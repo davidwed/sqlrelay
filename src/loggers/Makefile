@@ -33,19 +33,19 @@ sqlrlogger_custom_sc.la: custom_sc.cpp custom_sc.lo
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrlogger_debug.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_debug.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_debug.a
 	$(RM) $(libexecdir)/sqlrlogger_debug.la
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_debug.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqlrlogger_slowqueries.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_slowqueries.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_slowqueries.a
 	$(RM) $(libexecdir)/sqlrlogger_slowqueries.la
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_slowqueries.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqlrlogger_custom_nw.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_custom_nw.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.a
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.la
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_custom_nw.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqlrlogger_custom_sc.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_custom_sc.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_custom_sc.a
 	$(RM) $(libexecdir)/sqlrlogger_custom_sc.la
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_custom_sc.so so $(MODULESUFFIX)

@@ -30,7 +30,7 @@ CSQLRelay.la: $(SRCS) $(LOBJS)
 
 install: CSQLRelay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(LTINSTALL) CSQLRelay.la $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(LTINSTALL) $(CP) CSQLRelay.la $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
 	$(RM) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay/CSQLRelay.la
 	$(RM) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay/CSQLRelay.a
 	$(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay

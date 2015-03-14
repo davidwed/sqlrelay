@@ -32,7 +32,7 @@ install:
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 sqlrelay/private/sqlrutildll.h $(includedir)/sqlrelay/private
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrutil.la $(libdir)
+	$(LTINSTALL) $(CP) libsqlrutil.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

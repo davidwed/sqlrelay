@@ -311,15 +311,15 @@ install:
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrserver.la $(libdir)
+	$(LTINSTALL) $(CP) libsqlrserver.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-stop$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-connection$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-scaler$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-cachemanager$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-start$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-stop$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-listener$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-connection$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-scaler$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-cachemanager$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(tmpdir)/sockets

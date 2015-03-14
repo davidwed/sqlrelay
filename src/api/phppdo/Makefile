@@ -27,18 +27,20 @@ pdo_sqlrelay.la: pdo_sqlrelay.cpp pdo_sqlrelay.lo
 
 install: pdo_sqlrelay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) pdo_sqlrelay.la $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) pdo_sqlrelay.la $(DESTDIR)$(PHPEXTDIR)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.la
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.a
 	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
-		$(LTINSTALL) -m 644 pdo_sqlrelay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(LTINSTALL) $(CP) pdo_sqlrelay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(CHMOD) 644 $(DESTDIR)$(PHPCONFDIR)/pdo_sqlrelay.ini; \
 	fi
 	if ( test "$(PHPCONFSTYLE)" = "debian" -o "$(PHPCONFSTYLE)" = "ubuntu" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
-		$(LTINSTALL) -m 644 pdo_sqlrelay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(LTINSTALL) $(CP) pdo_sqlrelay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(CHMOD) 644 $(DESTDIR)$(PHPCONFDIR)/pdo_sqlrelay.ini; \
 		if ( test "$(PHPCONFSTYLE)" = "debian" ); \
 		then \
 			if ( test -r "$(DESTDIR)$(PHPCONFDIR)/../conf.d" -a ! -h "$(DESTDIR)$(PHPCONFDIR)/../conf.d/10-pdo_sqlrelay.ini" -a ! -r "$(DESTDIR)$(PHPCONFDIR)/../conf.d/10-pdo_sqlrelay.ini" ); \

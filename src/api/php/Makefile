@@ -27,18 +27,20 @@ sql_relay.la: sql_relay.cpp sql_relay.lo
 
 install: sql_relay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) sql_relay.la $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) sql_relay.la $(DESTDIR)$(PHPEXTDIR)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.la
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.a
 	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
-		$(LTINSTALL) -m 644 sql_relay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(LTINSTALL) $(CP) sql_relay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(CHMOD) 644 $(DESTDIR)$(PHPCONFDIR)/sql_relay.ini; \
 	fi
 	if ( test "$(PHPCONFSTYLE)" = "debian" -o "$(PHPCONFSTYLE)" = "ubuntu" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
-		$(LTINSTALL) -m 644 sql_relay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(LTINSTALL) $(CP) sql_relay.ini $(DESTDIR)$(PHPCONFDIR); \
+		$(CHMOD) 644 $(DESTDIR)$(PHPCONFDIR)/sql_relay.ini; \
 		if ( test "$(PHPCONFSTYLE)" = "debian" ); \
 		then \
 			if ( test -r "$(DESTDIR)$(PHPCONFDIR)/../conf.d" -a ! -h "$(DESTDIR)$(PHPCONFDIR)/../conf.d/10-sql_relay.ini" -a ! -r "$(DESTDIR)$(PHPCONFDIR)/../conf.d/10-sql_relay.ini" ); \

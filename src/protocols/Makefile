@@ -21,7 +21,7 @@ sqlrprotocol_sqlrclient.la: sqlrclient.cpp sqlrclient.lo
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrprotocol_sqlrclient.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrprotocol_sqlrclient.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.a
 	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.la
 	$(MODULERENAME) $(libexecdir)/sqlrprotocol_sqlrclient.so so $(MODULESUFFIX)

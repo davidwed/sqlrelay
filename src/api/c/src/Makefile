@@ -33,7 +33,7 @@ libsqlrclientwrapper.la: $(SRCS) $(LOBJS)
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
+	$(LTINSTALL) $(CP) libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(cachedir)
 	chmod 777 $(cachedir)

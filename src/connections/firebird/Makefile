@@ -30,7 +30,7 @@ sqlrconnection_firebird.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_firebird.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_firebird.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_firebird.a
 	$(RM) $(libexecdir)/sqlrconnection_firebird.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_firebird.so so $(MODULESUFFIX)

@@ -30,7 +30,7 @@ sqlrconnection_sqlite.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_sqlite.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_sqlite.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_sqlite.a
 	$(RM) $(libexecdir)/sqlrconnection_sqlite.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_sqlite.so so $(MODULESUFFIX)

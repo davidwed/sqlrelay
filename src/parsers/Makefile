@@ -22,7 +22,7 @@ install:
 	$(LIBTOOL) --mode=finish $(libdir)
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrparser_default.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrparser_default.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrparser_default.a
 	$(RM) $(libexecdir)/sqlrparser_default.la
 	$(MODULERENAME) $(libexecdir)/sqlrparser_default.so so $(MODULESUFFIX)

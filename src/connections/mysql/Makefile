@@ -30,7 +30,7 @@ sqlrconnection_mysql.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_mysql.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_mysql.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_mysql.a
 	$(RM) $(libexecdir)/sqlrconnection_mysql.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_mysql.so so $(MODULESUFFIX)

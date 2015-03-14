@@ -35,7 +35,7 @@ sqlrconnection_odbc.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_odbc.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_odbc.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_odbc.a
 	$(RM) $(libexecdir)/sqlrconnection_odbc.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_odbc.so so $(MODULESUFFIX)

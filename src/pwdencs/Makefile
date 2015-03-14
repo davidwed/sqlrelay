@@ -29,15 +29,15 @@ sqlrpwdenc_crypt.la: crypt.cpp crypt.lo
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrpwdenc_rot.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrpwdenc_rot.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrpwdenc_rot.a
 	$(RM) $(libexecdir)/sqlrpwdenc_rot.la
 	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_rot.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqlrpwdenc_md5.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrpwdenc_md5.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrpwdenc_md5.a
 	$(RM) $(libexecdir)/sqlrpwdenc_md5.la
 	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_md5.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqlrpwdenc_crypt.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrpwdenc_crypt.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrpwdenc_crypt.a
 	$(RM) $(libexecdir)/sqlrpwdenc_crypt.la
 	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_crypt.so so $(MODULESUFFIX)

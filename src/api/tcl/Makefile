@@ -30,7 +30,7 @@ sqlrelay.la: $(SRCS) $(LOBJS)
 
 install: sqlrelay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(LTINSTALL) sqlrelay.la $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LTINSTALL) $(CP) sqlrelay.la $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 	$(RM) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.la
 	$(RM) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.a
 	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay

@@ -59,19 +59,19 @@ install:
 	$(INSTALL) -m 644 sample-oracle-mysql-errors.map $(EXAMPLEDIR)
 	$(INSTALL) -m 644 sample-mssqlserver-mysql-errors.map $(EXAMPLEDIR)
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libmysql3sqlrelay.la $(libdir)
+	$(LTINSTALL) $(CP) libmysql3sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql3sqlrelay.a
 	$(RM) $(libdir)/libmysql3sqlrelay.la
-	$(LTINSTALL) libmysql40sqlrelay.la $(libdir)
+	$(LTINSTALL) $(CP) libmysql40sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql40sqlrelay.a
 	$(RM) $(libdir)/libmysql40sqlrelay.la
-	$(LTINSTALL) libmysql41sqlrelay.la $(libdir)
+	$(LTINSTALL) $(CP) libmysql41sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql41sqlrelay.a
 	$(RM) $(libdir)/libmysql41sqlrelay.la
-	$(LTINSTALL) libmysql50sqlrelay.la $(libdir)
+	$(LTINSTALL) $(CP) libmysql50sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql50sqlrelay.a
 	$(RM) $(libdir)/libmysql50sqlrelay.la
-	$(LTINSTALL) libmysql51sqlrelay.la $(libdir)
+	$(LTINSTALL) $(CP) libmysql51sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql51sqlrelay.a
 	$(RM) $(libdir)/libmysql51sqlrelay.la
 

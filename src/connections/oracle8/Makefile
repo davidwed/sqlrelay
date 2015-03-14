@@ -30,7 +30,7 @@ sqlrconnection_oracle8.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_oracle8.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_oracle8.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_oracle8.a
 	$(RM) $(libexecdir)/sqlrconnection_oracle8.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_oracle8.so so $(MODULESUFFIX)

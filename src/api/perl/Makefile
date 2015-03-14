@@ -67,8 +67,10 @@ install:
 	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
 	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
 	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay
-	$(LTINSTALL) -m 755 Connection.la $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
-	$(LTINSTALL) -m 755 Cursor.la $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+	$(LTINSTALL) $(CP) Connection.la $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
+	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.la
+	$(LTINSTALL) $(CP) Cursor.la $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.la
 	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.a
 	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.la
 	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.a

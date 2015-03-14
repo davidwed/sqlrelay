@@ -32,7 +32,7 @@ libpqsqlrelay.la: pqsqlrelay.cpp pqsqlrelay.lo
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libpqsqlrelay.la $(libdir)
+	$(LTINSTALL) $(CP) libpqsqlrelay.la $(libdir)
 	$(RM) $(libdir)/libpqsqlrelay.a
 	$(RM) $(libdir)/libpqsqlrelay.la
 

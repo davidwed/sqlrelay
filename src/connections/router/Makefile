@@ -30,7 +30,7 @@ sqlrconnection_router.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_router.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_router.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_router.a
 	$(RM) $(libexecdir)/sqlrconnection_router.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_router.so so $(MODULESUFFIX)

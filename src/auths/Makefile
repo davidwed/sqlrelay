@@ -24,11 +24,11 @@ sqlrauth_sqlrelay.la: sqlrelay.cpp sqlrelay.lo
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrauth_default.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrauth_default.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrauth_default.a
 	$(RM) $(libexecdir)/sqlrauth_default.la
 	$(MODULERENAME) $(libexecdir)/sqlrauth_default.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqlrauth_sqlrelay.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrauth_sqlrelay.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrauth_sqlrelay.a
 	$(RM) $(libexecdir)/sqlrauth_sqlrelay.la
 	$(MODULERENAME) $(libexecdir)/sqlrauth_sqlrelay.so so $(MODULESUFFIX)

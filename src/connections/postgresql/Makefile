@@ -30,7 +30,7 @@ sqlrconnection_postgresql.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_postgresql.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_postgresql.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.a
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_postgresql.so so $(MODULESUFFIX)

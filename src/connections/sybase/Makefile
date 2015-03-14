@@ -30,7 +30,7 @@ sqlrconnection_sybase.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_sybase.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_sybase.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_sybase.a
 	$(RM) $(libexecdir)/sqlrconnection_sybase.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_sybase.so so $(MODULESUFFIX)

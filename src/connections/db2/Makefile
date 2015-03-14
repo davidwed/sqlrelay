@@ -30,7 +30,7 @@ sqlrconnection_db2.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_db2.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_db2.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_db2.a
 	$(RM) $(libexecdir)/sqlrconnection_db2.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_db2.so so $(MODULESUFFIX)

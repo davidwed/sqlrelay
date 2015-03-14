@@ -30,7 +30,7 @@ sqlrconnection_mdbtools.la: $(SRCS) $(LOBJS)
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrconnection_mdbtools.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_mdbtools.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.a
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_mdbtools.so so $(MODULESUFFIX)

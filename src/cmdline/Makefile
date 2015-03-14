@@ -51,13 +51,13 @@ sqlrsh$(EXE): sqlrsh.cpp sqlrsh.lo
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-fields$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-query$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-export$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-import$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-pwdenc$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-status$(EXE) $(bindir)
-	$(LTINSTALL) sqlrsh$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-fields$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-query$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-export$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-import$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-pwdenc$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-status$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlrsh$(EXE) $(bindir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query$(EXE)

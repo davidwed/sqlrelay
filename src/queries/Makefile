@@ -25,11 +25,11 @@ sqlrquery_sqlrcmdcstat.la: sqlrcmdcstat.cpp sqlrcmdcstat.lo
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrquery_sqlrcmdgstat.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrquery_sqlrcmdgstat.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.a
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.la
 	$(MODULERENAME) $(libexecdir)/sqlrquery_sqlrcmdgstat.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqlrquery_sqlrcmdcstat.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrquery_sqlrcmdcstat.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.a
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.la
 	$(MODULERENAME) $(libexecdir)/sqlrquery_sqlrcmdcstat.so so $(MODULESUFFIX)
