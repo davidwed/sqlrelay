@@ -14,7 +14,10 @@ endif
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: sqlr-query$(EXE) \
 	sqlr-fields$(EXE) \
@@ -25,29 +28,28 @@ all: sqlr-query$(EXE) \
 	sqlr-status$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-fields$(EXE) sqlr-query$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlr-status$(EXE) sqlrsh$(EXE)
-	$(RMTREE) .libs
+	$(LTCLEAN) $(RM) *.lo *.o *.obj sqlr-fields$(EXE) sqlr-query$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlr-status$(EXE) sqlrsh$(EXE)
 
-sqlr-fields$(EXE): sqlr-fields.cpp sqlr-fields.lo
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-fields.lo $(LIBS) $(RPATH)
+sqlr-fields$(EXE): sqlr-fields.cpp sqlr-fields.$(OBJ)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-fields.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-query$(EXE): sqlr-query.cpp sqlr-query.lo
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-query.lo $(LIBS) $(RPATH)
+sqlr-query$(EXE): sqlr-query.cpp sqlr-query.$(OBJ)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-query.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-export$(EXE): sqlr-export.cpp sqlr-export.lo
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-export.lo $(LIBS) $(RPATH)
+sqlr-export$(EXE): sqlr-export.cpp sqlr-export.$(OBJ)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-export.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-import$(EXE): sqlr-import.cpp sqlr-import.lo
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-import.lo $(LIBS) $(RPATH)
+sqlr-import$(EXE): sqlr-import.cpp sqlr-import.$(OBJ)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-import.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.lo
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-pwdenc.lo -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE) $(RPATH)
+sqlr-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.$(OBJ)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE) $(RPATH)
 
-sqlr-status$(EXE): sqlr-status.cpp sqlr-status.lo
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-status.lo $(LIBS) $(RPATH)
+sqlr-status$(EXE): sqlr-status.cpp sqlr-status.$(OBJ)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-status.$(OBJ) $(LIBS) $(RPATH)
 
-sqlrsh$(EXE): sqlrsh.cpp sqlrsh.lo 
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIBS) $(RPATH)
+sqlrsh$(EXE): sqlrsh.cpp sqlrsh.$(OBJ) 
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlrsh.$(OBJ) $(LIBS) $(READLINELIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
@@ -60,12 +62,12 @@ install:
 	$(LTINSTALL) $(CP) sqlrsh$(EXE) $(bindir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/query$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/fields$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-fields$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-query$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-export$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-import$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-pwdenc$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-status$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/query$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/fields$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/sqlr-fields$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/sqlr-query$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/sqlr-export$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/sqlr-import$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/sqlr-pwdenc$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/sqlr-status$(EXE)
+	$(LTUNINSTALL) $(RM) $(bindir)/sqlrsh$(EXE)
