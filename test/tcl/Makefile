@@ -5,7 +5,7 @@ include ../../config.mk
 .SUFFIXES: .tcl .tcl.in
 
 .tcl.in.tcl:
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" $< > $@; chmod 755 $@
+	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" $< > $@; $(CHMOD) 755 $@
 
 all: db2.tcl \
 	firebird.tcl \

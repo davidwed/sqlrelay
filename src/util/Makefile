@@ -15,29 +15,45 @@ LOBJS = sqlrcmdline.lo sqlrtempdir.lo sqlrconfigfile.lo
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: libsqlrutil.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
-	$(RMTREE) .libs
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 
-libsqlrutil.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libsqlrutil.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-install:
+install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
-	$(INSTALL) -m 644 sqlrelay/sqlrutil.h $(includedir)/sqlrelay
+	$(INSTALL) sqlrelay/sqlrutil.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrutil.h
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/sqlrutildll.h $(includedir)/sqlrelay/private
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrutil.la $(libdir)
-	$(LIBTOOL) --mode=finish $(libdir)
+	$(INSTALL) sqlrelay/private/sqlrutildll.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrutildll.h
 
-uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil.la
-	$(RM) $(includedir)/sqlrelay/sqlrutil.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrutildll.h
-	$(RM) $(libdir)/libsqlrelay_*
-	$(RM) $(libdir)/libsqlrutil_p*.*
+installdll:
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) libsqlrutil.$(LIBEXT) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrutil.lib $(libdir)
+
+installlib:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrutil.$(LIBEXT) $(libdir)
+	$(LTFINISH) $(libdir)
+
+uninstall: $(UNINSTALLLIB)
+	$(RM) $(includedir)/sqlrelay/sqlrutil.h \
+		$(includedir)/sqlrelay/private/sqlrutildll.h
+
+uninstalldll:
+	$(RM) $(bindir)/libsqlrutil.$(LIBEXT) \
+		$(libdir)/libsqlrutil.lib
+
+uninstalllib:
+	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrutil.$(LIBEXT)

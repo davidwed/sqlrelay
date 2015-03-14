@@ -48,8 +48,8 @@ uninstall: $(UNINSTALLLIB)
 	$(RMTREE) $(cachedir)
 
 uninstalldll:
-	$(LTUNINSTALL) $(RM) $(bindir)/libsqlrclient.$(LIBEXT)
-	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclient.lib
+	$(RM) $(bindir)/libsqlrclient.$(LIBEXT) \
+		$(libdir)/libsqlrclient.lib
 
 uninstalllib:
 	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclient.$(LIBEXT)

@@ -147,7 +147,10 @@ LOBJS = sqlrlistener.lo \
 .SUFFIXES: .lo .cpp.in
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: $(PLUGINSRCS) \
 	libsqlrserver.la \
@@ -159,33 +162,32 @@ all: $(PLUGINSRCS) \
 	sqlr-cachemanager$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o sqlr-start$(EXE) sqlr-stop$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest sqlr-start$(EXE) sqlr-stop$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE)
 	if ( test -n "$(PLUGINSRCS)" ); \
 	then \
 		$(RM) $(PLUGINSRCS); \
 	fi
-	$(RMTREE) .libs
 
-libsqlrserver.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PLUGINLIBS) $(EXTRALIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libsqlrserver.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PLUGINLIBS) $(EXTRALIBS)
 
 sqlr-start$(EXE): sqlr-start.cpp sqlr-start.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-start.lo $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-start.$(OBJ) $(LIBS) $(RPATH)
 
 sqlr-stop$(EXE): sqlr-stop.cpp sqlr-stop.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-stop.lo $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-stop.$(OBJ) $(LIBS) $(RPATH)
 
 sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-listener.lo $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-listener.$(OBJ) $(LIBS) $(RPATH)
 
 sqlr-connection$(EXE): sqlr-connection.cpp sqlr-connection.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-connection.lo $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-connection.$(OBJ) $(LIBS) $(RPATH)
 
 sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-scaler.lo $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-scaler.$(OBJ) $(LIBS) $(RPATH)
 
 sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-cachemanager.lo $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(LIBS) $(RPATH)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@
@@ -299,7 +301,14 @@ sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-install:
+install: $(INSTALLLIB)
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-start$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-stop$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-listener$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-connection$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-scaler$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) sqlr-cachemanager$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrserver.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
@@ -310,50 +319,53 @@ install:
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrserver.la $(libdir)
-	$(LIBTOOL) --mode=finish $(libdir)
-	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-start$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-stop$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-listener$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-connection$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-scaler$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-cachemanager$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
-	chmod 777 $(tmpdir)
+	$(CHMOD) 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(tmpdir)/sockets
-	chmod 777 $(tmpdir)/sockets
+	$(CHMOD) 777 $(tmpdir)/sockets
 	$(MKINSTALLDIRS) $(tmpdir)/pids
-	chmod 777 $(tmpdir)/pids
+	$(CHMOD) 777 $(tmpdir)/pids
 	$(MKINSTALLDIRS) $(tmpdir)/ipc
-	chmod 777 $(tmpdir)/ipc
+	$(CHMOD) 777 $(tmpdir)/ipc
 	$(MKINSTALLDIRS) $(logdir)
-	chmod 777 $(logdir)
+	$(CHMOD) 777 $(logdir)
 	$(MKINSTALLDIRS) $(debugdir)
-	chmod 777 $(debugdir)
+	$(CHMOD) 777 $(debugdir)
 
-uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrserver.la
-	$(RM) $(includedir)/sqlrelay/sqlrserver.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrlistener.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrserverconnection.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrservercontroller.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrservercursor.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrserverdll.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrserverincludes.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrshmdata.h
-	$(RM) $(bindir)/sqlr-start$(EXE)
-	$(RM) $(bindir)/sqlr-stop$(EXE)
-	$(RM) $(bindir)/sqlr-listener$(EXE)
-	$(RM) $(bindir)/sqlr-connection$(EXE)
-	$(RM) $(bindir)/sqlr-scaler$(EXE)
-	$(RM) $(bindir)/sqlr-cachemanager$(EXE)
-	$(RMTREE) $(tmpdir)
-	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
-	$(RMTREE) $(logdir)
-	$(RMTREE) $(debugdir)
-	$(RM) $(libdir)/libsqlrelay_*
-	$(RM) $(libexecdir)/libsqlrelay_*
-	$(RM) $(libdir)/libsqlrconnection*
-	$(RM) $(libdir)/libsqlrconnection_p*
+installdll:
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) libsqlrserver.$(LIBEXT) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrserver.lib $(libdir)
+
+installlib:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrserver.$(LIBEXT) $(libdir)
+	$(LTFINISH) $(libdir)
+
+uninstall: $(UNINSTALLLIB)
+	$(RM) $(includedir)/sqlrelay/sqlrserver.h \
+		$(includedir)/sqlrelay/private/sqlrlistener.h \
+		$(includedir)/sqlrelay/private/sqlrserverconnection.h \
+		$(includedir)/sqlrelay/private/sqlrservercontroller.h \
+		$(includedir)/sqlrelay/private/sqlrservercursor.h \
+		$(includedir)/sqlrelay/private/sqlrserverdll.h \
+		$(includedir)/sqlrelay/private/sqlrserverincludes.h \
+		$(includedir)/sqlrelay/private/sqlrshmdata.h \
+		$(bindir)/sqlr-start$(EXE) \
+		$(bindir)/sqlr-stop$(EXE) \
+		$(bindir)/sqlr-listener$(EXE) \
+		$(bindir)/sqlr-connection$(EXE) \
+		$(bindir)/sqlr-scaler$(EXE) \
+		$(bindir)/sqlr-cachemanager$(EXE)
+	$(RMTREE) $(tmpdir) \
+		$(prefix)/lib/sqlrelay/tmp \
+		$(logdir) \
+		$(debugdir)
+
+uninstalldll:
+	$(RM) $(bindir)/libsqlrserver.$(LIBEXT) \
+		$(libdir)/libsqlrserver.lib
+
+uninstalllib:
+	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrserver.$(LIBEXT)

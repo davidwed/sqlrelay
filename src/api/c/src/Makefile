@@ -35,7 +35,7 @@ libsqlrclientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(cachedir)
-	chmod 777 $(cachedir)
+	$(CHMOD) 777 $(cachedir)
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
@@ -52,8 +52,8 @@ uninstall: $(UNINSTALLLIB)
 	$(RMTREE) $(cachedir)
 
 uninstalldll:
-	$(LTUNINSTALL) $(RM) $(bindir)/libsqlrclientwrapper.$(LIBEXT)
-	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclientwrapper.lib
+	$(RM) $(bindir)/libsqlrclientwrapper.$(LIBEXT) \
+		$(libdir)/libsqlrclientwrapper.lib
 
 uninstalllib:
 	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclientwrapper.$(LIBEXT)
