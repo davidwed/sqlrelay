@@ -2,77 +2,65 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-ifeq ($(DESTDIR),)
-	INSTPREFIX = 
-else
-	INSTPREFIX = -inst-prefix-dir $(DESTDIR)
-endif
-
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
-ifneq ($(strip $(libdir)),)
-ifeq ($(PSQLUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 all: libmysql3sqlrelay.$(LIBEXT) libmysql40sqlrelay.$(LIBEXT) libmysql41sqlrelay.$(LIBEXT) libmysql50sqlrelay.$(LIBEXT) libmysql51sqlrelay.$(LIBEXT)
 
 .SUFFIXES: .lo
 
 mysql3.lo: mysql.cpp
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_3=1 $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_3=1 $(COMPILE) $< $(OUT)$@
 
 mysql3.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_3=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_3=1 $(COMPILE) $<
 
 mysql40.lo: mysql.cpp
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_0=1 $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_4_0=1 $(COMPILE) $< $(OUT)$@
 
 mysql40.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_4_0=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_4_0=1 $(COMPILE) $<
 
 mysql41.lo: mysql.cpp
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_1=1 $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_4_1=1 $(COMPILE) $< $(OUT)$@
 
 mysql41.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_4_1=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_4_1=1 $(COMPILE) $<
 
 mysql50.lo: mysql.cpp
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_0=1 $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_5_0=1 $(COMPILE) $< $(OUT)$@
 
 mysql50.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_5_0=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_5_0=1 $(COMPILE) $<
 
 mysql51.lo: mysql.cpp
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_1=1 $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_5_1=1 $(COMPILE) $< $(OUT)$@
 
 mysql51.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_5_1=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_5_1=1 $(COMPILE) $<
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
 libmysql3sqlrelay.$(LIBEXT): mysql.cpp mysql3.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ mysql3.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql3.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
 libmysql40sqlrelay.$(LIBEXT): mysql.cpp mysql40.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ mysql40.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql40.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
 libmysql41sqlrelay.$(LIBEXT): mysql.cpp mysql41.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ mysql41.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql41.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
 libmysql50sqlrelay.$(LIBEXT): mysql.cpp mysql50.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ mysql50.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql50.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
 libmysql51sqlrelay.$(LIBEXT): mysql.cpp mysql51.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ mysql51.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql51.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(EXAMPLEDIR)
-	$(INSTALL) -m 644 sample-oracle-mysql-errors.map $(EXAMPLEDIR)
-	$(INSTALL) -m 644 sample-mssqlserver-mysql-errors.map $(EXAMPLEDIR)
+	$(CP) sample-oracle-mysql-errors.map $(EXAMPLEDIR)
+	$(CHMOD) 644 $(EXAMPLEDIR)/sample-oracle-mysql-errors.map
+	$(CP) sample-mssqlserver-mysql-errors.map $(EXAMPLEDIR)
+	$(CHMOD) 644 $(EXAMPLEDIR)/sample-mssqlserver-mysql-errors.map
 
 installdll:
 	$(MKINSTALLDIRS) $(libdir)

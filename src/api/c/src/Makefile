@@ -2,28 +2,16 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-ifeq ($(MINGW32),yes)
-DLLEXPORTS = -DLIBSQLRCLIENTWRAPPER_EXPORTS
-endif
-
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(WNOMISMATCHEDTAGS) $(DLLEXPORTS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-ifneq ($(strip $(libdir)),)
-ifeq ($(CUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 SRCS = sqlrclientwrapper.cpp
 LOBJS = sqlrclientwrapper.lo
 
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(CCPPFLAGS) $(COMPILE) $<
 
 all: libsqlrclientwrapper.$(LIBEXT)
 
@@ -32,7 +20,7 @@ clean:
 	$(RMTREE) .libs
 
 libsqlrclientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(CLIBS) $(CRPATH) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(cachedir)

@@ -2,39 +2,6 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-PERLCCFLAGS_LOCAL = $(shell echo "$(PERLCCFLAGS)" | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e 's|-x.*$$||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g" -e "s|-arch .* ||g" -e "s|-Kalloca ||g")
-PERLOPTIMIZE_LOCAL = $(shell echo "$(PERLOPTIMIZE)" | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e 's|-x.*$$||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g")
-ifeq ($(OVERRIDEPERLSITEARCH),)
-PERLSITEARCH_LOCAL = $(DESTDIR)$(shell echo "$(PERLSITEARCH)" | sed -e "s|UNKNOWN||g" )
-else
-PERLSITEARCH_LOCAL = $(DESTDIR)$(OVERRIDEPERLSITEARCH)
-endif
-ifeq ($(OVERRIDEPERLSITELIB),)
-PERLSITELIB_LOCAL = $(DESTDIR)$(shell echo "$(PERLSITELIB)" | sed -e "s|UNKNOWN||g" )
-else
-PERLSITELIB_LOCAL = $(DESTDIR)$(OVERRIDEPERLSITELIB)
-endif
-PERLINC_LOCAL = $(DESTDIR)$(shell echo "$(PERLINC)" | sed -e "s|UNKNOWN||g" )
-ifeq ($(OVERRIDEPERLINSTALLMAN3DIR),)
-PERLINSTALLMAN3DIR_LOCAL = $(DESTDIR)$(shell echo "$(PERLINSTALLMAN3DIR)" | sed -e "s|UNKNOWN||g" )
-else
-PERLINSTALLMAN3DIR_LOCAL = $(DESTDIR)$(OVERRIDEPERLINSTALLMAN3DIR)
-endif
-ifeq ($(OVERRIDEPERLMAN3EXT),)
-PERLMAN3EXT_LOCAL = $(shell echo "$(PERLMAN3EXT)" | sed -e "s|UNKNOWN||g" )
-else
-PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
-endif
-
-CPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
-LIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-RPATH =
-ifneq ($(strip $(libdir)),)
-ifeq ($(PERLUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 .SUFFIXES: .lo .xs
 
 .xs.cpp:
@@ -42,10 +9,10 @@ endif
 	$(MV) $<c $@
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(PERLCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(PERLCPPFLAGS) $(COMPILE) $<
 
 all: Connection.$(LIBEXT) Cursor.$(LIBEXT)
 
@@ -54,10 +21,10 @@ clean:
 	$(RMTREE) .libs
 
 Connection.$(LIBEXT): Connection.xs Connection.cpp Connection.lo
-	$(LTLINK) $(CXX) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection $(RPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(CXX) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(PERLCONLIBS) $(PERLRPATH) $(MODLINKFLAGS)
 
 Cursor.$(LIBEXT): Cursor.xs Cursor.cpp Cursor.lo
-	$(LTLINK) $(CXX) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor $(RPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(CXX) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(PERLCURLIBS) $(PERLRPATH) $(MODLINKFLAGS)
 
 
 install: $(INSTALLLIB)

@@ -2,34 +2,24 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
-LIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
-RPATH =
-ifneq ($(strip $(libdir)),)
-ifeq ($(PHPUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(PHPPDOCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all: pdo_sqlrelay.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(PHPPDOCPPFLAGS) $(COMPILE) $<
+
+all: pdo_sqlrelay.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so phpincludes.h errors1 errors2 errors3
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-pdo_sqlrelay.la: pdo_sqlrelay.cpp pdo_sqlrelay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ pdo_sqlrelay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -avoid-version -module
+pdo_sqlrelay.$(LIBEXT): pdo_sqlrelay.cpp pdo_sqlrelay.lo
+	$(LTLINK) $(LINK) -o $@ pdo_sqlrelay.$(OBJ) $(LDFLAGS) $(PHPPDOLIBS) $(PHPPDORPATH) $(MODLINKFLAGS)
 
-install: pdo_sqlrelay.la
-	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) $(CP) pdo_sqlrelay.la $(DESTDIR)$(PHPEXTDIR)
-	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.la
-	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.a
+install: $(INSTALLLIB)
 	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
@@ -60,8 +50,18 @@ install: pdo_sqlrelay.la
 		fi; \
 	fi
 
+installdll:
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
+
+installlib:
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.$(LIBEXT)
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.a
+
 uninstall:
-	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.so
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.$(LIBEXT)
 	$(RM) $(DESTDIR)$(PHPCONFDIR)/pdo_sqlrelay.ini
 	$(RM) $(DESTDIR)$(PHPCONFDIR)/../conf.d/10-pdo_sqlrelay.ini
 	$(RM) $(DESTDIR)$(PHPCONFDIR)/../*/conf.d/10-pdo_sqlrelay.ini

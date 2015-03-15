@@ -2,27 +2,13 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-ifeq ($(DESTDIR),)
-	INSTPREFIX = 
-else
-	INSTPREFIX = -inst-prefix-dir $(DESTDIR)
-endif
-
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES) $(ICONVINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(ODBCLIBS)
-ifneq ($(strip $(libdir)),)
-ifeq ($(PSQLUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(ODBCDRIVERCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(ODBCDRIVERCPPFLAGS) $(COMPILE) $<
 
 all: libsqlrodbc.$(LIBEXT)
 
@@ -31,7 +17,7 @@ clean:
 	$(RMTREE) .libs
 
 libsqlrodbc.$(LIBEXT): sqlrodbc.cpp sqlrodbc.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ sqlrodbc.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrodbc.$(OBJ) $(LDFLAGS) $(ODBCDRIVERLIBS) $(ODBCDRIVERRPATH) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
 

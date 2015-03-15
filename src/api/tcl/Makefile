@@ -2,22 +2,13 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-LIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-RPATH =
-ifneq ($(strip $(libdir)),)
-ifeq ($(TCLUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(TCLCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(TCLCPPFLAGS) $(COMPILE) $<
 	
 
 all: sqlrelay.$(LIBEXT)
@@ -27,7 +18,7 @@ clean:
 	$(RMTREE) .libs
 
 sqlrelay.$(LIBEXT): sqlrelayCmd.cpp sqlrelayCmd.lo
-	$(LTLINK) $(LINK) $(OUT)$@ sqlrelayCmd.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelayCmd.$(OBJ) $(LDFLAGS) $(TCLLIBS) $(TCLRPATH) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 	$(CP) pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay

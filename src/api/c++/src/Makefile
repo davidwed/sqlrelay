@@ -2,24 +2,16 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-ifeq ($(MINGW32),yes)
-DLLEXPORTS = -DLIBSQLRCLIENT_EXPORTS
-endif
-
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DLLEXPORTS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
-LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-
-
 SRCS = sqlrconnection.cpp sqlrcursor.cpp row.cpp
 LOBJS = sqlrconnection.lo sqlrcursor.lo row.lo
 
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(CPPCPPFLAGS) $(COMPILE) $<
 
 all: libsqlrclient.$(LIBEXT)
 
@@ -28,7 +20,7 @@ clean:
 	$(RMTREE) .libs
 
 libsqlrclient.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(CPPLIBS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(cachedir)

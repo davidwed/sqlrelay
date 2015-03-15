@@ -56,6 +56,7 @@ CACHEDIRCPPFLAG = -DCACHE_DIR=\"$(cachedir)\"
 # linker flags
 LTLINK = $(LIBTOOL) --mode=link
 LINK = @CXX@
+CCLINK = @CC@
 AR = @AR@
 LDFLAGS = @LDFLAGS@
 LINKFLAGS = -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
@@ -117,6 +118,23 @@ HAVE_ICONV = @HAVE_ICONV@
 ICONVINCLUDES = @ICONVINCLUDES@
 ICONVLIBS = @ICONVLIBS@
 
+# c++
+# windows needs /D LIBSQLRCLIENT_EXPORTS
+CPPCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+CPPLIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+
+# c
+CUSERPATH = @CUSERPATH@
+# windows needs /D LIBSQLRCLIENTWRAPPER_EXPORTS
+CCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(WNOMISMATCHEDTAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+CLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(CUSERPATH),yes)
+	CRPATH = -R $(libdir)
+endif
+endif
+
 # perl
 HAVE_PERL = @HAVE_PERL@
 PERL = @PERL@
@@ -136,6 +154,38 @@ OVERRIDEPERLSITEARCH = @OVERRIDEPERLSITEARCH@
 OVERRIDEPERLSITELIB = @OVERRIDEPERLSITELIB@
 OVERRIDEPERLINSTALLMAN3DIR = @OVERRIDEPERLINSTALLMAN3DIR@
 OVERRIDEPERLMAN3EXT = @OVERRIDEPERLMAN3EXT@
+PERLCCFLAGS_LOCAL = $(shell echo "$(PERLCCFLAGS)" | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e 's|-x.*$$||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g" -e "s|-arch .* ||g" -e "s|-Kalloca ||g")
+PERLOPTIMIZE_LOCAL = $(shell echo "$(PERLOPTIMIZE)" | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e 's|-x.*$$||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g")
+ifeq ($(OVERRIDEPERLSITEARCH),)
+PERLSITEARCH_LOCAL = $(DESTDIR)$(shell echo "$(PERLSITEARCH)" | sed -e "s|UNKNOWN||g" )
+else
+PERLSITEARCH_LOCAL = $(DESTDIR)$(OVERRIDEPERLSITEARCH)
+endif
+ifeq ($(OVERRIDEPERLSITELIB),)
+PERLSITELIB_LOCAL = $(DESTDIR)$(shell echo "$(PERLSITELIB)" | sed -e "s|UNKNOWN||g" )
+else
+PERLSITELIB_LOCAL = $(DESTDIR)$(OVERRIDEPERLSITELIB)
+endif
+PERLINC_LOCAL = $(DESTDIR)$(shell echo "$(PERLINC)" | sed -e "s|UNKNOWN||g" )
+ifeq ($(OVERRIDEPERLINSTALLMAN3DIR),)
+PERLINSTALLMAN3DIR_LOCAL = $(DESTDIR)$(shell echo "$(PERLINSTALLMAN3DIR)" | sed -e "s|UNKNOWN||g" )
+else
+PERLINSTALLMAN3DIR_LOCAL = $(DESTDIR)$(OVERRIDEPERLINSTALLMAN3DIR)
+endif
+ifeq ($(OVERRIDEPERLMAN3EXT),)
+PERLMAN3EXT_LOCAL = $(shell echo "$(PERLMAN3EXT)" | sed -e "s|UNKNOWN||g" )
+else
+PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
+endif
+PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
+PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
+PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+PERLRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(PERLUSERPATH),yes)
+	PERLRPATH = -R $(libdir)
+endif
+endif
 
 
 # python
@@ -144,6 +194,14 @@ PYTHONINCLUDES = @PYTHONFRAMEWORK@ @PYTHONINCLUDES@
 PYTHONDIR = @PYTHONDIR@
 PYTHONUSERPATH = @PYTHONUSERPATH@
 PYTHONLIB = @PYTHONLIB@
+PYTHONCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+PYTHONLIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PYTHONDIR)/site-packages/SQLRelay
+PYTHONRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(PYTHONUSERPATH),yes)
+	PYTHONRPATH = -R $(libdir)
+endif
+endif
 
 
 # ruby
@@ -151,6 +209,23 @@ HAVE_RUBY = @HAVE_RUBY@
 RUBY = @RUBY@
 RUBYLIB = @RUBYLIB@
 OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
+
+RUBYCFLAGS = $(shell LANG=POSIX $(RUBY) getcflags.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+
+ifeq ($(OVERRIDERUBYSITEARCHDIR),)
+RUBYSITEARCHDIR = $(shell LANG=POSIX $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
+else
+RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
+endif
+
+RUBYCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+RUBYLIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(RUBYSITEARCHDIR)
+RUBYRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(RUBYUSERPATH),yes)
+	RUBYRPATH = -R $(libdir)
+endif
+endif
 
 
 # php
@@ -164,6 +239,22 @@ PHPLIB = @PHPLIB@
 PHPCONFDIR = @PHPCONFDIR@
 PHPCONFSTYLE = @PHPCONFSTYLE@
 HAVE_PHP_PDO = @HAVE_PHP_PDO@
+PHPCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
+PHPLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(PHPUSERPATH),yes)
+	PHPRPATH = -R $(libdir)
+endif
+endif
+PHPPDOCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
+PHPPDOLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPPDORPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(PHPUSERPATH),yes)
+	PHPPDORPATH = -R $(libdir)
+endif
+endif
 
 
 # java
@@ -172,31 +263,55 @@ JAVAC = @JAVAC@
 JAR = @JAR@
 JAVAINCLUDES = @JAVAINCLUDES@
 JAVAUSERPATH = @JAVAUSERPATH@
+JAVACPPFLAGS = $(WERROR) $(WNOUNKNOWNPRAGMAS) $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
+JAVALIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay
+JAVARPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(JAVAUSERPATH),yes)
+	JAVARPATH = -R $(libdir)
+endif
+endif
 
 
-# TCL
+# tcl
 HAVE_TCL = @HAVE_TCL@
 TCLINCLUDE = @TCLINCLUDE@
 TCLLIB = @TCLLIB@
 TCLLIBSPATH = @TCLLIBSPATH@
 TCLUSERPATH = @TCLUSERPATH@
+TCLCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+TCLLIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(TCLLIBSPATH)/sqlrelay
+TCLRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(TCLUSERPATH),yes)
+	TCLRPATH = -R $(libdir)
+endif
+endif
 
-# Erlang
+
+# erlang
 HAVE_ERLANG = @HAVE_ERLANG@
 ERLC = @ERLC@
 ERLCFLAGS = @ERLCFLAGS@
 ERLANGINCLUDES = @ERLANGINCLUDES@
-ERLANGLIBS = @ERLANGLIBS@
+ERLANGLIB = @ERLANGLIBS@
 ERLANG_ROOT_DIR = @ERLANG_ROOT_DIR@
 ERLANG_LIB_DIR = @ERLANG_LIB_DIR@
 ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGUSERPATH = @ERLANGUSERPATH@
+ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c/src -L$(top_builddir)/src/api/c++/src -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ERLANGRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(ERLANGUSERPATH),yes)
+	ERLANGRPATH = -R $(libdir)
+endif
+endif
 
-# PSQL
+
+# psql
 PSQLUSERPATH = @PSQLUSERPATH@
 
-# C library
-CUSERPATH = @CUSERPATH@
 
 # readline
 READLINEINCLUDES = @READLINEINCLUDES@
@@ -205,86 +320,126 @@ READLINELIBS = @READLINELIBS@
 # libsocket
 SOCKETLIBS = @SOCKETLIBS@
 
-# Oracle stuff
+
+# oracle
 ORACLEVERSION = @ORACLEVERSION@
 ORACLEINCLUDES = @ORACLEINCLUDES@
 ORACLELIBS = @ORACLELIBS@
 ORACLELIBSPATH = @ORACLELIBSPATH@
 ORACLEUSERPATH = @ORACLEUSERPATH@
 
-# MySQL stuff
+
+# mysql
 MYSQLINCLUDES = @MYSQLINCLUDES@
 MYSQLLIBS = @MYSQLLIBS@
 MYSQLLIBSPATH = @MYSQLLIBSPATH@
 MYSQLUSERPATH = @MYSQLUSERPATH@
+MYSQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
+MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
+MYSQLDRLIBRPATH = 
+ifneq ($(strip $(libdir)),)
+ifeq ($(PSQLUSERPATH),yes)
+	MYSQLDRLIBRPATH = -R $(libdir)
+endif
+endif
 
-# PostgreSQL stuff
+
+# postgresql
 POSTGRESQLINCLUDES = @POSTGRESQLINCLUDES@
 POSTGRESQLLIBS = @POSTGRESQLLIBS@
 POSTGRESQLLIBSPATH = @POSTGRESQLLIBSPATH@
 POSTGRESQLUSERPATH = @POSTGRESQLUSERPATH@
+POSTGRESQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
+POSTGRESQLDRLIBRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(PSQLUSERPATH),yes)
+	POSTGRESQLDRLIBRPATH = -R $(libdir)
+endif
+endif
 
-# SQLite stuff
+
+# sqlite
 SQLITEINCLUDES = @SQLITEINCLUDES@
 SQLITELIBS = @SQLITELIBS@
 SQLITELIBSPATH = @SQLITELIBSPATH@
 SQLITEUSERPATH = @SQLITEUSERPATH@
 
-# FreeTDS stuff
+
+# freetds
 FREETDSINCLUDES = @FREETDSINCLUDES@
 FREETDSLIBS = @FREETDSLIBS@
 FREETDSLIBSPATH = @FREETDSLIBSPATH@
 FREETDSUSERPATH = @FREETDSUSERPATH@
 
-# Sybase stuff
+
+# sybase
 SYBASEINCLUDES = @SYBASEINCLUDES@
 SYBASELIBS = @SYBASELIBS@
 SYBASELIBSPATH = @SYBASELIBSPATH@
 SYBASEUSERPATH = @SYBASEUSERPATH@
 
-# ODBC stuff
+
+# odbc
 ODBCINCLUDES = @ODBCINCLUDES@
 ODBCLIBS = @ODBCLIBS@
 ODBCLIBSPATH = @ODBCLIBSPATH@
 ODBCUSERPATH = @ODBCUSERPATH@
 ODBCUNICODE = @ODBCUNICODE@
+ODBCDRIVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES) $(ICONVINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
+ODBCDRIVERLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(ODBCLIBS)
+ODBCDRIVERRPATH =
+ifneq ($(strip $(libdir)),)
+ifeq ($(PSQLUSERPATH),yes)
+	ODBCRPATH = -R $(libdir)
+endif
+endif
 
-# MDBTOOLS stuff
+
+# mdbtools
 MDBTOOLSINCLUDES = @MDBTOOLSINCLUDES@
 MDBTOOLSLIBS = @MDBTOOLSLIBS@
 MDBTOOLSLIBSPATH = @MDBTOOLSLIBSPATH@
 MDBTOOLSUSERPATH = @MDBTOOLSUSERPATH@
 
-# DB2 stuff
+
+# db2
 DB2INCLUDES = @DB2INCLUDES@
 DB2LIBS = @DB2LIBS@
 DB2LIBSPATH = @DB2LIBSPATH@
 DB2USERPATH = @DB2USERPATH@
 
-# Firebird stuff
+
+# firebird
 FIREBIRDINCLUDES = @FIREBIRDINCLUDES@
 FIREBIRDLIBS = @FIREBIRDLIBS@
 FIREBIRDLIBSPATH = @FIREBIRDLIBSPATH@
 FIREBIRDUSERPATH = @FIREBIRDUSERPATH@
 
-# Router stuff
+
+# router
 ROUTERLIBSPATH =
 ROUTERUSERPATH =
+
 
 # client/server rpath flags
 CLIENTUSERPATH = @CLIENTUSERPATH@
 SERVERUSERPATH = @SERVERUSERPATH@
 
-# dmalloc stuff
+
+# dmalloc
 LIBDMALLOC = @LIBDMALLOC@
 
-# ElectricFence stuff
+
+# ElectricFence
 LIBEFENCE = @LIBEFENCE@
 
-# Microsoft-specific stuff
+
+# Microsoft-specific
 EXE = @EXE@
 
-# Shared object and module stuff
+
+# Shared object and module
 SQLRELAY_ENABLE_SHARED = @enable_shared@
 SOSUFFIX = @SOSUFFIX@
 MODULESUFFIX = @MODULESUFFIX@

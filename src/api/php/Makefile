@@ -2,22 +2,13 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
-LIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
-RPATH =
-ifneq ($(strip $(libdir)),)
-ifeq ($(PHPUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(PHPCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPILE_DL=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(PHPCPPFLAGS) $(COMPILE) $<
 
 all: sql_relay.$(LIBEXT)
 
@@ -26,7 +17,7 @@ clean:
 	$(RMTREE) .libs
 
 sql_relay.$(LIBEXT): sql_relay.cpp sql_relay.lo
-	$(LTLINK) $(LINK) $(OUT)$@ sql_relay.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sql_relay.$(OBJ) $(LDFLAGS) $(PHPLIBS) $(PHPRPATH) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \

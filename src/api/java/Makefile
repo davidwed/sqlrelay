@@ -2,21 +2,13 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-CPPFLAGS = $(WERROR) $(WNOUNKNOWNPRAGMAS) $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-RPATH =
-ifneq ($(strip $(libdir)),)
-ifeq ($(JAVAUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(JAVACPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(JAVACPPFLAGS) $(COMPILE) $<
 
 all: java libSQLRConnection.$(LIBEXT) libSQLRCursor.$(LIBEXT) sqlrelay.jar
 
@@ -29,29 +21,18 @@ java:
 	$(JAVAC) com/firstworks/sqlrelay/*.java
 
 libSQLRConnection.$(LIBEXT): com_firstworks_sqlrelay_SQLRConnection.cpp com_firstworks_sqlrelay_SQLRConnection.lo
-	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRConnection.$(OBJ) $(LDFLAGS) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRConnection.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(JAVARPATH) $(MODLINKFLAGS)
 
 libSQLRCursor.$(LIBEXT): com_firstworks_sqlrelay_SQLRCursor.cpp com_firstworks_sqlrelay_SQLRCursor.lo
-	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRCursor.$(OBJ) $(LDFLAGS) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRCursor.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(JAVARPATH) $(MODLINKFLAGS)
 
 sqlrelay.jar:
-	if ( test -n "$(JAR)" ); \
-	then \
-		$(JAR) -cf $@ com/firstworks/sqlrelay/SQLRConnection.class \
-				com/firstworks/sqlrelay/SQLRCursor.class; \
-	fi
+	$(JAR) -cf $@ com/firstworks/sqlrelay/SQLRConnection.class \
+			com/firstworks/sqlrelay/SQLRCursor.class
 
 install: $(INSTALLLIB)
-	if ( test -n "$(JAR)" ); \
-	then \
-		$(CP) sqlrelay.jar $(javadir); \
-		$(CHMOD) 644 $(javadir)/sqlrelay.jar; \
-	else \
-		$(CP) com/firstworks/sqlrelay/SQLRConnection.class $(javadir)/com/firstworks/sqlrelay; \
-		$(CHMOD) 644 $(javadir)/com/firstworks/sqlrelay/SQLRConnection.class; \
-		$(CP) com/firstworks/sqlrelay/SQLRCursor.class $(javadir)/com/firstworks/sqlrelay; \
-		$(CHMOD) 644 $(javadir)/com/firstworks/sqlrelay/SQLRCursor.class; \
-	fi
+	$(CP) sqlrelay.jar $(javadir)
+	$(CHMOD) 644 $(javadir)/sqlrelay.jar
 
 installdll:
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
