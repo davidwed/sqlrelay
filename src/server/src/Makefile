@@ -311,15 +311,23 @@ install: $(INSTALLLIB)
 	$(LTINSTALL) $(CP) sqlr-scaler$(EXE) $(bindir)
 	$(LTINSTALL) $(CP) sqlr-cachemanager$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrserver.h $(includedir)/sqlrelay
+	$(CP) ../include/sqlrelay/sqlrserver.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrserver.h
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrlistener.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnection.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercontroller.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercursor.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
+	$(CP) ../include/sqlrelay/private/sqlrlistener.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrlistener.h
+	$(CP) ../include/sqlrelay/private/sqlrserverconnection.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverconnection.h
+	$(CP) ../include/sqlrelay/private/sqlrservercontroller.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrservercontroller.h
+	$(CP) ../include/sqlrelay/private/sqlrservercursor.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrservercursor.h
+	$(CP) ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverdll.h
+	$(CP) ../include/sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverincludes.h
+	$(CP) ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrshmdata.h
 	$(MKINSTALLDIRS) $(tmpdir)
 	$(CHMOD) 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(tmpdir)/sockets

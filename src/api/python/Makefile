@@ -20,9 +20,12 @@ CSQLRelay.$(LIBEXT): CSQLRelay.cpp CSQLRelay.lo
 	$(LTLINK) $(LINK) -o $@ CSQLRelay.$(OBJ) $(LDFLAGS) $(PYTHONLIBS) $(PYTHONRPATH) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
-	$(INSTALL) -m 644 PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(INSTALL) -m 644 PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
-	$(INSTALL) -m 644 __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(CP) PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(CHMOD) 644 $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay/PySQLRClient.py
+	$(CP) PySQLRDB.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(CHMOD) 644 $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay/PySQLRDB.py
+	$(CP) __init__.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay
+	$(CHMOD) 644 $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay/__init__.py
 
 installdll:
 	$(MKINSTALLDIRS) $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay

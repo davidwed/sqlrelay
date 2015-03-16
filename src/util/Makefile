@@ -31,10 +31,10 @@ libsqlrutil.$(LIBEXT): $(SRCS) $(LOBJS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
-	$(INSTALL) sqlrelay/sqlrutil.h $(includedir)/sqlrelay
+	$(CP) sqlrelay/sqlrutil.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrutil.h
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
-	$(INSTALL) sqlrelay/private/sqlrutildll.h $(includedir)/sqlrelay/private
+	$(CP) sqlrelay/private/sqlrutildll.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrutildll.h
 
 installdll:

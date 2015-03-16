@@ -38,7 +38,6 @@ CXX = @CXX@
 COMPILE = -c
 OUT = -o 
 BASECPPFLAGS = @CPPFLAGS@ @PTHREADINCLUDES@
-EXPORTSCPPFLAGS =
 EXTRACPPFLAGS =
 CXXFLAGS = @CXXFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
 CFLAGS = @CFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
@@ -65,7 +64,6 @@ LIBPATH = -L
 LIB = -l
 INSTALLLIB = installlib
 UNINSTALLLIB = uninstalllib
-DLLEXT = 
 LIBEXT = la
 
 # install commands
@@ -74,7 +72,6 @@ MV = mv
 CP = cp
 CHMOD = chmod
 MKINSTALLDIRS = $(top_builddir)/mkinstalldirs
-INSTALL = $(top_builddir)/install-sh -c
 LTFINISH = $(LIBTOOL) --mode=finish
 
 #uninstall/clean commands

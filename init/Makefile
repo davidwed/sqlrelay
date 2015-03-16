@@ -28,36 +28,50 @@ install:
 	if ( test -d "/etc/rc.d/init.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/rc.d/init.d; \
-		$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/rc.d/init.d/sqlrelay; \
-		$(INSTALL) -m 755 rc.sqlrcachemanager $(initroot)/etc/rc.d/init.d/sqlrcachemanager; \
+		$(CP) rc.sqlrelay $(initroot)/etc/rc.d/init.d/sqlrelay; \
+		$(CHMOD) 755 $(initroot)/etc/rc.d/init.d/sqlrelay; \
+		$(CP) rc.sqlrcachemanager $(initroot)/etc/rc.d/init.d/sqlrcachemanager; \
+		$(CHMOD) 755 $(initroot)/etc/rc.d/init.d/sqlrcachemanager; \
 	elif ( test -d "/etc/init.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/init.d; \
-		$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/init.d/sqlrelay; \
-		$(INSTALL) -m 755 rc.sqlrcachemanager $(initroot)/etc/init.d/sqlrcachemanager; \
+		$(CP) rc.sqlrelay $(initroot)/etc/init.d/sqlrelay; \
+		$(CHMOD) 755 $(initroot)/etc/init.d/sqlrelay; \
+		$(CP) rc.sqlrcachemanager $(initroot)/etc/init.d/sqlrcachemanager; \
+		$(CHMOD) 755 $(initroot)/etc/init.d/sqlrcachemanager; \
 	elif ( test -d "/etc/rc.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/rc.d; \
 		if ( test -r "/etc/rc.conf" ); \
 		then \
-			$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/rc.d/sqlrelay; \
-			$(INSTALL) -m 755 rc.sqlrcachemanager $(initroot)/etc/rc.d/sqlrcachemanager; \
+			$(CP) rc.sqlrelay $(initroot)/etc/rc.d/sqlrelay; \
+			$(CHMOD) 755 $(initroot)/etc/rc.d/sqlrelay; \
+			$(CP) rc.sqlrcachemanager $(initroot)/etc/rc.d/sqlrcachemanager; \
+			$(CHMOD) 755 $(initroot)/etc/rc.d/sqlrcachemanager; \
 		else \
-			$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/rc.d/rc.sqlrelay; \
-			$(INSTALL) -m 755 rc.sqlrcachemanager $(initroot)/etc/rc.d/rc.sqlrcachemanager; \
+			$(CP) rc.sqlrelay $(initroot)/etc/rc.d/rc.sqlrelay; \
+			$(CHMOD) 755 $(initroot)/etc/rc.d/rc.sqlrelay; \
+			$(CP) rc.sqlrcachemanager $(initroot)/etc/rc.d/rc.sqlrcachemanager; \
+			$(CHMOD) 755 $(initroot)/etc/rc.d/rc.sqlrcachemanager; \
 		fi; \
 	elif ( test -d "/usr/pkg/etc/rc.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/usr/pkg/etc/rc.d; \
-		$(INSTALL) -m 755 rc.sqlrelay $(initroot)/usr/pkg/etc/rc.d/sqlrelay; \
-		$(INSTALL) -m 755 rc.sqlrcachemanager $(initroot)/usr/pkg/etc/rc.d/sqlrcachemanager; \
+		$(CP) rc.sqlrelay $(initroot)/usr/pkg/etc/rc.d/sqlrelay; \
+		$(CHMOD) 755 $(initroot)/usr/pkg/etc/rc.d/sqlrelay; \
+		$(CP) rc.sqlrcachemanager $(initroot)/usr/pkg/etc/rc.d/sqlrcachemanager; \
+		$(CHMOD) 755 $(initroot)/usr/pkg/etc/rc.d/sqlrcachemanager; \
 	elif ( test -d "/Library/LaunchDaemons" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/Library/LaunchDaemons; \
-		$(INSTALL) -m 755 rc.sqlrelay $(bindir)/bin/rc.sqlrelay; \
-		$(INSTALL) -m 755 rc.sqlrcachemanager $(bindir)/bin/rc.sqlrcachemanager; \
-		$(INSTALL) -m 644 com.firstworks.sqlrelay.plist $(initroot)/Library/LaunchDaemons; \
-		$(INSTALL) -m 644 com.firstworks.sqlrcachemanager.plist $(initroot)/Library/LaunchDaemons; \
+		$(CP) rc.sqlrelay $(bindir)/bin/rc.sqlrelay; \
+		$(CHMOD) 755 $(bindir)/bin/rc.sqlrelay; \
+		$(CP) rc.sqlrcachemanager $(bindir)/bin/rc.sqlrcachemanager; \
+		$(CHMOD) 755 $(bindir)/bin/rc.sqlrcachemanager; \
+		$(CP) com.firstworks.sqlrelay.plist $(initroot)/Library/LaunchDaemons; \
+		$(CHMOD) 644 $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrelay.plist; \
+		$(CP) com.firstworks.sqlrcachemanager.plist $(initroot)/Library/LaunchDaemons; \
+		$(CHMOD) 644 $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
 	fi
 ifeq ($(initroot),)
 	if ( test -x "/sbin/chkconfig" ); \
