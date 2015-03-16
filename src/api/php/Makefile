@@ -16,7 +16,7 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sql_relay.$(LIBEXT): sql_relay.cpp sql_relay.lo
+sql_relay.$(LIBEXT): sql_relay.cpp sql_relay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sql_relay.$(OBJ) $(LDFLAGS) $(PHPLIBS) $(PHPRPATH) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)

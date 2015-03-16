@@ -35,11 +35,7 @@ tmpdir=prefix+"\var\sqlrelay\tmp"
 cachedir=prefix+"\var\sqlrelay\cache"
 debugdir=prefix+"\var\sqlrelay\debug"
 logdir=prefix+"\var\sqlrelay\log"
-initscript_prefix=
-
-' libraries
-SOCKETLIBS="ws2_32.lib netapi32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib"
-PTHREADLIB=""
+initscript_prefix=""
 
 ' extension
 EXE=".exe"
@@ -204,17 +200,17 @@ infiles=Array(_
 	configwindowsh,_
 	"bin\\sqlrclient-config.in",_
 	"bin\\sqlrclientwrapper-config.in",_
-	"bin\\sqlrclientserver-config.in",_
-	"sqlrelay-c.pc.in"_
+	"bin\\sqlrserver-config.in",_
+	"sqlrelay-c.pc.in",_
 	"sqlrelay-c++.pc.in"_
 	)
 outfiles=Array(_
 	"config.mk",_
-	"include\\rudiments\\private\\config.h",_
+	"config.h",_
 	"bin\\sqlrclient-config",_
 	"bin\\sqlrclientwrapper-config",_
-	"bin\\sqlrclientserver-config",_
-	"sqlrelay-c.pc"_
+	"bin\\sqlrserver-config",_
+	"sqlrelay-c.pc",_
 	"sqlrelay-c++.pc"_
 	)
 
@@ -259,8 +255,6 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@WIN32WINNT@",WIN32WINNT,1,-1,0)
 
 	' libraries
-	content=replace(content,"@SOCKETLIBS@",SOCKETLIBS,1,-1,0)
-	content=replace(content,"@PTHREADLIB@",PTHREADLIB,1,-1,0)
 	content=replace(content,"@SDKLIBS@",SDKLIBS,1,-1,0)
 
 	' extension

@@ -17,7 +17,7 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrelay.$(LIBEXT): sqlrelayCmd.cpp sqlrelayCmd.lo
+sqlrelay.$(LIBEXT): sqlrelayCmd.cpp sqlrelayCmd.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrelayCmd.$(OBJ) $(LDFLAGS) $(TCLLIBS) $(TCLRPATH) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)

@@ -20,29 +20,29 @@ all:
 	$(MAKE) sqlite
 	$(MAKE) sybase
 
-db2: db2.c db2.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ db2.lo $(LIBS)
+db2: db2.c db2.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ db2.$(OBJ) $(LIBS)
 
-freetds: freetds.c freetds.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ freetds.lo $(LIBS)
+freetds: freetds.c freetds.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ freetds.$(OBJ) $(LIBS)
 
-firebird: firebird.c firebird.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ firebird.lo $(LIBS)
+firebird: firebird.c firebird.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ firebird.$(OBJ) $(LIBS)
 
-mysql: mysql.c mysql.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
+mysql: mysql.c mysql.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.$(OBJ) $(LIBS)
 
-oracle: oracle.c oracle.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
+oracle: oracle.c oracle.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle.$(OBJ) $(LIBS)
 
-postgresql: postgresql.c postgresql.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql.lo $(LIBS)
+postgresql: postgresql.c postgresql.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql.$(OBJ) $(LIBS)
 
-sqlite: sqlite.c sqlite.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)
+sqlite: sqlite.c sqlite.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sqlite.$(OBJ) $(LIBS)
 
-sybase: sybase.c sybase.lo
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
+sybase: sybase.c sybase.$(OBJ)
+	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sybase.$(OBJ) $(LIBS)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 freetds firebird mysql oracle postgresql sqlite sybase

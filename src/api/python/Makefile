@@ -16,7 +16,7 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-CSQLRelay.$(LIBEXT): CSQLRelay.cpp CSQLRelay.lo
+CSQLRelay.$(LIBEXT): CSQLRelay.cpp CSQLRelay.$(OBJ)
 	$(LTLINK) $(LINK) -o $@ CSQLRelay.$(OBJ) $(LDFLAGS) $(PYTHONLIBS) $(PYTHONRPATH) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)

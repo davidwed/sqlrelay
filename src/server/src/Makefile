@@ -17,13 +17,13 @@ PLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrauthassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp
-PLUGINLOBJS = $(shell ls ../../connections/*/*.lo) \
-		$(shell ls ../../protocols/*.lo) \
-		$(shell ls ../../parsers/*.lo) \
-		$(shell ls ../../loggers/*.lo) \
-		$(shell ls ../../pwdencs/*.lo) \
-		$(shell ls ../../auths/*.lo) \
-		$(shell ls ../../queries/*.lo)
+PLUGINLOBJS = $(shell ls ../../connections/*/*.$(OBJ)) \
+		$(shell ls ../../protocols/*.$(OBJ)) \
+		$(shell ls ../../parsers/*.$(OBJ)) \
+		$(shell ls ../../loggers/*.$(OBJ)) \
+		$(shell ls ../../pwdencs/*.$(OBJ)) \
+		$(shell ls ../../auths/*.$(OBJ)) \
+		$(shell ls ../../queries/*.$(OBJ))
 PLUGINLIBS =
 ifneq ($(strip $(DB2LIBSPATH)),)
 ifeq ($(DB2USERPATH),yes)
@@ -120,28 +120,28 @@ SRCS = sqlrlistener.cpp \
 	sqlrauth.cpp \
 	sqlrscaler.cpp \
 
-LOBJS = sqlrlistener.lo \
-	sqlrservercontroller.lo \
-	sqlrserverconnection.lo \
-	sqlrservercursor.lo \
-	sqlrprotocols.lo \
-	sqlrprotocol.lo \
-	sqlrparser.lo \
-	sqlrtranslations.lo \
-	sqlrtranslation.lo \
-	sqlrresultsettranslations.lo \
-	sqlrresultsettranslation.lo \
-	sqlrtriggers.lo \
-	sqlrtrigger.lo \
-	sqlrloggers.lo \
-	sqlrlogger.lo \
-	sqlrqueries.lo \
-	sqlrquery.lo \
-	sqlrpwdencs.lo \
-	sqlrpwdenc.lo \
-	sqlrauths.lo \
-	sqlrauth.lo \
-	sqlrscaler.lo \
+LOBJS = sqlrlistener.$(OBJ) \
+	sqlrservercontroller.$(OBJ) \
+	sqlrserverconnection.$(OBJ) \
+	sqlrservercursor.$(OBJ) \
+	sqlrprotocols.$(OBJ) \
+	sqlrprotocol.$(OBJ) \
+	sqlrparser.$(OBJ) \
+	sqlrtranslations.$(OBJ) \
+	sqlrtranslation.$(OBJ) \
+	sqlrresultsettranslations.$(OBJ) \
+	sqlrresultsettranslation.$(OBJ) \
+	sqlrtriggers.$(OBJ) \
+	sqlrtrigger.$(OBJ) \
+	sqlrloggers.$(OBJ) \
+	sqlrlogger.$(OBJ) \
+	sqlrqueries.$(OBJ) \
+	sqlrquery.$(OBJ) \
+	sqlrpwdencs.$(OBJ) \
+	sqlrpwdenc.$(OBJ) \
+	sqlrauths.$(OBJ) \
+	sqlrauth.$(OBJ) \
+	sqlrscaler.$(OBJ) \
 	$(PLUGINLOBJS)
 
 .SUFFIXES: .lo .cpp.in
@@ -172,133 +172,133 @@ clean:
 libsqlrserver.$(LIBEXT): $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PLUGINLIBS) $(EXTRALIBS)
 
-sqlr-start$(EXE): sqlr-start.cpp sqlr-start.lo
+sqlr-start$(EXE): sqlr-start.cpp sqlr-start.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-start.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-stop$(EXE): sqlr-stop.cpp sqlr-stop.lo
+sqlr-stop$(EXE): sqlr-stop.cpp sqlr-stop.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-stop.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.lo
+sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-listener.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-connection$(EXE): sqlr-connection.cpp sqlr-connection.lo
+sqlr-connection$(EXE): sqlr-connection.cpp sqlr-connection.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-connection.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.lo
+sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-scaler.$(OBJ) $(LIBS) $(RPATH)
 
-sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.lo
+sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(LIBS) $(RPATH)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../connections/*/*connection.lo`; \
+	for file in `ls ../../connections/*/*connection.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrserverconnectionassignments.cpp: sqlrserverconnectionassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../connections/*/*connection.lo`; \
+	for file in `ls ../../connections/*/*connection.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrprotocoldeclarations.cpp: sqlrprotocoldeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../protocols/*.lo`; \
+	for file in `ls ../../protocols/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrprotocolassignments.cpp: sqlrprotocolassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../protocols/*.lo`; \
+	for file in `ls ../../protocols/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrparserdeclarations.cpp: sqlrparserdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../parsers/*.lo | grep -v sqlre`; \
+	for file in `ls ../../parsers/*.$(OBJ) | grep -v sqlre`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../parsers/*.lo | grep -v sqlre`; \
+	for file in `ls ../../parsers/*.$(OBJ) | grep -v sqlre`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrloggerdeclarations.cpp: sqlrloggerdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../loggers/*.lo`; \
+	for file in `ls ../../loggers/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrloggerassignments.cpp: sqlrloggerassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../loggers/*.lo`; \
+	for file in `ls ../../loggers/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../pwdencs/*.lo`; \
+	for file in `ls ../../pwdencs/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../pwdencs/*.lo`; \
+	for file in `ls ../../pwdencs/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrauthdeclarations.cpp: sqlrauthdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../auths/*.lo`; \
+	for file in `ls ../../auths/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../auths/*.lo`; \
+	for file in `ls ../../auths/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../queries/*.lo`; \
+	for file in `ls ../../queries/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
 sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../queries/*.lo`; \
+	for file in `ls ../../queries/*.$(OBJ)`; \
 	do \
-		module=`basename $$file .lo`; \
+		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 

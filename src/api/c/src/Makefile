@@ -3,7 +3,7 @@ top_builddir = ../../../..
 include ../../../../config.mk
 
 SRCS = sqlrclientwrapper.cpp
-LOBJS = sqlrclientwrapper.lo
+LOBJS = sqlrclientwrapper.$(OBJ)
 
 .SUFFIXES: .lo
 

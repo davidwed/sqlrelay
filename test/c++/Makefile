@@ -25,49 +25,49 @@ all:
 	$(MAKE) sybase
 	$(MAKE) router
 
-db2: db2.cpp db2.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db2.lo $(LIBS)
+db2: db2.cpp db2.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db2.$(OBJ) $(LIBS)
 
-db27: db27.cpp db27.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db27.lo $(LIBS)
+db27: db27.cpp db27.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db27.$(OBJ) $(LIBS)
 
-db26: db26.cpp db26.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db26.lo $(LIBS)
+db26: db26.cpp db26.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db26.$(OBJ) $(LIBS)
 
-freetds: freetds.cpp freetds.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ freetds.lo $(LIBS)
+freetds: freetds.cpp freetds.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ freetds.$(OBJ) $(LIBS)
 
-firebird: firebird.cpp firebird.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ firebird.lo $(LIBS)
+firebird: firebird.cpp firebird.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ firebird.$(OBJ) $(LIBS)
 
-mysql: mysql.cpp mysql.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
+mysql: mysql.cpp mysql.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.$(OBJ) $(LIBS)
 
-oracle: oracle.cpp oracle.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
+oracle: oracle.cpp oracle.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.$(OBJ) $(LIBS)
 
-oracle8: oracle8.cpp oracle8.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
-oracle7: oracle7.cpp oracle7.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
+oracle8: oracle8.cpp oracle8.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8.$(OBJ) $(LIBS)
+oracle7: oracle7.cpp oracle7.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle7.$(OBJ) $(LIBS)
 
-postgresql: postgresql.cpp postgresql.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(LIBS)
+postgresql: postgresql.cpp postgresql.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.$(OBJ) $(LIBS)
 
-oracleclobinsert: oracleclobinsert.cpp oracleclobinsert.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobinsert.lo $(LIBS)
+oracleclobinsert: oracleclobinsert.cpp oracleclobinsert.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobinsert.$(OBJ) $(LIBS)
 
-oracleclobfetch: oracleclobfetch.cpp oracleclobfetch.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobfetch.lo $(LIBS)
+oracleclobfetch: oracleclobfetch.cpp oracleclobfetch.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobfetch.$(OBJ) $(LIBS)
 
-sqlite: sqlite.cpp sqlite.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)
+sqlite: sqlite.cpp sqlite.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlite.$(OBJ) $(LIBS)
 
-sybase: sybase.cpp sybase.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
+sybase: sybase.cpp sybase.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sybase.$(OBJ) $(LIBS)
 
-router: router.cpp router.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ router.lo $(LIBS)
+router: router.cpp router.$(OBJ)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ router.$(OBJ) $(LIBS)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 db27 db26 freetds firebird mysql oracleclobfetch oracleclobinsert oracle oracle8 oracle7 postgresql sqlite sybase router

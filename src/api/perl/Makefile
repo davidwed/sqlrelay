@@ -20,10 +20,10 @@ clean:
 	$(LTCLEAN) $(RM) *.cpp *.lo *.o *.odj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.so *.$(PERLMAN3EXT_LOCAL)
 	$(RMTREE) .libs
 
-Connection.$(LIBEXT): Connection.xs Connection.cpp Connection.lo
+Connection.$(LIBEXT): Connection.xs Connection.cpp Connection.$(OBJ)
 	$(LTLINK) $(CXX) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(PERLCONLIBS) $(PERLRPATH) $(MODLINKFLAGS)
 
-Cursor.$(LIBEXT): Cursor.xs Cursor.cpp Cursor.lo
+Cursor.$(LIBEXT): Cursor.xs Cursor.cpp Cursor.$(OBJ)
 	$(LTLINK) $(CXX) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(PERLCURLIBS) $(PERLRPATH) $(MODLINKFLAGS)
 
 

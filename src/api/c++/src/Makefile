@@ -3,7 +3,7 @@ top_builddir = ../../../..
 include ../../../../config.mk
 
 SRCS = sqlrconnection.cpp sqlrcursor.cpp row.cpp
-LOBJS = sqlrconnection.lo sqlrcursor.lo row.lo
+LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ) row.$(OBJ)
 
 .SUFFIXES: .lo
 

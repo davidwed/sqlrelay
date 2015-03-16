@@ -3,7 +3,7 @@ top_builddir = ../../..
 include ../../../config.mk
 
 SRCS = erl_comm.c relay_driver.c
-LOBJS = erl_comm.lo relay_driver.lo
+LOBJS = erl_comm.$(OBJ) relay_driver.$(OBJ)
  
 .SUFFIXES: .lo .erl .beam
 

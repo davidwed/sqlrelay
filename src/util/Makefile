@@ -10,7 +10,7 @@ CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DLLEXPORTS) $(TMPDIRCPPFLAG) $(DEBUGDIRCP
 LIBS = $(RUDIMENTSLIBS)
 
 SRCS = sqlrcmdline.cpp sqlrtempdir.cpp sqlrconfigfile.cpp
-LOBJS = sqlrcmdline.lo sqlrtempdir.lo sqlrconfigfile.lo
+LOBJS = sqlrcmdline.$(OBJ) sqlrtempdir.$(OBJ) sqlrconfigfile.$(OBJ)
 
 .SUFFIXES: .lo
 
