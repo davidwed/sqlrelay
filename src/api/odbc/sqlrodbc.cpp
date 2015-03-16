@@ -13,7 +13,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 //#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
@@ -1846,9 +1846,14 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	}
 
 	// copy the dsn, sometimes it's not NULL-terminated
-	char	*dsncopy=new char[dsnlength+1];
-	charstring::copy(dsncopy,(const char *)dsn,(size_t)dsnlength);
-	dsncopy[dsnlength]='\0';
+	char	*dsncopy;
+	if (dsnlength==SQL_NTS) {
+		dsncopy=charstring::duplicate((const char *)dsn);
+	} else {
+		dsncopy=new char[dsnlength+1];
+		charstring::copy(dsncopy,(const char *)dsn,(size_t)dsnlength);
+		dsncopy[dsnlength]='\0';
+	}
 
 	// get data from dsn
 	SQLGetPrivateProfileString((const char *)dsncopy,"Server","",
