@@ -1,0 +1,277 @@
+' command line arguments
+OPTCPPFLAGS="/O2"
+DEBUGCPPFLAGS="/MD"
+DEBUGLDFLAGS=""
+for i=0 to WScript.Arguments.Count-1
+
+	arg=Wscript.Arguments.Item(i)
+
+	if arg="--enable-small-code" then
+		OPTCPPFLAGS="/O1"
+	elseif arg="--enable-debug" then
+		DEBUGCPPFLAGS="/Zi /MDd /D _DEBUG"
+		DEBUGLDFLAGS="/debug"
+	end if
+next
+
+
+' version
+SQLR_VERSION="0.59"
+
+' paths
+prefix="C:\""Program Files""\Firstworks"
+exec_prefix=prefix
+bindir=prefix+"\bin"
+includedir=prefix+"\include"
+libdir=prefix+"\lib"
+libexecdir=prefix+"\libexec"
+localstatedir=prefix+"\var"
+sysconfdir=prefix+"\etc"
+mandir=prefix+"\share\man"
+datadir=prefix+"\share"
+docdir=prefix+"\doc\sqlrelay"
+EXAMPLEDIR=prefix+"\doc\sqlrelay\examples"
+tmpdir=prefix+"\var\sqlrelay\tmp"
+cachedir=prefix+"\var\sqlrelay\cache"
+debugdir=prefix+"\var\sqlrelay\debug"
+logdir=prefix+"\var\sqlrelay\log"
+initscript_prefix=
+
+' libraries
+SOCKETLIBS="ws2_32.lib netapi32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib"
+PTHREADLIB=""
+
+' extension
+EXE=".exe"
+
+' create file system object
+set fso=CreateObject("Scripting.FileSystemObject")
+
+
+' get top_builddir
+top_builddir=fso.GetAbsolutePathName(".")
+
+
+' determine VC++ version and architecture
+set WshShell=WScript.CreateObject("WScript.Shell")
+set cmd=WshShell.exec("cl")
+stdout=cmd.StdOut.ReadAll()
+stderr=cmd.StdErr.ReadLine()
+parts=split(stderr)
+arch=parts(ubound(parts))
+version=""
+for i=lbound(parts) to ubound(parts)
+	if parts(i)="Version" then
+		version=parts(i+1)
+	end if
+next
+parts=split(version,".")
+version=parts(0)
+
+' determine VC++ architecture
+USE_32BIT_TIME_T=""
+if arch="80x86" then
+	USE_32BIT_TIME_T="/D _USE_32BIT_TIME_T"
+end if
+
+
+
+' determine OS Version number
+set cmd=WshShell.exec("%comspec% /c ver")
+stdout=cmd.StdOut.ReadAll()
+stderr=cmd.StdErr.ReadLine()
+hexversion=""
+if instr(stdout,"Windows NT Version 4.0")>0 then
+	hexversion="0x0400"
+else
+	parts0=split(stdout,"[")
+	parts1=split(parts0(1)," ")
+	parts2=split(parts1(1),"]")
+	parts3=split(parts2(0),".")
+	if parts3(1)="00" then
+		parts3(1)="0"
+	end if
+	hexversion="0x0"&parts3(0)&"0"&parts3(1)
+end if
+
+' in general, we need to set WIN32WINNT to the hexversion
+WINVER=""
+WIN32WINDOWS=""
+WIN32WINNT=hexversion
+
+' but, for OS'es older than WinXP we have to do some special things...
+
+' for Win2k and WinNT4, set WINVER also
+if hexversion="0x0500" or hexversion="0x0400" then
+	WINVER=hexversion
+
+' for WinME, set WIN32WINDOWS and unset WIN32WINNT
+elseif hexversion="0x0490" then
+	WIN32WINDOWS=hexversion
+	WIN32WINNT=""
+
+' for Win98, set WIN32WINDOWS and WINVER and unset WIN32WINNT
+elseif hexversion="0x0410" then
+	WIN32WINDOWS=hexversion
+	WINVER=hexversion
+	WIN32WINNT=""
+
+' for Win95, set WINVER and unset WIN32WINNT
+elseif hexversion="0x0400" then
+	WINVER=hexversion
+	WIN32WINNT=""
+
+' FIXME: not sure about WinNT3X, Win3X or below
+end if
+
+' add /D and macro name
+if WINVER<>"" then
+	WINVER="/D WINVER="&WINVER
+end if
+if WIN32WINDOWS<>"" then
+	WIN32WINDOWS="/D _WIN32_WINDOWS="&WIN32WINDOWS
+end if
+if WIN32WINNT<>"" then
+	WIN32WINNT="/D _WIN32_WINNT="&WIN32WINNT
+end if
+
+
+
+' determine config.h template...
+configwindowsh="config.windows.h"
+
+
+
+' determine SDK headers and libs... (FIXME: make this configurable)
+
+' VS2002, VS2003 and VS2008 and up come with a platform SDK
+SDKINCLUDES=""
+SDKLIBS=""
+
+' VS2005 doesn't come with an SDK and there are several that are compatible
+if version=14 then
+
+	' older SDK's have various issues
+
+	' 5.2.3700.0 - Microsoft Platform SDK February 2003
+	'SDKINCLUDES="/I""C:\Program Files\Microsoft SDK\include"""
+	'SDKLIBS="/LIBPATH:""C:\Program Files\Microsoft SDK\Lib"""
+
+	' 5.2.3790.1830.15 - Windows Server 2003 SP1 Platform SDK
+	SDKINCLUDES="/I""C:\Program Files\Microsoft Platform SDK\Include"""
+	SDKLIBS="/LIBPATH:""C:\Program Files\Microsoft Platform SDK\Lib"""
+
+	' 5.2.3790.2075.51 - Windows Server 2003 R2 Platform SDK
+	'SDKINCLUDES="/I""C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"""
+	'SDKLIBS="/LIBPATH:""C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"""
+
+	' 6.0A (comes with VC2008)
+	'SDKINCLUDES="/I""C:\Program Files\Microsoft SDKs\Windows\v6.0A\Include"""
+	'SDKLIBS="/LIBPATH:""C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib"""
+
+	' not sure about newer SDK's
+
+' VS6 doesn't come with a platform SDK
+elseif version=12 then
+
+	' older SDK's might work too
+
+	' 5.2.3700.0 - Microsoft Platform SDK February 2003
+	SDKINCLUDES="/I""C:\Program Files\Microsoft SDK\include"""
+	SDKLIBS="/LIBPATH:""C:\Program Files\Microsoft SDK\Lib"""
+
+	' not sure about newer SDK's
+
+' VS5 and lower don't come with a platform SDK
+elseif version<=11 then
+
+	' older SDK's might work too
+
+	' 5.1.2600.2180 - Microsoft Platform SDK for Windows XP SP2
+	' (this doesn't actually work)
+	'SDKINCLUDES="/I""C:\Program Files\Microsoft Platform SDK for Windows XP SP2\Include"""
+	'SDKLIBS="/LIBPATH:""C:\Program Files\Microsoft Platform SDK for Windows XP SP2\Lib"""
+
+	' newer SDK's give link errors
+
+end if
+
+
+
+' input and output files
+infiles=Array(_
+	"config.windows.mk",_
+	configwindowsh,_
+	"bin\\sqlrclient-config.in",_
+	"bin\\sqlrclientwrapper-config.in",_
+	"bin\\sqlrclientserver-config.in",_
+	"sqlrelay-c.pc.in"_
+	"sqlrelay-c++.pc.in"_
+	)
+outfiles=Array(_
+	"config.mk",_
+	"include\\rudiments\\private\\config.h",_
+	"bin\\sqlrclient-config",_
+	"bin\\sqlrclientwrapper-config",_
+	"bin\\sqlrclientserver-config",_
+	"sqlrelay-c.pc"_
+	"sqlrelay-c++.pc"_
+	)
+
+
+' create output files
+for i=lbound(infiles) to ubound(infiles)
+
+	' read input file
+	set infile=fso.OpenTextFile(infiles(i))
+	content=infile.ReadAll()
+
+	' version
+	content=replace(content,"@SQLR_VERSION@",SQLR_VERSION,1,-1,0)
+
+	' paths
+	content=replace(content,"@prefix@",prefix,1,-1,0)
+	content=replace(content,"@exec_prefix@",exec_prefix,1,-1,0)
+	content=replace(content,"@bindir@",bindir,1,-1,0)
+	content=replace(content,"@includedir@",includedir,1,-1,0)
+	content=replace(content,"@libdir@",libdir,1,-1,0)
+	content=replace(content,"@mandir@",mandir,1,-1,0)
+	content=replace(content,"@datadir@",datadir,1,-1,0)
+	content=replace(content,"@libexecdir@",libexecdir,1,-1,0)
+	content=replace(content,"@localstatedir@",localstatedir,1,-1,0)
+	content=replace(content,"@sysconfdir@",sysconfdir,1,-1,0)
+	content=replace(content,"@docdir@",docdir,1,-1,0)
+	content=replace(content,"@EXAMPLEDIR@",EXAMPLEDIR,1,-1,0)
+	content=replace(content,"@tmpdir@",tmpdir,1,-1,0)
+	content=replace(content,"@cachedir@",cachedir,1,-1,0)
+	content=replace(content,"@debugdir@",debugdir,1,-1,0)
+	content=replace(content,"@logdir@",logdir,1,-1,0)
+	content=replace(content,"@initscript_prefix@",initscript_prefix,1,-1,0)
+
+	' flags
+	content=replace(content,"@OPTCPPFLAGS@",OPTCPPFLAGS,1,-1,0)
+	content=replace(content,"@DEBUGCPPFLAGS@",DEBUGCPPFLAGS,1,-1,0)
+	content=replace(content,"@DEBUGLDFLAGS@",DEBUGLDFLAGS,1,-1,0)
+	content=replace(content,"@_USE_32BIT_TIME_T@",USE_32BIT_TIME_T,1,-1,0)
+	content=replace(content,"@SDKINCLUDES@",SDKINCLUDES,1,-1,0)
+	content=replace(content,"@WINVER@",WINVER,1,-1,0)
+	content=replace(content,"@WIN32WINDOWS@",WIN32WINDOWS,1,-1,0)
+	content=replace(content,"@WIN32WINNT@",WIN32WINNT,1,-1,0)
+
+	' libraries
+	content=replace(content,"@SOCKETLIBS@",SOCKETLIBS,1,-1,0)
+	content=replace(content,"@PTHREADLIB@",PTHREADLIB,1,-1,0)
+	content=replace(content,"@SDKLIBS@",SDKLIBS,1,-1,0)
+
+	' extension
+	content=replace(content,"@EXE@",EXE,1,-1,0)
+
+
+	' top_builddir
+	content=replace(content,"@top_builddir@",top_builddir,1,-1,0)
+
+	' write output file
+	set outfile=fso.OpenTextFile(outfiles(i),2,true)
+	call outfile.Write(content)
+	call outfile.Close()
+next
