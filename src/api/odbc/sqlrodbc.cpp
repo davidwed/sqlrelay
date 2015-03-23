@@ -262,7 +262,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			}
 			if (outputhandle) {
 				STMT	*stmt=new STMT;
-				stmt->cur=new sqlrcursor(conn->con);
+				stmt->cur=new sqlrcursor(conn->con,true);
 				*outputhandle=(SQLHANDLE)stmt;
 				stmt->currentfetchrow=0;
 				stmt->currentstartrow=0;
@@ -1932,7 +1932,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					conn->user,
 					conn->password,
 					conn->retrytime,
-					conn->tries);
+					conn->tries,
+					true);
 
 	#ifdef DEBUG_MESSAGES
 	conn->con->debugOn();
