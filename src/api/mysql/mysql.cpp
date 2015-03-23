@@ -21,14 +21,7 @@
 
 extern "C" {
 
-//#define DEBUG_MESSAGES 1
-#ifdef DEBUG_MESSAGES
-	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__);
-	#define debugPrintf(args...) stdoutput.printf(args);
-#else
-	#define debugFunction() /* */
-	#define debugPrintf(args...) /* */
-#endif
+#include <debugprint.h>
 
 #define CR_UNKNOWN_ERROR	2000
 #define MYSQL_NO_DATA		100

@@ -31,14 +31,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 extern "C" {
 
-//#define DEBUG_MESSAGES 1
-#ifdef DEBUG_MESSAGES
-	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__);
-	#define debugPrintf(args...) stdoutput.printf(args);
-#else
-	#define debugFunction() /* */
-	#define debugPrintf(args...) /* */
-#endif
+#include <debugprint.h>
 
 #define TRUE	1
 #define FALSE	0
@@ -1444,7 +1437,9 @@ void PQfreeNotify(PGnotify *notify) {
 }
 
 // for isatty()
-#include <unistd.h>
+#ifdef RUDIMENTS_HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
 
 typedef struct _PQprintOpt {
 	char	header;	

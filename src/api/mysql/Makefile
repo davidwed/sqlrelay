@@ -6,35 +6,40 @@ all: libmysql3sqlrelay.$(LIBEXT) libmysql40sqlrelay.$(LIBEXT) libmysql41sqlrelay
 
 .SUFFIXES: .lo
 
-mysql3.$(OBJ): mysql.cpp
+mysql3.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_3=1 $(COMPILE) $< $(OUT)$@
 
 mysql3.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_3=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_3=1 $(COMPILE) mysql.cpp
+	$(MV) mysql.obj mysql3.obj
 
-mysql40.$(OBJ): mysql.cpp
+mysql40.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_4_0=1 $(COMPILE) $< $(OUT)$@
 
 mysql40.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_4_0=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_4_0=1 $(COMPILE) mysql.cpp
+	$(MV) mysql.obj mysql40.obj
 
-mysql41.$(OBJ): mysql.cpp
+mysql41.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_4_1=1 $(COMPILE) $< $(OUT)$@
 
 mysql41.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_4_1=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_4_1=1 $(COMPILE) mysql.cpp
+	$(MV) mysql.obj mysql41.obj
 
-mysql50.$(OBJ): mysql.cpp
+mysql50.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_5_0=1 $(COMPILE) $< $(OUT)$@
 
 mysql50.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_5_0=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_5_0=1 $(COMPILE) mysql.cpp
+	$(MV) mysql.obj mysql50.obj
 
-mysql51.$(OBJ): mysql.cpp
+mysql51.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) -DCOMPAT_MYSQL_5_1=1 $(COMPILE) $< $(OUT)$@
 
 mysql51.obj: mysql.cpp
-	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_5_1=1 $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(MYSQLDRLIBCPPFLAGS) /D COMPAT_MYSQL_5_1=1 $(COMPILE) mysql.cpp
+	$(MV) mysql.obj mysql51.obj
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest

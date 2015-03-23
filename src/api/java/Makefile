@@ -18,7 +18,7 @@ clean:
 	$(RMTREE) .libs
 
 java:
-	$(JAVAC) com/firstworks/sqlrelay/*.java
+	$(JAVAC) com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)*.java
 
 libSQLRConnection.$(LIBEXT): com_firstworks_sqlrelay_SQLRConnection.cpp com_firstworks_sqlrelay_SQLRConnection.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRConnection.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(JAVARPATH) $(MODLINKFLAGS)

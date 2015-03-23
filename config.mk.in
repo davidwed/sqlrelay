@@ -24,6 +24,9 @@ initscript_prefix = @initscript_prefix@
 # command separator
 AND = ;
 
+# slash
+SLASH = /
+
 # shell
 SHELL = @SHELL@
 

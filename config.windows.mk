@@ -24,6 +24,9 @@ initscript_prefix = @initscript_prefix@
 # command separator
 AND = &
 
+# slash
+SLASH = \\
+
 # shell
 SHELL =
 
@@ -66,7 +69,7 @@ LIBEXT = dll
 
 # install commands
 LTINSTALL =
-MV = rename 
+MV = move
 CP = cscript /nologo @top_builddir@\cp.vbs
 CHMOD = echo
 MKINSTALLDIRS = cscript /nologo @top_builddir@\mkinstalldirs.vbs
@@ -113,11 +116,6 @@ CUSERPATH =
 CCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRCLIENTWRAPPER_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES)
 CLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS)
 CRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(CUSERPATH),yes)
-	#CRPATH = -R $(libdir)
-#endif
-#endif
 
 # perl
 HAVE_PERL = @HAVE_PERL@
@@ -161,9 +159,9 @@ OVERRIDEPERLMAN3EXT = @OVERRIDEPERLMAN3EXT@
 #else
 #PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
 #endif
-#PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
-#PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
-#PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+#PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) /I./ /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
+#PERLCONLIBS = $(PERLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
+#PERLCURLIBS = $(PERLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 #PERLRPATH =
 #ifneq ($(strip $(libdir)),)
 #ifeq ($(PERLUSERPATH),yes)
@@ -173,19 +171,14 @@ OVERRIDEPERLMAN3EXT = @OVERRIDEPERLMAN3EXT@
 
 
 # python
-HAVE_PYTHON = @HAVE_PYTHON@
-PYTHONINCLUDES = @PYTHONFRAMEWORK@ @PYTHONINCLUDES@
-PYTHONDIR = @PYTHONDIR@
-PYTHONUSERPATH = @PYTHONUSERPATH@
-PYTHONLIB = @PYTHONLIB@
-PYTHONCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-PYTHONLIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PYTHONDIR)/site-packages/SQLRelay
+HAVE_PYTHON =
+PYTHONINCLUDES = /I@PYTHONPREFIX@\include
+PYTHONDIR = @PYTHONPREFIX@\Lib
+PYTHONUSERPATH =
+PYTHONLIB = /LIBPATH:@PYTHONPREFIX@\libs python27.lib
+PYTHONCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 PYTHONRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(PYTHONUSERPATH),yes)
-	#PYTHONRPATH = -R $(libdir)
-#endif
-#endif
 
 
 # ruby
@@ -202,14 +195,9 @@ OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
 #RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
 #endif
 
-RUBYCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-RUBYLIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(RUBYSITEARCHDIR)
+RUBYCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) /I./ /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 RUBYRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(RUBYUSERPATH),yes)
-	#RUBYRPATH = -R $(libdir)
-#endif
-#endif
 
 
 # php
@@ -223,54 +211,34 @@ PHPLIB = @PHPLIB@
 PHPCONFDIR = @PHPCONFDIR@
 PHPCONFSTYLE = @PHPCONFSTYLE@
 HAVE_PHP_PDO = @HAVE_PHP_PDO@
-PHPCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
+PHPLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
 PHPRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(PHPUSERPATH),yes)
-	#PHPRPATH = -R $(libdir)
-#endif
-#endif
-PHPPDOCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPPDOLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPPDOCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
+PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
 PHPPDORPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(PHPUSERPATH),yes)
-	#PHPPDORPATH = -R $(libdir)
-#endif
-#endif
 
 
 # java
-HAVE_JAVA = @HAVE_JAVA@
-JAVAC = @JAVAC@
-JAR = @JAR@
-JAVAINCLUDES = @JAVAINCLUDES@
-JAVAUSERPATH = @JAVAUSERPATH@
-JAVACPPFLAGS = $(WERROR) $(WNOUNKNOWNPRAGMAS) $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-JAVALIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay
+HAVE_JAVA =
+JAVAC = "@JAVAPREFIX@\bin\javac"
+JAR = "@JAVAPREFIX@\bin\jar"
+JAVAINCLUDES = /I "@JAVAPREFIX@\include" /I "@JAVAPREFIX@\include\win32"
+JAVAUSERPATH =
+JAVACPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
+JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS) /LIBPATH:"@JAVAPREFIX@\lib" jvm.lib
 JAVARPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(JAVAUSERPATH),yes)
-	#JAVARPATH = -R $(libdir)
-#endif
-#endif
 
 
 # tcl
-HAVE_TCL = @HAVE_TCL@
-TCLINCLUDE = @TCLINCLUDE@
-TCLLIB = @TCLLIB@
-TCLLIBSPATH = @TCLLIBSPATH@
-TCLUSERPATH = @TCLUSERPATH@
-TCLCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-TCLLIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(TCLLIBSPATH)/sqlrelay
+HAVE_TCL =
+TCLINCLUDE = /IC:\Tcl\include
+TCLLIB = /LIBPATH:C:\Tcl\lib tcl86.lib
+TCLLIBSPATH = C:\Tcl\lib
+TCLUSERPATH =
+TCLCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+TCLLIBS = $(TCLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 TCLRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(TCLUSERPATH),yes)
-	#TCLRPATH = -R $(libdir)
-#endif
-#endif
 
 
 # erlang
@@ -283,14 +251,9 @@ ERLANG_ROOT_DIR = @ERLANG_ROOT_DIR@
 ERLANG_LIB_DIR = @ERLANG_LIB_DIR@
 ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGUSERPATH = @ERLANGUSERPATH@
-ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c/src -L$(top_builddir)/src/api/c++/src -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c/include /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c/src /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclientwrapper.lib libsqlrclient.lib $(RUDIMENTSLIBS)
 ERLANGRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(ERLANGUSERPATH),yes)
-	#ERLANGRPATH = -R $(libdir)
-#endif
-#endif
 
 
 # psql
@@ -318,14 +281,9 @@ MYSQLINCLUDES = @MYSQLINCLUDES@
 MYSQLLIBS = @MYSQLLIBS@
 MYSQLLIBSPATH = @MYSQLLIBSPATH@
 MYSQLUSERPATH = @MYSQLUSERPATH@
-MYSQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
-MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
+MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 MYSQLDRLIBRPATH = 
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(PSQLUSERPATH),yes)
-	#MYSQLDRLIBRPATH = -R $(libdir)
-#endif
-#endif
 
 
 # postgresql
@@ -333,14 +291,9 @@ POSTGRESQLINCLUDES = @POSTGRESQLINCLUDES@
 POSTGRESQLLIBS = @POSTGRESQLLIBS@
 POSTGRESQLLIBSPATH = @POSTGRESQLLIBSPATH@
 POSTGRESQLUSERPATH = @POSTGRESQLUSERPATH@
-POSTGRESQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
-POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
+POSTGRESQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+POSTGRESQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 POSTGRESQLDRLIBRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(PSQLUSERPATH),yes)
-	#POSTGRESQLDRLIBRPATH = -R $(libdir)
-#endif
-#endif
 
 
 # sqlite
@@ -365,19 +318,14 @@ SYBASEUSERPATH = @SYBASEUSERPATH@
 
 
 # odbc
-ODBCINCLUDES = @ODBCINCLUDES@
-ODBCLIBS = @ODBCLIBS@
-ODBCLIBSPATH = @ODBCLIBSPATH@
-ODBCUSERPATH = @ODBCUSERPATH@
-ODBCUNICODE = @ODBCUNICODE@
-ODBCDRIVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES) $(ICONVINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
-ODBCDRIVERLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(ODBCLIBS)
+ODBCINCLUDES =
+ODBCLIBS =
+ODBCLIBSPATH =
+ODBCUSERPATH =
+ODBCUNICODE =
+ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRODBC_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES)
+ODBCDRIVERLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS) user32.lib gdi32.lib odbc32.lib odbccp32.lib /DEF:sqlrodbc.def
 ODBCDRIVERRPATH =
-#ifneq ($(strip $(libdir)),)
-#ifeq ($(PSQLUSERPATH),yes)
-	#ODBCRPATH = -R $(libdir)
-#endif
-#endif
 
 
 # mdbtools
@@ -411,21 +359,12 @@ CLIENTUSERPATH = @CLIENTUSERPATH@
 SERVERUSERPATH = @SERVERUSERPATH@
 
 
-# dmalloc
-LIBDMALLOC = @LIBDMALLOC@
-
-
-# ElectricFence
-LIBEFENCE = @LIBEFENCE@
-
-
 # Microsoft-specific
-EXE = @EXE@
+EXE = .exe
 
 
 # Shared object and module
-SQLRELAY_ENABLE_SHARED = @enable_shared@
-SOSUFFIX = @SOSUFFIX@
-MODULESUFFIX = @MODULESUFFIX@
-JNISUFFIX = @JNISUFFIX@
-MODULERENAME = $(top_builddir)/modulerename.sh
+SOSUFFIX = dll
+MODULESUFFIX = dll
+JNISUFFIX = dll
+PYTHONSUFFIX = pyd

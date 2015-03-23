@@ -194,6 +194,16 @@ end if
 
 
 
+' java
+JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
+
+
+
+' python
+PYTHONPREFIX="C:\Python27"
+
+
+
 ' input and output files
 infiles=Array(_
 	"config.windows.mk",_
@@ -260,9 +270,12 @@ for i=lbound(infiles) to ubound(infiles)
 	' extension
 	content=replace(content,"@EXE@",EXE,1,-1,0)
 
-
 	' top_builddir
 	content=replace(content,"@top_builddir@",top_builddir,1,-1,0)
+
+	' api's
+	content=replace(content,"@JAVAPREFIX@",JAVAPREFIX,1,-1,0)
+	content=replace(content,"@PYTHONPREFIX@",PYTHONPREFIX,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)
