@@ -758,7 +758,8 @@ MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt->result->errorno=0;
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
-	mysql->currentstmt->result->sqlrcur->getDatabaseList(wild);
+	mysql->currentstmt->result->sqlrcur->getDatabaseList(wild,
+						SQLRCLIENTLISTFORMAT_MYSQL);
 	processFields(mysql->currentstmt);
 	mysql->currentstmt->result->currentfield=0;
 
@@ -780,7 +781,8 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt->result->errorno=0;
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
-	mysql->currentstmt->result->sqlrcur->getTableList(wild);
+	mysql->currentstmt->result->sqlrcur->getTableList(wild,
+						SQLRCLIENTLISTFORMAT_MYSQL);
 	processFields(mysql->currentstmt);
 	mysql->currentstmt->result->currentfield=0;
 
@@ -814,7 +816,8 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 	stmt->result->errorno=0;
 	stmt->result->fields=NULL;
 	stmt->result->lengths=NULL;
-	stmt->result->sqlrcur->getColumnList(table,wild);
+	stmt->result->sqlrcur->getColumnList(table,wild,
+					SQLRCLIENTLISTFORMAT_MYSQL);
 
 
 	// translate the rows into fields...
