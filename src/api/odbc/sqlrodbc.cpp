@@ -1823,7 +1823,8 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 	SQLRETURN	retval=
-			(stmt->cur->getColumnList(table.getString(),wild))?
+		(stmt->cur->getColumnList(table.getString(),wild,
+						SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
 	delete[] wild;
 	return retval;
@@ -5278,8 +5279,9 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	}
 	debugPrintf("  wild: %s\n",(wild)?wild:"");
 
-	SQLRETURN	retval=(stmt->cur->getTableList(wild))?
-						SQL_SUCCESS:SQL_ERROR;
+	SQLRETURN	retval=
+		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
 	delete[] wild;
 	return retval;
 }

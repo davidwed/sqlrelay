@@ -71,6 +71,13 @@ enum sqlrserverbindvartype_t {
 	SQLRSERVERBINDVARTYPE_DATE
 };
 
+enum sqlrserverlistformat_t {
+	SQLRSERVERLISTFORMAT_NULL=0,
+	SQLRSERVERLISTFORMAT_MYSQL,
+	SQLRSERVERLISTFORMAT_POSTGRESQL,
+	SQLRSERVERLISTFORMAT_ODBC
+};
+
 class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 	public:
 		char	*variable;
@@ -383,22 +390,28 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		// db, table, column lists
 		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrservercursor *cursor,
-							const char *wild);
+						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
-							const char *wild);
+						const char *wild);
 		bool		getColumnList(sqlrservercursor *cursor,
-							const char *table,
-							const char *wild);
+						const char *table,
+						const char *wild);
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(const char *table,
-							bool wild);
+								bool wild);
 
 		// column info
 		uint16_t	getSendColumnInfo();
 		void		setSendColumnInfo(uint16_t sendcolumninfo);
 		uint32_t	colCount(sqlrservercursor *cursor);
 		uint16_t	columnTypeFormat(sqlrservercursor *cursor);
+		void		setDatabaseListColumnMap(
+					sqlrserverlistformat_t listformat);
+		void		setTableListColumnMap(
+					sqlrserverlistformat_t listformat);
+		void		setColumnListColumnMap(
+					sqlrserverlistformat_t listformat);
 		const char	*getColumnName(sqlrservercursor *cursor,
 							uint32_t col);
 		uint16_t	getColumnNameLength(sqlrservercursor *cursor,

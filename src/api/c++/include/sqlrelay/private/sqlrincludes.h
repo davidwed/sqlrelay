@@ -15,5 +15,6 @@
 #include <sqlrelay/private/row.h>
 #include <sqlrelay/private/column.h>
 #include <sqlrelay/private/bindvar.h>
+#include <sqlrelay/private/listformat.h>
 
 class sqlrcursor;

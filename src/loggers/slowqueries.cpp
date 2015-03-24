@@ -142,6 +142,7 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 						logentry.getStringLength()) {
 			return false;
 		}
+		querylog.flushWriteBuffer(-1,-1);
 	}
 	return true;
 }

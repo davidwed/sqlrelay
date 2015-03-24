@@ -90,6 +90,9 @@
 
 		bool	handleBinds(sqlrservercursor *cursor);
 
+		uint32_t	mapColumn(uint32_t col);
+		uint32_t	mapColumnCount(uint32_t colcount);
+
 		void	commitOrRollback(sqlrservercursor *cursor);
 
 		void	dropTempTables(sqlrservercursor *cursor);
@@ -272,3 +275,5 @@
 		singlylinkedlist< char * >	sessiontemptablesfortrunc;
 		singlylinkedlist< char * >	transtemptablesfordrop;
 		singlylinkedlist< char * >	transtemptablesfortrunc;
+
+		dictionary< uint32_t, uint32_t >	*columnmap;

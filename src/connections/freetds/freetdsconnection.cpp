@@ -257,8 +257,8 @@ class freetdsconnection : public sqlrserverconnection {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(const char *table,
-								bool wild);
+		const char	*getColumnListQuery(
+						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
@@ -681,8 +681,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 	}
 }
 
-const char *freetdsconnection::getColumnListQuery(const char *table,
-								bool wild) {
+const char *freetdsconnection::getColumnListQuery(
+					const char *table, bool wild) {
 	if (sybasedb) {
 		return (wild)?
 			"select "

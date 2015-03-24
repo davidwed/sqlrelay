@@ -357,7 +357,8 @@ bool mdbtoolscursor::getTableList(const char *wild) {
 	return true;
 }
 
-bool mdbtoolscursor::getColumnList(const char *table, const char *wild) {
+bool mdbtoolscursor::getColumnList(const char *table,
+					const char *wild) {
 
 	cursortype=COLUMN_LIST_CURSORTYPE;
 

@@ -37,8 +37,8 @@ class postgresqlconnection : public sqlrserverconnection {
 		const char	*dbIpAddress();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(const char *table,
-								bool wild);
+		const char	*getColumnListQuery(
+					const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		bool		getLastInsertId(uint64_t *id);
@@ -502,8 +502,8 @@ const char *postgresqlconnection::getTableListQuery(bool wild) {
 		"	table_name";
 }
 
-const char *postgresqlconnection::getColumnListQuery(const char *table,
-								bool wild) {
+const char *postgresqlconnection::getColumnListQuery(
+					const char *table, bool wild) {
 	return (wild)?
 		"select "
 		"	column_name, "

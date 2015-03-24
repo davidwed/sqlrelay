@@ -174,8 +174,8 @@ class mysqlconnection : public sqlrserverconnection {
 		const char	*bindFormat();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(const char *table,
-								bool wild);
+		const char	*getColumnListQuery(
+						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		bool		getLastInsertId(uint64_t *id);
@@ -462,8 +462,8 @@ const char *mysqlconnection::getTableListQuery(bool wild) {
 	return (wild)?"show tables like '%s'":"show tables";
 }
 
-const char *mysqlconnection::getColumnListQuery(const char *table,
-								bool wild) {
+const char *mysqlconnection::getColumnListQuery(
+					const char *table, bool wild) {
 	return (wild)?"select "
 			"	column_name, "
 			"	data_type, "

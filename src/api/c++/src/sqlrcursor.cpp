@@ -528,6 +528,11 @@ void sqlrcursor::clearCacheDest() {
 }
 
 bool sqlrcursor::getDatabaseList(const char *wild) {
+	return getDatabaseList(wild,SQLRCLIENTLISTFORMAT_MYSQL);
+}
+
+bool sqlrcursor::getDatabaseList(const char *wild,
+					sqlrclientlistformat_t listformat) {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("getting database list");
@@ -539,10 +544,15 @@ bool sqlrcursor::getDatabaseList(const char *wild) {
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
-	return getList(GETDBLIST,NULL,wild);
+	return getList(GETDBLIST,listformat,NULL,wild);
 }
 
 bool sqlrcursor::getTableList(const char *wild) {
+	return getTableList(wild,SQLRCLIENTLISTFORMAT_MYSQL);
+}
+
+bool sqlrcursor::getTableList(const char *wild,
+					sqlrclientlistformat_t listformat) {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("getting table list");
@@ -554,10 +564,16 @@ bool sqlrcursor::getTableList(const char *wild) {
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
-	return getList(GETTABLELIST,NULL,wild);
+	return getList(GETTABLELIST,listformat,NULL,wild);
 }
 
 bool sqlrcursor::getColumnList(const char *table, const char *wild) {
+	return getColumnList(table,wild,SQLRCLIENTLISTFORMAT_MYSQL);
+}
+
+bool sqlrcursor::getColumnList(const char *table,
+				const char *wild,
+				sqlrclientlistformat_t listformat) {
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("getting column list for: \"");
@@ -571,11 +587,11 @@ bool sqlrcursor::getColumnList(const char *table, const char *wild) {
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
 	}
-	return getList(GETCOLUMNLIST,(table)?table:"",wild);
+	return getList(GETCOLUMNLIST,listformat,(table)?table:"",wild);
 }
 
-bool sqlrcursor::getList(uint16_t command,
-			const char *table, const char *wild) {
+bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
+					const char *table, const char *wild) {
 
 	reexecute=false;
 	validatebinds=false;
@@ -599,6 +615,9 @@ bool sqlrcursor::getList(uint16_t command,
 
 	// tell the server whether we'll need a cursor or not
 	sendCursorStatus();
+
+	// send the list format
+	sqlrc->cs->write((uint16_t)listformat);
 
 	// send the wild parameter
 	uint32_t	len=charstring::length(wild);

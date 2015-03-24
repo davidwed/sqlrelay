@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2015  David Muse
 // See the file COPYING for more information.
 
 	private:
@@ -19,6 +19,7 @@
 		void	initQueryBuffer(uint32_t querylength);
 		bool	sendQueryInternal(const char *query);
 		bool	getList(uint16_t command,
+				sqlrclientlistformat_t listformat,
 				const char *table, const char *wild);
 		void	sendCursorStatus();
 		void	performSubstitutions();
@@ -211,5 +212,12 @@
 		uint16_t	getOutputBindCursorId(const char *variable);
 		void		attachToBindCursor(uint16_t bindcursorid);
 		char		*getQueryTree();
+		bool		getDatabaseList(const char *wild,
+					sqlrclientlistformat_t listformat);
+		bool		getTableList(const char *wild,
+					sqlrclientlistformat_t listformat);
+		bool		getColumnList(const char *table,
+					const char *wild,
+					sqlrclientlistformat_t listformat);
 
 	friend class sqlrconnection;

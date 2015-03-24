@@ -146,6 +146,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	proxymode=false;
 	proxypid=0;
 
+	columnmap=NULL;
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -2103,7 +2104,7 @@ const char *sqlrservercontroller::getTableListQuery(bool wild) {
 }
 
 const char *sqlrservercontroller::getColumnListQuery(const char *table,
-							bool wild) {
+								bool wild) {
 	return conn->getColumnListQuery(table,wild);
 }
 
@@ -3113,6 +3114,9 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	cursor->bindswerefaked=false;
 	cursor->fakeinputbindsforthisquery=false;
 
+	// reset column mapping
+	columnmap=NULL;
+
 	// sanity check
 	if (querylen>maxquerysize) {
 		querylen=maxquerysize;
@@ -3424,6 +3428,29 @@ bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
 	return true;
 }
 
+void sqlrservercontroller::setDatabaseListColumnMap(
+					sqlrserverlistformat_t listformat) {
+	// FIXME: use this to remap columns for database lists
+}
+
+void sqlrservercontroller::setTableListColumnMap(
+					sqlrserverlistformat_t listformat) {
+	// FIXME: use this to remap columns for table lists
+}
+
+void sqlrservercontroller::setColumnListColumnMap(
+					sqlrserverlistformat_t listformat) {
+	// FIXME: use this to remap columns for column lists
+}
+
+uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
+	return (columnmap)?columnmap->getValue(col):col;
+}
+
+uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
+	return (columnmap)?columnmap->getList()->getLength():colcount;
+}
+
 void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						uint16_t index,
 						const char *field,
@@ -3442,6 +3469,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 		const char	*datetimeformat=cfgfl->getDateTimeFormat();
 		const char	*dateformat=cfgfl->getDateFormat();
 		const char	*timeformat=cfgfl->getTimeFormat();
+		// FIXME: use mapColumn() here?
 		reformatDateTimes(cursor,index,
 					field,fieldlength,
 					newfield,newfieldlength,
@@ -3452,6 +3480,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 
 	// run translations
 	if (sqlrrst) {
+		// FIXME: use mapColumn() here?
 		sqlrrst->runResultSetTranslations(conn,cursor,
 							index,
 							field,
@@ -5053,7 +5082,7 @@ uint64_t sqlrservercontroller::affectedRows(sqlrservercursor *cursor) {
 }
 
 uint32_t sqlrservercontroller::colCount(sqlrservercursor *cursor) {
-	return cursor->colCount();
+	return mapColumnCount(cursor->colCount());
 }
 
 uint16_t sqlrservercontroller::columnTypeFormat(sqlrservercursor *cursor) {
@@ -5062,82 +5091,83 @@ uint16_t sqlrservercontroller::columnTypeFormat(sqlrservercursor *cursor) {
 
 const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnName(col);
+	return cursor->getColumnName(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnNameLength(col);
+	return cursor->getColumnNameLength(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnType(col);
+	return cursor->getColumnType(mapColumn(col));
 }
 
 const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnTypeName(col);
+	return cursor->getColumnTypeName(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnTypeNameLength(col);
+	return cursor->getColumnTypeNameLength(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnLength(col);
+	return cursor->getColumnLength(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnPrecision(col);
+	return cursor->getColumnPrecision(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnScale(col);
+	return cursor->getColumnScale(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsNullable(col);
+	return cursor->getColumnIsNullable(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsPrimaryKey(col);
+	return cursor->getColumnIsPrimaryKey(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsUnique(col);
+	return cursor->getColumnIsUnique(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsPartOfKey(col);
+	return cursor->getColumnIsPartOfKey(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsUnsigned(col);
+	return cursor->getColumnIsUnsigned(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsZeroFilled(col);
+	return cursor->getColumnIsZeroFilled(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsBinary(col);
+	return cursor->getColumnIsBinary(mapColumn(col));
 }
 
-uint16_t sqlrservercontroller::getColumnIsAutoIncrement(sqlrservercursor *cursor,
+uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
+						sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsAutoIncrement(col);
+	return cursor->getColumnIsAutoIncrement(mapColumn(col));
 }
 
 bool sqlrservercontroller::noRowsToReturn(sqlrservercursor *cursor) {
@@ -5166,13 +5196,13 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 						uint64_t *fieldlength,
 						bool *blob,
 						bool *null) {
-	cursor->getField(col,field,fieldlength,blob,null);
+	cursor->getField(mapColumn(col),field,fieldlength,blob,null);
 }
 
 bool sqlrservercontroller::getLobFieldLength(sqlrservercursor *cursor,
 							uint32_t col,
 							uint64_t *length) {
-	return cursor->getLobFieldLength(col,length);
+	return cursor->getLobFieldLength(mapColumn(col),length);
 }
 
 bool sqlrservercontroller::getLobFieldSegment(sqlrservercursor *cursor,
@@ -5182,13 +5212,13 @@ bool sqlrservercontroller::getLobFieldSegment(sqlrservercursor *cursor,
 							uint64_t offset,
 							uint64_t charstoread,
 							uint64_t *charsread) {
-	return cursor->getLobFieldSegment(col,buffer,buffersize,
+	return cursor->getLobFieldSegment(mapColumn(col),buffer,buffersize,
 						offset,charstoread,charsread);
 }
 
 void sqlrservercontroller::closeLobField(sqlrservercursor *cursor,
 							uint32_t col) {
-	cursor->closeLobField(col);
+	cursor->closeLobField(mapColumn(col));
 }
 
 void sqlrservercontroller::closeResultSet(sqlrservercursor *cursor) {

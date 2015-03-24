@@ -114,14 +114,15 @@ class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(const char *table,
-								bool wild);
+		const char	*getColumnListQuery(
+						const char *table,
+						bool wild);
 		const char	*getColumnListQueryWithoutKeys(
-							const char *table,
-								bool wild);
+						const char *table,
+						bool wild);
 		const char	*getColumnListQueryWithKeys(
-							const char *table,
-								bool wild);
+						const char *table,
+						bool wild);
 		const char	*isSynonymQuery();
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
@@ -1192,15 +1193,15 @@ const char *oracle8connection::getTableListQuery(bool wild) {
 }
 
 const char *oracle8connection::getColumnListQuery(const char *table,
-							bool wild) {
+						bool wild) {
 	return (disablekeylookup)?
 			getColumnListQueryWithoutKeys(table,wild):
 			getColumnListQueryWithKeys(table,wild);
 }
 
 const char *oracle8connection::getColumnListQueryWithoutKeys(
-							const char *table,
-							bool wild) {
+						const char *table,
+						bool wild) {
 
 	// It takes a lot longer to look up synonyms than tables.  It's quick
 	// to see if the object is a synonym though, so we'll do that first
@@ -1420,8 +1421,8 @@ const char *oracle8connection::getColumnListQueryWithoutKeys(
 }
 
 const char *oracle8connection::getColumnListQueryWithKeys(
-							const char *table,
-							bool wild) {
+						const char *table,
+						bool wild) {
 
 	// It takes a lot longer to look up synonyms than tables.  It's quick
 	// to see if the object is a synonym though, so we'll do that first

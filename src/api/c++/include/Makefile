@@ -15,6 +15,8 @@ install:
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/column.h
 	$(CP) sqlrelay/private/row.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/row.h
+	$(CP) sqlrelay/private/listformat.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/listformat.h
 	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
 	$(CP) sqlrelay/private/sqlrdefines.h $(includedir)/sqlrelay/private
@@ -32,6 +34,7 @@ uninstall:
 		$(includedir)/private/column.h \
 		$(includedir)/private/field.h \
 		$(includedir)/private/row.h \
+		$(includedir)/private/listformat.h \
 		$(includedir)/private/sqlrconnection.h \
 		$(includedir)/private/sqlrdefines.h \
 		$(includedir)/private/sqlrincludes.h \

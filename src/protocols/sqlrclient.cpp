@@ -15,6 +15,13 @@
 //#define DEBUG_MESSAGES 1
 #include <debugprint.h>
 
+enum sqlrclientquerytype_t {
+	SQLRCLIENTQUERYTYPE_QUERY=0,
+	SQLRCLIENTQUERYTYPE_DATABASE_LIST,
+	SQLRCLIENTQUERYTYPE_TABLE_LIST,
+	SQLRCLIENTQUERYTYPE_COLUMN_LIST
+};
+
 class SQLRSERVER_DLLSPEC sqlrclient : public sqlrprotocol {
 	public:
 			sqlrclient(sqlrservercontroller *cont);
@@ -47,8 +54,10 @@ class SQLRSERVER_DLLSPEC sqlrclient : public sqlrprotocol {
 		bool	reExecuteQueryCommand(sqlrservercursor *cursor);
 		bool	fetchFromBindCursorCommand(sqlrservercursor *cursor);
 		bool	processQueryOrBindCursor(sqlrservercursor *cursor,
-							bool reexecute,
-							bool bindcursor);
+					sqlrclientquerytype_t querytype,
+					sqlrserverlistformat_t listformat,
+					bool reexecute,
+					bool bindcursor);
 		bool	getClientInfo(sqlrservercursor *cursor);
 		bool	getQuery(sqlrservercursor *cursor);
 		bool	getInputBinds(sqlrservercursor *cursor);
@@ -131,15 +140,18 @@ class SQLRSERVER_DLLSPEC sqlrclient : public sqlrprotocol {
 		bool	getTableListCommand(sqlrservercursor *cursor);
 		bool	getColumnListCommand(sqlrservercursor *cursor);
 		bool	getListCommand(sqlrservercursor *cursor,
-						int which, bool gettable);
+					sqlrclientquerytype_t querytype,
+					bool gettable);
 		bool	getListByApiCall(sqlrservercursor *cursor,
-						int which,
-						const char *table,
-						const char *wild);
+					sqlrclientquerytype_t querytype,
+					const char *table,
+					const char *wild,
+					sqlrserverlistformat_t listformat);
 		bool	getListByQuery(sqlrservercursor *cursor,
-						int which,
-						const char *table,
-						const char *wild);
+					sqlrclientquerytype_t querytype,
+					const char *table,
+					const char *wild,
+					sqlrserverlistformat_t listformat);
 		bool	buildListQuery(sqlrservercursor *cursor,
 						const char *query,
 						const char *wild,
@@ -358,6 +370,7 @@ sqlrclientexitstatus_t sqlrclient::clientSession() {
 		} else if (command==GETCOLUMNLIST) {
 			cont->incrementGetColumnListCount();
 			loop=getColumnListCommand(cursor);
+		} else if (command==GET_QUERY_TREE) {
 		} else if (command==GET_QUERY_TREE) {
 			cont->incrementGetQueryTreeCount();
 			loop=getQueryTreeCommand(cursor);
@@ -956,7 +969,10 @@ bool sqlrclient::newQueryCommand(sqlrservercursor *cursor) {
 	}
 
 	if (success) {
-		return processQueryOrBindCursor(cursor,false,false);
+		return processQueryOrBindCursor(cursor,
+				SQLRCLIENTQUERYTYPE_QUERY,
+				SQLRSERVERLISTFORMAT_NULL,
+				false,false);
 	}
 
 	// The client is apparently sending us something we
@@ -986,7 +1002,10 @@ bool sqlrclient::reExecuteQueryCommand(sqlrservercursor *cursor) {
 	if (getInputBinds(cursor) &&
 		getOutputBinds(cursor) &&
 		getSendColumnInfo()) {
-		return processQueryOrBindCursor(cursor,true,false);
+		return processQueryOrBindCursor(cursor,
+				SQLRCLIENTQUERYTYPE_QUERY,
+				SQLRSERVERLISTFORMAT_NULL,
+				true,false);
 	}
 
 	// The client is apparently sending us something we
@@ -1015,7 +1034,10 @@ bool sqlrclient::fetchFromBindCursorCommand(sqlrservercursor *cursor) {
 
 	// get whether to get column info
 	if (getSendColumnInfo()) {
-		return processQueryOrBindCursor(cursor,false,true);
+		return processQueryOrBindCursor(cursor,
+				SQLRCLIENTQUERYTYPE_QUERY,
+				SQLRSERVERLISTFORMAT_NULL,
+				false,true);
 	}
 
 	// The client is apparently sending us something we
@@ -1030,8 +1052,10 @@ bool sqlrclient::fetchFromBindCursorCommand(sqlrservercursor *cursor) {
 }
 
 bool sqlrclient::processQueryOrBindCursor(sqlrservercursor *cursor,
-							bool reexecute,
-							bool bindcursor) {
+					sqlrclientquerytype_t querytype,
+					sqlrserverlistformat_t listformat,
+					bool reexecute,
+					bool bindcursor) {
 	debugFunction();
 
 	// loop here to handle down databases
@@ -1073,6 +1097,24 @@ bool sqlrclient::processQueryOrBindCursor(sqlrservercursor *cursor,
 			// tell the client that this is not a
 			// suspended result set
 			clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
+
+			// remap columns
+			switch (querytype) {
+				case SQLRCLIENTQUERYTYPE_DATABASE_LIST:
+					cont->setDatabaseListColumnMap(
+								listformat);
+					break;
+				case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+					cont->setTableListColumnMap(
+								listformat);
+					break;
+				case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
+					cont->setColumnListColumnMap(
+								listformat);
+					break;
+				default:
+					break;
+			}
 
 			// send a result set header
 			returnResultSetHeader(cursor);
@@ -2757,7 +2799,8 @@ bool sqlrclient::resumeResultSetCommand(sqlrservercursor *cursor) {
 bool sqlrclient::getDatabaseListCommand(sqlrservercursor *cursor) {
 	debugFunction();
 	cont->logDebugMessage("get db list...");
-	bool	retval=getListCommand(cursor,0,false);
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_DATABASE_LIST,false);
 	cont->logDebugMessage("done getting db list");
 	return retval;
 }
@@ -2765,7 +2808,8 @@ bool sqlrclient::getDatabaseListCommand(sqlrservercursor *cursor) {
 bool sqlrclient::getTableListCommand(sqlrservercursor *cursor) {
 	debugFunction();
 	cont->logDebugMessage("get table list...");
-	bool	retval=getListCommand(cursor,1,false);
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_TABLE_LIST,false);
 	cont->logDebugMessage("done getting table list");
 	return retval;
 }
@@ -2773,14 +2817,16 @@ bool sqlrclient::getTableListCommand(sqlrservercursor *cursor) {
 bool sqlrclient::getColumnListCommand(sqlrservercursor *cursor) {
 	debugFunction();
 	cont->logDebugMessage("get column list...");
-	bool	retval=getListCommand(cursor,2,true);
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_COLUMN_LIST,true);
 	cont->logDebugMessage("done getting column list");
 	return retval;
 }
 
 
 bool sqlrclient::getListCommand(sqlrservercursor *cursor,
-						int which, bool gettable) {
+					sqlrclientquerytype_t querytype,
+					bool gettable) {
 	debugFunction();
 
 	// if we're using a custom cursor then close it
@@ -2791,9 +2837,20 @@ bool sqlrclient::getListCommand(sqlrservercursor *cursor,
 		cursor->clearCustomQueryCursor();
 	}
 
+	// get the list format
+	uint16_t	listformat;
+	ssize_t		result=clientsock->read(&listformat,
+						idleclienttimeout,0);
+	if (result!=sizeof(uint16_t)) {
+		cont->logClientProtocolError(cursor,
+				"get list failed: "
+				"failed to get list format",result);
+		return false;
+	}
+	
 	// get length of wild parameter
 	uint32_t	wildlen;
-	ssize_t		result=clientsock->read(&wildlen,idleclienttimeout,0);
+	result=clientsock->read(&wildlen,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cont->logClientProtocolError(cursor,
 				"get list failed: "
@@ -2881,9 +2938,11 @@ bool sqlrclient::getListCommand(sqlrservercursor *cursor,
 	// get the list and return it
 	bool	retval=true;
 	if (cont->getListsByApiCalls()) {
-		retval=getListByApiCall(cursor,which,table,wild);
+		retval=getListByApiCall(cursor,querytype,table,wild,
+					(sqlrserverlistformat_t)listformat);
 	} else {
-		retval=getListByQuery(cursor,which,table,wild);
+		retval=getListByQuery(cursor,querytype,table,wild,
+					(sqlrserverlistformat_t)listformat);
 	}
 
 	// clean up
@@ -2894,24 +2953,30 @@ bool sqlrclient::getListCommand(sqlrservercursor *cursor,
 }
 
 bool sqlrclient::getListByApiCall(sqlrservercursor *cursor,
-						int which,
-						const char *table,
-						const char *wild) {
+					sqlrclientquerytype_t querytype,
+					const char *table,
+					const char *wild,
+					sqlrserverlistformat_t listformat) {
 	debugFunction();
 
 	// initialize flags andbuffers
 	bool	success=false;
 
 	// get the appropriate list
-	switch (which) {
-		case 0:
+	switch (querytype) {
+		case SQLRCLIENTQUERYTYPE_DATABASE_LIST:
+			cont->setDatabaseListColumnMap(listformat);
 			success=cont->getDatabaseList(cursor,wild);
 			break;
-		case 1:
+		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+			cont->setTableListColumnMap(listformat);
 			success=cont->getTableList(cursor,wild);
 			break;
-		case 2:
+		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
+			cont->setColumnListColumnMap(listformat);
 			success=cont->getColumnList(cursor,table,wild);
+			break;
+		default:
 			break;
 	}
 
@@ -2956,30 +3021,35 @@ bool sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 }
 
 bool sqlrclient::getListByQuery(sqlrservercursor *cursor,
-						int which,
-						const char *table,
-						const char *wild) {
+					sqlrclientquerytype_t querytype,
+					const char *table,
+					const char *wild,
+					sqlrserverlistformat_t listformat) {
 	debugFunction();
 
 	// build the appropriate query
 	const char	*query=NULL;
 	bool		havewild=charstring::length(wild);
-	switch (which) {
-		case 0:
+	switch (querytype) {
+		case SQLRCLIENTQUERYTYPE_DATABASE_LIST:
 			query=cont->getDatabaseListQuery(havewild);
 			break;
-		case 1:
+		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
 			query=cont->getTableListQuery(havewild);
 			break;
-		case 2:
+		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
 			query=cont->getColumnListQuery(table,havewild);
+			break;
+		default:
 			break;
 	}
 
 	// FIXME: this can fail
 	buildListQuery(cursor,query,wild,table);
 
-	return processQueryOrBindCursor(cursor,false,false);
+	return processQueryOrBindCursor(cursor,
+				SQLRCLIENTQUERYTYPE_QUERY,
+				listformat,false,false);
 }
 
 bool sqlrclient::buildListQuery(sqlrservercursor *cursor,

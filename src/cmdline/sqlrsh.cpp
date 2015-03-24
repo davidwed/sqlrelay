@@ -768,14 +768,34 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 		// send the query
 		if (!charstring::compareIgnoringCase(command,
-							"show databases",14)) {
+						"show databases odbc",19)) {
+			char	*wild=getWild(command);
+			sqlrcur->getDatabaseList(wild,
+					SQLRCLIENTLISTFORMAT_ODBC);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show databases",14)) {
 			char	*wild=getWild(command);
 			sqlrcur->getDatabaseList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show tables odbc",16)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_ODBC);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 							"show tables",11)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show columns odbc",17)) {
+			char	*table=getTable(SHOW_COLUMNS_QUERY,command);
+			char	*wild=getWild(command);
+			sqlrcur->getColumnList(table,wild,
+					SQLRCLIENTLISTFORMAT_ODBC);
+			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 							"show columns",12)) {

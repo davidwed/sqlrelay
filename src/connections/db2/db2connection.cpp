@@ -248,8 +248,8 @@ class db2connection : public sqlrserverconnection {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(const char *table,
-								bool wild);
+		const char	*getColumnListQuery(
+					const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();

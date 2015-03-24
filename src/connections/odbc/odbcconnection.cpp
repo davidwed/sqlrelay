@@ -540,17 +540,19 @@ bool odbcconnection::getListsByApiCalls() {
 	return true;
 }
 
-bool odbcconnection::getDatabaseList(sqlrservercursor *cursor, const char *wild) {
+bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
+					const char *wild) {
 	return getDatabaseOrTableList(cursor,wild,false);
 }
 
-bool odbcconnection::getTableList(sqlrservercursor *cursor, const char *wild) {
+bool odbcconnection::getTableList(sqlrservercursor *cursor,
+					const char *wild) {
 	return getDatabaseOrTableList(cursor,wild,true);
 }
 
 bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
-							const char *wild,
-							bool table) {
+					const char *wild,
+					bool table) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
