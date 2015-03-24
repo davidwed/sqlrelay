@@ -147,6 +147,8 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	proxypid=0;
 
 	columnmap=NULL;
+
+	buildColumnMaps();
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -459,6 +461,9 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		alarmhandler.handleSignal(SIGALRM);
 	}
 	#endif
+
+	// build getXXXList column maps
+	buildColumnMaps();
 
 	return true;
 }
@@ -3441,6 +3446,79 @@ void sqlrservercontroller::setTableListColumnMap(
 void sqlrservercontroller::setColumnListColumnMap(
 					sqlrserverlistformat_t listformat) {
 	// FIXME: use this to remap columns for column lists
+}
+
+void sqlrservercontroller::buildColumnMaps() {
+
+	// FIXME: implement this...
+
+	// Native getDatabaseList:
+	//
+	// ...
+
+	// Native getTableList:
+	//
+	// ...
+
+	// Native getColumnList:
+	//
+	// ...
+
+
+	// MySQL getDatabaseList:
+	//
+	// Database - varchar
+
+	// MySQL getTableList:
+	//
+	// Tables_in_xxx - varchar
+
+	// MySQL getColumnList:
+	//
+	// column_name - varchar
+	// data_type - varchar
+	// character_maximum_length - integer
+	// numeric_precision - integer
+	// numeric_scale - integer
+	// column_key - varchar
+	// column_default - blob
+	// extra - varchar
+
+
+	// ODBC getDatabaseList:
+	// FIXME: what is this mapped to in ODBC?
+
+	// ODBC getTableList:
+	//
+	// TABLE_CAT - varchar - catalog (database) name
+	// TABLE_SCHEM - varchar - schema name
+	// TABLE_NAME - varchar - table name
+	// TABLE_TYPE - varchar - "TABLE","VIEW","SYSTEM TABLE",
+	// 				"GLOBAL TEMPORARY","LOCAL TEMPORARY",
+	// 				"ALIAS","SYNONYM"
+	// REMARKS - varchar - description
+
+	// ODBC getColumnList:
+	//
+	// TABLE_CAT - varchar - catalog (database) name
+	// TABLE_SCHEM - varchar - schema name
+	// TABLE_NAME - varchar not null - table name
+	// COLUMN_NAME - varchar not null - column name
+	// DATA_TYPE - smallint not null - ODBC or driver-specific id
+	// TYPE_NAME - varchar not null - column type string
+	// COLUMN_SIZE - integer - length in characters
+	// BUFFER_LEGTH - integer - length in bytes
+	// DECIMAL_DIGITS - smallint - scale
+	// NUM_PREC_RADIX - smallint - precision
+	// NULLABLE - smallint not null -
+	// 	SQL_NO_NULLS/SQL_NULLABLE/SQL_NULLABLE_UNKNOWN
+	// REMARKS - varchar - description
+	// COLUMN_DEF - varchar - default value
+	// SQL_DATA_TYPE - smallint not null - ODBC or driver-specific id
+	// SQL_DATETIME_SUB - smallint - subtype for interval types or NULL
+	// CHAR_OCTET_LENGTH - integer - maximum bytes for char/binary or NULL
+	// ORDINAL_POSITION - integer not null - column number (1-based)
+	// IS_NULLABLE - varchar - "YES", "NO" or "" (unknown)
 }
 
 uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
