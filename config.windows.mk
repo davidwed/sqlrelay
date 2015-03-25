@@ -276,10 +276,10 @@ ORACLEUSERPATH = @ORACLEUSERPATH@
 
 
 # mysql
-MYSQLINCLUDES = @MYSQLINCLUDES@
-MYSQLLIBS = @MYSQLLIBS@
-MYSQLLIBSPATH = @MYSQLLIBSPATH@
-MYSQLUSERPATH = @MYSQLUSERPATH@
+MYSQLINCLUDES = /I "C:\Program Files\MySQL\MySQL Connector.C 6.1\include"
+MYSQLLIBS = /LIBPATH:"C:\Program Files\MySQL\MySQL Connector.C 6.1\lib" libmysql.lib
+MYSQLLIBSPATH =
+MYSQLUSERPATH =
 MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 MYSQLDRLIBRPATH = 
@@ -358,6 +358,8 @@ CPPTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = /LIBPATH:$(libdir) libsqlrclient.lib $(RUDIMENTSLIBS)
 CTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
 CTESTLIBS = /LIBPATH:$(libdir) libsqlrclient.lib libsqlrclientwrapper.lib $(RUDIMENTSLIBS)
+DROPINTESTCPPFLAGS = $(BASECPPFLAGS) /I $(top_builddir) /I $(includedir) $(RUDIMENTSINCLUDES)
+DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
 # client/server rpath flags

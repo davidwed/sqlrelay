@@ -424,6 +424,8 @@ CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 CTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 CTESTLIBS = -L$(libdir) -lsqlrclient -lsqlrclientwrapper $(RUDIMENTSLIBS) $(LIBEFENCE)
+DROPINTESTCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(includedir) $(RUDIMENTSINCLUDES)
+DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
 # client/server rpath flags

@@ -4,29 +4,31 @@ include ../../config.mk
 
 .SUFFIXES: .lo
 
-CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
-LIBS = $(RUDIMENTSLIBS) $(LIBEFENCE)
-
-
-all:
-ifneq ($(strip $(MYSQLLIBS)),)
-	$(MAKE) mysql
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) postgresql
-endif
+all: mysql postgresql
+#ifneq ($(strip $(MYSQLLIBS)),)
+	#$(MAKE) mysql
+#endif
+#ifneq ($(strip $(POSTGRESQLLIBS)),)
+	#$(MAKE) postgresql
+#endif
 
 mysql.lo: mysql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -I$(top_builddir) $(MYSQLINCLUDES) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) $< $(OUT)$@
+
+mysql.obj: mysql.cpp
+	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) mysql.cpp 
 
 postgresql.lo: postgresql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -I$(top_builddir) $(POSTGRESQLINCLUDES) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(POSTGRESQLINCLUDES) $(COMPILE) $< $(OUT)$@
 
-mysql: mysql.cpp mysql.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.lo $(MYSQLLIBS) $(LIBS)
+postgresql.obj: postgresql.cpp
+	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(POSTGRESQLINCLUDES) $(COMPILE) $<
 
-postgresql: postgresql.cpp postgresql.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(POSTGRESQLLIBS) $(LIBS)
+mysql: mysql.cpp mysql.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
+
+postgresql: postgresql.cpp postgresql.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) postgresql.$(OBJ) $(POSTGRESQLLIBS) $(DROPINTESTLIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o mysql postgresql
+	$(LTCLEAN) $(RM) *.lo *.o *.obj mysql$(EXE) postgresql$(EXE)
