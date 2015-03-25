@@ -13,7 +13,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/character.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 	#undef uid_t
 	#undef gid_t
 	#undef ssize_t

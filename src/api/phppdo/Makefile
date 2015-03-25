@@ -17,9 +17,19 @@ clean:
 	$(RMTREE) .libs
 
 pdo_sqlrelay.$(LIBEXT): pdo_sqlrelay.cpp pdo_sqlrelay.$(OBJ)
-	$(LTLINK) $(LINK) -o $@ pdo_sqlrelay.$(OBJ) $(LDFLAGS) $(PHPPDOLIBS) $(PHPPDORPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ pdo_sqlrelay.$(OBJ) $(LDFLAGS) $(PHPPDOLIBS) $(PHPPDORPATH) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
+
+installlib:
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.$(LIBEXT)
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.a
 	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
@@ -49,16 +59,6 @@ install: $(INSTALLLIB)
 			done; \
 		fi; \
 	fi
-
-installdll:
-	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
-
-installlib:
-	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
-	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.$(LIBEXT)
-	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.a
 
 uninstall:
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.$(LIBEXT)

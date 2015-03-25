@@ -118,7 +118,7 @@ CLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLI
 CRPATH =
 
 # perl
-HAVE_PERL = @HAVE_PERL@
+HAVE_PERL =
 PERL = @PERL@
 PERLPREFIX = @PERLPREFIX@
 PERLLIB = @PERLLIB@
@@ -182,7 +182,7 @@ PYTHONRPATH =
 
 
 # ruby
-HAVE_RUBY = @HAVE_RUBY@
+HAVE_RUBY =
 RUBY = @RUBY@
 RUBYLIB = @RUBYLIB@
 OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
@@ -195,27 +195,27 @@ OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
 #RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
 #endif
 
-RUBYCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) /I./ /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+RUBYCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) /I./ /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 RUBYRPATH =
 
 
 # php
-HAVE_PHP = @HAVE_PHP@
-PHPINCLUDES = @PHPINCLUDES@
-PHPEXTDIR = @PHPEXTDIR@
-PHPUSERPATH = @PHPUSERPATH@
-PHPVERSION = @PHPVERSION@
-PHPMAJORVERSION = @PHPMAJORVERSION@
-PHPLIB = @PHPLIB@
-PHPCONFDIR = @PHPCONFDIR@
-PHPCONFSTYLE = @PHPCONFSTYLE@
-HAVE_PHP_PDO = @HAVE_PHP_PDO@
-PHPCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+HAVE_PHP =
+PHPINCLUDES = /I C:\\PHP\\dev\\include\\php /I C:\\PHP\\dev\\include\\php\\main /I C:\\PHP\\dev\\include\\php\\TSRM /I C:\\PHP\\dev\\include\\php\\Zend /I C:\\PHP\\dev\\include\\php\\ext /I C:\\PHP\\dev\\include\\php\\ext\date\lib $(RUDIMENTSINCLUDES)
+PHPEXTDIR = C:\\PHP\\ext
+PHPUSERPATH =
+PHPVERSION =
+PHPMAJORVERSION =
+PHPLIB = /LIBPATH:C:\\PHP\\dev php5ts.lib
+PHPCONFDIR = C:\\Windows
+PHPCONFSTYLE = windows
+HAVE_PHP_PDO =
+PHPCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) /D COMPILE_DL=1
+PHPLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 PHPRPATH =
-PHPPDOCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPPDOCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) /D COMPILE_DL=1
+PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 PHPPDORPATH =
 
 
@@ -242,7 +242,7 @@ TCLRPATH =
 
 
 # erlang
-HAVE_ERLANG = @HAVE_ERLANG@
+HAVE_ERLANG =
 ERLC = @ERLC@
 ERLCFLAGS = @ERLCFLAGS@
 ERLANGINCLUDES = @ERLANGINCLUDES@
@@ -251,7 +251,7 @@ ERLANG_ROOT_DIR = @ERLANG_ROOT_DIR@
 ERLANG_LIB_DIR = @ERLANG_LIB_DIR@
 ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGUSERPATH = @ERLANGUSERPATH@
-ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c/include /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+ERLANGCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c/include /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c/src /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclientwrapper.lib libsqlrclient.lib $(RUDIMENTSLIBS)
 ERLANGRPATH =
 

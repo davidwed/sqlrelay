@@ -44,7 +44,7 @@ extern "C" {
 
 extern "C" {
 
-#if WIN32|WINNT
+#ifdef _WIN32
 #include <windows.h>
 #define DLEXPORT __declspec(dllexport)
 #else
