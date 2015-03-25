@@ -32,7 +32,6 @@ SHELL = @SHELL@
 
 # libtool command
 LIBTOOL = @LIBTOOL@
-LIBTOOLGCC = @LIBTOOL@
 
 # compile commands
 LTCOMPILE = $(LIBTOOL) --mode=compile
@@ -418,6 +417,13 @@ FIREBIRDUSERPATH = @FIREBIRDUSERPATH@
 # router
 ROUTERLIBSPATH =
 ROUTERUSERPATH =
+
+
+# tests
+CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
+CPPTESTLIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
+CTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
+CTESTLIBS = -L$(libdir) -lsqlrclient -lsqlrclientwrapper $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 
 # client/server rpath flags

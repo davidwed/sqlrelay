@@ -6,8 +6,8 @@ prefix = @prefix@
 exec_prefix= @exec_prefix@
 includedir = @includedir@
 libdir = @libdir@
-javadir = $(exec_prefix)\java
-libexecdir = @libexecdir@\sqlrelay
+javadir = @javadir@
+libexecdir = @libexecdir@
 bindir = @bindir@
 localstatedir = @localstatedir@
 sysconfdir = @sysconfdir@
@@ -32,7 +32,6 @@ SHELL =
 
 # libtool command
 LIBTOOL =
-LIBTOOLGCC =
 
 # compile commands
 LTCOMPILE = 
@@ -352,6 +351,13 @@ FIREBIRDUSERPATH = @FIREBIRDUSERPATH@
 # router
 ROUTERLIBSPATH =
 ROUTERUSERPATH =
+
+
+# tests
+CPPTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
+CPPTESTLIBS = /LIBPATH:$(libdir) libsqlrclient.lib $(RUDIMENTSLIBS)
+CTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
+CTESTLIBS = /LIBPATH:$(libdir) libsqlrclient.lib libsqlrclientwrapper.lib $(RUDIMENTSLIBS)
 
 
 # client/server rpath flags

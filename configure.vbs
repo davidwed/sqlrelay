@@ -19,22 +19,24 @@ next
 SQLR_VERSION="0.59"
 
 ' paths
-prefix="C:\""Program Files""\Firstworks"
+pfix="C:\Program Files\Firstworks"
+prefix=""""+pfix+""""
 exec_prefix=prefix
-bindir=prefix+"\bin"
-includedir=prefix+"\include"
-libdir=prefix+"\lib"
-libexecdir=prefix+"\libexec"
-localstatedir=prefix+"\var"
-sysconfdir=prefix+"\etc"
-mandir=prefix+"\share\man"
-datadir=prefix+"\share"
-docdir=prefix+"\doc\sqlrelay"
-EXAMPLEDIR=prefix+"\doc\sqlrelay\examples"
-tmpdir=prefix+"\var\sqlrelay\tmp"
-cachedir=prefix+"\var\sqlrelay\cache"
-debugdir=prefix+"\var\sqlrelay\debug"
-logdir=prefix+"\var\sqlrelay\log"
+bindir=""""+pfix+"\bin"""
+includedir=""""+pfix+"\include"""
+libdir=""""+pfix+"\lib"""
+javadir=""""+pfix+"\java"""
+libexecdir=""""+pfix+"\libexec\sqlrelay"""
+localstatedir=""""+pfix+"\var"""
+sysconfdir=""""+pfix+"\etc"""
+mandir=""""+pfix+"\share\man"""
+datadir=""""+pfix+"\share"""
+docdir=""""+pfix+"\doc\sqlrelay"""
+EXAMPLEDIR=""""+pfix+"\doc\sqlrelay\examples"""
+tmpdir=""""+pfix+"\var\sqlrelay\tmp"""
+cachedir=""""+pfix+"\var\sqlrelay\cache"""
+debugdir=""""+pfix+"\var\sqlrelay\debug"""
+logdir=""""+pfix+"\var\sqlrelay\log"""
 initscript_prefix=""
 
 ' extension
@@ -241,6 +243,7 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@bindir@",bindir,1,-1,0)
 	content=replace(content,"@includedir@",includedir,1,-1,0)
 	content=replace(content,"@libdir@",libdir,1,-1,0)
+	content=replace(content,"@javadir@",javadir,1,-1,0)
 	content=replace(content,"@mandir@",mandir,1,-1,0)
 	content=replace(content,"@datadir@",datadir,1,-1,0)
 	content=replace(content,"@libexecdir@",libexecdir,1,-1,0)

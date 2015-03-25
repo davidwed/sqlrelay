@@ -2,49 +2,40 @@ top_builddir = ../..
 
 include ../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
-LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
-
 .SUFFIXES: .lo
 
 .c.lo:
-	$(LIBTOOLGCC) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CC) $(CFLAGS) $(CTESTCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all:
-	$(MAKE) db2
-	$(MAKE) freetds
-	$(MAKE) firebird
-	$(MAKE) mysql
-	$(MAKE) oracle
-	$(MAKE) postgresql
-	$(MAKE) sqlite
-	$(MAKE) sybase
+.c.obj:
+	$(CC) $(CFLAGS) $(CTESTCPPFLAGS) $(COMPILE) $<
 
-db2: db2.c db2.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ db2.$(OBJ) $(LIBS)
-
-freetds: freetds.c freetds.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ freetds.$(OBJ) $(LIBS)
-
-firebird: firebird.c firebird.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ firebird.$(OBJ) $(LIBS)
-
-mysql: mysql.c mysql.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ mysql.$(OBJ) $(LIBS)
-
-oracle: oracle.c oracle.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ oracle.$(OBJ) $(LIBS)
-
-postgresql: postgresql.c postgresql.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ postgresql.$(OBJ) $(LIBS)
-
-sqlite: sqlite.c sqlite.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sqlite.$(OBJ) $(LIBS)
-
-sybase: sybase.c sybase.$(OBJ)
-	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sybase.$(OBJ) $(LIBS)
+all: db2 freetds firebird mysql oracle postgresql sqlite sybase
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 freetds firebird mysql oracle postgresql sqlite sybase
-	$(RM) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracle$(EXE) postgresql$(EXE) sqlite$(EXE) sybase$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
+
+db2: db2.c db2.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) db2.$(OBJ) $(CTESTLIBS)
+
+freetds: freetds.c freetds.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) freetds.$(OBJ) $(CTESTLIBS)
+
+firebird: firebird.c firebird.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) firebird.$(OBJ) $(CTESTLIBS)
+
+mysql: mysql.c mysql.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(CTESTLIBS)
+
+oracle: oracle.c oracle.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(CTESTLIBS)
+
+postgresql: postgresql.c postgresql.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) postgresql.$(OBJ) $(CTESTLIBS)
+
+sqlite: sqlite.c sqlite.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sqlite.$(OBJ) $(CTESTLIBS)
+
+sybase: sybase.c sybase.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sybase.$(OBJ) $(CTESTLIBS)
