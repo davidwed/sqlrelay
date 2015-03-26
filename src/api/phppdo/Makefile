@@ -23,7 +23,7 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)/php_pdo_sqlrelay.$(LIBEXT)
 
 installlib:
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
