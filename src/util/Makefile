@@ -2,32 +2,25 @@ top_builddir = ../..
 
 include ../../config.mk
 
-ifeq ($(MINGW32),yes)
-DLLEXPORTS = -DLIBSQLRUTIL_EXPORTS
-endif
-
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DLLEXPORTS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
-LIBS = $(RUDIMENTSLIBS)
-
 SRCS = sqlrcmdline.cpp sqlrtempdir.cpp sqlrconfigfile.cpp
 LOBJS = sqlrcmdline.$(OBJ) sqlrtempdir.$(OBJ) sqlrconfigfile.$(OBJ)
 
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(UTILCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(UTILCPPFLAGS) $(COMPILE) $<
 
-all: libsqlrutil.la
+all: libsqlrutil.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
 libsqlrutil.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(UTILLIBS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay

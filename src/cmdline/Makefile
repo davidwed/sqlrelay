@@ -2,22 +2,13 @@ top_builddir = ../..
 
 include ../../config.mk
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
-LIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
-RPATH =
-ifneq ($(strip $(libdir)),)
-ifeq ($(CLIENTUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CMDLINECPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(CMDLINECPPFLAGS) $(COMPILE) $<
 
 all: sqlr-query$(EXE) \
 	sqlr-fields$(EXE) \
@@ -31,25 +22,25 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj sqlr-fields$(EXE) sqlr-query$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlr-status$(EXE) sqlrsh$(EXE)
 
 sqlr-fields$(EXE): sqlr-fields.cpp sqlr-fields.$(OBJ)
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-fields.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-fields.$(OBJ) $(CMDLINELIBS)
 
 sqlr-query$(EXE): sqlr-query.cpp sqlr-query.$(OBJ)
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-query.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-query.$(OBJ) $(CMDLINELIBS)
 
 sqlr-export$(EXE): sqlr-export.cpp sqlr-export.$(OBJ)
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-export.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-export.$(OBJ) $(CMDLINELIBS)
 
 sqlr-import$(EXE): sqlr-import.cpp sqlr-import.$(OBJ)
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-import.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-import.$(OBJ) $(CMDLINELIBS)
 
 sqlr-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.$(OBJ)
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE) $(RPATH)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) $(PWDENCLIBS)
 
 sqlr-status$(EXE): sqlr-status.cpp sqlr-status.$(OBJ)
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-status.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-status.$(OBJ) $(CMDLINELIBS)
 
 sqlrsh$(EXE): sqlrsh.cpp sqlrsh.$(OBJ) 
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlrsh.$(OBJ) $(LIBS) $(READLINELIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlrsh.$(OBJ) $(CMDLINELIBS) $(READLINELIBS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)

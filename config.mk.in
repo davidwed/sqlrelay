@@ -89,6 +89,10 @@ UNAME = @UNAME@
 # rpm build directory
 RPM_BUILD_DIR = @RPM_BUILD_DIR@
 
+# client/server rpath flags
+CLIENTUSERPATH = @CLIENTUSERPATH@
+SERVERUSERPATH = @SERVERUSERPATH@
+
 # math library
 MATHLIB = @MATHLIB@
 
@@ -114,6 +118,12 @@ RUDIMENTSLIBSPATH = @RUDIMENTSLIBSPATH@
 HAVE_ICONV = @HAVE_ICONV@
 ICONVINCLUDES = @ICONVINCLUDES@
 ICONVLIBS = @ICONVLIBS@
+
+# dmalloc
+LIBDMALLOC = @LIBDMALLOC@
+
+# ElectricFence
+LIBEFENCE = @LIBEFENCE@
 
 # c++
 # windows needs /D LIBSQLRCLIENT_EXPORTS
@@ -314,6 +324,7 @@ PSQLUSERPATH = @PSQLUSERPATH@
 READLINEINCLUDES = @READLINEINCLUDES@
 READLINELIBS = @READLINELIBS@
 
+
 # libsocket
 SOCKETLIBS = @SOCKETLIBS@
 
@@ -419,6 +430,26 @@ ROUTERLIBSPATH =
 ROUTERUSERPATH =
 
 
+# util
+ifeq ($(MINGW32),yes)
+UTILDLLEXPORTS = -DLIBSQLRUTIL_EXPORTS
+endif
+UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(UTILDLLEXPORTS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
+UTILLIBS = $(RUDIMENTSLIBS)
+
+
+# cmdline
+CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
+CMDLINELIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+PWDENCLIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ifneq ($(strip $(libdir)),)
+ifeq ($(CLIENTUSERPATH),yes)
+	CMDLINELIBS += -R $(libdir)
+	PWDENCLIBS += -R $(libdir)
+endif
+endif
+
+
 # tests
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
@@ -426,19 +457,6 @@ CTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 CTESTLIBS = -L$(libdir) -lsqlrclient -lsqlrclientwrapper $(RUDIMENTSLIBS) $(LIBEFENCE)
 DROPINTESTCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(includedir) $(RUDIMENTSINCLUDES)
 DROPINTESTLIBS = $(RUDIMENTSLIBS)
-
-
-# client/server rpath flags
-CLIENTUSERPATH = @CLIENTUSERPATH@
-SERVERUSERPATH = @SERVERUSERPATH@
-
-
-# dmalloc
-LIBDMALLOC = @LIBDMALLOC@
-
-
-# ElectricFence
-LIBEFENCE = @LIBEFENCE@
 
 
 # Microsoft-specific
