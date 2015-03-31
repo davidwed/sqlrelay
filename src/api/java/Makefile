@@ -36,8 +36,8 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay
-	$(LTINSTALL) $(CP) libSQLRConnection.$(LIBEXT) $(javadir)/com/firstworks/sqlrelay/libSQLRConnection.$(JNISUFFIX)
-	$(LTINSTALL) $(CP) libSQLRCursor.$(LIBEXT) $(javadir)/com/firstworks/sqlrelay/libSQLRCursor.$(JNISUFFIX)
+	$(LTINSTALL) $(CP) libSQLRConnection.$(LIBEXT) $(javadir)/com/firstworks/sqlrelay/SQLRConnection.$(JNISUFFIX)
+	$(LTINSTALL) $(CP) libSQLRCursor.$(LIBEXT) $(javadir)/com/firstworks/sqlrelay/SQLRCursor.$(JNISUFFIX)
 
 installlib:
 	$(MKINSTALLDIRS) $(javadir)/com/firstworks/sqlrelay

@@ -2,23 +2,19 @@ top_builddir = ../..
 
 include ../../config.mk
 
-CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(ODBCINCLUDES)
-LIBS = $(RUDIMENTSLIBS) $(ODBCLIBS) $(LIBEFENCE)
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(ODBCTESTCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all:
-ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) oracle
-endif
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(ODBCTESTCPPFLAGS) $(COMPILE) $<
 
-oracle: oracle.cpp oracle.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
+all: oracle
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o oracle
-	$(RM) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj oracle$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
+
+oracle: oracle.cpp oracle.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ oracle.$(OBJ) $(ODBCTESTLIBS)

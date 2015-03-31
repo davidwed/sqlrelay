@@ -16,28 +16,28 @@ clean:
 	$(RM) *.class cachefile* sqlnet.log
 
 db2.class: db2.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar db2.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar db2.java
 
 freetds.class: freetds.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar freetds.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar freetds.java
 
 firebird.class: firebird.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar firebird.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar firebird.java
 
 mysql.class: mysql.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar mysql.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar mysql.java
 
 oracle.class: oracle.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar oracle.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar oracle.java
 
 postgresql.class: postgresql.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar postgresql.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar postgresql.java
 
 sqlite.class: sqlite.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar sqlite.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar sqlite.java
 
 sybase.class: sybase.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar sybase.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar sybase.java
 
 test.class: test.java
-	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar test.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar test.java
