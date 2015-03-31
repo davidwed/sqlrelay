@@ -2,15 +2,13 @@ top_builddir = ../..
 
 include ../../config.mk
 
-LIBS = -L$(top_builddir)/src/server/src -lsqlrserver $(RUDIMENTSLIBS) $(EXTRALIBS)
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(AUTHCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) /I$(top_builddir)/src/util /I$(top_builddir)/src/server/include /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(WERROR) $(AUTHCPPFLAGS) $(COMPILE) $<
 
 all: sqlrauth_default.$(LIBEXT) sqlrauth_sqlrelay.$(LIBEXT)
 
@@ -19,10 +17,10 @@ clean:
 	$(RMTREE) .libs
 
 sqlrauth_default.$(LIBEXT): default.cpp default.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ default.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ default.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 sqlrauth_sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(LIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(SQLRAUTH_SQLRELAYLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
@@ -31,8 +29,9 @@ installdll:
 	$(LTINSTALL) $(CP) sqlrauth_default.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrauth_sqlrelay.$(LIBEXT) $(libexecdir)
 
-installlib:
-ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+installlib: $(INSTALLSHAREDLIB)
+
+installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrauth_default.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrauth_default.a
@@ -42,7 +41,6 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(RM) $(libexecdir)/sqlrauth_sqlrelay.a
 	$(RM) $(libexecdir)/sqlrauth_sqlrelay.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrauth_sqlrelay.so so $(MODULESUFFIX)
-endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrauth_default.*

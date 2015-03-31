@@ -19,47 +19,47 @@ LIBS = \
 	-L$(top_builddir)/src/api/c++/src \
 	-lsqlrclient \
 	$(RUDIMENTSLIBS) \
-	$(EXTRALIBS)
+	$(EXTRALIBS) \
+	$(DB2LIBS) \
+	$(FIREBIRDLIBS) \
+	$(FREETDSLIBS) \
+	$(MYSQLLIBS) \
+	$(ORACLELIBS) \
+	$(POSTGRESQLLIBS) \
+	$(SQLITELIBS) \
+	$(SYBASELIBS)
 
-ifneq ($(strip $(DB2LIBSPATH)),)
-	LIBS += -R $(DB2LIBSPATH)
-endif
-LIBS += $(DB2LIBS)
+#ifneq ($(strip $(DB2LIBSPATH)),)
+	#LIBS += -R $(DB2LIBSPATH)
+#endif
 
-ifneq ($(strip $(FIREBIRDLIBSPATH)),)
-	LIBS += -R $(FIREBIRDLIBSPATH)
-endif
-LIBS += $(FIREBIRDLIBS)
+#ifneq ($(strip $(FIREBIRDLIBSPATH)),)
+	#LIBS += -R $(FIREBIRDLIBSPATH)
+#endif
 
-ifneq ($(strip $(FREETDSLIBSPATH)),)
-	LIBS += -R $(FREETDSLIBSPATH)
-endif
-LIBS += $(FREETDSLIBS)
+#ifneq ($(strip $(FREETDSLIBSPATH)),)
+	#LIBS += -R $(FREETDSLIBSPATH)
+#endif
 
-ifneq ($(strip $(MYSQLLIBSPATH)),)
-	LIBS += -R $(MYSQLLIBSPATH)
-endif
-LIBS += $(MYSQLLIBS)
+#ifneq ($(strip $(MYSQLLIBSPATH)),)
+	#LIBS += -R $(MYSQLLIBSPATH)
+#endif
 
-ifneq ($(strip $(ORACLELIBSPATH)),)
-	LIBS += -R $(ORACLELIBSPATH)
-endif
-LIBS += $(ORACLELIBS)
+#ifneq ($(strip $(ORACLELIBSPATH)),)
+	#LIBS += -R $(ORACLELIBSPATH)
+#endif
 
-ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
-	LIBS += -R $(POSTGRESQLLIBSPATH)
-endif
-LIBS += $(POSTGRESQLLIBS)
+#ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
+	#LIBS += -R $(POSTGRESQLLIBSPATH)
+#endif
 
-ifneq ($(strip $(SQLITELIBSPATH)),)
-	LIBS += -R $(SQLITELIBSPATH)
-endif
-LIBS += $(SQLITELIBS)
+#ifneq ($(strip $(SQLITELIBSPATH)),)
+	#LIBS += -R $(SQLITELIBSPATH)
+#endif
 
-ifneq ($(strip $(SYBASELIBSPATH)),)
-	LIBS += -R $(SYBASELIBSPATH)
-endif
-LIBS += $(SYBASELIBS)
+#ifneq ($(strip $(SYBASELIBSPATH)),)
+	#LIBS += -R $(SYBASELIBSPATH)
+#endif
 
 SRCS = bench.cpp main.cpp \
 	sqlrelaybench.cpp \
@@ -86,13 +86,15 @@ LOBJS = bench.lo main.lo \
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.$(OBJ):
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: sqlr-bench
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-bench *.lo *.o
-	$(RM) sqlr-bench
+	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest
 
 sqlr-bench: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS)
+	$(LTLINK) $(LINK) $(OUT)$@$(EXE) $(LOBJS) $(LDFLAGS) $(LIBS)

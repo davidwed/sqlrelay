@@ -30,7 +30,7 @@
 
 class mysqlconnection;
 
-class mysqlcursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 	friend class mysqlconnection;
 	private:
 				mysqlcursor(sqlrserverconnection *conn,
@@ -149,7 +149,7 @@ class mysqlcursor : public sqlrservercursor {
 		mysqlconnection	*mysqlconn;
 };
 
-class mysqlconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 	friend class mysqlcursor;
 	public:
 				mysqlconnection(sqlrservercontroller *cont);
@@ -222,7 +222,8 @@ class mysqlconnection : public sqlrserverconnection {
 };
 
 extern "C" {
-	sqlrserverconnection *new_mysqlconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_mysqlconnection(
+						sqlrservercontroller *cont) {
 		return new mysqlconnection(cont);
 	}
 }

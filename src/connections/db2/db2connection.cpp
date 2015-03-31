@@ -49,7 +49,7 @@ struct datebind {
 
 class db2connection;
 
-class db2cursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 	friend class db2connection;
 	public:
 			db2cursor(sqlrserverconnection *conn, uint16_t id);
@@ -214,7 +214,7 @@ class db2cursor : public sqlrservercursor {
 		db2connection	*db2conn;
 };
 
-class db2connection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 	friend class db2cursor;
 	public:
 			db2connection(sqlrservercontroller *cont);

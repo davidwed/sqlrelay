@@ -2,15 +2,13 @@ top_builddir = ../..
 
 include ../../config.mk
 
-LIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) $(DEBUGDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) $(LOGDIRCPPFLAG) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(LOGGERCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) $(DEBUGDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) $(LOGDIRCPPFLAG) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(WERROR) $(LOGGERCPPFLAGS) $(COMPILE) $<
 
 all: sqlrlogger_debug.$(LIBEXT) \
 	sqlrlogger_slowqueries.$(LIBEXT) \
@@ -22,16 +20,16 @@ clean:
 	$(RMTREE) .libs
 
 sqlrlogger_debug.$(LIBEXT): debug.cpp debug.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ debug.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ debug.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 sqlrlogger_slowqueries.$(LIBEXT): slowqueries.cpp slowqueries.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ slowqueries.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ slowqueries.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 sqlrlogger_custom_nw.$(LIBEXT): custom_nw.cpp custom_nw.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ custom_nw.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ custom_nw.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 sqlrlogger_custom_sc.$(LIBEXT): custom_sc.cpp custom_sc.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ custom_sc.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ custom_sc.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
@@ -42,8 +40,9 @@ installdll:
 	$(LTINSTALL) $(CP) sqlrlogger_custom_nw.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrlogger_custom_sc.$(LIBEXT) $(libexecdir)
 
-installlib:
-ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+installlib: $(INSTALLSHAREDLIB)
+
+installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrlogger_debug.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_debug.a
@@ -61,7 +60,6 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(RM) $(libexecdir)/sqlrlogger_custom_sc.a
 	$(RM) $(libexecdir)/sqlrlogger_custom_sc.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_custom_sc.so so $(MODULESUFFIX)
-endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.*

@@ -13,7 +13,7 @@
 
 #include <libpq-fe.h>
 
-class postgresqlconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 	friend class postgresqlcursor;
 	public:
 			postgresqlconnection(sqlrservercontroller *cont);
@@ -78,7 +78,7 @@ class postgresqlconnection : public sqlrserverconnection {
 #endif
 };
 
-class postgresqlcursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 	friend class postgresqlconnection;
 	private:
 				postgresqlcursor(sqlrserverconnection *conn,

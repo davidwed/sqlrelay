@@ -8,31 +8,34 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.$(OBJ):
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: cursortest forktest query random socketeater threadtest timeouttest
 
-cursortest: cursortest.cpp cursortest.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ cursortest.lo $(LIBS)
+cursortest: cursortest.cpp cursortest.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) cursortest.$(OBJ) $(LIBS)
 
-forktest: forktest.cpp forktest.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ forktest.lo $(LIBS)
+forktest: forktest.cpp forktest.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) forktest.$(OBJ) $(LIBS)
 
-query: query.cpp query.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ query.lo $(LIBS)
+query: query.cpp query.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) query.$(OBJ) $(LIBS)
 
-random: random.cpp random.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ random.lo $(LIBS)
+random: random.cpp random.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) random.$(OBJ) $(LIBS)
 
-socketeater: socketeater.cpp socketeater.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ socketeater.lo $(LIBS)
+socketeater: socketeater.cpp socketeater.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) socketeater.$(OBJ) $(LIBS)
 
-threadtest: threadtest.cpp threadtest.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ threadtest.lo $(LIBS)
+threadtest: threadtest.cpp threadtest.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) threadtest.$(OBJ) $(LIBS)
 
-timeouttest: timeouttest.cpp timeouttest.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ timeouttest.lo $(LIBS)
+timeouttest: timeouttest.cpp timeouttest.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) timeouttest.$(OBJ) $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o cursortest forktest query random socketeater threadtest timeouttest cachefile*
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest cursortest$(EXE) forktest$(EXE) query$(EXE) random$(EXE) socketeater$(EXE) threadtest$(EXE) timeouttest$(EXE) cachefile*
 	$(RMTREE) .libs

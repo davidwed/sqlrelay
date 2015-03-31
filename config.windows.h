@@ -56,61 +56,61 @@
 #define HAVE_MEMORY_H 1
 
 /* MySQL supports mysql_autocommit */
-/* #undef HAVE_MYSQL_AUTOCOMMIT */
+#define HAVE_MYSQL_AUTOCOMMIT 1
 
 /* MySQL supports mysql_change_user */
-/* #undef HAVE_MYSQL_CHANGE_USER */
+#define HAVE_MYSQL_CHANGE_USER 1
 
 /* MySQL supports mysql_commit */
-/* #undef HAVE_MYSQL_COMMIT */
+#define HAVE_MYSQL_COMMIT 1
 
 /* MySQL supports CR_SERVER_GONE_ERROR */
-/* #undef HAVE_MYSQL_CR_SERVER_GONE_ERROR */
+#define HAVE_MYSQL_CR_SERVER_GONE_ERROR 1
 
 /* MySQL supports CR_SERVER_LOST */
-/* #undef HAVE_MYSQL_CR_SERVER_LOST */
+#define HAVE_MYSQL_CR_SERVER_LOST 1
 
 /* MySQL supports FIELD_TYPE_ENUM */
-/* #undef HAVE_MYSQL_FIELD_TYPE_ENUM */
+#define HAVE_MYSQL_FIELD_TYPE_ENUM 1
 
 /* MySQL supports FIELD_TYPE_NEWDATE */
-/* #undef HAVE_MYSQL_FIELD_TYPE_NEWDATE */
+#define HAVE_MYSQL_FIELD_TYPE_NEWDATE 1
 
 /* MySQL supports FIELD_TYPE_NEWDECIMAL */
-/* #undef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL */
+#define HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL 1
 
 /* MySQL supports FIELD_TYPE_SET */
-/* #undef HAVE_MYSQL_FIELD_TYPE_SET */
+#define HAVE_MYSQL_FIELD_TYPE_SET 1
 
 /* MySQL supports FIELD_TYPE_YEAR */
-/* #undef HAVE_MYSQL_FIELD_TYPE_YEAR */
+#define HAVE_MYSQL_FIELD_TYPE_YEAR 1
 
 /* MySQL supports MYSQL_GET_SERVER_VERSION */
-/* #undef HAVE_MYSQL_GET_SERVER_VERSION */
+#define HAVE_MYSQL_GET_SERVER_VERSION 1
 
 /* MySQL supports mysql_next_result */
-/* #undef HAVE_MYSQL_NEXT_RESULT */
+#define HAVE_MYSQL_NEXT_RESULT a1
 
 /* MySQL supports MYSQL_OPT_RECONNECT */
-/* #undef HAVE_MYSQL_OPT_RECONNECT */
+#define HAVE_MYSQL_OPT_RECONNECT 1
 
 /* MySQL supports mysql_ping */
-/* #undef HAVE_MYSQL_PING */
+#define HAVE_MYSQL_PING 1
 
 /* MySQL supports mysql_real_connect */
-/* #undef HAVE_MYSQL_REAL_CONNECT_FOR_SURE */
+#define HAVE_MYSQL_REAL_CONNECT_FOR_SURE 1
 
 /* MySQL supports mysql_rollback */
-/* #undef HAVE_MYSQL_ROLLBACK */
+#define HAVE_MYSQL_ROLLBACK 1
 
 /* MySQL supports mysql_select_db */
-/* #undef HAVE_MYSQL_SELECT_DB */
+#define HAVE_MYSQL_SELECT_DB 1
 
 /* MySQL supports mysql_set_character_set */
-/* #undef HAVE_MYSQL_SET_CHARACTER_SET */
+#define HAVE_MYSQL_SET_CHARACTER_SET 1
 
 /* MySQL supports mysql_stmt_prepare */
-/* #undef HAVE_MYSQL_STMT_PREPARE */
+#define HAVE_MYSQL_STMT_PREPARE 1
 
 /* oci.h */
 #define HAVE_OCI_H

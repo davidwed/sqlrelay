@@ -1,6 +1,7 @@
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
 
+
 # installation directories
 prefix = @prefix@
 exec_prefix= @exec_prefix@
@@ -21,17 +22,22 @@ debugdir = ${localstatedir}/sqlrelay/debug
 logdir = ${localstatedir}/sqlrelay/log
 initscript_prefix = @initscript_prefix@
 
+
 # command separator
 AND = ;
+
 
 # slash
 SLASH = /
 
+
 # shell
 SHELL = @SHELL@
 
+
 # libtool command
 LIBTOOL = @LIBTOOL@
+
 
 # compile commands
 LTCOMPILE = $(LIBTOOL) --mode=compile
@@ -54,6 +60,7 @@ LOGDIRCPPFLAG = -DLOG_DIR=\"$(logdir)\"
 CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\" -DDEFAULT_CONFIG_DIR=\"$(sysconfdir)/sqlrelay.conf.d\"
 CACHEDIRCPPFLAG = -DCACHE_DIR=\"$(cachedir)\"
 
+
 # linker flags
 LTLINK = $(LIBTOOL) --mode=link
 LINK = @CXX@
@@ -66,6 +73,7 @@ INSTALLLIB = installlib
 UNINSTALLLIB = uninstalllib
 LIBEXT = la
 
+
 # install commands
 LTINSTALL = $(LIBTOOL) --mode=install
 MV = mv
@@ -74,30 +82,38 @@ CHMOD = chmod
 MKINSTALLDIRS = $(top_builddir)/mkinstalldirs
 LTFINISH = $(LIBTOOL) --mode=finish
 
+
 #uninstall/clean commands
 LTUNINSTALL = $(LIBTOOL) --mode=uninstall
 LTCLEAN = $(LIBTOOL) --mode=clean
 RM = rm -f
 RMTREE = rm -rf
 
+
 # command to create a symbolic link
 SYMLINK = ln -s
+
 
 # uname -s
 UNAME = @UNAME@
 
+
 # rpm build directory
 RPM_BUILD_DIR = @RPM_BUILD_DIR@
+
 
 # client/server rpath flags
 CLIENTUSERPATH = @CLIENTUSERPATH@
 SERVERUSERPATH = @SERVERUSERPATH@
 
+
 # math library
 MATHLIB = @MATHLIB@
 
+
 # extra libs
 EXTRALIBS = @LIBS@
+
 
 # windows environment
 MINGW32 = @MINGW32@
@@ -105,8 +121,10 @@ CYGWIN = @CYGWIN@
 UWIN = @UWIN@
 MICROSOFT = @MICROSOFT@
 
+
 # libpthread
 PTHREADLIB = @PTHREADLIB@
+
 
 # rudiments library
 RUDIMENTSPATH = @RUDIMENTSPATH@
@@ -114,21 +132,25 @@ RUDIMENTSINCLUDES = @RUDIMENTSINCLUDES@
 RUDIMENTSLIBS = @RUDIMENTSLIBS@
 RUDIMENTSLIBSPATH = @RUDIMENTSLIBSPATH@ 
 
+
 #iconv
 HAVE_ICONV = @HAVE_ICONV@
 ICONVINCLUDES = @ICONVINCLUDES@
 ICONVLIBS = @ICONVLIBS@
 
+
 # dmalloc
 LIBDMALLOC = @LIBDMALLOC@
+
 
 # ElectricFence
 LIBEFENCE = @LIBEFENCE@
 
+
 # c++
-# windows needs /D LIBSQLRCLIENT_EXPORTS
 CPPCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 CPPLIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+
 
 # c
 CUSERPATH = @CUSERPATH@
@@ -138,9 +160,10 @@ CLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMA
 CRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(CUSERPATH),yes)
-	CRPATH = -R $(libdir)
+CRPATH = -R $(libdir)
 endif
 endif
+
 
 # perl
 HAVE_PERL = @HAVE_PERL@
@@ -190,7 +213,7 @@ PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIME
 PERLRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PERLUSERPATH),yes)
-	PERLRPATH = -R $(libdir)
+PERLRPATH = -R $(libdir)
 endif
 endif
 
@@ -206,7 +229,7 @@ PYTHONLIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIM
 PYTHONRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PYTHONUSERPATH),yes)
-	PYTHONRPATH = -R $(libdir)
+PYTHONRPATH = -R $(libdir)
 endif
 endif
 
@@ -230,7 +253,7 @@ RUBYLIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTS
 RUBYRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(RUBYUSERPATH),yes)
-	RUBYRPATH = -R $(libdir)
+RUBYRPATH = -R $(libdir)
 endif
 endif
 
@@ -251,7 +274,7 @@ PHPLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLI
 PHPRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
-	PHPRPATH = -R $(libdir)
+PHPRPATH = -R $(libdir)
 endif
 endif
 PHPPDOCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
@@ -259,7 +282,7 @@ PHPPDOLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENT
 PHPPDORPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
-	PHPPDORPATH = -R $(libdir)
+PHPPDORPATH = -R $(libdir)
 endif
 endif
 
@@ -275,7 +298,7 @@ JAVALIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpat
 JAVARPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(JAVAUSERPATH),yes)
-	JAVARPATH = -R $(libdir)
+JAVARPATH = -R $(libdir)
 endif
 endif
 
@@ -291,7 +314,7 @@ TCLLIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLI
 TCLRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(TCLUSERPATH),yes)
-	TCLRPATH = -R $(libdir)
+TCLRPATH = -R $(libdir)
 endif
 endif
 
@@ -311,7 +334,7 @@ ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c/src -L$(top_builddir)/src/
 ERLANGRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(ERLANGUSERPATH),yes)
-	ERLANGRPATH = -R $(libdir)
+ERLANGRPATH = -R $(libdir)
 endif
 endif
 
@@ -347,7 +370,7 @@ MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
 MYSQLDRLIBRPATH = 
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
-	MYSQLDRLIBRPATH = -R $(libdir)
+MYSQLDRLIBRPATH = -R $(libdir)
 endif
 endif
 
@@ -362,7 +385,7 @@ POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTS
 POSTGRESQLDRLIBRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
-	POSTGRESQLDRLIBRPATH = -R $(libdir)
+POSTGRESQLDRLIBRPATH = -R $(libdir)
 endif
 endif
 
@@ -394,12 +417,12 @@ ODBCLIBS = @ODBCLIBS@
 ODBCLIBSPATH = @ODBCLIBSPATH@
 ODBCUSERPATH = @ODBCUSERPATH@
 ODBCUNICODE = @ODBCUNICODE@
-ODBCDRIVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES) $(ICONVINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
+ODBCDRIVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
 ODBCDRIVERLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(ODBCLIBS)
 ODBCDRIVERRPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
-	ODBCRPATH = -R $(libdir)
+ODBCRPATH = -R $(libdir)
 endif
 endif
 
@@ -444,11 +467,271 @@ CMDLINELIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c+
 PWDENCLIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CLIENTUSERPATH),yes)
-	CMDLINELIBS += -R $(libdir)
-	PWDENCLIBS += -R $(libdir)
+CMDLINELIBS += -R $(libdir)
+PWDENCLIBS += -R $(libdir)
 endif
 endif
 
+
+# server
+ifeq ($(SQLRELAY_ENABLE_SHARED),no)
+STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
+		sqlrserverconnectionassignments.cpp \
+		sqlrprotocoldeclarations.cpp \
+		sqlrprotocolassignments.cpp \
+		sqlrparserdeclarations.cpp \
+		sqlrparserassignments.cpp \
+		sqlrloggerdeclarations.cpp \
+		sqlrloggerassignments.cpp \
+		sqlrpwdencdeclarations.cpp \
+		sqlrpwdencassignments.cpp \
+		sqlrauthdeclarations.cpp \
+		sqlrauthassignments.cpp \
+		sqlrquerydeclarations.cpp \
+		sqlrqueryassignments.cpp
+STATICPLUGINLOBJS = $(shell ls ../../connections/*/*.$(OBJ)) \
+		$(shell ls ../../protocols/*.$(OBJ)) \
+		$(shell ls ../../parsers/*.$(OBJ)) \
+		$(shell ls ../../loggers/*.$(OBJ)) \
+		$(shell ls ../../pwdencs/*.$(OBJ)) \
+		$(shell ls ../../auths/*.$(OBJ)) \
+		$(shell ls ../../queries/*.$(OBJ))
+STATICPLUGINLIBS =
+ifneq ($(strip $(DB2LIBSPATH)),)
+ifeq ($(DB2USERPATH),yes)
+STATICPLUGINLIBS += -R $(DB2LIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(DB2LIBS)
+ifneq ($(strip $(FIREBIRDLIBSPATH)),)
+ifeq ($(FIREBIRDUSERPATH),yes)
+STATICPLUGINLIBS += -R $(FIREBIRDLIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(FIREBIRDLIBS)
+ifneq ($(strip $(FREETDSLIBSPATH)),)
+ifeq ($(FREETDSUSERPATH),yes)
+STATICPLUGINLIBS += -R $(FREETDSLIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(FREETDSLIBS)
+ifneq ($(strip $(MDBTOOLSLIBSPATH)),)
+ifeq ($(MDBTOOLSUSERPATH),yes)
+STATICPLUGINLIBS += -R $(MDBTOOLSLIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(MDBTOOLSLIBS)
+ifneq ($(strip $(MYSQLLIBSPATH)),)
+ifeq ($(MYSQLUSERPATH),yes)
+STATICPLUGINLIBS += -R $(MYSQLLIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(MYSQLLIBS)
+ifneq ($(strip $(ODBCLIBSPATH)),)
+ifeq ($(ODBCUSERPATH),yes)
+STATICPLUGINLIBS += -R $(ODBCLIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(ODBCLIBS)
+ifneq ($(strip $(ORACLELIBSPATH)),)
+ifeq ($(ORACLEUSERPATH),yes)
+STATICPLUGINLIBS += -R $(ORACLELIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(ORACLELIBS)
+ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
+ifeq ($(POSTGRESQLUSERPATH),yes)
+STATICPLUGINLIBS += -R $(POSTGRESQLLIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(POSTGRESQLLIBS)
+ifneq ($(strip $(SQLITELIBSPATH)),)
+ifeq ($(SQLITEUSERPATH),yes)
+STATICPLUGINLIBS += -R $(SQLITELIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(SQLITELIBS)
+ifneq ($(strip $(SYBASELIBSPATH)),)
+ifeq ($(SYBASEUSERPATH),yes)
+STATICPLUGINLIBS += -R $(SYBASELIBSPATH)
+endif
+endif
+STATICPLUGINLIBS += $(SYBASELIBS)
+STATICPLUGINLIBS += -L$(top_builddir)/src/api/c++/src -lsqlrclient
+endif
+
+SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -I../include -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
+LIBSQLRSERVERLIBS = -L$(top_builddir)/src/util -lsqlrutil
+SERVERLIBS = -L./ -lsqlrserver $(STATICPLUGINLIBS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ifneq ($(strip $(libdir)),)
+ifeq ($(SERVERUSERPATH),yes)
+	SERVERLIBS += -R $(libdir)
+endif
+endif
+
+
+# plugins
+PLUGINCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include -I$(top_builddir)/src/api/c++/include -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+PLUGINLIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+
+AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++/include
+SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient
+
+LOGGERCPPFLAGS = $(PLUGINCPPFLAGS) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPLAG)
+
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+INSTALLSHAREDLIB = installsharedlib
+else
+INSTALLSHAREDLIB =
+endif
+
+
+# connections
+CONNECTIONCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES)
+CONNECTIONLIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+
+DB2CONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(DB2INCLUDES)
+DB2CONNECTIONLIBS = $(DB2LIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(DB2LIBSPATH)),)
+ifeq ($(DB2USERPATH),yes)
+DB2CONNECTIONLIBS = -R $(DB2LIBSPATH)
+endif
+endif
+
+FIREBIRDCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(FIREBIRDINCLUDES)
+FIREBIRDCONNECTIONLIBS = $(FIREBIRDLIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(FIREBIRDLIBSPATH)),)
+ifeq ($(FIREBIRDUSERPATH),yes)
+FIREBIRDCONNECTIONLIBS = -R $(FIREBIRDLIBSPATH)
+endif
+endif
+
+FREETDSCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(FREETDSINCLUDES)
+FREETDSCONNECTIONLIBS = $(FREETDSLIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(FREETDSLIBSPATH)),)
+ifeq ($(FREETDSUSERPATH),yes)
+FREETDSCONNECTIONLIBS = -R $(FREETDSLIBSPATH)
+endif
+endif
+
+MDBTOOLSCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(MDBTOOLSINCLUDES)
+MDBTOOLSCONNECTIONLIBS = $(MDBTOOLSLIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(MDBTOOLSLIBSPATH)),)
+ifeq ($(MDBTOOLSUSERPATH),yes)
+MDBTOOLSCONNECTIONLIBS = -R $(MDBTOOLSLIBSPATH)
+endif
+endif
+
+MYSQLCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(MYSQLINCLUDES)
+MYSQLCONNECTIONLIBS = $(MYSQLLIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(MYSQLLIBSPATH)),)
+ifeq ($(MYSQLUSERPATH),yes)
+MYSQLCONNECTIONLIBS = -R $(MYSQLLIBSPATH)
+endif
+endif
+
+ODBCCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(ODBCINCLUDES) $(ICONVINCLUDES)
+ODBCCONNECTIONLIBS = $(ODBCLIBS) $(ICONVLIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(ODBCLIBSPATH)),)
+ifeq ($(ODBCUSERPATH),yes)
+ODBCCONNECTIONLIBS = -R $(ODBCLIBSPATH)
+endif
+endif
+ifneq ($(strip $(ICONVLIBSPATH)),)
+ifeq ($(ICONVUSERPATH),yes)
+ODBCCONNECTIONLIBS = -R $(ICONVLIBSPATH)
+endif
+endif
+
+ORACLECONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(ORACLEINCLUDES)
+ORACLECONNECTIONLIBS = $(ORACLELIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(ORACLELIBSPATH)),)
+ifeq ($(ORACLEUSERPATH),yes)
+ORACLECONNECTIONLIBS = -R $(ORACLELIBSPATH)
+endif
+endif
+
+POSTGRESQLCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(POSTGRESQLINCLUDES)
+POSTGRESQLCONNECTIONLIBS = $(POSTGRESQLLIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
+ifeq ($(POSTGRESQLUSERPATH),yes)
+POSTGRESQLCONNECTIONLIBS = -R $(POSTGRESQLLIBSPATH)
+endif
+endif
+
+ROUTERCONNECTIONCPPFLAGS = -I$(top_builddir)/src/api/c++/include $(CONNECTIONCPPFLAGS)
+ROUTERCONNECTIONLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(CONNECTIONLIBS)
+ifneq ($(strip $(ROUTERLIBSPATH)),)
+ifeq ($(ROUTERUSERPATH),yes)
+ROUTERCONNECTIONLIBS = -R $(ROUTERLIBSPATH)
+endif
+endif
+
+SQLITECONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(SQLITEINCLUDES)
+SQLITECONNECTIONLIBS = $(SQLITELIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(SQLITELIBSPATH)),)
+ifeq ($(SQLITEUSERPATH),yes)
+SQLITECONNECTIONLIBS = -R $(SQLITELIBSPATH)
+endif
+endif
+
+SYBASECONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(SYBASEINCLUDES)
+SYBASECONNECTIONLIBS = $(SYBASELIBS) $(CONNECTIONLIBS)
+ifneq ($(strip $(SYBASELIBSPATH)),)
+ifeq ($(SYBASEUSERPATH),yes)
+SYBASECONNECTIONLIBS = -R $(SYBASELIBSPATH)
+endif
+endif
+
+
+# connections
+CONNECTIONSALLSUBDIRS =
+CONNECTIONSINSTALLSUBDIRS =
+
+ifneq ($(strip $(DB2LIBS)),)
+CONNECTIONSALLSUBDIRS += all-db2
+CONNECTIONSINSTALLSUBDIRS += install-db2
+endif
+ifneq ($(strip $(FREETDSLIBS)),)
+CONNECTIONSALLSUBDIRS += all-freetds
+CONNECTIONSINSTALLSUBDIRS += install-freetds
+endif
+ifneq ($(strip $(FIREBIRDLIBS)),)
+CONNECTIONSALLSUBDIRS += all-firebird
+CONNECTIONSINSTALLSUBDIRS += install-firebird
+endif
+ifneq ($(strip $(MDBTOOLSLIBS)),)
+CONNECTIONSALLSUBDIRS += all-mdbtools
+CONNECTIONSINSTALLSUBDIRS += install-mdbtools
+endif
+ifneq ($(strip $(MYSQLLIBS)),)
+CONNECTIONSALLSUBDIRS += all-mysql
+CONNECTIONSINSTALLSUBDIRS += install-mysql
+endif
+ifneq ($(strip $(ODBCLIBS)),)
+ifneq ($(strip $(ODBCUNICODE)),)
+CONNECTIONSALLSUBDIRS += all-odbc
+CONNECTIONSINSTALLSUBDIRS += install-odbc
+endif
+endif
+ifneq ($(strip $(ORACLELIBS)),)
+CONNECTIONSALLSUBDIRS += all-oracle8
+CONNECTIONSINSTALLSUBDIRS += install-oracle8
+endif
+ifneq ($(strip $(POSTGRESQLLIBS)),)
+CONNECTIONSALLSUBDIRS += all-postgresql
+CONNECTIONSINSTALLSUBDIRS += install-postgresql
+endif
+ifneq ($(strip $(SQLITELIBS)),)
+CONNECTIONSALLSUBDIRS += all-sqlite
+CONNECTIONSINSTALLSUBDIRS += install-sqlite
+endif
+ifneq ($(strip $(SYBASELIBS)),)
+CONNECTIONSALLSUBDIRS += all-sybase
+CONNECTIONSINSTALLSUBDIRS += install-sybase
+endif
+CONNECTIONSALLSUBDIRS += all-router
+CONNECTIONSINSTALLSUBDIRS += install-router
 
 # tests
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
@@ -464,13 +747,91 @@ DROPINTESTCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(includedir) $(RUDIMEN
 DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
-# Microsoft-specific
+# microsoft-specific
 EXE = @EXE@
 
 
-# Shared object and module
+# shared object and module
 SQLRELAY_ENABLE_SHARED = @enable_shared@
 SOSUFFIX = @SOSUFFIX@
 MODULESUFFIX = @MODULESUFFIX@
 JNISUFFIX = @JNISUFFIX@
 MODULERENAME = $(top_builddir)/modulerename.sh
+
+
+# build directories
+INSTALLSUBDIRS = install-src install-bin install-etc install-init install-man install-doc install-pkgconfig
+UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-man uninstall-doc uninstall-pkgconfig
+
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-connections all-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-connections install-cmdline
+else
+SRCALLSUBDIRS = all-util all-api all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-connections all-server all-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-connections install-server install-cmdline
+endif
+
+
+APIALLSUBDIRS = all-cpp all-c
+APICLEANSUBDIRS = clean-cpp clean-c
+APIINSTALLSUBDIRS = install-cpp install-c
+APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+APIALLSUBDIRS += all-postgresql all-mysql
+APICLEANSUBDIRS += clean-postgresql clean-mysql
+APIINSTALLSUBDIRS += install-postgresql install-mysql
+APIUNINSTALLSUBDIRS += uninstall-postgresql uninstall-mysql
+ifneq ($(ODBCLIBS),)
+APIALLSUBDIRS += all-odbc
+APICLEANSUBDIRS += clean-odbc
+APIINSTALLSUBDIRS += install-odbc
+APIUNINSTALLSUBDIRS += uninstall-odbc
+endif
+ifneq ($(HAVE_PYTHON),)
+APIALLSUBDIRS += all-python
+APICLEANSUBDIRS += clean-python
+APIINSTALLSUBDIRS += install-python
+APIUNINSTALLSUBDIRS += uninstall-python
+endif
+ifneq ($(HAVE_PERL),)
+APIALLSUBDIRS += all-perl
+APICLEANSUBDIRS += clean-perl
+APIINSTALLSUBDIRS += install-perl
+APIUNINSTALLSUBDIRS += uninstall-perl
+endif
+ifneq ($(HAVE_RUBY),)
+APIALLSUBDIRS += all-ruby
+APICLEANSUBDIRS += clean-ruby
+APIINSTALLSUBDIRS += install-ruby
+APIUNINSTALLSUBDIRS += uninstall-ruby
+endif
+ifneq ($(HAVE_PHP),)
+APIALLSUBDIRS += all-php
+APIINSTALLSUBDIRS += install-php
+APIUNINSTALLSUBDIRS += uninstall-php
+endif
+ifneq ($(HAVE_PHP_PDO),)
+APIALLSUBDIRS += all-phppdo
+APICLEANSUBDIRS += clean-phppdo
+APIINSTALLSUBDIRS += install-phppdo
+APIUNINSTALLSUBDIRS += uninstall-phppdo
+endif
+ifneq ($(HAVE_JAVA),)
+APIALLSUBDIRS += all-java
+APICLEANSUBDIRS += clean-java
+APIINSTALLSUBDIRS += install-java
+APIUNINSTALLSUBDIRS += uninstall-java
+endif
+ifneq ($(HAVE_TCL),)
+APIALLSUBDIRS += all-tcl
+APICLEANSUBDIRS += clean-tcl
+APIINSTALLSUBDIRS += install-tcl
+APIUNINSTALLSUBDIRS += uninstall-tcl
+endif
+ifneq ($(HAVE_ERLANG),)
+APIALLSUBDIRS += all-erlang
+APICLEANSUBDIRS += clean-erlang
+APIINSTALLSUBDIRS += install-erlang
+APIUNINSTALLSUBDIRS += uninstall-erlang
+endif
+endif

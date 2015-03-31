@@ -9,29 +9,57 @@ clean:
 	cd src $(AND) $(MAKE) clean
 	cd test $(AND) $(MAKE) clean
 
-install:
+install: $(INSTALLSUBDIRS)
+
+install-src:
 	cd src $(AND) $(MAKE) install
+
+install-bin:
 	cd bin $(AND) $(MAKE) install
+
+install-etc:
 	cd etc $(AND) $(MAKE) install
+
+install-init:
 	cd init $(AND) $(MAKE) install
+
+install-man:
 	cd man $(AND) $(MAKE) install
+
+install-doc:
 	cd doc $(AND) $(MAKE) install
+
+install-pkgconfig:
 	$(MKINSTALLDIRS) $(libdir)/pkgconfig
 	$(CP) sqlrelay-c.pc $(libdir)/pkgconfig/sqlrelay-c.pc
 	$(CHMOD) 0644 $(libdir)/pkgconfig/sqlrelay-c.pc
 	$(CP) sqlrelay-c++.pc $(libdir)/pkgconfig/sqlrelay-c++.pc
 	$(CHMOD) 0644 $(libdir)/pkgconfig/sqlrelay-c++.pc
 
-uninstall:
+uninstall: $(UNINSTALLSUBDIRS)
+	$(RMTREE) $(libexecdir)
+
+uninstall-src:
 	cd src $(AND) $(MAKE) uninstall
+
+uninstall-bin:
 	cd bin $(AND) $(MAKE) uninstall
+
+uninstall-etc:
 	cd etc $(AND) $(MAKE) uninstall
+
+uninstall-init:
 	cd init $(AND) $(MAKE) uninstall
+
+uninstall-man:
 	cd man $(AND) $(MAKE) uninstall
+
+uninstall-doc:
 	cd doc $(AND) $(MAKE) uninstall
+
+uninstall-pkgconfig:
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc \
 		$(libdir)/pkgconfig/sqlrelay-c++.pc
-	$(RMTREE) $(libexecdir)
 
 distclean: clean
 	$(RM) config.cache \

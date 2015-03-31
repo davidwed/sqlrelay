@@ -4,6 +4,11 @@
 // note that config.h must come first to avoid some macro redefinition warnings
 #include <config.h>
 
+// windows needs this (don't include for __CYGWIN__ though)
+#ifdef _WIN32
+	#include <windows.h>
+#endif
+
 #include <sql.h>
 #include <sqlext.h>
 #include <sqlucode.h>
@@ -59,7 +64,7 @@ struct datebind {
 
 class odbcconnection;
 
-class odbccursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 	friend class odbcconnection;
 	private:
 				odbccursor(sqlrserverconnection *conn,
@@ -190,7 +195,7 @@ class odbccursor : public sqlrservercursor {
 		odbcconnection	*odbcconn;
 };
 
-class odbcconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 	friend class odbccursor;
 	public:
 			odbcconnection(sqlrservercontroller *cont);

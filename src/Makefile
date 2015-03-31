@@ -1,21 +1,38 @@
 include ../config.mk
 
-all:
+all: $(SRCALLSUBDIRS)
+
+all-util:
 	cd util $(AND) $(MAKE) all
+
+all-api:
 	cd api $(AND) $(MAKE) all
-ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+
+all-server:
 	cd server $(AND) $(MAKE) all
-endif
+
+all-parsers:
 	cd parsers $(AND) $(MAKE) all
+
+all-queries:
 	cd queries $(AND) $(MAKE) all
+
+all-loggers:
 	cd loggers $(AND) $(MAKE) all
+
+all-protocols:
 	cd protocols $(AND) $(MAKE) all
+
+all-pwdencs:
 	cd pwdencs $(AND) $(MAKE) all
+
+all-auths:
 	cd auths $(AND) $(MAKE) all
+
+all-connections:
 	cd connections $(AND) $(MAKE) all
-ifeq ($(SQLRELAY_ENABLE_SHARED),no)
-	cd server $(AND) $(MAKE) all
-endif
+
+all-cmdline:
 	cd cmdline $(AND) $(MAKE) all
 
 clean:
@@ -31,22 +48,39 @@ clean:
 	cd server $(AND) $(MAKE) clean
 	cd cmdline $(AND) $(MAKE) clean
 
-install:
+install: $(SRCINSTALLSUBDIRS)
+
+install-util:
 	cd util $(AND) $(MAKE) install
+
+install-api:
 	cd api $(AND) $(MAKE) install
-ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+
+install-server:
 	cd server $(AND) $(MAKE) install
-endif
+
+install-parsers:
 	cd parsers $(AND) $(MAKE) install
+
+install-queries:
 	cd queries $(AND) $(MAKE) install
+
+install-loggers:
 	cd loggers $(AND) $(MAKE) install
+
+install-protocols:
 	cd protocols $(AND) $(MAKE) install
+
+install-pwdencs:
 	cd pwdencs $(AND) $(MAKE) install
+
+install-auths:
 	cd auths $(AND) $(MAKE) install
+
+install-connections:
 	cd connections $(AND) $(MAKE) install
-ifeq ($(SQLRELAY_ENABLE_SHARED),no)
-	cd server $(AND) $(MAKE) install
-endif
+
+install-cmdline:
 	cd cmdline $(AND) $(MAKE) install
 
 uninstall:

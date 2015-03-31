@@ -2,9 +2,9 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.SUFFIXES: .tcl .tcl.in
+.SUFFIXES: .tcl .in
 
-.tcl.in.tcl:
+.in.tcl:
 	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" $< > $@; $(CHMOD) 755 $@
 
 all: db2.tcl \

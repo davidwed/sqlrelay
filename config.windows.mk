@@ -1,6 +1,7 @@
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO =
 
+
 # installation directories
 prefix = @prefix@
 exec_prefix= @exec_prefix@
@@ -21,17 +22,22 @@ debugdir = $(localstatedir)\\sqlrelay\\debug
 logdir = $(localstatedir)\\sqlrelay\\log
 initscript_prefix = @initscript_prefix@
 
+
 # command separator
 AND = &
+
 
 # slash
 SLASH = \\
 
+
 # shell
 SHELL =
 
+
 # libtool command
 LIBTOOL =
+
 
 # compile commands
 LTCOMPILE = 
@@ -54,6 +60,7 @@ LOGDIRCPPFLAG = /D LOG_DIR=\"$(logdir)\"
 CONFIGFILECPPFLAG = /D DEFAULT_CONFIG_FILE=\"$(sysconfdir)\\sqlrelay.conf\" /D DEFAULT_CONFIG_DIR=\"$(sysconfdir)\\sqlrelay.conf.d\"
 CACHEDIRCPPFLAG = /D CACHE_DIR=\"$(cachedir)\"
 
+
 # linker flags
 LTLINK =
 LINK = link
@@ -66,6 +73,7 @@ INSTALLLIB = installdll
 UNINSTALLLIB = uninstalldll
 LIBEXT = dll
 
+
 # install commands
 LTINSTALL =
 MV = move
@@ -74,17 +82,21 @@ CHMOD = echo
 MKINSTALLDIRS = cscript /nologo @top_builddir@\mkinstalldirs.vbs
 LTFINISH =
 
+
 #uninstall/clean commands
 LTUNINSTALL =
 LTCLEAN =
 RM = cscript /nologo @top_builddir@\rm.vbs
 RMTREE = cscript /nologo @top_builddir@\rmtree.vbs
 
+
 # math library
 MATHLIB =
 
+
 # extra libs
 EXTRALIBS =
+
 
 # windows environment
 MINGW32 =
@@ -92,8 +104,10 @@ CYGWIN =
 UWIN =
 MICROSOFT =
 
+
 # libpthread
 PTHREADLIB =
+
 
 # rudiments library
 RUDIMENTSPATH =
@@ -101,24 +115,30 @@ RUDIMENTSINCLUDES = /I"C:\Program Files\Firstworks\include"
 RUDIMENTSLIBS = /LIBPATH:"C:\Program Files\Firstworks\lib" librudiments.lib
 RUDIMENTSLIBSPATH =
 
+
 #iconv
 HAVE_ICONV =
 ICONVINCLUDES =
 ICONVLIBS =
 
+
 # dmalloc
 LIBDMALLOC =
 
+
 # ElectricFence
 LIBEFENCE =
+
 
 # c++
 CPPCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRCLIENT_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\api\c++\include /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES)
 CPPLIBS = $(RUDIMENTSLIBS)
 
+
 # c
 CCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRCLIENTWRAPPER_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES)
 CLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS)
+
 
 # perl
 HAVE_PERL =
@@ -245,29 +265,30 @@ ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c/src /LIBPATH:$(top_
 READLINEINCLUDES =
 READLINELIBS =
 
+
 # libsocket
 SOCKETLIBS =
 
 
 # oracle
-ORACLEVERSION = @ORACLEVERSION@
-ORACLEINCLUDES = @ORACLEINCLUDES@
-ORACLELIBS = @ORACLELIBS@
-ORACLELIBSPATH = @ORACLELIBSPATH@
+ORACLEVERSION = 12c
+ORACLEINCLUDES = /I "C:\Program Files\Oracle\instantclient_12_1\sdk\include"
+ORACLELIBS = /LIBPATH:"C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc" oci.lib
+ORACLELIBSPATH =
 
 
 # mysql
-MYSQLINCLUDES = /I "C:\Program Files\MySQL\MySQL Connector.C 6.1\include"
-MYSQLLIBS = /LIBPATH:"C:\Program Files\MySQL\MySQL Connector.C 6.1\lib" libmysql.lib
+MYSQLINCLUDES = /I "C:\Program Files (x86)\MySQL\MySQL Connector.C 6.1\include"
+MYSQLLIBS = /LIBPATH:"C:\Program Files (x86)\MySQL\MySQL Connector.C 6.1\lib" libmysql.lib
 MYSQLLIBSPATH =
 MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
 
 # postgresql
-POSTGRESQLINCLUDES = @POSTGRESQLINCLUDES@
-POSTGRESQLLIBS = @POSTGRESQLLIBS@
-POSTGRESQLLIBSPATH = @POSTGRESQLLIBSPATH@
+POSTGRESQLINCLUDES = /I "C:\Program Files\PostgreSQL\9.4\include"
+POSTGRESQLLIBS = /LIBPATH:"C:\Program Files\PostgreSQL\9.4\lib" libpq.lib
+POSTGRESQLLIBSPATH =
 POSTGRESQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 POSTGRESQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -285,18 +306,18 @@ FREETDSLIBSPATH = @FREETDSLIBSPATH@
 
 
 # sybase
-SYBASEINCLUDES = @SYBASEINCLUDES@
-SYBASELIBS = @SYBASELIBS@
-SYBASELIBSPATH = @SYBASELIBSPATH@
+SYBASEINCLUDES = /I "C:\SAP\OCS-16_0\include"
+SYBASELIBS = /LIBPATH:"C:\SAP\OCS-16_0\lib" libsybblk64.lib libsybct64.lib libsybcs64.lib
+SYBASELIBSPATH =
 
 
 # odbc
 ODBCINCLUDES =
-ODBCLIBS =
+ODBCLIBS = user32.lib gdi32.lib odbc32.lib odbccp32.lib
 ODBCLIBSPATH =
 ODBCUNICODE =
-ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRODBC_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES)
-ODBCDRIVERLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS) user32.lib gdi32.lib odbc32.lib odbccp32.lib /DEF:sqlrodbc.def
+ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRODBC_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
+ODBCDRIVERLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS) $(ODBCLIBS) /DEF:sqlrodbc.def
 
 
 # mdbtools
@@ -329,7 +350,74 @@ UTILLIBS = $(RUDIMENTSLIBS)
 # cmdline
 CMDLINECPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) /D SYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server/include /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 CMDLINELIBS = /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
-PWDENCLIBS = /LIBPATH:$(top_builddir)/src/server libsqlrserver.lib /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
+PWDENCLIBS = /LIBPATH:$(top_builddir)/src/server/src libsqlrserver.lib /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
+
+
+# server
+STATICPLUGINSRCS = 
+STATICPLUGINOBJS =
+STATICPLUGINLIBS =
+
+SERVERCPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) /I../include /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
+LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib
+SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+
+
+# plugins
+PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server\include /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
+PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server\src libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
+
+AUTHCPPFLAGS = $(PLUGINCPPFLAGS) /I$(top_builddir)\src\api\c++\include
+SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib
+
+LOGGERCPPFLAGS = $(PLUGINCPPFLAGS) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPLAG)
+
+INSTALLSHAREDLIB =
+
+
+# connections
+CONNECTIONCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)\ /I$(top_builddir)\src\common /I$(top_builddir)\src\util /I$(top_builddir)\src\server\include $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
+CONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\server\src libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+
+DB2CONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(DB2INCLUDES)
+DB2CONNECTIONLIBS = $(DB2LIBS) $(CONNECTIONLIBS)
+
+FIREBIRDCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(FIREBIRDINCLUDES)
+FIREBIRDCONNECTIONLIBS = $(FIREBIRDLIBS) $(CONNECTIONLIBS)
+
+FREETDSCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(FREETDSINCLUDES)
+FREETDSCONNECTIONLIBS = $(FREETDSLIBS) $(CONNECTIONLIBS)
+
+MDBTOOLSCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(MDBTOOLSINCLUDES)
+MDBTOOLSCONNECTIONLIBS = $(MDBTOOLSLIBS) $(CONNECTIONLIBS)
+
+MYSQLCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(MYSQLINCLUDES)
+MYSQLCONNECTIONLIBS = $(MYSQLLIBS) $(CONNECTIONLIBS)
+
+ODBCCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(ODBCINCLUDES) $(ICONVINCLUDES)
+ODBCCONNECTIONLIBS = $(ODBCLIBS) $(ICONVLIBS) $(CONNECTIONLIBS)
+
+ORACLECONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(ORACLEINCLUDES)
+ORACLECONNECTIONLIBS = $(ORACLELIBS) $(CONNECTIONLIBS)
+
+POSTGRESQLCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(POSTGRESQLINCLUDES)
+POSTGRESQLCONNECTIONLIBS = $(POSTGRESQLLIBS) $(CONNECTIONLIBS)
+
+ROUTERCONNECTIONCPPFLAGS = /I$(top_builddir)\src\api\c++\include $(CONNECTIONCPPFLAGS)
+ROUTERCONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(CONNECTIONLIBS)
+
+SQLITECONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(SQLITEINCLUDES)
+SQLITECONNECTIONLIBS = $(SQLITELIBS) $(CONNECTIONLIBS)
+
+SYBASECONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(SYBASEINCLUDES)
+SYBASECONNECTIONLIBS = $(SYBASELIBS) $(CONNECTIONLIBS)
+
+
+# connections
+#CONNECTIONSALLSUBDIRS = all-db2 all-firebird all-freetds all-mdbtools all-mysql all-odbc all-oracle8 all-postgresql all-sqlite all-sybase all-router
+#CONNECTIONSINSTALLSUBDIRS = install-db2 install-firebird install-freetds install-mdbtools install-mysql install-odbc install-oracle8 install-postgresql install-sqlite install-sybase install-router
+CONNECTIONSALLSUBDIRS = all-oracle8 all-postgresql all-sybase all-router
+CONNECTIONSINSTALLSUBDIRS = install-oracle8 install-postgresql install-sybase install-router
 
 
 # tests
@@ -346,12 +434,34 @@ DROPINTESTCPPFLAGS = $(BASECPPFLAGS) /I $(top_builddir) /I $(includedir) $(RUDIM
 DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
-# Microsoft-specific
+# microsoft-specific
 EXE = .exe
 
 
-# Shared object and module
+# shared object and module
 SOSUFFIX = dll
 MODULESUFFIX = dll
 JNISUFFIX = dll
 PYTHONSUFFIX = pyd
+
+
+# build directories
+INSTALLSUBDIRS = install-src install-bin install-etc install-doc
+UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-doc
+
+SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-connections all-cmdline
+
+SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-connections install-cmdline
+
+
+#APIALLSUBDIRS = all-cpp all-c all-postgresql all-mysql all-odbc all-python all-perl all-ruby all-php all-phppdo all-java all-tcl all-erlang
+APIALLSUBDIRS = all-cpp all-c all-postgresql all-mysql all-odbc all-python all-php all-phppdo all-java all-tcl
+
+#APICLEANSUBDIRS = clean-cpp clean-c clean-postgresql clean-mysql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-tcl clean-erlang
+APICLEANSUBDIRS = clean-cpp clean-c clean-postgresql clean-mysql clean-odbc clean-python clean-php clean-phppdo clean-java clean-tcl
+
+#APIINSTALLSUBDIRS = install-cpp install-c install-postgresql install-mysql install-odbc install-python install-perl install-ruby install-php install-phppdo install-java install-tcl install-erlang
+APIINSTALLSUBDIRS = install-cpp install-c install-postgresql install-mysql install-odbc install-python install-php install-phppdo install-java install-tcl
+
+#APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-postgresql uninstall-mysql uninstall-odbc uninstall-python uninstall-perl uninstall-ruby uninstall-php uninstall-phppdo uninstall-java uninstall-tcl uninstall-erlang
+APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-postgresql uninstall-mysql uninstall-odbc uninstall-python uninstall-php uninstall-phppdo uninstall-java uninstall-tcl

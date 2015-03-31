@@ -50,16 +50,22 @@ install:
 	$(CHMOD) 644 $(docdir)/admin/tuning.html
 	$(CP) css/styles.css $(docdir)/css
 	$(CHMOD) 644 $(docdir)/css/styles.css
-	for file in `ls api/c/html/*.html api/c/html/*.css api/c/html/*.png api/c/html/*.js`; \
-	do \
-		$(CP) $$file $(docdir)/api/c/html; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
-	for file in `ls api/c++/html/*.html api/c++/html/*.css api/c++/html/*.png api/c++/html/*.js`; \
-	do \
-		$(CP) $$file $(docdir)/api/c++/html; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
+	$(CP) api/c/html/*.html $(docdir)/api/c/html
+	$(CHMOD) 644 $(docdir)/api/c/html/*.html
+	$(CP) api/c/html/*.css $(docdir)/api/c/html
+	$(CHMOD) 644 $(docdir)/api/c/html/*.css
+	$(CP) api/c/html/*.png $(docdir)/api/c/html
+	$(CHMOD) 644 $(docdir)/api/c/html/*.png
+	$(CP) api/c/html/*.js $(docdir)/api/c/html
+	$(CHMOD) 644 $(docdir)/api/c/html/*.js
+	$(CP) api/c++/html/*.html $(docdir)/api/c/html
+	$(CHMOD) 644 $(docdir)/api/c++/html/*.html
+	$(CP) api/c++/html/*.css $(docdir)/api/c++/html
+	$(CHMOD) 644 $(docdir)/api/c++/html/*.css
+	$(CP) api/c++/html/*.png $(docdir)/api/c++/html
+	$(CHMOD) 644 $(docdir)/api/c++/html/*.png
+	$(CP) api/c++/html/*.js $(docdir)/api/c++/html
+	$(CHMOD) 644 $(docdir)/api/c++/html/*.js
 	$(CP) api/perl/perl.html $(docdir)/api/perl
 	$(CHMOD) 644 $(docdir)/api/perl/perl.html
 	$(CP) api/perl/Connection.html $(docdir)/api/perl
@@ -68,50 +74,28 @@ install:
 	$(CHMOD) 644 $(docdir)/api/perl/Cursor.html
 	$(CP) api/perl/SQLRelay.html $(docdir)/api/perl
 	$(CHMOD) 644 $(docdir)/api/perl/SQLRelay.html
-	for file in `ls api/php/*.html`; \
-	do \
-		$(CP) $$file $(docdir)/api/php; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
-	for file in `ls api/php/media/*.css`; \
-	do \
-		$(CP) $$file $(docdir)/api/php/media; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
-	for file in `ls api/php/sql_relay/*.html`; \
-	do \
-		$(CP) $$file $(docdir)/api/php/sql_relay; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
+	$(CP) api/php/*.html $(docdir)/api/php
+	$(CHMOD) 644 $(docdir)/api/php/*.html
+	$(CP) api/php/media/*.css $(docdir)/api/php/media
+	$(CHMOD) 644 $(docdir)/api/php/media/*.css
+	$(CP) api/php/sql_relay/*.html $(docdir)/api/php/sql_relay
+	$(CHMOD) 644 $(docdir)/api/php/sql_relay/*.html
 	$(CP) api/python/PySQLRClient.py.html $(docdir)/api/python
 	$(CHMOD) 644 $(docdir)/api/python/PySQLRClient.py.html
 	$(CP) api/python/PySQLRDB.py.html $(docdir)/api/python
 	$(CHMOD) 644 $(docdir)/api/python/PySQLRDB.py.html
-	for file in `ls api/ruby/doc/*.html api/ruby/doc/*.css`; \
-	do \
-		$(CP) $$file $(docdir)/api/ruby/doc; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
-	for file in `ls api/ruby/doc/classes/*.html`; \
-	do \
-		$(CP) $$file $(docdir)/api/ruby/doc/classes; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
-	for file in `ls api/ruby/doc/classes/SQLRConnection.src/*.html`; \
-	do \
-		$(CP) $$file $(docdir)/api/ruby/doc/classes/SQLRConnection.src; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
-	for file in `ls api/ruby/doc/classes/SQLRCursor.src/*.html`; \
-	do \
-		$(CP) $$file $(docdir)/api/ruby/doc/classes/SQLRCursor.src; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
-	for file in `ls api/ruby/doc/files/*.html`; \
-	do \
-		$(CP) $$file $(docdir)/api/ruby/doc/files; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
+	$(CP) api/ruby/doc/*.html $(docdir)/api/ruby/doc
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/*.html
+	$(CP) api/ruby/doc/*.css $(docdir)/api/ruby/doc
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/*.css
+	$(CP) api/ruby/doc/classes/*.html $(docdir)/api/ruby/doc/classes
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/*.html
+	$(CP) api/ruby/doc/classes/SQLRConnection.src/*.html $(docdir)/api/ruby/doc/classes/SQLRConnection.src
+	$(CHMOD) 644 $(docdir)/api/doc/classes/SQLRConnection.src/*.html
+	$(CP) api/ruby/doc/classes/SQLRCursor.src/*.html $(docdir)/api/ruby/doc/classes/SQLRCursor.src
+	$(CHMOD) 644 $(docdir)/api/doc/classes/SQLRCursor.src/*.html
+	$(CP) api/ruby/doc/files/*.html $(docdir)/api/ruby/doc/files
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/files/*.html
 	$(CP) api/java/allclasses-frame.html $(docdir)/api/java
 	$(CHMOD) 644 $(docdir)/api/java/allclasses-frame.html
 	$(CP) api/java/allclasses-noframe.html $(docdir)/api/java
@@ -148,11 +132,10 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/java/resources
 	$(CP) api/java/resources/inherit.gif $(docdir)/api/java/resources
 	$(CHMOD) 644 $(docdir)/api/java/resources/inherit.gif
-	for file in `ls api/tcl/*.html api/tcl/*.txt`; \
-	do \
-		$(CP) $$file $(docdir)/api/tcl; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
+	$(CP) api/tcl/*.html $(docdir)/api/tcl
+	$(CHMOD) 644 $(docdir)/api/tcl/*.html
+	$(CP) api/tcl/*.txt $(docdir)/api/tcl
+	$(CHMOD) 644 $(docdir)/api/tcl/*.txt
 	$(CP) dropin/mysql.html $(docdir)/dropin
 	$(CHMOD) 644 $(docdir)/dropin/mysql.html
 	$(CP) dropin/postgresql.html $(docdir)/dropin
@@ -183,11 +166,10 @@ install:
 	$(CHMOD) 644 $(docdir)/features/suspendedtx.html
 	$(CP) features/throttling.html $(docdir)/features
 	$(CHMOD) 644 $(docdir)/features/throttling.html
-	for file in `ls images/*.png images/*.PNG`; \
-	do \
-		$(CP) $$file $(docdir)/images; \
-		$(CHMOD) 644 $(docdir)/$$file; \
-	done
+	$(CP) images/*.png $(docdir)/images
+	$(CHMOD) 644 $(docdir)/images/*.png
+	$(CP) images/*.PNG $(docdir)/images
+	$(CHMOD) 644 $(docdir)/images/*.PNG
 	$(CP) js/rotate.js $(docdir)/js
 	$(CHMOD) 644 $(docdir)/js/rotate.js
 	$(CP) modules/passwordencryption.html $(docdir)/modules

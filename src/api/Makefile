@@ -1,137 +1,168 @@
 include ../../config.mk
 
-all:
+all: $(APIALLSUBDIRS)
+
+all-cpp:
 	cd c++ $(AND) $(MAKE) all
+
+all-c:
 	cd c $(AND) $(MAKE) all
-ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
+
+all-postgresql:
 	cd postgresql $(AND) $(MAKE) all
+
+all-mysql:
 	cd mysql $(AND) $(MAKE) all
-ifneq ($(ODBCLIBS),)
+
+all-odbc:
 	cd odbc $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_PYTHON),)
+
+all-python:
 	cd python $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_PERL),)
+
+all-perl:
 	cd perl $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_RUBY),)
+
+all-ruby:
 	cd ruby $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_PHP),)
+
+all-php:
 	cd php $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_PHP_PDO),)
+
+all-phppdo:
 	cd phppdo $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_JAVA),)
+
+all-java:
 	cd java $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_TCL),)
+
+all-tcl:
 	cd tcl $(AND) $(MAKE) all
-endif
-ifneq ($(HAVE_ERLANG),)
+
+all-erlang:
 	cd erlang $(AND) $(MAKE) all
-endif
-endif
 
-clean:
+
+clean: $(APICLEANSUBDIRS)
+
+clean-cpp:
 	cd c++ $(AND) $(MAKE) clean
+
+clean-c:
 	cd c $(AND) $(MAKE) clean
+
+clean-postgresql:
 	cd postgresql $(AND) $(MAKE) clean
+
+clean-mysql:
 	cd mysql $(AND) $(MAKE) clean
-ifneq ($(ODBCLIBS),)
+
+clean-odbc:
 	cd odbc $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_PYTHON),)
+
+clean-python:
 	cd python $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_PERL),)
+
+clean-perl:
 	cd perl $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_RUBY),)
+
+clean-ruby:
 	cd ruby $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_PHP),)
+
+clean-php:
 	cd php $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_PHP_PDO),)
+
+clean-phppdo:
 	cd phppdo $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_JAVA),)
+
+clean-java:
 	cd java $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_TCL),)
+
+clean-tcl:
 	cd tcl $(AND) $(MAKE) clean
-endif
-ifneq ($(HAVE_ERLANG),)
+
+clean-erlang:
 	cd erlang $(AND) $(MAKE) clean
-endif
 
-install:
+
+install: $(APIINSTALLSUBDIRS)
+
+install-cpp:
 	cd c++ $(AND) $(MAKE) install
-	cd c $(AND) $(MAKE) install
-ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-	cd postgresql $(AND) $(MAKE) install
-	cd mysql $(AND) $(MAKE) install
-ifneq ($(ODBCLIBS),)
-	cd odbc $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_PYTHON),)
-	cd python $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_PERL),)
-	cd perl $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_RUBY),)
-	cd ruby $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_PHP),)
-	cd php $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_PHP_PDO),)
-	cd phppdo $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_JAVA),)
-	cd java $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_TCL),)
-	cd tcl $(AND) $(MAKE) install
-endif
-ifneq ($(HAVE_ERLANG),)
-	cd erlang $(AND) $(MAKE) install
-endif
-endif
 
-uninstall:
+install-c:
+	cd c $(AND) $(MAKE) install
+
+install-postgresql:
+	cd postgresql $(AND) $(MAKE) install
+
+install-mysql:
+	cd mysql $(AND) $(MAKE) install
+
+install-odbc:
+	cd odbc $(AND) $(MAKE) install
+
+install-python:
+	cd python $(AND) $(MAKE) install
+
+install-perl:
+	cd perl $(AND) $(MAKE) install
+
+install-ruby:
+	cd ruby $(AND) $(MAKE) install
+
+install-php:
+	cd php $(AND) $(MAKE) install
+
+install-phppdo:
+	cd phppdo $(AND) $(MAKE) install
+
+install-java:
+	cd java $(AND) $(MAKE) install
+
+install-tcl:
+	cd tcl $(AND) $(MAKE) install
+
+install-erlang:
+	cd erlang $(AND) $(MAKE) install
+
+
+uninstall: $(APIUNINSTALLSUBDIRS)
+
+uninstall-cpp:
 	cd c++ $(AND) $(MAKE) uninstall
+
+uninstall-c:
 	cd c $(AND) $(MAKE) uninstall
+
+uninstall-postgresql:
 	cd postgresql $(AND) $(MAKE) uninstall
+
+uninstall-mysql:
 	cd mysql $(AND) $(MAKE) uninstall
-ifneq ($(ODBCLIBS),)
+
+uninstall-odbc:
 	cd odbc $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_PYTHON),)
+
+uninstall-python:
 	cd python $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_PERL),)
+
+uninstall-perl:
 	cd perl $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_RUBY),)
+
+uninstall-ruby:
 	cd ruby $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_PHP),)
+
+uninstall-php:
 	cd php $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_PHP_PDO),)
+
+uninstall-phppdo:
 	cd phppdo $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_JAVA),)
+
+uninstall-java:
 	cd java $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_TCL),)
+
+uninstall-tcl:
 	cd tcl $(AND) $(MAKE) uninstall
-endif
-ifneq ($(HAVE_ERLANG),)
+
+uninstall-erlang:
 	cd erlang $(AND) $(MAKE) uninstall
-endif

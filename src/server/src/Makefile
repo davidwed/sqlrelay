@@ -2,102 +2,8 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-ifeq ($(SQLRELAY_ENABLE_SHARED),no)
-PLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
-		sqlrserverconnectionassignments.cpp \
-		sqlrprotocoldeclarations.cpp \
-		sqlrprotocolassignments.cpp \
-		sqlrparserdeclarations.cpp \
-		sqlrparserassignments.cpp \
-		sqlrloggerdeclarations.cpp \
-		sqlrloggerassignments.cpp \
-		sqlrpwdencdeclarations.cpp \
-		sqlrpwdencassignments.cpp \
-		sqlrauthdeclarations.cpp \
-		sqlrauthassignments.cpp \
-		sqlrquerydeclarations.cpp \
-		sqlrqueryassignments.cpp
-PLUGINLOBJS = $(shell ls ../../connections/*/*.$(OBJ)) \
-		$(shell ls ../../protocols/*.$(OBJ)) \
-		$(shell ls ../../parsers/*.$(OBJ)) \
-		$(shell ls ../../loggers/*.$(OBJ)) \
-		$(shell ls ../../pwdencs/*.$(OBJ)) \
-		$(shell ls ../../auths/*.$(OBJ)) \
-		$(shell ls ../../queries/*.$(OBJ))
-PLUGINLIBS =
-ifneq ($(strip $(DB2LIBSPATH)),)
-ifeq ($(DB2USERPATH),yes)
-PLUGINLIBS += -R $(DB2LIBSPATH)
-endif
-endif
-PLUGINLIBS += $(DB2LIBS)
-ifneq ($(strip $(FIREBIRDLIBSPATH)),)
-ifeq ($(FIREBIRDUSERPATH),yes)
-PLUGINLIBS += -R $(FIREBIRDLIBSPATH)
-endif
-endif
-PLUGINLIBS += $(FIREBIRDLIBS)
-ifneq ($(strip $(FREETDSLIBSPATH)),)
-ifeq ($(FREETDSUSERPATH),yes)
-PLUGINLIBS += -R $(FREETDSLIBSPATH)
-endif
-endif
-PLUGINLIBS += $(FREETDSLIBS)
-ifneq ($(strip $(MDBTOOLSLIBSPATH)),)
-ifeq ($(MDBTOOLSUSERPATH),yes)
-PLUGINLIBS += -R $(MDBTOOLSLIBSPATH)
-endif
-endif
-PLUGINLIBS += $(MDBTOOLSLIBS)
-ifneq ($(strip $(MYSQLLIBSPATH)),)
-ifeq ($(MYSQLUSERPATH),yes)
-PLUGINLIBS += -R $(MYSQLLIBSPATH)
-endif
-endif
-PLUGINLIBS += $(MYSQLLIBS)
-ifneq ($(strip $(ODBCLIBSPATH)),)
-ifeq ($(ODBCUSERPATH),yes)
-PLUGINLIBS += -R $(ODBCLIBSPATH)
-endif
-endif
-PLUGINLIBS += $(ODBCLIBS)
-ifneq ($(strip $(ORACLELIBSPATH)),)
-ifeq ($(ORACLEUSERPATH),yes)
-PLUGINLIBS += -R $(ORACLELIBSPATH)
-endif
-endif
-PLUGINLIBS += $(ORACLELIBS)
-ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
-ifeq ($(POSTGRESQLUSERPATH),yes)
-PLUGINLIBS += -R $(POSTGRESQLLIBSPATH)
-endif
-endif
-PLUGINLIBS += $(POSTGRESQLLIBS)
-ifneq ($(strip $(SQLITELIBSPATH)),)
-ifeq ($(SQLITEUSERPATH),yes)
-PLUGINLIBS += -R $(SQLITELIBSPATH)
-endif
-endif
-PLUGINLIBS += $(SQLITELIBS)
-ifneq ($(strip $(SYBASELIBSPATH)),)
-ifeq ($(SYBASEUSERPATH),yes)
-PLUGINLIBS += -R $(SYBASELIBSPATH)
-endif
-endif
-PLUGINLIBS += $(SYBASELIBS)
-PLUGINLIBS += -L$(top_builddir)/src/api/c++/src -lsqlrclient
-endif
-
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -I../include -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
-LIBS = -L./ -lsqlrserver $(PLUGINLIBS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
-RPATH =
-ifneq ($(strip $(libdir)),)
-ifeq ($(SERVERUSERPATH),yes)
-	RPATH = -R $(libdir)
-endif
-endif
-
-SRCS = sqlrlistener.cpp \
+LIBSQLRSERVERSRCS = \
+	sqlrlistener.cpp \
 	sqlrservercontroller.cpp \
 	sqlrserverconnection.cpp \
 	sqlrservercursor.cpp \
@@ -119,8 +25,10 @@ SRCS = sqlrlistener.cpp \
 	sqlrauths.cpp \
 	sqlrauth.cpp \
 	sqlrscaler.cpp \
+	$(STATICPLUGINSRCS)
 
-LOBJS = sqlrlistener.$(OBJ) \
+LIBSQLRSERVERLOBJS = \
+	sqlrlistener.$(OBJ) \
 	sqlrservercontroller.$(OBJ) \
 	sqlrserverconnection.$(OBJ) \
 	sqlrservercursor.$(OBJ) \
@@ -142,18 +50,18 @@ LOBJS = sqlrlistener.$(OBJ) \
 	sqlrauths.$(OBJ) \
 	sqlrauth.$(OBJ) \
 	sqlrscaler.$(OBJ) \
-	$(PLUGINLOBJS)
+	$(STATICPLUGINLOBJS)
 
 .SUFFIXES: .lo .cpp.in
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(SERVERCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(SERVERCPPFLAGS) $(COMPILE) $<
 
-all: $(PLUGINSRCS) \
-	libsqlrserver.la \
+all: $(STATICPLUGINSRCS) \
+	libsqlrserver.$(LIBEXT) \
 	sqlr-start$(EXE) \
 	sqlr-stop$(EXE) \
 	sqlr-listener$(EXE) \
@@ -162,33 +70,29 @@ all: $(PLUGINSRCS) \
 	sqlr-cachemanager$(EXE)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest sqlr-start$(EXE) sqlr-stop$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE)
-	if ( test -n "$(PLUGINSRCS)" ); \
-	then \
-		$(RM) $(PLUGINSRCS); \
-	fi
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest sqlr-start$(EXE) sqlr-stop$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE) $(STATICPLUGINSRCS)
 	$(RMTREE) .libs
 
-libsqlrserver.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PLUGINLIBS) $(EXTRALIBS)
+libsqlrserver.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LIBSQLRSERVERLOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBSQLRSERVERLIBS) $(RUDIMENTSLIBS) $(STATICPLUGINLIBS) $(EXTRALIBS)
 
 sqlr-start$(EXE): sqlr-start.cpp sqlr-start.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-start.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-start.$(OBJ) $(SERVERLIBS)
 
 sqlr-stop$(EXE): sqlr-stop.cpp sqlr-stop.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-stop.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-stop.$(OBJ) $(SERVERLIBS)
 
 sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-listener.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-listener.$(OBJ) $(SERVERLIBS)
 
 sqlr-connection$(EXE): sqlr-connection.cpp sqlr-connection.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-connection.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-connection.$(OBJ) $(SERVERLIBS)
 
 sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-scaler.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-scaler.$(OBJ) $(SERVERLIBS)
 
 sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(LIBS) $(RPATH)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(SERVERLIBS)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@

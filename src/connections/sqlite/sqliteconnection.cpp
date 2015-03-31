@@ -31,7 +31,7 @@ extern "C" {
 	#define sqlite3_malloc			malloc
 #endif
 
-class sqliteconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 	friend class sqlitecursor;
 	public:
 				sqliteconnection(sqlrservercontroller *cont);
@@ -83,7 +83,7 @@ class sqliteconnection : public sqlrserverconnection {
 		char	*hostname;
 };
 
-class sqlitecursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 	friend class sqliteconnection;
 	private:
 				sqlitecursor(sqlrserverconnection *conn,

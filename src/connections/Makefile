@@ -1,97 +1,97 @@
 include ../../config.mk
 
-all:
-ifneq ($(strip $(DB2LIBS)),)
-	$(MAKE) -C db2 all
-endif
-ifneq ($(strip $(FREETDSLIBS)),)
-	$(MAKE) -C freetds all
-endif
-ifneq ($(strip $(FIREBIRDLIBS)),)
-	$(MAKE) -C firebird all
-endif
-ifneq ($(strip $(MDBTOOLSLIBS)),)
-	$(MAKE) -C mdbtools all
-endif
-ifneq ($(strip $(MYSQLLIBS)),)
-	$(MAKE) -C mysql all
-endif
-ifneq ($(strip $(ODBCLIBS)),)
-ifneq ($(strip $(ODBCUNICODE)),)
-	$(MAKE) -C odbc all
-endif
-endif
-ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) -C oracle8 all
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) -C postgresql all
-endif
-ifneq ($(strip $(SQLITELIBS)),)
-	$(MAKE) -C sqlite all
-endif
-ifneq ($(strip $(SYBASELIBS)),)
-	$(MAKE) -C sybase all
-endif
-	$(MAKE) -C router all
+all: $(CONNECTIONSALLSUBDIRS)
+
+all-db2:
+	cd db2 $(AND) $(MAKE) all
+
+all-freetds:
+	cd freetds $(AND) $(MAKE) all
+
+all-firebird:
+	cd firebird $(AND) $(MAKE) all
+
+all-mdbtools:
+	cd mdbtools $(AND) $(MAKE) all
+
+all-mysql:
+	cd mysql $(AND) $(MAKE) all
+
+all-odbc:
+	cd odbc $(AND) $(MAKE) all
+
+all-oracle8:
+	cd oracle8 $(AND) $(MAKE) all
+
+all-postgresql:
+	cd postgresql $(AND) $(MAKE) all
+
+all-sqlite:
+	cd sqlite $(AND) $(MAKE) all
+
+all-sybase:
+	cd sybase $(AND) $(MAKE) all
+
+all-router:
+	cd router $(AND) $(MAKE) all
 
 clean:
-	$(MAKE) -C db2 clean
-	$(MAKE) -C freetds clean
-	$(MAKE) -C firebird clean
-	$(MAKE) -C mdbtools clean
-	$(MAKE) -C mysql clean
-	$(MAKE) -C odbc clean
-	$(MAKE) -C oracle8 clean
-	$(MAKE) -C postgresql clean
-	$(MAKE) -C sqlite clean
-	$(MAKE) -C sybase clean
-	$(MAKE) -C router clean
+	cd db2 $(AND) $(MAKE) clean
+	cd freetds $(AND) $(MAKE) clean
+	cd firebird $(AND) $(MAKE) clean
+	cd mdbtools $(AND) $(MAKE) clean
+	cd mysql $(AND) $(MAKE) clean
+	cd odbc $(AND) $(MAKE) clean
+	cd oracle8 $(AND) $(MAKE) clean
+	cd postgresql $(AND) $(MAKE) clean
+	cd sqlite $(AND) $(MAKE) clean
+	cd sybase $(AND) $(MAKE) clean
+	cd router $(AND) $(MAKE) clean
 
-install:
-ifneq ($(strip $(DB2LIBS)),)
-	$(MAKE) -C db2 install
-endif
-ifneq ($(strip $(FREETDSLIBS)),)
-	$(MAKE) -C freetds install
-endif
-ifneq ($(strip $(FIREBIRDLIBS)),)
-	$(MAKE) -C firebird install
-endif
-ifneq ($(strip $(MDBTOOLSLIBS)),)
-	$(MAKE) -C mdbtools install
-endif
-ifneq ($(strip $(MYSQLLIBS)),)
-	$(MAKE) -C mysql install
-endif
-ifneq ($(strip $(ODBCLIBS)),)
-ifneq ($(strip $(ODBCUNICODE)),)
-	$(MAKE) -C odbc install
-endif
-endif
-ifneq ($(strip $(ORACLELIBS)),)
-	$(MAKE) -C oracle8 install
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
-	$(MAKE) -C postgresql install
-endif
-ifneq ($(strip $(SQLITELIBS)),)
-	$(MAKE) -C sqlite install
-endif
-ifneq ($(strip $(SYBASELIBS)),)
-	$(MAKE) -C sybase install
-endif
-	$(MAKE) -C router install
+install: $(CONNECTIONSINSTALLSUBDIRS)
+
+install-db2:
+	cd db2 $(AND) $(MAKE) install
+
+install-freetds:
+	cd freetds $(AND) $(MAKE) install
+
+install-firebird:
+	cd firebird $(AND) $(MAKE) install
+
+install-mdbtools:
+	cd mdbtools $(AND) $(MAKE) install
+
+install-mysql:
+	cd mysql $(AND) $(MAKE) install
+
+install-odbc:
+	cd odbc $(AND) $(MAKE) install
+
+install-oracle8:
+	cd oracle8 $(AND) $(MAKE) install
+
+install-postgresql:
+	cd postgresql $(AND) $(MAKE) install
+
+install-sqlite:
+	cd sqlite $(AND) $(MAKE) install
+
+install-sybase:
+	cd sybase $(AND) $(MAKE) install
+
+install-router:
+	cd router $(AND) $(MAKE) install
 
 uninstall:
-	$(MAKE) -C db2 uninstall
-	$(MAKE) -C freetds uninstall
-	$(MAKE) -C firebird uninstall
-	$(MAKE) -C mdbtools uninstall
-	$(MAKE) -C mysql uninstall
-	$(MAKE) -C odbc uninstall
-	$(MAKE) -C oracle8 uninstall
-	$(MAKE) -C postgresql uninstall
-	$(MAKE) -C sqlite uninstall
-	$(MAKE) -C sybase uninstall
-	$(MAKE) -C router uninstall
+	cd db2 $(AND) $(MAKE) uninstall
+	cd freetds $(AND) $(MAKE) uninstall
+	cd firebird $(AND) $(MAKE) uninstall
+	cd mdbtools $(AND) $(MAKE) uninstall
+	cd mysql $(AND) $(MAKE) uninstall
+	cd odbc $(AND) $(MAKE) uninstall
+	cd oracle8 $(AND) $(MAKE) uninstall
+	cd postgresql $(AND) $(MAKE) uninstall
+	cd sqlite $(AND) $(MAKE) uninstall
+	cd sybase $(AND) $(MAKE) uninstall
+	cd router $(AND) $(MAKE) uninstall

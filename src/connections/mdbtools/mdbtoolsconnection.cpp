@@ -24,7 +24,7 @@ extern "C" {
 
 extern void mdb_remove_backends();
 
-class mdbtoolsconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC mdbtoolsconnection : public sqlrserverconnection {
 	friend class mdbtoolscursor;
 	public:
 			mdbtoolsconnection(sqlrservercontroller *cont);
@@ -70,7 +70,7 @@ enum cursortype_t {
 	COLUMN_LIST_CURSORTYPE
 };
 
-class mdbtoolscursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC mdbtoolscursor : public sqlrservercursor {
 	friend class mdbtoolsconnection;
 	private:
 				mdbtoolscursor(sqlrserverconnection *conn,

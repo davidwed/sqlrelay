@@ -57,7 +57,7 @@ struct datebind {
 
 class firebirdconnection;
 
-class firebirdcursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 	friend class firebirdconnection;
 	private:
 				firebirdcursor(sqlrserverconnection *conn,
@@ -204,7 +204,7 @@ class firebirdcursor : public sqlrservercursor {
 		bool	bindformaterror;
 };
 
-class firebirdconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 	friend class firebirdcursor;
 	public:
 			firebirdconnection(sqlrservercontroller *cont);

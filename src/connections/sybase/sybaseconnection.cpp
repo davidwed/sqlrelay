@@ -20,7 +20,7 @@ extern "C" {
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768
 
-class sybaseconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC sybaseconnection : public sqlrserverconnection {
 	friend class sybasecursor;
 	public:
 			sybaseconnection(sqlrservercontroller *cont);
@@ -102,7 +102,7 @@ struct datebind {
         const char      **tz;
 };
 
-class sybasecursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC sybasecursor : public sqlrservercursor {
 	friend class sybaseconnection;
 	private:
 				sybasecursor(sqlrserverconnection *conn,
@@ -776,7 +776,7 @@ bool sybasecursor::open() {
 	bool	retval=true;
 	if (sybaseconn->db && sybaseconn->db[0] && !sybaseconn->dbused) {
 		int32_t	len=charstring::length(sybaseconn->db)+4;
-		char	query[len+1];
+		char	*query=new char[len+1];
 		charstring::printf(query,len+1,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			char		err[2048];
@@ -790,6 +790,7 @@ bool sybasecursor::open() {
 			sybaseconn->dbused=true;
 		}
 		closeResultSet();
+		delete[] query;
 	}
 
 	if (!sybaseconn->dbversion) {

@@ -83,7 +83,7 @@ struct datebind {
 
 class freetdsconnection;
 
-class freetdscursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 	friend class freetdsconnection;
 	private:
 				freetdscursor(sqlrserverconnection *conn,
@@ -240,7 +240,7 @@ class freetdscursor : public sqlrservercursor {
 };
 
 
-class freetdsconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 	friend class freetdscursor;
 	public:
 			freetdsconnection(sqlrservercontroller *cont);
@@ -993,7 +993,7 @@ bool freetdscursor::open() {
 	bool	retval=true;
 	if (freetdsconn->db && freetdsconn->db[0] && !freetdsconn->dbused) {
 		uint32_t	len=charstring::length(freetdsconn->db)+4;
-		char		query[len+1];
+		char		*query=new char[len+1];
 		charstring::printf(query,len+1,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			char		err[2048];
@@ -1007,6 +1007,7 @@ bool freetdscursor::open() {
 			freetdsconn->dbused=true;
 		}
 		closeResultSet();
+		delete[] query;
 	}
 
 	if (!freetdsconn->dbversion) {

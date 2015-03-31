@@ -41,7 +41,7 @@ struct cursorbindvar {
 	sqlrservercursor	*cursor;
 };
 
-class routerconnection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 	friend class routercursor;
 	public:
 			routerconnection(sqlrservercontroller *cont);
@@ -95,7 +95,7 @@ class routerconnection : public sqlrserverconnection {
 		const char	*error;
 };
 
-class routercursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 	friend class routerconnection;
 	private:
 				routercursor(sqlrserverconnection *conn,
