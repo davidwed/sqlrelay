@@ -39,6 +39,8 @@
 	implemented the ODBC driver-manager dialog for windows
 	updated windows installer to install ODBC registry settings
 	ODBC driver copies references now
+	fixed various bugs in sqlrconfigfile that caused sqlr-start with no
+		-id to crash or behave strangely sometimes
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
