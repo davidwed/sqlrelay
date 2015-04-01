@@ -249,10 +249,13 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		bool		correctid;
 		bool		done;
 
+		void	init();
+		void	clear();
+
 		uint32_t	atouint32_t(const char *value,
 					const char *defaultvalue,
 					uint32_t minvalue);
-		int32_t	atoint32_t(const char *value,
+		int32_t		atoint32_t(const char *value,
 					const char *defaultvalue,
 					int32_t minvalue);
 

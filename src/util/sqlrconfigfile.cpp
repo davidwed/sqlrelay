@@ -13,8 +13,21 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
+	init();
+}
+
+sqlrconfigfile::~sqlrconfigfile() {
+	clear();
+}
+
+void sqlrconfigfile::init() {
 	getenabledids=false;
 	currentid=NULL;
+	enabled=false;
+	idlist=NULL;
+	id=NULL;
+	correctid=false;
+	done=false;
 	addresses=NULL;
 	addresscount=0;
 	port=0;
@@ -92,8 +105,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	inend=false;
 }
 
-sqlrconfigfile::~sqlrconfigfile() {
-
+void sqlrconfigfile::clear() {
 	delete[] currentid;
 	delete[] dbase;
 	delete[] unixport;
@@ -114,28 +126,35 @@ sqlrconfigfile::~sqlrconfigfile() {
 	for (listenernode *ln=listenerlist.getFirst(); ln; ln=ln->getNext()) {
 		delete ln->getValue();
 	}
+	listenerlist.clear();
 
 	for (usernode *un=userlist.getFirst(); un; un=un->getNext()) {
 		delete un->getValue();
 	}
+	userlist.clear();
 
 	for (connectstringnode *csn=connectstringlist.getFirst();
 						csn; csn=csn->getNext()) {
 		delete csn->getValue();
 	}
+	connectstringlist.clear();
 
 	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
 		delete rn->getValue();
 	}
+	routelist.clear();
 
 	for (linkedlistnode< char * > *ssln=sessionstartqueries.getFirst();
 						ssln; ssln=ssln->getNext()) {
 		delete[] ssln->getValue();
 	}
+	sessionstartqueries.clear();
+
 	for (linkedlistnode< char * > *seln=sessionendqueries.getFirst();
 						seln; seln=seln->getNext()) {
 		delete[] seln->getValue();
 	}
+	sessionendqueries.clear();
 }
 
 const char * const *sqlrconfigfile::getDefaultAddresses() {
@@ -654,28 +673,30 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		case CONNECTIONS_TAG:
 			currenttag=thistag;
 			break;
-		case CONNECTION_TAG: {
-			currentconnect=new connectstringcontainer();
-			connectstringlist.append(currentconnect);
-			stringbuffer	connectionid;
-			connectionid.append(id)->append("-");
-			connectionid.append(connectioncount);
-			currentconnect->setConnectionId(
-					connectionid.getString());
-			connectioncount++;
+		case CONNECTION_TAG:
+			if (id) {
+				currentconnect=new connectstringcontainer();
+				connectstringlist.append(currentconnect);
+				stringbuffer	connectionid;
+				connectionid.append(id)->append("-");
+				connectionid.append(connectioncount);
+				currentconnect->setConnectionId(
+						connectionid.getString());
+				connectioncount++;
 			}
 			break;
-		case ROUTER_TAG: {
-			currentconnect=new connectstringcontainer();
-			connectstringlist.append(currentconnect);
-			stringbuffer	connectionid;
-			connectionid.append(id)->append("-");
-			connectionid.append(connectioncount);
-			currentconnect->setConnectionId(
-					connectionid.getString());
-			connectioncount++;
-			currenttag=thistag;
+		case ROUTER_TAG:
+			if (id) {
+				currentconnect=new connectstringcontainer();
+				connectstringlist.append(currentconnect);
+				stringbuffer	connectionid;
+				connectionid.append(id)->append("-");
+				connectionid.append(connectioncount);
+				currentconnect->setConnectionId(
+						connectionid.getString());
+				connectioncount++;
 			}
+			currenttag=thistag;
 			break;
 		case ROUTE_TAG:
 		case FILTER_TAG:
@@ -798,6 +819,16 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			defaultlistener->setAddresses(addresses,addresscount);
 			defaultlistener->setPort(port);
 			defaultlistener->setSocket(unixport);
+			listenerlist.append(defaultlistener);
+		} else
+
+		// if no port or socket was specified in the instance tag and
+		// no listener was specified, then add a listener node with the
+		// default port
+		if (!listenerlist.getLength()) {
+			defaultlistener=new listenercontainer();
+			defaultlistener->setPort(
+				charstring::toInteger(DEFAULT_PORT));
 			listenerlist.append(defaultlistener);
 		}
 
@@ -1760,7 +1791,11 @@ void sqlrconfigfile::moveRegexList(routecontainer *cur,
 
 bool sqlrconfigfile::parse(const char *config, const char *id) {
 
-	// init some variables
+	// re-init
+	clear();
+	init();
+
+	// set some variables
 	getenabledids=false;
 	this->id=id;
 	correctid=false;
@@ -1810,7 +1845,11 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 void sqlrconfigfile::getEnabledIds(const char *config,
 					linkedlist< char * > *idlist) {
 
-	// init some variables
+	// re-init
+	clear();
+	init();
+
+	// set some variables
 	getenabledids=true;
 	this->idlist=idlist;
 	correctid=true;

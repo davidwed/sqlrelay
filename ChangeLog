@@ -1,3 +1,6 @@
+0.58.1 - fixed bugs that could cause sqlr-start with no id to crash and
+	sqlr-start on an id with neither port nor socket defined to crash
+
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
 	removed support for undocumented ~/.sqlrelay.conf
