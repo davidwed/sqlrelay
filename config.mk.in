@@ -803,6 +803,7 @@ APIUNINSTALLSUBDIRS += uninstall-ruby
 endif
 ifneq ($(HAVE_PHP),)
 APIALLSUBDIRS += all-php
+APICLEANSUBDIRS += clean-php
 APIINSTALLSUBDIRS += install-php
 APIUNINSTALLSUBDIRS += uninstall-php
 endif
