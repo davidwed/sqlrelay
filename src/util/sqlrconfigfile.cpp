@@ -820,6 +820,16 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			defaultlistener->setPort(port);
 			defaultlistener->setSocket(unixport);
 			listenerlist.append(defaultlistener);
+		} else
+
+		// if no port or socket was specified in the instance tag and
+		// no listener was specified, then add a listener node with the
+		// default port
+		if (!listenerlist.getLength()) {
+			defaultlistener=new listenercontainer();
+			defaultlistener->setPort(
+				charstring::toInteger(DEFAULT_PORT));
+			listenerlist.append(defaultlistener);
 		}
 
 		// reset flags
