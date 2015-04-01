@@ -61,7 +61,8 @@ LIBS = \
 	#LIBS += -R $(SYBASELIBSPATH)
 #endif
 
-SRCS = bench.cpp main.cpp \
+SRCS = bench.cpp \
+	main.cpp \
 	sqlrelaybench.cpp \
 	db2bench.cpp \
 	firebirdbench.cpp \
@@ -72,7 +73,8 @@ SRCS = bench.cpp main.cpp \
 	sqlitebench.cpp \
 	sybasebench.cpp
 
-LOBJS = bench.lo main.lo \
+LOBJS = bench.lo \
+	main.lo \
 	sqlrelaybench.lo \
 	db2bench.lo \
 	firebirdbench.lo \
@@ -88,7 +90,7 @@ LOBJS = bench.lo main.lo \
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-.cpp.$(OBJ):
+.cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: sqlr-bench

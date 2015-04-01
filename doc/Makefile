@@ -58,7 +58,7 @@ install:
 	$(CHMOD) 644 $(docdir)/api/c/html/*.png
 	$(CP) api/c/html/*.js $(docdir)/api/c/html
 	$(CHMOD) 644 $(docdir)/api/c/html/*.js
-	$(CP) api/c++/html/*.html $(docdir)/api/c/html
+	$(CP) api/c++/html/*.html $(docdir)/api/c++/html
 	$(CHMOD) 644 $(docdir)/api/c++/html/*.html
 	$(CP) api/c++/html/*.css $(docdir)/api/c++/html
 	$(CHMOD) 644 $(docdir)/api/c++/html/*.css
@@ -91,9 +91,9 @@ install:
 	$(CP) api/ruby/doc/classes/*.html $(docdir)/api/ruby/doc/classes
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/*.html
 	$(CP) api/ruby/doc/classes/SQLRConnection.src/*.html $(docdir)/api/ruby/doc/classes/SQLRConnection.src
-	$(CHMOD) 644 $(docdir)/api/doc/classes/SQLRConnection.src/*.html
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/SQLRConnection.src/*.html
 	$(CP) api/ruby/doc/classes/SQLRCursor.src/*.html $(docdir)/api/ruby/doc/classes/SQLRCursor.src
-	$(CHMOD) 644 $(docdir)/api/doc/classes/SQLRCursor.src/*.html
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/SQLRCursor.src/*.html
 	$(CP) api/ruby/doc/files/*.html $(docdir)/api/ruby/doc/files
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/files/*.html
 	$(CP) api/java/allclasses-frame.html $(docdir)/api/java

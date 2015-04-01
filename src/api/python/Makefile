@@ -17,7 +17,7 @@ clean:
 	$(RMTREE) .libs
 
 CSQLRelay.$(LIBEXT): CSQLRelay.cpp CSQLRelay.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ CSQLRelay.$(OBJ) $(LDFLAGS) $(PYTHONLIBS) $(PYTHONRPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ CSQLRelay.$(OBJ) $(LDFLAGS) $(PYTHONLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 	$(CP) PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay

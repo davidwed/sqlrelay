@@ -28,6 +28,8 @@ installdll:
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrprotocol_sqlrclient.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.a
 	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrprotocol_sqlrclient.so so $(MODULESUFFIX)

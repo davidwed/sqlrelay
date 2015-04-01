@@ -10,7 +10,7 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-.cpp.$(OBJ):
+.cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: cursortest forktest query random socketeater threadtest timeouttest

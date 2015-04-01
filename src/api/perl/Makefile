@@ -21,10 +21,10 @@ clean:
 	$(RMTREE) .libs
 
 Connection.$(LIBEXT): Connection.xs Connection.cpp Connection.$(OBJ)
-	$(LTLINK) $(CXX) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(PERLCONLIBS) $(PERLRPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(CXX) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(PERLCONLIBS) $(MODLINKFLAGS)
 
 Cursor.$(LIBEXT): Cursor.xs Cursor.cpp Cursor.$(OBJ)
-	$(LTLINK) $(CXX) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(PERLCURLIBS) $(PERLRPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(CXX) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(PERLCURLIBS) $(MODLINKFLAGS)
 
 
 install: $(INSTALLLIB)

@@ -34,7 +34,7 @@ clean:
 	$(RMTREE) .libs
 
 sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.lo
-	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(RUBYLIBS) $(RUBYRPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(RUBYLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

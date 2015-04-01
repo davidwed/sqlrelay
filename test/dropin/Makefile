@@ -4,13 +4,7 @@ include ../../config.mk
 
 .SUFFIXES: .lo
 
-all: mysql postgresql
-#ifneq ($(strip $(MYSQLLIBS)),)
-	#$(MAKE) mysql
-#endif
-#ifneq ($(strip $(POSTGRESQLLIBS)),)
-	#$(MAKE) postgresql
-#endif
+all: $(DROPINTESTTARGETS)
 
 mysql.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) $< $(OUT)$@

@@ -17,7 +17,7 @@ clean:
 	$(RMTREE) .libs
 
 pdo_sqlrelay.$(LIBEXT): pdo_sqlrelay.cpp pdo_sqlrelay.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ pdo_sqlrelay.$(OBJ) $(LDFLAGS) $(PHPPDOLIBS) $(PHPPDORPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ pdo_sqlrelay.$(OBJ) $(LDFLAGS) $(PHPPDOLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

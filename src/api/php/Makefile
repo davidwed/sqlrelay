@@ -17,7 +17,7 @@ clean:
 	$(RMTREE) .libs
 
 sql_relay.$(LIBEXT): sql_relay.cpp sql_relay.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ sql_relay.$(OBJ) $(LDFLAGS) $(PHPLIBS) $(PHPRPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sql_relay.$(OBJ) $(LDFLAGS) $(PHPLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

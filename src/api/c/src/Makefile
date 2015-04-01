@@ -20,7 +20,7 @@ clean:
 	$(RMTREE) .libs
 
 libsqlrclientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(CLIBS) $(CRPATH) $(LINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(CLIBS) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(cachedir)

@@ -1,6 +1,7 @@
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO =
 
+SQLRELAY_ENABLE_SHARED = yes
 
 # installation directories
 prefix = @prefix@
@@ -430,6 +431,7 @@ CTESTLIBS = /LIBPATH:$(libdir) libsqlrclient.lib libsqlrclientwrapper.lib $(RUDI
 ODBCTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(ODBCINCLUDES)
 ODBCTESTLIBS = $(RUDIMENTSLIBS) $(ODBCLIBS)
 
+DROPINTESTTARGETS = mysql postgresql
 DROPINTESTCPPFLAGS = $(BASECPPFLAGS) /I $(top_builddir) /I $(includedir) $(RUDIMENTSINCLUDES)
 DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
