@@ -11,7 +11,7 @@
 #include <debugprint.h>
 #include <defines.h>
 
-class custom_nw : public sqlrlogger {
+class SQLRSERVER_DLLSPEC custom_nw : public sqlrlogger {
 	public:
 			custom_nw(xmldomnode *parameters);
 			~custom_nw();
@@ -249,7 +249,8 @@ bool custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
 }
 
 extern "C" {
-	sqlrlogger	*new_sqlrlogger_custom_nw(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_nw(
+						xmldomnode *parameters) {
 		return new custom_nw(parameters);
 	}
 }

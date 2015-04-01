@@ -9,7 +9,7 @@
 #include <rudiments/filesystem.h>
 #include <rudiments/stringbuffer.h>
 
-class slowqueries : public sqlrlogger {
+class SQLRSERVER_DLLSPEC slowqueries : public sqlrlogger {
 	public:
 			slowqueries(xmldomnode *parameters);
 			~slowqueries();
@@ -148,7 +148,8 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 }
 
 extern "C" {
-	sqlrlogger	*new_sqlrlogger_slowqueries(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_slowqueries(
+						xmldomnode *parameters) {
 		return new slowqueries(parameters);
 	}
 }

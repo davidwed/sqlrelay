@@ -9,7 +9,7 @@
 // for time_t, time(), localtime()
 #include <time.h>
 
-class sqlrcmdgstat : public sqlrquery {
+class SQLRSERVER_DLLSPEC sqlrcmdgstat : public sqlrquery {
 	public:
 			sqlrcmdgstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
@@ -277,7 +277,8 @@ void sqlrcmdgstatcursor::getField(uint32_t col,
 }
 
 extern "C" {
-	sqlrquery	*new_sqlrquery_sqlrcmdgstat(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdgstat(
+						xmldomnode *parameters) {
 		return new sqlrcmdgstat(parameters);
 	}
 }

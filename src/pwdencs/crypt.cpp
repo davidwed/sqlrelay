@@ -5,7 +5,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/crypt.h>
 
-class crypt_pwdenc : public sqlrpwdenc {
+class SQLRSERVER_DLLSPEC crypt_pwdenc : public sqlrpwdenc {
 	public:
 			crypt_pwdenc(xmldomnode *parameters);
 		bool	oneWay();
@@ -34,7 +34,8 @@ char *crypt_pwdenc::encrypt(const char *value) {
 }
 
 extern "C" {
-	sqlrpwdenc *new_sqlrpwdenc_crypt(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_crypt(
+						xmldomnode *parameters) {
 		return new crypt_pwdenc(parameters);
 	}
 }

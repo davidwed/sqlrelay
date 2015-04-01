@@ -8,7 +8,7 @@
 #include <rudiments/datetime.h>
 #include <debugprint.h>
 
-class custom_sc : public sqlrlogger {
+class SQLRSERVER_DLLSPEC custom_sc : public sqlrlogger {
 	public:
 			custom_sc(xmldomnode *parameters);
 			~custom_sc();
@@ -221,7 +221,8 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 }
 
 extern "C" {
-	sqlrlogger	*new_sqlrlogger_custom_sc(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_sc(
+						xmldomnode *parameters) {
 		return new custom_sc(parameters);
 	}
 }

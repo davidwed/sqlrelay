@@ -8,7 +8,7 @@
 #include <datatypes.h>
 #include <debugprint.h>
 
-class sqlrcmdcstat : public sqlrquery {
+class SQLRSERVER_DLLSPEC sqlrcmdcstat : public sqlrquery {
 	public:
 			sqlrcmdcstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
@@ -248,7 +248,8 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 }
 
 extern "C" {
-	sqlrquery	*new_sqlrquery_sqlrcmdcstat(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdcstat(
+						xmldomnode *parameters) {
 		return new sqlrcmdcstat(parameters);
 	}
 }

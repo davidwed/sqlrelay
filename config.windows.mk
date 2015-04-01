@@ -114,7 +114,6 @@ PTHREADLIB =
 RUDIMENTSPATH =
 RUDIMENTSINCLUDES = /I"C:\Program Files\Firstworks\include"
 RUDIMENTSLIBS = /LIBPATH:"C:\Program Files\Firstworks\lib" librudiments.lib
-RUDIMENTSLIBSPATH =
 
 
 #iconv
@@ -202,15 +201,12 @@ HAVE_RUBY =
 RUBY = @RUBY@
 RUBYLIB = @RUBYLIB@
 OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
-
 #RUBYCFLAGS = $(shell LANG=POSIX $(RUBY) getcflags.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-
 #ifeq ($(OVERRIDERUBYSITEARCHDIR),)
 #RUBYSITEARCHDIR = $(shell LANG=POSIX $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 #else
 #RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
 #endif
-
 RUBYCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) /I./ /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -244,7 +240,7 @@ JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENT
 HAVE_TCL =
 TCLINCLUDE = /IC:\Tcl\include
 TCLLIB = /LIBPATH:C:\Tcl\lib tcl86.lib
-TCLLIBSPATH = C:\Tcl\lib
+TCLLIBSPATH = C:\Tclib
 TCLCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 TCLLIBS = $(TCLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -275,13 +271,11 @@ SOCKETLIBS =
 ORACLEVERSION = 12c
 ORACLEINCLUDES = /I "C:\Program Files\Oracle\instantclient_12_1\sdk\include"
 ORACLELIBS = /LIBPATH:"C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc" oci.lib
-ORACLELIBSPATH =
 
 
 # mysql
-MYSQLINCLUDES = /I "C:\Program Files (x86)\MySQL\MySQL Connector.C 6.1\include"
-MYSQLLIBS = /LIBPATH:"C:\Program Files (x86)\MySQL\MySQL Connector.C 6.1\lib" libmysql.lib
-MYSQLLIBSPATH =
+MYSQLINCLUDES = /I "C:\Program Files\MySQL\MySQL Connector.C 6.1\include"
+MYSQLLIBS = /LIBPATH:"C:\Program Files\MySQL\MySQL Connector.C 6.1\lib" libmysql.lib
 MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -289,7 +283,6 @@ MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RU
 # postgresql
 POSTGRESQLINCLUDES = /I "C:\Program Files\PostgreSQL\9.4\include"
 POSTGRESQLLIBS = /LIBPATH:"C:\Program Files\PostgreSQL\9.4\lib" libpq.lib
-POSTGRESQLLIBSPATH =
 POSTGRESQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 POSTGRESQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -297,50 +290,29 @@ POSTGRESQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib
 # sqlite
 SQLITEINCLUDES = @SQLITEINCLUDES@
 SQLITELIBS = @SQLITELIBS@
-SQLITELIBSPATH = @SQLITELIBSPATH@
-
-
-# freetds
-FREETDSINCLUDES = @FREETDSINCLUDES@
-FREETDSLIBS = @FREETDSLIBS@
-FREETDSLIBSPATH = @FREETDSLIBSPATH@
 
 
 # sybase
 SYBASEINCLUDES = /I "C:\SAP\OCS-16_0\include"
 SYBASELIBS = /LIBPATH:"C:\SAP\OCS-16_0\lib" libsybblk64.lib libsybct64.lib libsybcs64.lib
-SYBASELIBSPATH =
 
 
 # odbc
 ODBCINCLUDES =
 ODBCLIBS = user32.lib gdi32.lib odbc32.lib odbccp32.lib
-ODBCLIBSPATH =
 ODBCUNICODE =
 ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRODBC_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
 ODBCDRIVERLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS) $(ODBCLIBS) /DEF:sqlrodbc.def
 
 
-# mdbtools
-MDBTOOLSINCLUDES = @MDBTOOLSINCLUDES@
-MDBTOOLSLIBS = @MDBTOOLSLIBS@
-MDBTOOLSLIBSPATH = @MDBTOOLSLIBSPATH@
-
-
 # db2
-DB2INCLUDES = @DB2INCLUDES@
-DB2LIBS = @DB2LIBS@
-DB2LIBSPATH = @DB2LIBSPATH@
+DB2INCLUDES = /I"C:\Program Files\IBM\SQLLIB\include"
+DB2LIBS = /LIBPATH:"C:\Program Files\IBM\SQLLIB\lib" db2api.lib
 
 
 # firebird
-FIREBIRDINCLUDES = @FIREBIRDINCLUDES@
-FIREBIRDLIBS = @FIREBIRDLIBS@
-FIREBIRDLIBSPATH = @FIREBIRDLIBSPATH@
-
-
-# router
-ROUTERLIBSPATH =
+FIREBIRDINCLUDES = /I"C:\Program Files\Firebird\Firebird_2_5\include"
+FIREBIRDLIBS = /LIBPATH:"C:\Program Files\Firebird\Firebird_2_5\lib" fbclient_ms.lib
 
 
 # util
@@ -386,12 +358,6 @@ DB2CONNECTIONLIBS = $(DB2LIBS) $(CONNECTIONLIBS)
 FIREBIRDCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(FIREBIRDINCLUDES)
 FIREBIRDCONNECTIONLIBS = $(FIREBIRDLIBS) $(CONNECTIONLIBS)
 
-FREETDSCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(FREETDSINCLUDES)
-FREETDSCONNECTIONLIBS = $(FREETDSLIBS) $(CONNECTIONLIBS)
-
-MDBTOOLSCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(MDBTOOLSINCLUDES)
-MDBTOOLSCONNECTIONLIBS = $(MDBTOOLSLIBS) $(CONNECTIONLIBS)
-
 MYSQLCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(MYSQLINCLUDES)
 MYSQLCONNECTIONLIBS = $(MYSQLLIBS) $(CONNECTIONLIBS)
 
@@ -415,10 +381,8 @@ SYBASECONNECTIONLIBS = $(SYBASELIBS) $(CONNECTIONLIBS)
 
 
 # connections
-#CONNECTIONSALLSUBDIRS = all-db2 all-firebird all-freetds all-mdbtools all-mysql all-odbc all-oracle8 all-postgresql all-sqlite all-sybase all-router
-#CONNECTIONSINSTALLSUBDIRS = install-db2 install-firebird install-freetds install-mdbtools install-mysql install-odbc install-oracle8 install-postgresql install-sqlite install-sybase install-router
-CONNECTIONSALLSUBDIRS = all-oracle8 all-postgresql all-sybase all-router
-CONNECTIONSINSTALLSUBDIRS = install-oracle8 install-postgresql install-sybase install-router
+CONNECTIONSALLSUBDIRS = all-db2 all-firebird all-mysql all-oracle8 all-postgresql all-sybase all-router
+CONNECTIONSINSTALLSUBDIRS = install-db2 install-firebird install-mysql install-oracle8 install-postgresql install-sybase install-router
 
 
 # tests

@@ -402,7 +402,7 @@ char *MD5::MD5Sum(const unsigned char *data, uint64_t size) {
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 
-class md5 : public sqlrpwdenc {
+class SQLRSERVER_DLLSPEC md5 : public sqlrpwdenc {
 	public:
 			md5(xmldomnode *parameters);
 		bool	oneWay();
@@ -422,7 +422,8 @@ char *md5::encrypt(const char *value) {
 }
 
 extern "C" {
-	sqlrpwdenc *new_sqlrpwdenc_md5(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_md5(
+						xmldomnode *parameters) {
 		return new md5(parameters);
 	}
 }

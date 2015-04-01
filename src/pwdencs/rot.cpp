@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/character.h>
 
-class rot : public sqlrpwdenc {
+class SQLRSERVER_DLLSPEC rot : public sqlrpwdenc {
 	public:
 			rot(xmldomnode *parameters);
 		char	*encrypt(const char *value);
@@ -65,7 +65,8 @@ char *rot::rotate(const char *value, int64_t count) {
 }
 
 extern "C" {
-	sqlrpwdenc *new_sqlrpwdenc_rot(xmldomnode *parameters) {
+	 SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_rot(
+						xmldomnode *parameters) {
 		return new rot(parameters);
 	}
 }

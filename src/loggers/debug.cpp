@@ -8,7 +8,7 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
-class debug : public sqlrlogger {
+class SQLRSERVER_DLLSPEC debug : public sqlrlogger {
 	public:
 			debug(xmldomnode *parameters);
 			~debug();
@@ -149,7 +149,8 @@ void debug::closeDebugFile() {
 }
 
 extern "C" {
-	sqlrlogger	*new_sqlrlogger_debug(xmldomnode *parameters) {
+	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_debug(
+						xmldomnode *parameters) {
 		return new debug(parameters);
 	}
 }

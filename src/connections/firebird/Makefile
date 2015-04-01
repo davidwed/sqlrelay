@@ -11,7 +11,7 @@ LOBJS= firebirdconnection.$(OBJ)
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(FIREBIRDCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(FIREBIRDCONNECTIONCPPFLAGS) $(COMPILE) $<
 
 all: sqlrconnection_firebird.$(LIBEXT)
 

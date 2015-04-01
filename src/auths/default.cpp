@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 
-class defaultauth : public sqlrauth {
+class SQLRSERVER_DLLSPEC defaultauth : public sqlrauth {
 	public:
 			defaultauth(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
@@ -119,7 +119,9 @@ bool defaultauth::authenticate(const char *user, const char *password) {
 }
 
 extern "C" {
-	sqlrauth *new_sqlrauth_default(xmldomnode *users, sqlrpwdencs *sqlrpe) {
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_default(
+						xmldomnode *users,
+						sqlrpwdencs *sqlrpe) {
 		return new defaultauth(users,sqlrpe);
 	}
 }

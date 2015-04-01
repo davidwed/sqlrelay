@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
-class sqlrelay : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrelay : public sqlrauth {
 	public:
 			sqlrelay(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
@@ -97,8 +97,9 @@ bool sqlrelay::authenticate(const char *user, const char *password) {
 }
 
 extern "C" {
-	sqlrauth *new_sqlrauth_sqlrelay(xmldomnode *users,
-					sqlrpwdencs *sqlrpe) {
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrelay(
+						xmldomnode *users,
+						sqlrpwdencs *sqlrpe) {
 		return new sqlrelay(users,sqlrpe);
 	}
 }
