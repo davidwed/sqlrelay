@@ -13,7 +13,6 @@
 #include <rudiments/stdio.h>
 
 #define DEBUG_MESSAGES 1
-#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
 // windows needs this
@@ -124,9 +123,6 @@ struct STMT {
 	dictionary<int32_t,outputbind *>	outputbinds;
 	SQLROWSETSIZE				*rowsfetchedptr;
 	SQLUSMALLINT				*rowstatusptr;
-	bool					executed;
-	bool					executedbynumresultcols;
-	SQLRETURN				executedbynumresultcolsresult;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -270,9 +266,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			stmt->appparamdesc=stmt->impparamdesc;
 			stmt->rowsfetchedptr=NULL;
 			stmt->rowstatusptr=NULL;
-			stmt->executed=false;
-			stmt->executedbynumresultcols=false;
-			stmt->executedbynumresultcolsresult=SQL_SUCCESS;
 			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_DESC:
@@ -2301,51 +2294,6 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	bool	result=stmt->cur->sendQuery((const char *)statementtext,
 							statementtextlength);
 
-	// the statement has been executed
-	stmt->executed=true;
-
-	// handle success
-	if (result) {
-		SQLR_FetchOutputBinds(stmt);
-		return SQL_SUCCESS;
-	}
-
-	// handle error
-	SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
-				stmt->cur->errorNumber(),NULL);
-	return SQL_ERROR;
-}
-
-SQLRETURN SQL_API SQLR_SQLExecute(SQLHSTMT statementhandle) {
-	debugFunction();
-
-	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	// don't actually do anything if the statement
-	// was already executed by SQLNumResultCols
-	if (stmt->executedbynumresultcols) {
-		debugPrintf("already executed by SQLNumResultCols...\n");
-		stmt->executedbynumresultcols=false;
-		return stmt->executedbynumresultcolsresult;
-	}
-
-	// reinit row indices
-	stmt->currentfetchrow=0;
-	stmt->currentgetdatarow=0;
-
-	// clear the error
-	SQLR_STMTClearError(stmt);
-
-	// run the query
-	bool	result=stmt->cur->executeQuery();
-
-	// the statement has been executed
-	stmt->executed=true;
-
 	// handle success
 	if (result) {
 		SQLR_FetchOutputBinds(stmt);
@@ -2360,7 +2308,33 @@ SQLRETURN SQL_API SQLR_SQLExecute(SQLHSTMT statementhandle) {
 
 SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	debugFunction();
-	return SQLR_SQLExecute(statementhandle);
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
+	SQLR_STMTClearError(stmt);
+
+	// run the query
+	bool	result=stmt->cur->executeQuery();
+
+	// handle success
+	if (result) {
+		SQLR_FetchOutputBinds(stmt);
+		return SQL_SUCCESS;
+	}
+
+	// handle error
+	SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+				stmt->cur->errorNumber(),NULL);
+	return SQL_ERROR;
 }
 
 static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
@@ -3128,20 +3102,15 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	}
 
 	debugPrintf("messagetext: %s\n",(error)?error:"");
-	debugPrintf("bufferlength: %d\n",bufferlength);
 	debugPrintf("nativeerror: %lld\n",(int64_t)errn);
 	debugPrintf("sqlstate: %s\n",(sqlst)?sqlst:"");
 
 	// copy out the error and sqlstate
 	charstring::safeCopy((char *)messagetext,(size_t)bufferlength,error);
-	*textlength=charstring::length(error);
-	if (*textlength>bufferlength) {
-		*textlength=bufferlength;
-	}
 	if (nativeerror) {
 		*nativeerror=errn;
 	}
-	charstring::copy((char *)sqlstate,(sqlst && sqlst[0])?sqlst:"HYOOO");
+	charstring::copy((char *)sqlstate,(sqlst)?sqlst:"HYOOO");
 
 	return SQL_SUCCESS;
 }
@@ -3755,16 +3724,6 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("infotype: SQL_DBMS_VER\n");
 			strval=conn->con->dbVersion();
 			break;
-		case SQL_CURSOR_COMMIT_BEHAVIOR:
-			debugPrintf("infotype: SQL_CURSOR_COMMIT_BEHAVIOR\n");
-			// FIXME: is this true for all db's?
-			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
-			break;
-		case SQL_CURSOR_ROLLBACK_BEHAVIOR:
-			debugPrintf("infotype: SQL_CURSOR_ROLLBACK_BEHAVIOR\n");
-			// FIXME: is this true for all db's?
-			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
-			break;
 		case SQL_DATABASE_NAME:
 			debugPrintf("infotype: SQL_DATABASE_NAME\n");
 			strval=conn->con->getCurrentDatabase();
@@ -3792,55 +3751,6 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("infotype: SQL_PARAM_ARRAY_ROW_COUNTS\n");
 			// batch sql is not supported
 			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_CATALOG_NAME:
-			debugPrintf("infotype: SQL_CATALOG_NAME\n");
-			// FIXME: this isn't true for all db's
-			strval="Y";
-			break;
-		case SQL_MAX_CATALOG_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_CATALOG_NAME_LEN\n");
-			// 0 means no max length or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_SCHEMA_USAGE:
-			debugPrintf("infotype: SQL_SCHEMA_USAGE\n");
-			// FIXME: this isn't true for all db's
-			*(SQLUINTEGER *)infovalue=
-					SQL_SU_DML_STATEMENTS|
-					SQL_SU_PROCEDURE_INVOCATION|
-					SQL_SU_TABLE_DEFINITION|
-					SQL_SU_INDEX_DEFINITION|
-					SQL_SU_PRIVILEGE_DEFINITION;
-			break;
-		case SQL_TXN_ISOLATION_OPTION:
-			debugPrintf("infotype: SQL_TXN_ISOLATION_OPTION\n");
-			// FIXME: this isn't true for all db's
-			*(SQLUINTEGER *)infovalue=
-					SQL_TXN_READ_UNCOMMITTED|
-					SQL_TXN_READ_COMMITTED|
-					SQL_TXN_REPEATABLE_READ|
-					SQL_TXN_SERIALIZABLE;
-			break;
-		case SQL_MAX_SCHEMA_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_SCHEMA_NAME_LEN\n");
-			// 0 means no max length or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_MAX_TABLE_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_TABLE_NAME_LEN\n");
-			// 0 means no max length or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_MAX_PROCEDURE_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_PROCEDURE_NAME_LEN\n");
-			// 0 means no max length or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_IDENTIFIER_QUOTE_CHAR:
-			debugPrintf("infotype: SQL_IDENTIFIER_QUOTE_CHAR\n");
-			// FIXME: is this true for all db's?
-			strval="\"";
 			break;
 		default:
 			debugPrintf("unsupported infotype: %d\n",infotype);
@@ -4109,22 +4019,10 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	SQLRETURN	result=SQL_SUCCESS;
-
-	// Some db's apparently support this after the prepare phase, prior
-	// to execution.  SQL Relay doesn't but we can fake that by executing
-	// here and bypassing the next attempt to execute.
-	if (!stmt->executed) {
-		debugPrintf("not executed yet...\n");
-		stmt->executedbynumresultcolsresult=SQLR_SQLExecute(stmt);
-		stmt->executedbynumresultcols=true;
-		result=stmt->executedbynumresultcolsresult;
-	}
-
 	*columncount=(SQLSMALLINT)stmt->cur->colCount();
 	debugPrintf("columncount: %d\n",(int)*columncount);
 
-	return result;
+	return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
@@ -4167,10 +4065,6 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
 	#endif
 	stmt->cur->prepareQuery((const char *)statementtext,
 						statementtextlength);
-
-	// the statement has not been executed yet
-	stmt->executed=false;
-	stmt->executedbynumresultcols=false;
 
 	return SQL_SUCCESS;
 }
@@ -4220,7 +4114,6 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 	}
 
 	switch (attribute) {
-		#ifdef SQL_AUTOCOMMIT
 		case SQL_AUTOCOMMIT:
 		{
 			debugPrintf("attribute: SQL_AUTOCOMMIT\n");
@@ -4236,7 +4129,6 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 				}
 			}
 		}
-		#endif
 
 		// FIXME: implement
  		/*case SQL_ACCESS_MODE:
@@ -4245,6 +4137,8 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_OPT_TRACEFILE:
 		case SQL_TRANSLATE_DLL:
 		case SQL_TRANSLATE_OPTION:
+		case SQL_TXN_ISOLATION:
+		case SQL_CURRENT_QUALIFIER:
 		case SQL_ODBC_CURSORS:
 		case SQL_QUIET_MODE:
 		case SQL_PACKET_SIZE:
