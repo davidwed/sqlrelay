@@ -1252,7 +1252,8 @@ void postgresqlcursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrserverconnection *new_postgresqlconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_postgresqlconnection(
+						sqlrservercontroller *cont) {
 		return new postgresqlconnection(cont);
 	}
 }

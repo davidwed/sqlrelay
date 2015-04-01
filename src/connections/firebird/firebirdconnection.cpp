@@ -1906,7 +1906,8 @@ void firebirdcursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrserverconnection *new_firebirdconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_firebirdconnection(
+						sqlrservercontroller *cont) {
 		return new firebirdconnection(cont);
 	}
 }

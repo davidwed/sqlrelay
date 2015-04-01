@@ -1741,7 +1741,8 @@ void db2cursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrserverconnection *new_db2connection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_db2connection(
+						sqlrservercontroller *cont) {
 		return new db2connection(cont);
 	}
 }

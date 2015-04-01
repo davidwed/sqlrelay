@@ -861,7 +861,8 @@ char *sqliteconnection::duplicate(const char *str) {
 #endif
 
 extern "C" {
-	sqlrserverconnection *new_sqliteconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_sqliteconnection(
+						sqlrservercontroller *cont) {
 		return new sqliteconnection(cont);
 	}
 }

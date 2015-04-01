@@ -1636,7 +1636,8 @@ void odbccursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrserverconnection *new_odbcconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_odbcconnection(
+						sqlrservercontroller *cont) {
 		return new odbcconnection(cont);
 	}
 }

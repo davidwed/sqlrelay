@@ -1188,7 +1188,8 @@ void routerconnection::beginQueryFailed(uint16_t index) {
 }
 
 extern "C" {
-	sqlrserverconnection *new_routerconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_routerconnection(
+						sqlrservercontroller *cont) {
 		return new routerconnection(cont);
 	}
 }

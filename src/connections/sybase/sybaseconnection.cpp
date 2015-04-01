@@ -1805,7 +1805,8 @@ void sybaseconnection::errorMessage(char *errorbuffer,
 }
 
 extern "C" {
-	sqlrserverconnection *new_sybaseconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_sybaseconnection(
+						sqlrservercontroller *cont) {
 		return new sybaseconnection(cont);
 	}
 }

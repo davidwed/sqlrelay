@@ -2207,7 +2207,8 @@ void freetdsconnection::errorMessage(char *errorbuffer,
 }
 
 extern "C" {
-	sqlrserverconnection *new_freetdsconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_freetdsconnection(
+						sqlrservercontroller *cont) {
 		return new freetdsconnection(cont);
 	}
 }

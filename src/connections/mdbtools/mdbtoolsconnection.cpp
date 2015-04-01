@@ -699,7 +699,8 @@ void mdbtoolscursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrserverconnection *new_mdbtoolsconnection(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_mdbtoolsconnection(
+						sqlrservercontroller *cont) {
 		return new mdbtoolsconnection(cont);
 	}
 }
