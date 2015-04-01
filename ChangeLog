@@ -41,6 +41,8 @@
 	ODBC driver copies references now
 	fixed various bugs in sqlrconfigfile that caused sqlr-start with no
 		-id to crash or behave strangely sometimes
+	refactored build process to use nmake and be compatible with many
+		different versions of MS Visual Studio
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
