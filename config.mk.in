@@ -365,7 +365,7 @@ MYSQLINCLUDES = @MYSQLINCLUDES@
 MYSQLLIBS = @MYSQLLIBS@
 MYSQLLIBSPATH = @MYSQLLIBSPATH@
 MYSQLUSERPATH = @MYSQLUSERPATH@
-MYSQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(MYSQLINCLUDES)
+MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(MYSQLINCLUDES)
 MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(MYSQLUSERPATH),yes)
