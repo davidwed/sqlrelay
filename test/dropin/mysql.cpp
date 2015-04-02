@@ -1,4 +1,4 @@
-#include <mysql/mysql.h>
+#include <mysql.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>

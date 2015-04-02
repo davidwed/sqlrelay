@@ -4,9 +4,6 @@ all:
 	cd c $(AND) $(MAKE) all
 	cd c++ $(AND) $(MAKE) all
 	cd java $(AND) $(MAKE) all
-	cd dropin $(AND) $(MAKE) all
-	cd bench $(AND) $(MAKE) all
-	cd stress $(AND) $(MAKE) all
 
 clean:
 	cd c $(AND) $(MAKE) clean
