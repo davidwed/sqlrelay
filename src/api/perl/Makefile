@@ -92,12 +92,9 @@ installman:
 	echo $(PERLINSTALLMAN3DIR_LOCAL)/DBD$(PERLMANCLASSSEPARATOR)SQLRelay.$(PERLMAN3EXT_LOCAL) >> $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay/.packlist
 
 uninstall:
-	$(RM) `cat $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/.packlist`
-	$(RM) `cat $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/.packlist`
-	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/.packlist
-	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/.packlist
-	$(RM) `cat $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay/.packlist`
-	$(RM) $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay/.packlist
 	$(RMTREE) $(PERLSITEARCH_LOCAL)/auto/SQLRelay
 	$(RMTREE) $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay
 	$(RMTREE) $(PERLSITEARCH_LOCAL)/SQLRelay
+	$(RM) $(PERLSITELIB_LOCAL)/DBD/SQLRelay.pm
+	$(RM) $(PERLSITEARCH_LOCAL)/SQLRelay
+	$(RM) $(PERLINSTALLMAN3DIR_LOCAL)/*SQLRelay*.$(PERLMAN3EXT_LOCAL)

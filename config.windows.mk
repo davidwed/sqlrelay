@@ -140,7 +140,7 @@ CLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLI
 
 
 # perl
-PERLPREFIX = C:\Perl64
+PERLPREFIX = @PERLPREFIX@
 PERL = $(PERLPREFIX)\bin\perl
 PERLLIB = $(PERLPREFIX)\lib
 PERLINC = /I $(PERLLIB)\CORE
