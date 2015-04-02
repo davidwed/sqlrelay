@@ -365,7 +365,7 @@ MYSQLINCLUDES = @MYSQLINCLUDES@
 MYSQLLIBS = @MYSQLLIBS@
 MYSQLLIBSPATH = @MYSQLLIBSPATH@
 MYSQLUSERPATH = @MYSQLUSERPATH@
-MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(MYSQLINCLUDES)
+MYSQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(MYSQLUSERPATH),yes)
@@ -379,7 +379,7 @@ POSTGRESQLINCLUDES = @POSTGRESQLINCLUDES@
 POSTGRESQLLIBS = @POSTGRESQLLIBS@
 POSTGRESQLLIBSPATH = @POSTGRESQLLIBSPATH@
 POSTGRESQLUSERPATH = @POSTGRESQLUSERPATH@
-POSTGRESQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(POSTGRESQLINCLUDES)
+POSTGRESQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
