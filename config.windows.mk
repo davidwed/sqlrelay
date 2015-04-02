@@ -82,6 +82,7 @@ CP = cscript /nologo @top_builddir@\cp.vbs
 CHMOD = echo
 MKINSTALLDIRS = cscript /nologo @top_builddir@\mkinstalldirs.vbs
 LTFINISH =
+REPLACE = cscript /nologo @top_builddir@\replace.vbs
 
 
 #uninstall/clean commands
@@ -218,7 +219,7 @@ JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENT
 # tcl
 TCLINCLUDE = /IC:\Tcl\include
 TCLLIB = /LIBPATH:C:\Tcl\lib tcl86.lib
-TCLLIBSPATH = C:\Tclib
+TCLLIBSPATH = C:\\Tcl\\lib
 TCLCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 TCLLIBS = $(TCLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 

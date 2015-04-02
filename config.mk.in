@@ -82,6 +82,7 @@ CP = cp
 CHMOD = chmod
 MKINSTALLDIRS = $(top_builddir)/mkinstalldirs
 LTFINISH = $(LIBTOOL) --mode=finish
+REPLACE = $(top_builddir)/replace.sh
 
 
 #uninstall/clean commands

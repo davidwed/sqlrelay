@@ -13,32 +13,46 @@ all: db2.tcl \
 	sybase.tcl
 
 db2.tcl: db2.tcl.in
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" db2.tcl.in > $@
+	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) db2.tcl.in > $@.in.in
+	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in > $@
+	$(RM) $@.in.in
 	$(CHMOD) 755 $@
 
 firebird.tcl: firebird.tcl.in
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" firebird.tcl.in > $@
+	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) firebird.tcl.in > $@.in.in
+	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in > $@
+	$(RM) $@.in.in
 	$(CHMOD) 755 $@
 
 mysql.tcl: mysql.tcl.in
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" mysql.tcl.in > $@
+	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) mysql.tcl.in > $@.in.in
+	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in > $@
+	$(RM) $@.in.in
 	$(CHMOD) 755 $@
 
 oracle.tcl: oracle.tcl.in
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" oracle.tcl.in > $@
+	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) oracle.tcl.in > $@.in.in
+	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in > $@
+	$(RM) $@.in.in
 	$(CHMOD) 755 $@
 
 postgresql.tcl: postgresql.tcl.in
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" postgresql.tcl.in > $@
+	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) postgresql.tcl.in > $@.in.in
+	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in > $@
+	$(RM) $@.in.in
 	$(CHMOD) 755 $@
 
 sqlite.tcl: sqlite.tcl.in
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" sqlite.tcl.in > $@
+	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) sqlite.tcl.in > $@.in.in
+	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in > $@
+	$(RM) $@.in.in
 	$(CHMOD) 755 $@
 
 sybase.tcl: sybase.tcl.in
-	sed -e "s|@TCLLIBSPATH@|$(TCLLIBSPATH)|g" sybase.tcl.in > $@
+	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) sybase.tcl.in > $@.in.in
+	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in > $@
+	$(RM) $@.in.in
 	$(CHMOD) 755 $@
 
 clean:
-	$(RM) *.tcl cachefile* sqlnet.log
+	$(RM) *.in.in *.tcl cachefile* sqlnet.log
