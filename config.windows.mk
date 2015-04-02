@@ -181,15 +181,11 @@ PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient
 
 
 # ruby
-RUBY = @RUBY@
-RUBYLIB = @RUBYLIB@
-OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
-#RUBYCFLAGS = $(shell LANG=POSIX $(RUBY) getcflags.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-#ifeq ($(OVERRIDERUBYSITEARCHDIR),)
-#RUBYSITEARCHDIR = $(shell LANG=POSIX $(RUBY) getsitearchdir.rb | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
-#else
-#RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
-#endif
+RUBYPREFIX = C:\Ruby22-x64
+RUBY = $(RUBYPREFIX)\bin\ruby
+RUBYLIB = /LIBPATH:$(RUBYPREFIX)\lib libx64-msvcrt-ruby220.dll.a
+RUBYCFLAGS =
+RUBYSITEARCHDIR = $(RUBYPREFIX)\lib\ruby\site_ruby\2.2.0
 RUBYCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) /I./ /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
