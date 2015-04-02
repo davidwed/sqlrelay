@@ -181,7 +181,7 @@ PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient
 
 
 # ruby
-RUBYPREFIX = C:\Ruby22-x64
+RUBYPREFIX = @RUBYPREFIX@
 RUBY = $(RUBYPREFIX)\bin\ruby
 RUBYLIB = /LIBPATH:$(RUBYPREFIX)\lib libx64-msvcrt-ruby220.dll.a
 RUBYCFLAGS =
