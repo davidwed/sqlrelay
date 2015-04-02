@@ -7,7 +7,7 @@ namespace SQLRClientTest
     {
         public static void Main()
         {
-            SQLRConnection sqlrcon = new SQLRConnection("fedora", 9000, "", "test", "test", 0, 1);
+            SQLRConnection sqlrcon = new SQLRConnection("localhost", 9000, "", "test", "test", 0, 1);
             SQLRCursor sqlrcur = new SQLRCursor(sqlrcon);
 
             sqlrcon.debugOn();
