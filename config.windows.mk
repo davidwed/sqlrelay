@@ -117,7 +117,6 @@ RUDIMENTSLIBS = /LIBPATH:"C:\Program Files\Firstworks\lib" librudiments.lib
 
 
 #iconv
-HAVE_ICONV =
 ICONVINCLUDES =
 ICONVLIBS =
 
@@ -141,54 +140,38 @@ CLIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLI
 
 
 # perl
-HAVE_PERL =
-PERL = @PERL@
-PERLPREFIX = @PERLPREFIX@
-PERLLIB = @PERLLIB@
-PERLINC = @PERLINC@
-PERLCCFLAGS = @PERLCCFLAGS@ @PERL500@ @PERLREALLYOLD@
-PERLOPTIMIZE = @PERLOPTIMIZE@
-PERLSITEARCH = @PERLSITEARCH@
-PERLSITELIB = @PERLSITELIB@
-PERLARCHLIBEXP = @PERLARCHLIBEXP@
-PERLINSTALLMAN3DIR = @PERLINSTALLMAN3DIR@
-PERLMAN3EXT = @PERLMAN3EXT@
-XSUBPP = @XSUBPP@
-POD2MAN = @POD2MAN@
-OVERRIDEPERLSITEARCH = @OVERRIDEPERLSITEARCH@
-OVERRIDEPERLSITELIB = @OVERRIDEPERLSITELIB@
-OVERRIDEPERLINSTALLMAN3DIR = @OVERRIDEPERLINSTALLMAN3DIR@
-OVERRIDEPERLMAN3EXT = @OVERRIDEPERLMAN3EXT@
-#PERLCCFLAGS_LOCAL = $(shell echo "$(PERLCCFLAGS)" | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e 's|-x.*$$||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g" -e "s|-arch .* ||g" -e "s|-Kalloca ||g")
-#PERLOPTIMIZE_LOCAL = $(shell echo "$(PERLOPTIMIZE)" | sed -e 's| -belf||g' -e 's|-KPIC||g' -e 's|-x.* | |g' -e 's|-x.*$$||g' -e "s|UNKNOWN||g" -e "s|-Dbool=char||g" -e "s|-mtune=.* | |g")
-#ifeq ($(OVERRIDEPERLSITEARCH),)
-#PERLSITEARCH_LOCAL = $(DESTDIR)$(shell echo "$(PERLSITEARCH)" | sed -e "s|UNKNOWN||g" )
-#else
-#PERLSITEARCH_LOCAL = $(DESTDIR)$(OVERRIDEPERLSITEARCH)
-#endif
-#ifeq ($(OVERRIDEPERLSITELIB),)
-#PERLSITELIB_LOCAL = $(DESTDIR)$(shell echo "$(PERLSITELIB)" | sed -e "s|UNKNOWN||g" )
-#else
-#PERLSITELIB_LOCAL = $(DESTDIR)$(OVERRIDEPERLSITELIB)
-#endif
-#PERLINC_LOCAL = $(DESTDIR)$(shell echo "$(PERLINC)" | sed -e "s|UNKNOWN||g" )
-#ifeq ($(OVERRIDEPERLINSTALLMAN3DIR),)
-#PERLINSTALLMAN3DIR_LOCAL = $(DESTDIR)$(shell echo "$(PERLINSTALLMAN3DIR)" | sed -e "s|UNKNOWN||g" )
-#else
-#PERLINSTALLMAN3DIR_LOCAL = $(DESTDIR)$(OVERRIDEPERLINSTALLMAN3DIR)
-#endif
-#ifeq ($(OVERRIDEPERLMAN3EXT),)
-#PERLMAN3EXT_LOCAL = $(shell echo "$(PERLMAN3EXT)" | sed -e "s|UNKNOWN||g" )
-#else
-#PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
-#endif
-#PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) /I./ /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
-#PERLCONLIBS = $(PERLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
-#PERLCURLIBS = $(PERLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
+PERLPREFIX = C:\Perl64
+PERL = $(PERLPREFIX)\bin\perl
+PERLLIB = $(PERLPREFIX)\lib
+PERLINC = /I $(PERLLIB)\CORE
+PERLCCFLAGS =
+PERLOPTIMIZE =
+PERLSITEARCH = $(PERLPREFIX)\site\lib
+PERLSITELIB = $(PERLPREFIX)\site\lib
+PERLARCHLIBEXP =
+PERLINSTALLMAN3DIR = $(PERLPREFIX)\man\man3
+PERLMAN3EXT = 3
+PERLMANCLASSSEPARATOR = _
+XSUBPP = $(PERLPREFIX)\bin\xsubpp.bat
+POD2MAN = $(PERLPREFIX)\bin\pod2man.bat
+OVERRIDEPERLSITEARCH =
+OVERRIDEPERLSITELIB =
+OVERRIDEPERLINSTALLMAN3DIR =
+OVERRIDEPERLMAN3EXT =
+PERLCCFLAGS_LOCAL = $(PERLCCFLAGS)
+PERLOPTIMIZE_LOCAL = $(PERLOPTIMIZE)
+PERLSITEARCH_LOCAL = $(PERLSITEARCH)
+PERLSITELIB_LOCAL = $(PERLSITELIB)
+PERLINC_LOCAL = $(PERLINC)
+PERLINSTALLMAN3DIR_LOCAL = $(PERLINSTALLMAN3DIR)
+PERLMAN3EXT_LOCAL = $(PERLMAN3EXT)
+PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) /I./ /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
+PERLCONLIBS = /LIBPATH:$(PERLLIB)\CORE perl520.lib /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
+PERLCURLIBS = /LIBPATH:$(PERLLIB)\CORE perl520.lib /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
+PERLINSTALLMAN = installman
 
 
 # python
-HAVE_PYTHON =
 PYTHONINCLUDES = /I@PYTHONPREFIX@\include
 PYTHONDIR = @PYTHONPREFIX@\Lib
 PYTHONLIB = /LIBPATH:@PYTHONPREFIX@\libs python27.lib
@@ -197,7 +180,6 @@ PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient
 
 
 # ruby
-HAVE_RUBY =
 RUBY = @RUBY@
 RUBYLIB = @RUBYLIB@
 OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
@@ -212,7 +194,6 @@ RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib
 
 
 # php
-HAVE_PHP =
 PHPINCLUDES = /I C:\\PHP\\dev\\include\\php /I C:\\PHP\\dev\\include\\php\\main /I C:\\PHP\\dev\\include\\php\\TSRM /I C:\\PHP\\dev\\include\\php\\Zend /I C:\\PHP\\dev\\include\\php\\ext /I C:\\PHP\\dev\\include\\php\\ext\date\lib $(RUDIMENTSINCLUDES)
 PHPEXTDIR = C:\\PHP\\ext
 PHPVERSION =
@@ -220,7 +201,6 @@ PHPMAJORVERSION =
 PHPLIB = /LIBPATH:C:\\PHP\\dev php5ts.lib
 PHPCONFDIR = C:\\Windows
 PHPCONFSTYLE = windows
-HAVE_PHP_PDO =
 PHPCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) /D COMPILE_DL=1
 PHPLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 PHPPDOCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES) /D COMPILE_DL=1
@@ -228,7 +208,6 @@ PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.li
 
 
 # java
-HAVE_JAVA =
 JAVAC = "@JAVAPREFIX@\bin\javac"
 JAR = "@JAVAPREFIX@\bin\jar"
 JAVAINCLUDES = /I "@JAVAPREFIX@\include" /I "@JAVAPREFIX@\include\win32"
@@ -237,7 +216,6 @@ JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENT
 
 
 # tcl
-HAVE_TCL =
 TCLINCLUDE = /IC:\Tcl\include
 TCLLIB = /LIBPATH:C:\Tcl\lib tcl86.lib
 TCLLIBSPATH = C:\Tclib
@@ -246,7 +224,6 @@ TCLLIBS = $(TCLLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $
 
 
 # erlang
-HAVE_ERLANG =
 ERLC = @ERLC@
 ERLCFLAGS = @ERLCFLAGS@
 ERLANGINCLUDES = @ERLANGINCLUDES@
