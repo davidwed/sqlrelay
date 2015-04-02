@@ -540,7 +540,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 	}
 	delete[] parts;
 
-	if (retval) {
+	// Hmmm... this causes problems for validation of bad months
+	/*if (retval) {
 
 		// manage bad years
 		if (*year!=-1) {
@@ -561,7 +562,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				*month=12;
 			}
 		}
-	}
+	}*/
 
 	return retval;
 }
