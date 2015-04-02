@@ -4,10 +4,8 @@
 // note that config.h must come first to avoid some macro redefinition warnings
 #include <config.h>
 
-// windows needs this (don't include for __CYGWIN__ though)
-#ifdef _WIN32
-	#include <windows.h>
-#endif
+// windows needs this and it doesn't appear to hurt on other platforms
+#include <rudiments/private/winsock.h>
 
 #include <sql.h>
 #include <sqlext.h>

@@ -378,13 +378,13 @@
 #define RETSIGTYPE void
 
 /* Some systems use SQLLEN * in SQLBindCol */
-/* #undef SQLBINDCOL_SQLLEN */
+#define SQLBINDCOL_SQLLEN 1
 
 /* Some systems use SQLLEN * in SQLBINDPARAMETER */
-/* #undef SQLBINDPARAMETER_SQLLEN */
+#define SQLBINDPARAMETER_SQLLEN 1
 
 /* Some systems use SQLLEN * in SQLColAttribute */
-/* #undef SQLCOLATTRIBUTE_SQLLEN */
+#define SQLCOLATTRIBUTE_SQLLEN 1
 
 /* Some versions of sqlite are transactional */
 /* #undef SQLITE_TRANSACTIONAL */
@@ -399,7 +399,7 @@
 #define SQLRELAY_MODULESUFFIX "dll"
 
 /* Some systems use SQLLEN * in SQLRowCount */
-/* #undef SQLROWCOUNT_SQLLEN */
+#define SQLROWCOUNT_SQLLEN 1
 
 /* Version */
 #define SQLR_VERSION "0.59"

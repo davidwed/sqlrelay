@@ -381,8 +381,8 @@ SYBASECONNECTIONLIBS = $(SYBASELIBS) $(CONNECTIONLIBS)
 
 
 # connections
-CONNECTIONSALLSUBDIRS = all-db2 all-firebird all-mysql all-oracle8 all-postgresql all-sybase all-router
-CONNECTIONSINSTALLSUBDIRS = install-db2 install-firebird install-mysql install-oracle8 install-postgresql install-sybase install-router
+CONNECTIONSALLSUBDIRS = all-db2 all-firebird all-mysql all-odbc all-oracle8 all-postgresql all-sybase all-router
+CONNECTIONSINSTALLSUBDIRS = install-db2 install-firebird install-mysql install-odbc install-oracle8 install-postgresql install-sybase install-router
 
 
 # tests
