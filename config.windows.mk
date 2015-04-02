@@ -173,9 +173,9 @@ PERLINSTALLMAN = installman
 
 
 # python
-PYTHONINCLUDES = /I@PYTHONPREFIX@\include
-PYTHONDIR = @PYTHONPREFIX@\Lib
-PYTHONLIB = /LIBPATH:@PYTHONPREFIX@\libs python27.lib
+PYTHONINCLUDES = /IC:\Python27\include
+PYTHONDIR = C:\Python27\Lib
+PYTHONLIB = /LIBPATH:C:\Python27\libs python27.lib
 PYTHONCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -209,11 +209,11 @@ PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++/src libsqlrclient.li
 
 
 # java
-JAVAC = "@JAVAPREFIX@\bin\javac"
-JAR = "@JAVAPREFIX@\bin\jar"
-JAVAINCLUDES = /I "@JAVAPREFIX@\include" /I "@JAVAPREFIX@\include\win32"
+JAVAC = "C:\Program Files\Java\jdk1.8.0_25\bin\javac"
+JAR = "C:\Program Files\Java\jdk1.8.0_25\bin\jar"
+JAVAINCLUDES = /I "C:\Program Files\Java\jdk1.8.0_25\include" /I "C:\Program Files\Java\jdk1.8.0_25\include\win32"
 JAVACPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c\include /I$(top_builddir)\src\api\c++\include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS) /LIBPATH:"@JAVAPREFIX@\lib" jvm.lib
+JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++\src libsqlrclient.lib $(RUDIMENTSLIBS) /LIBPATH:"C:\Program Files\Java\jdk1.8.0_25\lib" jvm.lib
 
 
 # tcl
