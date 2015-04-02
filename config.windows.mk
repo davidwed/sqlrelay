@@ -397,14 +397,14 @@ SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers 
 SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-connections install-cmdline
 
 
-#APIALLSUBDIRS = all-cpp all-c all-postgresql all-mysql all-odbc all-python all-perl all-ruby all-php all-phppdo all-java all-tcl all-erlang
-APIALLSUBDIRS = all-cpp all-c all-postgresql all-mysql all-odbc all-python all-php all-phppdo all-java all-tcl
+#APIALLSUBDIRS = all-cpp all-c all-cs all-postgresql all-mysql all-odbc all-python all-perl all-ruby all-php all-phppdo all-java all-tcl all-erlang
+APIALLSUBDIRS = all-cpp all-c all-cs all-postgresql all-mysql all-odbc all-python all-php all-phppdo all-java all-tcl
 
-#APICLEANSUBDIRS = clean-cpp clean-c clean-postgresql clean-mysql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-tcl clean-erlang
-APICLEANSUBDIRS = clean-cpp clean-c clean-postgresql clean-mysql clean-odbc clean-python clean-php clean-phppdo clean-java clean-tcl
+#APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-postgresql clean-mysql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-tcl clean-erlang
+APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-postgresql clean-mysql clean-odbc clean-python clean-php clean-phppdo clean-java clean-tcl
 
-#APIINSTALLSUBDIRS = install-cpp install-c install-postgresql install-mysql install-odbc install-python install-perl install-ruby install-php install-phppdo install-java install-tcl install-erlang
-APIINSTALLSUBDIRS = install-cpp install-c install-postgresql install-mysql install-odbc install-python install-php install-phppdo install-java install-tcl
+#APIINSTALLSUBDIRS = install-cpp install-c install-cs install-postgresql install-mysql install-odbc install-python install-perl install-ruby install-php install-phppdo install-java install-tcl install-erlang
+APIINSTALLSUBDIRS = install-cpp install-c install-cs install-postgresql install-mysql install-odbc install-python install-php install-phppdo install-java install-tcl
 
-#APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-postgresql uninstall-mysql uninstall-odbc uninstall-python uninstall-perl uninstall-ruby uninstall-php uninstall-phppdo uninstall-java uninstall-tcl uninstall-erlang
-APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-postgresql uninstall-mysql uninstall-odbc uninstall-python uninstall-php uninstall-phppdo uninstall-java uninstall-tcl
+#APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-postgresql uninstall-mysql uninstall-odbc uninstall-python uninstall-perl uninstall-ruby uninstall-php uninstall-phppdo uninstall-java uninstall-tcl uninstall-erlang
+APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-postgresql uninstall-mysql uninstall-odbc uninstall-python uninstall-php uninstall-phppdo uninstall-java uninstall-tcl

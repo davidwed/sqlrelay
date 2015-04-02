@@ -8,6 +8,9 @@ all-cpp:
 all-c:
 	cd c $(AND) $(MAKE) all
 
+all-cs:
+	cd cs $(AND) $(MAKE) all
+
 all-postgresql:
 	cd postgresql $(AND) $(MAKE) all
 
@@ -49,6 +52,9 @@ clean-cpp:
 
 clean-c:
 	cd c $(AND) $(MAKE) clean
+
+clean-cs:
+	cd cs $(AND) $(MAKE) clean
 
 clean-postgresql:
 	cd postgresql $(AND) $(MAKE) clean
@@ -92,6 +98,9 @@ install-cpp:
 install-c:
 	cd c $(AND) $(MAKE) install
 
+install-cs:
+	cd cs $(AND) $(MAKE) install
+
 install-postgresql:
 	cd postgresql $(AND) $(MAKE) install
 
@@ -133,6 +142,9 @@ uninstall-cpp:
 
 uninstall-c:
 	cd c $(AND) $(MAKE) uninstall
+
+uninstall-cs:
+	cd cs $(AND) $(MAKE) uninstall
 
 uninstall-postgresql:
 	cd postgresql $(AND) $(MAKE) uninstall
