@@ -3284,7 +3284,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
 			uint32_t	sizetocopy=
-					(bufferlength<fieldlength)?
+					((uint32_t)bufferlength<fieldlength)?
 						bufferlength:fieldlength;
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
