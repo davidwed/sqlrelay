@@ -211,7 +211,7 @@ PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(
 JAVAC = "C:\Program Files\Java\jdk1.8.0_25\bin\javac"
 JAR = "C:\Program Files\Java\jdk1.8.0_25\bin\jar"
 JAVAINCLUDES = /I "C:\Program Files\Java\jdk1.8.0_25\include" /I "C:\Program Files\Java\jdk1.8.0_25\include\win32"
-JAVACPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
+JAVACPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
 JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS) /LIBPATH:"C:\Program Files\Java\jdk1.8.0_25\lib" jvm.lib
 
 
