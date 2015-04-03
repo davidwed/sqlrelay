@@ -330,8 +330,8 @@ ERLANG_ROOT_DIR = @ERLANG_ROOT_DIR@
 ERLANG_LIB_DIR = @ERLANG_LIB_DIR@
 ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGUSERPATH = @ERLANGUSERPATH@
-ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c/src -L$(top_builddir)/src/api/c++ -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
+ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c -L$(top_builddir)/src/api/c++ -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(ERLANGUSERPATH),yes)
 ERLANGLIBS += -R $(libdir)

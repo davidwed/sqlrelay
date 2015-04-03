@@ -8,7 +8,7 @@
 	#include <sys/vnode.h>
 #endif
 
-#include "../../c++/include/sqlrelay/sqlrclient.h"
+#include "../c++/sqlrelay/sqlrclient.h"
 #include <EXTERN.h>
 #define explicit
 
