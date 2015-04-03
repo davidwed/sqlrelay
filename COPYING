@@ -11,9 +11,9 @@ The SQLRelay software package is really several packages:
 	directories of the SQL Relay distribution. This package is 
 	hereafter refered to as The SQLRelay C/C++ API.
 
-3) Source code, scripts and binaries found in the src/api/python and 
-	src/api/zope directories of the SQL Relay distribution. This package is 
-	hereafter refered to as The SQLRelay Python/Zope API.
+3) Source code, scripts and binaries found in the src/api/python
+	directory of the SQL Relay distribution. This package is 
+	hereafter refered to as The SQLRelay Python API.
 
 4) Source code, scripts and binaries found in the src/api/perl and 
 	src/api/perl-DBD directories of the SQL Relay distribution. This
@@ -102,7 +102,7 @@ These libraries are covered by the Artistic License.  (attached below)
 
 --------------------------------------------------------------------------------
 
-The SQLRelay Python/Zope API
+The SQLRelay Python API
 Copyright (c) 2000  Roman Milner
 
 These libraries are covered by the PointOne Public License.  (attached below)
