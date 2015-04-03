@@ -298,9 +298,9 @@ UTILLIBS = $(RUDIMENTSLIBS)
 
 
 # cmdline
-CMDLINECPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) /D SYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server/include /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
+CMDLINECPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) /D SYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 CMDLINELIBS = /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
-PWDENCLIBS = /LIBPATH:$(top_builddir)/src/server/src libsqlrserver.lib /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+PWDENCLIBS = /LIBPATH:$(top_builddir)/src/server libsqlrserver.lib /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
 
 # server
@@ -308,14 +308,14 @@ STATICPLUGINSRCS =
 STATICPLUGINOBJS =
 STATICPLUGINLIBS =
 
-SERVERCPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) /I../include /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
+SERVERCPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
 LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib
 SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 
 # plugins
-PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server\include /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
-PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server\src libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
+PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
+PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) /I$(top_builddir)\src\api\c++
 SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib
@@ -326,8 +326,8 @@ INSTALLSHAREDLIB =
 
 
 # connections
-CONNECTIONCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)\ /I$(top_builddir)\src\common /I$(top_builddir)\src\util /I$(top_builddir)\src\server\include $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
-CONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\server\src libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+CONNECTIONCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)\ /I$(top_builddir)\src\common /I$(top_builddir)\src\util /I$(top_builddir)\src\server $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
+CONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\server libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 DB2CONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(DB2INCLUDES)
 DB2CONNECTIONLIBS = $(DB2LIBS) $(CONNECTIONLIBS)

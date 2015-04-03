@@ -45,6 +45,7 @@
 		different versions of MS Visual Studio
 	updated the slow query logger to show the date/time that the query
 		was executed
+	consolidated c, c++ and server source/includes down a few levels
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

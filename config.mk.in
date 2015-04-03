@@ -459,9 +459,9 @@ UTILLIBS = $(RUDIMENTSLIBS)
 
 
 # cmdline
-CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
+CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
 CMDLINELIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
-PWDENCLIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+PWDENCLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CLIENTUSERPATH),yes)
 CMDLINELIBS += -R $(libdir)
@@ -557,7 +557,7 @@ STATICPLUGINLIBS += $(SYBASELIBS)
 STATICPLUGINLIBS += -L$(top_builddir)/src/api/c++ -lsqlrclient
 endif
 
-SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -I../include -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
+SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 LIBSQLRSERVERLIBS = -L$(top_builddir)/src/util -lsqlrutil
 SERVERLIBS = -L./ -lsqlrserver $(STATICPLUGINLIBS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
@@ -568,8 +568,8 @@ endif
 
 
 # plugins
-PLUGINCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include -I$(top_builddir)/src/api/c++ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
-PLUGINLIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+PLUGINCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+PLUGINLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++
 SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient
@@ -584,8 +584,8 @@ endif
 
 
 # connections
-CONNECTIONCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES)
-CONNECTIONLIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+CONNECTIONCPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server $(RUDIMENTSINCLUDES)
+CONNECTIONLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 DB2CONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(DB2INCLUDES)
 DB2CONNECTIONLIBS = $(DB2LIBS) $(CONNECTIONLIBS)

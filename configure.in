@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(src/server/src/sqlr-listener.cpp)
+AC_INIT(src/server/sqlr-listener.cpp)
 
 dnl Compile time options.
 AC_ARG_ENABLE(small-code,
