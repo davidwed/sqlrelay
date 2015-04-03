@@ -13,8 +13,8 @@
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
 
-#define DEBUG_MESSAGES 1
-#define DEBUG_TO_FILE 1
+//#define DEBUG_MESSAGES 1
+//#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
