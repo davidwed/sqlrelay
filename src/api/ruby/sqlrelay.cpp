@@ -9,7 +9,7 @@
 #endif
 
 #include <ruby.h>
-#include "../c++/include/sqlrelay/sqlrclient.h"
+#include "../c++/sqlrelay/sqlrclient.h"
 
 #include "rubyincludes.h"
 
