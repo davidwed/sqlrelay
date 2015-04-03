@@ -85,7 +85,7 @@ bool slowqueries::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	return true;
 }
 
-static char *days[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+static const char *days[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
 bool slowqueries::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
@@ -145,7 +145,7 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 		
 		stringbuffer	logentry;
 		logentry.append(datebuffer)->append(" :\n");
-		logentry.append("query:\n")->append(sqlrcur->getQueryBuffer());
+		logentry.append(sqlrcur->getQueryBuffer());
 		logentry.append("\n");
 		logentry.append("execution time: ")->append(querysec);
 		logentry.append(".");
