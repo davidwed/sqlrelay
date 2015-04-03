@@ -1,15 +1,81 @@
+top_builddir = ../../..
+
 include ../../../config.mk
 
-all:
-	cd src $(AND) $(MAKE) all
+SRCS = sqlrconnection.cpp sqlrcursor.cpp row.cpp
+LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ) row.$(OBJ)
+
+.SUFFIXES: .lo
+
+.cpp.lo:
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPCPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPCPPFLAGS) $(COMPILE) $<
+
+all: libsqlrclient.$(LIBEXT)
 
 clean:
-	cd src $(AND) $(MAKE) clean
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(RMTREE) .libs
 
-install:
-	cd src $(AND) $(MAKE) install
-	cd include $(AND) $(MAKE) install
+libsqlrclient.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(CPPLIBS)
 
-uninstall:
-	cd src $(AND) $(MAKE) uninstall
-	cd include $(AND) $(MAKE) uninstall
+install: $(INSTALLLIB)
+	$(MKINSTALLDIRS) $(cachedir)
+	$(CHMOD) 777 $(cachedir)
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
+	$(CP) sqlrelay/sqlrclient.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
+	$(CP) sqlrelay/private/bindvar.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/bindvar.h
+	$(CP) sqlrelay/private/column.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/column.h
+	$(CP) sqlrelay/private/row.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/row.h
+	$(CP) sqlrelay/private/listformat.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/listformat.h
+	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
+	$(CP) sqlrelay/private/sqlrdefines.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrdefines.h
+	$(CP) sqlrelay/private/sqlrincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrincludes.h
+	$(CP) sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
+	$(CP) sqlrelay/private/dll.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/dll.h
+
+installdll::
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) libsqlrclient.$(LIBEXT) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrclient.lib $(libdir)
+
+installlib:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrclient.$(LIBEXT) $(libdir)
+	$(LTFINISH) $(libdir)
+
+uninstall: $(UNINSTALLLIB)
+	$(RMTREE) $(cachedir)
+	$(RM) $(includedir)/sqlrclient.h \
+		$(includedir)/private/bindvar.h \
+		$(includedir)/private/column.h \
+		$(includedir)/private/field.h \
+		$(includedir)/private/row.h \
+		$(includedir)/private/listformat.h \
+		$(includedir)/private/sqlrconnection.h \
+		$(includedir)/private/sqlrdefines.h \
+		$(includedir)/private/sqlrincludes.h \
+		$(includedir)/private/sqlrcursor.h
+	$(RMTREE) $(includedir)/sqlrelay
+
+uninstalldll:
+	$(RM) $(bindir)/libsqlrclient.$(LIBEXT) \
+		$(libdir)/libsqlrclient.lib
+
+uninstalllib:
+	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclient.$(LIBEXT)
