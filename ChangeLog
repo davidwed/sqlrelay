@@ -43,6 +43,8 @@
 		-id to crash or behave strangely sometimes
 	refactored build process to use nmake and be compatible with many
 		different versions of MS Visual Studio
+	updated the slow query logger to show the date/time that the query
+		was executed
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
