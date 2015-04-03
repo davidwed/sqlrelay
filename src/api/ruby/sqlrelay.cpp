@@ -1,6 +1,13 @@
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information.
 
+#ifdef _WIN32
+	#include <rudiments/private/winsock.h>
+	#define DLEXPORT __declspec(dllexport)
+#else
+	#define DLEXPORT
+#endif
+
 #include <ruby.h>
 #include "../c++/include/sqlrelay/sqlrclient.h"
 
@@ -1955,7 +1962,7 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_closeResultSet,0);
 }
 
-void Init_sqlrelay() {
+DLEXPORT void Init_sqlrelay() {
 	Init_SQLRConnection();
 	Init_SQLRCursor();
 }

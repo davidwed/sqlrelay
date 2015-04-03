@@ -5,10 +5,10 @@ include ../../../config.mk
 .SUFFIXES: .lo
 
 .cpp.lo:
-	cp rubyincludes1.h rubyincludes.h; \
+	$(CP) rubyincludes1.h rubyincludes.h; \
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(RUBYCPPFLAGS) $(COMPILE) $< $(OUT)$@ 2> errors1; \
 	if ( test ! -r sqlrelay.lo ); then \
-		cp rubyincludes2.h rubyincludes.h; \
+		$(CP) rubyincludes2.h rubyincludes.h; \
 		$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(RUBYCPPFLAGS) $(COMPILE) $< $(OUT)$@ 2> errors2; \
 		if ( test ! -r sqlrelay.lo ); then \
 			if ( test -s errors1 ); then \
@@ -26,6 +26,9 @@ include ../../../config.mk
 	fi; \
 	$(RM) errors1 errors2 rubyincludes.h
 
+.cpp.obj:
+	$(CP) rubyincludes2.h rubyincludes.h
+	$(CXX) $(CXXFLAGS) $(RUBYCPPFLAGS) $(COMPILE) $<
 
 all: sqlrelay.$(LIBEXT)
 
@@ -33,14 +36,14 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.so
 	$(RMTREE) .libs
 
-sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.lo
+sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(RUBYLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITEARCHDIR)
-	$(LTINSTALL) $(CP) sqlrelay.la $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.$(MODULESUFFIX)
+	$(LTINSTALL) $(CP) sqlrelay.$(LIBEXT) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.so
 
 installlib:
 	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITEARCHDIR)
@@ -50,4 +53,4 @@ installlib:
 	$(MODULERENAME) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.$(MODULESUFFIX)
+	$(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.*
