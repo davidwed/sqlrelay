@@ -3448,7 +3448,7 @@ void sqlrservercontroller::setDatabaseListColumnMap(
 			columnmap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
-			columnmap=&mysqltablescolumnmap;
+			columnmap=&mysqldatabasescolumnmap;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			columnmap=NULL;
@@ -3516,7 +3516,7 @@ void sqlrservercontroller::buildColumnMaps() {
 	// Native/MySQL getDatabaseList:
 	//
 	// Database
-	mysqldatabasecolumnmap.setValue(0,0);
+	mysqldatabasescolumnmap.setValue(0,0);
 
 	// Native/MySQL getTableList:
 	//

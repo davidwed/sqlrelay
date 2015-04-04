@@ -278,9 +278,9 @@
 		singlylinkedlist< char * >	transtemptablesfortrunc;
 
 		dictionary< uint32_t, uint32_t >	*columnmap;
-		dictionary< uint32_t, uint32_t >	mysqldatabasecolumnmap;
+		dictionary< uint32_t, uint32_t >	mysqldatabasescolumnmap;
 		dictionary< uint32_t, uint32_t >	mysqltablescolumnmap;
 		dictionary< uint32_t, uint32_t >	mysqlcolumnscolumnmap;
-		dictionary< uint32_t, uint32_t >	odbcdatabasecolumnmap;
+		dictionary< uint32_t, uint32_t >	odbcdatabasescolumnmap;
 		dictionary< uint32_t, uint32_t >	odbctablescolumnmap;
 		dictionary< uint32_t, uint32_t >	odbccolumnscolumnmap;
