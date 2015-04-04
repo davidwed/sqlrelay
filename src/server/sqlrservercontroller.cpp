@@ -3435,6 +3435,14 @@ bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
 
 void sqlrservercontroller::setDatabaseListColumnMap(
 					sqlrserverlistformat_t listformat) {
+
+	// for now, don't remap columns if api calls are used to get lists,
+	// the columns don't come back in the "native" format
+	if (conn->getListsByApiCalls()) {
+		columnmap=NULL;
+		return;
+	}
+
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			columnmap=NULL;
@@ -3453,6 +3461,14 @@ void sqlrservercontroller::setDatabaseListColumnMap(
 
 void sqlrservercontroller::setTableListColumnMap(
 					sqlrserverlistformat_t listformat) {
+
+	// for now, don't remap columns if api calls are used to get lists,
+	// the columns don't come back in the "native" format
+	if (conn->getListsByApiCalls()) {
+		columnmap=NULL;
+		return;
+	}
+
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			columnmap=NULL;
@@ -3471,6 +3487,14 @@ void sqlrservercontroller::setTableListColumnMap(
 
 void sqlrservercontroller::setColumnListColumnMap(
 					sqlrserverlistformat_t listformat) {
+
+	// for now, don't remap columns if api calls are used to get lists,
+	// the columns don't come back in the "native" format
+	if (conn->getListsByApiCalls()) {
+		columnmap=NULL;
+		return;
+	}
+
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			columnmap=NULL;
