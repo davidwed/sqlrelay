@@ -560,13 +560,14 @@ const char *sybaseconnection::dbHostNameQuery() {
 }
 
 const char *sybaseconnection::getDatabaseListQuery(bool wild) {
-	return "select '' as db";
+	return "select '',NULL as db";
 }
 
 const char *sybaseconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
-		"	name "
+		"	name, "
+		"	NULL "
 		"from "
 		"	sysobjects "
 		"where "
@@ -579,7 +580,8 @@ const char *sybaseconnection::getTableListQuery(bool wild) {
 		"	name":
 
 		"select "
-		"	name "
+		"	name, "
+		"	NULL "
 		"from "
 		"	sysobjects "
 		"where "
@@ -602,7 +604,8 @@ const char *sybaseconnection::getColumnListQuery(
 		"	(syscolumns.status&8)/8 as nullable, "
 		"	'' as primarykey, "
 		"	'' column_default, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	sysobjects, "
 		"	syscolumns, "
@@ -629,7 +632,8 @@ const char *sybaseconnection::getColumnListQuery(
 		"	(syscolumns.status&8)/8 as nullable, "
 		"	'' as primarykey, "
 		"	'' column_default, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	sysobjects, "
 		"	syscolumns, "

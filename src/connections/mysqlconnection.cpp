@@ -456,11 +456,35 @@ const char *mysqlconnection::bindFormat() {
 }
 
 const char *mysqlconnection::getDatabaseListQuery(bool wild) {
-	return (wild)?"show databases like '%s'":"show databases";
+	return (wild)?"select "
+			"	schema_name, "
+			"	NULL "
+			"from "
+			"	information_schema.schemata "
+			"where "
+			"	schema_name like '%s'"
+			:
+			"select "
+			"	schema_name, "
+			"	NULL "
+			"from "
+			"	information_schema.schemata";
 }
 
 const char *mysqlconnection::getTableListQuery(bool wild) {
-	return (wild)?"show tables like '%s'":"show tables";
+	return (wild)?"select "
+			"	table_name, "
+			"	NULL "
+			"from "
+			"	information_schema.tables "
+			"where "
+			"	table_name like '%s'"
+			:
+			"select "
+			"	table_name, "
+			"	NULL "
+			"from "
+			"	information_schema.tables";
 }
 
 const char *mysqlconnection::getColumnListQuery(
@@ -474,7 +498,8 @@ const char *mysqlconnection::getColumnListQuery(
 			"	is_nullable, "
 			"	column_key, "
 			"	column_default, "
-			"	extra "
+			"	extra, "
+			"	NULL "
 			"from "
 			"	information_schema.columns "
 			"where "
@@ -491,7 +516,8 @@ const char *mysqlconnection::getColumnListQuery(
 			"	is_nullable, "
 			"	column_key, "
 			"	column_default, "
-			"	extra "
+			"	extra, "
+			"	NULL "
 			"from "
 			"	information_schema.columns "
 			"where "

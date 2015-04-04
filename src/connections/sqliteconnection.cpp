@@ -241,13 +241,15 @@ const char *sqliteconnection::dbHostName() {
 }
 
 const char *sqliteconnection::getDatabaseListQuery(bool wild) {
-	return "pragma database_list";
+	//return "pragma database_list";
+	return "select '',NULL";
 }
 
 const char *sqliteconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
-		"	tbl_name "
+		"	tbl_name, "
+		"	NULL "
 		"from "
 		"(select "
 		"	tbl_name "
@@ -270,7 +272,8 @@ const char *sqliteconnection::getTableListQuery(bool wild) {
 		"	tbl_name":
 
 		"select "
-		"	tbl_name "
+		"	tbl_name, "
+		"	NULL "
 		"from "
 		"(select "
 		"	tbl_name "
@@ -300,7 +303,8 @@ const char *sqliteconnection::getColumnListQuery(
 		"	'' as nullable, "
 		"	'' as key, "
 		"	'' as column_default, "
-		"	'' as extra ";
+		"	'' as extra, "
+		"	NULL";
 }
 
 #ifdef SQLITE_TRANSACTIONAL

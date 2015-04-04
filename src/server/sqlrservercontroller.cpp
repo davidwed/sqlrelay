@@ -3435,54 +3435,90 @@ bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
 
 void sqlrservercontroller::setDatabaseListColumnMap(
 					sqlrserverlistformat_t listformat) {
-	// FIXME: use this to remap columns for database lists
+	switch (listformat) {
+		case SQLRSERVERLISTFORMAT_NULL:
+			columnmap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_MYSQL:
+			columnmap=&mysqltablescolumnmap;
+			break;
+		case SQLRSERVERLISTFORMAT_ODBC:
+			columnmap=NULL;
+			break;
+		default:
+			columnmap=NULL;
+			break;
+	}
 }
 
 void sqlrservercontroller::setTableListColumnMap(
 					sqlrserverlistformat_t listformat) {
-	// FIXME: use this to remap columns for table lists
+	switch (listformat) {
+		case SQLRSERVERLISTFORMAT_NULL:
+			columnmap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_MYSQL:
+			columnmap=&mysqltablescolumnmap;
+			break;
+		case SQLRSERVERLISTFORMAT_ODBC:
+			columnmap=&odbctablescolumnmap;
+			break;
+		default:
+			columnmap=NULL;
+			break;
+	}
 }
 
 void sqlrservercontroller::setColumnListColumnMap(
 					sqlrserverlistformat_t listformat) {
-	// FIXME: use this to remap columns for column lists
+	switch (listformat) {
+		case SQLRSERVERLISTFORMAT_NULL:
+			columnmap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_MYSQL:
+			columnmap=&mysqlcolumnscolumnmap;
+			break;
+		case SQLRSERVERLISTFORMAT_ODBC:
+			columnmap=&odbccolumnscolumnmap;
+			break;
+		default:
+			columnmap=NULL;
+			break;
+	}
 }
 
 void sqlrservercontroller::buildColumnMaps() {
 
-	// FIXME: implement this...
-
-	// Native getDatabaseList:
+	// Native/MySQL getDatabaseList:
 	//
-	// ...
+	// Database
+	mysqldatabasecolumnmap.setValue(0,0);
 
-	// Native getTableList:
+	// Native/MySQL getTableList:
 	//
-	// ...
+	// Tables_in_xxx
+	mysqltablescolumnmap.setValue(0,0);
 
-	// Native getColumnList:
+	// Native/MySQL getColumnList:
 	//
-	// ...
-
-
-	// MySQL getDatabaseList:
-	//
-	// Database - varchar
-
-	// MySQL getTableList:
-	//
-	// Tables_in_xxx - varchar
-
-	// MySQL getColumnList:
-	//
-	// column_name - varchar
-	// data_type - varchar
-	// character_maximum_length - integer
-	// numeric_precision - integer
-	// numeric_scale - integer
-	// column_key - varchar
-	// column_default - blob
-	// extra - varchar
+	// column_name
+	mysqlcolumnscolumnmap.setValue(0,0);
+	// data_type
+	mysqlcolumnscolumnmap.setValue(1,1);
+	// character_maximum_length
+	mysqlcolumnscolumnmap.setValue(2,2);
+	// numeric_precision
+	mysqlcolumnscolumnmap.setValue(3,3);
+	// numeric_scale
+	mysqlcolumnscolumnmap.setValue(4,4);
+	// is_nullable
+	mysqlcolumnscolumnmap.setValue(5,5);
+	// column_key
+	mysqlcolumnscolumnmap.setValue(6,6);
+	// column_default
+	mysqlcolumnscolumnmap.setValue(7,7);
+	// extra
+	mysqlcolumnscolumnmap.setValue(8,8);
 
 
 	// ODBC getDatabaseList:
@@ -3490,35 +3526,55 @@ void sqlrservercontroller::buildColumnMaps() {
 
 	// ODBC getTableList:
 	//
-	// TABLE_CAT - varchar - catalog (database) name
-	// TABLE_SCHEM - varchar - schema name
-	// TABLE_NAME - varchar - table name
-	// TABLE_TYPE - varchar - "TABLE","VIEW","SYSTEM TABLE",
-	// 				"GLOBAL TEMPORARY","LOCAL TEMPORARY",
-	// 				"ALIAS","SYNONYM"
-	// REMARKS - varchar - description
+	// TABLE_CAT -> NULL
+	odbctablescolumnmap.setValue(0,1);
+	// TABLE_SCHEM -> NULL
+	odbctablescolumnmap.setValue(1,1);
+	// TABLE_NAME -> NULL
+	odbctablescolumnmap.setValue(2,0);
+	// TABLE_TYPE -> NULL
+	odbctablescolumnmap.setValue(3,1);
+	// REMARKS -> NULL
+	odbctablescolumnmap.setValue(4,1);
 
 	// ODBC getColumnList:
 	//
-	// TABLE_CAT - varchar - catalog (database) name
-	// TABLE_SCHEM - varchar - schema name
-	// TABLE_NAME - varchar not null - table name
-	// COLUMN_NAME - varchar not null - column name
-	// DATA_TYPE - smallint not null - ODBC or driver-specific id
-	// TYPE_NAME - varchar not null - column type string
-	// COLUMN_SIZE - integer - length in characters
-	// BUFFER_LEGTH - integer - length in bytes
+	// TABLE_CAT -> NULL
+	odbccolumnscolumnmap.setValue(0,9);
+	// TABLE_SCHEM -> NULL
+	odbccolumnscolumnmap.setValue(1,9);
+	// TABLE_NAME -> NULL
+	odbccolumnscolumnmap.setValue(2,9);
+	// COLUMN_NAME -> column_name
+	odbccolumnscolumnmap.setValue(3,0);
+	// DATA_TYPE (numeric) -> NULL
+	odbccolumnscolumnmap.setValue(4,9);
+	// TYPE_NAME -> data_type
+	odbccolumnscolumnmap.setValue(5,1);
+	// COLUMN_SIZE -> character_maximum_length
+	odbccolumnscolumnmap.setValue(6,2);
+	// BUFFER_LEGTH -> character_maximum_length
+	odbccolumnscolumnmap.setValue(7,2);
 	// DECIMAL_DIGITS - smallint - scale
+	odbccolumnscolumnmap.setValue(8,4);
 	// NUM_PREC_RADIX - smallint - precision
-	// NULLABLE - smallint not null -
-	// 	SQL_NO_NULLS/SQL_NULLABLE/SQL_NULLABLE_UNKNOWN
-	// REMARKS - varchar - description
-	// COLUMN_DEF - varchar - default value
-	// SQL_DATA_TYPE - smallint not null - ODBC or driver-specific id
-	// SQL_DATETIME_SUB - smallint - subtype for interval types or NULL
-	// CHAR_OCTET_LENGTH - integer - maximum bytes for char/binary or NULL
-	// ORDINAL_POSITION - integer not null - column number (1-based)
-	// IS_NULLABLE - varchar - "YES", "NO" or "" (unknown)
+	odbccolumnscolumnmap.setValue(9,3);
+	// NULLABLE -> NULL
+	odbccolumnscolumnmap.setValue(10,9);
+	// REMARKS -> extra
+	odbccolumnscolumnmap.setValue(11,8);
+	// COLUMN_DEF -> column_default
+	odbccolumnscolumnmap.setValue(12,7);
+	// SQL_DATA_TYPE -> NULL
+	odbccolumnscolumnmap.setValue(13,9);
+	// SQL_DATETIME_SUB -> NULL
+	odbccolumnscolumnmap.setValue(14,9);
+	// CHAR_OCTET_LENGTH -> character_maximum_length
+	odbccolumnscolumnmap.setValue(15,2);
+	// ORDINAL_POSITION -> NULL
+	odbccolumnscolumnmap.setValue(16,9);
+	// IS_NULLABLE -> NULL
+	odbccolumnscolumnmap.setValue(17,5);
 }
 
 uint32_t sqlrservercontroller::mapColumn(uint32_t col) {

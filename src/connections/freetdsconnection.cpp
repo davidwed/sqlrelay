@@ -624,10 +624,11 @@ const char *freetdsconnection::dbHostNameQuery() {
 
 const char *freetdsconnection::getDatabaseListQuery(bool wild) {
 	if (sybasedb) {
-		return "select '' as db";
+		return "select '' as db, NULL";
 	} else {
 		return "select "
-			"	distinct catalog_name "
+			"	distinct catalog_name, "
+			"	NULL "
 			"from "
 			"	information_schema.schemata "
 			"order by "
@@ -639,7 +640,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 	if (sybasedb) {
 		return (wild)?
 			"select "
-			"	name "
+			"	name, "
+			"	NULL "
 			"from "
 			"	sysobjects "
 			"where "
@@ -652,7 +654,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 			"	name":
 	
 			"select "
-			"	name "
+			"	name, "
+			"	NULL "
 			"from "
 			"	sysobjects "
 			"where "
@@ -664,7 +667,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 	} else {
 		return (wild)?
 			"select "
-			"	table_name "
+			"	table_name, "
+			"	NULL "
 			"from "
 			"	information_schema.tables "
 			"where "
@@ -673,7 +677,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 			"	table_name":
 	
 			"select "
-			"	table_name "
+			"	table_name, "
+			"	NULL "
 			"from "
 			"	information_schema.tables "
 			"order by "
@@ -694,7 +699,8 @@ const char *freetdsconnection::getColumnListQuery(
 			"	(syscolumns.status&8)/8 as nullable, "
 			"	'' as primarykey, "
 			"	'' column_default, "
-			"	'' as extra "
+			"	'' as extra, "
+			"	NULL "
 			"from "
 			"	sysobjects, "
 			"	syscolumns, "
@@ -721,7 +727,8 @@ const char *freetdsconnection::getColumnListQuery(
 			"	(syscolumns.status&8)/8 as nullable, "
 			"	'' as primarykey, "
 			"	'' column_default, "
-			"	'' as extra "
+			"	'' as extra, "
+			"	NULL "
 			"from "
 			"	sysobjects, "
 			"	syscolumns, "
@@ -749,7 +756,8 @@ const char *freetdsconnection::getColumnListQuery(
 				"	is_nullable, "
 				"	'' as primarykey, "
 				"	column_default, "
-				"	'' as extra "
+				"	'' as extra, "
+				"	NULL "
 				"from "
 				"	tempdb.information_schema.columns "
 				"where "
@@ -769,7 +777,8 @@ const char *freetdsconnection::getColumnListQuery(
 				"	is_nullable, "
 				"	'' as primarykey, "
 				"	column_default, "
-				"	'' as extra "
+				"	'' as extra, "
+				"	NULL "
 				"from "
 				"	tempdb.information_schema.columns "
 				"where "
@@ -789,7 +798,8 @@ const char *freetdsconnection::getColumnListQuery(
 				"	is_nullable, "
 				"	'' as primarykey, "
 				"	column_default, "
-				"	'' as extra "
+				"	'' as extra, "
+				"	NULL "
 				"from "
 				"	information_schema.columns "
 				"where "
@@ -809,7 +819,8 @@ const char *freetdsconnection::getColumnListQuery(
 				"	is_nullable, "
 				"	'' as primarykey, "
 				"	column_default, "
-				"	'' as extra "
+				"	'' as extra, "
+				"	NULL "
 				"from "
 				"	information_schema.columns "
 				"where "

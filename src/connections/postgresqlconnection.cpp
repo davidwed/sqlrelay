@@ -463,7 +463,8 @@ const char *postgresqlconnection::dbIpAddress() {
 const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
 	return (wild)?
 		"select "
-		"	datname "
+		"	datname, "
+		"	NULL "
 		"from "
 		"	pg_database "
 		"where "
@@ -472,7 +473,8 @@ const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
 		"	datname":
 
 		"select "
-		"	datname "
+		"	datname, "
+		"	NULL "
 		"from "
 		"	pg_database "
 		"order by "
@@ -482,7 +484,8 @@ const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
 const char *postgresqlconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
-		"	table_name "
+		"	table_name, "
+		"	NULL "
 		"from "
 		"	information_schema.tables "
 		"where "
@@ -493,7 +496,8 @@ const char *postgresqlconnection::getTableListQuery(bool wild) {
 		"	table_name":
 
 		"select "
-		"	table_name "
+		"	table_name, "
+		"	NULL "
 		"from "
 		"	information_schema.tables "
 		"where "
@@ -514,7 +518,8 @@ const char *postgresqlconnection::getColumnListQuery(
 		"	is_nullable, "
 		"	'' as key, "
 		"	column_default, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	information_schema.columns "
 		"where "
@@ -533,7 +538,8 @@ const char *postgresqlconnection::getColumnListQuery(
 		"	is_nullable, "
 		"	'' as key, "
 		"	column_default, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	information_schema.columns "
 		"where "

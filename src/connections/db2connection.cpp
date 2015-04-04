@@ -446,7 +446,8 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquery=
 			"select distinct "
-			"	tabname "
+			"	tabname, "
+			"	NULL "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -462,7 +463,8 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquerywild=
 			"select distinct "
-			"	tabname "
+			"	tabname, "
+			"	NULL "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -483,7 +485,8 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquery=
 			"select distinct "
-			"	tabname "
+			"	tabname, "
+			"	NULL "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -499,7 +502,8 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquerywild=
 			"select distinct "
-			"	tabname "
+			"	tabname, "
+			"	NULL "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -643,14 +647,16 @@ const char *db2connection::dbHostNameQuery() {
 const char *db2connection::getDatabaseListQuery(bool wild) {
 	return (wild)?
 		"select "
-		"	schemaname "
+		"	schemaname, "
+		"	NULL "
 		"from "
 		"	syscat.schemata "
 		"where "
 		"	schemaname like '%s'":
 
 		"select "
-		"	schemaname "
+		"	schemaname, "
+		"	NULL "
 		"from "
 		"	syscat.schemata ";
 }
@@ -670,7 +676,8 @@ const char *db2connection::getColumnListQuery(const char *table, bool wild) {
 		"	nulls, "
 		"	keyseq as key, "
 		"	default, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	syscat.columns "
 		"where "
@@ -689,7 +696,8 @@ const char *db2connection::getColumnListQuery(const char *table, bool wild) {
 		"	nulls, "
 		"	keyseq as key, "
 		"	default, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	syscat.columns "
 		"where "

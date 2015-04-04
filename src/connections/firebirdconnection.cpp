@@ -530,13 +530,13 @@ const char *firebirdconnection::dbHostName() {
 }
 
 const char *firebirdconnection::getDatabaseListQuery(bool wild) {
-	return "select '' from rdb$database";
+	return "select '',NULL from rdb$database";
 }
 
 const char *firebirdconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
-		"	rdb$relation_name "
+		"	rdb$relation_name, NULL "
 		"from "
 		"	rdb$relations "
 		"where "
@@ -547,7 +547,7 @@ const char *firebirdconnection::getTableListQuery(bool wild) {
 		"	rdb$relation_name":
 
 		"select "
-		"	rdb$relation_name "
+		"	rdb$relation_name, NULL "
 		"from "
 		"	rdb$relations "
 		"where "
@@ -584,7 +584,8 @@ const char *firebirdconnection::getColumnListQuery(
 		"	r.rdb$null_flag, "
 		"	'' as primary_key, "
 		"	'' as default_value, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	rdb$relation_fields r "
 		"	left join "
@@ -623,7 +624,8 @@ const char *firebirdconnection::getColumnListQuery(
 		"	r.rdb$null_flag, "
 		"	'' as primary_key, "
 		"	'' as default_value, "
-		"	'' as extra "
+		"	'' as extra, "
+		"	NULL "
 		"from "
 		"	rdb$relation_fields r "
 		"	left join "

@@ -3047,9 +3047,8 @@ bool sqlrclient::getListByQuery(sqlrservercursor *cursor,
 	// FIXME: this can fail
 	buildListQuery(cursor,query,wild,table);
 
-	return processQueryOrBindCursor(cursor,
-				SQLRCLIENTQUERYTYPE_QUERY,
-				listformat,false,false);
+	return processQueryOrBindCursor(cursor,querytype,
+					listformat,false,false);
 }
 
 bool sqlrclient::buildListQuery(sqlrservercursor *cursor,
