@@ -13,7 +13,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
 
-//#define DEBUG_MESSAGES 1
+#define DEBUG_MESSAGES 1
 //#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
@@ -72,6 +72,7 @@ struct CONN {
 	char				*error;
 	int64_t				errn;
 	const char			*sqlstate;
+	char				dsn[1024];
 	char				server[1024];
 	uint16_t			port;
 	char				socket[1024];
@@ -1847,24 +1848,25 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	}
 
 	// copy the dsn, sometimes it's not NULL-terminated
-	char	*dsncopy;
 	if (dsnlength==SQL_NTS) {
-		dsncopy=charstring::duplicate((const char *)dsn);
-	} else {
-		dsncopy=new char[dsnlength+1];
-		charstring::copy(dsncopy,(const char *)dsn,(size_t)dsnlength);
-		dsncopy[dsnlength]='\0';
+		dsnlength=charstring::length(dsn);
 	}
+	if (dsnlength>=sizeof(conn->dsn)) {
+		dsnlength=sizeof(conn->dsn)-1;
+	}
+	charstring::safeCopy(conn->dsn,sizeof(conn->dsn),
+					(const char *)dsn,dsnlength);
+	conn->dsn[dsnlength]='\0';
 
 	// get data from dsn
-	SQLGetPrivateProfileString((const char *)dsncopy,"Server","",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Server","",
 					conn->server,sizeof(conn->server),
 					ODBC_INI);
 	char	portbuf[6];
-	SQLGetPrivateProfileString((const char *)dsncopy,"Port","",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Port","",
 					portbuf,sizeof(portbuf),ODBC_INI);
 	conn->port=(uint16_t)charstring::toUnsignedInteger(portbuf);
-	SQLGetPrivateProfileString((const char *)dsncopy,"Socket","",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Socket","",
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
 	if (charstring::length(user)) {
@@ -1879,9 +1881,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						userlength);
 		}
 	} else {
-		SQLGetPrivateProfileString((const char *)dsncopy,"User","",
-					conn->user,sizeof(conn->user),
-					ODBC_INI);
+		SQLGetPrivateProfileString((const char *)conn->dsn,
+						"User","",
+						conn->user,
+						sizeof(conn->user),
+						ODBC_INI);
 	}
 	if (charstring::length(password)) {
 		if (passwordlength==SQL_NTS) {
@@ -1895,27 +1899,29 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						(const char *)password);
 		}
 	} else {
-		SQLGetPrivateProfileString((const char *)dsncopy,"Password","",
-					conn->password,sizeof(conn->password),
-					ODBC_INI);
+		SQLGetPrivateProfileString((const char *)conn->dsn,
+						"Password","",
+						conn->password,
+						sizeof(conn->password),
+						ODBC_INI);
 	}
 	char	retrytimebuf[6];
-	SQLGetPrivateProfileString((const char *)dsncopy,"RetryTime","0",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"RetryTime","0",
 					retrytimebuf,sizeof(retrytimebuf),
 					ODBC_INI);
 	conn->retrytime=(int32_t)charstring::toInteger(retrytimebuf);
 	char	triesbuf[6];
-	SQLGetPrivateProfileString((const char *)dsncopy,"Tries","1",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tries","1",
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
 	char	debugbuf[6];
-	SQLGetPrivateProfileString((const char *)dsncopy,"Debug","0",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Debug","0",
 					debugbuf,sizeof(debugbuf),
 					ODBC_INI);
 	conn->debug=(charstring::toInteger(debugbuf)!=0);
 
-	debugPrintf("  DSN: %s\n",dsncopy);
+	debugPrintf("  DSN: %s\n",conn->dsn);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
 	debugPrintf("  Server: %s\n",conn->server);
 	debugPrintf("  Port: %d\n",(int)conn->port);
@@ -1943,9 +1949,6 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	if (conn->debug) {
 		conn->con->debugOn();
 	}
-
-	// clean up
-	delete[] dsncopy;
 
 	return SQL_SUCCESS;
 }
@@ -4289,87 +4292,686 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 	// some bits of info need a valid conn handle, but others don't
 	CONN	*conn=(CONN *)connectionhandle;
 	if ((connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) &&
-		(infotype==SQL_DRIVER_VER || infotype==SQL_DBMS_NAME ||
-		infotype==SQL_DBMS_VER || infotype==SQL_DATABASE_NAME)) {
+		(infotype==SQL_DATA_SOURCE_NAME ||
+			infotype==SQL_SERVER_NAME ||
+			infotype==SQL_DRIVER_VER ||
+			infotype==SQL_DBMS_NAME ||
+			infotype==SQL_DBMS_VER ||
+			infotype==SQL_ODBC_VER ||
+			infotype==SQL_DATABASE_NAME ||
+			infotype==SQL_USER_NAME)) {
 		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	const char	*strval=NULL;
 
-	// FIXME: there are tons more of these...
-	// http://vieka.com/esqldoc/esqlref/htm/odbcsqlgetinfo.htm
 	switch (infotype) {
-		case SQL_DRIVER_ODBC_VER:
-			debugPrintf("  infotype: SQL_DRIVER_ODBC_VER\n");
-			strval="03.00";
+		case SQL_ACTIVE_CONNECTIONS:
+			// aka SQL_MAX_DRIVER_CONNECTIONS
+			// aka SQL_MAXIMUM_DRIVER_CONNECTIONS
+			debugPrintf("  infotype: "
+					"SQL_ACTIVE_CONNECTIONS/"
+					"SQL_MAX_DRIVER_CONNECTIONS/"
+					"SQL_MAXIMUM_DRIVER_CONNECTIONS\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
 			break;
-		case SQL_DRIVER_NAME:
-			debugPrintf("  infotype: SQL_DRIVER_NAME\n");
-			strval="SQL Relay";
+		case SQL_ACTIVE_STATEMENTS:
+			// aka SQL_MAX_CONCURRENT_ACTIVITIES 
+			// aka SQL_MAXIMUM_CONCURRENT_ACTIVITIES
+			debugPrintf("  infotype: "
+					"SQL_ACTIVE_STATEMENTS/"
+					"SQL_MAX_CONCURRENT_ACTIVITIES/"
+					"SQL_MAXIMUM_CONCURRENT_ACTIVITIES\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
 			break;
-		case SQL_DRIVER_VER:
-			debugPrintf("  infotype: SQL_DRIVER_VER\n");
-			strval=conn->con->clientVersion();
+		case SQL_DATA_SOURCE_NAME:
+			debugPrintf("  infotype: "
+					"SQL_DATA_SOURCE_NAME\n");
+			strval=conn->dsn;
+			break;
+		case SQL_FETCH_DIRECTION:
+			debugPrintf("  infotype: "
+					"SQL_FETCH_DIRECTION\n");
+			// FIXME: for now...
+			*(SQLINTEGER *)infovalue=SQL_FD_FETCH_NEXT;
+			break;
+		case SQL_SERVER_NAME:
+			debugPrintf("  infotype: "
+					"SQL_SERVER_NAME\n");
+			strval=conn->server;
+			break;
+		case SQL_SEARCH_PATTERN_ESCAPE:
+			debugPrintf("  infotype: "
+					"SQL_SEARCH_PATTERN_ESCAPE\n");
+			// FIXME: what about _ and ?
+			strval="%";
+			break;
+		case SQL_DATABASE_NAME:
+			debugPrintf("  infotype: "
+					"SQL_DATABASE_NAME\n");
+			strval=conn->con->getCurrentDatabase();
 			break;
 		case SQL_DBMS_NAME:
-			debugPrintf("  infotype: SQL_DBMS_NAME\n");
+			debugPrintf("  infotype: "
+					"SQL_DBMS_NAME\n");
 			strval=conn->con->identify();
 			break;
 		case SQL_DBMS_VER:
-			debugPrintf("  infotype: SQL_DBMS_VER\n");
+			debugPrintf("  infotype: "
+					"SQL_DBMS_VER\n");
 			strval=conn->con->dbVersion();
 			break;
+		case SQL_ACCESSIBLE_TABLES:
+			debugPrintf("  infotype: "
+					"SQL_ACCESSIBLE_TABLES\n");
+			strval="N";
+			break;
+		case SQL_ACCESSIBLE_PROCEDURES:
+			debugPrintf("  infotype: "
+					"SQL_ACCESSIBLE_PROCEDURES\n");
+			strval="N";
+			break;
 		case SQL_CURSOR_COMMIT_BEHAVIOR:
-			debugPrintf("  infotype: SQL_CURSOR_COMMIT_BEHAVIOR\n");
+			debugPrintf("  infotype: "
+					"SQL_CURSOR_COMMIT_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
 			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
 			break;
-		case SQL_CURSOR_ROLLBACK_BEHAVIOR:
-			debugPrintf("  infotype: SQL_CURSOR_ROLLBACK_BEHAVIOR\n");
-			// FIXME: is this true for all db's?
-			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
+		case SQL_DATA_SOURCE_READ_ONLY:
+			debugPrintf("  infotype: "
+					"SQL_DATA_SOURCE_READ_ONLY\n");
+			// FIXME: this isn't always true
+			strval="N";
 			break;
-		case SQL_DATABASE_NAME:
-			debugPrintf("  infotype: SQL_DATABASE_NAME\n");
-			strval=conn->con->getCurrentDatabase();
+		case SQL_DEFAULT_TXN_ISOLATION:
+			debugPrintf("  infotype: "
+					"SQL_DEFAULT_TXN_ISOLATION\n");
+			// FIXME: this isn't always true, especially for mysql
+			*(SQLUINTEGER *)infovalue=SQL_TXN_READ_COMMITTED;
+			break;
+		case SQL_IDENTIFIER_CASE:
+			debugPrintf("  infotype: "
+					"SQL_IDENTIFIER_CASE\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=SQL_IC_MIXED;
+			break;
+		case SQL_IDENTIFIER_QUOTE_CHAR:
+			debugPrintf("  infotype: "
+					"SQL_IDENTIFIER_QUOTE_CHAR\n");
+			// FIXME: is this true for all db's?
+			strval="\"";
+			break;
+		case SQL_MAX_COLUMN_NAME_LEN:
+			// aka SQL_MAXIMUM_COLUMN_NAME_LENGTH
+			debugPrintf("  infotype: "
+					"SQL_MAX_COLUMN_NAME_LEN/"
+					"SQL_MAXIMUM_COLUMN_NAME_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_MAX_CURSOR_NAME_LEN:
+			// aka SQL_MAXIMUM_CURSOR_NAME_LENGTH
+			debugPrintf("  infotype: "
+					"SQL_MAX_CURSOR_NAME_LEN/"
+					"SQL_MAXIMUM_CURSOR_NAME_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_MAX_OWNER_NAME_LEN:
+			// aka SQL_MAX_SCHEMA_NAME_LEN
+			// aka SQL_MAXIMUM_SCHEMA_NAME_LENGTH
+			debugPrintf("  infotype: "
+					"SQL_MAX_OWNER_NAME_LEN/"
+					"SQL_MAX_SCHEMA_NAME_LEN/"
+					"SQL_MAXIMUM_SCHEMA_NAME_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_MAX_CATALOG_NAME_LEN:
+			// aka SQL_MAXIMUM_CATALOG_NAME_LENGTH
+			debugPrintf("  infotype: "
+					"SQL_MAX_CATALOG_NAME_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_MAX_TABLE_NAME_LEN:
+			debugPrintf("  infotype: "
+					"SQL_MAX_TABLE_NAME_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_SCROLL_CONCURRENCY:
+			debugPrintf("  infotype: "
+					"SQL_SCROLL_CONCURRENCY\n");
+			*(SQLINTEGER *)infovalue=SQL_SCCO_READ_ONLY;
 			break;
 		case SQL_TXN_CAPABLE:
-			debugPrintf("  infotype: SQL_TXN_CAPABLE\n");
+			// aka SQL_TRANSACTION_CAPABLE
+			debugPrintf("  infotype: "
+					"SQL_TXN_CAPABLE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUSMALLINT *)infovalue=SQL_TC_ALL;
 			break;
-		case SQL_SCROLL_OPTIONS:
-			debugPrintf("  infotype: SQL_SCROLL_OPTIONS\n");
-			*(SQLUINTEGER *)infovalue=SQL_SO_FORWARD_ONLY;
+		case SQL_USER_NAME:
+			debugPrintf("  infotype: "
+					"SQL_USER_NAME\n");
+			strval=conn->user;
 			break;
-		case SQL_BATCH_ROW_COUNT:
-			debugPrintf("  infotype: SQL_BATCH_ROW_COUNT\n");
-			// batch sql is not supported
-			*(SQLUINTEGER *)infovalue=0;
+		case SQL_TXN_ISOLATION_OPTION:
+			// aka SQL_TRANSACTION_ISOLATION_OPTION
+			debugPrintf("  infotype: "
+					"SQL_TXN_ISOLATION_OPTION/"
+					"SQL_TRANSACTION_ISOLATION_OPTION\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_TXN_READ_UNCOMMITTED|
+					SQL_TXN_READ_COMMITTED|
+					SQL_TXN_REPEATABLE_READ|
+					SQL_TXN_SERIALIZABLE;
 			break;
-		case SQL_BATCH_SUPPORT:
-			debugPrintf("  infotype: SQL_BATCH_SUPPORT\n");
-			// batch sql is not supported
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_PARAM_ARRAY_ROW_COUNTS:
-			debugPrintf("  infotype: SQL_PARAM_ARRAY_ROW_COUNTS\n");
-			// batch sql is not supported
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_CATALOG_NAME:
-			debugPrintf("  infotype: SQL_CATALOG_NAME\n");
+		case SQL_INTEGRITY:
+			// aka SQL_ODBC_SQL_OPT_IEF
+			debugPrintf("  infotype: "
+					"SQL_INTEGRITY/"
+					"SQL_ODBC_SQL_OPT_IEF\n");
 			// FIXME: this isn't true for all db's
 			strval="Y";
 			break;
-		case SQL_MAX_CATALOG_NAME_LEN:
-			debugPrintf("  infotype: SQL_MAX_CATALOG_NAME_LEN\n");
-			// 0 means no max length or unknown
+		case SQL_GETDATA_EXTENSIONS:
+			debugPrintf("  infotype: "
+					"SQL_GETDATA_EXTENSIONS\n");
+			*(SQLUINTEGER *)infovalue=SQL_GD_BLOCK;
+			break;
+		case SQL_NULL_COLLATION:
+			debugPrintf("  infotype: "
+					"SQL_NULL_COLLATION\n");
+			// FIXME: is this true for all db's?
+			*(SQLUSMALLINT *)infovalue=SQL_NC_LOW;
+			break;
+		case SQL_ALTER_TABLE:
+			debugPrintf("  infotype: "
+					"SQL_ALTER_TABLE\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=0
+					#if (ODBCVER >= 0x0200)
+					|SQL_AT_ADD_COLUMN
+					|SQL_AT_DROP_COLUMN
+					#endif
+					#if (ODBCVER >= 0x0300)
+					|SQL_AT_ADD_COLUMN_SINGLE
+					|SQL_AT_ADD_COLUMN_DEFAULT
+					|SQL_AT_ADD_COLUMN_COLLATION
+					|SQL_AT_SET_COLUMN_DEFAULT
+					|SQL_AT_DROP_COLUMN_DEFAULT
+					|SQL_AT_DROP_COLUMN_CASCADE
+					|SQL_AT_DROP_COLUMN_RESTRICT
+					|SQL_AT_ADD_TABLE_CONSTRAINT
+					|SQL_AT_DROP_TABLE_CONSTRAINT_CASCADE
+					|SQL_AT_DROP_TABLE_CONSTRAINT_RESTRICT
+					|SQL_AT_CONSTRAINT_NAME_DEFINITION
+					|SQL_AT_CONSTRAINT_INITIALLY_DEFERRED
+					|SQL_AT_CONSTRAINT_INITIALLY_IMMEDIATE
+					|SQL_AT_CONSTRAINT_DEFERRABLE
+					|SQL_AT_CONSTRAINT_NON_DEFERRABLE
+					#endif
+					;
+			break;
+		case SQL_ORDER_BY_COLUMNS_IN_SELECT:
+			debugPrintf("  infotype: "
+					"SQL_ORDER_BY_COLUMNS_IN_SELECT\n");
+			// FIXME: is this true for all db's?
+			strval="N";
+			break;
+		case SQL_SPECIAL_CHARACTERS:
+			debugPrintf("  infotype: "
+					"SQL_SPECIAL_CHARACTERS\n");
+			strval="#$_";
+			break;
+		case SQL_MAX_COLUMNS_IN_GROUP_BY:
+			// aka SQL_MAXIMUM_COLUMNS_IN_GROUP_BY
+			debugPrintf("  infotype: "
+					"SQL_MAX_COLUMNS_IN_GROUP_BY/"
+					"SQL_MAXIMUM_COLUMNS_IN_GROUP_BY\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		case SQL_MAX_COLUMNS_IN_INDEX:
+			// aka SQL_MAXIMUM_COLUMNS_IN_INDEX
+			debugPrintf("  infotype: "
+					"SQL_MAX_COLUMNS_IN_INDEX/"
+					"SQL_MAXIMUM_COLUMNS_IN_INDEX\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		case SQL_MAX_COLUMNS_IN_ORDER_BY:
+			// aka SQL_MAXIMUM_COLUMNS_IN_ORDER_BY
+			debugPrintf("  infotype: "
+					"SQL_MAX_COLUMNS_IN_ORDER_BY/"
+					"SQL_MAXIMUM_COLUMNS_IN_ORDER_BY\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		case SQL_MAX_COLUMNS_IN_SELECT:
+			// aka SQL_MAXIMUM_COLUMNS_IN_SELECT
+			debugPrintf("  infotype: "
+					"SQL_MAX_COLUMNS_IN_SELECT/"
+					"SQL_MAXIMUM_COLUMNS_IN_SELECT\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		case SQL_MAX_COLUMNS_IN_TABLE:
+			debugPrintf("  infotype: "
+					"SQL_MAX_COLUMNS_IN_TABLE\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		case SQL_MAX_INDEX_SIZE:
+			// aka SQL_MAXIMUM_INDEX_SIZE
+			debugPrintf("  infotype: "
+					"SQL_MAX_INDEX_SIZE/"
+					"SQL_MAXIMUM_INDEX_SIZE\n");
+			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
 			break;
-		case SQL_SCHEMA_USAGE:
-			debugPrintf("  infotype: SQL_SCHEMA_USAGE\n");
+		case SQL_MAX_ROW_SIZE:
+			// aka SQL_MAXIMUM_ROW_SIZE
+			debugPrintf("  infotype: "
+					"SQL_MAX_ROW_SIZE/"
+					"SQL_MAXIMUM_ROW_SIZE\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_MAX_STATEMENT_LEN:
+			// aka SQL_MAXIMUM_STATEMENT_LENGTH
+			debugPrintf("  infotype: "
+					"SQL_MAX_STATEMENT_LEN/"
+					"SQL_MAXIMUM_STATEMENT_LENGTH\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_MAX_TABLES_IN_SELECT:
+			// aka SQL_MAXIMUM_TABLES_IN_SELECT
+			debugPrintf("  infotype: "
+					"SQL_MAX_TABLES_IN_SELECT/"
+					"SQL_MAXIMUM_TABLES_IN_SELECT\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		case SQL_MAX_USER_NAME_LEN:
+			// aka SQL_MAXIMUM_USER_NAME_LENGTH
+			debugPrintf("  infotype: "
+					"SQL_MAX_USER_NAME_LEN/"
+					"SQL_MAXIMUM_USER_NAME_LENGTH\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		#if (ODBCVER >= 0x0300)
+		case SQL_OJ_CAPABILITIES:
+			// aka SQL_OUTER_JOIN_CAPABILITIES
+			debugPrintf("  infotype: "
+					"SQL_OJ_CAPABILITIES/"
+					"SQL_OUTER_JOIN_CAPABILITIES\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_OJ_LEFT|
+					SQL_OJ_RIGHT|
+					SQL_OJ_FULL|
+					SQL_OJ_NESTED|
+					SQL_OJ_NOT_ORDERED|
+					SQL_OJ_INNER|
+					SQL_OJ_ALL_COMPARISON_OPS;
+			break;
+		case SQL_XOPEN_CLI_YEAR:
+			debugPrintf("  infotype: "
+					"SQL_XOPEN_CLI_YEAR\n");
+			// FIXME: what actual year?
+			strval="1996";
+			break;
+		case SQL_CURSOR_SENSITIVITY:
+			debugPrintf("  infotype: "
+					"SQL_CURSOR_SENSITIVITY\n");
+			*(SQLUINTEGER *)infovalue=SQL_UNSPECIFIED;
+			break;
+		case SQL_DESCRIBE_PARAMETER:
+			debugPrintf("  infotype: "
+					"SQL_DESCRIBE_PARAMETER\n");
+			strval="N";
+			break;
+		case SQL_CATALOG_NAME:
+			debugPrintf("  infotype: "
+					"SQL_CATALOG_NAME\n");
+			// FIXME: is this true for all db's?
+			strval="Y";
+			break;
+		case SQL_COLLATION_SEQ:
+			debugPrintf("  infotype: "
+					"SQL_COLLATION_SEQ\n");
+			strval="";
+			break;
+		case SQL_MAX_IDENTIFIER_LEN:
+			// aka SQL_MAXIMUM_IDENTIFIER_LENGTH
+			debugPrintf("  infotype: "
+					"SQL_MAX_IDENTIFIER_LEN/"
+					"SQL_MAXIMUM_IDENTIFIER_LENGTH\n");
+			// FIXME: is this true for all db's?
+			*(SQLUSMALLINT *)infovalue=128;
+			break;
+		#endif
+		case SQL_DRIVER_HDBC:
+			debugPrintf("  unsupported infotype: "
+						"SQL_DRIVER_HDBC\n");
+			break;
+		case SQL_DRIVER_HENV:
+			debugPrintf("  unsupported infotype: "
+						"SQL_DRIVER_HENV\n");
+			break;
+		case SQL_DRIVER_HSTMT:
+			debugPrintf("  unsupported infotype: "
+						"SQL_DRIVER_HSTMT\n");
+			break;
+		case SQL_DRIVER_NAME:
+			debugPrintf("  infotype: "
+					"SQL_DRIVER_NAME\n");
+			strval="SQL Relay";
+			break;
+		case SQL_DRIVER_VER:
+			debugPrintf("  infotype: "
+					"SQL_DRIVER_VER\n");
+			strval=conn->con->clientVersion();
+			break;
+		case SQL_ODBC_API_CONFORMANCE:
+			debugPrintf("  infotype: "
+					"SQL_ODBC_API_CONFORMANCE\n");
+			*(SQLUSMALLINT *)infovalue=SQL_OAC_LEVEL2;
+			break;
+		case SQL_ODBC_VER:
+			debugPrintf("  infotype: "
+					"SQL_ODBC_VER\n");
+			// FIXME: this should be of format ##.##.####
+			// (major.minor.release)
+			strval=conn->con->clientVersion();
+			break;
+		case SQL_ROW_UPDATES:
+			debugPrintf("  infotype: "
+					"SQL_ROW_UPDATES\n");
+			strval="N";
+			break;
+		case SQL_ODBC_SAG_CLI_CONFORMANCE:
+			debugPrintf("  unsupported infotype: "
+					"SQL_ODBC_SAG_CLI_CONFORMANCE\n");
+			break;
+		case SQL_ODBC_SQL_CONFORMANCE:
+			debugPrintf("  infotype: "
+					"SQL_ODBC_SQL_CONFORMANCE\n");
+			*(SQLUSMALLINT *)infovalue=SQL_OSC_EXTENDED;
+			break;
+		case SQL_PROCEDURES:
+			debugPrintf("  infotype: "
+					"SQL_PROCEDURES\n");
+			// FIXME: this isn't true for all db's
+			strval="Y";
+			break;
+		case SQL_CONCAT_NULL_BEHAVIOR:
+			debugPrintf("  infotype: "
+					"SQL_CONCAT_NULL_BEHAVIOR\n");
+			// FIXME: is this true for all db's?
+			*(SQLUSMALLINT *)infovalue=SQL_CB_NON_NULL;
+			break;
+		case SQL_CURSOR_ROLLBACK_BEHAVIOR:
+			debugPrintf("  infotype: "
+					"SQL_CURSOR_ROLLBACK_BEHAVIOR\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
+			break;
+		case SQL_EXPRESSIONS_IN_ORDERBY:
+			debugPrintf("  infotype: "
+					"SQL_EXPRESSIONS_IN_ORDERBY\n");
+			// FIXME: is this true for all db's?
+			strval="Y";
+			break;
+		case SQL_MAX_PROCEDURE_NAME_LEN:
+			debugPrintf("  infotype: "
+					"SQL_MAX_PROCEDURE_NAME_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_MULT_RESULT_SETS:
+			debugPrintf("  infotype: "
+					"SQL_MULT_RESULT_SETS\n");
+			strval="N";
+			break;
+		case SQL_MULTIPLE_ACTIVE_TXN:
+			debugPrintf("  infotype: "
+					"SQL_MULTIPLE_ACTIVE_TXN\n");
+			strval="N";
+			break;
+		case SQL_OUTER_JOINS:
+			debugPrintf("  infotype: "
+					"SQL_OUTER_JOINS\n");
+			// FIXME: is this true for all db's?
+			strval="Y";
+			break;
+		case SQL_OWNER_TERM:
+			// aka SQL_SCHEMA_TERM
+			debugPrintf("  infotype: "
+					"SQL_OWNER_TERM/"
+					"SQL_SCHEMA_TERM\n");
+			strval="schema";
+			break;
+		case SQL_PROCEDURE_TERM:
+			debugPrintf("  infotype: "
+					"SQL_PROCEDURE_TERM\n");
+			strval="stored procedure";
+			break;
+		case SQL_QUALIFIER_NAME_SEPARATOR:
+			// aka SQL_CATALOG_NAME_SEPARATOR
+			debugPrintf("  infotype: "
+					"SQL_QUALIFIER_NAME_SEPARATOR/"
+					"SQL_CATALOG_NAME_SEPARATOR/");
+			// FIXME: is this true for all db's?
+			strval=".";
+			break;
+		case SQL_QUALIFIER_TERM:
+			// aka SQL_CATALOG_TERM
+			debugPrintf("  infotype: "
+					"SQL_QUALIFIER_TERM/"
+					"SQL_CATALOG_TERM\n");
+			strval="catalog";
+			break;
+		case SQL_SCROLL_OPTIONS:
+			debugPrintf("  infotype: "
+					"SQL_SCROLL_OPTIONS\n");
+			*(SQLUINTEGER *)infovalue=SQL_SO_FORWARD_ONLY;
+			break;
+		case SQL_TABLE_TERM:
+			debugPrintf("  infotype: "
+					"SQL_TABLE_TERM\n");
+			strval="table";
+			break;
+		case SQL_CONVERT_FUNCTIONS:
+			debugPrintf("  infotype: "
+					"SQL_CONVERT_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=SQL_FN_CVT_CAST;
+						//SQL_FN_CVT_CONVERT;
+			break;
+		case SQL_NUMERIC_FUNCTIONS:
+			debugPrintf("  unsupported infotype: "
+					"SQL_NUMERIC_FUNCTIONS\n");
+			break;
+		case SQL_STRING_FUNCTIONS:
+			debugPrintf("  unsupported infotype: "
+					"SQL_STRING_FUNCTIONS\n");
+			break;
+		case SQL_SYSTEM_FUNCTIONS:
+			debugPrintf("  unsupported infotype: "
+					"SQL_SYSTEM_FUNCTIONS\n");
+			break;
+		case SQL_TIMEDATE_FUNCTIONS:
+			debugPrintf("  unsupported infotype: "
+					"SQL_TIMEDATE_FUNCTIONS\n");
+			break;
+		case SQL_CONVERT_BIGINT:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_BIGINT\n");
+			break;
+		case SQL_CONVERT_BINARY:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_BINARY\n");
+			break;
+		case SQL_CONVERT_BIT:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_BIT\n");
+			break;
+		case SQL_CONVERT_CHAR:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_CHAR\n");
+			break;
+		case SQL_CONVERT_DATE:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_DATE\n");
+			break;
+		case SQL_CONVERT_DECIMAL:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_DECIMAL\n");
+			break;
+		case SQL_CONVERT_DOUBLE:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_DOUBLE\n");
+			break;
+		case SQL_CONVERT_FLOAT:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_FLOAT\n");
+			break;
+		case SQL_CONVERT_INTEGER:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_INTEGER\n");
+			break;
+		case SQL_CONVERT_LONGVARCHAR:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_LONGVARCHAR\n");
+			break;
+		case SQL_CONVERT_NUMERIC:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_NUMERIC\n");
+			break;
+		case SQL_CONVERT_REAL:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_REAL\n");
+			break;
+		case SQL_CONVERT_SMALLINT:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_SMALLINT\n");
+			break;
+		case SQL_CONVERT_TIME:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_TIME\n");
+			break;
+		case SQL_CONVERT_TIMESTAMP:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_TIMESTAMP\n");
+			break;
+		case SQL_CONVERT_TINYINT:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_TINYINT\n");
+			break;
+		case SQL_CONVERT_VARBINARY:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_VARBINARY\n");
+			break;
+		case SQL_CONVERT_VARCHAR:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_VARCHAR\n");
+			break;
+		case SQL_CONVERT_LONGVARBINARY:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_LONGVARBINARY\n");
+			break;
+		case SQL_CORRELATION_NAME:
+			debugPrintf("  infotype: "
+					"SQL_CORRELATION_NAME\n");
+			*(SQLUSMALLINT *)infovalue=SQL_CN_ANY;
+			break;
+		case SQL_NON_NULLABLE_COLUMNS:
+			debugPrintf("  infotype: "
+					"SQL_NON_NULLABLE_COLUMNS\n");
+			*(SQLUSMALLINT *)infovalue=SQL_NNC_NON_NULL;
+			break;
+		case SQL_DRIVER_HLIB:
+			debugPrintf("  unsupported infotype: "
+					"SQL_DRIVER_HLIB\n");
+			break;
+		case SQL_DRIVER_ODBC_VER:
+			debugPrintf("  infotype: "
+					"SQL_DRIVER_ODBC_VER\n");
+			strval="03.00";
+			break;
+		case SQL_LOCK_TYPES:
+			debugPrintf("  infotype: "
+					"SQL_LOCK_TYPES\n");
+			// FIXME: is this true for all db's?
+			*(SQLINTEGER *)infovalue=SQL_LCK_NO_CHANGE|
+							SQL_LCK_EXCLUSIVE|
+							SQL_LCK_UNLOCK;
+			break;
+		case SQL_POS_OPERATIONS:
+			debugPrintf("  infotype: "
+					"SQL_POS_OPERATIONS\n");
+			// FIXME: for now...
+			*(SQLUSMALLINT *)infovalue=SQL_POS_POSITION;
+			break;
+		case SQL_POSITIONED_STATEMENTS:
+			debugPrintf("  infotype: "
+					"SQL_POSITIONED_STATEMENTS\n");
+			// none, for now...
+			*(SQLINTEGER *)infovalue=0;
+			break;
+		case SQL_BOOKMARK_PERSISTENCE:
+			debugPrintf("  infotype: "
+					"SQL_BOOKMARK_PERSISTENCE\n");
+			// FIXME: none, for now...
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_STATIC_SENSITIVITY:
+			debugPrintf("  infotype: "
+					"SQL_STATIC_SENSITIVITY\n");
+			*(SQLINTEGER *)infovalue=0;
+			break;
+		case SQL_FILE_USAGE:
+			debugPrintf("  infotype: "
+					"SQL_FILE_USAGE\n");
+			*(SQLUINTEGER *)infovalue=SQL_FILE_NOT_SUPPORTED;
+			break;
+		case SQL_COLUMN_ALIAS:
+			debugPrintf("  infotype: "
+					"SQL_COLUMN_ALIAS\n");
+			// FIXME: this isn't true for all db's
+			strval="Y";
+			break;
+		case SQL_GROUP_BY:
+			debugPrintf("  infotype: "
+					"SQL_GROUP_BY\n");
+			// FIXME: is this true for all db's?
+			*(SQLUSMALLINT *)infovalue=
+					#if (ODBCVER >= 0x0300)
+					SQL_GB_COLLATE
+					#else
+					SQL_GB_GROUP_BY_EQUALS_SELECT
+					#endif
+					;
+			break;
+		case SQL_KEYWORDS:
+			debugPrintf("  unsupported infotype: "
+					"SQL_KEYWORDS\n");
+			break;
+		case SQL_OWNER_USAGE:
+			// aka SQL_SCHEMA_USAGE
+			debugPrintf("  infotype: "
+					"SQL_OWNSER_USAGE/"
+					"SQL_SCHEMA_USAGE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=
 					SQL_SU_DML_STATEMENTS|
@@ -4378,39 +4980,640 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SU_INDEX_DEFINITION|
 					SQL_SU_PRIVILEGE_DEFINITION;
 			break;
-		case SQL_TXN_ISOLATION_OPTION:
-			debugPrintf("  infotype: SQL_TXN_ISOLATION_OPTION\n");
+		case SQL_QUALIFIER_USAGE:
+			// aka SQL_CATALOG_USAGE
+			debugPrintf("  unsupported infotype: %d\n",infotype);
+			break;
+		case SQL_QUOTED_IDENTIFIER_CASE:
+			debugPrintf("  infotype: "
+					"SQL_QUOTED_IDENTIFIER_CASE\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=SQL_IC_SENSITIVE;
+			break;
+		case SQL_SUBQUERIES:
+			debugPrintf("  infotype: "
+					"SQL_SUBQUERIES\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=
+						SQL_SQ_CORRELATED_SUBQUERIES|
+						SQL_SQ_COMPARISON|
+						SQL_SQ_EXISTS|
+						SQL_SQ_IN|
+						SQL_SQ_QUANTIFIED;
+			break;
+		case SQL_UNION:
+			// aka SQL_UNION_STATEMENT
+			debugPrintf("  infotype: "
+					"SQL_UNION/"
+					"SQL_UNION_STATEMENT\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=SQL_U_UNION|SQL_U_UNION_ALL;
+			break;
+		case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
+			debugPrintf("  infotype: "
+					"SQL_MAX_ROW_SIZE_INCLUDES_LONG\n");
+			strval="N";
+			break;
+		case SQL_MAX_CHAR_LITERAL_LEN:
+			debugPrintf("  infotype: "
+					"SQL_MAX_CHAR_LITERAL_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_TIMEDATE_ADD_INTERVALS:
+			debugPrintf("  infotype: "
+					"SQL_TIMEDATE_ADD_INTERVALS\n");
+			// FIXME: this isn't true for all db's
+			// I think Oracle 12c supports intervals
+			*(SQLUINTEGER *)infovalue=0;
+					/*SQL_FN_TSI_FRAC_SECOND|
+					SQL_FN_TSI_SECOND|
+					SQL_FN_TSI_MINUTE|
+					SQL_FN_TSI_HOUR|
+					SQL_FN_TSI_DAY|
+					SQL_FN_TSI_WEEK|
+					SQL_FN_TSI_MONTH|
+					SQL_FN_TSI_QUARTER|
+					SQL_FN_TSI_YEAR;*/
+			break;
+		case SQL_TIMEDATE_DIFF_INTERVALS:
+			debugPrintf("  infotype: "
+					"SQL_TIMEDATE_DIFF_INTERVALS\n");
+			// FIXME: this isn't true for all db's
+			// I think Oracle 12c supports intervals
+			*(SQLUINTEGER *)infovalue=0;
+					/*SQL_FN_TSI_FRAC_SECOND|
+					SQL_FN_TSI_SECOND|
+					SQL_FN_TSI_MINUTE|
+					SQL_FN_TSI_HOUR|
+					SQL_FN_TSI_DAY|
+					SQL_FN_TSI_WEEK|
+					SQL_FN_TSI_MONTH|
+					SQL_FN_TSI_QUARTER|
+					SQL_FN_TSI_YEAR;*/
+			break;
+		case SQL_NEED_LONG_DATA_LEN:
+			debugPrintf("  infotype: "
+					"SQL_NEED_LONG_DATA_LEN\n");
+			strval="Y";
+			break;
+		case SQL_MAX_BINARY_LITERAL_LEN:
+			debugPrintf("  infotype: "
+					"SQL_MAX_BINARY_LITERAL_LEN\n");
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_LIKE_ESCAPE_CLAUSE:
+			debugPrintf("  infotype: "
+					"SQL_LIKE_ESCAPE_CLAUSE\n");
+			strval="Y";
+			break;
+		case SQL_QUALIFIER_LOCATION:
+			// aka SQL_CATALOG_LOCATION
+			debugPrintf("  unsupported infotype: %d\n",infotype);
+			break;
+		#if (ODBCVER >= 0x0300)
+		case SQL_ACTIVE_ENVIRONMENTS:
+			debugPrintf("  infotype: "
+					"SQL_ACTIVE_ENVIRONMENTS\n");
+			// 0 means no max or unknown
+			*(SQLUSMALLINT *)infovalue=0;
+			break;
+		case SQL_ALTER_DOMAIN:
+			debugPrintf("  infotype: "
+					"SQL_ALTER_DOMAIN\n");
+			// FIXME: no idea
+			*(SQLUINTEGER *)infovalue=
+					SQL_AD_ADD_DOMAIN_CONSTRAINT|
+					SQL_AD_ADD_DOMAIN_DEFAULT|
+					SQL_AD_CONSTRAINT_NAME_DEFINITION|
+					SQL_AD_DROP_DOMAIN_CONSTRAINT|
+					SQL_AD_DROP_DOMAIN_DEFAULT;
+			break;
+		case SQL_SQL_CONFORMANCE:
+			debugPrintf("  infotype: "
+					"SQL_SQL_CONFORMANCE\n");
+			// FIXME: no idea, conservative guess...
+			*(SQLUINTEGER *)infovalue=SQL_SC_SQL92_ENTRY;
+			/**(SQLUINTEGER *)infovalue=
+					SQL_SC_FIPS127_2_TRANSITIONAL;
+			*(SQLUINTEGER *)infovalue=
+					SQL_SC_SQL92_FULL;
+			*(SQLUINTEGER *)infovalue=
+					SQL_SC_SQL92_INTERMEDIATE;*/
+			break;
+		case SQL_DATETIME_LITERALS:
+			debugPrintf("  infotype: "
+					"SQL_DATETIME_LITERALS\n");
+			// FIXME: this isn't true for all db's
+			// I think Oracle 12c supports intervals
+			*(SQLUINTEGER *)infovalue=0;
+				/*SQL_DL_SQL92_DATE|
+				SQL_DL_SQL92_TIME|
+				SQL_DL_SQL92_TIMESTAMP|
+				SQL_DL_SQL92_INTERVAL_YEAR|
+				SQL_DL_SQL92_INTERVAL_MONTH|
+				SQL_DL_SQL92_INTERVAL_DAY|
+				SQL_DL_SQL92_INTERVAL_HOUR|
+				SQL_DL_SQL92_INTERVAL_MINUTE|
+				SQL_DL_SQL92_INTERVAL_SECOND|
+				SQL_DL_SQL92_INTERVAL_YEAR_TO_MONTH|
+				SQL_DL_SQL92_INTERVAL_DAY_TO_HOUR
+				SQL_DL_SQL92_INTERVAL_DAY_TO_MINUTE|
+				SQL_DL_SQL92_INTERVAL_DAY_TO_SECOND|
+				SQL_DL_SQL92_INTERVAL_HOUR_TO_MINUTE|
+				SQL_DL_SQL92_INTERVAL_HOUR_TO_SECOND|
+				SQL_DL_SQL92_INTERVAL_MINUTE_TO_SECOND;*/
+			break;
+		case SQL_ASYNC_MODE:
+			debugPrintf("  infotype: "
+					"SQL_ASYNC_MODE\n");
+			*(SQLUINTEGER *)infovalue=SQL_AM_NONE;
+			break;
+		case SQL_BATCH_ROW_COUNT:
+			debugPrintf("  infotype: "
+					"SQL_BATCH_ROW_COUNT\n");
+			// batch sql is not supported
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_BATCH_SUPPORT:
+			debugPrintf("  infotype: "
+					"SQL_BATCH_SUPPORT\n");
+			// batch sql is not supported
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_CONVERT_WCHAR:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_WCHAR\n");
+			break;
+		case SQL_CONVERT_INTERVAL_DAY_TIME:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_INTERVAL_DAY_TIME\n");
+			break;
+		case SQL_CONVERT_INTERVAL_YEAR_MONTH:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_INTERVAL_YEAR_MONTH\n");
+			break;
+		case SQL_CONVERT_WLONGVARCHAR:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_WLONGVARCHAR\n");
+			break;
+		case SQL_CONVERT_WVARCHAR:
+			debugPrintf("  unsupported infotype: "
+					"SQL_CONVERT_WVARCHAR\n");
+			break;
+		case SQL_CREATE_ASSERTION:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_ASSERTION\n");
+			// FIXME: not sure about this...
+			*(SQLUINTEGER *)infovalue=0;
+					/*SQL_CA_CREATE_ASSERTION|
+					SQL_CA_CONSTRAINT_INITIALLY_DEFERRED|
+					SQL_CA_CONSTRAINT_INITIALLY_IMMEDIATE|
+					SQL_CA_CONSTRAINT_DEFERRABLE|
+					SQL_CA_CONSTRAINT_NON_DEFERRABLE;*/
+			break;
+		case SQL_CREATE_CHARACTER_SET:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_CHARACTER_SET\n");
+			// FIXME: not sure about this...
+			*(SQLUINTEGER *)infovalue=0;
+					/*SQL_CCS_CREATE_CHARACTER_SET|
+					SQL_CCS_COLLATE_CLAUSE|
+					SQL_CCS_LIMITED_COLLATION;*/
+			break;
+		case SQL_CREATE_COLLATION:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_COLLATION\n");
+			// FIXME: not sure about this...
+			*(SQLUINTEGER *)infovalue=0;
+					//SQL_CCOL_CREATE_COLLATION;
+			break;
+		case SQL_CREATE_DOMAIN:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_DOMAIN\n");
+			// FIXME: not sure about this...
+			*(SQLUINTEGER *)infovalue=0;
+					/*SQL_CDO_CREATE_DOMAIN|
+					SQL_CDO_CONSTRAINT_NAME_DEFINITION|
+					SQL_CDO_DEFAULT|
+					SQL_CDO_CONSTRAINT|
+					SQL_CDO_COLLATION|
+					SQL_CDO_CONSTRAINT_INITIALLY_DEFERRED|
+					SQL_CDO_CONSTRAINT_INITIALLY_IMMEDIATE|
+					SQL_CDO_CONSTRAINT_DEFERRABLE|
+					SQL_CDO_CONSTRAINT_NON_DEFERRABLE;*/
+			break;
+		case SQL_CREATE_SCHEMA:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_SCHEMA\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=SQL_CS_CREATE_SCHEMA|
+						SQL_CS_AUTHORIZATION|
+						SQL_CS_DEFAULT_CHARACTER_SET;
+			break;
+		case SQL_CREATE_TABLE:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_TABLE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=
-					SQL_TXN_READ_UNCOMMITTED|
-					SQL_TXN_READ_COMMITTED|
-					SQL_TXN_REPEATABLE_READ|
-					SQL_TXN_SERIALIZABLE;
+					SQL_CT_CREATE_TABLE|
+					SQL_CT_TABLE_CONSTRAINT|
+					SQL_CT_CONSTRAINT_NAME_DEFINITION|
+					SQL_CT_COMMIT_DELETE|
+					SQL_CT_GLOBAL_TEMPORARY|
+					SQL_CT_COLUMN_CONSTRAINT|
+					SQL_CT_COLUMN_DEFAULT|
+					SQL_CT_COLUMN_COLLATION|
+					SQL_CT_CONSTRAINT_INITIALLY_IMMEDIATE|
+					SQL_CT_CONSTRAINT_NON_DEFERRABLE;
 			break;
-		case SQL_MAX_SCHEMA_NAME_LEN:
-			debugPrintf("  infotype: SQL_MAX_SCHEMA_NAME_LEN\n");
-			// 0 means no max length or unknown
+		case SQL_CREATE_TRANSLATION:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_TRANSLATION\n");
+			// FIXME: not sure about this...
 			*(SQLUINTEGER *)infovalue=0;
+					//SQL_CTR_CREATE_TRANSLATION;
 			break;
-		case SQL_MAX_TABLE_NAME_LEN:
-			debugPrintf("  infotype: SQL_MAX_TABLE_NAME_LEN\n");
-			// 0 means no max length or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_MAX_PROCEDURE_NAME_LEN:
-			debugPrintf("  infotype: SQL_MAX_PROCEDURE_NAME_LEN\n");
-			// 0 means no max length or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			break;
-		case SQL_IDENTIFIER_QUOTE_CHAR:
-			debugPrintf("  infotype: SQL_IDENTIFIER_QUOTE_CHAR\n");
+		case SQL_CREATE_VIEW:
+			debugPrintf("  infotype: "
+					"SQL_CREATE_VIEW\n");
 			// FIXME: is this true for all db's?
-			strval="\"";
+			*(SQLUINTEGER *)infovalue=SQL_CV_CREATE_VIEW|
+							SQL_CV_CHECK_OPTION|
+							SQL_CV_CASCADED|
+							SQL_CV_LOCAL ;
 			break;
-		case SQL_GETDATA_EXTENSIONS:
-			debugPrintf("  infotype: SQL_GETDATA_EXTENSIONS\n");
-			*(SQLUINTEGER *)infovalue=SQL_GD_BLOCK;
+		case SQL_DRIVER_HDESC:
+			debugPrintf("  unsupported infotype: "
+					"SQL_DRIVER_HDESC\n");
 			break;
+		case SQL_DROP_ASSERTION:
+			debugPrintf("  infotype: "
+					"SQL_DROP_ASSERTION\n");
+			// FIXME: not sure about this...
+			*(SQLUINTEGER *)infovalue=0;
+					//SQL_DA_DROP_ASSERTION;
+			break;
+		case SQL_DROP_CHARACTER_SET:
+			debugPrintf("  infotype: "
+					"SQL_DROP_CHARACTER_SET\n");
+			*(SQLUINTEGER *)infovalue=0;
+					//SQL_DCS_DROP_CHARACTER_SET;
+			break;
+		case SQL_DROP_COLLATION:
+			debugPrintf("  infotype: "
+					"SQL_DROP_COLLATION\n");
+			*(SQLUINTEGER *)infovalue=0;
+					//SQL_DC_DROP_COLLATION;
+			break;
+		case SQL_DROP_DOMAIN:
+			debugPrintf("  infotype: "
+					"SQL_DROP_DOMAIN\n");
+			*(SQLUINTEGER *)infovalue=0;
+					//SQL_DD_DROP_DOMAIN|
+					//SQL_DD_CASCADE|
+					//SQL_DD_RESTRICT;
+			break;
+		case SQL_DROP_SCHEMA:
+			debugPrintf("  infotype: "
+					"SQL_DROP_SCHEMA\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=SQL_DS_DROP_SCHEMA|
+						SQL_DS_CASCADE|
+						SQL_DS_RESTRICT;
+			break;
+		case SQL_DROP_TABLE:
+			debugPrintf("  infotype: "
+					"SQL_DROP_TABLE\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=SQL_DT_DROP_TABLE|
+						SQL_DT_CASCADE|
+						SQL_DT_RESTRICT;
+			break;
+		case SQL_DROP_TRANSLATION:
+			debugPrintf("  infotype: "
+					"SQL_DROP_TRANSLATION\n");
+			// FIXME: not sure about this...
+			*(SQLUINTEGER *)infovalue=0;
+					//SQL_DTR_DROP_TRANSLATION;
+			break;
+		case SQL_DROP_VIEW:
+			debugPrintf("  infotype: "
+					"SQL_DROP_VIEW\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=SQL_DV_DROP_VIEW|
+							SQL_DV_CASCADE|
+							SQL_DV_RESTRICT;
+			break;
+		case SQL_DYNAMIC_CURSOR_ATTRIBUTES1:
+			debugPrintf("  infotype: "
+					"SQL_DYNAMIC_CURSOR_ATTRIBUTES1\n");
+			// for now...
+			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
+						SQL_CA1_POS_POSITION;
+			break;
+		case SQL_DYNAMIC_CURSOR_ATTRIBUTES2:
+			debugPrintf("  infotype: "
+					"SQL_DYNAMIC_CURSOR_ATTRIBUTES2\n");
+			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			break;
+		case SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1:
+			debugPrintf("  infotype: "
+				"SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1\n");
+			// for now...
+			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
+						SQL_CA1_POS_POSITION;
+			break;
+		case SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2:
+			debugPrintf("  infotype: "
+				"SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2\n");
+			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			break;
+		case SQL_INDEX_KEYWORDS:
+			debugPrintf("  infotype: "
+					"SQL_INDEX_KEYWORDS\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=SQL_IK_ALL;
+			break;
+		case SQL_INFO_SCHEMA_VIEWS:
+			debugPrintf("  infotype: "
+					"SQL_INFO_SCHEMA_VIEWS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=0;
+					/*SQL_ISV_ASSERTIONS
+					SQL_ISV_CHARACTER_SETS
+					SQL_ISV_CHECK_CONSTRAINTS
+					SQL_ISV_COLLATIONS
+					SQL_ISV_COLUMN_DOMAIN_USAGE
+					SQL_ISV_COLUMN_PRIVILEGES
+					SQL_ISV_COLUMNS
+					SQL_ISV_CONSTRAINT_COLUMN_USAGE
+					SQL_ISV_CONSTRAINT_TABLE_USAGE
+					SQL_ISV_DOMAIN_CONSTRAINTS
+					SQL_ISV_DOMAINS
+					SQL_ISV_KEY_COLUMN_USAGE
+					SQL_ISV_REFERENTIAL_CONSTRAINTS
+					SQL_ISV_SCHEMATA
+					SQL_ISV_SQL_LANGUAGES
+					SQL_ISV_TABLE_CONSTRAINTS
+					SQL_ISV_TABLE_PRIVILEGES
+					SQL_ISV_TABLES
+					SQL_ISV_TRANSLATIONS
+					SQL_ISV_USAGE_PRIVILEGES
+					SQL_ISV_VIEW_COLUMN_USAGE
+					SQL_ISV_VIEW_TABLE_USAGE
+					SQL_ISV_VIEWS;*/
+			break;
+		case SQL_KEYSET_CURSOR_ATTRIBUTES1:
+			debugPrintf("  infotype: "
+					"SQL_KEYSET_CURSOR_ATTRIBUTES1\n");
+			// for now...
+			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
+						SQL_CA1_POS_POSITION;
+			break;
+		case SQL_KEYSET_CURSOR_ATTRIBUTES2:
+			debugPrintf("  infotype: "
+					"SQL_KEYSET_CURSOR_ATTRIBUTES2\n");
+			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			break;
+		case SQL_MAX_ASYNC_CONCURRENT_STATEMENTS:
+			debugPrintf("  unsupported infotype: %d\n",infotype);
+			// 0 means no max or unknown
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_ODBC_INTERFACE_CONFORMANCE:
+			debugPrintf("  infotype: "
+					"SQL_ODBC_INTERFACE_CONFORMANCE\n");
+			*(SQLUINTEGER *)infovalue=SQL_OIC_CORE;
+			break;
+		case SQL_PARAM_ARRAY_ROW_COUNTS:
+			debugPrintf("  infotype: "
+					"SQL_PARAM_ARRAY_ROW_COUNTS\n");
+			// batch sql is not supported
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_PARAM_ARRAY_SELECTS:
+			debugPrintf("  infotype: "
+					"SQL_PARAM_ARRAY_SELECTS\n");
+			// for now...
+			*(SQLUINTEGER *)infovalue=SQL_PAS_NO_SELECT;
+			break;
+		case SQL_SQL92_DATETIME_FUNCTIONS:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_DATETIME_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SDF_CURRENT_DATE|
+					SQL_SDF_CURRENT_TIME|
+					SQL_SDF_CURRENT_TIMESTAMP;
+			break;
+		case SQL_SQL92_FOREIGN_KEY_DELETE_RULE:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_FOREIGN_KEY_DELETE_RULE\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=SQL_SFKD_CASCADE;
+			break;
+		case SQL_SQL92_FOREIGN_KEY_UPDATE_RULE:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_FOREIGN_KEY_UPDATE_RULE\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=SQL_SFKU_CASCADE;
+			break;
+		case SQL_SQL92_GRANT:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_GRANT\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SG_DELETE_TABLE|
+					SQL_SG_INSERT_COLUMN|
+					SQL_SG_INSERT_TABLE|
+					SQL_SG_REFERENCES_TABLE|
+					SQL_SG_REFERENCES_COLUMN|
+					SQL_SG_SELECT_TABLE|
+					SQL_SG_UPDATE_COLUMN|
+					SQL_SG_UPDATE_TABLE|
+					SQL_SG_USAGE_ON_DOMAIN|
+					SQL_SG_USAGE_ON_CHARACTER_SET|
+					SQL_SG_USAGE_ON_COLLATION|
+					SQL_SG_USAGE_ON_TRANSLATION|
+					SQL_SG_WITH_GRANT_OPTION;
+			break;
+		case SQL_SQL92_NUMERIC_VALUE_FUNCTIONS:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_NUMERIC_VALUE_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SNVF_BIT_LENGTH|
+					SQL_SNVF_CHAR_LENGTH|
+					SQL_SNVF_CHARACTER_LENGTH|
+					SQL_SNVF_EXTRACT|
+					SQL_SNVF_OCTET_LENGTH|
+					SQL_SNVF_POSITION;
+			break;
+		case SQL_SQL92_PREDICATES:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_PREDICATES\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SP_BETWEEN|
+					SQL_SP_COMPARISON|
+					SQL_SP_EXISTS|
+					SQL_SP_IN|
+					SQL_SP_ISNOTNULL|
+					SQL_SP_ISNULL|
+					SQL_SP_LIKE|
+					SQL_SP_MATCH_FULL|
+					SQL_SP_MATCH_PARTIAL|
+					SQL_SP_MATCH_UNIQUE_FULL|
+					SQL_SP_MATCH_UNIQUE_PARTIAL|
+					SQL_SP_OVERLAPS|
+					SQL_SP_QUANTIFIED_COMPARISON|
+					SQL_SP_UNIQUE;
+			break;
+		case SQL_SQL92_RELATIONAL_JOIN_OPERATORS:
+			debugPrintf("  infotype: "
+				"SQL_SQL92_RELATIONAL_JOIN_OPERATORS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SRJO_CORRESPONDING_CLAUSE|
+					SQL_SRJO_CROSS_JOIN|
+					SQL_SRJO_EXCEPT_JOIN|
+					SQL_SRJO_FULL_OUTER_JOIN|
+					SQL_SRJO_INNER_JOIN|
+					SQL_SRJO_INTERSECT_JOIN|
+					SQL_SRJO_LEFT_OUTER_JOIN|
+					SQL_SRJO_NATURAL_JOIN|
+					SQL_SRJO_RIGHT_OUTER_JOIN|
+					SQL_SRJO_UNION_JOIN;
+			break;
+		case SQL_SQL92_REVOKE:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_REVOKE\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SR_CASCADE|
+					SQL_SR_DELETE_TABLE|
+					SQL_SR_GRANT_OPTION_FOR|
+					SQL_SR_INSERT_COLUMN|
+					SQL_SR_INSERT_TABLE|
+					SQL_SR_REFERENCES_COLUMN|
+					SQL_SR_REFERENCES_TABLE|
+					SQL_SR_RESTRICT|
+					SQL_SR_SELECT_TABLE|
+					SQL_SR_UPDATE_COLUMN|
+					SQL_SR_UPDATE_TABLE|
+					SQL_SR_USAGE_ON_DOMAIN|
+					SQL_SR_USAGE_ON_CHARACTER_SET|
+					SQL_SR_USAGE_ON_COLLATION|
+					SQL_SR_USAGE_ON_TRANSLATION;
+			break;
+		case SQL_SQL92_ROW_VALUE_CONSTRUCTOR:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_ROW_VALUE_CONSTRUCTOR\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SRVC_VALUE_EXPRESSION|
+					SQL_SRVC_NULL|
+					SQL_SRVC_DEFAULT|
+					SQL_SRVC_ROW_SUBQUERY;
+			break;
+		case SQL_SQL92_STRING_FUNCTIONS:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_STRING_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SSF_CONVERT|
+					SQL_SSF_LOWER|
+					SQL_SSF_UPPER|
+					SQL_SSF_SUBSTRING|
+					SQL_SSF_TRANSLATE|
+					SQL_SSF_TRIM_BOTH|
+					SQL_SSF_TRIM_LEADING|
+					SQL_SSF_TRIM_TRAILING;
+			break;
+		case SQL_SQL92_VALUE_EXPRESSIONS:
+			debugPrintf("  infotype: "
+					"SQL_SQL92_VALUE_EXPRESSIONS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SVE_CASE|
+					SQL_SVE_CAST|
+					SQL_SVE_COALESCE|
+					SQL_SVE_NULLIF;
+			break;
+		case SQL_STANDARD_CLI_CONFORMANCE:
+			debugPrintf("  infotype: "
+					"SQL_STANDARD_CLI_CONFORMANCE\n");
+			// FIXME: no idea, conservative guess...
+			*(SQLUINTEGER *)infovalue=SQL_SCC_XOPEN_CLI_VERSION1;
+			//*(SQLUINTEGER *)infovalue=SQL_SCC_ISO92_CLI;
+			break;
+		case SQL_STATIC_CURSOR_ATTRIBUTES1:
+			debugPrintf("  infotype: "
+					"SQL_STATIC_CURSOR_ATTRIBUTES1\n");
+			// for now...
+			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
+						SQL_CA1_POS_POSITION;
+			break;
+		case SQL_STATIC_CURSOR_ATTRIBUTES2:
+			debugPrintf("  infotype: "
+					"SQL_STATIC_CURSOR_ATTRIBUTES2\n");
+			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			break;
+		case SQL_AGGREGATE_FUNCTIONS:
+			debugPrintf("  infotype: "
+					"SQL_AGGREGATE_FUNCTIONS\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=
+						SQL_AF_ALL|
+						SQL_AF_AVG|
+						SQL_AF_COUNT|
+						SQL_AF_DISTINCT|
+						SQL_AF_MAX|
+						SQL_AF_MIN|
+						SQL_AF_SUM;
+			break;
+		case SQL_DDL_INDEX:
+			debugPrintf("  infotype: "
+					"SQL_DDL_INDEX\n");
+			*(SQLUINTEGER *)infovalue=
+					SQL_DI_CREATE_INDEX|
+					SQL_DI_DROP_INDEX;
+			break;
+		case SQL_DM_VER:
+			debugPrintf("  infotype: "
+					"SQL_DM_VER\n");
+			// FIXME: Should this be implemented or should only
+			// the Driver Manager implement it?
+			// This is the version number for the windows 7
+			// Driver Manager...
+			strval="03.80";
+			break;
+		case SQL_INSERT_STATEMENT:
+			debugPrintf("  infotype: "
+					"SQL_INSERT_STATEMENT\n");
+			// FIXME: is this true for all db's?
+			*(SQLUINTEGER *)infovalue=
+					SQL_IS_INSERT_LITERALS|
+					SQL_IS_INSERT_SEARCHED|
+					SQL_IS_SELECT_INTO;
+			break;
+		#if (ODBCVER >= 0x0380)
+		case SQL_ASYNC_DBC_FUNCTIONS:
+			debugPrintf("  infotype: "
+					"SQL_ASYNC_DBC_FUNCTIONS\n");
+			// for now...
+			*(SQLUINTEGER *)infovalue=SQL_ASYNC_DBC_NOT_CAPABLE;
+			break;
+		#endif
+		#endif
+		#ifdef SQL_DTC_TRANSITION_COST
+		case SQL_DTC_TRANSITION_COST:
+			debugPrintf("  unsupported infotype: "
+					"SQL_DTC_TRANSITION_COST\n");
+			break;
+		#endif
 		default:
 			debugPrintf("  unsupported infotype: %d\n",infotype);
 			break;
