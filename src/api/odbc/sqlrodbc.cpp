@@ -4795,7 +4795,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_CONVERT_FUNCTIONS\n");
 			// FIXME: this isn't true for all db's
-			*(SQLUINTEGER *)infovalue=SQL_FN_CVT_CAST;
+			*((SQLUINTEGER *)infovalue)=SQL_FN_CVT_CAST;
 						//SQL_FN_CVT_CONVERT;
 			break;
 		case SQL_NUMERIC_FUNCTIONS:
