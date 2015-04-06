@@ -48,6 +48,7 @@
 	consolidated c, c++ and server source/includes down a few levels
 	implemented column-remapping for get db/table/column commands to
 		enable different formats for mysql, odbc, etc.
+	odbc connection correctly returns database/table lists now
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

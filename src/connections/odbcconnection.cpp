@@ -567,24 +567,43 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 	// initialize row and column counts
 	odbccur->initializeRowAndColumnCounts();
 
-	// SQLTables takes non-const arguments, so we have to make
-	// copies of the various arguments that we want to pass in.
-	char	*allcatalogs=(table)?NULL:
-				charstring::duplicate(SQL_ALL_CATALOGS);
-	char	*wildcopy=charstring::duplicate(wild);
-	char	*empty=new char[1];
-	empty[0]='\0';
-
 	// get the table/database list
+	char		catalogbuffer[1024];
+	const char	*catalog=NULL;
+	char		schemabuffer[1024];
+	const char	*schema="";
+	const char	*tablename="";
+	if (table) {
+		// get the current catalog (instance)
+		SQLINTEGER	cataloglen=0;
+		if (SQLGetConnectAttr(dbc,
+					SQL_CURRENT_QUALIFIER,
+					catalogbuffer,
+					sizeof(catalogbuffer),
+					&cataloglen)==SQL_SUCCESS) {
+			catalogbuffer[cataloglen]='\0';
+			catalog=catalogbuffer;
+		}
+		// get the current user (schema)
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
+		tablename=(wild && wild[0])?wild:"%";
+	} else {
+		catalog=((wild && wild[0])?wild:SQL_ALL_CATALOGS);
+	}
 	erg=SQLTables(odbccur->stmt,
-			(SQLCHAR *)((table)?empty:allcatalogs),SQL_NTS,
-			(SQLCHAR *)empty,SQL_NTS,
-			(SQLCHAR *)wildcopy,charstring::length(wildcopy),
-			(SQLCHAR *)empty,SQL_NTS);
+			(SQLCHAR *)catalog,SQL_NTS,
+			(SQLCHAR *)schema,SQL_NTS,
+			(SQLCHAR *)tablename,SQL_NTS,
+			NULL,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-	delete[] empty;
-	delete[] wildcopy;
-	delete[] allcatalogs;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;

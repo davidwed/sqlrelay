@@ -3438,6 +3438,9 @@ void sqlrservercontroller::setDatabaseListColumnMap(
 
 	// for now, don't remap columns if api calls are used to get lists,
 	// the columns don't come back in the "native" format
+	// FIXME: this "happens to work" for odbc passthrough:
+	// ODBC -> sqlrelay client -> sqlrelay server -> ODBC -> some db
+	// but wouldn't if either ODBC were replaced with something else
 	if (conn->getListsByApiCalls()) {
 		columnmap=NULL;
 		return;
@@ -3464,6 +3467,9 @@ void sqlrservercontroller::setTableListColumnMap(
 
 	// for now, don't remap columns if api calls are used to get lists,
 	// the columns don't come back in the "native" format
+	// FIXME: this "happens to work" for odbc passthrough:
+	// ODBC -> sqlrelay client -> sqlrelay server -> ODBC -> some db
+	// but wouldn't if either ODBC were replaced with something else
 	if (conn->getListsByApiCalls()) {
 		columnmap=NULL;
 		return;
@@ -3490,6 +3496,9 @@ void sqlrservercontroller::setColumnListColumnMap(
 
 	// for now, don't remap columns if api calls are used to get lists,
 	// the columns don't come back in the "native" format
+	// FIXME: this "happens to work" for odbc passthrough:
+	// ODBC -> sqlrelay client -> sqlrelay server -> ODBC -> some db
+	// but wouldn't if either ODBC were replaced with something else
 	if (conn->getListsByApiCalls()) {
 		columnmap=NULL;
 		return;
