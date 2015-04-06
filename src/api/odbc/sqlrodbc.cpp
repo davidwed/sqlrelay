@@ -13,7 +13,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 //#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
@@ -4305,6 +4305,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 	}
 
 	const char	*strval=NULL;
+	SQLSMALLINT	valuelength=0;
 
 	switch (infotype) {
 		case SQL_ACTIVE_CONNECTIONS:
@@ -4316,6 +4317,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_DRIVER_CONNECTIONS\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_ACTIVE_STATEMENTS:
 			// aka SQL_MAX_CONCURRENT_ACTIVITIES 
@@ -4326,6 +4328,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_CONCURRENT_ACTIVITIES\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_DATA_SOURCE_NAME:
 			debugPrintf("  infotype: "
@@ -4337,6 +4340,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_FETCH_DIRECTION\n");
 			// FIXME: for now...
 			*(SQLINTEGER *)infovalue=SQL_FD_FETCH_NEXT;
+			valuelength=sizeof(SQLINTEGER);
 			break;
 		case SQL_SERVER_NAME:
 			debugPrintf("  infotype: "
@@ -4379,6 +4383,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_CURSOR_COMMIT_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
 			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DATA_SOURCE_READ_ONLY:
 			debugPrintf("  infotype: "
@@ -4391,12 +4396,14 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_DEFAULT_TXN_ISOLATION\n");
 			// FIXME: this isn't always true, especially for mysql
 			*(SQLUINTEGER *)infovalue=SQL_TXN_READ_COMMITTED;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_IDENTIFIER_CASE:
 			debugPrintf("  infotype: "
 					"SQL_IDENTIFIER_CASE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=SQL_IC_MIXED;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_IDENTIFIER_QUOTE_CHAR:
 			debugPrintf("  infotype: "
@@ -4411,6 +4418,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_COLUMN_NAME_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_CURSOR_NAME_LEN:
 			// aka SQL_MAXIMUM_CURSOR_NAME_LENGTH
@@ -4419,6 +4427,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_CURSOR_NAME_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_OWNER_NAME_LEN:
 			// aka SQL_MAX_SCHEMA_NAME_LEN
@@ -4429,6 +4438,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_SCHEMA_NAME_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_CATALOG_NAME_LEN:
 			// aka SQL_MAXIMUM_CATALOG_NAME_LENGTH
@@ -4436,17 +4446,20 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_CATALOG_NAME_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_TABLE_NAME_LEN:
 			debugPrintf("  infotype: "
 					"SQL_MAX_TABLE_NAME_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SCROLL_CONCURRENCY:
 			debugPrintf("  infotype: "
 					"SQL_SCROLL_CONCURRENCY\n");
 			*(SQLINTEGER *)infovalue=SQL_SCCO_READ_ONLY;
+			valuelength=sizeof(SQLINTEGER);
 			break;
 		case SQL_TXN_CAPABLE:
 			// aka SQL_TRANSACTION_CAPABLE
@@ -4454,6 +4467,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_TXN_CAPABLE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUSMALLINT *)infovalue=SQL_TC_ALL;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_USER_NAME:
 			debugPrintf("  infotype: "
@@ -4471,6 +4485,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_TXN_READ_COMMITTED|
 					SQL_TXN_REPEATABLE_READ|
 					SQL_TXN_SERIALIZABLE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_INTEGRITY:
 			// aka SQL_ODBC_SQL_OPT_IEF
@@ -4484,12 +4499,14 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_GETDATA_EXTENSIONS\n");
 			*(SQLUINTEGER *)infovalue=SQL_GD_BLOCK;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_NULL_COLLATION:
 			debugPrintf("  infotype: "
 					"SQL_NULL_COLLATION\n");
 			// FIXME: is this true for all db's?
 			*(SQLUSMALLINT *)infovalue=SQL_NC_LOW;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_ALTER_TABLE:
 			debugPrintf("  infotype: "
@@ -4518,6 +4535,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					|SQL_AT_CONSTRAINT_NON_DEFERRABLE
 					#endif
 					;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_ORDER_BY_COLUMNS_IN_SELECT:
 			debugPrintf("  infotype: "
@@ -4537,6 +4555,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_COLUMNS_IN_GROUP_BY\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_COLUMNS_IN_INDEX:
 			// aka SQL_MAXIMUM_COLUMNS_IN_INDEX
@@ -4545,6 +4564,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_COLUMNS_IN_INDEX\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_COLUMNS_IN_ORDER_BY:
 			// aka SQL_MAXIMUM_COLUMNS_IN_ORDER_BY
@@ -4553,6 +4573,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_COLUMNS_IN_ORDER_BY\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_COLUMNS_IN_SELECT:
 			// aka SQL_MAXIMUM_COLUMNS_IN_SELECT
@@ -4561,12 +4582,14 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_COLUMNS_IN_SELECT\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_COLUMNS_IN_TABLE:
 			debugPrintf("  infotype: "
 					"SQL_MAX_COLUMNS_IN_TABLE\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_INDEX_SIZE:
 			// aka SQL_MAXIMUM_INDEX_SIZE
@@ -4575,6 +4598,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_INDEX_SIZE\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_ROW_SIZE:
 			// aka SQL_MAXIMUM_ROW_SIZE
@@ -4583,6 +4607,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_ROW_SIZE\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_STATEMENT_LEN:
 			// aka SQL_MAXIMUM_STATEMENT_LENGTH
@@ -4591,6 +4616,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_STATEMENT_LENGTH\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_TABLES_IN_SELECT:
 			// aka SQL_MAXIMUM_TABLES_IN_SELECT
@@ -4599,6 +4625,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_TABLES_IN_SELECT\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_USER_NAME_LEN:
 			// aka SQL_MAXIMUM_USER_NAME_LENGTH
@@ -4607,6 +4634,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_USER_NAME_LENGTH\n");
 			// 0 means no max or unknown
 			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_OJ_CAPABILITIES:
@@ -4623,6 +4651,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_OJ_NOT_ORDERED|
 					SQL_OJ_INNER|
 					SQL_OJ_ALL_COMPARISON_OPS;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_XOPEN_CLI_YEAR:
 			debugPrintf("  infotype: "
@@ -4634,6 +4663,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_CURSOR_SENSITIVITY\n");
 			*(SQLUINTEGER *)infovalue=SQL_UNSPECIFIED;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DESCRIBE_PARAMETER:
 			debugPrintf("  infotype: "
@@ -4658,6 +4688,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAXIMUM_IDENTIFIER_LENGTH\n");
 			// FIXME: is this true for all db's?
 			*(SQLUSMALLINT *)infovalue=128;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		#endif
 		case SQL_DRIVER_HDBC:
@@ -4686,6 +4717,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_ODBC_API_CONFORMANCE\n");
 			*(SQLUSMALLINT *)infovalue=SQL_OAC_LEVEL2;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_ODBC_VER:
 			debugPrintf("  infotype: "
@@ -4707,6 +4739,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_ODBC_SQL_CONFORMANCE\n");
 			*(SQLUSMALLINT *)infovalue=SQL_OSC_EXTENDED;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_PROCEDURES:
 			debugPrintf("  infotype: "
@@ -4719,12 +4752,14 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_CONCAT_NULL_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
 			*(SQLUSMALLINT *)infovalue=SQL_CB_NON_NULL;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_CURSOR_ROLLBACK_BEHAVIOR:
 			debugPrintf("  infotype: "
 					"SQL_CURSOR_ROLLBACK_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
 			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_EXPRESSIONS_IN_ORDERBY:
 			debugPrintf("  infotype: "
@@ -4737,6 +4772,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_PROCEDURE_NAME_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MULT_RESULT_SETS:
 			debugPrintf("  infotype: "
@@ -4785,6 +4821,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_SCROLL_OPTIONS\n");
 			*(SQLUINTEGER *)infovalue=SQL_SO_FORWARD_ONLY;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_TABLE_TERM:
 			debugPrintf("  infotype: "
@@ -4795,8 +4832,9 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_CONVERT_FUNCTIONS\n");
 			// FIXME: this isn't true for all db's
-			*((SQLUINTEGER *)infovalue)=SQL_FN_CVT_CAST;
-						//SQL_FN_CVT_CONVERT;
+			*(SQLUINTEGER *)infovalue=SQL_FN_CVT_CAST|
+						SQL_FN_CVT_CONVERT;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_NUMERIC_FUNCTIONS:
 			debugPrintf("  unsupported infotype: "
@@ -4894,11 +4932,13 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_CORRELATION_NAME\n");
 			*(SQLUSMALLINT *)infovalue=SQL_CN_ANY;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_NON_NULLABLE_COLUMNS:
 			debugPrintf("  infotype: "
 					"SQL_NON_NULLABLE_COLUMNS\n");
 			*(SQLUSMALLINT *)infovalue=SQL_NNC_NON_NULL;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_DRIVER_HLIB:
 			debugPrintf("  unsupported infotype: "
@@ -4916,34 +4956,40 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			*(SQLINTEGER *)infovalue=SQL_LCK_NO_CHANGE|
 							SQL_LCK_EXCLUSIVE|
 							SQL_LCK_UNLOCK;
+			valuelength=sizeof(SQLINTEGER);
 			break;
 		case SQL_POS_OPERATIONS:
 			debugPrintf("  infotype: "
 					"SQL_POS_OPERATIONS\n");
 			// FIXME: for now...
 			*(SQLUSMALLINT *)infovalue=SQL_POS_POSITION;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_POSITIONED_STATEMENTS:
 			debugPrintf("  infotype: "
 					"SQL_POSITIONED_STATEMENTS\n");
 			// none, for now...
 			*(SQLINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLINTEGER);
 			break;
 		case SQL_BOOKMARK_PERSISTENCE:
 			debugPrintf("  infotype: "
 					"SQL_BOOKMARK_PERSISTENCE\n");
 			// FIXME: none, for now...
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_STATIC_SENSITIVITY:
 			debugPrintf("  infotype: "
 					"SQL_STATIC_SENSITIVITY\n");
 			*(SQLINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLINTEGER);
 			break;
 		case SQL_FILE_USAGE:
 			debugPrintf("  infotype: "
 					"SQL_FILE_USAGE\n");
 			*(SQLUINTEGER *)infovalue=SQL_FILE_NOT_SUPPORTED;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_COLUMN_ALIAS:
 			debugPrintf("  infotype: "
@@ -4962,6 +5008,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_GB_GROUP_BY_EQUALS_SELECT
 					#endif
 					;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_KEYWORDS:
 			debugPrintf("  unsupported infotype: "
@@ -4979,6 +5026,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SU_TABLE_DEFINITION|
 					SQL_SU_INDEX_DEFINITION|
 					SQL_SU_PRIVILEGE_DEFINITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_QUALIFIER_USAGE:
 			// aka SQL_CATALOG_USAGE
@@ -4989,6 +5037,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_QUOTED_IDENTIFIER_CASE\n");
 			// FIXME: is this true for all db's?
 			*(SQLUINTEGER *)infovalue=SQL_IC_SENSITIVE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SUBQUERIES:
 			debugPrintf("  infotype: "
@@ -5000,6 +5049,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 						SQL_SQ_EXISTS|
 						SQL_SQ_IN|
 						SQL_SQ_QUANTIFIED;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_UNION:
 			// aka SQL_UNION_STATEMENT
@@ -5008,6 +5058,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_UNION_STATEMENT\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=SQL_U_UNION|SQL_U_UNION_ALL;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
 			debugPrintf("  infotype: "
@@ -5019,6 +5070,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_CHAR_LITERAL_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_TIMEDATE_ADD_INTERVALS:
 			debugPrintf("  infotype: "
@@ -5026,6 +5078,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// FIXME: this isn't true for all db's
 			// I think Oracle 12c supports intervals
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 					/*SQL_FN_TSI_FRAC_SECOND|
 					SQL_FN_TSI_SECOND|
 					SQL_FN_TSI_MINUTE|
@@ -5051,6 +5104,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_FN_TSI_MONTH|
 					SQL_FN_TSI_QUARTER|
 					SQL_FN_TSI_YEAR;*/
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_NEED_LONG_DATA_LEN:
 			debugPrintf("  infotype: "
@@ -5062,6 +5116,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_BINARY_LITERAL_LEN\n");
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_LIKE_ESCAPE_CLAUSE:
 			debugPrintf("  infotype: "
@@ -5089,6 +5144,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_AD_CONSTRAINT_NAME_DEFINITION|
 					SQL_AD_DROP_DOMAIN_CONSTRAINT|
 					SQL_AD_DROP_DOMAIN_DEFAULT;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL_CONFORMANCE:
 			debugPrintf("  infotype: "
@@ -5101,6 +5157,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SC_SQL92_FULL;
 			*(SQLUINTEGER *)infovalue=
 					SQL_SC_SQL92_INTERMEDIATE;*/
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DATETIME_LITERALS:
 			debugPrintf("  infotype: "
@@ -5124,23 +5181,27 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 				SQL_DL_SQL92_INTERVAL_HOUR_TO_MINUTE|
 				SQL_DL_SQL92_INTERVAL_HOUR_TO_SECOND|
 				SQL_DL_SQL92_INTERVAL_MINUTE_TO_SECOND;*/
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_ASYNC_MODE:
 			debugPrintf("  infotype: "
 					"SQL_ASYNC_MODE\n");
 			*(SQLUINTEGER *)infovalue=SQL_AM_NONE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_BATCH_ROW_COUNT:
 			debugPrintf("  infotype: "
 					"SQL_BATCH_ROW_COUNT\n");
 			// batch sql is not supported
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_BATCH_SUPPORT:
 			debugPrintf("  infotype: "
 					"SQL_BATCH_SUPPORT\n");
 			// batch sql is not supported
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CONVERT_WCHAR:
 			debugPrintf("  unsupported infotype: "
@@ -5172,6 +5233,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_CA_CONSTRAINT_INITIALLY_IMMEDIATE|
 					SQL_CA_CONSTRAINT_DEFERRABLE|
 					SQL_CA_CONSTRAINT_NON_DEFERRABLE;*/
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CREATE_CHARACTER_SET:
 			debugPrintf("  infotype: "
@@ -5181,6 +5243,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					/*SQL_CCS_CREATE_CHARACTER_SET|
 					SQL_CCS_COLLATE_CLAUSE|
 					SQL_CCS_LIMITED_COLLATION;*/
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CREATE_COLLATION:
 			debugPrintf("  infotype: "
@@ -5188,6 +5251,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// FIXME: not sure about this...
 			*(SQLUINTEGER *)infovalue=0;
 					//SQL_CCOL_CREATE_COLLATION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CREATE_DOMAIN:
 			debugPrintf("  infotype: "
@@ -5203,6 +5267,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_CDO_CONSTRAINT_INITIALLY_IMMEDIATE|
 					SQL_CDO_CONSTRAINT_DEFERRABLE|
 					SQL_CDO_CONSTRAINT_NON_DEFERRABLE;*/
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CREATE_SCHEMA:
 			debugPrintf("  infotype: "
@@ -5211,6 +5276,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			*(SQLUINTEGER *)infovalue=SQL_CS_CREATE_SCHEMA|
 						SQL_CS_AUTHORIZATION|
 						SQL_CS_DEFAULT_CHARACTER_SET;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CREATE_TABLE:
 			debugPrintf("  infotype: "
@@ -5227,6 +5293,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_CT_COLUMN_COLLATION|
 					SQL_CT_CONSTRAINT_INITIALLY_IMMEDIATE|
 					SQL_CT_CONSTRAINT_NON_DEFERRABLE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CREATE_TRANSLATION:
 			debugPrintf("  infotype: "
@@ -5234,6 +5301,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// FIXME: not sure about this...
 			*(SQLUINTEGER *)infovalue=0;
 					//SQL_CTR_CREATE_TRANSLATION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_CREATE_VIEW:
 			debugPrintf("  infotype: "
@@ -5243,6 +5311,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 							SQL_CV_CHECK_OPTION|
 							SQL_CV_CASCADED|
 							SQL_CV_LOCAL ;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DRIVER_HDESC:
 			debugPrintf("  unsupported infotype: "
@@ -5254,11 +5323,13 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// FIXME: not sure about this...
 			*(SQLUINTEGER *)infovalue=0;
 					//SQL_DA_DROP_ASSERTION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DROP_CHARACTER_SET:
 			debugPrintf("  infotype: "
 					"SQL_DROP_CHARACTER_SET\n");
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 					//SQL_DCS_DROP_CHARACTER_SET;
 			break;
 		case SQL_DROP_COLLATION:
@@ -5266,6 +5337,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_DROP_COLLATION\n");
 			*(SQLUINTEGER *)infovalue=0;
 					//SQL_DC_DROP_COLLATION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DROP_DOMAIN:
 			debugPrintf("  infotype: "
@@ -5274,6 +5346,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					//SQL_DD_DROP_DOMAIN|
 					//SQL_DD_CASCADE|
 					//SQL_DD_RESTRICT;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DROP_SCHEMA:
 			debugPrintf("  infotype: "
@@ -5282,6 +5355,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			*(SQLUINTEGER *)infovalue=SQL_DS_DROP_SCHEMA|
 						SQL_DS_CASCADE|
 						SQL_DS_RESTRICT;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DROP_TABLE:
 			debugPrintf("  infotype: "
@@ -5290,6 +5364,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			*(SQLUINTEGER *)infovalue=SQL_DT_DROP_TABLE|
 						SQL_DT_CASCADE|
 						SQL_DT_RESTRICT;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DROP_TRANSLATION:
 			debugPrintf("  infotype: "
@@ -5297,6 +5372,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// FIXME: not sure about this...
 			*(SQLUINTEGER *)infovalue=0;
 					//SQL_DTR_DROP_TRANSLATION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DROP_VIEW:
 			debugPrintf("  infotype: "
@@ -5305,6 +5381,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			*(SQLUINTEGER *)infovalue=SQL_DV_DROP_VIEW|
 							SQL_DV_CASCADE|
 							SQL_DV_RESTRICT;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DYNAMIC_CURSOR_ATTRIBUTES1:
 			debugPrintf("  infotype: "
@@ -5312,11 +5389,13 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// for now...
 			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
 						SQL_CA1_POS_POSITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DYNAMIC_CURSOR_ATTRIBUTES2:
 			debugPrintf("  infotype: "
 					"SQL_DYNAMIC_CURSOR_ATTRIBUTES2\n");
 			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1:
 			debugPrintf("  infotype: "
@@ -5324,17 +5403,20 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// for now...
 			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
 						SQL_CA1_POS_POSITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2:
 			debugPrintf("  infotype: "
 				"SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2\n");
 			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_INDEX_KEYWORDS:
 			debugPrintf("  infotype: "
 					"SQL_INDEX_KEYWORDS\n");
 			// FIXME: is this true for all db's?
 			*(SQLUINTEGER *)infovalue=SQL_IK_ALL;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_INFO_SCHEMA_VIEWS:
 			debugPrintf("  infotype: "
@@ -5364,6 +5446,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_ISV_VIEW_COLUMN_USAGE
 					SQL_ISV_VIEW_TABLE_USAGE
 					SQL_ISV_VIEWS;*/
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_KEYSET_CURSOR_ATTRIBUTES1:
 			debugPrintf("  infotype: "
@@ -5371,33 +5454,39 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// for now...
 			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
 						SQL_CA1_POS_POSITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_KEYSET_CURSOR_ATTRIBUTES2:
 			debugPrintf("  infotype: "
 					"SQL_KEYSET_CURSOR_ATTRIBUTES2\n");
 			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_MAX_ASYNC_CONCURRENT_STATEMENTS:
 			debugPrintf("  unsupported infotype: %d\n",infotype);
 			// 0 means no max or unknown
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_ODBC_INTERFACE_CONFORMANCE:
 			debugPrintf("  infotype: "
 					"SQL_ODBC_INTERFACE_CONFORMANCE\n");
 			*(SQLUINTEGER *)infovalue=SQL_OIC_CORE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_PARAM_ARRAY_ROW_COUNTS:
 			debugPrintf("  infotype: "
 					"SQL_PARAM_ARRAY_ROW_COUNTS\n");
 			// batch sql is not supported
 			*(SQLUINTEGER *)infovalue=0;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_PARAM_ARRAY_SELECTS:
 			debugPrintf("  infotype: "
 					"SQL_PARAM_ARRAY_SELECTS\n");
 			// for now...
 			*(SQLUINTEGER *)infovalue=SQL_PAS_NO_SELECT;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_DATETIME_FUNCTIONS:
 			debugPrintf("  infotype: "
@@ -5407,18 +5496,21 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SDF_CURRENT_DATE|
 					SQL_SDF_CURRENT_TIME|
 					SQL_SDF_CURRENT_TIMESTAMP;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_FOREIGN_KEY_DELETE_RULE:
 			debugPrintf("  infotype: "
 					"SQL_SQL92_FOREIGN_KEY_DELETE_RULE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=SQL_SFKD_CASCADE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_FOREIGN_KEY_UPDATE_RULE:
 			debugPrintf("  infotype: "
 					"SQL_SQL92_FOREIGN_KEY_UPDATE_RULE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=SQL_SFKU_CASCADE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_GRANT:
 			debugPrintf("  infotype: "
@@ -5438,6 +5530,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SG_USAGE_ON_COLLATION|
 					SQL_SG_USAGE_ON_TRANSLATION|
 					SQL_SG_WITH_GRANT_OPTION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_NUMERIC_VALUE_FUNCTIONS:
 			debugPrintf("  infotype: "
@@ -5450,6 +5543,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SNVF_EXTRACT|
 					SQL_SNVF_OCTET_LENGTH|
 					SQL_SNVF_POSITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_PREDICATES:
 			debugPrintf("  infotype: "
@@ -5470,6 +5564,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SP_OVERLAPS|
 					SQL_SP_QUANTIFIED_COMPARISON|
 					SQL_SP_UNIQUE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_RELATIONAL_JOIN_OPERATORS:
 			debugPrintf("  infotype: "
@@ -5486,6 +5581,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SRJO_NATURAL_JOIN|
 					SQL_SRJO_RIGHT_OUTER_JOIN|
 					SQL_SRJO_UNION_JOIN;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_REVOKE:
 			debugPrintf("  infotype: "
@@ -5507,6 +5603,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SR_USAGE_ON_CHARACTER_SET|
 					SQL_SR_USAGE_ON_COLLATION|
 					SQL_SR_USAGE_ON_TRANSLATION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_ROW_VALUE_CONSTRUCTOR:
 			debugPrintf("  infotype: "
@@ -5517,6 +5614,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SRVC_NULL|
 					SQL_SRVC_DEFAULT|
 					SQL_SRVC_ROW_SUBQUERY;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_STRING_FUNCTIONS:
 			debugPrintf("  infotype: "
@@ -5531,6 +5629,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SSF_TRIM_BOTH|
 					SQL_SSF_TRIM_LEADING|
 					SQL_SSF_TRIM_TRAILING;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SQL92_VALUE_EXPRESSIONS:
 			debugPrintf("  infotype: "
@@ -5541,6 +5640,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SVE_CAST|
 					SQL_SVE_COALESCE|
 					SQL_SVE_NULLIF;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_STANDARD_CLI_CONFORMANCE:
 			debugPrintf("  infotype: "
@@ -5548,6 +5648,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// FIXME: no idea, conservative guess...
 			*(SQLUINTEGER *)infovalue=SQL_SCC_XOPEN_CLI_VERSION1;
 			//*(SQLUINTEGER *)infovalue=SQL_SCC_ISO92_CLI;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_STATIC_CURSOR_ATTRIBUTES1:
 			debugPrintf("  infotype: "
@@ -5555,11 +5656,13 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// for now...
 			*(SQLUINTEGER *)infovalue=SQL_CA1_NEXT|
 						SQL_CA1_POS_POSITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_STATIC_CURSOR_ATTRIBUTES2:
 			debugPrintf("  infotype: "
 					"SQL_STATIC_CURSOR_ATTRIBUTES2\n");
 			*(SQLUINTEGER *)infovalue=SQL_CA2_READ_ONLY_CONCURRENCY;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_AGGREGATE_FUNCTIONS:
 			debugPrintf("  infotype: "
@@ -5573,6 +5676,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 						SQL_AF_MAX|
 						SQL_AF_MIN|
 						SQL_AF_SUM;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DDL_INDEX:
 			debugPrintf("  infotype: "
@@ -5580,6 +5684,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			*(SQLUINTEGER *)infovalue=
 					SQL_DI_CREATE_INDEX|
 					SQL_DI_DROP_INDEX;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_DM_VER:
 			debugPrintf("  infotype: "
@@ -5598,6 +5703,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_IS_INSERT_LITERALS|
 					SQL_IS_INSERT_SEARCHED|
 					SQL_IS_SELECT_INTO;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		#if (ODBCVER >= 0x0380)
 		case SQL_ASYNC_DBC_FUNCTIONS:
@@ -5605,6 +5711,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_ASYNC_DBC_FUNCTIONS\n");
 			// for now...
 			*(SQLUINTEGER *)infovalue=SQL_ASYNC_DBC_NOT_CAPABLE;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		#endif
 		#endif
@@ -5623,10 +5730,11 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 	if (strval) {
 		charstring::safeCopy((char *)infovalue,bufferlength,strval);
 		debugPrintf("  infovalue: %s\n",(const char *)infovalue);
-		if (stringlength) {
-			*stringlength=charstring::length(strval);
-			debugPrintf("  stringlength: %d\n",(int)*stringlength);
-		}
+		valuelength=charstring::length(strval);
+	}
+	if (stringlength) {
+		*stringlength=valuelength;
+		debugPrintf("  stringlength: %d\n",(int)*stringlength);
 	}
 
 	return SQL_SUCCESS;
