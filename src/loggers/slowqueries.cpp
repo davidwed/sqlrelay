@@ -27,6 +27,7 @@ class slowqueries : public sqlrlogger {
 		uint64_t	sec;
 		uint64_t	usec;
 		uint64_t	totalusec;
+		bool		enabled;
 };
 
 slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
@@ -34,6 +35,8 @@ slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
 	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
 	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
 	totalusec=sec*1000000+usec;
+	enabled=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("enabled"),"no");
 }
 
 slowqueries::~slowqueries() {
@@ -42,6 +45,10 @@ slowqueries::~slowqueries() {
 }
 
 bool slowqueries::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+
+	if (!enabled) {
+		return true;
+	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -78,12 +85,18 @@ bool slowqueries::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	return true;
 }
 
+static const char *days[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+
 bool slowqueries::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
+
+	if (!enabled) {
+		return true;
+	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -115,12 +128,26 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 					sqlrcur->getQueryStartUSec();
 	uint64_t	querytotalusec=querysec*1000000+queryusec;
 
-	if (querytotalusec>totalusec) {
+	if (querytotalusec>=totalusec) {
 
+		datetime	dt;
+		dt.getSystemDateAndTime();
+		char	datebuffer[26];
+		charstring::printf(datebuffer,sizeof(datebuffer),
+					"%s %d %s % 2d  %02d:%02d:%02d",
+					days[dt.getDayOfWeek()-1],
+					dt.getYear(),
+					dt.getMonthAbbreviation(),
+					dt.getDayOfMonth(),
+					dt.getHour(),
+					dt.getMinutes(),
+					dt.getSeconds());
+		
 		stringbuffer	logentry;
-		logentry.append("query:\n")->append(sqlrcur->getQueryBuffer());
+		logentry.append(datebuffer)->append(" :\n");
+		logentry.append(sqlrcur->getQueryBuffer());
 		logentry.append("\n");
-		logentry.append("time: ")->append(querysec);
+		logentry.append("execution time: ")->append(querysec);
 		logentry.append(".");
 		char	*usecstr=charstring::parseNumber(queryusec,6);
 		logentry.append(usecstr);
@@ -131,12 +158,13 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 						logentry.getStringLength()) {
 			return false;
 		}
+		//querylog.flushWriteBuffer(-1,-1);
 	}
 	return true;
 }
 
 extern "C" {
-	sqlrlogger	*new_sqlrlogger_slowqueries(xmldomnode *parameters) {
+	sqlrlogger *new_sqlrlogger_slowqueries(xmldomnode *parameters) {
 		return new slowqueries(parameters);
 	}
 }

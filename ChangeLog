@@ -1,3 +1,5 @@
+0.58.2 - updated slowqueries logger with timestamp and accurate query time
+
 0.58.1 - fixed bugs that could cause sqlr-start with no id to crash and
 	sqlr-start on an id with neither port nor socket defined to crash
 
