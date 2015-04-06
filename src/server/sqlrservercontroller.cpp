@@ -3548,9 +3548,9 @@ void sqlrservercontroller::buildColumnMaps() {
 	// ODBC getDatabaseList:
 	//
 	// TABLE_CAT -> NULL
-	odbcdatabasescolumnmap.setValue(0,1);
+	odbcdatabasescolumnmap.setValue(0,0);
 	// TABLE_SCHEM -> NULL
-	odbcdatabasescolumnmap.setValue(1,0);
+	odbcdatabasescolumnmap.setValue(1,1);
 	// TABLE_NAME -> NULL
 	odbcdatabasescolumnmap.setValue(2,1);
 	// TABLE_TYPE -> NULL

@@ -6622,20 +6622,20 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	// so the two are usually interchangeable.
 	//
 	// The SQL Relay server is currently only capable of returning
-	// the column format that ODBC likes for a schema list, not a catalog
-	// list, so for now, we'll ignore requests for catalog lists and
-	// return the list of databases in schema format, when the list of
-	// schemas are requested.
+	// the column format that ODBC likes for a catalog list, not a schema
+	// list, so for now, we'll ignore requests for schema lists and
+	// return the list of databases in catalog format, when the list of
+	// catalogs are requested.
 
 	char		*wild=NULL;
 	SQLRETURN	retval=SQL_ERROR;
-	if (schemaname && schemaname[0]) {
-		if (namelength2==SQL_NTS) {
-			namelength2=charstring::length(schemaname);
+	if (catalogname && catalogname[0]) {
+		if (namelength1==SQL_NTS) {
+			namelength1=charstring::length(catalogname);
 		}
 		wild=charstring::duplicate(
-				(const char *)schemaname,namelength2);
-		if (!charstring::compare(wild,SQL_ALL_SCHEMAS)) {
+				(const char *)catalogname,namelength1);
+		if (!charstring::compare(wild,SQL_ALL_CATALOGS)) {
 			delete[] wild;
 			wild=NULL;
 		}
