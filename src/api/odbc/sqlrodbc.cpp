@@ -81,6 +81,7 @@ struct CONN {
 	int32_t				retrytime;
 	int32_t				tries;
 	bool				debug;
+	bool				attrmetadataid;
 };
 
 struct rowdesc {
@@ -248,6 +249,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				SQLR_CONNClearError(conn);
 				env->connlist.append(conn);
 				conn->env=env;
+				conn->attrmetadataid=false;
 			}
 			return SQL_SUCCESS;
 			}
@@ -1781,7 +1783,13 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: I suspect I'll be revisiting his in the future...
+	// FIXME: this code treats xxxname as a search pattern in all cases
+	// xxxname is a case-insensitive search pattern if:
+	// * SQL_ODBC_VERSION is SQL_OV_ODBC3
+	// * SQL_ATTR_METADATA_ID is SQL_FALSE
+	// otherwise it's a case-insensitive literal
+
+	// FIXME: I suspect I'll be revisiting this in the future...
 	//
 	// SQLGetConnectAttr(SQL_ATTR_CURRENT_CATALOG) returns the
 	// "current db name".  In most db's, this is the instance but in others
@@ -1812,12 +1820,14 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 					tablename,namelength3);
 	}
 
-	char	*wild=NULL;
 	if (namelength4==SQL_NTS) {
-		wild=charstring::duplicate((const char *)columnname);
-	} else {
-		wild=charstring::duplicate((const char *)columnname,
-							namelength4);
+		namelength4=charstring::length(columnname);
+	}
+	char	*wild=charstring::duplicate(
+				(const char *)columnname,namelength4);
+	if (!charstring::compare(wild,"%")) {
+		delete[] wild;
+		wild=NULL;
 	}
 
 	debugPrintf("  table: %s\n",table.getString());
@@ -2979,7 +2989,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		//case SQL_ATTR_CURRENT_CATALOG:
 		//	(dup of SQL_CURRENT_QUALIFIER)
 		case SQL_CURRENT_QUALIFIER:
-			{
+		{
 			debugPrintf("  attribute: SQL_CURRENT_QUALIFIER/"
 						"SQL_ATTR_CURRENT_CATALOG\n");
 			const char	*db=conn->con->getCurrentDatabase();
@@ -2988,19 +2998,27 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 							db,*stringlength);
 			debugPrintf("    current catalog: %s\n",db);
 			return SQL_SUCCESS;
-			}
+		}
 
 		/*case SQL_ODBC_CURSORS:
 		case SQL_QUIET_MODE:
-		case SQL_PACKET_SIZE:
+		case SQL_PACKET_SIZE:*/
 	#if (ODBCVER >= 0x0300)
-		case SQL_ATTR_CONNECTION_TIMEOUT:
+		/*case SQL_ATTR_CONNECTION_TIMEOUT:
 		case SQL_ATTR_DISCONNECT_BEHAVIOR:
 		case SQL_ATTR_ENLIST_IN_DTC:
 		case SQL_ATTR_ENLIST_IN_XA:
-		case SQL_ATTR_AUTO_IPD:
+		case SQL_ATTR_AUTO_IPD:*/
 		case SQL_ATTR_METADATA_ID:
-	#endif*/
+		{
+			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
+			*(SQLUINTEGER *)value=
+				(conn->attrmetadataid)?SQL_TRUE:SQL_FALSE;
+			*stringlength=sizeof(SQLUINTEGER);
+			debugPrintf("    value: %d\n",*(SQLUINTEGER *)value);
+			return SQL_SUCCESS;
+		}
+	#endif
 		default:
 			debugPrintf("  unsupported attribute: %d\n",attribute);
 			return SQL_SUCCESS;
@@ -6109,7 +6127,8 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		{
 			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
 			// use reinterpret_cast to avoid compiler warnings
-			uint64_t	val=reinterpret_cast<uint64_t>(value);
+			SQLUINTEGER	val=
+					reinterpret_cast<SQLUINTEGER>(value);
 			if (val==SQL_AUTOCOMMIT_ON) {
 				if (conn->con->autoCommitOn()) {
 					return SQL_SUCCESS;
@@ -6131,15 +6150,23 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_TRANSLATE_OPTION:
 		case SQL_ODBC_CURSORS:
 		case SQL_QUIET_MODE:
-		case SQL_PACKET_SIZE:
+		case SQL_PACKET_SIZE:*/
 	#if (ODBCVER >= 0x0300)
-		case SQL_ATTR_CONNECTION_TIMEOUT:
+		/*case SQL_ATTR_CONNECTION_TIMEOUT:
 		case SQL_ATTR_DISCONNECT_BEHAVIOR:
 		case SQL_ATTR_ENLIST_IN_DTC:
 		case SQL_ATTR_ENLIST_IN_XA:
-		case SQL_ATTR_AUTO_IPD:
+		case SQL_ATTR_AUTO_IPD:*/
 		case SQL_ATTR_METADATA_ID:
-	#endif*/
+		{
+			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
+			// use reinterpret_cast to avoid compiler warnings
+			SQLUINTEGER	val=
+					reinterpret_cast<SQLUINTEGER>(value);
+			conn->attrmetadataid=(val==SQL_TRUE);
+			return SQL_SUCCESS;
+		}
+	#endif
 		default:
 			debugPrintf("  unsupported attribute: %d\n",attribute);
 			return SQL_SUCCESS;
@@ -6581,18 +6608,60 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	char	*wild=NULL;
-	if (namelength3==SQL_NTS) {
-		wild=charstring::duplicate((const char *)tablename);
-	} else {
-		wild=charstring::duplicate((const char *)tablename,
-							namelength3);
-	}
-	debugPrintf("  wild: %s\n",(wild)?wild:"");
+	// FIXME: this code treats xxxname as a search pattern in all cases
+	// xxxname is a case-insensitive search pattern if:
+	// * SQL_ODBC_VERSION is SQL_OV_ODBC3
+	// * SQL_ATTR_METADATA_ID is SQL_FALSE
+	// otherwise it's a case-insensitive literal
 
-	SQLRETURN	retval=
+	// FIXME: I suspect I'll be revisiting this in the future...
+	//
+	// SQL Relay doesn't really differentiate between catalog and schema.
+	// It calls both "database" because most db's don't have a concept of
+	// catalog.schema.table, just catalog.table or schema.table
+	// so the two are usually interchangeable.
+	//
+	// The SQL Relay server is currently only capable of returning
+	// the column format that ODBC likes for a schema list, not a catalog
+	// list, so for now, we'll ignore requests for catalog lists and
+	// return the list of databases in schema format, when the list of
+	// schemas are requested.
+
+	char		*wild=NULL;
+	SQLRETURN	retval=SQL_ERROR;
+	if (schemaname && schemaname[0]) {
+		if (namelength2==SQL_NTS) {
+			namelength2=charstring::length(schemaname);
+		}
+		wild=charstring::duplicate(
+				(const char *)schemaname,namelength2);
+		if (!charstring::compare(wild,SQL_ALL_SCHEMAS)) {
+			delete[] wild;
+			wild=NULL;
+		}
+
+		debugPrintf("  wild: %s\n",(wild)?wild:"");
+
+		retval=
+		(stmt->cur->getDatabaseList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
+	} else if (tablename && tablename[0]) {
+		if (namelength3==SQL_NTS) {
+			namelength3=charstring::length(tablename);
+		}
+		wild=charstring::duplicate(
+				(const char *)tablename,namelength3);
+		if (!charstring::compare(wild,"%")) {
+			delete[] wild;
+			wild=NULL;
+		}
+
+		debugPrintf("  wild: %s\n",(wild)?wild:"");
+
+		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
+	}
 	delete[] wild;
 	return retval;
 }

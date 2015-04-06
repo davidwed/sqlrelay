@@ -3451,7 +3451,7 @@ void sqlrservercontroller::setDatabaseListColumnMap(
 			columnmap=&mysqldatabasescolumnmap;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
-			columnmap=NULL;
+			columnmap=&odbcdatabasescolumnmap;
 			break;
 		default:
 			columnmap=NULL;
@@ -3546,7 +3546,17 @@ void sqlrservercontroller::buildColumnMaps() {
 
 
 	// ODBC getDatabaseList:
-	// FIXME: what is this mapped to in ODBC?
+	//
+	// TABLE_CAT -> NULL
+	odbcdatabasescolumnmap.setValue(0,1);
+	// TABLE_SCHEM -> NULL
+	odbcdatabasescolumnmap.setValue(1,0);
+	// TABLE_NAME -> NULL
+	odbcdatabasescolumnmap.setValue(2,1);
+	// TABLE_TYPE -> NULL
+	odbcdatabasescolumnmap.setValue(3,1);
+	// REMARKS -> NULL
+	odbcdatabasescolumnmap.setValue(4,1);
 
 	// ODBC getTableList:
 	//
