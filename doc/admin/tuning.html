@@ -430,7 +430,7 @@ finding it may dramatically improve that query's performance.</p>
 <a name="memoryusage"></a>
 <span class="heading2">Memory Usage</span><br>
 
-<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, SAP/Sybase, FreeTDS and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
+<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, SAP/Sybase, FreeTDS, MySQL and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
 
 <p>The size of the result set buffer is determined by 3 parameters:</p>
 
@@ -452,7 +452,7 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
 
-<p>The default result set buffer size for Oracle, DB2 and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  FreeTDS and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
+<p>The default result set buffer size for Oracle, DB2 and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  FreeTDS, MySQL and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
 
 <p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.<p>
 
@@ -466,7 +466,7 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</p>
 
-<p>For Oracle, SAP/Sybase and DB2, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
+<p>For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For MySQL and FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
 
 <p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 

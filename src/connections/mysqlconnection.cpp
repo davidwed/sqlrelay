@@ -37,6 +37,10 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 							uint16_t id);
 				~mysqlcursor();
 #ifdef HAVE_MYSQL_STMT_PREPARE
+		void		allocateResultSetBuffers(
+						int32_t selectlistsize,
+						int32_t itembuffersize);
+		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
@@ -116,7 +120,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		void		closeResultSet();
 
 		MYSQL_RES	*mysqlresult;
-		MYSQL_FIELD	*mysqlfields[MAX_SELECT_LIST_SIZE];
+		MYSQL_FIELD	**mysqlfields;
 		uint32_t	mysqlfieldindex;
 		unsigned int	ncols;
 		my_ulonglong	nrows;
@@ -127,11 +131,10 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		MYSQL_STMT	*stmt;
 		bool		stmtfreeresult;
 
-		MYSQL_BIND	fieldbind[MAX_SELECT_LIST_SIZE];
-		char		field[MAX_SELECT_LIST_SIZE]
-					[MAX_ITEM_BUFFER_SIZE];
-		my_bool		isnull[MAX_SELECT_LIST_SIZE];
-		unsigned long	fieldlength[MAX_SELECT_LIST_SIZE];
+		MYSQL_BIND	*fieldbind;
+		char		*field;
+		my_bool		*isnull;
+		unsigned long	*fieldlength;
 
 		uint16_t	bindcount;
 		bool		boundvariables;
@@ -209,6 +212,10 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*sslcipher;
 		bool		foundrows;
 		bool		ignorespace;
+		int32_t		maxselectlistsize;
+#ifdef HAVE_MYSQL_STMT_PREPARE
+		int32_t		maxitembuffersize;
+#endif
 
 		char	*dbversion;
 		char	*dbhostname;
@@ -240,6 +247,11 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 	// start this at false because we don't need to do a commit before
 	// the first query when we very first start up
 	firstquery=false;
+
+	maxselectlistsize=MAX_SELECT_LIST_SIZE;
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+#endif
 }
 
 mysqlconnection::~mysqlconnection() {
@@ -268,6 +280,20 @@ void mysqlconnection::handleConnectString() {
 			cont->getConnectStringValue("foundrows"),"yes");
 	ignorespace=!charstring::compare(
 			cont->getConnectStringValue("ignorespace"),"yes");
+
+	maxselectlistsize=charstring::toInteger(
+			cont->getConnectStringValue("maxselectlistsize"));
+	if (!maxselectlistsize) {
+		maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	}
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	maxitembuffersize=charstring::toInteger(
+			cont->getConnectStringValue("maxitembuffersize"));
+	if (!maxitembuffersize) {
+		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+	}
+#endif
 }
 
 bool mysqlconnection::logIn(const char **error, const char **warning) {
@@ -616,6 +642,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
+
+	mysqlfields=new MYSQL_FIELD *[mysqlconn->maxselectlistsize];
+
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
 	stmtfreeresult=false;
@@ -626,14 +655,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	unsupportedbystmt.compile(
 			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start|CHECK|check|REPAIR|repair)\\s+)|((begin|BEGIN)\\s*)");
 	unsupportedbystmt.study();
-	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {
-		mysqlfields[index]=NULL;
-		fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
-		fieldbind[index].buffer=(char *)&field[index];
-		fieldbind[index].buffer_length=MAX_ITEM_BUFFER_SIZE;
-		fieldbind[index].is_null=&isnull[index];
-		fieldbind[index].length=&fieldlength[index];
-	}
+
+	allocateResultSetBuffers(mysqlconn->maxselectlistsize,
+					mysqlconn->maxitembuffersize);
 #endif
 }
 
@@ -647,10 +671,43 @@ mysqlcursor::~mysqlcursor() {
 	}
 	delete[] bind;
 	delete[] bindvaluesize;
+
+	deallocateResultSetBuffers();
 #endif
+
+	delete[] mysqlfields;
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
+void mysqlcursor::allocateResultSetBuffers(int32_t selectlistsize,
+						int32_t itembuffersize) {
+	if (selectlistsize<1) {
+		fieldbind=NULL;
+		field=NULL;
+		isnull=NULL;
+		fieldlength=NULL;
+	} else {
+		fieldbind=new MYSQL_BIND[selectlistsize];
+		field=new char[selectlistsize*itembuffersize];
+		isnull=new my_bool[selectlistsize];
+		fieldlength=new unsigned long[selectlistsize];
+		for (unsigned short index=0; index<selectlistsize; index++) {
+			fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
+			fieldbind[index].buffer=&field[index*itembuffersize];
+			fieldbind[index].buffer_length=itembuffersize;
+			fieldbind[index].is_null=&isnull[index];
+			fieldbind[index].length=&fieldlength[index];
+		}
+	}
+}
+
+void mysqlcursor::deallocateResultSetBuffers() {
+	delete[] fieldbind;
+	delete[] field;
+	delete[] isnull;
+	delete[] fieldlength;
+}
+
 bool mysqlcursor::open() {
 	stmt=mysql_stmt_init(&mysqlconn->mysql);
 	return true;
@@ -967,6 +1024,29 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		// get the column count
 		ncols=mysql_stmt_field_count(stmt);
+		if (ncols>mysqlconn->maxselectlistsize &&
+			mysqlconn->maxselectlistsize!=-1) {
+			// mysql_stmt_bind_result expects:
+			// "the array (fieldbind) to contain one element for
+			// each colun of the result set."
+			// If there isn't, then mysql_stmt_bind_result will
+			// run off the end of the array, wreaking havoc.
+			// So, bail with an error if we don't have enough
+			// columns.
+			stringbuffer	err;
+			err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
+			err.append(" (")->append(mysqlconn->maxselectlistsize);
+			err.append('<')->append(ncols)->append(')');
+			setError(err.getString(),
+				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
+			return false;
+		}
+
+		// allocate buffers, if necessary
+		if (mysqlconn->maxselectlistsize==-1) {
+			allocateResultSetBuffers(ncols,
+					mysqlconn->maxitembuffersize);
+		}
 
 		// get the metadata
 		mysqlresult=NULL;
@@ -1369,7 +1449,7 @@ void mysqlcursor::getField(uint32_t col,
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		if (!isnull[col]) {
-			*fld=field[col];
+			*fld=&field[col*mysqlconn->maxitembuffersize];
 			*fldlength=fieldlength[col];
 		} else {
 			*null=true;
@@ -1416,4 +1496,9 @@ void mysqlcursor::closeResultSet() {
 		}
 #endif
 	}
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (usestmtprepare && mysqlconn->maxselectlistsize==-1) {
+		deallocateResultSetBuffers();
+	}
+#endif
 }

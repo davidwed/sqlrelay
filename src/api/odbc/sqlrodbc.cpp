@@ -1861,7 +1861,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	if (dsnlength==SQL_NTS) {
 		dsnlength=charstring::length(dsn);
 	}
-	if (dsnlength>=sizeof(conn->dsn)) {
+	if ((size_t)dsnlength>=sizeof(conn->dsn)) {
 		dsnlength=sizeof(conn->dsn)-1;
 	}
 	charstring::safeCopy(conn->dsn,sizeof(conn->dsn),
@@ -6126,9 +6126,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_AUTOCOMMIT:
 		{
 			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
-			// use reinterpret_cast to avoid compiler warnings
-			SQLUINTEGER	val=
-					reinterpret_cast<SQLUINTEGER>(value);
+			uint64_t	val=(uint64_t)value;
 			if (val==SQL_AUTOCOMMIT_ON) {
 				if (conn->con->autoCommitOn()) {
 					return SQL_SUCCESS;
@@ -6160,9 +6158,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_ATTR_METADATA_ID:
 		{
 			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
-			// use reinterpret_cast to avoid compiler warnings
-			SQLUINTEGER	val=
-					reinterpret_cast<SQLUINTEGER>(value);
+			uint64_t	val=(uint64_t)value;
 			conn->attrmetadataid=(val==SQL_TRUE);
 			return SQL_SUCCESS;
 		}
