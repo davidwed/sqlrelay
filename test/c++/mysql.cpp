@@ -72,7 +72,7 @@ int	main(int argc, char **argv) {
 	uint32_t	*fieldlens;
 
 	// instantiation
-	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
@@ -1000,7 +1000,7 @@ int	main(int argc, char **argv) {
 	// Note: Mysql's default isolation level is repeatable-read,
 	// not read-committed like most other db's.  Both sessions must
 	// commit to see the changes that each other has made.
-	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
@@ -1090,6 +1090,28 @@ int	main(int argc, char **argv) {
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
+
+	// long lobs
+	stdoutput.printf("LONG LOBS: \n");
+	cur->sendQuery("drop table testtable1");
+	cur->sendQuery("create table testtable1 (testtext text, testblob blob)");
+	cur->prepareQuery("insert into testtable1 values (?,?)");
+	char	clobval[8*1024+1];
+	char	blobval[8*1024+1];
+	for (uint32_t i=0; i<8*1024; i++) {
+		clobval[i]='C';
+		blobval[i]='C';
+	}
+	clobval[8*1024]='\0';
+	blobval[8*1024]='\0';
+	cur->inputBindClob("1",clobval,8*1024);
+	cur->inputBindBlob("2",blobval,8*1024);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select * from testtable1");
+	checkSuccess(cur->getField(0,"testtext"),clobval);
+	checkSuccess(cur->getField(0,"testblob"),clobval);
+	cur->sendQuery("drop table testtable1");
+	stdoutput.printf("\n");
 
 	// invalid queries...
 	stdoutput.printf("INVALID QUERIES: \n");

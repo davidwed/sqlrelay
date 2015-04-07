@@ -51,6 +51,8 @@
 	odbc connection correctly returns database/table lists now
 	added support for maxselectlistsize/maxitembuffersize to MySQL
 		connection
+	updated mysql connection to fetch blob columns in chunks and not be
+		bound by maxitembuffersize
 	fixed a misspelling in sqlrelay.dtd
 
 0.58 - updated spawn() calls to detach on windows

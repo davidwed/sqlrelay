@@ -117,6 +117,19 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+		bool		getLobFieldLength(uint32_t col,
+						uint64_t *length);
+		bool		getLobFieldSegment(uint32_t col,
+						char *buffer,
+						uint64_t buffersize,
+						uint64_t offset,
+						uint64_t charstoread,
+						uint64_t *charsread);
+		void		closeLobField(uint32_t col);
+#endif
+
 		void		closeResultSet();
 
 		MYSQL_RES	*mysqlresult;
@@ -140,6 +153,8 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		bool		boundvariables;
 		MYSQL_BIND	*bind;
 		unsigned long	*bindvaluesize;
+
+		MYSQL_BIND	lobfield;
 
 		bool		usestmtprepare;
 		bool		bindformaterror;
@@ -668,6 +683,12 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 
 	allocateResultSetBuffers(mysqlconn->maxselectlistsize,
 					mysqlconn->maxitembuffersize);
+
+	lobfield.buffer_type=MYSQL_TYPE_STRING;
+	lobfield.buffer=NULL;
+	lobfield.buffer_length=0;
+	lobfield.is_null=NULL;
+	lobfield.length=NULL;
 #endif
 }
 
@@ -1461,8 +1482,17 @@ void mysqlcursor::getField(uint32_t col,
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		if (!isnull[col]) {
-			*fld=&field[col*mysqlconn->maxitembuffersize];
-			*fldlength=fieldlength[col];
+			uint16_t	coltype=getColumnType(col);
+			if (coltype==TINY_BLOB_DATATYPE ||
+				coltype==BLOB_DATATYPE ||
+				coltype==MEDIUM_BLOB_DATATYPE ||
+				coltype==LONG_BLOB_DATATYPE) {
+				*blob=true;
+				return;
+			} else {
+				*fld=&field[col*mysqlconn->maxitembuffersize];
+				*fldlength=fieldlength[col];
+			}
 		} else {
 			*null=true;
 		}
@@ -1478,6 +1508,53 @@ void mysqlcursor::getField(uint32_t col,
 	}
 #endif
 }
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
+bool mysqlcursor::getLobFieldLength(uint32_t col, uint64_t *length)  {
+	lobfield.buffer_length=fieldlength[col];
+	*length=lobfield.buffer_length;
+	return true;
+}
+
+bool mysqlcursor::getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+
+	// mysql can't fetch the lob in chunks so we need to fetch the
+	// entire thing into a buffer here at the beginning
+	if (!offset) {
+		lobfield.buffer=new char[lobfield.buffer_length];
+		if (mysql_stmt_fetch_column(stmt,&lobfield,col,0)) {
+			return false;
+		}
+	}
+
+	// sanity checks
+	if (!lobfield.buffer || offset>lobfield.buffer_length) {
+		return false;
+	}
+
+	// deterine how many characters to actually read
+	*charsread=charstoread;
+	if (charstoread>lobfield.buffer_length-offset) {
+		*charsread=lobfield.buffer_length-offset;
+	}
+
+	// copy out the data
+	bytestring::copy(buffer,
+		(unsigned char *)lobfield.buffer+offset,*charsread);
+
+	return true;
+}
+
+void mysqlcursor::closeLobField(uint32_t col) {
+	delete[] lobfield.buffer;
+	lobfield.buffer=NULL;
+	lobfield.buffer_length=0;
+	return;
+}
+#endif
 
 void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
