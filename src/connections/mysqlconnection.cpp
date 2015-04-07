@@ -372,6 +372,16 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	mysql_options(&mysql,MYSQL_OPT_RECONNECT,&mytrue);
 #endif
 
+#ifdef HAVE_MYSQL_REPORT_DATA_TRUNCATION
+	// The way this code works, if mysql_stmt_fetch returns any error,
+	// then the fetch fails and no more rows are returned.  At some point,
+	// MySQL started reporting data truncation as an error.  Disable this
+	// though, we'd rather get the truncated data and keep fetching rows
+	// rather than stopping all fetching at the point that the truncation
+	// occurs.
+	mysql_options(&mysql,MYSQL_REPORT_DATA_TRUNCATION,&myfalse);
+#endif
+
 #ifdef MYSQL_SELECT_DB
 	if (mysql_select_db(&mysql,dbval)) {
 		loginerror.clear();
@@ -1060,6 +1070,8 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// store the result set
+		// FIXME: this causes the entire result set to be buffered,
+		// do we want to do that?
 		if (mysql_stmt_store_result(stmt)) {
 			return false;
 		}

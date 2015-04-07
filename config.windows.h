@@ -100,6 +100,9 @@
 /* MySQL supports mysql_real_connect */
 #define HAVE_MYSQL_REAL_CONNECT_FOR_SURE 1
 
+/* MySQL supports MYSQL_REPORT_DATA_TRUNCATION */
+#define HAVE_MYSQL_REPORT_DATA_TRUNCATION 1
+
 /* MySQL supports mysql_rollback */
 #define HAVE_MYSQL_ROLLBACK 1
 

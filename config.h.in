@@ -99,6 +99,9 @@
 /* MySQL supports mysql_real_connect */
 #undef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 
+/* MySQL supports MYSQL_REPORT_DATA_TRUNCATION */
+#undef HAVE_MYSQL_REPORT_DATA_TRUNCATION
+
 /* MySQL supports mysql_rollback */
 #undef HAVE_MYSQL_ROLLBACK
 
