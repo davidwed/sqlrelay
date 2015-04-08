@@ -38,12 +38,20 @@ SQLRClient.il: SQLRClient.dll.in keyPair.snk
 SQLRClient.dll: SQLRClient.il
 	$(ILASM) SQLRClient.il /dll /key=keyPair.snk
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
 	$(MKINSTALLDIRS) $(dotnetdir)
 	$(CP) SQLRClient.dll $(dotnetdir)
+	#$(GACUTIL) /i $(dotnetdir)/SQLRClient.dll
+
+installlib:
+	$(MKINSTALLDIRS) $(dotnetdir)
+	$(CP) SQLRClient.dll $(dotnetdir)
+	$(CP) SQLRClient.dll.config $(dotnetdir)
 	$(CHMOD) 755 $(dotnetdir)/SQLRClient.dll
 	#$(GACUTIL) /i $(dotnetdir)/SQLRClient.dll
 
 uninstall:
-	$(RM) $(dotnetdir)/SQLRClient.dll
+	$(RM) $(dotnetdir)/SQLRClient.dll*
 	#$(GACUTIL) /u SQLRClient
