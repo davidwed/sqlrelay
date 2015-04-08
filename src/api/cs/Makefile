@@ -18,29 +18,31 @@ SRCS = SQLRConnection.cs \
 all: SQLRClient.dll SQLRClient.dll.config
 
 clean:
-	$(RM) *.dll *.pdb SQLRClient.dll.config
+	$(RM) *.snk *.il *.dll.in *.dll *.mdb AssemblyInfo.cs SQLRClient.dll.config
+
+AssemblyInfo.cs: AssemblyInfo.cs.in
+	$(REPLACE) @SQLR_VERSION@ $(SQLR_VERSION) AssemblyInfo.cs.in > AssemblyInfo.cs
 
 SQLRClient.dll.config: SQLRClient.dll.config.in
 	$(REPLACE) @SQLR_VERSION@ $(SQLR_VERSION) SQLRClient.dll.config.in > SQLRClient.dll.config
 
-SQLRClient.dll: $(SRCS)
+SQLRClient.dll.in: $(SRCS)
 	$(CSC) $(CSCFLAGS) /optimize /target:library /out:$@ $(SRCS)
 
-install: $(INSTALLLIB)
+keyPair.snk:
+	$(SN) -k keyPair.snk
 
-installlib:
-	$(MKINSTALLDIRS) $(monodir)
-	$(CP) SQLRClient.dll $(monodir)
-	$(CP) SQLRClient.dll.config $(monodir)
+SQLRClient.il: SQLRClient.dll.in keyPair.snk
+	$(ILDASM) SQLRClient.dll.in > SQLRClient.il
 
-installdll:
-	$(MKINSTALLDIRS) $(monodir)
-	$(CP) SQLRClient.dll $(monodir)
+SQLRClient.dll: SQLRClient.il
+	$(ILASM) SQLRClient.il /dll /key=keyPair.snk
 
-uninstall: $(UNINSTALLLIB)
+install:
+	$(MKINSTALLDIRS) $(dotnetdir)
+	$(CP) SQLRClient.dll $(dotnetdir)
+	$(GACUTIL) /i $(dotnetdir)/SQLRClient.dll /package SQLRClient
 
-uninstalllib:
-	$(RMTREE) $(monodir)
-
-uninstalldll:
-	$(RM) $(monodir)/SQLRClient.dll*
+uninstall:
+	$(GACUTIL) /u SQLRClient
+	$(RM) $(dotnetdir)/SQLRClient.dll
