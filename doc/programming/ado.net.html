@@ -28,9 +28,68 @@
 <a name="languages"></a>
 <span class="heading2">Language Compatibility</span><br><br>
 
-<p>Currently, the SQL Relay ADO.NET Adapter is only supported on Windows.  Mono support is planned but is not currently implemented.</p>
+<p>The SQL Relay ADO.NET Adapter is supported on Windows platforms using Visual Studio and on Unix/Linux using Mono.</p>
 
 <p>The example code below is given in C# but the SQL Relay ADO.NET Adapter can be used from any language capable of using the .NET API.</p>
+
+<a name="compiling"></a>
+<span class="heading2">Compiling an SQL Relay Client Program</span><br><br>
+
+<p>When writing an SQL Relay client program using the ADO.NET API, you need to
+use the SQLRClient namespace.<p>
+
+<blockquote>
+using SQLRClient;
+</blockquote>
+
+<p>You'll also need to include the SQLRelay.dll assembly.  This is usually found in C:\Program Files\Firstworks\bin on Windows or /usr/local/firstworks/lib on Unix/Linux.</p>
+
+<p>As the ADO.NET Adapter ultimately relies on the C API, on Unix/Linux, there is also a SQLRelay.dll.config file, found in the same directory, that maps internal references to libsqlrclient.dll to the Unix/Linux equivalent shared object library.  This file isn't necessary on Windows and isn't installed.</p>
+
+<p>To compile a progarm using the Visual Studio IDE, you just have to configure your project to include the SQLRelay.dll assembly and compile your program.</p>
+
+<p>To compile from the command line using either Visual Studio or Mono, it's easiest to copy SQLRelay.dll into the current directory and build against it locally.<br/>When using Mono, you should also copy SQLRelay.dll.config into the current directory.</p>
+
+<p>For example, to create the executable sqlrexample.exe from the source code sqlrexample.cs...</p>
+
+<p>From the Visual Studio command line:</p>
+
+<blockquote>
+<pre>
+copy "C:\Program Files\Firstworks\bin\SQLRClient.dll" .
+csc /out:sqlrexample.exe sqlrexample.cs /reference:SQLRClient.dll
+</pre>
+</blockquote>
+
+<p>Using the Mono compiler from the Unix/Linux command line:</p>
+
+<blockquote>
+<pre>
+cp /usr/local/firstworks/lib/SQLRClient.dll .
+cp /usr/local/firstworks/lib/SQLRClient.dll.config .
+mcs -pkg:dotnet /out:sqlrexample.exe sqlrexample.cs /reference:SQLRClient.dll
+</pre>
+</blockquote>
+
+<p>(Note that an explicit reference to the dotnet package is required with Mono).</p>
+
+<p>To run the program under Windows, you can just run it directly:</p>
+
+<blockquote>
+<pre>
+sqlrexample.exe
+</pre>
+</blockquote>
+
+<p>Use the mono runtime to run the program on Unix/Linux:</p>
+
+<blockquote>
+<pre>
+mono sqlrexample.exe
+</pre>
+</blockquote>
+
+<p>If you get an error about libsqlrclient.dll not being found, then you probably forgot to copy SQLRClient.dll.config into the current directory.</p>
 
 <a name="session"></a>
 <span class="heading2">Establishing a Session</span><br><br>
