@@ -145,7 +145,7 @@ CLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 CSC = csc
 CSCFLAGS =
 SN = sn
-ILDASM = ildasm
+ILDASM = ildasm /text
 ILDASMOUT = /out=
 ILASM = ilasm
 GACUTIL = gacutil

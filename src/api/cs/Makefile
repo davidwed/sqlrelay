@@ -43,15 +43,12 @@ install: $(INSTALLLIB)
 installdll:
 	$(MKINSTALLDIRS) $(dotnetdir)
 	$(CP) SQLRClient.dll $(dotnetdir)
-	#$(GACUTIL) /i $(dotnetdir)/SQLRClient.dll
 
 installlib:
 	$(MKINSTALLDIRS) $(dotnetdir)
 	$(CP) SQLRClient.dll $(dotnetdir)
 	$(CP) SQLRClient.dll.config $(dotnetdir)
 	$(CHMOD) 755 $(dotnetdir)/SQLRClient.dll
-	#$(GACUTIL) /i $(dotnetdir)/SQLRClient.dll
 
 uninstall:
 	$(RM) $(dotnetdir)/SQLRClient.dll*
-	#$(GACUTIL) /u SQLRClient
