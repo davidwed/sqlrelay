@@ -3524,13 +3524,13 @@ then
 
 	if ( test -n "$HAVE_MONO" )
 	then
-		AC_MSG_CHECKING(whether $CSC works)
 
 		BASECSCFLAGS="$CSCFLAGS"
 		for flags in "" "$MONOPATH/mono/2.0"
 		do
 
 			CSCFLAGS="$BASECSCFLAGS $flags"
+			AC_MSG_CHECKING(whether $CSC $CSCFLAGS works)
 
 			cat << EOF > conftest.cs
 using System;
@@ -3550,16 +3550,16 @@ EOF
 			$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
 			if ( test -r "conftest.exe" )
 			then
+				AC_MSG_RESULT(yes)
 				break;
+			else
+				AC_MSG_RESULT(no)
 			fi
 		done
 
-		if ( test -r "conftest.exe" )
+		if ( test ! -r "conftest.exe" )
 		then
-			AC_MSG_RESULT(yes)
-		else
 			CSCFLAGS=$BASECSCFLAGS
-			AC_MSG_RESULT(no)
 			AC_MSG_WARN(The Mono API will not be built.)
 			HAVE_MONO=""
 		fi

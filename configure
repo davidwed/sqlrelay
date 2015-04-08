@@ -33623,14 +33623,14 @@ $as_echo "no" >&6; }
 
 	if ( test -n "$HAVE_MONO" )
 	then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CSC works" >&5
-$as_echo_n "checking whether $CSC works... " >&6; }
 
 		BASECSCFLAGS="$CSCFLAGS"
 		for flags in "" "$MONOPATH/mono/2.0"
 		do
 
 			CSCFLAGS="$BASECSCFLAGS $flags"
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CSC $CSCFLAGS works" >&5
+$as_echo_n "checking whether $CSC $CSCFLAGS works... " >&6; }
 
 			cat << EOF > conftest.cs
 using System;
@@ -33650,18 +33650,18 @@ EOF
 			$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
 			if ( test -r "conftest.exe" )
 			then
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
 				break;
+			else
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
 			fi
 		done
 
-		if ( test -r "conftest.exe" )
+		if ( test ! -r "conftest.exe" )
 		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		else
 			CSCFLAGS=$BASECSCFLAGS
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
 $as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
 			HAVE_MONO=""
