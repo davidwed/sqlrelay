@@ -54,6 +54,9 @@
 	updated mysql connection to fetch blob columns in chunks and not be
 		bound by maxitembuffersize
 	fixed a misspelling in sqlrelay.dtd
+	swapped order of init directory detection, looking for /etc/init.d
+		ahead of /etc/rc.d/init.d to resolve conflict with dkms on
+		SuSE Enterprise
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
