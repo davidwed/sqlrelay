@@ -25,20 +25,20 @@ endif
 all:
 
 install:
-	if ( test -d "/etc/rc.d/init.d" ); \
-	then \
-		$(MKINSTALLDIRS) $(initroot)/etc/rc.d/init.d; \
-		$(CP) rc.sqlrelay $(initroot)/etc/rc.d/init.d/sqlrelay; \
-		$(CHMOD) 755 $(initroot)/etc/rc.d/init.d/sqlrelay; \
-		$(CP) rc.sqlrcachemanager $(initroot)/etc/rc.d/init.d/sqlrcachemanager; \
-		$(CHMOD) 755 $(initroot)/etc/rc.d/init.d/sqlrcachemanager; \
-	elif ( test -d "/etc/init.d" ); \
+	if ( test -d "/etc/init.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/init.d; \
 		$(CP) rc.sqlrelay $(initroot)/etc/init.d/sqlrelay; \
 		$(CHMOD) 755 $(initroot)/etc/init.d/sqlrelay; \
 		$(CP) rc.sqlrcachemanager $(initroot)/etc/init.d/sqlrcachemanager; \
 		$(CHMOD) 755 $(initroot)/etc/init.d/sqlrcachemanager; \
+	elif ( test -d "/etc/rc.d/init.d" ); \
+	then \
+		$(MKINSTALLDIRS) $(initroot)/etc/rc.d/init.d; \
+		$(CP) rc.sqlrelay $(initroot)/etc/rc.d/init.d/sqlrelay; \
+		$(CHMOD) 755 $(initroot)/etc/rc.d/init.d/sqlrelay; \
+		$(CP) rc.sqlrcachemanager $(initroot)/etc/rc.d/init.d/sqlrcachemanager; \
+		$(CHMOD) 755 $(initroot)/etc/rc.d/init.d/sqlrcachemanager; \
 	elif ( test -d "/etc/rc.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/rc.d; \
