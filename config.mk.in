@@ -9,7 +9,7 @@ exec_prefix= @exec_prefix@
 includedir = @includedir@
 libdir = @libdir@
 javadir = ${exec_prefix}/java
-monodir = ${exec_prefix}/mono
+dotnetdir = $(libdir)
 libexecdir = @libexecdir@/sqlrelay
 bindir = @bindir@
 localstatedir = @localstatedir@
@@ -170,6 +170,10 @@ endif
 HAVE_MONO = @HAVE_MONO@
 CSC = @CSC@
 CSCFLAGS = @CSCFLAGS@
+SN = @SN@
+ILDASM = @ILDASM@
+ILASM = @ILASM@
+GACUTIL = @GACUTIL@
 
 
 # perl

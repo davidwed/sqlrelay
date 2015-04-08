@@ -138,7 +138,7 @@ namespace SQLRClientTest
         {
 
             // open connection and command
-            SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=localhost:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=true");
+            SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=localhost:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
             sqlrcon.Open();
 
 

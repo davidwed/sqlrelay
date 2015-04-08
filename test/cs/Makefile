@@ -2,14 +2,12 @@ top_builddir = ../..
 
 include ../../config.mk
 
-all: SQLRClient.dll oracle$(EXE)
+all: oracle
 
 clean:
-	$(RM) oracle$(EXE) *.dll *.dll.config *.pdb
+	$(RM) oracle.exe *.dll *.dll.config *.pdb
 
-SQLRClient.dll:
+oracle: oracle.cs
 	$(CP) ../../src/api/cs/SQLRClient.dll .
 	$(CP) ../../src/api/cs/SQLRClient.dll.config .
-
-oracle$(EXE): oracle.cs
-	$(CSC) $(CSCFLAGS) /out:$@ oracle.cs /lib:..\..\src\api\cs /reference:SQLRClient.dll
+	$(CSC) $(CSCFLAGS) /out:oracle.exe oracle.cs /reference:SQLRClient.dll

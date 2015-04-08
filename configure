@@ -638,6 +638,10 @@ STATICLINK
 SONAME_VERSION_INFO
 SQLR_VERSION
 RPM_BUILD_DIR
+GACUTIL
+ILASM
+ILDASM
+SN
 CSCFLAGS
 CSC
 HAVE_MONO
@@ -33486,6 +33490,8 @@ then
 
 	else
 
+				CSC=""
+		CSCFLAGS=""
 		for compiler in "mcs" "gmcs" "dmcs" "smcs"
 		do
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $compiler" >&5
@@ -33506,19 +33512,112 @@ $as_echo_n "checking for $compiler... " >&6; }
 			fi
 		done
 
-		CSCFLAGS="-pkg:dotnet"
-
 		if ( test -r "$CSC" )
 		then
-			HAVE_MONO="yes"
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $CSC" >&5
 $as_echo "$CSC" >&6; }
 		else
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
-$as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
 		fi
+
+
+				SN=""
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sn" >&5
+$as_echo_n "checking for sn... " >&6; }
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/sn" )
+			then
+				SN="$path/bin/sn"
+				break;
+			fi
+		done
+
+		if ( test -r "$SN" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SN" >&5
+$as_echo "$SN" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+
+
+				ILDASM=""
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for monodis" >&5
+$as_echo_n "checking for monodis... " >&6; }
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/monodis" )
+			then
+				ILDASM="$path/bin/monodis"
+				break;
+			fi
+		done
+
+		if ( test -r "$ILDASM" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ILDASM" >&5
+$as_echo "$ILDASM" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+
+
+				ILASM=""
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ilasm" >&5
+$as_echo_n "checking for ilasm... " >&6; }
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/ilasm" )
+			then
+				ILASM="$path/bin/ilasm"
+				break;
+			fi
+		done
+
+		if ( test -r "$ILASM" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ILASM" >&5
+$as_echo "$ILASM" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+
+
+				GACUTIL=""
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gacutil" >&5
+$as_echo_n "checking for gacutil... " >&6; }
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/gacutil" )
+			then
+				GACUTIL="$path/bin/gacutil"
+				break;
+			fi
+		done
+
+		if ( test -r "$GACUTIL" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $GACUTIL" >&5
+$as_echo "$GACUTIL" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+	fi
+
+	if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" -a -r "$GACUTIL")
+	then
+		CSCFLAGS="-pkg:dotnet"
+		HAVE_MONO="yes"
 	fi
 
 	if ( test -n "$HAVE_MONO" )
@@ -33539,7 +33638,7 @@ namespace ConfTest
     }
 }
 EOF
-		$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+				$CSC $CSCFLAGS /out:conftest.exe conftest.cs
 		if ( test -r "conftest.exe" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -33551,7 +33650,15 @@ $as_echo "no" >&6; }
 			HAVE_MONO=""
 		fi
 		rm -f conftest.cs
+	else
+		HAVE_MONO=""
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
+$as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
 	fi
+
+
+
+
 
 
 

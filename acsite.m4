@@ -3398,6 +3398,9 @@ then
 
 	else
 
+		dnl look for the compiler
+		CSC=""
+		CSCFLAGS=""
 		for compiler in "mcs" "gmcs" "dmcs" "smcs"
 		do
 			AC_MSG_CHECKING(for $compiler)
@@ -3417,16 +3420,105 @@ then
 			fi
 		done
 
-		CSCFLAGS="-pkg:dotnet"
-
 		if ( test -r "$CSC" )
 		then
-			HAVE_MONO="yes"
 			AC_MSG_RESULT($CSC)
 		else
 			AC_MSG_RESULT(no)
-			AC_MSG_WARN(The Mono API will not be built.)
 		fi
+
+
+		dnl look for the sn
+		SN=""
+		AC_MSG_CHECKING(for sn)
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/sn" )
+			then
+				SN="$path/bin/sn"
+				break;
+			fi
+		done
+
+		if ( test -r "$SN" )
+		then
+			AC_MSG_RESULT($SN)
+		else
+			AC_MSG_RESULT(no)
+		fi
+
+
+		dnl look for the ildasm/monodis
+		ILDASM=""
+		AC_MSG_CHECKING(for monodis)
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/monodis" )
+			then
+				ILDASM="$path/bin/monodis"
+				break;
+			fi
+		done
+
+		if ( test -r "$ILDASM" )
+		then
+			AC_MSG_RESULT($ILDASM)
+		else
+			AC_MSG_RESULT(no)
+		fi
+
+
+		dnl look for the ilasm
+		ILASM=""
+		AC_MSG_CHECKING(for ilasm)
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/ilasm" )
+			then
+				ILASM="$path/bin/ilasm"
+				break;
+			fi
+		done
+
+		if ( test -r "$ILASM" )
+		then
+			AC_MSG_RESULT($ILASM)
+		else
+			AC_MSG_RESULT(no)
+		fi
+
+
+		dnl look for the gacutil
+		GACUTIL=""
+		AC_MSG_CHECKING(for gacutil)
+
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		do
+			if ( test -r "$path/bin/gacutil" )
+			then
+				GACUTIL="$path/bin/gacutil"
+				break;
+			fi
+		done
+
+		if ( test -r "$GACUTIL" )
+		then
+			AC_MSG_RESULT($GACUTIL)
+		else
+			AC_MSG_RESULT(no)
+		fi
+	fi
+
+	dnl don't worry about gacutil for now, we're not going to install
+	dnl anything in the global assembly cache at this point
+	dnl if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" -a -r "$GACUTIL" )
+	if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" )
+	then
+		CSCFLAGS="-pkg:dotnet"
+		HAVE_MONO="yes"
 	fi
 
 	if ( test -n "$HAVE_MONO" )
@@ -3446,7 +3538,8 @@ namespace ConfTest
     }
 }
 EOF
-		$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+		dnl$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+		$CSC $CSCFLAGS /out:conftest.exe conftest.cs
 		if ( test -r "conftest.exe" )
 		then
 			AC_MSG_RESULT(yes)
@@ -3456,11 +3549,18 @@ EOF
 			HAVE_MONO=""
 		fi
 		rm -f conftest.cs
+	else
+		HAVE_MONO=""
+		AC_MSG_WARN(The Mono API will not be built.)
 	fi
 
 	AC_SUBST(HAVE_MONO)
 	AC_SUBST(CSC)
 	AC_SUBST(CSCFLAGS)
+	AC_SUBST(SN)
+	AC_SUBST(ILDASM)
+	AC_SUBST(ILASM)
+	AC_SUBST(GACUTIL)
 fi
 ])
 

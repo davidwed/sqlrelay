@@ -9,7 +9,7 @@ exec_prefix= @exec_prefix@
 includedir = @includedir@
 libdir = @libdir@
 javadir = @javadir@
-monodir = @bindir@
+dotnetdir = @bindir@
 libexecdir = @libexecdir@
 bindir = @bindir@
 localstatedir = @localstatedir@
@@ -144,6 +144,10 @@ CLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 # c#
 CSC = csc
 CSCFLAGS =
+SN = sn
+ILDASM = ildasm
+ILASM = ilasm
+GACUTIL = gacutil
 
 
 # perl
