@@ -3410,6 +3410,7 @@ then
 				if ( test -r "$path/bin/$compiler" )
 				then
 					CSC="$path/bin/$compiler"
+					MONOPATH="$path"
 					break;
 				fi
 			done
@@ -3524,7 +3525,14 @@ then
 	if ( test -n "$HAVE_MONO" )
 	then
 		AC_MSG_CHECKING(whether $CSC works)
-		cat << EOF > conftest.cs
+
+		BASECSCFLAGS="$CSCFLAGS"
+		for flags in "" "$MONOPATH/mono/2.0"
+		do
+
+			CSCFLAGS="$BASECSCFLAGS $flags"
+
+			cat << EOF > conftest.cs
 using System;
 using System.Data;
 namespace ConfTest
@@ -3538,17 +3546,26 @@ namespace ConfTest
     }
 }
 EOF
-		dnl$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
-		$CSC $CSCFLAGS /out:conftest.exe conftest.cs
+
+			$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+			if ( test -r "conftest.exe" )
+			then
+				break;
+			fi
+		done
+
 		if ( test -r "conftest.exe" )
 		then
 			AC_MSG_RESULT(yes)
-			rm -f conftest.exe
 		else
+			CSCFLAGS=$BASECSCFLAGS
 			AC_MSG_RESULT(no)
+			AC_MSG_WARN(The Mono API will not be built.)
 			HAVE_MONO=""
 		fi
+
 		rm -f conftest.cs
+		rm -f conftest.exe
 	else
 		HAVE_MONO=""
 		AC_MSG_WARN(The Mono API will not be built.)

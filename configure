@@ -33502,6 +33502,7 @@ $as_echo_n "checking for $compiler... " >&6; }
 				if ( test -r "$path/bin/$compiler" )
 				then
 					CSC="$path/bin/$compiler"
+					MONOPATH="$path"
 					break;
 				fi
 			done
@@ -33614,7 +33615,7 @@ $as_echo "no" >&6; }
 		fi
 	fi
 
-	if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" -a -r "$GACUTIL")
+				if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" )
 	then
 		CSCFLAGS="-pkg:dotnet"
 		HAVE_MONO="yes"
@@ -33624,7 +33625,14 @@ $as_echo "no" >&6; }
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CSC works" >&5
 $as_echo_n "checking whether $CSC works... " >&6; }
-		cat << EOF > conftest.cs
+
+		BASECSCFLAGS="$CSCFLAGS"
+		for flags in "" "$MONOPATH/mono/2.0"
+		do
+
+			CSCFLAGS="$BASECSCFLAGS $flags"
+
+			cat << EOF > conftest.cs
 using System;
 using System.Data;
 namespace ConfTest
@@ -33638,18 +33646,29 @@ namespace ConfTest
     }
 }
 EOF
-				$CSC $CSCFLAGS /out:conftest.exe conftest.cs
+
+			$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+			if ( test -r "conftest.exe" )
+			then
+				break;
+			fi
+		done
+
 		if ( test -r "conftest.exe" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-			rm -f conftest.exe
 		else
+			CSCFLAGS=$BASECSCFLAGS
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
+$as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
 			HAVE_MONO=""
 		fi
+
 		rm -f conftest.cs
+		rm -f conftest.exe
 	else
 		HAVE_MONO=""
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
