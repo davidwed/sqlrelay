@@ -3526,7 +3526,7 @@ then
 	then
 
 		BASECSCFLAGS="$CSCFLAGS"
-		for flags in "" "$MONOPATH/lib/mono/2.0"
+		for flags in "" "$MONOPATH/lib/mono/4.5" "$MONOPATH/lib/mono/4.0" "$MONOPATH/lib/mono/3.5" "$MONOPATH/lib/mono/2.0"
 		do
 
 			CSCFLAGS="$BASECSCFLAGS $flags"
