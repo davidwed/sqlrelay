@@ -295,14 +295,22 @@ AC_ARG_WITH(erlang-prefix,
 	ERLANGPATH="$withval",
 	ERLANGPATH="")
 AC_ARG_ENABLE(erlang,
-	[  --disable-erlang              Don't build ERLANG api],
+	[  --disable-erlang              Don't build Erlang api],
 	ENABLE_ERLANG="",
 	ENABLE_ERLANG="yes")
 AC_ARG_ENABLE(erlang-rpath,
-	[  --enable-erlang-rpath         Use -rpath when linking the ERLANG library against the SQL Relay client library],
+	[  --enable-erlang-rpath         Use -rpath when linking the Erlang library against the SQL Relay client library],
 	ERLANGUSERPATH="yes",
 	ERLANGUSERPATH="")
 AC_SUBST(ERLANGUSERPATH)
+AC_ARG_WITH(mono-prefix,
+	[  --with-mono-prefix            Location of Mono (C#)],
+	MONOPATH="$withval",
+	MONOPATH="")
+AC_ARG_ENABLE(mono,
+	[  --disable-mono                Don't build Mono/C# api],
+	ENABLE_MONO="",
+	ENABLE_MONO="yes")
 AC_ARG_ENABLE(c-rpath,
 	[  --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library],
 	CUSERPATH="yes",
@@ -694,6 +702,13 @@ FW_CHECK_ERLANG
 echo "******************************"
 
 
+dnl Checks for Mono.
+echo
+echo "***** Mono *******************"
+FW_CHECK_MONO
+echo "******************************"
+
+
 
 dnl Checks for header files.
 echo
@@ -831,6 +846,7 @@ PHPPDOBUILD="no "
 JAVABUILD="no "
 TCLBUILD="no "
 ERLANGBUILD="no "
+MONOBUILD="no "
 ODBCBUILD="no "
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
@@ -856,6 +872,9 @@ fi
 if ( test -n "$HAVE_ERLANG" ); then
 	ERLANGBUILD="yes"
 fi
+if ( test -n "$HAVE_MONO" ); then
+	MONOBUILD="yes"
+fi
 if ( test -n "$ODBCLIBS" ); then
 	ODBCBUILD="yes"
 fi
@@ -865,6 +884,7 @@ echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
 echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCBUILD"
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
+echo "                Mono        $MONOBUILD"
 echo ""
 
 ORACLE8BUILD="no     "

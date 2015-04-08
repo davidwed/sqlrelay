@@ -167,9 +167,9 @@ endif
 
 
 # c#
-HAVE_MONO = 
-CSC = mcs
-CSCFLAGS = -pkg:dotnet
+HAVE_MONO = @HAVE_MONO@
+CSC = @CSC@
+CSCFLAGS = @CSCFLAGS@
 
 
 # perl

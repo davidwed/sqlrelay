@@ -3090,6 +3090,7 @@ EOF
 			AC_MSG_RESULT(no)
 			HAVE_JAVA=""
 		fi
+		rm -f conftest.java
 	fi
 
 	if ( test -n "$HAVE_JAVA" )
@@ -3380,6 +3381,89 @@ END
 	AC_SUBST(ERLANG_INSTALL_LIB_DIR)
 fi
 ])
+
+
+AC_DEFUN([FW_CHECK_MONO],
+[
+if ( test "$ENABLE_MONO" = "yes" )
+then
+
+	HAVE_MONO=""
+
+	if ( test "$cross_compiling" = "yes" )
+	then
+
+		dnl cross compiling ...
+		echo "cross compiling..."
+
+	else
+
+		for compiler in "mcs" "gmcs" "dmcs" "smcs"
+		do
+			AC_MSG_CHECKING(for $compiler)
+
+			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+			do
+				if ( test -r "$path/bin/$compiler" )
+				then
+					CSC="$path/bin/$compiler"
+					break;
+				fi
+			done
+
+			if ( test -n "$CSC" )
+			then
+				break
+			fi
+		done
+
+		CSCFLAGS="-pkg:dotnet"
+
+		if ( test -r "$CSC" )
+		then
+			HAVE_MONO="yes"
+			AC_MSG_RESULT($CSC)
+		else
+			AC_MSG_RESULT(no)
+			AC_MSG_WARN(The Mono API will not be built.)
+		fi
+	fi
+
+	if ( test -n "$HAVE_MONO" )
+	then
+		AC_MSG_CHECKING(whether $CSC works)
+		cat << EOF > conftest.cs
+using System;
+using System.Data;
+namespace ConfTest
+{
+    public class ConfTestClass
+    {
+        public static void Main(String[[]] args)
+        {
+            Console.WriteLine("hello world");
+        }
+    }
+}
+EOF
+		$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+		if ( test -r "conftest.exe" )
+		then
+			AC_MSG_RESULT(yes)
+			rm -f conftest.exe
+		else
+			AC_MSG_RESULT(no)
+			HAVE_MONO=""
+		fi
+		rm -f conftest.cs
+	fi
+
+	AC_SUBST(HAVE_MONO)
+	AC_SUBST(CSC)
+	AC_SUBST(CSCFLAGS)
+fi
+])
+
 
 AC_DEFUN([FW_CHECK_TCL],
 [

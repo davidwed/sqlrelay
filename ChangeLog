@@ -57,6 +57,7 @@
 	swapped order of init directory detection, looking for /etc/init.d
 		ahead of /etc/rc.d/init.d to resolve conflict with dkms on
 		SuSE Enterprise
+	C# api and tests compile and work under Mono on unix/linux now
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
