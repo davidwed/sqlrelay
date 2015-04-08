@@ -1094,7 +1094,7 @@ int	main(int argc, char **argv) {
 	// long lobs
 	stdoutput.printf("LONG LOBS: \n");
 	cur->sendQuery("drop table testtable1");
-	cur->sendQuery("create table testtable1 (testtext text, testblob blob)");
+	cur->sendQuery("create table testtable1 (testtext longtext, testblob longblob)");
 	cur->prepareQuery("insert into testtable1 values (?,?)");
 	char	clobval[8*1024+1];
 	char	blobval[8*1024+1];
