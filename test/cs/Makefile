@@ -12,5 +12,4 @@ SQLRClient.dll:
 	$(CP) ../../src/api/cs/SQLRClient.dll.config .
 
 oracle$(EXE): oracle.cs
-	#csc /out:$@ oracle.cs /lib:..\..\src\api\cs /reference:SQLRClient.dll
-	mcs -pkg:dotnet /out:$@ oracle.cs /lib:../../src/api/cs /reference:SQLRClient.dll
+	$(CSC) $(CSCFLAGS) /out:$@ oracle.cs /lib:..\..\src\api\cs /reference:SQLRClient.dll
