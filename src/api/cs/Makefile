@@ -15,26 +15,32 @@ SRCS = SQLRConnection.cs \
 	SQLRelayType.cs \
 	AssemblyInfo.cs
 
-all: SQLRClient.dll
+all: SQLRClient.dll SQLRClient.dll.config
 
 clean:
-	$(RM) *.dll *.pdb SQLRConnection.cs SQLRCursor.cs
+	$(RM) *.dll *.pdb SQLRClient.dll.config
 
-SQLRConnection.cs: SQLRConnection.cs.in
-	#$(REPLACE) @LIBEXT@ $(SOSUFFIX) SQLRConnection.cs.in > SQLRConnection.cs
-	$(REPLACE) @LIBEXT@ dll SQLRConnection.cs.in > SQLRConnection.cs
-
-SQLRCursor.cs: SQLRCursor.cs.in
-	#$(REPLACE) @LIBEXT@ $(SOSUFFIX) SQLRCursor.cs.in > SQLRCursor.cs
-	$(REPLACE) @LIBEXT@ dll SQLRCursor.cs.in > SQLRCursor.cs
+SQLRClient.dll.config: SQLRClient.dll.config.in
+	$(REPLACE) @SQLR_VERSION@ $(SQLR_VERSION) SQLRClient.dll.config.in > SQLRClient.dll.config
 
 SQLRClient.dll: $(SRCS)
-	#csc /optimize /target:library /out:$@ $(SRCS)
-	mcs -pkg:dotnet /optimize /target:library /out:$@ $(SRCS)
+	$(CSC) $(CSCFLAGS) /optimize /target:library /out:$@ $(SRCS)
 
-install:
-	$(MKINSTALLDIRS) $(bindir)
-	$(CP) SQLRClient.dll $(bindir)
+install: $(INSTALLLIB)
 
-uninstall:
-	$(RM) $(bindir)/SQLRClient.dll
+installlib:
+	$(MKINSTALLDIRS) $(monodir)
+	$(CP) SQLRClient.dll $(monodir)
+	$(CP) SQLRClient.dll.config $(monodir)
+
+installdll:
+	$(MKINSTALLDIRS) $(monodir)
+	$(CP) SQLRClient.dll $(monodir)
+
+uninstall: $(UNINSTALLLIB)
+
+uninstalllib:
+	$(RMTREE) $(monodir)
+
+uninstalldll:
+	$(RM) $(monodir)/SQLRClient.dll*

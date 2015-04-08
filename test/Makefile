@@ -9,6 +9,7 @@ all:
 clean:
 	cd c $(AND) $(MAKE) clean
 	cd c++ $(AND) $(MAKE) clean
+	cd cs $(AND) $(MAKE) clean
 	cd java $(AND) $(MAKE) clean
 	cd perl $(AND) $(MAKE) clean
 	cd python $(AND) $(MAKE) clean

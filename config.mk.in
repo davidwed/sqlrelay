@@ -9,6 +9,7 @@ exec_prefix= @exec_prefix@
 includedir = @includedir@
 libdir = @libdir@
 javadir = ${exec_prefix}/java
+monodir = ${exec_prefix}/mono
 libexecdir = @libexecdir@/sqlrelay
 bindir = @bindir@
 localstatedir = @localstatedir@
@@ -163,6 +164,12 @@ ifeq ($(CUSERPATH),yes)
 CLIBS += -R $(libdir)
 endif
 endif
+
+
+# c#
+HAVE_MONO = 
+CSC = mcs
+CSCFLAGS = -pkg:dotnet
 
 
 # perl
@@ -779,6 +786,12 @@ APIALLSUBDIRS = all-cpp all-c
 APICLEANSUBDIRS = clean-cpp clean-c
 APIINSTALLSUBDIRS = install-cpp install-c
 APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c
+ifneq ($(HAVE_MONO),)
+APIALLSUBDIRS += all-cs
+APICLEANSUBDIRS += clean-cs
+APIINSTALLSUBDIRS += install-cs
+APIUNINSTALLSUBDIRS += uninstall-cs
+endif
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 APIALLSUBDIRS += all-postgresql all-mysql
 APICLEANSUBDIRS += clean-postgresql clean-mysql

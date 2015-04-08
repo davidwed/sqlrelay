@@ -9,6 +9,7 @@ exec_prefix= @exec_prefix@
 includedir = @includedir@
 libdir = @libdir@
 javadir = @javadir@
+monodir = @bindir@
 libexecdir = @libexecdir@
 bindir = @bindir@
 localstatedir = @localstatedir@
@@ -138,6 +139,11 @@ CPPLIBS = $(RUDIMENTSLIBS)
 # c
 CCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRCLIENTWRAPPER_EXPORTS /I$(top_builddir) /I./ /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES)
 CLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+
+
+# c#
+CSC = csc
+CSCFLAGS =
 
 
 # perl
