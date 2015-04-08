@@ -15,17 +15,26 @@ SRCS = SQLRConnection.cs \
 	SQLRelayType.cs \
 	AssemblyInfo.cs
 
-all: SQLRClient.$(LIBEXT)
+all: SQLRClient.dll
 
 clean:
-	$(RM) *.$(LIBEXT) *.pdb
+	$(RM) *.dll *.pdb SQLRConnection.cs SQLRCursor.cs
 
-SQLRClient.$(LIBEXT): $(SRCS)
-	csc /optimize /target:library /out:$@ $(SRCS)
+SQLRConnection.cs: SQLRConnection.cs.in
+	#$(REPLACE) @LIBEXT@ $(SOSUFFIX) SQLRConnection.cs.in > SQLRConnection.cs
+	$(REPLACE) @LIBEXT@ dll SQLRConnection.cs.in > SQLRConnection.cs
+
+SQLRCursor.cs: SQLRCursor.cs.in
+	#$(REPLACE) @LIBEXT@ $(SOSUFFIX) SQLRCursor.cs.in > SQLRCursor.cs
+	$(REPLACE) @LIBEXT@ dll SQLRCursor.cs.in > SQLRCursor.cs
+
+SQLRClient.dll: $(SRCS)
+	#csc /optimize /target:library /out:$@ $(SRCS)
+	mcs -pkg:dotnet /optimize /target:library /out:$@ $(SRCS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(CP) SQLRClient.$(LIBEXT) $(bindir)
+	$(CP) SQLRClient.dll $(bindir)
 
 uninstall:
-	$(RM) $(bindir)/SQLRClient.$(LIBEXT)
+	$(RM) $(bindir)/SQLRClient.dll
