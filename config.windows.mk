@@ -146,6 +146,7 @@ CSC = csc
 CSCFLAGS =
 SN = sn
 ILDASM = ildasm
+ILDASMOUT = /out=
 ILASM = ilasm
 GACUTIL = gacutil
 

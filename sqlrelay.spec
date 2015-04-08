@@ -39,12 +39,8 @@ Buildroot: %{_tmppath}/%{name}-root
 
 %define docdir %{_docdir}/%{name}
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
-	%define initscript1 /etc/init.d/sqlrelay
-	%define initscript2 /etc/init.d/sqlrcachemanager
 	%define phpconfdir /etc/php5/conf.d
 %else
-	%define initscript1 /etc/rc.d/init.d/sqlrelay
-	%define initscript2 /etc/rc.d/init.d/sqlrcachemanager
 	%define phpconfdir /etc/php.d
 %endif
 
@@ -394,8 +390,8 @@ rm -rf %{buildroot}
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
-%{initscript1}
-%{initscript2}
+%{/etc/init.d/sqlrelay}
+%{/etc/init.d/sqlrcachemanager}
 %{_bindir}/sqlr-cachemanager*
 %{_bindir}/sqlr-listener*
 %{_bindir}/sqlr-connection*

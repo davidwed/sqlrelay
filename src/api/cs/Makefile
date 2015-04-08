@@ -33,7 +33,7 @@ keyPair.snk:
 	$(SN) -k keyPair.snk
 
 SQLRClient.il: SQLRClient.dll.in keyPair.snk
-	$(ILDASM) SQLRClient.dll.in > SQLRClient.il
+	$(ILDASM) SQLRClient.dll.in $(ILDASMOUT)SQLRClient.il
 
 SQLRClient.dll: SQLRClient.il
 	$(ILASM) SQLRClient.il /dll /key=keyPair.snk
