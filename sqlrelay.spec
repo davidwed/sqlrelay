@@ -23,6 +23,7 @@
 # --without ruby
 # --without tcl
 # --without erlang
+# --without mono
 
 Summary: Persistent database connection system.
 Name: sqlrelay
@@ -56,6 +57,7 @@ BuildRequires: rudiments-devel
 %{!?_without_ruby:BuildRequires: ,ruby-devel}
 %{!?_without_tcl:BuildRequires: ,tcl-devel}
 %{!?_without_erlang:BuildRequires: ,erlang}
+%{!?_without_mono:BuildRequires: ,mono-devel,mono-data}
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL and Erlang, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
@@ -279,6 +281,14 @@ Group: Development/Languages
 SQL Relay modules for Erlang.
 
 
+%package mono
+Summary: SQL Relay modules for Mono.
+Group: Development/Languages
+
+%description mono
+SQL Relay modules for Mono.
+
+
 %package doc
 Summary: Documentation for SQL Relay.
 Group: Applications/Database
@@ -336,6 +346,7 @@ Man pages for SQL Relay.
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_erlang:	--disable-erlang} \
+	%{?_without_mono:	--disable-mono} \
 	%{?_without_perl:	--disable-perl} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
@@ -569,6 +580,11 @@ rm -rf %{buildroot}
 %{!?_without_erlang:%files erlang}
 %{!?_without_erlang:%defattr(-, root, root)}
 %{!?_without_erlang:%{erlangdir}/sqlrelay-%{version}}
+
+%{!?_without_mono:%files mono}
+%{!?_without_mono:%defattr(-, root, root)}
+%{!?_without_mono:%{_libdir}/SQLRClient.dll}
+%{!?_without_mono:%{_libdir}/SQLRClient.dll.config}
 
 %files doc
 %{_docdir}/%{name}
