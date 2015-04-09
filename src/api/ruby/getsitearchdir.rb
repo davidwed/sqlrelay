@@ -20,7 +20,7 @@ print $libdir.sub(drive, "").sub("$(DESTDIR)","")
 print "\n"
 if CONFIG["RUBY_BASE_NAME"]!=nil then
 	print "RUBY_BASE_NAME = "
-	print CONFIG["RUBY_BASE_NAME"].sub(drive, "")
+	print CONFIG["RUBY_BASE_NAME"]
 	print "\n"
 end
 if CONFIG["rubylibprefix"]!=nil then
