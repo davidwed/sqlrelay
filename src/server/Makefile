@@ -96,7 +96,7 @@ sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../connections/*/*connection.$(OBJ)`; \
+	for file in `ls ../connections/*/*connection.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -104,7 +104,7 @@ sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 
 sqlrserverconnectionassignments.cpp: sqlrserverconnectionassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../connections/*/*connection.$(OBJ)`; \
+	for file in `ls ../connections/*/*connection.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -112,7 +112,7 @@ sqlrserverconnectionassignments.cpp: sqlrserverconnectionassignments.cpp.in
 
 sqlrprotocoldeclarations.cpp: sqlrprotocoldeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../protocols/*.$(OBJ)`; \
+	for file in `ls ../protocols/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -120,7 +120,7 @@ sqlrprotocoldeclarations.cpp: sqlrprotocoldeclarations.cpp.in
 
 sqlrprotocolassignments.cpp: sqlrprotocolassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../protocols/*.$(OBJ)`; \
+	for file in `ls ../protocols/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -128,7 +128,7 @@ sqlrprotocolassignments.cpp: sqlrprotocolassignments.cpp.in
 
 sqlrparserdeclarations.cpp: sqlrparserdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../parsers/*.$(OBJ) | grep -v sqlre`; \
+	for file in `ls ../parsers/*.$(OBJ) | grep -v sqlre`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -136,7 +136,7 @@ sqlrparserdeclarations.cpp: sqlrparserdeclarations.cpp.in
 
 sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../parsers/*.$(OBJ) | grep -v sqlre`; \
+	for file in `ls ../parsers/*.$(OBJ) | grep -v sqlre`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -144,7 +144,7 @@ sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
 
 sqlrloggerdeclarations.cpp: sqlrloggerdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../loggers/*.$(OBJ)`; \
+	for file in `ls ../loggers/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -152,7 +152,7 @@ sqlrloggerdeclarations.cpp: sqlrloggerdeclarations.cpp.in
 
 sqlrloggerassignments.cpp: sqlrloggerassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../loggers/*.$(OBJ)`; \
+	for file in `ls ../loggers/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -160,7 +160,7 @@ sqlrloggerassignments.cpp: sqlrloggerassignments.cpp.in
 
 sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../pwdencs/*.$(OBJ)`; \
+	for file in `ls ../pwdencs/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -168,7 +168,7 @@ sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
 
 sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../pwdencs/*.$(OBJ)`; \
+	for file in `ls ../pwdencs/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -176,7 +176,7 @@ sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
 
 sqlrauthdeclarations.cpp: sqlrauthdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../auths/*.$(OBJ)`; \
+	for file in `ls ../auths/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -184,7 +184,7 @@ sqlrauthdeclarations.cpp: sqlrauthdeclarations.cpp.in
 
 sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../auths/*.$(OBJ)`; \
+	for file in `ls ../auths/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -192,7 +192,7 @@ sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
 
 sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../../queries/*.$(OBJ)`; \
+	for file in `ls ../queries/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -200,7 +200,7 @@ sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 
 sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../../queries/*.$(OBJ)`; \
+	for file in `ls ../queries/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
