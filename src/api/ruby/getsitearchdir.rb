@@ -18,6 +18,12 @@ print "\n"
 print "libdir = "
 print $libdir.sub(drive, "").sub("$(DESTDIR)","")
 print "\n"
+print "RUBY_BASE_NAME = "
+print CONFIG["RUBY_BASE_NAME"].sub(drive, "")
+print "\n"
+print "rubylibprefix = "
+print CONFIG["rubylibprefix"].sub(drive, "").sub("$(DESTDIR)","")
+print "\n"
 print "rubylibdir = "
 print $rubylibdir.sub(drive, "").sub("$(DESTDIR)","")
 print "\n"
