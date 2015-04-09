@@ -498,13 +498,13 @@ STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrauthassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp
-STATICPLUGINLOBJS = $(shell ls ../../connections/*/*.$(OBJ)) \
-		$(shell ls ../../protocols/*.$(OBJ)) \
-		$(shell ls ../../parsers/*.$(OBJ)) \
-		$(shell ls ../../loggers/*.$(OBJ)) \
-		$(shell ls ../../pwdencs/*.$(OBJ)) \
-		$(shell ls ../../auths/*.$(OBJ)) \
-		$(shell ls ../../queries/*.$(OBJ))
+STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
+		$(shell ls ../protocols/*.$(OBJ)) \
+		$(shell ls ../parsers/*.$(OBJ)) \
+		$(shell ls ../loggers/*.$(OBJ)) \
+		$(shell ls ../pwdencs/*.$(OBJ)) \
+		$(shell ls ../auths/*.$(OBJ)) \
+		$(shell ls ../queries/*.$(OBJ))
 STATICPLUGINLIBS =
 ifneq ($(strip $(DB2LIBSPATH)),)
 ifeq ($(DB2USERPATH),yes)

@@ -96,7 +96,7 @@ sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../connections/*/*connection.$(OBJ)`; \
+	for file in `ls ../connections/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -104,7 +104,7 @@ sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 
 sqlrserverconnectionassignments.cpp: sqlrserverconnectionassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../connections/*/*connection.$(OBJ)`; \
+	for file in `ls ../connections/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
