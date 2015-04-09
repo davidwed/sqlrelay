@@ -555,7 +555,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=strdup(con->getConnectionSocket());
+	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
@@ -571,7 +571,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=strdup(con->getConnectionSocket());
+	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
@@ -587,7 +587,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=strdup(con->getConnectionSocket());
+	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
@@ -608,7 +608,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=strdup(con->getConnectionSocket());
+	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
 	stdoutput.printf("\n");
@@ -632,7 +632,7 @@ int	main(int argc, char **argv) {
 	cur->cacheToFile("cachefile1");
 	cur->setCacheTtl(200);
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),1);
-	filename=strdup(cur->getCacheFileName());
+	filename=charstring::duplicate(cur->getCacheFileName());
 	checkSuccess(filename,"cachefile1");
 	cur->cacheOff();
 	checkSuccess(cur->openCachedResultSet(filename),1);
@@ -663,7 +663,7 @@ int	main(int argc, char **argv) {
 	cur->cacheToFile("cachefile1");
 	cur->setCacheTtl(200);
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),1);
-	filename=strdup(cur->getCacheFileName());
+	filename=charstring::duplicate(cur->getCacheFileName());
 	checkSuccess(filename,"cachefile1");
 	cur->cacheOff();
 	checkSuccess(cur->openCachedResultSet(filename),1);
@@ -699,13 +699,13 @@ int	main(int argc, char **argv) {
 	cur->setCacheTtl(200);
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),1);
 	checkSuccess(cur->getField(2,(uint32_t)0),"3");
-	filename=strdup(cur->getCacheFileName());
+	filename=charstring::duplicate(cur->getCacheFileName());
 	checkSuccess(filename,"cachefile1");
 	id=cur->getResultSetId();
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=strdup(con->getConnectionSocket());
+	socket=charstring::duplicate(con->getConnectionSocket());
 	stdoutput.printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);
@@ -758,7 +758,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=strdup(con->getConnectionSocket());
+	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),NULL);

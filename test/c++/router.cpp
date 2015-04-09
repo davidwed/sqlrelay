@@ -920,7 +920,7 @@ int	main(int argc, char **argv) {
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
-	socket=strdup(con->getConnectionSocket());
+	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),NULL);
