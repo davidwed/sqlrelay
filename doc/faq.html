@@ -820,8 +820,7 @@ delete cur;
 <p>There is an exception to this is with Oracle.  Since Oracle exposes cursor variables directly, and each cursor variable can be bound to a client-side cursor, one result set can be fetched from each cursor variable exposed by a stored procedure.</p>
 
 <br><a name="returning"></a>
-<span class="heading3">How do I get data out of DML with RETURNING 
-clauses?</span>
+<span class="heading3">How do I get data out of DML with RETURNING clauses?</span>
 
 <p>You can use output bind variables to get data out of DML with RETURNING clauses if the values returned are scalar.  For example:</p>
 
@@ -834,11 +833,23 @@ insert into testtable values ("one",2) returning :first, :second
 <br><a name="temptables"></a>
 <span class="heading3">Do temporary tables work with SQL Relay?</span>
 
-<p>Yes.  Support for PostgreSQL temporary tables was added in version 0.34 and support for all other databases was added in 0.35.</p>
+<p>Yes.</p>
 
-<p>The reason temporary tables are an issue is because normally temporary tables are either dropped or truncated when an application closes its connection to the database or commits/rolls-back a transaction.   Transaction-scope tables work naturally with SQL Relay.  But, since SQL Relay never logs out of the database, the database doesn't know to drop or truncate tables when an application closes its connection to SQL Relay.  To remedy this, SQL Relay parses each query according to the rules for creating a temporary table for the database that it is connected to and keeps a list of temporary tables.  Then, when the application closes its connection, SQL Relay drops or truncates the tables as appropriate.</p>
+<p>There are two classes of temporary tables: "regular temporary tables" and "global temporary tables".  Both present problems to connection pooling systems.  SQL Relay manages each in different ways.</p>
 
-<p>In Oracle, temporary tables are never dropped when the session or transaction ends, only truncated.  Transaction-scope tables are handled naturally by the database, but session-scope tables must be handled by SQL Relay.  In other databases, a create table query would have to have been issued but not with Oracle.  SQL Relay only knows to truncate the table if a create table query was issued.  So, when using session-scope tables in Oracle, you should issue a create table query, even if you know the table already exists.  The query will fail, but SQL Relay will know to truncate the table when the session ends.</p>
+<p>"Regular temporary tables" are dropped when an application commits or rolls-back the transaction they were created in, or closes its connection to the database.   The database itself drops temporary tables when a commit or rollback is issued, so there is no problem there.  But, since SQL Relay never logs out of the database and doesn't necessarily issue a commit or rollback at the end of the client session, the database doesn't know to drop the tables when the client disconnects.</p>
+
+<p>To remedy this, SQL Relay watches the queries that are run and builds a list of the temporary tables that were created during the session.  Then, when the client closes its connection, SQL Relay drops each of these tables.</p>
+
+<p>"Global temporary tables" more complex.  They are never automatically dropped.  Whether they are truncated during a commit or rollback depends on whether or not they were created with an "on commit preserve rows" clause.  They are always truncated when an application closes its connection to the database though.</p>
+
+<p>As with regular temporary tables, the database handles whatever is supposed to happen when a commit or rollback is issued.  But, as with regular temporary tables, since SQL Relay never logs out of the database and doesn't necessarily issue a commit or rollback and the end of the client session, the database doesn't know to drop the tables when the client disconnects.</p>
+
+<p>To remedy this, as it does with regular temporary tables, SQL Relay watches the queries that are run and builds a list of the global temporary tables that are created during the session.  Then, when the client closes its connection, SQL Relay truncates each of these tables.</p>
+
+<p>But unlike regular temporary tables, global temporary tables that were created outside of the current session (or outside of SQL Relay entirely) may need to be truncated at the end of the session as well.  Since SQL Relay didn't track the creation of these, it doesn't know to truncate them.</p>
+
+<p>To manage this, for databases that support global temporary tables (currently Oracle and Firebird), there's a <b>globaltemptables</b> parameter in the sqlrelay.conf file that can be set to either % or a comma-delimited list of tables.  If set to %, then SQL Relay queries the database for a list of global temporary tables at the end of each session, and truncates all of them.  If set to a comma-delimited list of tables, then only the tables in the list are truncated.  If omitted, then only the tables that were created during the session are truncated.  Using % rather than a list is more flexible, but using a list performs substantially better.  See the <a href="admin/configreference.html">SQL Relay Configuration Reference</a> for more information about this parameter.</p>
 
 <br><a name="threadsafe"></a>
 <span class="heading3">Is the SQL Relay API thread-safe?</span>
