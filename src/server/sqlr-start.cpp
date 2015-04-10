@@ -8,6 +8,11 @@
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
+#ifdef _WIN32
+	#include <stdio.h>
+	#include <io.h>
+#endif
+
 // for ceil()
 #include <math.h>
 
@@ -252,6 +257,34 @@ int main(int argc, const char **argv) {
 	const char	*config=cmdl.getConfig();
 	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
 
+	// on Windows, open a new console window and redirect everything to it
+	#ifdef _WIN32
+	fclose(stdin);
+	fclose(stdout);
+	fclose(stderr);
+	FreeConsole();
+	AllocConsole();
+	stringbuffer	title;
+	title.append("SQL Relay");
+	if (id && id[0]) {
+		title.append(" - ");
+		title.append(id);
+	}
+	SetConsoleTitle(title.getString());
+	*stdin=*(_fdopen(_open_osfhandle(
+				(long)GetStdHandle(STD_INPUT_HANDLE),
+				_O_TEXT),"r"));
+	setvbuf(stdin,NULL,_IONBF,0);
+	*stdout=*(_fdopen(_open_osfhandle(
+				(long)GetStdHandle(STD_OUTPUT_HANDLE),
+				_O_TEXT),"w"));
+	setvbuf(stdout,NULL,_IONBF,0);
+	*stderr=*(_fdopen(_open_osfhandle(
+				(long)GetStdHandle(STD_ERROR_HANDLE),
+				_O_TEXT),"w"));
+	setvbuf(stderr,NULL,_IONBF,0);
+	#endif
+
 	// are we running on windows
 	iswindows=!charstring::compareIgnoringCase(
 				sys::getOperatingSystemName(),"Windows");
@@ -295,7 +328,7 @@ int main(int argc, const char **argv) {
 	stdoutput.printf("	Perl API.\n");
 	stdoutput.printf("Thanks to FeedLounge for sponsoring: \n");
 	stdoutput.printf("	Query routing and filtering.\n");*/
-	
+
 	// successful exit
 	process::exit(exitstatus);
 }

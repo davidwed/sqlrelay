@@ -58,6 +58,7 @@
 		ahead of /etc/rc.d/init.d to resolve conflict with dkms on
 		SuSE Enterprise
 	C# api and tests compile and work under Mono on unix/linux now
+	sqlr-start spawns a new window on Windows now
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
