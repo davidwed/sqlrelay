@@ -143,6 +143,8 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	reformattedfield=NULL;
 	reformattedfieldlength=0;
 
+	allglobaltemptables=false;
+
 	proxymode=false;
 	proxypid=0;
 
@@ -213,6 +215,12 @@ sqlrservercontroller::~sqlrservercontroller() {
 	}
 
 	delete[] reformattedfield;
+
+	for (singlylinkedlistnode< char * >
+			*sln=globaltemptables.getFirst();
+						sln; sln=sln->getNext()) {
+		delete[] sln->getValue();
+	}
 
 	delete conn;
 }
@@ -2108,6 +2116,10 @@ const char *sqlrservercontroller::getTableListQuery(bool wild) {
 	return conn->getTableListQuery(wild);
 }
 
+const char *sqlrservercontroller::getGlobalTempTableListQuery() {
+	return conn->getGlobalTempTableListQuery();
+}
+
 const char *sqlrservercontroller::getColumnListQuery(const char *table,
 								bool wild) {
 	return conn->getColumnListQuery(table,wild);
@@ -3910,6 +3922,45 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 		delete[] sln->getValue();
 	}
 	sessiontemptablesfortrunc.clear();
+
+	// truncate global temp tables...
+
+	// all tables...
+	if (allglobaltemptables) {
+
+		const char	*tablename=NULL;
+		uint64_t	fieldlength;
+		bool		blob;
+		bool		null;
+		const char	*query=getGlobalTempTableListQuery();
+
+		sqlrservercursor	*gttcur=newCursor();
+		if (open(gttcur) &&
+			prepareQuery(gttcur,query,charstring::length(query)) &&
+			executeQuery(gttcur)) {
+
+			while (fetchRow(gttcur)) {
+				getField(gttcur,0,
+					&tablename,&fieldlength,&blob,&null);
+				truncateTempTable(cursor,tablename);
+
+				// FIXME: kludgy
+				nextRow(gttcur);
+			}
+		}
+		closeResultSet(gttcur);
+		close(gttcur);
+		deleteCursor(gttcur);
+
+		return;
+	}
+
+	// specific tables...
+	for (singlylinkedlistnode< char * >
+			*sln=globaltemptables.getFirst();
+						sln; sln=sln->getNext()) {
+		truncateTempTable(cursor,sln->getValue());
+	}
 }
 
 void sqlrservercontroller::truncateTempTable(sqlrservercursor *cursor,
@@ -4934,6 +4985,24 @@ void sqlrservercontroller::addSessionTempTableForDrop(const char *table) {
 
 void sqlrservercontroller::addTransactionTempTableForDrop(const char *table) {
 	transtemptablesfordrop.append(charstring::duplicate(table));
+}
+
+void sqlrservercontroller::addGlobalTempTables(const char *gtts) {
+
+	// all tables
+	if (!charstring::compare(gtts,"%")) {
+		allglobaltemptables=true;
+		return;
+	}
+
+	// specific tables
+	char		**gttlist=NULL;
+	uint64_t	gttlistcount=0;
+	charstring::split(gtts,",",true,&gttlist,&gttlistcount);
+	for (uint64_t i=0; i<gttlistcount; i++) {
+		globaltemptables.append(gttlist[i]);
+	}
+	delete[] gttlist;
 }
 
 void sqlrservercontroller::addSessionTempTableForTrunc(const char *table) {

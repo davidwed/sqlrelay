@@ -563,6 +563,10 @@ const char *sqlrserverconnection::getTableListQuery(bool wild) {
 	return "select 1";
 }
 
+const char *sqlrserverconnection::getGlobalTempTableListQuery() {
+	return NULL;
+}
+
 const char *sqlrserverconnection::getColumnListQuery(const char *table,
 								bool wild) {
 	return "select 1";

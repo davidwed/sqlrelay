@@ -59,6 +59,9 @@
 		SuSE Enterprise
 	C# api and tests compile and work under Mono on unix/linux now
 	sqlr-start spawns a new window on Windows now
+	added global temp table tracking for firebird
+	added droptemptables parameter for firebird
+	added globaltemptables parameter for oracle and firebird
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

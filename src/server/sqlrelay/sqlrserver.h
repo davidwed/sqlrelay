@@ -372,6 +372,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						sqlrservercursor *cursor);
 
 		// temp tables
+		void	addGlobalTempTables(const char *gtts);
 		void	addSessionTempTableForDrop(const char *tablename);
 		void	addSessionTempTableForTrunc(const char *tablename);
 		void	addTransactionTempTableForDrop(const char *tablename);
@@ -397,6 +398,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						const char *wild);
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
+		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(const char *table,
 								bool wild);
 
@@ -633,6 +635,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						const char *wild);
 		virtual const char	*getDatabaseListQuery(bool wild);
 		virtual const char	*getTableListQuery(bool wild);
+		virtual const char	*getGlobalTempTableListQuery();
 		virtual const char	*getColumnListQuery(
 						const char *table,
 						bool wild);
@@ -787,7 +790,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual void	checkForTempTable(const char *query,
 							uint32_t length);
 		virtual	const char	*truncateTableQuery();
-		virtual	bool	executeQuery(const char *query,
+		virtual	bool		executeQuery(const char *query,
 							uint32_t length);
 		virtual bool	fetchFromBindCursor();
 		virtual	bool	queryIsNotSelect();

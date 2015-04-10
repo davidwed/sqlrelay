@@ -153,6 +153,8 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
+		void		checkForTempTable(const char *query,
+							uint32_t length);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
 		bool		knowsAffectedRows();
@@ -202,6 +204,8 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 
 		bool	queryisexecsp;
 		bool	bindformaterror;
+
+		regularexpression	preserverows;
 };
 
 class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
@@ -229,6 +233,7 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
+		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*bindFormat();
@@ -244,6 +249,8 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		unsigned short	dialect;
 
 		const char	*charset;
+
+		bool		droptemptables;
 
 		char		*dbversion;
 
@@ -317,6 +324,12 @@ void firebirdconnection::handleConnectString() {
 		!charstring::compare(
 			cont->getConnectStringValue("faketransactionblocks"),
 			"yes"));
+
+	droptemptables=!charstring::compare(
+			cont->getConnectStringValue("droptemptables"),"yes");
+
+	cont->addGlobalTempTables(
+			cont->getConnectStringValue("globaltemptables"));
 
 	const char	*lastinsertidfunc=
 			cont->getConnectStringValue("lastinsertidfunction");
@@ -556,6 +569,17 @@ const char *firebirdconnection::getTableListQuery(bool wild) {
 		"	rdb$relation_name";
 }
 
+const char *firebirdconnection::getGlobalTempTableListQuery() {
+	return "select "
+		"	rdb$relation_name "
+		"from "
+		"	rdb$relations "
+		"where "
+		"	rdb$system_flag=0 "
+		"	and "
+		"	rdb$relation_type=4 ";
+}
+
 const char *firebirdconnection::getColumnListQuery(
 					const char *table, bool wild) {
 	return (wild)?
@@ -673,6 +697,11 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	bindformaterror=false;
 
 	outbindcount=0;
+
+	createtemp.compile("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
+	createtemp.study();
+	preserverows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(preserve|PRESERVE)[ 	\\n\\r]+(rows|ROWS)");
+	preserverows.study();
 }
 
 firebirdcursor::~firebirdcursor() {
@@ -1320,6 +1349,11 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 
 	// handle non-stored procedures...
 
+	// check for create temp table query
+	if (querytype==isc_info_sql_stmt_ddl) {
+		checkForTempTable(query,length);
+	}
+
 	// describe the cursor
 	outsqlda->sqld=0;
 	if (isc_dsql_describe(firebirdconn->error,&stmt,1,outsqlda)) {
@@ -1472,6 +1506,50 @@ void firebirdcursor::errorMessage(char *errorbuffer,
 					errorlength,
 					errorcode,
 					liveconnection);
+}
+
+void firebirdcursor::checkForTempTable(const char *query, uint32_t length) {
+
+	const char	*ptr=query;
+	const char	*endptr=query+length;
+
+	// skip any leading whitespace and comments
+	ptr=conn->cont->skipWhitespaceAndComments(query);
+	if (!(*ptr)) {
+		return;
+	}
+
+	// look for "create global temporary table "
+	if (createtemp.match(ptr)) {
+		ptr=createtemp.getSubstringEnd(0);
+	} else {
+		return;
+	}
+
+	// get the table name
+	stringbuffer	tablename;
+	while (ptr && *ptr && *ptr!=' ' &&
+		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
+		tablename.append(*ptr);
+		ptr++;
+	}
+
+	// look for "on commit preserve rows"
+	bool	preserverowsoncommit=preserverows.match(ptr);
+
+	if (firebirdconn->droptemptables) {
+
+		// if "droptemptables" was specified...
+		conn->cont->addSessionTempTableForDrop(tablename.getString());
+
+	} else if (preserverowsoncommit) {
+
+		// If "on commit preserve rows" was specified, then when
+		// the commit/rollback is executed at the end of the
+		// session, the data won't be truncated.  It needs to
+		// be though, so we'll set it up to be truncated manually.
+		conn->cont->addSessionTempTableForTrunc(tablename.getString());
+	}
 }
 
 bool firebirdcursor::queryIsNotSelect() {

@@ -114,6 +114,7 @@ class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
+		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(
 						const char *table,
 						bool wild);
@@ -404,7 +405,6 @@ class SQLRSERVER_DLLSPEC oracle8cursor : public sqlrservercursor {
 
 #ifdef HAVE_ORACLE_8i
 		regularexpression	preserverows;
-		regularexpression	deleterows;
 #endif
 };
 
@@ -508,6 +508,9 @@ void oracle8connection::handleConnectString() {
 #ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
 			cont->getConnectStringValue("droptemptables"),"yes");
+
+	cont->addGlobalTempTables(
+			cont->getConnectStringValue("globaltemptables"));
 #endif
 
 	rejectduplicatebinds=!charstring::compare(
@@ -1205,6 +1208,27 @@ const char *oracle8connection::getTableListQuery(bool wild) {
 			"	user_tables "
 			"order by "
 			"	table_name";
+	}
+}
+
+const char *oracle8connection::getGlobalTempTableListQuery() {
+	if (supportssyscontext) {
+		return "select "
+			"	table_name "
+			"from "
+			"	all_tables "
+			"where "
+			"	owner=sys_context('userenv','current_schema') "
+			"	and "
+			"	temporary='Y'";
+	} else {
+		return "select "
+			"	table_name, "
+			"	NULL "
+			"from "
+			"	user_tables "
+			"	and "
+			"	temporary='Y'";
 	}
 }
 
@@ -1993,8 +2017,6 @@ oracle8cursor::oracle8cursor(sqlrserverconnection *conn, uint16_t id) :
 #ifdef HAVE_ORACLE_8i
 	createtemp.compile("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
 	createtemp.study();
-	deleterows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(delete|DELETE)[ 	\\n\\r]+(rows|ROWS)");
-	deleterows.study();
 	preserverows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(preserve|PRESERVE)[ 	\\n\\r]+(rows|ROWS)");
 	preserverows.study();
 #endif

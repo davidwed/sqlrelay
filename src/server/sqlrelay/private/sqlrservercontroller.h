@@ -272,6 +272,8 @@
 		static  signalhandler           alarmhandler;
 		static  volatile sig_atomic_t   alarmrang;
 
+		singlylinkedlist< char * >	globaltemptables;
+		bool				allglobaltemptables;
 		singlylinkedlist< char * >	sessiontemptablesfordrop;
 		singlylinkedlist< char * >	sessiontemptablesfortrunc;
 		singlylinkedlist< char * >	transtemptablesfordrop;
