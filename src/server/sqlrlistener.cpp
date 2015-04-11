@@ -433,7 +433,21 @@ void sqlrlistener::setHandoffMethod() {
         	delete[] rel;
 
 	} else {
-		handoffmode=HANDOFF_PROXY;
+
+        	// on some OS'es, force pass, even if proxy was specified...
+
+        	// get the os and version
+        	char    *os=sys::getOperatingSystemName();
+	
+        	// force pass for Windows
+        	if (!charstring::compare(os,"Windows",7)) {
+			handoffmode=HANDOFF_PASS;
+			stderror.printf("Warning: handoff=\"proxy\" not "
+					"supported, falling back to "
+					"handoff=\"pass\".\n");
+		} else {
+			handoffmode=HANDOFF_PROXY;
+		}
 	}
 
 	// create the list of handoff nodes
