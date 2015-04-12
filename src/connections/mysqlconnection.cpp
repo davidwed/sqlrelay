@@ -461,7 +461,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 bool mysqlconnection::changeUser(const char *newuser,
 					const char *newpassword) {
 	return !mysql_change_user(&mysql,newuser,newpassword,
-					(char *)((db && db[0])?db:""));
+					(char *)((db && db[0])?db:NULL));
 }
 #endif
 
