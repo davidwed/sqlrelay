@@ -2,6 +2,7 @@
 // See the file COPYING for more information.
 
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/randomnumber.h>
 #include <rudiments/thread.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
@@ -17,24 +18,30 @@ int		threadcount;
 
 void runQuery(void *id) {
 
-	sqlrconnection	*con=new sqlrconnection(host,port,sock,
-						login,password,0,1);
-	sqlrcursor	*cur=new sqlrcursor(con);
+	uint32_t	seed=(int64_t)id;
 
-	con->debugOn();
-	cur->sendQuery(query);
-	con->endSession();
-	
-	for (uint64_t i=0; i<cur->rowCount(); i++) {
-		stdoutput.printf("%lld  ",(int64_t)id);
-		for (uint32_t j=0; j<cur->colCount(); j++) {
-			stdoutput.printf("\"%s\",",cur->getField(i,j));
+	for (;;) {
+
+		sqlrconnection	sqlrcon(host,port,sock,login,password,0,1);
+		sqlrcursor	sqlrcur(&sqlrcon);
+
+		seed=randomnumber::generateNumber(seed);
+		int32_t	count=randomnumber::scaleNumber(seed,1,20);
+		//count=10;
+								
+		stdoutput.printf("%lld: looping %d times\n",(uint64_t)id,count);
+		int32_t	successcount=0;
+		for (int32_t i=0; i<count; i++) {
+			if (!sqlrcur.sendQuery(query)) {
+				stdoutput.printf("error: %s\n",
+						sqlrcur.errorMessage());
+				//return;
+			} else {
+				successcount++;
+			}
 		}
-		stdoutput.printf("\n");
+		stdoutput.printf("%d: succeeded\n",successcount);
 	}
-
-	delete cur;
-	delete con;
 }
 
 int main(int argc, char **argv) {
@@ -45,6 +52,7 @@ int main(int argc, char **argv) {
 	}
 
 	host="sqlrserver";
+	//host="192.168.123.13";
 	port=9000;
 	sock="/tmp/test.socket";
 	login="test";

@@ -592,12 +592,12 @@ bool sqlrservercontroller::handlePidFile() {
 	if (!charstring::compareIgnoringCase(
 			sys::getOperatingSystemName(),"Windows")) {
 		listenertimeout=100;
-		if (!charstring::compareIgnoringCase(
+		if ((!charstring::compareIgnoringCase(
 				sys::getOperatingSystemArchitecture(),
 				"x86_64") ||
 			!charstring::compareIgnoringCase(
 				sys::getOperatingSystemArchitecture(),
-				"amd64") &&
+				"amd64")) &&
 			sizeof(void *)==4) {
 			listenertimeout=200;
 		}
