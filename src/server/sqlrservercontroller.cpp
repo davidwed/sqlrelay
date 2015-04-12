@@ -585,22 +585,27 @@ bool sqlrservercontroller::handlePidFile() {
 				tmpdir->getString(),cmdl->getId());
 
 	// On most platforms, 1 second is plenty of time to wait for the
-	// listener to come up, but on 64-bit windows, when running 32-bit
-	// apps, listening on an inet socket can take many seconds.
-	uint8_t	listenertimeout=10;
+	// listener to come up, but on windows, it can take a while longer.
+	// On 64-bit windows, when running 32-bit apps, listening on an inet
+	// socket can take an especially long time.
+	uint16_t	listenertimeout=10;
 	if (!charstring::compareIgnoringCase(
-			sys::getOperatingSystemName(),"Windows") &&
-		(!charstring::compareIgnoringCase(
-			sys::getOperatingSystemArchitecture(),"x86_64") ||
-		!charstring::compareIgnoringCase(
-			sys::getOperatingSystemArchitecture(),"amd64")) &&
-		sizeof(void *)==4) {
+			sys::getOperatingSystemName(),"Windows")) {
 		listenertimeout=100;
+		if (!charstring::compareIgnoringCase(
+				sys::getOperatingSystemArchitecture(),
+				"x86_64") ||
+			!charstring::compareIgnoringCase(
+				sys::getOperatingSystemArchitecture(),
+				"amd64") &&
+			sizeof(void *)==4) {
+			listenertimeout=200;
+		}
 	}
 
 	bool	retval=true;
 	bool	found=false;
-	for (uint8_t i=0; !found && i<listenertimeout; i++) {
+	for (uint16_t i=0; !found && i<listenertimeout; i++) {
 		if (i) {
 			snooze::microsnooze(0,100000);
 		}
