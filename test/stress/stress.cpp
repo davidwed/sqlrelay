@@ -135,7 +135,6 @@ int main(int argc, char **argv) {
 	}
 
 	host="sqlrserver";
-	//host="192.168.123.13";
 	port=9000;
 	sock="/tmp/test.socket";
 	login="test";
@@ -143,7 +142,7 @@ int main(int argc, char **argv) {
 	threadcount=charstring::toInteger(argv[1]);
 	cursorcount=charstring::toInteger(argv[2]);
 
-	thread	th[threadcount];
+	thread	*th=new thread[threadcount];
 
 	for (int64_t i=0; i<threadcount; i++) {
 		th[i].setFunction((void *(*)(void *))runQuery,(void *)i);
@@ -153,5 +152,6 @@ int main(int argc, char **argv) {
 	for (int64_t i=0; i<threadcount; i++) {
 		th[i].join(NULL);
 	}
+	delete[] th;
 	process::exit(1);
 }

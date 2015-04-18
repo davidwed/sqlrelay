@@ -1352,11 +1352,12 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 						const char *protocol,
 						thread *thr) {
 
-	uint32_t	connectionpid;
-	uint16_t	inetport;
-	char 		unixportstr[MAXPATHLEN+1];
-	uint16_t	unixportstrlen;
-	bool		retval=false;
+	unixsocketclient	connectionsock;
+	uint32_t		connectionpid;
+	uint16_t		inetport;
+	char 			unixportstr[MAXPATHLEN+1];
+	uint16_t		unixportstrlen;
+	bool			retval=false;
 
 	// loop in case client doesn't get handed off successfully
 	for (;;) {
@@ -1371,7 +1372,6 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 
 		// Get the socket associated with the pid of the
 		// available connection.
-		unixsocketclient	connectionsock;
 		if (!findMatchingSocket(connectionpid,&connectionsock)) {
 			// FIXME: should there be a limit to the number
 			// of times we retry?
@@ -1396,7 +1396,8 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 					sock->getFileDescriptor())) {
 
 				// this could fail if a connection
-				// died because its ttl expired
+				// died because its ttl expired...
+
 				logInternalError("failed to pass "
 						"file descriptor");
 				continue;
@@ -1408,22 +1409,21 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 			if (!proxyClient(connectionpid,&connectionsock,sock)) {
 
 				// this could fail if a connection
-				// died because its ttl expired
+				// died because its ttl expired...
 				continue;
 			}
 		}
 
 		// If we got this far, everything worked.
 		retval=true;
-		
-		// Set the file descriptor to -1, otherwise it will get
-		// closed when connectionsock is freed.  If the file
-		// descriptor gets closed, the next time we try to pass
-		// a file descriptor to the same connection, it will
-		// fail.
-		connectionsock.setFileDescriptor(-1);
 		break;
 	}
+		
+	// Set the file descriptor to -1, otherwise it will get closed when
+	// connectionsock is freed.  If the file descriptor gets closed, the
+	// next time we try to pass a file descriptor to the same connection,
+	// it will fail.
+	connectionsock.setFileDescriptor(-1);
 
 	return retval;
 }

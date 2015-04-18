@@ -3,8 +3,7 @@
 
 int main() {
 
-	//const char	*host="sqlrserver";
-	const char	*host="192.168.123.13";
+	const char	*host="sqlrserver";
 	uint16_t	port=9000;
 
 	inetsocketclient	cl;

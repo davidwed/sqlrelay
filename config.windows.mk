@@ -387,6 +387,9 @@ DROPINTESTTARGETS = mysql postgresql
 DROPINTESTCPPFLAGS = $(BASECPPFLAGS) /I $(top_builddir) /I $(includedir) $(RUDIMENTSINCLUDES)
 DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
+STRESSCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
+STRESSLIBS = /LIBPATH:$(libdir) libsqlrclient.lib $(RUDIMENTSLIBS)
+
 
 # microsoft-specific
 EXE = .exe

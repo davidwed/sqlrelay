@@ -762,6 +762,9 @@ endif
 DROPINTESTCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(includedir) $(RUDIMENTSINCLUDES)
 DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
+STRESSCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
+STRESSLIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
+
 
 # microsoft-specific
 EXE = @EXE@
