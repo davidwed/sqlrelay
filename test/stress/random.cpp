@@ -3,20 +3,14 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
-const char	*host;
-uint16_t	port;
-const  char	*sock;
-const char	*login;
-const char	*password;
-
 int main(int argc, char **argv) {
 
-	//host="sqlrserver";
-	host="192.168.123.13";
-	port=9000;
-	sock="/tmp/test.socket";
-	login="test";
-	password="test";
+	//const char	*host="sqlrserver";
+	const char	*host="192.168.123.13";
+	uint16_t	port=9000;
+	const  char	*sock="/tmp/test.socket";
+	const char	*login="test";
+	const char	*password="test";
 
 	sqlrconnection	sqlrcon(host,port,sock,login,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);

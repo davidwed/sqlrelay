@@ -13,10 +13,7 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
-all: forktest random socketeater threadtest timeouttest
-
-forktest: forktest.cpp forktest.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) forktest.$(OBJ) $(LIBS)
+all: random socketeater stress
 
 random: random.cpp random.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) random.$(OBJ) $(LIBS)
@@ -24,12 +21,9 @@ random: random.cpp random.$(OBJ)
 socketeater: socketeater.cpp socketeater.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) socketeater.$(OBJ) $(LIBS)
 
-threadtest: threadtest.cpp threadtest.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) threadtest.$(OBJ) $(LIBS)
-
-timeouttest: timeouttest.cpp timeouttest.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) timeouttest.$(OBJ) $(LIBS)
+stress: stress.cpp stress.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) stress.$(OBJ) $(LIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest forktest$(EXE) random$(EXE) socketeater$(EXE) threadtest$(EXE) timeouttest$(EXE) cachefile*
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest random$(EXE) socketeater$(EXE) stress$(EXE)
 	$(RMTREE) .libs

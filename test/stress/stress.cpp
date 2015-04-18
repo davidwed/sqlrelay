@@ -47,7 +47,7 @@ void runQuery(void *id) {
 int main(int argc, char **argv) {
 
 	if (argc<3) {
-		stdoutput.printf("usage: threadtest \"query\" threadcount\n");
+		stdoutput.printf("usage: stress \"query\" simultaneous-clients\n");
 		process::exit(1);
 	}
 
