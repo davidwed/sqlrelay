@@ -98,8 +98,12 @@ void runQuery(void *id) {
 			for (int64_t i=0; i<times; i++) {
 				sqlrcursor	**cursors=
 						new sqlrcursor *[cursorcount];
+				cursors[0]=&sqlrcur;
 				for (int64_t j=0; j<cursorcount; j++) {
-					cursors[j]=new sqlrcursor(&sqlrcon);
+					if (j) {
+						cursors[j]=
+						new sqlrcursor(&sqlrcon);
+					}
 					query.clear();
 					query.append("select * from test");
 					query.append(threadid);
@@ -109,7 +113,7 @@ void runQuery(void *id) {
 						cursors[j]->errorMessage());
 					}
 				}
-				for (int32_t j=0; j<cursorcount; j++) {
+				for (int32_t j=1; j<cursorcount; j++) {
 					delete cursors[j];
 				}
 				delete cursors;
