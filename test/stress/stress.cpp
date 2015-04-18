@@ -134,8 +134,8 @@ int main(int argc, char **argv) {
 		process::exit(1);
 	}
 
-	//host="sqlrserver";
-	host="192.168.123.13";
+	host="sqlrserver";
+	//host="192.168.123.13";
 	port=9000;
 	sock="/tmp/test.socket";
 	login="test";
