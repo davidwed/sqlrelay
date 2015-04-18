@@ -13,10 +13,7 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
-all: cursortest forktest query random socketeater threadtest timeouttest
-
-cursortest: cursortest.cpp cursortest.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) cursortest.$(OBJ) $(LIBS)
+all: forktest query random socketeater threadtest timeouttest
 
 forktest: forktest.cpp forktest.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) forktest.$(OBJ) $(LIBS)
@@ -37,5 +34,5 @@ timeouttest: timeouttest.cpp timeouttest.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) timeouttest.$(OBJ) $(LIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest cursortest$(EXE) forktest$(EXE) query$(EXE) random$(EXE) socketeater$(EXE) threadtest$(EXE) timeouttest$(EXE) cachefile*
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest forktest$(EXE) query$(EXE) random$(EXE) socketeater$(EXE) threadtest$(EXE) timeouttest$(EXE) cachefile*
 	$(RMTREE) .libs

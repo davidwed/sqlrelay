@@ -27,7 +27,6 @@ void runQuery(void *id) {
 
 		seed=randomnumber::generateNumber(seed);
 		int32_t	count=randomnumber::scaleNumber(seed,1,20);
-		//count=10;
 								
 		stdoutput.printf("%lld: looping %d times\n",(uint64_t)id,count);
 		int32_t	successcount=0;
@@ -35,12 +34,13 @@ void runQuery(void *id) {
 			if (!sqlrcur.sendQuery(query)) {
 				stdoutput.printf("error: %s\n",
 						sqlrcur.errorMessage());
-				//return;
+				break;
 			} else {
 				successcount++;
 			}
 		}
-		stdoutput.printf("%d: succeeded\n",successcount);
+		stdoutput.printf("%lld: %d succeeded\n",
+						(uint64_t)id,successcount);
 	}
 }
 

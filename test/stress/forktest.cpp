@@ -26,7 +26,6 @@ void	runQuery(uint32_t seed) {
 
 		seed=randomnumber::generateNumber(seed);
 		int32_t	count=randomnumber::scaleNumber(seed,1,20);
-		//count=10;
 								
 		stdoutput.printf("%d: looping %d times\n",
 					process::getProcessId(),count);
@@ -35,12 +34,13 @@ void	runQuery(uint32_t seed) {
 			if (!sqlrcur.sendQuery(query)) {
 				stdoutput.printf("error: %s\n",
 						sqlrcur.errorMessage());
-				//process::exit(0);
+				break;
 			} else {
 				successcount++;
 			}
 		}
-		stdoutput.printf("%d: succeeded\n",successcount);
+		stdoutput.printf("%d: %d succeeded\n",
+					process::getProcessId(),successcount);
 	}
 }
 
@@ -51,7 +51,8 @@ int main(int argc, char **argv) {
 		process::exit(1);
 	}
 
-	host="sqlrserver";
+	//host="sqlrserver";
+	host="192.168.123.13";
 	port=9000;
 	sock="/tmp/test.socket";
 	login="test";
@@ -64,9 +65,7 @@ int main(int argc, char **argv) {
 			datetime	dt;
 			dt.getSystemDateAndTime();
 			runQuery(dt.getEpoch());
-			process::exit(0);
 		}
-		//snooze::microsnooze(0,50000);
-		//process::waitForChildren();
 	}
+	process::exit(0);
 }
