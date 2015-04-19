@@ -286,6 +286,3 @@
 		dictionary< uint32_t, uint32_t >	odbcdatabasescolumnmap;
 		dictionary< uint32_t, uint32_t >	odbctablescolumnmap;
 		dictionary< uint32_t, uint32_t >	odbccolumnscolumnmap;
-
-	public:
-		const char	*debug;
