@@ -36,7 +36,6 @@ signalhandler		sqlrservercontroller::alarmhandler;
 volatile sig_atomic_t	sqlrservercontroller::alarmrang=0;
 
 sqlrservercontroller::sqlrservercontroller() : listener() {
-	debug=NULL;
 
 	conn=NULL;
 
