@@ -65,8 +65,9 @@ void shutDown(int32_t signum) {
 		default:
 			// Other signals are bugs
 			stderror.printf("(pid=%ld) Abnormal termination: "
-					"signal %d received\n",
-					(long)process::getProcessId(),signum);
+					"signal %d received (%s)\n",
+					(long)process::getProcessId(),signum,
+					cont->debug);
 			delete cont;
 			// Now reraise the signal.  We reactivate the signal's
 		   	// default handling, which is to terminate the process.

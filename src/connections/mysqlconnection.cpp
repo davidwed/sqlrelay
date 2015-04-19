@@ -213,6 +213,31 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		void		endSession();
 
 		MYSQL	mysql;
+#ifdef _WIN32
+		// On Unix/Linux, mysql_config tells you what flags to use
+		// when compiling code that uses libmysqlclient and SQL Relay
+		// uses them.  There's no corresponding utility on Windows
+		// though, as far as I know.
+		//
+		// The problem this causes is that libmysqlclient may have been
+		// compiled with flags that caused the mysql strucuture to be
+		// aligned differently, and be larger than this code believes
+		// it is.  As a result, the mysql functions write off of the
+		// end of the structure, overwriting this class' member
+		// variables, and methods of this class overwrite locations
+		// that the mysql functions think are part of the mysql
+		// structure.  This wreaks general havoc.
+		// (see Robert Basler's comment at:
+		// https://dev.mysql.com/doc/refman/5.7/en/mysql-init.html)
+		//
+		// I ran into what appears to have been this issue while
+		// testing version 0.59 against MySQL Connector/C 6.1.5 on
+		// Widnows 7 x64.
+		//
+		// Declaring some padding after the structure appears to have
+		// resolved the issue.  We'll see though...
+		char padding[128];
+#endif
 		bool	connected;
 
 		const char	*db;
@@ -1102,7 +1127,8 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 	
 		// get the affected row count
 		// (call after mysql_stmt_store_result or this will return
-		// -1 when the query is a select)
+		// -1 when the query is a select, which we don't want if
+		// foundrows is enabled)
 		affectedrows=mysql_stmt_affected_rows(stmt);
 
 	} else {
@@ -1153,7 +1179,8 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		// get the affected row count
 		// (call after mysql_stmt_store_result or this will return
-		// -1 when the query is a select)
+		// -1 when the query is a select, which we don't want if
+		// foundrows is enabled)
 		affectedrows=mysql_affected_rows(&mysqlconn->mysql);
 
 #ifdef HAVE_MYSQL_STMT_PREPARE

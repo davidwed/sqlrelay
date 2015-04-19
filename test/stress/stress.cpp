@@ -7,6 +7,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
+#include <rudiments/snooze.h>
 
 const char	*host;
 uint16_t	port;
@@ -33,14 +34,20 @@ void runQuery(void *id) {
 		int32_t		times=0;
 
 		// drop the table (just in case)
-		query.clear();
 		query.append("drop table test")->append(threadid);
-		sqlrcur.sendQuery(query.getString());
+		if (!sqlrcur.sendQuery(query.getString())) {
+			// loop back if we couldn't connect to the listener
+			if (charstring::contains(sqlrcur.errorMessage(),
+					"Couldn't connect to the listener.")) {
+				snooze::macrosnooze(1);
+				continue;
+			}
+		}
 
 		seed=randomnumber::generateNumber(seed);
 
 		int32_t	loopcount=randomnumber::scaleNumber(seed,1,20);
-		stdoutput.printf("%lld: looping %d times\n",id,loopcount);
+		stdoutput.printf("%lld: looping %d times\n",threadid,loopcount);
 
 		for (int32_t l=0; l<loopcount; l++) {
 
@@ -48,7 +55,7 @@ void runQuery(void *id) {
 			seed=randomnumber::generateNumber(seed);
 			colcount=randomnumber::scaleNumber(seed,1,15);
 			stdoutput.printf("%lld: creating table with %d cols\n",
-								id,colcount);
+							threadid,colcount);
 			query.clear();
 			query.append("create table test");
 			query.append(threadid)->append(" (");
@@ -60,15 +67,15 @@ void runQuery(void *id) {
 			}
 			query.append(")");
 			if (!sqlrcur.sendQuery(query.getString())) {
-				stdoutput.printf("%lld: %s\n",
-						id,sqlrcur.errorMessage());
+				stdoutput.printf("%lld: create table - %s\n",
+					threadid,sqlrcur.errorMessage());
 			}
 
 			// populate it with a random number of rows
 			seed=randomnumber::generateNumber(seed);
 			rowcount=randomnumber::scaleNumber(seed,1,100);
 			stdoutput.printf("%lld: populating with %d rows\n",
-								id,rowcount);
+							threadid,rowcount);
 			for (int32_t i=0; i<rowcount; i++) {
 				seed=randomnumber::generateNumber(seed);
 				value=randomnumber::scaleNumber(seed,1,100000);
@@ -83,8 +90,8 @@ void runQuery(void *id) {
 				}
 				query.append(")");
 				if (!sqlrcur.sendQuery(query.getString())) {
-					stdoutput.printf("%lld: %s\n",
-						id,sqlrcur.errorMessage());
+					stdoutput.printf("%lld: insert - %s\n",
+					threadid,sqlrcur.errorMessage());
 				}
 			}
 
@@ -94,7 +101,7 @@ void runQuery(void *id) {
 			times=randomnumber::scaleNumber(seed,1,4);
 			stdoutput.printf("%lld: selecting %d times with "
 					"%lld nested cursors\n",
-					id,times,cursorcount);
+					threadid,times,cursorcount);
 			for (int64_t i=0; i<times; i++) {
 				sqlrcursor	**cursors=
 						new sqlrcursor *[cursorcount];
@@ -109,7 +116,8 @@ void runQuery(void *id) {
 					query.append(threadid);
 					if (!cursors[j]->sendQuery(
 							query.getString())) {
-						stdoutput.printf("%s\n",
+						stdoutput.printf(
+						"%lld: select - %s\n",threadid,
 						cursors[j]->errorMessage());
 					}
 				}

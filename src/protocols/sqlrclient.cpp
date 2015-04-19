@@ -371,7 +371,6 @@ sqlrclientexitstatus_t sqlrclient::clientSession() {
 			cont->incrementGetColumnListCount();
 			loop=getColumnListCommand(cursor);
 		} else if (command==GET_QUERY_TREE) {
-		} else if (command==GET_QUERY_TREE) {
 			cont->incrementGetQueryTreeCount();
 			loop=getQueryTreeCommand(cursor);
 		} else {
