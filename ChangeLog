@@ -64,6 +64,7 @@
 	added globaltemptables parameter for oracle and firebird
 	added padding to mysqlconnection class to deal with alignment issues
 		on Windows
+	fixed subtle noon/midnight-related bugs in date/time translation
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

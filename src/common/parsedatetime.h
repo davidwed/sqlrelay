@@ -37,11 +37,21 @@ static const char *longmonths[]={
 	NULL
 };
 
+static int16_t adjustHour(int16_t hour, const char *timestring) {
+	if (hour<12 && charstring::contains(timestring,"PM")) {
+		return hour+12;
+	} else if (hour==12 && charstring::contains(timestring,"AM")) {
+		return hour-12;
+	}
+	return hour;
+}
+
 static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 			bool supportdotdelimiteddate,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second,
 			int16_t *fraction) {
+stdoutput.printf("datetime - %s\n",datetime);
 
 	// initialize date/time parts
 	*year=-1;
@@ -155,8 +165,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=0;
 				*fraction=0;
-				*hour=*hour+(12*charstring::contains(
-							timeparts[1],"PM"));
+				*hour=adjustHour(*hour,timeparts[1]);
 
 			} else if (timepartcount==3 &&
 				charstring::isNumber(timeparts[0]) &&
@@ -222,8 +231,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				const char	*dot=
 					charstring::findFirst(timeparts[2],'.');
 				*fraction=charstring::toInteger(dot+1);
-				*hour=*hour+(12*charstring::contains(
-							timeparts[2],"PM"));
+				*hour=adjustHour(*hour,timeparts[2]);
 
 			} else if (timepartcount==3 &&
 				charstring::isNumber(timeparts[0]) &&
@@ -239,8 +247,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
 				*fraction=0;
-				*hour=*hour+(12*charstring::contains(
-							timeparts[2],"PM"));
+				*hour=adjustHour(*hour,timeparts[2]);
 
 			} else if (timepartcount==3 &&
 				charstring::isNumber(timeparts[0]) &&
@@ -269,8 +276,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
 				*fraction=charstring::toInteger(timeparts[3]);
-				*hour=*hour+(12*charstring::contains(
-							timeparts[3],"PM"));
+				*hour=adjustHour(*hour,timeparts[3]);
 
 			} else if (timepartcount==4 &&
 				charstring::isNumber(timeparts[0]) &&
@@ -641,7 +647,7 @@ static char *convertDateTime(const char *format,
 			output.append(buf);
 			ptr=ptr+3;
 		} else if (!charstring::compare(ptr,"AM",2)) {
-			output.append((hour<13)?"AM":"PM");
+			output.append((hour<12)?"AM":"PM");
 			ptr=ptr+2;
 		} else {
 			output.append(*ptr);
