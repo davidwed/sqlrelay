@@ -121,8 +121,17 @@ is simlar to using it on the command line.  You just need to add the LD_PRELOAD
 command to the startup script for the daemon before the command that starts the
 daemon itself.</p>
 
-<p>This goes for using the drop-in replacement library with PHP.  You just need
-to add the LD_PRELOAD command to the startup script for the http daemon.</p>
+<p>This goes for using the drop-in replacement library with PHP too.  You just
+need to add the LD_PRELOAD command to the startup script for the http
+daemon.</p>
+
+<p>If your system uses systemd instead of init scripts, then you can modify the systemd configuration to make the LD_PRELOAD setting part of the environment.  For example, the Apache webserver is typically started by the systemd config file /lib/systemd/system/httpd.service.  To configure Apache, create a new file /etc/systemd/system/httpd.service with the following contents:</p>
+
+<blockquote><b>
+.include /lib/systemd/system/httpd.service<br>
+[Service]<br>
+Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+</b></blockquote>
 
 <br>
 <a name="inetd"></a>
@@ -214,22 +223,23 @@ native PostgreSQL client library, all of its functions will be overriden by the
 SQL Relay drop-in replacement library.</p>
 
 <p>If the program is a daemon then add the LD_PRELOAD command to the startup
-script for the daemon.</p>
+script or systemd configuration for the daemon.</p>
 
 <p>If the program runs in the address space of a daemon, such as a PHP
 application running under Apache's mod_php, then add the LD_PRELOAD command to
-the startup script for the daemon.  The caveat here is that all applications
-running in the address space of the daemon will use the drop-in replacement
-library instead of the native PostgreSQL library.  It is not possible, for
-example for a web server to run one PHP application directly against PostgreSQL
-and another PHP application against SQL Relay using the drop-in replacement
-library; if the drop-in replacement library is loaded, both applications will
-end up using it.</p>
+the startup script or systemd configuration for the daemon.  The caveat here is
+that all applications running in the address space of the daemon will use the
+drop-in replacement library instead of the native PostgreSQL library.  It is
+not possible, for example for a web server to run one PHP application directly
+against PostgreSQL and another PHP application against SQL Relay using the
+drop-in replacement library; if the drop-in replacement library is loaded, both
+applications will end up using it.</p>
 
 <p>If the program is spawned by a daemon, such as a cgi spawned by a web-server
 or an inetd/xinetd helper program, then you can either add the LD_PRELOAD
-command to the daemon's startup script or write a script to run the LD_PRELOAD
-command and pass along the command line arguments (see the section
+command to the daemon's startup script/systemd configuration or write a script
+to run the LD_PRELOAD command and pass along the command line arguments (see
+the section
 <a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper
 programs above)</a>).</p>
 
