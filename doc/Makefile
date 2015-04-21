@@ -8,8 +8,10 @@ install:
 	$(MKINSTALLDIRS) $(docdir)
 	$(MKINSTALLDIRS) $(docdir)/admin
 	$(MKINSTALLDIRS) $(docdir)/api
+	$(MKINSTALLDIRS) $(docdir)/api/ado.net/html
 	$(MKINSTALLDIRS) $(docdir)/api/c/html
 	$(MKINSTALLDIRS) $(docdir)/api/c++/html
+	$(MKINSTALLDIRS) $(docdir)/api/cs/html
 	$(MKINSTALLDIRS) $(docdir)/api/perl
 	$(MKINSTALLDIRS) $(docdir)/api/php/media
 	$(MKINSTALLDIRS) $(docdir)/api/php/sql_relay
@@ -28,30 +30,20 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/modules
 	$(MKINSTALLDIRS) $(docdir)/programming
-	$(CP) index.html $(docdir)
-	$(CHMOD) 644 $(docdir)/index.html
-	$(CP) faq.html $(docdir)
-	$(CHMOD) 644 $(docdir)/faq.html
-	$(CP) admin/configguide.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/configguide.html
-	$(CP) admin/configreference.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/configreference.html
-	$(CP) admin/installing.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/installing.html
-	$(CP) admin/loadbalfailover.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/loadbalfailover.html
-	$(CP) admin/oraclentier.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/oraclentier.html
-	$(CP) admin/router.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/router.html
-	$(CP) admin/router.png $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/router.png
-	$(CP) admin/running.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/running.html
-	$(CP) admin/tuning.html $(docdir)/admin
-	$(CHMOD) 644 $(docdir)/admin/tuning.html
-	$(CP) css/styles.css $(docdir)/css
-	$(CHMOD) 644 $(docdir)/css/styles.css
+	$(CP) *.html $(docdir)
+	$(CHMOD) 644 $(docdir)/*.html
+	$(CP) admin/*.html $(docdir)/admin
+	$(CHMOD) 644 $(docdir)/admin/*.html
+	$(CP) css/*.css $(docdir)/css
+	$(CHMOD) 644 $(docdir)/css/*.css
+	$(CP) api/ado.net/html/*.html $(docdir)/api/ado.net/html
+	$(CHMOD) 644 $(docdir)/api/ado.net/html/*.html
+	$(CP) api/ado.net/html/*.css $(docdir)/api/ado.net/html
+	$(CHMOD) 644 $(docdir)/api/ado.net/html/*.css
+	$(CP) api/ado.net/html/*.png $(docdir)/api/ado.net/html
+	$(CHMOD) 644 $(docdir)/api/ado.net/html/*.png
+	$(CP) api/ado.net/html/*.js $(docdir)/api/ado.net/html
+	$(CHMOD) 644 $(docdir)/api/ado.net/html/*.js
 	$(CP) api/c/html/*.html $(docdir)/api/c/html
 	$(CHMOD) 644 $(docdir)/api/c/html/*.html
 	$(CP) api/c/html/*.css $(docdir)/api/c/html
@@ -68,6 +60,14 @@ install:
 	$(CHMOD) 644 $(docdir)/api/c++/html/*.png
 	$(CP) api/c++/html/*.js $(docdir)/api/c++/html
 	$(CHMOD) 644 $(docdir)/api/c++/html/*.js
+	$(CP) api/cs/html/*.html $(docdir)/api/cs/html
+	$(CHMOD) 644 $(docdir)/api/cs/html/*.html
+	$(CP) api/cs/html/*.css $(docdir)/api/cs/html
+	$(CHMOD) 644 $(docdir)/api/cs/html/*.css
+	$(CP) api/cs/html/*.png $(docdir)/api/cs/html
+	$(CHMOD) 644 $(docdir)/api/cs/html/*.png
+	$(CP) api/cs/html/*.js $(docdir)/api/cs/html
+	$(CHMOD) 644 $(docdir)/api/cs/html/*.js
 	$(CP) api/perl/perl.html $(docdir)/api/perl
 	$(CHMOD) 644 $(docdir)/api/perl/perl.html
 	$(CP) api/perl/Connection.html $(docdir)/api/perl
@@ -82,10 +82,8 @@ install:
 	$(CHMOD) 644 $(docdir)/api/php/media/*.css
 	$(CP) api/php/sql_relay/*.html $(docdir)/api/php/sql_relay
 	$(CHMOD) 644 $(docdir)/api/php/sql_relay/*.html
-	$(CP) api/python/PySQLRClient.py.html $(docdir)/api/python
-	$(CHMOD) 644 $(docdir)/api/python/PySQLRClient.py.html
-	$(CP) api/python/PySQLRDB.py.html $(docdir)/api/python
-	$(CHMOD) 644 $(docdir)/api/python/PySQLRDB.py.html
+	$(CP) api/python/*.html $(docdir)/api/python
+	$(CHMOD) 644 $(docdir)/api/python/*.html
 	$(CP) api/ruby/doc/*.html $(docdir)/api/ruby/doc
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/*.html
 	$(CP) api/ruby/doc/*.css $(docdir)/api/ruby/doc
@@ -102,122 +100,38 @@ install:
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/images/*.png
 	$(CP) api/ruby/doc/js/*.js $(docdir)/api/ruby/doc/js
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/js/*.js
-	$(CP) api/java/allclasses-frame.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/allclasses-frame.html
-	$(CP) api/java/allclasses-noframe.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/allclasses-noframe.html
-	$(CP) api/java/constant-values.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/constant-values.html
-	$(CP) api/java/deprecated-list.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/deprecated-list.html
-	$(CP) api/java/help-doc.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/help-doc.html
-	$(CP) api/java/index-all.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/index-all.html
-	$(CP) api/java/index.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/index.html
-	$(CP) api/java/overview-tree.html $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/overview-tree.html
+	$(CP) api/java/*.html $(docdir)/api/java
+	$(CHMOD) 644 $(docdir)/api/java/*.html
 	$(CP) api/java/package-list $(docdir)/api/java
 	$(CHMOD) 644 $(docdir)/api/java/package-list
-	$(CP) api/java/stylesheet.css $(docdir)/api/java
-	$(CHMOD) 644 $(docdir)/api/java/stylesheet.css
+	$(CP) api/java/*.css $(docdir)/api/java
+	$(CHMOD) 644 $(docdir)/api/java/*.css
 	$(MKINSTALLDIRS) $(docdir)/api/java/com
 	$(MKINSTALLDIRS) $(docdir)/api/java/com/firstworks
 	$(MKINSTALLDIRS) $(docdir)/api/java/com/firstworks/sqlrelay
-	$(CP) api/java/com/firstworks/sqlrelay/package-frame.html $(docdir)/api/java/com/firstworks/sqlrelay
-	$(CHMOD) 644 $(docdir)/api/java/com/firstworks/sqlrelay/package-frame.html
-	$(CP) api/java/com/firstworks/sqlrelay/package-summary.html $(docdir)/api/java/com/firstworks/sqlrelay
-	$(CHMOD) 644 $(docdir)/api/java/com/firstworks/sqlrelay/package-summary.html
-	$(CP) api/java/com/firstworks/sqlrelay/package-tree.html $(docdir)/api/java/com/firstworks/sqlrelay
-	$(CHMOD) 644 $(docdir)/api/java/com/firstworks/sqlrelay/package-tree.html
-	$(CP) api/java/com/firstworks/sqlrelay/SQLRConnection.html $(docdir)/api/java/com/firstworks/sqlrelay
-	$(CHMOD) 644 $(docdir)/api/java/com/firstworks/sqlrelay/SQLRConnection.html
-	$(CP) api/java/com/firstworks/sqlrelay/SQLRCursor.html $(docdir)/api/java/com/firstworks/sqlrelay
-	$(CHMOD) 644 $(docdir)/api/java/com/firstworks/sqlrelay/SQLRCursor.html
+	$(CP) api/java/com/firstworks/sqlrelay/*.html $(docdir)/api/java/com/firstworks/sqlrelay
+	$(CHMOD) 644 $(docdir)/api/java/com/firstworks/sqlrelay/*.html
 	$(MKINSTALLDIRS) $(docdir)/api/java/resources
-	$(CP) api/java/resources/inherit.gif $(docdir)/api/java/resources
-	$(CHMOD) 644 $(docdir)/api/java/resources/inherit.gif
+	$(CP) api/java/resources/*.gif $(docdir)/api/java/resources
+	$(CHMOD) 644 $(docdir)/api/java/resources/*.gif
 	$(CP) api/tcl/*.html $(docdir)/api/tcl
 	$(CHMOD) 644 $(docdir)/api/tcl/*.html
 	$(CP) api/tcl/*.txt $(docdir)/api/tcl
 	$(CHMOD) 644 $(docdir)/api/tcl/*.txt
-	$(CP) dropin/mysql.html $(docdir)/dropin
-	$(CHMOD) 644 $(docdir)/dropin/mysql.html
-	$(CP) dropin/postgresql.html $(docdir)/dropin
-	$(CHMOD) 644 $(docdir)/dropin/postgresql.html
-	$(CP) features/connectionpooling.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/connectionpooling.html
-	$(CP) features/databases.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/databases.html
-	$(CP) features/dbabstractionlayers.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/dbabstractionlayers.html
-	$(CP) features/dropinreplacementlibs.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/dropinreplacementlibs.html
-	$(CP) features/languages.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/languages.html
-	$(CP) features/loadbalancing.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/loadbalancing.html
-	$(CP) features/multirowfetches.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/multirowfetches.html
-	$(CP) features/proxying.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/proxying.html
-	$(CP) features/queryrouting.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/queryrouting.html
-	$(CP) features/resultsetcaching.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/resultsetcaching.html
-	$(CP) features/substitutionandbindvars.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/substitutionandbindvars.html
-	$(CP) features/suspendedtx.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/suspendedtx.html
-	$(CP) features/throttling.html $(docdir)/features
-	$(CHMOD) 644 $(docdir)/features/throttling.html
+	$(CP) dropin/*.html $(docdir)/dropin
+	$(CHMOD) 644 $(docdir)/dropin/*.html
+	$(CP) features/*.html $(docdir)/features
+	$(CHMOD) 644 $(docdir)/features/*.html
 	$(CP) images/*.png $(docdir)/images
 	$(CHMOD) 644 $(docdir)/images/*.png
 	$(CP) images/*.PNG $(docdir)/images
 	$(CHMOD) 644 $(docdir)/images/*.PNG
-	$(CP) js/rotate.js $(docdir)/js
-	$(CHMOD) 644 $(docdir)/js/rotate.js
-	$(CP) modules/passwordencryption.html $(docdir)/modules
-	$(CHMOD) 644 $(docdir)/modules/passwordencryption.html
-	$(CP) modules/logger.html $(docdir)/modules
-	$(CHMOD) 644 $(docdir)/modules/logger.html
-	$(CP) modules/sqlr-connection.1871.html $(docdir)/modules
-	$(CHMOD) 644 $(docdir)/modules/sqlr-connection.1871.html
-	$(CP) modules/sqlr-listener.1869.html $(docdir)/modules
-	$(CHMOD) 644 $(docdir)/modules/sqlr-listener.1869.html
-	$(CP) modules/sqlr-listener.1886.html $(docdir)/modules
-	$(CHMOD) 644 $(docdir)/modules/sqlr-listener.1886.html
-	$(CP) modules/sqlr-connection-oracletest-querylog.2899.html $(docdir)/modules
-	$(CHMOD) 644 $(docdir)/modules/sqlr-connection-oracletest-querylog.2899.html
-	$(CP) programming/binds.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/binds.html
-	$(CP) programming/odbc.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/odbc.html
-	$(CP) programming/jdbc.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/jdbc.html
-	$(CP) programming/c++.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/c++.html
-	$(CP) programming/c.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/c.html
-	$(CP) programming/perl.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/perl.html
-	$(CP) programming/perldbi.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/perldbi.html
-	$(CP) programming/php.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/php.html
-	$(CP) programming/phppdo.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/phppdo.html
-	$(CP) programming/python.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/python.html
-	$(CP) programming/pythondb.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/pythondb.html
-	$(CP) programming/ruby.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/ruby.html
-	$(CP) programming/java.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/java.html
-	$(CP) programming/tcl.html $(docdir)/programming
-	$(CHMOD) 644 $(docdir)/programming/tcl.html
+	$(CP) js/*.js $(docdir)/js
+	$(CHMOD) 644 $(docdir)/js/*.js
+	$(CP) modules/*.html $(docdir)/modules
+	$(CHMOD) 644 $(docdir)/modules/*.html
+	$(CP) programming/*.html $(docdir)/programming
+	$(CHMOD) 644 $(docdir)/programming/*.html
 
 uninstall:
 	$(RMTREE) $(docdir)
