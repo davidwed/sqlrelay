@@ -17,6 +17,8 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRConnection.src
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRCursor.src
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/files
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/images
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/js
 	$(MKINSTALLDIRS) $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/dropin
@@ -96,6 +98,10 @@ install:
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/SQLRCursor.src/*.html
 	$(CP) api/ruby/doc/files/*.html $(docdir)/api/ruby/doc/files
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/files/*.html
+	$(CP) api/ruby/doc/images/*.png $(docdir)/api/ruby/doc/images
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/images/*.png
+	$(CP) api/ruby/doc/js/*.js $(docdir)/api/ruby/doc/js
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/js/*.js
 	$(CP) api/java/allclasses-frame.html $(docdir)/api/java
 	$(CHMOD) 644 $(docdir)/api/java/allclasses-frame.html
 	$(CP) api/java/allclasses-noframe.html $(docdir)/api/java
