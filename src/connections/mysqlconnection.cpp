@@ -32,6 +32,11 @@
 	#undef HAVE_MYSQL_STMT_PREPARE
 #endif
 
+// mysql_change_user() once worked, but it hasn't for a long time.  It's not
+// clear why, but the problem appears to be on the server-side.  I'm disabling
+// it until I can figure out a workaround.
+#undef HAVE_MYSQL_CHANGE_USER
+
 #define MAX_SELECT_LIST_SIZE	256
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	#define MAX_ITEM_BUFFER_SIZE	32768
