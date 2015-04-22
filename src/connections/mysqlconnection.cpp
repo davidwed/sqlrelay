@@ -212,8 +212,11 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 #endif
 		void		endSession();
 
+#if MYSQL_VERSION_ID<32200
 		MYSQL	mysql;
-#ifdef _WIN32
+#endif
+		MYSQL	*mysqlptr;
+/*#ifdef _WIN32
 		// On Unix/Linux, mysql_config tells you what flags to use
 		// when compiling code that uses libmysqlclient and SQL Relay
 		// uses them.  There's no corresponding utility on Windows
@@ -237,7 +240,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		// Declaring some padding after the structure appears to have
 		// resolved the issue.  We'll see though...
 		char padding[128];
-#endif
+#endif*/
 		bool	connected;
 
 		const char	*db;
@@ -292,6 +295,8 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 #endif
+
+	mysqlptr=NULL;
 }
 
 mysqlconnection::~mysqlconnection() {
@@ -377,28 +382,30 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	#endif
 	#if MYSQL_VERSION_ID>=32200
 	// initialize database connection structure
-	if (!mysql_init(&mysql)) {
+	mysqlptr=mysql_init(NULL);
+	if (!mysqlptr) {
 		*error="mysql_init failed";
 		return false;
 	}
 	#ifdef HAVE_MYSQL_SSL_SET
-	mysql_ssl_set(&mysql,sslkey,sslcert,sslca,sslcapath,sslcipher);
+	mysql_ssl_set(mysqlptr,sslkey,sslcert,sslca,sslcapath,sslcipher);
 	#endif
-	if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
+	if (!mysql_real_connect(mysqlptr,hostval,user,password,dbval,
 					portval,socketval,clientflag)) {
 	#else
-	if (!mysql_real_connect(&mysql,hostval,user,password,
+	mysqlptr=&mysql;
+	if (!mysql_real_connect(mysqlptr,hostval,user,password,
 					portval,socketval,clientflag)) {
 	#endif
 		loginerror.clear();
 		loginerror.append("mysql_real_connect failed: ");
-		loginerror.append(mysql_error(&mysql));
+		loginerror.append(mysql_error(mysqlptr));
 		*error=loginerror.getString();
 #else
-	if (!mysql_connect(&mysql,hostval,user,password)) {
+	if (!mysql_connect(mysqlptr,hostval,user,password)) {
 		loginerror.clear();
 		loginerror.append("mysql_connect failed: ");
-		loginerror.append(mysql_error(&mysql));
+		loginerror.append(mysql_error(mysqlptr));
 		*error=loginerror.getString();
 #endif
 		logOut();
@@ -409,7 +416,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	// Enable autoreconnect in the C api
 	// (ordinarily mysql_options should be called before mysql_connect,
 	// but not for this option)
-	mysql_options(&mysql,MYSQL_OPT_RECONNECT,&mytrue);
+	mysql_options(mysqlptr,MYSQL_OPT_RECONNECT,&mytrue);
 #endif
 
 #ifdef HAVE_MYSQL_REPORT_DATA_TRUNCATION
@@ -419,14 +426,14 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	// though, we'd rather get the truncated data and keep fetching rows
 	// rather than stopping all fetching at the point that the truncation
 	// occurs.
-	mysql_options(&mysql,MYSQL_REPORT_DATA_TRUNCATION,&myfalse);
+	mysql_options(mysqlptr,MYSQL_REPORT_DATA_TRUNCATION,&myfalse);
 #endif
 
 #ifdef MYSQL_SELECT_DB
-	if (mysql_select_db(&mysql,dbval)) {
+	if (mysql_select_db(mysqlptr,dbval)) {
 		loginerror.clear();
 		loginerror.append("mysql_select_db failed: ");
-		loginerror.append(mysql_error(&mysql));
+		loginerror.append(mysql_error(mysqlptr));
 		*error=loginerror.getString();
 		logOut();
 		return false;
@@ -437,13 +444,13 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	// fake binds when connected to older servers
 #ifdef HAVE_MYSQL_GET_SERVER_VERSION
-	if (mysql_get_server_version(&mysql)<40102) {
+	if (mysql_get_server_version(mysqlptr)<40102) {
 		cont->fakeInputBinds();
 	}
 #else
 	char		**list;
 	uint64_t	listlen;
-	charstring::split(mysql_get_server_info(&mysql),
+	charstring::split(mysql_get_server_info(mysqlptr),
 				".",true,&list,&listlen);
 
 	if (listlen==3) {
@@ -462,7 +469,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 #endif
 
 	// get the db host name
-	const char	*hostinfo=mysql_get_host_info(&mysql);
+	const char	*hostinfo=mysql_get_host_info(mysqlptr);
 	const char	*space=charstring::findFirst(hostinfo,' ');
 	if (space) {
 		dbhostname=charstring::duplicate(hostinfo,space-hostinfo);
@@ -475,7 +482,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 #ifdef HAVE_MYSQL_SET_CHARACTER_SET
 	// set the character set
 	if (charstring::length(charset)) {
-		mysql_set_character_set(&mysql,charset);
+		mysql_set_character_set(mysqlptr,charset);
 	}
 #endif
 
@@ -485,7 +492,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 #ifdef HAVE_MYSQL_CHANGE_USER
 bool mysqlconnection::changeUser(const char *newuser,
 					const char *newpassword) {
-	return !mysql_change_user(&mysql,newuser,newpassword,
+	return !mysql_change_user(mysqlptr,newuser,newpassword,
 					(char *)((db && db[0])?db:NULL));
 }
 #endif
@@ -500,12 +507,12 @@ void mysqlconnection::deleteCursor(sqlrservercursor *curs) {
 
 void mysqlconnection::logOut() {
 	connected=false;
-	mysql_close(&mysql);
+	mysql_close(mysqlptr);
 }
 
 #ifdef HAVE_MYSQL_PING
 bool mysqlconnection::ping() {
-	return (!mysql_ping(&mysql))?true:false;
+	return (!mysql_ping(mysqlptr))?true:false;
 }
 #endif
 
@@ -515,7 +522,7 @@ const char *mysqlconnection::identify() {
 
 const char *mysqlconnection::dbVersion() {
 	delete[] dbversion;
-	dbversion=charstring::duplicate(mysql_get_server_info(&mysql));
+	dbversion=charstring::duplicate(mysql_get_server_info(mysqlptr));
 	return dbversion;
 }
 
@@ -609,7 +616,7 @@ const char *mysqlconnection::getCurrentDatabaseQuery() {
 }
 
 bool mysqlconnection::getLastInsertId(uint64_t *id) {
-	*id=mysql_insert_id(&mysql);
+	*id=mysql_insert_id(mysqlptr);
 	return true;
 }
 
@@ -619,7 +626,7 @@ bool mysqlconnection::isTransactional() {
 
 bool mysqlconnection::autoCommitOn() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
-	return !mysql_autocommit(&mysql,true);
+	return !mysql_autocommit(mysqlptr,true);
 #else
 	// do nothing
 	return true;
@@ -628,7 +635,7 @@ bool mysqlconnection::autoCommitOn() {
 
 bool mysqlconnection::autoCommitOff() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
-	return !mysql_autocommit(&mysql,false);
+	return !mysql_autocommit(mysqlptr,false);
 #else
 	// do nothing
 	return true;
@@ -637,7 +644,7 @@ bool mysqlconnection::autoCommitOff() {
 
 bool mysqlconnection::commit() {
 #ifdef HAVE_MYSQL_COMMIT
-	return !mysql_commit(&mysql);
+	return !mysql_commit(mysqlptr);
 #else
 	// do nothing
 	return true;
@@ -646,7 +653,7 @@ bool mysqlconnection::commit() {
 
 bool mysqlconnection::rollback() {
 #ifdef HAVE_MYSQL_ROLLBACK
-	return !mysql_rollback(&mysql);
+	return !mysql_rollback(mysqlptr);
 #else
 	// do nothing
 	return true;
@@ -658,11 +665,11 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-	const char	*errorstring=mysql_error(&mysql);
+	const char	*errorstring=mysql_error(mysqlptr);
 	*errorlength=charstring::length(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
-	*errorcode=mysql_errno(&mysql);
+	*errorcode=mysql_errno(mysqlptr);
 	*liveconnection=(!charstring::compare(errorstring,"") ||
 		!charstring::compareIgnoringCase(errorstring,
 				"mysql server has gone away") ||
@@ -765,7 +772,7 @@ void mysqlcursor::deallocateResultSetBuffers() {
 }
 
 bool mysqlcursor::open() {
-	stmt=mysql_stmt_init(&mysqlconn->mysql);
+	stmt=mysql_stmt_init(mysqlconn->mysqlptr);
 	return true;
 }
 #endif
@@ -1150,7 +1157,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		mysqlresult=NULL;
 
 		// execute the query
-		if ((queryresult=mysql_real_query(&mysqlconn->mysql,
+		if ((queryresult=mysql_real_query(mysqlconn->mysqlptr,
 							query,length))) {
 			return false;
 		}
@@ -1158,12 +1165,12 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		checkForTempTable(query,length);
 
 		// store the result set
-		if ((mysqlresult=mysql_store_result(&mysqlconn->mysql))==
+		if ((mysqlresult=mysql_store_result(mysqlconn->mysqlptr))==
 							(MYSQL_RES *)NULL) {
 
 			// if there was an error then return failure, otherwise
 			// the query must have been some DML or DDL
-			char	*err=(char *)mysql_error(&mysqlconn->mysql);
+			char	*err=(char *)mysql_error(mysqlconn->mysqlptr);
 			if (err && err[0]) {
 				return false;
 			} else {
@@ -1181,7 +1188,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		// (call after mysql_stmt_store_result or this will return
 		// -1 when the query is a select, which we don't want if
 		// foundrows is enabled)
-		affectedrows=mysql_affected_rows(&mysqlconn->mysql);
+		affectedrows=mysql_affected_rows(mysqlconn->mysqlptr);
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	}
@@ -1218,8 +1225,8 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 			errn=mysql_stmt_errno(stmt);
 		} else {
 	#endif
-			err=mysql_error(&mysqlconn->mysql);
-			errn=mysql_errno(&mysqlconn->mysql);
+			err=mysql_error(mysqlconn->mysqlptr);
+			errn=mysql_errno(mysqlconn->mysqlptr);
 	#ifdef HAVE_MYSQL_STMT_PREPARE
 		}
 	}
@@ -1576,7 +1583,7 @@ bool mysqlcursor::getLobFieldSegment(uint32_t col,
 }
 
 void mysqlcursor::closeLobField(uint32_t col) {
-	delete[] lobfield.buffer;
+	delete[] (char *)lobfield.buffer;
 	lobfield.buffer=NULL;
 	lobfield.buffer_length=0;
 	return;
@@ -1603,8 +1610,8 @@ void mysqlcursor::closeResultSet() {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;
 #ifdef HAVE_MYSQL_NEXT_RESULT
-		while (!mysql_next_result(&mysqlconn->mysql)) {
-			mysqlresult=mysql_store_result(&mysqlconn->mysql);
+		while (!mysql_next_result(mysqlconn->mysqlptr)) {
+			mysqlresult=mysql_store_result(mysqlconn->mysqlptr);
 			if (mysqlresult!=(MYSQL_RES *)NULL) {
 				mysql_free_result(mysqlresult);
 				mysqlresult=NULL;
