@@ -66,7 +66,10 @@
 		struct on platforms that support mysql_init, rather than
 		using a static struct
 	fixed subtle noon/midnight-related bugs in date/time translation
-	
+	updated mysql connection to get affected rows when not using the
+		statement api
+	updated mysql connection not to use the statement API on windows
+		(for now)
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

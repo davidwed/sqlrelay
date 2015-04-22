@@ -23,6 +23,15 @@
 #define FALSE (0)
 #endif
 
+// Using the statement API on Windows crashes for some reason.
+// I suspect that the module needs to be compiled with the same compiler options
+// as the library, otherwise various structs have mismatched sizes or something.
+// There's no good way to know what compiler options were used though.  This
+// seems to resolve the problem though.  So, for now we'll do this.
+#ifdef _WIN32
+	#undef HAVE_MYSQL_STMT_PREPARE
+#endif
+
 #define MAX_SELECT_LIST_SIZE	256
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	#define MAX_ITEM_BUFFER_SIZE	32768
@@ -216,31 +225,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		MYSQL	mysql;
 #endif
 		MYSQL	*mysqlptr;
-/*#ifdef _WIN32
-		// On Unix/Linux, mysql_config tells you what flags to use
-		// when compiling code that uses libmysqlclient and SQL Relay
-		// uses them.  There's no corresponding utility on Windows
-		// though, as far as I know.
-		//
-		// The problem this causes is that libmysqlclient may have been
-		// compiled with flags that caused the mysql strucuture to be
-		// aligned differently, and be larger than this code believes
-		// it is.  As a result, the mysql functions write off of the
-		// end of the structure, overwriting this class' member
-		// variables, and methods of this class overwrite locations
-		// that the mysql functions think are part of the mysql
-		// structure.  This wreaks general havoc.
-		// (see Robert Basler's comment at:
-		// https://dev.mysql.com/doc/refman/5.7/en/mysql-init.html)
-		//
-		// I ran into what appears to have been this issue while
-		// testing version 0.59 against MySQL Connector/C 6.1.5 on
-		// Widnows 7 x64.
-		//
-		// Declaring some padding after the structure appears to have
-		// resolved the issue.  We'll see though...
-		char padding[128];
-#endif*/
+
 		bool	connected;
 
 		const char	*db;
@@ -1174,6 +1159,11 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 			if (err && err[0]) {
 				return false;
 			} else {
+
+				// get affected rows, if it was DML then 
+				// this should be set
+				affectedrows=mysql_affected_rows(
+						mysqlconn->mysqlptr);
 				return true;
 			}
 		}
