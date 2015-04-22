@@ -62,9 +62,11 @@
 	added global temp table tracking for firebird
 	added droptemptables parameter for firebird
 	added globaltemptables parameter for oracle and firebird
-	added padding to mysqlconnection class to deal with alignment issues
-		on Windows
+	updated mysql connection to allow mysql_init to allocate a mysql
+		struct on platforms that support mysql_init, rather than
+		using a static struct
 	fixed subtle noon/midnight-related bugs in date/time translation
+	
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
