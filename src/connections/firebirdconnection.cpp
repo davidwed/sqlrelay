@@ -916,6 +916,7 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 	}
 
 	// create a blob
+	bytestring::zero(&inblobhandle[index],sizeof(isc_blob_handle));
 	if (isc_create_blob2(firebirdconn->error,
 				&firebirdconn->db,
 				&firebirdconn->tr,
@@ -939,6 +940,7 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 		if (isc_put_segment(firebirdconn->error,
 					&inblobhandle[index],
 					bytestoput,(char *)(value+bytesput))) {
+stdoutput.printf("isc_put_segment failed\n");
 			return false;
 		}
 		bytesput=bytesput+bytestoput;

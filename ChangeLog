@@ -71,6 +71,7 @@
 	updated mysql connection not to use the statement API on windows,
 		for now
 	disabled mysql_change_user, for now
+	fixed blob-input binds on firebird
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
