@@ -370,8 +370,8 @@ SYBASECONNECTIONLIBS = $(SYBASELIBS) $(CONNECTIONLIBS)
 
 
 # connections
-CONNECTIONSALLTARGETS = all-db2 all-firebird all-mysql all-odbc all-oracle8 all-postgresql all-sybase all-router
-CONNECTIONSINSTALLTARGETS = installdll-db2 installdll-firebird installdll-mysql installdll-odbc installdll-oracle8 installdll-postgresql installdll-sybase installdll-router
+CONNECTIONSALLTARGETS = all-db2 all-firebird all-mysql all-odbc all-oracle8 all-postgresql @ALLSYBASE@ all-router
+CONNECTIONSINSTALLTARGETS = installdll-db2 installdll-firebird installdll-mysql installdll-odbc installdll-oracle8 installdll-postgresql @INSTALLSYBASE@ installdll-router
 
 
 # tests
