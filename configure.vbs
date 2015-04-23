@@ -69,14 +69,16 @@ version=parts(0)
 ' determine VC++ architecture
 USE_32BIT_TIME_T=""
 PERLPREFIX="C:\Perl64"
-RUBYARCH="x64-msvcr"
 RUBYVCVERSION="100"
 RUBYTARGET="x64-mswin64"
+RUBYLIBPREFIX="x64-msvcr100"
+RUBYSITEARCHDIRSUFFIX="x64-msvcr100"
 if arch="80x86" then
 	USE_32BIT_TIME_T="/D _USE_32BIT_TIME_T"
 	PERLPREFIX="C:\Perl"
-	RUBYARCH="msvcr"
 	RUBYTARGET="i386-mswin32"
+	RUBYLIBPREFIX="msvcr100"
+	RUBYSITEARCHDIRSUFFIX="i386-msvcr100"
 end if
 
 
@@ -276,9 +278,10 @@ for i=lbound(infiles) to ubound(infiles)
 	' api's
 	content=replace(content,"@PERLPREFIX@",PERLPREFIX,1,-1,0)
 	content=replace(content,"@RUBYPREFIX@",RUBYPREFIX,1,-1,0)
-	content=replace(content,"@RUBYARCH@",RUBYARCH,1,-1,0)
 	content=replace(content,"@RUBYVCVERSION@",RUBYVCVERSION,1,-1,0)
 	content=replace(content,"@RUBYTARGET@",RUBYTARGET,1,-1,0)
+	content=replace(content,"@RUBYLIBPREFIX@",RUBYLIBPREFIX,1,-1,0)
+	content=replace(content,"@RUBYSITEARCHDIRSUFFIX@",RUBYSITEARCHDIRSUFFIX,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)
