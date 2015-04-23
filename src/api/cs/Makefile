@@ -26,17 +26,21 @@ AssemblyInfo.cs: AssemblyInfo.cs.in
 SQLRClient.dll.config: SQLRClient.dll.config.in
 	$(REPLACE) @SQLR_VERSION@ $(SQLR_VERSION) SQLRClient.dll.config.in > SQLRClient.dll.config
 
-SQLRClient.dll.in: $(SRCS)
+SQLRClient.dll: $(SRCS)
 	$(CSC) $(CSCFLAGS) /optimize /target:library /out:$@ $(SRCS)
 
-keyPair.snk:
-	$(SN) -k keyPair.snk
+# in case we ever want to sign the dll
+#SQLRClient.dll.in: $(SRCS)
+#	$(CSC) $(CSCFLAGS) /optimize /target:library /out:$@ $(SRCS)
 
-SQLRClient.il: SQLRClient.dll.in keyPair.snk
-	$(ILDASM) SQLRClient.dll.in $(ILDASMOUT)SQLRClient.il
+#keyPair.snk:
+#	$(SN) -k keyPair.snk
 
-SQLRClient.dll: SQLRClient.il
-	$(ILASM) SQLRClient.il /dll /key=keyPair.snk
+#SQLRClient.il: SQLRClient.dll.in keyPair.snk
+#	$(ILDASM) SQLRClient.dll.in $(ILDASMOUT)SQLRClient.il
+
+#SQLRClient.dll: SQLRClient.il
+#	$(ILASM) SQLRClient.il /dll /key=keyPair.snk
 
 install: $(INSTALLLIB)
 
