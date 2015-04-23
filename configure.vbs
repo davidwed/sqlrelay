@@ -75,7 +75,7 @@ RUBYTARGET="x64-mswin64"
 if arch="80x86" then
 	USE_32BIT_TIME_T="/D _USE_32BIT_TIME_T"
 	PERLPREFIX="C:\Perl"
-	RUBYARCH="i386-msvcr100"
+	RUBYARCH="msvcr"
 	RUBYTARGET="i386-mswin32"
 end if
 
