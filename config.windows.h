@@ -122,31 +122,31 @@
 #define HAVE_ORACLE_8i
 
 /* Some versions of postgresql have PQbinaryTuples */
-/* #undef HAVE_POSTGRESQL_PQBINARYTUPLES */
+#define HAVE_POSTGRESQL_PQBINARYTUPLES 1
 
 /* Some versions of postgresql have PQexecPrepared */
-/* #undef HAVE_POSTGRESQL_PQEXECPREPARED */
+#define HAVE_POSTGRESQL_PQEXECPREPARED 1
 
 /* Some versions of postgresql have PQfmod */
-/* #undef HAVE_POSTGRESQL_PQFMOD */
+#define HAVE_POSTGRESQL_PQFMOD 1
 
 /* Some versions of postgresql have PQoidValue */
-/* #undef HAVE_POSTGRESQL_PQOIDVALUE */
+#define HAVE_POSTGRESQL_PQOIDVALUE 1
 
 /* Some versions of postgresql have PQparameterStatus */
-/* #undef HAVE_POSTGRESQL_PQPARAMETERSTATUS */
+#define HAVE_POSTGRESQL_PQPARAMETERSTATUS 1
 
 /* Some versions of postgresql have PQprepare */
-/* #undef HAVE_POSTGRESQL_PQPREPARE */
+#define HAVE_POSTGRESQL_PQPREPARE 1
 
 /* Some versions of postgresql have PQserverVersion */
-/* #undef HAVE_POSTGRESQL_PQSERVERVERSION */
+#define HAVE_POSTGRESQL_PQSERVERVERSION 1
 
 /* Some versions of postgresql have PQsetClientEncoding */
-/* #undef HAVE_POSTGRESQL_PQSETCLIENTENCODING */
+#define HAVE_POSTGRESQL_PQSETCLIENTENCODING 1
 
 /* Some versions of postgresql have PQsetNoticeProcessor */
-/* #undef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR */
+#define HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR 1
 
 /* Do we have readline */
 /* #undef HAVE_READLINE */
