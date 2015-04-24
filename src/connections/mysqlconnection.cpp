@@ -705,12 +705,6 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 
 	allocateResultSetBuffers(mysqlconn->maxselectlistsize,
 					mysqlconn->maxitembuffersize);
-
-	lobfield.buffer_type=MYSQL_TYPE_STRING;
-	lobfield.buffer=NULL;
-	lobfield.buffer_length=0;
-	lobfield.is_null=NULL;
-	lobfield.length=NULL;
 #endif
 }
 
@@ -745,6 +739,7 @@ void mysqlcursor::allocateResultSetBuffers(int32_t selectlistsize,
 		isnull=new my_bool[selectlistsize];
 		fieldlength=new unsigned long[selectlistsize];
 		for (unsigned short index=0; index<selectlistsize; index++) {
+			bytestring::zero(&fieldbind[index],sizeof(MYSQL_BIND));
 			fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
 			fieldbind[index].buffer=&field[index*itembuffersize];
 			fieldbind[index].buffer_length=itembuffersize;
@@ -752,6 +747,9 @@ void mysqlcursor::allocateResultSetBuffers(int32_t selectlistsize,
 			fieldbind[index].length=&fieldlength[index];
 		}
 	}
+
+	bytestring::zero(&lobfield,sizeof(MYSQL_BIND));
+	lobfield.buffer_type=MYSQL_TYPE_STRING;
 }
 
 void mysqlcursor::deallocateResultSetBuffers() {
