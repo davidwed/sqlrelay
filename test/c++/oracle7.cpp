@@ -50,7 +50,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 		}
 	}
 
-	if (!strncmp(value,success,length)) {
+	if (!charstring::compare(value,success,length)) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%s!=%s\n",value,success);
