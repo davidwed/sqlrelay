@@ -2201,7 +2201,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 		if (intransactionblock) {
 			cursor->setError(
 				"begin while in transaction block",
-							999999,false);
+							999999,true);
 			return false;
 		}
 		return begin();
@@ -2216,7 +2216,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 		if (!intransactionblock) {
 			cursor->setError(
 				"commit while not in transaction block",
-								999998,false);
+								999998,true);
 			return false;
 		}
 		return commit();
@@ -2231,7 +2231,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 		if (!intransactionblock) {
 			cursor->setError(
 				"rollback while not in transaction block",
-								999997,false);
+								999997,true);
 			return false;
 		}
 		return rollback();
