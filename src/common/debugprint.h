@@ -21,35 +21,47 @@
 	#include <rudiments/stdio.h>
 #endif
 
-#ifdef DEBUG_MESSAGES
-	#ifdef DEBUG_TO_FILE
-		#define debugFunction() { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); }
-		#ifdef _MSC_VER
-			#define debugPrintf(args,...) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printf(args,__VA_ARGS__); }
-		#else
-			#define debugPrintf(args...) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printf(args); }
-		#endif
-		#define debugSafePrint(a,b) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.safePrint(a,b); }
-		#define debugPrintBits(a) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printBits(a); }
-	#else
-		#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); stdoutput.flush();
-		#ifdef _MSC_VER
-			#define debugPrintf(args,...) stdoutput.printf(args,__VA_ARGS__); stdoutput.flush();
-		#else
-			#define debugPrintf(args...) stdoutput.printf(args); stdoutput.flush();
-		#endif
-		#define debugSafePrint(a,b) stdoutput.safePrint(a,b); stdoutput.flush();
-		#define debugPrintBits(a) stdoutput.printBits(a); stdoutput.flush();
-	#endif
+#if defined(_MSC_VER) && (_MSC_VER <= 1300)
+
+	// degenerate debug macros for really incapable compilers
+	static void debugFunction() {}
+	static void debugPrintf(const char *format, ...) {}
+	static void debugSafePrint(const char *str, int32_t length) {}
+	static void debugPrintBits(uint16_t a) {}
+
 #else
-	#define debugFunction() /* */
-	#ifdef _MSC_VER
-		#define debugPrintf(args,...) /* */
+
+	#ifdef DEBUG_MESSAGES
+		#ifdef DEBUG_TO_FILE
+			#define debugFunction() { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); }
+			#ifdef _MSC_VER
+				#define debugPrintf(args,...) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printf(args,__VA_ARGS__); }
+			#else
+				#define debugPrintf(args...) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printf(args); }
+			#endif
+			#define debugSafePrint(a,b) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.safePrint(a,b); }
+			#define debugPrintBits(a) { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printBits(a); }
+		#else
+			#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); stdoutput.flush();
+			#ifdef _MSC_VER
+				#define debugPrintf(args,...) stdoutput.printf(args,__VA_ARGS__); stdoutput.flush();
+			#else
+				#define debugPrintf(args...) stdoutput.printf(args); stdoutput.flush();
+			#endif
+			#define debugSafePrint(a,b) stdoutput.safePrint(a,b); stdoutput.flush();
+			#define debugPrintBits(a) stdoutput.printBits(a); stdoutput.flush();
+		#endif
 	#else
-		#define debugPrintf(args...) /* */
+		#define debugFunction() /* */
+		#ifdef _MSC_VER
+			#define debugPrintf(args,...) /* */
+		#else
+			#define debugPrintf(args...) /* */
+		#endif
+		#define debugSafePrint(a,b) /* */
+		#define debugPrintBits(a) /* */
 	#endif
-	#define debugSafePrint(a,b) /* */
-	#define debugPrintBits(a) /* */
+
 #endif
 
 #endif
