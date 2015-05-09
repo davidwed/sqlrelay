@@ -44,7 +44,7 @@ struct sqlrconnstatistics {
 	uint32_t			nautocommit;
 	uint32_t			nbegin;
 	uint32_t			ncommit;
-	uint32_t			nrollback;;
+	uint32_t			nrollback;
 	uint32_t			ndbversion;
 	uint32_t			nbindformat;
 	uint32_t			nserverversion;
