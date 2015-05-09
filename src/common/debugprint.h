@@ -25,6 +25,7 @@
 	(defined(__USLC__) && !defined(__GNUC__))
 
 	// degenerate debug macros for really incapable compilers
+	// (old microsoft compilers, unixware native compiler)
 	static void debugFunction() {}
 	static void debugPrintf(const char *format, ...) {}
 	static void debugSafePrint(const char *str, int32_t length) {}
@@ -32,6 +33,7 @@
 
 #else
 
+	// working debug macros for more modern compilers
 	#ifdef DEBUG_MESSAGES
 		#ifdef DEBUG_TO_FILE
 			#define debugFunction() { if (f.getFileDescriptor()==-1) { f.dontGetCurrentPropertiesOnOpen(); f.open(debugfile,O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); } f.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); }
