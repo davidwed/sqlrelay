@@ -293,7 +293,7 @@ FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Werror],[],[],[WERROR="-We
 
 dnl disable -Werror with gcc < 2.7 because they misinterpret placement new
 CXX_VERSION=`$CXX --version | tr -d '.' | cut -c1-2`
-if ( test "$CXX_VERSION" -le "27" )
+if ( test "$CXX_VERSION" -lt "27" )
 then
 	WERROR=""
 fi
