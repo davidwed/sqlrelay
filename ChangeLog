@@ -1,5 +1,6 @@
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
+	disabled -Werror for gcc < 2.7
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings

@@ -290,6 +290,14 @@ AC_DEFUN([FW_CHECK_WERROR],
 [
 AC_MSG_CHECKING(for -Werror)
 FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Werror],[],[],[WERROR="-Werror"],[WERROR=""])
+
+dnl disable -Werror with gcc < 2.7 because they misinterpret placement new
+CXX_VERSION=`$CXX --version | tr -d '.' | cut -c1-2`
+if ( test "$CXX_VERSION" -le "27" )
+then
+	WERROR=""
+fi
+
 if ( test -n "$WERROR" )
 then
 	AC_MSG_RESULT(yes)
