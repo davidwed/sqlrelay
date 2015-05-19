@@ -1218,7 +1218,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
-					options,6);
+					options,
+					sizeof(options)/sizeof(options[0]));
 	const char	*host=options[0].optval;
 	uint16_t	port=charstring::toInteger(options[1].optval);
 	const char	*socket=options[2].optval;

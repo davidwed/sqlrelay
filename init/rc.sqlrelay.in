@@ -98,7 +98,14 @@ prefix=@prefix@
 sysconfdir=@sysconfdir@
 localstatedir=@localstatedir@
 tmpdir=${localstatedir}/sqlrelay/tmp
+logdir=${localstatedir}/sqlrelay/log
 
+# see if the cronolog command is available.
+cronolog=/usr/sbin/cronolog
+if ( test ! -f "$cronolog" )
+then
+    cronolog=
+fi
 
 # define lock directory
 lockdir=/tmp
@@ -157,9 +164,24 @@ start_sqlrelay() {
     then
         printf " sqlrelay"
     fi
-
-    sqlr-start 0<&- 1>&- 2>&-
-    RETVAL=$?
+    # If the cronolog command is available along with the shell features
+    # to take advantage of it, then use it to capture the stdout and stdout
+    # of sqlr-start along with all processes that will be created by sqlr-start
+    # and by processes created by sql-scaler etc.
+    # Because coproc file descriptors are close on exec we also need to
+    # use the proc filesystem.
+    # The cronolog command itself ends up running as root. You can use "su" to
+    # modify that behavior.
+    if ( test "$cronolog" != "" -a -d "$logdir" -a "${BASH_VERSINFO[0]}" -ge 4 -a -d /proc/$$/fd )
+    then
+        coproc myproc { sleep 1; echo starting sqlr-start; sqlr-start 0<&- 2>&1; }
+        $cronolog $logdir/sqlr-start-%Y-%m-%d-%H-%M.log 1>&- 2>&- 0</proc/$myproc_PID/fd/1 &
+        wait $myproc_PID
+        RETVAL=$?
+    else
+        sqlr-start 0<&- 1>&- 2>&-
+        RETVAL=$?
+    fi
     if ( test "$BSD" != "yes" )
     then
         printf "Starting sqlrelay: "
@@ -207,8 +229,15 @@ stop_sqlrelay() {
     then
         printf " sqlrelay ("
     fi
-
-    sqlr-stop 0<&- 1>&- 2>&-
+    # If we were using the cronolog command to capture the output of the sqlr-start
+    # then also capture the output of sqlr-stop
+    if ( test "$cronolog" != "" -a -d "$logdir" -a "${BASH_VERSINFO[0]}" -ge 4 -a -d /proc/$$/fd )
+    then
+     TS=`date +%Y-%m-%d-%H-%M`
+     sqlr-stop 0<&- 1>>$logdir/sqlr-stop-$TS.log 2>&1
+    else
+     sqlr-stop 0<&- 1>&- 2>&-
+    fi
     RETVAL=$?
     if ( test "$BSD" != "yes" )
     then
