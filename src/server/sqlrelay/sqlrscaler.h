@@ -67,7 +67,7 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		bool		debug;
 
-		sqlrtempdir	*tmpdir;
+		sqlrpaths	*sqlrpth;
 		sqlrcmdline	*cmdl;
 
 		bool		iswindows;

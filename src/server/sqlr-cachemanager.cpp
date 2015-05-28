@@ -37,7 +37,7 @@ class sqlrcachemanager {
 		dirnode	*currentdir;
 
 		sqlrcmdline	*cmdl;
-		sqlrtempdir	*tmpdir;
+		sqlrpaths	*sqlrpth;
 
 		char	*pidfile;
 };
@@ -60,7 +60,7 @@ dirnode::~dirnode() {
 sqlrcachemanager::sqlrcachemanager(int argc, const char **argv) {
 
 	cmdl=new sqlrcmdline(argc,argv);
-	tmpdir=new sqlrtempdir(cmdl);
+	sqlrpth=new sqlrpaths(cmdl);
 	pidfile=NULL;
 
 	// get the scaninterval
@@ -87,7 +87,7 @@ sqlrcachemanager::~sqlrcachemanager() {
 	}
 
 	delete cmdl;
-	delete tmpdir;
+	delete sqlrpth;
 
 	if (pidfile) {
 		file::remove(pidfile);
@@ -102,12 +102,12 @@ void sqlrcachemanager::scan() {
 
 	// create pid file
 	pid_t	pid=process::getProcessId();
-	size_t	pidfilelen=tmpdir->getLength()+24+
+	size_t	pidfilelen=sqlrpth->getTmpDirLength()+24+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
 				"%s/pids/sqlr-cachemanager.%ld",
-				tmpdir->getString(),(long)pid);
+				sqlrpth->getTmpDir(),(long)pid);
 
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
 

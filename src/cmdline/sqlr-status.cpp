@@ -36,9 +36,9 @@ int main(int argc, const char **argv) {
 	}
 	
 	// get the id filename and key
-	sqlrtempdir	tmpdir(&cmdl);
+	sqlrpaths	sqlrp(&cmdl);
 	stringbuffer	idfilename;
-	idfilename.append(tmpdir.getString());
+	idfilename.append(sqlrp.getTmpDir());
 	idfilename.append("/ipc/");
 	idfilename.append(cmdl.getId());
 	key_t	key=file::generateKey(idfilename.getString(),1);

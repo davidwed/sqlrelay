@@ -38,9 +38,9 @@ int main(int argc, const char **argv) {
 	size_t		idlen=charstring::length(id);
 
 	// get the pid directory
-	sqlrtempdir	tmpdir(&cmdl);
+	sqlrpaths	sqlrpth(&cmdl);
 	stringbuffer	piddir;
-	piddir.append(tmpdir.getString());
+	piddir.append(sqlrpth.getTmpDir());
 	piddir.append((iswindows)?'\\':'/');
 	piddir.append("pids");
 

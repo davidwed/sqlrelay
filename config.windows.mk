@@ -57,8 +57,8 @@ WNOMISMATCHEDTAGS =
 INC = /I
 OBJ = obj
 TMPDIRCPPFLAG = /D TMP_DIR=\"$(tmpdir)\"
-DEBUGDIRCPPFLAG = /D DEBUG_DIR=\"$(debugdir)\"
 LOGDIRCPPFLAG = /D LOG_DIR=\"$(logdir)\"
+DEBUGDIRCPPFLAG = /D DEBUG_DIR=\"$(debugdir)\"
 CONFIGFILECPPFLAG = /D DEFAULT_CONFIG_FILE=\"$(sysconfdir)\\sqlrelay.conf\" /D DEFAULT_CONFIG_DIR=\"$(sysconfdir)\\sqlrelay.conf.d\"
 CACHEDIRCPPFLAG = /D CACHE_DIR=\"$(cachedir)\"
 
@@ -305,7 +305,7 @@ FIREBIRDLIBS = /LIBPATH:"C:\Program Files\Firebird\Firebird_2_5\lib" fbclient_ms
 
 
 # util
-UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) /DLIBEXECDIR=\"$(libexecdir)\"
+UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS $(TMPDIRCPPFLAG) $(LOGDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) /DLIBEXECDIR=\"$(libexecdir)\"
 UTILLIBS = $(RUDIMENTSLIBS)
 
 
@@ -320,7 +320,7 @@ STATICPLUGINSRCS =
 STATICPLUGINOBJS =
 STATICPLUGINLIBS =
 
-SERVERCPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
+SERVERCPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
 LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib
 SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
@@ -332,7 +332,7 @@ PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server libsqlrserver.lib /LIBPATH:$(to
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) /I$(top_builddir)\src\api\c++
 SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib
 
-LOGGERCPPFLAGS = $(PLUGINCPPFLAGS) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPLAG)
+LOGGERCPPFLAGS = $(PLUGINCPPFLAGS)
 
 INSTALLSHAREDLIB =
 

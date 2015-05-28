@@ -91,10 +91,7 @@
 		uint64_t	listenertimeout;
 
 		char		*pidfile;
-		sqlrtempdir	*tmpdir;
-
-		char		*logdir;
-		char		*debugdir;
+		sqlrpaths	*sqlrpth;
 
 		sqlrloggers	*sqlrlg;
 

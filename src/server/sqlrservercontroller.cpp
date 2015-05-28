@@ -57,10 +57,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	dbchanged=false;
 	originaldb=NULL;
 
-	tmpdir=NULL;
-
-	logdir=NULL;
-	debugdir=NULL;
+	sqlrpth=NULL;
 
 	unixsocket=NULL;
 	unixsocketptr=NULL;
@@ -168,10 +165,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete[] originaldb;
 
-	delete[] logdir;
-	delete[] debugdir;
-
-	delete tmpdir;
+	delete sqlrpth;
 
 	delete[] protocol;
 
@@ -230,26 +224,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// process command line
 	cmdl=new sqlrcmdline(argc,argv);
 
-	// set the tmpdir
-	tmpdir=new sqlrtempdir(cmdl);
-
-	// set the log and debug dirs
-	const char	*localstatedir=cmdl->getLocalStateDir();
-	if (localstatedir && localstatedir[0]) {
-
-		size_t	dirlen=charstring::length(localstatedir)+14+1;
-		logdir=new char[dirlen];
-		charstring::printf(logdir,dirlen,
-					"%s/sqlrelay/log/",localstatedir);
-
-		dirlen=charstring::length(localstatedir)+16+1;
-		debugdir=new char[dirlen];
-		charstring::printf(debugdir,dirlen,
-					"%s/sqlrelay/debug/",localstatedir);
-	} else {
-		logdir=charstring::duplicate(LOG_DIR);
-		debugdir=charstring::duplicate(DEBUG_DIR);
-	}
+	// initialize the paths
+	sqlrpth=new sqlrpaths(cmdl);
 
 	// default id warning
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
@@ -426,13 +402,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// create connection pid file
 	pid_t	pid=process::getProcessId();
-	size_t	pidfilelen=tmpdir->getLength()+22+
+	size_t	pidfilelen=sqlrpth->getTmpDirLength()+22+
 				charstring::length(cmdl->getId())+1+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
 				"%s/pids/sqlr-connection-%s.%ld",
-				tmpdir->getString(),cmdl->getId(),(long)pid);
+				sqlrpth->getTmpDir(),cmdl->getId(),(long)pid);
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// increment connection counter
@@ -562,11 +538,11 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 }
 
 void sqlrservercontroller::setUnixSocketDirectory() {
-	size_t	unixsocketlen=tmpdir->getLength()+31;
+	size_t	unixsocketlen=sqlrpth->getTmpDirLength()+31;
 	unixsocket=new char[unixsocketlen];
 	charstring::printf(unixsocket,unixsocketlen,
-				"%s/sockets/",tmpdir->getString());
-	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
+				"%s/sockets/",sqlrpth->getTmpDir());
+	unixsocketptr=unixsocket+sqlrpth->getTmpDirLength()+8+1;
 	unixsocketptrlen=unixsocketlen-(unixsocketptr-unixsocket);
 }
 
@@ -577,12 +553,12 @@ bool sqlrservercontroller::handlePidFile() {
 	// writes it out after forking and it's possible that the connection
 	// might start up after the sqlr-listener has forked, but before it
 	// writes out the pid file)
-	size_t	listenerpidfilelen=tmpdir->getLength()+20+
+	size_t	listenerpidfilelen=sqlrpth->getTmpDirLength()+20+
 				charstring::length(cmdl->getId())+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
 				"%s/pids/sqlr-listener-%s",
-				tmpdir->getString(),cmdl->getId());
+				sqlrpth->getTmpDir(),cmdl->getId());
 
 	// On most platforms, 1 second is plenty of time to wait for the
 	// listener to come up, but on windows, it can take a while longer.
@@ -631,12 +607,12 @@ bool sqlrservercontroller::handlePidFile() {
 void sqlrservercontroller::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	size_t	updownlen=charstring::length(tmpdir->getString())+5+
+	size_t	updownlen=sqlrpth->getTmpDirLength()+5+
 					charstring::length(cmdl->getId())+1+
 					charstring::length(connectionid)+1;
 	updown=new char[updownlen];
 	charstring::printf(updown,updownlen,"%s/ipc/%s-%s",
-			tmpdir->getString(),cmdl->getId(),connectionid);
+			sqlrpth->getTmpDir(),cmdl->getId(),connectionid);
 }
 
 bool sqlrservercontroller::getUnixSocket() {
@@ -668,10 +644,10 @@ bool sqlrservercontroller::getUnixSocket() {
 bool sqlrservercontroller::openSequenceFile(file *sockseq) {
 
 	// open the sequence file and get the current port number
-	size_t	sockseqnamelen=tmpdir->getLength()+9;
+	size_t	sockseqnamelen=sqlrpth->getTmpDirLength()+9;
 	char	*sockseqname=new char[sockseqnamelen];
 	charstring::printf(sockseqname,sockseqnamelen,
-				"%s/sockseq",tmpdir->getString());
+				"%s/sockseq",sqlrpth->getTmpDir());
 
 	size_t	stringlen=8+charstring::length(sockseqname)+1;
 	char	*string=new char[stringlen];
@@ -1414,12 +1390,12 @@ void sqlrservercontroller::registerForHandoff() {
 	logDebugMessage("registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	handoffsocknamelen=tmpdir->getLength()+9+
+	size_t	handoffsocknamelen=sqlrpth->getTmpDirLength()+9+
 				charstring::length(cmdl->getId())+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
 					"%s/sockets/%s-handoff",
-					tmpdir->getString(),cmdl->getId());
+					sqlrpth->getTmpDir(),cmdl->getId());
 
 	size_t	stringlen=17+charstring::length(handoffsockname)+1;
 	char	*string=new char[stringlen];
@@ -1461,13 +1437,13 @@ void sqlrservercontroller::deRegisterForHandoff() {
 	logDebugMessage("de-registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	removehandoffsocknamelen=tmpdir->getLength()+9+
+	size_t	removehandoffsocknamelen=sqlrpth->getTmpDirLength()+9+
 					charstring::length(cmdl->getId())+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
 				"%s/sockets/%s-removehandoff",
-				tmpdir->getString(),cmdl->getId());
+				sqlrpth->getTmpDir(),cmdl->getId());
 
 	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
 	char	*string=new char[stringlen];
@@ -4141,11 +4117,11 @@ void sqlrservercontroller::deleteCursor(sqlrservercursor *curs) {
 
 bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
-	size_t	idfilenamelen=tmpdir->getLength()+5+
+	size_t	idfilenamelen=sqlrpth->getTmpDirLength()+5+
 					charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,"%s/ipc/%s",
-						tmpdir->getString(),id);
+						sqlrpth->getTmpDir(),id);
 
 	debugstr.clear();
 	debugstr.append("attaching to shared memory and semaphores ");
@@ -5235,11 +5211,11 @@ const char *sqlrservercontroller::getId() {
 }
 
 const char *sqlrservercontroller::getLogDir() {
-	return logdir;
+	return sqlrpth->getLogDir();
 }
 
 const char *sqlrservercontroller::getDebugDir() {
-	return debugdir;
+	return sqlrpth->getDebugDir();
 }
 
 bool sqlrservercontroller::isCustomQuery(sqlrservercursor *cursor) {

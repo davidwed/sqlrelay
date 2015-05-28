@@ -168,7 +168,7 @@
 		bool		dbchanged;
 		char		*originaldb;
 
-		sqlrtempdir	*tmpdir;
+		sqlrpaths	*sqlrpth;
 
 		connectstringcontainer	*constr;
 
