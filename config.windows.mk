@@ -56,11 +56,8 @@ WNOUNKNOWNPRAGMAS =
 WNOMISMATCHEDTAGS =
 INC = /I
 OBJ = obj
-TMPDIRCPPFLAG = /D TMP_DIR=\"$(tmpdir)\"
-LOGDIRCPPFLAG = /D LOG_DIR=\"$(logdir)\"
-DEBUGDIRCPPFLAG = /D DEBUG_DIR=\"$(debugdir)\"
-CONFIGFILECPPFLAG = /D DEFAULT_CONFIG_FILE=\"$(sysconfdir)\\sqlrelay.conf\" /D DEFAULT_CONFIG_DIR=\"$(sysconfdir)\\sqlrelay.conf.d\"
-CACHEDIRCPPFLAG = /D CACHE_DIR=\"$(cachedir)\"
+LOCALSTATEDIRCPPFLAG = /D LOCALSTATEDIR=\"$(localstatedir)\"
+SYSCONFDIRCPPFLAG = /D SYSCONFDIR=\"$(sysconfir)\"
 
 
 # linker flags
@@ -305,12 +302,12 @@ FIREBIRDLIBS = /LIBPATH:"C:\Program Files\Firebird\Firebird_2_5\lib" fbclient_ms
 
 
 # util
-UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS $(TMPDIRCPPFLAG) $(LOGDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) /DLIBEXECDIR=\"$(libexecdir)\"
+UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS $(LOCALSTATEDIRCPPFLAG) $(SYSCONFDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) /DLIBEXECDIR=\"$(libexecdir)\"
 UTILLIBS = $(RUDIMENTSLIBS)
 
 
 # cmdline
-CMDLINECPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) /D SYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
+CMDLINECPPFLAGS = $(BASECPPFLAGS) /D SYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 CMDLINELIBS = /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 PWDENCLIBS = /LIBPATH:$(top_builddir)/src/server libsqlrserver.lib /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -320,7 +317,7 @@ STATICPLUGINSRCS =
 STATICPLUGINOBJS =
 STATICPLUGINLIBS =
 
-SERVERCPPFLAGS = $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
+SERVERCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
 LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib
 SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 

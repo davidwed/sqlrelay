@@ -222,8 +222,8 @@ void sqlrcachemanager::parseCacheDirs(const char *cachedirs) {
 	} else {
 
 		// in the event that there is no dirnames 
-		// string then use the default CACHE_DIR 
-		firstdir=new dirnode(CACHE_DIR);
+		// string then use the default cache directory
+		firstdir=new dirnode(sqlrpth->getCacheDir());
 		currentdir=firstdir;
 	}
 }

@@ -63,12 +63,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	cmdl=new sqlrcmdline(argc,argv);
 
 	// get the id
-	const char	*tmpid=cmdl->getValue("-id");
-	if (!(tmpid && tmpid[0])) {
-		tmpid=DEFAULT_ID;
+	id=cmdl->getId();
+	if (!charstring::compare(id,DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");
 	}
-	id=charstring::duplicate(tmpid);
 
 	sqlrpth=new sqlrpaths(cmdl);
 
@@ -142,10 +140,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	debug=cmdl->found("-debug");
 
 	// get the config file
-	config=charstring::duplicate(cmdl->getValue("-config"));
+	config=sqlrpth->getConfigFile();
 
 	// parse the config file
-	cfgfile=new sqlrconfigfile;
+	cfgfile=new sqlrconfigfile(sqlrpth);
 	if (cfgfile->parse(config,id)) {
 
 		// don't even start if we're not using dynamic scaling
@@ -241,7 +239,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 		ttl=cfgfile->getTtl();
 
 		// get the database type
-		dbase=charstring::duplicate(cfgfile->getDbase());
+		dbase=cfgfile->getDbase();
 
 		// get the list of connect strings
 		connectstringlist=cfgfile->getConnectStringList();
@@ -315,7 +313,6 @@ void scaler::cleanUp() {
 	delete semset;
 	delete shmem;
 	delete cfgfile;
-	delete[] id;
 
 	delete sqlrpth;
 
@@ -324,7 +321,6 @@ void scaler::cleanUp() {
 		delete[] pidfile;
 	}
 
-	delete[] config;
 	delete[] dbase;
 
 	delete cmdl;
@@ -426,10 +422,8 @@ pid_t scaler::openOneConnection() {
 		args[p++]="-config";
 		args[p++]=config;
 	}
-	if (charstring::length(cmdl->getLocalStateDir())) {
-		args[p++]="-localstatedir";
-		args[p++]=cmdl->getLocalStateDir();
-	}
+	args[p++]="-localstatedir";
+	args[p++]=sqlrpth->getLocalStateDir();
 	args[p++]="-scaler";
 	if (debug) {
 		args[p++]="-debug";

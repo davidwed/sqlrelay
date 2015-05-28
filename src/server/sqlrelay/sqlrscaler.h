@@ -41,9 +41,9 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		char		*pidfile;
 
-		char		*id;
-		char		*config;
-		char		*dbase;
+		const char	*id;
+		const char	*config;
+		const char	*dbase;
 
 		sqlrconfigfile	*cfgfile;
 

@@ -249,12 +249,15 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	// get the command line args
 	sqlrcmdline	cmdl(argc,argv);
-	const char	*localstatedir=cmdl.getValue("-localstatedir");
+	sqlrpaths	sqlrpth(&cmdl);
+	sqlrconfigfile	cfgfile(&sqlrpth);
+
+	// get the command line args
+	const char	*localstatedir=sqlrpth.getLocalStateDir();
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getValue("-id");
-	const char	*config=cmdl.getConfig();
+	const char	*config=sqlrpth.getConfigFile();
 	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
 
 	// on Windows, open a new console window and redirect everything to it
@@ -290,7 +293,6 @@ int main(int argc, const char **argv) {
 				sys::getOperatingSystemName(),"Windows");
 
 	// get the id
-	sqlrconfigfile	cfgfile;
 	linkedlist< char * >	ids;
 	if (id && id[0]) {
 		ids.append(charstring::duplicate(id));

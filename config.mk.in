@@ -56,11 +56,8 @@ WNOUNKNOWNPRAGMAS = @WNOUNKNOWNPRAGMAS@
 WNOMISMATCHEDTAGS = @WNOMISMATCHEDTAGS@
 INC = -I
 OBJ = lo
-TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
-LOGDIRCPPFLAG = -DLOG_DIR=\"$(logdir)\"
-DEBUGDIRCPPFLAG = -DDEBUG_DIR=\"$(debugdir)\"
-CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\" -DDEFAULT_CONFIG_DIR=\"$(sysconfdir)/sqlrelay.conf.d\"
-CACHEDIRCPPFLAG = -DCACHE_DIR=\"$(cachedir)\"
+LOCALSTATEDIRCPPFLAG = -DLOCALSTATEDIR=\"$(localstatedir)\"
+SYSCONFDIRCPPFLAG = -DSYSCONFDIR=\"$(sysconfdir)\"
 
 
 # linker flags
@@ -466,12 +463,12 @@ ROUTERUSERPATH =
 ifeq ($(MINGW32),yes)
 UTILDLLEXPORTS = -DLIBSQLRUTIL_EXPORTS
 endif
-UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(UTILDLLEXPORTS) $(TMPDIRCPPFLAG) $(LOGDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
+UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(UTILDLLEXPORTS) $(LOCALSTATEDIRCPPFLAG) $(SYSCONFDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 UTILLIBS = $(RUDIMENTSLIBS)
 
 
 # cmdline
-CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" $(CACHEDIRCPPFLAG) -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
+CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
 CMDLINELIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 PWDENCLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
@@ -569,7 +566,7 @@ STATICPLUGINLIBS += $(SYBASELIBS)
 STATICPLUGINLIBS += -L$(top_builddir)/src/api/c++ -lsqlrclient
 endif
 
-SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
+SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 LIBSQLRSERVERLIBS = -L$(top_builddir)/src/util -lsqlrutil
 SERVERLIBS = -L./ -lsqlrserver $(STATICPLUGINLIBS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)

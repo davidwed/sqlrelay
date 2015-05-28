@@ -91,7 +91,10 @@
 		uint64_t	listenertimeout;
 
 		char		*pidfile;
+
+		sqlrcmdline	*cmdl;
 		sqlrpaths	*sqlrpth;
+		sqlrconfigfile	*cfgfl;
 
 		sqlrloggers	*sqlrlg;
 
@@ -127,8 +130,6 @@
 		regularexpression	*allowed;
 		regularexpression	*denied;
 
-		sqlrcmdline	*cmdl;
-
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
 		uint16_t	maxbindnamelength;
@@ -136,8 +137,6 @@
 
 		bool	isforkedchild;
 		bool	isforkedthread;
-
-		sqlrconfigfile		cfgfl;
 
 		static	signalhandler		alarmhandler;
 		static	volatile sig_atomic_t	alarmrang;

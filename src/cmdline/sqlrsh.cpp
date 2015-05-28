@@ -7,7 +7,6 @@
 #include <sqlrelay/sqlrclient.h>
 #include <sqlrelay/sqlrutil.h>
 
-#include <rudiments/commandline.h>
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/filesystem.h>
@@ -131,9 +130,8 @@ enum querytype_t {
 
 class	sqlrsh {
 	public:
-#ifndef HAVE_READLINE
 			sqlrsh();
-#endif
+			~sqlrsh();
 		void	execute(int argc, const char **argv);
 	private:
 		void	startupMessage(sqlrshenv *env,
@@ -218,17 +216,29 @@ class	sqlrsh {
 #ifndef HAVE_READLINE
 		filedescriptor	standardin;
 #endif
+
+		sqlrcmdline	*cmdline;
+		sqlrpaths	*sqlrpth;
 };
 
-#ifndef HAVE_READLINE
 sqlrsh::sqlrsh() {
+
+	cmdline=NULL;
+	sqlrpth=NULL;
+
+#ifndef HAVE_READLINE
 	standardin.setFileDescriptor(0);
 	// Critical on some systems (Syllable for sure, maybe others)
 	// or prompts just roll up the screen forever.
 	standardin.useBlockingMode();
 	standardin.allowShortReads();
-}
 #endif
+}
+
+sqlrsh::~sqlrsh() {
+	delete cmdline;
+	delete sqlrpth;
+}
 
 void sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 						sqlrshenv *env) {
@@ -1582,13 +1592,14 @@ void sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
 
 	// build filename
 	stringbuffer	fn;
-	if (CACHE_DIR[0]=='/') {
+	const char	*cachedir=sqlrpth->getCacheDir();
+	if (cachedir[0]=='/') {
 		if (*ptr!='/') {
-			fn.append(CACHE_DIR)->append('/');
+			fn.append(cachedir)->append('/');
 		}
-	} else if (!charstring::compare(CACHE_DIR+1,":\\",2)) {
+	} else if (!charstring::compare(cachedir+1,":\\",2)) {
 		if (!charstring::compare(ptr+1,":\\",2)) {
-			fn.append(CACHE_DIR)->append('\\');
+			fn.append(cachedir)->append('\\');
 		}
 	}
 	bool	inquotes=false;
@@ -1640,23 +1651,24 @@ void sqlrsh::openCache(sqlrshenv *env,
 
 	// if the file name starts with a slash then use it as-is, otherwise
 	// prepend the default cache directory.
-	stringbuffer	filename;
-	if (CACHE_DIR[0]=='/') {
+	stringbuffer	fn;
+	const char	*cachedir=sqlrpth->getCacheDir();
+	if (cachedir[0]=='/') {
 		if (*command!='/') {
-			filename.append(CACHE_DIR)->append('/');
+			fn.append(cachedir)->append('/');
 		}
-	} else if (!charstring::compare(CACHE_DIR+1,":\\",2)) {
+	} else if (!charstring::compare(cachedir+1,":\\",2)) {
 		if (!charstring::compare(command+1,":\\",2)) {
-			filename.append(CACHE_DIR)->append('\\');
+			fn.append(cachedir)->append('\\');
 		}
 	}
-	filename.append(command);
+	fn.append(command);
 
 	// init stats
 	initStats(env);
 
 	// open the cached result set
-	sqlrcur->openCachedResultSet(filename.getString());
+	sqlrcur->openCachedResultSet(fn.getString());
 
 	// display the header
 	displayHeader(sqlrcur,env);
@@ -1851,21 +1863,21 @@ void sqlrsh::prompt(unsigned long promptcount) {
 
 void sqlrsh::execute(int argc, const char **argv) {
 
+	cmdline=new sqlrcmdline(argc,argv);
+	sqlrpth=new sqlrpaths(cmdline);
+	sqlrconfigfile	cfgfile(sqlrpth);
 
-	commandline	cmdline(argc,argv);
-	sqlrconfigfile	cfgfile;
-
-	const char	*config=cmdline.getValue("-config");
-	const char	*id=cmdline.getValue("-id");
-	const char	*host=cmdline.getValue("-host");
+	const char	*config=cmdline->getValue("-config");
+	const char	*id=cmdline->getValue("-id");
+	const char	*host=cmdline->getValue("-host");
 	uint16_t	port=charstring::toInteger(
-				(cmdline.found("-port"))?
-					cmdline.getValue("-port"):DEFAULT_PORT);
-	const char	*socket=cmdline.getValue("-socket");
-	const char	*user=cmdline.getValue("-user");
-	const char	*password=cmdline.getValue("-password");
-	const char	*script=cmdline.getValue("-script");
-	const char	*command=cmdline.getValue("-command");
+				(cmdline->found("-port"))?
+				cmdline->getValue("-port"):DEFAULT_PORT);
+	const char	*socket=cmdline->getValue("-socket");
+	const char	*user=cmdline->getValue("-user");
+	const char	*password=cmdline->getValue("-password");
+	const char	*script=cmdline->getValue("-script");
+	const char	*command=cmdline->getValue("-command");
 	
 	if (!(charstring::length(id) ||
 		charstring::length(host) ||

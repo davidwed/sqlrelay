@@ -7,7 +7,6 @@
 #include <sqlrelay/sqlrclient.h>
 #include <sqlrelay/sqlrutil.h>
 
-#include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
@@ -51,9 +50,9 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	sqlrconfigfile	cfgfile;
-
-	commandline	cmdline(argc,argv);
+	sqlrcmdline 	cmdline(argc,argv);
+	sqlrpaths	sqlrpth(&cmdline);
+	sqlrconfigfile	cfgfile(&sqlrpth);
 
 	const char	*config=cmdline.getValue("-config");
 	const char	*id=cmdline.getValue("-id");

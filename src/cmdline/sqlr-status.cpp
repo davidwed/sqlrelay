@@ -28,10 +28,11 @@ int main(int argc, const char **argv) {
 
 	// parse the command line
 	sqlrcmdline	cmdl(argc,argv);
+	sqlrpaths	sqlrpth(&cmdl);
+	sqlrconfigfile	cfgfl(&sqlrpth);
 
 	// parse the config file
-	sqlrconfigfile	cfgfl;
-	if (!cfgfl.parse(cmdl.getConfig(),cmdl.getId())) {
+	if (!cfgfl.parse(sqlrpth.getConfigFile(),cmdl.getId())) {
 		process::exit(0);
 	}
 	

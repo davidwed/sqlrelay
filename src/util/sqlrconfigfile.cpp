@@ -12,7 +12,8 @@
 #include <defines.h>
 #include <defaults.h>
 
-sqlrconfigfile::sqlrconfigfile() : xmlsax() {
+sqlrconfigfile::sqlrconfigfile(sqlrpaths *sqlrpth) : xmlsax() {
+	this->sqlrpth=sqlrpth;
 	init();
 }
 
@@ -1803,7 +1804,7 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 
 	// attempt to parse the config file
 	if (!config || !config[0]) {
-		config=DEFAULT_CONFIG_FILE;
+		config=sqlrpth->getDefaultConfigFile();
 	}
 	parseFile(config);
 
@@ -1813,7 +1814,7 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 	const char	*slash=(!charstring::compareIgnoringCase(
 						sys::getOperatingSystemName(),
 						"Windows"))?"\\":"/";
-	if (!done && d.open(DEFAULT_CONFIG_DIR)) {
+	if (!done && d.open(sqlrpth->getDefaultConfigDir())) {
 		for (;;) {
 			char	*filename=d.read();
 			if (!filename) {
@@ -1823,7 +1824,7 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 				charstring::compare(filename,"..")) {
 
 				fullpath.clear();
-				fullpath.append(DEFAULT_CONFIG_DIR);
+				fullpath.append(sqlrpth->getDefaultConfigDir());
 				fullpath.append(slash);
 				fullpath.append(filename);
 				delete[] filename;
@@ -1857,7 +1858,7 @@ void sqlrconfigfile::getEnabledIds(const char *config,
 
 	// attempt to parse the config file
 	if (!config || !config[0]) {
-		config=DEFAULT_CONFIG_FILE;
+		config=sqlrpth->getDefaultConfigFile();
 	}
 	parseFile(config);
 
@@ -1867,7 +1868,7 @@ void sqlrconfigfile::getEnabledIds(const char *config,
 	const char	*slash=(!charstring::compareIgnoringCase(
 						sys::getOperatingSystemName(),
 						"Windows"))?"\\":"/";
-	if (d.open(DEFAULT_CONFIG_DIR)) {
+	if (d.open(sqlrpth->getDefaultConfigDir())) {
 		for (;;) {
 			char	*filename=d.read();
 			if (!filename) {
@@ -1877,7 +1878,7 @@ void sqlrconfigfile::getEnabledIds(const char *config,
 				charstring::compare(filename,"..")) {
 
 				fullpath.clear();
-				fullpath.append(DEFAULT_CONFIG_DIR);
+				fullpath.append(sqlrpth->getDefaultConfigDir());
 				fullpath.append(slash);
 				fullpath.append(filename);
 				delete[] filename;

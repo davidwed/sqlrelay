@@ -14,18 +14,15 @@
 #include <sqlrelay/private/sqlrutildll.h>
 
 class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
+	friend class sqlrpaths;
 	public:
 			sqlrcmdline(int argc, const char **argv);
 
-		const char	*getConfig() const;
 		const char	*getId() const;
-		const char	*getLocalStateDir() const;
 	private:
-		void	setConfig();
-		void	setId();
-		void	setLocalStateDir();
+		const char	*getConfig() const;
+		const char	*getLocalStateDir() const;
 
-		// command line parameters
 		const char	*id;
 		const char	*config;
 		const char	*localstatedir;
@@ -35,19 +32,25 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 	public:
 				sqlrpaths(sqlrcmdline *cmdl);
 				~sqlrpaths();
+		const char	*getLocalStateDir();
 		const char	*getTmpDir();
 		uint32_t	getTmpDirLength();
 		const char	*getLogDir();
-		uint32_t	getLogDirLength();
 		const char	*getDebugDir();
-		uint32_t	getDebugDirLength();
+		const char	*getCacheDir();
+		const char	*getDefaultConfigFile();
+		const char	*getDefaultConfigDir();
+		const char	*getConfigFile();
 	protected:
+		const char	*localstatedir;
 		char		*tmpdir;
 		uint32_t	tmpdirlen;
 		char		*logdir;
-		uint32_t	logdirlen;
 		char		*debugdir;
-		uint32_t	debugdirlen;
+		char		*cachedir;
+		char		*defaultconfigfile;
+		char		*defaultconfigdir;
+		const char	*configfile;
 };
 
 class SQLRUTIL_DLLSPEC listenercontainer {
@@ -120,7 +123,6 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 		bool		behindloadbalancer;
 		char		*pwdenc;
 
-		// connect string parameters
 		parameterstring	connectstring;
 };
 
@@ -160,7 +162,7 @@ typedef linkedlistnode< routecontainer * >	routenode;
 
 class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 	public:
-			sqlrconfigfile();
+			sqlrconfigfile(sqlrpaths *sqlrpth);
 			~sqlrconfigfile();
 		void	getEnabledIds(const char *config,
 					linkedlist< char * > *idlist);
@@ -248,6 +250,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		linkedlist< routecontainer * >	*getRouteList();
 	private:
+		sqlrpaths		*sqlrpth;
+
 		bool			getenabledids;
 		char			*currentid;
 		bool			enabled;

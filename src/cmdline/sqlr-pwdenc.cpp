@@ -7,7 +7,6 @@
 #include <sqlrelay/sqlrutil.h>
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
@@ -15,8 +14,11 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
+	sqlrcmdline 	cmdline(argc,argv);
+	sqlrpaths	sqlrpth(&cmdline);
+	sqlrconfigfile	cfgfl(&sqlrpth);
+
 	// get the command line arguments
-	commandline	cmdline(argc,argv);
 	const char	*config=cmdline.getValue("-config");
 	const char	*id=cmdline.getValue("-id");
 	const char	*pwdencid=cmdline.getValue("-pwdencid");
@@ -34,7 +36,6 @@ int main(int argc, const char **argv) {
 	}
 
 	// open the config file
-	sqlrconfigfile	cfgfl;
 	if (!cfgfl.parse(config,id)) {
 		stderror.printf("SQL Relay instance %s not found in %s\n",
 								id,config);

@@ -1,42 +1,55 @@
 // Copyright (c) 2000-2005  David Muse
 // See the file COPYING for more information
 
-#include <rudiments/charstring.h>
+#include <rudiments/stringbuffer.h>
 #include <sqlrelay/sqlrutil.h>
 
 sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 
-	if (cmdl->getLocalStateDir()[0]) {
+	localstatedir=cmdl->getLocalStateDir();
+	if (!cmdl->getLocalStateDir()[0]) {
+		localstatedir=LOCALSTATEDIR;
+	}
+	const char	*sysconfdir=SYSCONFDIR;
 
-		tmpdirlen=charstring::length(cmdl->getLocalStateDir())+13;
-		tmpdir=new char[tmpdirlen+1];
-		charstring::copy(tmpdir,cmdl->getLocalStateDir());
-		charstring::append(tmpdir,"/sqlrelay/tmp");
+	stringbuffer	scratch;
+	scratch.append(localstatedir)->append("/sqlrelay/tmp");
+	tmpdirlen=scratch.getStringLength();
+	tmpdir=scratch.detachString();
 
-		logdirlen=charstring::length(cmdl->getLocalStateDir())+13;
-		logdir=new char[logdirlen+1];
-		charstring::copy(logdir,cmdl->getLocalStateDir());
-		charstring::append(logdir,"/sqlrelay/log");
+	scratch.append(localstatedir)->append("/sqlrelay/log");
+	logdir=scratch.detachString();
 
-		debugdirlen=charstring::length(cmdl->getLocalStateDir())+15;
-		debugdir=new char[debugdirlen+1];
-		charstring::copy(debugdir,cmdl->getLocalStateDir());
-		charstring::append(debugdir,"/sqlrelay/debug");
+	scratch.append(localstatedir)->append("/sqlrelay/debug");
+	debugdir=scratch.detachString();
 
+	scratch.append(localstatedir)->append("/sqlrelay/cache");
+	cachedir=scratch.detachString();
+
+	scratch.append(sysconfdir)->append("/sqlrelay.conf");
+	defaultconfigfile=scratch.detachString();
+
+	scratch.append(sysconfdir)->append("/sqlrelay.conf.d");
+	defaultconfigdir=scratch.detachString();
+
+	if (cmdl->getConfig()) {
+		configfile=cmdl->getConfig();
 	} else {
-		tmpdir=charstring::duplicate(TMP_DIR);
-		tmpdirlen=charstring::length(tmpdir);
-
-		logdir=charstring::duplicate(LOG_DIR);
-		logdirlen=charstring::length(logdir);
-
-		debugdir=charstring::duplicate(DEBUG_DIR);
-		debugdirlen=charstring::length(debugdir);
+		configfile=defaultconfigfile;
 	}
 }
 
 sqlrpaths::~sqlrpaths() {
 	delete[] tmpdir;
+	delete[] logdir;
+	delete[] debugdir;
+	delete[] cachedir;
+	delete[] defaultconfigfile;
+	delete[] defaultconfigdir;
+}
+
+const char *sqlrpaths::getLocalStateDir() {
+	return localstatedir;
 }
 
 const char *sqlrpaths::getTmpDir() {
@@ -51,14 +64,22 @@ const char *sqlrpaths::getLogDir() {
 	return logdir;
 }
 
-uint32_t sqlrpaths::getLogDirLength() {
-	return logdirlen;
-}
-
 const char *sqlrpaths::getDebugDir() {
 	return debugdir;
 }
 
-uint32_t sqlrpaths::getDebugDirLength() {
-	return debugdirlen;
+const char *sqlrpaths::getCacheDir() {
+	return cachedir;
+}
+
+const char *sqlrpaths::getDefaultConfigFile() {
+	return defaultconfigfile;
+}
+
+const char *sqlrpaths::getDefaultConfigDir() {
+	return defaultconfigdir;
+}
+
+const char *sqlrpaths::getConfigFile() {
+	return configfile;
 }
