@@ -31,15 +31,23 @@ class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 		const char	*localstatedir;
 };
 
-class SQLRUTIL_DLLSPEC sqlrtempdir {
+class SQLRUTIL_DLLSPEC sqlrpaths {
 	public:
-			sqlrtempdir(sqlrcmdline *cmdl);
-			~sqlrtempdir();
-		char	*getString();
-		int32_t	getLength();
+				sqlrpaths(sqlrcmdline *cmdl);
+				~sqlrpaths();
+		const char	*getTmpDir();
+		uint32_t	getTmpDirLength();
+		const char	*getLogDir();
+		uint32_t	getLogDirLength();
+		const char	*getDebugDir();
+		uint32_t	getDebugDirLength();
 	protected:
-		char	*tmpdir;
-		int32_t	tmpdirlen;
+		char		*tmpdir;
+		uint32_t	tmpdirlen;
+		char		*logdir;
+		uint32_t	logdirlen;
+		char		*debugdir;
+		uint32_t	debugdirlen;
 };
 
 class SQLRUTIL_DLLSPEC listenercontainer {
