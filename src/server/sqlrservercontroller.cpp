@@ -542,7 +542,7 @@ void sqlrservercontroller::setUnixSocketDirectory() {
 	unixsocket=new char[unixsocketlen];
 	charstring::printf(unixsocket,unixsocketlen,"%s",
 					sqlrpth->getSocketsDir());
-	unixsocketptr=unixsocket+charstring::length(sqlrpth->getSocketsDir())+1;
+	unixsocketptr=unixsocket+charstring::length(sqlrpth->getSocketsDir());
 	unixsocketptrlen=unixsocketlen-(unixsocketptr-unixsocket);
 }
 
@@ -704,12 +704,9 @@ bool sqlrservercontroller::getAndIncrementSequenceNumber(file *sockseq) {
 	}
 	charstring::printf(unixsocketptr,unixsocketptrlen,"%d",buffer);
 
-	size_t	stringlen=21+charstring::length(unixsocketptr)+1;
-	char	*string=new char[stringlen];
-	charstring::printf(string,stringlen,
-			"got sequence number: %s",unixsocketptr);
-	logDebugMessage(string);
-	delete[] string;
+	debugstr.clear();
+	debugstr.append("got sequence number: ")->append(unixsocketptr);
+	logDebugMessage(debugstr.getString());
 
 	// increment the sequence number but don't let it roll over
 	if (buffer==2147483647) {
@@ -718,10 +715,9 @@ bool sqlrservercontroller::getAndIncrementSequenceNumber(file *sockseq) {
 		buffer=buffer+1;
 	}
 
-	string=new char[50];
-	charstring::printf(string,50,"writing new sequence number: %d",buffer);
-	logDebugMessage(string);
-	delete[] string;
+	debugstr.clear();
+	debugstr.append("writing new sequence number: ")->append(buffer);
+	logDebugMessage(debugstr.getString());
 
 	// write the sequence number back to the file
 	if (sockseq->setPositionRelativeToBeginning(0)==-1 ||
@@ -965,11 +961,9 @@ void sqlrservercontroller::decrementConnectionCount() {
 
 void sqlrservercontroller::markDatabaseAvailable() {
 
-	size_t	stringlen=9+charstring::length(updown)+1;
-	char	*string=new char[stringlen];
-	charstring::printf(string,stringlen,"creating %s",updown);
-	logDebugMessage(string);
-	delete[] string;
+	debugstr.clear();
+	debugstr.append("creating ")->append(updown);
+	logDebugMessage(debugstr.getString());
 
 	// the database is up if the file is there, 
 	// opening and closing it will create it
@@ -984,11 +978,9 @@ void sqlrservercontroller::markDatabaseUnavailable() {
 		return;
 	}
 
-	size_t	stringlen=10+charstring::length(updown)+1;
-	char	*string=new char[stringlen];
-	charstring::printf(string,stringlen,"unlinking %s",updown);
-	logDebugMessage(string);
-	delete[] string;
+	debugstr.clear();
+	debugstr.append("unlinking ")->append(updown);
+	logDebugMessage(debugstr.getString());
 
 	// the database is down if the file isn't there
 	file::remove(updown);
@@ -1005,14 +997,10 @@ bool sqlrservercontroller::openSockets() {
 			serversockun=new unixsocketserver();
 			if (serversockun->listen(unixsocket,0000,5)) {
 
-				size_t	stringlen=26+
-					charstring::length(unixsocket)+1;
-				char	*string=new char[stringlen];
-				charstring::printf(string,stringlen,
-						"listening on unix socket: %s",
-						unixsocket);
-				logDebugMessage(string);
-				delete[] string;
+				debugstr.clear();
+				debugstr.append("listening on unix socket: ");
+				debugstr.append(unixsocket);
+				logDebugMessage(debugstr.getString());
 
 				addReadFileDescriptor(serversockun);
 
@@ -1391,12 +1379,9 @@ void sqlrservercontroller::registerForHandoff() {
 					sqlrpth->getSocketsDir(),
 					cmdl->getId());
 
-	size_t	stringlen=17+charstring::length(handoffsockname)+1;
-	char	*string=new char[stringlen];
-	charstring::printf(string,stringlen,
-				"handoffsockname: %s",handoffsockname);
-	logDebugMessage(string);
-	delete[] string;
+	debugstr.clear();
+	debugstr.append("handoffsockname: ")->append(handoffsockname);
+	logDebugMessage(debugstr.getString());
 
 	// Try to connect over and over forever on 1 second intervals.
 	// If the connect succeeds but the write fails, loop back and
@@ -1440,13 +1425,10 @@ void sqlrservercontroller::deRegisterForHandoff() {
 				"%s%s-removehandoff",
 				sqlrpth->getSocketsDir(),cmdl->getId());
 
-	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
-	char	*string=new char[stringlen];
-	charstring::printf(string,stringlen,
-				"removehandoffsockname: %s",
-				removehandoffsockname);
-	logDebugMessage(string);
-	delete[] string;
+	debugstr.clear();
+	debugstr.append("removehandoffsockname: ");
+	debugstr.append(removehandoffsockname);
+	logDebugMessage(debugstr.getString());
 
 	// attach to the socket and write the process id
 	unixsocketclient	removehandoffsockun;

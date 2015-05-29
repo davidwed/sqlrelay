@@ -60,9 +60,11 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 
 	char	slash=sys::getDirectorySeparator();
 
-	localstatedir=cmdl->getLocalStateDir();
+	localstatedir=charstring::duplicate(cmdl->getLocalStateDir());
 	if (!cmdl->getLocalStateDir()[0]) {
 		localstatedir=defaultlocalstatedir;
+	} else {
+		delete[] defaultlocalstatedir;
 	}
 
 	scratch.append(localstatedir)->append("sqlrelay")->append(slash);
@@ -105,12 +107,11 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 		configfile=defaultconfigfile;
 	}
 
-	delete[] defaultlocalstatedir;
 	delete[] sysconfdir;
-	delete[] libexecdir;
 }
 
 sqlrpaths::~sqlrpaths() {
+	delete[] localstatedir;
 	delete[] tmpdir;
 	delete[] sockseqfile;
 	delete[] socketsdir;
@@ -121,6 +122,7 @@ sqlrpaths::~sqlrpaths() {
 	delete[] cachedir;
 	delete[] defaultconfigfile;
 	delete[] defaultconfigdir;
+	delete[] libexecdir;
 }
 
 const char *sqlrpaths::getLocalStateDir() {
