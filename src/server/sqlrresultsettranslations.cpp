@@ -10,9 +10,10 @@
 
 #include <config.h>
 
-sqlrresultsettranslations::sqlrresultsettranslations() {
+sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth) {
 	debugFunction();
 	xmld=NULL;
+	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrresultsettranslations::~sqlrresultsettranslations() {
@@ -97,8 +98,8 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the result set translation module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrresultsettranslation_");
+	modulename.append(libexecdir);
+	modulename.append("sqlrresultsettranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

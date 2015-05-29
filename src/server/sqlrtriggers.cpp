@@ -9,9 +9,10 @@
 
 #include <config.h>
 
-sqlrtriggers::sqlrtriggers(bool debug) {
+sqlrtriggers::sqlrtriggers(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	xmld=NULL;
+	libexecdir=sqlrpth->getLibExecDir();
 	this->debug=debug;
 }
 
@@ -111,8 +112,8 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the trigger module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrtrigger_");
+	modulename.append(libexecdir);
+	modulename.append("sqlrtrigger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

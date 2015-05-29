@@ -33,17 +33,24 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 				sqlrpaths(sqlrcmdline *cmdl);
 				~sqlrpaths();
 		const char	*getLocalStateDir();
-		const char	*getTmpDir();
-		uint32_t	getTmpDirLength();
+		const char	*getSockSeqFile();
+		const char	*getSocketsDir();
+		const char	*getIpcDir();
+		const char	*getPidDir();
 		const char	*getLogDir();
 		const char	*getDebugDir();
 		const char	*getCacheDir();
 		const char	*getDefaultConfigFile();
 		const char	*getDefaultConfigDir();
 		const char	*getConfigFile();
+		const char	*getLibExecDir();
 	protected:
 		const char	*localstatedir;
 		char		*tmpdir;
+		char		*sockseqfile;
+		char		*socketsdir;
+		char		*ipcdir;
+		char		*piddir;
 		uint32_t	tmpdirlen;
 		char		*logdir;
 		char		*debugdir;
@@ -51,6 +58,7 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 		char		*defaultconfigfile;
 		char		*defaultconfigdir;
 		const char	*configfile;
+		const char	*libexecdir;
 };
 
 class SQLRUTIL_DLLSPEC listenercontainer {

@@ -15,9 +15,10 @@
 	}
 #endif
 
-sqlrloggers::sqlrloggers() {
+sqlrloggers::sqlrloggers(sqlrpaths *sqlrpth) {
 	debugFunction();
 	xmld=NULL;
+	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrloggers::~sqlrloggers() {
@@ -95,8 +96,8 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the logger module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrlogger_");
+	modulename.append(libexecdir);
+	modulename.append("sqlrlogger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

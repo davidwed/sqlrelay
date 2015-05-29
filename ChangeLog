@@ -2,7 +2,7 @@
 		that could lead to a reLogIn loop
 	disabled -Werror for gcc < 2.7
 	applied George Carrette's patch to fix PDO connectstring options
-	migrated tmp/debug/log dir path info into sqlrpaths class
+	migrated directory/file paths info into sqlrpaths class
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings

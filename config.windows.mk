@@ -56,8 +56,7 @@ WNOUNKNOWNPRAGMAS =
 WNOMISMATCHEDTAGS =
 INC = /I
 OBJ = obj
-LOCALSTATEDIRCPPFLAG = /D LOCALSTATEDIR=\"$(localstatedir)\"
-SYSCONFDIRCPPFLAG = /D SYSCONFDIR=\"$(sysconfir)\"
+DIRCPPFLAG = /D LOCALSTATEDIR=\"$(localstatedir)\\\" /D SYSCONFDIR=\"$(sysconfir)\\\" /D LIBEXECDIR=\"$(libexecdir)\\\"
 
 
 # linker flags
@@ -302,7 +301,7 @@ FIREBIRDLIBS = /LIBPATH:"C:\Program Files\Firebird\Firebird_2_5\lib" fbclient_ms
 
 
 # util
-UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS $(LOCALSTATEDIRCPPFLAG) $(SYSCONFDIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) /DLIBEXECDIR=\"$(libexecdir)\"
+UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS $(DIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 UTILLIBS = $(RUDIMENTSLIBS)
 
 
@@ -317,7 +316,7 @@ STATICPLUGINSRCS =
 STATICPLUGINOBJS =
 STATICPLUGINLIBS =
 
-SERVERCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBEXECDIR=\"$(libexecdir)\" /D LIBSQLRSERVER_EXPORTS
+SERVERCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
 LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib
 SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 

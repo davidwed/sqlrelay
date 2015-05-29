@@ -26,10 +26,6 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	// are we running on windows
-	bool	iswindows=!charstring::compareIgnoringCase(
-				sys::getOperatingSystemName(),"Windows");
-
 	// process the command line
 	sqlrcmdline	cmdl(argc,argv);
 
@@ -39,16 +35,12 @@ int main(int argc, const char **argv) {
 
 	// get the pid directory
 	sqlrpaths	sqlrpth(&cmdl);
-	stringbuffer	piddir;
-	piddir.append(sqlrpth.getTmpDir());
-	piddir.append((iswindows)?'\\':'/');
-	piddir.append("pids");
 
 	// open the pid directory
 	directory	dir;
-	if (!dir.open(piddir.getString())) {
+	if (!dir.open(sqlrpth.getPidDir())) {
 		stdoutput.printf("failed to open pid directory %s\n",
-							piddir.getString());
+							sqlrpth.getPidDir());
 		process::exit(1);
 	}
 
@@ -104,8 +96,7 @@ int main(int argc, const char **argv) {
 
 			// build the fully qualified path name of the pid file
 			fqp.clear();
-			fqp.append(piddir.getString());
-			fqp.append((iswindows)?'\\':'/');
+			fqp.append(sqlrpth.getPidDir());
 			fqp.append(file);
 
 			// skip the pid file if it's not readable

@@ -1,35 +1,56 @@
 // Copyright (c) 2000-2005  David Muse
 // See the file COPYING for more information
 
-#include <rudiments/stringbuffer.h>
 #include <sqlrelay/sqlrutil.h>
 
+#include <rudiments/charstring.h>
+#include <rudiments/sys.h>
+#include <rudiments/stringbuffer.h>
+
 sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
+
+	char	slash=sys::getDirectorySeparator();
 
 	localstatedir=cmdl->getLocalStateDir();
 	if (!cmdl->getLocalStateDir()[0]) {
 		localstatedir=LOCALSTATEDIR;
 	}
-	const char	*sysconfdir=SYSCONFDIR;
 
 	stringbuffer	scratch;
-	scratch.append(localstatedir)->append("/sqlrelay/tmp");
+	scratch.append(localstatedir)->append("sqlrelay")->append(slash);
+	char	*lsdir=scratch.detachString();
+
+	scratch.append(lsdir)->append("tmp")->append(slash);
 	tmpdirlen=scratch.getStringLength();
 	tmpdir=scratch.detachString();
 
-	scratch.append(localstatedir)->append("/sqlrelay/log");
+	scratch.append(tmpdir)->append("sockseq");
+	sockseqfile=scratch.detachString();
+
+	scratch.append(tmpdir)->append("sockets")->append(slash);
+	socketsdir=scratch.detachString();
+
+	scratch.append(tmpdir)->append("ipc")->append(slash);
+	ipcdir=scratch.detachString();
+
+	scratch.append(tmpdir)->append("pids")->append(slash);
+	piddir=scratch.detachString();
+
+	scratch.append(lsdir)->append("log")->append(slash);
 	logdir=scratch.detachString();
 
-	scratch.append(localstatedir)->append("/sqlrelay/debug");
+	scratch.append(lsdir)->append("debug")->append(slash);
 	debugdir=scratch.detachString();
 
-	scratch.append(localstatedir)->append("/sqlrelay/cache");
+	scratch.append(lsdir)->append("cache")->append(slash);
 	cachedir=scratch.detachString();
 
-	scratch.append(sysconfdir)->append("/sqlrelay.conf");
+	const char	*sysconfdir=SYSCONFDIR;
+
+	scratch.append(sysconfdir)->append("sqlrelay.conf");
 	defaultconfigfile=scratch.detachString();
 
-	scratch.append(sysconfdir)->append("/sqlrelay.conf.d");
+	scratch.append(sysconfdir)->append("sqlrelay.conf.d")->append(slash);
 	defaultconfigdir=scratch.detachString();
 
 	if (cmdl->getConfig()) {
@@ -37,10 +58,16 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	} else {
 		configfile=defaultconfigfile;
 	}
+
+	libexecdir=LIBEXECDIR;
 }
 
 sqlrpaths::~sqlrpaths() {
 	delete[] tmpdir;
+	delete[] sockseqfile;
+	delete[] socketsdir;
+	delete[] ipcdir;
+	delete[] piddir;
 	delete[] logdir;
 	delete[] debugdir;
 	delete[] cachedir;
@@ -52,12 +79,20 @@ const char *sqlrpaths::getLocalStateDir() {
 	return localstatedir;
 }
 
-const char *sqlrpaths::getTmpDir() {
-	return tmpdir;
+const char *sqlrpaths::getSockSeqFile() {
+	return sockseqfile;
 }
 
-uint32_t sqlrpaths::getTmpDirLength() {
-	return tmpdirlen;
+const char *sqlrpaths::getSocketsDir() {
+	return socketsdir;
+}
+
+const char *sqlrpaths::getIpcDir() {
+	return ipcdir;
+}
+
+const char *sqlrpaths::getPidDir() {
+	return piddir;
 }
 
 const char *sqlrpaths::getLogDir() {
@@ -82,4 +117,8 @@ const char *sqlrpaths::getDefaultConfigDir() {
 
 const char *sqlrpaths::getConfigFile() {
 	return configfile;
+}
+
+const char *sqlrpaths::getLibExecDir() {
+	return libexecdir;
 }

@@ -15,9 +15,10 @@
 	}
 #endif
 
-sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont) {
+sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont, sqlrpaths *sqlrpth) {
 	debugFunction();
 	this->cont=cont;
+	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrprotocols::~sqlrprotocols() {
@@ -76,8 +77,8 @@ void sqlrprotocols::loadProtocol(const char *module) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the password encryption module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrprotocol_");
+	modulename.append(libexecdir);
+	modulename.append("sqlrprotocol_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

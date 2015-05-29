@@ -274,7 +274,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get password encryptions
 	const char	*pwdencs=cfgfl->getPasswordEncryptions();
 	if (pwdencs && pwdencs[0]) {
-		sqlrpe=new sqlrpwdencs;
+		sqlrpe=new sqlrpwdencs(sqlrpth);
 		sqlrpe->loadPasswordEncryptions(pwdencs);
 	}	
 
@@ -282,7 +282,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	initLocalAuthentication();
 	const char	*auths=cfgfl->getAuthentications();
 	if (auths && auths[0]) {
-		sqlra=new sqlrauths;
+		sqlra=new sqlrauths(sqlrpth);
 		sqlra->loadAuthenticators(auths,sqlrpe);
 	}
 
@@ -297,7 +297,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get loggers
 	const char	*loggers=cfgfl->getLoggers();
 	if (loggers && loggers[0]) {
-		sqlrlg=new sqlrloggers;
+		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(NULL,conn);
 	}
@@ -356,7 +356,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	const char	*translations=cfgfl->getTranslations();
 	if (translations && translations[0]) {
 		sqlrp=newParser();
-		sqlrt=new sqlrtranslations(debugsqlrtranslation);
+		sqlrt=new sqlrtranslations(sqlrpth,debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
 	}
 
@@ -364,7 +364,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	const char	*resultsettranslations=
 				cfgfl->getResultSetTranslations();
 	if (resultsettranslations && resultsettranslations[0]) {
-		sqlrrst=new sqlrresultsettranslations;
+		sqlrrst=new sqlrresultsettranslations(sqlrpth);
 		sqlrrst->loadResultSetTranslations(resultsettranslations);
 	}
 
@@ -376,7 +376,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		if (!sqlrp) {
 			sqlrp=newParser();
 		}
-		sqlrtr=new sqlrtriggers(debugtriggers);
+		sqlrtr=new sqlrtriggers(sqlrpth,debugtriggers);
 		sqlrtr->loadTriggers(triggers);
 	}
 
@@ -402,13 +402,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// create connection pid file
 	pid_t	pid=process::getProcessId();
-	size_t	pidfilelen=sqlrpth->getTmpDirLength()+22+
+	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+16+
 				charstring::length(cmdl->getId())+1+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
-				"%s/pids/sqlr-connection-%s.%ld",
-				sqlrpth->getTmpDir(),cmdl->getId(),(long)pid);
+				"%ssqlr-connection-%s.%ld",
+				sqlrpth->getPidDir(),cmdl->getId(),(long)pid);
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// increment connection counter
@@ -429,12 +429,12 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the custom query handlers
 	const char	*queries=cfgfl->getQueries();
 	if (queries && queries[0]) {
-		sqlrq=new sqlrqueries;
+		sqlrq=new sqlrqueries(sqlrpth);
 		sqlrq->loadQueries(queries);
 	}
 
 	// init client protocols
-	sqlrpr=new sqlrprotocols(this);
+	sqlrpr=new sqlrprotocols(this,sqlrpth);
 	sqlrpr->loadProtocols();
 
 	// set a handler for SIGALARMs, if necessary
@@ -488,8 +488,8 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the connection module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrconnection_");
+	modulename.append(sqlrpth->getLibExecDir());
+	modulename.append("sqlrconnection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!conndl.open(modulename.getString(),true,true)) {
 		stderror.printf("failed to load connection module: %s\n",
@@ -538,11 +538,11 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 }
 
 void sqlrservercontroller::setUnixSocketDirectory() {
-	size_t	unixsocketlen=sqlrpth->getTmpDirLength()+31;
+	size_t	unixsocketlen=charstring::length(sqlrpth->getSocketsDir())+22;
 	unixsocket=new char[unixsocketlen];
-	charstring::printf(unixsocket,unixsocketlen,
-				"%s/sockets/",sqlrpth->getTmpDir());
-	unixsocketptr=unixsocket+sqlrpth->getTmpDirLength()+8+1;
+	charstring::printf(unixsocket,unixsocketlen,"%s",
+					sqlrpth->getSocketsDir());
+	unixsocketptr=unixsocket+charstring::length(sqlrpth->getSocketsDir())+1;
 	unixsocketptrlen=unixsocketlen-(unixsocketptr-unixsocket);
 }
 
@@ -553,12 +553,12 @@ bool sqlrservercontroller::handlePidFile() {
 	// writes it out after forking and it's possible that the connection
 	// might start up after the sqlr-listener has forked, but before it
 	// writes out the pid file)
-	size_t	listenerpidfilelen=sqlrpth->getTmpDirLength()+20+
-				charstring::length(cmdl->getId())+1;
+	size_t	listenerpidfilelen=charstring::length(sqlrpth->getPidDir())+14+
+					charstring::length(cmdl->getId())+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
-				"%s/pids/sqlr-listener-%s",
-				sqlrpth->getTmpDir(),cmdl->getId());
+					"%ssqlr-listener-%s",
+					sqlrpth->getPidDir(),cmdl->getId());
 
 	// On most platforms, 1 second is plenty of time to wait for the
 	// listener to come up, but on windows, it can take a while longer.
@@ -607,12 +607,12 @@ bool sqlrservercontroller::handlePidFile() {
 void sqlrservercontroller::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	size_t	updownlen=sqlrpth->getTmpDirLength()+5+
-					charstring::length(cmdl->getId())+1+
-					charstring::length(connectionid)+1;
+	size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
+				charstring::length(cmdl->getId())+1+
+				charstring::length(connectionid)+1;
 	updown=new char[updownlen];
-	charstring::printf(updown,updownlen,"%s/ipc/%s-%s",
-			sqlrpth->getTmpDir(),cmdl->getId(),connectionid);
+	charstring::printf(updown,updownlen,"%s%s-%s",
+			sqlrpth->getIpcDir(),cmdl->getId(),connectionid);
 }
 
 bool sqlrservercontroller::getUnixSocket() {
@@ -644,38 +644,30 @@ bool sqlrservercontroller::getUnixSocket() {
 bool sqlrservercontroller::openSequenceFile(file *sockseq) {
 
 	// open the sequence file and get the current port number
-	size_t	sockseqnamelen=sqlrpth->getTmpDirLength()+9;
-	char	*sockseqname=new char[sockseqnamelen];
-	charstring::printf(sockseqname,sockseqnamelen,
-				"%s/sockseq",sqlrpth->getTmpDir());
+	const char	*sockseqfile=sqlrpth->getSockSeqFile();
 
-	size_t	stringlen=8+charstring::length(sockseqname)+1;
-	char	*string=new char[stringlen];
-	charstring::printf(string,stringlen,"opening %s",sockseqname);
-	logDebugMessage(string);
-	delete[] string;
+	debugstr.clear();
+	debugstr.append("opening ")->append(sockseqfile);
+	logDebugMessage(debugstr.getString());
 
 	mode_t	oldumask=process::setFileCreationMask(011);
-	bool	success=sockseq->open(sockseqname,O_RDWR|O_CREAT,
+	bool	success=sockseq->open(sockseqfile,O_RDWR|O_CREAT,
 					permissions::everyoneReadWrite());
 	process::setFileCreationMask(oldumask);
 
 	// handle error
 	if (!success) {
 
-		stderror.printf("Could not open: %s\n",sockseqname);
+		stderror.printf("Could not open: %s\n",sockseqfile);
 		stderror.printf("Make sure that the file and directory are \n");
 		stderror.printf("readable and writable.\n\n");
 		unixsocketptr[0]='\0';
 
 		debugstr.clear();
 		debugstr.append("failed to open socket sequence file: ");
-		debugstr.append(sockseqname);
+		debugstr.append(sockseqfile);
 		logInternalError(NULL,debugstr.getString());
-		delete[] string;
 	}
-
-	delete[] sockseqname;
 
 	return success;
 }
@@ -1390,12 +1382,14 @@ void sqlrservercontroller::registerForHandoff() {
 	logDebugMessage("registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	handoffsocknamelen=sqlrpth->getTmpDirLength()+9+
-				charstring::length(cmdl->getId())+8+1;
+	size_t	handoffsocknamelen=
+			charstring::length(sqlrpth->getSocketsDir())+
+			charstring::length(cmdl->getId())+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
-					"%s/sockets/%s-handoff",
-					sqlrpth->getTmpDir(),cmdl->getId());
+					"%s%s-handoff",
+					sqlrpth->getSocketsDir(),
+					cmdl->getId());
 
 	size_t	stringlen=17+charstring::length(handoffsockname)+1;
 	char	*string=new char[stringlen];
@@ -1437,13 +1431,14 @@ void sqlrservercontroller::deRegisterForHandoff() {
 	logDebugMessage("de-registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	removehandoffsocknamelen=sqlrpth->getTmpDirLength()+9+
-					charstring::length(cmdl->getId())+14+1;
+	size_t	removehandoffsocknamelen=
+				charstring::length(sqlrpth->getSocketsDir())+
+				charstring::length(cmdl->getId())+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
-				"%s/sockets/%s-removehandoff",
-				sqlrpth->getTmpDir(),cmdl->getId());
+				"%s%s-removehandoff",
+				sqlrpth->getSocketsDir(),cmdl->getId());
 
 	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
 	char	*string=new char[stringlen];
@@ -4117,11 +4112,11 @@ void sqlrservercontroller::deleteCursor(sqlrservercursor *curs) {
 
 bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
-	size_t	idfilenamelen=sqlrpth->getTmpDirLength()+5+
-					charstring::length(id)+1;
+	size_t	idfilenamelen=charstring::length(sqlrpth->getIpcDir())+
+						charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printf(idfilename,idfilenamelen,"%s/ipc/%s",
-						sqlrpth->getTmpDir(),id);
+	charstring::printf(idfilename,idfilenamelen,"%s%s",
+						sqlrpth->getIpcDir(),id);
 
 	debugstr.clear();
 	debugstr.append("attaching to shared memory and semaphores ");
@@ -4381,8 +4376,8 @@ sqlrparser *sqlrservercontroller::newParser(const char *module) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the parser module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrparser_");
+	modulename.append(sqlrpth->getLibExecDir());
+	modulename.append("sqlrparser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!sqlrpdl.open(modulename.getString(),true,true)) {
 		stderror.printf("failed to load parser module: %s\n",module);

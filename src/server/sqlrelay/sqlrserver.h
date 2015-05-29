@@ -947,7 +947,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocolplugin {
 
 class SQLRSERVER_DLLSPEC sqlrprotocols {
 	public:
-			sqlrprotocols(sqlrservercontroller *cont);
+			sqlrprotocols(sqlrservercontroller *cont,
+						sqlrpaths *sqlrpth);
 			~sqlrprotocols();
 
 		bool		loadProtocols();
@@ -956,9 +957,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 		void	unloadProtocols();
 		void	loadProtocol(const char *module);
 
-		dictionary< const char *, sqlrprotocolplugin * >	protos;
-
 		sqlrservercontroller	*cont;
+		const char		*libexecdir;
+
+		dictionary< const char *, sqlrprotocolplugin * >	protos;
 };
 
 
@@ -983,7 +985,7 @@ class SQLRSERVER_DLLSPEC sqlrauthplugin {
 
 class SQLRSERVER_DLLSPEC sqlrauths {
 	public:
-			sqlrauths();
+			sqlrauths(sqlrpaths *sqlrpth);
 			~sqlrauths();
 
 		bool	loadAuthenticators(const char *auths,
@@ -994,7 +996,9 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		void	loadAuthenticator(xmldomnode *auth,
 						sqlrpwdencs *sqlrpe);
 
-		xmldom					*xmld;
+		const char	*libexecdir;
+		xmldom		*xmld;
+
 		singlylinkedlist< sqlrauthplugin * >	llist;
 };
 
@@ -1020,7 +1024,7 @@ class SQLRSERVER_DLLSPEC sqlrpwdencplugin {
 
 class SQLRSERVER_DLLSPEC sqlrpwdencs {
 	public:
-			sqlrpwdencs();
+			sqlrpwdencs(sqlrpaths *sqlrpth);
 			~sqlrpwdencs();
 
 		bool		loadPasswordEncryptions(const char *pwdencs);
@@ -1029,7 +1033,9 @@ class SQLRSERVER_DLLSPEC sqlrpwdencs {
 		void	unloadPasswordEncryptions();
 		void	loadPasswordEncryption(xmldomnode *pwdenc);
 
-		xmldom					*xmld;
+		const char	*libexecdir;
+		xmldom		*xmld;
+
 		singlylinkedlist< sqlrpwdencplugin * >	llist;
 };
 
@@ -1084,7 +1090,7 @@ class SQLRSERVER_DLLSPEC sqlrloggerplugin {
 
 class SQLRSERVER_DLLSPEC sqlrloggers {
 	public:
-			sqlrloggers();
+			sqlrloggers(sqlrpaths *sqlrpth);
 			~sqlrloggers();
 
 		bool	loadLoggers(const char *loggers);
@@ -1100,7 +1106,9 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 		void		unloadLoggers();
 		void		loadLogger(xmldomnode *logger);
 
-		xmldom					*xmld;
+		const char	*libexecdir;
+		xmldom		*xmld;
+
 		singlylinkedlist< sqlrloggerplugin * >	llist;
 };
 
@@ -1164,7 +1172,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslationplugin {
 
 class SQLRSERVER_DLLSPEC sqlrtranslations {
 	public:
-			sqlrtranslations(bool debug);
+			sqlrtranslations(sqlrpaths *sqlrpth, bool debug);
 			~sqlrtranslations();
 
 		bool	loadTranslations(const char *translations);
@@ -1212,12 +1220,12 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 				const char *schema,
 				const char *oldname);
 		
-		xmldom	*xmld;
-		xmldom	*tree;
-		bool	debug;
+		const char	*libexecdir;
+		xmldom		*xmld;
+		xmldom		*tree;
+		bool		debug;
 
 		singlylinkedlist< sqlrtranslationplugin * >	tlist;
-
 
 	public:
 		// helper methods
@@ -1280,7 +1288,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslationplugin {
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 	public:
-			sqlrresultsettranslations();
+			sqlrresultsettranslations(sqlrpaths *sqlrpth);
 			~sqlrresultsettranslations();
 
 		bool	loadResultSetTranslations(
@@ -1297,7 +1305,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 		void	loadResultSetTranslation(
 					xmldomnode *resultsettranslation);
 		
-		xmldom	*xmld;
+		const char	*libexecdir;
+		xmldom		*xmld;
 
 		singlylinkedlist< sqlrresultsettranslationplugin * >	tlist;
 };
@@ -1327,7 +1336,7 @@ class SQLRSERVER_DLLSPEC sqlrtriggerplugin {
 
 class SQLRSERVER_DLLSPEC sqlrtriggers {
 	public:
-			sqlrtriggers(bool debug);
+			sqlrtriggers(sqlrpaths *sqlrpth, bool debug);
 			~sqlrtriggers();
 
 		bool	loadTriggers(const char *triggers);
@@ -1351,8 +1360,10 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 					bool before,
 					bool success);
 
-		xmldom					*xmld;
-		bool					debug;
+		const char	*libexecdir;
+		xmldom		*xmld;
+		bool		debug;
+
 		singlylinkedlist< sqlrtriggerplugin * >	beforetriggers;
 		singlylinkedlist< sqlrtriggerplugin * >	aftertriggers;
 };
@@ -1393,7 +1404,7 @@ class SQLRSERVER_DLLSPEC sqlrqueryplugin {
 
 class SQLRSERVER_DLLSPEC sqlrqueries {
 	public:
-			sqlrqueries();
+			sqlrqueries(sqlrpaths *sqlrpth);
 			~sqlrqueries();
 
 		bool		loadQueries(const char *queries);
@@ -1405,7 +1416,9 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 		void		unloadQueries();
 		void		loadQuery(xmldomnode *logger);
 
-		xmldom					*xmld;
+		const char	*libexecdir;
+		xmldom		*xmld;
+
 		singlylinkedlist< sqlrqueryplugin * >	llist;
 };
 

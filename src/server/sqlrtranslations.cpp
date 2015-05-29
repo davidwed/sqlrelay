@@ -10,13 +10,14 @@
 
 #include <config.h>
 
-sqlrtranslations::sqlrtranslations(bool debug) {
+sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	xmld=NULL;
 	tree=NULL;
 	this->debug=debug;
 	temptablepool=new memorypool(0,128,100);
 	tempindexpool=new memorypool(0,128,100);
+	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrtranslations::~sqlrtranslations() {
@@ -96,8 +97,8 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the translation module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrtranslation_");
+	modulename.append(libexecdir);
+	modulename.append("sqlrtranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

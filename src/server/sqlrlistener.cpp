@@ -110,13 +110,13 @@ sqlrlistener::~sqlrlistener() {
 						node; node=node->getNext()) {
 		connectstringcontainer	*cs=node->getValue();
 		const char	*connectionid=cs->getConnectionId();
-		size_t	updownlen=sqlrpth->getTmpDirLength()+5+
+		size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
 					charstring::length(cmdl->getId())+1+
 					charstring::length(connectionid)+1;
 		char	*updown=new char[updownlen];
 		charstring::printf(updown,updownlen,
-					"%s/ipc/%s-%s",
-					sqlrpth->getTmpDir(),
+					"%s%s-%s",
+					sqlrpth->getIpcDir(),
 					cmdl->getId(),connectionid);
 		file::remove(updown);
 		delete[] updown;
@@ -202,7 +202,7 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	const char	*loggers=cfgfl->getLoggers();
 	if (charstring::length(loggers)) {
-		sqlrlg=new sqlrloggers;
+		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(this,NULL);
 	}
@@ -322,12 +322,12 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 bool sqlrlistener::handlePidFile(const char *id) {
 
 	// check/set pid file
-	size_t	pidfilelen=sqlrpth->getTmpDirLength()+20+
-					charstring::length(id)+1;
+	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+14+
+						charstring::length(id)+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
-				"%s/pids/sqlr-listener-%s",
-				sqlrpth->getTmpDir(),id);
+				"%ssqlr-listener-%s",
+				sqlrpth->getPidDir(),id);
 
 	if (process::checkForPidFile(pidfile)!=-1) {
 		stderror.printf("\nsqlr-listener error:\n");
@@ -454,11 +454,11 @@ void sqlrlistener::setIpPermissions() {
 bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// initialize the ipc filename
-	size_t	idfilenamelen=sqlrpth->getTmpDirLength()+5+
-					charstring::length(id)+1;
+	size_t	idfilenamelen=charstring::length(sqlrpth->getIpcDir())+
+						charstring::length(id)+1;
 	idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,
-				"%s/ipc/%s",sqlrpth->getTmpDir(),id);
+				"%s%s",sqlrpth->getIpcDir(),id);
 
 	if (sqlrlg) {
 		debugstr.clear();
@@ -764,12 +764,13 @@ bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
 bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 
 	// the handoff socket
-	size_t	handoffsocknamelen=sqlrpth->getTmpDirLength()+9+
+	size_t	handoffsocknamelen=
+			charstring::length(sqlrpth->getSocketsDir())+
 						charstring::length(id)+8+1;
 	handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
-				"%s/sockets/%s-handoff",
-				sqlrpth->getTmpDir(),id);
+				"%s%s-handoff",
+				sqlrpth->getSocketsDir(),id);
 
 	handoffsockun=new unixsocketserver();
 	bool	success=handoffsockun->listen(handoffsockname,0066,15);
@@ -795,13 +796,13 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 
 	// the deregistration socket
-	size_t	removehandoffsocknamelen=sqlrpth->getTmpDirLength()+9+
+	size_t	removehandoffsocknamelen=
+			charstring::length(sqlrpth->getSocketsDir())+
 						charstring::length(id)+14+1;
 	removehandoffsockname=new char[removehandoffsocknamelen];
-	charstring::printf(removehandoffsockname,
-				removehandoffsocknamelen,
-				"%s/sockets/%s-removehandoff",
-				sqlrpth->getTmpDir(),id);
+	charstring::printf(removehandoffsockname,removehandoffsocknamelen,
+				"%s%s-removehandoff",
+				sqlrpth->getSocketsDir(),id);
 
 	removehandoffsockun=new unixsocketserver();
 	bool	success=removehandoffsockun->listen(
@@ -828,12 +829,13 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 bool sqlrlistener::listenOnFixupSocket(const char *id) {
 
 	// the fixup socket
-	size_t	fixupsocknamelen=sqlrpth->getTmpDirLength()+9+
-					charstring::length(id)+6+1;
+	size_t	fixupsocknamelen=
+			charstring::length(sqlrpth->getSocketsDir())+
+						charstring::length(id)+6+1;
 	fixupsockname=new char[fixupsocknamelen];
 	charstring::printf(fixupsockname,fixupsocknamelen,
-				"%s/sockets/%s-fixup",
-				sqlrpth->getTmpDir(),id);
+				"%s%s-fixup",
+				sqlrpth->getSocketsDir(),id);
 
 	fixupsockun=new unixsocketserver();
 	bool	success=fixupsockun->listen(fixupsockname,0066,15);
@@ -1719,13 +1721,13 @@ void sqlrlistener::alarmThread(void *attr) {
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
 
 	// initialize the database up/down filename
-	size_t	updownlen=sqlrpth->getTmpDirLength()+5+
+	size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
 					charstring::length(cmdl->getId())+1+
 					charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
 	charstring::printf(updown,updownlen,
-				"%s/ipc/%s-%s",
-				sqlrpth->getTmpDir(),
+				"%s%s-%s",
+				sqlrpth->getIpcDir(),
 				cmdl->getId(),connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;

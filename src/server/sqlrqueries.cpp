@@ -15,9 +15,10 @@
 	}
 #endif
 
-sqlrqueries::sqlrqueries() {
+sqlrqueries::sqlrqueries(sqlrpaths *sqlrpth) {
 	debugFunction();
 	xmld=NULL;
+	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrqueries::~sqlrqueries() {
@@ -95,8 +96,8 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the query module
 	stringbuffer	modulename;
-	modulename.append(LIBEXECDIR);
-	modulename.append("/sqlrquery_");
+	modulename.append(libexecdir);
+	modulename.append("sqlrquery_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

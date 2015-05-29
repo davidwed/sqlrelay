@@ -1592,16 +1592,7 @@ void sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
 
 	// build filename
 	stringbuffer	fn;
-	const char	*cachedir=sqlrpth->getCacheDir();
-	if (cachedir[0]=='/') {
-		if (*ptr!='/') {
-			fn.append(cachedir)->append('/');
-		}
-	} else if (!charstring::compare(cachedir+1,":\\",2)) {
-		if (!charstring::compare(ptr+1,":\\",2)) {
-			fn.append(cachedir)->append('\\');
-		}
-	}
+	fn.append(sqlrpth->getCacheDir());
 	bool	inquotes=false;
 	while (*ptr) {
 		if (*ptr=='"') {
@@ -1652,17 +1643,7 @@ void sqlrsh::openCache(sqlrshenv *env,
 	// if the file name starts with a slash then use it as-is, otherwise
 	// prepend the default cache directory.
 	stringbuffer	fn;
-	const char	*cachedir=sqlrpth->getCacheDir();
-	if (cachedir[0]=='/') {
-		if (*command!='/') {
-			fn.append(cachedir)->append('/');
-		}
-	} else if (!charstring::compare(cachedir+1,":\\",2)) {
-		if (!charstring::compare(command+1,":\\",2)) {
-			fn.append(cachedir)->append('\\');
-		}
-	}
-	fn.append(command);
+	fn.append(sqlrpth->getCacheDir())->append(command);
 
 	// init stats
 	initStats(env);

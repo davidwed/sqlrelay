@@ -75,12 +75,12 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// writes it out after forking and it's possible that the scaler might
 	// start up after the sqlr-listener has forked, but before it writes
 	// out the pid file)
-	size_t	listenerpidfilelen=sqlrpth->getTmpDirLength()+20+
-					charstring::length(id)+1;
+	size_t	listenerpidfilelen=charstring::length(sqlrpth->getPidDir())+14+
+						charstring::length(id)+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
-				"%s/pids/sqlr-listener-%s",
-				sqlrpth->getTmpDir(),id);
+					"%ssqlr-listener-%s",
+					sqlrpth->getPidDir(),id);
 
 	// On most platforms, 3 seconds is plenty of time to wait for the
 	// listener to come up, but on 64-bit windows, when running 32-bit
@@ -116,12 +116,12 @@ bool scaler::initScaler(int argc, const char **argv) {
 	delete[] listenerpidfile;
 
 	// check/set pid file
-	size_t	pidfilelen=sqlrpth->getTmpDirLength()+18+
-					charstring::length(id)+1;
+	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+12+
+						charstring::length(id)+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
-				"%s/pids/sqlr-scaler-%s",
-				sqlrpth->getTmpDir(),id);
+				"%ssqlr-scaler-%s",
+				sqlrpth->getPidDir(),id);
 	if (process::checkForPidFile(pidfile)!=-1) {
 		stderror.printf("\nsqlr-scaler error:\n");
 		stderror.printf("	The pid file %s",pidfile);
@@ -249,11 +249,11 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 
 	// initialize the shared memory segment filename
-	size_t	idfilenamelen=sqlrpth->getTmpDirLength()+5+
-					charstring::length(id)+1;
+	size_t	idfilenamelen=charstring::length(sqlrpth->getIpcDir())+
+						charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,
-				"%s/ipc/%s",sqlrpth->getTmpDir(),id);
+				"%s%s",sqlrpth->getIpcDir(),id);
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;
 
@@ -621,12 +621,12 @@ void scaler::getRandomConnectionId() {
 bool scaler::availableDatabase() {
 	
 	// initialize the database up/down filename
-	size_t	updownlen=sqlrpth->getTmpDirLength()+5+
+	size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
 					charstring::length(id)+1+
 					charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
-	charstring::printf(updown,updownlen,"%s/ipc/%s-%s",
-				sqlrpth->getTmpDir(),id,connectionid);
+	charstring::printf(updown,updownlen,"%s%s-%s",
+				sqlrpth->getIpcDir(),id,connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;
