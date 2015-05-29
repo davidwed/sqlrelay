@@ -66,23 +66,10 @@ next
 parts=split(version,".")
 version=parts(0)
 
-' determine VC++ architecture
+' set some architecture-based flags
 USE_32BIT_TIME_T=""
-PERLPREFIX="C:\Perl64"
-RUBYVCVERSION="100"
-RUBYTARGET="x64-mswin64"
-RUBYLIBPREFIX="x64-msvcr100"
-RUBYSITEARCHDIRSUFFIX="x64-msvcr100"
-ALLSYBASE="all-sybase"
-INSTALLSYBASE="installdll-sybase"
 if arch="80x86" then
 	USE_32BIT_TIME_T="/D _USE_32BIT_TIME_T"
-	PERLPREFIX="C:\Perl"
-	RUBYTARGET="i386-mswin32"
-	RUBYLIBPREFIX="msvcr100"
-	RUBYSITEARCHDIRSUFFIX="i386-msvcr100"
-	ALLSYBASE=""
-	INSTALLSYBASE=""
 end if
 
 
@@ -209,6 +196,95 @@ end if
 
 
 
+' oracle
+ORACLEVERSION="12c"
+ORACLEINCLUDES="/I ""C:\Program Files\Oracle\instantclient_12_1\sdk\include"""
+ORACLELIBS="/LIBPATH:""C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc"" oci.lib"
+ALLORACLE8="all-oracle8"
+INSTALLORACLE8="installdll-oracle8"
+
+' mysql
+MYSQLINCLUDES="/I ""C:\Program Files\MySQL\MySQL Connector.C 6.1\include"""
+MYSQLLIBS="/LIBPATH:""C:\Program Files\MySQL\MySQL Connector.C 6.1\lib"" libmysql.lib"
+ALLMYSQL="all-mysql"
+INSTALLMYSQL="installdll-mysql"
+
+' postgresql
+POSTGRESQLINCLUDES="/I ""C:\Program Files\PostgreSQL\9.4\include"""
+POSTGRESQLLIBS="/LIBPATH:""C:\Program Files\PostgreSQL\9.4\lib"" libpq.lib"
+ALLPOSTGRESQL="all-postgresql"
+INSTALLPOSTGRESQL="installdll-postgresql"
+
+' sqlite
+SQLITEINCLUDES=""
+SQLITELIBS=""
+ALLSQLITE=""
+INSTALLSQLITE=""
+
+' sybase
+SYBASEINCLUDES="/I ""C:\SAP\OCS-16_0\include"""
+SYBASELIBS="/LIBPATH:""C:\SAP\OCS-16_0\lib"" libsybblk64.lib libsybct64.lib libsybcs64.lib"
+ALLSYBASE="all-sybase"
+INSTALLSYBASE="installdll-sybase"
+if arch="80x86" then
+	ALLSYBASE=""
+	INSTALLSYBASE=""
+end if
+
+' odbc
+ODBCINCLUDES=""
+ODBCLIBS="user32.lib gdi32.lib odbc32.lib odbccp32.lib"
+ALLODBC="all-odbc"
+INSTALLODBC="installdll-odbc"
+
+' db2
+DB2INCLUDES="/I""C:\Program Files\IBM\SQLLIB\include"""
+DB2LIBS="/LIBPATH:""C:\Program Files\IBM\SQLLIB\lib"" db2api.lib"
+ALLDB2="all-db2"
+INSTALLDB2="installdll-db2"
+
+' firebid
+FIREBIRDINCLUDES="/I""C:\Program Files\Firebird\Firebird_2_5\include"""
+FIREBIRDLIBS="/LIBPATH:""C:\Program Files\Firebird\Firebird_2_5\lib"" fbclient_ms.lib"
+ALLFIREBIRD="all-firebird"
+INSTALLFIREBIRD="installdll-firebird"
+
+
+' perl
+PERLPREFIX="C:\Perl64"
+PERLVERSION="520"
+if arch="80x86" then
+	PERLPREFIX="C:\Perl"
+end if
+
+' python
+PYTHONPREFIX="C:\Python27"
+PYTHONVERSION="27"
+
+' ruby
+RUBYPREFIX="C:\Ruby"
+RUBYVERSION="2.2.0"
+RUBYLIBVERSION="220"
+RUBYVCVERSION="100"
+RUBYTARGET="x64-mswin64"
+RUBYLIBPREFIX="x64-msvcr100"
+RUBYSITEARCHDIRSUFFIX="x64-msvcr100"
+if arch="80x86" then
+	RUBYTARGET="i386-mswin32"
+	RUBYLIBPREFIX="msvcr100"
+	RUBYSITEARCHDIRSUFFIX="i386-msvcr100"
+end if
+
+' php
+PHPPREFIX="C:\PHP"
+
+' java
+JAVAPREFIX="C:\Program Files\Java\jdk18.0_25"
+
+' tcl
+TCLPREFIX="C:\Tcl"
+
+
 ' input and output files
 infiles=Array(_
 	"config.windows.mk",_
@@ -279,17 +355,74 @@ for i=lbound(infiles) to ubound(infiles)
 	' top_builddir
 	content=replace(content,"@top_builddir@",top_builddir,1,-1,0)
 
-	' api's
+	' perl
 	content=replace(content,"@PERLPREFIX@",PERLPREFIX,1,-1,0)
+	content=replace(content,"@PERLVERSION@",PERLVERSION,1,-1,0)
+
+	' python
+	content=replace(content,"@PYTHONPREFIX@",PYTHONPREFIX,1,-1,0)
+	content=replace(content,"@PYTHONVERSION@",PYTHONVERSION,1,-1,0)
+
+	' ruby
 	content=replace(content,"@RUBYPREFIX@",RUBYPREFIX,1,-1,0)
+	content=replace(content,"@RUBYVERSION@",RUBYVERSION,1,-1,0)
+	content=replace(content,"@RUBYLIBVERSION@",RUBYLIBVERSION,1,-1,0)
 	content=replace(content,"@RUBYVCVERSION@",RUBYVCVERSION,1,-1,0)
 	content=replace(content,"@RUBYTARGET@",RUBYTARGET,1,-1,0)
 	content=replace(content,"@RUBYLIBPREFIX@",RUBYLIBPREFIX,1,-1,0)
 	content=replace(content,"@RUBYSITEARCHDIRSUFFIX@",RUBYSITEARCHDIRSUFFIX,1,-1,0)
 
+	' php
+	content=replace(content,"@PHPPREFIX@",PHPPREFIX,1,-1,0)
+
+	' java
+	content=replace(content,"@JAVAPREFIX@",JAVAPREFIX,1,-1,0)
+
+	' tcl
+	content=replace(content,"@TCLPREFIX@",TCLPREFIX,1,-1,0)
+
 	' connections
+	content=replace(content,"@ORACLEVERSION@",ORACLEVERSION,1,-1,0)
+	content=replace(content,"@ORACLEINCLUDES@",ORACLEINCLUDES,1,-1,0)
+	content=replace(content,"@ORACLELIBS@",ORACLELIBS,1,-1,0)
+	content=replace(content,"@ALLORACLE8@",ALLORACLE8,1,-1,0)
+	content=replace(content,"@INSTALLORACLE8@",INSTALLORACLE8,1,-1,0)
+
+	content=replace(content,"@MYSQLINCLUDES@",MYSQLINCLUDES,1,-1,0)
+	content=replace(content,"@MYSQLLIBS@",MYSQLLIBS,1,-1,0)
+	content=replace(content,"@ALLMYSQL@",ALLMYSQL,1,-1,0)
+	content=replace(content,"@INSTALLMYSQL@",INSTALLMYSQL,1,-1,0)
+
+	content=replace(content,"@POSTGRESQLINCLUDES@",POSTGRESQLINCLUDES,1,-1,0)
+	content=replace(content,"@POSTGRESQLLIBS@",POSTGRESQLLIBS,1,-1,0)
+	content=replace(content,"@ALLPOSTGRESQL@",ALLPOSTGRESQL,1,-1,0)
+	content=replace(content,"@INSTALLPOSTGRESQL@",INSTALLPOSTGRESQL,1,-1,0)
+
+	content=replace(content,"@SQLITEINCLUDES@",SQLITEINCLUDES,1,-1,0)
+	content=replace(content,"@SQLITELIBS@",SQLITELIBS,1,-1,0)
+	content=replace(content,"@ALLSQLITE@",ALLSQLITE,1,-1,0)
+	content=replace(content,"@INSTALLSQLITE@",INSTALLSQLITE,1,-1,0)
+
+	content=replace(content,"@SYBASEINCLUDES@",SYBASEINCLUDES,1,-1,0)
+	content=replace(content,"@SYBASELIBS@",SYBASELIBS,1,-1,0)
 	content=replace(content,"@ALLSYBASE@",ALLSYBASE,1,-1,0)
 	content=replace(content,"@INSTALLSYBASE@",INSTALLSYBASE,1,-1,0)
+
+	content=replace(content,"@ODBCINCLUDES@",ODBCINCLUDES,1,-1,0)
+	content=replace(content,"@ODBCLIBS@",ODBCLIBS,1,-1,0)
+	content=replace(content,"@ALLODBC@",ALLODBC,1,-1,0)
+	content=replace(content,"@INSTALLODBC@",INSTALLODBC,1,-1,0)
+
+	content=replace(content,"@DB2INCLUDES@",DB2INCLUDES,1,-1,0)
+	content=replace(content,"@DB2LIBS@",DB2LIBS,1,-1,0)
+	content=replace(content,"@ALLDB2@",ALLDB2,1,-1,0)
+	content=replace(content,"@INSTALLDB2@",INSTALLDB2,1,-1,0)
+
+	content=replace(content,"@FIREBIRDINCLUDES@",FIREBIRDINCLUDES,1,-1,0)
+	content=replace(content,"@FIREBIRDLIBS@",FIREBIRDLIBS,1,-1,0)
+	content=replace(content,"@ALLFIREBIRD@",ALLFIREBIRD,1,-1,0)
+	content=replace(content,"@INSTALLFIREBIRD@",INSTALLFIREBIRD,1,-1,0)
+
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)

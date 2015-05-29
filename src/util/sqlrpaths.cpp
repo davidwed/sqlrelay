@@ -7,6 +7,12 @@
 #include <rudiments/sys.h>
 #include <rudiments/stringbuffer.h>
 
+#ifdef _WIN32
+	#define LOCALSTATEDIR "C:\\Program Files\\Firstworks\\var\\"
+	#define SYSCONFDIR "C:\\Program Files\\Firstworks\\etc\\"
+	#define LIBEXECDIR "C:\\Program Files\\Firstworks\\libexec\\sqlrelay\\"
+#endif
+
 sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 
 	char	slash=sys::getDirectorySeparator();

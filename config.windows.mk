@@ -5,7 +5,7 @@ SQLRELAY_ENABLE_SHARED = yes
 
 # installation directories
 prefix = @prefix@
-exec_prefix= @exec_prefix@
+exec_prefix = @exec_prefix@
 includedir = @includedir@
 libdir = @libdir@
 javadir = @javadir@
@@ -56,7 +56,6 @@ WNOUNKNOWNPRAGMAS =
 WNOMISMATCHEDTAGS =
 INC = /I
 OBJ = obj
-DIRCPPFLAG = /D LOCALSTATEDIR=\"$(localstatedir)\\\" /D SYSCONFDIR=\"$(sysconfir)\\\" /D LIBEXECDIR=\"$(libexecdir)\\\"
 
 
 # linker flags
@@ -149,6 +148,7 @@ GACUTIL = gacutil
 
 # perl
 PERLPREFIX = @PERLPREFIX@
+PERLVERSION = @PERLVERSION@
 PERL = $(PERLPREFIX)\bin\perl
 PERLLIB = $(PERLPREFIX)\lib
 PERLINC = /I $(PERLLIB)\CORE
@@ -174,40 +174,45 @@ PERLINC_LOCAL = $(PERLINC)
 PERLINSTALLMAN3DIR_LOCAL = $(PERLINSTALLMAN3DIR)
 PERLMAN3EXT_LOCAL = $(PERLMAN3EXT)
 PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) /I$(top_builddir) /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
-PERLCONLIBS = /LIBPATH:$(PERLLIB)\CORE perl520.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
-PERLCURLIBS = /LIBPATH:$(PERLLIB)\CORE perl520.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+PERLCONLIBS = /LIBPATH:$(PERLLIB)\CORE perl$(PERLVERSION).lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+PERLCURLIBS = /LIBPATH:$(PERLLIB)\CORE perl$(PERLVERSION).lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 PERLINSTALLMAN = installman
 
 
 # python
-PYTHONINCLUDES = /IC:\Python27\include
-PYTHONDIR = C:\Python27\Lib
-PYTHONLIB = /LIBPATH:C:\Python27\libs python27.lib
+PYTHONPREFIX = @PYTHONPREFIX@
+PYTHONVERSION = @PYTHONVERSION@
+PYTHONINCLUDES = /I$(PYTHONPREFIX)\include
+PYTHONDIR = $(PYTHONPREFIX)\Lib
+PYTHONLIB = /LIBPATH:$(PYTHONPREFIX)\libs python$(PYTHONVERSION).lib
 PYTHONCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
 
 # ruby
-RUBYPREFIX = C:\Ruby
+RUBYPREFIX = @RUBYPREFIX@
+RUBYVERSION= @RUBYVERSION@
+RUBYLIBVERSION= @RUBYLIBVERSION@
 RUBYVCVERSION = @RUBYVCVERSION@
 RUBYTARGET = @RUBYTARGET@
 RUBYLIBPREFIX = @RUBYLIBPREFIX@
 RUBYSITEARCHDIRSUFFIX = @RUBYSITEARCHDIRSUFFIX@
 RUBY = $(RUBYPREFIX)\bin\ruby
-RUBYLIB = /LIBPATH:$(RUBYPREFIX)\lib $(RUBYLIBPREFIX)-ruby220.lib
-RUBYCFLAGS = /I $(RUBYPREFIX)\include\ruby-2.2.0 /I $(RUBYPREFIX)\include\ruby-2.2.0/$(RUBYTARGET)_$(RUBYVCVERSION)
-RUBYSITEARCHDIR = $(RUBYPREFIX)\lib\ruby\site_ruby\2.2.0\$(RUBYSITEARCHDIRSUFFIX)
+RUBYLIB = /LIBPATH:$(RUBYPREFIX)\lib $(RUBYLIBPREFIX)-ruby$(RUBYLIBVERSION).lib
+RUBYCFLAGS = /I $(RUBYPREFIX)\include\ruby-$(RUBYVERSION) /I $(RUBYPREFIX)\include\ruby-$(RUBYVERSION)/$(RUBYTARGET)_$(RUBYVCVERSION)
+RUBYSITEARCHDIR = $(RUBYPREFIX)\lib\ruby\site_ruby\$(RUBYVERSION)\$(RUBYSITEARCHDIRSUFFIX)
 RUBYCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) /I./ /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
 
 # php
-PHPINCLUDES = /I C:\\PHP\\dev\\include\\php /I C:\\PHP\\dev\\include\\php\\main /I C:\\PHP\\dev\\include\\php\\TSRM /I C:\\PHP\\dev\\include\\php\\Zend /I C:\\PHP\\dev\\include\\php\\ext /I C:\\PHP\\dev\\include\\php\\ext\date\lib $(RUDIMENTSINCLUDES)
-PHPEXTDIR = C:\\PHP\\ext
+PHPPREFIX = @PHPPREFIX@
+PHPINCLUDES = /I $(PHPPREFIX)\dev\include\php /I $(PHPPREFIX)\dev\include\php\main /I $(PHPPREFIX)\dev\include\php\TSRM /I $(PHPPREFIX)\dev\include\php\Zend /I $(PHPPREFIX)\dev\include\php\ext /I $(PHPPREFIX)\dev\include\php\ext\date\lib $(RUDIMENTSINCLUDES)
+PHPEXTDIR = $(PHPPREFIX)\ext
 PHPVERSION =
 PHPMAJORVERSION =
-PHPLIB = /LIBPATH:C:\\PHP\\dev php5ts.lib
-PHPCONFDIR = C:\\Windows
+PHPLIB = /LIBPATH:$(PHPPREFIX)\dev php5ts.lib
+PHPCONFDIR = C:\Windows
 PHPCONFSTYLE = windows
 PHPCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PHPINCLUDES) /D COMPILE_DL=1
 PHPLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
@@ -216,17 +221,19 @@ PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(
 
 
 # java
-JAVAC = "C:\Program Files\Java\jdk1.8.0_25\bin\javac"
-JAR = "C:\Program Files\Java\jdk1.8.0_25\bin\jar"
-JAVAINCLUDES = /I "C:\Program Files\Java\jdk1.8.0_25\include" /I "C:\Program Files\Java\jdk1.8.0_25\include\win32"
+JAVAPREFIX = @JAVAPREFIX@
+JAVAC = "$(JAVAPREFIX)\bin\javac"
+JAR = "$(JAVAPREFIX)\bin\jar"
+JAVAINCLUDES = /I "$(JAVAPREFIX)\include" /I "$(JAVAPREFIX)\include\win32"
 JAVACPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS) /LIBPATH:"C:\Program Files\Java\jdk1.8.0_25\lib" jvm.lib
+JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS) /LIBPATH:"$(JAVAPREFIX)\lib" jvm.lib
 
 
 # tcl
-TCLINCLUDE = /IC:\Tcl\include
-TCLLIB = /LIBPATH:C:\Tcl\lib tcl86.lib
-TCLLIBSPATH = C:\\Tcl\\lib
+TCLPREFIX = @TCLPREFIX@
+TCLINCLUDE = /I$(TCLPREFIX)\include
+TCLLIB = /LIBPATH:$(TCLPREFIX)\lib tcl86.lib
+TCLLIBSPATH = $(TCLPREFIX)\lib
 TCLCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) /I$(top_builddir) /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 TCLLIBS = $(TCLLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -253,21 +260,21 @@ SOCKETLIBS =
 
 
 # oracle
-ORACLEVERSION = 12c
-ORACLEINCLUDES = /I "C:\Program Files\Oracle\instantclient_12_1\sdk\include"
-ORACLELIBS = /LIBPATH:"C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc" oci.lib
+ORACLEVERSION = @ORACLEVERSION@
+ORACLEINCLUDES = @ORACLEINCLUDES@
+ORACLELIBS = @ORACLELIBS@
 
 
 # mysql
-MYSQLINCLUDES = /I "C:\Program Files\MySQL\MySQL Connector.C 6.1\include"
-MYSQLLIBS = /LIBPATH:"C:\Program Files\MySQL\MySQL Connector.C 6.1\lib" libmysql.lib
+MYSQLINCLUDES = @MYSQLINCLUDES@
+MYSQLLIBS = @MYSQLLIBS@
 MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
 
 # postgresql
-POSTGRESQLINCLUDES = /I "C:\Program Files\PostgreSQL\9.4\include"
-POSTGRESQLLIBS = /LIBPATH:"C:\Program Files\PostgreSQL\9.4\lib" libpq.lib
+POSTGRESQLINCLUDES = @POSTGRESQLINCLUDES@
+POSTGRESQLLIBS = @POSTGRESQLLIBS@
 POSTGRESQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 POSTGRESQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
@@ -278,30 +285,30 @@ SQLITELIBS = @SQLITELIBS@
 
 
 # sybase
-SYBASEINCLUDES = /I "C:\SAP\OCS-16_0\include"
-SYBASELIBS = /LIBPATH:"C:\SAP\OCS-16_0\lib" libsybblk64.lib libsybct64.lib libsybcs64.lib
+SYBASEINCLUDES = @SYBASEINCLUDES@
+SYBASELIBS = @SYBASELIBS@
 
 
 # odbc
-ODBCINCLUDES =
-ODBCLIBS = user32.lib gdi32.lib odbc32.lib odbccp32.lib
+ODBCINCLUDES = @ODBCINCLUDES@
+ODBCLIBS = @ODBCLIBS@
 ODBCUNICODE =
 ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRODBC_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
 ODBCDRIVERLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS) $(ODBCLIBS) /DEF:sqlrodbc.def
 
 
 # db2
-DB2INCLUDES = /I"C:\Program Files\IBM\SQLLIB\include"
-DB2LIBS = /LIBPATH:"C:\Program Files\IBM\SQLLIB\lib" db2api.lib
+DB2INCLUDES = @DB2INCLUDES@
+DB2LIBS = @DB2LIBS@
 
 
 # firebird
-FIREBIRDINCLUDES = /I"C:\Program Files\Firebird\Firebird_2_5\include"
-FIREBIRDLIBS = /LIBPATH:"C:\Program Files\Firebird\Firebird_2_5\lib" fbclient_ms.lib
+FIREBIRDINCLUDES = @FIREBIRDINCLUDES@
+FIREBIRDLIBS = @FIREBIRDLIBS@
 
 
 # util
-UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS $(DIRCPPFLAG) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 UTILLIBS = $(RUDIMENTSLIBS)
 
 
@@ -366,8 +373,8 @@ SYBASECONNECTIONLIBS = $(SYBASELIBS) $(CONNECTIONLIBS)
 
 
 # connections
-CONNECTIONSALLTARGETS = all-db2 all-firebird all-mysql all-odbc all-oracle8 all-postgresql @ALLSYBASE@ all-router
-CONNECTIONSINSTALLTARGETS = installdll-db2 installdll-firebird installdll-mysql installdll-odbc installdll-oracle8 installdll-postgresql @INSTALLSYBASE@ installdll-router
+CONNECTIONSALLTARGETS = @ALLDB2@ @ALLFIREBIRD@ @ALLMYSQL@ @ALLODBC@ @ALLORACLE8@ @ALLPOSTGRESQL@ @ALLSQLITE@ @ALLSYBASE@ all-router
+CONNECTIONSINSTALLTARGETS = @INSTALLDB2@ @INSTALLFIREBIRD@ @INSTALLMYSQL@ @INSTALLODBC@ @INSTALLORACLE8@ @INSTALLPOSTGRESQL@ @INSTALLSQLITE@ @INSTALLSYBASE@ installdll-router
 
 
 # tests
