@@ -255,7 +255,7 @@ int main(int argc, const char **argv) {
 	// get the command line args
 	const char	*localstatedir=sqlrpth.getLocalStateDir();
 	bool		strace=cmdl.found("-strace");
-	const char	*id=cmdl.getId();
+	const char	*id=cmdl.getValue("-id");
 	const char	*config=sqlrpth.getConfigFile();
 	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
 
