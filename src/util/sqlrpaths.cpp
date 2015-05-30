@@ -28,16 +28,10 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 				"SOFTWARE\\SQLRelay",
 				0,KEY_READ,&hkey)!=ERROR_SUCCESS ||
 		RegQueryValueEx(hkey,"prefix",0,NULL,
-				prefix,&prefixsize)!=ERROR_SUCCESS) {
+				(LPBYTE)prefix,&prefixsize)!=ERROR_SUCCESS) {
 
 		// fall back to defaults
-		if (sizeof(long)==8) {
-			charstring::copy(prefix,
-					"C:\\Program Files\\Firstworks");
-		} else {
-			charstring::copy(prefix,
-					"C:\\Program Files (x86)\\Firstworks");
-		}
+		charstring::copy(prefix,PREFIX);
 	}
 
 	// build default localstatedir
@@ -49,7 +43,7 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	sysconfdir=scratch.detachString();
 
 	// libexecdir
-	scratch.append(prefix)->append("\\libexec\\");
+	scratch.append(prefix)->append("\\libexec\\sqlrelay\\");
 	libexecdir=scratch.detachString();
 
 #else
@@ -60,11 +54,11 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 
 	char	slash=sys::getDirectorySeparator();
 
-	localstatedir=charstring::duplicate(cmdl->getLocalStateDir());
-	if (!cmdl->getLocalStateDir()[0]) {
-		localstatedir=defaultlocalstatedir;
-	} else {
+	if (cmdl->getLocalStateDir()[0]) {
+		localstatedir=charstring::duplicate(cmdl->getLocalStateDir());
 		delete[] defaultlocalstatedir;
+	} else {
+		localstatedir=defaultlocalstatedir;
 	}
 
 	scratch.append(localstatedir)->append("sqlrelay")->append(slash);

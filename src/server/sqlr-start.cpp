@@ -5,7 +5,6 @@
 #include <defaults.h>
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/process.h>
-#include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
 #ifdef _WIN32
@@ -256,7 +255,7 @@ int main(int argc, const char **argv) {
 	// get the command line args
 	const char	*localstatedir=sqlrpth.getLocalStateDir();
 	bool		strace=cmdl.found("-strace");
-	const char	*id=cmdl.getValue("-id");
+	const char	*id=cmdl.getId();
 	const char	*config=sqlrpth.getConfigFile();
 	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
 
@@ -286,11 +285,10 @@ int main(int argc, const char **argv) {
 				(long)GetStdHandle(STD_ERROR_HANDLE),
 				_O_TEXT),"w"));
 	setvbuf(stderr,NULL,_IONBF,0);
+	iswindows=true;
+	#else
+	iswindows=false;
 	#endif
-
-	// are we running on windows
-	iswindows=!charstring::compareIgnoringCase(
-				sys::getOperatingSystemName(),"Windows");
 
 	// get the id
 	linkedlist< char * >	ids;

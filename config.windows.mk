@@ -4,18 +4,18 @@ SONAME_VERSION_INFO =
 SQLRELAY_ENABLE_SHARED = yes
 
 # installation directories
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-includedir = @includedir@
-libdir = @libdir@
-javadir = @javadir@
-dotnetdir = @bindir@
-libexecdir = @libexecdir@
-bindir = @bindir@
-localstatedir = @localstatedir@
-sysconfdir = @sysconfdir@
-mandir = @mandir@
-datadir = @datadir@
+prefix = "@prefix@"
+exec_prefix = "@exec_prefix@"
+includedir = "@includedir@"
+libdir = "@libdir@"
+javadir = "@javadir@"
+dotnetdir = "@bindir@"
+libexecdir = "@libexecdir@"
+bindir = "@bindir@"
+localstatedir = "@localstatedir@"
+sysconfdir = "@sysconfdir@"
+mandir = "@mandir@"
+datadir = "@datadir@"
 docdir = $(datadir)\\doc\\sqlrelay
 EXAMPLEDIR = $(datadir)\\examples
 tmpdir = $(localstatedir)\\sqlrelay\\tmp
@@ -308,8 +308,8 @@ FIREBIRDLIBS = @FIREBIRDLIBS@
 
 
 # util
-UTILCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRUTIL_EXPORTS /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
-UTILLIBS = $(RUDIMENTSLIBS)
+UTILCPPFLAGS = $(BASECPPFLAGS) /D PREFIX="\"@prefix@\"" /D LIBSQLRUTIL_EXPORTS /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+UTILLIBS = $(RUDIMENTSLIBS) advapi32.lib
 
 
 # cmdline

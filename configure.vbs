@@ -20,23 +20,23 @@ SQLR_VERSION="0.60"
 
 ' paths
 pfix="C:\\Program Files\\Firstworks"
-prefix=""""+pfix+""""
+prefix=pfix
 exec_prefix=prefix
-bindir=""""+pfix+"\\bin"""
-includedir=""""+pfix+"\\include"""
-libdir=""""+pfix+"\\lib"""
-javadir=""""+pfix+"\\java"""
-libexecdir=""""+pfix+"\\libexec\\sqlrelay"""
-localstatedir=""""+pfix+"\\var"""
-sysconfdir=""""+pfix+"\\etc"""
-mandir=""""+pfix+"\\share\\man"""
-datadir=""""+pfix+"\\share"""
-docdir=""""+pfix+"\\doc\\sqlrelay"""
-EXAMPLEDIR=""""+pfix+"\\doc\\sqlrelay\\examples"""
-tmpdir=""""+pfix+"\\var\\sqlrelay\\tmp"""
-cachedir=""""+pfix+"\\var\\sqlrelay\\cache"""
-debugdir=""""+pfix+"\\var\\sqlrelay\\debug"""
-logdir=""""+pfix+"\\var\\sqlrelay\\log"""
+bindir=pfix+"\\bin"
+includedir=pfix+"\\include"
+libdir=pfix+"\\lib"
+javadir=pfix+"\\java"
+libexecdir=pfix+"\\libexec\\sqlrelay"
+localstatedir=pfix+"\\var"
+sysconfdir=pfix+"\\etc"
+mandir=pfix+"\\share\\man"
+datadir=pfix+"\\share"
+docdir=pfix+"\\doc\\sqlrelay"
+EXAMPLEDIR=pfix+"\\doc\\sqlrelay\\examples"
+tmpdir=pfix+"\\var\\sqlrelay\\tmp"
+cachedir=pfix+"\\var\\sqlrelay\\cache"
+debugdir=pfix+"\\var\\sqlrelay\\debug"
+logdir=pfix+"\\var\\sqlrelay\\log"
 initscript_prefix=""
 
 ' extension
@@ -279,7 +279,7 @@ end if
 PHPPREFIX="C:\PHP"
 
 ' java
-JAVAPREFIX="C:\Program Files\Java\jdk18.0_25"
+JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
 
 ' tcl
 TCLPREFIX="C:\Tcl"
