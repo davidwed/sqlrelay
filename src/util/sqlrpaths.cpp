@@ -95,7 +95,7 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	scratch.append(sysconfdir)->append("sqlrelay.conf.d")->append(slash);
 	defaultconfigdir=scratch.detachString();
 
-	if (cmdl->getConfig()) {
+	if (cmdl->getConfig()[0]) {
 		configfile=cmdl->getConfig();
 	} else {
 		configfile=defaultconfigfile;
