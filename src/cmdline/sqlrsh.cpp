@@ -213,10 +213,6 @@ class	sqlrsh {
 					sqlrcursor *sqlrcur, sqlrshenv *env);
 		void	prompt(unsigned long promptcount);
 
-#ifndef HAVE_READLINE
-		filedescriptor	standardin;
-#endif
-
 		sqlrcmdline	*cmdline;
 		sqlrpaths	*sqlrpth;
 };
@@ -225,14 +221,6 @@ sqlrsh::sqlrsh() {
 
 	cmdline=NULL;
 	sqlrpth=NULL;
-
-#ifndef HAVE_READLINE
-	standardin.setFileDescriptor(0);
-	// Critical on some systems (Syllable for sure, maybe others)
-	// or prompts just roll up the screen forever.
-	standardin.useBlockingMode();
-	standardin.allowShortReads();
-#endif
 }
 
 sqlrsh::~sqlrsh() {
@@ -1795,7 +1783,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			#else
 				prompt(promptcount);
 				char	cmd[1024];
-				ssize_t	bytes=standardin.read(cmd,1024);
+				ssize_t	bytes=stdinput.read(cmd,1024);
 				cmd[bytes-1]='\0';
 				#ifdef ADD_NEWLINE_AFTER_READ_FROM_STDIN
 					stdoutput.printf("\n");
