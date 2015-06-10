@@ -1224,7 +1224,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 		csa->lsnr=this;
 		csa->clientsock=clientsock;
 		csa->protocol=protocol;
-		thr->setFunction((void*(*)(void*))clientSessionThread,csa);
+		thr->setFunction((void*(*)(void*))clientSessionThread);
+		thr->setArgument(csa);
 
 		// fork the thread
 		if (thr->create()) {
@@ -1595,7 +1596,8 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				ata->mainthr=thr;
 				ata->listenertimeout=listenertimeout;
 				alarmthread->setFunction(
-					(void*(*)(void*))alarmThread,ata);
+					(void*(*)(void*))alarmThread);
+				alarmthread->setArgument(ata);
 				alarmthread->create();
 			} else {
 				signalmanager::alarm(listenertimeout);
@@ -1758,7 +1760,8 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 		pda->connectionpid=connectionpid;
 		pda->unixportstr=unixportstr;
 		pda->inetport=inetport;
-		thr->setFunction((void*(*)(void*))pingDatabaseThread,pda);
+		thr->setFunction((void*(*)(void*))pingDatabaseThread);
+		thr->setArgument(pda);
 
 		// fork the thread
 		thr->create();
