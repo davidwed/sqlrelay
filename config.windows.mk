@@ -407,8 +407,8 @@ PYTHONSUFFIX = pyd
 
 
 # build directories
-INSTALLSUBDIRS = install-reg install-src install-bin install-etc install-doc
-UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-doc uninstall-reg
+INSTALLSUBDIRS = install-src install-bin install-etc install-doc
+UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-doc
 
 SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-connections all-cmdline
 
