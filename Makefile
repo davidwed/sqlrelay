@@ -36,6 +36,9 @@ install-pkgconfig:
 	$(CP) sqlrelay-c++.pc $(libdir)/pkgconfig/sqlrelay-c++.pc
 	$(CHMOD) 0644 $(libdir)/pkgconfig/sqlrelay-c++.pc
 
+install-reg:
+	reginstall.vbs $(prefix)
+
 uninstall: $(UNINSTALLSUBDIRS)
 	$(RMTREE) $(libexecdir)
 
@@ -60,6 +63,9 @@ uninstall-doc:
 uninstall-pkgconfig:
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc \
 		$(libdir)/pkgconfig/sqlrelay-c++.pc
+
+uninstall-reg:
+	reguninstall.vbs
 
 distclean: clean
 	$(RM) config.cache \
