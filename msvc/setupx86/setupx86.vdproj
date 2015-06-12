@@ -3937,7 +3937,7 @@
             "Sequence" = "3:1"
             "Identifier" = "8:_A7572FA6_28FA_4791_BAF5_9EF849377208"
             "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
+            "CustomActionData" = "8:[TARGETDIR]"
             }
         }
         "DefaultFeature"

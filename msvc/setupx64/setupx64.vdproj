@@ -3943,7 +3943,7 @@
             "Sequence" = "3:1"
             "Identifier" = "8:_A7572FA6_28FA_4791_BAF5_9EF849377208"
             "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
+            "CustomActionData" = "8:[TARGETDIR]"
             }
         }
         "DefaultFeature"
@@ -17729,7 +17729,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Firstworks SQL Relay (64-bit)"
         "ProductCode" = "8:{C0EC8D59-D301-4F83-83D9-1CCD6E8001A5}"
-        "PackageCode" = "8:{86938D47-BA19-4B3A-A7EE-5E5D8524C7D1}"
+        "PackageCode" = "8:{6E5CA021-56B6-49C7-AB90-ADF01D041609}"
         "UpgradeCode" = "8:{97679A6A-B07C-4278-9494-57F8C96615C6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -17770,28 +17770,6 @@
                     "Transitive" = "11:FALSE"
                         "Keys"
                         {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_57447DE481B043668F73276D0181E990"
-                            {
-                            "Name" = "8:SQLRelay"
-                            "Condition" = "8:"
-                            "AlwaysCreate" = "11:FALSE"
-                            "DeleteAtUninstall" = "11:FALSE"
-                            "Transitive" = "11:FALSE"
-                                "Keys"
-                                {
-                                }
-                                "Values"
-                                {
-                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C1021482BED143C5BA88325025B7843F"
-                                    {
-                                    "Name" = "8:prefix"
-                                    "Condition" = "8:"
-                                    "Transitive" = "11:FALSE"
-                                    "ValueTypes" = "3:1"
-                                    "Value" = "8:[TARGETDIR]"
-                                    }
-                                }
-                            }
                             "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_954C92649EE146C69766F6F25FC5789F"
                             {
                             "Name" = "8:ODBC"
@@ -17918,6 +17896,28 @@
                                 }
                                 "Values"
                                 {
+                                }
+                            }
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_C6CAFBDED7D345408C7CC2BB02A65E31"
+                            {
+                            "Name" = "8:SQLRelay"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:FALSE"
+                            "DeleteAtUninstall" = "11:FALSE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                }
+                                "Values"
+                                {
+                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_10FB0A376BA145FD84CB711D9D805A97"
+                                    {
+                                    "Name" = "8:prefix"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "ValueTypes" = "3:1"
+                                    "Value" = "8:[TARGETDIR]"
+                                    }
                                 }
                             }
                         }

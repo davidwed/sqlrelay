@@ -34,6 +34,9 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 		charstring::copy(prefix,PREFIX);
 	}
 
+	// trim trailing slashes
+	charstring::rightTrim(prefix,'\\');
+
 	// build default localstatedir
 	scratch.append(prefix)->append("\\var\\");
 	defaultlocalstatedir=scratch.detachString();

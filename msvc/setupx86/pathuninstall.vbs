@@ -1,7 +1,10 @@
 Set wshShell = CreateObject("WScript.Shell")
+
+prefix = wshShell.RegRead("HKLM\SOFTWARE\SQLRelay\prefix")
+
+' update the path
 Set wshSystemEnv = wshShell.Environment("SYSTEM")
-'WScript.Echo wshSystemEnv("PATH")
-wshSystemEnv("PATH") = Replace(wshSystemEnv("PATH"),";C:\Program Files\Firstworks\bin","")
-'WScript.Echo wshSystemEnv("PATH")
+wshSystemEnv("PATH") = Replace(wshSystemEnv("PATH"),";" & prefix & "bin","",1,-1)
+
 Set wshSystemEnv = Nothing
 Set wshShell = Nothing
