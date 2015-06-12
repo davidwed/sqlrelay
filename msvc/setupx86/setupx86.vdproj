@@ -5906,7 +5906,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.59.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.60.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_262F174C65C8408AB1A323DB9BB92EBA"
@@ -17796,7 +17796,7 @@
                                                     "Condition" = "8:"
                                                     "Transitive" = "11:FALSE"
                                                     "ValueTypes" = "3:1"
-                                                    "Value" = "8:C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
+                                                    "Value" = "8:[TARGETDIR]bin\\libsqlrodbc.dll"
                                                     }
                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_9A6BE19A789C4AFEABD7D329AFFBDC14"
                                                     {
@@ -17812,7 +17812,7 @@
                                                     "Condition" = "8:"
                                                     "Transitive" = "11:FALSE"
                                                     "ValueTypes" = "3:1"
-                                                    "Value" = "8:C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
+                                                    "Value" = "8:[TARGETDIR]bin\\libsqlrodbc.dll"
                                                     }
                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C0BDFB6AD1244D74BAE880C669E9C807"
                                                     {
@@ -17870,6 +17870,28 @@
                                 }
                                 "Values"
                                 {
+                                }
+                            }
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_FC257A82CD8A4467A11601D9A3B33720"
+                            {
+                            "Name" = "8:SQLRelay"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:FALSE"
+                            "DeleteAtUninstall" = "11:FALSE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                }
+                                "Values"
+                                {
+                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_BB3B9A47F2D040CC967A4E704EBE58ED"
+                                    {
+                                    "Name" = "8:prefix"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "ValueTypes" = "3:1"
+                                    "Value" = "8:[TARGETDIR]"
+                                    }
                                 }
                             }
                         }
