@@ -2421,6 +2421,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9B352B61C4254C5A9CA350272386BD92"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9CBAC72309B44DD29C70D71EE1877713"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3592,6 +3598,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EC4021E859034959BC5280A6FCF30CC9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EE39BA3B8707408E858EE4FBBF6042A5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -5912,7 +5924,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SQLRClient.dll, Version=0.59.0.0, Culture=neutral, PublicKeyToken=82bf123fd0ae543a, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.60.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_262F174C65C8408AB1A323DB9BB92EBA"
@@ -11999,6 +12011,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9B352B61C4254C5A9CA350272386BD92"
+            {
+            "SourcePath" = "8:reguninstall.vbs"
+            "TargetName" = "8:reguninstall.vbs"
+            "Tag" = "8:"
+            "Folder" = "8:_1CC44F4587134A968D439AFB1479C24A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9CBAC72309B44DD29C70D71EE1877713"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ado.net\\html\\tab_a.png"
@@ -15919,6 +15951,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE39BA3B8707408E858EE4FBBF6042A5"
+            {
+            "SourcePath" = "8:reginstall.vbs"
+            "TargetName" = "8:reginstall.vbs"
+            "Tag" = "8:"
+            "Folder" = "8:_1CC44F4587134A968D439AFB1479C24A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE64DA198E7240D693F893BCF90157ED"
             {
             "SourcePath" = "8:..\\..\\src\\auths\\sqlrauth_sqlrelay.dll"
@@ -17729,7 +17781,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Firstworks SQL Relay (64-bit)"
         "ProductCode" = "8:{C0EC8D59-D301-4F83-83D9-1CCD6E8001A5}"
-        "PackageCode" = "8:{8CE8F4C4-DB02-4036-B6AB-786B98A94F71}"
+        "PackageCode" = "8:{1F66B200-97D6-4A72-8CC2-6A4CD2109333}"
         "UpgradeCode" = "8:{97679A6A-B07C-4278-9494-57F8C96615C6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -17770,6 +17822,28 @@
                     "Transitive" = "11:FALSE"
                         "Keys"
                         {
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_57447DE481B043668F73276D0181E990"
+                            {
+                            "Name" = "8:SQLRelay"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:FALSE"
+                            "DeleteAtUninstall" = "11:FALSE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                }
+                                "Values"
+                                {
+                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C1021482BED143C5BA88325025B7843F"
+                                    {
+                                    "Name" = "8:prefix"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "ValueTypes" = "3:1"
+                                    "Value" = "8:C:\\Program Files\\Firstworks"
+                                    }
+                                }
+                            }
                             "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_954C92649EE146C69766F6F25FC5789F"
                             {
                             "Name" = "8:ODBC"
