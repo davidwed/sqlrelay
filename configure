@@ -32538,7 +32538,7 @@ then
 	eval "JAVAINCLUDES=\"-I$JAVAPATH/Headers\""
 fi
 
-			if ( test -n "$JAVAINCLUDES" )
+			if ( test -z "$JAVAINCLUDES" )
 			then
 				for i in `ls -d $JAVAPATH/include/* $JAVAPATH/Headers/* 2> /dev/null`
 				do
