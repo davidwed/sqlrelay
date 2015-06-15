@@ -15,7 +15,17 @@
 // for ceil()
 #include <math.h>
 
+#define MAX_CONNECTIONS 200
+
 bool	iswindows;
+
+int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {
+	int32_t	connections=cfgfile->getConnections();
+	if (!override && connections>MAX_CONNECTIONS) {
+		connections=MAX_CONNECTIONS;
+	}
+	return connections;
+}
 
 bool startListener(const char *id, const char *config,
 					const char *localstatedir) {
@@ -113,7 +123,8 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 
 bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 				const char *id, const char *config,
-				const char *localstatedir) {
+				const char *localstatedir,
+				bool overridemaxconn) {
 
 	// get the connection count and total metric
 	linkedlist< connectstringcontainer *>	*connectionlist=
@@ -131,7 +142,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	}
 
 	// get number of connections
-	int32_t	connections=cfgfile->getConnections();
+	int32_t	connections=getConnections(cfgfile,overridemaxconn);
 
 	// start the connections
 	connectstringnode	*csn=connectionlist->getFirst();
@@ -246,6 +257,7 @@ int main(int argc, const char **argv) {
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getValue("-id");
 	const char	*config=sqlrpth.getConfigFile();
+	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
 
 	// on Windows, open a new console window and redirect everything to it
 	#ifdef _WIN32
@@ -298,8 +310,8 @@ int main(int argc, const char **argv) {
 		// start listener, connections and scaler
 		if (!cfgfile.parse(config,thisid) ||
 			!startListener(thisid,config,localstatedir) ||
-			!startConnections(&cfgfile,strace,thisid,
-						config,localstatedir) ||
+			!startConnections(&cfgfile,strace,thisid,config,
+					localstatedir,overridemaxconn) ||
 			!startScaler(&cfgfile,thisid,config,localstatedir)) {
 			exitstatus=1;
 		}
