@@ -32526,12 +32526,15 @@ then
 	eval "JAR=\"$JAVAPATH/Commands/jar$EXE\""
 fi
 
+			if ( test "$JAVAPATH" != "/usr" )
+			then
 
 if ( test -r ""$JAVAPATH/include/jni.h"" )
 then
 	eval "JAVAINCLUDES=\"-I$JAVAPATH/include\""
 fi
 
+			fi
 
 if ( test -r ""$JAVAPATH/Headers/jni.h"" )
 then

@@ -5,7 +5,7 @@
 	migrated directory/file paths info into sqlrpaths class
 	removed undocumented and not-so-relevent-these-days
 		MAX_CONNECTIONS/overridemaxconnections failsafe in sqlr-start
-	fixed transposed -n/-z in confiugre test for java headers
+	fixed java header detection for javac located in /usr/bin
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings
