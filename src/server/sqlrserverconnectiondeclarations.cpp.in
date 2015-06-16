@@ -1,1 +1,1 @@
-sqlrserverconnection	*new_@module@(sqlrservercontroller *cont);
+sqlrserverconnection	*new_@module@connection(sqlrservercontroller *cont);
