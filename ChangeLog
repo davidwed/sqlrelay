@@ -8,6 +8,7 @@
 	fixed java header detection for javac located in /usr/bin
 	updated java api to support non-null-tolerant implementations of
 		environment::NewStringUTF()
+	the perl api builds correctly on OSR5 again
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings
