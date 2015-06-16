@@ -22,9 +22,14 @@
 	#endif
 #endif
 
+#ifndef _SCO_DS
 extern "C" {
+#endif
 	#include <perl.h>
+#ifndef _SCO_DS
 }
+#endif
+
 #include <XSUB.h>
 #ifdef CLASS
 	#undef CLASS
