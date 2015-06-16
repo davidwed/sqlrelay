@@ -32,6 +32,10 @@ static void conReleaseStringUTFChars(JNIEnv *env, jstring string, char *chararra
 	}
 }
 
+static jstring conNewStringUTF(JNIEnv *env, const char *string) {
+	return (string)?env->NewStringUTF(string):NULL;
+}
+
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    alloc
@@ -142,7 +146,7 @@ JNIEXPORT jshort JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnecti
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getConnectionSocket
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(
+	return conNewStringUTF(env,
 			getSqlrConnection(env,self)->getConnectionSocket());
 }
 
@@ -191,7 +195,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_selectDat
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getCurrentDatabase
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->getCurrentDatabase());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->getCurrentDatabase());
 }
 
 /*
@@ -261,7 +265,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_rollback
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->identify());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->identify());
 }
 
 /*
@@ -271,7 +275,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_identify
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbVersion
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->dbVersion());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->dbVersion());
 }
 
 /*
@@ -281,7 +285,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbVersion
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbHostName
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->dbHostName());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->dbHostName());
 }
 
 /*
@@ -291,7 +295,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbHostName
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbIpAddress
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->dbIpAddress());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->dbIpAddress());
 }
 
 /*
@@ -301,7 +305,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbIpAddres
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_serverVersion
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->serverVersion());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->serverVersion());
 }
 
 /*
@@ -311,7 +315,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_serverVers
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_clientVersion
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->clientVersion());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->clientVersion());
 }
 
 /*
@@ -321,7 +325,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_clientVers
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->bindFormat());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->bindFormat());
 }
 
 /*
@@ -331,7 +335,7 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_errorMessage
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->errorMessage());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->errorMessage());
 }
 
 /*
@@ -405,7 +409,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setClientInfo
  */
 JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getClientInfo
   (JNIEnv *env, jobject self) {
-	return env->NewStringUTF(getSqlrConnection(env,self)->getClientInfo());
+	return conNewStringUTF(env,getSqlrConnection(env,self)->getClientInfo());
 }
 
 #ifdef __cplusplus

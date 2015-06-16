@@ -6,6 +6,8 @@
 	removed undocumented and not-so-relevent-these-days
 		MAX_CONNECTIONS/overridemaxconnections failsafe in sqlr-start
 	fixed java header detection for javac located in /usr/bin
+	updated java api to support non-null-tolerant implementations of
+		environment::NewStringUTF()
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings
