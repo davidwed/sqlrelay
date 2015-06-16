@@ -3064,7 +3064,7 @@ then
 				FW_CHECK_FILE("$JAVAPATH/include/jni.h",[JAVAINCLUDES=\"-I$JAVAPATH/include\"])
 			fi
 			FW_CHECK_FILE("$JAVAPATH/Headers/jni.h",[JAVAINCLUDES=\"-I$JAVAPATH/Headers\"])
-			if ( test -z "$JAVAINCLUDES" -a "$JAVAPATH" != "/usr" )
+			if ( test -n "$JAVAINCLUDES" -a "$JAVAPATH" != "/usr" )
 			then
 				for i in `ls -d $JAVAPATH/include/* $JAVAPATH/Headers/* 2> /dev/null`
 				do
