@@ -34,124 +34,124 @@ clean:
 
 
 
-db2connection.lo: db2connection.cpp
+db2.lo: db2.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DB2CONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-db2connection.obj: db2connection.cpp
-	$(CXX) $(CXXFLAGS) $(DB2CONNECTIONCPPFLAGS) $(COMPILE) db2connection.cpp
+db2.obj: db2.cpp
+	$(CXX) $(CXXFLAGS) $(DB2CONNECTIONCPPFLAGS) $(COMPILE) db2.cpp
 
-sqlrconnection_db2.$(LIBEXT): db2connection.$(OBJ) db2connection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ db2connection.$(OBJ) $(LDFLAGS) $(DB2CONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_db2.$(LIBEXT): db2.$(OBJ) db2.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ db2.$(OBJ) $(LDFLAGS) $(DB2CONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-firebirdconnection.lo: firebirdconnection.cpp
+firebird.lo: firebird.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(FIREBIRDCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-firebirdconnection.obj: firebirdconnection.cpp
-	$(CXX) $(CXXFLAGS) $(FIREBIRDCONNECTIONCPPFLAGS) $(COMPILE) firebirdconnection.cpp
+firebird.obj: firebird.cpp
+	$(CXX) $(CXXFLAGS) $(FIREBIRDCONNECTIONCPPFLAGS) $(COMPILE) firebird.cpp
 
-sqlrconnection_firebird.$(LIBEXT): firebirdconnection.$(OBJ) firebirdconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ firebirdconnection.$(OBJ) $(LDFLAGS) $(FIREBIRDCONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_firebird.$(LIBEXT): firebird.$(OBJ) firebird.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ firebird.$(OBJ) $(LDFLAGS) $(FIREBIRDCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-freetdsconnection.lo: freetdsconnection.cpp
+freetds.lo: freetds.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(FREETDSCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-freetdsconnection.obj: freetdsconnection.cpp
-	$(CXX) $(CXXFLAGS) $(FREETDSCONNECTIONCPPFLAGS) $(COMPILE) freetdsconnection.cpp
+freetds.obj: freetds.cpp
+	$(CXX) $(CXXFLAGS) $(FREETDSCONNECTIONCPPFLAGS) $(COMPILE) freetds.cpp
 
-sqlrconnection_freetds.$(LIBEXT): freetdsconnection.$(OBJ) freetdsconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ freetdsconnection.$(OBJ) $(LDFLAGS) $(FREETDSCONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_freetds.$(LIBEXT): freetds.$(OBJ) freetds.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ freetds.$(OBJ) $(LDFLAGS) $(FREETDSCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-mdbtoolsconnection.lo: mdbtoolsconnection.cpp
+mdbtools.lo: mdbtools.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MDBTOOLSCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-mdbtoolsconnection.obj: mdbtoolsconnection.cpp
-	$(CXX) $(CXXFLAGS) $(MDBTOOLSCONNECTIONCPPFLAGS) $(COMPILE) mdbtoolsconnection.cpp
+mdbtools.obj: mdbtools.cpp
+	$(CXX) $(CXXFLAGS) $(MDBTOOLSCONNECTIONCPPFLAGS) $(COMPILE) mdbtools.cpp
 
-sqlrconnection_mdbtools.$(LIBEXT): mdbtoolsconnection.$(OBJ) mdbtoolsconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ mdbtoolsconnection.$(OBJ) $(LDFLAGS) $(MDBTOOLSCONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_mdbtools.$(LIBEXT): mdbtools.$(OBJ) mdbtools.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ mdbtools.$(OBJ) $(LDFLAGS) $(MDBTOOLSCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-mysqlconnection.lo: mysqlconnection.cpp
+mysql.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MYSQLCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-mysqlconnection.obj: mysqlconnection.cpp
-	$(CXX) $(CXXFLAGS) $(MYSQLCONNECTIONCPPFLAGS) $(COMPILE) mysqlconnection.cpp
+mysql.obj: mysql.cpp
+	$(CXX) $(CXXFLAGS) $(MYSQLCONNECTIONCPPFLAGS) $(COMPILE) mysql.cpp
 
-sqlrconnection_mysql.$(LIBEXT): mysqlconnection.$(OBJ) mysqlconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ mysqlconnection.$(OBJ) $(LDFLAGS) $(MYSQLCONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_mysql.$(LIBEXT): mysql.$(OBJ) mysql.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ mysql.$(OBJ) $(LDFLAGS) $(MYSQLCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-odbcconnection.lo: odbcconnection.cpp
+odbc.lo: odbc.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(ODBCCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-odbcconnection.obj: odbcconnection.cpp
-	$(CXX) $(CXXFLAGS) $(ODBCCONNECTIONCPPFLAGS) $(COMPILE) odbcconnection.cpp
+odbc.obj: odbc.cpp
+	$(CXX) $(CXXFLAGS) $(ODBCCONNECTIONCPPFLAGS) $(COMPILE) odbc.cpp
 
-sqlrconnection_odbc.$(LIBEXT): odbcconnection.$(OBJ) odbcconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ odbcconnection.$(OBJ) $(LDFLAGS) $(ODBCCONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_odbc.$(LIBEXT): odbc.$(OBJ) odbc.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ odbc.$(OBJ) $(LDFLAGS) $(ODBCCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-oracle8connection.lo: oracle8connection.cpp
+oracle8.lo: oracle8.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(ORACLECONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-oracle8connection.obj: oracle8connection.cpp
-	$(CXX) $(CXXFLAGS) $(ORACLECONNECTIONCPPFLAGS) $(COMPILE) oracle8connection.cpp
+oracle8.obj: oracle8.cpp
+	$(CXX) $(CXXFLAGS) $(ORACLECONNECTIONCPPFLAGS) $(COMPILE) oracle8.cpp
 
-sqlrconnection_oracle8.$(LIBEXT): oracle8connection.$(OBJ) oracle8connection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ oracle8connection.$(OBJ) $(LDFLAGS) $(ORACLECONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_oracle8.$(LIBEXT): oracle8.$(OBJ) oracle8.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ oracle8.$(OBJ) $(LDFLAGS) $(ORACLECONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-postgresqlconnection.lo: postgresqlconnection.cpp
+postgresql.lo: postgresql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(POSTGRESQLCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-postgresqlconnection.obj: postgresqlconnection.cpp
-	$(CXX) $(CXXFLAGS) $(POSTGRESQLCONNECTIONCPPFLAGS) $(COMPILE) postgresqlconnection.cpp
+postgresql.obj: postgresql.cpp
+	$(CXX) $(CXXFLAGS) $(POSTGRESQLCONNECTIONCPPFLAGS) $(COMPILE) postgresql.cpp
 
-sqlrconnection_postgresql.$(LIBEXT): postgresqlconnection.$(OBJ) postgresqlconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ postgresqlconnection.$(OBJ) $(LDFLAGS) $(POSTGRESQLCONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_postgresql.$(LIBEXT): postgresql.$(OBJ) postgresql.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ postgresql.$(OBJ) $(LDFLAGS) $(POSTGRESQLCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-routerconnection.lo: routerconnection.cpp
+router.lo: router.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(ROUTERCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-routerconnection.obj: routerconnection.cpp
-	$(CXX) $(CXXFLAGS) $(ROUTERCONNECTIONCPPFLAGS) $(COMPILE) routerconnection.cpp
+router.obj: router.cpp
+	$(CXX) $(CXXFLAGS) $(ROUTERCONNECTIONCPPFLAGS) $(COMPILE) router.cpp
 
-sqlrconnection_router.$(LIBEXT): routerconnection.$(OBJ) routerconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ routerconnection.$(OBJ) $(LDFLAGS) $(ROUTERCONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_router.$(LIBEXT): router.$(OBJ) router.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ router.$(OBJ) $(LDFLAGS) $(ROUTERCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-sqliteconnection.lo: sqliteconnection.cpp
+sqlite.lo: sqlite.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(SQLITECONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-sqliteconnection.obj: sqliteconnection.cpp
-	$(CXX) $(CXXFLAGS) $(SQLITECONNECTIONCPPFLAGS) $(COMPILE) sqliteconnection.cpp
+sqlite.obj: sqlite.cpp
+	$(CXX) $(CXXFLAGS) $(SQLITECONNECTIONCPPFLAGS) $(COMPILE) sqlite.cpp
 
-sqlrconnection_sqlite.$(LIBEXT): sqliteconnection.$(OBJ) sqliteconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ sqliteconnection.$(OBJ) $(LDFLAGS) $(SQLITECONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_sqlite.$(LIBEXT): sqlite.$(OBJ) sqlite.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ sqlite.$(OBJ) $(LDFLAGS) $(SQLITECONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
-sybaseconnection.lo: sybaseconnection.cpp
+sybase.lo: sybase.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(SYBASECONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-sybaseconnection.obj: sybaseconnection.cpp
-	$(CXX) $(CXXFLAGS) $(SYBASECONNECTIONCPPFLAGS) $(COMPILE) sybaseconnection.cpp
+sybase.obj: sybase.cpp
+	$(CXX) $(CXXFLAGS) $(SYBASECONNECTIONCPPFLAGS) $(COMPILE) sybase.cpp
 
-sqlrconnection_sybase.$(LIBEXT): sybaseconnection.$(OBJ) sybaseconnection.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ sybaseconnection.$(OBJ) $(LDFLAGS) $(SYBASECONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_sybase.$(LIBEXT): sybase.$(OBJ) sybase.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ sybase.$(OBJ) $(LDFLAGS) $(SYBASECONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 

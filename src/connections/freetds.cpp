@@ -1053,6 +1053,10 @@ bool freetdscursor::open() {
 			freetdsconn->dbversion=
 				charstring::duplicate("unknown");
 		}
+
+		// set sybasedb too, it's sybase if it's not microsoft
+		freetdsconn->sybasedb=!charstring::contains(
+					freetdsconn->dbversion,"Microsoft");
 	}
 	return retval;
 }
