@@ -33625,7 +33625,7 @@ $as_echo "no" >&6; }
 		fi
 	fi
 
-				if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" )
+						if ( test -r "$CSC" )
 	then
 		CSCFLAGS="-pkg:dotnet"
 		HAVE_MONO="yes"
@@ -33680,9 +33680,39 @@ $as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
 		rm -f conftest.cs
 		rm -f conftest.exe
 	else
-		HAVE_MONO=""
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
 $as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
+	fi
+
+		if ( test -n "$HAVE_MONO" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for mono version" >&5
+$as_echo_n "checking for mono version... " >&6; }
+
+		MONOMAJOR=`$CSC --version 2> /dev/null | cut -d' ' -f5 | cut -d'.' -f1`
+		MONOMINOR=`$CSC --version 2> /dev/null | cut -d' ' -f5 | cut -d'.' -f2`
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $MONOMAJOR.$MONOMINOR (2.8 required)" >&5
+$as_echo "$MONOMAJOR.$MONOMINOR (2.8 required)" >&6; }
+
+		if ( test -z "$MONOMAJOR" -o -z "$MONOMINOR" )
+		then
+			HAVE_MONO=""
+		else
+			if ( test "$MONOMAJOR" -lt "2" )
+			then
+				HAVE_MONO=""
+			elif ( test "$MONOMAJOR" = "2" -a "$MONOMINOR" -lt "8" )
+			then
+				HAVE_MONO=""
+			fi
+		fi
+
+		if ( test -z "$HAVE_MONO" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
+$as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
+		fi
 	fi
 
 

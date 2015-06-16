@@ -3524,10 +3524,12 @@ then
 		fi
 	fi
 
-	dnl don't worry about gacutil for now, we're not going to install
-	dnl anything in the global assembly cache at this point
+	dnl Don't worry about gacutil for now, we're not going to install
+	dnl anything in the global assembly cache at this point.
+	dnl Don't worry about sn, ildasm or ilasm either, we're not going
+	dnl to sign anything at this point either.
 	dnl if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" -a -r "$GACUTIL" )
-	if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" )
+	if ( test -r "$CSC" )
 	then
 		CSCFLAGS="-pkg:dotnet"
 		HAVE_MONO="yes"
@@ -3578,8 +3580,36 @@ EOF
 		rm -f conftest.cs
 		rm -f conftest.exe
 	else
-		HAVE_MONO=""
 		AC_MSG_WARN(The Mono API will not be built.)
+	fi
+
+	dnl for now, mono 2.8 or higher is required
+	if ( test -n "$HAVE_MONO" )
+	then
+		AC_MSG_CHECKING(for mono version)
+
+		MONOMAJOR=`$CSC --version 2> /dev/null | cut -d' ' -f5 | cut -d'.' -f1`
+		MONOMINOR=`$CSC --version 2> /dev/null | cut -d' ' -f5 | cut -d'.' -f2`
+
+		AC_MSG_RESULT([$MONOMAJOR.$MONOMINOR (2.8 required)])
+
+		if ( test -z "$MONOMAJOR" -o -z "$MONOMINOR" )
+		then
+			HAVE_MONO=""
+		else
+			if ( test "$MONOMAJOR" -lt "2" )
+			then
+				HAVE_MONO=""
+			elif ( test "$MONOMAJOR" = "2" -a "$MONOMINOR" -lt "8" )
+			then
+				HAVE_MONO=""
+			fi
+		fi
+
+		if ( test -z "$HAVE_MONO" )
+		then
+			AC_MSG_WARN(The Mono API will not be built.)
+		fi
 	fi
 
 	AC_SUBST(HAVE_MONO)

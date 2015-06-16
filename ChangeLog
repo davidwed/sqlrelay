@@ -12,6 +12,7 @@
 	the postgresql sslmode is omitted entirely from the connect string now,
 		if it's disabled, to prevent problems with older versions of
 		postgresql that don't support the parameter at all
+	mono 2.8 or greater is required now
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings
