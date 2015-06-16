@@ -47,10 +47,19 @@ static int16_t adjustHour(int16_t hour, const char *timestring) {
 }
 
 static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
-			bool supportdotdelimiteddate,
+			const char *datedelimiters,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second,
 			int16_t *fraction) {
+
+	bool	supportslashdelimiteddate=
+			charstring::contains(datedelimiters,'/');
+	bool	supportdashdelimiteddate=
+			charstring::contains(datedelimiters,'-');
+	bool	supportdotdelimiteddate=
+			charstring::contains(datedelimiters,'.');
+	bool	supportcolondelimiteddate=
+			charstring::contains(datedelimiters,':');
 
 	// initialize date/time parts
 	*year=-1;
@@ -174,7 +183,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				// well, if the first or last part is 4 digit
 				// then it's a date (firebird uses
 				// colon-delimited dates) otherwise it's a time
-				if (charstring::length(timeparts[0])==4) {
+				if (supportcolondelimiteddate &&
+					charstring::length(timeparts[0])==4) {
 					*year=charstring::toInteger(
 								timeparts[0]);
 					if (ddmm) {
@@ -188,8 +198,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 						*day=charstring::toInteger(
 								timeparts[2]);
 					}
-				} else if (charstring::length(
-							timeparts[2])==4) {
+				} else if (supportcolondelimiteddate &&
+					charstring::length(timeparts[2])==4) {
 					if (ddmm) {
 						*day=charstring::toInteger(
 								timeparts[0]);
@@ -298,7 +308,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 			}
 			delete[] timeparts;
 
-		} else if (charstring::contains(parts[i],'/')) {
+		} else if (supportslashdelimiteddate &&
+				charstring::contains(parts[i],'/')) {
 
 			// the section with /'s is the date...
 
@@ -358,7 +369,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 			}
 			delete[] dateparts;
 
-		} else if (charstring::contains(parts[i],'-')) {
+		} else if (supportdashdelimiteddate &&
+				charstring::contains(parts[i],'-')) {
 
 			// the section with -'s is the date...
 

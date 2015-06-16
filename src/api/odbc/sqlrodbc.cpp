@@ -3103,7 +3103,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	}
 
 	// parse
-	parseDateTime(value,ddmm,yyyyddmm,false,&year,&month,&day,
+	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
 					&hour,&minute,&second,&fraction);
 
 	// copy data out
@@ -3136,7 +3136,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	}
 
 	// parse
-	parseDateTime(value,ddmm,yyyyddmm,false,&year,&month,&day,
+	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
 					&hour,&minute,&second,&fraction);
 
 	// copy data out
@@ -3169,7 +3169,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	}
 
 	// parse
-	parseDateTime(value,ddmm,yyyyddmm,false,&year,&month,&day,
+	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
 					&hour,&minute,&second,&fraction);
 
 	// copy data out

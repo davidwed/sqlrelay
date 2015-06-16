@@ -495,6 +495,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						const char **newfield,
 						uint32_t *newfieldlength,
 						bool ddmm, bool yyyyddmm,
+						const char *datedelimiters,
 						const char *datetimeformat,
 						const char *dateformat,
 						const char *timeformat);
@@ -536,7 +537,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 
 		bool parseDateTime(const char *datetime,
 				bool ddmm, bool yyyyddmm,
-				bool supportdotdelimiteddate,
+				const char *datedelimiters,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
 				int16_t *fraction);

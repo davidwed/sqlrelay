@@ -2268,14 +2268,12 @@ const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 
 bool sqlrservercontroller::parseDateTime(
 				const char *datetime, bool ddmm, bool yyyyddmm,
-				bool supportdotdelimiteddate,
+				const char *datedelimiters,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
 				int16_t *fraction) {
-	return ::parseDateTime(datetime,ddmm,yyyyddmm,
-				supportdotdelimiteddate,
-				year,month,day,
-				hour,minute,second,fraction);
+	return ::parseDateTime(datetime,ddmm,yyyyddmm,datedelimiters,
+				year,month,day,hour,minute,second,fraction);
 }
 
 char *sqlrservercontroller::convertDateTime(const char *format,
@@ -3613,6 +3611,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	if (reformatdatetimes) {
 		bool		ddmm=cfgfl->getDateDdMm();
 		bool		yyyyddmm=cfgfl->getDateYyyyDdMm();
+		const char	*datedelimiters=cfgfl->getDateDelimiters();
 		const char	*datetimeformat=cfgfl->getDateTimeFormat();
 		const char	*dateformat=cfgfl->getDateFormat();
 		const char	*timeformat=cfgfl->getTimeFormat();
@@ -3621,6 +3620,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 					field,fieldlength,
 					newfield,newfieldlength,
 					ddmm,yyyyddmm,
+					datedelimiters,
 					datetimeformat,
 					dateformat,timeformat);
 	}
@@ -3644,6 +3644,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 						const char **newfield,
 						uint32_t *newfieldlength,
 						bool ddmm, bool yyyyddmm,
+						const char *datedelimiters,
 						const char *datetimeformat,
 						const char *dateformat,
 						const char *timeformat) {
@@ -3663,7 +3664,8 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	int16_t	minute=-1;
 	int16_t	second=-1;
 	int16_t	fraction=-1;
-	if (!parseDateTime(field,ddmm,yyyyddmm,true,
+	if (!parseDateTime(field,ddmm,yyyyddmm,
+				datedelimiters,
 				&year,&month,&day,
 				&hour,&minute,&second,
 				&fraction)) {

@@ -1705,7 +1705,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
 	}
 	parseDateTime(buffer,ddmm,yyyyddmm,
-				false,&year,&month,&day,
+				"/-:",&year,&month,&day,
 				&hour,&minute,&second,
 				&fraction);
 

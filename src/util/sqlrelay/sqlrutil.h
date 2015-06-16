@@ -230,6 +230,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getTimeFormat();
 		bool		getDateDdMm();
 		bool		getDateYyyyDdMm();
+		const char	*getDateDelimiters();
 
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
@@ -343,6 +344,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		bool		dateddmm;
 		bool		dateyyyyddmm;
 		bool		dateyyyyddmmset;
+		char		*datedelimiters;
 
 		bool		instart;
 		bool		inend;
@@ -484,6 +486,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			TIMEFORMAT_ATTRIBUTE,
 			DATEDDMM_ATTRIBUTE,
 			DATEYYYYDDMM_ATTRIBUTE,
+			DATEDELIMITERS_ATTRIBUTE,
 			ENABLED_ATTRIBUTE,
 		} attribute;
 

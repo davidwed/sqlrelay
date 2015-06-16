@@ -102,6 +102,7 @@ void sqlrconfigfile::init() {
 	dateddmm=false;
 	dateyyyyddmm=false;
 	dateyyyyddmmset=false;
+	datedelimiters=charstring::duplicate(DEFAULT_DATEDELIMITERS);
 	instart=false;
 	inend=false;
 }
@@ -373,6 +374,10 @@ bool sqlrconfigfile::getDateDdMm() {
 
 bool sqlrconfigfile::getDateYyyyDdMm() {
 	return dateyyyyddmm;
+}
+
+const char *sqlrconfigfile::getDateDelimiters() {
+	return datedelimiters;
 }
 
 linkedlist< char * > *sqlrconfigfile::getSessionStartQueries() {
@@ -1165,6 +1170,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=DATEDDMM_ATTRIBUTE;
 		} else if (!charstring::compare(name,"dateyyyyddmm")) {
 			currentattribute=DATEYYYYDDMM_ATTRIBUTE;
+		} else if (!charstring::compare(name,"datedelimiters")) {
+			currentattribute=DATEDELIMITERS_ATTRIBUTE;
 		} else if (!charstring::compare(name,"enabled")) {
 			currentattribute=ENABLED_ATTRIBUTE;
 		}
@@ -1716,6 +1723,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			dateyyyyddmm=
 				!charstring::compareIgnoringCase(value,"yes");
 			dateyyyyddmmset=true;
+		} else if (currentattribute==DATEDELIMITERS_ATTRIBUTE) {
+			delete[] datedelimiters;
+			datedelimiters=charstring::duplicate(value);
 		} else if (currentattribute==ENABLED_ATTRIBUTE) {
 			enabled=!charstring::compareIgnoringCase(value,"yes");
 		}
