@@ -16,6 +16,7 @@
 	added a datedelimiters attribute to the instance tag in sqlrelay.conf
 		to limit what date delimiters are used when translating dates
 	re-added mssqlserver detection, which had been accidentally removed
+	fixed statically-linked build
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings
