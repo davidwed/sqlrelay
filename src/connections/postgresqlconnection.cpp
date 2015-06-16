@@ -250,6 +250,9 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 	if (db && db[0]) {
 		conninfo.append(" dbname=")->append(db);
 	}
+	// sslmode isn't supported by older versions of postgresql, and
+	// including it at all will cause PQconnectdb to fail.  Remove it
+	// altogether if it's omitted or disabled.
 	if (sslmode && sslmode[0] && charstring::compare(sslmode,"disable")) {
 		conninfo.append(" sslmode=")->append(sslmode);
 	}
