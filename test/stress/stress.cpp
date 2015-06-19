@@ -153,8 +153,8 @@ int main(int argc, char **argv) {
 	thread	*th=new thread[threadcount];
 
 	for (int64_t i=0; i<threadcount; i++) {
-		th[i].setFunction((void *(*)(void *))runQuery,(void *)i);
-		th[i].create();
+		th[i].setFunction((void *(*)(void *))runQuery);
+		th[i].run((void *)i);
 	}
 
 	for (int64_t i=0; i<threadcount; i++) {

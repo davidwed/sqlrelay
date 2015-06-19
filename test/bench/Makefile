@@ -5,7 +5,7 @@ include ../../config.mk
 CPPFLAGS = \
 	$(BASECPPFLAGS) \
 	$(RUDIMENTSINCLUDES) \
-	-I$(top_builddir)/src/api/c++/include \
+	-I$(top_builddir)/src/api/c++ \
 	$(DB2INCLUDES) \
 	$(FIREBIRDINCLUDES) \
 	$(FREETDSINCLUDES) \
@@ -16,7 +16,7 @@ CPPFLAGS = \
 	$(SYBASEINCLUDES)
 
 LIBS = \
-	-L$(top_builddir)/src/api/c++/src \
+	-L$(top_builddir)/src/api/c++ \
 	-lsqlrclient \
 	$(RUDIMENTSLIBS) \
 	$(EXTRALIBS) \
