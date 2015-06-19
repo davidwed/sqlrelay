@@ -17,6 +17,7 @@
 		to limit what date delimiters are used when translating dates
 	re-added mssqlserver detection, which had been accidentally removed
 	fixed statically-linked build
+	fixed mysql lob field bug that could cause a crash
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings
