@@ -321,8 +321,6 @@ void scaler::cleanUp() {
 		delete[] pidfile;
 	}
 
-	delete[] dbase;
-
 	delete cmdl;
 }
 
