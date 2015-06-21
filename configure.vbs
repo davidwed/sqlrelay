@@ -16,7 +16,7 @@ next
 
 
 ' version
-SQLR_VERSION="0.60"
+SQLR_VERSION="0.61"
 
 ' paths
 pfix="C:\\Program Files\\Firstworks"
