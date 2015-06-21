@@ -1,3 +1,5 @@
+0.61 -
+
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
 	disabled -Werror for gcc < 2.7
