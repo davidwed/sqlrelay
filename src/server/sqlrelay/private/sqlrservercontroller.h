@@ -67,10 +67,6 @@
 		bool	isCommitQuery(sqlrservercursor *cursor);
 		bool	isRollbackQuery(sqlrservercursor *cursor);
 
-		const char	*skipQuotedStrings(const char *ptr,
-							stringbuffer *sb);
-		bool	normalizeQuery(sqlrservercursor *cursor);
-
 		void	translateBindVariablesFromMappings(
 						sqlrservercursor *cursor);
 		bool	translateQuery(sqlrservercursor *cursor);
@@ -261,10 +257,6 @@
 
 		char		*debugdir;
 		stringbuffer	debugstr;
-
-		stringbuffer	normalizedquerypass1;
-		stringbuffer	normalizedquerypass2;
-		stringbuffer	normalizedquerypass3;
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
