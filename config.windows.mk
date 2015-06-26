@@ -410,9 +410,9 @@ PYTHONSUFFIX = pyd
 INSTALLSUBDIRS = install-src install-bin install-etc install-doc
 UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-doc
 
-SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-connections all-cmdline
+SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-filters all-connections all-cmdline
 
-SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-connections install-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-filters install-connections install-cmdline
 
 
 APIALLSUBDIRS = all-cpp all-c all-cs all-odbc all-python all-perl all-ruby all-php all-phppdo all-java all-tcl

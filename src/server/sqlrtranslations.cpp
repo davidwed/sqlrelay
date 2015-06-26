@@ -175,7 +175,10 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 				if (debug) {
 					stdoutput.printf(
 						"current query tree:\n");
-					tree->getRootNode()->print(&stdoutput);
+					if (tree) {
+						tree->getRootNode()->
+							print(&stdoutput);
+					}
 					stdoutput.printf("\n");
 				}
 			}
@@ -186,24 +189,25 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 
 		} else {
 
+			bool	freequery=false;
 			if (tree) {
 				if (!sqlrp->write(&tempquerystr)) {
 					return false;
 				}
 				tree=NULL;
+				query=tempquerystr.detachString();
+				freequery=true;
 			}
 
-			char	*tempquery=tempquerystr.detachString();
-			if (tempquery) {
-				query=tempquery;
+			bool	success=tr->run(sqlrcon,sqlrcur,
+						query,&tempquerystr);
+			if (freequery) {
+				delete[] query;
 			}
 
-			if (!tr->run(sqlrcon,sqlrcur,query,&tempquerystr)) {
-				delete[] tempquery;
+			if (!success) {
 				return false;
 			}
-
-			delete[] tempquery;
 
 			query=tempquerystr.getString();
 		}
@@ -215,14 +219,16 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 		}
 	} else {
 		translatedquery->append(query);
-		if (!sqlrp->parse(translatedquery->getString())) {
-			return false;
+		if (sqlrp->parse(translatedquery->getString())) {
+			tree=sqlrp->getTree();
 		}
 	}
 
 	if (debug) {
-		stdoutput.printf("after translation:\n");
-		tree->getRootNode()->print(&stdoutput);
+		stdoutput.printf("query tree after translation:\n");
+		if (tree) {
+			tree->getRootNode()->print(&stdoutput);
+		}
 		stdoutput.printf("\n");
 	}
 

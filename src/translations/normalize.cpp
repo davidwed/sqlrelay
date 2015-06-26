@@ -6,12 +6,11 @@
 #include <rudiments/character.h>
 #include <debugprint.h>
 
-class normalize : public sqlrtranslation {
+class SQLRSERVER_DLLSPEC normalize : public sqlrtranslation {
 	public:
 			normalize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,

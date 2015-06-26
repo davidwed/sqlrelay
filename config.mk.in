@@ -492,6 +492,10 @@ STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrpwdencassignments.cpp \
 		sqlrauthdeclarations.cpp \
 		sqlrauthassignments.cpp \
+		sqlrtranslationdeclarations.cpp \
+		sqlrtranslationassignments.cpp \
+		sqlrfilterdeclarations.cpp \
+		sqlrfilterassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp
 STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
@@ -500,6 +504,8 @@ STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../loggers/*.$(OBJ)) \
 		$(shell ls ../pwdencs/*.$(OBJ)) \
 		$(shell ls ../auths/*.$(OBJ)) \
+		$(shell ls ../translations/*.$(OBJ)) \
+		$(shell ls ../filters/*.$(OBJ)) \
 		$(shell ls ../queries/*.$(OBJ))
 STATICPLUGINLIBS =
 ifneq ($(strip $(DB2LIBSPATH)),)
@@ -778,11 +784,11 @@ INSTALLSUBDIRS = install-src install-bin install-etc install-init install-man in
 UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-man uninstall-doc uninstall-pkgconfig
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-connections all-cmdline
-SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-connections install-cmdline
+SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-filters all-connections all-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-filters install-connections install-cmdline
 else
-SRCALLSUBDIRS = all-util all-api all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-connections all-server all-cmdline
-SRCINSTALLSUBDIRS = install-util install-api install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-connections install-server install-cmdline
+SRCALLSUBDIRS = all-util all-api all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-filters all-connections all-server all-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-filters install-connections install-server install-cmdline
 endif
 
 

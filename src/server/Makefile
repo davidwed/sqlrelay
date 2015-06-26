@@ -193,6 +193,38 @@ sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
+sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../translations/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../translations/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrfilterdeclarations.cpp: sqlrfilterdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../filters/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrfilterassignments.cpp: sqlrfilterassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../filters/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
 sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../queries/*.$(OBJ)`; \

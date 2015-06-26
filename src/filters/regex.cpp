@@ -5,7 +5,7 @@
 #include <rudiments/regularexpression.h>
 #include <debugprint.h>
 
-class regex : public sqlrfilter {
+class SQLRSERVER_DLLSPEC regex : public sqlrfilter {
 	public:
 			regex(sqlrfilters *sqlrfs,
 					xmldomnode *parameters,
