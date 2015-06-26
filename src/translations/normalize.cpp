@@ -16,8 +16,9 @@ class SQLRSERVER_DLLSPEC normalize : public sqlrtranslation {
 					const char *query,
 					stringbuffer *translatedquery);
 	private:
-		const char	*skipQuotedStrings(const char *ptr,
-							stringbuffer *sb);
+		bool	skipQuotedStrings(const char *ptr,
+						stringbuffer *sb,
+						const char **newptr);
 
 		stringbuffer	pass1;
 		stringbuffer	pass2;
@@ -77,7 +78,10 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 			continue;
 		}
 
-		ptr=skipQuotedStrings(ptr,&pass1);
+		// skip quoted strings
+		if (skipQuotedStrings(ptr,&pass1,&ptr)) {
+			continue;
+		}
 
 		// check for end of query
 		if (!*ptr) {
@@ -102,7 +106,10 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 	ptr=pass1.getString();
 	for (;;) {
 
-		ptr=skipQuotedStrings(ptr,&pass2);
+		// skip quoted strings
+		if (skipQuotedStrings(ptr,&pass2,&ptr)) {
+			continue;
+		}
 
 		// remove spaces around symbols
 		if (*ptr==' ' &&
@@ -141,7 +148,10 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 	const char	*start=ptr;
 	for (;;) {
 
-		ptr=skipQuotedStrings(ptr,translatedquery);
+		// skip quoted strings
+		if (skipQuotedStrings(ptr,translatedquery,&ptr)) {
+			continue;
+		}
 
 		// convert static concatenations
 		if (ptr!=start && !charstring::compare(ptr-1,"'||'",4)) {
@@ -172,10 +182,14 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-const char *normalize::skipQuotedStrings(const char *ptr, stringbuffer *sb) {
+bool normalize::skipQuotedStrings(const char *ptr,
+					stringbuffer *sb,
+					const char **newptr) {
 
+	bool	found=false;
 	for (;;) {
 		if (*ptr=='\'' || *ptr=='"') {
+			found=true;
 			char	quote=*ptr;
 			do {
 				sb->append(*ptr);
@@ -186,7 +200,8 @@ const char *normalize::skipQuotedStrings(const char *ptr, stringbuffer *sb) {
 				ptr++;
 			}
 		} else {
-			return ptr;
+			*newptr=ptr;
+			return found;
 		}
 	}
 }

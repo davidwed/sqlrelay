@@ -1775,7 +1775,6 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 							prmpt.getString()));
 				prmpt.clear();
 				if (cmd && cmd[0]) {
-					charstring::rightTrim(cmd);
 					add_history(cmd);
 				} else {
 					stdoutput.printf("\n");
@@ -1814,7 +1813,6 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 		// trim the command
 		char	*cmd=command.detachString();
-		charstring::bothTrim(cmd);
 
 		// run the command
 		if (!runCommands(sqlrcon,sqlrcur,env,cmd)) {
