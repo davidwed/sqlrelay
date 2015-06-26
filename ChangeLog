@@ -1,5 +1,6 @@
 0.61 - added query filter plugin framework
-	added query normalization for when various plugins are used
+	added regex filter
+	added normalization translation
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
