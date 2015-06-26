@@ -12,6 +12,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrparser.cpp \
 	sqlrtranslations.cpp \
 	sqlrtranslation.cpp \
+	sqlrfilters.cpp \
+	sqlrfilter.cpp \
 	sqlrresultsettranslations.cpp \
 	sqlrresultsettranslation.cpp \
 	sqlrtriggers.cpp \
@@ -37,6 +39,8 @@ LIBSQLRSERVERLOBJS = \
 	sqlrparser.$(OBJ) \
 	sqlrtranslations.$(OBJ) \
 	sqlrtranslation.$(OBJ) \
+	sqlrfilters.$(OBJ) \
+	sqlrfilter.$(OBJ) \
 	sqlrresultsettranslations.$(OBJ) \
 	sqlrresultsettranslation.$(OBJ) \
 	sqlrtriggers.$(OBJ) \

@@ -110,6 +110,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	sqlrpr=NULL;
 	sqlrp=NULL;
 	sqlrt=NULL;
+	sqlrf=NULL;
 	sqlrrst=NULL;
 	sqlrtr=NULL;
 	sqlrlg=NULL;
@@ -120,6 +121,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	decrypteddbpassword=NULL;
 
 	debugsqlrtranslation=false;
+	debugsqlrfilters=false;
 	debugtriggers=false;
 	debugbindtranslation=false;
 
@@ -194,6 +196,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete sqlrpr;
 	delete sqlrp;
 	delete sqlrt;
+	delete sqlrf;
 	delete sqlrrst;
 	delete sqlrtr;
 	delete sqlrlg;
@@ -358,6 +361,17 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		sqlrp=newParser();
 		sqlrt=new sqlrtranslations(sqlrpth,debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
+	}
+
+	// get the query filters
+	debugsqlrfilters=cfgfl->getDebugFilters();
+	const char	*filters=cfgfl->getFilters();
+	if (filters && filters[0]) {
+		if (!sqlrp) {
+			sqlrp=newParser();
+		}
+		sqlrf=new sqlrfilters(sqlrpth,debugsqlrfilters);
+		sqlrf->loadFilters(filters);
 	}
 
 	// get the result set translators
@@ -2845,6 +2859,28 @@ void sqlrservercontroller::translateBeginTransaction(sqlrservercursor *cursor) {
 	logDebugMessage(querybuffer);
 }
 
+bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
+
+	const char	*query=cursor->getQueryBuffer();
+
+	if (debugsqlrfilters) {
+		stdoutput.printf("filtering:\n\"%s\"\n\n",query);
+	}
+
+	// apply filters
+	if (!sqlrf->runFilters(conn,cursor,sqlrp,query)) {
+		if (debugsqlrfilters) {
+			stdoutput.printf("query rejected\n");
+		} 
+		return false;
+	}
+
+	if (debugsqlrtranslation) {
+		stdoutput.printf("query accepted\n");
+	}
+	return true;
+}
+
 sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(	
 						sqlrservercursor *cursor) {
 
@@ -3107,11 +3143,12 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor) {
-	return executeQuery(cursor,false,false);
+	return executeQuery(cursor,false,false,false);
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enabletranslations,
+						bool enablefilters,
 						bool enabletriggers) {
 
 	// set state
@@ -3157,6 +3194,13 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		if (conn->supportsTransactionBlocks() &&
 				isBeginTransactionQuery(cursor)) {
 			translateBeginTransaction(cursor);
+		}
+
+		// filter query
+		if (enablefilters && sqlrf) {
+			if (!filterQuery(cursor)) {
+				return false;
+			}
 		}
 
 		// fake input binds if necessary

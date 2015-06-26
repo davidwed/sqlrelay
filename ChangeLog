@@ -1,4 +1,4 @@
-0.61 -
+0.61 - added query filter plugin framework
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

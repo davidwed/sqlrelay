@@ -207,6 +207,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getDeniedIps();
 		const char	*getDebug();
 		bool		getDebugTranslations();
+		bool		getDebugFilters();
 		bool		getDebugTriggers();
 		bool		getDebugBindTranslations();
 		uint64_t	getMaxClientInfoLength();
@@ -236,6 +237,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		linkedlist< char *>	*getSessionEndQueries();
 
 		const char	*getTranslations();
+
+		const char	*getFilters();
 
 		const char	*getResultSetTranslations();
 
@@ -320,6 +323,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*deniedips;
 		char		*debug;
 		bool		debugtranslations;
+		bool		debugfilters;
 		bool		debugtriggers;
 		bool		debugbindtranslations;
 		uint64_t	maxclientinfolength;
@@ -356,6 +360,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		stringbuffer	translations;
 		uint16_t	translationsdepth;
+
+		stringbuffer	filters;
+		uint16_t	filtersdepth;
 
 		stringbuffer	resultsettranslations;
 		uint16_t	resultsettranslationsdepth;
@@ -406,6 +413,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			FILTER_TAG,
 			QUERY_TAG,
 	   		TRANSLATIONS_TAG,
+	   		FILTERS_TAG,
 	   		RESULTSETTRANSLATIONS_TAG,
 	   		TRIGGERS_TAG,
 	   		LOGGERS_TAG,
@@ -473,6 +481,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			FAKEINPUTBINDVARIABLES_ATTRIBUTE,
 			TRANSLATEBINDVARIABLES_ATTRIBUTE,
 			TRANSLATIONS_ATTRIBUTE,
+			FILTERS_ATTRIBUTE,
 			RESULTSETTRANSLATIONS_ATTRIBUTE,
 			TRIGGERS_ATTRIBUTE,
 			LOGGERS_ATTRIBUTE,

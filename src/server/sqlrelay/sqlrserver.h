@@ -19,6 +19,8 @@ class sqlrloggers;
 class sqlrparser;
 class sqlrtranslation;
 class sqlrtranslations;
+class sqlrfilter;
+class sqlrfilters;
 class sqlrresultsettranslation;
 class sqlrresultsettranslations;
 class sqlrtrigger;
@@ -330,6 +332,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		bool	executeQuery(sqlrservercursor *cursor);
 		bool	executeQuery(sqlrservercursor *cursor,
 						bool enabletranslations,
+						bool enablefilters,
 						bool enabletriggers);
 		bool	fetchFromBindCursor(sqlrservercursor *cursor);
 
@@ -1258,6 +1261,57 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 		memorypool	*tempindexpool;
 		dictionary< databaseobject *, char * >	temptablemap;
 		dictionary< databaseobject *, char * >	tempindexmap;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrfilter {
+	public:
+			sqlrfilter(sqlrfilters *sqlrfs,
+					xmldomnode *parameters,
+					bool debug);
+		virtual	~sqlrfilter();
+
+		virtual bool	usesTree();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					const char *query);
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					xmldom *querytree);
+	protected:
+		sqlrfilters		*sqlrfs;
+		xmldomnode		*parameters;
+		bool			debug;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrfilterplugin {
+	public:
+		sqlrfilter	*f;
+		dynamiclib	*dl;
+};
+
+class SQLRSERVER_DLLSPEC sqlrfilters {
+	public:
+			sqlrfilters(sqlrpaths *sqlrpth, bool debug);
+			~sqlrfilters();
+
+		bool	loadFilters(const char *filters);
+		bool	runFilters(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						sqlrparser *sqlrp,
+						const char *query);
+	private:
+		void	unloadFilters();
+		void	loadFilter(xmldomnode *filter);
+		
+		const char	*libexecdir;
+		xmldom		*xmld;
+		bool		debug;
+
+		singlylinkedlist< sqlrfilterplugin * >	tlist;
 };
 
 

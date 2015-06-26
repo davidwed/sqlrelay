@@ -88,6 +88,8 @@
 
 		void	translateBeginTransaction(sqlrservercursor *cursor);
 
+		bool	filterQuery(sqlrservercursor *cursor);
+
 		bool	handleBinds(sqlrservercursor *cursor);
 
 		void		buildColumnMaps();
@@ -151,6 +153,7 @@
 		sqlrprotocols			*sqlrpr;
 		sqlrparser			*sqlrp;
 		sqlrtranslations		*sqlrt;
+		sqlrfilters			*sqlrf;
 		sqlrresultsettranslations	*sqlrrst;
 		sqlrtriggers			*sqlrtr;
 		sqlrloggers			*sqlrlg;
@@ -216,6 +219,7 @@
 		namevaluepairs	*outbindmappings;
 
 		bool		debugsqlrtranslation;
+		bool		debugsqlrfilters;
 		bool		debugtriggers;
 		bool		debugbindtranslation;
 

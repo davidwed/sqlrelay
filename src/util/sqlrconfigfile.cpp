@@ -59,6 +59,7 @@ void sqlrconfigfile::init() {
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debugtranslations=charstring::contains(debug,"translations");
+	debugfilters=charstring::contains(debug,"filters");
 	debugtriggers=charstring::contains(debug,"triggers");
 	debugbindtranslations=charstring::contains(debug,"bindtranslations");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
@@ -88,6 +89,7 @@ void sqlrconfigfile::init() {
 	currenttag=INSTANCE_TAG;
 	authenticationsdepth=0;
 	translationsdepth=0;
+	filtersdepth=0;
 	resultsettranslationsdepth=0;
 	triggersdepth=0;
 	loggersdepth=0;
@@ -284,6 +286,10 @@ bool sqlrconfigfile::getDebugTranslations() {
 	return debugtranslations;
 }
 
+bool sqlrconfigfile::getDebugFilters() {
+	return debugfilters;
+}
+
 bool sqlrconfigfile::getDebugTriggers() {
 	return debugtriggers;
 }
@@ -390,6 +396,10 @@ linkedlist< char * > *sqlrconfigfile::getSessionEndQueries() {
 
 const char *sqlrconfigfile::getTranslations() {
 	return translations.getString();
+}
+
+const char *sqlrconfigfile::getFilters() {
+	return filters.getString();
 }
 
 const char *sqlrconfigfile::getResultSetTranslations() {
@@ -501,6 +511,9 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			} else if (!charstring::compare(name,"translations")) {
 				thistag=TRANSLATIONS_TAG;
 				translations.clear();
+			} else if (!charstring::compare(name,"filters")) {
+				thistag=FILTERS_TAG;
+				filters.clear();
 			} else if (!charstring::compare(name,
 						"resultsettranslations")) {
 				thistag=RESULTSETTRANSLATIONS_TAG;
@@ -721,6 +734,19 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			}
 			translations.append("<");
 			translations.append(name);
+			currenttag=thistag;
+			break;
+		case FILTERS_TAG:
+			if (!charstring::compare(name,"filters")) {
+				filtersdepth=0;
+			} else {
+				filtersdepth++;
+			}
+			if (filtersdepth) {
+				filters.append(">");
+			}
+			filters.append("<");
+			filters.append(name);
 			currenttag=thistag;
 			break;
 		case RESULTSETTRANSLATIONS_TAG:
@@ -977,6 +1003,17 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 				translations.append(">");
 			}
 			translationsdepth--;
+			break;
+		case FILTERS_TAG:
+			if (!charstring::compare(name,"filters")) {
+				currenttag=INSTANCE_TAG;
+			}
+			filters.append("></");
+			filters.append(name);
+			if (!filtersdepth) {
+				filters.append(">");
+			}
+			filtersdepth--;
 			break;
 		case RESULTSETTRANSLATIONS_TAG:
 			if (!charstring::compare(name,
@@ -1262,6 +1299,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=TRANSLATIONS_ATTRIBUTE;
 		break;
 
+	case FILTERS_TAG:
+		filters.append(" ")->append(name);
+		currentattribute=FILTERS_ATTRIBUTE;
+		break;
+
 	case RESULTSETTRANSLATIONS_TAG:
 		resultsettranslations.append(" ")->append(name);
 		currentattribute=RESULTSETTRANSLATIONS_ATTRIBUTE;
@@ -1340,6 +1382,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			case TRANSLATIONS_TAG:
 				tagname="translations";
 				break;
+			case FILTERS_TAG:
+				tagname="filters";
+				break;
 			case RESULTSETTRANSLATIONS_TAG:
 				tagname="resultsettranslations";
 				break;
@@ -1411,6 +1456,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currenttag==TRANSLATIONS_TAG) {
 			translations.append("=\"");
 			translations.append(value)->append("\"");
+		} else if (currenttag==FILTERS_TAG) {
+			filters.append("=\"");
+			filters.append(value)->append("\"");
 		} else if (currenttag==RESULTSETTRANSLATIONS_TAG) {
 			resultsettranslations.append("=\"");
 			resultsettranslations.append(value)->append("\"");
@@ -1558,6 +1606,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_DEBUG);
 			debugtranslations=charstring::contains(debug,
 							"translations");
+			debugfilters=charstring::contains(debug,
+							"filters");
 			debugtriggers=charstring::contains(debug,
 							"triggers");
 			debugbindtranslations=charstring::contains(debug,
