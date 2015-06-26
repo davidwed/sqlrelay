@@ -1805,7 +1805,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			}
 			if (!done) {
 				promptcount++;
-				command.append(" ");
+				command.append('\n');
 			}
 			#ifdef HAVE_READLINE
 				delete[] cmd;

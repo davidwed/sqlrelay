@@ -3180,6 +3180,16 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// because translateQuery might use it
 		bindmappingspool->deallocate();
 
+		// if we're translating, filtering, or triggering then
+		// normalize the query
+		if ((enabletranslations && sqlrt) ||
+				(enablefilters && sqlrf) ||
+				(enabletriggers && sqlrtr)) {
+			if (!normalizeQuery(cursor)) {
+				return false;
+			}
+		}
+
 		// translate query
 		if (enabletranslations && sqlrt) {
 			translateQuery(cursor);
@@ -3379,6 +3389,181 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	logDebugMessage("done executing query");
 
 	return success;
+}
+
+const char *sqlrservercontroller::skipQuotedStrings(const char *ptr,
+							stringbuffer *sb) {
+
+	for (;;) {
+		if (*ptr=='\'' || *ptr=='"') {
+			char	quote=*ptr;
+			do {
+				sb->append(*ptr);
+				ptr++;
+			} while (*ptr && *ptr!=quote);
+			if (*ptr) {
+				sb->append(*ptr);
+				ptr++;
+			}
+		} else {
+			return ptr;
+		}
+	}
+}
+
+const char symbols[]="!@#$%^&*-_+=[{]}\\|;:,<.>/?";
+
+bool sqlrservercontroller::normalizeQuery(sqlrservercursor *cursor) {
+
+	// get the query buffer
+	char	*querybuffer=cursor->getQueryBuffer();
+
+	if (debugsqlrtranslation || debugsqlrfilters || debugtriggers) {
+		stdoutput.printf("original query:\n\"%s\"\n\n",querybuffer);
+	}
+
+	// clear the normalized query buffers
+	normalizedquerypass1.clear();
+	normalizedquerypass2.clear();
+
+	// normalize the query, first pass...
+	// * remove comments
+	// * translate all whitespace characters into spaces and compress it
+	// * lower-case whatever we can
+	// FIXME:
+	// * translate printable hex (or other) encoded values into characters
+	const char	*ptr=querybuffer;
+	for (;;) {
+
+		// NOTE: it matters what order these are in...
+
+		// skip comments
+		if (!charstring::compare(ptr,"-- ",3)) {
+			while (*ptr && *ptr!='\n') {
+				ptr++;
+			}
+			if (*ptr) {
+				ptr++;
+			}
+		}
+
+		// convert whitespace into spaces and compress them
+		if (character::isWhitespace(*ptr)) {
+			do {
+				ptr++;
+			} while (character::isWhitespace(*ptr));
+			if (*ptr) {
+				normalizedquerypass1.append(' ');
+			}
+			continue;
+		}
+
+		ptr=skipQuotedStrings(ptr,&normalizedquerypass1);
+
+		// check for end of query
+		if (!*ptr) {
+			break;
+		}
+
+		// convert the character to lower case and append it
+		// FIXME: what if the db supports case-sensitive identifiers?
+		normalizedquerypass1.append((char)character::toLowerCase(*ptr));
+
+		// move on to the next character
+		ptr++;
+	}
+
+	if (debugsqlrtranslation || debugsqlrfilters || debugtriggers) {
+		stdoutput.printf("normalized query (pass 1):\n\"%s\"\n\n",
+					normalizedquerypass1.getString());
+	}
+
+	// normalize the query, second pass...
+	// * remove spaces around symbols
+	ptr=normalizedquerypass1.getString();
+	for (;;) {
+
+		ptr=skipQuotedStrings(ptr,&normalizedquerypass2);
+
+		// remove spaces around symbols
+		if (*ptr==' ' &&
+			(character::inSet(*(ptr+1),symbols) ||
+			character::inSet(*(ptr-1),symbols))) {
+			ptr++;
+			continue;
+		}
+
+		// FIXME: parentheses require special handling
+		// as they serve multiple purposes
+
+		// check for end of query
+		if (!*ptr) {
+			break;
+		}
+
+		// append the character
+		normalizedquerypass2.append(*ptr);
+
+		// move on to the next character
+		ptr++;
+	}
+
+	if (debugsqlrtranslation || debugsqlrfilters || debugtriggers) {
+		stdoutput.printf("normalized query (pass 2):\n\"%s\"\n\n",
+					normalizedquerypass2.getString());
+	}
+
+	// normalize the query, third pass...
+	// * convert static concatenations to equivalent strings
+	// FIXME:
+	// * convert static char() calls to equivalent strings
+	// 	(if db supports static char() calls)
+	ptr=normalizedquerypass2.getString();
+	const char	*start=ptr;
+	for (;;) {
+
+		ptr=skipQuotedStrings(ptr,&normalizedquerypass3);
+
+		// convert static concatenations
+		if (ptr!=start && !charstring::compare(ptr-1,"'||'",4)) {
+			ptr=ptr+3;
+			normalizedquerypass3.setPosition(
+				normalizedquerypass3.getPosition()-1);
+			continue;
+		}
+
+		// check for end of query
+		if (!*ptr) {
+			break;
+		}
+
+		// write, rather than append, the character because
+		// we may have fiddled with the current position above
+		normalizedquerypass3.write(*ptr);
+
+		// move on to the next character
+		ptr++;
+	}
+
+	if (debugsqlrtranslation || debugsqlrfilters || debugtriggers) {
+		stdoutput.printf("normalized query (pass 3):\n\"%s\"\n\n",
+					normalizedquerypass3.getString());
+	}
+
+	// make sure the normalized query didn't grow too large
+	if (normalizedquerypass3.getStringLength()>maxquerysize) {
+		if (debugsqlrtranslation || debugsqlrfilters || debugtriggers) {
+			stdoutput.printf("normalized query too large\n");
+		}
+		return false;
+	}
+
+	// copy the normalized query back into the query buffer
+	charstring::copy(querybuffer,normalizedquerypass3.getString(),
+					normalizedquerypass3.getStringLength());
+	querybuffer[normalizedquerypass3.getStringLength()]='\0';
+	cursor->setQueryLength(normalizedquerypass3.getStringLength());
+	return true;
 }
 
 void sqlrservercontroller::commitOrRollbackIsNeeded() {
