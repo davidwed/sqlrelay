@@ -213,6 +213,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 
 		// connection state
 		void	updateState(enum sqlrconnectionstate_t state);
+		void	updateCurrentUser(const char *user,
+						uint32_t userlen);
 		void	updateCurrentQuery(const char *query,
 						uint32_t querylen);
 		void	updateClientInfo(const char *info,
@@ -277,6 +279,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		void	logDbWarning(sqlrservercursor *cursor,
 							const char *info);
 		void	logQuery(sqlrservercursor *cursor);
+		void	logFilterViolation(sqlrservercursor *cursor);
 		void	logInternalError(sqlrservercursor *cursor,
 							const char *info);
 		void	logInternalWarning(sqlrservercursor *cursor,
@@ -1061,6 +1064,7 @@ enum sqlrlogger_eventtype_t {
 	SQLRLOGGER_EVENTTYPE_DB_ERROR,
 	SQLRLOGGER_EVENTTYPE_DB_WARNING,
 	SQLRLOGGER_EVENTTYPE_QUERY,
+	SQLRLOGGER_EVENTTYPE_FILTER_VIOLATION,
 	SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
 	SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING,
 	SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE

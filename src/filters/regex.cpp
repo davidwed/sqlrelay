@@ -16,12 +16,20 @@ class SQLRSERVER_DLLSPEC regex : public sqlrfilter {
 	private:
 		regularexpression	re;
 		const char		*pattern;
+
+		bool	enabled;
 };
 
 regex::regex(sqlrfilters *sqlrfs,
 			xmldomnode *parameters,
 			bool debug) : sqlrfilter(sqlrfs,parameters,debug) {
 	debugFunction();
+
+	enabled=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("enabled"),"no");
+	if (!enabled) {
+		return;
+	}
 
 	pattern=parameters->getAttributeValue("pattern");
 	re.compile(pattern);
@@ -32,6 +40,10 @@ bool regex::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				const char *query) {
 	debugFunction();
+
+	if (!enabled) {
+		return true;
+	}
 
 	if (re.match(query)) {
 		if (debug) {

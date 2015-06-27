@@ -1782,10 +1782,18 @@ bool sqlrservercontroller::authenticate(const char *userbuffer,
 	logDebugMessage("authenticate...");
 
 	// authenticate on the approprite tier
+	bool	success=false;
 	if (cfgfl->getAuthOnDatabase() && conn->supportsAuthOnDatabase()) {
-		return databaseBasedAuth(userbuffer,passwordbuffer);
+		success=databaseBasedAuth(userbuffer,passwordbuffer);
+	} else {
+		success=connectionBasedAuth(userbuffer,passwordbuffer);
 	}
-	return connectionBasedAuth(userbuffer,passwordbuffer);
+
+	if (success) {
+		updateCurrentUser(userbuffer,charstring::length(userbuffer));
+	}
+
+	return success;
 }
 
 bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
@@ -2869,8 +2877,9 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
 
 	// apply filters
 	if (!sqlrf->runFilters(conn,cursor,sqlrp,query)) {
+		logFilterViolation(cursor);
 		if (debugsqlrfilters) {
-			stdoutput.printf("query rejected\n");
+			stdoutput.printf("query filtered out\n");
 		} 
 		return false;
 	}
@@ -4477,6 +4486,19 @@ void sqlrservercontroller::updateClientSessionStartTime() {
 	connstats->clientsessionusec=dt.getMicroseconds();
 }
 
+void sqlrservercontroller::updateCurrentUser(const char *user,
+						uint32_t userlen) {
+	if (!connstats) {
+		return;
+	}
+	uint32_t	len=userlen;
+	if (len>USERSIZE-1) {
+		len=USERSIZE-1;
+	}
+	charstring::copy(connstats->user,user,len);
+	connstats->user[len]='\0';
+}
+
 void sqlrservercontroller::updateCurrentQuery(const char *query,
 						uint32_t querylen) {
 	if (!connstats) {
@@ -4490,7 +4512,8 @@ void sqlrservercontroller::updateCurrentQuery(const char *query,
 	connstats->sqltext[len]='\0';
 }
 
-void sqlrservercontroller::updateClientInfo(const char *info, uint32_t infolen) {
+void sqlrservercontroller::updateClientInfo(const char *info,
+						uint32_t infolen) {
 	if (!connstats) {
 		return;
 	}
@@ -5142,6 +5165,16 @@ void sqlrservercontroller::logQuery(sqlrservercursor *cursor) {
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_INFO,
 			SQLRLOGGER_EVENTTYPE_QUERY,
+			NULL);
+}
+
+void sqlrservercontroller::logFilterViolation(sqlrservercursor *cursor) {
+	if (!sqlrlg) {
+		return;
+	}
+	sqlrlg->runLoggers(NULL,conn,cursor,
+			SQLRLOGGER_LOGLEVEL_INFO,
+			SQLRLOGGER_EVENTTYPE_FILTER_VIOLATION,
 			NULL);
 }
 

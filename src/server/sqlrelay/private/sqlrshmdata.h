@@ -76,6 +76,7 @@ struct sqlrconnstatistics {
 	char				clientaddr[16];
 	char				clientinfo[STATCLIENTINFOLEN];
 	char				sqltext[STATSQLTEXTLEN];
+	char				user[USERSIZE];
 };
 
 // This structure is used to pass data in shared memory between the listener

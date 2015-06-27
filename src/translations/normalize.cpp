@@ -30,7 +30,7 @@ normalize::normalize(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-static const char symbols[]="!@#$%^&*-_+=[{]}\\|;:,<.>/?";
+static const char symbols[]="!@#$%^&-_+=[{]}\\|;:,<.>/?";
 
 bool normalize::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -57,7 +57,7 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 
 		// NOTE: it matters what order these are in...
 
-		// skip comments
+		// remove comments
 		if (!charstring::compare(ptr,"-- ",3)) {
 			while (*ptr && *ptr!='\n') {
 				ptr++;
@@ -65,6 +65,7 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 			if (*ptr) {
 				ptr++;
 			}
+			continue;
 		}
 
 		// convert whitespace into spaces and compress them
@@ -72,7 +73,7 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 			do {
 				ptr++;
 			} while (character::isWhitespace(*ptr));
-			if (*ptr) {
+			if (*ptr && pass1.getStringLength()) {
 				pass1.append(' ');
 			}
 			continue;
@@ -120,6 +121,9 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// FIXME: parentheses require special handling
+		// as they serve multiple purposes
+
+		// FIXME: asterisks require special handling
 		// as they serve multiple purposes
 
 		// check for end of query
