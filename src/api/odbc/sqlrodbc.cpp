@@ -2613,6 +2613,11 @@ uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 		length=textlength;
 	}
 
+	// if the length is 0 then it's definitely already trimmed
+	if (!textlength) {
+		return 0;
+	}
+
 	// trim trailing whitespace and semicolons
 	for (;;) {
 		char	ch=statementtext[length-1];
@@ -2627,7 +2632,7 @@ uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 	}
 }
 
-SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
+SQLRETURN SQL_API SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 					SQLCHAR *statementtext,
 					SQLINTEGER textlength) {
 	debugFunction();
@@ -2675,6 +2680,13 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 				stmt->cur->errorNumber(),NULL);
 	return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
+					SQLCHAR *statementtext,
+					SQLINTEGER textlength) {
+	debugFunction();
+	return SQLR_SQLExecDirect(statementhandle,statementtext,textlength);
 }
 
 SQLRETURN SQL_API SQLR_SQLExecute(SQLHSTMT statementhandle) {
@@ -4972,7 +4984,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case SQL_DRIVER_ODBC_VER:
 			debugPrintf("  infotype: "
-					"SQL_DRIVER_ODBC_VER\n");
+					"SQL_DRIVER_ODBC_VER (%d.%d)\n",
+					SQL_SPEC_MAJOR,SQL_SPEC_MINOR);
 			strval="03.00";
 			break;
 		case SQL_LOCK_TYPES:
@@ -6001,9 +6014,22 @@ SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT statementhandle,
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 					SQLSMALLINT DataType) {
 	debugFunction();
-	// not supported, return success though, JDBC-ODBC bridge really
-	// wants this function to work and it will fail gracefully when
-	// attempts to fetch the result set result in no data
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("  NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	// This function isn't currently supported  We need to return success
+	// though as the JDBC-ODBC bridge really wants this function to work.
+	// It's ok if the the result set contains no data, but there has to at
+	// least be an empty result set.  So, we'll just run an erroneous
+	// query (which will return no result set) and pretend that it
+	// succeeded.
+
+	SQLR_SQLExecDirect(statementhandle,(SQLCHAR *)"",0);
+	SQLR_STMTClearError(stmt);
 	return SQL_SUCCESS;
 }
 

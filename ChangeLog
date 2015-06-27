@@ -4,6 +4,7 @@
 	fixed error in sqlrconfigfile class that could cause sqlr-start to
 		crash if one instance defines addresses but the next doesn't
 	added query status flag to sqlrservercursor
+	tweaked odbc driver's SQLGetTypeInfo()
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
