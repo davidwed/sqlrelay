@@ -6,8 +6,9 @@
 
 		uint16_t	id;
 
-		char		*querybuffer;
-		uint32_t	querylength;
+		char			*querybuffer;
+		uint32_t		querylength;
+		sqlrquerystatus_t	querystatus;
 
 		xmldom		*querytree;
 

@@ -62,6 +62,12 @@ enum sqlrquerytype_t {
 	SQLRQUERYTYPE_ETC
 };
 
+enum sqlrquerystatus_t {
+	SQLRQUERYSTATUS_SUCCESS=0,
+	SQLRQUERYSTATUS_ERROR,
+	SQLRQUERYSTATUS_FILTER_VIOLATION
+};
+
 enum sqlrserverbindvartype_t {
 	SQLRSERVERBINDVARTYPE_NULL=0,
 	SQLRSERVERBINDVARTYPE_STRING,
@@ -324,6 +330,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		uint32_t 	getQueryLength(sqlrservercursor *cursor);
 		void		setQueryLength(sqlrservercursor *cursor,
 						uint32_t querylength);
+
+		// query status
+		sqlrquerystatus_t	getQueryStatus(
+						sqlrservercursor *cursor);
 
 		// query tree
 		xmldom		*getQueryTree(sqlrservercursor *cursor);
@@ -875,6 +885,9 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		char		*getQueryBuffer();
 		uint32_t 	getQueryLength();
 		void		setQueryLength(uint32_t querylength);
+
+		void		setQueryStatus(sqlrquerystatus_t status);
+		sqlrquerystatus_t	getQueryStatus();
 
 		void		setQueryTree(xmldom *tree);
 		xmldom		*getQueryTree();

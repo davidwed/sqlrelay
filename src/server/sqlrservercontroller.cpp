@@ -3131,6 +3131,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	cursor->querywasintercepted=false;
 	cursor->bindswerefaked=false;
 	cursor->fakeinputbindsforthisquery=false;
+	cursor->setQueryStatus(SQLRQUERYSTATUS_ERROR);
 
 	// reset column mapping
 	columnmap=NULL;
@@ -3208,6 +3209,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// filter query
 		if (enablefilters && sqlrf) {
 			if (!filterQuery(cursor)) {
+				cursor->setQueryStatus(
+					SQLRQUERYSTATUS_FILTER_VIOLATION);
 				return false;
 			}
 		}
@@ -3241,6 +3244,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// intercept some queries for special handling
 		success=interceptQuery(cursor,&(cursor->querywasintercepted));
 		if (cursor->querywasintercepted) {
+			if (success) {
+				cursor->setQueryStatus(SQLRQUERYSTATUS_SUCCESS);
+			}
 			return success;
 		}
 	}
@@ -3386,6 +3392,10 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	logDebugMessage((success)?"executing query succeeded":
 					"executing query failed");
 	logDebugMessage("done executing query");
+
+	if (success) {
+		cursor->setQueryStatus(SQLRQUERYSTATUS_SUCCESS);
+	}
 
 	return success;
 }
@@ -5573,6 +5583,11 @@ uint32_t  sqlrservercontroller::getQueryLength(sqlrservercursor *cursor) {
 void sqlrservercontroller::setQueryLength(sqlrservercursor *cursor,
 						uint32_t querylength) {
 	cursor->setQueryLength(querylength);
+}
+
+sqlrquerystatus_t sqlrservercontroller::getQueryStatus(
+						sqlrservercursor *cursor) {
+	return cursor->getQueryStatus();
 }
 
 xmldom *sqlrservercontroller::getQueryTree(sqlrservercursor *cursor) {

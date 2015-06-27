@@ -27,6 +27,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	querybuffer=new char[conn->cont->cfgfl->getMaxQuerySize()+1];
 	setQueryLength(0);
 
+	setQueryStatus(SQLRQUERYSTATUS_ERROR);
+
 	setQueryTree(NULL);
 
 	error=new char[maxerrorlength+1];
@@ -747,6 +749,14 @@ uint32_t sqlrservercursor::getQueryLength() {
 
 void sqlrservercursor::setQueryLength(uint32_t querylength) {
 	this->querylength=querylength;
+}
+
+void sqlrservercursor::setQueryStatus(sqlrquerystatus_t status) {
+	querystatus=status;
+}
+
+sqlrquerystatus_t sqlrservercursor::getQueryStatus() {
+	return querystatus;
 }
 
 void sqlrservercursor::setQueryTree(xmldom *tree) {
