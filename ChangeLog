@@ -5,6 +5,7 @@
 		crash if one instance defines addresses but the next doesn't
 	added query status flag to sqlrservercursor
 	tweaked odbc driver's SQLGetTypeInfo()
+	field name is passed into runResultSetTranslations() now
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

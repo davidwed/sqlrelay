@@ -499,6 +499,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		void	closeLobField(sqlrservercursor *cursor,
 						uint32_t col);
 		void	reformatField(sqlrservercursor *cursor,
+						const char *name,
 						uint16_t index,
 						const char *field,
 						uint32_t fieldlength,
@@ -1341,6 +1342,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
+					const char *fieldname,
 					uint16_t fieldindex,
 					const char *field,
 					uint32_t fieldlength,
@@ -1367,6 +1369,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 					const char *resultsettranslations);
 		bool	runResultSetTranslations(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
+						const char *fieldname,
 						uint16_t fieldindex,
 						const char *field,
 						uint32_t fieldlength,

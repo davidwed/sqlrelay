@@ -3660,6 +3660,7 @@ uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
 }
 
 void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
+						const char *name,
 						uint16_t index,
 						const char *field,
 						uint32_t fieldlength,
@@ -3692,6 +3693,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	if (sqlrrst) {
 		// FIXME: use mapColumn() here?
 		sqlrrst->runResultSetTranslations(conn,cursor,
+							name,
 							index,
 							field,
 							fieldlength,

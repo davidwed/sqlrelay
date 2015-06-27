@@ -150,6 +150,7 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 bool sqlrresultsettranslations::runResultSetTranslations(
 						sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
+						const char *fieldname,
 						uint16_t fieldindex,
 						const char *field,
 						uint32_t fieldlength,
@@ -161,7 +162,7 @@ bool sqlrresultsettranslations::runResultSetTranslations(
 						tlist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
-						fieldindex,
+						fieldname,fieldindex,
 						field,fieldlength,
 						newfield,newfieldlength)) {
 			return false;

@@ -2522,7 +2522,9 @@ void sqlrclient::returnRow(sqlrservercursor *cursor) {
 		} else {
 			const char	*newfield=NULL;
 			uint32_t	newfieldlength=0;
-			cont->reformatField(cursor,i,field,fieldlength,
+			cont->reformatField(cursor,
+						cont->getColumnName(cursor,i),
+						i,field,fieldlength,
 						&newfield,&newfieldlength);
 			sendField(newfield,newfieldlength);
 		}
