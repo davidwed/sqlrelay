@@ -159,6 +159,8 @@ void sqlrconfigfile::clear() {
 		delete[] seln->getValue();
 	}
 	sessionendqueries.clear();
+
+	addresscount=0;
 }
 
 const char * const *sqlrconfigfile::getDefaultAddresses() {
@@ -484,9 +486,11 @@ bool sqlrconfigfile::tagStart(const char *name) {
 	const char	*currentname="instance";
 	tag		thistag=currenttag;
 
-	// re-init enabled flag
+	// re-init enabled flag and address count
 	if (!charstring::compare(name,"instance")) {
 		enabled=false;
+		addresses=NULL;
+		addresscount=0;
 	}
 
 	// set the current tag, validate structure in the process

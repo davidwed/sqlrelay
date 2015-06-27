@@ -1,6 +1,8 @@
 0.61 - added query filter plugin framework
 	added regex filter
 	added normalization translation
+	fixed error in sqlrconfigfile class that could cause sqlr-start to
+		crash if one instance defines addresses but the next doesn't
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
