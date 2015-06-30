@@ -2,6 +2,20 @@
 OPTCPPFLAGS="/O2"
 DEBUGCPPFLAGS="/MD"
 DEBUGLDFLAGS=""
+disableoracle=false
+disablemysql=false
+disablepostgresql=false
+disablesybase=false
+disableodbc=false
+disabledb2=false
+disablefirebird=false
+disableperl=false
+disablepython=false
+disableruby=false
+disablejava=false
+disablephp=false
+disabletcl=false
+disablecs=false
 for i=0 to WScript.Arguments.Count-1
 
 	arg=Wscript.Arguments.Item(i)
@@ -11,6 +25,34 @@ for i=0 to WScript.Arguments.Count-1
 	elseif arg="--enable-debug" then
 		DEBUGCPPFLAGS="/Zi /MDd /D _DEBUG"
 		DEBUGLDFLAGS="/debug"
+	elseif arg="--disable-oracle" then
+		disableoracle=true
+	elseif arg="--disable-mysql" then
+		disablemysql=true
+	elseif arg="--disable-postgresql" then
+		disablepostgresql=true
+	elseif arg="--disable-sybase" then
+		disablesybase=true
+	elseif arg="--disable-odbc" then
+		disableodbc=true
+	elseif arg="--disable-db2" then
+		disabledb2=true
+	elseif arg="--disable-firebird" then
+		disablefirebird=true
+	elseif arg="--disable-perl" then
+		disableperl=true
+	elseif arg="--disable-python" then
+		disablepython=true
+	elseif arg="--disable-ruby" then
+		disableruby=true
+	elseif arg="--disable-java" then
+		disablejava=true
+	elseif arg="--disable-php" then
+		disablephp=true
+	elseif arg="--disable-tcl" then
+		disabletcl=true
+	elseif arg="--disable-cs" then
+		disablecs=true
 	end if
 next
 
@@ -200,20 +242,26 @@ end if
 ORACLEVERSION="12c"
 ORACLEINCLUDES="/I ""C:\Program Files\Oracle\instantclient_12_1\sdk\include"""
 ORACLELIBS="/LIBPATH:""C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc"" oci.lib"
-ALLORACLE8="all-oracle8"
-INSTALLORACLE8="installdll-oracle8"
+if disableoracle=false then
+	ALLORACLE8="all-oracle8"
+	INSTALLORACLE8="installdll-oracle8"
+end if
 
 ' mysql
 MYSQLINCLUDES="/I ""C:\Program Files\MySQL\MySQL Connector.C 6.1\include"""
 MYSQLLIBS="/LIBPATH:""C:\Program Files\MySQL\MySQL Connector.C 6.1\lib"" libmysql.lib"
-ALLMYSQL="all-mysql"
-INSTALLMYSQL="installdll-mysql"
+if disablemysql=false then
+	ALLMYSQL="all-mysql"
+	INSTALLMYSQL="installdll-mysql"
+end if
 
 ' postgresql
 POSTGRESQLINCLUDES="/I ""C:\Program Files\PostgreSQL\9.4\include"""
 POSTGRESQLLIBS="/LIBPATH:""C:\Program Files\PostgreSQL\9.4\lib"" libpq.lib"
-ALLPOSTGRESQL="all-postgresql"
-INSTALLPOSTGRESQL="installdll-postgresql"
+if disablepostgresql=false then
+	ALLPOSTGRESQL="all-postgresql"
+	INSTALLPOSTGRESQL="installdll-postgresql"
+end if
 
 ' sqlite
 SQLITEINCLUDES=""
@@ -224,8 +272,10 @@ INSTALLSQLITE=""
 ' sybase
 SYBASEINCLUDES="/I ""C:\SAP\OCS-16_0\include"""
 SYBASELIBS="/LIBPATH:""C:\SAP\OCS-16_0\lib"" libsybblk64.lib libsybct64.lib libsybcs64.lib"
-ALLSYBASE="all-sybase"
-INSTALLSYBASE="installdll-sybase"
+if disablesybase=false then
+	ALLSYBASE="all-sybase"
+	INSTALLSYBASE="installdll-sybase"
+end if
 if arch="80x86" then
 	ALLSYBASE=""
 	INSTALLSYBASE=""
@@ -234,21 +284,41 @@ end if
 ' odbc
 ODBCINCLUDES=""
 ODBCLIBS="user32.lib gdi32.lib odbc32.lib odbccp32.lib"
-ALLODBC="all-odbc"
-INSTALLODBC="installdll-odbc"
+if disableodbc=false then
+	ALLODBC="all-odbc"
+	INSTALLODBC="installdll-odbc"
+end if
 
 ' db2
 DB2INCLUDES="/I""C:\Program Files\IBM\SQLLIB\include"""
 DB2LIBS="/LIBPATH:""C:\Program Files\IBM\SQLLIB\lib"" db2api.lib"
-ALLDB2="all-db2"
-INSTALLDB2="installdll-db2"
+if disabledb2=false then
+	ALLDB2="all-db2"
+	INSTALLDB2="installdll-db2"
+end if
 
 ' firebid
 FIREBIRDINCLUDES="/I""C:\Program Files\Firebird\Firebird_2_5\include"""
 FIREBIRDLIBS="/LIBPATH:""C:\Program Files\Firebird\Firebird_2_5\lib"" fbclient_ms.lib"
-ALLFIREBIRD="all-firebird"
-INSTALLFIREBIRD="installdll-firebird"
+if disablefirebird=false then
+	ALLFIREBIRD="all-firebird"
+	INSTALLFIREBIRD="installdll-firebird"
+end if
 
+
+' api's...
+APIALLSUBDIRS="c++ c"
+APICLEANSUBDIRS="c++ c"
+APIINSTALLSUBDIRS="c++ c"
+APIUNINSTALLSUBDIRS="c++ c"
+
+' c#
+if disablecs=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" cs"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" cs"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" cs"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " cs"
+end if
 
 ' perl
 PERLPREFIX="C:\Perl64"
@@ -256,10 +326,22 @@ PERLVERSION="520"
 if arch="80x86" then
 	PERLPREFIX="C:\Perl"
 end if
+if disableperl=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" perl"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" perl"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" perl"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " perl"
+end if
 
 ' python
 PYTHONPREFIX="C:\Python27"
 PYTHONVERSION="27"
+if disablepython=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" python"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" python"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" python"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " python"
+end if
 
 ' ruby
 RUBYPREFIX="C:\Ruby"
@@ -274,15 +356,39 @@ if arch="80x86" then
 	RUBYLIBPREFIX="msvcr100"
 	RUBYSITEARCHDIRSUFFIX="i386-msvcr100"
 end if
+if disableruby=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" ruby"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" ruby"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" ruby"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " ruby"
+end if
 
 ' php
 PHPPREFIX="C:\PHP"
+if disablephp=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" php phppdo"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" php phppdo"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" php phppdo"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " php phppdo"
+end if
 
 ' java
 JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
+if disablejava=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" java"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" java"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" java"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " java"
+end if
 
 ' tcl
 TCLPREFIX="C:\Tcl"
+if disabletcl=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" tcl"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" tcl"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" tcl"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " tcl"
+end if
 
 
 ' input and output files
@@ -423,6 +529,11 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@ALLFIREBIRD@",ALLFIREBIRD,1,-1,0)
 	content=replace(content,"@INSTALLFIREBIRD@",INSTALLFIREBIRD,1,-1,0)
 
+	' enabled apis
+	content=replace(content,"@APIALLSUBDIRS@",APIALLSUBDIRS,1,-1,0)
+	content=replace(content,"@APICLEANSUBDIRS@",APICLEANSUBDIRS,1,-1,0)
+	content=replace(content,"@APIINSTALLSUBDIRS@",APIINSTALLSUBDIRS,1,-1,0)
+	content=replace(content,"@APIUNINSTALLSUBDIRS@",APIUNINSTALLSUBDIRS,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)

@@ -415,10 +415,10 @@ SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers 
 SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-filters install-connections install-cmdline
 
 
-APIALLSUBDIRS = all-cpp all-c all-cs all-odbc all-python all-perl all-ruby all-php all-phppdo all-java all-tcl
+APIALLSUBDIRS = @APIALLSUBDIRS@
 
-APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-tcl
+APICLEANSUBDIRS = @APICLEANSUBDIRS@
 
-APIINSTALLSUBDIRS = install-cpp install-c install-cs install-odbc install-python install-perl install-ruby install-php install-phppdo install-java install-tcl
+APIINSTALLSUBDIRS = @APIINSTALLSUBDIRS@
 
-APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-odbc uninstall-python uninstall-perl uninstall-ruby uninstall-php uninstall-phppdo uninstall-java uninstall-tcl
+APIUNINSTALLSUBDIRS = @APIUNINSTALLSUBDIRS@
