@@ -2,6 +2,7 @@
 OPTCPPFLAGS="/O2"
 DEBUGCPPFLAGS="/MD"
 DEBUGLDFLAGS=""
+
 disableoracle=false
 disablemysql=false
 disablepostgresql=false
@@ -16,6 +17,20 @@ disablejava=false
 disablephp=false
 disabletcl=false
 disablecs=false
+
+ORACLEPREFIX=""
+MYSQLPREFIX=""
+POSTGRESQLPREFIX=""
+SYBASEPREFIX=""
+DB2PREFIX=""
+FIREBIRDPREFIX=""
+PERLPREFIX=""
+PYTHONPREFIX=""
+RUBYPREFIX=""
+JAVAPREFIX=""
+PHPPREFIX=""
+TCLPREFIX=""
+
 for i=0 to WScript.Arguments.Count-1
 
 	arg=Wscript.Arguments.Item(i)
@@ -27,30 +42,54 @@ for i=0 to WScript.Arguments.Count-1
 		DEBUGLDFLAGS="/debug"
 	elseif arg="--disable-oracle" then
 		disableoracle=true
+	elseif mid(arg,1,16)="--oracle-prefix=" then
+		ORACLEPREFIX=mid(arg,17)
 	elseif arg="--disable-mysql" then
 		disablemysql=true
+	elseif mid(arg,1,15)="--mysql-prefix=" then
+		MYSQLPREFIX=mid(arg,16)
 	elseif arg="--disable-postgresql" then
 		disablepostgresql=true
+	elseif mid(arg,1,20)="--postgresql-prefix=" then
+		POSTGRESQLPREFIX=mid(arg,21)
 	elseif arg="--disable-sybase" then
 		disablesybase=true
+	elseif mid(arg,1,16)="--sybase-prefix=" then
+		SYBASEPREFIX=mid(arg,17)
 	elseif arg="--disable-odbc" then
 		disableodbc=true
 	elseif arg="--disable-db2" then
 		disabledb2=true
+	elseif mid(arg,1,13)="--db2-prefix=" then
+		DB2PREFIX=mid(arg,14)
 	elseif arg="--disable-firebird" then
 		disablefirebird=true
+	elseif mid(arg,1,18)="--firebird-prefix=" then
+		FIREBIRDPREFIX=mid(arg,19)
 	elseif arg="--disable-perl" then
 		disableperl=true
+	elseif mid(arg,1,14)="--perl-prefix=" then
+		PERLPREFIX=mid(arg,15)
 	elseif arg="--disable-python" then
 		disablepython=true
+	elseif mid(arg,1,16)="--python-prefix=" then
+		PYTHONPREFIX=mid(arg,17)
 	elseif arg="--disable-ruby" then
 		disableruby=true
+	elseif mid(arg,1,14)="--ruby-prefix=" then
+		RUBYPREFIX=mid(arg,15)
 	elseif arg="--disable-java" then
 		disablejava=true
+	elseif mid(arg,1,14)="--java-prefix=" then
+		JAVAPREFIX=mid(arg,15)
 	elseif arg="--disable-php" then
 		disablephp=true
+	elseif mid(arg,1,13)="--php-prefix=" then
+		PHPPREFIX=mid(arg,14)
 	elseif arg="--disable-tcl" then
 		disabletcl=true
+	elseif mid(arg,1,13)="--tcl-prefix=" then
+		TCLPREFIX=mid(arg,14)
 	elseif arg="--disable-cs" then
 		disablecs=true
 	end if
@@ -239,7 +278,9 @@ end if
 
 
 ' oracle
-ORACLEPREFIX="C:\Program Files\Oracle\instantclient_12_1\sdk"
+if ORACLEPREFIX="" then
+	ORACLEPREFIX="C:\Program Files\Oracle\instantclient_12_1\sdk"
+end if
 ORACLEVERSION="12c"
 ORACLEINCLUDES="/I """+ORACLEPREFIX+"\include"""
 ORACLELIBS="/LIBPATH:"""+ORACLEPREFIX+"\lib\msvc"" oci.lib"
@@ -249,7 +290,9 @@ if disableoracle=false then
 end if
 
 ' mysql
-MYSQLPREFIX="C:\Program Files\MySQL\MySQL Connector.C 6.1"
+if MYSQLPREFIX="" then
+	MYSQLPREFIX="C:\Program Files\MySQL\MySQL Connector.C 6.1"
+end if
 MYSQLINCLUDES="/I """+MYSQLPREFIX+"\include"""
 MYSQLLIBS="/LIBPATH:"""+MYSQLPREFIX+"\lib"" libmysql.lib"
 if disablemysql=false then
@@ -258,7 +301,9 @@ if disablemysql=false then
 end if
 
 ' postgresql
-POSTGRESQLPREFIX="C:\Program Files\PostgreSQL\9.4"
+if POSTGRESQLPREFIX="" then
+	POSTGRESQLPREFIX="C:\Program Files\PostgreSQL\9.4"
+end if
 POSTGRESQLINCLUDES="/I """+POSTGRESQLPREFIX+"\include"""
 POSTGRESQLLIBS="/LIBPATH:"""+POSTGRESQLPREFIX+"\lib"" libpq.lib"
 if disablepostgresql=false then
@@ -273,7 +318,9 @@ ALLSQLITE=""
 INSTALLSQLITE=""
 
 ' sybase
-SYBASEPREFIX="C:\SAP\OCS-16_0"
+if SYBASEPREFIX="" then
+	SYBASEPREFIX="C:\SAP\OCS-16_0"
+end if
 SYBASEINCLUDES="/I """+SYBASEPREFIX+"\include"""
 SYBASELIBS="/LIBPATH:"""+SYBASEPREFIX+"\lib"" libsybblk64.lib libsybct64.lib libsybcs64.lib"
 if disablesybase=false then
@@ -294,7 +341,9 @@ if disableodbc=false then
 end if
 
 ' db2
-DB2PREFIX="C:\Program Files\IBM\SQLLIB"
+if DB2PREFIX="" then
+	DB2PREFIX="C:\Program Files\IBM\SQLLIB"
+end if
 DB2INCLUDES="/I"""+DB2PREFIX+"\include"""
 DB2LIBS="/LIBPATH:"""+DB2PREFIX+"\lib"" db2api.lib"
 if disabledb2=false then
@@ -303,7 +352,9 @@ if disabledb2=false then
 end if
 
 ' firebid
-FIREBIRDPREFIX="C:\Program Files\Firebird\Firebird_2_5"
+if FIREBIRDPREFIX="" then
+	FIREBIRDPREFIX="C:\Program Files\Firebird\Firebird_2_5"
+end if
 FIREBIRDINCLUDES="/I"""+FIREBIRDPREFIX+"\include"""
 FIREBIRDLIBS="/LIBPATH:"""+FIREBIRDPREFIX+"\lib"" fbclient_ms.lib"
 if disablefirebird=false then
@@ -327,7 +378,9 @@ if disablecs=false then
 end if
 
 ' perl
-PERLPREFIX="C:\Perl64"
+if PERLPREFIX="" then
+	PERLPREFIX="C:\Perl64"
+end if
 PERLVERSION="520"
 if arch="80x86" then
 	PERLPREFIX="C:\Perl"
@@ -340,7 +393,9 @@ if disableperl=false then
 end if
 
 ' python
-PYTHONPREFIX="C:\Python27"
+if PYTHONPREFIX="" then
+	PYTHONPREFIX="C:\Python27"
+end if
 PYTHONVERSION="27"
 if disablepython=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-python"
@@ -350,7 +405,9 @@ if disablepython=false then
 end if
 
 ' ruby
-RUBYPREFIX="C:\Ruby"
+if RUBYPREFIX="" then
+	RUBYPREFIX="C:\Ruby"
+end if
 RUBYVERSION="2.2.0"
 RUBYLIBVERSION="220"
 RUBYVCVERSION="100"
@@ -370,7 +427,9 @@ if disableruby=false then
 end if
 
 ' php
-PHPPREFIX="C:\PHP"
+if PHPPREFIX="" then
+	PHPPREFIX="C:\PHP"
+end if
 if disablephp=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-php all-phppdo"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-php clean-phppdo"
@@ -379,7 +438,9 @@ if disablephp=false then
 end if
 
 ' java
-JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
+if JAVAPREFIX="" then
+	JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
+end if
 if disablejava=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-java"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java"
@@ -388,7 +449,9 @@ if disablejava=false then
 end if
 
 ' tcl
-TCLPREFIX="C:\Tcl"
+if TCLPREFIX="" then
+	TCLPREFIX="C:\Tcl"
+end if
 if disabletcl=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-tcl"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-tcl"
