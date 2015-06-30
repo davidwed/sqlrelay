@@ -25,8 +25,11 @@ SYBASEPREFIX=""
 DB2PREFIX=""
 FIREBIRDPREFIX=""
 PERLPREFIX=""
+PERLVERSION=""
 PYTHONPREFIX=""
+PYTHONVERSION=""
 RUBYPREFIX=""
+RUBYVERSION=""
 JAVAPREFIX=""
 PHPPREFIX=""
 TCLPREFIX=""
@@ -70,14 +73,20 @@ for i=0 to WScript.Arguments.Count-1
 		disableperl=true
 	elseif mid(arg,1,14)="--perl-prefix=" then
 		PERLPREFIX=mid(arg,15)
+	elseif mid(arg,1,15)="--perl-version=" then
+		PERLVERSION=mid(arg,16)
 	elseif arg="--disable-python" then
 		disablepython=true
 	elseif mid(arg,1,16)="--python-prefix=" then
 		PYTHONPREFIX=mid(arg,17)
+	elseif mid(arg,1,17)="--python-version=" then
+		PYTHONPREFIX=mid(arg,18)
 	elseif arg="--disable-ruby" then
 		disableruby=true
 	elseif mid(arg,1,14)="--ruby-prefix=" then
 		RUBYPREFIX=mid(arg,15)
+	elseif mid(arg,1,15)="--ruby-version=" then
+		RUBYVERSION=mid(arg,16)
 	elseif arg="--disable-java" then
 		disablejava=true
 	elseif mid(arg,1,14)="--java-prefix=" then
@@ -281,7 +290,6 @@ end if
 if ORACLEPREFIX="" then
 	ORACLEPREFIX="C:\Program Files\Oracle\instantclient_12_1\sdk"
 end if
-ORACLEVERSION="12c"
 ORACLEINCLUDES="/I """+ORACLEPREFIX+"\include"""
 ORACLELIBS="/LIBPATH:"""+ORACLEPREFIX+"\lib\msvc"" oci.lib"
 if disableoracle=false then
@@ -381,7 +389,9 @@ end if
 if PERLPREFIX="" then
 	PERLPREFIX="C:\Perl64"
 end if
-PERLVERSION="520"
+if PERLVERSION="" then
+	PERLVERSION="520"
+end if
 if arch="80x86" then
 	PERLPREFIX="C:\Perl"
 end if
@@ -396,7 +406,9 @@ end if
 if PYTHONPREFIX="" then
 	PYTHONPREFIX="C:\Python27"
 end if
-PYTHONVERSION="27"
+if PYTHONVERSION="" then
+	PYTHONVERSION="27"
+end if
 if disablepython=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-python"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-python"
@@ -408,7 +420,9 @@ end if
 if RUBYPREFIX="" then
 	RUBYPREFIX="C:\Ruby"
 end if
-RUBYVERSION="2.2.0"
+if RUBYVERSION="" then
+	RUBYVERSION="2.2.0"
+end if
 RUBYLIBVERSION="220"
 RUBYVCVERSION="100"
 RUBYTARGET="x64-mswin64"
@@ -557,7 +571,6 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@TCLPREFIX@",TCLPREFIX,1,-1,0)
 
 	' connections
-	content=replace(content,"@ORACLEVERSION@",ORACLEVERSION,1,-1,0)
 	content=replace(content,"@ORACLEINCLUDES@",ORACLEINCLUDES,1,-1,0)
 	content=replace(content,"@ORACLELIBS@",ORACLELIBS,1,-1,0)
 	content=replace(content,"@ALLORACLE8@",ALLORACLE8,1,-1,0)
