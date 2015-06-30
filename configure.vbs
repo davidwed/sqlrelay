@@ -239,25 +239,28 @@ end if
 
 
 ' oracle
+ORACLEPREFIX="C:\Program Files\Oracle\instantclient_12_1\sdk"
 ORACLEVERSION="12c"
-ORACLEINCLUDES="/I ""C:\Program Files\Oracle\instantclient_12_1\sdk\include"""
-ORACLELIBS="/LIBPATH:""C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc"" oci.lib"
+ORACLEINCLUDES="/I """+ORACLEPREFIX+"\include"""
+ORACLELIBS="/LIBPATH:"""+ORACLEPREFIX+"\lib\msvc"" oci.lib"
 if disableoracle=false then
 	ALLORACLE8="all-oracle8"
 	INSTALLORACLE8="installdll-oracle8"
 end if
 
 ' mysql
-MYSQLINCLUDES="/I ""C:\Program Files\MySQL\MySQL Connector.C 6.1\include"""
-MYSQLLIBS="/LIBPATH:""C:\Program Files\MySQL\MySQL Connector.C 6.1\lib"" libmysql.lib"
+MYSQLPREFIX="C:\Program Files\MySQL\MySQL Connector.C 6.1"
+MYSQLINCLUDES="/I """+MYSQLPREFIX+"\include"""
+MYSQLLIBS="/LIBPATH:"""+MYSQLPREFIX+"\lib"" libmysql.lib"
 if disablemysql=false then
 	ALLMYSQL="all-mysql"
 	INSTALLMYSQL="installdll-mysql"
 end if
 
 ' postgresql
-POSTGRESQLINCLUDES="/I ""C:\Program Files\PostgreSQL\9.4\include"""
-POSTGRESQLLIBS="/LIBPATH:""C:\Program Files\PostgreSQL\9.4\lib"" libpq.lib"
+POSTGRESQLPREFIX="C:\Program Files\PostgreSQL\9.4"
+POSTGRESQLINCLUDES="/I """+POSTGRESQLPREFIX+"\include"""
+POSTGRESQLLIBS="/LIBPATH:"""+POSTGRESQLPREFIX+"\lib"" libpq.lib"
 if disablepostgresql=false then
 	ALLPOSTGRESQL="all-postgresql"
 	INSTALLPOSTGRESQL="installdll-postgresql"
@@ -270,8 +273,9 @@ ALLSQLITE=""
 INSTALLSQLITE=""
 
 ' sybase
-SYBASEINCLUDES="/I ""C:\SAP\OCS-16_0\include"""
-SYBASELIBS="/LIBPATH:""C:\SAP\OCS-16_0\lib"" libsybblk64.lib libsybct64.lib libsybcs64.lib"
+SYBASEPREFIX="C:\SAP\OCS-16_0"
+SYBASEINCLUDES="/I """+SYBASEPREFIX+"\include"""
+SYBASELIBS="/LIBPATH:"""+SYBASEPREFIX+"\lib"" libsybblk64.lib libsybct64.lib libsybcs64.lib"
 if disablesybase=false then
 	ALLSYBASE="all-sybase"
 	INSTALLSYBASE="installdll-sybase"
@@ -290,16 +294,18 @@ if disableodbc=false then
 end if
 
 ' db2
-DB2INCLUDES="/I""C:\Program Files\IBM\SQLLIB\include"""
-DB2LIBS="/LIBPATH:""C:\Program Files\IBM\SQLLIB\lib"" db2api.lib"
+DB2PREFIX="C:\Program Files\IBM\SQLLIB"
+DB2INCLUDES="/I"""+DB2PREFIX+"\include"""
+DB2LIBS="/LIBPATH:"""+DB2PREFIX+"\lib"" db2api.lib"
 if disabledb2=false then
 	ALLDB2="all-db2"
 	INSTALLDB2="installdll-db2"
 end if
 
 ' firebid
-FIREBIRDINCLUDES="/I""C:\Program Files\Firebird\Firebird_2_5\include"""
-FIREBIRDLIBS="/LIBPATH:""C:\Program Files\Firebird\Firebird_2_5\lib"" fbclient_ms.lib"
+FIREBIRDPREFIX="C:\Program Files\Firebird\Firebird_2_5"
+FIREBIRDINCLUDES="/I"""+FIREBIRDPREFIX+"\include"""
+FIREBIRDLIBS="/LIBPATH:"""+FIREBIRDPREFIX+"\lib"" fbclient_ms.lib"
 if disablefirebird=false then
 	ALLFIREBIRD="all-firebird"
 	INSTALLFIREBIRD="installdll-firebird"
@@ -307,17 +313,17 @@ end if
 
 
 ' api's...
-APIALLSUBDIRS="c++ c"
-APICLEANSUBDIRS="c++ c"
-APIINSTALLSUBDIRS="c++ c"
-APIUNINSTALLSUBDIRS="c++ c"
+APIALLSUBDIRS="all-cpp all-c all-odbc"
+APICLEANSUBDIRS="clean-cpp clean-c clean-odbc"
+APIINSTALLSUBDIRS="install-cpp install-c install-odbc"
+APIUNINSTALLSUBDIRS="uninstall-cpp uninstall-c uninstall-odbc"
 
 ' c#
 if disablecs=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" cs"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" cs"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" cs"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " cs"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-cs"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-cs"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-cs"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-cs"
 end if
 
 ' perl
@@ -327,20 +333,20 @@ if arch="80x86" then
 	PERLPREFIX="C:\Perl"
 end if
 if disableperl=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" perl"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" perl"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" perl"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " perl"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-perl"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-perl"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-perl"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-perl"
 end if
 
 ' python
 PYTHONPREFIX="C:\Python27"
 PYTHONVERSION="27"
 if disablepython=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" python"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" python"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" python"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " python"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-python"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-python"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-python"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-python"
 end if
 
 ' ruby
@@ -357,37 +363,37 @@ if arch="80x86" then
 	RUBYSITEARCHDIRSUFFIX="i386-msvcr100"
 end if
 if disableruby=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" ruby"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" ruby"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" ruby"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " ruby"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-ruby"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-ruby"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-ruby"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-ruby"
 end if
 
 ' php
 PHPPREFIX="C:\PHP"
 if disablephp=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" php phppdo"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" php phppdo"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" php phppdo"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " php phppdo"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-php all-phppdo"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-php clean-phppdo"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-php install-phppdo"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-php uninstall-phppdo"
 end if
 
 ' java
 JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
 if disablejava=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" java"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" java"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" java"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " java"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-java"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-java"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-java"
 end if
 
 ' tcl
 TCLPREFIX="C:\Tcl"
 if disabletcl=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" tcl"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" tcl"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" tcl"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " tcl"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-tcl"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-tcl"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-tcl"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-tcl"
 end if
 
 
