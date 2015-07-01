@@ -119,6 +119,7 @@
 	sqlrcur_defineOutputBindInteger($cur,"1");
 	sqlrcur_defineOutputBindDouble($cur,"2");
 	sqlrcur_defineOutputBindString($cur,"3",20);
+	sqlrcur_defineOutputBindBlob($cur,"4");
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	checkSuccess(sqlrcur_getOutputBindInteger($cur,"1"),1);
 	//checkSuccess(sqlrcur_getOutputBindDouble($cur,"2"),1.1);

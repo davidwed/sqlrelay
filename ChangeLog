@@ -6,6 +6,8 @@
 	added query status flag to sqlrservercursor
 	tweaked odbc driver's SQLGetTypeInfo()
 	field name is passed into runResultSetTranslations() now
+	added support for maxitembuffersize, maxselectlistsize,
+		and maxbindcount for firebird
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

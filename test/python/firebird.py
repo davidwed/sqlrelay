@@ -113,6 +113,7 @@ def main():
 	cur.defineOutputBindInteger("1")
 	cur.defineOutputBindDouble("2")
 	cur.defineOutputBindString("3",20)
+	cur.defineOutputBindBlob("4")
 	checkSuccess(cur.executeQuery(),1)
 	checkSuccess(cur.getOutputBindInteger("1"),1)
 	#checkSuccess(cur.getOutputBindDouble("2"),1.1)

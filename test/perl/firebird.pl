@@ -140,6 +140,7 @@ $cur->inputBind("3","hello");
 $cur->defineOutputBindInteger("1");
 $cur->defineOutputBindDouble("2");
 $cur->defineOutputBindString("3",20);
+$cur->defineOutputBindBlob("4");
 checkSuccess($cur->executeQuery(),1);
 $numvar=$cur->getOutputBindInteger("1");
 $floatvar=$cur->getOutputBindDouble("2");
