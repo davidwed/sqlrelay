@@ -89,7 +89,7 @@ sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-listener.$(OBJ) $(SERVERLIBS)
 
 sqlr-connection$(EXE): sqlr-connection.cpp sqlr-connection.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-connection.$(OBJ) $(SERVERLIBS) -lefence
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-connection.$(OBJ) $(SERVERLIBS)
 
 sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-scaler.$(OBJ) $(SERVERLIBS)
