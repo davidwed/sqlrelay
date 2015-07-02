@@ -3623,6 +3623,83 @@ fi
 ])
 
 
+AC_DEFUN([FW_CHECK_NODEJS],
+[
+if ( test "$ENABLE_NODEJS" = "yes" )
+then
+
+	HAVE_NODEJS=""
+
+	if ( test "$cross_compiling" = "yes" )
+	then
+
+		dnl cross compiling ...
+		echo "cross compiling..."
+
+	else
+
+		NODE=""
+		NODEGYP=""
+		NODEJSDIR=""
+		AC_MSG_CHECKING(for node and node-gyp)
+
+		for path in "$NODEJSPATH" "/" "/usr" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
+		do
+			if ( test -r "$path/bin/node" )
+			then
+				NODE="$path/bin/node"
+			fi
+
+			if ( test -r "$path/bin/nodejs" )
+			then
+				NODE="$path/bin/nodejs"
+			fi
+
+			if ( test -r "$path/bin/node-gyp" )
+			then
+				NODEGYP="$path/bin/node-gyp"
+			fi
+
+			if ( test -n "$NODE" -a -n "$NODEGYP" )
+			then
+				NODEJSDIR="$path"
+				break;
+			fi
+		done
+		AC_MSG_RESULT()
+
+		AC_MSG_CHECKING(for node)
+		if ( test -r "$NODE" )
+		then
+			AC_MSG_RESULT($NODE)
+		else
+			AC_MSG_RESULT(no)
+		fi
+
+		AC_MSG_CHECKING(for node-gyp)
+		if ( test -r "$NODEGYP" )
+		then
+			AC_MSG_RESULT($NODEGYP)
+		else
+			AC_MSG_RESULT(no)
+		fi
+	fi
+
+	if ( test -r "$NODE" -a -r "$NODEGYP" )
+	then
+		HAVE_NODEJS="yes"
+	else
+		AC_MSG_WARN(The Mono API will not be built.)
+	fi
+
+	AC_SUBST(HAVE_NODEJS)
+	AC_SUBST(NODE)
+	AC_SUBST(NODEGYP)
+	AC_SUBST(NODEJSDIR)
+fi
+])
+
+
 AC_DEFUN([FW_CHECK_TCL],
 [
 if ( test "$ENABLE_TCL" = "yes" )

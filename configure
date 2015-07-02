@@ -638,6 +638,10 @@ STATICLINK
 SONAME_VERSION_INFO
 SQLR_VERSION
 RPM_BUILD_DIR
+NODEJSDIR
+NODEGYP
+NODE
+HAVE_NODEJS
 GACUTIL
 ILASM
 ILDASM
@@ -959,6 +963,8 @@ enable_erlang
 enable_erlang_rpath
 with_mono_prefix
 enable_mono
+with_nodejs_prefix
+enable_nodejs
 enable_c_rpath
 enable_psql_rpath
 with_pthread_prefix
@@ -1638,6 +1644,7 @@ Optional Features:
   --disable-erlang              Don't build Erlang api
   --enable-erlang-rpath         Use -rpath when linking the Erlang library against the SQL Relay client library
   --disable-mono                Don't build Mono/C# api
+  --disable-nodejs              Don't build node.js api
   --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library
   --enable-psql-rpath           Use -rpath when linking the psql replacement library against the SQL Relay client library
   --enable-dmalloc              Use the dmalloc library
@@ -1684,6 +1691,7 @@ Optional Packages:
   --with-tcl-libraries		 Location of libtcl, where to install tcl module
   --with-erlang-prefix          Location of Erlang
   --with-mono-prefix            Location of Mono (C#)
+  --with-nodejs-prefix          Location of node.js
   --with-pthread-prefix         Location of pthread library
   --with-system-libtool   use system libtool instead of ./libtool
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
@@ -3160,6 +3168,21 @@ if test "${enable_mono+set}" = set; then :
   enableval=$enable_mono; ENABLE_MONO=""
 else
   ENABLE_MONO="yes"
+fi
+
+
+# Check whether --with-nodejs-prefix was given.
+if test "${with_nodejs_prefix+set}" = set; then :
+  withval=$with_nodejs_prefix; NODEJSPATH="$withval"
+else
+  NODEJSPATH=""
+fi
+
+# Check whether --enable-nodejs was given.
+if test "${enable_nodejs+set}" = set; then :
+  enableval=$enable_nodejs; ENABLE_NODEJS=""
+else
+  ENABLE_NODEJS="yes"
 fi
 
 # Check whether --enable-c-rpath was given.
@@ -33727,6 +33750,93 @@ fi
 echo "******************************"
 
 
+echo
+echo "***** node.js ****************"
+
+if ( test "$ENABLE_NODEJS" = "yes" )
+then
+
+	HAVE_NODEJS=""
+
+	if ( test "$cross_compiling" = "yes" )
+	then
+
+				echo "cross compiling..."
+
+	else
+
+		NODE=""
+		NODEGYP=""
+		NODEJSDIR=""
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node and node-gyp" >&5
+$as_echo_n "checking for node and node-gyp... " >&6; }
+
+		for path in "$NODEJSPATH" "/" "/usr" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
+		do
+			if ( test -r "$path/bin/node" )
+			then
+				NODE="$path/bin/node"
+			fi
+
+			if ( test -r "$path/bin/nodejs" )
+			then
+				NODE="$path/bin/nodejs"
+			fi
+
+			if ( test -r "$path/bin/node-gyp" )
+			then
+				NODEGYP="$path/bin/node-gyp"
+			fi
+
+			if ( test -n "$NODE" -a -n "$NODEGYP" )
+			then
+				NODEJSDIR="$path"
+				break;
+			fi
+		done
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
+$as_echo "" >&6; }
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node" >&5
+$as_echo_n "checking for node... " >&6; }
+		if ( test -r "$NODE" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODE" >&5
+$as_echo "$NODE" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node-gyp" >&5
+$as_echo_n "checking for node-gyp... " >&6; }
+		if ( test -r "$NODEGYP" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEGYP" >&5
+$as_echo "$NODEGYP" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+	fi
+
+	if ( test -r "$NODE" -a -r "$NODEGYP" )
+	then
+		HAVE_NODEJS="yes"
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
+$as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
+	fi
+
+
+
+
+
+fi
+
+echo "******************************"
+
+
 
 echo
 echo "***** Headers ****************"
@@ -36383,6 +36493,7 @@ JAVABUILD="no "
 TCLBUILD="no "
 ERLANGBUILD="no "
 MONOBUILD="no "
+NODEJSBUILD="no "
 ODBCBUILD="no "
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
@@ -36411,6 +36522,9 @@ fi
 if ( test -n "$HAVE_MONO" ); then
 	MONOBUILD="yes"
 fi
+if ( test -n "$HAVE_NODEJS" ); then
+	NODEJSBUILD="yes"
+fi
 if ( test -n "$ODBCLIBS" ); then
 	ODBCBUILD="yes"
 fi
@@ -36420,7 +36534,7 @@ echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
 echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCBUILD"
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
-echo "                Mono        $MONOBUILD"
+echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
 echo ""
 
 ORACLE8BUILD="no     "

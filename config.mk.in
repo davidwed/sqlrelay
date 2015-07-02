@@ -347,6 +347,13 @@ endif
 endif
 
 
+# node.js
+HAVE_NODEJS = @HAVE_NODEJS@
+NODE = @NODE@
+NODEGYP = @NODEGYP@
+NODEJSDIR = @NODEJSDIR@
+
+
 # psql
 PSQLUSERPATH = @PSQLUSERPATH@
 
@@ -860,5 +867,11 @@ APIALLSUBDIRS += all-erlang
 APICLEANSUBDIRS += clean-erlang
 APIINSTALLSUBDIRS += install-erlang
 APIUNINSTALLSUBDIRS += uninstall-erlang
+endif
+ifneq ($(HAVE_NODEJS),)
+APIALLSUBDIRS += all-nodejs
+APICLEANSUBDIRS += clean-nodejs
+APIINSTALLSUBDIRS += install-nodejs
+APIUNINSTALLSUBDIRS += uninstall-nodejs
 endif
 endif

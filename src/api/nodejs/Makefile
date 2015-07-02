@@ -10,7 +10,7 @@ clean:
 	$(RMTREE) build
 
 build: sqlrelay.cpp
-	node-gyp configure build
+	$(NODEGYP) configure build
 
 install: $(INSTALLLIB)
 

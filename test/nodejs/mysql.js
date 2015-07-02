@@ -6,7 +6,7 @@ var	sqlrelay=require("../../src/api/nodejs/build/Release/sqlrelay");
 
 function checkSuccess(value,success) {
 	if (value==success) {
-		console.log("success ");
+		process.stdout.write("success ");
 	} else {
 		console.log(value+"!="+success+" ");
 		console.log("failure ");
@@ -36,11 +36,12 @@ var	cur=new sqlrelay.SQLRCursor(con);
 // get database type
 console.log("IDENTIFY: ");
 checkSuccess(con.identify(),"mysql");
+console.log("\n");
 
 // ping
 console.log("PING: ");
 checkSuccess(con.ping(),1);
-console.log();
+console.log("\n");
 
 // drop existing table
 cur.sendQuery("drop table testtable");
@@ -48,18 +49,18 @@ cur.sendQuery("drop table testtable");
 // create a new table
 console.log("CREATE TEMPTABLE: ");
 checkSuccess(cur.sendQuery("create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
-console.log();
+console.log("\n");
 
 console.log("INSERT: ");
 checkSuccess(cur.sendQuery("insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',null)"),1);
 checkSuccess(cur.sendQuery("insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',null)"),1);
 checkSuccess(cur.sendQuery("insert into testdb.testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',null)"),1);
 checkSuccess(cur.sendQuery("insert into testdb.testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',null)"),1);
-console.log();
+console.log("\n");
 
 console.log("AFFECTED ROWS: ");
 checkSuccess(cur.affectedRows(),1);
-console.log();
+console.log("\n");
 
 console.log("BIND BY POSITION: ");
 cur.prepareQuery("insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null)");
@@ -123,7 +124,7 @@ cur.inputBind("16","tinytext7");
 cur.inputBind("17","mediumtext7");
 cur.inputBind("18","longtext7");
 checkSuccess(cur.executeQuery(),1);
-console.log();
+console.log("\n");
 
 console.log("BIND BY POSITION WITH VALIDATION: ");
 cur.clearBinds();
@@ -147,15 +148,15 @@ cur.inputBind("17","mediumtext8");
 cur.inputBind("18","longtext8");
 cur.validateBinds();
 checkSuccess(cur.executeQuery(),1);
-console.log();
+console.log("\n");
 
 console.log("SELECT: ");
 checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1);
-console.log();
+console.log("\n");
 
 console.log("COLUMN COUNT: ");
 checkSuccess(cur.colCount(),19);
-console.log();
+console.log("\n");
 
 console.log("COLUMN NAMES: ");
 checkSuccess(cur.getColumnName(0),"testtinyint");
@@ -197,7 +198,7 @@ checkSuccess(cols[15],"testtinytext");
 checkSuccess(cols[16],"testmediumtext");
 checkSuccess(cols[17],"testlongtext");
 checkSuccess(cols[18],"testtimestamp");*/
-console.log();
+console.log("\n");
 
 console.log("COLUMN TYPES: ");
 checkSuccess(cur.getColumnType(0),"TINYINT");
@@ -238,7 +239,7 @@ checkSuccess(cur.getColumnType("testtinytext"),"TINYBLOB");
 checkSuccess(cur.getColumnType("testmediumtext"),"MEDIUMBLOB");
 checkSuccess(cur.getColumnType("testlongtext"),"LONGBLOB");
 checkSuccess(cur.getColumnType("testtimestamp"),"TIMESTAMP");
-console.log();
+console.log("\n");
 
 console.log("COLUMN LENGTH: ");
 checkSuccess(cur.getColumnLength(0),1);
@@ -279,7 +280,7 @@ checkSuccess(cur.getColumnLength("testtinytext"),255);
 checkSuccess(cur.getColumnLength("testmediumtext"),16777215);
 checkSuccess(cur.getColumnLength("testlongtext"),2147483647);
 checkSuccess(cur.getColumnLength("testtimestamp"),4);
-console.log();
+console.log("\n");
 
 console.log("LONGEST COLUMN: ");
 checkSuccess(cur.getLongest(0),1);
@@ -320,23 +321,23 @@ checkSuccess(cur.getLongest("testtinytext"),9);
 checkSuccess(cur.getLongest("testmediumtext"),11);
 checkSuccess(cur.getLongest("testlongtext"),9);
 checkSuccess(cur.getLongest("testtimestamp"),19);
-console.log();
+console.log("\n");
 
 console.log("ROW COUNT: ");
 checkSuccess(cur.rowCount(),8);
-console.log();
+console.log("\n");
 
 console.log("TOTAL ROWS: ");
 checkSuccess(cur.totalRows(),8);
-console.log();
+console.log("\n");
 
 console.log("FIRST ROW INDEX: ");
 checkSuccess(cur.firstRowIndex(),0);
-console.log();
+console.log("\n");
 
 console.log("END OF RESULT SET: ");
 checkSuccess(cur.endOfResultSet(),1);
-console.log();
+console.log("\n");
 
 console.log("FIELDS BY INDEX: ");
 checkSuccess(cur.getField(0,0),"1");
@@ -518,7 +519,7 @@ checkSuccess(fields[14],"varchar1");
 checkSuccess(fields[15],"tinytext1");
 checkSuccess(fields[16],"mediumtext1");
 checkSuccess(fields[17],"longtext1");
-console.log();
+console.log("\n");
 
 console.log("FIELD LENGTHS BY ARRAY: ");
 fieldlens=cur.getRowLengths(0);
@@ -540,7 +541,7 @@ checkSuccess(fieldlens[14],8);
 checkSuccess(fieldlens[15],9);
 checkSuccess(fieldlens[16],11);
 checkSuccess(fieldlens[17],9);
-console.log();*/
+console.log("\n");*/
 
 console.log("INDIVIDUAL SUBSTITUTIONS: ");
 cur.prepareQuery("select $(var1),'$(var2)',$(var3)");
@@ -548,49 +549,49 @@ cur.substitution("var1",1);
 cur.substitution("var2","hello");
 cur.substitution("var3",10.5556,6,4);
 checkSuccess(cur.executeQuery(),1);
-console.log();
+console.log("\n");
 
 console.log("FIELDS: ");
 checkSuccess(cur.getField(0,0),"1");
 checkSuccess(cur.getField(0,1),"hello");
 checkSuccess(cur.getField(0,2),"10.5556");
-console.log();
+console.log("\n");
 
 /*console.log("ARRAY SUBSTITUTIONS: ");
 cur.prepareQuery("select $(var1),$(var2),$(var3)");
 cur.substitutions(subvars,subvallongs);
 checkSuccess(cur.executeQuery(),1);
-console.log();
+console.log("\n");
 
 console.log("FIELDS: ");
 checkSuccess(cur.getField(0,0),"1");
 checkSuccess(cur.getField(0,1),"2");
 checkSuccess(cur.getField(0,2),"3");
-console.log();
+console.log("\n");
 
 console.log("ARRAY SUBSTITUTIONS: ");
 cur.prepareQuery("select '$(var1)','$(var2)','$(var3)'");
 cur.substitutions(subvars,subvalstrings);
 checkSuccess(cur.executeQuery(),1);
-console.log();
+console.log("\n");
 
 console.log("FIELDS: ");
 checkSuccess(cur.getField(0,0),"hi");
 checkSuccess(cur.getField(0,1),"hello");
 checkSuccess(cur.getField(0,2),"bye");
-console.log();
+console.log("\n");
 
 console.log("ARRAY SUBSTITUTIONS: ");
 cur.prepareQuery("select $(var1),$(var2),$(var3)");
 cur.substitutions(subvars,subvaldoubles,precs,scales);
 checkSuccess(cur.executeQuery(),1);
-console.log();
+console.log("\n");
 
 console.log("FIELDS: ");
 checkSuccess(cur.getField(0,0),"10.55");
 checkSuccess(cur.getField(0,1),"10.556");
 checkSuccess(cur.getField(0,2),"10.5556");
-console.log();*/
+console.log("\n");*/
 
 console.log("nullS as Nulls: ");
 cur.getNullsAsNulls();
@@ -604,7 +605,7 @@ checkSuccess(cur.getField(0,0),"");
 checkSuccess(cur.getField(0,1),"1");
 checkSuccess(cur.getField(0,2),"");
 cur.getNullsAsNulls();
-console.log();
+console.log("\n");
 
 console.log("RESULT SET BUFFER SIZE: ");
 checkSuccess(cur.getResultSetBufferSize(),0);
@@ -633,7 +634,7 @@ console.log();
 checkSuccess(cur.firstRowIndex(),8);
 checkSuccess(cur.endOfResultSet(),1);
 checkSuccess(cur.rowCount(),8);
-console.log();
+console.log("\n");
 
 console.log("DONT GET COLUMN INFO: ");
 cur.dontGetColumnInfo();
@@ -647,7 +648,7 @@ checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1);
 checkSuccess(cur.getColumnName(0),"testtinyint");
 checkSuccess(cur.getColumnLength(0),1);
 checkSuccess(cur.getColumnType(0),"TINYINT");
-console.log();
+console.log("\n");
 
 console.log("SUSPENDED SESSION: ");
 checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1);
@@ -697,7 +698,7 @@ checkSuccess(cur.getField(4,0),"5");
 checkSuccess(cur.getField(5,0),"6");
 checkSuccess(cur.getField(6,0),"7");
 checkSuccess(cur.getField(7,0),"8");
-console.log();
+console.log("\n");
 
 console.log("SUSPENDED RESULT SET: ");
 cur.setResultSetBufferSize(2);
@@ -725,7 +726,7 @@ checkSuccess(cur.firstRowIndex(),8);
 checkSuccess(cur.endOfResultSet(),1);
 checkSuccess(cur.rowCount(),8);
 cur.setResultSetBufferSize(0);
-console.log();
+console.log("\n");
 
 console.log("CACHED RESULT SET: ");
 cur.cacheToFile("cachefile1");
@@ -736,11 +737,11 @@ checkSuccess(filename,"cachefile1");
 cur.cacheOff();
 checkSuccess(cur.openCachedResultSet(filename),1);
 checkSuccess(cur.getField(7,0),"8");
-console.log();
+console.log("\n");
 
 console.log("COLUMN COUNT FOR CACHED RESULT SET: ");
 checkSuccess(cur.colCount(),19);
-console.log();
+console.log("\n");
 
 console.log("COLUMN NAMES FOR CACHED RESULT SET: ");
 checkSuccess(cur.getColumnName(0),"testtinyint");
@@ -780,7 +781,7 @@ checkSuccess(cols[14],"testvarchar");
 checkSuccess(cols[15],"testtinytext");
 checkSuccess(cols[16],"testmediumtext");
 checkSuccess(cols[17],"testlongtext");*/
-console.log();
+console.log("\n");
 
 console.log("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: ");
 cur.setResultSetBufferSize(2);
@@ -794,7 +795,7 @@ checkSuccess(cur.openCachedResultSet(filename),1);
 checkSuccess(cur.getField(7,0),"8");
 checkSuccess(cur.getField(8,0),null);
 cur.setResultSetBufferSize(0);
-console.log();
+console.log("\n");
 
 console.log("FROM ONE CACHE FILE TO ANOTHER: ");
 cur.cacheToFile("cachefile2");
@@ -803,7 +804,7 @@ cur.cacheOff();
 checkSuccess(cur.openCachedResultSet("cachefile2"),1);
 checkSuccess(cur.getField(7,0),"8");
 checkSuccess(cur.getField(8,0),null);
-console.log();
+console.log("\n");
 
 console.log("FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: ");
 cur.setResultSetBufferSize(2);
@@ -814,7 +815,7 @@ checkSuccess(cur.openCachedResultSet("cachefile2"),1);
 checkSuccess(cur.getField(7,0),"8");
 checkSuccess(cur.getField(8,0),null);
 cur.setResultSetBufferSize(0);
-console.log();
+console.log("\n");
 
 console.log("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: ");
 cur.setResultSetBufferSize(2);
@@ -852,7 +853,7 @@ checkSuccess(cur.openCachedResultSet(filename),1);
 checkSuccess(cur.getField(7,0),"8");
 checkSuccess(cur.getField(8,0),null);
 cur.setResultSetBufferSize(0);
-console.log();
+console.log("\n");
 
 console.log("COMMIT AND ROLLBACK: ");
 // Note: Mysql's default isolation level is repeatable-read,
@@ -873,7 +874,7 @@ checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 checkSuccess(secondcur.getField(0,0),"9");
 checkSuccess(con.autoCommitOff(),1);
 secondcon.commit();
-console.log();
+console.log("\n");
 
 console.log("FINISHED SUSPENDED SESSION: ");
 checkSuccess(cur.sendQuery("select * from testtable order by testint"),1);
@@ -892,7 +893,7 @@ checkSuccess(cur.getField(4,0),null);
 checkSuccess(cur.getField(5,0),null);
 checkSuccess(cur.getField(6,0),null);
 checkSuccess(cur.getField(7,0),null);
-console.log();
+console.log("\n");
 
 // drop existing table
 cur.sendQuery("drop table testtable");
@@ -913,4 +914,4 @@ checkSuccess(cur.sendQuery("create table testtable"),0);
 checkSuccess(cur.sendQuery("create table testtable"),0);
 checkSuccess(cur.sendQuery("create table testtable"),0);
 checkSuccess(cur.sendQuery("create table testtable"),0);
-console.log();
+console.log("\n");

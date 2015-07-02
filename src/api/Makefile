@@ -44,6 +44,9 @@ all-tcl:
 all-erlang:
 	cd erlang $(AND) $(MAKE) all
 
+all-nodejs:
+	cd nodejs $(AND) $(MAKE) all
+
 
 clean: $(APICLEANSUBDIRS)
 
@@ -88,6 +91,9 @@ clean-tcl:
 
 clean-erlang:
 	cd erlang $(AND) $(MAKE) clean
+
+clean-nodejs:
+	cd nodejs $(AND) $(MAKE) clean
 
 
 install: $(APIINSTALLSUBDIRS)
@@ -134,6 +140,9 @@ install-tcl:
 install-erlang:
 	cd erlang $(AND) $(MAKE) install
 
+install-nodejs:
+	cd nodejs $(AND) $(MAKE) install
+
 
 uninstall: $(APIUNINSTALLSUBDIRS)
 
@@ -178,3 +187,6 @@ uninstall-tcl:
 
 uninstall-erlang:
 	cd erlang $(AND) $(MAKE) uninstall
+
+uninstall-nodejs:
+	cd nodejs $(AND) $(MAKE) uninstall
