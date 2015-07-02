@@ -4,11 +4,11 @@
 			"target_name": "sqlrelay",
 			"sources": ["sqlrelay.cpp"],
 			"include_dirs": [
-				"../../../src/api/c++",
+				"@top_builddir@/src/api/c++",
 				"/usr/local/firstworks/include"
 			],
 			"ldflags" : [
-				"-L../../../src/c++/.libs",
+				"-L@top_builddir@/src/c++/.libs",
 				"-lsqlrclient",
 				"-L/usr/local/firstworks/lib",
 				"-lrudiments"
