@@ -14,7 +14,7 @@ build: binding.gyp sqlrelay.cpp
 	$(NODEGYP) configure build
 
 binding.gyp: binding_in.gyp
-	$(REPLACE) @top_builddir@ "$(top_builddir)" binding_in.gyp > binding.gyp
+	$(REPLACE) @TOP_BUILDDIR_ABS@ "$(TOP_BUILDDIR_ABS)" binding_in.gyp > binding.gyp
 
 install: $(INSTALLLIB)
 

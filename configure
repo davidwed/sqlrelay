@@ -638,6 +638,7 @@ STATICLINK
 SONAME_VERSION_INFO
 SQLR_VERSION
 RPM_BUILD_DIR
+TOP_BUILDDIR_ABS
 NODEJSDIR
 NODEGYP
 NODE
@@ -33827,6 +33828,9 @@ $as_echo "no" >&6; }
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
 $as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
 	fi
+
+	TOP_BUILDDIR_ABS=`pwd`
+
 
 
 
