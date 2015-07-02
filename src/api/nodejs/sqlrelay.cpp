@@ -20,7 +20,7 @@ using namespace node;
 	#define returnString(isolate,result) if (result) { args.GetReturnValue().Set(String::NewFromUtf8(isolate,result)); } else { args.GetReturnValue().Set(Null(isolate)); }
 	#define returnInteger(isolate,result) args.GetReturnValue().Set(Integer::New(isolate,result))
 	#define returnNumber(isolate,result) args.GetReturnValue().Set(Number::New(isolate,result))
-	#define returnArray(isolate,result) /* FIXME: implement this */
+	#define returnArray(isolate,result) /* FIXME: implement this */ args.GetReturnValue().Set(Null(isolate))
 	#define returnVoid(isolate)
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); return; }
 #else
@@ -31,11 +31,11 @@ using namespace node;
 	#define resetConstructor(constructor,isolate,tpl)
 	#define returnObject(object) return scope.Close(object)
 	#define returnBoolean(isolate,result) return scope.Close(Boolean::New(result))
-	#define returnString(isolate,result) if (result) { return scope.Close(String::NewFromUtf8(result)); } else { return scope.Close(Null()); }
+	#define returnString(isolate,result) if (result) { return scope.Close(String::New(result)); } else { return scope.Close(Null()); }
 	#define returnInteger(isolate,result) return scope.Close(Integer::New(result))
 	#define returnNumber(isolate,result) return scope.Close(Number::New(result))
-	#define returnArray(isolate,result) /* FIXME: implement this */ return scope.Close()
-	#define returnVoid(isolate) return scope.Close()
+	#define returnArray(isolate,result) /* FIXME: implement this */ return scope.Close(Null())
+	#define returnVoid(isolate) return scope.Close(Null())
 	#define scope(isolate) scope
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); returnBoolean(isolate,false); }
 	#define NewFromUtf8(isolate,str) New(str)
@@ -43,8 +43,8 @@ using namespace node;
 
 
 // convenience macros
-#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Wrong number of arguments")))
-#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Invalid argument type")))
+#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Wrong number of arguments")))
+#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Invalid argument type")))
 #define argToString(arg) *(String::Utf8Value(arg))
 
 
