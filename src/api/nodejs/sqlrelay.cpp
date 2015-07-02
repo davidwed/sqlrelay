@@ -19,6 +19,8 @@ using namespace node;
 	#define returnBoolean(isolate,result) args.GetReturnValue().Set(Boolean::New(isolate,result))
 	#define returnString(isolate,result) args.GetReturnValue().Set(String::NewFromUtf8(isolate,result))
 	#define returnInteger(isolate,result) args.GetReturnValue().Set(Integer::New(isolate,result))
+	#define returnNumber(isolate,result) args.GetReturnValue().Set(Number::New(isolate,result))
+	#define returnArray(isolate,result) /* FIXME: implement this */
 	#define returnVoid(isolate)
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); return; }
 #else
@@ -31,6 +33,8 @@ using namespace node;
 	#define returnBoolean(isolate,result) return scope.Close(Boolean::New(result))
 	#define returnString(isolate,result) return scope.Close(String::NewFromUtf8(result))
 	#define returnInteger(isolate,result) return scope.Close(Integer::New(result))
+	#define returnNumber(isolate,result) return scope.Close(Number::New(result))
+	#define returnArray(isolate,result) /* FIXME: implement this */ return scope.Close()
 	#define returnVoid(isolate) return scope.Close()
 	#define scope(isolate) scope
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); returnBoolean(isolate,false); }
@@ -105,7 +109,89 @@ class SQLRCursor : public ObjectWrap {
 		explicit	SQLRCursor();
 				~SQLRCursor();
 		static RET	New(const ARGS &args);
+
+		static RET	setResultSetBufferSize(const ARGS &args);
+		static RET	getResultSetBufferSize(const ARGS &args);
+		static RET	dontGetColumnInfo(const ARGS &args);
+		static RET	getColumnInfo(const ARGS &args);
+		static RET	mixedCaseColumnNames(const ARGS &args);
+		static RET	upperCaseColumnNames(const ARGS &args);
+		static RET	lowerCaseColumnNames(const ARGS &args);
+		static RET	cacheToFile(const ARGS &args);
+		static RET	setCacheTtl(const ARGS &args);
+		static RET	getCacheFileName(const ARGS &args);
+		static RET	cacheOff(const ARGS &args);
+		static RET	getDatabaseList(const ARGS &args);
+		static RET	getTableList(const ARGS &args);
+		static RET	getColumnList(const ARGS &args);
 		static RET	sendQuery(const ARGS &args);
+		static RET	sendFileQuery(const ARGS &args);
+		static RET	prepareQuery(const ARGS &args);
+		static RET	prepareFileQuery(const ARGS &args);
+		static RET	substitution(const ARGS &args);
+		static RET	substitutions(const ARGS &args);
+		static RET	inputBind(const ARGS &args);
+		static RET	inputBindBlob(const ARGS &args);
+		static RET	inputBindClob(const ARGS &args);
+		static RET	inputBinds(const ARGS &args);
+		static RET	defineOutputBindString(const ARGS &args);
+		static RET	defineOutputBindInteger(const ARGS &args);
+		static RET	defineOutputBindDouble(const ARGS &args);
+		static RET	defineOutputBindDate(const ARGS &args);
+		static RET	defineOutputBindBlob(const ARGS &args);
+		static RET	defineOutputBindClob(const ARGS &args);
+		static RET	defineOutputBindCursor(const ARGS &args);
+		static RET	clearBinds(const ARGS &args);
+		static RET	countBindVariables(const ARGS &args);
+		static RET	validateBinds(const ARGS &args);
+		static RET	validBind(const ARGS &args);
+		static RET	executeQuery(const ARGS &args);
+		static RET	fetchFromBindCursor(const ARGS &args);
+		static RET	getOutputBindString(const ARGS &args);
+		static RET	getOutputBindInteger(const ARGS &args);
+		static RET	getOutputBindDouble(const ARGS &args);
+		static RET	getOutputBindDate(const ARGS &args);
+		static RET	getOutputBindBlob(const ARGS &args);
+		static RET	getOutputBindClob(const ARGS &args);
+		static RET	getOutputBindLength(const ARGS &args);
+		static RET	getOutputBindCursor(const ARGS &args);
+		static RET	openCachedResultSet(const ARGS &args);
+		static RET	colCount(const ARGS &args);
+		static RET	rowCount(const ARGS &args);
+		static RET	totalRows(const ARGS &args);
+		static RET	affectedRows(const ARGS &args);
+		static RET	firstRowIndex(const ARGS &args);
+		static RET	endOfResultSet(const ARGS &args);
+		static RET	errorMessage(const ARGS &args);
+		static RET	errorNumber(const ARGS &args);
+		static RET	getNullsAsEmptyStrings(const ARGS &args);
+		static RET	getNullsAsNulls(const ARGS &args);
+		static RET	getField(const ARGS &args);
+		static RET	getFieldAsInteger(const ARGS &args);
+		static RET	getFieldAsDouble(const ARGS &args);
+		static RET	getFieldLength(const ARGS &args);
+		static RET	getRow(const ARGS &args);
+		static RET	getRowLengths(const ARGS &args);
+		static RET	getColumnNames(const ARGS &args);
+		static RET	getColumnName(const ARGS &args);
+		static RET	getColumnType(const ARGS &args);
+		static RET	getColumnLength(const ARGS &args);
+		static RET	getColumnPrecision(const ARGS &args);
+		static RET	getColumnScale(const ARGS &args);
+		static RET	getColumnIsNullable(const ARGS &args);
+		static RET	getColumnIsPrimaryKey(const ARGS &args);
+		static RET	getColumnIsUnique(const ARGS &args);
+		static RET	getColumnIsPartOfKey(const ARGS &args);
+		static RET	getColumnIsUnsigned(const ARGS &args);
+		static RET	getColumnIsZeroFilled(const ARGS &args);
+		static RET	getColumnIsBinary(const ARGS &args);
+		static RET	getColumnIsAutoIncrement(const ARGS &args);
+		static RET	getLongest(const ARGS &args);
+		static RET	suspendResultSet(const ARGS &args);
+		static RET	getResultSetId(const ARGS &args);
+		static RET	resumeResultSet(const ARGS &args);
+		static RET	resumeCachedResultSet(const ARGS &args);
+		static RET	closeResultSet(const ARGS &args);
 
 		static Persistent<Function>	constructor;
 
@@ -208,7 +294,7 @@ RET SQLRConnection::setConnectTimeout(const ARGS &args) {
 	Isolate		*isolate=Isolate::GetCurrent();
 	HandleScope	scope(isolate);
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,isolate,2);
 
 	sqlrcon(args)->setConnectTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
@@ -221,7 +307,7 @@ RET SQLRConnection::setAuthenticationTimeout(const ARGS &args) {
 	Isolate		*isolate=Isolate::GetCurrent();
 	HandleScope	scope(isolate);
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,isolate,2);
 
 	sqlrcon(args)->setAuthenticationTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
@@ -234,7 +320,7 @@ RET SQLRConnection::setResponseTimeout(const ARGS &args) {
 	Isolate		*isolate=Isolate::GetCurrent();
 	HandleScope	scope(isolate);
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,isolate,2);
 
 	sqlrcon(args)->setResponseTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
@@ -295,7 +381,7 @@ RET SQLRConnection::resumeSession(const ARGS &args) {
 	Isolate		*isolate=Isolate::GetCurrent();
 	HandleScope	scope(isolate);
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,isolate,2);
 
 	bool	result=sqlrcon(args)->resumeSession(args[0]->Int32Value(),
 							argToString(args[1]));
@@ -404,7 +490,7 @@ RET SQLRConnection::selectDatabase(const ARGS &args) {
 	Isolate		*isolate=Isolate::GetCurrent();
 	HandleScope	scope(isolate);
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,isolate,1);
 
 	bool	result=sqlrcon(args)->selectDatabase(argToString(args[0]));
 
@@ -560,7 +646,7 @@ RET SQLRConnection::setDebugFile(const ARGS &args) {
 	Isolate		*isolate=Isolate::GetCurrent();
 	HandleScope	scope(isolate);
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,isolate,1);
 
 	sqlrcon(args)->setDebugFile(argToString(args[0]));
 
@@ -572,7 +658,7 @@ RET SQLRConnection::setClientInfo(const ARGS &args) {
 	Isolate		*isolate=Isolate::GetCurrent();
 	HandleScope	scope(isolate);
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,isolate,1);
 
 	sqlrcon(args)->setClientInfo(argToString(args[0]));
 
@@ -607,7 +693,117 @@ void SQLRCursor::Init(Handle<Object> exports) {
 	// internal field count is the number of non-static member variables
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+	NODE_SET_PROTOTYPE_METHOD(tpl,"setResultSetBufferSize",
+						setResultSetBufferSize);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getResultSetBufferSize",
+						getResultSetBufferSize);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"dontGetColumnInfo",dontGetColumnInfo);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnInfo",getColumnInfo);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"mixedCaseColumnNames",
+						mixedCaseColumnNames);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"upperCaseColumnNames",
+						upperCaseColumnNames);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"lowerCaseColumnNames",
+						lowerCaseColumnNames);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"cacheToFile",cacheToFile);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"setCacheTtl",setCacheTtl);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getCacheFileName",getCacheFileName);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"cacheOff",cacheOff);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getDatabaseList",getDatabaseList);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getTableList",getTableList);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnList",getColumnList);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"sendQuery",sendQuery);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"sendFileQuery",sendFileQuery);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"prepareQuery",prepareQuery);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"prepareFileQuery",prepareFileQuery);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"substitution",substitution);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"substitutions",substitutions);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"inputBind",inputBind);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"inputBindBlob",inputBindBlob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"inputBindClob",inputBindClob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"inputBinds",inputBinds);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"defineOutputBindString",
+						defineOutputBindString);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"defineOutputBindInteger",
+						defineOutputBindInteger);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"defineOutputBindDouble",
+						defineOutputBindDouble);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"defineOutputBindDate",
+						defineOutputBindDate);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"defineOutputBindBlob",
+						defineOutputBindBlob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"defineOutputBindClob",
+						defineOutputBindClob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"defineOutputBindCursor",
+						defineOutputBindCursor);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"clearBinds",clearBinds);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"countBindVariables",countBindVariables);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"validateBinds",validateBinds);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"validBind",validBind);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"executeQuery",executeQuery);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"fetchFromBindCursor",
+						fetchFromBindCursor);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindString",
+						getOutputBindString);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindInteger",
+						getOutputBindInteger);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindDouble",
+						getOutputBindDouble);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindDate",getOutputBindDate);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindBlob",getOutputBindBlob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindClob",getOutputBindClob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindLength",
+						getOutputBindLength);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindCursor",
+						getOutputBindCursor);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"openCachedResultSet",
+						openCachedResultSet);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"colCount",colCount);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"rowCount",rowCount);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"totalRows",totalRows);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"affectedRows",affectedRows);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"firstRowIndex",firstRowIndex);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"endOfResultSet",endOfResultSet);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"errorMessage",errorMessage);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"errorNumber",errorNumber);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getNullsAsEmptyStrings",
+						getNullsAsEmptyStrings);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getNullsAsNulls",getNullsAsNulls);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getField",getField);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getFieldAsInteger",getFieldAsInteger);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getFieldAsDouble",getFieldAsDouble);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getFieldLength",getFieldLength);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getRow",getRow);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getRowLengths",getRowLengths);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnNames",getColumnNames);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnName",getColumnName);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnType",getColumnType);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnLength",getColumnLength);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnPrecision",getColumnPrecision);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnScale",getColumnScale);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsNullable",
+						getColumnIsNullable);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsPrimaryKey",
+						getColumnIsPrimaryKey);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsUnique",
+						getColumnIsUnique);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsPartOfKey",
+						getColumnIsPartOfKey);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsUnsigned",
+						getColumnIsUnsigned);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsZeroFilled",
+						getColumnIsZeroFilled);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsBinary",
+						getColumnIsBinary);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getColumnIsAutoIncrement",
+						getColumnIsAutoIncrement);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getLongest",getLongest);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"suspendResultSet",suspendResultSet);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getResultSetId",getResultSetId);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"resumeResultSet",resumeResultSet);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"resumeCachedResultSet",
+						resumeCachedResultSet);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"closeResultSet",closeResultSet);
 
 	resetConstructor(constructor,isolate,tpl);
 	exports->Set(String::NewFromUtf8(isolate,"SQLRCursor"),
@@ -646,6 +842,175 @@ RET SQLRCursor::New(const ARGS &args) {
 	}
 }
 
+RET SQLRCursor::setResultSetBufferSize(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->setResultSetBufferSize(args[0]->Uint32Value());
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getResultSetBufferSize(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint64_t	result=sqlrcur(args)->getResultSetBufferSize();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::dontGetColumnInfo(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->dontGetColumnInfo();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getColumnInfo(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->getColumnInfo();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::mixedCaseColumnNames(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->mixedCaseColumnNames();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::upperCaseColumnNames(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->upperCaseColumnNames();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::lowerCaseColumnNames(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->lowerCaseColumnNames();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::cacheToFile(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->cacheToFile(argToString(args[0]));
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::setCacheTtl(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->setCacheTtl(args[0]->Uint32Value());
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getCacheFileName(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	const char	*result=sqlrcur(args)->getCacheFileName();
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::cacheOff(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->cacheOff();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getDatabaseList(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getDatabaseList(argToString(args[0]));
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getTableList(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getTableList(argToString(args[0]));
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnList(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	bool	result=sqlrcur(args)->getColumnList(argToString(args[0]),
+							argToString(args[1]));
+
+	returnBoolean(isolate,result);
+}
+
 RET SQLRCursor::sendQuery(const ARGS &args) {
 
 	Isolate		*isolate=Isolate::GetCurrent();
@@ -655,7 +1020,992 @@ RET SQLRCursor::sendQuery(const ARGS &args) {
 
 	bool	result=sqlrcur(args)->sendQuery(argToString(args[0]));
 
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->sendQuery(argToString(args[0]),
+						args[1]->Uint32Value());*/
+
 	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::sendFileQuery(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	bool	result=sqlrcur(args)->sendFileQuery(argToString(args[0]),
+							argToString(args[1]));
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::prepareQuery(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->prepareQuery(argToString(args[0]));
+
+	// FIXME: support both
+	/*sqlrcur(args)->prepareQuery(argToString(args[0]),
+						args[1]->Uint32Value());*/
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::prepareFileQuery(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	bool	result=sqlrcur(args)->prepareFileQuery(argToString(args[0]),
+							argToString(args[1]));
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::substitution(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	sqlrcur(args)->substitution(argToString(args[0]),
+					argToString(args[1]));
+
+	// FIXME: support all of these
+	/*sqlrcur(args)->substitution(argToString(args[0]),
+					args[1]->Int32Value());
+	sqlrcur(args)->substitution(argToString(args[0]),
+					args[1]->NumberValue(),
+					args[2]->Uint32Value(),
+					args[3]->Uint32Value());*/
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::substitutions(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	// FIXME: array parameters...
+	/*sqlrcur(args)->substitutions(const char **variables,
+						const char **values);
+	sqlrcur(args)->substitutions(const char **variables,
+						const int64_t *values);
+	sqlrcur(args)->substitutions(const char **variables,
+						const double *values,
+						const uint32_t *precisions,
+						const uint32_t *scales);*/
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::inputBind(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	sqlrcur(args)->inputBind(argToString(args[0]),
+					argToString(args[1]));
+
+	// FIXME: support all of these
+	/*sqlrcur(args)->inputBind(argToString(args[0]),
+					argToString(args[1]),
+					args[2]->Uint32Value());
+	sqlrcur(args)->inputBind(argToString(args[0]),
+					args[1]->Int32Value());
+	sqlrcur(args)->inputBind(argToString(args[0]),
+					args[1]->NumberValue(),
+					args[2]->Uint32Value(),
+					args[3]->Uint32Value());
+	sqlrcur(args)->inputBind(argToString(args[0]),
+					args[1]->Int32Value(),
+					args[2]->Int32Value(),
+					args[3]->Int32Value(),
+					args[4]->Int32Value(),
+					args[5]->Int32Value(),
+					args[6]->Int32Value(),
+					args[7]->Int32Value(),
+					argToString(args[8]));*/
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::inputBindBlob(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,3);
+
+	sqlrcur(args)->inputBindBlob(argToString(args[0]),
+					argToString(args[1]),
+					args[2]->Uint32Value());
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::inputBindClob(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,3);
+
+	sqlrcur(args)->inputBindClob(argToString(args[0]),
+					argToString(args[1]),
+					args[2]->Uint32Value());
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::inputBinds(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	// FIXME: array parameters...
+	/*sqlrcur(args)->inputBinds(const char **variables,
+ 					const char **values);
+	sqlrcur(args)->inputBinds(const char **variables,
+					const int64_t *values);
+	sqlrcur(args)->inputBinds(const char **variables,
+					const double *values,
+					const uint32_t *precisions,
+					const uint32_t *scales);*/
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::defineOutputBindString(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	sqlrcur(args)->defineOutputBindString(argToString(args[0]),
+						args[1]->Uint32Value());
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::defineOutputBindInteger(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->defineOutputBindInteger(argToString(args[0]));
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::defineOutputBindDouble(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->defineOutputBindDouble(argToString(args[0]));
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::defineOutputBindDate(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->defineOutputBindDate(argToString(args[0]));
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::defineOutputBindBlob(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->defineOutputBindBlob(argToString(args[0]));
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::defineOutputBindClob(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->defineOutputBindClob(argToString(args[0]));
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::defineOutputBindCursor(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	sqlrcur(args)->defineOutputBindCursor(argToString(args[0]));
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::clearBinds(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->clearBinds();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::countBindVariables(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint16_t	result=sqlrcur(args)->countBindVariables();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::validateBinds(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->validateBinds();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::validBind(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->validBind(argToString(args[0]));
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::executeQuery(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	bool	result=sqlrcur(args)->executeQuery();
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::fetchFromBindCursor(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	bool	result=sqlrcur(args)->fetchFromBindCursor();
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getOutputBindString(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	const char	*result=sqlrcur(args)->getOutputBindString(
+						argToString(args[0]));
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::getOutputBindInteger(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	int64_t	result=sqlrcur(args)->getOutputBindInteger(
+						argToString(args[0]));
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getOutputBindDouble(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	double	result=sqlrcur(args)->getOutputBindDouble(
+						argToString(args[0]));
+
+	returnNumber(isolate,result);
+}
+
+RET SQLRCursor::getOutputBindDate(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	// FIXME: out parameters
+	/*bool	result=sqlrcur(args)->getOutputBindDate(const char *variable,
+							int16_t *year,
+							int16_t *month,
+							int16_t *day,
+							int16_t *hour,
+							int16_t *minute,
+							int16_t *second,
+							int32_t *microsecond,
+							const char **tz);
+	returnBoolean(isolate,result);*/
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getOutputBindBlob(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	const char	*result=sqlrcur(args)->getOutputBindBlob(
+						argToString(args[0]));
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::getOutputBindClob(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	const char	*result=sqlrcur(args)->getOutputBindClob(
+						argToString(args[0]));
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::getOutputBindLength(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	uint32_t	result=sqlrcur(args)->getOutputBindLength(
+						argToString(args[0]));
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getOutputBindCursor(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	// FIXME: support this...
+	/*sqlrcursor	*result=sqlrcur(args)->getOutputBindCursor(
+						argToString(args[0]));
+	returnObject(result);*/
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::openCachedResultSet(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->openCachedResultSet(
+						argToString(args[0]));
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::colCount(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint32_t	result=sqlrcur(args)->colCount();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::rowCount(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint64_t	result=sqlrcur(args)->rowCount();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::totalRows(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint64_t	result=sqlrcur(args)->totalRows();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::affectedRows(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint64_t	result=sqlrcur(args)->affectedRows();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::firstRowIndex(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint64_t	result=sqlrcur(args)->firstRowIndex();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::endOfResultSet(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	bool	result=sqlrcur(args)->endOfResultSet();
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::errorMessage(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	const char	*result=sqlrcur(args)->errorMessage();
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::errorNumber(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	int64_t	result=sqlrcur(args)->errorNumber();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getNullsAsEmptyStrings(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->getNullsAsEmptyStrings();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getNullsAsNulls(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->getNullsAsNulls();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getField(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	const char	*result=sqlrcur(args)->getField(
+						args[0]->Uint32Value(),
+						args[1]->Uint32Value());
+
+	// FIXME: support both
+	/*const char	*result=sqlrcur(args)->getField(
+						args[0]->Uint32Value(),
+						argToString(args[1]));*/
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::getFieldAsInteger(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	int64_t	result=sqlrcur(args)->getFieldAsInteger(
+						args[0]->Uint32Value(),
+						args[1]->Uint32Value());
+
+	// FIXME: support both
+	/*int64_t	result=sqlrcur(args)->getFieldAsInteger(
+						args[0]->Uint32Value(),
+						argToString(args[1]));*/
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getFieldAsDouble(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	double	result=sqlrcur(args)->getFieldAsDouble(
+						args[0]->Uint32Value(),
+						args[1]->Uint32Value());
+
+	// FIXME: support both
+	/*double	result=sqlrcur(args)->getFieldAsDouble(
+						args[0]->Uint32Value(),
+						argToString(args[1]));*/
+
+	returnNumber(isolate,result);
+}
+
+RET SQLRCursor::getFieldLength(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	uint32_t	result=sqlrcur(args)->getFieldLength(
+						args[0]->Uint32Value(),
+						args[1]->Uint32Value());
+
+	// FIXME: support both
+	/*uint32_t	result=sqlrcur(args)->getFieldLength(
+						args[0]->Uint32Value(),
+						argToString(args[1]));*/
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getRow(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	// FIXME: return array...
+	/*const char * const *result=sqlrcur(args)->getRow(
+						args[0]->Uint32Value());*/
+
+	returnArray(args,result);
+}
+
+RET SQLRCursor::getRowLengths(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	// FIXME: return array...
+	/*uint32_t	*result=sqlrcur(args)->getRowLengths(
+						args[0]->Uint32Value());*/
+
+	returnArray(isolate,result);
+}
+
+RET SQLRCursor::getColumnNames(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	// FIXME: return array...
+	//const char * const *result=sqlrcur(args)->getColumnNames();
+
+	returnArray(args,result);
+}
+
+RET SQLRCursor::getColumnName(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	const char	*result=sqlrcur(args)->getColumnName(
+						args[0]->Uint32Value());
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::getColumnType(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	const char	*result=sqlrcur(args)->getColumnType(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*const char	*result=sqlrcur(args)->getColumnType(
+						argToString(args[0]));*/
+
+	returnString(isolate,result);
+}
+
+RET SQLRCursor::getColumnLength(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	uint32_t	result=sqlrcur(args)->getColumnLength(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*uint32_t	result=sqlrcur(args)->getColumnLength(
+						argToString(args[0]));*/
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getColumnPrecision(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	uint32_t	result=sqlrcur(args)->getColumnPrecision(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*uint32_t	result=sqlrcur(args)->getColumnPrecision(
+						argToString(args[0]));*/
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getColumnScale(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	uint32_t	result=sqlrcur(args)->getColumnScale(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*uint32_t	result=sqlrcur(args)->getColumnScale(
+						argToString(args[0]));*/
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsNullable(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsNullable(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsNullable(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsPrimaryKey(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsPrimaryKey(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsPrimaryKey(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsUnique(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsUnique(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsUnique(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsPartOfKey(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsPartOfKey(
+						args[0]->Uint32Value());
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsPartOfKey(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsUnsigned(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsUnsigned(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsUnsigned(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsZeroFilled(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsZeroFilled(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsZeroFilled(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsBinary(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsBinary(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsBinary(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getColumnIsAutoIncrement(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->getColumnIsAutoIncrement(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*bool	result=sqlrcur(args)->getColumnIsAutoIncrement(
+						argToString(args[0]));*/
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::getLongest(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	uint32_t	result=sqlrcur(args)->getLongest(
+						args[0]->Uint32Value());
+
+	// FIXME: support both
+	/*uint32_t	result=sqlrcur(args)->getLongest(
+						argToString(args[0]));*/
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::suspendResultSet(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->suspendResultSet();
+
+	returnVoid(isolate);
+}
+
+RET SQLRCursor::getResultSetId(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	uint16_t	result=sqlrcur(args)->getResultSetId();
+
+	returnInteger(isolate,result);
+}
+
+RET SQLRCursor::resumeResultSet(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,1);
+
+	bool	result=sqlrcur(args)->resumeResultSet(args[0]->Uint32Value());
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::resumeCachedResultSet(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,2);
+
+	bool	result=sqlrcur(args)->resumeCachedResultSet(
+						args[0]->Uint32Value(),
+						argToString(args[1]));
+
+	returnBoolean(isolate,result);
+}
+
+RET SQLRCursor::closeResultSet(const ARGS &args) {
+
+	Isolate		*isolate=Isolate::GetCurrent();
+	HandleScope	scope(isolate);
+
+	checkArgCount(args,isolate,0);
+
+	sqlrcur(args)->closeResultSet();
+
+	returnVoid(isolate);
 }
 
 sqlrcursor *SQLRCursor::sqlrcur(const ARGS &args) {
