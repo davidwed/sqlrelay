@@ -11,7 +11,7 @@ clean:
 	$(NODEGYP) clean
 
 build: binding.gyp sqlrelay.cpp
-	$(NODEGYP) configure build
+	$(NODEGYP) -v configure build
 
 binding.gyp: binding_in.gyp
 	$(REPLACE) @TOP_BUILDDIR_ABS@ "$(TOP_BUILDDIR_ABS)" binding_in.gyp > binding.gyp
