@@ -1,0 +1,11 @@
+{
+	"name" : "sqlrelay",
+	"version" : "@SQLR_VERSION@.0",
+	"main" : "build/Release/sqlrelay.node",
+	"description" : "SQL Relay module for node.js",
+	"homepage" : "http://sqlrelay.sourceforge.net",
+	"author" : {
+		"name" : "David Muse",
+		"email" : "david.muse@firstworks.com"
+	}
+}
