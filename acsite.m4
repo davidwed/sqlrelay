@@ -3640,7 +3640,7 @@ then
 
 		NODE=""
 		NODEGYP=""
-		NODEJSDIR=""
+		NODEDIR=""
 		AC_MSG_CHECKING(for node and node-gyp)
 
 		for path in "$NODEJSPATH" "/" "/usr" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
@@ -3662,7 +3662,7 @@ then
 
 			if ( test -n "$NODE" -a -n "$NODEGYP" )
 			then
-				NODEJSDIR="$path"
+				NODEDIR="$path"
 				break;
 			fi
 		done
@@ -3688,8 +3688,16 @@ then
 	if ( test -r "$NODE" -a -r "$NODEGYP" )
 	then
 		HAVE_NODEJS="yes"
+
+		AC_MSG_CHECKING(for node module directory)
+		NODEMODULEDIR=$NODEDIR/lib/node_modules
+		if ( test -d "$NODEDIR/lib/nodejs" )
+		then
+			NODEMODULEDIR=$NODEDIR/lib/nodejs
+		fi
+		AC_MSG_RESULT($NODEMODULEDIR)
 	else
-		AC_MSG_WARN(The Mono API will not be built.)
+		AC_MSG_WARN(The node.js API will not be built.)
 	fi
 
 	TOP_BUILDDIR_ABS=`pwd`
@@ -3697,7 +3705,7 @@ then
 	AC_SUBST(HAVE_NODEJS)
 	AC_SUBST(NODE)
 	AC_SUBST(NODEGYP)
-	AC_SUBST(NODEJSDIR)
+	AC_SUBST(NODEMODULEDIR)
 	AC_SUBST(TOP_BUILDDIR_ABS)
 fi
 ])

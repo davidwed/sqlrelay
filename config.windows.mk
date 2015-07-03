@@ -249,6 +249,13 @@ ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclientwrapper.lib libsqlrclient.lib $(RUDIMENTSLIBS)
 
+# node.js
+NODE = @NODE@
+NODEGYP = @NODEGYP@
+NODEMODULEDIR = @NODEMODULEDIR@
+NODEJSCFLAGS = /I"@top_builddir@/src/api/c++" $(RUDIMENTSINCLUDES)
+NODEJSLIBS = /LIBPATH:"@top_builddir@/src/api/c++" libsqlrclient.lib $(RUDIMENTSLIBS)
+
 
 # readline
 READLINEINCLUDES =

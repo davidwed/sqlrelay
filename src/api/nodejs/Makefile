@@ -14,7 +14,9 @@ build: binding.gyp sqlrelay.cpp package.json
 	$(NODEGYP) -v configure build
 
 binding.gyp: binding_in.gyp
-	$(REPLACE) @TOP_BUILDDIR_ABS@ "$(TOP_BUILDDIR_ABS)" binding_in.gyp > binding.gyp
+	$(REPLACE) @NODEJSCFLAGS@ "$(NODEJSCFLAGS)" binding_in.gyp > temp.gyp
+	$(REPLACE) @NODEJSLIBS@ "$(NODEJSLIBS)" temp.gyp > binding.gyp
+	$(RM) temp.gyp
 
 package.json: package_in.json
 	$(REPLACE) @SQLR_VERSION@ "$(SQLR_VERSION)" package_in.json > package.json

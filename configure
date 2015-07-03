@@ -639,7 +639,7 @@ SONAME_VERSION_INFO
 SQLR_VERSION
 RPM_BUILD_DIR
 TOP_BUILDDIR_ABS
-NODEJSDIR
+NODEMODULEDIR
 NODEGYP
 NODE
 HAVE_NODEJS
@@ -33768,7 +33768,7 @@ then
 
 		NODE=""
 		NODEGYP=""
-		NODEJSDIR=""
+		NODEDIR=""
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node and node-gyp" >&5
 $as_echo_n "checking for node and node-gyp... " >&6; }
 
@@ -33791,7 +33791,7 @@ $as_echo_n "checking for node and node-gyp... " >&6; }
 
 			if ( test -n "$NODE" -a -n "$NODEGYP" )
 			then
-				NODEJSDIR="$path"
+				NODEDIR="$path"
 				break;
 			fi
 		done
@@ -33824,9 +33824,19 @@ $as_echo "no" >&6; }
 	if ( test -r "$NODE" -a -r "$NODEGYP" )
 	then
 		HAVE_NODEJS="yes"
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node module directory" >&5
+$as_echo_n "checking for node module directory... " >&6; }
+		NODEMODULEDIR=$NODEDIR/lib/node_modules
+		if ( test -d "$NODEDIR/lib/nodejs" )
+		then
+			NODEMODULEDIR=$NODEDIR/lib/nodejs
+		fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEMODULEDIR" >&5
+$as_echo "$NODEMODULEDIR" >&6; }
 	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Mono API will not be built." >&5
-$as_echo "$as_me: WARNING: The Mono API will not be built." >&2;}
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The node.js API will not be built." >&5
+$as_echo "$as_me: WARNING: The node.js API will not be built." >&2;}
 	fi
 
 	TOP_BUILDDIR_ABS=`pwd`

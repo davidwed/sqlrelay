@@ -1,7 +1,7 @@
 // Copyright (c) 2015  David Muse
 // See the file COPYING for more information.
 
-var	sqlrelay=require("../../src/api/nodejs/build/Release/sqlrelay");
+var	sqlrelay=require("sqlrelay");
 
 
 function checkSuccess(value,success) {
