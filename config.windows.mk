@@ -250,9 +250,9 @@ ERLANGCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) /I$(top_buildd
 ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclientwrapper.lib libsqlrclient.lib $(RUDIMENTSLIBS)
 
 # node.js
-NODE = @NODE@
-NODEGYP = @NODEGYP@
-NODEMODULEDIR = @NODEMODULEDIR@
+NODE = "@NODEJSPREFIX@\node.exe"
+NODEGYP = $(NODE) "@NODEJSPREFIX@\node_modules\npm\node_modules\node-gyp\bin\node-gyp.js"
+NODEMODULEDIR = @NODEJSPREFIX@\node_modules
 NODEJSCFLAGS = /I"@top_builddir@/src/api/c++" $(RUDIMENTSINCLUDES)
 NODEJSLIBS = /LIBPATH:"@top_builddir@/src/api/c++" libsqlrclient.lib $(RUDIMENTSLIBS)
 

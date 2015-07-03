@@ -16,6 +16,7 @@ disableruby=false
 disablejava=false
 disablephp=false
 disabletcl=false
+disablenodejs=false
 disablecs=false
 
 ORACLEPREFIX=""
@@ -33,6 +34,7 @@ RUBYVERSION=""
 JAVAPREFIX=""
 PHPPREFIX=""
 TCLPREFIX=""
+NODEJSPREFIX=""
 
 for i=0 to WScript.Arguments.Count-1
 
@@ -99,6 +101,10 @@ for i=0 to WScript.Arguments.Count-1
 		disabletcl=true
 	elseif mid(arg,1,13)="--tcl-prefix=" then
 		TCLPREFIX=mid(arg,14)
+	elseif arg="--disable-nodejs" then
+		disablenodejs=true
+	elseif mid(arg,1,16)="--nodejs-prefix=" then
+		NODEJSPREFIX=mid(arg,17)
 	elseif arg="--disable-cs" then
 		disablecs=true
 	end if
@@ -473,6 +479,18 @@ if disabletcl=false then
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-tcl"
 end if
 
+' node.js
+if NODEJSPREFIX="" then
+	NODEJSPREFIX="C:\Program Files\nodejs"
+end if
+if disablenodejs=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-nodejs"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-nodejs"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-nodejs"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-nodejs"
+end if
+
+
 
 ' input and output files
 infiles=Array(_
@@ -569,6 +587,9 @@ for i=lbound(infiles) to ubound(infiles)
 
 	' tcl
 	content=replace(content,"@TCLPREFIX@",TCLPREFIX,1,-1,0)
+
+	' nodejs
+	content=replace(content,"@NODEJSPREFIX@",NODEJSPREFIX,1,-1,0)
 
 	' connections
 	content=replace(content,"@ORACLEINCLUDES@",ORACLEINCLUDES,1,-1,0)
