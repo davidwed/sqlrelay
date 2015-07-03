@@ -4,19 +4,21 @@ include ../../../config.mk
 
 .SUFFIXES: .lo
 
-all: build
+all: build/Release/sqlrelay.node
 
 clean:
 	$(RM) binding.gyp package.json
 	$(NODEGYP) clean
+	$(RM) temp1.gyp temp2.gyp
 
-build: binding.gyp sqlrelay.cpp package.json
+build/Release/sqlrelay.node: binding.gyp sqlrelay.cpp package.json
 	$(NODEGYP) -v configure build
 
 binding.gyp: binding_in.gyp
-	$(REPLACE) @NODEJSCFLAGS@ "$(NODEJSCFLAGS)" binding_in.gyp > temp.gyp
-	$(REPLACE) @NODEJSLIBS@ "$(NODEJSLIBS)" temp.gyp > binding.gyp
-	$(RM) temp.gyp
+	$(REPLACE) @NODEJSINCLUDEDIRS@ "$(NODEJSINCLUDEDIRS)" binding_in.gyp > temp1.gyp
+	$(REPLACE) @NODEJSCFLAGS@ "$(NODEJSCFLAGS)" temp1.gyp > temp2.gyp
+	$(REPLACE) @NODEJSLIBS@ "$(NODEJSLIBS)" temp2.gyp > binding.gyp
+	$(RM) temp1.gyp temp2.gyp
 
 package.json: package_in.json
 	$(REPLACE) @SQLR_VERSION@ "$(SQLR_VERSION)" package_in.json > package.json

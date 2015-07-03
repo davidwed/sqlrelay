@@ -483,6 +483,20 @@ end if
 if NODEJSPREFIX="" then
 	NODEJSPREFIX="C:\Program Files\nodejs"
 end if
+NODEJSMSVSVERSION=2005
+if version=15 then
+	NODEJSMSVSVERSION=2008
+elseif version=16 then
+	NODEJSMSVSVERSION=2010
+elseif version=17 then
+	NODEJSMSVSVERSION=2012
+elseif version=18 then
+	NODEJSMSVSVERSION=2013
+elseif version=19 then
+	NODEJSMSVSVERSION=2015
+else
+	NODEJSMSVSVERSION=2000+version-4
+end if
 if disablenodejs=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-nodejs"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-nodejs"
@@ -590,6 +604,7 @@ for i=lbound(infiles) to ubound(infiles)
 
 	' nodejs
 	content=replace(content,"@NODEJSPREFIX@",NODEJSPREFIX,1,-1,0)
+	content=replace(content,"@NODEJSMSVSVERSION@",NODEJSMSVSVERSION,1,-1,0)
 
 	' connections
 	content=replace(content,"@ORACLEINCLUDES@",ORACLEINCLUDES,1,-1,0)

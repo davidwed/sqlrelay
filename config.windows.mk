@@ -249,12 +249,13 @@ ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclientwrapper.lib libsqlrclient.lib $(RUDIMENTSLIBS)
 
+
 # node.js
 NODE = "@NODEJSPREFIX@\node.exe"
-NODEGYP = $(NODE) "@NODEJSPREFIX@\node_modules\npm\node_modules\node-gyp\bin\node-gyp.js"
+NODEGYP = $(NODE) "@NODEJSPREFIX@\node_modules\npm\node_modules\node-gyp\bin\node-gyp.js" --msvs_version=@NODEJSMSVSVERSION@
 NODEMODULEDIR = @NODEJSPREFIX@\node_modules
-NODEJSCFLAGS = /I"@top_builddir@/src/api/c++" $(RUDIMENTSINCLUDES)
-NODEJSLIBS = /LIBPATH:"@top_builddir@/src/api/c++" libsqlrclient.lib $(RUDIMENTSLIBS)
+NODEJSINCLUDEDIRS = @top_builddir@\src\\api\c++;C:\Program Files\Firstworks\include
+NODEJSLIBS = @top_builddir@\src\\api\c++\libsqlrclient.lib;C:\Program Files\Firstworks\lib\librudiments.lib
 
 
 # readline
