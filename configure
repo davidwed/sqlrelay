@@ -33769,8 +33769,8 @@ then
 		NODE=""
 		NODEGYP=""
 		NODEDIR=""
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node and node-gyp" >&5
-$as_echo_n "checking for node and node-gyp... " >&6; }
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node" >&5
+$as_echo_n "checking for node... " >&6; }
 
 		for path in "$NODEJSPATH" "/" "/usr" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
 		do
@@ -33784,22 +33784,13 @@ $as_echo_n "checking for node and node-gyp... " >&6; }
 				NODE="$path/bin/nodejs"
 			fi
 
-			if ( test -r "$path/bin/node-gyp" )
-			then
-				NODEGYP="$path/bin/node-gyp"
-			fi
-
-			if ( test -n "$NODE" -a -n "$NODEGYP" )
+			if ( test -n "$NODE" )
 			then
 				NODEDIR="$path"
 				break;
 			fi
 		done
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
-$as_echo "" >&6; }
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node" >&5
-$as_echo_n "checking for node... " >&6; }
 		if ( test -r "$NODE" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODE" >&5
@@ -33808,20 +33799,9 @@ $as_echo "$NODE" >&6; }
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 		fi
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node-gyp" >&5
-$as_echo_n "checking for node-gyp... " >&6; }
-		if ( test -r "$NODEGYP" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEGYP" >&5
-$as_echo "$NODEGYP" >&6; }
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		fi
 	fi
 
-	if ( test -r "$NODE" -a -r "$NODEGYP" )
+	if ( test -r "$NODE" )
 	then
 		HAVE_NODEJS="yes"
 
@@ -33834,7 +33814,32 @@ $as_echo_n "checking for node module directory... " >&6; }
 		fi
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEMODULEDIR" >&5
 $as_echo "$NODEMODULEDIR" >&6; }
-	else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node-gyp" >&5
+$as_echo_n "checking for node-gyp... " >&6; }
+		if ( test -r "$NODEMODULEDIR" )
+		then
+			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js"
+			do
+				if ( test -r "$file" )
+				then
+					NODEGYP="$file"
+					break
+				fi
+			done
+		fi
+		if ( test -n "$NODEGYP" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEGYP" >&5
+$as_echo "$NODEGYP" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+	fi
+
+	if ( test -z "$NODE" -o -z "$NODEGYP" )
+	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The node.js API will not be built." >&5
 $as_echo "$as_me: WARNING: The node.js API will not be built." >&2;}
 	fi

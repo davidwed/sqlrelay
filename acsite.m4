@@ -3641,7 +3641,7 @@ then
 		NODE=""
 		NODEGYP=""
 		NODEDIR=""
-		AC_MSG_CHECKING(for node and node-gyp)
+		AC_MSG_CHECKING(for node)
 
 		for path in "$NODEJSPATH" "/" "/usr" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
 		do
@@ -3655,37 +3655,22 @@ then
 				NODE="$path/bin/nodejs"
 			fi
 
-			if ( test -r "$path/bin/node-gyp" )
-			then
-				NODEGYP="$path/bin/node-gyp"
-			fi
-
-			if ( test -n "$NODE" -a -n "$NODEGYP" )
+			if ( test -n "$NODE" )
 			then
 				NODEDIR="$path"
 				break;
 			fi
 		done
-		AC_MSG_RESULT()
 
-		AC_MSG_CHECKING(for node)
 		if ( test -r "$NODE" )
 		then
 			AC_MSG_RESULT($NODE)
 		else
 			AC_MSG_RESULT(no)
 		fi
-
-		AC_MSG_CHECKING(for node-gyp)
-		if ( test -r "$NODEGYP" )
-		then
-			AC_MSG_RESULT($NODEGYP)
-		else
-			AC_MSG_RESULT(no)
-		fi
 	fi
 
-	if ( test -r "$NODE" -a -r "$NODEGYP" )
+	if ( test -r "$NODE" )
 	then
 		HAVE_NODEJS="yes"
 
@@ -3696,7 +3681,29 @@ then
 			NODEMODULEDIR=$NODEDIR/lib/nodejs
 		fi
 		AC_MSG_RESULT($NODEMODULEDIR)
-	else
+
+		AC_MSG_CHECKING(for node-gyp)
+		if ( test -r "$NODEMODULEDIR" )
+		then
+			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" 
+			do
+				if ( test -r "$file" )
+				then
+					NODEGYP="$file"
+					break
+				fi
+			done
+		fi
+		if ( test -n "$NODEGYP" )
+		then
+			AC_MSG_RESULT($NODEGYP)
+		else
+			AC_MSG_RESULT(no)
+		fi
+	fi
+
+	if ( test -z "$NODE" -o -z "$NODEGYP" )
+	then
 		AC_MSG_WARN(The node.js API will not be built.)
 	fi
 
