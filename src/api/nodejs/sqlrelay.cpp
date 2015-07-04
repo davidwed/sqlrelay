@@ -76,9 +76,13 @@ using namespace node;
 #if NODE_MINOR_VERSION >= 12
 	#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
 	#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
+
+	#define toArray(arg) Array::Cast(*arg);
 #else
 	#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
 	#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
+
+	#define toArray(arg) Array::Cast(*arg);
 #endif
 
 
@@ -1138,8 +1142,8 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 
 		if (args[0]->IsArray() && args[1]->IsArray()) {
 			
-			Local<Array>	vars=Array::Cast(*args[0]);
-			Local<Array>	vals=Array::Cast(*args[1]);
+			Local<Array>	vars=toArray(args[0]);
+			Local<Array>	vals=toArray(args[1]);
 
 			if (vars->Length()) {
 
@@ -1190,10 +1194,10 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 		if (args[0]->IsArray() && args[1]->IsArray() &&
 			args[2]->IsArray() && args[3]->IsArray()) {
 			
-			Local<Array>	vars=Array::Cast(*args[0]);
-			Local<Array>	vals=Array::Cast(*args[1]);
-			Local<Array>	precs=Array::Cast(*args[2]);
-			Local<Array>	scales=Array::Cast(*args[3]);
+			Local<Array>	vars=toArray(args[0]);
+			Local<Array>	vals=toArray(args[1]);
+			Local<Array>	precs=toArray(args[2]);
+			Local<Array>	scales=toArray(args[3]);
 
 			if (vars->Length()) {
 
@@ -1330,8 +1334,8 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 
 		if (args[0]->IsArray() && args[1]->IsArray()) {
 			
-			Local<Array>	vars=Array::Cast(*args[0]);
-			Local<Array>	vals=Array::Cast(*args[1]);
+			Local<Array>	vars=toArray(args[0]);
+			Local<Array>	vals=toArray(args[1]);
 
 			if (vars->Length()) {
 
@@ -1382,10 +1386,10 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 		if (args[0]->IsArray() && args[1]->IsArray() &&
 			args[2]->IsArray() && args[3]->IsArray()) {
 			
-			Local<Array>	vars=Array::Cast(*args[0]);
-			Local<Array>	vals=Array::Cast(*args[1]);
-			Local<Array>	precs=Array::Cast(*args[2]);
-			Local<Array>	scales=Array::Cast(*args[3]);
+			Local<Array>	vars=toArray(args[0]);
+			Local<Array>	vals=toArray(args[1]);
+			Local<Array>	precs=toArray(args[2]);
+			Local<Array>	scales=toArray(args[3]);
 
 			if (vars->Length()) {
 
