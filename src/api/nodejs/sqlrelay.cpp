@@ -77,12 +77,13 @@ using namespace node;
 	#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
 	#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
 
-	#define toArray(arg) Array::Cast(*arg);
+	#define toArray(arg) Handle<Array>::Cast(arg);
 #else
 	#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
 	#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
 
-	#define toArray(arg) Array::Cast(*arg);
+	//#define toArray(arg) Array::Cast(*arg);
+	#define toArray(arg) Handle<Array>::Cast(arg);
 #endif
 
 
@@ -1142,8 +1143,8 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 
 		if (args[0]->IsArray() && args[1]->IsArray()) {
 			
-			Local<Array>	vars=toArray(args[0]);
-			Local<Array>	vals=toArray(args[1]);
+			Handle<Array>	vars=toArray(args[0]);
+			Handle<Array>	vals=toArray(args[1]);
 
 			if (vars->Length()) {
 
@@ -1194,10 +1195,10 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 		if (args[0]->IsArray() && args[1]->IsArray() &&
 			args[2]->IsArray() && args[3]->IsArray()) {
 			
-			Local<Array>	vars=toArray(args[0]);
-			Local<Array>	vals=toArray(args[1]);
-			Local<Array>	precs=toArray(args[2]);
-			Local<Array>	scales=toArray(args[3]);
+			Handle<Array>	vars=toArray(args[0]);
+			Handle<Array>	vals=toArray(args[1]);
+			Handle<Array>	precs=toArray(args[2]);
+			Handle<Array>	scales=toArray(args[3]);
 
 			if (vars->Length()) {
 
@@ -1334,8 +1335,8 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 
 		if (args[0]->IsArray() && args[1]->IsArray()) {
 			
-			Local<Array>	vars=toArray(args[0]);
-			Local<Array>	vals=toArray(args[1]);
+			Handle<Array>	vars=toArray(args[0]);
+			Handle<Array>	vals=toArray(args[1]);
 
 			if (vars->Length()) {
 
@@ -1386,10 +1387,10 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 		if (args[0]->IsArray() && args[1]->IsArray() &&
 			args[2]->IsArray() && args[3]->IsArray()) {
 			
-			Local<Array>	vars=toArray(args[0]);
-			Local<Array>	vals=toArray(args[1]);
-			Local<Array>	precs=toArray(args[2]);
-			Local<Array>	scales=toArray(args[3]);
+			Handle<Array>	vars=toArray(args[0]);
+			Handle<Array>	vals=toArray(args[1]);
+			Handle<Array>	precs=toArray(args[2]);
+			Handle<Array>	scales=toArray(args[3]);
 
 			if (vars->Length()) {
 
