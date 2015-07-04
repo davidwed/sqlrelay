@@ -78,7 +78,7 @@ using namespace node;
 
 
 // convenience macros
-#define toString(arg) *(String::Utf8Value(arg))
+#define toString(arg) ((arg->IsNull())?NULL:*(String::Utf8Value(arg)))
 #define toArray(arg) Handle<Array>::Cast(arg);
 
 #if NODE_MINOR_VERSION >= 12
@@ -1071,7 +1071,7 @@ RET SQLRCursor::substitution(const ARGS &args) {
 	initLocalScope();
 
 	if (args.Length()==2) {
-		if (args[1]->IsString()) {
+		if (args[1]->IsString() || args[1]->IsNull()) {
 			sqlrcur(args)->substitution(toString(args[0]),
 							toString(args[1]));
 		} else if (args[1]->IsNumber()) {
@@ -1108,7 +1108,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 				Local<Value>	first=
 					vals->Get(newInteger(0));
 
-				if (first->IsString()) {
+				if (first->IsString() || first->IsNull()) {
 
 					for (uint32_t i=0;
 						i<vars->Length(); i++) {
@@ -1205,7 +1205,7 @@ RET SQLRCursor::inputBind(const ARGS &args) {
 
 	if (args.Length()==2) {
 
-		if (args[1]->IsString()) {
+		if (args[1]->IsString() || args[1]->IsNull()) {
 
 			// string
 			sqlrcur(args)->inputBind(toString(args[0]),
@@ -1296,7 +1296,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 				Local<Value>	first=
 					vals->Get(newInteger(0));
 
-				if (first->IsString()) {
+				if (first->IsString() || first->IsNull()) {
 
 					for (uint32_t i=0;
 						i<vars->Length(); i++) {
