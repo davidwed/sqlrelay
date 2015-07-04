@@ -14,26 +14,37 @@ using namespace node;
 
 	#define RET void
 	#define ARGS FunctionCallbackInfo<Value>
+
+	#define resetConstructor(constructor,isolate,tpl) constructor.Reset(isolate,tpl->GetFunction())
+
+	#define returnObject(object) args.GetReturnValue().Set(object)
+	#define returnString(isolate,result) if (result) { args.GetReturnValue().Set(newString(isolate,result)); } else { args.GetReturnValue().Set(Null(isolate)); }
+	#define returnBoolean(isolate,result) args.GetReturnValue().Set(newBoolean(isolate,result))
+	#define returnInteger(isolate,result) args.GetReturnValue().Set(newInteger(isolate,result))
+	#define returnInt32(isolate,result) args.GetReturnValue().Set(newInt32(isolate,result))
+	#define returnUint32(isolate,result) args.GetReturnValue().Set(newUint32(isolate,result))
+	#define returnNumber(isolate,result) args.GetReturnValue().Set(newNumber(isolate,result))
+	#define returnVoid(isolate)
+
 	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(isolate,func)
 	#define newLocalFunction(isolate,func) Local<Function>::New(isolate,func)
-	#define resetConstructor(constructor,isolate,tpl) constructor.Reset(isolate,tpl->GetFunction())
-	#define returnObject(object) args.GetReturnValue().Set(object)
-	#define returnBoolean(isolate,result) args.GetReturnValue().Set(Boolean::New(isolate,result))
-	#define returnString(isolate,result) if (result) { args.GetReturnValue().Set(String::NewFromUtf8(isolate,result)); } else { args.GetReturnValue().Set(Null(isolate)); }
-	#define returnInteger(isolate,result) args.GetReturnValue().Set(Integer::New(isolate,result))
-	#define returnInt32(isolate,result) args.GetReturnValue().Set(Int32::New(isolate,result))
-	#define returnUint32(isolate,result) args.GetReturnValue().Set(Uint32::New(isolate,result))
-	#define returnNumber(isolate,result) args.GetReturnValue().Set(Number::New(isolate,result))
-	#define returnVoid(isolate)
+	#define newString(isolate,val) String::NewFromUtf8(isolate,val)
+	#define newBoolean(isolate,val) Boolean::New(isolate,val)
+	#define newInteger(isolate,val) Integer::New(isolate,val)
+	#define newUint32(isolate,val) Uint32::New(isolate,val)
+	#define newInt32(isolate,val) Int32::New(isolate,val)
+	#define newNumber(isolate,val) Number::New(isolate,val)
+
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); return; }
 
 #else
 
 	#define RET Handle<Value>
 	#define ARGS Arguments
-	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(func)
-	#define newLocalFunction(isolate,func) Local<Function>::New(func)
+	#define scope(isolate) scope
+
 	#define resetConstructor(constructor,isolate,tpl)
+
 	#define returnObject(object) return scope.Close(object)
 	#define returnBoolean(isolate,result) return scope.Close(Boolean::New(result))
 	#define returnString(isolate,result) if (result) { return scope.Close(String::New(result)); } else { return scope.Close(Null()); }
@@ -42,22 +53,31 @@ using namespace node;
 	#define returnUint32(isolate,result) return scope.Close(Uint32::New(result))
 	#define returnNumber(isolate,result) return scope.Close(Number::New(result))
 	#define returnVoid(isolate) return scope.Close(Null())
-	#define scope(isolate) scope
+
+	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(func)
+	#define newLocalFunction(isolate,func) Local<Function>::New(func)
+	#define newString(isolate,val) String::New(val)
+	#define newBoolean(isolate,val) Boolean::New(val)
+	#define newInteger(isolate,val) Integer::New(val)
+	#define newUint32(isolate,val) Uint32::New(val)
+	#define newInt32(isolate,val) Int32::New(val)
+	#define newNumber(isolate,val) Number::New(val)
+
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); returnBoolean(isolate,false); }
-	#define NewFromUtf8(isolate,str) New(str)
 
 #endif
 
 
 // convenience macros
-#if NODE_MINOR_VERSION >= 12
-	#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Wrong number of arguments")))
-	#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Invalid argument type")))
-#else
-	#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Wrong number of arguments")))
-	#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Invalid argument type")))
-#endif
 #define toString(arg) *(String::Utf8Value(arg))
+
+#if NODE_MINOR_VERSION >= 12
+	#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
+	#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
+#else
+	#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
+	#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
+#endif
 
 
 
@@ -220,7 +240,7 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	Isolate	*isolate=Isolate::GetCurrent();
 
 	Local<FunctionTemplate>	tpl=newFunctionTemplate(isolate,New);
-	tpl->SetClassName(String::NewFromUtf8(isolate,"SQLRConnection"));
+	tpl->SetClassName(newString(isolate,"SQLRConnection"));
 	// internal field count is the number of non-static member variables
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
@@ -260,8 +280,7 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getClientInfo",getClientInfo);
 
 	resetConstructor(constructor,isolate,tpl);
-	exports->Set(String::NewFromUtf8(isolate,"SQLRConnection"),
-						tpl->GetFunction());
+	exports->Set(newString(isolate,"SQLRConnection"),tpl->GetFunction());
 }
 
 SQLRConnection::SQLRConnection() {
@@ -700,7 +719,7 @@ void SQLRCursor::Init(Handle<Object> exports) {
 	Isolate	*isolate=Isolate::GetCurrent();
 
 	Local<FunctionTemplate>	tpl=newFunctionTemplate(isolate,New);
-	tpl->SetClassName(String::NewFromUtf8(isolate,"SQLRCursor"));
+	tpl->SetClassName(newString(isolate,"SQLRCursor"));
 	// internal field count is the number of non-static member variables
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
@@ -813,8 +832,7 @@ void SQLRCursor::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"closeResultSet",closeResultSet);
 
 	resetConstructor(constructor,isolate,tpl);
-	exports->Set(String::NewFromUtf8(isolate,"SQLRCursor"),
-						tpl->GetFunction());
+	exports->Set(newString(isolate,"SQLRCursor"),tpl->GetFunction());
 }
 
 SQLRCursor::SQLRCursor() {
@@ -1124,7 +1142,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-						vals->Get(Integer::New(0));
+					vals->Get(newInteger(isolate,0));
 
 				if (first->IsString()) {
 
@@ -1135,10 +1153,11 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 							substitution(
 
 							toString(vars->Get(
-							Integer::New(i))),
+							newInteger(isolate,i))),
 
 							toString(vals->Get(
-							Integer::New(i))));
+							newInteger(isolate,i)))
+							);
 					}
 
 				} else if (first->IsNumber()) {
@@ -1150,10 +1169,10 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 							substitution(
 
 							toString(vars->Get(
-							Integer::New(i))),
+							newInteger(isolate,i))),
 
 							vals->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							IntegerValue());
 					}
 
@@ -1177,7 +1196,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-						vals->Get(Integer::New(0));
+					vals->Get(newInteger(isolate,0));
 
 				if (first->IsNumber()) {
 
@@ -1187,18 +1206,18 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 						sqlrcur(args)->substitution(
 
 							toString(vars->Get(
-							Integer::New(i))),
+							newInteger(isolate,i))),
 
 							vals->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							NumberValue(),
 
 							precs->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							Uint32Value(),
 
 							scales->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							Uint32Value());
 					}
 
@@ -1315,7 +1334,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-						vals->Get(Integer::New(0));
+					vals->Get(newInteger(isolate,0));
 
 				if (first->IsString()) {
 
@@ -1326,10 +1345,11 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 							inputBind(
 
 							toString(vars->Get(
-							Integer::New(i))),
+							newInteger(isolate,i))),
 
 							toString(vals->Get(
-							Integer::New(i))));
+							newInteger(isolate,i)))
+							);
 					}
 
 				} else if (first->IsNumber()) {
@@ -1341,10 +1361,10 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 							inputBind(
 
 							toString(vars->Get(
-							Integer::New(i))),
+							newInteger(isolate,i))),
 
 							vals->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							IntegerValue());
 					}
 
@@ -1368,7 +1388,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-						vals->Get(Integer::New(0));
+					vals->Get(newInteger(isolate,0));
 
 				if (first->IsNumber()) {
 
@@ -1378,18 +1398,18 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 						sqlrcur(args)->inputBind(
 
 							toString(vars->Get(
-							Integer::New(i))),
+							newInteger(isolate,i))),
 
 							vals->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							NumberValue(),
 
 							precs->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							Uint32Value(),
 
 							scales->Get(
-							Integer::New(i))->
+							newInteger(isolate,i))->
 							Uint32Value());
 					}
 
@@ -1885,8 +1905,7 @@ RET SQLRCursor::getRow(const ARGS &args) {
 
 	Handle<Array>	result=Array::New(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(Integer::New(i),
-				String::NewFromUtf8(isolate,fields[i]));
+		result->Set(newInteger(isolate,i),newString(isolate,fields[i]));
 	}
 
 	returnObject(result);
@@ -1905,7 +1924,8 @@ RET SQLRCursor::getRowLengths(const ARGS &args) {
 
 	Handle<Array>	result=Array::New(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(Integer::New(i),Uint32::New(lengths[i]));
+		result->Set(newInteger(isolate,i),
+				newUint32(isolate,lengths[i]));
 	}
 
 	returnObject(result);
@@ -1923,8 +1943,7 @@ RET SQLRCursor::getColumnNames(const ARGS &args) {
 
 	Handle<Array>	result=Array::New(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(Integer::New(i),
-				String::NewFromUtf8(isolate,names[i]));
+		result->Set(newInteger(isolate,i),newString(isolate,names[i]));
 	}
 
 	returnObject(result);
