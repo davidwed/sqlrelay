@@ -178,7 +178,7 @@ checkSuccess(cur.getColumnName(15),"testtinytext");
 checkSuccess(cur.getColumnName(16),"testmediumtext");
 checkSuccess(cur.getColumnName(17),"testlongtext");
 checkSuccess(cur.getColumnName(18),"testtimestamp");
-/*cols=cur.getColumnNames();
+cols=cur.getColumnNames();
 checkSuccess(cols[0],"testtinyint");
 checkSuccess(cols[1],"testsmallint");
 checkSuccess(cols[2],"testmediumint");
@@ -197,7 +197,7 @@ checkSuccess(cols[14],"testvarchar");
 checkSuccess(cols[15],"testtinytext");
 checkSuccess(cols[16],"testmediumtext");
 checkSuccess(cols[17],"testlongtext");
-checkSuccess(cols[18],"testtimestamp");*/
+checkSuccess(cols[18],"testtimestamp");
 console.log("\n");
 
 console.log("COLUMN TYPES: ");
@@ -499,7 +499,7 @@ checkSuccess(cur.getFieldLength(7,"testmediumtext"),11);
 checkSuccess(cur.getFieldLength(7,"testlongtext"),9);
 console.log();
 
-/*console.log("FIELDS BY ARRAY: ");
+console.log("FIELDS BY ARRAY: ");
 fields=cur.getRow(0);
 checkSuccess(fields[0],"1");
 checkSuccess(fields[1],"1");
@@ -541,7 +541,7 @@ checkSuccess(fieldlens[14],8);
 checkSuccess(fieldlens[15],9);
 checkSuccess(fieldlens[16],11);
 checkSuccess(fieldlens[17],9);
-console.log("\n");*/
+console.log("\n");
 
 console.log("INDIVIDUAL SUBSTITUTIONS: ");
 cur.prepareQuery("select $(var1),'$(var2)',$(var3)");
@@ -557,7 +557,7 @@ checkSuccess(cur.getField(0,1),"hello");
 checkSuccess(cur.getField(0,2),"10.5556");
 console.log("\n");
 
-/*console.log("ARRAY SUBSTITUTIONS: ");
+console.log("ARRAY SUBSTITUTIONS: ");
 cur.prepareQuery("select $(var1),$(var2),$(var3)");
 cur.substitutions(subvars,subvallongs);
 checkSuccess(cur.executeQuery(),1);
@@ -591,7 +591,7 @@ console.log("FIELDS: ");
 checkSuccess(cur.getField(0,0),"10.55");
 checkSuccess(cur.getField(0,1),"10.556");
 checkSuccess(cur.getField(0,2),"10.5556");
-console.log("\n");*/
+console.log("\n");
 
 console.log("nullS as Nulls: ");
 cur.getNullsAsNulls();
@@ -762,7 +762,7 @@ checkSuccess(cur.getColumnName(14),"testvarchar");
 checkSuccess(cur.getColumnName(15),"testtinytext");
 checkSuccess(cur.getColumnName(16),"testmediumtext");
 checkSuccess(cur.getColumnName(17),"testlongtext");
-/*cols=cur.getColumnNames();
+cols=cur.getColumnNames();
 checkSuccess(cols[0],"testtinyint");
 checkSuccess(cols[1],"testsmallint");
 checkSuccess(cols[2],"testmediumint");
@@ -780,7 +780,7 @@ checkSuccess(cols[13],"testtext");
 checkSuccess(cols[14],"testvarchar");
 checkSuccess(cols[15],"testtinytext");
 checkSuccess(cols[16],"testmediumtext");
-checkSuccess(cols[17],"testlongtext");*/
+checkSuccess(cols[17],"testlongtext");
 console.log("\n");
 
 console.log("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: ");
