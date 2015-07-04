@@ -33819,7 +33819,7 @@ $as_echo "$NODEMODULEDIR" >&6; }
 $as_echo_n "checking for node-gyp... " >&6; }
 		if ( test -r "$NODEMODULEDIR" )
 		then
-			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js"
+			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js"
 			do
 				if ( test -r "$file" )
 				then

@@ -3685,7 +3685,7 @@ then
 		AC_MSG_CHECKING(for node-gyp)
 		if ( test -r "$NODEMODULEDIR" )
 		then
-			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" 
+			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js"
 			do
 				if ( test -r "$file" )
 				then
