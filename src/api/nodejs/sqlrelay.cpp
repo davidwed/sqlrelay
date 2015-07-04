@@ -21,6 +21,7 @@ using namespace node;
 	#define returnString(isolate,result) if (result) { args.GetReturnValue().Set(newString(isolate,result)); } else { args.GetReturnValue().Set(Null(isolate)); }
 	#define returnBoolean(isolate,result) args.GetReturnValue().Set(newBoolean(isolate,result))
 	#define returnInteger(isolate,result) args.GetReturnValue().Set(newInteger(isolate,result))
+	#define returnUnsignedInteger(isolate,result) args.GetReturnValue().Set(newUnsignedInteger(isolate,result))
 	#define returnInt32(isolate,result) args.GetReturnValue().Set(newInt32(isolate,result))
 	#define returnUint32(isolate,result) args.GetReturnValue().Set(newUint32(isolate,result))
 	#define returnNumber(isolate,result) args.GetReturnValue().Set(newNumber(isolate,result))
@@ -31,6 +32,7 @@ using namespace node;
 	#define newString(isolate,val) String::NewFromUtf8(isolate,val)
 	#define newBoolean(isolate,val) Boolean::New(isolate,val)
 	#define newInteger(isolate,val) Integer::New(isolate,val)
+	#define newUnsignedInteger(isolate,val) Integer::NewFromUnsigned(isolate,val)
 	#define newUint32(isolate,val) Uint32::New(isolate,val)
 	#define newInt32(isolate,val) Int32::New(isolate,val)
 	#define newNumber(isolate,val) Number::New(isolate,val)
@@ -49,10 +51,11 @@ using namespace node;
 	#define returnObject(object) return scope.Close(object)
 	#define returnBoolean(isolate,result) return scope.Close(Boolean::New(result))
 	#define returnString(isolate,result) if (result) { return scope.Close(String::New(result)); } else { return scope.Close(Null()); }
-	#define returnInteger(isolate,result) return scope.Close(Integer::New(result))
-	#define returnInt32(isolate,result) return scope.Close(Int32::New(result))
-	#define returnUint32(isolate,result) return scope.Close(Uint32::New(result))
-	#define returnNumber(isolate,result) return scope.Close(Number::New(result))
+	#define returnInteger(isolate,result) return scope.Close(newInteger(isolate,result))
+	#define returnUnsignedInteger(isolate,result) return scope.Close(newUnsignedInteger(isolate,result))
+	#define returnInt32(isolate,result) return scope.Close(newInt32(isolate,result))
+	#define returnUint32(isolate,result) return scope.Close(newUint32(isolate,result))
+	#define returnNumber(isolate,result) return scope.Close(newNumber(isolate,result))
 	#define returnVoid(isolate) return scope.Close(Null())
 
 	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(func)
@@ -60,6 +63,7 @@ using namespace node;
 	#define newString(isolate,val) String::New(val)
 	#define newBoolean(isolate,val) Boolean::New(val)
 	#define newInteger(isolate,val) Integer::New(val)
+	#define newUnsignedInteger(isolate,val) Integer::NewFromUnsigned(val)
 	#define newUint32(isolate,val) Uint32::New(val)
 	#define newInt32(isolate,val) Int32::New(val)
 	#define newNumber(isolate,val) Number::New(val)
@@ -551,7 +555,7 @@ RET SQLRConnection::getLastInsertId(const ARGS &args) {
 
 	uint64_t	result=sqlrcon(args)->getLastInsertId();
 
-	returnInteger(isolate,result);
+	returnUnsignedInteger(isolate,result);
 }
 
 RET SQLRConnection::autoCommitOn(const ARGS &args) {
@@ -891,7 +895,7 @@ RET SQLRCursor::getResultSetBufferSize(const ARGS &args) {
 
 	uint64_t	result=sqlrcur(args)->getResultSetBufferSize();
 
-	returnInteger(isolate,result);
+	returnUnsignedInteger(isolate,result);
 }
 
 RET SQLRCursor::dontGetColumnInfo(const ARGS &args) {
@@ -1702,7 +1706,7 @@ RET SQLRCursor::rowCount(const ARGS &args) {
 
 	uint64_t	result=sqlrcur(args)->rowCount();
 
-	returnInteger(isolate,result);
+	returnUnsignedInteger(isolate,result);
 }
 
 RET SQLRCursor::totalRows(const ARGS &args) {
@@ -1714,7 +1718,7 @@ RET SQLRCursor::totalRows(const ARGS &args) {
 
 	uint64_t	result=sqlrcur(args)->totalRows();
 
-	returnInteger(isolate,result);
+	returnUnsignedInteger(isolate,result);
 }
 
 RET SQLRCursor::affectedRows(const ARGS &args) {
@@ -1726,7 +1730,7 @@ RET SQLRCursor::affectedRows(const ARGS &args) {
 
 	uint64_t	result=sqlrcur(args)->affectedRows();
 
-	returnInteger(isolate,result);
+	returnUnsignedInteger(isolate,result);
 }
 
 RET SQLRCursor::firstRowIndex(const ARGS &args) {
@@ -1738,7 +1742,7 @@ RET SQLRCursor::firstRowIndex(const ARGS &args) {
 
 	uint64_t	result=sqlrcur(args)->firstRowIndex();
 
-	returnInteger(isolate,result);
+	returnUnsignedInteger(isolate,result);
 }
 
 RET SQLRCursor::endOfResultSet(const ARGS &args) {
