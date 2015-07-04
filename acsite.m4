@@ -3704,6 +3704,7 @@ then
 
 	if ( test -z "$NODE" -o -z "$NODEGYP" )
 	then
+		HAVE_NODEJS="no"
 		AC_MSG_WARN(The node.js API will not be built.)
 	fi
 
