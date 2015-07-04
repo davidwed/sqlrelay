@@ -253,9 +253,9 @@ ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c /LIBPATH:$(top_buil
 # node.js
 NODE = "@NODEJSPREFIX@\node.exe"
 NODEGYP = $(NODE) "@NODEJSPREFIX@\node_modules\npm\node_modules\node-gyp\bin\node-gyp.js" --msvs_version=@NODEJSMSVSVERSION@
-NODEMODULEDIR = @NODEJSPREFIX@\node_modules
-NODEJSINCLUDEDIRS = @top_builddir@\src\\api\c++;C:\Program Files\Firstworks\include
-NODEJSLIBS = @top_builddir@\src\\api\c++\libsqlrclient.lib;C:\Program Files\Firstworks\lib\librudiments.lib
+NODEMODULEDIR = "@NODEJSPREFIX@\node_modules"
+NODEJSINCLUDEDIRS = @top_builddir@\src\api\c++;C:\Program Files\Firstworks\include
+NODEJSLIBS = @top_builddir@\src\api\c++\libsqlrclient.lib;C:\Program Files\Firstworks\lib\librudiments.lib
 
 
 # readline

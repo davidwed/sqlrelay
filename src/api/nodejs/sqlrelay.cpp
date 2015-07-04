@@ -1,4 +1,7 @@
 #include <sqlrelay/sqlrclient.h>
+#ifdef _WIN32
+	#define _SSIZE_T_DEFINED
+#endif
 #include <v8.h>
 #include <node.h>
 #include <node_object_wrap.h>
@@ -6,10 +9,9 @@
 using namespace v8;
 using namespace node;
 
-
-
 // macros to deal with differences between major versions of node.js
 #if NODE_MINOR_VERSION >= 12
+
 	#define RET void
 	#define ARGS FunctionCallbackInfo<Value>
 	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(isolate,func)
@@ -23,7 +25,9 @@ using namespace node;
 	#define returnArray(isolate,result) /* FIXME: implement this */ args.GetReturnValue().Set(Null(isolate))
 	#define returnVoid(isolate)
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); return; }
+
 #else
+
 	#define RET Handle<Value>
 	#define ARGS Arguments
 	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(func)
@@ -39,12 +43,18 @@ using namespace node;
 	#define scope(isolate) scope
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); returnBoolean(isolate,false); }
 	#define NewFromUtf8(isolate,str) New(str)
+
 #endif
 
 
 // convenience macros
-#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Wrong number of arguments")))
-#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Invalid argument type")))
+#if NODE_MINOR_VERSION >= 12
+	#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Wrong number of arguments")))
+	#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Invalid argument type")))
+#else
+	#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Wrong number of arguments")))
+	#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(String::NewFromUtf8(isolate,"Invalid argument type")))
+#endif
 #define argToString(arg) *(String::Utf8Value(arg))
 
 
@@ -1701,7 +1711,7 @@ RET SQLRCursor::getRow(const ARGS &args) {
 	/*const char * const *result=sqlrcur(args)->getRow(
 						args[0]->Uint32Value());*/
 
-	returnArray(args,result);
+	returnArray(isolate,result);
 }
 
 RET SQLRCursor::getRowLengths(const ARGS &args) {
@@ -1728,7 +1738,7 @@ RET SQLRCursor::getColumnNames(const ARGS &args) {
 	// FIXME: return array of strings
 	//const char * const *result=sqlrcur(args)->getColumnNames();
 
-	returnArray(args,result);
+	returnArray(isolate,result);
 }
 
 RET SQLRCursor::getColumnName(const ARGS &args) {
