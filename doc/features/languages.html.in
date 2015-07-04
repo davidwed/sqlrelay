@@ -8,7 +8,7 @@
 
 <span class="heading1">Native API</span><br><br>
 
-<p>The native SQL Relay client API currently supports C, C++, .NET languages, Java, Perl, Python, PHP, Ruby, TCL and Erlang.</p>
+<p>The native SQL Relay client API currently supports C, C++, .NET languages, Java, Perl, Python, PHP, Ruby, TCL, Erlang, and node.js.</p>
 
 <p>The native API is intuitive, consistent across languages, and supports powerful features not available when using a database abstraction layer like suspended sessions, result set caching and tuning options.</p>
 
