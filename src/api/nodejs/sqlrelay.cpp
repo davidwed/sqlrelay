@@ -15,61 +15,66 @@ using namespace node;
 	#define RET void
 	#define ARGS FunctionCallbackInfo<Value>
 
-	#define resetConstructor(constructor,isolate,tpl) constructor.Reset(isolate,tpl->GetFunction())
+	#define isolate() Isolate *isolate=Isolate::GetCurrent()
+	#define localScope() HandleScope	localscope(isolate)
+
+	#define resetConstructor(constructor,tpl) constructor.Reset(isolate,tpl->GetFunction())
 
 	#define returnObject(object) args.GetReturnValue().Set(object)
-	#define returnString(isolate,result) if (result) { args.GetReturnValue().Set(newString(isolate,result)); } else { args.GetReturnValue().Set(Null(isolate)); }
-	#define returnBoolean(isolate,result) args.GetReturnValue().Set(newBoolean(isolate,result))
-	#define returnInteger(isolate,result) args.GetReturnValue().Set(newInteger(isolate,result))
-	#define returnUnsignedInteger(isolate,result) args.GetReturnValue().Set(newUnsignedInteger(isolate,result))
-	#define returnInt32(isolate,result) args.GetReturnValue().Set(newInt32(isolate,result))
-	#define returnUint32(isolate,result) args.GetReturnValue().Set(newUint32(isolate,result))
-	#define returnNumber(isolate,result) args.GetReturnValue().Set(newNumber(isolate,result))
-	#define returnVoid(isolate)
+	#define returnString(result) if (result) { args.GetReturnValue().Set(newString(result)); } else { args.GetReturnValue().Set(Null(isolate)); }
+	#define returnBoolean(result) args.GetReturnValue().Set(newBoolean(result))
+	#define returnInteger(result) args.GetReturnValue().Set(newInteger(result))
+	#define returnUnsignedInteger(result) args.GetReturnValue().Set(newUnsignedInteger(result))
+	#define returnInt32(result) args.GetReturnValue().Set(newInt32(result))
+	#define returnUint32(result) args.GetReturnValue().Set(newUint32(result))
+	#define returnNumber(result) args.GetReturnValue().Set(newNumber(result))
+	#define returnVoid()
 
-	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(isolate,func)
-	#define newLocalFunction(isolate,func) Local<Function>::New(isolate,func)
-	#define newString(isolate,val) String::NewFromUtf8(isolate,val)
-	#define newBoolean(isolate,val) Boolean::New(isolate,val)
-	#define newInteger(isolate,val) Integer::New(isolate,val)
-	#define newUnsignedInteger(isolate,val) Integer::NewFromUnsigned(isolate,val)
-	#define newUint32(isolate,val) Uint32::New(isolate,val)
-	#define newInt32(isolate,val) Int32::New(isolate,val)
-	#define newNumber(isolate,val) Number::New(isolate,val)
-	#define newArray(isolate,len) Array::New(isolate,len)
+	#define newFunctionTemplate(func) FunctionTemplate::New(isolate,func)
+	#define newLocalFunction(func) Local<Function>::New(isolate,func)
+	#define newString(val) String::NewFromUtf8(isolate,val)
+	#define newBoolean(val) Boolean::New(isolate,val)
+	#define newInteger(val) Integer::New(isolate,val)
+	#define newUnsignedInteger(val) Integer::NewFromUnsigned(isolate,val)
+	#define newUint32(val) Uint32::New(isolate,val)
+	#define newInt32(val) Int32::New(isolate,val)
+	#define newNumber(val) Number::New(isolate,val)
+	#define newArray(len) Array::New(isolate,len)
 
-	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); return; }
+	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); return; }
 
 #else
 
 	#define RET Handle<Value>
 	#define ARGS Arguments
-	#define scope(isolate) scope
 
-	#define resetConstructor(constructor,isolate,tpl)
+	#define	isolate()
+	#define localScope() HandleScope	localscope
 
-	#define returnObject(object) return scope.Close(object)
-	#define returnBoolean(isolate,result) return scope.Close(Boolean::New(result))
-	#define returnString(isolate,result) if (result) { return scope.Close(String::New(result)); } else { return scope.Close(Null()); }
-	#define returnInteger(isolate,result) return scope.Close(newInteger(isolate,result))
-	#define returnUnsignedInteger(isolate,result) return scope.Close(newUnsignedInteger(isolate,result))
-	#define returnInt32(isolate,result) return scope.Close(newInt32(isolate,result))
-	#define returnUint32(isolate,result) return scope.Close(newUint32(isolate,result))
-	#define returnNumber(isolate,result) return scope.Close(newNumber(isolate,result))
-	#define returnVoid(isolate) return scope.Close(Null())
+	#define resetConstructor(constructor,tpl)
 
-	#define newFunctionTemplate(isolate,func) FunctionTemplate::New(func)
-	#define newLocalFunction(isolate,func) Local<Function>::New(func)
-	#define newString(isolate,val) String::New(val)
-	#define newBoolean(isolate,val) Boolean::New(val)
-	#define newInteger(isolate,val) Integer::New(val)
-	#define newUnsignedInteger(isolate,val) Integer::NewFromUnsigned(val)
-	#define newUint32(isolate,val) Uint32::New(val)
-	#define newInt32(isolate,val) Int32::New(val)
-	#define newNumber(isolate,val) Number::New(val)
-	#define newArray(isolate,len) Array::New(len)
+	#define returnObject(object) return localscope.Close(object)
+	#define returnBoolean(result) return localscope.Close(Boolean::New(result))
+	#define returnString(result) if (result) { return localscope.Close(String::New(result)); } else { return localscope.Close(Null()); }
+	#define returnInteger(result) return localscope.Close(newInteger(result))
+	#define returnUnsignedInteger(result) return localscope.Close(newUnsignedInteger(result))
+	#define returnInt32(result) return localscope.Close(newInt32(result))
+	#define returnUint32(result) return localscope.Close(newUint32(result))
+	#define returnNumber(result) return localscope.Close(newNumber(result))
+	#define returnVoid() return localscope.Close(Null())
 
-	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); returnBoolean(isolate,false); }
+	#define newFunctionTemplate(func) FunctionTemplate::New(func)
+	#define newLocalFunction(func) Local<Function>::New(func)
+	#define newString(val) String::New(val)
+	#define newBoolean(val) Boolean::New(val)
+	#define newInteger(val) Integer::New(val)
+	#define newUnsignedInteger(val) Integer::NewFromUnsigned(val)
+	#define newUint32(val) Uint32::New(val)
+	#define newInt32(val) Int32::New(val)
+	#define newNumber(val) Number::New(val)
+	#define newArray(len) Array::New(len)
+
+	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); returnBoolean(false); }
 
 #endif
 
@@ -79,11 +84,11 @@ using namespace node;
 #define toArray(arg) Handle<Array>::Cast(arg);
 
 #if NODE_MINOR_VERSION >= 12
-	#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
-	#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
+	#define throwWrongNumberOfArguments() isolate->ThrowException(Exception::TypeError(newString("Wrong number of arguments")))
+	#define throwInvalidArgumentType() isolate->ThrowException(Exception::TypeError(newString("Invalid argument type")))
 #else
-	#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
-	#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
+	#define throwWrongNumberOfArguments() ThrowException(Exception::TypeError(newString("Wrong number of arguments")))
+	#define throwInvalidArgumentType() ThrowException(Exception::TypeError(newString("Invalid argument type")))
 #endif
 
 
@@ -244,10 +249,10 @@ Persistent<Function> SQLRCursor::constructor;
 // SQLRConnection methods...
 void SQLRConnection::Init(Handle<Object> exports) {
 
-	Isolate	*isolate=Isolate::GetCurrent();
+	isolate();
 
-	Local<FunctionTemplate>	tpl=newFunctionTemplate(isolate,New);
-	tpl->SetClassName(newString(isolate,"SQLRConnection"));
+	Local<FunctionTemplate>	tpl=newFunctionTemplate(New);
+	tpl->SetClassName(newString("SQLRConnection"));
 	// internal field count is the number of non-static member variables
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
@@ -286,8 +291,8 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setClientInfo",setClientInfo);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getClientInfo",getClientInfo);
 
-	resetConstructor(constructor,isolate,tpl);
-	exports->Set(newString(isolate,"SQLRConnection"),tpl->GetFunction());
+	resetConstructor(constructor,tpl);
+	exports->Set(newString("SQLRConnection"),tpl->GetFunction());
 }
 
 SQLRConnection::SQLRConnection() {
@@ -298,12 +303,12 @@ SQLRConnection::~SQLRConnection() {
 
 RET SQLRConnection::New(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
 	if (args.IsConstructCall()) {
 
-		checkArgCount(args,isolate,7);
+		checkArgCount(args,7);
 
 		// invoked as constructor: new SQLRConnection(...)
 		SQLRConnection	*obj=new SQLRConnection();
@@ -321,397 +326,397 @@ RET SQLRConnection::New(const ARGS &args) {
 		// invoked as function: SQLRConnection(...)
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
-		Local<Function>	cons=newLocalFunction(isolate,constructor);
+		Local<Function>	cons=newLocalFunction(constructor);
 		returnObject(cons->NewInstance(argc,argv));
 	}
 }
 
 RET SQLRConnection::setConnectTimeout(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	sqlrcon(args)->setConnectTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::setAuthenticationTimeout(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	sqlrcon(args)->setAuthenticationTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::setResponseTimeout(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	sqlrcon(args)->setResponseTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::endSession(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcon(args)->endSession();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::suspendSession(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->suspendSession();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::getConnectionPort(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint16_t	result=sqlrcon(args)->getConnectionPort();
 
-	returnInt32(isolate,result);
+	returnInt32(result);
 }
 
 RET SQLRConnection::getConnectionSocket(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->getConnectionSocket();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::resumeSession(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	bool	result=sqlrcon(args)->resumeSession(args[0]->Int32Value(),
 							toString(args[1]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::ping(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->ping();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::identify(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->identify();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::dbVersion(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->dbVersion();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::dbHostName(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->dbHostName();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::dbIpAddress(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->dbIpAddress();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::serverVersion(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->serverVersion();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::clientVersion(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->clientVersion();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::bindFormat(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->bindFormat();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::selectDatabase(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=sqlrcon(args)->selectDatabase(toString(args[0]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::getCurrentDatabase(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->getCurrentDatabase();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::getLastInsertId(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint64_t	result=sqlrcon(args)->getLastInsertId();
 
-	returnUnsignedInteger(isolate,result);
+	returnUnsignedInteger(result);
 }
 
 RET SQLRConnection::autoCommitOn(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->autoCommitOn();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::autoCommitOff(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->autoCommitOff();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::begin(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->begin();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::commit(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->commit();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::rollback(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->rollback();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::errorMessage(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->errorMessage();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRConnection::errorNumber(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	int64_t		result=sqlrcon(args)->errorNumber();
 
-	returnInteger(isolate,result);
+	returnInteger(result);
 }
 
 RET SQLRConnection::debugOn(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcon(args)->debugOn();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::debugOff(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcon(args)->debugOff();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::getDebug(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcon(args)->getDebug();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRConnection::setDebugFile(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcon(args)->setDebugFile(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::setClientInfo(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcon(args)->setClientInfo(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRConnection::getClientInfo(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->getClientInfo();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 sqlrconnection *SQLRConnection::sqlrcon(const ARGS &args) {
@@ -723,10 +728,10 @@ sqlrconnection *SQLRConnection::sqlrcon(const ARGS &args) {
 // SQLRCursor methods...
 void SQLRCursor::Init(Handle<Object> exports) {
 
-	Isolate	*isolate=Isolate::GetCurrent();
+	isolate();
 
-	Local<FunctionTemplate>	tpl=newFunctionTemplate(isolate,New);
-	tpl->SetClassName(newString(isolate,"SQLRCursor"));
+	Local<FunctionTemplate>	tpl=newFunctionTemplate(New);
+	tpl->SetClassName(newString("SQLRCursor"));
 	// internal field count is the number of non-static member variables
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
@@ -784,7 +789,10 @@ void SQLRCursor::Init(Handle<Object> exports) {
 						getOutputBindInteger);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindDouble",
 						getOutputBindDouble);
-	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindClob",getOutputBindClob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindBlob",
+						getOutputBindBlob);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindClob",
+						getOutputBindClob);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindLength",
 						getOutputBindLength);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getOutputBindCursor",
@@ -838,8 +846,8 @@ void SQLRCursor::Init(Handle<Object> exports) {
 						resumeCachedResultSet);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"closeResultSet",closeResultSet);
 
-	resetConstructor(constructor,isolate,tpl);
-	exports->Set(newString(isolate,"SQLRCursor"),tpl->GetFunction());
+	resetConstructor(constructor,tpl);
+	exports->Set(newString("SQLRCursor"),tpl->GetFunction());
 }
 
 SQLRCursor::SQLRCursor() {
@@ -850,12 +858,12 @@ SQLRCursor::~SQLRCursor() {
 
 RET SQLRCursor::New(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
 	if (args.IsConstructCall()) {
 
-		checkArgCount(args,isolate,1);
+		checkArgCount(args,1);
 
 		// invoked as constructor: new SQLRCursor(...)
 		SQLRConnection	*sqlrcon=
@@ -869,184 +877,184 @@ RET SQLRCursor::New(const ARGS &args) {
 		// invoked as function: SQLRCursor(...)
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
-		Local<Function>	cons=newLocalFunction(isolate,constructor);
+		Local<Function>	cons=newLocalFunction(constructor);
 		returnObject(cons->NewInstance(argc,argv));
 	}
 }
 
 RET SQLRCursor::setResultSetBufferSize(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->setResultSetBufferSize(args[0]->IntegerValue());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::getResultSetBufferSize(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint64_t	result=sqlrcur(args)->getResultSetBufferSize();
 
-	returnUnsignedInteger(isolate,result);
+	returnUnsignedInteger(result);
 }
 
 RET SQLRCursor::dontGetColumnInfo(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->dontGetColumnInfo();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::getColumnInfo(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->getColumnInfo();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::mixedCaseColumnNames(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->mixedCaseColumnNames();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::upperCaseColumnNames(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->upperCaseColumnNames();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::lowerCaseColumnNames(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->lowerCaseColumnNames();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::cacheToFile(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->cacheToFile(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::setCacheTtl(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->setCacheTtl(args[0]->Uint32Value());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::getCacheFileName(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcur(args)->getCacheFileName();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::cacheOff(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->cacheOff();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::getDatabaseList(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=sqlrcur(args)->getDatabaseList(toString(args[0]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getTableList(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=sqlrcur(args)->getTableList(toString(args[0]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnList(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	bool	result=sqlrcur(args)->getColumnList(toString(args[0]),
 							toString(args[1]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::sendQuery(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
 	bool	result=false;
 
@@ -1056,31 +1064,31 @@ RET SQLRCursor::sendQuery(const ARGS &args) {
 		result=sqlrcur(args)->sendQuery(toString(args[0]),
 						args[1]->Uint32Value());
 	} else {
-		throwWrongNumberOfArguments(isolate);
+		throwWrongNumberOfArguments();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::sendFileQuery(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	bool	result=sqlrcur(args)->sendFileQuery(toString(args[0]),
 							toString(args[1]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::prepareQuery(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	if (args.Length()==1) {
 		sqlrcur(args)->prepareQuery(toString(args[0]));
@@ -1088,29 +1096,29 @@ RET SQLRCursor::prepareQuery(const ARGS &args) {
 		sqlrcur(args)->prepareQuery(toString(args[0]),
 						args[1]->Uint32Value());
 	} else {
-		throwWrongNumberOfArguments(isolate);
+		throwWrongNumberOfArguments();
 	}
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::prepareFileQuery(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	bool	result=sqlrcur(args)->prepareFileQuery(toString(args[0]),
 							toString(args[1]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::substitution(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
 	if (args.Length()==2) {
 		if (args[1]->IsString()) {
@@ -1120,7 +1128,7 @@ RET SQLRCursor::substitution(const ARGS &args) {
 			sqlrcur(args)->substitution(toString(args[0]),
 						args[1]->IntegerValue());
 		} else {
-			throwInvalidArgumentType(isolate);
+			throwInvalidArgumentType();
 		}
 	} else if (args.Length()==4) {
 		sqlrcur(args)->substitution(toString(args[0]),
@@ -1128,16 +1136,16 @@ RET SQLRCursor::substitution(const ARGS &args) {
 						args[2]->Uint32Value(),
 						args[3]->Uint32Value());
 	} else {
-		throwWrongNumberOfArguments(isolate);
+		throwWrongNumberOfArguments();
 	}
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::substitutions(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
 	if (args.Length()==2) {
 
@@ -1149,7 +1157,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(isolate,0));
+					vals->Get(newInteger(0));
 
 				if (first->IsString()) {
 
@@ -1160,10 +1168,10 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 							substitution(
 
 							toString(vars->Get(
-							newInteger(isolate,i))),
+							newInteger(i))),
 
 							toString(vals->Get(
-							newInteger(isolate,i)))
+							newInteger(i)))
 							);
 					}
 
@@ -1176,19 +1184,19 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 							substitution(
 
 							toString(vars->Get(
-							newInteger(isolate,i))),
+							newInteger(i))),
 
 							vals->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							IntegerValue());
 					}
 
 				} else {
-					throwInvalidArgumentType(isolate);
+					throwInvalidArgumentType();
 				}
 			}
 		} else {
-			throwInvalidArgumentType(isolate);
+			throwInvalidArgumentType();
 		}
 	} else if (args.Length()==4) {
 
@@ -1203,7 +1211,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(isolate,0));
+					vals->Get(newInteger(0));
 
 				if (first->IsNumber()) {
 
@@ -1213,39 +1221,39 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 						sqlrcur(args)->substitution(
 
 							toString(vars->Get(
-							newInteger(isolate,i))),
+							newInteger(i))),
 
 							vals->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							NumberValue(),
 
 							precs->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							Uint32Value(),
 
 							scales->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							Uint32Value());
 					}
 
 				} else {
-					throwInvalidArgumentType(isolate);
+					throwInvalidArgumentType();
 				}
 			}
 		} else {
-			throwInvalidArgumentType(isolate);
+			throwInvalidArgumentType();
 		}
 	} else {
-		throwWrongNumberOfArguments(isolate);
+		throwWrongNumberOfArguments();
 	}
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::inputBind(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
 	if (args.Length()==2) {
 
@@ -1260,7 +1268,7 @@ RET SQLRCursor::inputBind(const ARGS &args) {
 			sqlrcur(args)->inputBind(toString(args[0]),
 						args[1]->IntegerValue());
 		} else {
-			throwInvalidArgumentType(isolate);
+			throwInvalidArgumentType();
 		}
 
 	} else if (args.Length()==3) {
@@ -1292,44 +1300,44 @@ RET SQLRCursor::inputBind(const ARGS &args) {
 						toString(args[8]));
 
 	} else {
-		throwWrongNumberOfArguments(isolate);
+		throwWrongNumberOfArguments();
 	}
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::inputBindBlob(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,3);
+	checkArgCount(args,3);
 
 	sqlrcur(args)->inputBindBlob(toString(args[0]),
 					toString(args[1]),
 					args[2]->Uint32Value());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::inputBindClob(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,3);
+	checkArgCount(args,3);
 
 	sqlrcur(args)->inputBindClob(toString(args[0]),
 					toString(args[1]),
 					args[2]->Uint32Value());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::inputBinds(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
 	if (args.Length()==2) {
 
@@ -1341,7 +1349,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(isolate,0));
+					vals->Get(newInteger(0));
 
 				if (first->IsString()) {
 
@@ -1352,10 +1360,10 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 							inputBind(
 
 							toString(vars->Get(
-							newInteger(isolate,i))),
+							newInteger(i))),
 
 							toString(vals->Get(
-							newInteger(isolate,i)))
+							newInteger(i)))
 							);
 					}
 
@@ -1368,19 +1376,19 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 							inputBind(
 
 							toString(vars->Get(
-							newInteger(isolate,i))),
+							newInteger(i))),
 
 							vals->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							IntegerValue());
 					}
 
 				} else {
-					throwInvalidArgumentType(isolate);
+					throwInvalidArgumentType();
 				}
 			}
 		} else {
-			throwInvalidArgumentType(isolate);
+			throwInvalidArgumentType();
 		}
 	} else if (args.Length()==4) {
 
@@ -1395,7 +1403,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(isolate,0));
+					vals->Get(newInteger(0));
 
 				if (first->IsNumber()) {
 
@@ -1405,412 +1413,410 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 						sqlrcur(args)->inputBind(
 
 							toString(vars->Get(
-							newInteger(isolate,i))),
+							newInteger(i))),
 
 							vals->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							NumberValue(),
 
 							precs->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							Uint32Value(),
 
 							scales->Get(
-							newInteger(isolate,i))->
+							newInteger(i))->
 							Uint32Value());
 					}
 
 				} else {
-					throwInvalidArgumentType(isolate);
+					throwInvalidArgumentType();
 				}
 			}
 		} else {
-			throwInvalidArgumentType(isolate);
+			throwInvalidArgumentType();
 		}
 	} else {
-		throwWrongNumberOfArguments(isolate);
+		throwWrongNumberOfArguments();
 	}
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::defineOutputBindString(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	sqlrcur(args)->defineOutputBindString(toString(args[0]),
 						args[1]->Uint32Value());
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::defineOutputBindInteger(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->defineOutputBindInteger(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::defineOutputBindDouble(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->defineOutputBindDouble(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::defineOutputBindBlob(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->defineOutputBindBlob(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::defineOutputBindClob(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->defineOutputBindClob(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::defineOutputBindCursor(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	sqlrcur(args)->defineOutputBindCursor(toString(args[0]));
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::clearBinds(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->clearBinds();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::countBindVariables(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint16_t	result=sqlrcur(args)->countBindVariables();
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::validateBinds(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->validateBinds();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::validBind(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=sqlrcur(args)->validBind(toString(args[0]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::executeQuery(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcur(args)->executeQuery();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::fetchFromBindCursor(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcur(args)->fetchFromBindCursor();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getOutputBindString(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	const char	*result=sqlrcur(args)->getOutputBindString(
 						toString(args[0]));
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::getOutputBindInteger(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	int64_t	result=sqlrcur(args)->getOutputBindInteger(
 						toString(args[0]));
 
-	returnInteger(isolate,result);
+	returnInteger(result);
 }
 
 RET SQLRCursor::getOutputBindDouble(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	double	result=sqlrcur(args)->getOutputBindDouble(
 						toString(args[0]));
 
-	returnNumber(isolate,result);
+	returnNumber(result);
 }
 
 RET SQLRCursor::getOutputBindBlob(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	const char	*result=sqlrcur(args)->getOutputBindBlob(
 						toString(args[0]));
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::getOutputBindClob(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	const char	*result=sqlrcur(args)->getOutputBindClob(
 						toString(args[0]));
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::getOutputBindLength(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	uint32_t	result=sqlrcur(args)->getOutputBindLength(
 						toString(args[0]));
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::getOutputBindCursor(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
-	// FIXME: support this...
-	/*sqlrcursor	*result=sqlrcur(args)->getOutputBindCursor(
-						toString(args[0]));
-	returnObject(result);*/
-
-	returnVoid(isolate);
+	SQLRCursor	*obj=new SQLRCursor();
+	obj->sqlrc=sqlrcur(args)->getOutputBindCursor(toString(args[0]));
+	obj->Wrap(args.This());
+	returnObject(args.This());
 }
 
 RET SQLRCursor::openCachedResultSet(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=sqlrcur(args)->openCachedResultSet(
 						toString(args[0]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::colCount(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint32_t	result=sqlrcur(args)->colCount();
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::rowCount(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint64_t	result=sqlrcur(args)->rowCount();
 
-	returnUnsignedInteger(isolate,result);
+	returnUnsignedInteger(result);
 }
 
 RET SQLRCursor::totalRows(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint64_t	result=sqlrcur(args)->totalRows();
 
-	returnUnsignedInteger(isolate,result);
+	returnUnsignedInteger(result);
 }
 
 RET SQLRCursor::affectedRows(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint64_t	result=sqlrcur(args)->affectedRows();
 
-	returnUnsignedInteger(isolate,result);
+	returnUnsignedInteger(result);
 }
 
 RET SQLRCursor::firstRowIndex(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint64_t	result=sqlrcur(args)->firstRowIndex();
 
-	returnUnsignedInteger(isolate,result);
+	returnUnsignedInteger(result);
 }
 
 RET SQLRCursor::endOfResultSet(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	bool	result=sqlrcur(args)->endOfResultSet();
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::errorMessage(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char	*result=sqlrcur(args)->errorMessage();
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::errorNumber(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	int64_t	result=sqlrcur(args)->errorNumber();
 
-	returnInteger(isolate,result);
+	returnInteger(result);
 }
 
 RET SQLRCursor::getNullsAsEmptyStrings(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->getNullsAsEmptyStrings();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::getNullsAsNulls(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->getNullsAsNulls();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::getField(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	const char	*result=NULL;
 
@@ -1821,18 +1827,18 @@ RET SQLRCursor::getField(const ARGS &args) {
 		result=sqlrcur(args)->getField(args[0]->IntegerValue(),
 							toString(args[1]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::getFieldAsInteger(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	int64_t	result=0;
 
@@ -1845,18 +1851,18 @@ RET SQLRCursor::getFieldAsInteger(const ARGS &args) {
 						args[0]->IntegerValue(),
 						toString(args[1]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnInteger(isolate,result);
+	returnInteger(result);
 }
 
 RET SQLRCursor::getFieldAsDouble(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	double	result=0;
 
@@ -1869,18 +1875,18 @@ RET SQLRCursor::getFieldAsDouble(const ARGS &args) {
 						args[0]->IntegerValue(),
 						toString(args[1]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnNumber(isolate,result);
+	returnNumber(result);
 }
 
 RET SQLRCursor::getFieldLength(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	uint32_t	result=0;
 
@@ -1893,26 +1899,26 @@ RET SQLRCursor::getFieldLength(const ARGS &args) {
 						args[0]->IntegerValue(),
 						toString(args[1]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::getRow(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	const char * const *fields=sqlrcur(args)->getRow(
 						args[0]->IntegerValue());
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
-	Handle<Array>	result=newArray(isolate,colcount);
+	Handle<Array>	result=newArray(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(newInteger(isolate,i),newString(isolate,fields[i]));
+		result->Set(newInteger(i),newString(fields[i]));
 	}
 
 	returnObject(result);
@@ -1920,19 +1926,19 @@ RET SQLRCursor::getRow(const ARGS &args) {
 
 RET SQLRCursor::getRowLengths(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	uint32_t	*lengths=sqlrcur(args)->getRowLengths(
 						args[0]->IntegerValue());
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
-	Handle<Array>	result=newArray(isolate,colcount);
+	Handle<Array>	result=newArray(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(newInteger(isolate,i),
-				newUint32(isolate,lengths[i]));
+		result->Set(newInteger(i),
+				newUint32(lengths[i]));
 	}
 
 	returnObject(result);
@@ -1940,17 +1946,17 @@ RET SQLRCursor::getRowLengths(const ARGS &args) {
 
 RET SQLRCursor::getColumnNames(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	const char * const *names=sqlrcur(args)->getColumnNames();
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
-	Handle<Array>	result=newArray(isolate,colcount);
+	Handle<Array>	result=newArray(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(newInteger(isolate,i),newString(isolate,names[i]));
+		result->Set(newInteger(i),newString(names[i]));
 	}
 
 	returnObject(result);
@@ -1958,23 +1964,23 @@ RET SQLRCursor::getColumnNames(const ARGS &args) {
 
 RET SQLRCursor::getColumnName(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	const char	*result=sqlrcur(args)->getColumnName(
 						args[0]->Uint32Value());
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::getColumnType(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	const char	*result=NULL;
 
@@ -1983,18 +1989,18 @@ RET SQLRCursor::getColumnType(const ARGS &args) {
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getColumnType(toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnString(isolate,result);
+	returnString(result);
 }
 
 RET SQLRCursor::getColumnLength(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	uint32_t	result=0;
 
@@ -2003,18 +2009,18 @@ RET SQLRCursor::getColumnLength(const ARGS &args) {
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getColumnLength(toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::getColumnPrecision(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	uint32_t	result=0;
 
@@ -2025,18 +2031,18 @@ RET SQLRCursor::getColumnPrecision(const ARGS &args) {
 		result=sqlrcur(args)->getColumnPrecision(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::getColumnScale(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	uint32_t	result=0;
 
@@ -2045,18 +2051,18 @@ RET SQLRCursor::getColumnScale(const ARGS &args) {
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getColumnScale(toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::getColumnIsNullable(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2067,18 +2073,18 @@ RET SQLRCursor::getColumnIsNullable(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsNullable(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnIsPrimaryKey(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2089,19 +2095,19 @@ RET SQLRCursor::getColumnIsPrimaryKey(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsPrimaryKey(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnIsUnique(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2112,18 +2118,18 @@ RET SQLRCursor::getColumnIsUnique(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsUnique(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnIsPartOfKey(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2134,18 +2140,18 @@ RET SQLRCursor::getColumnIsPartOfKey(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsPartOfKey(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnIsUnsigned(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2156,18 +2162,18 @@ RET SQLRCursor::getColumnIsUnsigned(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsUnsigned(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnIsZeroFilled(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2178,18 +2184,18 @@ RET SQLRCursor::getColumnIsZeroFilled(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsZeroFilled(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnIsBinary(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2200,18 +2206,18 @@ RET SQLRCursor::getColumnIsBinary(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsBinary(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getColumnIsAutoIncrement(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=false;
 
@@ -2222,18 +2228,18 @@ RET SQLRCursor::getColumnIsAutoIncrement(const ARGS &args) {
 		result=sqlrcur(args)->getColumnIsAutoIncrement(
 						toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::getLongest(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	uint32_t	result=0;
 
@@ -2242,72 +2248,72 @@ RET SQLRCursor::getLongest(const ARGS &args) {
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getLongest(toString(args[0]));
 	} else {
-		throwInvalidArgumentType(isolate);
+		throwInvalidArgumentType();
 	}
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::suspendResultSet(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->suspendResultSet();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 RET SQLRCursor::getResultSetId(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	uint16_t	result=sqlrcur(args)->getResultSetId();
 
-	returnUint32(isolate,result);
+	returnUint32(result);
 }
 
 RET SQLRCursor::resumeResultSet(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,1);
+	checkArgCount(args,1);
 
 	bool	result=sqlrcur(args)->resumeResultSet(args[0]->Uint32Value());
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::resumeCachedResultSet(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,2);
+	checkArgCount(args,2);
 
 	bool	result=sqlrcur(args)->resumeCachedResultSet(
 						args[0]->Uint32Value(),
 						toString(args[1]));
 
-	returnBoolean(isolate,result);
+	returnBoolean(result);
 }
 
 RET SQLRCursor::closeResultSet(const ARGS &args) {
 
-	Isolate		*isolate=Isolate::GetCurrent();
-	HandleScope	scope(isolate);
+	isolate();
+	localScope();
 
-	checkArgCount(args,isolate,0);
+	checkArgCount(args,0);
 
 	sqlrcur(args)->closeResultSet();
 
-	returnVoid(isolate);
+	returnVoid();
 }
 
 sqlrcursor *SQLRCursor::sqlrcur(const ARGS &args) {
