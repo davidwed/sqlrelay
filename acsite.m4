@@ -3422,7 +3422,7 @@ then
 				then
 					CSC="$path/bin/$compiler"
 					MONOPATH="$path"
-					break;
+					break
 				fi
 			done
 
@@ -3449,7 +3449,7 @@ then
 			if ( test -r "$path/bin/sn" )
 			then
 				SN="$path/bin/sn"
-				break;
+				break
 			fi
 		done
 
@@ -3470,7 +3470,7 @@ then
 			if ( test -r "$path/bin/monodis" )
 			then
 				ILDASM="$path/bin/monodis"
-				break;
+				break
 			fi
 		done
 
@@ -3491,7 +3491,7 @@ then
 			if ( test -r "$path/bin/ilasm" )
 			then
 				ILASM="$path/bin/ilasm"
-				break;
+				break
 			fi
 		done
 
@@ -3512,7 +3512,7 @@ then
 			if ( test -r "$path/bin/gacutil" )
 			then
 				GACUTIL="$path/bin/gacutil"
-				break;
+				break
 			fi
 		done
 
@@ -3564,7 +3564,7 @@ EOF
 			if ( test -r "conftest.exe" )
 			then
 				AC_MSG_RESULT(yes)
-				break;
+				break
 			else
 				AC_MSG_RESULT(no)
 			fi
@@ -3663,7 +3663,7 @@ then
 			if ( test -n "$NODE" )
 			then
 				NODEDIR="$path"
-				break;
+				break
 			fi
 		done
 
@@ -3680,11 +3680,14 @@ then
 		HAVE_NODEJS="yes"
 
 		AC_MSG_CHECKING(for node module directory)
-		NODEMODULEDIR=$NODEDIR/lib/node_modules
-		if ( test -d "$NODEDIR/lib/nodejs" )
-		then
-			NODEMODULEDIR=$NODEDIR/lib/nodejs
-		fi
+		for file in "$NODEDIR/lib64/node_modules" "$NODEDIR/lib64/nodejs" "$NODEDIR/lib/node_modules" "$NODEDIR/lib/nodejs"
+		do
+			if ( test -d "$file" )
+			then
+				NODEMODULEDIR="$file"
+				break
+			fi
+		done
 		AC_MSG_RESULT($NODEMODULEDIR)
 
 		AC_MSG_CHECKING(for node-gyp)
@@ -3709,7 +3712,6 @@ then
 
 	if ( test -z "$NODE" -o -z "$NODEGYP" )
 	then
-		HAVE_NODEJS="no"
 		AC_MSG_WARN(The node.js API will not be built.)
 	fi
 

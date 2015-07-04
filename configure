@@ -33537,7 +33537,7 @@ $as_echo_n "checking for $compiler... " >&6; }
 				then
 					CSC="$path/bin/$compiler"
 					MONOPATH="$path"
-					break;
+					break
 				fi
 			done
 
@@ -33566,7 +33566,7 @@ $as_echo_n "checking for sn... " >&6; }
 			if ( test -r "$path/bin/sn" )
 			then
 				SN="$path/bin/sn"
-				break;
+				break
 			fi
 		done
 
@@ -33589,7 +33589,7 @@ $as_echo_n "checking for monodis... " >&6; }
 			if ( test -r "$path/bin/monodis" )
 			then
 				ILDASM="$path/bin/monodis"
-				break;
+				break
 			fi
 		done
 
@@ -33612,7 +33612,7 @@ $as_echo_n "checking for ilasm... " >&6; }
 			if ( test -r "$path/bin/ilasm" )
 			then
 				ILASM="$path/bin/ilasm"
-				break;
+				break
 			fi
 		done
 
@@ -33635,7 +33635,7 @@ $as_echo_n "checking for gacutil... " >&6; }
 			if ( test -r "$path/bin/gacutil" )
 			then
 				GACUTIL="$path/bin/gacutil"
-				break;
+				break
 			fi
 		done
 
@@ -33686,7 +33686,7 @@ EOF
 			then
 				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-				break;
+				break
 			else
 				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -33792,7 +33792,7 @@ $as_echo_n "checking for node... " >&6; }
 			if ( test -n "$NODE" )
 			then
 				NODEDIR="$path"
-				break;
+				break
 			fi
 		done
 
@@ -33812,11 +33812,14 @@ $as_echo "no" >&6; }
 
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node module directory" >&5
 $as_echo_n "checking for node module directory... " >&6; }
-		NODEMODULEDIR=$NODEDIR/lib/node_modules
-		if ( test -d "$NODEDIR/lib/nodejs" )
-		then
-			NODEMODULEDIR=$NODEDIR/lib/nodejs
-		fi
+		for file in "$NODEDIR/lib64/node_modules" "$NODEDIR/lib64/nodejs" "$NODEDIR/lib/node_modules" "$NODEDIR/lib/nodejs"
+		do
+			if ( test -d "$file" )
+			then
+				NODEMODULEDIR="$file"
+				break
+			fi
+		done
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEMODULEDIR" >&5
 $as_echo "$NODEMODULEDIR" >&6; }
 
@@ -33845,7 +33848,6 @@ $as_echo "no" >&6; }
 
 	if ( test -z "$NODE" -o -z "$NODEGYP" )
 	then
-		HAVE_NODEJS="no"
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The node.js API will not be built." >&5
 $as_echo "$as_me: WARNING: The node.js API will not be built." >&2;}
 	fi

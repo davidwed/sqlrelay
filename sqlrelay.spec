@@ -45,6 +45,16 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define phpconfdir /etc/php.d
 %endif
 
+%if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
+%ifarch x86_64
+	%define nodejsdir /usr/lib64/node_modules
+%else
+	%define nodejsdir /usr/lib/node_modules
+%endif
+%else
+	%define nodejsdir /usr/lib/node_modules
+%endif
+
 BuildRequires: rudiments-devel
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
@@ -598,7 +608,7 @@ rm -rf %{buildroot}
 
 %{!?_without_nodejs:%files nodejs}
 %{!?_without_nodejs:%defattr(-, root, root)}
-%{!?_without_nodejs:/usr/lib/node_modules/sqlrelay}
+%{!?_without_nodejs:%{nodejsdir}/sqlrelay}
 
 %files doc
 %{_docdir}/%{name}
