@@ -34,6 +34,7 @@ using namespace node;
 	#define newUint32(isolate,val) Uint32::New(isolate,val)
 	#define newInt32(isolate,val) Int32::New(isolate,val)
 	#define newNumber(isolate,val) Number::New(isolate,val)
+	#define newArray(isolate,len) Array::New(isolate,len)
 
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); return; }
 
@@ -62,6 +63,7 @@ using namespace node;
 	#define newUint32(isolate,val) Uint32::New(val)
 	#define newInt32(isolate,val) Int32::New(val)
 	#define newNumber(isolate,val) Number::New(val)
+	#define newArray(isolate,len) Array::New(len)
 
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); returnBoolean(isolate,false); }
 
@@ -1903,7 +1905,7 @@ RET SQLRCursor::getRow(const ARGS &args) {
 						args[0]->IntegerValue());
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
-	Handle<Array>	result=Array::New(colcount);
+	Handle<Array>	result=newArray(isolate,colcount);
 	for (uint32_t i=0; i<colcount; i++) {
 		result->Set(newInteger(isolate,i),newString(isolate,fields[i]));
 	}
@@ -1922,7 +1924,7 @@ RET SQLRCursor::getRowLengths(const ARGS &args) {
 						args[0]->IntegerValue());
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
-	Handle<Array>	result=Array::New(colcount);
+	Handle<Array>	result=newArray(isolate,colcount);
 	for (uint32_t i=0; i<colcount; i++) {
 		result->Set(newInteger(isolate,i),
 				newUint32(isolate,lengths[i]));
@@ -1941,7 +1943,7 @@ RET SQLRCursor::getColumnNames(const ARGS &args) {
 	const char * const *names=sqlrcur(args)->getColumnNames();
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
-	Handle<Array>	result=Array::New(colcount);
+	Handle<Array>	result=newArray(isolate,colcount);
 	for (uint32_t i=0; i<colcount; i++) {
 		result->Set(newInteger(isolate,i),newString(isolate,names[i]));
 	}
