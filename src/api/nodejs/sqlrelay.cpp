@@ -21,6 +21,8 @@ using namespace node;
 	#define returnBoolean(isolate,result) args.GetReturnValue().Set(Boolean::New(isolate,result))
 	#define returnString(isolate,result) if (result) { args.GetReturnValue().Set(String::NewFromUtf8(isolate,result)); } else { args.GetReturnValue().Set(Null(isolate)); }
 	#define returnInteger(isolate,result) args.GetReturnValue().Set(Integer::New(isolate,result))
+	#define returnInt32(isolate,result) args.GetReturnValue().Set(Int32::New(isolate,result))
+	#define returnUint32(isolate,result) args.GetReturnValue().Set(Uint32::New(isolate,result))
 	#define returnNumber(isolate,result) args.GetReturnValue().Set(Number::New(isolate,result))
 	#define returnVoid(isolate)
 	#define checkArgCount(args,isolate,count) if (args.Length()!=count) { throwWrongNumberOfArguments(isolate); return; }
@@ -36,6 +38,8 @@ using namespace node;
 	#define returnBoolean(isolate,result) return scope.Close(Boolean::New(result))
 	#define returnString(isolate,result) if (result) { return scope.Close(String::New(result)); } else { return scope.Close(Null()); }
 	#define returnInteger(isolate,result) return scope.Close(Integer::New(result))
+	#define returnInt32(isolate,result) return scope.Close(Int32::New(result))
+	#define returnUint32(isolate,result) return scope.Close(Uint32::New(result))
 	#define returnNumber(isolate,result) return scope.Close(Number::New(result))
 	#define returnVoid(isolate) return scope.Close(Null())
 	#define scope(isolate) scope
@@ -368,7 +372,7 @@ RET SQLRConnection::getConnectionPort(const ARGS &args) {
 
 	uint16_t	result=sqlrcon(args)->getConnectionPort();
 
-	returnInteger(isolate,result);
+	returnInt32(isolate,result);
 }
 
 RET SQLRConnection::getConnectionSocket(const ARGS &args) {
@@ -852,7 +856,7 @@ RET SQLRCursor::setResultSetBufferSize(const ARGS &args) {
 
 	checkArgCount(args,isolate,1);
 
-	sqlrcur(args)->setResultSetBufferSize(args[0]->Uint32Value());
+	sqlrcur(args)->setResultSetBufferSize(args[0]->IntegerValue());
 
 	returnVoid(isolate);
 }
@@ -1087,11 +1091,9 @@ RET SQLRCursor::substitution(const ARGS &args) {
 		if (args[1]->IsString()) {
 			sqlrcur(args)->substitution(toString(args[0]),
 							toString(args[1]));
-		} else if (args[1]->IsInt32() ||
-				args[1]->IsUint32() ||
-				args[1]->IsNumber()) {
+		} else if (args[1]->IsNumber()) {
 			sqlrcur(args)->substitution(toString(args[0]),
-							args[1]->Int32Value());
+						args[1]->IntegerValue());
 		} else {
 			throwInvalidArgumentType(isolate);
 		}
@@ -1139,9 +1141,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 							Integer::New(i))));
 					}
 
-				} else if (first->IsInt32() ||
-						first->IsUint32() ||
-						first->IsNumber()) {
+				} else if (first->IsNumber()) {
 
 					for (uint32_t i=0;
 						i<vars->Length(); i++) {
@@ -1154,7 +1154,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 
 							vals->Get(
 							Integer::New(i))->
-							Int32Value());
+							IntegerValue());
 					}
 
 				} else {
@@ -1228,13 +1228,11 @@ RET SQLRCursor::inputBind(const ARGS &args) {
 			// string
 			sqlrcur(args)->inputBind(toString(args[0]),
 							toString(args[1]));
-		} else if (args[1]->IsInt32() ||
-				args[1]->IsUint32() ||
-				args[1]->IsNumber()) {
+		} else if (args[1]->IsNumber()) {
 
 			// integer
 			sqlrcur(args)->inputBind(toString(args[0]),
-							args[1]->Int32Value());
+						args[1]->IntegerValue());
 		} else {
 			throwInvalidArgumentType(isolate);
 		}
@@ -1334,9 +1332,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 							Integer::New(i))));
 					}
 
-				} else if (first->IsInt32() ||
-						first->IsUint32() ||
-						first->IsNumber()) {
+				} else if (first->IsNumber()) {
 
 					for (uint32_t i=0;
 						i<vars->Length(); i++) {
@@ -1349,7 +1345,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 
 							vals->Get(
 							Integer::New(i))->
-							Int32Value());
+							IntegerValue());
 					}
 
 				} else {
@@ -1505,7 +1501,7 @@ RET SQLRCursor::countBindVariables(const ARGS &args) {
 
 	uint16_t	result=sqlrcur(args)->countBindVariables();
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::validateBinds(const ARGS &args) {
@@ -1631,7 +1627,7 @@ RET SQLRCursor::getOutputBindLength(const ARGS &args) {
 	uint32_t	result=sqlrcur(args)->getOutputBindLength(
 						toString(args[0]));
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::getOutputBindCursor(const ARGS &args) {
@@ -1671,7 +1667,7 @@ RET SQLRCursor::colCount(const ARGS &args) {
 
 	uint32_t	result=sqlrcur(args)->colCount();
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::rowCount(const ARGS &args) {
@@ -1791,12 +1787,12 @@ RET SQLRCursor::getField(const ARGS &args) {
 
 	const char	*result=NULL;
 
-	if (args[1]->IsInt32() || args[1]->IsUint32() || args[1]->IsNumber()) {
-		result=sqlrcur(args)->getField(args[0]->Uint32Value(),
-						args[1]->Uint32Value());
+	if (args[1]->IsNumber()) {
+		result=sqlrcur(args)->getField(args[0]->IntegerValue(),
+							args[1]->Uint32Value());
 	} else if (args[1]->IsString()) {
-		result=sqlrcur(args)->getField(args[0]->Uint32Value(),
-						toString(args[1]));
+		result=sqlrcur(args)->getField(args[0]->IntegerValue(),
+							toString(args[1]));
 	} else {
 		throwInvalidArgumentType(isolate);
 	}
@@ -1813,13 +1809,13 @@ RET SQLRCursor::getFieldAsInteger(const ARGS &args) {
 
 	int64_t	result=0;
 
-	if (args[1]->IsInt32() || args[1]->IsUint32() || args[1]->IsNumber()) {
+	if (args[1]->IsNumber()) {
 		result=sqlrcur(args)->getFieldAsInteger(
-						args[0]->Uint32Value(),
+						args[0]->IntegerValue(),
 						args[1]->Uint32Value());
 	} else if (args[1]->IsString()) {
 		result=sqlrcur(args)->getFieldAsInteger(
-						args[0]->Uint32Value(),
+						args[0]->IntegerValue(),
 						toString(args[1]));
 	} else {
 		throwInvalidArgumentType(isolate);
@@ -1837,13 +1833,13 @@ RET SQLRCursor::getFieldAsDouble(const ARGS &args) {
 
 	double	result=0;
 
-	if (args[1]->IsInt32() || args[1]->IsUint32() || args[1]->IsNumber()) {
+	if (args[1]->IsNumber()) {
 		result=sqlrcur(args)->getFieldAsDouble(
-						args[0]->Uint32Value(),
+						args[0]->IntegerValue(),
 						args[1]->Uint32Value());
 	} else if (args[1]->IsString()) {
 		result=sqlrcur(args)->getFieldAsDouble(
-						args[0]->Uint32Value(),
+						args[0]->IntegerValue(),
 						toString(args[1]));
 	} else {
 		throwInvalidArgumentType(isolate);
@@ -1861,19 +1857,19 @@ RET SQLRCursor::getFieldLength(const ARGS &args) {
 
 	uint32_t	result=0;
 
-	if (args[1]->IsInt32() || args[1]->IsUint32() || args[1]->IsNumber()) {
+	if (args[1]->IsNumber()) {
 		result=sqlrcur(args)->getFieldLength(
-						args[0]->Uint32Value(),
+						args[0]->IntegerValue(),
 						args[1]->Uint32Value());
 	} else if (args[1]->IsString()) {
 		result=sqlrcur(args)->getFieldLength(
-						args[0]->Uint32Value(),
+						args[0]->IntegerValue(),
 						toString(args[1]));
 	} else {
 		throwInvalidArgumentType(isolate);
 	}
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::getRow(const ARGS &args) {
@@ -1884,7 +1880,7 @@ RET SQLRCursor::getRow(const ARGS &args) {
 	checkArgCount(args,isolate,1);
 
 	const char * const *fields=sqlrcur(args)->getRow(
-						args[0]->Uint32Value());
+						args[0]->IntegerValue());
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
 	Handle<Array>	result=Array::New(colcount);
@@ -1904,7 +1900,7 @@ RET SQLRCursor::getRowLengths(const ARGS &args) {
 	checkArgCount(args,isolate,1);
 
 	uint32_t	*lengths=sqlrcur(args)->getRowLengths(
-						args[0]->Uint32Value());
+						args[0]->IntegerValue());
 	uint32_t	colcount=sqlrcur(args)->colCount();
 
 	Handle<Array>	result=Array::New(colcount);
@@ -1956,7 +1952,7 @@ RET SQLRCursor::getColumnType(const ARGS &args) {
 
 	const char	*result=NULL;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnType(args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getColumnType(toString(args[0]));
@@ -1976,7 +1972,7 @@ RET SQLRCursor::getColumnLength(const ARGS &args) {
 
 	uint32_t	result=0;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnLength(args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getColumnLength(toString(args[0]));
@@ -1984,7 +1980,7 @@ RET SQLRCursor::getColumnLength(const ARGS &args) {
 		throwInvalidArgumentType(isolate);
 	}
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::getColumnPrecision(const ARGS &args) {
@@ -1996,7 +1992,7 @@ RET SQLRCursor::getColumnPrecision(const ARGS &args) {
 
 	uint32_t	result=0;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnPrecision(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2006,7 +2002,7 @@ RET SQLRCursor::getColumnPrecision(const ARGS &args) {
 		throwInvalidArgumentType(isolate);
 	}
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::getColumnScale(const ARGS &args) {
@@ -2018,7 +2014,7 @@ RET SQLRCursor::getColumnScale(const ARGS &args) {
 
 	uint32_t	result=0;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnScale(args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getColumnScale(toString(args[0]));
@@ -2026,7 +2022,7 @@ RET SQLRCursor::getColumnScale(const ARGS &args) {
 		throwInvalidArgumentType(isolate);
 	}
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::getColumnIsNullable(const ARGS &args) {
@@ -2038,7 +2034,7 @@ RET SQLRCursor::getColumnIsNullable(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsNullable(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2060,7 +2056,7 @@ RET SQLRCursor::getColumnIsPrimaryKey(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsPrimaryKey(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2083,7 +2079,7 @@ RET SQLRCursor::getColumnIsUnique(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsUnique(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2105,7 +2101,7 @@ RET SQLRCursor::getColumnIsPartOfKey(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsPartOfKey(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2127,7 +2123,7 @@ RET SQLRCursor::getColumnIsUnsigned(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsUnsigned(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2149,7 +2145,7 @@ RET SQLRCursor::getColumnIsZeroFilled(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsZeroFilled(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2171,7 +2167,7 @@ RET SQLRCursor::getColumnIsBinary(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsBinary(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2193,7 +2189,7 @@ RET SQLRCursor::getColumnIsAutoIncrement(const ARGS &args) {
 
 	bool	result=false;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getColumnIsAutoIncrement(
 						args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
@@ -2215,7 +2211,7 @@ RET SQLRCursor::getLongest(const ARGS &args) {
 
 	uint32_t	result=0;
 
-	if (args[0]->IsInt32() || args[0]->IsUint32() || args[0]->IsNumber()) {
+	if (args[0]->IsNumber()) {
 		result=sqlrcur(args)->getLongest(args[0]->Uint32Value());
 	} else if (args[0]->IsString()) {
 		result=sqlrcur(args)->getLongest(toString(args[0]));
@@ -2223,7 +2219,7 @@ RET SQLRCursor::getLongest(const ARGS &args) {
 		throwInvalidArgumentType(isolate);
 	}
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::suspendResultSet(const ARGS &args) {
@@ -2247,7 +2243,7 @@ RET SQLRCursor::getResultSetId(const ARGS &args) {
 
 	uint16_t	result=sqlrcur(args)->getResultSetId();
 
-	returnInteger(isolate,result);
+	returnUint32(isolate,result);
 }
 
 RET SQLRCursor::resumeResultSet(const ARGS &args) {
