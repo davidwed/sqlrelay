@@ -16806,50 +16806,6 @@
                     }
                 }
             }
-            "{1525181F-901A-416C-8A58-119130FE478E}:_6050427E2BD84F30BE0A6E6B162F9027"
-            {
-            "Name" = "8:#1912"
-            "AlwaysCreate" = "11:FALSE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Property" = "8:ProgramFilesFolder"
-                "Folders"
-                {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_993696A9CDA8408C905465904D395572"
-                    {
-                    "Name" = "8:nodejs"
-                    "AlwaysCreate" = "11:FALSE"
-                    "Condition" = "8:"
-                    "Transitive" = "11:FALSE"
-                    "Property" = "8:_EB6798E36ACE4F68B130CE7F95C1032F"
-                        "Folders"
-                        {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_01893ED43037456BB8FC09181900225B"
-                            {
-                            "Name" = "8:node_modules"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_50DE3A3459194AFA833C0D393DC00B7C"
-                                "Folders"
-                                {
-                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_3CE9B8BD4655479BBD1CCA7E6CF0C0A6"
-                                    {
-                                    "Name" = "8:sqlrelay"
-                                    "AlwaysCreate" = "11:FALSE"
-                                    "Condition" = "8:"
-                                    "Transitive" = "11:FALSE"
-                                    "Property" = "8:_E46D09C6481641D683E5B63199C8A3C8"
-                                        "Folders"
-                                        {
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             "{994432C3-9487-495D-8656-3E829A8DBDDE}:_6739EED46433442D9EF33F94549239A6"
             {
             "DefaultLocation" = "8:C:\\Python27"
@@ -17670,6 +17626,50 @@
                                                     }
                                                 }
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_D02E1BD5C471499D88EBBC119E44BA82"
+            {
+            "Name" = "8:#1935"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:ProgramFiles64Folder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_9180BB1C592744FAB1344BF76704D030"
+                    {
+                    "Name" = "8:nodejs"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_EB6798E36ACE4F68B130CE7F95C1032F"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_01893ED43037456BB8FC09181900225B"
+                            {
+                            "Name" = "8:node_modules"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_50DE3A3459194AFA833C0D393DC00B7C"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_3CE9B8BD4655479BBD1CCA7E6CF0C0A6"
+                                    {
+                                    "Name" = "8:sqlrelay"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_E46D09C6481641D683E5B63199C8A3C8"
+                                        "Folders"
+                                        {
                                         }
                                     }
                                 }

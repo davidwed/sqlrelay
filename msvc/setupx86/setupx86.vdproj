@@ -429,6 +429,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1B3715CCDEC14F98A9169461E7274233"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1C2EB85AAB8D49F69E5AFFDE68AF2C0E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1629,6 +1635,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_69D01D7D0C8944649722BA0623DA0409"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_6A067428AC7340458C084757C153F523"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1888,6 +1900,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7D6CB54A86D3456C9E45EDD010248A2A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7DF65B48AE574BF99AB244EF7F69A84F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -5342,6 +5360,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1B3715CCDEC14F98A9169461E7274233"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\nodejs\\index.js"
+            "TargetName" = "8:index.js"
+            "Tag" = "8:"
+            "Folder" = "8:_03935DEB180840ABB9E661AEEB57BCCA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1C2EB85AAB8D49F69E5AFFDE68AF2C0E"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRCursor.src\\M000066.html"
@@ -5906,7 +5944,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.60.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.61.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_262F174C65C8408AB1A323DB9BB92EBA"
@@ -9353,6 +9391,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_69D01D7D0C8944649722BA0623DA0409"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\nodejs\\package.json"
+            "TargetName" = "8:package.json"
+            "Tag" = "8:"
+            "Folder" = "8:_03935DEB180840ABB9E661AEEB57BCCA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6A067428AC7340458C084757C153F523"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c\\html\\dynsections.js"
@@ -10219,6 +10277,26 @@
             "TargetName" = "8:sqlr-fetch-many-return-rsbuffersize.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7DF65B48AE574BF99AB244EF7F69A84F"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\nodejs\\build\\Release\\sqlrelay.node"
+            "TargetName" = "8:sqlrelay.node"
+            "Tag" = "8:"
+            "Folder" = "8:_03935DEB180840ABB9E661AEEB57BCCA"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -17455,6 +17533,50 @@
                                                 {
                                                 }
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_AB37CDE930FB4B96B4ED6B74565DD4E7"
+            {
+            "Name" = "8:#1912"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:ProgramFilesFolder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_F6B32249879E457487A9D3A5EDAB9E40"
+                    {
+                    "Name" = "8:nodejs"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_2B4560FBD3044EBE84757CB73FE82A11"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_52096BF4C1DE4233AFEF7144A2114210"
+                            {
+                            "Name" = "8:node_modules"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_729B90F4F39143D492682B135467CB51"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_03935DEB180840ABB9E661AEEB57BCCA"
+                                    {
+                                    "Name" = "8:sqlrelay"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_51B49239F4134E57AE0F9CF48F153C50"
+                                        "Folders"
+                                        {
                                         }
                                     }
                                 }
