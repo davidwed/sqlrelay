@@ -72,18 +72,14 @@ using namespace node;
 
 // convenience macros
 #define toString(arg) *(String::Utf8Value(arg))
+#define toArray(arg) Handle<Array>::Cast(arg);
 
 #if NODE_MINOR_VERSION >= 12
 	#define throwWrongNumberOfArguments(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
 	#define throwInvalidArgumentType(isolate) isolate->ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
-
-	#define toArray(arg) Handle<Array>::Cast(arg);
 #else
 	#define throwWrongNumberOfArguments(isolate) ThrowException(Exception::TypeError(newString(isolate,"Wrong number of arguments")))
 	#define throwInvalidArgumentType(isolate) ThrowException(Exception::TypeError(newString(isolate,"Invalid argument type")))
-
-	//#define toArray(arg) Array::Cast(*arg);
-	#define toArray(arg) Handle<Array>::Cast(arg);
 #endif
 
 
