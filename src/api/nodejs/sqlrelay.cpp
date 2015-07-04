@@ -15,8 +15,7 @@ using namespace node;
 	#define RET void
 	#define ARGS FunctionCallbackInfo<Value>
 
-	#define isolate() Isolate *isolate=Isolate::GetCurrent()
-	#define localScope() HandleScope	localscope(isolate)
+	#define initLocalScope() Isolate *isolate=Isolate::GetCurrent(); HandleScope	localscope(isolate)
 
 	#define resetConstructor(constructor,tpl) constructor.Reset(isolate,tpl->GetFunction())
 
@@ -48,8 +47,7 @@ using namespace node;
 	#define RET Handle<Value>
 	#define ARGS Arguments
 
-	#define	isolate()
-	#define localScope() HandleScope	localscope
+	#define initLocalScope() HandleScope	localscope
 
 	#define resetConstructor(constructor,tpl)
 
@@ -249,7 +247,7 @@ Persistent<Function> SQLRCursor::constructor;
 // SQLRConnection methods...
 void SQLRConnection::Init(Handle<Object> exports) {
 
-	isolate();
+	initLocalScope();
 
 	Local<FunctionTemplate>	tpl=newFunctionTemplate(New);
 	tpl->SetClassName(newString("SQLRConnection"));
@@ -303,8 +301,7 @@ SQLRConnection::~SQLRConnection() {
 
 RET SQLRConnection::New(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	if (args.IsConstructCall()) {
 
@@ -322,7 +319,9 @@ RET SQLRConnection::New(const ARGS &args) {
 						true);
 		obj->Wrap(args.This());
 		returnObject(args.This());
+
 	} else {
+
 		// invoked as function: SQLRConnection(...)
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
@@ -333,8 +332,7 @@ RET SQLRConnection::New(const ARGS &args) {
 
 RET SQLRConnection::setConnectTimeout(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -346,8 +344,7 @@ RET SQLRConnection::setConnectTimeout(const ARGS &args) {
 
 RET SQLRConnection::setAuthenticationTimeout(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -359,8 +356,7 @@ RET SQLRConnection::setAuthenticationTimeout(const ARGS &args) {
 
 RET SQLRConnection::setResponseTimeout(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -372,8 +368,7 @@ RET SQLRConnection::setResponseTimeout(const ARGS &args) {
 
 RET SQLRConnection::endSession(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -384,8 +379,7 @@ RET SQLRConnection::endSession(const ARGS &args) {
 
 RET SQLRConnection::suspendSession(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -396,8 +390,7 @@ RET SQLRConnection::suspendSession(const ARGS &args) {
 
 RET SQLRConnection::getConnectionPort(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -408,8 +401,7 @@ RET SQLRConnection::getConnectionPort(const ARGS &args) {
 
 RET SQLRConnection::getConnectionSocket(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -420,8 +412,7 @@ RET SQLRConnection::getConnectionSocket(const ARGS &args) {
 
 RET SQLRConnection::resumeSession(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -433,8 +424,7 @@ RET SQLRConnection::resumeSession(const ARGS &args) {
 
 RET SQLRConnection::ping(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -445,8 +435,7 @@ RET SQLRConnection::ping(const ARGS &args) {
 
 RET SQLRConnection::identify(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -457,8 +446,7 @@ RET SQLRConnection::identify(const ARGS &args) {
 
 RET SQLRConnection::dbVersion(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -469,8 +457,7 @@ RET SQLRConnection::dbVersion(const ARGS &args) {
 
 RET SQLRConnection::dbHostName(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -481,8 +468,7 @@ RET SQLRConnection::dbHostName(const ARGS &args) {
 
 RET SQLRConnection::dbIpAddress(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -493,8 +479,7 @@ RET SQLRConnection::dbIpAddress(const ARGS &args) {
 
 RET SQLRConnection::serverVersion(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -505,8 +490,7 @@ RET SQLRConnection::serverVersion(const ARGS &args) {
 
 RET SQLRConnection::clientVersion(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -517,8 +501,7 @@ RET SQLRConnection::clientVersion(const ARGS &args) {
 
 RET SQLRConnection::bindFormat(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -529,8 +512,7 @@ RET SQLRConnection::bindFormat(const ARGS &args) {
 
 RET SQLRConnection::selectDatabase(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -541,8 +523,7 @@ RET SQLRConnection::selectDatabase(const ARGS &args) {
 
 RET SQLRConnection::getCurrentDatabase(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -553,8 +534,7 @@ RET SQLRConnection::getCurrentDatabase(const ARGS &args) {
 
 RET SQLRConnection::getLastInsertId(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -565,8 +545,7 @@ RET SQLRConnection::getLastInsertId(const ARGS &args) {
 
 RET SQLRConnection::autoCommitOn(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -577,8 +556,7 @@ RET SQLRConnection::autoCommitOn(const ARGS &args) {
 
 RET SQLRConnection::autoCommitOff(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -589,8 +567,7 @@ RET SQLRConnection::autoCommitOff(const ARGS &args) {
 
 RET SQLRConnection::begin(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -601,8 +578,7 @@ RET SQLRConnection::begin(const ARGS &args) {
 
 RET SQLRConnection::commit(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -613,8 +589,7 @@ RET SQLRConnection::commit(const ARGS &args) {
 
 RET SQLRConnection::rollback(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -625,8 +600,7 @@ RET SQLRConnection::rollback(const ARGS &args) {
 
 RET SQLRConnection::errorMessage(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -637,8 +611,7 @@ RET SQLRConnection::errorMessage(const ARGS &args) {
 
 RET SQLRConnection::errorNumber(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -649,8 +622,7 @@ RET SQLRConnection::errorNumber(const ARGS &args) {
 
 RET SQLRConnection::debugOn(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -661,8 +633,7 @@ RET SQLRConnection::debugOn(const ARGS &args) {
 
 RET SQLRConnection::debugOff(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -673,8 +644,7 @@ RET SQLRConnection::debugOff(const ARGS &args) {
 
 RET SQLRConnection::getDebug(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -685,8 +655,7 @@ RET SQLRConnection::getDebug(const ARGS &args) {
 
 RET SQLRConnection::setDebugFile(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -697,8 +666,7 @@ RET SQLRConnection::setDebugFile(const ARGS &args) {
 
 RET SQLRConnection::setClientInfo(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -709,8 +677,7 @@ RET SQLRConnection::setClientInfo(const ARGS &args) {
 
 RET SQLRConnection::getClientInfo(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -728,7 +695,7 @@ sqlrconnection *SQLRConnection::sqlrcon(const ARGS &args) {
 // SQLRCursor methods...
 void SQLRCursor::Init(Handle<Object> exports) {
 
-	isolate();
+	initLocalScope();
 
 	Local<FunctionTemplate>	tpl=newFunctionTemplate(New);
 	tpl->SetClassName(newString("SQLRCursor"));
@@ -858,22 +825,24 @@ SQLRCursor::~SQLRCursor() {
 
 RET SQLRCursor::New(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	if (args.IsConstructCall()) {
 
 		checkArgCount(args,1);
 
 		// invoked as constructor: new SQLRCursor(...)
-		SQLRConnection	*sqlrcon=
+		sqlrconnection	*sqlrcon=
 			node::ObjectWrap::Unwrap<SQLRConnection>(
-							args[0]->ToObject());
+						args[0]->ToObject())->sqlrc;
+
 		SQLRCursor	*obj=new SQLRCursor();
-		obj->sqlrc=new sqlrcursor(sqlrcon->sqlrc,true);
+		obj->sqlrc=new sqlrcursor(sqlrcon,true);
 		obj->Wrap(args.This());
 		returnObject(args.This());
+
 	} else {
+
 		// invoked as function: SQLRCursor(...)
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
@@ -884,8 +853,7 @@ RET SQLRCursor::New(const ARGS &args) {
 
 RET SQLRCursor::setResultSetBufferSize(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -896,8 +864,7 @@ RET SQLRCursor::setResultSetBufferSize(const ARGS &args) {
 
 RET SQLRCursor::getResultSetBufferSize(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -908,8 +875,7 @@ RET SQLRCursor::getResultSetBufferSize(const ARGS &args) {
 
 RET SQLRCursor::dontGetColumnInfo(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -920,8 +886,7 @@ RET SQLRCursor::dontGetColumnInfo(const ARGS &args) {
 
 RET SQLRCursor::getColumnInfo(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -932,8 +897,7 @@ RET SQLRCursor::getColumnInfo(const ARGS &args) {
 
 RET SQLRCursor::mixedCaseColumnNames(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -944,8 +908,7 @@ RET SQLRCursor::mixedCaseColumnNames(const ARGS &args) {
 
 RET SQLRCursor::upperCaseColumnNames(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -956,8 +919,7 @@ RET SQLRCursor::upperCaseColumnNames(const ARGS &args) {
 
 RET SQLRCursor::lowerCaseColumnNames(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -968,8 +930,7 @@ RET SQLRCursor::lowerCaseColumnNames(const ARGS &args) {
 
 RET SQLRCursor::cacheToFile(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -980,8 +941,7 @@ RET SQLRCursor::cacheToFile(const ARGS &args) {
 
 RET SQLRCursor::setCacheTtl(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -992,8 +952,7 @@ RET SQLRCursor::setCacheTtl(const ARGS &args) {
 
 RET SQLRCursor::getCacheFileName(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1004,8 +963,7 @@ RET SQLRCursor::getCacheFileName(const ARGS &args) {
 
 RET SQLRCursor::cacheOff(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1016,8 +974,7 @@ RET SQLRCursor::cacheOff(const ARGS &args) {
 
 RET SQLRCursor::getDatabaseList(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1028,8 +985,7 @@ RET SQLRCursor::getDatabaseList(const ARGS &args) {
 
 RET SQLRCursor::getTableList(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1040,8 +996,7 @@ RET SQLRCursor::getTableList(const ARGS &args) {
 
 RET SQLRCursor::getColumnList(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1053,8 +1008,7 @@ RET SQLRCursor::getColumnList(const ARGS &args) {
 
 RET SQLRCursor::sendQuery(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	bool	result=false;
 
@@ -1072,8 +1026,7 @@ RET SQLRCursor::sendQuery(const ARGS &args) {
 
 RET SQLRCursor::sendFileQuery(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1085,8 +1038,7 @@ RET SQLRCursor::sendFileQuery(const ARGS &args) {
 
 RET SQLRCursor::prepareQuery(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1104,8 +1056,7 @@ RET SQLRCursor::prepareQuery(const ARGS &args) {
 
 RET SQLRCursor::prepareFileQuery(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1117,8 +1068,7 @@ RET SQLRCursor::prepareFileQuery(const ARGS &args) {
 
 RET SQLRCursor::substitution(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	if (args.Length()==2) {
 		if (args[1]->IsString()) {
@@ -1144,8 +1094,7 @@ RET SQLRCursor::substitution(const ARGS &args) {
 
 RET SQLRCursor::substitutions(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	if (args.Length()==2) {
 
@@ -1252,8 +1201,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 
 RET SQLRCursor::inputBind(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	if (args.Length()==2) {
 
@@ -1308,8 +1256,7 @@ RET SQLRCursor::inputBind(const ARGS &args) {
 
 RET SQLRCursor::inputBindBlob(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,3);
 
@@ -1322,8 +1269,7 @@ RET SQLRCursor::inputBindBlob(const ARGS &args) {
 
 RET SQLRCursor::inputBindClob(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,3);
 
@@ -1336,8 +1282,7 @@ RET SQLRCursor::inputBindClob(const ARGS &args) {
 
 RET SQLRCursor::inputBinds(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	if (args.Length()==2) {
 
@@ -1444,8 +1389,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 
 RET SQLRCursor::defineOutputBindString(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1457,8 +1401,7 @@ RET SQLRCursor::defineOutputBindString(const ARGS &args) {
 
 RET SQLRCursor::defineOutputBindInteger(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1469,8 +1412,7 @@ RET SQLRCursor::defineOutputBindInteger(const ARGS &args) {
 
 RET SQLRCursor::defineOutputBindDouble(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1481,8 +1423,7 @@ RET SQLRCursor::defineOutputBindDouble(const ARGS &args) {
 
 RET SQLRCursor::defineOutputBindBlob(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1493,8 +1434,7 @@ RET SQLRCursor::defineOutputBindBlob(const ARGS &args) {
 
 RET SQLRCursor::defineOutputBindClob(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1505,8 +1445,7 @@ RET SQLRCursor::defineOutputBindClob(const ARGS &args) {
 
 RET SQLRCursor::defineOutputBindCursor(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1517,8 +1456,7 @@ RET SQLRCursor::defineOutputBindCursor(const ARGS &args) {
 
 RET SQLRCursor::clearBinds(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1529,8 +1467,7 @@ RET SQLRCursor::clearBinds(const ARGS &args) {
 
 RET SQLRCursor::countBindVariables(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1541,8 +1478,7 @@ RET SQLRCursor::countBindVariables(const ARGS &args) {
 
 RET SQLRCursor::validateBinds(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1553,8 +1489,7 @@ RET SQLRCursor::validateBinds(const ARGS &args) {
 
 RET SQLRCursor::validBind(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1565,8 +1500,7 @@ RET SQLRCursor::validBind(const ARGS &args) {
 
 RET SQLRCursor::executeQuery(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1577,8 +1511,7 @@ RET SQLRCursor::executeQuery(const ARGS &args) {
 
 RET SQLRCursor::fetchFromBindCursor(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1589,8 +1522,7 @@ RET SQLRCursor::fetchFromBindCursor(const ARGS &args) {
 
 RET SQLRCursor::getOutputBindString(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1602,8 +1534,7 @@ RET SQLRCursor::getOutputBindString(const ARGS &args) {
 
 RET SQLRCursor::getOutputBindInteger(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1615,8 +1546,7 @@ RET SQLRCursor::getOutputBindInteger(const ARGS &args) {
 
 RET SQLRCursor::getOutputBindDouble(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1628,8 +1558,7 @@ RET SQLRCursor::getOutputBindDouble(const ARGS &args) {
 
 RET SQLRCursor::getOutputBindBlob(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1641,8 +1570,7 @@ RET SQLRCursor::getOutputBindBlob(const ARGS &args) {
 
 RET SQLRCursor::getOutputBindClob(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1654,8 +1582,7 @@ RET SQLRCursor::getOutputBindClob(const ARGS &args) {
 
 RET SQLRCursor::getOutputBindLength(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1667,8 +1594,7 @@ RET SQLRCursor::getOutputBindLength(const ARGS &args) {
 
 RET SQLRCursor::getOutputBindCursor(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1680,8 +1606,7 @@ RET SQLRCursor::getOutputBindCursor(const ARGS &args) {
 
 RET SQLRCursor::openCachedResultSet(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1693,8 +1618,7 @@ RET SQLRCursor::openCachedResultSet(const ARGS &args) {
 
 RET SQLRCursor::colCount(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1705,8 +1629,7 @@ RET SQLRCursor::colCount(const ARGS &args) {
 
 RET SQLRCursor::rowCount(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1717,8 +1640,7 @@ RET SQLRCursor::rowCount(const ARGS &args) {
 
 RET SQLRCursor::totalRows(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1729,8 +1651,7 @@ RET SQLRCursor::totalRows(const ARGS &args) {
 
 RET SQLRCursor::affectedRows(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1741,8 +1662,7 @@ RET SQLRCursor::affectedRows(const ARGS &args) {
 
 RET SQLRCursor::firstRowIndex(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1753,8 +1673,7 @@ RET SQLRCursor::firstRowIndex(const ARGS &args) {
 
 RET SQLRCursor::endOfResultSet(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1765,8 +1684,7 @@ RET SQLRCursor::endOfResultSet(const ARGS &args) {
 
 RET SQLRCursor::errorMessage(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1777,8 +1695,7 @@ RET SQLRCursor::errorMessage(const ARGS &args) {
 
 RET SQLRCursor::errorNumber(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1789,8 +1706,7 @@ RET SQLRCursor::errorNumber(const ARGS &args) {
 
 RET SQLRCursor::getNullsAsEmptyStrings(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1801,8 +1717,7 @@ RET SQLRCursor::getNullsAsEmptyStrings(const ARGS &args) {
 
 RET SQLRCursor::getNullsAsNulls(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1813,8 +1728,7 @@ RET SQLRCursor::getNullsAsNulls(const ARGS &args) {
 
 RET SQLRCursor::getField(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1835,8 +1749,7 @@ RET SQLRCursor::getField(const ARGS &args) {
 
 RET SQLRCursor::getFieldAsInteger(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1859,8 +1772,7 @@ RET SQLRCursor::getFieldAsInteger(const ARGS &args) {
 
 RET SQLRCursor::getFieldAsDouble(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1883,8 +1795,7 @@ RET SQLRCursor::getFieldAsDouble(const ARGS &args) {
 
 RET SQLRCursor::getFieldLength(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -1907,8 +1818,7 @@ RET SQLRCursor::getFieldLength(const ARGS &args) {
 
 RET SQLRCursor::getRow(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1926,8 +1836,7 @@ RET SQLRCursor::getRow(const ARGS &args) {
 
 RET SQLRCursor::getRowLengths(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1946,8 +1855,7 @@ RET SQLRCursor::getRowLengths(const ARGS &args) {
 
 RET SQLRCursor::getColumnNames(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -1964,8 +1872,7 @@ RET SQLRCursor::getColumnNames(const ARGS &args) {
 
 RET SQLRCursor::getColumnName(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1977,8 +1884,7 @@ RET SQLRCursor::getColumnName(const ARGS &args) {
 
 RET SQLRCursor::getColumnType(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -1997,8 +1903,7 @@ RET SQLRCursor::getColumnType(const ARGS &args) {
 
 RET SQLRCursor::getColumnLength(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2017,8 +1922,7 @@ RET SQLRCursor::getColumnLength(const ARGS &args) {
 
 RET SQLRCursor::getColumnPrecision(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2039,8 +1943,7 @@ RET SQLRCursor::getColumnPrecision(const ARGS &args) {
 
 RET SQLRCursor::getColumnScale(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2059,8 +1962,7 @@ RET SQLRCursor::getColumnScale(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsNullable(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2081,8 +1983,7 @@ RET SQLRCursor::getColumnIsNullable(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsPrimaryKey(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2104,8 +2005,7 @@ RET SQLRCursor::getColumnIsPrimaryKey(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsUnique(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2126,8 +2026,7 @@ RET SQLRCursor::getColumnIsUnique(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsPartOfKey(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2148,8 +2047,7 @@ RET SQLRCursor::getColumnIsPartOfKey(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsUnsigned(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2170,8 +2068,7 @@ RET SQLRCursor::getColumnIsUnsigned(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsZeroFilled(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2192,8 +2089,7 @@ RET SQLRCursor::getColumnIsZeroFilled(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsBinary(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2214,8 +2110,7 @@ RET SQLRCursor::getColumnIsBinary(const ARGS &args) {
 
 RET SQLRCursor::getColumnIsAutoIncrement(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2236,8 +2131,7 @@ RET SQLRCursor::getColumnIsAutoIncrement(const ARGS &args) {
 
 RET SQLRCursor::getLongest(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2256,8 +2150,7 @@ RET SQLRCursor::getLongest(const ARGS &args) {
 
 RET SQLRCursor::suspendResultSet(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -2268,8 +2161,7 @@ RET SQLRCursor::suspendResultSet(const ARGS &args) {
 
 RET SQLRCursor::getResultSetId(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
@@ -2280,8 +2172,7 @@ RET SQLRCursor::getResultSetId(const ARGS &args) {
 
 RET SQLRCursor::resumeResultSet(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,1);
 
@@ -2292,8 +2183,7 @@ RET SQLRCursor::resumeResultSet(const ARGS &args) {
 
 RET SQLRCursor::resumeCachedResultSet(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,2);
 
@@ -2306,8 +2196,7 @@ RET SQLRCursor::resumeCachedResultSet(const ARGS &args) {
 
 RET SQLRCursor::closeResultSet(const ARGS &args) {
 
-	isolate();
-	localScope();
+	initLocalScope();
 
 	checkArgCount(args,0);
 
