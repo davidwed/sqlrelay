@@ -1833,6 +1833,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7AC0290F7F524934BB0DD1350583BD87"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_7B046E1BBB2043F6B5A77836A5B9B9D2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2086,6 +2092,12 @@
         "Entry"
         {
         "MsmKey" = "8:_87940E1015344B68BC2286079AA5B9DE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_87BCF994B7714B34AE26EDDBF8E753F9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3196,6 +3208,12 @@
         "Entry"
         {
         "MsmKey" = "8:_CFF965D26F174462990C2D9711F2C8A1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D02BAF3F6DD64FB384E471BD8F40179F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -5912,7 +5930,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.60.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.61.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_262F174C65C8408AB1A323DB9BB92EBA"
@@ -10039,6 +10057,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7AC0290F7F524934BB0DD1350583BD87"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\nodejs\\build\\Release\\sqlrelay.node"
+            "TargetName" = "8:sqlrelay.node"
+            "Tag" = "8:"
+            "Folder" = "8:_3CE9B8BD4655479BBD1CCA7E6CF0C0A6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7B046E1BBB2043F6B5A77836A5B9B9D2"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\java\\com\\firstworks\\sqlrelay\\SQLRConnection.html"
@@ -10885,6 +10923,26 @@
             "TargetName" = "8:libsqlrclientwrapper.lib"
             "Tag" = "8:"
             "Folder" = "8:_A4ED155A88C64BE48DDEB1FAE1E7408B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_87BCF994B7714B34AE26EDDBF8E753F9"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\nodejs\\package.json"
+            "TargetName" = "8:package.json"
+            "Tag" = "8:"
+            "Folder" = "8:_3CE9B8BD4655479BBD1CCA7E6CF0C0A6"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14599,6 +14657,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D02BAF3F6DD64FB384E471BD8F40179F"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\nodejs\\index.js"
+            "TargetName" = "8:index.js"
+            "Tag" = "8:"
+            "Folder" = "8:_3CE9B8BD4655479BBD1CCA7E6CF0C0A6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D066DD474F9A40419757510AACE11BEF"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c\\html\\ftv2blank.png"
@@ -16724,6 +16802,50 @@
                     "Property" = "8:_D002206880A748C694082177CFD91BFA"
                         "Folders"
                         {
+                        }
+                    }
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_6050427E2BD84F30BE0A6E6B162F9027"
+            {
+            "Name" = "8:#1912"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:ProgramFilesFolder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_993696A9CDA8408C905465904D395572"
+                    {
+                    "Name" = "8:nodejs"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_EB6798E36ACE4F68B130CE7F95C1032F"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_01893ED43037456BB8FC09181900225B"
+                            {
+                            "Name" = "8:node_modules"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_50DE3A3459194AFA833C0D393DC00B7C"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_3CE9B8BD4655479BBD1CCA7E6CF0C0A6"
+                                    {
+                                    "Name" = "8:sqlrelay"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_E46D09C6481641D683E5B63199C8A3C8"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
