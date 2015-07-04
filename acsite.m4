@@ -3643,8 +3643,13 @@ then
 		NODEDIR=""
 		AC_MSG_CHECKING(for node)
 
-		for path in "$NODEJSPATH" "/" "/usr" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
+		for path in "$NODEJSPATH" "/usr" "/" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
 		do
+			if ( test -z "$path" )
+			then
+				continue
+			fi
+
 			if ( test -r "$path/bin/node" )
 			then
 				NODE="$path/bin/node"

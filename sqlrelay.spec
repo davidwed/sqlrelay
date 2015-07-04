@@ -24,6 +24,7 @@
 # --without tcl
 # --without erlang
 # --without mono
+# --without nodejs
 
 Summary: Persistent database connection system.
 Name: sqlrelay
@@ -54,9 +55,10 @@ BuildRequires: rudiments-devel
 %{!?_without_tcl:BuildRequires: ,tcl-devel}
 %{!?_without_erlang:BuildRequires: ,erlang}
 %{!?_without_mono:BuildRequires: ,mono-devel,mono-data}
+%{!?_without_nodejs:BuildRequires: ,nodejs-devel}
 
 %description
-SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL and Erlang, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
+SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
 
 
 %package server-devel
@@ -285,6 +287,14 @@ Group: Development/Languages
 SQL Relay modules for Mono.
 
 
+%package nodejs
+Summary: SQL Relay modules for node.js.
+Group: Development/Languages
+
+%description nodejs
+SQL Relay modules for node.js.
+
+
 %package doc
 Summary: Documentation for SQL Relay.
 Group: Applications/Database
@@ -345,6 +355,7 @@ Man pages for SQL Relay.
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_erlang:	--disable-erlang} \
+	%{?_without_nodejs:	--disable-nodejs} \
 	%{?_without_mono:	--disable-mono} \
 	%{?_without_perl:	--disable-perl} \
 	%{?_without_php:	--disable-php} \
@@ -584,6 +595,10 @@ rm -rf %{buildroot}
 %{!?_without_mono:%defattr(-, root, root)}
 %{!?_without_mono:%{_libdir}/SQLRClient.dll}
 %{!?_without_mono:%{_libdir}/SQLRClient.dll.config}
+
+%{!?_without_nodejs:%files nodejs}
+%{!?_without_nodejs:%defattr(-, root, root)}
+%{!?_without_nodejs:/usr/lib/node_modules/sqlrelay}
 
 %files doc
 %{_docdir}/%{name}
