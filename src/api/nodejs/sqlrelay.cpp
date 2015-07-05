@@ -1,3 +1,6 @@
+// Copyright (c) 2015  David Muse
+// See the file COPYING for more information.
+
 #include <sqlrelay/sqlrclient.h>
 #ifdef _WIN32
 	#define _SSIZE_T_DEFINED
