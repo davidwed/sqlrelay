@@ -1,3 +1,6 @@
+# Copyright (c) 2003 Takeshi Taguchi
+# See the file COPYING for more information
+
 # Creates a cursor to run queries and fetch result
 # sets using connecton "sqlrc".
 proc sqlrcurCmd {sqlrc} 

@@ -1,3 +1,6 @@
+# Copyright (c) 2003 Takeshi Taguchi
+# See the file COPYING for more information
+
 # Initiates a connection to "server" on "port"
 # or to the unix "socket" on the local machine
 # and authenticates with "user" and "password".

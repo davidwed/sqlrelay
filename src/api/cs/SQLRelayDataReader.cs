@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information
+
+using System;
 using System.Data;
 using System.Globalization;
 using System.Collections.Generic;
@@ -161,7 +164,7 @@ namespace SQLRClient
             {
                 sqlrcur = _sqlrcurlist.Dequeue();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

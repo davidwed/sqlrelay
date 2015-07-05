@@ -1,3 +1,6 @@
+// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information
+
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
