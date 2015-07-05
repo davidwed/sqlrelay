@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_00B82F48E12C4E50A5D34ABDEBA189CC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_015C2C885A1E426CAA08B3BAAEC31627"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -130,6 +136,12 @@
         "Entry"
         {
         "MsmKey" = "8:_087407321A334C5D94C4BF26750CA1BE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_08CC947412A248EA955979AE6C12F3E8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -429,6 +441,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1AFCE501E2E14864ABBC1EF07EC9A637"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1B3715CCDEC14F98A9169461E7274233"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -460,6 +478,12 @@
         "Entry"
         {
         "MsmKey" = "8:_1E803EBA63A64A09A6E36D1C8FADBEB6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1ECB36C607B148C9A0C244A0187AF19D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -513,6 +537,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_20FE42D8C8AE4A5594601255CEEB07B7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_212C0A077F5440A8A480452130E962B4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2170DDD0A68E407290D95F9C06255DED"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -531,6 +567,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_22A48A2882E742069AE2014D21F25EF8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_22C3CEC36EDC4DF7AD3BC17908E2717E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -538,6 +580,12 @@
         "Entry"
         {
         "MsmKey" = "8:_23162ECA9769476C9E40D33AB2A96C38"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_23183522B4A74F03B63EBD88D26FD96B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -592,6 +640,12 @@
         "Entry"
         {
         "MsmKey" = "8:_25203AA2669F485087279F4F77B0DB8C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_25C77811AFD24387950FB7EA86F5E88F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -693,6 +747,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2D45C90DDB894DB684EC2DB0686B2973"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2D4CF7E762974B0098CD00CFEC350D49"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -712,6 +772,12 @@
         "Entry"
         {
         "MsmKey" = "8:_2F47575015A84FEF85D894DB603FEF72"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2FDA652FF4E84D75BED3ED7554D435CF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -993,6 +1059,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_40C4ECF136D94621B470CD6F0000E167"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_40E2316E61FE4903BA25613B732A7F6F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1197,6 +1269,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_51BEF53E52DB4A10B333560768840A50"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5220243283C44477A9A64B53432C47FF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1318,6 +1396,12 @@
         "Entry"
         {
         "MsmKey" = "8:_58CB5ADD176844388A7DEA33A7F9FF4F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_58CBCB34D2194A06B0DF75229997040C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1504,6 +1588,12 @@
         "Entry"
         {
         "MsmKey" = "8:_6571E9A2BCAC41EAAC482A1968870E61"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_65A50A4997D04F02889126D7E13E21A7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1761,6 +1851,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7393CD8C018A43279A6F498DF0687B0F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_73F5AD69A9314704822C9941B8E1038C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1797,6 +1893,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_75B7203E2A584CA8A1667D7D9537790A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_76A81473D5F1440AB0A857C386B2E63B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1827,6 +1929,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_78797B6D131E4284AE4C609FB51A2BF4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_79E800A3BE374F6EB0F8AB0F77F625E2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1852,6 +1960,12 @@
         "Entry"
         {
         "MsmKey" = "8:_7B5DD36A3C2741239CDD225260A8BA5B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7BB5AEE187084E69A285A9632D44F92B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2050,6 +2164,12 @@
         "Entry"
         {
         "MsmKey" = "8:_8591069FF1E345C2B7D6194178611F98"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_85BA4D7F13044EEAAEA4691BEF295E6D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2631,7 +2751,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A6865DE3214E4E74B2A560E4497652F1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A6A694DF65504DC4B3FCF63438E132A7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A6D87F512F3A4333ABD6ABC6962AEE5F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2722,6 +2854,12 @@
         "Entry"
         {
         "MsmKey" = "8:_ACDD673A6ED246F982D96410254DC580"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AD52E8FD4DE3497ABD733B1194F24CED"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2907,6 +3045,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B8FE3361424B4C33A4C1E8FB3C7E3B57"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B98A78974F3C4C398F8FCC44FEF8B65C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_BA55D86AB2EC4C1B8D1DC1C835B70052"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2914,6 +3064,18 @@
         "Entry"
         {
         "MsmKey" = "8:_BA6C620F5F4046BA8008A090E50A77C9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BA7F17EF9F2B41099CB5BC8369BDF867"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BAE12C5F05B043F8A3C5BFA1BEF3BEA1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3004,6 +3166,12 @@
         "Entry"
         {
         "MsmKey" = "8:_C01A052063FF45E29896AAF4DC207277"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C0AF7911B1B14FD3A5DD8CBD7D2A3F08"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3387,6 +3555,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DB841D9EE2FF44BA9DDB8A26A87A7EC5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DC7FAD1A2E1E4A62AB4E2E0CFAF0753B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_DCE6534177B24170A73D388DC8B0F5DC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3423,6 +3603,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E16DC0610F6941619F0EA445911603AC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E1D94C23F7F0490AA677403DFFA7B311"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3448,6 +3634,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E33B270784A643D99205F192CF00ABC3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E35061708F3C4DC89B66364927487954"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3579,6 +3771,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_EB08C21342A44AAEB7156BF6A5B8484F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_EB73FCDB3D094A46A989796F5E8581AB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3615,6 +3813,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_EE83C52588D84393BE3F78883AF52FDC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_EEADEA35206D419E9E171366A75919BB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3628,6 +3832,18 @@
         "Entry"
         {
         "MsmKey" = "8:_EF9249EB624445839C9FCEB3B4706F42"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EFA060AA6CA6442F9EB66ADACAAF16C1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EFEA11F7430D4C9888BD9BCD98763369"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3831,6 +4047,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_FE650AFCCF084EF7BA32EB94CC0DA6C5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_FF192709C4E94AC091045B4FE5B2AB31"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3980,6 +4202,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_00B82F48E12C4E50A5D34ABDEBA189CC"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\functions.html"
+            "TargetName" = "8:functions.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_015C2C885A1E426CAA08B3BAAEC31627"
             {
             "SourcePath" = "8:..\\..\\doc\\admin\\tuning.html"
@@ -4366,6 +4608,26 @@
             "TargetName" = "8:M000040.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_08CC947412A248EA955979AE6C12F3E8"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\dir_da61e3e9a357748887e3ca8d7c5a0c16.html"
+            "TargetName" = "8:dir_da61e3e9a357748887e3ca8d7c5a0c16.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -5360,6 +5622,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1AFCE501E2E14864ABBC1EF07EC9A637"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\nav_f.png"
+            "TargetName" = "8:nav_f.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1B3715CCDEC14F98A9169461E7274233"
             {
             "SourcePath" = "8:..\\..\\src\\api\\nodejs\\index.js"
@@ -5466,6 +5748,26 @@
             "TargetName" = "8:deprecated-list.html"
             "Tag" = "8:"
             "Folder" = "8:_7340A2080A604A91B4B190607ED6FC86"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1ECB36C607B148C9A0C244A0187AF19D"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\tab_s.png"
+            "TargetName" = "8:tab_s.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -5640,6 +5942,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_20FE42D8C8AE4A5594601255CEEB07B7"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\closed.png"
+            "TargetName" = "8:closed.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_212C0A077F5440A8A480452130E962B4"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\dynsections.js"
+            "TargetName" = "8:dynsections.js"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2170DDD0A68E407290D95F9C06255DED"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c++\\html\\dir_02092e011f41b1efe6b3468ebe92cde9.html"
@@ -5700,6 +6042,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_22A48A2882E742069AE2014D21F25EF8"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\tab_b.png"
+            "TargetName" = "8:tab_b.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_22C3CEC36EDC4DF7AD3BC17908E2717E"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c++\\html\\ftv2splitbar.png"
@@ -5726,6 +6088,26 @@
             "TargetName" = "8:substitutionandbindvars.html"
             "Tag" = "8:"
             "Folder" = "8:_CB4C1A4C40744B33B6C776AC6843B95E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_23183522B4A74F03B63EBD88D26FD96B"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\classes.html"
+            "TargetName" = "8:classes.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -5906,6 +6288,26 @@
             "TargetName" = "8:sqlr-query.exe"
             "Tag" = "8:"
             "Folder" = "8:_0888B5E585AE438DA1FFC568FF54A5C7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_25C77811AFD24387950FB7EA86F5E88F"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\arrowdown.png"
+            "TargetName" = "8:arrowdown.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -6251,6 +6653,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2D45C90DDB894DB684EC2DB0686B2973"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\doxygen.png"
+            "TargetName" = "8:doxygen.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2D4CF7E762974B0098CD00CFEC350D49"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRCursor.src\\M000013.html"
@@ -6317,6 +6739,26 @@
             "TargetName" = "8:bug.png"
             "Tag" = "8:"
             "Folder" = "8:_BEDC4A8DF92B4E728A13406CDB225AAB"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2FDA652FF4E84D75BED3ED7554D435CF"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\nav_h.png"
+            "TargetName" = "8:nav_h.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -7251,6 +7693,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_40C4ECF136D94621B470CD6F0000E167"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\sync_on.png"
+            "TargetName" = "8:sync_on.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_40E2316E61FE4903BA25613B732A7F6F"
             {
             "SourcePath" = "8:..\\..\\doc\\images\\sybase.png"
@@ -7931,6 +8393,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_51BEF53E52DB4A10B333560768840A50"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\dir_e0347da986b64b83ab9fe56dd33df350.html"
+            "TargetName" = "8:dir_e0347da986b64b83ab9fe56dd33df350.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5220243283C44477A9A64B53432C47FF"
             {
             "SourcePath" = "8:..\\..\\doc\\programming\\python.html"
@@ -8337,6 +8819,26 @@
             "TargetName" = "8:doxygen.png"
             "Tag" = "8:"
             "Folder" = "8:_BB071E25355C4CE190B565A35068EF36"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_58CBCB34D2194A06B0DF75229997040C"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\folderclosed.png"
+            "TargetName" = "8:folderclosed.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -8957,6 +9459,26 @@
             "TargetName" = "8:sqlrserver.h"
             "Tag" = "8:"
             "Folder" = "8:_A98CA166A1324E9BB755632EB30C98C6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_65A50A4997D04F02889126D7E13E21A7"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\bc_s.png"
+            "TargetName" = "8:bc_s.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -9811,6 +10333,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7393CD8C018A43279A6F498DF0687B0F"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\doxygen.css"
+            "TargetName" = "8:doxygen.css"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_73F5AD69A9314704822C9941B8E1038C"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\python\\PySQLRClient.py.html"
@@ -9931,6 +10473,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_75B7203E2A584CA8A1667D7D9537790A"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\functions_func.html"
+            "TargetName" = "8:functions_func.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_76A81473D5F1440AB0A857C386B2E63B"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\php\\li_sql_relay.html"
@@ -10031,6 +10593,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_78797B6D131E4284AE4C609FB51A2BF4"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\index.html"
+            "TargetName" = "8:index.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_79E800A3BE374F6EB0F8AB0F77F625E2"
             {
             "SourcePath" = "8:..\\..\\doc\\programming\\ado.net.html"
@@ -10117,6 +10699,26 @@
             "TargetName" = "8:M000063.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7BB5AEE187084E69A285A9632D44F92B"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\dir_68267d1309a1af8e8297ef4c3efbcdba.html"
+            "TargetName" = "8:dir_68267d1309a1af8e8297ef4c3efbcdba.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -10777,6 +11379,26 @@
             "TargetName" = "8:arm-linux-uclibc-thumb.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_85BA4D7F13044EEAAEA4691BEF295E6D"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\tabs.css"
+            "TargetName" = "8:tabs.css"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -12711,12 +13333,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A6865DE3214E4E74B2A560E4497652F1"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\bdwn.png"
+            "TargetName" = "8:bdwn.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A6A694DF65504DC4B3FCF63438E132A7"
             {
             "SourcePath" = "8:..\\..\\doc\\images\\mysql-sqlr-chain.png"
             "TargetName" = "8:mysql-sqlr-chain.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A6D87F512F3A4333ABD6ABC6962AEE5F"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\class_s_q_l_r_cursor.html"
+            "TargetName" = "8:class_s_q_l_r_cursor.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -13017,6 +13679,26 @@
             "TargetName" = "8:postgresql.html"
             "Tag" = "8:"
             "Folder" = "8:_AB7FD74D3DDA49E5BFA2AAF1FEE06958"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AD52E8FD4DE3497ABD733B1194F24CED"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\class_s_q_l_r_cursor-members.html"
+            "TargetName" = "8:class_s_q_l_r_cursor-members.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -13631,6 +14313,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B8FE3361424B4C33A4C1E8FB3C7E3B57"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\tab_a.png"
+            "TargetName" = "8:tab_a.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B98A78974F3C4C398F8FCC44FEF8B65C"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\sync_off.png"
+            "TargetName" = "8:sync_off.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BA55D86AB2EC4C1B8D1DC1C835B70052"
             {
             "SourcePath" = "8:..\\..\\doc\\features\\multirowfetches.html"
@@ -13657,6 +14379,46 @@
             "TargetName" = "8:doxygen.css"
             "Tag" = "8:"
             "Folder" = "8:_1D210F24103844498F8966485E987D0B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BA7F17EF9F2B41099CB5BC8369BDF867"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\arrowright.png"
+            "TargetName" = "8:arrowright.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BAE12C5F05B043F8A3C5BFA1BEF3BEA1"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\folderopen.png"
+            "TargetName" = "8:folderopen.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -13957,6 +14719,26 @@
             "TargetName" = "8:dynsections.js"
             "Tag" = "8:"
             "Folder" = "8:_1D210F24103844498F8966485E987D0B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C0AF7911B1B14FD3A5DD8CBD7D2A3F08"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\annotated.html"
+            "TargetName" = "8:annotated.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -15231,6 +16013,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DB841D9EE2FF44BA9DDB8A26A87A7EC5"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\open.png"
+            "TargetName" = "8:open.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DC7FAD1A2E1E4A62AB4E2E0CFAF0753B"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\jquery.js"
+            "TargetName" = "8:jquery.js"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DCE6534177B24170A73D388DC8B0F5DC"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\java\\index-all.html"
@@ -15351,6 +16173,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E16DC0610F6941619F0EA445911603AC"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\splitbar.png"
+            "TargetName" = "8:splitbar.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E1D94C23F7F0490AA677403DFFA7B311"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ado.net\\html\\class_s_q_l_r_client_1_1_s_q_l_relay_row_updated_event_args-members.html"
@@ -15437,6 +16279,26 @@
             "TargetName" = "8:dir_e8d73255ec7feed8fb64227e7a4ab864.html"
             "Tag" = "8:"
             "Folder" = "8:_5BFCE3D2C583443DB10577904D6DBA74"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E35061708F3C4DC89B66364927487954"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\tab_h.png"
+            "TargetName" = "8:tab_h.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -15871,6 +16733,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EB08C21342A44AAEB7156BF6A5B8484F"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\nav_g.png"
+            "TargetName" = "8:nav_g.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EB73FCDB3D094A46A989796F5E8581AB"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c++\\html\\ftv2folderclosed.png"
@@ -15991,6 +16873,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE83C52588D84393BE3F78883AF52FDC"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\class_s_q_l_r_connection.html"
+            "TargetName" = "8:class_s_q_l_r_connection.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EEADEA35206D419E9E171366A75919BB"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\fr_class_index.html"
@@ -16037,6 +16939,46 @@
             "TargetName" = "8:class_s_q_l_r_client_1_1_s_q_l_relay_data_adapter.html"
             "Tag" = "8:"
             "Folder" = "8:_1D210F24103844498F8966485E987D0B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EFA060AA6CA6442F9EB66ADACAAF16C1"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\class_s_q_l_r_connection-members.html"
+            "TargetName" = "8:class_s_q_l_r_connection-members.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EFEA11F7430D4C9888BD9BCD98763369"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\sqlrelay_8doc_8h_source.html"
+            "TargetName" = "8:sqlrelay_8doc_8h_source.html"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -16697,6 +17639,26 @@
             "TargetName" = "8:M000093.html"
             "Tag" = "8:"
             "Folder" = "8:_5FB1068A6C334E6EBD8232B83C104F45"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FE650AFCCF084EF7BA32EB94CC0DA6C5"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\doc.png"
+            "TargetName" = "8:doc.png"
+            "Tag" = "8:"
+            "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -17503,6 +18465,28 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "Property" = "8:_0378361339EC403D9331A588EA809188"
+                                                                "Folders"
+                                                                {
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_C4DC571AD6E84CC49021ADCBBC4A3E32"
+                                                    {
+                                                    "Name" = "8:nodejs"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "Property" = "8:_E23BA05D5FB24EF9879E7964F4491E2E"
+                                                        "Folders"
+                                                        {
+                                                            "{9EF0B969-E518-4E46-987F-47570745A589}:_40E4FA8D017E4C2593AC53845FDAA29B"
+                                                            {
+                                                            "Name" = "8:html"
+                                                            "AlwaysCreate" = "11:FALSE"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "Property" = "8:_72DD3AB4764D41D2A24EFA5B0D4665BE"
                                                                 "Folders"
                                                                 {
                                                                 }
