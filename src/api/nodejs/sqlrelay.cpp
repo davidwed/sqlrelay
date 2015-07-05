@@ -1599,7 +1599,7 @@ RET SQLRCursor::getOutputBindCursor(const ARGS &args) {
 	checkArgCount(args,1);
 
 	SQLRCursor	*obj=new SQLRCursor();
-	obj->sqlrc=sqlrcur(args)->getOutputBindCursor(toString(args[0]));
+	obj->sqlrc=sqlrcur(args)->getOutputBindCursor(toString(args[0]),true);
 	obj->Wrap(args.This());
 	returnObject(args.This());
 }
