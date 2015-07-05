@@ -25,7 +25,8 @@
 <a href="../programming/ruby.html">Ruby</a>,
 <a href="../programming/java.html">Java</a>,
 <a href="../programming/tcl.html">TCL</a>,
-<a href="../programming/erlang.html">Erlang</a>
+<a href="../programming/erlang.html">Erlang</a>,
+<a href="../programming/nodejs.html">node.js</a>
 
 <br>
 
@@ -38,7 +39,8 @@
 <a href="../api/python/PySQLRClient.py.html">Python</a>,
 <a href="../api/ruby/doc/index.html">Ruby</a>,
 <a href="../api/java/index.html">Java</a>,
-<a href="../api/tcl/index.html">TCL</a>
+<a href="../api/tcl/index.html">TCL</a>,
+<a href="../api/nodejs/html/annotated.html">node.js</a>,
 </blockquote>
 
 <div class="slide">
@@ -123,6 +125,13 @@
 <span class="heading2">TCL</span>
 <p class="code" style="height: 300px;">
 @example.tcl.html@
+</p>
+</div>
+
+<div style="display: block; float: left;"/>
+<span class="heading2">node.js</span>
+<p class="code" style="height: 300px;">
+@example.js.html@
 </p>
 </div>
 

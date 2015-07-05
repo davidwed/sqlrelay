@@ -8,11 +8,11 @@
 
 <span class="heading1">Native API</span><br><br>
 
-<p>The native SQL Relay client API currently supports C, C++, .NET languages, Java, Perl, Python, PHP, Ruby, TCL and Erlang.</p>
+<p>The native SQL Relay client API currently supports C, C++, .NET languages, Java, Perl, Python, PHP, Ruby, TCL, Erlang, and node.js.</p>
 
 <p>The native API is intuitive, consistent across languages, and supports powerful features not available when using a database abstraction layer like suspended sessions, result set caching and tuning options.</p>
 
-<p>Programming guides with sample code and API references are available for each supported language:</p>
+<p>Programming guides with sample code and API references are available for each language:</p>
 
 <blockquote>
 <b>Guides:</b>
@@ -25,7 +25,8 @@
 <a href="../programming/ruby.html">Ruby</a>,
 <a href="../programming/java.html">Java</a>,
 <a href="../programming/tcl.html">TCL</a>,
-<a href="../programming/erlang.html">Erlang</a>
+<a href="../programming/erlang.html">Erlang</a>,
+<a href="../programming/nodejs.html">node.js</a>
 
 <br>
 
@@ -38,7 +39,8 @@
 <a href="../api/python/PySQLRClient.py.html">Python</a>,
 <a href="../api/ruby/doc/index.html">Ruby</a>,
 <a href="../api/java/index.html">Java</a>,
-<a href="../api/tcl/index.html">TCL</a>
+<a href="../api/tcl/index.html">TCL</a>,
+<a href="../api/nodejs/html/annotated.html">node.js</a>,
 </blockquote>
 
 <div class="slide">
@@ -342,6 +344,32 @@ sqlrcur.sendQuery(<font color="#6a5acd">&quot;</font><font color="#ff00ff">selec
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>puts</b></font>&nbsp;<font color="#ff00ff">&quot;&quot;</font><br>
 }<br>
+</font>
+</p>
+</div>
+
+<div style="display: block; float: left;"/>
+<span class="heading2">node.js</span>
+<p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrelay=require(<font color="#ff00ff">&quot;sqlrelay&quot;</font>);<br>
+<br>
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrcon=<font color="#a52a2a"><b>new</b></font>&nbsp;sqlrelay.SQLRConnection(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplehost&quot;</font>,9000,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,0,1);<br>
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrcur=<font color="#a52a2a"><b>new</b></font>&nbsp;sqlrelay.SQLRCursor(sqlrcon);<br>
+<br>
+sqlrcur.sendQuery(<font color="#ff00ff">&quot;select * from exampletable&quot;</font>);<br>
+<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">var</font>&nbsp;row=0; row&lt;sqlrcur.rowCount(); row++)&nbsp;<font color="#008b8b">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">var</font>&nbsp;col=0; col&lt;sqlrcur.colCount(); col++)&nbsp;<font color="#008b8b">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process.stdout.write(sqlrcur.getField(row,col)+<font color="#ff00ff">&quot;,&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">}</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process.stdout.write(<font color="#ff00ff">&quot;</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>);<br>
+<font color="#008b8b">}</font><br>
 </font>
 </p>
 </div>
