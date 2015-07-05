@@ -784,7 +784,6 @@ for (var i=0; i<8*1024; i++) {
 	clobval=clobval+"C";
 }
 cur.inputBindClob("clobval",clobval,8*1024);
-con.debugOn();
 checkSuccess(cur.executeQuery(),1);
 cur.sendQuery("select testclob from testtable2");
 checkSuccess(clobval,cur.getField(0,"testclob"));
