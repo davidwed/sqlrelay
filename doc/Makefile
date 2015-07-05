@@ -23,6 +23,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/js
 	$(MKINSTALLDIRS) $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
+	$(MKINSTALLDIRS) $(docdir)/api/nodejs/html
 	$(MKINSTALLDIRS) $(docdir)/dropin
 	$(MKINSTALLDIRS) $(docdir)/features
 	$(MKINSTALLDIRS) $(docdir)/images
@@ -118,6 +119,14 @@ install:
 	$(CHMOD) 644 $(docdir)/api/tcl/*.html
 	$(CP) api/tcl/*.txt $(docdir)/api/tcl
 	$(CHMOD) 644 $(docdir)/api/tcl/*.txt
+	$(CP) api/nodejs/html/*.html $(docdir)/api/nodejs/html
+	$(CHMOD) 644 $(docdir)/api/nodejs/html/*.html
+	$(CP) api/nodejs/html/*.css $(docdir)/api/nodejs/html
+	$(CHMOD) 644 $(docdir)/api/nodejs/html/*.css
+	$(CP) api/nodejs/html/*.png $(docdir)/api/nodejs/html
+	$(CHMOD) 644 $(docdir)/api/nodejs/html/*.png
+	$(CP) api/nodejs/html/*.js $(docdir)/api/nodejs/html
+	$(CHMOD) 644 $(docdir)/api/nodejs/html/*.js
 	$(CP) dropin/*.html $(docdir)/dropin
 	$(CHMOD) 644 $(docdir)/dropin/*.html
 	$(CP) features/*.html $(docdir)/features
