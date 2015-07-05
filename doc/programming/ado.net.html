@@ -210,7 +210,7 @@ namespace SQLRExamples
 <a name="commit"></a>
 <span class="heading2">Commits and Rollbacks</span><br><br>
 
-<p>If you need to execute a commit or rollback, you should create an instance of the SQLRelayTransaction class and use its commit() and rollback() methods rather than sending "commit" or "rollback" queries.  There are two reasons for this.  First, it's much more efficient to call the methods.  Second, if you're writing code that can run on transactional or non-transactional databases, some non-transactional databases will throw errors if they receive a "commit" or "rollback" query, but by calling the commit() and rollback() methods you instruct the database connection daemon to call the commit and rollback API methods for that database rather than issuing them as queries.  If the API's have no commit or rollback methods, the calls do nothing and the database throws no error.  This is especially important when using SQL Relay with ODBC.</p>
+<p>If you need to execute a commit or rollback, you should create an instance of the SQLRelayTransaction class and use its commit() and rollback() methods rather than sending "commit" or "rollback" queries.  There are two reasons for this.  First, it's much more efficient to call the methods.  Second, if you're writing code that can run on transactional or non-transactional databases, some non-transactional databases will throw errors if they receive a "commit" or "rollback" query, but by calling the commit() and rollback() methods you instruct the database connection daemon to call the commit and rollback API methods for that database rather than issuing them as queries.  If the API's have no commit or rollback methods, the calls do nothing and the database throws no error.</p>
 
 <blockquote>
 <PRE>

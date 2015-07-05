@@ -188,8 +188,7 @@ databases will throw errors if they receive a "commit" or "rollback" query, but
 by calling the commit() and rollback() methods you instruct the database 
 connection daemon to call the commit and rollback API methods for that database 
 rather than issuing them as queries.  If the API's have no commit or rollback 
-methods, the calls do nothing and the database throws no error.  This is 
-especially important when using SQL Relay with ODBC.</p>
+methods, the calls do nothing and the database throws no error.</p>
 
 <p>You can also turn Autocommit on or off with the autoCommitOn() and
 autoCommitOff() methods of the sqlrconnection class.  When Autocommit is on,

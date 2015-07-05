@@ -154,8 +154,7 @@ but by calling the sqlrcon_commit() and sqlrcon_rollback() functions you
 instruct the database connection daemon to call the commit and rollback API 
 functions for that database rather than issuing them as queries.  If the API's 
 have no commit or rollback functions, the calls do nothing and the database 
-throws no error.  This is especially important when using SQL Relay with 
-ODBC.</p>
+throws no error.</p>
 
 <p>You can also turn Autocommit on or off with the sqlrcon_autoCommitOn() and
 sqlrcon_autoCommitOff() functions.  When Autocommit is on, the database

@@ -98,8 +98,7 @@ non-transactional databases will throw errors if they receive a "commit" or
 instruct the database connection daemon to call the commit and rollback API 
 methods for that database rather than issuing them as queries.  If the API's 
 have no commit or rollback methods, the calls do nothing and the database 
-throws no error.  This is especially important when using SQL Relay with 
-ODBC.</p>
+throws no error.</p>
 
 <p>You can also turn Autocommit on or off with the autoCommitOn() and
 autoCommitOff() methods of the SQLRelay::Connection class.  When 
