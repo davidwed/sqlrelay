@@ -1,0 +1,5 @@
+rm -f html/*.png
+rm -f html/*.html
+rm -f html/*.js
+rm -f html/*.css
+doxygen doxygen.config
