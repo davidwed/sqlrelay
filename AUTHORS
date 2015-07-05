@@ -1,98 +1,217 @@
 David Muse - david.muse@firstworks.com
-	Core daemons and connections
-	C, C++, Perl and Ruby API's
+	Server, command-line clients, and database connections
+	C, C++, C#, Java, Perl, Ruby, node.js API's
 
 Roman Milner - rmilner@pointone.com
-	Python API
+	Python API - (0.14)
 
 Adam Kropielnicki - adasz@wp.pl
-	PHP Module
+	PHP Module - (0.15)
 
 Dmitry Ovsyanko - do@rambler.ru
-	Perl DBD Module
+	Perl DBI Driver - (0.16)
 
 Eric Peters - egpeters@u.washington.edu - www.myecamp.com
-	PHP Module - sqlrc_getarray() function
+	PHP Module - sqlrc_getarray() function (0.16?)
+
+Adrian Likins
+	patches...
+
+Christoph Schwarz
+	patches...
+
+Adrian Pavlykevych
+	patches...
+
+Vladimir Kirichenko
+	patches...
+
+Sang Jin Park
+	patches...
+
+Dieter Maurer
+	shared memory alignment patch (0.32)
 
 minx@nownuri.net
-	Oracle CLOB support
+	oracle lob-fetch bugfixes (0.33)
+	Oracle CLOB support (0.33?)
 
 Florain Weps - fweps@greenmail.ch   and   Andreas Tille - tille@debian.org
-	man pages, patches, debian packages
+	man pages (0.33?)
+	patches (0.33?)
+	debian packages (0.33?)
 
 Takeshi Taguchi - taguchi@tohoku.iij.ad.jp
-	TCL API, many patches
+	TCL API (0.33)
+	many patches for typos and compiler warnings (0.34)
+
+Leonardo Rochael Almeida
+	python-db driver patch (0.33)
+	python segfault patch (0.35)
+
+Paolo Dotta
+	postgresql liveconnection patch (0.33)
 
 Vladimir Kouznetsov
-	interbase stored procedure/output bind support, other patches
+	PHP null patches (0.33)
+	interbase stored procedure/output bind support (0.34)
+
+Jean Coursol
+	patches... (0.34?)
+
+Anatoly K. Lasareff
+	patches... (0.34?)
+
+Pavel Chekin
+	patches... (0.34?)
+
+Chris Clark
+	patches... (0.34?)
 
 dolphpower
-	pkgconfig scripts
+	pkgconfig scripts (0.35)
 
 zhu shi song
-	activex dll wrapper
+	activex dll wrapper (0.35?)
+
+Masanori Akaishi
+	db2 version-8 bug (0.35)
+
+Tony Fleisher and Erik Hollensbe
+	reexecute bug patch (0.35)
+	perl dbi patch (0.35)
+
+Srinivas Devarakonda
+	fake binds patch (0.35)
+
+Jason Hihn
+	sqlite3 patch (0.35)
 
 Gena01 - gena01@gmail.com
-	Lots of php pear db driver fixes
+	Lots of php pear db driver fixes (0.36)
+
+Matthias Klose
+	freetds patchlevel patch (0.36)
+	configure patch (0.36)
+
+Jose A. Garcia Leiva
+	patches... (0.36?)
+
+Mark Summers
+	patches... (0.36?)
+
+Mike "Szii" Oxford
+	patches (php-related?)... (0.36?)
+
+David Forums
+	PHP Pear DB driver patches (0.36)
+
+Cesar Peregrina
+	freetds liveconnection patch (0.36)
+
+Holger Lehmann
+	patches (zope-related?) (0.36?)...
+
+Dave Sugar
+	PHP Pear DB driver patches (0.36)
+
+Gavan Fantom
+	patches (netbsd-related?) (0.37)
 
 Sharpinskiy Dmitry - d-sh1@yandex.ru
-	added unicode support to odbc connection
+	added unicode support to odbc connection (0.38)
 
 Devananda - karnah805@yahoo.com
-	statistics gathering
-	mysql patches
+	statistics gathering (0.38)
+	mysql patches (0.38)
 
-Fixes/Patches incorporated from:
-	Adrian Likins
-	Christoph Schwarz
-	Adrian Pavlykevych
-	Vladimir Kirichenko
-	Sang Jin Park
-	Dieter Maurer
-	Leonardo Rochael Almeida
-	Paolo Dotta
-	Jean Coursol
-	Anatoly K. Lasareff
-	Pavel Chekin
-	Chris Clark
-	Masanori Akaishi
-	Tony Fleisher
-	Erik Hollensbe
-	Srinivas Devarakonda
-	Jason Hihn
-	Matthias Klose
-	Jose A. Garcia Leiva
-	Mark Summers
-	Mike "Szii" Oxford
-	David Forums
-	Cesar Peregrina
-	Holger Lehmann
-	Dave Sugar
-	Gavan Fantom
-	Andreas Behr
-	Steve Halasz
-	Tomasz Prus
-	Johnny Luong
-	Jason McClellen
-	james@thoughtpatterns.com
-	Tim Bunce
-	Chris Coyle
-	Ragnar Rova
-	Yeb Havinga
-	Jesse Wagner
-	Paul Maddox
-	Renaud Amar
-	Renat Sabitov
-	Alexey Leontev
-	Stephan van Egmond
-	mingang@taobao.com
-	Cal Heldenbrand
-	Claudio Friere
-	Carlos (CJ) Vergara
-	Benno Lange
-	Georgiy Kirichenko
-	Chae Young-ku
-	Ville Silventoinen
-	Gerhard Lausser
-	Samat Yusupov
-	George Carrette <gjc@alum.mit.edu>
+Andreas Behr
+	listener crash patch (0.38)
+
+Steve Halasz
+	patches (debian related?)...
+
+Tomasz Prus
+	patches...
+
+Johnny Luong
+	postgresql drop-in lib patch (0.39)
+
+Jason McClellen
+	perl dbi raise-error patch (0.39)
+
+james@thoughtpatterns.com
+	perl null bind patch (0.39)
+
+Tim Bunce
+	perl driver and DBI patches (0.39)
+
+Chris Coyle
+	mysql auto-reconnect patch (0.39)
+
+Ragnar Rova - rr@mima.x.se
+	pid cleanup in init script patch (0.39)
+
+Yeb Havinga
+	db-tier authentication patch (0.39)
+
+Jesse Wagner
+	oracle 11g acsite patch (0.40)
+
+Paul Maddox
+	patches...
+
+Renaud Amar
+	HAVE_MYSQL_OPT_RECONNECT patch (0.40)
+
+Renat Sabitov - srr@stacksoft.ru
+	output bind patch (0.41)
+	sqlr-scaler reap patch (0.41)
+	sqlr-scaler connection counting patch (0.41)
+	sqlr-listener sem(8) shutdown patch (0.41)
+	ruby DESTDIR patch (0.41)
+	sqlr-connection sem(8) shutdown patch (0.41)
+	"several patches" (0.42)
+	sqlr-scaler -debug patch (0.42)
+	11g configure patch (0.42)
+	sqlr-listener decrement session count patch (0.44)
+	sqlr-listener client-session count patch (0.44)
+	sqlr-listener alarm handling patch (0.45)
+
+Alexey Leontev
+	sqlrconfigfile addresscount patch (0,42)
+
+Stephan van Egmond
+	sqlrsh history patch (0,42)
+
+mingang@taobao.com
+	scaler patch for -debug (0.42)
+
+Cal Heldenbrand - cal@fbsdata.com
+	dynamic cursor patch (0.42)
+
+Eric Hall
+	patch to fix sqlrclient crash (0.42)
+
+Benno Lange - Benno.Lange@langesw.de
+	patch to fix -localstatedir bugs (0.45)
+
+Georgiy Kirichenko - georgiy@stacksoft.ru
+	sqlr-listener - missing flushWriteBuffer() patch (0.46)
+
+Chae Young-ku
+	ODBC patches (0.46)
+
+Ville Silventoinen - ville.silventoinen@gmail.com
+	build-related patches (0.51)
+	python api patches?
+	other patches?
+
+Gerhard Lausser - Gerhard.Lausser@consol.de
+	configure script patch - improve instantclient detection (0.55)
+
+Samat Yusupov
+	PHP PDO dbh driver methods (0.58)
+
+George Carrette - gjc@alum.mit.edu
+	PHP PDO connect string patches (0.60)
