@@ -66,6 +66,7 @@ sub connect {
 	$dsn{'retrytime'}=0;
 	$dsn{'tries'}=1;
 	$dsn{'debug'}=0;
+	$dsn{'lazyconnect'}=1;
 
 	# split the dsn
 	my $var;
@@ -94,6 +95,14 @@ sub connect {
 	} elsif ($dsn{'debug'} ne "0") {
 		$connection->setDebugFile($dsn{'debug'});
 		$connection->debugOn();
+	}
+
+	# if we're not doing lazy connects, then do something lightweight
+	# that will verify whether SQL Relay is available or not
+	if (!$dsn{'lazyconnect'} && !$connection->identify()) {
+		$connection=undef;
+		$dbh=undef;
+		return $dbh;
 	}
 
 	# store some references in the database handle

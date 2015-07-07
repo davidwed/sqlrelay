@@ -56,9 +56,9 @@ bool regex::run(sqlrserverconnection *sqlrcon,
 }
 
 extern "C" {
-	sqlrfilter *new_sqlrfilter_regex(sqlrfilters *sqlrfs,
-						xmldomnode *parameters,
-						bool debug) {
+	SQLRSERVER_DLLSPEC sqlrfilter *new_sqlrfilter_regex(sqlrfilters *sqlrfs,
+							xmldomnode *parameters,
+							bool debug) {
 		return new regex(sqlrfs,parameters,debug);
 	}
 }

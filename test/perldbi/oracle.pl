@@ -768,6 +768,11 @@ checkSuccessString($dbh->quote_identifier("mytable"),"\"mytable\"");
 checkSuccessString($dbh->quote_identifier("mycatalog","myschema","mytable"),"\"myschema\".\"mytable\"\@\"mycatalog\"");
 print("\n");
 
+print("NON-LAZY CONNECT: \n");
+$dsn = $prefix."sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;debug=0;lazyconnect=0";
+checkUndef(DBI->connect($dsn,"test","test"));
+print("\n");
+
 # invalid queries...
 print("INVALID QUERIES: \n");
 checkSuccess($dbh->do("select * from testtable order by testnumber"),0);

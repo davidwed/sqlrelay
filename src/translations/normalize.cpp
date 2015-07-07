@@ -212,10 +212,10 @@ bool normalize::skipQuotedStrings(const char *ptr,
 
 
 extern "C" {
-	sqlrtranslation	*new_sqlrtranslation_normalize(
-						sqlrtranslations *sqlts,
-						xmldomnode *parameters,
-						bool debug) {
+	SQLRSERVER_DLLSPEC sqlrtranslation *new_sqlrtranslation_normalize(
+							sqlrtranslations *sqlts,
+							xmldomnode *parameters,
+							bool debug) {
 		return new normalize(sqlts,parameters,debug);
 	}
 }

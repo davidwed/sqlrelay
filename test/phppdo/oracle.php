@@ -629,6 +629,11 @@
 	unlink("test.blob");
 	echo("\n");
 
+	echo("NON-LAZY CONNECT: \n");
+	$dsn = "sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;debug=0;lazyconnect=0";
+	checkSuccess(new PDO($dsn,$user,$password),0);
+	echo("\n");
+
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
 

@@ -1215,6 +1215,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		{"resultsetbuffersize",(char *)"0",0},
 		{"dontgetcolumninfo",(char *)"0",0},
 		{"nullsasnulls",(char *)"0",0},
+		{"lazyconnect",(char *)"1",0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1226,6 +1227,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	int32_t		tries=charstring::toInteger(options[3].optval);
 	int32_t		retrytime=charstring::toInteger(options[4].optval);
 	const char	*debug=options[5].optval;
+	bool		lazyconnect=(charstring::toInteger(
+						options[6].optval)>0);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1240,6 +1243,14 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	} else if (debug && debug[0] && charstring::compare(debug,"0")) {
 		sqlrdbh->sqlrcon->setDebugFile(debug);
 		sqlrdbh->sqlrcon->debugOn();
+	}
+
+	// if we're not doing lazy connects, then do something lightweight
+	// that will verify whether SQL Relay is available or not
+	if (!lazyconnect && !sqlrdbh->sqlrcon->identify()) {
+		delete sqlrdbh->sqlrcon;
+		sqlrdbh->sqlrcon=NULL;
+		return 0;
 	}
 
 	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);

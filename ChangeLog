@@ -1,6 +1,7 @@
 0.61 - added query filter plugin framework
 	added regex filter
 	added normalization translation
+	added reformatdatetime result set translation
 	fixed error in sqlrconfigfile class that could cause sqlr-start to
 		crash if one instance defines addresses but the next doesn't
 	added query status flag to sqlrservercursor
@@ -16,6 +17,7 @@
 		getting properly converted to null-terminated empty strings
 	fetchatonce, maxitembuffersize and maxselectlistsize are set to
 		defaulting values if invalid values are given for them
+	added lazyconnect option to PHP PDO and Perl DBI drivers (defaults to 1)
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
