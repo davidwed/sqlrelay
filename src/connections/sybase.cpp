@@ -1514,6 +1514,14 @@ uint16_t sybasecursor::getColumnType(uint32_t col) {
 			return VOID_DATATYPE;
 		case CS_USHORT_TYPE:
 			return USHORT_DATATYPE;
+		#ifdef CS_BIGINT_TYPE
+		case CS_BIGINT_TYPE:
+			return BIGINT_DATATYPE;
+		#endif
+		#ifdef CS_UBIGINT_TYPE
+		case CS_UBIGINT_TYPE:
+			return UBIGINT_DATATYPE;
+		#endif
 		default:
 			return UNKNOWN_DATATYPE;
 	}

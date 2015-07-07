@@ -1582,7 +1582,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	// For queries which return rows or parameters (output bind variables),
 	// get the column count and bind columns.  For DML queries, get the
 	// affected row count.
-	// Affected row count is only supported in versio>=0.53 but appears
+	// Affected row count is only supported in version>=0.53 but appears
 	// to be broken in 0.61 as well
 	if (majorversion==0 && (minorversion<53 || minorversion==61)) {
 		knowsaffectedrows=false;
@@ -1846,6 +1846,18 @@ uint16_t freetdscursor::getColumnType(uint32_t col) {
 			return VOID_DATATYPE;
 		case CS_USHORT_TYPE:
 			return USHORT_DATATYPE;
+		#ifdef CS_BIGINT_TYPE
+		case CS_BIGINT_TYPE:
+			return BIGINT_DATATYPE;
+		#endif
+		#ifdef CS_UBIGINT_TYPE
+		case CS_UBIGINT_TYPE:
+			return UBIGINT_DATATYPE;
+		#endif
+		#ifdef CS_UNIQUE_TYPE
+		case CS_UNIQUE_TYPE:
+			return UNIQUEIDENTIFIER_DATATYPE;
+		#endif
 		default:
 			return UNKNOWN_DATATYPE;
 	}
@@ -1999,15 +2011,22 @@ void freetdscursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
 
-	// handle normal datatypes
-	if (nullindicator[col][row]>-1 && datalength[col][row]) {
-		*field=&data[col][row*freetdsconn->maxitembuffersize];
-		*fieldlength=datalength[col][row]-1;
+	// handle NULLs
+	if (nullindicator[col][row]==-1) {
+		*null=true;
 		return;
 	}
 
-	// handle NULLs
-	*null=true;
+	// Empty TEXT fields don't get properly converted
+	// to null-terminated strings.  Handle them.
+	if (column[col].datatype==CS_TEXT_TYPE && datalength[col][row]) {
+		data[col][row*freetdsconn->maxitembuffersize]='\0';
+		datalength[col][row]=1;
+	}
+
+	// handle normal datatypes
+	*field=&data[col][row*freetdsconn->maxitembuffersize];
+	*fieldlength=datalength[col][row]-1;
 }
 
 void freetdscursor::nextRow() {
