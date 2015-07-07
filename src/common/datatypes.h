@@ -194,8 +194,11 @@ typedef	enum {
 	PG_TYPE_DATATYPE,
 	PG_ATTRIBUTE_DATATYPE,
 	PG_PROC_DATATYPE,
-	PG_CLASS_DATATYPE
+	PG_CLASS_DATATYPE,
 	// none added by sqlite
+	// added by sqlserver
+	UBIGINT_DATATYPE,
+	UNIQUEIDENTIFIER_DATATYPE
 } datatype;
 
 #ifdef NEED_DATATYPESTRING
@@ -385,6 +388,9 @@ static const char	*datatypestring[] = {
 	"PG_PROC",
 	"PG_CLASS",
 	// none added by sqlite
+	// added by sqlserver
+	"UBIGINT",
+	"UNIQUEIDENTIFIER",
 	NULL
 };
 #endif

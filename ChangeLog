@@ -9,6 +9,11 @@
 	added support for maxitembuffersize, maxselectlistsize,
 		and maxbindcount for firebird
 	added native api for node.js
+	added recognition of bigint, ubigint and uniqueidentifier fields in
+		freetds/sybase
+	added nullsasnulls command to sqlrsh
+	added workaround for freetds empty (but non-null) text fields not
+		getting properly converted to null-terminated empty strings
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

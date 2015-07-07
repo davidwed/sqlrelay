@@ -443,6 +443,7 @@ int sqlrsh::commandType(const char *command) {
 	if (!charstring::compareIgnoringCase(ptr,"headers",7) ||
 		!charstring::compareIgnoringCase(ptr,"stats",5) ||
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
+		!charstring::compareIgnoringCase(ptr,"nullsasnulls",12) ||
 		!charstring::compareIgnoringCase(ptr,"autocommit",10) ||
 		!charstring::compareIgnoringCase(ptr,"final",5) ||
 		!charstring::compareIgnoringCase(ptr,"help") ||
@@ -515,6 +516,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"debug",5)) {	
 		ptr=ptr+5;
 		cmdtype=4;
+	} else if (!charstring::compareIgnoringCase(ptr,"nullsasnulls",12)) {	
+		ptr=ptr+13;
+		cmdtype=9;
 	} else if (!charstring::compareIgnoringCase(ptr,"autocommit",10)) {	
 		ptr=ptr+10;
 		cmdtype=8;
@@ -669,6 +673,16 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		} else {
 			sqlrcon->debugOn();
 			sqlrcon->setDebugFile(ptr);
+		}
+		return;
+	}
+
+	// handle nullsasnulls
+	if (cmdtype==9) {
+		if (!charstring::compareIgnoringCase(ptr,"on",2)) {
+			sqlrcur->getNullsAsNulls();
+		} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
+			sqlrcur->getNullsAsEmptyStrings();
 		}
 		return;
 	}
@@ -1061,26 +1075,30 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
-	// display column names
 	uint32_t	colcount=sqlrcur->colCount();
-	uint32_t	namelen;
-	uint32_t	longest;
-
 	if (!colcount) {
 		return;
 	}
 
+	uint32_t	namelen;
+	uint32_t	longest;
+	const char	*field;
+	uint32_t	fieldlength;
+
 	uint32_t	i=0;
-	const char	*field="";
-	while (field && colcount) {
+	while (!(sqlrcur->endOfResultSet() && i==sqlrcur->rowCount())) {
 		for (uint32_t j=0; j<colcount; j++) {
 
-			if (!(field=sqlrcur->getField(i,j))) {
-				break;
+			// get the field
+			field=sqlrcur->getField(i,j);
+			fieldlength=sqlrcur->getFieldLength(i,j);
+			if (!field) {
+				field="NULL";
+				fieldlength=4;
 			}
 
-			// write the column value
-			stdoutput.printf("%s",field);
+			// write the field
+			stdoutput.write(field);
 
 			// which is longer, field name or longest field
 			longest=sqlrcur->getLongest(j);
@@ -1093,19 +1111,16 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			}
 
 			// pad after the name with spaces
-			for (uint32_t k=sqlrcur->getFieldLength(i,j); 
-							k<longest; k++) {
-				stdoutput.printf(" ");
+			for (uint32_t k=fieldlength; k<longest; k++) {
+				stdoutput.write(' ');
 			}
 
 			// put an extra space between names
 			if (j<colcount-1) {
-				stdoutput.printf(" ");
+				stdoutput.write(' ');
 			}
 		}
-		if (field) {
-			stdoutput.printf("\n");
-		}
+		stdoutput.write('\n');
 		i++;
 	}
 }
@@ -1682,6 +1697,10 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("toggles statistics after result set\n");
 	stdoutput.printf("	debug on/off		- ");
 	stdoutput.printf("toggles debug messages\n");
+	stdoutput.printf("	nullsasnulls on/off	- ");
+	stdoutput.printf("toggles getting nulls as nulls\n"
+			"					"
+			"(rather than as empty strings)\n");
 	stdoutput.printf("	autocommit on/off	- ");
 	stdoutput.printf("toggles autocommit\n");
 	stdoutput.printf("	final on/off		- ");

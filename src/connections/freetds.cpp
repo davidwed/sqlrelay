@@ -2019,7 +2019,7 @@ void freetdscursor::getField(uint32_t col,
 
 	// Empty TEXT fields don't get properly converted
 	// to null-terminated strings.  Handle them.
-	if (column[col].datatype==CS_TEXT_TYPE && datalength[col][row]) {
+	if (column[col].datatype==CS_TEXT_TYPE && !datalength[col][row]) {
 		data[col][row*freetdsconn->maxitembuffersize]='\0';
 		datalength[col][row]=1;
 	}

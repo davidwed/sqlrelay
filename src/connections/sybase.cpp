@@ -1600,15 +1600,15 @@ void sybasecursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
 
-	// handle normal datatypes
-	if (nullindicator[col][row]>-1 && datalength[col][row]) {
-		*field=&data[col][row*sybaseconn->maxitembuffersize];
-		*fieldlength=datalength[col][row]-1;
+	// handle NULLs
+	if (nullindicator[col][row]==-1) {
+		*null=true;
 		return;
 	}
 
-	// handle NULLs
-	*null=true;
+	// handle normal datatypes
+	*field=&data[col][row*sybaseconn->maxitembuffersize];
+	*fieldlength=datalength[col][row]-1;
 }
 
 void sybasecursor::nextRow() {
