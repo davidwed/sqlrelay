@@ -14,6 +14,8 @@
 	added nullsasnulls command to sqlrsh
 	added workaround for freetds empty (but non-null) text fields not
 		getting properly converted to null-terminated empty strings
+	fetchatonce, maxitembuffersize and maxselectlistsize are set to
+		defaulting values if invalid values are given for them
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

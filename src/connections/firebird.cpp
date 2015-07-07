@@ -357,13 +357,13 @@ void firebirdconnection::handleConnectString() {
 
 	maxselectlistsize=charstring::toInteger(
 			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize) {
+	if (!maxselectlistsize || maxselectlistsize<-1) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	}
 
 	maxitembuffersize=charstring::toInteger(
 			cont->getConnectStringValue("maxitembuffersize"));
-	if (!maxitembuffersize) {
+	if (maxitembuffersize<1) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
 }

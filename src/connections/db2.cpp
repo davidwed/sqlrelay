@@ -324,22 +324,22 @@ void db2connection::handleConnectString() {
 
 	fetchatonce=charstring::toUnsignedInteger(
 				cont->getConnectStringValue("fetchatonce"));
-	if (!fetchatonce) {
+	if (fetchatonce<1) {
 		fetchatonce=FETCH_AT_ONCE;
 	}
 	maxselectlistsize=charstring::toInteger(
 			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize) {
+	if (!maxselectlistsize || maxselectlistsize<-1) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	}
 	maxitembuffersize=charstring::toInteger(
 			cont->getConnectStringValue("maxitembuffersize"));
-	if (!maxitembuffersize) {
+	if (maxitembuffersize<1) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
 	maxoutbindlobsize=charstring::toInteger(
 			cont->getConnectStringValue("maxoutbindlobsize"));
-	if (!maxoutbindlobsize) {
+	if (maxoutbindlobsize<1) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	}
 }

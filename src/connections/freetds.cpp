@@ -350,12 +350,12 @@ void freetdsconnection::handleConnectString() {
 	// this is here in case freetds ever supports array fetches
 	/*fetchatonce=charstring::toInteger(
 				cont->getConnectStringValue("fetchatonce"));
-	if (!fetchatonce) {
+	if (fetchatonce<1) {
 		fetchatonce=FETCH_AT_ONCE;
 	}*/
 	maxselectlistsize=charstring::toInteger(
 			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize) {
+	if (!maxselectlistsize || maxselectlistsize<-1) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	} else if (maxselectlistsize==1) {
 		// if maxselectlistsize is set to 1 then force it
@@ -364,7 +364,7 @@ void freetdsconnection::handleConnectString() {
 	}
 	maxitembuffersize=charstring::toInteger(
 			cont->getConnectStringValue("maxitembuffersize"));
-	if (!maxitembuffersize) {
+	if (maxitembuffersize<1) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
 }

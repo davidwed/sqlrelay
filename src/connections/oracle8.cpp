@@ -462,19 +462,19 @@ void oracle8connection::handleConnectString() {
 
 	fetchatonce=charstring::toUnsignedInteger(
 				cont->getConnectStringValue("fetchatonce"));
-	if (!fetchatonce) {
+	if (fetchatonce<1) {
 		fetchatonce=FETCH_AT_ONCE;
 	}
 
 	maxselectlistsize=charstring::toInteger(
 			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize) {
+	if (!maxselectlistsize || maxselectlistsize<-1) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	}
 
 	maxitembuffersize=charstring::toInteger(
 			cont->getConnectStringValue("maxitembuffersize"));
-	if (!maxitembuffersize) {
+	if (maxitembuffersize<1) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
 	if (maxitembuffersize<MAX_BYTES_PER_CHAR) {
