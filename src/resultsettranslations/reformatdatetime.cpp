@@ -23,6 +23,7 @@ class SQLRSERVER_DLLSPEC reformatdatetime : public sqlrresultsettranslation {
 
 		bool		ddmm;
 		bool		yyyyddmm;
+		bool		ignorenondatetime;
 		const char	*datedelimiters;
 		const char	*datetimeformat;
 		const char	*dateformat;
@@ -55,6 +56,11 @@ reformatdatetime::reformatdatetime(sqlrresultsettranslations *sqlrrsts,
 	}
 	ddmm=!charstring::compareIgnoringCase(dateddmm,"yes");
 	yyyyddmm=!charstring::compareIgnoringCase(dateyyyyddmm,"yes");
+
+	ignorenondatetime=!charstring::compareIgnoringCase(
+				parameters->getAttributeValue(
+						"ignorenondatetime"),"yes");
+
 	datedelimiters=parameters->getAttributeValue("datedelimiters");
 	if (!datedelimiters) {
 		datedelimiters="/-.:";
@@ -90,6 +96,7 @@ bool reformatdatetime::run(sqlrserverconnection *sqlrcon,
 					field,fieldlength,
 					newfield,newfieldlength,
 					ddmm,yyyyddmm,
+					ignorenondatetime,
 					datedelimiters,
 					datetimeformat,
 					dateformat,

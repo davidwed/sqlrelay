@@ -21,6 +21,7 @@
 
 #include <defines.h>
 #include <defaults.h>
+#define NEED_IS_DATETIME_TYPE_INT
 #include <datatypes.h>
 #define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
@@ -3675,6 +3676,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	if (reformatdatetimes) {
 		bool		ddmm=cfgfl->getDateDdMm();
 		bool		yyyyddmm=cfgfl->getDateYyyyDdMm();
+		bool		ignorenondatetime=cfgfl->getIgnoreNonDateTime();
 		const char	*datedelimiters=cfgfl->getDateDelimiters();
 		const char	*datetimeformat=cfgfl->getDateTimeFormat();
 		const char	*dateformat=cfgfl->getDateFormat();
@@ -3684,6 +3686,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 					field,fieldlength,
 					newfield,newfieldlength,
 					ddmm,yyyyddmm,
+					ignorenondatetime,
 					datedelimiters,
 					datetimeformat,
 					dateformat,timeformat);
@@ -3709,10 +3712,17 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 						const char **newfield,
 						uint32_t *newfieldlength,
 						bool ddmm, bool yyyyddmm,
+						bool ignorenondatetime,
 						const char *datedelimiters,
 						const char *datetimeformat,
 						const char *dateformat,
 						const char *timeformat) {
+
+	// ignore non-date fields, if specified
+	if (ignorenondatetime &&
+		!isDateTimeTypeInt(getColumnType(cursor,index))) {
+		return;
+	}
 
 	// This weirdness is mainly to address a FreeTDS/MSSQL
 	// issue.  See the code for the method

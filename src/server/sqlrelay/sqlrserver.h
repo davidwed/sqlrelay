@@ -512,6 +512,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						const char **newfield,
 						uint32_t *newfieldlength,
 						bool ddmm, bool yyyyddmm,
+						bool ignorenondatetime,
 						const char *datedelimiters,
 						const char *datetimeformat,
 						const char *dateformat,

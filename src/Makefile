@@ -32,6 +32,9 @@ all-auths:
 all-translations:
 	cd translations $(AND) $(MAKE) all
 
+all-resultsettranslations:
+	cd resultsettranslations $(AND) $(MAKE) all
+
 all-filters:
 	cd filters $(AND) $(MAKE) all
 
@@ -51,6 +54,7 @@ clean:
 	cd pwdencs $(AND) $(MAKE) clean
 	cd auths $(AND) $(MAKE) clean
 	cd translations $(AND) $(MAKE) clean
+	cd resultsettranslations $(AND) $(MAKE) clean
 	cd filters $(AND) $(MAKE) clean
 	cd connections $(AND) $(MAKE) clean
 	cd server $(AND) $(MAKE) clean
@@ -88,6 +92,9 @@ install-auths:
 install-translations:
 	cd translations $(AND) $(MAKE) install
 
+install-resultsettranslations:
+	cd resultsettranslations $(AND) $(MAKE) install
+
 install-filters:
 	cd filters $(AND) $(MAKE) install
 
@@ -107,6 +114,7 @@ uninstall:
 	cd pwdencs $(AND) $(MAKE) uninstall
 	cd auths $(AND) $(MAKE) uninstall
 	cd translations $(AND) $(MAKE) uninstall
+	cd resultsettranslations $(AND) $(MAKE) uninstall
 	cd filters $(AND) $(MAKE) uninstall
 	cd connections $(AND) $(MAKE) uninstall
 	cd server $(AND) $(MAKE) uninstall

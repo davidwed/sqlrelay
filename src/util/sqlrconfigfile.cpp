@@ -105,6 +105,7 @@ void sqlrconfigfile::init() {
 	dateyyyyddmm=false;
 	dateyyyyddmmset=false;
 	datedelimiters=charstring::duplicate(DEFAULT_DATEDELIMITERS);
+	ignorenondatetime=false;
 	instart=false;
 	inend=false;
 }
@@ -386,6 +387,10 @@ bool sqlrconfigfile::getDateYyyyDdMm() {
 
 const char *sqlrconfigfile::getDateDelimiters() {
 	return datedelimiters;
+}
+
+bool sqlrconfigfile::getIgnoreNonDateTime() {
+	return ignorenondatetime;
 }
 
 linkedlist< char * > *sqlrconfigfile::getSessionStartQueries() {
@@ -1213,6 +1218,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=DATEYYYYDDMM_ATTRIBUTE;
 		} else if (!charstring::compare(name,"datedelimiters")) {
 			currentattribute=DATEDELIMITERS_ATTRIBUTE;
+		} else if (!charstring::compare(name,"ignorenondatetime")) {
+			currentattribute=IGNORENONDATETIME_ATTRIBUTE;
 		} else if (!charstring::compare(name,"enabled")) {
 			currentattribute=ENABLED_ATTRIBUTE;
 		}
@@ -1780,6 +1787,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==DATEDELIMITERS_ATTRIBUTE) {
 			delete[] datedelimiters;
 			datedelimiters=charstring::duplicate(value);
+		} else if (currentattribute==IGNORENONDATETIME_ATTRIBUTE) {
+			ignorenondatetime=
+				!charstring::compareIgnoringCase(value,"yes");
 		} else if (currentattribute==ENABLED_ATTRIBUTE) {
 			enabled=!charstring::compareIgnoringCase(value,"yes");
 		}

@@ -10,6 +10,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqlrresultsettranslationdeclarations.cpp"
+	}
+#endif
+
 sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth) {
 	debugFunction();
 	xmld=NULL;
@@ -134,9 +140,12 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 		(*newResultSetTranslation)(this,resultsettranslation);
 
 #else
-
 	dynamiclib			*dl=NULL;
-	sqlrresultsettranslation	*rstr=NULL;
+	sqlrresultsettranslation	*rstr;
+	#include "sqlrresultsettranslationassignments.cpp"
+	{
+		rstr=NULL;
+	}
 #endif
 
 	// add the plugin to the list

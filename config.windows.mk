@@ -418,9 +418,9 @@ PYTHONSUFFIX = pyd
 INSTALLSUBDIRS = install-src install-bin install-etc install-doc
 UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-doc
 
-SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-filters all-connections all-cmdline
+SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
 
-SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-filters install-connections install-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
 
 
 APIALLSUBDIRS = @APIALLSUBDIRS@
