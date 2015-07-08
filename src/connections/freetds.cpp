@@ -7,6 +7,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/stdio.h>
+#include <rudiments/snooze.h>
 
 #include <datatypes.h>
 #include <defines.h>
@@ -101,7 +102,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 		void		encodeBlob(stringbuffer *buffer,
 							const char *data,
 							uint32_t datasize);
-#ifdef FREETDS_SUPPORTS_CURSORS
+		#ifdef FREETDS_SUPPORTS_CURSORS
 		bool		inputBind(const char *variable,
 						uint16_t variablesize,
 						const char *value,
@@ -156,7 +157,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
-#endif
+		#endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		bool		knowsAffectedRows();
@@ -901,6 +902,11 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	}
 	delete[] versionstring;
 
+	// Affected row count is generally supported in versions >= 0.53 but
+	// appears to be broken in 0.61.
+	knowsaffectedrows=(majorversion>=0 ||
+				(minorversion>=53 && minorversion!=61));
+
 	prepared=false;
 	freetdsconn=(freetdsconnection *)conn;
 	cmd=NULL;
@@ -1099,7 +1105,7 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 
 		// initiate a cursor command
 		cmd=cursorcmd;
-#ifdef FREETDS_SUPPORTS_CURSORS
+		#ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
 				(CS_CHAR *)cursorname,
 				(CS_INT)cursornamelength,
@@ -1108,33 +1114,33 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
-#endif
+		#endif
 
 	} else if (rpcquery.match(query)) {
 
 		// initiate an rpc command
 		isrpcquery=true;
 		cmd=languagecmd;
-#ifdef FREETDS_SUPPORTS_CURSORS
+		#ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_command(languagecmd,CS_RPC_CMD,
 			(CS_CHAR *)rpcquery.getSubstringEnd(0),
 			length-rpcquery.getSubstringEndOffset(0),
 			CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
-#endif
+		#endif
 
 	} else {
 
 		// initiate a language command
 		cmd=languagecmd;
-#ifdef FREETDS_SUPPORTS_CURSORS
+		#ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_command(languagecmd,CS_LANG_CMD,
 				(CS_CHAR *)query,length,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
-#endif
+		#endif
 	}
 
 	clean=false;
@@ -1143,11 +1149,11 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 }
 
 bool freetdscursor::supportsNativeBinds(const char *query, uint32_t length) {
-#ifdef FREETDS_SUPPORTS_CURSORS
-	return true;
-#else
-	return false;
-#endif
+	#ifdef FREETDS_SUPPORTS_CURSORS
+		return true;
+	#else
+		return false;
+	#endif
 }
 
 void freetdscursor::encodeBlob(stringbuffer *buffer,
@@ -1489,13 +1495,12 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 
 	// initialize return values
 	ncols=0;
-	knowsaffectedrows=false;
 	affectedrows=0;
 	row=0;
 	maxrow=0;
 	totalrows=0;
 
-#ifdef FREETDS_SUPPORTS_CURSORS
+	#ifdef FREETDS_SUPPORTS_CURSORS
 	if (cmd==cursorcmd) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
@@ -1511,7 +1516,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			return false;
 		}
 	}
-#endif
+	#endif
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
 		closeResultSet();
@@ -1522,51 +1527,65 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 
 		results=ct_results(cmd,&resultstype);
 
-		if (results==CS_FAIL ||
-			resultstype==CS_CMD_FAIL || resultstype==CS_CMD_DONE) {
+		// handle the end of all result sets
+		if (results==CS_END_RESULTS) {
+			break;
+		}
+
+		// handle failed queries
+		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
 			closeResultSet();
 			return false;
 		}
 
-		if (cmd==languagecmd) {
+		// Queries can generate multiple result sets.
+		//
+		// A DML/DDL query will just send a CS_CMD_SUCCEED.
+		//
+		// If we're not using cursors, then selects will also just
+		// send a single CS_ROW_RESULT.
+		//
+		// But...
+		//
+		// If a cursor is used to execute a select, then each
+		// ct_cursor() call generates a results set, and then the
+		// ct_send also generates a CS_ROW_RESULT result set.
+		//
+		// RPC queries (EXEC some-stored-procedures or direct
+		// TransactSQL may generate a series of result sets including
+		// CS_CMD_SUCCEED, CS_CMD_DONE, CS_STATUS_RESULT, CS_ROW_RESULT
+		// or CS_COMPUTE_RESULT result sets, in any combination or
+		// order.
+		//
+		// Currently SQL Relay only supports 1 result set per query, so
+		// for a given query, we only really care about one result set,
+		// the CS_PARAM_RESULT, CS_ROW_RESULT, CS_CURSOR_RESULT, or
+		// CS_COMPUTE_RESULT.  We'll grab whichever of those we get
+		// first, and ignore the rest.
 
-			if (isrpcquery) {
-				// For rpc commands, there could be several
-				// result sets - CS_STATUS_RESULT,
-				// maybe a CS_PARAM_RESULT and maybe a
-				// CS_ROW_RESULT, we're not guaranteed
-				// what order they'll come in though, what
-				// a pickle...
-				// For now, we care about the CS_PARAM_RESULT,
-				// or the CS_ROW_RESULT, whichever we get first,
-				// presumably there will only be 1 row in the
-				// CS_PARAM_RESULT...
-				if (resultstype==CS_PARAM_RESULT ||
-						resultstype==CS_ROW_RESULT) {
-					break;
+		if (resultstype==CS_CMD_SUCCEED) {
+			// If we got CS_CMD_SUCCEED, then try to get the
+			// affected row count.  The query might have been
+			// DML/DDL, or this could be one of the result sets of
+			// a stored procedure or direct TransactSQL.  We need
+			// to do this here because we're going to cancel this
+			// result set below.
+			affectedrows=0;
+			if (knowsaffectedrows) {
+				if (ct_res_info(cmd,CS_ROW_COUNT,
+					(CS_VOID *)&affectedrows,
+					CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+					return false;
 				}
-			} else {
-				// For non-rpc language commands (non-selects),
-				// there should be only one result set.
-				break;
 			}
-
-		} else if (resultstype==CS_ROW_RESULT ||
-#ifdef FREETDS_SUPPORTS_CURSORS
-					resultstype==CS_CURSOR_RESULT ||
-#endif
-					resultstype==CS_COMPUTE_RESULT) {
-			// For cursor commands (selects), each call to
-			// ct_cursor will have generated a result set.  There
-			// will be result sets for the CS_CURSOR_DECLARE,
-			// CS_CURSOR_ROWS and CS_CURSOR_OPEN calls.  We need to
-			// skip past the first 2, unless they failed.  If they
-			// failed, it will be caught above.
+		}  else if (resultstype==CS_PARAM_RESULT ||
+				resultstype==CS_ROW_RESULT ||
+				resultstype==CS_CURSOR_RESULT ||
+				resultstype==CS_COMPUTE_RESULT) {
 			break;
 		}
 
-		// if we got here, then we don't want to process this result
-		// set, cancel it and move on to the next one...
+		// the result set was a type that we want to ignore
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 			freetdsconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
@@ -1580,28 +1599,14 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	prepared=false;
 
 	// For queries which return rows or parameters (output bind variables),
-	// get the column count and bind columns.  For DML queries, get the
-	// affected row count.
-	// Affected row count is only supported in version>=0.53 but appears
-	// to be broken in 0.61 as well
-	if (majorversion==0 && (minorversion<53 || minorversion==61)) {
-		knowsaffectedrows=false;
-	} else {
-		knowsaffectedrows=true;
-	}
-
-	// For queries which return rows or parameters (output bind variables),
-	// get the column count and bind columns.  For DML queries, get the
-	// affected row count.
+	// get the column count and bind columns.
 	bool	moneycolumn=false;
-	affectedrows=0;
 	if (resultstype==CS_ROW_RESULT ||
-#ifdef FREETDS_SUPPORTS_CURSORS
 			resultstype==CS_CURSOR_RESULT ||
-#endif
 			resultstype==CS_COMPUTE_RESULT ||
 			resultstype==CS_PARAM_RESULT) {
 
+		// get the column count
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			return false;
@@ -1649,7 +1654,8 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			// however, if we're getting the output bind variables
 			// of a stored procedure that returns dates, then use
 			// the datetime type instead...
-			if (isrpcquery && outbindtype[i]==CS_DATETIME_TYPE) {
+			if (resultstype==CS_PARAM_RESULT &&
+				outbindtype[i]==CS_DATETIME_TYPE) {
 				column[i].datatype=CS_DATETIME_TYPE;
 				column[i].format=CS_FMT_UNUSED;
 				column[i].maxlength=sizeof(CS_DATETIME);
@@ -1681,11 +1687,6 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			}
 		}
 
-	} else if (resultstype==CS_CMD_SUCCEED && knowsaffectedrows) {
-		if (ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
-					CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			return false;
-		} 
 	}
 
 	// If we got a moneycolumn (and version<0.53) then cancel the
@@ -1704,7 +1705,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	// if we're doing an rpc query, the result set should be a single
 	// row of output parameter results, fetch it and populate the output
 	// bind variables...
-	if (isrpcquery && resultstype==CS_PARAM_RESULT) {
+	if (resultstype==CS_PARAM_RESULT) {
 
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
 				&rowsread)!=CS_SUCCEED && !rowsread) {
@@ -1753,21 +1754,6 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		discardResults();
 		ncols=0;
 	}
-
-	// For non-rpc language commands, we need to discard the result sets
-	// here or subsequent select queries in other cursors will fail until
-	// this cursor is cleaned up.  They will fail with:
-	// Client Library error:
-	// severity(1)
-	// layer(1)
-	// origin(1)
-	// number(49)
-	// Error:	ct_send(): user api layer: external error: This routine cannot be called because another command structure has results pending.
-	// FIXME: this has to be done in the sybase connection but if it's
-	// done here then it hangs.
-	/*if (cmd==languagecmd && !isrpcquery) {
-		discardResults();
-	}*/
 
 	// return success only if no error was generated
 	if (freetdsconn->errorstring.getStringLength()) {
@@ -1951,9 +1937,7 @@ bool freetdscursor::ignoreDateDdMmParameter(uint32_t col,
 bool freetdscursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
 	return (resultstype!=CS_ROW_RESULT &&
-#ifdef FREETDS_SUPPORTS_CURSORS
 			resultstype!=CS_CURSOR_RESULT &&
-#endif
 			resultstype!=CS_COMPUTE_RESULT);
 }
 
@@ -2075,7 +2059,7 @@ void freetdscursor::discardResults() {
 
 void freetdscursor::discardCursor() {
 
-#ifdef FREETDS_SUPPORTS_CURSORS
+	#ifdef FREETDS_SUPPORTS_CURSORS
 	if (cmd==cursorcmd) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
 				NULL,CS_UNUSED,CS_DEALLOC)==CS_SUCCEED) {
@@ -2085,7 +2069,7 @@ void freetdscursor::discardCursor() {
 			}
 		}
 	}
-#endif
+	#endif
 }
 
 CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt, 

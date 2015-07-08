@@ -883,6 +883,26 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,13),"1");
 	stdoutput.printf("\n");
 
+	stdoutput.printf("DIRECT TRANSACTSQL: \n");
+	checkSuccess(cur->sendQuery("BEGIN declare @s varchar(20) declare @e varchar(20) set @s = 'hello' set @e = 'goodbye' select @s as s, @e as e END"),1);
+	checkSuccess(cur->getField(0,"s"),"hello");
+	checkSuccess(cur->getField(0,"e"),"goodbye");
+	stdoutput.printf("\n");
+
+	stdoutput.printf("NESTED SELECTS: \n");
+	// can't do this with freetds
+	//cur->setResultSetBufferSize(1);
+	checkSuccess(cur->sendQuery("select * from testtable"),1);
+	uint32_t i=0;
+	while (cur->getRow(i++)) {
+		sqlrcursor	*cur2=new sqlrcursor(con);
+		// can't do this with freetds
+		//cur2->setResultSetBufferSize(1);
+		checkSuccess(cur2->sendQuery("select * from testtable"),1);
+		delete cur2;
+	}
+	stdoutput.printf("\n");
+
 	// drop existing table
 	cur->sendQuery("commit tran");
 	cur->sendQuery("drop table testtable");

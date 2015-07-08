@@ -433,7 +433,7 @@ chmod o+r tnsnames.ora
 <br><a name="pending"></a>
 <span class="heading3">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</span>
 
-<p>The short answer... If you're doing nested selects, don't use setResultSetBufferSize() with a non-0 argument on the client when using FreeTDS on the server.</p>
+<p>The short answer is... If you're doing nested selects, don't call setResultSetBufferSize() with a non-zero argument.</p>
 
 <p>The longer answer is that the TDS protocol doesn't support fetching mulitple result sets simultaneously through the same connection.  Somehow the Sybase client API works around this but FreeTDS does not.</p>
 

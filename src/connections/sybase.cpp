@@ -1251,48 +1251,63 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 
 		results=ct_results(cmd,&resultstype);
 
+		// handle the end of all result sets
+		if (results==CS_END_RESULTS) {
+			break;
+		}
+
+		// handle failed queries
 		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
 			closeResultSet();
 			return false;
 		}
 
-		if (cmd==languagecmd) {
+		// Queries can generate multiple result sets.
+		//
+		// A DML/DDL query will just send a CS_CMD_SUCCEED.
+		//
+		// If we're not using cursors, then selects will also just
+		// send a single CS_ROW_RESULT.
+		//
+		// But...
+		//
+		// If a cursor is used to execute a select, then each
+		// ct_cursor() call generates a results set, and then the
+		// ct_send also generates a CS_ROW_RESULT result set.
+		//
+		// RPC queries (EXEC some-stored-procedures or direct
+		// TransactSQL may generate a series of result sets including
+		// CS_CMD_SUCCEED, CS_CMD_DONE, CS_STATUS_RESULT, CS_ROW_RESULT
+		// or CS_COMPUTE_RESULT result sets, in any combination or
+		// order.
+		//
+		// Currently SQL Relay only supports 1 result set per query, so
+		// for a given query, we only really care about one result set,
+		// the CS_PARAM_RESULT, CS_ROW_RESULT, CS_CURSOR_RESULT, or
+		// CS_COMPUTE_RESULT.  We'll grab whichever of those we get
+		// first, and ignore the rest.
 
-			if (isrpcquery) {
-				// For rpc commands, there could be several
-				// result sets - CS_STATUS_RESULT,
-				// maybe a CS_PARAM_RESULT and maybe a
-				// CS_ROW_RESULT, we're not guaranteed
-				// what order they'll come in though, what
-				// a pickle...
-				// For now, we care about the CS_PARAM_RESULT,
-				// or the CS_ROW_RESULT, whichever we get first,
-				// presumably there will only be 1 row in the
-				// CS_PARAM_RESULT...
-				if (resultstype==CS_PARAM_RESULT ||
-						resultstype==CS_ROW_RESULT) {
-					break;
-				}
-			} else {
-				// For non-rpc language commands (non-selects),
-				// there should be only one result set.
-				break;
+		if (resultstype==CS_CMD_SUCCEED) {
+			// If we got CS_CMD_SUCCEED, then try to get the
+			// affected row count.  The query might have been
+			// DML/DDL, or this could be one of the result sets of
+			// a stored procedure or direct TransactSQL.  We need
+			// to do this here because we're going to cancel this
+			// result set below.
+			affectedrows=0;
+			if (ct_res_info(cmd,CS_ROW_COUNT,
+				(CS_VOID *)&affectedrows,
+				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
+				return false;
 			}
-
-		} else if (resultstype==CS_ROW_RESULT ||
-					resultstype==CS_CURSOR_RESULT ||
-					resultstype==CS_COMPUTE_RESULT) {
-			// For cursor commands (selects), each call to
-			// ct_cursor will have generated a result set.  There
-			// will be result sets for the CS_CURSOR_DECLARE,
-			// CS_CURSOR_ROWS and CS_CURSOR_OPEN calls.  We need to
-			// skip past the first 2, unless they failed.  If they
-			// failed, it will be caught above.
+		}  else if (resultstype==CS_PARAM_RESULT ||
+				resultstype==CS_ROW_RESULT ||
+				resultstype==CS_CURSOR_RESULT ||
+				resultstype==CS_COMPUTE_RESULT) {
 			break;
 		}
 
-		// if we got here, then we don't want to process this result
-		// set, cancel it and move on to the next one...
+		// the result set was a type that we want to ignore
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 			sybaseconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
@@ -1306,14 +1321,13 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 	prepared=false;
 
 	// For queries which return rows or parameters (output bind variables),
-	// get the column count and bind columns.  For DML queries, get the
-	// affected row count.
-	affectedrows=0;
+	// get the column count and bind columns.
 	if (resultstype==CS_ROW_RESULT ||
 			resultstype==CS_CURSOR_RESULT ||
 			resultstype==CS_COMPUTE_RESULT ||
 			resultstype==CS_PARAM_RESULT) {
 
+		// get the column count
 		if (ct_res_info(cmd,CS_NUMDATA,(CS_VOID *)&ncols,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
 			return false;
@@ -1336,7 +1350,8 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 			// however, if we're getting the output bind variables
 			// of a stored procedure that returns dates, then use
 			// the datetime type instead...
-			if (isrpcquery && outbindtype[i]==CS_DATETIME_TYPE) {
+			if (resultstype==CS_PARAM_RESULT &&
+				outbindtype[i]==CS_DATETIME_TYPE) {
 				column[i].datatype=CS_DATETIME_TYPE;
 				column[i].format=CS_FMT_UNUSED;
 				column[i].maxlength=sizeof(CS_DATETIME);
@@ -1368,17 +1383,12 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 			}
 		}
 
-	} else if (resultstype==CS_CMD_SUCCEED) {
-		if (ct_res_info(cmd,CS_ROW_COUNT,(CS_VOID *)&affectedrows,
-				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			return false;
-		} 
 	}
 
 	// if we're doing an rpc query, the result set should be a single
 	// row of output parameter results, fetch it and populate the output
 	// bind variables...
-	if (isrpcquery && resultstype==CS_PARAM_RESULT) {
+	if (resultstype==CS_PARAM_RESULT) {
 
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
 				&rowsread)!=CS_SUCCEED && !rowsread) {
@@ -1426,19 +1436,6 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 
 		discardResults();
 		ncols=0;
-	}
-
-	// For non-rpc language commands, we need to discard the result sets
-	// here or subsequent select queries in other cursors will fail until
-	// this cursor is cleaned up.  They will fail with:
-	// Client Library error:
-	// severity(1)
-	// layer(1)
-	// origin(1)
-	// number(49)
-	// Error:	ct_send(): user api layer: external error: This routine cannot be called because another command structure has results pending.
-	if (cmd==languagecmd && !isrpcquery) {
-		discardResults();
 	}
 
 	// return success only if no error was generated
