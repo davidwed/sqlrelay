@@ -18,6 +18,8 @@
 	fetchatonce, maxitembuffersize and maxselectlistsize are set to
 		defaulting values if invalid values are given for them
 	added lazyconnect option to PHP PDO and Perl DBI drivers (defaults to 1)
+	direct Transact SQL which returns a result set is now supported with 
+		Sybase/SAP/MSSQLServer/FreeTDS
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
