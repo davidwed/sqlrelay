@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		f=new_sqlrfilter_@module@(this,filter,debug);
+	} else

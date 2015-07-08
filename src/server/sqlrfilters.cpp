@@ -10,6 +10,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqlrfilterdeclarations.cpp"
+	}
+#endif
+
 sqlrfilters::sqlrfilters(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	xmld=NULL;
@@ -126,7 +132,11 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 
 #else
 	dynamiclib	*dl=NULL;
-	sqlrfilter	*f=NULL;
+	sqlrfilter	*f;
+	#include "sqlrfilterassignments.cpp"
+	{
+		f=NULL;
+	}
 #endif
 
 	// add the plugin to the list
