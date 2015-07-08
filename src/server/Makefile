@@ -1,3 +1,4 @@
+Oi
 top_builddir = ../..
 
 include ../../config.mk
@@ -204,6 +205,22 @@ sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
 sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsettranslationdeclarations.cpp: sqlrresultsettranslationdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../resultsettranslations/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsettranslationassignments.cpp: sqlrresultsettranslationassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../resultsettranslations/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
