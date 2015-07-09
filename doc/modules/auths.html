@@ -18,13 +18,25 @@
 <br><a name="introduction"></a>
 <span class="heading2">Introduction</span><br>
 
-<p>Authentication modules allow the SQL Relay server programs to log various bits of information as they run.  A section of the sqlrelay.conf file indicates which modules to load and what parameters to use when logging.</p>
+<p>SQL Relay typically authenticates users against a static list of valid user/password combinations in the sqlrelay.conf file, or against the database itself.  Which to do depends on the authtier parameter.  If authtier="connection" then the sqlr-connection process authenticates the user against the static list.  If authtier="database" then the user is authenticated against the database.  When authtier="database", users must log into SQL Relay using a user/password combination that would be valid to log into the database directly.</p>
+
+<p>Authentication modules allow the SQL Relay server programs to authenticate users in some other manner.<p>
+
+<p>A section of the sqlrelay.conf file indicates which authentication modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+... example here ...
+</blockquote>
 
 <p>The <i>module</i> attribute specifies which module to load.</p>
 
-<p>Multiple authentication modules may be loaded by specifying multiple authentication tags.</p>
+<p>Authentication modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, but with different configurations, may also be loaded.</p>
 
-<p>At startup, the SQL Relay server creates instances of the specified authentication modules and initializes them.  When a client connects, the server calls each module's "run" method, passing it the credentials supplied by the client...</p>
+<blockquote>
+... example here ...
+</blockquote>
+
+<p>At startup, the SQL Relay server creates instances of the specified authentication modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  If a module successfully authenticates a user, then the client is allowed to continue its session.  If a module fails to authenticate a user, then the credentials are passed on to the next module.  If all modules fail to authenticate a user, then the client is not allowed to continue its session.</p>
 
 <br><a name="available"></a>
 <span class="heading2">Available Modules</span><br>
@@ -40,12 +52,42 @@
 
 <span class="heading3">default</span><br>
 
+<p>The default module authenticates a user against a static list of valid user/password combinations.  In fact, it has the same behavior as the default behavior of SQL Relay.  The only difference is that the syntax in the config file is a little different.</p>
+
+<p>When using the default authentication module, rather than using the <i>users</i> tag to specify valid users...</p>
+
+<blockquote>
+... example here ...
+</blockquote>
+
+<p>...you would list the users inside of the tag for the module:</p>
+
+<blockquote>
+... example here ...
+</blockquote>
+
+<p><a href="pwdencs.html">Password encryption</a> modules may also be used.</p>
+
+<blockquote>
+... example here ...
+</blockquote>
+
+<p>Why would you ever do this?  When stacking authentication modules, this is a good way to define a "fall back" list of valid users, should the other authentication modules fail.</p>
+
 <span class="heading3">sqlrelay</span><br>
+
+<p>The sqlrelay module authenticates a user against a table in a database, using another instance of SQL Relay to access that database.</p>
+
+<p>The module's <b>host</b>, <b>port</b>, <b>socket</b>, <b>user</b> and <b>password</b> paramters define which instance of SQL Relay to talk to.  The <b>table</b>, <b>usercolumn</b> and <b>passwordcolumn</b> parameters define which table and which columns within the table to authenticate against.</p>
+
+<blockquote>
+... example here...
+</blockquote>
 
 <br><a name="custom"></a>
 <span class="heading2">Custom Modules</span><br>
 
-<p>Custom authentication modules...</p>
+<p>Custom authentication modules may also be developed...</p>
 
 </body>
 </html>
