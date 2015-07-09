@@ -1,0 +1,48 @@
+<html>
+<head>
+<title>SQL Relay - Extension Modules - Query Filters</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Query Filter Modules</span><br><br>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#available">Available Modules</a></li>
+<li><a href="#custom">Custom Modules</a></li>
+</ul>
+
+<hr>
+
+<br><a name="introduction"></a>
+<span class="heading2">Introduction</span><br>
+
+<p>Query Filter modules allow the SQL Relay server programs to filter out queries, based on some set of criteria.</p>
+
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Multiple query filter modules may be loaded by specifying multiple filter tags.</p>
+
+<p>At startup, the SQL Relay server creates instances of the specified filter modules and initializes them.  When a query is run, the server calls each module's "run" method, passing it the query....</p>
+
+<br><a name="available"></a>
+<span class="heading2">Available Modules</span><br>
+
+<p>Currently, the following standard filter module is available:</p>
+
+<b>
+<ul>
+<li>regex</li>
+</ul>
+</b>
+
+<span class="heading3">regex</span><br>
+
+<br><a name="custom"></a>
+<span class="heading2">Custom Modules</span><br>
+
+<p>Custom filter modules...</p>
+
+</body>
+</html>

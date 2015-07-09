@@ -325,7 +325,17 @@ or a tnsnames-style expression such as:
 <br><a name="modules"></a>
 <span class="heading2">Extension Modules</span><br>
 
-<p>SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to a configuration file and each module has its own tags and attributes.  Currently <a href="../modules/passwordencryption.html">Password Encryption</a> and <a href="../modules/logger.html">Logger</a> modules are supported.</p>
+<p>SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to a configuration file and each module has its own tags and attributes.  The following types of modules are currently supported:</p>
+
+<ul>
+<li><a href="../modules/pwdencs.html">Password Encryption</a></li>
+<li><a href="../modules/auths.html">Authentication</a></li>
+<li><a href="../modules/translations.html">Query Translation</a></li>
+<li><a href="../modules/filters.html">Query Filter</a></li>
+<li><a href="../modules/queries.html">Query</a></li>
+<li><a href="../modules/resultsettranslations.html">Result Set Translations</a></li>
+<li><a href="../modules/loggers.html">Logger</a></li>
+</ul>
 
 </body>
 </html>

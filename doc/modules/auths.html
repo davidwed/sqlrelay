@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>SQL Relay - Extension Modules - Authentication</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Authentication Modules</span><br><br>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#available">Available Modules</a></li>
+<li><a href="#custom">Custom Modules</a></li>
+</ul>
+
+<hr>
+
+<br><a name="introduction"></a>
+<span class="heading2">Introduction</span><br>
+
+<p>Authentication modules allow the SQL Relay server programs to log various bits of information as they run.  A section of the sqlrelay.conf file indicates which modules to load and what parameters to use when logging.</p>
+
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Multiple authentication modules may be loaded by specifying multiple authentication tags.</p>
+
+<p>At startup, the SQL Relay server creates instances of the specified authentication modules and initializes them.  When a client connects, the server calls each module's "run" method, passing it the credentials supplied by the client...</p>
+
+<br><a name="available"></a>
+<span class="heading2">Available Modules</span><br>
+
+<p>Currently, the following standard authentication modules are available:</p>
+
+<b>
+<ul>
+<li>default</li>
+<li>sqlrelay</li>
+</ul>
+</b>
+
+<span class="heading3">default</span><br>
+
+<span class="heading3">sqlrelay</span><br>
+
+<br><a name="custom"></a>
+<span class="heading2">Custom Modules</span><br>
+
+<p>Custom authentication modules...</p>
+
+</body>
+</html>
