@@ -203,7 +203,7 @@ sqlrsh -id example -user test -password test
 
 <p>You can create your own custom password encryption modules too.</p>
 
-<p>SQL Relay provides a base class for password encryption modules, called sqlrpwdenc, defined in the header file: sqlrpwdenc.h, most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package:</p>
+<p>SQL Relay provides a base class for password encryption modules, called sqlrpwdenc, defined in the header file: sqlrserver.h</p>
 
 <blockquote>
 
@@ -223,6 +223,8 @@ sqlrsh -id example -user test -password test
 </font>
 </blockquote>
 
+<p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
+
 <p>The default implementaion of the constructor just sets the member variable <i>parameters</i> to the passed-in value <i>parameters</i> which is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
 
 <p>By default, the destructor does nothing.</p>
@@ -233,9 +235,9 @@ sqlrsh -id example -user test -password test
 
 <p>encrypt() and decrypt() return NULL by default.</p>
 
-<p>The custom module module must contain a class that inherits from sqlrpwdenc, implements the necessary methods and implements a function to return an instance of the class.</p>
+<p>A custom module module must contain a class that inherits from sqlrpwdenc, implements the necessary methods and implements a function to return an instance of the class.</p>
 
-<p>Lets say we want to create a custom encryption module that reverses the case of the password.</p>
+<p>Lets say we want to create a custom password encryption module that reverses the case of the password.</p>
 
 <p>We can create the file reversecase.cpp:</p>
 
@@ -293,7 +295,7 @@ reversecase::reversecase(xmldomnode *parameters) : sqlrpwdenc(parameters) {<br>
 
 <p>Note that the encrypt() and decrypt() methods allocate the result string internally and then return it.  The calling program will deallocate these values.  It is also safe to return NULL.</p>
 
-<p>Note also, the "new_reversecase()" function which just allocates an instance of reversecase and returns it.  This function is essential to provide, and it is essential that it be named "new_<i>modulename</i>" and take a single xmldomnode * parameter.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+<p>Note also, the "new_sqlrpwdenc_reversecase()" function which just allocates an instance of reversecase and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrpwdenc_<i>modulename</i>" and take a single xmldomnode * parameter.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
 
 <p>To build the module on a Linux or Unix system, run a command like:</p>
 

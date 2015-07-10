@@ -91,7 +91,80 @@
 <br><a name="custom"></a>
 <span class="heading2">Custom Modules</span><br>
 
-<p>Custom authentication modules may also be developed...</p>
+<p>You can create your own custom authentication modules too.</p>
+
+<p>SQL Relay provides a base class for authentication modules, called sqlrauth, defined in the header file: sqlrserver.h</p>
+
+<blockquote>
+@sqlrauth.h.html@
+</blockquote>
+
+<p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
+
+<p>The default implementaion of the constructor just sets the member variables <i>parameters</i> and <i>sqlrpe</i> to the corresponding passed-in values.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
+
+<p>By default, the destructor does nothing.</p>
+
+<p>authenticate() does nothing by default and returns false, indicating that authentication failed.</p>
+
+<p>A custom module module must contain a class that inherits from sqlrauth, implements the necessary methods and implements a function to return an instance of the class.</p>
+
+<p>Lets say we want to create a custom authentication module that authenticates a user against a hardcoded list of users.</p>
+
+<p>We can create the file hardcoded.cpp:</p>
+
+<blockquote>
+@hardcoded.cpp.html@
+</blockquote>
+
+<p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The authenticate() method compares the user and password to a hardcoded list and returns true if it matches or false if it doesn't.</p>
+
+<p>Note the "new_sqlrauth_hardcoded()" function which just allocates an instance of hardcoded and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrauth_<i>modulename</i>" and take xmldomnode * and sqlrpwdencs * parameters.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+
+<p>To build the module on a Linux or Unix system, run a command like:</p>
+
+<blockquote><b>
+gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.so hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>This will create the file sqlrauth_hardcoded.so</p>
+
+<p>On Mac OSX, run a command like:</p>
+
+<blockquote><b>
+gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.bundle hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>This will create the sqlrauth_hardcoded.bundle</p>
+
+<p>On Windows, run commands like:</p>
+
+<blockquote><b>
+cl /I"C:\Program Files\Firstworks\include" /c hardcoded.cpp<br>
+link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
+</b></blockquote>
+
+<p>This will create the sqlrauth_hardcoded.dll</p>
+
+<p>It is essential that the file be named "sqlrauth_<i>modulename</i>.<i>extension</i>".</p>
+
+<p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
+
+<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "passwordencryptions" section and add passwordencryption attributes to the user and/or connection tag as appropriate:</p>
+
+<blockquote>
+@sqlrelay-auths-hardcoded.conf.html@
+</blockquote>
+
+<p>The server will see the module="hardcoded" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrauth_hardcoded.<i>extension</i>, load it and and run the new_sqlrauth_hardcoded() method to get an instance of the hardcoded class and then run the various methods of that class.</p>
+
+<p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
+
+<blockquote>
+@sqlrauth-param.cpp.html@
+</blockquote>
+
+<p>Refer to the rudiments documentation for more info on the xmldomnode class.</p>
 
 </body>
 </html>

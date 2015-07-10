@@ -221,7 +221,158 @@
 <br><a name="custom"></a>
 <span class="heading2">Custom Modules</span><br>
 
-<p>Custom authentication modules may also be developed...</p>
+<p>You can create your own custom authentication modules too.</p>
+
+<p>SQL Relay provides a base class for authentication modules, called sqlrauth, defined in the header file: sqlrserver.h</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRSERVER_DLLSPEC sqlrauth {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>public</b></font>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrauth(xmldomnode *parameters,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;~sqlrauth();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;&nbsp;&nbsp;&nbsp;authenticate(<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*user,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*password);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>protected</b></font>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xmldomnode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*parameters;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *sqlrpe;<br>
+};<br>
+</font>
+</blockquote>
+
+<p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
+
+<p>The default implementaion of the constructor just sets the member variables <i>parameters</i> and <i>sqlrpe</i> to the corresponding passed-in values.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
+
+<p>By default, the destructor does nothing.</p>
+
+<p>authenticate() does nothing by default and returns false, indicating that authentication failed.</p>
+
+<p>A custom module module must contain a class that inherits from sqlrauth, implements the necessary methods and implements a function to return an instance of the class.</p>
+
+<p>Lets say we want to create a custom authentication module that authenticates a user against a hardcoded list of users.</p>
+
+<p>We can create the file hardcoded.cpp:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#800080">#include&nbsp;</font><font color="#ff00ff">&lt;sqlrelay/sqlrserver.h&gt;</font><br>
+<font color="#800080">#include&nbsp;</font><font color="#ff00ff">&lt;sqlrelay/sqlrclient.h&gt;</font><br>
+<font color="#800080">#include&nbsp;</font><font color="#ff00ff">&lt;rudiments/charstring.h&gt;</font><br>
+<br>
+<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRSERVER_DLLSPEC hardcoded :&nbsp;<font color="#a52a2a"><b>public</b></font>&nbsp;sqlrauth {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>public</b></font>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hardcoded(xmldomnode *parameters,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;&nbsp;&nbsp;&nbsp;authenticate(<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*user,&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*password);<br>
+};<br>
+<br>
+hardcoded::hardcoded(xmldomnode *parameters,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe) :<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrauth(parameters,sqlrpe) {<br>
+}<br>
+<br>
+<font color="#2e8b57"><b>struct</b></font>&nbsp;cred_t {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*user;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*password;<br>
+};<br>
+<br>
+<font color="#2e8b57"><b>static</b></font>&nbsp;cred_t credentials[]={<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="#ff00ff">&quot;userone&quot;</font>,<font color="#ff00ff">&quot;passwordone&quot;</font>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="#ff00ff">&quot;usertwo&quot;</font>,<font color="#ff00ff">&quot;passwordtwo&quot;</font>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="#ff00ff">&quot;userthree&quot;</font>,<font color="#ff00ff">&quot;passwordthree&quot;</font>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="#ff00ff">NULL</font>,<font color="#ff00ff">NULL</font>}<br>
+};<br>
+<br>
+<font color="#2e8b57"><b>bool</b></font>&nbsp;hardcoded::authenticate(<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*user,&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*password) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#2e8b57"><b>const</b></font>&nbsp;cred_t *c=credentials; c-&gt;user; c++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>if</b></font>&nbsp;(!charstring::compare(user,c-&gt;user) &amp;&amp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!charstring::compare(password,c-&gt;password)) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#ff00ff">true</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#ff00ff">false</font>;<br>
+}<br>
+<br>
+<font color="#2e8b57"><b>extern</b></font>&nbsp;<font color="#ff00ff">&quot;C&quot;</font>&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_hardcoded(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xmldomnode *users,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;hardcoded(users,sqlrpe);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
+</blockquote>
+
+<p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The authenticate() method compares the user and password to a hardcoded list and returns true if it matches or false if it doesn't.</p>
+
+<p>Note the "new_sqlrauth_hardcoded()" function which just allocates an instance of hardcoded and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrauth_<i>modulename</i>" and take xmldomnode * and sqlrpwdencs * parameters.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+
+<p>To build the module on a Linux or Unix system, run a command like:</p>
+
+<blockquote><b>
+gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.so hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>This will create the file sqlrauth_hardcoded.so</p>
+
+<p>On Mac OSX, run a command like:</p>
+
+<blockquote><b>
+gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.bundle hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>This will create the sqlrauth_hardcoded.bundle</p>
+
+<p>On Windows, run commands like:</p>
+
+<blockquote><b>
+cl /I"C:\Program Files\Firstworks\include" /c hardcoded.cpp<br>
+link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
+</b></blockquote>
+
+<p>This will create the sqlrauth_hardcoded.dll</p>
+
+<p>It is essential that the file be named "sqlrauth_<i>modulename</i>.<i>extension</i>".</p>
+
+<p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
+
+<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "passwordencryptions" section and add passwordencryption attributes to the user and/or connection tag as appropriate:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;hardcoded&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<p>The server will see the module="hardcoded" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrauth_hardcoded.<i>extension</i>, load it and and run the new_sqlrauth_hardcoded() method to get an instance of the hardcoded class and then run the various methods of that class.</p>
+
+<p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
+
+<blockquote>
+</blockquote>
+
+<p>Refer to the rudiments documentation for more info on the xmldomnode class.</p>
 
 </body>
 </html>
