@@ -12,7 +12,7 @@ if ( test "@libdir@" = "/usr/lib" ); then
 else
 	sqlrserver_libs="-L@libdir@ -lsqlrserver -lsqlrutil"
 fi
-sqlrserver_cflags="-I@includedir@"
+sqlrserver_cflags="@FPIC@ -I@includedir@"
 
 usage()
 {

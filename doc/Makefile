@@ -144,3 +144,9 @@ install:
 
 uninstall:
 	$(RMTREE) $(docdir)
+
+clean:
+	cd admin $(AND) $(MAKE) cleanparts
+	cd features $(AND) $(MAKE) cleanparts
+	cd modules $(AND) $(MAKE) cleanparts
+	cd programming $(AND) $(MAKE) cleanparts

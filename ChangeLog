@@ -20,6 +20,9 @@
 	added lazyconnect option to PHP PDO and Perl DBI drivers (defaults to 1)
 	direct Transact SQL which returns a result set is now supported with 
 		Sybase/SAP/MSSQLServer/FreeTDS
+	added docs for authentication, query translation, query filter and
+		result set translation modules
+	added -fPIC to sqlrserver-config --cflags, if supported
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

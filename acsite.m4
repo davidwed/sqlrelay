@@ -285,6 +285,21 @@ AC_SUBST(PIPE)
 ])
 
 
+dnl checks to see if -fPIC option to gcc works or not
+AC_DEFUN([FW_CHECK_FPIC],
+[
+AC_MSG_CHECKING(for -fPIC option)
+FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-fPIC],[],[],[FPIC="-fPIC"],[FPIC=""])
+if ( test -n "$FPIC" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(FPIC)
+])
+
+
 dnl checks to see if -Werror option works or not
 AC_DEFUN([FW_CHECK_WERROR],
 [
