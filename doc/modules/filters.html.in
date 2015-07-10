@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>SQL Relay - Extension Modules - Query Filters</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Query Filter Modules</span><br><br>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#available">Available Modules</a></li>
+<li><a href="#custom">Custom Modules</a></li>
+</ul>
+
+<hr>
+
+<br><a name="introduction"></a>
+<span class="heading2">Introduction</span><br>
+
+<p>Query Filter modules allow the SQL Relay server programs to filter out queries, and not pass them along to the database.</p>
+
+<p>The <i>filters</i> section of the sqlrelay.conf file indicates which filter modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+@sqlrelay-filters-regex.conf.html@
+</blockquote>
+
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
+
+<p>Filter modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
+
+<blockquote>
+@sqlrelay-filter-stacked.conf.html@
+</blockquote>
+
+<p>At startup, the SQL Relay server creates instances of the specified filter modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module filters out the query, then it isn't passed along to the next module, nor is it sent to the database, and the client program is told that the query failed.</p>
+
+<p>When using query filters, it is helpful to use the <i>normalize</i> query translation too:</p>
+
+<blockquote>
+@sqlrelay-filter-regex-normalize.conf.html@
+</blockquote>
+
+<p>See <a href="translations.html">Query Translations</a> for more information.</p>
+
+<br><a name="available"></a>
+<span class="heading2">Available Modules</span><br>
+
+<p>Currently, the following filter module is available:</p>
+
+<b>
+<ul>
+<li>regex</li>
+</ul>
+</b>
+
+<span class="heading3">regex</span><br>
+
+<p>The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.</p>
+
+<p>For example, with the following configuration:</p>
+
+<blockquote>
+@sqlrelay-filters-regex.conf.html@
+</blockquote>
+
+<p>This query would be filtered out:</p>
+
+<blockquote>
+@regex-filtered.sql.html@
+</blockquote>
+
+<p>But this query would not be:</p>
+
+<blockquote>
+@regex-notfiltered.sql.html@
+</blockquote>
+
+<br><a name="custom"></a>
+<span class="heading2">Custom Modules</span><br>
+
+<p>You can create your own custom query filter modules too.</p>
+
+<p>SQL Relay provides a base class for query filter modules, called sqlrfilter, defined in the header file: sqlrserver.h</p>
+
+<blockquote>
+@sqlrfilter.h.html@
+</blockquote>
+
+<p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
+
+<p>The default implementaion of the constructor just sets the member variables <i>sqlrfs</i>, <i>parameters</i> and <i>debug</i> to the corresponding passed-in values.  <i>sqlrfs</i> is a pointer to an instance of the sqlrfilters class, which provides various helper methods.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.  <i>debug</i> is just a flag, indicating whether debug is requested or not.  The module should consult this flat and print out some debug if it is true.</p>
+
+<p>By default, the destructor does nothing.</p>
+
+<p>run() does nothing by default and returns true, indicating that no error occurred.</p>
+
+<p>A custom module module must contain a class that inherits from sqlrfilter, implements the necessary methods and implements a function to return an instance of the class.</p>
+
+<p>Lets say we want to create a custom filter module that filters out all queries that start with "select".</p>
+
+<p>We can create the file select.cpp:</p>
+
+<blockquote>
+@sqlrfilter-select.cpp.html@
+</blockquote>
+
+<p>Here, the select class inherits from sqlrfilter.  The constructor just calls the parent constructor.  The run() method returns false if the first 6 characters of the query match "select" (ignoring case) and true othersize.  Returning false indicates that the query should be filtered out.  Returning true indicates that the query should not be filtered out.</p>
+
+<p>Note the "new_sqlrfilter_select()" function which just allocates an instance of select and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrfilter_<i>modulename</i>" and take sqlrfilters *, xmldomnode * and bool.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+
+<p>To build the module on a Linux or Unix system, run a command like:</p>
+
+<blockquote><b>
+gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrfilter_select.so select.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>This will create the file sqlrfilter_select.so</p>
+
+<p>On Mac OSX, run a command like:</p>
+
+<blockquote><b>
+gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrfilter_select.bundle select.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>This will create the sqlrfilter_select.bundle</p>
+
+<p>On Windows, run commands like:</p>
+
+<blockquote><b>
+cl /I"C:\Program Files\Firstworks\include" /c select.cpp<br>
+link -out:sqlrfilter_select.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
+</b></blockquote>
+
+<p>This will create the sqlrfilter_select.dll</p>
+
+<p>It is essential that the file be named "sqlrfilter_<i>modulename</i>.<i>extension</i>".</p>
+
+<p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
+
+<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "filters" section:</p>
+
+<blockquote>
+@sqlrelay-filters-select.conf.html@
+</blockquote>
+
+<p>The server will see the module="select" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrfilter_select.<i>extension</i>, load it and and run the new_sqlrfilter_select() method to get an instance of the select class and then run the various methods of that class.</p>
+
+<p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
+
+<blockquote>
+@sqlrfilter-param.cpp.html@
+</blockquote>
+
+<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.</p>
+
+</body>
+</html>
