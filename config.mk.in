@@ -884,6 +884,8 @@ endif
 # documentation
 .PHONY: doc parts html cleanparts
 
+all:
+
 doc: parts html cleanparts
 
 parts:

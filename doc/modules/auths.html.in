@@ -25,7 +25,7 @@
 <p>The <i>authentications</i> section of the sqlrelay.conf file indicates which authentication modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-@sqlrelay-auths-default.conf.html@
+@sqlrelay-auths-userlist.conf.html@
 </blockquote>
 
 <p>The <i>module</i> attribute specifies which module to load.  The <i>user</i> tags specify the list of valid users and passwords.</p>
@@ -47,16 +47,16 @@
 
 <b>
 <ul>
-<li>default</li>
+<li>userlist</li>
 <li>sqlrelay</li>
 </ul>
 </b>
 
-<span class="heading3">default</span><br>
+<span class="heading3">userlist</span><br>
 
-<p>The default module authenticates a user against a static list of valid user/password combinations.  In fact, it has the same behavior as the default behavior of SQL Relay.  The only difference is that the syntax in the config file is a little different.</p>
+<p>The userlist module authenticates a user against a static list of valid user/password combinations.  In fact, it has the same behavior as the default behavior of SQL Relay.  The only difference is that the syntax in the config file is a little different.</p>
 
-<p>When using the default authentication module, rather than using the <i>users</i> tag to specify valid users...</p>
+<p>When using the userlist authentication module, rather than using the <i>users</i> tag to specify valid users...</p>
 
 <blockquote>
 @sqlrelay-auths-users.conf.html@
@@ -65,18 +65,18 @@
 <p>...you would list the users inside of the tag for the module:</p>
 
 <blockquote>
-@sqlrelay-auths-default.conf.html@
+@sqlrelay-auths-userlist.conf.html@
 </blockquote>
 
 <p><a href="pwdencs.html">Password encryption</a> modules may also be used.</p>
 
 <blockquote>
-@sqlrelay-auths-default-pwdenc.conf.html@
+@sqlrelay-auths-userlist-pwdenc.conf.html@
 </blockquote>
 
-<p>Since the default authentication module appears to provide the exact same functionality as the built-in <i>users</i> tag, why would you want to use it instead of just using the built-in <i>users</i> tag?</p>
+<p>Since the userlist authentication module appears to provide the exact same functionality as the built-in <i>users</i> tag, why would you want to use it instead of just using the built-in <i>users</i> tag?</p>
 
-<p>The <i>users</i> tag is evaluated prior to evaluating any modules.  So, you must use the default module if you are stacking authentication modules, and want to use a different authentication module first, falling back to a static list of users if it fails.</p>
+<p>The <i>users</i> tag is evaluated prior to evaluating any modules.  So, you must use the userlist module if you are stacking authentication modules, and want to use a different authentication module first, falling back to a static list of users if it fails.</p>
 
 <span class="heading3">sqlrelay</span><br>
 

@@ -10,14 +10,14 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(WERROR) $(AUTHCPPFLAGS) $(COMPILE) $<
 
-all: sqlrauth_default.$(LIBEXT) sqlrauth_sqlrelay.$(LIBEXT)
+all: sqlrauth_userlist.$(LIBEXT) sqlrauth_sqlrelay.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrauth_default.$(LIBEXT): default.cpp default.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ default.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+sqlrauth_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 sqlrauth_sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(SQLRAUTH_SQLRELAYLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
@@ -26,17 +26,17 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrauth_default.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrauth_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrauth_sqlrelay.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrauth_default.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrauth_default.a
-	$(RM) $(libexecdir)/sqlrauth_default.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrauth_default.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) sqlrauth_userlist.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/sqlrauth_userlist.a
+	$(RM) $(libexecdir)/sqlrauth_userlist.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/sqlrauth_userlist.so so $(MODULESUFFIX)
 	$(LTINSTALL) $(CP) sqlrauth_sqlrelay.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrauth_sqlrelay.a
 	$(RM) $(libexecdir)/sqlrauth_sqlrelay.$(LIBEXT)
@@ -44,4 +44,5 @@ installsharedlib:
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrauth_default.*
+	$(RM) $(libexecdir)/sqlrauth_userlist.*
 	$(RM) $(libexecdir)/sqlrauth_sqlrelay.*
