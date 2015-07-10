@@ -1,0 +1,190 @@
+<html>
+<head>
+<title>SQL Relay - Extension Modules - Password Encryption</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Password Encryption Modules</span><br><br>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#available">Available Modules</a></li>
+<li><a href="#custom">Custom Modules</a></li>
+</ul>
+
+<hr>
+
+<br><a name="introduction"></a>
+<span class="heading2">Introduction</span><br>
+
+<p>Password encryption allows you to store encrypted passwords in the sqlrelay.conf file so that they are not publicly visible.  Passwords for SQL Relay users and database passwords may both be encrypted.</p>
+
+<p>Encryption and decryption are achieved via loadable modules.  A section of the sqlrelay.conf file indicates which modules to load and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.</p>
+
+<p>For example, the <i>rot</i> (rotate) module encrypts by performing a simple character rotation.  To use this module you would include a section in the sqlrelay.conf file like:</p>
+
+<blockquote>
+@sqlrelay-pwdencs-rot13.conf.html@
+</blockquote>
+
+<p>The <i>module</i> attribute specifies which module to load.  The <i>count</i> attribute is a parameter for the module.  Different modules may have different parameters, or may have no parameters.  In this case, "13" tells the module to rotate by 13 characters.  The <i>id</i> parameter is defined by you and just assigns this particular configuration an id that may be referred to later.</p>
+
+<p>To use this module with with an SQL Relay password, you would specify:</p>
+
+<blockquote>
+@sqlrelay-pwdencs-user-rot13.conf.html@
+</blockquote>
+
+<p>Note that the password is encrypted.  Unencrypted, it would just be "test".  A command line program (described later) is provided to encrypt passwords.</p>
+
+<p>Note also that the passwordencryption attribute refers to the id of the module as set using the <i>id</i> parameter in the passwordencryption tag (<i>rot13</i>), not the module name (<i>rot</i>).</p>
+
+<p>To use password encryption with a database password, you would specify:</p>
+
+<blockquote>
+@sqlrelay-pwdencs-connection-rot13.conf.html@
+</blockquote>
+
+<p>Again, the password is encrypted.  Unencrypted, it would just be "testpassword".</p>
+
+<p>It is possible to load multiple modules and use each one with a different password.  For example, you might want to use the <i>rot</i> module with a count of 13 for the SQL Relay password and a count of 10 for the database password.</p>
+
+<blockquote>
+@sqlrelay-pwdencs-multiple.conf.html@
+</blockquote>
+
+<p>Encryption modules may be either two-way or one-way.  Two-way encryption modules can both encrypt and decrypt a password.  One-way encryption modules can only encrypt a password.</p>
+
+<p>Symmetric and asymmetric key encryption techniques are two-way.  The rot encryption is an example of symmetric key encryption.  Asymmetric key encryptions generally use a public/private key pair, where the publicly available key is be used to encrypt the data but a privately held key is required to decrypt it.  SQL Relay can use two-way encryption modules with passwords for SQL Relay users and database passwords.</p>
+
+<p>One-way encryption techniques include DES, MD5 and SHA1 hashes.  When using those techniques, the password can be encrypted but cannot effectively be decrypted.  SQL Relay can only use one-way encryption modules with passwords for SQL Relay users.</p>
+
+<p>The command line tool <b>sqlr-pwdenc</b> is provided to help encrypt passwords for inclusion in the sqlrelay.conf file.  Given an encryption module and password, it will print out the encrypted password.</p>
+
+<blockquote>
+<b>sqlr-pwdenc [-config </b>configfile<b>] -id </b>id<b> -pwdencid </b>passwordencryptionid<b> -password </b>password
+</blockquote>
+
+<ul>
+<li>configfile - optional and refers to the sqlrelay.conf file</li>
+<li>id - the instance within the sqlrelay.conf file to look for the specified password encryption module definition</li>
+<li>passwordencryptionid - the id of the password encryption module to use</li>
+<li>password - the password to encrypt</li>
+</ul>
+
+<p>For example:</p>
+
+<blockquote><b>
+[dmuse@localhost ~]$ sqlr-pwdenc -id oracletest -pwdencid rot13 -password testpassword<br>
+grfgcnffjbeq
+</b></blockquote>
+
+<p>The resulting string "grfgcnffjbeq" can now be put in the sqlrelay.conf file as the password.</p>
+
+<p>One final thing to note is that when using the command line utilities which take a -id parameter like sqlrsh or sqlr-import against an instance of SQL Relay where the SQL Relay password has been encrypted, on the same machine that the SQL Relay server is running, you should not use the -id parameter, but should specify connection parameters directly instead.  For example, do not do:</p>
+
+<blockquote><b>
+sqlrsh -id oracletest
+</b></blockquote>
+
+<p>Instead, do:</p>
+
+<blockquote><b>
+sqlrsh -host localhost -port 9000 -user test -password test
+</b></blockquote>
+
+<p>The -id parameter causes the program to open the sqlrelay.conf file and extract the host, port, socket, user and password from the specified instance.  If the password is encrypted, the encrypted password will be extracted and passed to the server, already encrypted, causing it not to match.</p>
+
+<br><a name="available"></a>
+<span class="heading2">Available Modules</span><br>
+
+<p>Currently, the following password encryption modules are available:</p>
+
+<ul>
+<li>rot</li>
+<li>md5</li>
+<li>crypt</li>
+</ul>
+
+<p>The <b>rot</b> module is a two-way encryption module that performs a character rotation, similar to the popular <a href="http://en.wikipedia.org/wiki/ROT13">ROT13</a> algorithm, though it can rotate by any amount specified in the <i>count</i> attribute, not just 13 and rotates digits as well as upper and lower-case characters.  See the <a href="#introduction">Introduction</a> for example usage.</p>
+
+<p>The <b>md5</b> module is a one-way encryption module that encrypts the password using the <a href="http://en.wikipedia.org/wiki/MD5">MD5</a> algorithm.</p>
+
+<p>The <b>crypt</b> module is a one-way encryption module that encrypts the password using the <a href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> attribute.  The salt is required and must be a 2 digit alphanumeric code.</p>
+
+<br><a name="custom"></a>
+<span class="heading2">Custom Modules</span><br>
+
+<p>You can create your own custom password encryption modules too.</p>
+
+<p>SQL Relay provides a base class for password encryption modules, called sqlrpwdenc, defined in the header file: sqlrpwdenc.h, most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package:</p>
+
+<blockquote>
+@sqlrpwdenc.h.html@
+</blockquote>
+
+<p>The default implementaion of the constructor just sets the member variable <i>parameters</i> to the passed-in value <i>parameters</i> which is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
+
+<p>By default, the destructor does nothing.</p>
+
+<p>getId() returns the ID for this instance of the password encryption module, as defined in the sqlrelay.conf file.</p>
+
+<p>oneWay() returns false by default.</p>
+
+<p>encrypt() and decrypt() return NULL by default.</p>
+
+<p>The custom module module must contain a class that inherits from sqlrpwdenc, implements the necessary methods and implements a function to return an instance of the class.</p>
+
+<p>Lets say we want to create a custom encryption module that reverses the case of the password.</p>
+
+<p>We can create the file reversecase.cpp:</p>
+
+<blockquote>
+@reversecase.cpp.html@
+</blockquote>
+
+<p>Here, the reversecase class inherits from sqlrpwdenc.  The constructor just calls the parent constructor.  Since the encryption and decryption operations are the same for case-reversal, we define a private reverse() method to actually perform the operation and call it from the public encrypt() and decrypt() methods.  We don't need to implement the oneWay() method because it returns false by default, and our module implements a two-way encryption strategy.</p>
+
+<p>Note that the encrypt() and decrypt() methods allocate the result string internally and then return it.  The calling program will deallocate these values.  It is also safe to return NULL.</p>
+
+<p>Note also, the "new_reversecase()" function which just allocates an instance of reversecase and returns it.  This function is essential to provide, and it is essential that it be named "new_<i>modulename</i>" and take a single xmldomnode * parameter.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+
+<p>To build the module on a Linux or Unix system, run a command like:</p>
+
+<blockquote><b>
+gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrpwdenc_reversecase.so reversecase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>On Mac OSX, run a command like:</p>
+
+<blockquote><b>
+gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrpwdenc_reversecase.bundle reversecase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</b></blockquote>
+
+<p>This will create the file sqlrpwdenc_reversecase.so (or sqlrpwdenc_reversecase.bundle on OSX).</p>
+
+<p>It is essential that the file be named "sqlrpwdenc_<i>modulename</i>.so" (or sqlrpwdenc_<i>modulename</i>.bundle on OSX).</p>
+
+<p>The sqlrserver-config and rudiments-config scripts must be in your PATH and will supply the appropriate compile options for those libraries.</p>
+
+<p>To install the new module, copy it to the SQL Relay "modules" directory, most likely: /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.</p>
+
+<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "passwordencryptions" section and add passwordencryption attributes to the user and/or connection tag as appropriate:</p>
+
+<blockquote>
+@sqlrelay-pwdencs-reversecase.conf.html@
+</blockquote>
+
+<p>The server will see the module="reversecase" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrpwdenc_reversecase.so, load it and and run the new_reversecase() method to get an instance of the reversecase class and then run the various methods of that class.</p>
+
+<p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
+
+<blockquote>
+@sqlrpwdenc-count.cpp.html@
+</blockquote>
+
+<p>Refer to the rudiments documentation for more info on the xmldomnode class.</p>
+
+</body>
+</html>
