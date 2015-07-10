@@ -147,7 +147,7 @@ sqlrsh -id example -user test -password test
 <p>We can create the file reversecase.cpp:</p>
 
 <blockquote>
-@reversecase.cpp.html@
+@sqlrpwdenc-reversecase.cpp.html@
 </blockquote>
 
 <p>Here, the reversecase class inherits from sqlrpwdenc.  The constructor just calls the parent constructor.  Since the encryption and decryption operations are the same for case-reversal, we define a private reverse() method to actually perform the operation and call it from the public encrypt() and decrypt() methods.  We don't need to implement the oneWay() method because it returns false by default, and our module implements a two-way encryption strategy.</p>
@@ -196,10 +196,10 @@ link -out:sqlrpwdenc_reversecase.dll /LIBPATH:"C:\Program Files\Firstworks\lib" 
 <p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
 
 <blockquote>
-@sqlrpwdenc-count.cpp.html@
+@sqlrpwdenc-param.cpp.html@
 </blockquote>
 
-<p>Refer to the rudiments documentation for more info on the xmldomnode class.</p>
+<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.</p>
 
 </body>
 </html>

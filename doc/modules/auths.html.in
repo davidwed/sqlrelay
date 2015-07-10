@@ -114,7 +114,7 @@
 <p>We can create the file hardcoded.cpp:</p>
 
 <blockquote>
-@hardcoded.cpp.html@
+@sqlrauth-hardcoded.cpp.html@
 </blockquote>
 
 <p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The authenticate() method compares the user and password to a hardcoded list and returns true if it matches or false if it doesn't.</p>
@@ -150,7 +150,7 @@ link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libs
 
 <p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
 
-<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "passwordencryptions" section and add passwordencryption attributes to the user and/or connection tag as appropriate:</p>
+<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "authentications" section:</p>
 
 <blockquote>
 @sqlrelay-auths-hardcoded.conf.html@
@@ -164,7 +164,7 @@ link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libs
 @sqlrauth-param.cpp.html@
 </blockquote>
 
-<p>Refer to the rudiments documentation for more info on the xmldomnode class.</p>
+<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.</p>
 
 </body>
 </html>
