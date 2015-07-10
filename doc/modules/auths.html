@@ -22,18 +22,67 @@
 
 <p>Authentication modules allow the SQL Relay server programs to authenticate users in some other manner.<p>
 
-<p>A section of the sqlrelay.conf file indicates which authentication modules to load and what parameters to use when executing them.</p>
+<p>The <i>authentications</i> section of the sqlrelay.conf file indicates which authentication modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-... example here ...
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;default&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password1&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password3&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
 
-<p>The <i>module</i> attribute specifies which module to load.</p>
+<p>The <i>module</i> attribute specifies which module to load.  The <i>user</i> tags specify the list of valid users and passwords.</p>
 
-<p>Authentication modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, but with different configurations, may also be loaded.</p>
+<p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
+
+<p>Authentication modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
-... example here ...
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;default&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password1&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password3&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentication&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/auth.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;default&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user4&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password4&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user5&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password5&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentication&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
 
 <p>At startup, the SQL Relay server creates instances of the specified authentication modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  If a module successfully authenticates a user, then the client is allowed to continue its session.  If a module fails to authenticate a user, then the credentials are passed on to the next module.  If all modules fail to authenticate a user, then the client is not allowed to continue its session.</p>
@@ -41,7 +90,7 @@
 <br><a name="available"></a>
 <span class="heading2">Available Modules</span><br>
 
-<p>Currently, the following standard authentication modules are available:</p>
+<p>Currently, the following authentication modules are available:</p>
 
 <b>
 <ul>
@@ -57,22 +106,90 @@
 <p>When using the default authentication module, rather than using the <i>users</i> tag to specify valid users...</p>
 
 <blockquote>
-... example here ...
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password1&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
 
 <p>...you would list the users inside of the tag for the module:</p>
 
 <blockquote>
-... example here ...
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;default&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password1&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password3&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
 
 <p><a href="pwdencs.html">Password encryption</a> modules may also be used.</p>
 
 <blockquote>
-... example here ...
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">passwordencryptions</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">passwordencryption</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;rot&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;rot13&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>count</b></font>=<font color="#ff00ff">&quot;13&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">passwordencryption</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;rot&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;rot16&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>count</b></font>=<font color="#ff00ff">&quot;16&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/passwordencryptions&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;default&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;cnffjbeq4&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>passwordencryption</b></font>=<font color="#ff00ff">&quot;rot13&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;cnffjbeq5&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>passwordencryption</b></font>=<font color="#ff00ff">&quot;rot13&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;fqiimeht8&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>passwordencryption</b></font>=<font color="#ff00ff">&quot;rot16&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
 
-<p>Why would you ever do this?  When stacking authentication modules, this is a good way to define a "fall back" list of valid users, should the other authentication modules fail.</p>
+<p>Since the default authentication module appears to provide the exact same functionality as the built-in <i>users</i> tag, why would you want to use it instead of just using the built-in <i>users</i> tag?</p>
+
+<p>The <i>users</i> tag is evaluated prior to evaluating any modules.  So, you must use the default module if you are stacking authentication modules, and want to use a different authentication module first, falling back to a static list of users if it fails.</p>
 
 <span class="heading3">sqlrelay</span><br>
 
@@ -81,7 +198,24 @@
 <p>The module's <b>host</b>, <b>port</b>, <b>socket</b>, <b>user</b> and <b>password</b> paramters define which instance of SQL Relay to talk to.  The <b>table</b>, <b>usercolumn</b> and <b>passwordcolumn</b> parameters define which table and which columns within the table to authenticate against.</p>
 
 <blockquote>
-... example here...
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/auth.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
 
 <br><a name="custom"></a>
