@@ -98,7 +98,7 @@
 
 <p>run() does nothing by default and returns true, indicating that no error occurred.</p>
 
-<p>A custom module module must contain a class that inherits from sqlrfilter, implements the necessary methods and implements a function to return an instance of the class.</p>
+<p>A custom module module must contain a class that inherits from sqlrfilter, implements the necessary methods, and implements a function to return an instance of the class.</p>
 
 <p>Lets say we want to create a custom filter module that filters out all queries that start with "select".</p>
 
