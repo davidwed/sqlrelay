@@ -1,5 +1,5 @@
 0.61 - added query filter plugin framework
-	added regex and string filters
+	added regex, string and pattern filters
 	added normalization translation
 	added reformatdatetime result set translation
 	fixed error in sqlrconfigfile class that could cause sqlr-start to

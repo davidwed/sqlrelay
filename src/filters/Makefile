@@ -11,7 +11,8 @@ include ../../config.mk
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
 all: sqlrfilter_regex.$(LIBEXT) \
-	sqlrfilter_string.$(LIBEXT)
+	sqlrfilter_string.$(LIBEXT) \
+	sqlrfilter_patterns.$(LIBEXT) \
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
@@ -23,12 +24,16 @@ sqlrfilter_regex.$(LIBEXT): regex.cpp regex.$(OBJ)
 sqlrfilter_string.$(LIBEXT): string.cpp string.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ string.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+sqlrfilter_patterns.$(LIBEXT): patterns.cpp patterns.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ patterns.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrfilter_regex.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrfilter_string.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrfilter_patterns.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
@@ -42,7 +47,12 @@ installsharedlib:
 	$(RM) $(libexecdir)/sqlrfilter_string.a
 	$(RM) $(libexecdir)/sqlrfilter_string.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrfilter_string.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) sqlrfilter_patterns.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/sqlrfilter_patterns.a
+	$(RM) $(libexecdir)/sqlrfilter_patterns.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/sqlrfilter_patterns.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrfilter_regex.*
 	$(RM) $(libexecdir)/sqlrfilter_string.*
+	$(RM) $(libexecdir)/sqlrfilter_patterns.*

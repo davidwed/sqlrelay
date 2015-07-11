@@ -53,14 +53,45 @@
 
 <b>
 <ul>
+<li>patterns</li>
 <li>regex</li>
 <li>string</li>
 </ul>
 </b>
 
+<span class="heading3">patterns</span><br>
+
+<p>The patterns module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.</p>
+
+<p>The list of patterns is given by a set of <b>pattern</b> child tags.  Each pattern tag may have contain the following attributes.</p>
+
+<ul>
+<li><b>pattern</b> - Required.  The pattern to match.</li>
+<li><b>type</b> - Optional.  Defaults to "string".  Valid values are "string", "cistring" (case insensitive string), and "regex" (regular expression).</li>
+<li><b>scope</b> - Optional.  Defaults to "query".  Valid values are "query" (attempt to match against the entire query), "outsidequotes" (only match parts of the query not surrounded by single-quotes), and "insidequotes" (only match parts of the query surrounded by single-quotes).</li>
+</ul>
+
+<p>For example, with the following configuration...</p>
+
+<blockquote>
+@sqlrelay-filters-patterns.conf.html@
+</blockquote>
+
+<p>These queries would be filtered out:</p>
+
+<blockquote>
+@patterns-filtered.sql.html@
+</blockquote>
+
+<p>But these queries would not be:</p>
+
+<blockquote>
+@patterns-notfiltered.sql.html@
+</blockquote>
+
 <span class="heading3">regex</span><br>
 
-<p>The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.</p>
+<p>The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you don't need the complexity of the patterns module.</p>
 
 <p>For example, with the following configuration:</p>
 
@@ -82,7 +113,7 @@
 
 <span class="heading3">string</span><br>
 
-<p>The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you don't need the complexity of regular expressions.</p>
+<p>The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you don't need the complexity of regular expressions or of the patterns module.</p>
 
 <p>The module's <b>ignorecase</b> parameter defaults to "no", but if set to "yes", causes the comparison to be case insensitive.</p>
 
