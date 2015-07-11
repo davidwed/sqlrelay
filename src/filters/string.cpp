@@ -10,11 +10,13 @@ class SQLRSERVER_DLLSPEC string : public sqlrfilter {
 			string(sqlrfilters *sqlrfs,
 					xmldomnode *parameters,
 					bool debug);
+			~string();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
 	private:
 		const char		*pattern;
+		char			*lowerpattern;
 		bool			ignorecase;
 
 		bool	enabled;
@@ -33,8 +35,22 @@ string::string(sqlrfilters *sqlrfs,
 	}
 
 	pattern=parameters->getAttributeValue("pattern");
+
 	ignorecase=!charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"yes");
+			parameters->getAttributeValue("ignorecase"),"yes");
+
+	lowerpattern=NULL;
+	if (ignorecase) {
+		lowerpattern=charstring::duplicate(pattern);
+		for (char *c=lowerpattern; *c; c++) {
+			*c=character::toLowerCase(*c);
+		}
+		pattern=lowerpattern;
+	}
+}
+
+string::~string() {
+	delete[] lowerpattern;
 }
 
 bool string::run(sqlrserverconnection *sqlrcon,
@@ -55,7 +71,7 @@ bool string::run(sqlrserverconnection *sqlrcon,
 		query=lowered;
 	}
 
-	bool	result=charstring::contains(query,pattern);
+	bool	result=!charstring::contains(query,pattern);
 
 	if (result && debug) {
 		stdoutput.printf("string: matches pattern \"%s\"\n\n",pattern);
