@@ -50,6 +50,28 @@
 <p>Filter modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filters</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot; [0-9]*=[0-9]*&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^(create)&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^(drop)&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;string&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;badtable&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>ignorecase</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;string&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;badschema&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>ignorecase</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/filters&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
 
 <p>At startup, the SQL Relay server creates instances of the specified filter modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module filters out the query, then it isn't passed along to the next module, nor is it sent to the database, and the client program is told that the query failed.</p>
@@ -64,11 +86,12 @@
 <br><a name="available"></a>
 <span class="heading2">Available Modules</span><br>
 
-<p>Currently, the following filter module is available:</p>
+<p>Currently, the following filter modules are available:</p>
 
 <b>
 <ul>
 <li>regex</li>
+<li>string</li>
 </ul>
 </b>
 
@@ -116,6 +139,55 @@
 
 <font face="monospace">
 <font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;mytable&nbsp;<font color="#6a5acd">where</font>&nbsp;column1=<font color="#ff00ff">1</font><br>
+</font>
+</blockquote>
+
+<span class="heading3">string</span><br>
+
+<p>The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you don't need the complexity of regular expressions.</p>
+
+<p>The module's <b>ignorecase</b> parameter defaults to "no", but if set to "yes", causes the comparison to be case insensitive.</p>
+
+<p>For example, with the following configuration:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filters</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;string&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;badtable&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>ignorecase</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/filters&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<p>This query would be filtered out:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;badtable&nbsp;<font color="#6a5acd">where</font>&nbsp;column1=<font color="#ff00ff">1</font><br>
+</font>
+</blockquote>
+
+<p>But this query would not be:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;goodtable&nbsp;<font color="#6a5acd">where</font>&nbsp;column1=<font color="#ff00ff">1</font><br>
 </font>
 </blockquote>
 

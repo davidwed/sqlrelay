@@ -33,7 +33,7 @@
 <p>Filter modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
-@sqlrelay-filter-stacked.conf.html@
+@sqlrelay-filters-stacked.conf.html@
 </blockquote>
 
 <p>At startup, the SQL Relay server creates instances of the specified filter modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module filters out the query, then it isn't passed along to the next module, nor is it sent to the database, and the client program is told that the query failed.</p>
@@ -49,11 +49,12 @@
 <br><a name="available"></a>
 <span class="heading2">Available Modules</span><br>
 
-<p>Currently, the following filter module is available:</p>
+<p>Currently, the following filter modules are available:</p>
 
 <b>
 <ul>
 <li>regex</li>
+<li>string</li>
 </ul>
 </b>
 
@@ -77,6 +78,30 @@
 
 <blockquote>
 @regex-notfiltered.sql.html@
+</blockquote>
+
+<span class="heading3">string</span><br>
+
+<p>The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you don't need the complexity of regular expressions.</p>
+
+<p>The module's <b>ignorecase</b> parameter defaults to "no", but if set to "yes", causes the comparison to be case insensitive.</p>
+
+<p>For example, with the following configuration:</p>
+
+<blockquote>
+@sqlrelay-filters-string.conf.html@
+</blockquote>
+
+<p>This query would be filtered out:</p>
+
+<blockquote>
+@string-filtered.sql.html@
+</blockquote>
+
+<p>But this query would not be:</p>
+
+<blockquote>
+@string-notfiltered.sql.html@
 </blockquote>
 
 <br><a name="custom"></a>

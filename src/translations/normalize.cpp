@@ -22,12 +22,18 @@ class SQLRSERVER_DLLSPEC normalize : public sqlrtranslation {
 
 		stringbuffer	pass1;
 		stringbuffer	pass2;
+
+		bool	enabled;
 };
 
 normalize::normalize(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+	debugFunction();
+
+	enabled=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("enabled"),"no");
 }
 
 static const char symbols[]="!@#$%^&-_+=[{]}\\|;:,<.>/?";
@@ -37,6 +43,10 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 					const char *query,
 					stringbuffer *translatedquery) {
 	debugFunction();
+
+	if (!enabled) {
+		return true;
+	}
 
 	if (debug) {
 		stdoutput.printf("original query:\n\"%s\"\n\n",query);
