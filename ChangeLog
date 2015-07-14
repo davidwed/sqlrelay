@@ -24,6 +24,7 @@
 		result set translation modules
 	added -fPIC to sqlrserver-config --cflags, if supported
 	the "default" auth module is now called "userlist"
+	added database auth module that is analagous to authtier="database"
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

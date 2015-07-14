@@ -56,8 +56,6 @@
 		void	initLocalAuthentication();
 		bool	authenticateLocal(const char *user,
 						const char *password);
-		bool	databaseBasedAuth(const char *userbuffer,
-						const char *passwordbuffer);
 
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();

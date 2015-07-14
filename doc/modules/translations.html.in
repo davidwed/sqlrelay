@@ -49,6 +49,7 @@
 </ul>
 </b>
 
+<br><br>
 <span class="heading3">normalize</span><br>
 
 <p>The normalize module performs the following operations on a query:</p>

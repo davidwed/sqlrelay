@@ -18,7 +18,7 @@
 <br><a name="introduction"></a>
 <span class="heading2">Introduction</span><br>
 
-<p>SQL Relay typically authenticates users against a static list of valid user/password combinations in the sqlrelay.conf file, or against the database itself.  Which to do depends on the authtier parameter.  If authtier="connection" then the sqlr-connection process authenticates the user against the static list.  If authtier="database" then the user is authenticated against the database.  When authtier="database", users must log into SQL Relay using a user/password combination that would be valid to log into the database directly.</p>
+<p>SQL Relay provides two built-in authentication mechanisms, configurable by the authtier attribute of the instance tag.  If authtier="connection" then users are authenticated against a static list.  If authtier="database" then users are authenticated against the database itself and users must log into SQL Relay using a user/password combination that would be valid to log into the database directly.</p>
 
 <p>Authentication modules allow the SQL Relay server programs to authenticate users in some other manner.<p>
 
@@ -28,7 +28,7 @@
 @sqlrelay-auths-userlist.conf.html@
 </blockquote>
 
-<p>The <i>module</i> attribute specifies which module to load.  The <i>user</i> tags specify the list of valid users and passwords.</p>
+<p>In this example, the <i>module</i> attribute specifies which module to load and the <i>user</i> tags specify the list of valid users and passwords.</p>
 
 <p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
 
@@ -48,10 +48,12 @@
 <b>
 <ul>
 <li>userlist</li>
+<li>database</li>
 <li>sqlrelay</li>
 </ul>
 </b>
 
+<br><br>
 <span class="heading3">userlist</span><br>
 
 <p>The userlist module authenticates a user against a static list of valid user/password combinations.  In fact, it has the same behavior as the default behavior of SQL Relay.  The only difference is that the syntax in the config file is a little different.</p>
@@ -78,6 +80,38 @@
 
 <p>The <i>users</i> tag is evaluated prior to evaluating any modules.  So, you must use the userlist module if you are stacking authentication modules, and want to use a different authentication module first, falling back to a static list of users if it fails.</p>
 
+<br><br>
+<span class="heading3">database</span><br>
+
+<p>The database module authenticates a user against the database itself.  This causes SQL Relay to switch which user it is logged into the database as.</p>
+
+<p>When using SQL Relay with Oracle 8i or higher, it switches users without logging out.  The database connection must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to SQL Relay as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
+
+<p>When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is somewhat ineffecient and defeats the value of keeping persistent database connections but might be useful for particular applications.</p>
+
+<p><b>NOTE:</b> Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router uses to use database authentication but not the router instance itself.  If database authentication is used for that instance, authentication will fail.</p>
+
+<p>Using the database module has the same behavior as setting authtier="database" in the config file.  The only difference is that the syntax in the config file is different.</p>
+
+<p>When using the database authentication module, rather than using authtier="database"...</p>
+
+<blockquote>
+@sqlrelay-auths-authtier-database.conf.html@
+</blockquote>
+
+<p>...you would use the module instead:</p>
+
+<blockquote>
+@sqlrelay-auths-database.conf.html@
+</blockquote>
+
+<p>Since the userlist authentication module appears to provide the exact same functionality as the built-in <i>authtier</i> attribute, why would you want to use it instead of just using the built-in <i>authtier</i> attribute?</p>
+
+<p>There is no specific advantage to using the module instead of the attribute, other than consistency.  If you're using other authentication modules in other instances, then you might also want to use the database authentication module in this instance.</p>
+
+<p>Note also, that the database authentication module should not be used in a stacked configuration.  Or, at least, using it in a stacked configuration could lead to unexpected results.  When using database authentication, each connection is left logged in as the most recently authenticated user.  If an SQL Relay user is authenticated by some other method, then there is no guarantee what user it will access the database as.</p>
+
+<br><br>
 <span class="heading3">sqlrelay</span><br>
 
 <p>The sqlrelay module authenticates a user against a table in a database, using another instance of SQL Relay to access that database.</p>

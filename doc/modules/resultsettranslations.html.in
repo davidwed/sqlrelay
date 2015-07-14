@@ -49,6 +49,7 @@
 </ul>
 </b>
 
+<br><br>
 <span class="heading3">reformatdatetime</span><br>
 
 <p>The reformatdatetime module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.</p>

@@ -3,8 +3,9 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 			sqlrauth(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
 		virtual	~sqlrauth();
-		virtual	bool	authenticate(const char *user,
-						const char *password);
+		virtual	bool	authenticate(sqlrserverconnection *sqlrcon,
+							const char *user,
+							const char *password);
 	protected:
 		xmldomnode		*parameters;
 		sqlrpwdencs		*sqlrpe;

@@ -1,14 +1,15 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 2014-2015  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC defaultauth : public sqlrauth {
+class SQLRSERVER_DLLSPEC userlist : public sqlrauth {
 	public:
-			defaultauth(xmldomnode *parameters,
+			userlist(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
-		bool	authenticate(const char *user, const char *password);
+		bool	authenticate(sqlrserverconnection *sqlrcon,
+					const char *user, const char *password);
 	private:
 		const char	**users;
 		const char	**passwords;
@@ -16,7 +17,7 @@ class SQLRSERVER_DLLSPEC defaultauth : public sqlrauth {
 		uint64_t	usercount;
 };
 
-defaultauth::defaultauth(xmldomnode *parameters,
+userlist::userlist(xmldomnode *parameters,
 				sqlrpwdencs *sqlrpe) :
 				sqlrauth(parameters,sqlrpe) {
 
@@ -47,7 +48,8 @@ defaultauth::defaultauth(xmldomnode *parameters,
 	}
 }
 
-bool defaultauth::authenticate(const char *user, const char *password) {
+bool userlist::authenticate(sqlrserverconnection *sqlrcon,
+				const char *user, const char *password) {
 
 	// run through the user/password arrays...
 	for (uint32_t i=0; i<usercount; i++) {
@@ -119,9 +121,9 @@ bool defaultauth::authenticate(const char *user, const char *password) {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_default(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_userlist(
 						xmldomnode *users,
 						sqlrpwdencs *sqlrpe) {
-		return new defaultauth(users,sqlrpe);
+		return new userlist(users,sqlrpe);
 	}
 }

@@ -227,6 +227,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						uint32_t infolen);
 
 
+		// authentication api...
+		bool	databaseBasedAuth(const char *userbuffer,
+						const char *passwordbuffer);
+
+
 		// statistics api...
 		void	incrementOpenDatabaseConnections();
 		void	decrementOpenDatabaseConnections();
@@ -991,8 +996,9 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 			sqlrauth(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
 		virtual	~sqlrauth();
-		virtual	bool	authenticate(const char *user,
-						const char *password);
+		virtual	bool	authenticate(sqlrserverconnection *sqlrcon,
+							const char *user,
+							const char *password);
 	protected:
 		xmldomnode		*parameters;
 		sqlrpwdencs		*sqlrpe;
@@ -1012,7 +1018,8 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 
 		bool	loadAuthenticators(const char *auths,
 						sqlrpwdencs *sqlrpe);
-		bool	authenticate(const char *user, const char *password);
+		bool	authenticate(sqlrserverconnection *sqlrcon,
+					const char *user, const char *password);
 	private:
 		void	unloadAuthenticators();
 		void	loadAuthenticator(xmldomnode *auth,

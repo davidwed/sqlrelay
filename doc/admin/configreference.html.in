@@ -316,7 +316,7 @@ or a tnsnames-style expression such as:
 
 <p>When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is somewhat ineffecient and defeats the value of keeping persistent database connections but might be useful for particular applications.</p>
 
-<p><b>NOTE:</b> authtier="database" can't be used in an instance where dbase="router".  It's OK for the instances that the router uses to use authtier="database" but not the router instance itself.  If authtier="database" is set on that instance, it will be overridden to authier="connection".</p>
+<p><b>NOTE:</b> Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router uses to use database authentication but not the router instance itself.  If database authentication is used for that instance, authentication will fail.</p>
 
 <br><span class="heading3">Handoff</span><br>
 

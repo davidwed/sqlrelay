@@ -1803,7 +1803,7 @@ bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
 	// handle connection-based authentication
 	bool	retval=
 		(authenticateLocal(userbuffer,passwordbuffer) ||
-		(sqlra && sqlra->authenticate(userbuffer,passwordbuffer)));
+		(sqlra && sqlra->authenticate(conn,userbuffer,passwordbuffer)));
 	if (retval) {
 		logDebugMessage("auth succeeded on connection");
 	} else {

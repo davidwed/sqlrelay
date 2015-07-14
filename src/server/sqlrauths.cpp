@@ -146,11 +146,12 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 	llist.append(sqlrap);
 }
 
-bool sqlrauths::authenticate(const char *user, const char *password) {
+bool sqlrauths::authenticate(sqlrserverconnection *sqlrcon,
+				const char *user, const char *password) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
-		if (node->getValue()->au->authenticate(user,password)) {
+		if (node->getValue()->au->authenticate(sqlrcon,user,password)) {
 			return true;
 		}
 	}

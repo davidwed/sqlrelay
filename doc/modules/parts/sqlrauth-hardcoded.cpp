@@ -6,7 +6,9 @@ class SQLRSERVER_DLLSPEC hardcoded : public sqlrauth {
 	public:
 			hardcoded(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
-		bool	authenticate(const char *user, const char *password);
+		bool	authenticate(sqlrserverconnection *conn,
+						const char *user,
+						const char *password);
 };
 
 hardcoded::hardcoded(xmldomnode *parameters,
@@ -26,7 +28,8 @@ static cred_t credentials[]={
 	{NULL,NULL}
 };
 
-bool hardcoded::authenticate(const char *user, const char *password) {
+bool hardcoded::authenticate(sqlrserverconnection *sqlrcon,
+				const char *user, const char *password) {
 	for (const cred_t *c=credentials; c->user; c++) {
 		if (!charstring::compare(user,c->user) &&
 			!charstring::compare(password,c->password)) {
