@@ -1251,8 +1251,10 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=USER_ATTRIBUTE;
 		} else if (!charstring::compare(name,"password")) {
 			currentattribute=PASSWORD_ATTRIBUTE;
-		} else if (!charstring::compare(name,"passwordencryption")) {
-			currentattribute=PASSWORDENCRYPTION_ATTRIBUTE;
+		} else if (!charstring::compare(name,"passwordencryptionid") ||
+			// also support older version of the attribute
+			!charstring::compare(name,"passwordencryption")) {
+			currentattribute=PASSWORDENCRYPTIONID_ATTRIBUTE;
 		}
 		break;
 
@@ -1267,8 +1269,10 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=METRIC_ATTRIBUTE;
 		} else if (!charstring::compare(name,"behindloadbalancer")) {
 			currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
-		} else if (!charstring::compare(name,"passwordencryption")) {
-			currentattribute=PASSWORDENCRYPTION_ATTRIBUTE;
+		} else if (!charstring::compare(name,"passwordencryptionid") ||
+			// also support older version of the attribute
+			!charstring::compare(name,"passwordencryption")) {
+			currentattribute=PASSWORDENCRYPTIONID_ATTRIBUTE;
 		}
 		break;
 
@@ -1657,7 +1661,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			currentuser->setUser((value)?value:"");
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {
 			currentuser->setPassword((value)?value:"");
-		} else if (currentattribute==PASSWORDENCRYPTION_ATTRIBUTE) {
+		} else if (currentattribute==PASSWORDENCRYPTIONID_ATTRIBUTE) {
 			if (currenttag==USERS_TAG) {
 				currentuser->setPasswordEncryption(
 							(value)?value:NULL);

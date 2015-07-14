@@ -25,6 +25,7 @@
 	added -fPIC to sqlrserver-config --cflags, if supported
 	the "default" auth module is now called "userlist"
 	added database auth module that is analagous to authtier="database"
+	replaced passwordencryption attribute with passwordencryptionid
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

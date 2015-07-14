@@ -41,8 +41,15 @@ userlist::userlist(xmldomnode *parameters,
 
 		users[i]=user->getAttributeValue("user");
 		passwords[i]=user->getAttributeValue("password");
-		passwordencryptions[i]=
-			user->getAttributeValue("passwordencryption");
+
+		// support modern "passwordencryptionid" and fall back to
+		// older "passwordencryption" attribute
+		const char	*pwdencid=
+				user->getAttributeValue("passwordencryptionid");
+		if (!pwdencid) {
+			pwdencid=user->getAttributeValue("passwordencryption");
+		}
+		passwordencryptions[i]=pwdencid;
 
 		user=user->getNextTagSibling("user");
 	}
