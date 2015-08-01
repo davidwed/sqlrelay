@@ -86,6 +86,10 @@ AC_ARG_ENABLE(postgresql-rpath,
 	POSTGRESQLUSERPATH="yes",
 	POSTGRESQLUSERPATH="")
 AC_SUBST(POSTGRESQLUSERPATH)
+AC_ARG_ENABLE(postgresql8-api,
+	[  --disable-postgresql8-api     Use older postgresql api without native bind support],
+	ENABLE_POSTGRESQL8API="",
+	ENABLE_POSTGRESQL8API="yes")
 AC_ARG_WITH(sqlite-prefix,
 	[  --with-sqlite-prefix          Location of SQLite],
 	SQLITEPATH="$withval",

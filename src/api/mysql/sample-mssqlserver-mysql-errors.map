@@ -20,6 +20,9 @@
 # Violation of UNIQUE KEY constraint ... -> ER_DUP_ENTRY
 2627:1062
 
+# Cannot insert duplicate key row ... -> ER_DUP_ENTRY
+2601:1062
+
 # There is already an object named 'xxx' in the database. -> ER_TABLE_EXISTS_ERROR
 2714:1050
 

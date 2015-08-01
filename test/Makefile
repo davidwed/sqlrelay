@@ -16,6 +16,7 @@ clean:
 	cd nodejs $(AND) $(MAKE) clean
 	cd odbc $(AND) $(MAKE) clean
 	cd perl $(AND) $(MAKE) clean
+	cd php $(AND) $(MAKE) clean
 	cd python $(AND) $(MAKE) clean
 	cd ruby $(AND) $(MAKE) clean
 	cd stress $(AND) $(MAKE) clean

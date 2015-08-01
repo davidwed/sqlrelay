@@ -36,7 +36,12 @@ minx@nownuri.net
 	oracle lob-fetch bugfixes (0.33)
 	Oracle CLOB support (0.33?)
 
-Florain Weps - fweps@greenmail.ch   and   Andreas Tille - tille@debian.org
+Florain Weps - fweps@greenmail.ch
+	man pages (0.33?)
+	patches (0.33?)
+	debian packages (0.33?)
+
+Andreas Tille - tille@debian.org
 	man pages (0.33?)
 	patches (0.33?)
 	debian packages (0.33?)
@@ -77,14 +82,18 @@ zhu shi song
 Masanori Akaishi
 	db2 version-8 bug (0.35)
 
-Tony Fleisher and Erik Hollensbe
+Tony Fleisher - tfleisher@musiciansfriend.com
+	reexecute bug patch (0.35)
+	perl dbi patch (0.35)
+
+Erik Hollensbe - erik@hollensbe.org
 	reexecute bug patch (0.35)
 	perl dbi patch (0.35)
 
 Srinivas Devarakonda
 	fake binds patch (0.35)
 
-Jason Hihn
+Jason Hihn - jason@eyemaginations.com, jason.hihn@verint.com
 	sqlite3 patch (0.35)
 
 Gena01 - gena01@gmail.com
@@ -115,10 +124,11 @@ Holger Lehmann
 Dave Sugar
 	PHP Pear DB driver patches (0.36)
 
-Gavan Fantom
-	patches (netbsd-related?) (0.37)
+Gavan Fantom - gavan@netbsd.org, gavan@coolfactor.org
+	various Makefile patches (0.37)
+	see https://mail-index.netbsd.org/pkgsrc-changes/2006/03/29/0001.html
 
-Sharpinskiy Dmitry - d-sh1@yandex.ru
+Sharpinskiy Dmitry - d-sh1@yandex.ru, dmitry.shrp@gmail.com
 	added unicode support to odbc connection (0.38)
 
 Devananda - karnah805@yahoo.com
@@ -128,7 +138,7 @@ Devananda - karnah805@yahoo.com
 Andreas Behr
 	listener crash patch (0.38)
 
-Steve Halasz
+Steve Halasz - debian@adkgis.org
 	patches (debian related?)...
 
 Tomasz Prus
@@ -161,10 +171,11 @@ Jesse Wagner
 Paul Maddox
 	patches...
 
-Renaud Amar
+Renaud Amar - renaud@meebo.com
 	HAVE_MYSQL_OPT_RECONNECT patch (0.40)
 
 Renat Sabitov - srr@stacksoft.ru
+	(current Stack Soft contact - Dmitry Volkov - vdv@stacksoft.ru)
 	output bind patch (0.41)
 	sqlr-scaler reap patch (0.41)
 	sqlr-scaler connection counting patch (0.41)
@@ -178,7 +189,7 @@ Renat Sabitov - srr@stacksoft.ru
 	sqlr-listener client-session count patch (0.44)
 	sqlr-listener alarm handling patch (0.45)
 
-Alexey Leontev
+Alexey Leontev - alex@lbc.ru
 	sqlrconfigfile addresscount patch (0,42)
 
 Stephan van Egmond
@@ -197,10 +208,11 @@ Benno Lange - Benno.Lange@langesw.de
 	patch to fix -localstatedir bugs (0.45)
 
 Georgiy Kirichenko - georgiy@stacksoft.ru
+	(current Stack Soft contact - Dmitry Volkov - vdv@stacksoft.ru)
 	sqlr-listener - missing flushWriteBuffer() patch (0.46)
 
 Chae Young-ku
-	ODBC patches (0.46)
+	ODBC client API patches (0.46)
 
 Ville Silventoinen - ville.silventoinen@gmail.com
 	build-related patches (0.51)

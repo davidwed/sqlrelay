@@ -913,6 +913,7 @@ enable_mysql_rpath
 with_postgresql_prefix
 enable_postgresql
 enable_postgresql_rpath
+enable_postgresql8_api
 with_sqlite_prefix
 enable_sqlite
 enable_sqlite_rpath
@@ -1619,6 +1620,7 @@ Optional Features:
   --enable-mysql-rpath          Use -rpath when building MySQL connection
   --disable-postgresql          Don't build PostgreSQL connection
   --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection
+  --disable-postgresql8-api     Use older postgresql api without native bind support
   --disable-sqlite              Don't build SQLite connection
   --enable-sqlite-rpath         Use -rpath when building SQLite connection
   --disable-freetds             Don't build FreeTDS connection
@@ -2765,6 +2767,13 @@ else
   POSTGRESQLUSERPATH=""
 fi
 
+
+# Check whether --enable-postgresql8-api was given.
+if test "${enable_postgresql8_api+set}" = set; then :
+  enableval=$enable_postgresql8_api; ENABLE_POSTGRESQL8API=""
+else
+  ENABLE_POSTGRESQL8API="yes"
+fi
 
 
 # Check whether --with-sqlite-prefix was given.
@@ -16096,6 +16105,7 @@ fi
 
 
 
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Werror" >&5
 $as_echo_n "checking for -Werror... " >&6; }
 
@@ -16130,10 +16140,19 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-CXX_VERSION=`$CXX --version | tr -d '.' | cut -c1-2`
-if ( test "$CXX_VERSION" -lt "27" )
+if ( test -n "$WERROR" )
 then
-	WERROR=""
+
+			CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+
+			if ( test "$CXX_VERSION" != "g+" )
+	then
+				if (  test "$CXX_VERSION" -lt "27" )
+		then
+			WERROR=""
+		fi
+	fi
+
 fi
 
 if ( test -n "$WERROR" )
@@ -22963,7 +22982,9 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQprepare" >&5
+		if ( test -n "$ENABLE_POSTGRESQL8API" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQprepare" >&5
 $as_echo_n "checking if PostgreSQL has PQprepare... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -23001,7 +23022,7 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQexecPrepared" >&5
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQexecPrepared" >&5
 $as_echo_n "checking if PostgreSQL has PQexecPrepared... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -23039,8 +23060,9 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQserverVersion" >&5
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQserverVersion" >&5
 $as_echo_n "checking if PostgreSQL has PQserverVersion... " >&6; }
+		fi
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"

@@ -26,6 +26,8 @@
 	the "default" auth module is now called "userlist"
 	added database auth module that is analagous to authtier="database"
 	replaced passwordencryption attribute with passwordencryptionid
+	added --disable-postgresql8-api configure option
+	tweaked -Werror detection in configure script
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
@@ -47,6 +49,8 @@
 	re-added mssqlserver detection, which had been accidentally removed
 	fixed statically-linked build
 	fixed mysql lob field bug that could cause a crash
+	added --disable-postgresql8-api configure option to disable
+		PQprepare/PQexecPrepared and native bind support
 
 0.59 - updated docs, removed some Cygwin-specific info
 	added support for login warnings

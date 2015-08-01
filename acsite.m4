@@ -303,14 +303,29 @@ AC_SUBST(FPIC)
 dnl checks to see if -Werror option works or not
 AC_DEFUN([FW_CHECK_WERROR],
 [
+
 AC_MSG_CHECKING(for -Werror)
 FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Werror],[],[],[WERROR="-Werror"],[WERROR=""])
 
-dnl disable -Werror with gcc < 2.7 because they misinterpret placement new
-CXX_VERSION=`$CXX --version | tr -d '.' | cut -c1-2`
-if ( test "$CXX_VERSION" -lt "27" )
+dnl if -Werror appers to be supported...
+if ( test -n "$WERROR" )
 then
-	WERROR=""
+
+	dnl disable -Werror with gcc < 2.7 because
+	dnl it misinterprets placement new
+	CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+
+	dnl Newer versions of gcc output the version differently
+	dnl and the above results in "g+".  These all work correctly.
+	if ( test "$CXX_VERSION" != "g+" )
+	then
+		dnl older versions output something like 27, 28, 29, etc.
+		if (  test "$CXX_VERSION" -lt "27" )
+		then
+			WERROR=""
+		fi
+	fi
+
 fi
 
 if ( test -n "$WERROR" )
@@ -1556,13 +1571,16 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQsetNoticeProcessor)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQsetNoticeProcessor(NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR,1,Some versions of postgresql have PQsetNoticeProcessor)],[AC_MSG_RESULT(no)])
-		AC_MSG_CHECKING(if PostgreSQL has PQprepare)
-		FW_TRY_LINK([#include <libpq-fe.h>
+		if ( test -n "$ENABLE_POSTGRESQL8API" )
+		then
+			AC_MSG_CHECKING(if PostgreSQL has PQprepare)
+			FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQprepare(NULL,NULL,NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQPREPARE,1,Some versions of postgresql have PQprepare)],[AC_MSG_RESULT(no)])
-		AC_MSG_CHECKING(if PostgreSQL has PQexecPrepared)
-		FW_TRY_LINK([#include <libpq-fe.h>
+			AC_MSG_CHECKING(if PostgreSQL has PQexecPrepared)
+			FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQexecPrepared(NULL,NULL,0,NULL,NULL,NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQEXECPREPARED,1,Some versions of postgresql have PQexecPrepared)],[AC_MSG_RESULT(no)])
-		AC_MSG_CHECKING(if PostgreSQL has PQserverVersion)
+			AC_MSG_CHECKING(if PostgreSQL has PQserverVersion)
+		fi
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQserverVersion(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSERVERVERSION,1,Some versions of postgresql have PQserverVersion)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQparameterStatus)
