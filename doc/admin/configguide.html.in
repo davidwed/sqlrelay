@@ -248,7 +248,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 </code>
 </blockquote>
 
-<p>See the <a href="router.html">Query Routing and Filtering</a> for more information on query routing.</p>
+<p>See the <a href="router.html">Query Routing</a> for more information on query routing.</p>
 
 
 <br><br><a name="sessionqueries"></a>

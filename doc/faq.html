@@ -15,7 +15,7 @@
 <li><a href="#proxying">What is "proxying"?</a></li>
 <li><a href="#throttling">What is "throttling"?</a></li>
 <li><a href="#loadbalancing">What is "load balancing"?</a></li>
-<li><a href="#queryrouting">What is "query routing/filtering"?</a></li>
+<li><a href="#queryrouting">What is "query routing"?</a></li>
 <li><a href="#dropinlibs">What are "drop-in replacement libraries"?</a></li>
 <li><a href="#databases">What databases does SQL Relay support?</a></li>
 <li><a href="#platforms">What platforms does SQL Relay run on?</a></li>
@@ -33,7 +33,7 @@
 <li><a href="#databaseusers">Can SQL Relay proxy multiple database users instead of using the same user for every session?</a></li>
 <li><a href="#routing">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
 <li><a href="#mysqlrouting">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
-<li><a href="#filtering">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</a></li>
+<li><a href="#filtering">Can SQL Relay be configured to filter out certain queries?</a></li>
 </ul>
 
 <br><span class="heading2">Build Questions</span><br>
@@ -177,9 +177,9 @@ Solves - "I wrote my app using the native MySQL API but the company is migrating
 <p>See <a href="features/loadbalancing.html">Load Balancing</a>.</p>
 
 <br><a name="queryrouting"></a>
-<span class="heading3">What is "query routing/filtering"?</span><br>
+<span class="heading3">What is "query routing"?</span><br>
 
-<p>See <a href="features/queryrouting.html">Query Routing and Filtering</a>.</p>
+<p>See <a href="features/queryrouting.html">Query Routing</a>.</p>
 
 <br><a name="dropinlibs"></a>
 <span class="heading3">What are "drop-in replacement libraries"?</span><br>
@@ -289,21 +289,21 @@ databases?</span>
 <br><a name="routing"></a>
 <span class="heading3">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
 
-<p>Yes, see <a href="router.html">Routing and Filtering Queries with SQL Relay</a>.</p>
+<p>Yes, see <a href="admin/router.html">Routing Queries with SQL Relay</a>.</p>
 
 <br><a name="mysqlrouting"></a>
 <span class="heading3">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
 
 <p>Probably.  You'll need to set up SQL Relay to route queries and use the Drop-in Replacement Library for MySQL to redirect your app to use SQL Relay.</p>
 
-<p>See <a href="router.html">Routing and Filtering Queries with SQL Relay</a> for details on how to set up SQL Relay as a query router.</p>
+<p>See <a href="admin/router.html">Routing Queries with SQL Relay</a> for details on how to set up SQL Relay as a query router.</p>
 
 <p>See <a href="dropin/mysql.html">Using the SQL Relay drop-in replacement library for MySQL</a> for details about how to use the drop-in replacement library.</p>
 
 <br><a name="filtering"></a>
-<span class="heading3">Can SQL Relay be configured to filter out certain queries, such as select's without a where clause?</span>
+<span class="heading3">Can SQL Relay be configured to filter out certain queries?</span>
 
-<p>Yes, see <a href="router.html">Routing and Filtering Queries with SQL Relay</a>.</p>
+<p>Yes, using query filter modules.  See <a href="modules/filters.html">Query Filters</a>.</p>
 
 <hr>
 

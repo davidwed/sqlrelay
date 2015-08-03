@@ -1,11 +1,11 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Query Routing and Filtering</title>
+<title>firstworks   SQL Relay - Query Routing</title>
 <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Query Routing and Filtering</span><br><br>
+<span class="heading1">Query Routing</span><br><br>
 
 <p>Solves - "My database is getting slammed. I could replicate it but then I'd have to rewrite my app to send DML to the master and somehow distribute selects over the slaves."</p>
 
@@ -13,19 +13,7 @@
 
 <img src="../images/queryrouting.png">
 
-<p>Query filtering prevents queries that match a certian pattern from being run at all.  There are often certain queries that will bring the entire database to its knees.  A common use for query filtering is to identify those queries and prevent them from being run.</p>
-
-<p>For example, <i>select * from hugetable where id=100</i> might be fine...</p>
-
-<img src="../images/query-allowed.png">
-
-<p>...but <i>select * from hugetable</i> without a where clause might crush the database.</p>
-
-<img src="../images/query-rejected.png">
-
-<p>SQL Relay can be configured to allow one and reject the other.</p>
-
-<p>The configuration is a bit more complex than suggested by these diagrams, but a complete descripton of query routing and filtering with example configuration files is given <a href="../admin/router.html">here</a>.</p>
+<p>The configuration is a bit more complex than suggested by this diagram, but a complete descripton of query routing with example configuration files is given <a href="../admin/router.html">here</a>.</p>
 
 </body>
 </html>

@@ -1,1 +1,1 @@
-select * from badtable where column1=1
+select * from hugetable

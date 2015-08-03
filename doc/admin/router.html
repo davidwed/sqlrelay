@@ -1,26 +1,20 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Query Routing and Filtering</title>
+<title>firstworks   SQL Relay - Query Routing</title>
 <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
 <br>
-<span class="heading1">Query Routing and Filtering</span><br>
+<span class="heading1">Query Routing</span><br>
 
-<p>SQL Relay's query routing and filtering feature allows you to send one
-set of queries to one database, another set of queries to another and filter
-out queries entirely so that they aren't sent to any database.</p>
+<p>SQL Relay's query routing feature allows you to send one set of queries to one database, another set of queries to another.</p>
 
 <p>How is this useful?  Here are some examples of what you can do:</p>
 
 <ul>
-<li>Send inserts, updates and deletes to a master database and distribute
-selects over a set of slaves.</li>
-<li>Provide a single point of access to multiple databases, even different
-types of databases.</li>
-<li>Prevent joins between particular sets of tables.</li>
-<li>Filter out queries that lack a where clause.</li>
+<li>Send inserts, updates and deletes to a master database and distribute selects over a set of slaves.</li>
+<li>Provide a single point of access to multiple databases, even different types of databases.</li>
 </ul>
 
 <p>These are not the only things you can do.  Use your imagination.</p>
@@ -28,43 +22,22 @@ types of databases.</li>
 <br>
 <span class="heading1">How it Works</span><br>
 
-<p>Normally, SQL Relay maintains a set of persistent connections to a database
-or database cluster and distributes queries over the connections.  The databases
-to connect to are defined in a configuration file.</p>
+<p>Normally, SQL Relay maintains a set of persistent connections to a database or database cluster and distributes queries over the connections.  The databases to connect to are defined in a configuration file.</p>
 
-<p>When used in query routing and filtering mode, SQL Relay is configured to
-distribute queries over other instances of SQL Relay running in standard
-mode.</p>
+<p>When used in query routing mode, SQL Relay is configured to distribute queries over other instances of SQL Relay running in standard mode.</p>
 
-<p>For instance, you can set up one instance of SQL Relay to maintain 3
-connections to a MySQL database and another instance of SQL Relay to maintain
-5 connections to a PostgreSQL database, then set up another instance of
-SQL Relay to route queries to the other 2 instances.</p>
+<p>For instance, you can set up one instance of SQL Relay to maintain 3 connections to a MySQL database and another instance of SQL Relay to maintain 5 connections to a PostgreSQL database, then set up another instance of SQL Relay to route queries to the other 2 instances.</p>
 
 <blockquote><img src="router.png"></blockquote>
 
-<p>The router instance decides which queries to send to the other instances by
-comparing them to a set of regular expressions.</p>
+<p>The router instance decides which queries to send to the other instances by comparing them to a set of regular expressions.</p>
 
 <br>
 <span class="heading1">General Configuration</span><br>
 
-<p>Each instance of SQL Relay that will be used as a query router must omit
-the <b>connection</b> tag and include a single <b>router</b> tag.  The
-<b>router</b> tag must contain a set of <b>route</b> and <b>filter</b> tags.
-Each <b>route</b> tag defines an instance of SQL Relay to route queries to
-and contains a set of <b>query</b> tags defining which queries to route to it.
-Each <b>filter</b> tag contains a set of <b>query</b> tags defining which
-queries to filter out.</p>
+<p>Each instance of SQL Relay that will be used as a query router must omit the <b>connection</b> tag and include a single <b>router</b> tag.  The <b>router</b> tag must contain a set of <b>route</b> tags.  Each <b>route</b> tag defines an instance of SQL Relay to route queries to and contains a set of <b>query</b> tags defining which queries to route to it.</p>
 
-<p>When deciding where to route a query (or whether to filter it out), SQL
-Relay runs through the <b>query</b> tags, in the order that they appear in the
-configuration file, and compares the query to the regular expression defined in
-the tag.  If the query matches a regular expression defined in a <b>query</b>
-tag inside of a <b>route</b> tag, it will be routed to the instance of SQL Relay
-defined in the <b>route</b> tag.  If the query matches a regular expression
-defined in a <b>query</b> tag inside of a <b>filter</b> tag, it will be filtered
-out.</p>
+<p>When deciding where to route a query, SQL Relay runs through the <b>query</b> tags, in the order that they appear in the configuration file, and compares the query to the regular expression defined in the tag.  If the query matches a regular expression defined in a <b>query</b> tag inside of a <b>route</b> tag, it will be routed to the instance of SQL Relay defined in the <b>route</b> tag.</p>
 
 <p>See the examples below.  Note that the regular expressions in the
 examples below aren't perfect.  They are not case insensitive, for example, nor
@@ -209,111 +182,6 @@ all queries containing "postgresqldb." to the PostgreSQL database.</p>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/postgresqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;postgresqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;postgresqldbpassword&quot;</font><font color="#008b8b">&gt;</font>
                                 <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;postgresqldb\.&quot;</font><font color="#008b8b">/&gt;</font>
                         <font color="#008b8b">&lt;/route&gt;</font>
-                <font color="#008b8b">&lt;/router&gt;</font>
-        <font color="#008b8b">&lt;/instance&gt;</font>
-
-<font color="#008b8b">&lt;/instances&gt;</font>
-</pre>
-</blockquote>
-
-<span class="heading1">Prevent Joins Between Particular Sets of Tables</span>
-
-<p>Here's an example configuration which prevent joins between particular sets
-of tables.</span>
-
-<p>In this example, any select containing both table1 and table3 will be
-filtered out.</p>
-
-<blockquote>
-<pre>
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b> </b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font>
-<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font> instances <font color="#a52a2a"><b>SYSTEM</b></font> <font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font>
-
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font>
-
-        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to a MySQL database --</font><font color="#0000ff">&gt;</font>
-        <font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> </font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;mysqldb&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;mysql&quot;</font><font color="#008b8b">&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">/&gt;</font>
-                <font color="#008b8b">&lt;/users&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=mysqldbuser;password=mysqldbpassword;host=mysqldb;db=mysqldb;&quot;</font><font color="#008b8b">/&gt;</font>
-                <font color="#008b8b">&lt;/connections&gt;</font>
-        <font color="#008b8b">&lt;/instance&gt;</font>
-
-
-        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance sends queries to the</font>
-<font color="#0000ff">                mysqldb instance after filtering them --</font><font color="#0000ff">&gt;</font>
-        <font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> </font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/router.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;routeruser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;routerpassword&quot;</font><font color="#008b8b">/&gt;</font>
-                <font color="#008b8b">&lt;/users&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&gt;</font>
-                        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- filter out selects containing table1 and table3 --</font><font color="#0000ff">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^select .* (table1.*table3|table3.*table1)&quot;</font><font color="#008b8b">/&gt;</font>
-                        <font color="#008b8b">&lt;/filter&gt;</font>
-                        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- send any other queries to &quot;mysqldb&quot; --</font><font color="#0000ff">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;.*&quot;</font><font color="#008b8b">/&gt;</font>
-                        <font color="#008b8b">&lt;/route&gt;</font>
-                <font color="#008b8b">&lt;/router&gt;</font>
-        <font color="#008b8b">&lt;/instance&gt;</font>
-
-<font color="#008b8b">&lt;/instances&gt;</font>
-</pre>
-</blockquote>
-
-<span class="heading1">Filter Out Queries That Lack a Where Clause</span>
-
-<p>Here's an example configuration which filters out queries which lack a where
-clause.</span>
-
-<blockquote>
-<pre>
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b> </b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font>
-<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font> instances <font color="#a52a2a"><b>SYSTEM</b></font> <font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font>
-
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font>
-
-        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to a MySQL database --</font><font color="#0000ff">&gt;</font>
-        <font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> </font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;mysqldb&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;mysql&quot;</font><font color="#008b8b">&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">/&gt;</font>
-                <font color="#008b8b">&lt;/users&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=mysqldbuser;password=mysqldbpassword;host=mysqldb;db=mysqldb;&quot;</font><font color="#008b8b">/&gt;</font>
-                <font color="#008b8b">&lt;/connections&gt;</font>
-        <font color="#008b8b">&lt;/instance&gt;</font>
-
-
-        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance sends queries to the</font>
-<font color="#0000ff">                mysqldb instance after filtering them --</font><font color="#0000ff">&gt;</font>
-        <font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> </font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/router.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;routeruser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;routerpassword&quot;</font><font color="#008b8b">/&gt;</font>
-                <font color="#008b8b">&lt;/users&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&gt;</font>
-                        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- send queries to &quot;mysqldb&quot; which match the</font>
-<font color="#0000ff">                                specified patterns --</font><font color="#0000ff">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">&gt;</font>
-                                <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow creates --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^create &quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow drops --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^drop &quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow inserts --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^insert &quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow deletes --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^delete &quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow updates --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^update &quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow selects with a where clause --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^select .* from .* where &quot;</font><font color="#008b8b">/&gt;</font>
-                        <font color="#008b8b">&lt;/route&gt;</font>
-                        <font color="#0000ff">&lt;!</font><font color="#0000ff">-- all other queries will be filtered out --</font><font color="#0000ff">&gt;</font>
-                        <font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;.*&quot;</font><font color="#008b8b">/&gt;</font>
-                        <font color="#008b8b">&lt;/filter&gt;</font>
                 <font color="#008b8b">&lt;/router&gt;</font>
         <font color="#008b8b">&lt;/instance&gt;</font>
 
