@@ -1,9 +1,11 @@
 include ../config.mk
 
 all:
+	cd bench $(AND) $(MAKE) all
 	cd c $(AND) $(MAKE) all
 	cd c++ $(AND) $(MAKE) all
 	cd java $(AND) $(MAKE) all
+	cd stress $(AND) $(MAKE) all
 	cd tcl $(AND) $(MAKE) all
 
 clean:
