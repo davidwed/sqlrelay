@@ -7,15 +7,19 @@
 
 #include "bench.h"
 
+#include "sqlrelaybench.h"
 #include "db2bench.h"
 #include "firebirdbench.h"
-#include "freetdsbench.h"
+#ifndef _WIN32
+	#include "freetdsbench.h"
+#endif
 #include "mysqlbench.h"
 #include "oraclebench.h"
 #include "postgresqlbench.h"
-#include "sqlitebench.h"
-#include "sybasebench.h"
-#include "sqlrelaybench.h"
+#ifndef _WIN32
+	#include "sqlitebench.h"
+	#include "sybasebench.h"
+#endif
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
 
@@ -148,6 +152,7 @@ int main(int argc, const char **argv) {
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
+		#ifndef _WIN32
 		} else if (!charstring::compare(db,"freetds")) {
 			if (!connectstring) {
 				connectstring=
@@ -159,6 +164,7 @@ int main(int argc, const char **argv) {
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
+		#endif
 		} else if (!charstring::compare(db,"mysql")) {
 			if (!connectstring) {
 				connectstring=
@@ -214,6 +220,7 @@ int main(int argc, const char **argv) {
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
+		#ifndef _WIN32
 		} else if (!charstring::compare(db,"sqlite")) {
 			if (!connectstring) {
 				connectstring=
@@ -234,6 +241,7 @@ int main(int argc, const char **argv) {
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
+		#endif
 		}
 		if (!bm) {
 			stdoutput.printf("error creating benchmarks\n");

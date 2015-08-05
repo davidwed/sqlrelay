@@ -1,5 +1,7 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
+#ifndef _WIN32
+
 #include "../../config.h"
 
 #include "sqlitebench.h"
@@ -58,3 +60,5 @@ bool sqlitebenchcursor::query(const char *query, bool getcolumns) {
 bool sqlitebenchcursor::close() {
 	return true;
 }
+
+#endif

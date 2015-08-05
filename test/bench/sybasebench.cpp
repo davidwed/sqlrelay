@@ -1,5 +1,7 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
+#ifndef _WIN32
+
 #include "../../config.h"
 
 #include <rudiments/environment.h>
@@ -111,7 +113,7 @@ bool sybasebenchconnection::connect() {
 	}
 	stringbuffer	usedb;
 	usedb.append("use ")->append(dbname);
-	if (ct_command(cmd,CS_LANG_CMD,usedb.getString(),
+	if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)usedb.getString(),
 			usedb.getStringLength(),CS_UNUSED)!=CS_SUCCEED) {
 		stdoutput.printf("ct_command failed\n");
 		return false;
@@ -223,7 +225,7 @@ bool sybasebenchcursor::query(const char *query, bool getcolumns) {
 	} else {
 
 		// initiate a language command
-		if (ct_command(cmd,CS_LANG_CMD,query,
+		if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)query,
 			charstring::length(query),CS_UNUSED)!=CS_SUCCEED) {
 			stdoutput.printf("ct_command failed\n");
 			return false;
@@ -338,3 +340,5 @@ bool sybasebenchcursor::close() {
 	ct_cmd_drop(cmd);
 	return true;
 }
+
+#endif

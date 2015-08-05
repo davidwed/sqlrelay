@@ -1,5 +1,7 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
+#ifndef _WIN32
+
 #include "../../config.h"
 
 #include "freetdsbench.h"
@@ -62,3 +64,5 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 bool freetdsbenchcursor::close() {
 	return true;
 }
+
+#endif

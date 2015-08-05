@@ -3,6 +3,10 @@
 #ifndef MYSQL_BENCH_H
 #define MYSQL_BENCH_H
 
+#ifdef _WIN32
+#include <winsock2.h>
+#endif
+
 extern "C" {
 	#include <mysql.h>
 }
