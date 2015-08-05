@@ -29,6 +29,11 @@ install-man:
 install-doc:
 	cd doc $(AND) $(MAKE) install
 
+install-license:
+	$(MKINSTALLDIRS) $(licensedir)
+	$(CP) COPYING $(licensedir)
+	$(CHMOD) 0644 $(licensedir)/COPYING
+
 install-pkgconfig:
 	$(MKINSTALLDIRS) $(libdir)/pkgconfig
 	$(CP) sqlrelay-c.pc $(libdir)/pkgconfig/sqlrelay-c.pc
@@ -56,6 +61,9 @@ uninstall-man:
 
 uninstall-doc:
 	cd doc $(AND) $(MAKE) uninstall
+
+uninstall-license:
+	$(RMTREE) $(licensedir)
 
 uninstall-pkgconfig:
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc \

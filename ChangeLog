@@ -34,6 +34,7 @@
 		The SQLRelay Server (as designated in COPYING) license now
 		carries an exception, explicitly allowing it to be linked with
 		various non-GPL compatible libraries
+	license is installed now
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

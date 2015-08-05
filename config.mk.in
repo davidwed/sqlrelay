@@ -17,6 +17,7 @@ sysconfdir = @sysconfdir@
 mandir = @mandir@
 datadir = @datadir@
 docdir = ${datadir}/doc/sqlrelay
+licensedir = ${datadir}/licenses/sqlrelay
 EXAMPLEDIR = ${datadir}/examples
 tmpdir = ${localstatedir}/sqlrelay/tmp
 cachedir = ${localstatedir}/sqlrelay/cache
@@ -862,8 +863,8 @@ MODULERENAME = $(top_builddir)/modulerename.sh
 
 
 # build directories
-INSTALLSUBDIRS = install-src install-bin install-etc install-init install-man install-doc install-pkgconfig
-UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-man uninstall-doc uninstall-pkgconfig
+INSTALLSUBDIRS = install-src install-bin install-etc install-init install-man install-doc install-license install-pkgconfig
+UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-man uninstall-doc uninstall-license uninstall-pkgconfig
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
