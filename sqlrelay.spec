@@ -38,7 +38,6 @@ Buildroot: %{_tmppath}/%{name}-root
 
 %define fedoraversion %(for word in `cat /etc/redhat-release 2> /dev/null`; do VAR=`echo $word | grep -x "[0-9]*"`; if ( test -n "$VAR" ); then echo $VAR; fi ; done)
 
-%define docdir %{_docdir}/%{name}
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
 	%define phpconfdir /etc/php5/conf.d
 %else
