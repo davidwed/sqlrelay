@@ -34076,7 +34076,7 @@ then
 fi
 
 
-MAKELIST="config.mk bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist test/test sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF
@@ -36556,7 +36556,6 @@ chmod 755 bin/sqlrclientwrapper-config
 chmod 755 bin/sqlrserver-config
 chmod 755 init/rc.sqlrelay
 chmod 755 init/rc.sqlrcachemanager
-chmod 755 test/test
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
 mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
