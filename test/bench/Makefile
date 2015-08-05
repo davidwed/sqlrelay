@@ -14,17 +14,17 @@ SRCS = bench.cpp \
 	sqlitebench.cpp \
 	sybasebench.cpp
 
-LOBJS = bench.lo \
-	main.lo \
-	sqlrelaybench.lo \
-	db2bench.lo \
-	firebirdbench.lo \
-	freetdsbench.lo \
-	mysqlbench.lo \
-	oraclebench.lo \
-	postgresqlbench.lo \
-	sqlitebench.lo \
-	sybasebench.lo
+LOBJS = bench.$(OBJ) \
+	main.$(OBJ) \
+	sqlrelaybench.$(OBJ) \
+	db2bench.$(OBJ) \
+	firebirdbench.$(OBJ) \
+	freetdsbench.$(OBJ) \
+	mysqlbench.$(OBJ) \
+	oraclebench.$(OBJ) \
+	postgresqlbench.$(OBJ) \
+	sqlitebench.$(OBJ) \
+	sybasebench.$(OBJ)
 
 .SUFFIXES: .lo
 

@@ -72,11 +72,11 @@ void benchmarks::run() {
 
 	const char	*selectquery="select * from testtable";
 	uint32_t	colfactor=4;
-	uint32_t	colcount=pow(2,colfactor);
+	uint32_t	colcount=pow((double)2,colfactor);
 	while (colcount<=cols && !shutdown) {
 
 		uint32_t	rowfactor=6;
-		uint32_t	rowcount=pow(2,rowfactor);
+		uint32_t	rowcount=pow((double)2,rowfactor);
 		while (rowcount<=rows && !shutdown) {
 
 			// create
@@ -152,7 +152,7 @@ void benchmarks::run() {
 				rowcount++;
 			} else {
 				rowfactor++;
-				rowcount=pow(2,rowfactor);
+				rowcount=pow((double)2,rowfactor);
 				if (rowcount>rows) {
 					rowcount=rows;
 				}
@@ -164,7 +164,7 @@ void benchmarks::run() {
 			colcount++;
 		} else {
 			colfactor++;
-			colcount=pow(2,colfactor);
+			colcount=pow((double)2,colfactor);
 			if (colcount>cols) {
 				colcount=cols;
 			}
