@@ -1,68 +1,82 @@
-The SQLRelay software package is really several packages:
+SQLRelay consists of several components:
 
-*) Source code, scripts and binaries found under the src/server, bin and init
-	directories of the SQL Relay source distribution.  This package is
-	hereafter refered to as The SQLRelay Server.
+*) Source code, scripts and binaries found under the src/server, src/auths,
+	src/connections, src/filters, src/loggers, src/parsers, src/protocols,
+	src/pwdencs, src/queries, src/resultsettranslations, src/translations,
+	src/util, bin and init directories of the SQL Relay source distribution.
+	This component is hereafter refered to as The SQLRelay Server.
 
 *) Source code, scripts and binaries found under the src/cmdline directory of
-	the SQL Relay source distribution This package is hereafter refered to
-	as The SQLRelay Command-Line Clients.
+	the SQL Relay source distribution This component is hereafter refered
+	to as The SQLRelay Command-Line Clients.
 
 *) Source code, scripts and binaries found under the src/api/c and src/api/c++
-	directories of the SQL Relay distribution. This package is 
+	directories of the SQL Relay distribution. This component is 
 	hereafter refered to as The SQLRelay C/C++ API.
 
 *) Source code, scripts and binaries found under the src/api/cs
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay C# API
 
 *) Source code, scripts and binaries found under the src/api/erlang
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay Erlang API.
 
 *) Source code, scripts and binaries found under the src/api/java
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay Java API.
 
 *) Source code, scripts and binaries found under the src/api/nodejs
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay node.js API
 
 *) Source code, scripts and binaries found under the src/api/odbc
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay ODBC API
 
 *) Source code, scripts and binaries found under the src/api/perl and 
 	src/api/perl-DBD directories of the SQL Relay distribution. This
-	package is hereafter refered to as The SQLRelay Perl API.
+	component is hereafter refered to as The SQLRelay Perl API.
 
 *) Source code, scripts and binaries found under the src/api/python
-	directory of the SQL Relay distribution. This package is 
+	directory of the SQL Relay distribution. This component is 
 	hereafter refered to as The SQLRelay Python API.
 
 *) Source code, scripts and binaries found under the src/api/php 
-	directory of the SQL Relay source distribution. This package is 
+	directory of the SQL Relay source distribution. This component is 
 	hereafter refered to as The SQLRelay PHP API.
 
 *) Source code, scripts and binaries found under the src/api/phppdo
-	directory of the SQL Relay source distribution. This package is 
+	directory of the SQL Relay source distribution. This component is 
 	hereafter refered to as The SQLRelay PHP PDO API.
 
 *) Source code, scripts and binaries found under the src/api/ruby 
 	directory of the SQL Relay source distribution.
-        This package is hereafter refered to as The SQLRelay Ruby API.
+        This component is hereafter refered to as The SQLRelay Ruby API.
 
 *) Source code, scripts and binaries found under the src/api/tcl
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay TCL API.
 
 *) Source code, scripts and binaries found under the src/api/mysql
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay MySQL Drop-In API.
 
 *) Source code, scripts and binaries found under the src/api/postgresql
-	directory of the SQL Relay source distribution.  This package is
+	directory of the SQL Relay source distribution.  This component is
 	hereafter refered to as The SQLRelay PostgreSQL Drop-In API.
+
+*) Source code, scripts and binaries found under the test directory of the
+	SQL Relay source distribution.  This component is hereafter refered
+	to as The SQLRelay Tests.
+
+*) Documentation found under the doc and man directories of the SQL Relay
+	source distribution, except for example code given within said
+	documentation.  This component is hereafter referred to as
+	The SQLRelay Documentation.
+
+*) Example code found in The SQL Relay Documentation.  This component is
+	hereafter referred to as The SQLRelay Documentation Examples.
 
 --------------------------------------------------------------------------------
 
@@ -84,6 +98,43 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 (attached below)
+
+Linking The SQLRelay Server statically or dynamically with other modules is
+making a combined work based on The SQLRelay Server. Thus, the terms and
+conditions of the GNU General Public License cover the whole combination.
+
+In addition, as a special exception, the copyright holders of The SQLRelay
+Server give you permission to combine The SQLRelay Server with free software
+programs or libraries that are released under the GNU LGPL and with code
+included in the standard release of the following libraries (or modified
+versions of such code, with unchanged license):
+
+* OpenSSL and its dependencies.
+* Perl-Compatible Regular Expressions (PCRE) and its dependencies.
+* IBM DB2 database client libraries and their dependencies.
+* Firebird database client libraries and their dependencies.
+* FreeTDS client libraries and their dependencies.
+* MDB Tools client lbiraries and their dependencies.
+* MySQL database client libraries and their dependencies.
+* ODBC client libraries and their dependencies.
+* Oracle database client libraries and their dependencies.
+* PostgreSQL database client libraries and their dependencies.
+* SQLite client libraries and their dependencies.
+* Sybase/SAP client libraries and their dependencies.
+* Any other programs or libraries as designated, in writing, now or in the
+  future, by David Muse, his authorized agents, authorized heirs, or authorized
+  agents of his authorized heirs.
+
+You may copy and distribute such a system following the terms of the GNU GPL
+for The SQLRelay Server and the licenses of the other code concerned{, provided
+that you include the source code of that other code when and as the GNU GPL
+requires distribution of source code}.
+
+Note that people who make modified versions of The SQLRelay Server are not
+obligated to grant this special exception for their modified versions; it is
+their choice whether to do so. The GNU General Public License gives permission
+to release a modified version without this exception; this exception also makes
+it possible to release a modified version which carries forward this exception. 
 
 --------------------------------------------------------------------------------
 
@@ -205,7 +256,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 --------------------------------------------------------------------------------
 
 The SQLRelay ODBC API
-Copyright (c) 2007-2014  David Muse
+Copyright (c) 2007-2015  David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -258,7 +309,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay PHP PDO API
-Copyright (c) 2014  David Muse
+Copyright (c) 2014-2015  David Muse
 
 This source file is subject to version 3.01 of the PHP license,
 that is bundled with this package in the file COPYING, and is
@@ -346,9 +397,60 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay PostgreSQL Drop-In API
-Copyright (c) 2003-2014 David Muse
+Copyright (c) 2003-2015 David Muse
 
 This work is covered by the BSD License for derivative works of PostgreSQL.
+
+(attached below)
+
+--------------------------------------------------------------------------------
+
+The SQLRelay Tests
+Copyright (c) 1999-2015  David Muse
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+(attached below)
+
+--------------------------------------------------------------------------------
+
+The SQLRelay Documentation
+Copyright (c) 1999-2015  David Muse
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+(attached below)
+
+--------------------------------------------------------------------------------
+
+The SQLRelay Documentation Examples
+Copyright (c) 1999-2015  David Muse
+
+This work is covered by the FSF Unlimited License.
 
 (attached below)
 
@@ -1086,7 +1188,7 @@ Portions Copyright (c) 1996-2002, The PostgreSQL Global Development Group
 
 Portions Copyright (c) 1994, The Regents of the University of California
 
-Portions Copyright (c) 2003-2014, David Muse
+Portions Copyright (c) 2003-2015, David Muse
 
 Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and this paragraph and the following two paragraphs appear in all copies.
 
@@ -1164,3 +1266,12 @@ please see <http://www.php.net>.
 
 PHP includes the Zend Engine, freely available at
 <http://www.zend.com>.
+
+--------------------------------------------------------------------------------
+
+The FSF Unlimited License
+
+This software is free software; you have unlimited permission
+to copy, distribute and modify it.
+
+--------------------------------------------------------------------------------
