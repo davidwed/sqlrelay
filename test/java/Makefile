@@ -13,7 +13,7 @@ all:
 	$(MAKE) sybase.class
 
 clean:
-	$(RM) *.class cachefile* sqlnet.log
+	$(RM) *.class cachefile* sqlnet.log make.bat
 
 db2.class: db2.java
 	$(JAVAC) -classpath $(javadir)/sqlrelay.jar db2.java
