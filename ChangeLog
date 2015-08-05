@@ -29,6 +29,11 @@
 	added --disable-postgresql8-api configure option
 	tweaked -Werror detection in configure script
 	refactored sqlr-bench build to work on windows
+	documentation, examples and tests are now covered by a license
+	reflecting modern interpretation of the GPL, The license for
+		The SQLRelay Server (as designated in COPYING) license now
+		carries an exception, explicitly allowing it to be linked with
+		various non-GPL compatible libraries
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
