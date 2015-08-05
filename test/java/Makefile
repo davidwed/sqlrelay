@@ -2,15 +2,15 @@ top_builddir = ../..
 
 include ../../config.mk
 
-all:
-	$(MAKE) db2.class
-	$(MAKE) freetds.class
-	$(MAKE) firebird.class
-	$(MAKE) mysql.class
-	$(MAKE) oracle.class
-	$(MAKE) postgresql.class
-	$(MAKE) sqlite.class
-	$(MAKE) sybase.class
+all: db2.class\
+	freetds.class \
+	firebird.class \
+	mysql.class \
+	oracle.class \
+	postgresql.class \
+	sqlite.class \
+	sybase.class \
+	run.bat
 
 clean:
 	$(RM) *.class cachefile* sqlnet.log run.bat
@@ -41,3 +41,6 @@ sybase.class: sybase.java
 
 test.class: test.java
 	$(JAVAC) -classpath $(javadir)/sqlrelay.jar test.java
+
+run.bat: run.batch
+	$(CP) run.batch run.bat
