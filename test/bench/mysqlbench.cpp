@@ -133,7 +133,7 @@ start.getSystemDateAndTime();*/
 		if (getcolumns) {
 			mysql_field_seek(mysqlresult,0);
 			for (uint32_t i=0; i<ncols; i++) {
-				MYSQL_FIELD	*mysqlfields=
+				//MYSQL_FIELD	*mysqlfields=
 					mysql_fetch_field(mysqlresult);
 				//stdoutput.printf("%s,",mysqlfields->name);
 			}

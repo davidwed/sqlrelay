@@ -85,12 +85,6 @@ void checkSuccess(double value, double success) {
 
 int	main(int argc, char **argv) {
 
-	const char	*subvars[4]={"var1","var2","var3",NULL};
-	const char	*subvalstrings[3]={"hi","hello","bye"};
-	int64_t		subvallongs[3]={1,2,3};
-	double		subvaldoubles[3]={10.55,10.556,10.5556};
-	uint32_t	precs[3]={4,5,6};
-	uint32_t	scales[3]={2,3,4};
 	int64_t		numvar;
 	const char	*clobvar;
 	uint32_t	clobvarlength;
@@ -103,7 +97,6 @@ int	main(int argc, char **argv) {
 	uint16_t	port;
 	char		*socket;
 	uint16_t	id;
-	char		*filename;
 	uint32_t	*fieldlens;
 
 	// instantiation

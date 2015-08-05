@@ -9,9 +9,9 @@ extern "C" {
 	#include <ctpublic.h>
 }
 
-#define FETCH_AT_ONCE 10
-#define MAX_SELECT_LIST_SIZE 256
-#define MAX_ITEM_BUFFER_SIZE 2048
+#define SYBASE_FETCH_AT_ONCE 10
+#define SYBASE_MAX_SELECT_LIST_SIZE 256
+#define SYBASE_MAX_ITEM_BUFFER_SIZE 2048
 
 
 class sybasebenchmarks : public benchmarks {
@@ -73,13 +73,14 @@ class sybasebenchcursor : public benchcursor {
 		CS_COMMAND	*cmd;
 		CS_INT		resultstype;
 		CS_INT		ncols;
-		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
-		char		data[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE][MAX_ITEM_BUFFER_SIZE];
-		CS_INT		datalength[MAX_SELECT_LIST_SIZE]
-							[FETCH_AT_ONCE];
-		CS_SMALLINT	nullindicator[MAX_SELECT_LIST_SIZE]
-							[FETCH_AT_ONCE];
+		CS_DATAFMT	column[SYBASE_MAX_SELECT_LIST_SIZE];
+		char		data[SYBASE_MAX_SELECT_LIST_SIZE]
+						[SYBASE_FETCH_AT_ONCE]
+						[SYBASE_MAX_ITEM_BUFFER_SIZE];
+		CS_INT		datalength[SYBASE_MAX_SELECT_LIST_SIZE]
+						[SYBASE_FETCH_AT_ONCE];
+		CS_SMALLINT	nullindicator[SYBASE_MAX_SELECT_LIST_SIZE]
+						[SYBASE_FETCH_AT_ONCE];
 		CS_INT		rowcount;
 };
 

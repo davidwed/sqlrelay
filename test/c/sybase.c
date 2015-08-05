@@ -54,14 +54,6 @@ void checkSuccessInt(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	const char	*bindvars[14]={"1","2","3","4","5","6",
-				"7","8","9","10","11","12",
-				"13",NULL};
-	const char	*bindvals[13]={"4","4","4","4.4","4.4","4.4","4.4",
-				"4.00","4.00",
-				"01-Jan-2004 04:00:00",
-				"01-Jan-2004 04:00:00",
-				"testchar4","testvarchar4"};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};

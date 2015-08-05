@@ -197,7 +197,7 @@ bool oraclebenchcursor::open() {
 	}
 
 	// set the number of rows to prefetch
-	fetchatonce=FETCH_AT_ONCE;
+	fetchatonce=ORACLE_FETCH_AT_ONCE;
 	if (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
 			(dvoid *)&fetchatonce,(ub4)0,
 			OCI_ATTR_PREFETCH_ROWS,
@@ -281,7 +281,7 @@ bool oraclebenchcursor::query(const char *query, bool getcolumns) {
 		OCIDefineByPos(stmt,&def[i],orabcon->err,
 				i+1,
 				(dvoid *)def_buf[i],
-				(sb4)MAX_ITEM_BUFFER_SIZE,
+				(sb4)ORACLE_MAX_ITEM_BUFFER_SIZE,
 				SQLT_STR,
 				(dvoid *)def_indp[i],
 				(ub2 *)def_col_retlen[i],

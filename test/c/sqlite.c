@@ -65,7 +65,7 @@ int	main(int argc, char **argv) {
 	uint16_t	port;
 	const char	*socket;
 	uint16_t	id;
-	const char	*filename;
+	char		*filename;
 	uint32_t	*fieldlens;
 
 	// instantiation

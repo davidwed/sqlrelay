@@ -81,7 +81,7 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 		return false;
 	}
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)FETCH_AT_ONCE,0);
+				(SQLPOINTER)DB2_FETCH_AT_ONCE,0);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		stdoutput.printf("SQLSetStmtAttr (ROW_ARRAY_SIZE) failed\n");
 		return false;
@@ -178,7 +178,7 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 
 		// bind field and null indicator
 		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-				field[i],MAX_ITEM_BUFFER_SIZE,
+				field[i],DB2_MAX_ITEM_BUFFER_SIZE,
 				(SQLINTEGER *)indicator[i]);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			stdoutput.printf("SQLBindCol failed\n");
@@ -205,7 +205,7 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 			// SQL_ATTR_ROW_NUMBER to always be 1, running through
 			// the row status buffer appears to work though.
 			uint32_t	index=0;
-			while (index<FETCH_AT_ONCE &&
+			while (index<DB2_FETCH_AT_ONCE &&
 				(rowstat[index]==SQL_ROW_SUCCESS ||
 				rowstat[index]==SQL_ROW_SUCCESS_WITH_INFO)) {
 				index++;

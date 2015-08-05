@@ -28,6 +28,7 @@
 	replaced passwordencryption attribute with passwordencryptionid
 	added --disable-postgresql8-api configure option
 	tweaked -Werror detection in configure script
+	refactored sqlr-bench build to work on windows
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop

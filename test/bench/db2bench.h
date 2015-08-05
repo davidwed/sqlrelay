@@ -9,9 +9,9 @@
 
 #include <sqlcli1.h>
 
-#define FETCH_AT_ONCE		10
-#define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768
+#define DB2_FETCH_AT_ONCE		10
+#define DB2_MAX_SELECT_LIST_SIZE	256
+#define DB2_MAX_ITEM_BUFFER_SIZE	32768
 
 struct db2column {
 	char		*name;
@@ -78,12 +78,14 @@ class db2benchcursor : public benchcursor {
 		SQLRETURN	erg;
 		SQLSMALLINT	ncols;
 
-		db2column	column[MAX_SELECT_LIST_SIZE];
-		char		field[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE][MAX_ITEM_BUFFER_SIZE];
-		SQLINTEGER	indicator[MAX_SELECT_LIST_SIZE][FETCH_AT_ONCE];
+		db2column	column[DB2_MAX_SELECT_LIST_SIZE];
+		char		field[DB2_MAX_SELECT_LIST_SIZE]
+						[DB2_FETCH_AT_ONCE]
+						[DB2_MAX_ITEM_BUFFER_SIZE];
+		SQLINTEGER	indicator[DB2_MAX_SELECT_LIST_SIZE]
+						[DB2_FETCH_AT_ONCE];
 		#if (DB2VERSION>7)
-		SQLUSMALLINT	rowstat[FETCH_AT_ONCE];
+		SQLUSMALLINT	rowstat[DB2_FETCH_AT_ONCE];
 		#endif
 };
 

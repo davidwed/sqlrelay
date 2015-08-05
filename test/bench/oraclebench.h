@@ -9,9 +9,9 @@ extern "C" {
 
 #include "bench.h"
 
-#define FETCH_AT_ONCE		10
-#define MAX_ITEM_BUFFER_SIZE	2048
-#define MAX_SELECT_LIST_SIZE	256
+#define ORACLE_FETCH_AT_ONCE		10
+#define ORACLE_MAX_ITEM_BUFFER_SIZE	2048
+#define ORACLE_MAX_SELECT_LIST_SIZE	256
 
 struct describe {
 	OCIParam	*paramd;
@@ -72,18 +72,18 @@ class oraclebenchcursor : public benchcursor {
 		OCIStmt		*stmt;
 		int32_t		fetchatonce;
 
-		describe	desc[MAX_SELECT_LIST_SIZE];
+		describe	desc[ORACLE_MAX_SELECT_LIST_SIZE];
 
-		OCIDefine	*def[MAX_SELECT_LIST_SIZE];
-		ub1		def_buf[MAX_SELECT_LIST_SIZE]
-						[FETCH_AT_ONCE]
-						[MAX_ITEM_BUFFER_SIZE];
-		sb2		def_indp[MAX_SELECT_LIST_SIZE]
-							[FETCH_AT_ONCE];
-		ub2		def_col_retlen[MAX_SELECT_LIST_SIZE]
-							[FETCH_AT_ONCE];
-		ub2		def_col_retcode[MAX_SELECT_LIST_SIZE]
-							[FETCH_AT_ONCE];
+		OCIDefine	*def[ORACLE_MAX_SELECT_LIST_SIZE];
+		ub1		def_buf[ORACLE_MAX_SELECT_LIST_SIZE]
+						[ORACLE_FETCH_AT_ONCE]
+						[ORACLE_MAX_ITEM_BUFFER_SIZE];
+		sb2		def_indp[ORACLE_MAX_SELECT_LIST_SIZE]
+							[ORACLE_FETCH_AT_ONCE];
+		ub2		def_col_retlen[ORACLE_MAX_SELECT_LIST_SIZE]
+							[ORACLE_FETCH_AT_ONCE];
+		ub2		def_col_retcode[ORACLE_MAX_SELECT_LIST_SIZE]
+							[ORACLE_FETCH_AT_ONCE];
 };
 
 #endif

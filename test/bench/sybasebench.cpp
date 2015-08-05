@@ -204,7 +204,7 @@ bool sybasebenchcursor::query(const char *query, bool getcolumns) {
 		if (ct_cursor(cmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
 					NULL,CS_UNUSED,
-					(CS_INT)FETCH_AT_ONCE)!=
+					(CS_INT)SYBASE_FETCH_AT_ONCE)!=
 					CS_SUCCEED) {
 			stdoutput.printf("ct_cursor (rows) failed\n");
 			return false;
@@ -277,11 +277,11 @@ bool sybasebenchcursor::query(const char *query, bool getcolumns) {
 	
 		column[i].datatype=CS_CHAR_TYPE;
 		column[i].format=CS_FMT_NULLTERM;
-		column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
+		column[i].maxlength=SYBASE_MAX_ITEM_BUFFER_SIZE;
 		column[i].scale=CS_UNUSED;
 		column[i].precision=CS_UNUSED;
 		column[i].status=CS_UNUSED;
-		column[i].count=FETCH_AT_ONCE;
+		column[i].count=SYBASE_FETCH_AT_ONCE;
 		column[i].usertype=CS_UNUSED;
 		column[i].locale=NULL;
 
