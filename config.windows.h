@@ -405,7 +405,7 @@
 #define SQLROWCOUNT_SQLLEN 1
 
 /* Version */
-#define SQLR_VERSION "0.62"
+#define SQLR_VERSION "0.63"
 
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
