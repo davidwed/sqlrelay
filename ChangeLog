@@ -1,4 +1,4 @@
-0.61 - added query filter plugin framework
+0.62 - added query filter plugin framework
 	added regex, string and pattern filters
 	added normalization translation
 	added reformatdatetime result set translation
@@ -35,6 +35,8 @@
 		carries an exception, explicitly allowing it to be linked with
 		various non-GPL compatible libraries
 	license is installed now
+
+0.61 - skipped
 
 0.60 - fixed true->false transposition in sqlrservercontroller::interceptQuery
 		that could lead to a reLogIn loop
