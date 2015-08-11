@@ -33735,7 +33735,6 @@ $as_echo_n "checking whether $CSC $CSCFLAGS works... " >&6; }
 
 			cat << EOF > conftest.cs
 using System;
-using System.Data;
 namespace ConfTest
 {
     public class ConfTestClass

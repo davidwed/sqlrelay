@@ -3580,7 +3580,6 @@ then
 
 			cat << EOF > conftest.cs
 using System;
-using System.Data;
 namespace ConfTest
 {
     public class ConfTestClass
