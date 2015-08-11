@@ -33916,6 +33916,7 @@ $as_echo "no" >&6; }
 
 	if ( test -z "$NODE" -o -z "$NODEGYP" )
 	then
+		HAVE_NODEJS=""
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The node.js API will not be built." >&5
 $as_echo "$as_me: WARNING: The node.js API will not be built." >&2;}
 	fi
