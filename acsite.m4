@@ -1653,11 +1653,8 @@ else
 		if ( test -n "$GLIBINCLUDES" )
 		then
 			PATHNAME=`echo $GLIBINCLUDES | sed -e "s|-I||"`
-echo $PATHNAME
 			DIRNAME1=`dirname $PATHNAME 2> /dev/null`
-echo $DIRNAME1
 			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
-echo $DIRNAME2
 			GLIBINCLUDES="$GLIBINCLUDES -I$DIRNAME2/lib/glib/include -I$DIRNAME2/lib/glib-2.0/include"
 		fi
 	fi
@@ -3597,6 +3594,30 @@ namespace ConfTest
 EOF
 
 			$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+
+			if ( test ! -r "conftest.exe" )
+			then
+
+				dnl try that again, some shells don't
+				dnl double-up the brackets...
+				cat << EOF > conftest.cs
+using System;
+namespace ConfTest
+{
+    public class ConfTestClass
+    {
+        public static void Main(String[] args)
+        {
+            Console.WriteLine("hello world");
+        }
+    }
+}
+EOF
+
+				$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+			fi
+
+
 			if ( test -r "conftest.exe" )
 			then
 				AC_MSG_RESULT(yes)
