@@ -3,8 +3,7 @@
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 
-
-load @TCLLIBSPATH@/sqlrelay/sqlrelay.@SOSUFFIX@ sqlrelay
+load @TCLLIBSPATH@@SLASH@sqlrelay@SLASH@sqlrelay.@SOSUFFIX@ sqlrelay
 
 proc checkUndef {value} {
 
