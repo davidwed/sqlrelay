@@ -348,13 +348,15 @@ or a tnsnames-style expression such as:
 <li><b>maxoutlobbindsize</b>: The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.</li>
 </ul>
 </li>
-<li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;charset=CHARSET;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;"</li>
+<li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
 <li><b>db</b>: The filename of the database open.  Required.</li>
 <li><b>dialect</b>: The database dialect to use.  Optional, defaults to 3.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 4096. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Firebird is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
 <li><b>droptemptables</b>: In most databases, temporary tables are dropped at the end of the client session.  In Firebird however, the rows may be deleted but the table itself remains.  Setting this parameter to "yes" causes any temporary tables that were created during an SQL Relay client session, to be dropped when the session is over, in effect emulating the behavior or other databases.  Note that temporary tables created outside of the session will not be dropped.</li>

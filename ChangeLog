@@ -1,6 +1,11 @@
 0.63 - suppressed ruby configure warning
 	fixed glib detection if pkg-config isn't present
 	fixed mono detection on freebsd
+	fixed node.js yes/no misreport bug in configure script
+	added freetds tcl test
+	fixed slashes in tcl tests for windows
+	updated docs to mention firebird buffer size parameters
+	updated MAX_ITEM_BUFFER_SIZE to 32768 for firebird
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters
