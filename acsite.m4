@@ -1655,7 +1655,7 @@ else
 			PATHNAME=`sed -e "s|$GLIBINCLUDES|-I|"`
 			DIRNAME1=`dirname $PATHNAME 2> /dev/null`
 			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
-			GLIBINCLUDES="$GLIBINCLUDES -I$DIRNAME2/lib/glib/include"
+			GLIBINCLUDES="$GLIBINCLUDES -I$DIRNAME2/lib/glib/include -I$DIRNAME2/lib/glib-2.0/include"
 		fi
 	fi
 fi
