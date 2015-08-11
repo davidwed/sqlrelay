@@ -1652,7 +1652,7 @@ else
 		FW_CHECK_HEADERS_AND_LIBS([$LIBGLIBPATH],[glib-2.0],[glib.h],[glib-2.0],[$STATICFLAG],[$RPATHFLAG],[GLIBINCLUDES],[GLIBLIBS],[GLIBLIBSPATH],[GLIBSTATIC])
 		if ( test -n "$GLIBINCLUDES" )
 		then
-			PATHNAME=`sed -e "s|$GLIBINCLUDES|-I|"`
+			PATHNAME=`echo $GLIBINCLUDES | sed -e "s|-I||"`
 echo $PATHNAME
 			DIRNAME1=`dirname $PATHNAME 2> /dev/null`
 echo $DIRNAME1
