@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information.
+
+using System;
 using SQLRClient;
 using System.Data;
 using System.IO;
