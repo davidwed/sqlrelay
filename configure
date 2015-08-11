@@ -32512,7 +32512,7 @@ print "	echo \$(hdrdir)\n"
 END
 
 			HAVE_RUBY_H=""
-			for dir in `eval $RUBY conftest.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
 			do
 				if ( test -r "$dir/ruby.h" )
 				then

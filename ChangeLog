@@ -1,4 +1,4 @@
-0.63 - 
+0.63 - suppressed ruby configure warning
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters
