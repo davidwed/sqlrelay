@@ -30929,6 +30929,7 @@ fi
 
 		if ( test -n "$GLIBINCLUDES" )
 		then
+echo "glibincludes: $GLIBINCLUDES"
 			DIRNAME1=`dirname $GLIBINCLUDES 2> /dev/null`
 			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
 			GLIBINCLUDES="$GLIBINCLUDES $DIRNAME2/lib/glib/include"

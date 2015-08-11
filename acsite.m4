@@ -1652,6 +1652,7 @@ else
 		FW_CHECK_HEADERS_AND_LIBS([$LIBGLIBPATH],[glib-2.0],[glib.h],[glib-2.0],[$STATICFLAG],[$RPATHFLAG],[GLIBINCLUDES],[GLIBLIBS],[GLIBLIBSPATH],[GLIBSTATIC])
 		if ( test -n "$GLIBINCLUDES" )
 		then
+echo "glibincludes: $GLIBINCLUDES"
 			DIRNAME1=`dirname $GLIBINCLUDES 2> /dev/null`
 			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
 			GLIBINCLUDES="$GLIBINCLUDES $DIRNAME2/lib/glib/include"
