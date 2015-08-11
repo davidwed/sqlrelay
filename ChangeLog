@@ -1,4 +1,5 @@
 0.63 - suppressed ruby configure warning
+	fixed glib detection if pkg-config isn't present
 	fixed mono detection on freebsd
 
 0.62 - added query filter plugin framework
