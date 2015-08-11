@@ -30930,8 +30930,11 @@ fi
 		if ( test -n "$GLIBINCLUDES" )
 		then
 			PATHNAME=`sed -e "s|$GLIBINCLUDES|-I|"`
+echo $PATHNAME
 			DIRNAME1=`dirname $PATHNAME 2> /dev/null`
+echo $DIRNAME1
 			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
+echo $DIRNAME2
 			GLIBINCLUDES="$GLIBINCLUDES -I$DIRNAME2/lib/glib/include -I$DIRNAME2/lib/glib-2.0/include"
 		fi
 	fi
