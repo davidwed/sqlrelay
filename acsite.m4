@@ -3593,7 +3593,10 @@ namespace ConfTest
 }
 EOF
 
-			$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+			dnl$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+			cat conftest.cs
+			echo $CSC $CSCFLAGS /out:conftest.exe conftest.cs
+			$CSC $CSCFLAGS /out:conftest.exe conftest.cs
 
 			if ( test ! -r "conftest.exe" )
 			then
@@ -3614,7 +3617,10 @@ namespace ConfTest
 }
 EOF
 
-				$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+				dnl$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+				cat conftest.cs
+				echo $CSC $CSCFLAGS /out:conftest.exe conftest.cs
+				$CSC $CSCFLAGS /out:conftest.exe conftest.cs
 			fi
 
 
