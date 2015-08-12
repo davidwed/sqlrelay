@@ -36702,7 +36702,7 @@ if ( test -n "$MDBTOOLSLIBS" ); then
 		MDBTOOLSBUILD="static "
 	fi
 fi
-echo " Connections  : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
+echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD       Sybase     $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
@@ -36710,7 +36710,7 @@ echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD
 
 echo "*************************************************************"
 echo
-echo "If you expected a Connection or API that doesn't show up in the Summary"
+echo "If you expected a Database or API that doesn't show up in the Summary"
 echo "then the configure script probably couldn't find a package it needed to"
 echo "build it.  You can manually specify package locations using command line"
 echo "options."
