@@ -6,7 +6,6 @@
 	fixed slashes in tcl tests for windows
 	updated docs to mention firebird buffer size parameters
 	updated MAX_ITEM_BUFFER_SIZE to 32768 for firebird
-	fixed mono detection on older platforms that need System.Data included
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters
