@@ -3595,6 +3595,28 @@ EOF
 
 			$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
 
+			dnl well, try again, including System.Data...
+			if ( test -r "conftest.exe" )
+			then
+
+				cat << EOF > conftest.cs
+using System;
+using System.Data;
+namespace ConfTest
+{
+    public class ConfTestClass
+    {
+        public static void Main(String[[]] args)
+        {
+            Console.WriteLine("hello world");
+        }
+    }
+}
+EOF
+
+				$CSC $CSCFLAGS /out:conftest.exe conftest.cs > /dev/null 2> /dev/null
+			fi
+
 			if ( test -r "conftest.exe" )
 			then
 				AC_MSG_RESULT(yes)
