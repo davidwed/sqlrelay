@@ -36,7 +36,7 @@ print "\n"
 print "srcdir = "
 print $srcdir
 print "\n"
-print "CFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(hdrdir)/$(sitearch) -I$(srcdir) "
+print "CFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(hdrdir)/$(sitearch) -I$(srcdir) -I$(hdrdir)/../$(arch)/ruby-$(ruby_version)"
 print "\n"
 print "CPPFLAGS = "
 print $CFLAGS
