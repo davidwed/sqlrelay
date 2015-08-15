@@ -423,6 +423,10 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_new,7);
 	rb_define_method(csqlrconnection,"setConnectTimeout",
 				(CAST)sqlrcon_setConnectTimeout,2);
+	rb_define_method(csqlrconnection,"setAuthenticationTimeout",
+				(CAST)sqlrcon_setAuthenticationTimeout,2);
+	rb_define_method(csqlrconnection,"setResponseTimeout",
+				(CAST)sqlrcon_setResponseTimeout,2);
 	rb_define_method(csqlrconnection,"endSession",
 				(CAST)sqlrcon_endSession,0);
 	rb_define_method(csqlrconnection,"suspendSession",

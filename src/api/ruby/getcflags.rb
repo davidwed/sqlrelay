@@ -1,8 +1,5 @@
 require "mkmf"
 
-#Config::CONFIG.each { |e| print e, "\n" }
-#exit
-
 drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/
 print "\n"
 print "arch = "
@@ -12,7 +9,11 @@ print "sitearch = "
 print CONFIG["sitearch"]
 print "\n"
 print "ruby_version = "
+begin
 print Config::CONFIG["ruby_version"]
+rescue
+print CONFIG["ruby_version"]
+end
 print "\n"
 print "prefix = "
 print CONFIG["prefix"].sub(drive, "")

@@ -7,7 +7,11 @@ print "sitearch = "
 print CONFIG["sitearch"]
 print "\n"
 print "ruby_version = "
+begin
 print Config::CONFIG["ruby_version"]
+rescue
+print CONFIG["ruby_version"]
+end
 print "\n"
 print "prefix = "
 print CONFIG["prefix"].sub(drive, "").sub("$(DESTDIR)","")
