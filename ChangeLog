@@ -10,6 +10,7 @@
 	fixed missing export for setAuth/ResponseTimeout in ruby api
 	added manual include of inttypes.h in php api to work around issue with
 		define/undef games, revealed on openbsd 5.7
+	tweaked ruby cflags script for debian 8
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters
