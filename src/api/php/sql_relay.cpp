@@ -3,6 +3,14 @@
 
 #include <sqlrelay/sqlrclient.h>
 
+// The various define/undef games below play havoc with inttypes.h
+// on some platforms (openbsd 5.7, for example).  Including it here
+// prevents it from being included later after the games.
+// We'll borrow a macro from rudiments to detect it's existence.
+#ifdef RUDIMENTS_HAVE_INTTYPES_H
+	#include <inttypes.h>
+#endif
+
 #ifdef WIN32
 	#undef uid_t
 	#undef gid_t

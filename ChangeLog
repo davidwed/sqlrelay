@@ -8,6 +8,8 @@
 	updated MAX_ITEM_BUFFER_SIZE to 32768 for firebird
 	fixed ruby detection on fedora 22
 	fixed missing export for setAuth/ResponseTimeout in ruby api
+	added manual include of inttypes.h in php api to work around issue with
+		define/undef games, revealed on openbsd 5.7
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters
