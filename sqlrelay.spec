@@ -28,7 +28,7 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.62
+Version: 0.63
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
@@ -350,6 +350,7 @@ Man pages for SQL Relay.
 %setup -q
 
 %build
+echo %{ruby_sitearchdir}
 %configure \
 	%{?_without_db2:	--disable-db2} \
 	%{?_without_freetds:	--disable-freetds} \
