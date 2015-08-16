@@ -12,7 +12,7 @@
 # --without oracle
 # --without postgresql
 # --without sqlite
-# --without sybase
+# --without sap
 #
 # Language options:
 # ================
@@ -67,7 +67,7 @@ BuildRequires: rudiments-devel
 %{!?_without_nodejs:BuildRequires: ,nodejs-devel}
 
 %description
-SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
+SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
 
 
 %package server-devel
@@ -153,11 +153,11 @@ SQL Relay connection plugin for IBM DB2.
 
 
 %package freetds
-Summary: SQL Relay connection plugin for FreeTDS (Sybase and MS SQL Server).
+Summary: SQL Relay connection plugin for FreeTDS (SAP/Sybase and MS SQL Server).
 Group: Applications/Databases
 
 %description freetds
-SQL Relay connection plugin for FreeTDS (Sybase and MS SQL Server).
+SQL Relay connection plugin for FreeTDS (SAP/Sybase and MS SQL Server).
 
 
 %package firebird
@@ -192,12 +192,12 @@ Group: Applications/Databases
 SQL Relay connection plugin for ODBC.
 
 
-%package oracle8
-Summary: SQL Relay connection plugin for Oracle 8.
+%package oracle
+Summary: SQL Relay connection plugin for Oracle.
 Group: Applications/Databases
 
-%description oracle8
-SQL Relay connection plugin for Oracle 8.
+%description oracle
+SQL Relay connection plugin for Oracle.
 
 
 %package postgresql
@@ -216,12 +216,12 @@ Group: Applications/Databases
 SQL Relay connection plugin for SQLite.
 
 
-%package sybase
-Summary: SQL Relay connection plugin for Sybase.
+%package sap
+Summary: SQL Relay connection plugin for SAP/Sybase.
 Group: Applications/Databases
 
-%description sybase
-SQL Relay connection plugin for Sybase.
+%description sap
+SQL Relay connection plugin for SAP/Sybase.
 
 
 %package router
@@ -360,7 +360,7 @@ Man pages for SQL Relay.
 	%{?_without_oracle:	--disable-oracle} \
 	%{?_without_postgresql:	--disable-postgresql} \
 	%{?_without_sqlite:	--disable-sqlite} \
-	%{?_without_sybase:	--disable-sybase} \
+	%{?_without_sap:	--disable-sap} \
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_erlang:	--disable-erlang} \
@@ -543,9 +543,9 @@ rm -rf %{buildroot}
 %{!?_without_odbc:%defattr(-, root, root)}
 %{!?_without_odbc:%{_libexecdir}/sqlrelay/sqlrconnection_odbc*}
 
-%{!?_without_oracle:%files oracle8}
+%{!?_without_oracle:%files oracle}
 %{!?_without_oracle:%defattr(-, root, root)}
-%{!?_without_oracle:%{_libexecdir}/sqlrelay/sqlrconnection_oracle8*}
+%{!?_without_oracle:%{_libexecdir}/sqlrelay/sqlrconnection_oracle*}
 
 %{!?_without_postgresql:%files postgresql}
 %{!?_without_postgresql:%defattr(-, root, root)}
@@ -555,9 +555,9 @@ rm -rf %{buildroot}
 %{!?_without_sqlite:%defattr(-, root, root)}
 %{!?_without_sqlite:%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*}
 
-%{!?_without_sybase:%files sybase}
-%{!?_without_sybase:%defattr(-, root, root)}
-%{!?_without_sybase:%{_libexecdir}/sqlrelay/sqlrconnection_sybase*}
+%{!?_without_sap:%files sap}
+%{!?_without_sap:%defattr(-, root, root)}
+%{!?_without_sap:%{_libexecdir}/sqlrelay/sqlrconnection_sap*}
 
 %{!?_without_router:%files router}
 %{!?_without_router:%defattr(-, root, root)}

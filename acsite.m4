@@ -441,7 +441,7 @@ fi
 ])
 
 
-dnl check for x64 platform - important for sybase and db2 detection
+dnl check for x64 platform - important for SAP/Sybase and DB2 detection
 AC_DEFUN([FW_CHECK_X64],
 [
 ARCH=""

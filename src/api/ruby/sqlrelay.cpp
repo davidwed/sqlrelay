@@ -168,7 +168,7 @@ static VALUE sqlrcon_ping(VALUE self) {
 	return INT2NUM(sqlrcon->ping());
 }
 
-/** Returns the type of database: oracle8, postgresql, mysql, etc. */
+/** Returns the type of database: oracle, postgresql, mysql, etc. */
 static VALUE sqlrcon_identify(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);

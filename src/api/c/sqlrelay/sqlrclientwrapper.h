@@ -104,7 +104,7 @@ SQLRCLIENTWRAPPER_DLLSPEC
 int	sqlrcon_ping(sqlrcon sqlrconref);
 
 /** @ingroup sqlrclientwrapper
- *  Returns the type of database: oracle8, postgresql, mysql, etc. */
+ *  Returns the type of database: oracle, postgresql, mysql, etc. */
 SQLRCLIENTWRAPPER_DLLSPEC
 const char	*sqlrcon_identify(sqlrcon sqlrconref);
 

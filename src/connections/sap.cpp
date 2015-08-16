@@ -20,11 +20,11 @@ extern "C" {
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768
 
-class SQLRSERVER_DLLSPEC sybaseconnection : public sqlrserverconnection {
-	friend class sybasecursor;
+class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
+	friend class sapcursor;
 	public:
-			sybaseconnection(sqlrservercontroller *cont);
-			~sybaseconnection();
+			sapconnection(sqlrservercontroller *cont);
+			~sapconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
@@ -102,12 +102,12 @@ struct datebind {
         const char      **tz;
 };
 
-class SQLRSERVER_DLLSPEC sybasecursor : public sqlrservercursor {
-	friend class sybaseconnection;
+class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
+	friend class sapconnection;
 	private:
-				sybasecursor(sqlrserverconnection *conn,
+				sapcursor(sqlrserverconnection *conn,
 								uint16_t id);
-				~sybasecursor();
+				~sapcursor();
 		void		allocateResultSetBuffers(
 					int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
@@ -243,16 +243,16 @@ class SQLRSERVER_DLLSPEC sybasecursor : public sqlrservercursor {
 
 		bool			isrpcquery;
 
-		sybaseconnection	*sybaseconn;
+		sapconnection	*sapconn;
 };
 
 
-stringbuffer	sybaseconnection::errorstring;
-int64_t		sybaseconnection::errorcode;
-bool		sybaseconnection::liveconnection;
+stringbuffer	sapconnection::errorstring;
+int64_t		sapconnection::errorcode;
+bool		sapconnection::liveconnection;
 
 
-sybaseconnection::sybaseconnection(sqlrservercontroller *cont) :
+sapconnection::sapconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 	dbused=false;
 	dbversion=NULL;
@@ -262,11 +262,11 @@ sybaseconnection::sybaseconnection(sqlrservercontroller *cont) :
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 }
 
-sybaseconnection::~sybaseconnection() {
+sapconnection::~sapconnection() {
 	delete[] dbversion;
 }
 
-void sybaseconnection::handleConnectString() {
+void sapconnection::handleConnectString() {
 	sybase=cont->getConnectStringValue("sybase");
 	lang=cont->getConnectStringValue("lang");
 	cont->setUser(cont->getConnectStringValue("user"));
@@ -302,7 +302,7 @@ void sybaseconnection::handleConnectString() {
 	}
 }
 
-bool sybaseconnection::logIn(const char **error, const char **warning) {
+bool sapconnection::logIn(const char **error, const char **warning) {
 
 	// set sybase
 	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {
@@ -342,7 +342,7 @@ bool sybaseconnection::logIn(const char **error, const char **warning) {
 
 	// configure the error handling callbacks
 	if (cs_config(context,CS_SET,CS_MESSAGE_CB,
-		(CS_VOID *)sybaseconnection::csMessageCallback,CS_UNUSED,
+		(CS_VOID *)sapconnection::csMessageCallback,CS_UNUSED,
 			(CS_INT *)NULL)
 			!=CS_SUCCEED) {
 		*error=logInError(
@@ -350,14 +350,14 @@ bool sybaseconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_CLIENTMSG_CB,
-		(CS_VOID *)sybaseconnection::clientMessageCallback)
+		(CS_VOID *)sapconnection::clientMessageCallback)
 			!=CS_SUCCEED) {
 		*error=logInError(
 			"Failed to set a client error message callback",4);
 		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_SERVERMSG_CB,
-		(CS_VOID *)sybaseconnection::serverMessageCallback)
+		(CS_VOID *)sapconnection::serverMessageCallback)
 			!=CS_SUCCEED) {
 		*error=logInError(
 			"Failed to set a server error message callback",4);
@@ -504,7 +504,7 @@ bool sybaseconnection::logIn(const char **error, const char **warning) {
 	return retval;
 }
 
-const char *sybaseconnection::logInError(const char *error, uint16_t stage) {
+const char *sapconnection::logInError(const char *error, uint16_t stage) {
 
 	loginerror.clear();
 	if (error) {
@@ -530,16 +530,16 @@ const char *sybaseconnection::logInError(const char *error, uint16_t stage) {
 	return loginerror.getString();
 }
 
-sqlrservercursor *sybaseconnection::newCursor(uint16_t id) {
-	return (sqlrservercursor *)new sybasecursor(
+sqlrservercursor *sapconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new sapcursor(
 					(sqlrserverconnection *)this,id);
 }
 
-void sybaseconnection::deleteCursor(sqlrservercursor *curs) {
-	delete (sybasecursor *)curs;
+void sapconnection::deleteCursor(sqlrservercursor *curs) {
+	delete (sapcursor *)curs;
 }
 
-void sybaseconnection::logOut() {
+void sapconnection::logOut() {
 	cs_loc_drop(context,locale);
 	ct_close(dbconn,CS_UNUSED);
 	ct_con_drop(dbconn);
@@ -547,23 +547,23 @@ void sybaseconnection::logOut() {
 	cs_ctx_drop(context);
 }
 
-const char *sybaseconnection::identify() {
-	return "sybase";
+const char *sapconnection::identify() {
+	return "sap";
 }
 
-const char *sybaseconnection::dbVersion() {
+const char *sapconnection::dbVersion() {
 	return dbversion;
 }
 
-const char *sybaseconnection::dbHostNameQuery() {
+const char *sapconnection::dbHostNameQuery() {
 	return "select asehostname()";
 }
 
-const char *sybaseconnection::getDatabaseListQuery(bool wild) {
+const char *sapconnection::getDatabaseListQuery(bool wild) {
 	return "select '',NULL as db";
 }
 
-const char *sybaseconnection::getTableListQuery(bool wild) {
+const char *sapconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
 		"	name, "
@@ -592,7 +592,7 @@ const char *sybaseconnection::getTableListQuery(bool wild) {
 		"	name";
 }
 
-const char *sybaseconnection::getColumnListQuery(
+const char *sapconnection::getColumnListQuery(
 					const char *table, bool wild) {
 	return (wild)?
 		"select "
@@ -650,34 +650,34 @@ const char *sybaseconnection::getColumnListQuery(
 		"	syscolumns.colid";
 }
 
-const char *sybaseconnection::selectDatabaseQuery() {
+const char *sapconnection::selectDatabaseQuery() {
 	return "use %s";
 }
 
-const char *sybaseconnection::getCurrentDatabaseQuery() {
+const char *sapconnection::getCurrentDatabaseQuery() {
 	return "select db_name()";
 }
 
-const char *sybaseconnection::getLastInsertIdQuery() {
+const char *sapconnection::getLastInsertIdQuery() {
 	return "select @@identity";
 }
 
-const char *sybaseconnection::bindFormat() {
+const char *sapconnection::bindFormat() {
 	return "@*";
 }
 
-const char *sybaseconnection::beginTransactionQuery() {
+const char *sapconnection::beginTransactionQuery() {
 	return "BEGIN TRANSACTION";
 }
 
-char sybaseconnection::bindVariablePrefix() {
+char sapconnection::bindVariablePrefix() {
 	return '@';
 }
 
-sybasecursor::sybasecursor(sqlrserverconnection *conn, uint16_t id) :
+sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	prepared=false;
-	sybaseconn=(sybaseconnection *)conn;
+	sapconn=(sapconnection *)conn;
 	cmd=NULL;
 	languagecmd=NULL;
 	cursorcmd=NULL;
@@ -706,10 +706,10 @@ sybasecursor::sybasecursor(sqlrserverconnection *conn, uint16_t id) :
 	rpcquery.study();
 
 	selectlistsize=0;
-	allocateResultSetBuffers(sybaseconn->maxselectlistsize);
+	allocateResultSetBuffers(sapconn->maxselectlistsize);
 }
 
-sybasecursor::~sybasecursor() {
+sapcursor::~sapcursor() {
 	close();
 	delete[] cursorname;
 	delete[] parameter;
@@ -723,7 +723,7 @@ sybasecursor::~sybasecursor() {
 	deallocateResultSetBuffers();
 }
 
-void sybasecursor::allocateResultSetBuffers(int32_t selectlistsize) {
+void sapcursor::allocateResultSetBuffers(int32_t selectlistsize) {
 
 	if (selectlistsize==-1) {
 		this->selectlistsize=0;
@@ -738,17 +738,17 @@ void sybasecursor::allocateResultSetBuffers(int32_t selectlistsize) {
 		datalength=new CS_INT *[selectlistsize];
 		nullindicator=new CS_SMALLINT *[selectlistsize];
 		for (int32_t i=0; i<selectlistsize; i++) {
-			data[i]=new char[sybaseconn->fetchatonce*
-					sybaseconn->maxitembuffersize];
+			data[i]=new char[sapconn->fetchatonce*
+					sapconn->maxitembuffersize];
 			datalength[i]=
-				new CS_INT[sybaseconn->fetchatonce];
+				new CS_INT[sapconn->fetchatonce];
 			nullindicator[i]=
-				new CS_SMALLINT[sybaseconn->fetchatonce];
+				new CS_SMALLINT[sapconn->fetchatonce];
 		}
 	}
 }
 
-void sybasecursor::deallocateResultSetBuffers() {
+void sapcursor::deallocateResultSetBuffers() {
 	if (selectlistsize) {
 		delete[] column;
 		for (int32_t i=0; i<selectlistsize; i++) {
@@ -763,14 +763,14 @@ void sybasecursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool sybasecursor::open() {
+bool sapcursor::open() {
 
 	clean=true;
 
-	if (ct_cmd_alloc(sybaseconn->dbconn,&languagecmd)!=CS_SUCCEED) {
+	if (ct_cmd_alloc(sapconn->dbconn,&languagecmd)!=CS_SUCCEED) {
 		return false;
 	}
-	if (ct_cmd_alloc(sybaseconn->dbconn,&cursorcmd)!=CS_SUCCEED) {
+	if (ct_cmd_alloc(sapconn->dbconn,&cursorcmd)!=CS_SUCCEED) {
 		return false;
 	}
 	cmd=NULL;
@@ -778,10 +778,10 @@ bool sybasecursor::open() {
 	// switch to the correct database, get dbversion
 	// (only do this once per connection)
 	bool	retval=true;
-	if (sybaseconn->db && sybaseconn->db[0] && !sybaseconn->dbused) {
-		int32_t	len=charstring::length(sybaseconn->db)+4;
+	if (sapconn->db && sapconn->db[0] && !sapconn->dbused) {
+		int32_t	len=charstring::length(sapconn->db)+4;
 		char	*query=new char[len+1];
-		charstring::printf(query,len+1,"use %s",sybaseconn->db);
+		charstring::printf(query,len+1,"use %s",sapconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			char		err[2048];
 			uint32_t	errlen;
@@ -791,13 +791,13 @@ bool sybasecursor::open() {
 			stderror.printf("%s\n",err);
 			retval=false;
 		} else {
-			sybaseconn->dbused=true;
+			sapconn->dbused=true;
 		}
 		closeResultSet();
 		delete[] query;
 	}
 
-	if (!sybaseconn->dbversion) {
+	if (!sapconn->dbversion) {
 
 		// try the various queries that might return the version
 		const char	*query[]={
@@ -809,7 +809,7 @@ bool sybasecursor::open() {
 			0,1,0
 		};
 
-		for (uint32_t i=0; query[i] && !sybaseconn->dbversion; i++) {
+		for (uint32_t i=0; query[i] && !sapconn->dbversion; i++) {
 
 			const char	*q=query[i];
 			int32_t		len=charstring::length(q);
@@ -817,7 +817,7 @@ bool sybasecursor::open() {
 			if (prepareQuery(q,len) &&
 					executeQuery(q,len) &&
 					fetchRow()) {
-				sybaseconn->dbversion=
+				sapconn->dbversion=
 					charstring::duplicate(data[index[i]]);
 			}
 
@@ -825,8 +825,8 @@ bool sybasecursor::open() {
 		}
 
 		// fall back to unknown
-		if (!sybaseconn->dbversion) {
-			sybaseconn->dbversion=
+		if (!sapconn->dbversion) {
+			sapconn->dbversion=
 				charstring::duplicate("unknown");
 		}
 	}
@@ -834,7 +834,7 @@ bool sybasecursor::open() {
 	return retval;
 }
 
-bool sybasecursor::close() {
+bool sapcursor::close() {
 	bool	retval=true;
 	if (languagecmd) {
 		retval=(ct_cmd_drop(languagecmd)==CS_SUCCEED);
@@ -848,7 +848,7 @@ bool sybasecursor::close() {
 	return retval;
 }
 
-bool sybasecursor::prepareQuery(const char *query, uint32_t length) {
+bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 
 	clean=true;
 
@@ -902,7 +902,7 @@ bool sybasecursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void sybasecursor::encodeBlob(stringbuffer *buffer,
+void sapcursor::encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize) {
 
 	// sybase wants each byte of blob data to be converted to two
@@ -915,7 +915,7 @@ void sybasecursor::encodeBlob(stringbuffer *buffer,
 	}
 }
 
-void sybasecursor::checkRePrepare() {
+void sapcursor::checkRePrepare() {
 
 	// Sybase doesn't allow you to rebind and re-execute when using 
 	// ct_command.  You have to re-prepare too.  I'll make this transparent
@@ -925,7 +925,7 @@ void sybasecursor::checkRePrepare() {
 	}
 }
 
-bool sybasecursor::inputBind(const char *variable,
+bool sapcursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				const char *value,
 				uint32_t valuesize,
@@ -953,7 +953,7 @@ bool sybasecursor::inputBind(const char *variable,
 	return true;
 }
 
-bool sybasecursor::inputBind(const char *variable,
+bool sapcursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t *value) {
 
@@ -979,7 +979,7 @@ bool sybasecursor::inputBind(const char *variable,
 	return true;
 }
 
-bool sybasecursor::inputBind(const char *variable,
+bool sapcursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				double *value,
 				uint32_t precision,
@@ -1015,7 +1015,7 @@ static const char *monthname[]={
 	NULL
 };
 
-bool sybasecursor::inputBind(const char *variable,
+bool sapcursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t year,
 				int16_t month,
@@ -1065,7 +1065,7 @@ bool sybasecursor::inputBind(const char *variable,
 				buffer,charstring::length(buffer),isnull);
 }
 
-bool sybasecursor::outputBind(const char *variable, 
+bool sapcursor::outputBind(const char *variable, 
 				uint16_t variablesize,
 				char *value, 
 				uint16_t valuesize, 
@@ -1099,7 +1099,7 @@ bool sybasecursor::outputBind(const char *variable,
 	return true;
 }
 
-bool sybasecursor::outputBind(const char *variable,
+bool sapcursor::outputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t *value,
 				int16_t *isnull) {
@@ -1131,7 +1131,7 @@ bool sybasecursor::outputBind(const char *variable,
 	return true;
 }
 
-bool sybasecursor::outputBind(const char *variable,
+bool sapcursor::outputBind(const char *variable,
 				uint16_t variablesize,
 				double *value,
 				uint32_t *precision,
@@ -1165,7 +1165,7 @@ bool sybasecursor::outputBind(const char *variable,
 	return true;
 }
 
-bool sybasecursor::outputBind(const char *variable,
+bool sapcursor::outputBind(const char *variable,
 				uint16_t variablesize,
 				int16_t *year,
 				int16_t *month,
@@ -1212,12 +1212,12 @@ bool sybasecursor::outputBind(const char *variable,
 	return true;
 }
 
-bool sybasecursor::executeQuery(const char *query, uint32_t length) {
+bool sapcursor::executeQuery(const char *query, uint32_t length) {
 
 	// clear out any errors
-	sybaseconn->errorstring.clear();
-	sybaseconn->errorcode=0;
-	sybaseconn->liveconnection=true;
+	sapconn->errorstring.clear();
+	sapconn->errorcode=0;
+	sapconn->liveconnection=true;
 
 	// initialize return values
 	ncols=0;
@@ -1230,7 +1230,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
 					NULL,CS_UNUSED,
-					(CS_INT)sybaseconn->fetchatonce)!=
+					(CS_INT)sapconn->fetchatonce)!=
 					CS_SUCCEED) {
 			return false;
 		}
@@ -1309,7 +1309,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 
 		// the result set was a type that we want to ignore
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-			sybaseconn->liveconnection=false;
+			sapconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			return false;
 		}
@@ -1334,10 +1334,10 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// allocate buffers and limit column count if necessary
-		if (sybaseconn->maxselectlistsize==-1) {
+		if (sapconn->maxselectlistsize==-1) {
 			allocateResultSetBuffers(ncols);
-		} else if (ncols>sybaseconn->maxselectlistsize) {
-			ncols=sybaseconn->maxselectlistsize;
+		} else if (ncols>sapconn->maxselectlistsize) {
+			ncols=sapconn->maxselectlistsize;
 		}
 
 		// bind columns
@@ -1359,12 +1359,12 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 				column[i].datatype=CS_CHAR_TYPE;
 				column[i].format=CS_FMT_NULLTERM;
 				column[i].maxlength=
-					sybaseconn->maxitembuffersize;
+					sapconn->maxitembuffersize;
 			}
 			column[i].scale=CS_UNUSED;
 			column[i].precision=CS_UNUSED;
 			column[i].status=CS_UNUSED;
-			column[i].count=sybaseconn->fetchatonce;
+			column[i].count=sapconn->fetchatonce;
 			column[i].usertype=CS_UNUSED;
 			column[i].locale=NULL;
 	
@@ -1418,7 +1418,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 				// convert to a CS_DATEREC
 				CS_DATEREC	dr;
 				bytestring::zero(&dr,sizeof(CS_DATEREC));
-				cs_dt_crack(sybaseconn->context,
+				cs_dt_crack(sapconn->context,
 						CS_DATETIME_TYPE,
 						(CS_VOID *)data[i],&dr);
 
@@ -1439,25 +1439,25 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// return success only if no error was generated
-	if (sybaseconn->errorstring.getStringLength()) {
+	if (sapconn->errorstring.getStringLength()) {
 		return false;
 	}
 	return true;
 }
 
-uint64_t sybasecursor::affectedRows() {
+uint64_t sapcursor::affectedRows() {
 	return affectedrows;
 }
 
-uint32_t sybasecursor::colCount() {
+uint32_t sapcursor::colCount() {
 	return ncols;
 }
 
-const char *sybasecursor::getColumnName(uint32_t col) {
+const char *sapcursor::getColumnName(uint32_t col) {
 	return column[col].name;
 }
 
-uint16_t sybasecursor::getColumnType(uint32_t col) {
+uint16_t sapcursor::getColumnType(uint32_t col) {
 	switch (column[col].datatype) {
 		case CS_CHAR_TYPE:
 			return CHAR_DATATYPE;
@@ -1524,50 +1524,50 @@ uint16_t sybasecursor::getColumnType(uint32_t col) {
 	}
 }
 
-uint32_t sybasecursor::getColumnLength(uint32_t col) {
+uint32_t sapcursor::getColumnLength(uint32_t col) {
 	// limit the column size
-	if (column[col].maxlength>sybaseconn->maxitembuffersize) {
-		column[col].maxlength=sybaseconn->maxitembuffersize;
+	if (column[col].maxlength>sapconn->maxitembuffersize) {
+		column[col].maxlength=sapconn->maxitembuffersize;
 	}
 	return column[col].maxlength;
 }
 
-uint32_t sybasecursor::getColumnPrecision(uint32_t col) {
+uint32_t sapcursor::getColumnPrecision(uint32_t col) {
 	return column[col].precision;
 }
 
-uint32_t sybasecursor::getColumnScale(uint32_t col) {
+uint32_t sapcursor::getColumnScale(uint32_t col) {
 	return column[col].scale;
 }
 
-uint16_t sybasecursor::getColumnIsNullable(uint32_t col) {
+uint16_t sapcursor::getColumnIsNullable(uint32_t col) {
 	return (column[col].status&CS_CANBENULL);
 }
 
-uint16_t sybasecursor::getColumnIsPartOfKey(uint32_t col) {
+uint16_t sapcursor::getColumnIsPartOfKey(uint32_t col) {
 	return (column[col].status&(CS_KEY|CS_VERSION_KEY));
 }
 
-uint16_t sybasecursor::getColumnIsUnsigned(uint32_t col) {
+uint16_t sapcursor::getColumnIsUnsigned(uint32_t col) {
 	return (getColumnType(col)==USHORT_DATATYPE);
 }
 
-uint16_t sybasecursor::getColumnIsBinary(uint32_t col) {
+uint16_t sapcursor::getColumnIsBinary(uint32_t col) {
 	return (getColumnType(col)==IMAGE_DATATYPE);
 }
 
-uint16_t sybasecursor::getColumnIsAutoIncrement(uint32_t col) {
+uint16_t sapcursor::getColumnIsAutoIncrement(uint32_t col) {
 	return (column[col].status&CS_IDENTITY);
 }
 
-bool sybasecursor::noRowsToReturn() {
+bool sapcursor::noRowsToReturn() {
 	// unless the query was a successful select, send no data
 	return (resultstype!=CS_ROW_RESULT &&
 			resultstype!=CS_CURSOR_RESULT &&
 			resultstype!=CS_COMPUTE_RESULT);
 }
 
-bool sybasecursor::skipRow() {
+bool sapcursor::skipRow() {
 	if (fetchRow()) {
 		row++;
 		return true;
@@ -1575,8 +1575,8 @@ bool sybasecursor::skipRow() {
 	return false;
 }
 
-bool sybasecursor::fetchRow() {
-	if (row==sybaseconn->fetchatonce) {
+bool sapcursor::fetchRow() {
+	if (row==sapconn->fetchatonce) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
@@ -1593,7 +1593,7 @@ bool sybasecursor::fetchRow() {
 	return true;
 }
 
-void sybasecursor::getField(uint32_t col,
+void sapcursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
 
@@ -1604,15 +1604,15 @@ void sybasecursor::getField(uint32_t col,
 	}
 
 	// handle normal datatypes
-	*field=&data[col][row*sybaseconn->maxitembuffersize];
+	*field=&data[col][row*sapconn->maxitembuffersize];
 	*fieldlength=datalength[col][row]-1;
 }
 
-void sybasecursor::nextRow() {
+void sapcursor::nextRow() {
 	row++;
 }
 
-void sybasecursor::closeResultSet() {
+void sapcursor::closeResultSet() {
 
 	if (clean) {
 		return;
@@ -1624,13 +1624,13 @@ void sybasecursor::closeResultSet() {
 	clean=true;
 }
 
-void sybasecursor::discardResults() {
+void sapcursor::discardResults() {
 
 	// if there are any unprocessed result sets, process them
 	if (results==CS_SUCCEED) {
 		do {
 			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-				sybaseconn->liveconnection=false;
+				sapconn->liveconnection=false;
 				// FIXME: call ct_close(CS_FORCE_CLOSE)
 				// maybe return false
 			}
@@ -1640,19 +1640,19 @@ void sybasecursor::discardResults() {
 
 	if (results==CS_FAIL) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
-			sybaseconn->liveconnection=false;
+			sapconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 		}
 	}
 
-	if (sybaseconn->maxselectlistsize==-1) {
+	if (sapconn->maxselectlistsize==-1) {
 		deallocateResultSetBuffers();
 	}
 }
 
 
-void sybasecursor::discardCursor() {
+void sapcursor::discardCursor() {
 
 	if (cmd==cursorcmd) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
@@ -1665,7 +1665,7 @@ void sybasecursor::discardCursor() {
 	}
 }
 
-CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt, 
+CS_RETCODE sapconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
 	if (errorstring.getStringLength()) {
 		return CS_SUCCEED;
@@ -1709,7 +1709,7 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
+CS_RETCODE sapconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CONNECTION *cnn,
 						CS_CLIENTMSG *msgp) {
 	if (errorstring.getStringLength()) {
@@ -1753,7 +1753,7 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt, 
+CS_RETCODE sapconnection::serverMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CONNECTION *cnn,
 						CS_SERVERMSG *msgp) {
 
@@ -1787,21 +1787,21 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-const char *sybaseconnection::tempTableDropPrefix() {
+const char *sapconnection::tempTableDropPrefix() {
 	return "#";
 }
 
-bool sybaseconnection::commit() {
+bool sapconnection::commit() {
 	cont->closeAllResultSets();
 	return sqlrserverconnection::commit();
 }
 
-bool sybaseconnection::rollback() {
+bool sapconnection::rollback() {
 	cont->closeAllResultSets();
 	return sqlrserverconnection::rollback();
 }
 
-void sybaseconnection::errorMessage(char *errorbuffer,
+void sapconnection::errorMessage(char *errorbuffer,
 					uint32_t errorbufferlength,
 					uint32_t *errorlength,
 					int64_t *errorcode,
@@ -1814,8 +1814,8 @@ void sybaseconnection::errorMessage(char *errorbuffer,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrserverconnection *new_sybaseconnection(
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_sapconnection(
 						sqlrservercontroller *cont) {
-		return new sybaseconnection(cont);
+		return new sapconnection(cont);
 	}
 }

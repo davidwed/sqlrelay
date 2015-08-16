@@ -171,7 +171,7 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 <p>In the following example, SQL Relay is configured to connect to a SAP/Sybase database.</p>
 
 <blockquote>
-@sqlrelay-sybase.conf.html@
+@sqlrelay-sap.conf.html@
 </blockquote>
 
 <p>In this example, SQL Relay is configured to connect to an IBM DB2 database.</p>
@@ -180,7 +180,7 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 @sqlrelay-db2.conf.html@
 </blockquote>
 
-<p>When connecting to an Oracle database, the dbase parameter may be omitted or set to "oracle8".  The 8 is for historical reasons.  SQL Relay originally supported Oracle OCI 7 and 8 and the dbase parameter could be set to "oracle7" or "oracle8".  Eventually "oracle7" was dropped and "oracle8" was updated to support all future versions of OCI but the "oracle8" label remained.</p>
+<p>When connecting to an Oracle database, the dbase parameter may be omitted or set to "oracle".</p>
 
 <p>SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for valid dbase settings and information on connect string options for each database.</p>
 
@@ -285,7 +285,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <blockquote>
 <code>
 sqlr-start -id oracleexample<br>
-sqlr-start -id sybaseexample<br>
+sqlr-start -id sapexample<br>
 sqlr-start -id db2example
 </code>
 </blockquote>
@@ -310,7 +310,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 
 <p>Additional configuration files may be created under this directory.  These files must follow the same format as the main configuration file.</p>
 
-<p>For example, if you wanted to split up oracle, sybase and db2 configurations into 3 separate files, you could create:</p>
+<p>For example, if you wanted to split up oracle, sap and db2 configurations into 3 separate files, you could create:</p>
 
 <p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/oracle.conf</b></p>
 
@@ -318,10 +318,10 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 @sqlrelay-multipleoracle.conf.html@
 </blockquote>
 
-<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/sybase.conf</b></p>
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/sap.conf</b></p>
 
 <blockquote>
-@sqlrelay-multiplesybase.conf.html@
+@sqlrelay-multiplesap.conf.html@
 </blockquote>
 
 <p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/db2.conf</b></p>
@@ -342,7 +342,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 @sqlrelay-autostart.conf.html@
 </blockquote>
 
-<p>...then calling sqlr-start without the -id parameter will start oracleexample and sybaseexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
+<p>...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
 
 <p>When installed on most platforms, SQL Relay creates an init script in the appropriate place under /etc.  This init script calls sqlr-start with no -id option.  If configured to run at boot, it will start all instances for which enabled="yes" is configured.</p>
 

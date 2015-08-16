@@ -78,7 +78,7 @@ proc resumeSession {port socket}
 proc ping {} 
 
 # Returns the type of database: 
-# oracle8 postgresql mysql etc.
+# oracle postgresql mysql etc.
 proc identify {} 
 
 # Returns the version of the database

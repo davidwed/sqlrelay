@@ -72,7 +72,7 @@
 <li><b>addresses</b> - A comma-delimited list of addresses that the instance should bind to.  If absent or set to 0.0.0.0, it will bind to all addresses.  Defaults to 0.0.0.0.</li>
 <li><b>port</b> - The port to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.</li>
 <li><b>socket</b> - The unix socket (filename) to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket</li>
-<li><b>dbase</b> - The type of database the connection daemon should connect to.  Should be one of: "oracle8", "mysql", "postgresql", "sqlite", "freetds", "sybase", "odbc", "db2", "firebird" or "mdbtools".  Defaults to "oracle8".</li>
+<li><b>dbase</b> - The type of database the connection daemon should connect to.  Should be one of: "oracle", "mysql", "postgresql", "sqlite", "freetds", "sap", "odbc", "db2", "firebird" or "mdbtools".  Defaults to "oracle".  Note: for historical reasons, "oracle8" and "sybase" are also supported, and are synonymous with "oracle" and "sap"</li>
 <li><b>connections</b> - The number of database connections to open at startup.  This may be set to any positive number or 0.  Defaults to 5.</li>
 <li><b>maxconnections</b> - The maximum number of database connections to scale up to.  If this is set to a number lower than the value for the <b>connections</b> parameter then it will be automatically bumped up to the value set for <b>connections</b>.  Defaults to the same value as <b>connections</b>.</li>
 <li><b>maxqueuelength</b> - The size the queue of waiting clients has to grow to before more connections will be spawned.  Defaults to 0.</li>
@@ -136,7 +136,7 @@
 <li><b>connectionid</b> - The ID of this connection.  This parameter defaults to <i>id</i>-<i>number</i> where "id" is the id of the instance snd "number" is the index of the connection tag.  It's not necessary to set this parameter if you use sqlr-start.  It's only necessary if you plan on starting the daemons individually and want friendlier connection ids.</li>
 <li><b>string</b> - The database connect string the connection daemon should use.</li>
 <ul>
-<li>For <b>oracle8</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;stmtcachesize=0;rejectduplicatebinds=yes/no;disablekeylookup=yes/no"
+<li>For <b>oracle</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;stmtcachesize=0;rejectduplicatebinds=yes/no;disablekeylookup=yes/no"
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -216,7 +216,7 @@ or a tnsnames-style expression such as:
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
-<li>For <b>sybase</b> databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;"
+<li>For <b>sap</b> (or <b>sybase</b>) databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;"
 <ul>
 <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>

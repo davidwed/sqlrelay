@@ -305,12 +305,12 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 <br>
 <font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sybase&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sybase;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 <br>
@@ -342,7 +342,7 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 </font>
 </blockquote>
 
-<p>When connecting to an Oracle database, the dbase parameter may be omitted or set to "oracle8".  The 8 is for historical reasons.  SQL Relay originally supported Oracle OCI 7 and 8 and the dbase parameter could be set to "oracle7" or "oracle8".  Eventually "oracle7" was dropped and "oracle8" was updated to support all future versions of OCI but the "oracle8" label remained.</p>
+<p>When connecting to an Oracle database, the dbase parameter may be omitted or set to "oracle".</p>
 
 <p>SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for valid dbase settings and information on connect string options for each database.</p>
 
@@ -587,12 +587,12 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sybaseexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sybase&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sapexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sybase;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 <br>
@@ -614,7 +614,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <blockquote>
 <code>
 sqlr-start -id oracleexample<br>
-sqlr-start -id sybaseexample<br>
+sqlr-start -id sapexample<br>
 sqlr-start -id db2example
 </code>
 </blockquote>
@@ -639,7 +639,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 
 <p>Additional configuration files may be created under this directory.  These files must follow the same format as the main configuration file.</p>
 
-<p>For example, if you wanted to split up oracle, sybase and db2 configurations into 3 separate files, you could create:</p>
+<p>For example, if you wanted to split up oracle, sap and db2 configurations into 3 separate files, you could create:</p>
 
 <p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/oracle.conf</b></p>
 
@@ -665,7 +665,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </font>
 </blockquote>
 
-<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/sybase.conf</b></p>
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/sap.conf</b></p>
 
 <blockquote>
 
@@ -676,12 +676,12 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 <br>
 <font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sybaseexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sybase&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sapexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sybase;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 <br>
@@ -739,12 +739,12 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sybaseexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>enabled</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sybase&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sapexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>enabled</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sybase;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 <br>
@@ -761,7 +761,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </font>
 </blockquote>
 
-<p>...then calling sqlr-start without the -id parameter will start oracleexample and sybaseexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
+<p>...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
 
 <p>When installed on most platforms, SQL Relay creates an init script in the appropriate place under /etc.  This init script calls sqlr-start with no -id option.  If configured to run at boot, it will start all instances for which enabled="yes" is configured.</p>
 

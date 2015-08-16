@@ -32,7 +32,7 @@ Field at row 0, col 0 length is 1
 
 *********** Testing suspend/resume functions
 *********** Testing identity/version functions
-Identity is oracle8
+Identity is oracle
 DB Version is Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Production
 With the Partitioning, OLAP and Data Mining options
 Bind format is :*

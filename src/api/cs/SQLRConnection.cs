@@ -122,7 +122,7 @@ public class SQLRConnection : IDisposable
         return sqlrcon_ping(sqlrconref)!=0;
     }
     
-    /** Returns the type of database: oracle8, postgresql, mysql, etc. */
+    /** Returns the type of database: oracle, postgresql, mysql, etc. */
     public String identify()
     {
         return sqlrcon_identify(sqlrconref);

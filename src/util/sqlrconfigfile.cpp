@@ -1533,6 +1533,13 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			}
 		} else if (currentattribute==DBASE_ATTRIBUTE) {
 			delete[] dbase;
+			// support dbase="oracle8" and dbase="sybase" by
+			// converting them to oracle8 and sap
+			if (!charstring::compare(value,"oracle8")) {
+				value="oracle";
+			} else if (!charstring::compare(value,"sybase")) {
+				value="sap";
+			}
 			dbase=charstring::duplicate((value)?value:
 							DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {

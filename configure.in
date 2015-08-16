@@ -116,16 +116,16 @@ AC_ARG_ENABLE(freetds-rpath,
 	FREETDSUSERPATH="",
 	FREETDSUSERPATH="yes")
 AC_SUBST(FREETDSUSERPATH)
-AC_ARG_WITH(sybase-prefix,
-	[  --with-sybase-prefix          Location of Sybase],
+AC_ARG_WITH(sap-prefix,
+	[  --with-sap-prefix             Location of SAP/Sybase],
 	SYBASEPATH="$withval",
 	SYBASEPATH="")
-AC_ARG_ENABLE(sybase,
-	[  --disable-sybase              Don't build Sybase connection],
+AC_ARG_ENABLE(sap,
+	[  --disable-sap                 Don't build SAP/Sybase connection],
 	ENABLE_SYBASE="",
 	ENABLE_SYBASE="yes")
-AC_ARG_ENABLE(sybase-rpath,
-	[  --disable-sybase-rpath        Don't use -rpath when building Sybase connection],
+AC_ARG_ENABLE(sap-rpath,
+	[  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection],
 	SYBASEUSERPATH="",
 	SYBASEUSERPATH="yes")
 AC_SUBST(SYBASEUSERPATH)
@@ -621,9 +621,9 @@ echo "******************************"
 
 
 
-dnl Checks for Sybase.
+dnl Checks for SAP/Sybase.
 echo
-echo "***** Sybase *****************"
+echo "***** SAP/Sybase *************"
 FW_CHECK_SYBASE
 echo "******************************"
 
@@ -982,7 +982,7 @@ if ( test -n "$MDBTOOLSLIBS" ); then
 fi
 echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
-echo "                FreeTDS     $FREETDSBUILD       Sybase     $SYBASEBUILD"
+echo "                FreeTDS     $FREETDSBUILD       SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
 echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD"
 
@@ -1018,19 +1018,19 @@ fi
 if ( test "$FREETDSSYSTEMWARNING" = "yes" -a "$SYBASEBUILD" != "no     " )
 then
 	echo
-	echo "WARNING!  FreeTDS and Sybase connections will both be built"
+	echo "WARNING!  FreeTDS and SAP/Sybase connections will both be built"
 	echo "          but FreeTDS libraries and headers appear to have"
 	echo "          been installed in /usr/include and /usr/lib paths."
-	echo "          This will cause the Sybase connection to be compiled"
+	echo "          This will cause the SAP/Sybase connection to be compiled"
 	echo "          against the FreeTDS headers and linked against a mix"
-	echo "          of FreeTDS and Sybase libraries.  There is no good"
+	echo "          of FreeTDS and SAP/Sybase libraries.  There is no good"
 	echo "          way to prevent the compiler, linker or system from"
 	echo "          searching those paths at compile, link or run time."
-	echo "          Please re-run configure, with the --disable-sybase"
+	echo "          Please re-run configure, with the --disable-sap"
 	echo "          option or, if you want to build both connections,"
 	echo "          please re-install the FreeTDS headers and libraries"
 	echo "          somewhere else.  If you are positive that the headers"
 	echo "          and libraries in /usr/include and /usr/lib are in fact"
-	echo "          from Sybase, not FreeTDS, please re-run configure with"
+	echo "          from SAP/Sybase, not FreeTDS, please re-run configure with"
 	echo "          the --disable-freetds option."
 fi

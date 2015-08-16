@@ -1128,7 +1128,7 @@ const char *oracle8connection::pingQuery() {
 }
 
 const char *oracle8connection::identify() {
-	return "oracle8";
+	return "oracle";
 }
 
 const char *oracle8connection::dbVersion() {

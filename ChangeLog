@@ -13,6 +13,8 @@
 	tweaked ruby cflags script for debian 8
 	refactored mysql detection
 	tweaked unixodbc detection to also look in /usr/include/odbc
+	renamed "oracle8" connection plugin to "oracle"
+	renamed "sybase" connection plugin to "sap"
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters

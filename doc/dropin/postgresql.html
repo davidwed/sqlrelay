@@ -41,23 +41,23 @@ by the client program.</p>
 <p>In the following example, we're running the "psql" program against an
 instance of SQL Relay running on the localhost, port 8009 against an Oracle
 database.  This instance of SQL Relay is configured with a username/password of
-oracle8user/oracle8pass.</p>
+oracleuser/oraclepass.</p>
 
 <p>For sh-based shells:</p>
 
 <blockquote><pre><b>
 LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
 export LD_PRELOAD
-psql -h localhost -p 8009 -U oracle8user -W
-Password: oracle8pass
+psql -h localhost -p 8009 -U oracleuser -W
+Password: oraclepass
 </b></pre></blockquote>
 
 <p>For csh-based shells:</p>
 
 <blockquote><pre><b>
 setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
-psql -h localhost -p 8009 -U oracle8user -W
-Password: oracle8pass
+psql -h localhost -p 8009 -U oracleuser -W
+Password: oraclepass
 </b></pre></blockquote>
 
 <p>The LD_PRELOAD environment variable instructs the dynamic loader to load
@@ -88,7 +88,7 @@ PLS<font color="#ff00ff">-00103</font>: Encountered the symbol <font color="#ff0
    ; <font color="#a52829"><b>comment</b></font> work &lt;a SQL statement&gt;
 
 Attempted Query:
-<font color="#6b59ce">BEGIN</font>; <font color="#a52829"><b>SELECT</b></font> usesuper <font color="#6b59ce">FROM</font> pg_catalog.pg_user <font color="#6b59ce">WHERE</font> usename = <font color="#ff00ff">'oracle8test'</font>; <font color="#a52829"><b>COMMIT</b></font>
+<font color="#6b59ce">BEGIN</font>; <font color="#a52829"><b>SELECT</b></font> usesuper <font color="#6b59ce">FROM</font> pg_catalog.pg_user <font color="#6b59ce">WHERE</font> usename = <font color="#ff00ff">'oracletest'</font>; <font color="#a52829"><b>COMMIT</b></font>
 Welcome <font color="#6b59ce">to</font> psql <font color="#ff00ff">7.3</font>.<font color="#ff00ff">4</font>-RH, the PostgreSQL interactive terminal.
 
 <font color="#6b59ce">Type</font>:  \copyright <font color="#6b59ce">for</font> distribution terms

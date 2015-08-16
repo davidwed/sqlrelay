@@ -53,12 +53,12 @@
 <ul>
 <li><a href="#canxxxdb">Can I use SQL Relay to connect to XXX database?</a></li>
 <li><a href="#oracle">Why can't I get SQL Relay to connect to Oracle?</a></li>
-<li><a href="#sqlserver">Why can't I get SQL Relay to connect to Sybase/Microsoft SQL Server?</a></li>
-<li><a href="#freetds">I know that Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</a></li>
+<li><a href="#sqlserver">Why can't I get SQL Relay to connect to SAP/Sybase/Microsoft SQL Server?</a></li>
+<li><a href="#freetds">I know that SAP/Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</a></li>
 <li><a href="#money">Why are money types crashing my FreeTDS connections?</a>
 <li><a href="#pending">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</a>
 
-<li><a href="#sybasefreetdsdiff">What's the difference between the Sybase and FreeTDS connections?</a></li>
+<li><a href="#sybasefreetdsdiff">What's the difference between the SAP/Sybase and FreeTDS connections?</a></li>
 <li><a href="#postgresql">Postgresql's native API uses numbers for types but
 SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
@@ -414,14 +414,14 @@ chmod o+r tnsnames.ora
 <p>The next most common cause is an invalid ORACLE_HOME environment variable, or invalid oracle_home setting in the configuration file.  The ORACLE_SID environment variable, or oracle_sid setting in the configuration file, can either refer to an entry in the tnsnames.ora file or it can just be an fully qualified entry itself.  In the case of the former, the ORACLE_HOME must be set to a valid directory, under which network/admin/tnsnames.ora can be found.  In the case of the latter, when using Oracle 8 and 8i or any version of Oracle Instant Client, ORACLE_HOME can be set to anything at all or left empty, but when using Oracle 9i and up, ORACLE_HOME must be set to a valid location.</p>
 
 <br><a name="sqlserver"></a>
-<span class="heading3">Why can't I get SQL Relay to connect to Sybase/Microsoft SQL Server?</span>
+<span class="heading3">Why can't I get SQL Relay to connect to SAP/Sybase/Microsoft SQL Server?</span>
 
-<p>The server parameter in the string attribute of the connection tag does not refer to the DNS name of the server.  Rather it refers to an entry in the "interfaces" file.  The Sybase and FreeTDS libraries look for that file in default places, but if the file is installed somewhere else and the library can't find it, it will not be able to figure out what host/port the server is running on.  One way to tell SQL Relay where the file is located is to set the SYBASE environment variable to the directory containing the file before starting SQL Relay.  Starting with version 0.32, the string attribute of the connection tag takes a sybase parameter which sets the environment variable.</p>
+<p>The server parameter in the string attribute of the connection tag does not refer to the DNS name of the server.  Rather it refers to an entry in the "interfaces" file.  The SAP/Sybase and FreeTDS libraries look for that file in default places, but if the file is installed somewhere else and the library can't find it, it will not be able to figure out what host/port the server is running on.  One way to tell SQL Relay where the file is located is to set the SYBASE environment variable to the directory containing the file before starting SQL Relay.  Starting with version 0.32, the string attribute of the connection tag takes a sybase parameter which sets the environment variable.</p>
 
-<p>Another problem that people have connecting to Sybase/Microsoft SQL Server is related to database selection.  Until version 0.32, the Sybase and FreeTDS connection daemons ignored the "db" connectstring parameter.  This was an oversight.  The connection daemons would connect to the correct server but would not use the correct database.  Instead, the connection daemons would be connected to the master database on that server.  This is fixed in 0.32.  To work around this problem in an older release it is necessary to fully qualify table names if the table is not in the master database.  A fully qualified table name is dbname.username.tablename.</p>
+<p>Another problem that people have connecting to SAP/Sybase/Microsoft SQL Server is related to database selection.  Until version 0.32, the SAP/Sybase and FreeTDS connection daemons ignored the "db" connectstring parameter.  This was an oversight.  The connection daemons would connect to the correct server but would not use the correct database.  Instead, the connection daemons would be connected to the master database on that server.  This is fixed in 0.32.  To work around this problem in an older release it is necessary to fully qualify table names if the table is not in the master database.  A fully qualified table name is dbname.username.tablename.</p>
 
 <br><a name="freetds"></a>
-<span class="heading3">I know that Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</span>
+<span class="heading3">I know that SAP/Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</span>
 
 <p>Before FreeTDS version 0.53, calling the FreeTDS function to get the number of affected rows would cause a segmentation fault.  As of version 0.32, SQL Relay figures out what version of FreeTDS is installed at compile time and only enables affected rows if the version of FreeTDS is greater than 0.52.  If you compile against an earlier version of FreeTDS, a -1 is returned for affected rows as if the database didn't support the feature.</p>
 
@@ -435,7 +435,7 @@ chmod o+r tnsnames.ora
 
 <p>The short answer is... If you're doing nested selects, don't call setResultSetBufferSize() with a non-zero argument.</p>
 
-<p>The longer answer is that the TDS protocol doesn't support fetching mulitple result sets simultaneously through the same connection.  Somehow the Sybase client API works around this but FreeTDS does not.</p>
+<p>The longer answer is that the TDS protocol doesn't support fetching mulitple result sets simultaneously through the same connection.  Somehow the SAP/Sybase client API works around this but FreeTDS does not.</p>
 
 <p>SQL Relay can work around it by fetching the entire result set and caching it on the client, which is SQL Relay's default behavior, but using setResultSetBufferSize() with a non-0 argument defeats this behavior, causing the result set to be fetched in chunks rather than all-at-once.  If you do this and then run nested selects then the result set from the outer select will still be pending when the inner select is run and FreeTDS will return this error.</p>
 
@@ -444,13 +444,13 @@ chmod o+r tnsnames.ora
 <p>See the <a href="http://www.freetds.org/faq.html#pending">FreeTDS FAQ</a> for more info.</p>
 
 <br><a name="sybasefreetdsdiff"></a>
-<span class="heading3">What's the difference between the Sybase and FreeTDS connections?</span>
+<span class="heading3">What's the difference between the SAP/Sybase and FreeTDS connections?</span>
 
-<p>The sqlrconnection_sybase plugin is compiled against Sybase ctlib; the libraries that come with Sybase Adaptive Server Enterprise.  They use a protocol called TDS (Tabular Data Stream) to talk to the database.</p>
+<p>The sqlrconnection_sybase plugin is compiled against SAP/Sybase ctlib; the libraries that come with SAP/Sybase Adaptive Server Enterprise.  They use a protocol called TDS (Tabular Data Stream) to talk to the database.</p>
 
 <p>The sqlrconnection_freetds plugin is compiled against FreeTDS, an open-source implementation of the TDS protocol and ctlib.</p>
 
-<p>Very old versions of Microsoft SQL Server are compatible with Sybase ctlib, but modern versions are not.  FreeTDS is compatible with all versions of Sybase Adaptive Server Enterprise and Microsoft SQL Server.  So, if you want to access a modern version of Microsoft SQL Server, you must use the FreeTDS connection.  You can also access all versions of Sybase with the FreeTDS connection.</p>
+<p>Very old versions of Microsoft SQL Server are compatible with SAP/Sybase ctlib, but modern versions are not.  FreeTDS is compatible with all versions of SAP/Sybase Adaptive Server Enterprise and Microsoft SQL Server.  So, if you want to access a modern version of Microsoft SQL Server, you must use the FreeTDS connection.  You can also access all versions of SAP/Sybase with the FreeTDS connection.</p>
 
 <br><a name="postgresql"></a>
 <span class="heading3">Postgresql's native API uses numbers for types but SQL Relay mangles them.  How do I get the numbers?</span>
@@ -482,7 +482,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>Configuring the character set used by the SQL Relay process is different for each database.</p>
 
-<p>Since SQL Relay 0.43, when using MySQL, PostgreSQL, FreeTDS, Sybase and Firebird databases, the character set can be set by setting the <b>charset</b> variable in the connect string of the configuration file.</p>
+<p>Since SQL Relay 0.43, when using MySQL, PostgreSQL, FreeTDS, SAP/Sybase and Firebird databases, the character set can be set by setting the <b>charset</b> variable in the connect string of the configuration file.</p>
 
 <p>Since SQL Relay 0.37, when using Oracle, the character set can be set by setting the <b>nls_lang</b> variable in the connect string.</p>
 
@@ -577,9 +577,9 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <br><a name="mssqldates"></a>
 <span class="heading3">What's the deal with date columns in MS SQL Server?</span>
 
-<p>SQL Relay uses FreeTDS to connect to MS SQL Server.  SQL Relay can also use FreeTDS to connect to Sybase.</p>
+<p>SQL Relay uses FreeTDS to connect to MS SQL Server.  SQL Relay can also use FreeTDS to connect to SAP/Sybase.</p>
 
-<p>FreeTDS recognizes Sybase DATE/DATETIME columns and MS SQL Server DATETIME columns as DATETIME types and formats them according to the rules defined in FreeTDS's locales.conf file for the locale of the SQL Relay server.</p>
+<p>FreeTDS recognizes SAP/Sybase DATE/DATETIME columns and MS SQL Server DATETIME columns as DATETIME types and formats them according to the rules defined in FreeTDS's locales.conf file for the locale of the SQL Relay server.</p>
 
 <p>However, FreeTDS doesn't recognizes MS SQL Server DATE columns as DATETIME types.  Rather it recognizes them as CHAR types and formats them in YYYY-MM-DD format universally.</p>
 
@@ -590,7 +590,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br>
 </blockquote>
 
-<p>instead of what you'd get with Sybase:</p>
+<p>instead of what you'd get with SAP/Sybase:</p>
 
 <blockquote>
 <b>DATE:</b> Aug  5 2013 12:00:00:000AM<br>
@@ -753,7 +753,7 @@ delete cur;
 delete con;
 </pre>
 
-<p>Sybase/MS SQL Server example:</p>
+<p>SAP/Sybase/MS SQL Server example:</p>
 <pre>
 sqlrconnection	*con=new sqlrconnection(...);
 sqlrcursor	*cur=new sqlrcursor(cur);
@@ -811,7 +811,7 @@ delete cur;
 
 <p>This depends entirely on the database you're using.</p>
 
-<p>For Firebird you just run a query like <b>select * from myprocedure</b>.  For DB2 and MySQL you just run a query like <b>call myprocedure</b>.  For Sybase/FreeTDS you just run a query like <b>exec myprocedure</b>.  For PostgreSQL you call <b>select * from myprocedure() ...</b> where ... is replaced with a description of the columns that the procedure returns.  In all of these cases, the result set is available as if you were selecting from a table.</p>
+<p>For Firebird you just run a query like <b>select * from myprocedure</b>.  For DB2 and MySQL you just run a query like <b>call myprocedure</b>.  For SAP/Sybase/FreeTDS you just run a query like <b>exec myprocedure</b>.  For PostgreSQL you call <b>select * from myprocedure() ...</b> where ... is replaced with a description of the columns that the procedure returns.  In all of these cases, the result set is available as if you were selecting from a table.</p>
 
 <p>Oracle is a bit different.  A stored procedure may declare a cursor variable, assign the results of a query to it and return it either as a return value or as an output bind variable.  You have to use defineOutputBindCursor(), getOutputBindCursor() and fetchFromBindCursor().  The use of these are documented in the various language guides for SQL Relay such as <a href="programming/c++.html">the C++ guide</a>.  After calling fetchFromBindCursor(), the result set is available as if you were selecting from a table.</p>
 

@@ -81,7 +81,7 @@ class SQLRConnection {
 		var		ping();
 
 		/** Returns the type of database: 
-		 *  oracle8, postgresql, mysql, etc. */
+		 *  oracle, postgresql, mysql, etc. */
 		var identify();
 
 		/** Returns the version of the database */

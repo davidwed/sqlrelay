@@ -94,7 +94,7 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 		bool		ping();
 
 		/** Returns the type of database: 
-		 *  oracle8, postgresql, mysql, etc. */
+		 *  oracle, postgresql, mysql, etc. */
 		const char	*identify();
 
 		/** Returns the version of the database */

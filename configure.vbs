@@ -6,7 +6,7 @@ DEBUGLDFLAGS=""
 disableoracle=false
 disablemysql=false
 disablepostgresql=false
-disablesybase=false
+disablesap=false
 disableodbc=false
 disabledb2=false
 disablefirebird=false
@@ -57,9 +57,9 @@ for i=0 to WScript.Arguments.Count-1
 		disablepostgresql=true
 	elseif mid(arg,1,20)="--postgresql-prefix=" then
 		POSTGRESQLPREFIX=mid(arg,21)
-	elseif arg="--disable-sybase" then
-		disablesybase=true
-	elseif mid(arg,1,16)="--sybase-prefix=" then
+	elseif arg="--disable-sap" then
+		disablesap=true
+	elseif mid(arg,1,16)="--sap-prefix=" then
 		SYBASEPREFIX=mid(arg,17)
 	elseif arg="--disable-odbc" then
 		disableodbc=true
@@ -299,8 +299,8 @@ end if
 ORACLEINCLUDES="/I """+ORACLEPREFIX+"\include"""
 ORACLELIBS="/LIBPATH:"""+ORACLEPREFIX+"\lib\msvc"" oci.lib"
 if disableoracle=false then
-	ALLORACLE8="all-oracle8"
-	INSTALLORACLE8="installdll-oracle8"
+	ALLORACLE="all-oracle"
+	INSTALLORACLE="installdll-oracle"
 end if
 
 ' mysql
@@ -331,15 +331,15 @@ SQLITELIBS=""
 ALLSQLITE=""
 INSTALLSQLITE=""
 
-' sybase
+' sap
 if SYBASEPREFIX="" then
 	SYBASEPREFIX="C:\SAP\OCS-16_0"
 end if
 SYBASEINCLUDES="/I """+SYBASEPREFIX+"\include"""
 SYBASELIBS="/LIBPATH:"""+SYBASEPREFIX+"\lib"" libsybblk64.lib libsybct64.lib libsybcs64.lib"
-if disablesybase=false then
-	ALLSYBASE="all-sybase"
-	INSTALLSYBASE="installdll-sybase"
+if disablesap=false then
+	ALLSYBASE="all-sap"
+	INSTALLSYBASE="installdll-sap"
 end if
 if arch="80x86" then
 	ALLSYBASE=""
@@ -609,8 +609,8 @@ for i=lbound(infiles) to ubound(infiles)
 	' connections
 	content=replace(content,"@ORACLEINCLUDES@",ORACLEINCLUDES,1,-1,0)
 	content=replace(content,"@ORACLELIBS@",ORACLELIBS,1,-1,0)
-	content=replace(content,"@ALLORACLE8@",ALLORACLE8,1,-1,0)
-	content=replace(content,"@INSTALLORACLE8@",INSTALLORACLE8,1,-1,0)
+	content=replace(content,"@ALLORACLE@",ALLORACLE,1,-1,0)
+	content=replace(content,"@INSTALLORACLE@",INSTALLORACLE,1,-1,0)
 
 	content=replace(content,"@MYSQLINCLUDES@",MYSQLINCLUDES,1,-1,0)
 	content=replace(content,"@MYSQLLIBS@",MYSQLLIBS,1,-1,0)

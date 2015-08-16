@@ -836,7 +836,7 @@ uint16_t sqlrcursor::countBindVariables() const {
 		}
 
 		// If we're not inside of a quoted string and we run into
-		// a ?, : (for oracle-style bind's), @ (for sybase-style
+		// a ?, : (for oracle-style bind's), @ (for sap/sybase-style
 		// binds) or $ (for postgresql-style binds) and the previous
 		// character was something that might come before a bind
 		// variable then we must have found a bind variable.

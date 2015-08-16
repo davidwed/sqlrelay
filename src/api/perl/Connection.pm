@@ -110,7 +110,7 @@ __END__
 
         identify();
             # Returns the type of database:
-            #   oracle8, postgresql, mysql, etc.
+            #   oracle, postgresql, mysql, etc.
 
         dbVersion();
             # Returns the version of the database

@@ -90,7 +90,7 @@ public class SQLRConnection {
 	 *  if it's down.  */
 	public native boolean	ping();
 	/** Returns the type of database: 
-	 *    oracle8, postgresql, mysql, etc.  */
+	 *    oracle, postgresql, mysql, etc.  */
 	public native String	identify();
 	/** Returns the version of the database */
 	public native String	dbVersion();

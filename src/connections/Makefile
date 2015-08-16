@@ -18,7 +18,7 @@ all-mysql: sqlrconnection_mysql.$(LIBEXT)
 
 all-odbc: sqlrconnection_odbc.$(LIBEXT)
 
-all-oracle8: sqlrconnection_oracle8.$(LIBEXT)
+all-oracle: sqlrconnection_oracle.$(LIBEXT)
 
 all-postgresql: sqlrconnection_postgresql.$(LIBEXT)
 
@@ -26,7 +26,7 @@ all-router: sqlrconnection_router.$(LIBEXT)
 
 all-sqlite: sqlrconnection_sqlite.$(LIBEXT)
 
-all-sybase: sqlrconnection_sybase.$(LIBEXT)
+all-sap: sqlrconnection_sap.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
@@ -100,14 +100,14 @@ sqlrconnection_odbc.$(LIBEXT): odbc.$(OBJ) odbc.cpp
 
 
 
-oracle8.lo: oracle8.cpp
+oracle.lo: oracle.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(ORACLECONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-oracle8.obj: oracle8.cpp
-	$(CXX) $(CXXFLAGS) $(ORACLECONNECTIONCPPFLAGS) $(COMPILE) oracle8.cpp
+oracle.obj: oracle.cpp
+	$(CXX) $(CXXFLAGS) $(ORACLECONNECTIONCPPFLAGS) $(COMPILE) oracle.cpp
 
-sqlrconnection_oracle8.$(LIBEXT): oracle8.$(OBJ) oracle8.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ oracle8.$(OBJ) $(LDFLAGS) $(ORACLECONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_oracle.$(LIBEXT): oracle.$(OBJ) oracle.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ oracle.$(OBJ) $(LDFLAGS) $(ORACLECONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
@@ -144,14 +144,14 @@ sqlrconnection_sqlite.$(LIBEXT): sqlite.$(OBJ) sqlite.cpp
 
 
 
-sybase.lo: sybase.cpp
+sap.lo: sap.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(SYBASECONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-sybase.obj: sybase.cpp
-	$(CXX) $(CXXFLAGS) $(SYBASECONNECTIONCPPFLAGS) $(COMPILE) sybase.cpp
+sap.obj: sap.cpp
+	$(CXX) $(CXXFLAGS) $(SYBASECONNECTIONCPPFLAGS) $(COMPILE) sap.cpp
 
-sqlrconnection_sybase.$(LIBEXT): sybase.$(OBJ) sybase.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ sybase.$(OBJ) $(LDFLAGS) $(SYBASECONNECTIONLIBS) $(MODLINKFLAGS)
+sqlrconnection_sap.$(LIBEXT): sap.$(OBJ) sap.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ sap.$(OBJ) $(LDFLAGS) $(SYBASECONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
@@ -183,9 +183,9 @@ installdll-odbc:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrconnection_odbc.$(LIBEXT) $(libexecdir)
 
-installdll-oracle8:
+installdll-oracle:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconnection_oracle8.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_oracle.$(LIBEXT) $(libexecdir)
 
 installdll-postgresql:
 	$(MKINSTALLDIRS) $(libexecdir)
@@ -199,9 +199,9 @@ installdll-sqlite:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrconnection_sqlite.$(LIBEXT) $(libexecdir)
 
-installdll-sybase:
+installdll-sap:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconnection_sybase.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_sap.$(LIBEXT) $(libexecdir)
 
 
 installlib: $(INSTALLSHAREDLIB)
@@ -250,12 +250,12 @@ installsharedlib-odbc:
 	$(RM) $(libexecdir)/sqlrconnection_odbc.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_odbc.so so $(MODULESUFFIX)
 
-installsharedlib-oracle8:
+installsharedlib-oracle:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconnection_oracle8.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrconnection_oracle8.a
-	$(RM) $(libexecdir)/sqlrconnection_oracle8.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrconnection_oracle8.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) sqlrconnection_oracle.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_oracle.a
+	$(RM) $(libexecdir)/sqlrconnection_oracle.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_oracle.so so $(MODULESUFFIX)
 
 installsharedlib-postgresql:
 	$(MKINSTALLDIRS) $(libexecdir)
@@ -278,12 +278,12 @@ installsharedlib-sqlite:
 	$(RM) $(libexecdir)/sqlrconnection_sqlite.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_sqlite.so so $(MODULESUFFIX)
 
-installsharedlib-sybase:
+installsharedlib-sap:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconnection_sybase.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrconnection_sybase.a
-	$(RM) $(libexecdir)/sqlrconnection_sybase.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrconnection_sybase.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) sqlrconnection_sap.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_sap.a
+	$(RM) $(libexecdir)/sqlrconnection_sap.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_sap.so so $(MODULESUFFIX)
 
 
 uninstall:

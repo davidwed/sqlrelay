@@ -76,7 +76,7 @@ function sqlrcon_resumeSession($sqlrconref, $port, $socket){}
 function sqlrcon_ping($sqlrconref){}
 
 /** 
- *  Returns the type of database: oracle8, postgresql, mysql, etc. */
+ *  Returns the type of database: oracle, postgresql, mysql, etc. */
 function sqlrcon_identify($sqlrconref){}
 
 /** 
