@@ -350,7 +350,6 @@ Man pages for SQL Relay.
 %setup -q
 
 %build
-echo %{ruby_sitearchdir}
 %configure \
 	%{?_without_db2:	--disable-db2} \
 	%{?_without_freetds:	--disable-freetds} \
