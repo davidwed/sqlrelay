@@ -39,7 +39,7 @@
 	$queryvar="";
 	$bindvar=1;
 	switch ($dbtype) {
-		case "oracle8":
+		case "oracle":
 		case "sqlite":
 			$queryvar=":1";
 			break;
@@ -66,7 +66,7 @@
 	$queryvar="";
 	$bindvar="";
 	switch ($dbtype) {
-		case "oracle8":
+		case "oracle":
 		case "sqlite":
 			$queryvar=":var1";
 			$bindvar="var1";

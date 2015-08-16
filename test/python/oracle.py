@@ -29,7 +29,7 @@ def main():
 
 	# get database type
 	print "IDENTIFY: "
-	checkSuccess(con.identify(),"oracle8")
+	checkSuccess(con.identify(),"oracle")
 	print
 
 	# ping

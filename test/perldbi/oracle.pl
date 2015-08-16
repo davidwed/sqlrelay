@@ -749,7 +749,7 @@ print("\n");
 # get info
 print("GET INFO: \n");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),"TESTUSER");
-checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_NAME}),"oracle8");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_NAME}),"oracle");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_VER}),"Oracle Database 12c Enterprise Edition Release 12.1.0.1.0 - 64bit Production\nWith the Partitioning, OLAP, Advanced Analytics and Real Application Testing options");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"test");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_IDENTIFIER_QUOTE_CHAR}),"\"");

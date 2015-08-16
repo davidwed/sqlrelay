@@ -135,7 +135,7 @@ int	main(int argc, char **argv) {
 
 	// get database type
 	printf("IDENTIFY: \n");
-	checkSuccessString(sqlrcon_identify(con),"oracle8");
+	checkSuccessString(sqlrcon_identify(con),"oracle");
 	printf("\n");
 
 	// ping

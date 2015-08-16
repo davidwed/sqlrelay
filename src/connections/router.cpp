@@ -960,7 +960,7 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 void routercursor::checkForTempTable(const char *query, uint32_t length) {
 
 	// for non-oracle db's
-	if (charstring::compare(con->identify(),"oracle8")) {
+	if (charstring::compare(con->identify(),"oracle")) {
 		sqlrservercursor::checkForTempTable(query,length);
 		return;
 	}

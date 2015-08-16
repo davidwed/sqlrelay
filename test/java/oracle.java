@@ -151,7 +151,7 @@ class oracle {
 	
 		// get database type
 		System.out.println("IDENTIFY: ");
-		checkSuccess(con.identify(),"oracle8");
+		checkSuccess(con.identify(),"oracle");
 		System.out.println();
 	
 		// ping

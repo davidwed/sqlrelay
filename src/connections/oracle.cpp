@@ -79,11 +79,11 @@ struct datebind {
 	OCIDate		*ocidate;
 };
 
-class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
-	friend class oracle8cursor;
+class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
+	friend class oraclecusor;
 	public:
-				oracle8connection(sqlrservercontroller *cont);
-				~oracle8connection();
+				oracleconnection(sqlrservercontroller *cont);
+				~oracleconnection();
 	private:
 		void		handleConnectString();
 #ifdef HAVE_ORACLE_8i
@@ -169,12 +169,12 @@ class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
 		bool		disablekeylookup;
 };
 
-class SQLRSERVER_DLLSPEC oracle8cursor : public sqlrservercursor {
-	friend class oracle8connection;
+class SQLRSERVER_DLLSPEC oraclecusor : public sqlrservercursor {
+	friend class oracleconnection;
 	private:
-				oracle8cursor(sqlrserverconnection *conn,
+				oraclecusor(sqlrserverconnection *conn,
 								uint16_t id);
-				~oracle8cursor();
+				~oraclecusor();
 		void		allocateResultSetBuffers(uint32_t fetchatonce,
 							int32_t selectlistsize,
 							int32_t itembuffersize);
@@ -401,14 +401,14 @@ class SQLRSERVER_DLLSPEC oracle8cursor : public sqlrservercursor {
 
 		bool		resultfreed;
 
-		oracle8connection	*oracle8conn;
+		oracleconnection	*oracleconn;
 
 #ifdef HAVE_ORACLE_8i
 		regularexpression	preserverows;
 #endif
 };
 
-oracle8connection::oracle8connection(sqlrservercontroller *cont) :
+oracleconnection::oracleconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
 	stmtmode=OCI_DEFAULT;
 
@@ -446,11 +446,11 @@ oracle8connection::oracle8connection(sqlrservercontroller *cont) :
 	disablekeylookup=false;
 }
 
-oracle8connection::~oracle8connection() {
+oracleconnection::~oracleconnection() {
 	delete[] lastinsertidquery;
 }
 
-void oracle8connection::handleConnectString() {
+void oracleconnection::handleConnectString() {
 	cont->setUser(cont->getConnectStringValue("user"));
 	cont->setPassword(cont->getConnectStringValue("password"));
 	sid=cont->getConnectStringValue("oracle_sid");
@@ -538,7 +538,7 @@ void oracle8connection::handleConnectString() {
 }
 
 #ifdef HAVE_ORACLE_8i
-bool oracle8connection::tempTableTruncateBeforeDrop() {
+bool oracleconnection::tempTableTruncateBeforeDrop() {
 	// When dropping temporary tables, if any of those tables were created
 	// with "on commit preserve rows" then the table has to be truncated
 	// before it can be dropped or oracle will return the following error:
@@ -554,7 +554,7 @@ bool oracle8connection::tempTableTruncateBeforeDrop() {
 }
 #endif
 
-bool oracle8connection::logIn(const char **error, const char **warning) {
+bool oracleconnection::logIn(const char **error, const char **warning) {
 
 	// get user/password
 	const char	*user=cont->getUser();
@@ -948,7 +948,7 @@ bool oracle8connection::logIn(const char **error, const char **warning) {
 	return true;
 }
 
-const char *oracle8connection::logInError(const char *errmsg) {
+const char *oracleconnection::logInError(const char *errmsg) {
 
 	errormessage.clear();
 	if (errmsg) {
@@ -966,16 +966,16 @@ const char *oracle8connection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrservercursor *oracle8connection::newCursor(uint16_t id) {
-	return (sqlrservercursor *)new oracle8cursor(
+sqlrservercursor *oracleconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new oraclecusor(
 					(sqlrserverconnection *)this,id);
 }
 
-void oracle8connection::deleteCursor(sqlrservercursor *curs) {
-	delete (oracle8cursor *)curs;
+void oracleconnection::deleteCursor(sqlrservercursor *curs) {
+	delete (oraclecusor *)curs;
 }
 
-void oracle8connection::logOut() {
+void oracleconnection::logOut() {
 
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	if (newsession) {
@@ -996,7 +996,7 @@ void oracle8connection::logOut() {
 }
 
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
-bool oracle8connection::changeUser(const char *newuser,
+bool oracleconnection::changeUser(const char *newuser,
 					const char *newpassword) {
 
 	// if the database we're connected to doesn't
@@ -1055,29 +1055,29 @@ bool oracle8connection::changeUser(const char *newuser,
 }
 #endif
 
-bool oracle8connection::autoCommitOn() {
+bool oracleconnection::autoCommitOn() {
 	stmtmode=OCI_COMMIT_ON_SUCCESS;
 	return true;
 }
 
-bool oracle8connection::autoCommitOff() {
+bool oracleconnection::autoCommitOff() {
 	stmtmode=OCI_DEFAULT;
 	return true;
 }
 
-bool oracle8connection::supportsTransactionBlocks() {
+bool oracleconnection::supportsTransactionBlocks() {
 	return false;
 }
 
-bool oracle8connection::commit() {
+bool oracleconnection::commit() {
 	return (OCITransCommit(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
 }
 
-bool oracle8connection::rollback() {
+bool oracleconnection::rollback() {
 	return (OCITransRollback(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
 }
 
-void oracle8connection::errorMessage(char *errorbuffer,
+void oracleconnection::errorMessage(char *errorbuffer,
 					uint32_t errorbufferlength,
 					uint32_t *errorlength,
 					int64_t *errorcode,
@@ -1123,15 +1123,15 @@ void oracle8connection::errorMessage(char *errorbuffer,
 	}
 }
 
-const char *oracle8connection::pingQuery() {
+const char *oracleconnection::pingQuery() {
 	return "select 1 from dual";
 }
 
-const char *oracle8connection::identify() {
+const char *oracleconnection::identify() {
 	return "oracle";
 }
 
-const char *oracle8connection::dbVersion() {
+const char *oracleconnection::dbVersion() {
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
 				OCI_HTYPE_SVCCTX)==OCI_SUCCESS) {
@@ -1140,14 +1140,14 @@ const char *oracle8connection::dbVersion() {
 	return NULL;
 }
 
-const char *oracle8connection::dbHostNameQuery() {
+const char *oracleconnection::dbHostNameQuery() {
 	if (supportssyscontext) {
 		return "select sys_context('USERENV','SERVER_HOST') from dual";
 	}
 	return NULL;
 }
 
-const char *oracle8connection::getDatabaseListQuery(bool wild) {
+const char *oracleconnection::getDatabaseListQuery(bool wild) {
 	return (wild)?"select "
 			"	username, "
 			"	NULL "
@@ -1165,7 +1165,7 @@ const char *oracle8connection::getDatabaseListQuery(bool wild) {
 			"order by username";
 }
 
-const char *oracle8connection::getTableListQuery(bool wild) {
+const char *oracleconnection::getTableListQuery(bool wild) {
 	if (supportssyscontext) {
 		return (wild)?
 			"select "
@@ -1211,7 +1211,7 @@ const char *oracle8connection::getTableListQuery(bool wild) {
 	}
 }
 
-const char *oracle8connection::getGlobalTempTableListQuery() {
+const char *oracleconnection::getGlobalTempTableListQuery() {
 	if (supportssyscontext) {
 		return "select "
 			"	table_name "
@@ -1232,14 +1232,14 @@ const char *oracle8connection::getGlobalTempTableListQuery() {
 	}
 }
 
-const char *oracle8connection::getColumnListQuery(const char *table,
+const char *oracleconnection::getColumnListQuery(const char *table,
 						bool wild) {
 	return (disablekeylookup)?
 			getColumnListQueryWithoutKeys(table,wild):
 			getColumnListQueryWithKeys(table,wild);
 }
 
-const char *oracle8connection::getColumnListQueryWithoutKeys(
+const char *oracleconnection::getColumnListQueryWithoutKeys(
 						const char *table,
 						bool wild) {
 
@@ -1468,7 +1468,7 @@ const char *oracle8connection::getColumnListQueryWithoutKeys(
 	}
 }
 
-const char *oracle8connection::getColumnListQueryWithKeys(
+const char *oracleconnection::getColumnListQueryWithKeys(
 						const char *table,
 						bool wild) {
 
@@ -1901,7 +1901,7 @@ const char *oracle8connection::getColumnListQueryWithKeys(
 	}
 }
 
-const char *oracle8connection::isSynonymQuery() {
+const char *oracleconnection::isSynonymQuery() {
 	if (supportssyscontext) {
 		return "select "
 			"	object_name "
@@ -1930,19 +1930,19 @@ const char *oracle8connection::isSynonymQuery() {
 	}
 }
 
-const char *oracle8connection::selectDatabaseQuery() {
+const char *oracleconnection::selectDatabaseQuery() {
 	return "alter session set current_schema=%s";
 }
 
-const char *oracle8connection::getCurrentDatabaseQuery() {
+const char *oracleconnection::getCurrentDatabaseQuery() {
 	return "select sys_context('userenv','current_schema') from dual";
 }
 
-const char *oracle8connection::getLastInsertIdQuery() {
+const char *oracleconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
 }
 
-oracle8cursor::oracle8cursor(sqlrserverconnection *conn, uint16_t id) :
+oraclecusor::oraclecusor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 
 	stmt=NULL;
@@ -1952,10 +1952,10 @@ oracle8cursor::oracle8cursor(sqlrserverconnection *conn, uint16_t id) :
 #endif
 	ncols=0;
 
-	oracle8conn=(oracle8connection *)conn;
-	allocateResultSetBuffers(oracle8conn->fetchatonce,
-					oracle8conn->maxselectlistsize,
-					oracle8conn->maxitembuffersize);
+	oracleconn=(oracleconnection *)conn;
+	allocateResultSetBuffers(oracleconn->fetchatonce,
+					oracleconn->maxselectlistsize,
+					oracleconn->maxitembuffersize);
 
 	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
 	inbindpp=new OCIBind *[maxbindcount];
@@ -2022,7 +2022,7 @@ oracle8cursor::oracle8cursor(sqlrserverconnection *conn, uint16_t id) :
 #endif
 }
 
-oracle8cursor::~oracle8cursor() {
+oraclecusor::~oraclecusor() {
 
 	for (uint16_t i=0; i<orainbindcount; i++) {
 		delete[] inintbindstring[i];
@@ -2061,7 +2061,7 @@ oracle8cursor::~oracle8cursor() {
 	deallocateResultSetBuffers();
 }
 
-void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
+void oraclecusor::allocateResultSetBuffers(uint32_t fetchatonce,
 						int32_t selectlistsize,
 						int32_t itembuffersize) {
 
@@ -2098,7 +2098,7 @@ void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
 	}
 }
 
-void oracle8cursor::deallocateResultSetBuffers() {
+void oraclecusor::deallocateResultSetBuffers() {
 	if (resultsetbuffercount) {
 		for (int32_t i=0; i<resultsetbuffercount; i++) {
 			delete[] def_col_retcode[i];
@@ -2118,7 +2118,7 @@ void oracle8cursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool oracle8cursor::open() {
+bool oraclecusor::open() {
 
 	stmt=NULL;
 
@@ -2130,13 +2130,13 @@ bool oracle8cursor::open() {
 	// If statement caching isn't available then we need to allocate a
 	// cursor handle here and set the number of rows to prefetch.
 	stmtreleasemode=OCI_DEFAULT;
-	if (oracle8conn->stmtcachesize) {
+	if (oracleconn->stmtcachesize) {
 		return true;
 	}
 #endif
 
 	// allocate a cursor handle
-	if (OCIHandleAlloc((dvoid *)oracle8conn->env,
+	if (OCIHandleAlloc((dvoid *)oracleconn->env,
 				(dvoid **)&stmt,
 				OCI_HTYPE_STMT,(size_t)0,
 				(dvoid **)0)!=OCI_SUCCESS) {
@@ -2145,18 +2145,18 @@ bool oracle8cursor::open() {
 
 	// set the number of rows to prefetch
 	return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&(oracle8conn->fetchatonce),
+				(dvoid *)&(oracleconn->fetchatonce),
 				(ub4)0,OCI_ATTR_PREFETCH_ROWS,
-				(OCIError *)oracle8conn->err)==OCI_SUCCESS);
+				(OCIError *)oracleconn->err)==OCI_SUCCESS);
 }
 
-bool oracle8cursor::close() {
+bool oraclecusor::close() {
 
 	closeResultSet();
 
 #ifdef OCI_STMT_CACHE
-	if (oracle8conn->stmtcachesize && stmt) {
-		return OCIStmtRelease(stmt,oracle8conn->err,
+	if (oracleconn->stmtcachesize && stmt) {
+		return OCIStmtRelease(stmt,oracleconn->err,
 				NULL,0,OCI_STRLS_CACHE_DELETE)==OCI_SUCCESS;
 	}
 #endif
@@ -2164,7 +2164,7 @@ bool oracle8cursor::close() {
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
 
-bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
+bool oraclecusor::prepareQuery(const char *query, uint32_t length) {
 
 	// keep a pointer to the query and length in case it needs to be 
 	// reprepared later
@@ -2182,7 +2182,7 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 	// otherwise just use OCIStmtPrepare.
 
 #ifdef OCI_STMT_CACHE
-	if (oracle8conn->stmtcachesize) {
+	if (oracleconn->stmtcachesize) {
 
 		// release any prior-allocated statement...
 		if (stmt) {
@@ -2194,7 +2194,7 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 				stmtreleasemode=OCI_STRLS_CACHE_DELETE;
 			}
 
-			if (OCIStmtRelease(stmt,oracle8conn->err,
+			if (OCIStmtRelease(stmt,oracleconn->err,
 					NULL,0,stmtreleasemode)!=OCI_SUCCESS) {
 				return false;
 			}
@@ -2208,11 +2208,11 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 
 		// prepare the query...
 		bool	prepare=true;
-		if (oracle8conn->cont->logEnabled()) {
+		if (oracleconn->cont->logEnabled()) {
 			// check for a statment cache hit
 			// and report our findings
-			if (OCIStmtPrepare2(oracle8conn->svc,&stmt,
-					oracle8conn->err,
+			if (OCIStmtPrepare2(oracleconn->svc,&stmt,
+					oracleconn->err,
 					(text *)query,(ub4)length,
 					NULL,0,
 					(ub4)OCI_NTV_SYNTAX,
@@ -2220,20 +2220,20 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 					OCI_SUCCESS) {
 				// we got a hit and don't
 				// need to do anything else
-				oracle8conn->cont->logDebugMessage(
+				oracleconn->cont->logDebugMessage(
 							"statement cache hit");
 				prepare=false;
 			} else {
 				// we didn't get a hit and
 				// need to prepare the query
-				oracle8conn->cont->logDebugMessage(
+				oracleconn->cont->logDebugMessage(
 							"statement cache miss");
 			}
 		}
 		if (prepare) {
 			// prepare the query
-			if (OCIStmtPrepare2(oracle8conn->svc,&stmt,
-					oracle8conn->err,
+			if (OCIStmtPrepare2(oracleconn->svc,&stmt,
+					oracleconn->err,
 					(text *)query,(ub4)length,
 					NULL,0,
 					(ub4)OCI_NTV_SYNTAX,
@@ -2244,9 +2244,9 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 
 		// set the number of rows to prefetch
 		return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&(oracle8conn->fetchatonce),(ub4)0,
+				(dvoid *)&(oracleconn->fetchatonce),(ub4)0,
 				OCI_ATTR_PREFETCH_ROWS,
-				(OCIError *)oracle8conn->err)==OCI_SUCCESS);
+				(OCIError *)oracleconn->err)==OCI_SUCCESS);
 
 	}
 #endif
@@ -2255,13 +2255,13 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 	stmttype=0;
 
 	// prepare the query
-	return (OCIStmtPrepare(stmt,oracle8conn->err,
+	return (OCIStmtPrepare(stmt,oracleconn->err,
 				(text *)query,(ub4)length,
 				(ub4)OCI_NTV_SYNTAX,
 				(ub4)OCI_DEFAULT)==OCI_SUCCESS);
 }
 
-void oracle8cursor::checkRePrepare() {
+void oraclecusor::checkRePrepare() {
 
 	// I once thought that it was necessary to re-prepare every time we
 	// re-execute.  It turns out that actually, when using OCI lower than
@@ -2272,7 +2272,7 @@ void oracle8cursor::checkRePrepare() {
 	// reprepare or not is a bit of work.  Maybe I'll do that at some point.
 	// For now, with those versions, we'll reprepare if we rebind at all.
 
-	if (oracle8conn->requiresreprepare && !prepared &&
+	if (oracleconn->requiresreprepare && !prepared &&
 			stmttype && stmttype!=OCI_STMT_SELECT) {
 		closeResultSet();
 		prepareQuery(query,length);
@@ -2280,7 +2280,7 @@ void oracle8cursor::checkRePrepare() {
 	}
 }
 
-void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
+void oraclecusor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				int32_t microsecond, const char *tz) {
@@ -2298,7 +2298,7 @@ void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 	}
 }
 
-void oracle8cursor::encodeBlob(stringbuffer *buffer,
+void oraclecusor::encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize) {
 
 	// oracle wants each byte of blob data to be converted to two
@@ -2313,7 +2313,7 @@ void oracle8cursor::encodeBlob(stringbuffer *buffer,
 	buffer->append('\'');
 }
 
-bool oracle8cursor::inputBind(const char *variable,
+bool oraclecusor::inputBind(const char *variable,
 				uint16_t variablesize,
 				const char *value,
 				uint32_t valuesize,
@@ -2328,7 +2328,7 @@ bool oracle8cursor::inputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
 				(dvoid *)isnull,(ub2 *)0,
@@ -2339,7 +2339,7 @@ bool oracle8cursor::inputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
@@ -2355,7 +2355,7 @@ bool oracle8cursor::inputBind(const char *variable,
 }
 
 
-bool oracle8cursor::inputBind(const char *variable,
+bool oraclecusor::inputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t *value) {
 	checkRePrepare();
@@ -2369,7 +2369,7 @@ bool oracle8cursor::inputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)inintbindstring[orainbindcount],
 				(sb4)charstring::length(
 					inintbindstring[orainbindcount])+1,
@@ -2381,7 +2381,7 @@ bool oracle8cursor::inputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)inintbindstring[orainbindcount],
 				(sb4)charstring::length(
@@ -2398,7 +2398,7 @@ bool oracle8cursor::inputBind(const char *variable,
 }
 
 
-bool oracle8cursor::inputBind(const char *variable,
+bool oraclecusor::inputBind(const char *variable,
 				uint16_t variablesize,
 				double *value,
 				uint32_t precision,
@@ -2412,7 +2412,7 @@ bool oracle8cursor::inputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -2422,7 +2422,7 @@ bool oracle8cursor::inputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
@@ -2437,7 +2437,7 @@ bool oracle8cursor::inputBind(const char *variable,
 }
 
 
-bool oracle8cursor::inputBind(const char *variable,
+bool oraclecusor::inputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t year,
 				int16_t month,
@@ -2463,7 +2463,7 @@ bool oracle8cursor::inputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)indatebind[orainbindcount],
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
@@ -2474,7 +2474,7 @@ bool oracle8cursor::inputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)indatebind[orainbindcount],
 				(sb4)sizeof(OCIDate),
@@ -2490,7 +2490,7 @@ bool oracle8cursor::inputBind(const char *variable,
 }
 
 
-bool oracle8cursor::outputBind(const char *variable,
+bool oraclecusor::outputBind(const char *variable,
 				uint16_t variablesize,
 				char *value,
 				uint16_t valuesize,
@@ -2507,7 +2507,7 @@ bool oracle8cursor::outputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)value,
 				(sb4)valuesize,
 				SQLT_STR,
@@ -2519,7 +2519,7 @@ bool oracle8cursor::outputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,
 				(sb4)valuesize,
@@ -2535,7 +2535,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBind(const char *variable,
+bool oraclecusor::outputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t *value,
 				int16_t *isnull) {
@@ -2553,7 +2553,7 @@ bool oracle8cursor::outputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)outintbindstring[oraoutbindcount],
 				(sb4)21,
 				SQLT_STR,
@@ -2565,7 +2565,7 @@ bool oracle8cursor::outputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)outintbindstring[oraoutbindcount],
 				(sb4)21,
@@ -2581,7 +2581,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBind(const char *variable,
+bool oraclecusor::outputBind(const char *variable,
 				uint16_t variablesize,
 				double *value,
 				uint32_t *precision,
@@ -2599,7 +2599,7 @@ bool oracle8cursor::outputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
 				(dvoid *)isnull,(ub2 *)0,
@@ -2610,7 +2610,7 @@ bool oracle8cursor::outputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
@@ -2625,7 +2625,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBind(const char *variable,
+bool oraclecusor::outputBind(const char *variable,
 				uint16_t variablesize,
 				int16_t *year,
 				int16_t *month,
@@ -2659,7 +2659,7 @@ bool oracle8cursor::outputBind(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)db->ocidate,
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
@@ -2671,7 +2671,7 @@ bool oracle8cursor::outputBind(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)db->ocidate,
 				(sb4)sizeof(OCIDate),
@@ -2687,7 +2687,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBindCursor(const char *variable,
+bool oraclecusor::outputBindCursor(const char *variable,
 					uint16_t variablesize,
 					sqlrservercursor *cursor) {
 
@@ -2697,14 +2697,14 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	// bug or a problem caused by SQL Relay somehow, but until I discover
 	// a solution, we'll return an error here.  Ideally, I'd set an error
 	// message too...
-	if (oracle8conn->stmtcachesize) {
+	if (oracleconn->stmtcachesize) {
 		return false;
 	}
 #endif
 
 	checkRePrepare();
 
-	((oracle8cursor *)cursor)->bound=true;
+	((oraclecusor *)cursor)->bound=true;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
@@ -2713,8 +2713,8 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&curbindpp[oracurbindcount],
-				oracle8conn->err,pos,
-				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
+				oracleconn->err,pos,
+				(dvoid *)&(((oraclecusor *)cursor)->stmt),
 				(sb4)0,
 				SQLT_RSET,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -2724,9 +2724,9 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&curbindpp[oracurbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
+				(dvoid *)&(((oraclecusor *)cursor)->stmt),
 				(sb4)0,
 				SQLT_RSET,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -2738,17 +2738,17 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	bindvarname[bindvarcount++]=variable+1;
 
 	// initialize values as if a statement has been prepared and executed
-	((oracle8cursor *)cursor)->stmttype=0;
-	((oracle8cursor *)cursor)->ncols=0;
-	((oracle8cursor *)cursor)->row=0;
-	((oracle8cursor *)cursor)->maxrow=0;
-	((oracle8cursor *)cursor)->totalrows=0;
-	((oracle8cursor *)cursor)->bound=true;
+	((oraclecusor *)cursor)->stmttype=0;
+	((oraclecusor *)cursor)->ncols=0;
+	((oraclecusor *)cursor)->row=0;
+	((oraclecusor *)cursor)->maxrow=0;
+	((oraclecusor *)cursor)->totalrows=0;
+	((oraclecusor *)cursor)->bound=true;
 	return true;
 }
 
 #ifdef HAVE_ORACLE_8i
-bool oracle8cursor::inputBindBlob(const char *variable,
+bool oraclecusor::inputBindBlob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
@@ -2758,7 +2758,7 @@ bool oracle8cursor::inputBindBlob(const char *variable,
 					OCI_TEMP_BLOB,SQLT_BLOB);
 }
 
-bool oracle8cursor::inputBindClob(const char *variable,
+bool oraclecusor::inputBindClob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
@@ -2768,7 +2768,7 @@ bool oracle8cursor::inputBindClob(const char *variable,
 					OCI_TEMP_CLOB,SQLT_CLOB);
 }
 
-bool oracle8cursor::inputBindGenericLob(const char *variable,
+bool oraclecusor::inputBindGenericLob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
@@ -2779,14 +2779,14 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 	checkRePrepare();
 
 	// create a temporary lob, write the value to it
-	if (OCIDescriptorAlloc((dvoid *)oracle8conn->env,
+	if (OCIDescriptorAlloc((dvoid *)oracleconn->env,
 			(dvoid **)&inbind_lob[orainbindlobcount],
 			(ub4)OCI_DTYPE_LOB,
 			(size_t)0,(dvoid **)0)!=OCI_SUCCESS) {
 		return false;
 	}
 
-	if (OCILobCreateTemporary(oracle8conn->svc,oracle8conn->err,
+	if (OCILobCreateTemporary(oracleconn->svc,oracleconn->err,
 			inbind_lob[orainbindlobcount],
 			//(ub2)0,SQLCS_IMPLICIT,
 			(ub2)OCI_DEFAULT,OCI_DEFAULT,
@@ -2796,26 +2796,26 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 		return false;
 	}
 
-	if (OCILobOpen(oracle8conn->svc,oracle8conn->err,
+	if (OCILobOpen(oracleconn->svc,oracleconn->err,
 			inbind_lob[orainbindlobcount],
 			OCI_LOB_READWRITE)!=OCI_SUCCESS) {
-		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
+		OCILobFreeTemporary(oracleconn->svc,oracleconn->err,
 					inbind_lob[orainbindlobcount]);
 		OCIDescriptorFree(inbind_lob[orainbindlobcount],OCI_DTYPE_LOB);
 		return false;
 	}
 
 	ub4	size=valuesize;
-	if (OCILobWrite(oracle8conn->svc,oracle8conn->err,
+	if (OCILobWrite(oracleconn->svc,oracleconn->err,
 			inbind_lob[orainbindlobcount],&size,1,
 			(void *)value,valuesize,
 			OCI_ONE_PIECE,(dvoid *)0,
 			(sb4 (*)(dvoid*,dvoid*,ub4*,ub1 *))0,
 			0,SQLCS_IMPLICIT)!=OCI_SUCCESS) {
 
-		OCILobClose(oracle8conn->svc,oracle8conn->err,
+		OCILobClose(oracleconn->svc,oracleconn->err,
 					inbind_lob[orainbindlobcount]);
-		OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
+		OCILobFreeTemporary(oracleconn->svc,oracleconn->err,
 					inbind_lob[orainbindlobcount]);
 		OCIDescriptorFree(inbind_lob[orainbindlobcount],OCI_DTYPE_LOB);
 		return false;
@@ -2829,7 +2829,7 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,pos,
+				oracleconn->err,pos,
 				(dvoid *)&inbind_lob[orainbindlobcount],(sb4)0,
 				type,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -2839,7 +2839,7 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)&inbind_lob[orainbindlobcount],(sb4)0,
 				type,
@@ -2854,7 +2854,7 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBindBlob(const char *variable,
+bool oraclecusor::outputBindBlob(const char *variable,
 					uint16_t variablesize,
 					uint16_t index,
 					int16_t *isnull) {
@@ -2862,7 +2862,7 @@ bool oracle8cursor::outputBindBlob(const char *variable,
 						isnull,SQLT_BLOB);
 }
 
-bool oracle8cursor::outputBindClob(const char *variable,
+bool oraclecusor::outputBindClob(const char *variable,
 					uint16_t variablesize,
 					uint16_t index,
 					int16_t *isnull) {
@@ -2870,7 +2870,7 @@ bool oracle8cursor::outputBindClob(const char *variable,
 						isnull,SQLT_CLOB);
 }
 
-bool oracle8cursor::outputBindGenericLob(const char *variable,
+bool oraclecusor::outputBindGenericLob(const char *variable,
 					uint16_t variablesize,
 					uint16_t index,
 					int16_t *isnull,
@@ -2879,7 +2879,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 	checkRePrepare();
 
 	// allocate a lob descriptor
-	if (OCIDescriptorAlloc((dvoid *)oracle8conn->env,
+	if (OCIDescriptorAlloc((dvoid *)oracleconn->env,
 		(dvoid **)&outbind_lob[index],(ub4)OCI_DTYPE_LOB,
 		(size_t)0,(dvoid **)0)!=OCI_SUCCESS) {
 		return false;
@@ -2894,7 +2894,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-			oracle8conn->err,pos,
+			oracleconn->err,pos,
 			(dvoid *)&outbind_lob[index],
 			(sb4)sizeof(OCILobLocator *),
 			type,
@@ -2905,7 +2905,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)&outbind_lob[index],
 				(sb4)sizeof(OCILobLocator *),
@@ -2920,17 +2920,17 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+bool oraclecusor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
 	ub4	loblength=0;
-	bool	retval=(OCILobGetLength(oracle8conn->svc,
-				oracle8conn->err,
+	bool	retval=(OCILobGetLength(oracleconn->svc,
+				oracleconn->err,
 				outbind_lob[index],
 				&loblength)==OCI_SUCCESS);
 	*length=loblength;
 	return retval;
 }
 
-bool oracle8cursor::getLobOutputBindSegment(uint16_t index,
+bool oraclecusor::getLobOutputBindSegment(uint16_t index,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread) {
@@ -2941,8 +2941,8 @@ bool oracle8cursor::getLobOutputBindSegment(uint16_t index,
 	// read from the lob
 	// (offset+1 is very important,
 	// apparently oracle lob offsets are 1-based)
-	sword	result=OCILobRead(oracle8conn->svc,
-				oracle8conn->err,
+	sword	result=OCILobRead(oracleconn->svc,
+				oracleconn->err,
 				outbind_lob[index],
 				&readlength,
 				offset+1,
@@ -2961,7 +2961,7 @@ bool oracle8cursor::getLobOutputBindSegment(uint16_t index,
 	return (result!=OCI_INVALID_HANDLE);
 }
 
-void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
+void oraclecusor::checkForTempTable(const char *query, uint32_t length) {
 
 	const char	*ptr=query;
 	const char	*endptr=query+length;
@@ -2990,7 +2990,7 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 	// look for "on commit preserve rows"
 	bool	preserverowsoncommit=preserverows.match(ptr);
 
-	if (oracle8conn->droptemptables) {
+	if (oracleconn->droptemptables) {
 
 		// When dropping temporary tables, if any of those tables were
 		// created with "on commit preserve rows" then the table has to
@@ -3002,7 +3002,7 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 		// It's not really clear why, but that's the case.
 		// As such, we'll set a flag to cause truncation if the query
 		// contained that clause.
-		oracle8conn->temptabletruncatebeforedrop=preserverowsoncommit;
+		oracleconn->temptabletruncatebeforedrop=preserverowsoncommit;
 
 		// if "droptemptables" was specified...
 		conn->cont->addSessionTempTableForDrop(tablename.getString());
@@ -3017,20 +3017,20 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 	}
 }
 
-const char *oracle8cursor::truncateTableQuery() {
+const char *oraclecusor::truncateTableQuery() {
 	return "truncate table";
 }
 #endif
 
-bool oracle8cursor::executeQuery(const char *query, uint32_t length) {
+bool oraclecusor::executeQuery(const char *query, uint32_t length) {
 	return executeQueryOrFetchFromBindCursor(query,length,true);
 }
 
-bool oracle8cursor::fetchFromBindCursor() {
+bool oraclecusor::fetchFromBindCursor() {
 	return executeQueryOrFetchFromBindCursor(NULL,0,false);
 }
 
-bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
+bool oraclecusor::executeQueryOrFetchFromBindCursor(const char *query,
 							uint32_t length,
 							bool execute) {
 
@@ -3043,7 +3043,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 	// get the type of the query (select, insert, update, etc...)
 	if (OCIAttrGet(stmt,OCI_HTYPE_STMT,
 			(dvoid *)&stmttype,(ub4 *)NULL,
-			OCI_ATTR_STMT_TYPE,oracle8conn->err)!=OCI_SUCCESS) {
+			OCI_ATTR_STMT_TYPE,oracleconn->err)!=OCI_SUCCESS) {
 		return false;
 	}
 
@@ -3067,18 +3067,18 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 		// the query.  Only retry once though.
 		bool	first=true;
 		for (;;) {
-			if (OCIStmtExecute(oracle8conn->svc,stmt,
-					oracle8conn->err,
+			if (OCIStmtExecute(oracleconn->svc,stmt,
+					oracleconn->err,
 					(stmttype==OCI_STMT_SELECT)?0:1,
 					(ub4)0,NULL,NULL,
-					oracle8conn->stmtmode)==OCI_SUCCESS) {
+					oracleconn->stmtmode)==OCI_SUCCESS) {
 				break;
 			}
 			if (!first) {
 				return false;
 			}
 			sb4	errcode=0;
-			OCIErrorGet((dvoid *)oracle8conn->err,
+			OCIErrorGet((dvoid *)oracleconn->err,
 					1,(text *)0,&errcode,
 					NULL,0,OCI_HTYPE_ERROR);
 			if (!first || errcode!=4068) {
@@ -3098,26 +3098,26 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 		if (OCIAttrGet((dvoid *)stmt,OCI_HTYPE_STMT,
 				(dvoid *)&ncols,(ub4 *)NULL,
 				OCI_ATTR_PARAM_COUNT,
-				oracle8conn->err)!=OCI_SUCCESS) {
+				oracleconn->err)!=OCI_SUCCESS) {
 			return false;
 		}
 
 		// validate column count
-		if (oracle8conn->maxselectlistsize!=-1 &&
-			ncols>oracle8conn->maxselectlistsize) {
+		if (oracleconn->maxselectlistsize!=-1 &&
+			ncols>oracleconn->maxselectlistsize) {
 			stringbuffer	err;
 			err.append(SQLR_ERROR_MAXSELECTLIST_STRING);
 			err.append(" (")->append(ncols)->append('>');
-			err.append(oracle8conn->maxselectlistsize)->append(')');
+			err.append(oracleconn->maxselectlistsize)->append(')');
 			setError(err.getString(),
 					SQLR_ERROR_MAXSELECTLIST,true);
 			return false;
 		}
 
 		// allocate buffers, if necessary
-		if (oracle8conn->maxselectlistsize==-1) {
-			allocateResultSetBuffers(oracle8conn->fetchatonce,
-					ncols,oracle8conn->maxitembuffersize);
+		if (oracleconn->maxselectlistsize==-1) {
+			allocateResultSetBuffers(oracleconn->fetchatonce,
+					ncols,oracleconn->maxitembuffersize);
 		}
 
 		// indicate that the result needs to be freed
@@ -3131,7 +3131,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 
 			// get the entire column definition
 			if (OCIParamGet(stmt,OCI_HTYPE_STMT,
-				oracle8conn->err,
+				oracleconn->err,
 				(dvoid **)&desc[i].paramd,
 				i+1)!=OCI_SUCCESS) {
 				return false;
@@ -3143,7 +3143,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 				(dvoid **)&desc[i].buf,
 				(ub4 *)&desc[i].buflen,
 				(ub4)OCI_ATTR_NAME,
-				oracle8conn->err)!=OCI_SUCCESS) {
+				oracleconn->err)!=OCI_SUCCESS) {
 				return false;
 			}
 
@@ -3152,7 +3152,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 				OCI_DTYPE_PARAM,
 				(dvoid *)&desc[i].dbtype,(ub4 *)NULL,
 				(ub4)OCI_ATTR_DATA_TYPE,
-				oracle8conn->err)!=OCI_SUCCESS) {
+				oracleconn->err)!=OCI_SUCCESS) {
 				return false;
 			}
 
@@ -3161,7 +3161,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 				OCI_DTYPE_PARAM,
 				(dvoid *)&desc[i].precision,(ub4 *)NULL,
 				(ub4)OCI_ATTR_PRECISION,
-				oracle8conn->err)!=OCI_SUCCESS) {
+				oracleconn->err)!=OCI_SUCCESS) {
 				return false;
 			}
 
@@ -3170,7 +3170,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 				OCI_DTYPE_PARAM,
 				(dvoid *)&desc[i].scale,(ub4 *)NULL,
 				(ub4)OCI_ATTR_SCALE,
-				oracle8conn->err)!=OCI_SUCCESS) {
+				oracleconn->err)!=OCI_SUCCESS) {
 				return false;
 			}
 
@@ -3179,7 +3179,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 				OCI_DTYPE_PARAM,
 				(dvoid *)&desc[i].nullok,(ub4 *)NULL,
 				(ub4)OCI_ATTR_IS_NULL,
-				oracle8conn->err)!=OCI_SUCCESS) {
+				oracleconn->err)!=OCI_SUCCESS) {
 				return false;
 			}
 
@@ -3194,14 +3194,14 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 				// set the NULL indicators to false
 				bytestring::zero(def_indp[i],
 						sizeof(sb2)*
-						oracle8conn->fetchatonce);
+						oracleconn->fetchatonce);
 
 				// allocate a lob descriptor
 				for (uint32_t j=0;
-					j<oracle8conn->fetchatonce;
+					j<oracleconn->fetchatonce;
 					j++) {
 					if (OCIDescriptorAlloc(
-						(void *)oracle8conn->env,
+						(void *)oracleconn->env,
 						(void **)&def_lob[i][j],
 						OCI_DTYPE_LOB,0,0)) {
 						return false;
@@ -3210,7 +3210,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 
 				// define the column as a lob
 				if (OCIDefineByPos(stmt,&def[i],
-					oracle8conn->err,
+					oracleconn->err,
 					i+1,
 					(dvoid *)def_lob[i],
 					(sb4)-1,
@@ -3230,17 +3230,17 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 					(dvoid *)&desc[i].dbsize,
 					(ub4 *)NULL,
 					(ub4)OCI_ATTR_DATA_SIZE,
-					oracle8conn->err)!=OCI_SUCCESS) {
+					oracleconn->err)!=OCI_SUCCESS) {
 					return false;
 				}
 
 				// if the column is not a LOB, define it,
 				// translated to a NULL terminated string
 				if (OCIDefineByPos(stmt,&def[i],
-					oracle8conn->err,
+					oracleconn->err,
 					i+1,
 					(dvoid *)def_buf[i],
-					(sb4)oracle8conn->maxitembuffersize,
+					(sb4)oracleconn->maxitembuffersize,
 					SQLT_STR,
 					(dvoid *)def_indp[i],
 					(ub2 *)def_col_retlen[i],
@@ -3251,7 +3251,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 
 				// set the lob member to NULL
 				for (uint32_t j=0;
-					j<oracle8conn->fetchatonce;
+					j<oracleconn->fetchatonce;
 					j++) {
 					def_lob[i][j]=NULL;
 				}
@@ -3292,7 +3292,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 	return true;
 }
 
-bool oracle8cursor::validBinds() {
+bool oraclecusor::validBinds() {
 
 	// NOTE: If we're using the statement cache, then it is vital to
 	// verify that all variables are bound.  Without the statement cache,
@@ -3305,11 +3305,11 @@ bool oracle8cursor::validBinds() {
 	// duplicate binds then we can just return
 	bool	usingstmtcache=false;
 	#ifdef OCI_STMT_CACHE
-	if (oracle8conn->stmtcachesize) {
+	if (oracleconn->stmtcachesize) {
 		usingstmtcache=true;
 	}
 	#endif
-	if (!usingstmtcache && !oracle8conn->rejectduplicatebinds) {
+	if (!usingstmtcache && !oracleconn->rejectduplicatebinds) {
 		return true;
 	}
 
@@ -3317,7 +3317,7 @@ bool oracle8cursor::validBinds() {
 
 	// get the bind info from the query
 	sb4	found;
-	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,maxbindcount,
+	sword	ret=OCIStmtGetBindInfo(stmt,oracleconn->err,maxbindcount,
 					1,&found,bvnp,bvnl,invp,inpl,dupl,hndl);
 
 	// there were no bind variables
@@ -3336,7 +3336,7 @@ bool oracle8cursor::validBinds() {
 		// Using PL/SQL and binding by position with duplicate bind
 		// variables, doesn't work correctly.  Detecting PL/SQL is
 		// tricky so we'll just prevent duplicate bind names outright.
-		if (oracle8conn->rejectduplicatebinds && dupl[i]) {
+		if (oracleconn->rejectduplicatebinds && dupl[i]) {
 			stringbuffer	err;
 			err.append(SQLR_ERROR_DUPLICATEBINDNAME_STRING);
 			err.append(" (")->append(bvnp[i])->append(')');
@@ -3364,11 +3364,11 @@ bool oracle8cursor::validBinds() {
 	return true;
 }
 
-bool oracle8cursor::queryIsNotSelect() {
+bool oraclecusor::queryIsNotSelect() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-void oracle8cursor::errorMessage(char *errorbuffer,
+void oraclecusor::errorMessage(char *errorbuffer,
 					uint32_t errorbufferlength,
 					uint32_t *errorlength,
 					int64_t *errorcode,
@@ -3405,31 +3405,31 @@ void oracle8cursor::errorMessage(char *errorbuffer,
 #endif
 }
 
-uint64_t oracle8cursor::affectedRows() {
+uint64_t oraclecusor::affectedRows() {
 
 	// get the affected row count
 	ub4	rows;
 	if (OCIAttrGet(stmt,OCI_HTYPE_STMT,
 			(dvoid *)&rows,(ub4 *)NULL,
-			OCI_ATTR_ROW_COUNT,oracle8conn->err)==OCI_SUCCESS) {
+			OCI_ATTR_ROW_COUNT,oracleconn->err)==OCI_SUCCESS) {
 		return rows;
 	}
 	return 0;
 }
 
-uint32_t oracle8cursor::colCount() {
+uint32_t oraclecusor::colCount() {
 	return ncols;
 }
 
-const char *oracle8cursor::getColumnName(uint32_t col) {
+const char *oraclecusor::getColumnName(uint32_t col) {
 	return (const char *)desc[col].buf;
 }
 
-uint16_t oracle8cursor::getColumnNameLength(uint32_t col) {
+uint16_t oraclecusor::getColumnNameLength(uint32_t col) {
 	return (uint16_t)desc[col].buflen;
 }
 
-uint16_t oracle8cursor::getColumnType(uint32_t col) {
+uint16_t oraclecusor::getColumnType(uint32_t col) {
 	switch (desc[col].dbtype) {
 		case VARCHAR2_TYPE:
 			return VARCHAR2_DATATYPE;
@@ -3460,23 +3460,23 @@ uint16_t oracle8cursor::getColumnType(uint32_t col) {
 	}
 }
 
-uint32_t oracle8cursor::getColumnLength(uint32_t col) {
+uint32_t oraclecusor::getColumnLength(uint32_t col) {
 	return (uint32_t)desc[col].dbsize;
 }
 
-uint32_t oracle8cursor::getColumnPrecision(uint32_t col) {
+uint32_t oraclecusor::getColumnPrecision(uint32_t col) {
 	return (uint32_t)desc[col].precision;
 }
 
-uint32_t oracle8cursor::getColumnScale(uint32_t col) {
+uint32_t oraclecusor::getColumnScale(uint32_t col) {
 	return (uint32_t)desc[col].scale;
 }
 
-uint16_t oracle8cursor::getColumnIsNullable(uint32_t col) {
+uint16_t oraclecusor::getColumnIsNullable(uint32_t col) {
 	return (uint16_t)desc[col].nullok;
 }
 
-uint16_t oracle8cursor::getColumnIsBinary(uint32_t col) {
+uint16_t oraclecusor::getColumnIsBinary(uint32_t col) {
 	switch (getColumnType(col)) {
 		case RAW_DATATYPE:
 		case LONG_RAW_DATATYPE:
@@ -3488,11 +3488,11 @@ uint16_t oracle8cursor::getColumnIsBinary(uint32_t col) {
 	}
 }
 
-bool oracle8cursor::noRowsToReturn() {
+bool oraclecusor::noRowsToReturn() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-bool oracle8cursor::skipRow() {
+bool oraclecusor::skipRow() {
 	if (fetchRow()) {
 		row++;
 		return true;
@@ -3500,21 +3500,21 @@ bool oracle8cursor::skipRow() {
 	return false;
 }
 
-bool oracle8cursor::fetchRow() {
-	if (row==oracle8conn->fetchatonce) {
+bool oraclecusor::fetchRow() {
+	if (row==oracleconn->fetchatonce) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
 		return false;
 	}
 	if (!row) {
-		OCIStmtFetch(stmt,oracle8conn->err,
-				(ub4)oracle8conn->fetchatonce,
+		OCIStmtFetch(stmt,oracleconn->err,
+				(ub4)oracleconn->fetchatonce,
 				OCI_FETCH_NEXT,OCI_DEFAULT);
 		ub4	currentrow;
 		OCIAttrGet(stmt,OCI_HTYPE_STMT,
 				(dvoid *)&currentrow,(ub4 *)NULL,
-				OCI_ATTR_ROW_COUNT,oracle8conn->err);
+				OCI_ATTR_ROW_COUNT,oracleconn->err);
 		if (currentrow==totalrows) {
 			return false;
 		}
@@ -3524,7 +3524,7 @@ bool oracle8cursor::fetchRow() {
 	return true;
 }
 
-void oracle8cursor::getField(uint32_t col,
+void oraclecusor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
 
@@ -3543,25 +3543,25 @@ void oracle8cursor::getField(uint32_t col,
 	}
 
 	// handle normal datatypes
-	*field=(const char *)&def_buf[col][row*oracle8conn->maxitembuffersize];
+	*field=(const char *)&def_buf[col][row*oracleconn->maxitembuffersize];
 	*fieldlength=def_col_retlen[col][row];
 }
 
-void oracle8cursor::nextRow() {
+void oraclecusor::nextRow() {
 	row++;
 }
 
-bool oracle8cursor::getLobFieldLength(uint32_t col, uint64_t *length) {
+bool oraclecusor::getLobFieldLength(uint32_t col, uint64_t *length) {
 	ub4	loblength=0;
-	bool	retval=(OCILobGetLength(oracle8conn->svc,
-				oracle8conn->err,
+	bool	retval=(OCILobGetLength(oracleconn->svc,
+				oracleconn->err,
 				def_lob[col][row],
 				&loblength)==OCI_SUCCESS);
 	*length=loblength;
 	return retval;
 }
 
-bool oracle8cursor::getLobFieldSegment(uint32_t col,
+bool oraclecusor::getLobFieldSegment(uint32_t col,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread) {
@@ -3572,8 +3572,8 @@ bool oracle8cursor::getLobFieldSegment(uint32_t col,
 	// read from the lob
 	// (offset+1 is very important,
 	// apparently oracle lob offsets are 1-based)
-	sword	result=OCILobRead(oracle8conn->svc,
-				oracle8conn->err,
+	sword	result=OCILobRead(oracleconn->svc,
+				oracleconn->err,
 				def_lob[col][row],
 				&readlength,
 				offset+1,
@@ -3592,43 +3592,43 @@ bool oracle8cursor::getLobFieldSegment(uint32_t col,
 	return (result!=OCI_INVALID_HANDLE);
 }
 
-void oracle8cursor::closeLobField(uint32_t col) {
+void oraclecusor::closeLobField(uint32_t col) {
 #ifdef HAVE_ORACLE_8i
 	// if the lob is temporary, deallocate it
 	boolean	templob;
-	if (OCILobIsTemporary(oracle8conn->env,
-				oracle8conn->err,
+	if (OCILobIsTemporary(oracleconn->env,
+				oracleconn->err,
 				def_lob[col][row],
 				&templob)!=OCI_SUCCESS) {
 		return;
 	}
 	if (templob) {
-		OCILobFreeTemporary(oracle8conn->svc,
-					oracle8conn->err,
+		OCILobFreeTemporary(oracleconn->svc,
+					oracleconn->err,
 					def_lob[col][row]);
 	}
 #endif
 }
 
-void oracle8cursor::closeResultSet() {
+void oraclecusor::closeResultSet() {
 
 	// OCI8 version of ocan(), but since it uses OCIStmtFetch we
 	// only want to run it if the statement was a select
 	if (stmttype==OCI_STMT_SELECT) {
-		OCIStmtFetch(stmt,oracle8conn->err,0,
+		OCIStmtFetch(stmt,oracleconn->err,0,
 				OCI_FETCH_NEXT,OCI_DEFAULT);
 	}
 
 	// free row/column resources
 	if (!resultfreed) {
 
-		int32_t	selectlistsize=(oracle8conn->maxselectlistsize==-1)?
-					ncols:oracle8conn->maxselectlistsize;
+		int32_t	selectlistsize=(oracleconn->maxselectlistsize==-1)?
+					ncols:oracleconn->maxselectlistsize;
 
 		for (int32_t i=0; i<selectlistsize; i++) {
 
 			// free lob resources
-			for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
+			for (uint32_t j=0; j<oracleconn->fetchatonce; j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(
 						def_lob[i][j],OCI_DTYPE_LOB);
@@ -3665,7 +3665,7 @@ void oracle8cursor::closeResultSet() {
 
 		// deallocate buffers, if necessary
 		if (stmttype==OCI_STMT_SELECT &&
-			oracle8conn->maxselectlistsize==-1) {
+			oracleconn->maxselectlistsize==-1) {
 			deallocateResultSetBuffers();
 		}
 
@@ -3675,20 +3675,20 @@ void oracle8cursor::closeResultSet() {
 #ifdef HAVE_ORACLE_8i
 	// free lob bind resources
 	for (uint16_t i=0; i<orainbindlobcount; i++) {
-		OCILobFreeTemporary(oracle8conn->svc,
-						oracle8conn->err,
+		OCILobFreeTemporary(oracleconn->svc,
+						oracleconn->err,
 						inbind_lob[i]);
-		OCILobClose(oracle8conn->svc,oracle8conn->err,
+		OCILobClose(oracleconn->svc,oracleconn->err,
 						inbind_lob[i]);
 		OCIDescriptorFree(inbind_lob[i],OCI_DTYPE_LOB);
 	}
 	for (uint16_t i=0; i<oraoutbindlobcount; i++) {
 		if (outbind_lob[i]) {
-			OCILobFreeTemporary(oracle8conn->svc,
-						oracle8conn->err,
+			OCILobFreeTemporary(oracleconn->svc,
+						oracleconn->err,
 						outbind_lob[i]);
-			OCILobClose(oracle8conn->svc,
-						oracle8conn->err,
+			OCILobClose(oracleconn->svc,
+						oracleconn->err,
 						outbind_lob[i]);
 			OCIDescriptorFree(outbind_lob[i],
 						OCI_DTYPE_LOB);
@@ -3726,8 +3726,8 @@ void oracle8cursor::closeResultSet() {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrserverconnection *new_oracle8connection(
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_oracleconnection(
 						sqlrservercontroller *cont) {
-		return new oracle8connection(cont);
+		return new oracleconnection(cont);
 	}
 }

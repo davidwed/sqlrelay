@@ -238,8 +238,7 @@ bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		!charstring::compare(dbtype,"interbase")) {
 		query.append("select gen_id(")->append(sequence);
 		query.append(",1) from rdb$database");
-	} else if (!charstring::compare(dbtype,"oracle7") ||
-			!charstring::compare(dbtype,"oracle8")) {
+	} else if (!charstring::compare(dbtype,"oracle")) {
 		query.append("select ")->append(sequence);
 		query.append(".nextval from dual");
 	} else if (!charstring::compare(dbtype,"postgresql")) {

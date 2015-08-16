@@ -370,7 +370,7 @@
 	echo("OTHER DRIVER-SPECIFIC OPTIONS: \n");
 	checkSuccess($dbh->getAttribute(PDO::SQLRELAY_ATTR_BIND_FORMAT),":*");
 	checkSuccess($dbh->getAttribute(
-				PDO::SQLRELAY_ATTR_DB_TYPE),"oracle8");
+				PDO::SQLRELAY_ATTR_DB_TYPE),"oracle");
 	echo("db version: ".$dbh->getAttribute(
 				PDO::SQLRELAY_ATTR_DB_VERSION)."\n");
 	echo("db host name: ".$dbh->getAttribute(

@@ -1387,7 +1387,7 @@ bool sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a allocated and cleared because oracle8
+			// This must be a allocated and cleared because oracle
 			// gets angry if these aren't initialized to NULL's.
 			// It's possible that just the first character needs to
 			// be NULL, but for now I'm just going to go ahead and

@@ -196,7 +196,7 @@ OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 OCIAttrGet((dvoid *)stmt,OCI_HTYPE_STMT,
 				(dvoid *)&ncols,(ub4 *)NULL,
 				OCI_ATTR_PARAM_COUNT,
-				oracle8conn->err) {
+				oracleconn->err) {
 	OCI_HTYPE_STMT
 		OCI_ATTR_STMT_TYPE
 		OCI_ATTR_PARAM_COUNT
@@ -236,7 +236,7 @@ OCITransRollback(svc,err,OCI_DEFAULT) {
 
 
 
-OCIStmtPrepare(stmt,oracle8conn->err,
+OCIStmtPrepare(stmt,oracleconn->err,
 				(text *)query,(ub4)length,
 				(ub4)OCI_NTV_SYNTAX,
 				(ub4)OCI_DEFAULT) {
@@ -244,7 +244,7 @@ OCIStmtPrepare(stmt,oracle8conn->err,
 
 
 OCIBindByPos(stmt,&inbindpp[inbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(ub4)charstring::toInteger(variable+1),
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
@@ -259,7 +259,7 @@ OCIBindByPos(stmt,&inbindpp[inbindcount],
 
 
 OCIBindByName(stmt,&inbindpp[inbindcount],
-				oracle8conn->err,
+				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
@@ -274,7 +274,7 @@ OCIBindByName(stmt,&inbindpp[inbindcount],
 
 
 
-OCIDescriptorAlloc((dvoid *)oracle8conn->env,
+OCIDescriptorAlloc((dvoid *)oracleconn->env,
 			(dvoid **)&inbind_lob[inbindlobcount],
 			(ub4)OCI_DTYPE_LOB,
 			(size_t)0,(dvoid **)0) {
@@ -285,7 +285,7 @@ OCIDescriptorFree(inbind_lob[inbindlobcount],OCI_DTYPE_LOB) {
 	OCI_DTYPE_LOB
 }
 
-OCILobCreateTemporary(oracle8conn->svc,oracle8conn->err,
+OCILobCreateTemporary(oracleconn->svc,oracleconn->err,
 			inbind_lob[inbindlobcount],
 			//(ub2)0,SQLCS_IMPLICIT,
 			(ub2)OCI_DEFAULT,OCI_DEFAULT,
@@ -293,22 +293,22 @@ OCILobCreateTemporary(oracle8conn->svc,oracle8conn->err,
 			OCI_DURATION_SESSION) {
 }
 
-OCILobIsTemporary(oracle8conn->env,oracle8conn->err,
+OCILobIsTemporary(oracleconn->env,oracleconn->err,
 					def_lob[col][row],
 					&templob) {
 }
 
-OCILobFreeTemporary(oracle8conn->svc,oracle8conn->err,
+OCILobFreeTemporary(oracleconn->svc,oracleconn->err,
 					inbind_lob[inbindlobcount]) {
 }
 
-OCILobOpen(oracle8conn->svc,oracle8conn->err,
+OCILobOpen(oracleconn->svc,oracleconn->err,
 			inbind_lob[inbindlobcount],
 			OCI_LOB_READWRITE) {
 }
 
 
-OCILobWrite(oracle8conn->svc,oracle8conn->err,
+OCILobWrite(oracleconn->svc,oracleconn->err,
 			inbind_lob[inbindlobcount],&size,1,
 			(void *)value,valuesize,
 			OCI_ONE_PIECE,(dvoid *)0,
@@ -317,45 +317,45 @@ OCILobWrite(oracle8conn->svc,oracle8conn->err,
 }
 
 
-OCILobRead(oracle8conn->svc,oracle8conn->err,
+OCILobRead(oracleconn->svc,oracleconn->err,
 				outbind_lob[index],
 				&retlen,
 				offset,
 				(dvoid *)buf,
-				oracle8conn->maxitembuffersize,
+				oracleconn->maxitembuffersize,
 				(dvoid *)NULL,
 				(sb4(*)(dvoid *,CONST dvoid *,ub4,ub1))NULL,
 				(ub2)0,
 				(ub1)SQLCS_IMPLICIT) {
 }
 
-OCILobClose(oracle8conn->svc,oracle8conn->err,inbind_lob[inbindlobcount]) {
+OCILobClose(oracleconn->svc,oracleconn->err,inbind_lob[inbindlobcount]) {
 }
 
-OCILobGetLength(oracle8conn->svc,
-			oracle8conn->err,
+OCILobGetLength(oracleconn->svc,
+			oracleconn->err,
 			outbind_lob[index],
 			&loblength) {
 }
 
 
-OCIStmtExecute(oracle8conn->svc,stmt,
-				oracle8conn->err,iters,
+OCIStmtExecute(oracleconn->svc,stmt,
+				oracleconn->err,iters,
 				(ub4)0,NULL,NULL,
-				oracle8conn->statementmode) {
+				oracleconn->statementmode) {
 }
 
 
-OCIParamGet(stmt,OCI_HTYPE_STMT,oracle8conn->err,
+OCIParamGet(stmt,OCI_HTYPE_STMT,oracleconn->err,
 				(dvoid **)&desc[i].paramd,
 				i+1) {
 }
 
 
-OCIDefineByPos(stmt,&def[i],oracle8conn->err,
+OCIDefineByPos(stmt,&def[i],oracleconn->err,
 					i+1,
 					(dvoid *)def_buf[i],
-					(sb4)oracle8conn->maxitembuffersize,
+					(sb4)oracleconn->maxitembuffersize,
 					SQLT_STR,
 					(dvoid *)def_indp[i],
 					(ub2 *)def_col_retlen[i],
@@ -364,7 +364,7 @@ OCIDefineByPos(stmt,&def[i],oracle8conn->err,
 }
 
 
-OCIStmtFetch(stmt,oracle8conn->err,oracle8conn->fetchatonce,
+OCIStmtFetch(stmt,oracleconn->err,oracleconn->fetchatonce,
 						OCI_FETCH_NEXT,OCI_DEFAULT) {
 	OCI_FETCH_NEXT
 }

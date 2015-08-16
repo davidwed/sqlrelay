@@ -28,7 +28,7 @@ cur=SQLRCursor.new(con)
 
 # get database type
 print "IDENTIFY: \n"
-checkSuccess(con.identify(),"oracle8")
+checkSuccess(con.identify(),"oracle")
 print "\n"
 
 # ping

@@ -12963,8 +12963,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9FF9CD34199D41D88B5C288B0B2677D5"
             {
-            "SourcePath" = "8:..\\..\\src\\connections\\sqlrconnection_oracle8.dll"
-            "TargetName" = "8:sqlrconnection_oracle8.dll"
+            "SourcePath" = "8:..\\..\\src\\connections\\sqlrconnection_oracle.dll"
+            "TargetName" = "8:sqlrconnection_oracle.dll"
             "Tag" = "8:"
             "Folder" = "8:_0CC0967169F54C2998A34CCA57F17B2E"
             "Condition" = "8:"

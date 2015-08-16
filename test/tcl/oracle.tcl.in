@@ -33,7 +33,7 @@ set cur [$con sqlrcur]
 
 # get database type
 puts "IDENTIFY: "
-checkSuccess [$con identify] "oracle8"
+checkSuccess [$con identify] "oracle"
 puts ""
 
 # ping

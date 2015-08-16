@@ -49,7 +49,7 @@ var cur=new sqlrelay.SQLRCursor(con);
 	
 // get database type
 console.log("IDENTIFY: ");
-checkSuccess(con.identify(),"oracle8");
+checkSuccess(con.identify(),"oracle");
 console.log("\n");
 	
 // ping

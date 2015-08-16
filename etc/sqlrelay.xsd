@@ -20,15 +20,15 @@
       <xs:attribute name="addresses" default="0.0.0.0"/>
       <xs:attribute name="port" default="9000"/>
       <xs:attribute name="socket" default="/tmp/sqlrelay.socket"/>
-      <xs:attribute name="dbase" default="oracle8">
+      <xs:attribute name="dbase" default="oracle">
         <xs:simpleType>
           <xs:restriction base="xs:token">
-            <xs:enumeration value="oracle8"/>
+            <xs:enumeration value="oracle"/>
             <xs:enumeration value="mysql"/>
             <xs:enumeration value="postgresql"/>
             <xs:enumeration value="sqlite"/>
             <xs:enumeration value="freetds"/>
-            <xs:enumeration value="sybase"/>
+            <xs:enumeration value="sap"/>
             <xs:enumeration value="odbc"/>
             <xs:enumeration value="db2"/>
             <xs:enumeration value="firebird"/>

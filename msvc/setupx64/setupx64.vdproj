@@ -11115,8 +11115,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7DC5746EB2DB4EACA6F876CC91492622"
             {
-            "SourcePath" = "8:..\\..\\src\\connections\\sqlrconnection_oracle8.dll"
-            "TargetName" = "8:sqlrconnection_oracle8.dll"
+            "SourcePath" = "8:..\\..\\src\\connections\\sqlrconnection_oracle.dll"
+            "TargetName" = "8:sqlrconnection_oracle.dll"
             "Tag" = "8:"
             "Folder" = "8:_0CC0967169F54C2998A34CCA57F17B2E"
             "Condition" = "8:"
@@ -14735,8 +14735,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BCD7CFE05658439B86D0ABF5FD578907"
             {
-            "SourcePath" = "8:..\\..\\src\\connections\\sqlrconnection_sybase.dll"
-            "TargetName" = "8:sqlrconnection_sybase.dll"
+            "SourcePath" = "8:..\\..\\src\\connections\\sqlrconnection_sap.dll"
+            "TargetName" = "8:sqlrconnection_sap.dll"
             "Tag" = "8:"
             "Folder" = "8:_0CC0967169F54C2998A34CCA57F17B2E"
             "Condition" = "8:"

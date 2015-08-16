@@ -27,7 +27,7 @@
 
 	# get database type
 	echo("IDENTIFY: \n");
-	checkSuccess(sqlrcon_identify($con),"oracle8");
+	checkSuccess(sqlrcon_identify($con),"oracle");
 	echo("\n");
 
 	# ping

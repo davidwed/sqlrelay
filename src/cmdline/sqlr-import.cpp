@@ -306,7 +306,7 @@ bool sqlrimport::sequenceTagEnd() {
 
 	query.clear();
 
-	// sqlite, mysql, sybase/mssql have autoincrementing fields
+	// sqlite, mysql, sap/sybase and mssql have autoincrementing fields
 	// mdbtools has nothing
 	// odbc can't tell what kind of underlying db we're using
 	if (!charstring::compare(dbtype,"firebird") ||
@@ -317,8 +317,7 @@ bool sqlrimport::sequenceTagEnd() {
 			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		return true;
-	} else if (!charstring::compare(dbtype,"oracle7") ||
-			!charstring::compare(dbtype,"oracle8")) {
+	} else if (!charstring::compare(dbtype,"oracle")) {
 		sqlrcursor	sqlrcur2(sqlrcon);
 		char	*uppersequence=charstring::duplicate(sequence);
 		charstring::upper(uppersequence);

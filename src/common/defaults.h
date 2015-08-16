@@ -13,7 +13,7 @@
 #define DEFAULT_PROTOCOL "sqlrclient"
 
 // default database type
-#define DEFAULT_DBASE "oracle8"
+#define DEFAULT_DBASE "oracle"
 
 // default number of connections to start
 #define DEFAULT_CONNECTIONS "5"
