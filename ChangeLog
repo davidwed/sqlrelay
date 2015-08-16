@@ -12,6 +12,7 @@
 		define/undef games, revealed on openbsd 5.7
 	tweaked ruby cflags script for debian 8
 	refactored mysql detection
+	tweaked unixodbc detection to also look in /usr/include/odbc
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters
