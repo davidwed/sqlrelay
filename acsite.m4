@@ -1305,7 +1305,6 @@ then
 				else
 					MYSQLCONFIG="mysql_config"
 				fi
-echo trying $MYSQLCONFIG
 
 				MYSQLINCLUDES=`$MYSQLCONFIG --cflags 2> /dev/null | sed -e "s|'||g"`
 
