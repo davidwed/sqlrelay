@@ -20379,7 +20379,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-msql_close(NULL);
+mysql_close(NULL);
   ;
   return 0;
 }

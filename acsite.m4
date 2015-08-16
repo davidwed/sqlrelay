@@ -1349,7 +1349,7 @@ echo trying $MYSQLCONFIG
 		then
 			AC_MSG_CHECKING(for valid mysql_config output)
 			FW_TRY_LINK([#include <mysql.h>
-#include <stdlib.h>],[msql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); MYSQLINCLUDES=""; MYSQLLIBS=""])
+#include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); MYSQLINCLUDES=""; MYSQLLIBS=""])
 		fi
 
 		dnl do we need -lz?
