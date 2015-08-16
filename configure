@@ -19992,79 +19992,36 @@ then
 			STATICFLAG="-static"
 		fi
 
-		if ( test -z "$MYSQLLIBS" )
+				if ( test -z "$MYSQLLIBS" )
 		then
-			MYSQLINCLUDES=`mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
-									if ( test -n "`echo $CXX | grep g++`" )
-			then
-				MYSQLINCLUDES=`echo $MYSQLINCLUDES | sed -e "s|-x.* ||g" -e "s|-x.*$||g" -e "s|-nofstore ||g" -e "s|-nofstore$||g" -e "s|-f.* ||g" -e "s|-f.*$||g" -e "s|-mt ||g" -e "s|-mt$||g"`
-			fi
-
-									MYSQLLIBS=`mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
-			MYSQLLIBSR=`mysql_config --libs_r 2> /dev/null | sed -e "s|'||g"`
-			if ( test -n "$MYSQLLIBSR" -a -z "`echo $MYSQLLIBSR | grep Usage:`" )
-			then
-				MYSQLLIBS=$MYSQLLIBSR
-			fi
-
-			if ( test -n "$MYSQLLIBS" )
-			then
-								{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for valid mysql_config output" >&5
-$as_echo_n "checking for valid mysql_config output... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIBS"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <mysql.h>
-#include <stdlib.h>
-int
-main ()
-{
-mysql_close(NULL);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; MYSQLINCLUDES=""; MYSQLLIBS=""
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-			fi
-		fi
-
-		if ( test -z "$MYSQLLIBS" )
-		then
-			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
+			for dir in "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls /usr/mysql/*/bin 2> /dev/null | sort -r`
 			do
-				if ( test -d "$i" )
+
+				if ( test -n "$dir" )
 				then
-					MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
-					MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
-					if ( test -n "$MYSQLLIBS" )
-					then
-						break
-					fi
+					MYSQLCONFIG="$dir/mysql_config"
+				else
+					MYSQLCONFIG="mysql_config"
+				fi
+echo trying $MYSQLCONFIG
+
+				MYSQLINCLUDES=`$MYSQLCONFIG --cflags 2> /dev/null | sed -e "s|'||g"`
+
+												MYSQLLIBS=`$MYSQLCONFIG --libs 2> /dev/null | sed -e "s|'||g"`
+				MYSQLLIBSR=`$MYSQLCONFIG --libs_r 2> /dev/null | sed -e "s|'||g"`
+				if ( test -n "$MYSQLLIBSR" -a -z "`echo $MYSQLLIBSR | grep Usage:`" )
+				then
+					MYSQLLIBS=$MYSQLLIBSR
+				fi
+
+				if ( test -n "$MYSQLLIBS" )
+				then
+					break;
 				fi
 			done
 		fi
 
-		if ( test -z "$MYSQLLIBS" )
+						if ( test -z "$MYSQLLIBS" )
 		then
 
 
@@ -20391,11 +20348,62 @@ then
 	eval "dummy=\"$HEADERSANDLIBSPATH\""
 fi
 
+		fi
 
-			if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
-			then
+						if ( test -n "`echo $CXX | grep g++`" )
+		then
+			MYSQLINCLUDES=`echo $MYSQLINCLUDES | sed -e "s|-x.* ||g" -e "s|-x.*$||g" -e "s|-nofstore ||g" -e "s|-nofstore$||g" -e "s|-f.* ||g" -e "s|-f.*$||g" -e "s|-mt ||g" -e "s|-mt$||g"`
+		fi
 
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MySQL requires -lz" >&5
+		if ( test "$MYSQLINCLUDES" = "-I/usr/include" )
+		then
+			MYSQLINCLUDES=""
+		fi
+
+				if ( test -n "$MYSQLLIBS" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for valid mysql_config output" >&5
+$as_echo_n "checking for valid mysql_config output... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mysql.h>
+#include <stdlib.h>
+int
+main ()
+{
+msql_close(NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; MYSQLINCLUDES=""; MYSQLLIBS=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		fi
+
+				if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
+		then
+
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MySQL requires -lz" >&5
 $as_echo_n "checking if MySQL requires -lz... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -20432,10 +20440,10 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-				NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
-				if ( test -n "$NEEDSLIBZ" )
-				then
-					{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gzopen in -lz" >&5
+			NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
+			if ( test -n "$NEEDSLIBZ" )
+			then
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gzopen in -lz" >&5
 $as_echo_n "checking for gzopen in -lz... " >&6; }
 if ${ac_cv_lib_z_gzopen+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -20483,13 +20491,7 @@ else
 $as_echo "$as_me: WARNING: MySQL requires libz but libz was not found." >&2;}
 fi
 
-				fi
 			fi
-		fi
-
-		if ( test "$MYSQLINCLUDES" = "-I/usr/include" )
-		then
-			MYSQLINCLUDES=""
 		fi
 	fi
 

@@ -1293,72 +1293,78 @@ then
 			STATICFLAG="-static"
 		fi
 
+		dnl try mysql_config first...
 		if ( test -z "$MYSQLLIBS" )
 		then
-			MYSQLINCLUDES=`mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
-			dnl on some platforms, mysql_config returns options
-			dnl that the native compiler likes but g++ does not
-			if ( test -n "`echo $CXX | grep g++`" )
-			then
-				MYSQLINCLUDES=`echo $MYSQLINCLUDES | sed -e "s|-x.* ||g" -e "s|-x.*$||g" -e "s|-nofstore ||g" -e "s|-nofstore$||g" -e "s|-f.* ||g" -e "s|-f.*$||g" -e "s|-mt ||g" -e "s|-mt$||g"`
-			fi
-
-			dnl try --libs and --libs_r flags and go with
-			dnl --libs_r if it's valid
-			MYSQLLIBS=`mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
-			MYSQLLIBSR=`mysql_config --libs_r 2> /dev/null | sed -e "s|'||g"`
-			if ( test -n "$MYSQLLIBSR" -a -z "`echo $MYSQLLIBSR | grep Usage:`" )
-			then
-				MYSQLLIBS=$MYSQLLIBSR
-			fi
-
-			if ( test -n "$MYSQLLIBS" )
-			then
-				dnl sanity check
-				AC_MSG_CHECKING(for valid mysql_config output)
-				FW_TRY_LINK([#include <mysql.h>
-#include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); MYSQLINCLUDES=""; MYSQLLIBS=""])
-			fi
-		fi
-
-		if ( test -z "$MYSQLLIBS" )
-		then
-			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
+			for dir in "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls /usr/mysql/*/bin 2> /dev/null | sort -r`
 			do
-				if ( test -d "$i" )
+
+				if ( test -n "$dir" )
 				then
-					MYSQLINCLUDES=`$i/mysql_config --cflags 2> /dev/null | sed -e "s|'||g"`
-					MYSQLLIBS=`$i/mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
-					if ( test -n "$MYSQLLIBS" )
-					then
-						break
-					fi
+					MYSQLCONFIG="$dir/mysql_config"
+				else
+					MYSQLCONFIG="mysql_config"
+				fi
+echo trying $MYSQLCONFIG
+
+				MYSQLINCLUDES=`$MYSQLCONFIG --cflags 2> /dev/null | sed -e "s|'||g"`
+
+				dnl try --libs and --libs_r flags and go with
+				dnl --libs_r if it's valid
+				MYSQLLIBS=`$MYSQLCONFIG --libs 2> /dev/null | sed -e "s|'||g"`
+				MYSQLLIBSR=`$MYSQLCONFIG --libs_r 2> /dev/null | sed -e "s|'||g"`
+				if ( test -n "$MYSQLLIBSR" -a -z "`echo $MYSQLLIBSR | grep Usage:`" )
+				then
+					MYSQLLIBS=$MYSQLLIBSR
+				fi
+
+				if ( test -n "$MYSQLLIBS" )
+				then
+					break;
 				fi
 			done
 		fi
 
+		dnl if mysql_config didn't work then fall back to just looking
+		dnl directly for headers and libs
 		if ( test -z "$MYSQLLIBS" )
 		then
 			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mysql],[mysql.h],[mysqlclient],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[yes])
+		fi
 
-			if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
-			then
-		
-				AC_MSG_CHECKING(if MySQL requires -lz)
-				FW_TRY_LINK([#include <mysql.h>
-#include <stdlib.h>],[mysql_real_connect(NULL,NULL,NULL,NULL,NULL,0,NULL,0); mysql_real_query(NULL,NULL,0); mysql_store_result(NULL); mysql_num_fields(NULL); mysql_fetch_row(NULL); mysql_free_result(NULL); mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); MYSQLLIBS="$MYSQLLIBS -lz"])
-		
-				NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
-				if ( test -n "$NEEDSLIBZ" )
-				then
-					AC_CHECK_LIB(z,gzopen,,MYSQLINCLUDES=""; MYSQLLIBS=""; AC_MSG_WARN(MySQL requires libz but libz was not found.))
-				fi
-			fi
+		dnl on some platforms, mysql_config returns options
+		dnl that the native compiler likes but g++ does not
+		if ( test -n "`echo $CXX | grep g++`" )
+		then
+			MYSQLINCLUDES=`echo $MYSQLINCLUDES | sed -e "s|-x.* ||g" -e "s|-x.*$||g" -e "s|-nofstore ||g" -e "s|-nofstore$||g" -e "s|-f.* ||g" -e "s|-f.*$||g" -e "s|-mt ||g" -e "s|-mt$||g"`
 		fi
 		
 		if ( test "$MYSQLINCLUDES" = "-I/usr/include" )
 		then
 			MYSQLINCLUDES=""
+		fi
+
+		dnl sanity check
+		if ( test -n "$MYSQLLIBS" )
+		then
+			AC_MSG_CHECKING(for valid mysql_config output)
+			FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[msql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); MYSQLINCLUDES=""; MYSQLLIBS=""])
+		fi
+
+		dnl do we need -lz?
+		if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
+		then
+		
+			AC_MSG_CHECKING(if MySQL requires -lz)
+			FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_real_connect(NULL,NULL,NULL,NULL,NULL,0,NULL,0); mysql_real_query(NULL,NULL,0); mysql_store_result(NULL); mysql_num_fields(NULL); mysql_fetch_row(NULL); mysql_free_result(NULL); mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); MYSQLLIBS="$MYSQLLIBS -lz"])
+		
+			NEEDSLIBZ=`echo "$MYSQLLIBS" | grep "\-lz"`
+			if ( test -n "$NEEDSLIBZ" )
+			then
+				AC_CHECK_LIB(z,gzopen,,MYSQLINCLUDES=""; MYSQLLIBS=""; AC_MSG_WARN(MySQL requires libz but libz was not found.))
+			fi
 		fi
 	fi
 
