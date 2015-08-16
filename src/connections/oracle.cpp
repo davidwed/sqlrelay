@@ -167,6 +167,8 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 #endif
 		bool		rejectduplicatebinds;
 		bool		disablekeylookup;
+
+		const char	*identity;
 };
 
 class SQLRSERVER_DLLSPEC oraclecusor : public sqlrservercursor {
@@ -444,6 +446,7 @@ oracleconnection::oracleconnection(sqlrservercontroller *cont) :
 #endif
 	rejectduplicatebinds=false;
 	disablekeylookup=false;
+	identity=NULL;
 }
 
 oracleconnection::~oracleconnection() {
@@ -535,6 +538,8 @@ void oracleconnection::handleConnectString() {
 			cont->getConnectStringValue("fakebinds"),"yes")) {
 		cont->fakeInputBinds();
 	}
+
+	identity=cont->getConnectStringValue("identity");
 }
 
 #ifdef HAVE_ORACLE_8i
@@ -1128,7 +1133,7 @@ const char *oracleconnection::pingQuery() {
 }
 
 const char *oracleconnection::identify() {
-	return "oracle";
+	return (identity)?identity:"oracle";
 }
 
 const char *oracleconnection::dbVersion() {

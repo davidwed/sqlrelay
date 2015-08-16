@@ -72,6 +72,8 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 #endif
 		char	*lastinsertidquery;
 
+		const char	*identity;
+
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	private:
 		file	devnull;
@@ -181,6 +183,7 @@ postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
 	currentoid=InvalidOid;
 #endif
 	lastinsertidquery=NULL;
+	identity=NULL;
 	hostname=NULL;
 }
 
@@ -222,6 +225,7 @@ void postgresqlconnection::handleConnectString() {
 			cont->getConnectStringValue("fakebinds"),"yes")) {
 		cont->fakeInputBinds();
 	}
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool postgresqlconnection::logIn(const char **error, const char **warning) {
@@ -388,7 +392,7 @@ void postgresqlconnection::errorMessage(char *errorbuffer,
 }
 
 const char *postgresqlconnection::identify() {
-	return "postgresql";
+	return (identity)?identity:"postgresql";
 }
 
 const char *postgresqlconnection::dbVersion() {

@@ -60,6 +60,8 @@ class SQLRSERVER_DLLSPEC mdbtoolsconnection : public sqlrserverconnection {
 					bool *liveconnection);
 
 		const char	*db;
+		const char	*identity;
+
 		char		*hostname;
 };
 
@@ -120,6 +122,7 @@ class SQLRSERVER_DLLSPEC mdbtoolscursor : public sqlrservercursor {
 mdbtoolsconnection::mdbtoolsconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
 	hostname=NULL;
+	identity=NULL;
 }
 
 mdbtoolsconnection::~mdbtoolsconnection() {
@@ -128,6 +131,7 @@ mdbtoolsconnection::~mdbtoolsconnection() {
 
 void mdbtoolsconnection::handleConnectString() {
 	db=cont->getConnectStringValue("db");
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool mdbtoolsconnection::logIn(const char **error, const char **warning) {
@@ -155,7 +159,7 @@ bool mdbtoolsconnection::ping() {
 }
 
 const char *mdbtoolsconnection::identify() {
-	return "mdbtools";
+	return (identity)?identity:"mdbtools";
 }
 
 const char *mdbtoolsconnection::dbVersion() {

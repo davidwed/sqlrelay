@@ -239,6 +239,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*dsn;
 		uint64_t	timeout;
 
+		const char	*identity;
+
 		stringbuffer	errormessage;
 
 		char		dbversion[512];
@@ -360,6 +362,7 @@ char *conv_to_ucs(char *inbuf) {
 
 odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
+	identity=NULL;
 }
 
 
@@ -382,6 +385,8 @@ void odbcconnection::handleConnectString() {
 	} else {
 		timeout=charstring::toInteger(to);
 	}
+
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool odbcconnection::logIn(const char **error, const char **warning) {
@@ -527,7 +532,7 @@ bool odbcconnection::ping() {
 }
 
 const char *odbcconnection::identify() {
-	return "odbc";
+	return (identity)?identity:"odbc";
 }
 
 const char *odbcconnection::dbVersion() {

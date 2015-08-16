@@ -228,7 +228,7 @@
 <li><b>connectionid</b> - The ID of this connection.  This parameter defaults to <i>id</i>-<i>number</i> where "id" is the id of the instance snd "number" is the index of the connection tag.  It's not necessary to set this parameter if you use sqlr-start.  It's only necessary if you plan on starting the daemons individually and want friendlier connection ids.</li>
 <li><b>string</b> - The database connect string the connection daemon should use.</li>
 <ul>
-<li>For <b>oracle</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;stmtcachesize=0;rejectduplicatebinds=yes/no;disablekeylookup=yes/no"
+<li>For <b>oracle</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;stmtcachesize=0;rejectduplicatebinds=yes/no;disablekeylookup=yes/no;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -250,9 +250,10 @@ or a tnsnames-style expression such as:
 <li><b>stmtcachesize</b>: Set the size of the local statement cache.  Using a local statement cache can improve performance significantly.  This parameter defaults to 0, which disables using the cache.  This parameter also has no effect when SQL Relay is compiled against a version of Oracle prior to 9i.  There is one known issue with using the statement cache.  There is either a bug in OCI or a bug in the way SQL Relay uses it.  Running a query that uses a stored procedure that returns a result set in an output bind cursor while using the statement cache causes a segmentation fault in the OCIStmtExecute function.  To prevent this, SQL Relay prevents any attempt to run such a query if stmtcachesize is non-zero.  It is possible to run such queries when stmtcachesize is set to 0 or defaulted to 0 though.</li>
 <li><b>rejectduplicatebinds</b>: Setting this to yes causes SQL Relay to reject queries which contain more than one instance of the same bind variable.  If you're binding by position and using PL/SQL and your query contains duplicate bind variables, it may not work as expected and it might be convenient to just have SQL Relay reject all queries containing duplicate bind variables.  This parameter is defaulted to no.  By default, queries containing duplicate bind variables are not rejected.</li>
 <li><b>disablekeylookup</b>: It is possible to get the list of columns in a table by running "describe table" or "show columns of table like '...'" in sqlrsh, or calling getColumnList() in one of the native API's, or by other methods using non-native API's.  When doing this, whether each column is a primary, unique or foreign key is returned.  Looking up this key information takes a noticeably long time though.  This parameter makes it possible to disable key lookup by setting disablekeylookup=yes.</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;fakebinds=FAKEBINDS;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;sslkey=keyfile;sslcert=certfile;sslca=cafile;sslcapath=cafilepath;sslcipher=cipherlist;foundrows=yes/no;ignorespace=yes/no"
+<li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;fakebinds=FAKEBINDS;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;sslkey=keyfile;sslcert=certfile;sslca=cafile;sslcapath=cafilepath;sslcipher=cipherlist;foundrows=yes/no;ignorespace=yes/no;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -271,9 +272,10 @@ or a tnsnames-style expression such as:
 <li><b>sslcipher</b>: The list of permissable ciphers to use for SSL encryption.  Only necessary if you want to restrict which cipers to use when onnecting ot MySQL using SSL.</li>
 <li><b>foundrows</b>: Ordinarily, the MySQL client library returns the number of rows that were modified by an insert, update or delete command are returned as the "affected rows" of the query.  Setting foundrows to "yes" passes a flag to the MySQL client library, telling it to return the number of rows that matched the where clause of the query rather than the number that were modified.  This can be a different number with certain queries.  This parameter defaults to no.</li>
 <li><b>ignorespace</b>: Tells MySQL to allow spaces after function names.  Ie. "select count (*) from mytable" should be valid, with the space between count and (*).</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;sslmode=SSLMODE;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;lastinsertidfunction=LASTINSERTDFUNCTION"
+<li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;sslmode=SSLMODE;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;lastinsertidfunction=LASTINSERTDFUNCTION;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -287,13 +289,15 @@ or a tnsnames-style expression such as:
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
 <li><b>lastinsertidfunction</b>: Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Postgresql doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Postgresql.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.</li>
 </ul>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </li>
-<li>For <b>sqlite</b> databases, the connect string syntax is "db=DB;"
+<li>For <b>sqlite</b> databases, the connect string syntax is "db=DB;identity=ID"</li>
 <ul>
 <li><b>db</b>: The filename of the database open.  Required.</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>freetds</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;"
+<li>For <b>freetds</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"</li>
 <ul>
 <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -306,9 +310,10 @@ or a tnsnames-style expression such as:
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
 <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>sap</b> (or <b>sybase</b>) databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;"
+<li>For <b>sap</b> (or <b>sybase</b>) databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"</li>
 <ul>
 <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -322,18 +327,20 @@ or a tnsnames-style expression such as:
 <li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;"</li>
+<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
 <li><b>dsn</b>: The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
 <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE"</li>
+<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -346,9 +353,10 @@ or a tnsnames-style expression such as:
 <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxoutlobbindsize</b>: The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;"</li>
+<li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -362,11 +370,13 @@ or a tnsnames-style expression such as:
 <li><b>droptemptables</b>: In most databases, temporary tables are dropped at the end of the client session.  In Firebird however, the rows may be deleted but the table itself remains.  Setting this parameter to "yes" causes any temporary tables that were created during an SQL Relay client session, to be dropped when the session is over, in effect emulating the behavior or other databases.  Note that temporary tables created outside of the session will not be dropped.</li>
 <li><b>globaltemptables</b>: Since SQL Relay doesn't log out of the database at the end of each client session, global temporary tables aren't automatically truncated by the database.  SQL Relay tracks the creation of global temporary tables and truncates any table created during the session, or drops them if droptemptables=yes is configured.  But, SQL Relay isn't aware of tables created outside of the current session, or outside of SQL Relay altogether.  To work around this issue, this parameter can be set to either a comma-separated list of global temporary tables that SQL Relay should truncate at the end of each session.  Alternatively, it can be set to % and SQL Relay will truncate all global temporary tables that it has access to at the end of each session.  If this parameter is omitted, only tables that were created during the session are truncated.  Providing a list of tables performs SUBSTANTIALLY better but is less flexible than using %.</li>
 <li><b>lastinsertidfunction</b>: Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Firebird doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Firebird.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>mdbtools</b> databases, the connect string syntax is "db=DATABASE;"
+<li>For <b>mdbtools</b> databases, the connect string syntax is "db=DATABASE;identity=ID"
 <ul>
 <li><b>db</b>: The filename of the database open.  Required.</li>
+<li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
 </ul>

@@ -292,6 +292,8 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
 
+		const char	*identity;
+
 		bool		dbused;
 
 		char		*dbversion;
@@ -327,6 +329,8 @@ freetdsconnection::freetdsconnection(sqlrservercontroller *cont) :
 	fetchatonce=FETCH_AT_ONCE;
 	maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+
+	identity=NULL;
 }
 
 freetdsconnection::~freetdsconnection() {
@@ -368,6 +372,8 @@ void freetdsconnection::handleConnectString() {
 	if (maxitembuffersize<1) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
+
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool freetdsconnection::logIn(const char **error, const char **warning) {
@@ -612,7 +618,7 @@ void freetdsconnection::logOut() {
 }
 
 const char *freetdsconnection::identify() {
-	return "freetds";
+	return (identity)?identity:"freetds";
 }
 
 const char *freetdsconnection::dbVersion() {

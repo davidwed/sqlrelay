@@ -262,6 +262,8 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
 
+		const char	*identity;
+
 		char		*dbversion;
 
 		char		*lastinsertidquery;
@@ -285,6 +287,7 @@ firebirdconnection::firebirdconnection(sqlrservercontroller *cont) :
 	dbversion=NULL;
 	lastinsertidquery=NULL;
 	host=NULL;
+	identity=NULL;
 }
 
 firebirdconnection::~firebirdconnection() {
@@ -366,6 +369,8 @@ void firebirdconnection::handleConnectString() {
 	if (maxitembuffersize<1) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
+
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool firebirdconnection::logIn(const char **err, const char **warning) {
@@ -516,7 +521,7 @@ bool firebirdconnection::ping() {
 }
 
 const char *firebirdconnection::identify() {
-	return "firebird";
+	return (identity)?identity:"firebird";
 }
 
 const char *firebirdconnection::dbVersion() {

@@ -250,6 +250,8 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		int32_t		maxitembuffersize;
 #endif
 
+		const char	*identity;
+
 		char	*dbversion;
 		char	*dbhostname;
 
@@ -285,6 +287,8 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 #endif
+
+	identity=NULL;
 
 	mysqlptr=NULL;
 }
@@ -329,6 +333,8 @@ void mysqlconnection::handleConnectString() {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
 #endif
+
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool mysqlconnection::logIn(const char **error, const char **warning) {
@@ -507,7 +513,7 @@ bool mysqlconnection::ping() {
 #endif
 
 const char *mysqlconnection::identify() {
-	return "mysql";
+	return (identity)?identity:"mysql";
 }
 
 const char *mysqlconnection::dbVersion() {

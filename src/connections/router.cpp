@@ -76,6 +76,8 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		void	rollbackFailed(uint16_t index);
 		void	beginQueryFailed(uint16_t index);
 
+		const char	*identity;
+
 		sqlrconnection	**cons;
 		sqlrconnection	*cur;
 		const char	**beginquery;
@@ -249,6 +251,8 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 
 routerconnection::routerconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
+	identity=NULL;
+
 	cons=NULL;
 	cur=NULL;
 	beginquery=NULL;
@@ -278,6 +282,8 @@ bool routerconnection::supportsAuthOnDatabase() {
 }
 
 void routerconnection::handleConnectString() {
+
+	identity=cont->getConnectStringValue("identity");
 
 	cfgfile=cont->cfgfl;
 
@@ -497,7 +503,7 @@ void routerconnection::endSession() {
 }
 
 const char *routerconnection::identify() {
-	return "router";
+	return (identity)?identity:"router";
 }
 
 const char *routerconnection::dbVersion() {

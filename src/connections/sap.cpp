@@ -71,6 +71,8 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
 
+		const char	*identity;
+
 		bool		dbused;
 
 		char		*dbversion;
@@ -260,6 +262,8 @@ sapconnection::sapconnection(sqlrservercontroller *cont) :
 	fetchatonce=FETCH_AT_ONCE;
 	maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+
+	identity=NULL;
 }
 
 sapconnection::~sapconnection() {
@@ -300,6 +304,7 @@ void sapconnection::handleConnectString() {
 	if (maxitembuffersize<1) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool sapconnection::logIn(const char **error, const char **warning) {
@@ -548,7 +553,7 @@ void sapconnection::logOut() {
 }
 
 const char *sapconnection::identify() {
-	return "sap";
+	return (identity)?identity:"sap";
 }
 
 const char *sapconnection::dbVersion() {

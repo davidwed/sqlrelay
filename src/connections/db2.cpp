@@ -271,6 +271,8 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		int32_t		maxitembuffersize;
 		int32_t		maxoutbindlobsize;
 
+		const char	*identity;
+
 		char		dbversion[512];
 		uint16_t	dbmajorversion;
 
@@ -288,6 +290,7 @@ db2connection::db2connection(sqlrservercontroller *cont) :
 	maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
+	identity=NULL;
 }
 
 void db2connection::handleConnectString() {
@@ -342,6 +345,7 @@ void db2connection::handleConnectString() {
 	if (maxoutbindlobsize<1) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	}
+	identity=cont->getConnectStringValue("identity");
 }
 
 bool db2connection::mustDetachBeforeLogIn() {
@@ -633,7 +637,7 @@ const char *db2connection::pingQuery() {
 }
 
 const char *db2connection::identify() {
-	return "db2";
+	return (identity)?identity:"db2";
 }
 
 const char *db2connection::dbVersion() {
