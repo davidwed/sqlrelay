@@ -304,14 +304,14 @@ sub get_info {
 	} elsif ($index==41) {
 		# catalog name separator
 		my $identity=$dbh->get_info(17);
-		if ($identity eq 'oracle') {
+		if ($identity =~ m/oracle/) {
 			return '@';
 		}
 		return '.';
 	} elsif ($index==114) {
 		# catalog location
 		my $identity=$dbh->get_info(17);
-		if ($identity eq 'oracle') {
+		if ($identity =~ m/oracle/) {
 			return 2;
 		}
 		return 1;

@@ -234,17 +234,17 @@ bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	const char	*dbtype=sqlrcon->identify();
 
 	stringbuffer	query;
-	if (!charstring::compare(dbtype,"firebird") ||
-		!charstring::compare(dbtype,"interbase")) {
+	if (charstring::contains(dbtype,"firebird") ||
+		charstring::contains(dbtype,"interbase")) {
 		query.append("select gen_id(")->append(sequence);
 		query.append(",1) from rdb$database");
-	} else if (!charstring::compare(dbtype,"oracle")) {
+	} else if (charstring::contains(dbtype,"oracle")) {
 		query.append("select ")->append(sequence);
 		query.append(".nextval from dual");
-	} else if (!charstring::compare(dbtype,"postgresql")) {
+	} else if (charstring::contains(dbtype,"postgresql")) {
 		query.append("select nextval('")->append(sequence);
 		query.append("')");
-	} else if (!charstring::compare(dbtype,"db2")) {
+	} else if (charstring::contains(dbtype,"db2")) {
 		query.append("values nextval for ")->append(sequence);
 	} else {
 		stdoutput.printf("%s doesn't support sequences.\n",dbtype);

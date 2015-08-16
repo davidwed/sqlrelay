@@ -15,6 +15,8 @@
 	tweaked unixodbc detection to also look in /usr/include/odbc
 	renamed "oracle8" connection plugin to "oracle"
 	renamed "sybase" connection plugin to "sap"
+	updated identity tests in api's/cmdline clients to use
+		charstring::contains() rather than !charstring::compare()
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters

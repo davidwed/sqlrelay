@@ -309,15 +309,15 @@ bool sqlrimport::sequenceTagEnd() {
 	// sqlite, mysql, sap/sybase and mssql have autoincrementing fields
 	// mdbtools has nothing
 	// odbc can't tell what kind of underlying db we're using
-	if (!charstring::compare(dbtype,"firebird") ||
-		!charstring::compare(dbtype,"interbase")) {
+	if (charstring::contains(dbtype,"firebird") ||
+		charstring::contains(dbtype,"interbase")) {
 		query.append("set generator ")->append(sequence);
 		query.append(" to ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
 			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		return true;
-	} else if (!charstring::compare(dbtype,"oracle")) {
+	} else if (charstring::contains(dbtype,"oracle")) {
 		sqlrcursor	sqlrcur2(sqlrcon);
 		char	*uppersequence=charstring::duplicate(sequence);
 		charstring::upper(uppersequence);
@@ -365,8 +365,8 @@ bool sqlrimport::sequenceTagEnd() {
 			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		return true;
-	} else if (!charstring::compare(dbtype,"postgresql") ||
-			!charstring::compare(dbtype,"db2")) {
+	} else if (charstring::contains(dbtype,"postgresql") ||
+			charstring::contains(dbtype,"db2")) {
 		query.append("alter sequence ")->append(sequence);
 		query.append(" restart with ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
