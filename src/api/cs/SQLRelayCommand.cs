@@ -57,13 +57,12 @@ namespace SQLRClient
         /** Releases all resources used by the SQLRelayCommand. */
         void IDisposable.Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
         private void Dispose(Boolean disposing)
         {
-            // FIXME: do anything?
         }
 
         #endregion

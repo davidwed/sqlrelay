@@ -39,7 +39,7 @@ namespace SQLRClient
          *  releasing or resetting unmanaged resources. */
         void IDisposable.Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -49,7 +49,10 @@ namespace SQLRClient
             {
                 try
                 {
-                    this.Close();
+                    if (IsClosed == false)
+                    {
+                        Close();
+                    }
                 }
                 catch (Exception e)
                 {

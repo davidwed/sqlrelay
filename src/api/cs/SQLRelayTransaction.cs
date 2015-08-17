@@ -37,7 +37,7 @@ namespace SQLRClient
         /** Releases the unmanaged resources used by the SQLRelayTransaction. */
         void IDisposable.Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
