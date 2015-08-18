@@ -17,6 +17,7 @@
 	renamed "sybase" connection plugin to "sap"
 	updated identity tests in api's/cmdline clients to use
 		charstring::contains() rather than !charstring::compare()
+	implemented missing destructors for ADO.NET Data Provider
 
 0.62 - added query filter plugin framework
 	added regex, string and pattern filters
