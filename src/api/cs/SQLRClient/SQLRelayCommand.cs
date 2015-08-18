@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information
+
+using System;
 using System.Data;
 
 namespace SQLRClient
@@ -52,15 +55,20 @@ namespace SQLRClient
         }
 
         /** Releases all resources used by the SQLRelayCommand. */
+        ~SQLRelayCommand()
+        {
+            Dispose(false);
+        }
+
+        /** Releases all resources used by the SQLRelayCommand. */
         void IDisposable.Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
         private void Dispose(Boolean disposing)
         {
-            // FIXME: do anything?
         }
 
         #endregion

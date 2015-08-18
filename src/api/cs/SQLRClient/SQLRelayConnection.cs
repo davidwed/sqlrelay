@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information
+
+using System;
 using System.Data;
 
 namespace SQLRClient
@@ -45,10 +48,10 @@ namespace SQLRClient
          *
          *  Password - The password to use when logging into SQL Relay.
          *
-         *  Retry Time - If a connection fails, it will be retried in this
+         *  Retry Time - If a connection fails, it will be retried on this
          *  interval (in seconds).
          *
-         *  Tries - If a connection fails, it will be retries this many times.
+         *  Tries - If a connection fails, it will be retried this many times.
          *
          *  Initial Catalog - The database/schema to switch to after logging in.
          *  Optional.
@@ -57,6 +60,12 @@ namespace SQLRClient
         public SQLRelayConnection(String connectstring)
         {
             ConnectionString = connectstring;
+        }
+
+        /** Releases all resources used by the SQLRelayConnection. */
+        ~SQLRelayConnection()
+        {
+            Dispose(false);
         }
 
         private void Dispose(Boolean disposing)

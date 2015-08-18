@@ -1,3 +1,6 @@
+// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information
+
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -9,13 +12,13 @@ public class SQLRConnection : IDisposable
 {
     /** Initiates a connection to "server" on "port" or to the unix "socket" on
      *  the local machine and authenticates with "user" and "password".  Failed
-     *  connections will be retried for "tries" times on interval "retrytime".
-     *  If "tries" is 0 then retries will continue forever.  If "retrytime" is 0
-     *  then retries will be attempted on a default interval.
-     *  If the "socket" parameter is nether NULL nor "" then an attempt will be
-     *  made to connect through it before attempting to connect to "server" on
-     *  "port".  If it is NULL or "" then no attempt will be made to connect
-     *  through the socket.*/
+     *  connections will be retried for "tries" times, waiting "retrytime"
+     *  seconds between each try.  If "tries" is 0 then retries will continue
+     *  forever.  If "retrytime" is 0 then retries will be attempted on a
+     *  default interval.  If the "socket" parameter is nether NULL nor "" then
+     *  an attempt will be made to connect through it before attempting to
+     *  connect to "server" on "port".  If it is NULL or "" then no attempt
+     *  will be made to connect through the socket.*/
     public SQLRConnection(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries)
     {
         sqlrconref = sqlrcon_alloc_copyrefs(server, port, socket, user, password, retrytime, tries, true);
@@ -119,7 +122,7 @@ public class SQLRConnection : IDisposable
         return sqlrcon_ping(sqlrconref)!=0;
     }
     
-    /** Returns the type of database: oracle8, postgresql, mysql, etc. */
+    /** Returns the type of database: oracle, postgresql, mysql, etc. */
     public String identify()
     {
         return sqlrcon_identify(sqlrconref);
@@ -262,6 +265,14 @@ public class SQLRConnection : IDisposable
         return sqlrcon_getDebug(sqlrconref)!=0;
     }
 
+    /** Allows you to specify a file to write debug to.
+     *  Setting "filename" to NULL or an empty string causes debug
+     *  to be written to standard output (the default). */
+    public void setDebugFile(String filename)
+    {
+        sqlrcon_setDebugFile(sqlrconref,filename);
+    }
+
     /** Allows you to set a string that will be passed to the server and
      *  ultimately included in server-side logging along with queries that were
      *  run by this instance of the client. */
@@ -376,6 +387,9 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int32 sqlrcon_getDebug(IntPtr sqlrconref);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_setDebugFile(IntPtr sqlrconref, String filename);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_setClientInfo(IntPtr sqlrconref, String clientinfo);

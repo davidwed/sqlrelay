@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information
+
+using System;
 using System.Data;
 using System.Globalization;
 using System.Collections.Generic;
@@ -32,11 +35,17 @@ namespace SQLRClient
             _endsession = endsession;
         }
 
+        /** Releases all resources used by the SQLRelayDataReader. */
+        ~SQLRelayDataReader()
+        {
+            Dispose(false);
+        }
+
         /** Performs application-defined tasks associated with freeing,
          *  releasing or resetting unmanaged resources. */
         void IDisposable.Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -46,7 +55,10 @@ namespace SQLRClient
             {
                 try
                 {
-                    this.Close();
+                    if (IsClosed == false)
+                    {
+                        Close();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -161,7 +173,7 @@ namespace SQLRClient
             {
                 sqlrcur = _sqlrcurlist.Dequeue();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

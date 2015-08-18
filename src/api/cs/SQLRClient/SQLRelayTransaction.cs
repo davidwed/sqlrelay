@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2012-2015  David Muse
+// See the file COPYING for more information
+
+using System;
 using System.Data;
 
 namespace SQLRClient
@@ -20,6 +23,12 @@ namespace SQLRClient
             _open = true;
         }
 
+        /** Releases all resources used by the SQLRelayTransaction. */
+        ~SQLRelayTransaction()
+        {
+            Dispose(false);
+        }
+
         private void Dispose(Boolean disposing)
         {
             if (disposing)
@@ -34,7 +43,7 @@ namespace SQLRClient
         /** Releases the unmanaged resources used by the SQLRelayTransaction. */
         void IDisposable.Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
