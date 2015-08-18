@@ -62,6 +62,12 @@ namespace SQLRClient
             ConnectionString = connectstring;
         }
 
+        /** Releases all resources used by the SQLRelayConnection. */
+        ~SQLRelayConnection()
+        {
+            Dispose(false);
+        }
+
         private void Dispose(Boolean disposing)
         {
             if (_connectionstate == ConnectionState.Open)

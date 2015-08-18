@@ -35,6 +35,12 @@ namespace SQLRClient
             _endsession = endsession;
         }
 
+        /** Releases all resources used by the SQLRelayDataReader. */
+        ~SQLRelayDataReader()
+        {
+            Dispose(false);
+        }
+
         /** Performs application-defined tasks associated with freeing,
          *  releasing or resetting unmanaged resources. */
         void IDisposable.Dispose()

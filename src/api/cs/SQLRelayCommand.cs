@@ -55,6 +55,12 @@ namespace SQLRClient
         }
 
         /** Releases all resources used by the SQLRelayCommand. */
+        ~SQLRelayCommand()
+        {
+            Dispose(false);
+        }
+
+        /** Releases all resources used by the SQLRelayCommand. */
         void IDisposable.Dispose()
         {
             Dispose(true);

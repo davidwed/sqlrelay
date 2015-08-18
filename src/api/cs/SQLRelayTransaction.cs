@@ -23,6 +23,12 @@ namespace SQLRClient
             _open = true;
         }
 
+        /** Releases all resources used by the SQLRelayTransaction. */
+        ~SQLRelayTransaction()
+        {
+            Dispose(false);
+        }
+
         private void Dispose(Boolean disposing)
         {
             if (disposing)
