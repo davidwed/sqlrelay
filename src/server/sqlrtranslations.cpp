@@ -254,8 +254,10 @@ void sqlrtranslations::endSession() {
 
 xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
 						const char *type) {
-	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
-						TAG_XMLDOMNODETYPE,type,NULL);
+	xmldomnode	*retval=new xmldomnode(tree,
+						parentnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						NULL,type,NULL);
 	parentnode->appendChild(retval);
 	return retval;
 }
@@ -270,8 +272,10 @@ xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
 xmldomnode *sqlrtranslations::newNodeAfter(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
-	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
-						TAG_XMLDOMNODETYPE,type,NULL);
+	xmldomnode	*retval=new xmldomnode(tree,
+						parentnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						NULL,type,NULL);
 	parentnode->insertChild(retval,node->getPosition()+1);
 	return retval;
 }
@@ -288,8 +292,10 @@ xmldomnode *sqlrtranslations::newNodeAfter(xmldomnode *parentnode,
 xmldomnode *sqlrtranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
-	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
-						TAG_XMLDOMNODETYPE,type,NULL);
+	xmldomnode	*retval=new xmldomnode(tree,
+						parentnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						NULL,type,NULL);
 	parentnode->insertChild(retval,node->getPosition());
 	return retval;
 }
