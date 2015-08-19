@@ -284,11 +284,11 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 					const char *defaultvalue,
 					int32_t minvalue);
 
-		bool	tagStart(const char *name);
+		bool	tagStart(const char *ns, const char *name);
 		bool	attributeName(const char *name);
 		bool	attributeValue(const char *value);
 		bool	text(const char *string);
-		bool	tagEnd(const char *name);
+		bool	tagEnd(const char *ns, const char *name);
 
 		routecontainer	*routeAlreadyExists(routecontainer *cur);
 		void		moveRegexList(routecontainer *cur,

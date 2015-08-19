@@ -479,7 +479,7 @@ linkedlist< routecontainer * >	*sqlrconfigfile::getRouteList() {
 	return &routelist;
 }
 
-bool sqlrconfigfile::tagStart(const char *name) {
+bool sqlrconfigfile::tagStart(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -843,7 +843,7 @@ bool sqlrconfigfile::tagStart(const char *name) {
 	return true;
 }
 
-bool sqlrconfigfile::tagEnd(const char *name) {
+bool sqlrconfigfile::tagEnd(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id

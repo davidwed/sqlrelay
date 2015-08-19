@@ -21,10 +21,10 @@ class sqlrimport : public xmlsax {
 					const char *dbtype);
 			~sqlrimport();
 	private:
-		bool	tagStart(const char *name);
+		bool	tagStart(const char *ns, const char *name);
 		bool	attributeName(const char *name);
 		bool	attributeValue(const char *value);
-		bool	tagEnd(const char *name);
+		bool	tagEnd(const char *ns, const char *name);
 
 		bool	tableTagStart();
 		bool	sequenceTagStart();
@@ -152,7 +152,7 @@ sqlrimport::~sqlrimport() {
 	delete[] numbercolumn;
 }
 
-bool sqlrimport::tagStart(const char *name) {
+bool sqlrimport::tagStart(const char *ns, const char *name) {
 	if (!charstring::compare(name,"table")) {
 		return tableTagStart();
 	} else if (!charstring::compare(name,"sequence")) {
@@ -230,7 +230,7 @@ bool sqlrimport::attributeValue(const char *value) {
 	return true;
 }
 
-bool sqlrimport::tagEnd(const char *name) {
+bool sqlrimport::tagEnd(const char *ns, const char *name) {
 	if (!charstring::compare(name,"table")) {
 		return tableTagEnd();
 	} else if (!charstring::compare(name,"sequence")) {
