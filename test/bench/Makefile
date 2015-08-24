@@ -34,6 +34,11 @@ LOBJS = bench.$(OBJ) \
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(COMPILE) $<
 
+all: sqlr-bench
+
+clean:
+	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest
+
 db2bench.lo: db2bench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(DB2INCLUDES) $(COMPILE) $< $(OUT)$@
 
@@ -81,11 +86,6 @@ sybasebench.lo: sybasebench.cpp
 
 sybasebench.obj: sybasebench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SYBASEINCLUDES) $(COMPILE) sybasebench.cpp
-
-all: sqlr-bench
-
-clean:
-	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest
 
 sqlr-bench: $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@$(EXE) $(LOBJS) $(LDFLAGS) $(BENCHLIBS)
