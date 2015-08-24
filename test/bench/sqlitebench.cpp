@@ -6,6 +6,33 @@
 
 #include "sqlitebench.h"
 
+class sqlitebenchconnection : public benchconnection {
+	friend class sqlitebenchcursor;
+	public:
+			sqlitebenchconnection(const char *connectstring,
+						const char *dbtype);
+			~sqlitebenchconnection();
+
+		bool	connect();
+		bool	disconnect();
+
+	private:
+		const char	*db;
+};
+
+class sqlitebenchcursor : public benchcursor {
+	public:
+			sqlitebenchcursor(benchconnection *con);
+			~sqlitebenchcursor();
+
+		bool	open();
+		bool	query(const char *query, bool getcolumns);
+		bool	close();
+
+	private:
+		sqlitebenchconnection	*sbcon;
+};
+
 sqlitebenchmarks::sqlitebenchmarks(const char *connectstring,
 					const char *db,
 					uint64_t queries,

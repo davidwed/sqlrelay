@@ -5,7 +5,6 @@
 
 #include "bench.h"
 
-
 class firebirdbenchmarks : public benchmarks {
 	public:
 		firebirdbenchmarks(const char *connectstring,
@@ -16,36 +15,6 @@ class firebirdbenchmarks : public benchmarks {
 					uint32_t colsize,
 					uint16_t iterations,
 					bool debug);
-};
-
-class firebirdbenchconnection : public benchconnection {
-	friend class firebirdbenchcursor;
-	public:
-			firebirdbenchconnection(const char *connectstring,
-						const char *dbtype);
-			~firebirdbenchconnection();
-
-		bool	connect();
-		bool	disconnect();
-
-	private:
-		const char	*db;
-		const char	*dialect;
-		const char	*user;
-		const char	*password;
-};
-
-class firebirdbenchcursor : public benchcursor {
-	public:
-			firebirdbenchcursor(benchconnection *con);
-			~firebirdbenchcursor();
-
-		bool	open();
-		bool	query(const char *query, bool getcolumns);
-		bool	close();
-
-	private:
-		firebirdbenchconnection	*fbbcon;
 };
 
 #endif

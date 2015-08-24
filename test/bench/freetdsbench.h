@@ -5,7 +5,6 @@
 
 #include "bench.h"
 
-
 class freetdsbenchmarks : public benchmarks {
 	public:
 		freetdsbenchmarks(const char *connectstring,
@@ -16,38 +15,6 @@ class freetdsbenchmarks : public benchmarks {
 					uint32_t colsize,
 					uint16_t iterations,
 					bool debug);
-};
-
-class freetdsbenchconnection : public benchconnection {
-	friend class freetdsbenchcursor;
-	public:
-			freetdsbenchconnection(const char *connectstring,
-						const char *dbtype);
-			~freetdsbenchconnection();
-
-		bool	connect();
-		bool	disconnect();
-
-	private:
-		const char	*sybase;
-		const char	*lang;
-		const char	*server;
-		const char	*db;
-		const char	*user;
-		const char	*password;
-};
-
-class freetdsbenchcursor : public benchcursor {
-	public:
-			freetdsbenchcursor(benchconnection *con);
-			~freetdsbenchcursor();
-
-		bool	open();
-		bool	query(const char *query, bool getcolumns);
-		bool	close();
-
-	private:
-		freetdsbenchconnection	*ftdsbcon;
 };
 
 #endif

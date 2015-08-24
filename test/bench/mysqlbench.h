@@ -3,14 +3,6 @@
 #ifndef MYSQL_BENCH_H
 #define MYSQL_BENCH_H
 
-#ifdef _WIN32
-#include <winsock2.h>
-#endif
-
-extern "C" {
-	#include <mysql.h>
-}
-
 #include "bench.h"
 
 class mysqlbenchmarks : public benchmarks {
@@ -23,46 +15,6 @@ class mysqlbenchmarks : public benchmarks {
 					uint32_t colsize,
 					uint16_t iterations,
 					bool debug);
-};
-
-class mysqlbenchconnection : public benchconnection {
-	friend class mysqlbenchcursor;
-	public:
-			mysqlbenchconnection(const char *connectstring,
-						const char *dbtype);
-			~mysqlbenchconnection();
-
-		bool	connect();
-		bool	disconnect();
-
-	private:
-		const char	*host;
-		uint16_t	port;
-		const char	*socket;
-		const char	*dbname;
-		const char	*user;
-		const char	*password;
-
-		const char	*sslcapath;
-		const char	*sslca;
-		const char	*sslcert;
-		const char	*sslkey;
-		const char	*sslcipher;
-
-		MYSQL	mysql;
-
-		bool		firstquery;
-};
-
-class mysqlbenchcursor : public benchcursor {
-	public:
-			mysqlbenchcursor(benchconnection *con);
-			~mysqlbenchcursor();
-
-		bool	query(const char *query, bool getcolumns);
-
-	private:
-		mysqlbenchconnection	*mbcon;
 };
 
 #endif

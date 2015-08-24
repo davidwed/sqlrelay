@@ -7,6 +7,74 @@
 
 #include "oraclebench.h"
 
+extern "C" {
+	#include <oci.h>
+}
+
+#define ORACLE_FETCH_AT_ONCE		10
+#define ORACLE_MAX_ITEM_BUFFER_SIZE	2048
+#define ORACLE_MAX_SELECT_LIST_SIZE	256
+
+struct describe {
+	OCIParam	*paramd;
+	sb4	dbsize;
+	sb2	dbtype;
+	text	*buf;
+	sb4	buflen;
+};
+
+class oraclebenchconnection : public benchconnection {
+	friend class oraclebenchcursor;
+	public:
+			oraclebenchconnection(const char *connectstring,
+						const char *dbtype);
+			~oraclebenchconnection();
+
+		bool	connect();
+		bool	disconnect();
+
+	private:
+		const char	*sid;
+		const char	*user;
+		const char	*password;
+
+		OCIEnv		*env;
+		OCIServer	*srv;
+		OCIError	*err;
+		OCISvcCtx	*svc;
+		OCISession	*session;
+		OCITrans	*trans;
+};
+
+class oraclebenchcursor : public benchcursor {
+	public:
+			oraclebenchcursor(benchconnection *con);
+			~oraclebenchcursor();
+
+		bool	open();
+		bool	query(const char *query, bool getcolumns);
+		bool	close();
+
+	private:
+		oraclebenchconnection	*orabcon;
+
+		OCIStmt		*stmt;
+		int32_t		fetchatonce;
+
+		describe	desc[ORACLE_MAX_SELECT_LIST_SIZE];
+
+		OCIDefine	*def[ORACLE_MAX_SELECT_LIST_SIZE];
+		ub1		def_buf[ORACLE_MAX_SELECT_LIST_SIZE]
+						[ORACLE_FETCH_AT_ONCE]
+						[ORACLE_MAX_ITEM_BUFFER_SIZE];
+		sb2		def_indp[ORACLE_MAX_SELECT_LIST_SIZE]
+							[ORACLE_FETCH_AT_ONCE];
+		ub2		def_col_retlen[ORACLE_MAX_SELECT_LIST_SIZE]
+							[ORACLE_FETCH_AT_ONCE];
+		ub2		def_col_retcode[ORACLE_MAX_SELECT_LIST_SIZE]
+							[ORACLE_FETCH_AT_ONCE];
+};
+
 oraclebenchmarks::oraclebenchmarks(const char *connectstring,
 					const char *db,
 					uint64_t queries,

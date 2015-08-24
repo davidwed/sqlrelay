@@ -6,6 +6,38 @@
 
 #include "freetdsbench.h"
 
+class freetdsbenchconnection : public benchconnection {
+	friend class freetdsbenchcursor;
+	public:
+			freetdsbenchconnection(const char *connectstring,
+						const char *dbtype);
+			~freetdsbenchconnection();
+
+		bool	connect();
+		bool	disconnect();
+
+	private:
+		const char	*sybase;
+		const char	*lang;
+		const char	*server;
+		const char	*db;
+		const char	*user;
+		const char	*password;
+};
+
+class freetdsbenchcursor : public benchcursor {
+	public:
+			freetdsbenchcursor(benchconnection *con);
+			~freetdsbenchcursor();
+
+		bool	open();
+		bool	query(const char *query, bool getcolumns);
+		bool	close();
+
+	private:
+		freetdsbenchconnection	*ftdsbcon;
+};
+
 freetdsbenchmarks::freetdsbenchmarks(const char *connectstring,
 					const char *db,
 					uint64_t queries,

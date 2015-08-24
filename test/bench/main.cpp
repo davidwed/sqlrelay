@@ -18,8 +18,8 @@
 #include "postgresqlbench.h"
 #ifndef _WIN32
 	#include "sqlitebench.h"
-	#include "sybasebench.h"
 #endif
+#include "sybasebench.h"
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
 
