@@ -189,7 +189,8 @@ int main(int argc, const char **argv) {
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
-		} else if (!charstring::compare(db,"oracle")) {
+		} else if (!charstring::compare(db,"oracle") ||
+				!charstring::compare(db,"oracle8")) {
 			if (!connectstring) {
 				connectstring=
 					"sid="ORACLE_SID";"
@@ -231,7 +232,8 @@ int main(int argc, const char **argv) {
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		#endif
-		} else if (!charstring::compare(db,"sap")) {
+		} else if (!charstring::compare(db,"sap") ||
+				!charstring::compare(db,"sybase")) {
 			if (!connectstring) {
 				connectstring=
 					"sybase=/opt/sybase;lang=en_US;"
