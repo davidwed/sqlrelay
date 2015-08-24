@@ -19,7 +19,7 @@
 #ifndef _WIN32
 	#include "sqlitebench.h"
 #endif
-#include "sybasebench.h"
+#include "sapbench.h"
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
 
@@ -230,18 +230,18 @@ int main(int argc, const char **argv) {
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
-		} else if (!charstring::compare(db,"sybase")) {
+		#endif
+		} else if (!charstring::compare(db,"sap")) {
 			if (!connectstring) {
 				connectstring=
 					"sybase=/opt/sybase;lang=en_US;"
 					"server=TESTDB;db=testdb;"
 					"user=testuser;password=testpassword;";
 			}
-			bm=new sybasebenchmarks(
+			bm=new sapbenchmarks(
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
-		#endif
 		}
 		if (!bm) {
 			stdoutput.printf("error creating benchmarks\n");

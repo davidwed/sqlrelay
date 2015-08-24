@@ -12,7 +12,7 @@ SRCS = bench.cpp \
 	oraclebench.cpp \
 	postgresqlbench.cpp \
 	sqlitebench.cpp \
-	sybasebench.cpp
+	sapbench.cpp
 
 LOBJS = bench.$(OBJ) \
 	main.$(OBJ) \
@@ -24,7 +24,7 @@ LOBJS = bench.$(OBJ) \
 	oraclebench.$(OBJ) \
 	postgresqlbench.$(OBJ) \
 	sqlitebench.$(OBJ) \
-	sybasebench.$(OBJ)
+	sapbench.$(OBJ)
 
 .SUFFIXES: .lo
 
@@ -81,11 +81,11 @@ sqlitebench.lo: sqlitebench.cpp
 sqlitebench.obj: sqlitebench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SQLITEINCLUDES) $(COMPILE) sqlitebench.cpp
 
-sybasebench.lo: sybasebench.cpp
+sapbench.lo: sapbench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SYBASEINCLUDES) $(COMPILE) $< $(OUT)$@
 
-sybasebench.obj: sybasebench.cpp
-	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SYBASEINCLUDES) $(COMPILE) sybasebench.cpp
+sapbench.obj: sapbench.cpp
+	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SYBASEINCLUDES) $(COMPILE) sapbench.cpp
 
 sqlr-bench: $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@$(EXE) $(LOBJS) $(LDFLAGS) $(BENCHLIBS)
