@@ -2321,7 +2321,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				// convert to a mysql-native string and bind...
 				// (we can use a local varaible because we've
 				// told the API to copy references)
-				MYSQL_TIME	*tm=
+				/*MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
 
 				unsigned int	first=tm->month;
@@ -2339,7 +2339,18 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 						"%04d/%02d/%02d %02d:%02d:%02d",
 						tm->year,first,second,
 						tm->hour,tm->minute,tm->second);
-				cursor->inputBind(variable,buffer);
+				cursor->inputBind(variable,buffer);*/
+
+				MYSQL_TIME	*tm=
+						(MYSQL_TIME *)bind[i].buffer;
+				cursor->inputBind(variable,
+							tm->year,
+							tm->month,
+							tm->day,
+							tm->hour,
+							tm->minute,
+							tm->second,
+							0,NULL);
 				break;
 			}
 			case MYSQL_TYPE_NEWDECIMAL:
