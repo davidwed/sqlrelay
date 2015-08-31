@@ -26,15 +26,14 @@
 # --without mono
 # --without nodejs
 
-Summary: Persistent database connection system.
 Name: sqlrelay
 Version: 0.63
-Release: 1
-License: GPL/LGPL and Others
-Group: System Environment/Daemons
-Source0: %{name}-%{version}.tar.gz
+Release: 1%{?dist}
+Summary: Persistent database connection system
+
+License: GPLv2/LGPLv2 and Others
 URL: http://sqlrelay.sourceforge.net
-Buildroot: %{_tmppath}/%{name}-root
+Source0: http://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 
 %define fedoraversion %(for word in `cat /etc/redhat-release 2> /dev/null`; do VAR=`echo $word | grep -x "[0-9]*"`; if ( test -n "$VAR" ); then echo $VAR; fi ; done)
 
@@ -71,40 +70,35 @@ SQL Relay is a persistent database connection pooling, proxying, throttling, loa
 
 
 %package server-devel
-Summary: Development files for developing modules for the SQL Relay server.
-Group: Development/Libraries
+Summary: Development files for developing modules for the SQL Relay server
 
 %description server-devel
 Development files for developing modules for the SQL Relay server.
 
 
 %package clients
-Summary: Command line applications for accessing databases through SQL Relay.
-Group: Applications/Database
+Summary: Command line applications for accessing databases through SQL Relay
 
 %description clients
 Command line applications for accessing databases through SQL Relay.
 
 
 %package client-runtime-c++
-Summary: Runtime libraries for SQL Relay clients written in C++.
-Group: Applications/Libraries
+Summary: Runtime libraries for SQL Relay clients written in C++
 
 %description client-runtime-c++
 Runtime libraries for SQL Relay clients written in C++.
 
 
 %package client-runtime-c
-Summary: Runtime libraries for SQL Relay clients written in C.
-Group: Applications/Libraries
+Summary: Runtime libraries for SQL Relay clients written in C
 
 %description client-runtime-c
 Runtime libraries for SQL Relay clients written in C.
 
 
 %package client-devel-c++
-Summary: Development files for developing programs in C++ that use SQL Relay.
-Group: Development/Libraries
+Summary: Development files for developing programs in C++ that use SQL Relay
 
 %description client-devel-c++
 Header files and static libraries to use for developing programs in C++ that
@@ -112,8 +106,7 @@ use SQL Relay.
 
 
 %package client-devel-c
-Summary: Development files for developing programs C that use SQL Relay.
-Group: Development/Libraries
+Summary: Development files for developing programs C that use SQL Relay
 
 %description client-devel-c
 Header files and static libraries to use for developing programs in C that
@@ -121,16 +114,14 @@ use SQL Relay.
 
 
 %package client-postgresql
-Summary: Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
-Group: Applications/Libraries
+Summary: Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead
 
 %description client-postgresql
 Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
 
 
 %package client-mysql
-Summary: Drop in replacement library allowing MySQL clients to use SQL Relay instead.
-Group: Applications/Libraries
+Summary: Drop in replacement library allowing MySQL clients to use SQL Relay instead
 
 %description client-mysql
 Drop in replacement library allowing MySQL clients to use SQL Relay instead.
@@ -138,183 +129,160 @@ Drop in replacement library allowing MySQL clients to use SQL Relay instead.
 
 %package client-odbc
 Summary: ODBC driver
-Group: Applications/Libraries
 
 %description client-odbc
 ODBC driver
 
 
 %package db2
-Summary: SQL Relay connection plugin for IBM DB2.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for IBM DB2
 
 %description db2
 SQL Relay connection plugin for IBM DB2.
 
 
 %package freetds
-Summary: SQL Relay connection plugin for FreeTDS (SAP/Sybase and MS SQL Server).
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for FreeTDS (SAP/Sybase and MS SQL Server)
 
 %description freetds
 SQL Relay connection plugin for FreeTDS (SAP/Sybase and MS SQL Server).
 
 
 %package firebird
-Summary: SQL Relay connection plugin for Firebird.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for Firebird
 
 %description firebird
 SQL Relay connection plugin for Firebird.
 
 
 %package mdbtools
-Summary: SQL Relay connection plugin for MDB Tools (Microsoft Access).
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for MDB Tools (Microsoft Access)
 
 %description mdbtools
 SQL Relay connection plugin for MDB Tools (Microsoft Access).
 
 
 %package mysql
-Summary: SQL Relay connection plugin for MySQL.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for MySQL
 
 %description mysql
 SQL Relay connection plugin for MySQL.
 
 
 %package odbc
-Summary: SQL Relay connection plugin for ODBC.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for ODBC
 
 %description odbc
 SQL Relay connection plugin for ODBC.
 
 
 %package oracle
-Summary: SQL Relay connection plugin for Oracle.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for Oracle
 
 %description oracle
 SQL Relay connection plugin for Oracle.
 
 
 %package postgresql
-Summary: SQL Relay connection plugin for PostgreSQL.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for PostgreSQL
 
 %description postgresql
 SQL Relay connection plugin for PostgreSQL.
 
 
 %package sqlite
-Summary: SQL Relay connection plugin for SQLite.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for SQLite
 
 %description sqlite
 SQL Relay connection plugin for SQLite.
 
 
 %package sap
-Summary: SQL Relay connection plugin for SAP/Sybase.
-Group: Applications/Databases
+Summary: SQL Relay connection plugin for SAP/Sybase
 
 %description sap
 SQL Relay connection plugin for SAP/Sybase.
 
 
 %package router
-Summary: SQL Relay query routing daemon.
-Group: Applications/Databases
+Summary: SQL Relay query routing daemon
 
 %description router
 SQL Relay query routing daemon.
 
 
 %package java
-Summary: SQL Relay modules for Java.
-Group: Development/Languages
+Summary: SQL Relay modules for Java
 
 %description java
 SQL Relay modules for Java.
 
 
 %package perl
-Summary: SQL Relay modules for Perl.
-Group: Development/Languages
+Summary: SQL Relay modules for Perl
 
 %description perl
 SQL Relay modules for Perl.
 
 
 %package php
-Summary: SQL Relay modules for PHP.
-Group: Development/Languages
+Summary: SQL Relay modules for PHP
 
 %description php
 SQL Relay modules for PHP.
 
 
 %package python
-Summary: SQL Relay modules for Python.
-Group: Development/Languages
+Summary: SQL Relay modules for Python
 
 %description python
 SQL Relay modules for Python.
 
 
 %package ruby
-Summary: SQL Relay modules for Ruby.
-Group: Development/Languages
+Summary: SQL Relay modules for Ruby
 
 %description ruby
 SQL Relay modules for Ruby.
 
 
 %package tcl
-Summary: SQL Relay modules for TCL.
-Group: Development/Languages
+Summary: SQL Relay modules for TCL
 
 %description tcl
 SQL Relay modules for TCL.
 
 
 %package erlang
-Summary: SQL Relay modules for Erlang.
-Group: Development/Languages
+Summary: SQL Relay modules for Erlang
 
 %description erlang
 SQL Relay modules for Erlang.
 
 
 %package mono
-Summary: SQL Relay modules for Mono.
-Group: Development/Languages
+Summary: SQL Relay modules for Mono
 
 %description mono
 SQL Relay modules for Mono.
 
 
 %package nodejs
-Summary: SQL Relay modules for node.js.
-Group: Development/Languages
+Summary: SQL Relay modules for node.js
 
 %description nodejs
 SQL Relay modules for node.js.
 
 
 %package doc
-Summary: Documentation for SQL Relay.
-Group: Applications/Database
+Summary: Documentation for SQL Relay
 
 %description doc
 Documentation for SQL Relay.
 
 
 %package man
-Summary: Man pages for SQL Relay.
-Group: Applications/Database
+Summary: Man pages for SQL Relay
 
 %description man
 Man pages for SQL Relay.
