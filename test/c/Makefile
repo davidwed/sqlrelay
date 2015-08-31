@@ -10,10 +10,10 @@ include ../../config.mk
 .c.obj:
 	$(CC) $(CFLAGS) $(CTESTCPPFLAGS) $(COMPILE) $<
 
-all: db2 freetds firebird mysql oracle postgresql sqlite sybase
+all: db2 freetds firebird mysql oracle postgresql sqlite sap
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracle$(EXE) postgresql$(EXE) sqlite$(EXE) sybase$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracle$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
 db2: db2.c db2.$(OBJ)
@@ -37,5 +37,5 @@ postgresql: postgresql.c postgresql.$(OBJ)
 sqlite: sqlite.c sqlite.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sqlite.$(OBJ) $(CTESTLIBS)
 
-sybase: sybase.c sybase.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sybase.$(OBJ) $(CTESTLIBS)
+sap: sap.c sap.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sap.$(OBJ) $(CTESTLIBS)

@@ -75,7 +75,7 @@ int	main(int argc, char **argv) {
 
 	// get database type
 	printf("IDENTIFY: \n");
-	checkSuccessString(sqlrcon_identify(con),"sybase");
+	checkSuccessString(sqlrcon_identify(con),"sap");
 	printf("\n");
 
 	// ping
