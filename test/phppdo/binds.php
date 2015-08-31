@@ -43,7 +43,7 @@
 		case "sqlite":
 			$queryvar=":1";
 			break;
-		case "sybase":
+		case "sap":
 		case "freetds":
 			$queryvar="@1";
 			break;
@@ -71,7 +71,7 @@
 			$queryvar=":var1";
 			$bindvar="var1";
 			break;
-		case "sybase":
+		case "sap":
 		case "freetds":
 			$queryvar="@var1";
 			$bindvar="var1";

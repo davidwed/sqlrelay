@@ -21,11 +21,11 @@ all: db2 \
 	oracle7 \
 	postgresql \
 	sqlite \
-	sybase \
+	sap \
 	router
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sybase$(EXE) router$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) router$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
 db2: db2.cpp db2.$(OBJ)
@@ -66,8 +66,8 @@ oracleclobfetch: oracleclobfetch.cpp oracleclobfetch.$(OBJ)
 sqlite: sqlite.cpp sqlite.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sqlite.$(OBJ) $(CPPTESTLIBS)
 
-sybase: sybase.cpp sybase.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sybase.$(OBJ) $(CPPTESTLIBS)
+sap: sap.cpp sap.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sap.$(OBJ) $(CPPTESTLIBS)
 
 router: router.cpp router.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) router.$(OBJ) $(CPPTESTLIBS)

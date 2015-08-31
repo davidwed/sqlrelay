@@ -11,7 +11,7 @@ all: db2.tcl \
 	oracle.tcl \
 	postgresql.tcl \
 	sqlite.tcl \
-	sybase.tcl
+	sap.tcl
 
 db2.tcl: db2.tcl.in
 	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in
@@ -62,7 +62,7 @@ sqlite.tcl: sqlite.tcl.in
 	$(RM) $@.in.in $@.in.in.in
 	$(CHMOD) 755 $@
 
-sybase.tcl: sybase.tcl.in
+sap.tcl: sap.tcl.in
 	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in > $@.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in > $@

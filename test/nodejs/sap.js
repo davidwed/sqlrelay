@@ -58,7 +58,7 @@ var cur=new sqlrelay.SQLRCursor(con);
 	
 // get database type
 console.log("IDENTIFY: ");
-checkSuccess(con.identify(),"sybase");
+checkSuccess(con.identify(),"sap");
 console.log("\n");
 	
 // ping

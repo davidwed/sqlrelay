@@ -44,7 +44,7 @@
 
 	# get database type
 	echo("IDENTIFY: \n");
-	checkSuccess(sqlrcon_identify($con),"sybase");
+	checkSuccess(sqlrcon_identify($con),"sap");
 	echo("\n");
 
 	# ping

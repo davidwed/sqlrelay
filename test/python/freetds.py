@@ -595,7 +595,7 @@ def main():
 	checkSuccess(cur.getField(0,2),None)
 	cur.getNullsAsEmptyStrings()
 	checkSuccess(cur.sendQuery("select NULL,1,NULL"),1)
-	# not a good test, sybase makes all of these columns int type
+	# not a good test, sap makes all of these columns int type
 	checkSuccess(cur.getField(0,0),0)
 	checkSuccess(cur.getField(0,1),1)
 	checkSuccess(cur.getField(0,2),0)

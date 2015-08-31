@@ -9,7 +9,7 @@ all: db2.class\
 	oracle.class \
 	postgresql.class \
 	sqlite.class \
-	sybase.class \
+	sap.class \
 	run.bat
 
 clean:
@@ -36,8 +36,8 @@ postgresql.class: postgresql.java
 sqlite.class: sqlite.java
 	$(JAVAC) -classpath $(javadir)/sqlrelay.jar sqlite.java
 
-sybase.class: sybase.java
-	$(JAVAC) -classpath $(javadir)/sqlrelay.jar sybase.java
+sap.class: sap.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar sap.java
 
 test.class: test.java
 	$(JAVAC) -classpath $(javadir)/sqlrelay.jar test.java

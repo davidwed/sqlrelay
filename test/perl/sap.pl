@@ -57,7 +57,7 @@ $cur=SQLRelay::Cursor->new($con);
 
 # get database type
 print("IDENTIFY: \n");
-checkSuccessString($con->identify(),"sybase");
+checkSuccessString($con->identify(),"sap");
 print("\n");
 
 # ping

@@ -30,7 +30,7 @@ def main():
 
 	# get database type
 	print "IDENTIFY: "
-	checkSuccess(con.identify(),"sybase")
+	checkSuccess(con.identify(),"sap")
 	print
 
 	# ping
@@ -592,7 +592,7 @@ def main():
 	checkSuccess(cur.getField(0,2),None)
 	cur.getNullsAsEmptyStrings()
 	checkSuccess(cur.sendQuery("select NULL,1,NULL"),1)
-	# not a good test, sybase turns all 3 of these fields into int types
+	# not a good test, sap turns all 3 of these fields into int types
 	checkSuccess(cur.getField(0,0),0)
 	checkSuccess(cur.getField(0,1),1)
 	checkSuccess(cur.getField(0,2),0)

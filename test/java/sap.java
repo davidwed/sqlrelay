@@ -5,7 +5,7 @@ import com.firstworks.sqlrelay.SQLRConnection;
 import com.firstworks.sqlrelay.SQLRCursor;
 
 
-class sybase {
+class sap {
 	
 	private static void checkSuccess(String value, String success) {
 	
@@ -97,7 +97,7 @@ class sybase {
 	
 		// get database type
 		System.out.println("IDENTIFY: ");
-		checkSuccess(con.identify(),"sybase");
+		checkSuccess(con.identify(),"sap");
 		System.out.println();
 	
 		// ping

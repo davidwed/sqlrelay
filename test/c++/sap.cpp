@@ -88,7 +88,7 @@ int	main(int argc, char **argv) {
 
 	// get database type
 	stdoutput.printf("IDENTIFY: \n");
-	checkSuccess(con->identify(),"sybase");
+	checkSuccess(con->identify(),"sap");
 	stdoutput.printf("\n");
 
 	// ping

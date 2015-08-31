@@ -33,7 +33,7 @@ set cur [$con sqlrcur]
 
 # get database type
 puts "IDENTIFY: "
-checkSuccess [$con identify]  "sybase"
+checkSuccess [$con identify]  "sap"
 puts ""
 
 # ping

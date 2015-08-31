@@ -27,7 +27,7 @@ cur=SQLRCursor.new(con)
 
 # get database type
 print "IDENTIFY: \n"
-checkSuccess(con.identify(),"sybase")
+checkSuccess(con.identify(),"sap")
 print "\n"
 
 # ping
