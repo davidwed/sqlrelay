@@ -1,13 +1,13 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
-#ifndef SYBASE_BENCH_H
-#define SYBASE_BENCH_H
+#ifndef SAP_BENCH_H
+#define SAP_BENCH_H
 
 #include "bench.h"
 
-class sybasebenchmarks : public benchmarks {
+class sapbenchmarks : public benchmarks {
 	public:
-		sybasebenchmarks(const char *connectstring,
+		sapbenchmarks(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
