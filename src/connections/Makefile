@@ -12,6 +12,8 @@ all-firebird: sqlrconnection_firebird.$(LIBEXT)
 
 all-freetds: sqlrconnection_freetds.$(LIBEXT)
 
+all-informix: sqlrconnection_informix.$(LIBEXT)
+
 all-mdbtools: sqlrconnection_mdbtools.$(LIBEXT)
 
 all-mysql: sqlrconnection_mysql.$(LIBEXT)
@@ -64,6 +66,17 @@ freetds.obj: freetds.cpp
 
 sqlrconnection_freetds.$(LIBEXT): freetds.$(OBJ) freetds.cpp
 	$(LTLINK) $(LINK) $(OUT)$@ freetds.$(OBJ) $(LDFLAGS) $(FREETDSCONNECTIONLIBS) $(MODLINKFLAGS)
+
+
+
+informix.lo: informix.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(INFORMIXCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+informix.obj: informix.cpp
+	$(CXX) $(CXXFLAGS) $(INFORMIXCONNECTIONCPPFLAGS) $(COMPILE) informix.cpp
+
+sqlrconnection_informix.$(LIBEXT): informix.$(OBJ) informix.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ informix.$(OBJ) $(LDFLAGS) $(INFORMIXCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
@@ -171,6 +184,10 @@ installdll-freetds:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrconnection_freetds.$(LIBEXT) $(libexecdir)
 
+installdll-informix:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_informix.$(LIBEXT) $(libexecdir)
+
 installdll-mdbtools:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) sqlrconnection_mdbtools.$(LIBEXT) $(libexecdir)
@@ -228,6 +245,13 @@ installsharedlib-freetds:
 	$(RM) $(libexecdir)/sqlrconnection_freetds.a
 	$(RM) $(libexecdir)/sqlrconnection_freetds.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_freetds.so so $(MODULESUFFIX)
+
+installsharedlib-informix:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_informix.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_informix.a
+	$(RM) $(libexecdir)/sqlrconnection_informix.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_informix.so so $(MODULESUFFIX)
 
 installsharedlib-mdbtools:
 	$(MKINSTALLDIRS) $(libexecdir)

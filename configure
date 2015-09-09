@@ -708,6 +708,10 @@ FIREBIRDSTATIC
 FIREBIRDLIBSPATH
 FIREBIRDLIBS
 FIREBIRDINCLUDES
+INFORMIXUSERPATH
+INFORMIXLIBSPATH
+INFORMIXLIBS
+INFORMIXINCLUDES
 DB2STATIC
 DB2LIBSPATH
 DB2LIBS
@@ -29982,6 +29986,24 @@ _ACEOF
 fi
 
 echo "******************************"
+
+
+
+echo
+echo "***** Informix *****************"
+
+	INFORMIXINCLUDES="-I/opt/informix/incl/cli"
+	INFORMIXLIBS="-L/opt/informix/lib/cli -lifcli"
+	INFORMIXLIBSPATH="/opt/informix/lib/cli"
+	INFORMIXUSERPATH=""
+
+
+
+
+
+
+echo "******************************"
+
 
 
 

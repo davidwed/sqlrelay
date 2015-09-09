@@ -645,6 +645,15 @@ echo "******************************"
 
 
 
+dnl Checks for Informix.
+echo
+echo "***** Informix *****************"
+FW_CHECK_INFORMIX
+echo "******************************"
+
+
+
+
 dnl Checks for Firebird.
 echo
 echo "***** Firebird **************"
