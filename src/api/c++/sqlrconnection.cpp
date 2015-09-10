@@ -1297,9 +1297,9 @@ void sqlrconnection::debugPrint(const char *string) {
 	if (printfunction) {
 		(*printfunction)("%s",string);
 	} else if (debugfile.getFileDescriptor()!=-1) {
-		debugfile.safePrint("%s");
+		debugfile.safePrint(string);
 	} else {
-		stdoutput.safePrint("%s");
+		stdoutput.safePrint(string);
 	}
 }
 

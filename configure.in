@@ -172,6 +172,19 @@ AC_ARG_ENABLE(firebird-rpath,
 	FIREBIRDUSERPATH="yes",
 	FIREBIRDUSERPATH="")
 AC_SUBST(FIREBIRDUSERPATH)
+AC_ARG_WITH(informix-prefix,
+	[  --with-informix-prefix       Location of Informix],
+	INFORMIXPATH="$withval",
+	INFORMIXPATH="")
+AC_ARG_ENABLE(informix,
+	[  --disable-informix           Don't build Informix connection],
+	ENABLE_INFORMIX="",
+	ENABLE_INFORMIX="yes")
+AC_ARG_ENABLE(informix-rpath,
+	[  --enable-informix-rpath      Use -rpath when building Informix connection],
+	INFORMIXUSERPATH="yes",
+	INFORMIXUSERPATH="")
+AC_SUBST(INFORMIXUSERPATH)
 AC_ARG_WITH(mdbtools-prefix,
 	[  --with-mdbtools-prefix        Location of MDB Tools],
 	MDBTOOLSPATH="$withval",
@@ -615,7 +628,7 @@ echo "******************************"
 
 dnl Checks for FreeTDS.
 echo
-echo "***** FreeTDS ******************"
+echo "***** FreeTDS ****************"
 FW_CHECK_FREETDS
 echo "******************************"
 
@@ -631,7 +644,7 @@ echo "******************************"
 
 dnl Checks for ODBC.
 echo
-echo "***** ODBC *********************"
+echo "***** ODBC *******************"
 FW_CHECK_ODBC
 echo "******************************"
 
@@ -639,7 +652,7 @@ echo "******************************"
 
 dnl Checks for DB2.
 echo
-echo "***** DB2 **********************"
+echo "***** DB2 ********************"
 FW_CHECK_DB2
 echo "******************************"
 
@@ -647,7 +660,7 @@ echo "******************************"
 
 dnl Checks for Informix.
 echo
-echo "***** Informix *****************"
+echo "***** Informix ***************"
 FW_CHECK_INFORMIX
 echo "******************************"
 
@@ -656,7 +669,7 @@ echo "******************************"
 
 dnl Checks for Firebird.
 echo
-echo "***** Firebird **************"
+echo "***** Firebird ***************"
 FW_CHECK_FIREBIRD
 echo "******************************"
 

@@ -708,7 +708,6 @@ FIREBIRDSTATIC
 FIREBIRDLIBSPATH
 FIREBIRDLIBS
 FIREBIRDINCLUDES
-INFORMIXUSERPATH
 INFORMIXLIBSPATH
 INFORMIXLIBS
 INFORMIXINCLUDES
@@ -845,6 +844,7 @@ OVERRIDEPERLINSTALLMAN3DIR
 OVERRIDEPERLSITELIB
 OVERRIDEPERLSITEARCH
 MDBTOOLSUSERPATH
+INFORMIXUSERPATH
 FIREBIRDUSERPATH
 DB2USERPATH
 ODBCUSERPATH
@@ -937,6 +937,9 @@ enable_db2_rpath
 with_firebird_prefix
 enable_firebird
 enable_firebird_rpath
+with_informix_prefix
+enable_informix
+enable_informix_rpath
 with_mdbtools_prefix
 enable_mdbtools
 enable_mdbtools_rpath
@@ -1637,6 +1640,8 @@ Optional Features:
   --disable-db2-rpath            Use -rpath when building DB2 connection
   --disable-firebird           Don't build Firebird connection
   --enable-firebird-rpath      Use -rpath when building Firebird connection
+  --disable-informix           Don't build Informix connection
+  --enable-informix-rpath      Use -rpath when building Informix connection
   --disable-mdbtools            Don't build MDB Tools connection
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection
   --disable-perl                Don't build Perl api
@@ -1681,6 +1686,7 @@ Optional Packages:
   --with-db2-prefix             Location of DB2
   --with-db2-version            DB2 Version (7 or 8)
   --with-firebird-prefix       Location of Firebird
+  --with-informix-prefix       Location of Informix
   --with-mdbtools-prefix        Location of MDB Tools
   --with-perl-prefix            Location of Perl
   --with-pod2man                Full pathname of pod2man
@@ -2922,6 +2928,29 @@ if test "${enable_firebird_rpath+set}" = set; then :
   enableval=$enable_firebird_rpath; FIREBIRDUSERPATH="yes"
 else
   FIREBIRDUSERPATH=""
+fi
+
+
+
+# Check whether --with-informix-prefix was given.
+if test "${with_informix_prefix+set}" = set; then :
+  withval=$with_informix_prefix; INFORMIXPATH="$withval"
+else
+  INFORMIXPATH=""
+fi
+
+# Check whether --enable-informix was given.
+if test "${enable_informix+set}" = set; then :
+  enableval=$enable_informix; ENABLE_INFORMIX=""
+else
+  ENABLE_INFORMIX="yes"
+fi
+
+# Check whether --enable-informix-rpath was given.
+if test "${enable_informix_rpath+set}" = set; then :
+  enableval=$enable_informix_rpath; INFORMIXUSERPATH="yes"
+else
+  INFORMIXUSERPATH=""
 fi
 
 
@@ -24587,7 +24616,7 @@ echo "******************************"
 
 
 echo
-echo "***** FreeTDS ******************"
+echo "***** FreeTDS ****************"
 
 if ( test "$ENABLE_FREETDS" = "yes" )
 then
@@ -25960,7 +25989,7 @@ echo "******************************"
 
 
 echo
-echo "***** ODBC *********************"
+echo "***** ODBC *******************"
 
 if ( test "$ENABLE_ODBC" = "yes" )
 then
@@ -28520,7 +28549,7 @@ echo "******************************"
 
 
 echo
-echo "***** DB2 **********************"
+echo "***** DB2 ********************"
 
 if ( test "$ENABLE_DB2" = "yes" )
 then
@@ -29990,8 +30019,10 @@ echo "******************************"
 
 
 echo
-echo "***** Informix *****************"
+echo "***** Informix ***************"
 
+if ( test "$ENABLE_INFORMIX" = "yes" )
+then
 	INFORMIXINCLUDES="-I/opt/informix/incl/cli"
 	INFORMIXLIBS="-L/opt/informix/lib/cli -lifcli"
 	INFORMIXLIBSPATH="/opt/informix/lib/cli"
@@ -30001,6 +30032,7 @@ echo "***** Informix *****************"
 
 
 
+fi
 
 echo "******************************"
 
@@ -30008,7 +30040,7 @@ echo "******************************"
 
 
 echo
-echo "***** Firebird **************"
+echo "***** Firebird ***************"
 
 if ( test "$ENABLE_FIREBIRD" = "yes" )
 then

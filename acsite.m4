@@ -2414,6 +2414,8 @@ fi
 
 AC_DEFUN([FW_CHECK_INFORMIX],
 [
+if ( test "$ENABLE_INFORMIX" = "yes" )
+then
 	INFORMIXINCLUDES="-I/opt/informix/incl/cli"
 	INFORMIXLIBS="-L/opt/informix/lib/cli -lifcli"
 	INFORMIXLIBSPATH="/opt/informix/lib/cli"
@@ -2423,6 +2425,7 @@ AC_DEFUN([FW_CHECK_INFORMIX],
 	AC_SUBST(INFORMIXLIBS)
 	AC_SUBST(INFORMIXLIBSPATH)
 	AC_SUBST(INFORMIXUSERPATH)
+fi
 ])
 
 
