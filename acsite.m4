@@ -2416,11 +2416,40 @@ AC_DEFUN([FW_CHECK_INFORMIX],
 [
 if ( test "$ENABLE_INFORMIX" = "yes" )
 then
-	INFORMIXINCLUDES="-I/opt/informix/incl/cli"
-	INFORMIXLIBS="-L/opt/informix/lib/cli -lifcli"
-	INFORMIXCLILIBSPATH="/opt/informix/lib/cli"
-	INFORMIXESQLLIBSPATH="/opt/informix/lib/esql"
-	INFORMIXUSERPATH="yes"
+	INFORMIXINCLUDES=""
+	INFORMIXLIBS=""
+	INFORMIXCLILIBSPATH=""
+	INFORMIXESQLLIBSPATH=""
+	INFORMIXSTATIC=""
+
+	for dir in "$INFORMIXPATH" "$INFORMIXDIR" "/opt/informix" "/usr/local/informix"
+	do
+		if ( test -z "$dir" )
+		then
+			continue
+		fi
+
+		if ( test -d "$dir" )
+		then
+			FW_CHECK_HEADER_LIB([$dir/incl/cli/infxsql.h],[INFORMIXINCLUDES=\"-I$dir/incl/cli\"],[$dir/lib/cli/libifcli.$SOSUFFIX],[INFORMIXLIBS=\"-L$dir/lib/cli -lifcli\"],[$dir/lib/cli/libifcli.a],[INFORMIXLIBS=\"$dir/lib/cli/libifcli.a\"; INFORMIXSTATIC=\"yes\"])
+
+			if ( test -n "$INFORMIXLIBS" )
+			then
+				if ( test -d "$dir/lib/cli" )
+				then
+					INFORMIXCLILIBSPATH="$dir/lib/cli"
+				fi
+				if ( test -d "$dir/lib/esql" )
+				then
+					INFORMIXESQLLIBSPATH="$dir/lib/esql"
+				fi
+				break
+			fi
+		fi
+	done
+
+	FW_INCLUDES(informix,[$INFORMIXINCLUDES])
+	FW_LIBS(informix,[$INFORMIXLIBS])
 
 	AC_SUBST(INFORMIXINCLUDES)
 	AC_SUBST(INFORMIXLIBS)

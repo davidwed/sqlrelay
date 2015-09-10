@@ -1642,7 +1642,7 @@ Optional Features:
   --disable-firebird           Don't build Firebird connection
   --enable-firebird-rpath      Use -rpath when building Firebird connection
   --disable-informix           Don't build Informix connection
-  --enable-informix-rpath      Use -rpath when building Informix connection
+  --disable-informix-rpath     Don't use -rpath when building Informix connection
   --disable-mdbtools            Don't build MDB Tools connection
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection
   --disable-perl                Don't build Perl api
@@ -1696,7 +1696,7 @@ Optional Packages:
   --with-perl-install-man3-dir  Override Perl's built-in PERLINSTALLMAN3DIR variable (location to install perl module man pages)
   --with-perl-man3-ext          Override Perl's built-in PERLMAN3EXT variable (extension to put on perl module man pages)
   --with-python-prefix          Location of Python
-  --with-python-dir             Path to install Python driver
+  --with-python-dir             Path to install Python api
   --with-ruby-prefix            Location of Ruby
   --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)
   --with-java-prefix            Location of Java
@@ -2949,9 +2949,9 @@ fi
 
 # Check whether --enable-informix-rpath was given.
 if test "${enable_informix_rpath+set}" = set; then :
-  enableval=$enable_informix_rpath; INFORMIXUSERPATH="yes"
+  enableval=$enable_informix_rpath; INFORMIXUSERPATH=""
 else
-  INFORMIXUSERPATH=""
+  INFORMIXUSERPATH="yes"
 fi
 
 
@@ -30024,11 +30024,88 @@ echo "***** Informix ***************"
 
 if ( test "$ENABLE_INFORMIX" = "yes" )
 then
-	INFORMIXINCLUDES="-I/opt/informix/incl/cli"
-	INFORMIXLIBS="-L/opt/informix/lib/cli -lifcli"
-	INFORMIXCLILIBSPATH="/opt/informix/lib/cli"
-	INFORMIXESQLLIBSPATH="/opt/informix/lib/esql"
-	INFORMIXUSERPATH="yes"
+	INFORMIXINCLUDES=""
+	INFORMIXLIBS=""
+	INFORMIXCLILIBSPATH=""
+	INFORMIXESQLLIBSPATH=""
+	INFORMIXSTATIC=""
+
+	for dir in "$INFORMIXPATH" "$INFORMIXDIR" "/opt/informix" "/usr/local/informix"
+	do
+		if ( test -z "$dir" )
+		then
+			continue
+		fi
+
+		if ( test -d "$dir" )
+		then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$dir/incl/cli/infxsql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$dir/lib/cli/libifcli.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INFORMIXINCLUDES=\"-I$dir/incl/cli\""
+		eval "INFORMIXLIBS=\"-L$dir/lib/cli -lifcli\""
+	fi
+else
+	if ( test -n "$dir/lib/cli/libifcli.a" -a -n "INFORMIXLIBS=\"$dir/lib/cli/libifcli.a\"; INFORMIXSTATIC=\"yes\"" )
+	then
+
+if ( test -r "$dir/lib/cli/libifcli.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INFORMIXINCLUDES=\"-I$dir/incl/cli\""
+			eval "INFORMIXLIBS=\"$dir/lib/cli/libifcli.a\"; INFORMIXSTATIC=\"yes\""
+		fi
+	fi
+fi
+
+
+			if ( test -n "$INFORMIXLIBS" )
+			then
+				if ( test -d "$dir/lib/cli" )
+				then
+					INFORMIXCLILIBSPATH="$dir/lib/cli"
+				fi
+				if ( test -d "$dir/lib/esql" )
+				then
+					INFORMIXESQLLIBSPATH="$dir/lib/esql"
+				fi
+				break
+			fi
+		fi
+	done
+
+
+if ( test -n "$INFORMIXINCLUDES" )
+then
+	echo "informix includes... $INFORMIXINCLUDES"
+fi
+
+
+if ( test -n "$INFORMIXLIBS" )
+then
+	echo "informix libs... $INFORMIXLIBS"
+fi
+
 
 
 
@@ -37358,6 +37435,7 @@ ODBCBUILD="no     "
 DB2BUILD="no     "
 FIREBIRDBUILD="no     "
 MDBTOOLSBUILD="no     "
+INFORMIXBUILD="no     "
 if ( test -n "$ORACLEVERSION" ); then
 	ORACLE8BUILD="dynamic"
 	if ( test -n "$ORACLESTATIC" ); then
@@ -37418,11 +37496,18 @@ if ( test -n "$MDBTOOLSLIBS" ); then
 		MDBTOOLSBUILD="static "
 	fi
 fi
+if ( test -n "$INFORMIXLIBS" ); then
+	INFORMIXBUILD="dynamic"
+	if ( test -n "$INFORMIXSTATIC" ); then
+		INFORMIXBUILD="static "
+	fi
+fi
 echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD       SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
 echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD"
+echo "                Informix    $INFORMIXBUILD"
 
 echo "*************************************************************"
 echo
