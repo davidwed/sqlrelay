@@ -1816,8 +1816,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					} else {
 						command.append(cmd[i]);
 					}
-				} else if (cmd[i]>=32 || 
-						cmd[i]=='	') {
+				} else {
 					command.append(cmd[i]);
 				}
 			}
@@ -1830,7 +1829,6 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			#endif
 		}
 
-		// trim the command
 		char	*cmd=command.detachString();
 
 		// run the command
