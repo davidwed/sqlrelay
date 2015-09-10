@@ -13,7 +13,7 @@
 // it's not immediately clear how to do lobs in informix
 #define USE_LOBS 0
 
-// db2 > 7 has a bug that requires the use of rowstat rather than
+// DB2 > 7 has a bug that requires the use of rowstat rather than
 // SQL_ATTR_ROW_NUMBER.  not sure if informix does too
 #define USE_ROWSTAT 0
 
@@ -96,6 +96,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+#if USE_LOBS == 1
 		bool		inputBindBlob(const char *variable,
 						uint16_t variablesize,
 						const char *value,
@@ -106,6 +107,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						const char *value,
 						uint32_t valuesize,
 						int16_t *isnull);
+#endif
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
@@ -134,6 +136,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+#if USE_LOBS == 1
 		bool		outputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						uint16_t index,
@@ -142,6 +145,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						uint16_t variablesize,
 						uint16_t index,
 						int16_t *isnull);
+#endif
 		bool		getLobOutputBindLength(uint16_t index,
 							uint64_t *length);
 		bool		getLobOutputBindSegment(uint16_t index,
@@ -266,9 +270,12 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		SQLRETURN	erg;
 		SQLHDBC		dbc;
 
-		const char	*server;
+		const char	*informixdir;
+		const char	*servername;
+		const char	*database;
 		const char	*lang;
 		uint32_t	timeout;
+		stringbuffer	dsn;
 
 		stringbuffer	errormessage;
 
@@ -301,15 +308,45 @@ informixconnection::informixconnection(sqlrservercontroller *cont) :
 
 void informixconnection::handleConnectString() {
 
-	// override legacy "server" parameter with modern "db" parameter
-	server=cont->getConnectStringValue("server");
-	const char	*tmp=cont->getConnectStringValue("db");
-	if (tmp && tmp[0]) {
-		server=tmp;
-	}
+	// get informix dir
+	informixdir=cont->getConnectStringValue("informixdir");
 
+	// get dsn components
+	servername=cont->getConnectStringValue("servername");
+	if (!servername || !servername[0]) {
+		servername=environment::getValue("INFORMIXSERVER");
+	}
+	database=cont->getConnectStringValue("database");
 	cont->setUser(cont->getConnectStringValue("user"));
 	cont->setPassword(cont->getConnectStringValue("password"));
+
+	// build dsn
+	dsn.clear();
+	if (servername && servername[0]) {
+		dsn.append("Servername=")->append(servername);
+	}
+	if (database && database[0]) {
+		if (dsn.getStringLength()) {
+			dsn.append(";");
+		}
+		dsn.append("Database=")->append(database);
+	}
+	const char	*user=cont->getUser();
+	if (user && user[0]) {
+		if (dsn.getStringLength()) {
+			dsn.append(";");
+		}
+		dsn.append("LogonID=")->append(user);
+	}
+	const char	*pass=cont->getPassword();
+	if (pass && pass[0]) {
+		if (dsn.getStringLength()) {
+			dsn.append(";");
+		}
+		dsn.append("pwd=")->append(pass);
+	}
+
+	// get other parameters
 	const char	*autocom=cont->getConnectStringValue("autocommit");
 	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
@@ -323,13 +360,7 @@ void informixconnection::handleConnectString() {
 		cont->fakeInputBinds();
 	}
 
-	const char	*to=cont->getConnectStringValue("timeout");
-	if (!charstring::length(to)) {
-		// for back-compatibility
-		timeout=5;
-	} else {
-		timeout=charstring::toInteger(to);
-	}
+	timeout=charstring::toInteger(cont->getConnectStringValue("timeout"));
 
 	fetchatonce=charstring::toUnsignedInteger(
 				cont->getConnectStringValue("fetchatonce"));
@@ -356,8 +387,16 @@ void informixconnection::handleConnectString() {
 
 bool informixconnection::logIn(const char **error, const char **warning) {
 
+	// set the INFORMIX environment variable
+	if (charstring::length(informixdir) &&
+		!environment::setValue("INFORMIXDIR",informixdir)) {
+		*error="Failed to set INFORMIXDIR environment variable";
+		return false;
+	}
+
 	// set the LANG environment variable
-	if (charstring::length(lang) && !environment::setValue("LANG",lang)) {
+	if (charstring::length(lang) &&
+		!environment::setValue("LANG",lang)) {
 		*error="Failed to set LANG environment variable";
 		return false;
 	}
@@ -397,9 +436,10 @@ bool informixconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// connect to the database
-	erg=SQLConnect(dbc,(SQLCHAR *)server,SQL_NTS,
-				(SQLCHAR *)cont->getUser(),SQL_NTS,
-				(SQLCHAR *)cont->getPassword(),SQL_NTS);
+	erg=SQLDriverConnect(dbc,NULL,
+				(SQLCHAR *)dsn.getString(),
+				dsn.getStringLength(),
+				NULL,0,NULL,SQL_DRIVER_COMPLETE);
 	if (erg==SQL_SUCCESS_WITH_INFO) {
 		*warning=logInError(NULL);
 	} else if (erg!=SQL_SUCCESS) {
@@ -527,7 +567,8 @@ void informixconnection::dbVersionSpecificTasks() {
 }
 
 sqlrservercursor *informixconnection::newCursor(uint16_t id) {
-	return (sqlrservercursor *)new informixcursor((sqlrserverconnection *)this,id);
+	return (sqlrservercursor *)new informixcursor(
+					(sqlrserverconnection *)this,id);
 }
 
 void informixconnection::deleteCursor(sqlrservercursor *curs) {
