@@ -13,9 +13,8 @@
 // it's not immediately clear how to do lobs in informix
 #define USE_LOBS 0
 
-// DB2 > 7 has a bug that requires the use of rowstat rather than
-// SQL_ATTR_ROW_NUMBER.  not sure if informix does too
-#define USE_ROWSTAT 0
+// column nullability doesn't work with SQLColAttribute
+#define USE_NULLABLE 0
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
@@ -32,7 +31,9 @@ struct informixcolumn {
 	int32_t		length;
 	int32_t		precision;
 	int32_t		scale;
+	#if USE_NULLABLE == 1
 	int32_t		nullable;
+	#endif
 	uint16_t	primarykey;
 	uint16_t	unique;
 	uint16_t	partofkey;
@@ -96,7 +97,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
-#if USE_LOBS == 1
+		#if USE_LOBS == 1
 		bool		inputBindBlob(const char *variable,
 						uint16_t variablesize,
 						const char *value,
@@ -107,7 +108,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						const char *value,
 						uint32_t valuesize,
 						int16_t *isnull);
-#endif
+		#endif
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
@@ -136,7 +137,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
-#if USE_LOBS == 1
+		#if USE_LOBS == 1
 		bool		outputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						uint16_t index,
@@ -145,7 +146,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						uint16_t variablesize,
 						uint16_t index,
 						int16_t *isnull);
-#endif
+		#endif
 		bool		getLobOutputBindLength(uint16_t index,
 							uint64_t *length);
 		bool		getLobOutputBindSegment(uint16_t index,
@@ -169,7 +170,9 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		uint32_t	getColumnLength(uint32_t i);
 		uint32_t	getColumnPrecision(uint32_t i);
 		uint32_t	getColumnScale(uint32_t i);
+		#if USE_NULLABLE == 1
 		uint16_t	getColumnIsNullable(uint32_t i);
+		#endif
 		uint16_t	getColumnIsUnsigned(uint32_t i);
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
@@ -182,14 +185,14 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 					bool *blob,
 					bool *null);
 		void		nextRow();
-#if USE_LOBS == 1
+		#if USE_LOBS == 1
 		bool		getLobFieldLength(uint32_t col,
 							uint64_t *length);
 		bool		getLobFieldSegment(uint32_t col,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
-#endif
+		#endif
 		void		closeResultSet();
 
 		SQLRETURN	erg;
@@ -203,9 +206,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		SQLINTEGER	**loblocator;
 		SQLINTEGER	**loblength;
 		SQLLEN		**indicator;
-		#ifdef USE_ROWSTAT
-		SQLUSMALLINT	*rowstat;
-		#endif
 		informixcolumn	*column;
 
 		uint16_t	maxbindcount;
@@ -288,10 +288,6 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 
 		char		dbversion[512];
 		uint16_t	dbmajorversion;
-
-		const char	*gettablelistquery;
-		const char	*gettablelistquerywild;
-		const char	*dbhostnamequery;
 
 		stringbuffer	errormsg;
 };
@@ -475,95 +471,14 @@ const char *informixconnection::logInError(const char *errmsg) {
 
 void informixconnection::dbVersionSpecificTasks() {
 
+	// NOTE: keep this code because we may need it at some point
 	// get the db version
-	SQLSMALLINT	dbversionlen;
+	/*SQLSMALLINT	dbversionlen;
 	SQLGetInfo(dbc,SQL_DBMS_VER,
 			(SQLPOINTER)dbversion,
 			(SQLSMALLINT)sizeof(dbversion),
 			&dbversionlen);
-	dbmajorversion=charstring::toInteger(dbversion);
-
-	// set queries to use based on version
-	if (dbmajorversion>7) {
-
-		gettablelistquery=
-			"select distinct "
-			"	tabname, "
-			"	NULL "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	ownertype='U' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"	and "
-			"	tabname like '%s' "
-			"order by "
-			"	tabname";
-
-		gettablelistquerywild=
-			"select distinct "
-			"	tabname, "
-			"	NULL "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	ownertype='U' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"order by "
-			"	tabname";
-
-		dbhostnamequery=
-			"select "
-			"	host_name "
-			"from "
-			"	table(sysproc.env_get_sys_info())";
-	} else {
-
-		gettablelistquery=
-			"select distinct "
-			"	tabname, "
-			"	NULL "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	definer!='SYSIBM' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"	and "
-			"	tabname like '%s' "
-			"order by "
-			"	tabname";
-
-		gettablelistquerywild=
-			"select distinct "
-			"	tabname, "
-			"	NULL "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	definer!='SYSIBM' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"order by "
-			"	tabname";
-
-		// there is no obvious way to get this prior to 8.0
-		dbhostnamequery=
-			"select "
-			"	NULL "
-			"from "
-			"	sysibm.sysdummy1";
-	}
+	dbmajorversion=charstring::toInteger(dbversion);*/
 }
 
 sqlrservercursor *informixconnection::newCursor(uint16_t id) {
@@ -639,7 +554,7 @@ bool informixconnection::liveConnection(SQLINTEGER nativeerrnum,
 					const char *errorbuffer,
 					SQLSMALLINT errlength) {
 
-	// FIXME: update these for informix
+	// FIXME: implement this for informix
 
 	// When the DB goes down, DB2 first reports one error:
 	// 	[IBM][CLI Driver] SQL1224N  A database agent could not be
@@ -674,7 +589,7 @@ bool informixconnection::liveConnection(SQLINTEGER nativeerrnum,
 
 
 const char *informixconnection::pingQuery() {
-	return "values 1";
+	return "select 1 from systables where tabid=1";
 }
 
 const char *informixconnection::identify() {
@@ -686,14 +601,19 @@ const char *informixconnection::dbVersion() {
 }
 
 const char *informixconnection::dbHostNameQuery() {
-	return dbhostnamequery;
+	// FIXME: implement this for informix
+	return "select "
+		"	host_name "
+		"from "
+		"	table(sysproc.env_get_sys_info())";
 }
 
 const char *informixconnection::getDatabaseListQuery(bool wild) {
+	// FIXME: implement this for informix
 	return (wild)?
 		"select "
 		"	schemaname, "
-		"	NULL "
+		"	'' as extra "
 		"from "
 		"	syscat.schemata "
 		"where "
@@ -701,52 +621,87 @@ const char *informixconnection::getDatabaseListQuery(bool wild) {
 
 		"select "
 		"	schemaname, "
-		"	NULL "
+		"	'' as extra "
 		"from "
 		"	syscat.schemata ";
 }
 
 const char *informixconnection::getTableListQuery(bool wild) {
-	return (wild)?gettablelistquery:gettablelistquerywild;
+	return (wild)?
+		"select distinct "
+		"	tabname, "
+		"	'' as extra "
+		"from "
+		"	systables "
+		"where "
+		"	tabid > 99 "
+		"	and "
+		"	tabname like '%s' "
+		"	and "
+		"	tabtype in ('T','S','P','V') "
+		"order by "
+		"	tabname":
+
+		"select distinct "
+		"	tabname, "
+		"	'' as extra "
+		"from "
+		"	systables "
+		"where "
+		"	tabid > 99 "
+		"	and "
+		"	tabtype in ('T','S','P','V') "
+		"order by "
+		"	tabname";
 }
 
-const char *informixconnection::getColumnListQuery(const char *table, bool wild) {
+const char *informixconnection::getColumnListQuery(
+					const char *table, bool wild) {
+	// FIXME: coltype is a number and collength is impossibly large
+	// see col_cnvrt(), fix_nm(), and fix_dt() in dbdiff2 at
+	// http://www.iiug.org/library/faqs/informix-faq/dbdiff2.4gl.txt
 	return (wild)?
 		"select "
 		"	colname, "
-		"	typename, "
-		"	length, "
-		"	length as precision, "
-		"	scale, "
-		"	nulls, "
-		"	keyseq as key, "
-		"	default, "
+		"	coltype, "
+		"	'' as length, "
+		"	'' as precision, "
+		"	'' as scale, "
+		"	'' as nulls, "
+		"	'' as key, "
+		"	'' as default, "
 		"	'' as extra, "
-		"	NULL "
+		"	'' as extra2 "
 		"from "
-		"	syscat.columns "
+		"	systables, "
+		"	syscolumns "
 		"where "
-		"	upper(tabame)=upper('%s') "
+		"	upper(systables.tabname)=upper('%s') "
 		"	and "
-		"	colname like '%s' "
+		"	syscolumns.tabid=systables.tabid "
+		"	and "
+		"	syscolumns.colname like '%s' "
 		"order by "
 		"	colno":
 
 		"select "
 		"	colname, "
-		"	typename, "
-		"	length, "
-		"	length as precision, "
-		"	scale, "
-		"	nulls, "
-		"	keyseq as key, "
-		"	default, "
+		"	coltype, "
+		"	'' as length, "
+		"	'' as precision, "
+		"	'' as scale, "
+		"	'' as nulls, "
+		"	'' as key, "
+		"	'' as default, "
 		"	'' as extra, "
-		"	NULL "
+		"	'' as extra2 "
 		"from "
-		"	syscat.columns "
+		"	systables, "
+		"	syscolumns "
 		"where "
-		"	upper(tabname)=upper('%s') "
+		"	upper(systables.tabname)=upper('%s') "
+		"	and "
+		"	syscolumns.tabid=systables.tabid "
 		"order by "
 		"	colno";
 }
@@ -756,18 +711,22 @@ const char *informixconnection::bindFormat() {
 }
 
 const char *informixconnection::selectDatabaseQuery() {
+	// FIXME: implement this for informix
 	return "set schema %s";
 }
 
 const char *informixconnection::getCurrentDatabaseQuery() {
+	// FIXME: implement this for informix
 	return "values current schema";
 }
 
 const char *informixconnection::getLastInsertIdQuery() {
+	// FIXME: implement this for informix
 	return "values identity_val_local()";
 }
 
 const char *informixconnection::setIsolationLevelQuery() {
+	// FIXME: implement this for informix
         return "set current isolation %s";
 }
 
@@ -806,9 +765,6 @@ void informixcursor::allocateResultSetBuffers(int32_t selectlistsize) {
 		loblocator=NULL;
 		loblength=NULL;
 		indicator=NULL;
-		#ifdef USE_ROWSTAT
-		rowstat=NULL;
-		#endif
 		column=NULL;
 	} else {
 		this->selectlistsize=selectlistsize;
@@ -816,14 +772,11 @@ void informixcursor::allocateResultSetBuffers(int32_t selectlistsize) {
 		loblocator=new SQLINTEGER *[selectlistsize];
 		loblength=new SQLINTEGER *[selectlistsize];
 		indicator=new SQLLEN *[selectlistsize];
-		#ifdef USE_ROWSTAT
-		rowstat=new SQLUSMALLINT[informixconn->fetchatonce];
-		#endif
 		column=new informixcolumn[selectlistsize];
 		for (int32_t i=0; i<selectlistsize; i++) {
 			column[i].name=new char[4096];
 			field[i]=new char[informixconn->fetchatonce*
-						informixconn->maxitembuffersize];
+					informixconn->maxitembuffersize];
 			loblocator[i]=new SQLINTEGER[informixconn->fetchatonce];
 			loblength[i]=new SQLINTEGER[informixconn->fetchatonce];
 			indicator[i]=new SQLLEN[informixconn->fetchatonce];
@@ -845,9 +798,6 @@ void informixcursor::deallocateResultSetBuffers() {
 		delete[] loblocator;
 		delete[] loblength;
 		delete[] indicator;
-		#ifdef USE_ROWSTAT
-		delete[] rowstat;
-		#endif
 		selectlistsize=0;
 	}
 }
@@ -874,20 +824,6 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
-
-	#ifdef USE_ROWSTAT
-	if (informixconn->maxselectlistsize!=-1) {
-
-		// set the row status ptr
-		// (only do this here if we're not
-		// dynamically allocating row buffers)
-		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
-					(SQLPOINTER)rowstat,0);
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
-	}
-	#endif
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -1303,20 +1239,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 
 	// allocate buffers and limit column count if necessary
 	if (informixconn->maxselectlistsize==-1) {
-
 		allocateResultSetBuffers(ncols);
-
-		#ifdef USE_ROWSTAT
-		// set the row status ptr
-		// (only do this here if we're
-		// dynamically allocating row buffers)
-		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
-					(SQLPOINTER)rowstat,0);
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
-		#endif
-
 	} else if (ncols>informixconn->maxselectlistsize) {
 		ncols=informixconn->maxselectlistsize;
 	}
@@ -1364,11 +1287,15 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			}
 
 			// column nullable
+			// FIXME: informix doesn't appear to support this with
+			// SQLColAttribute, try SQLColAttributes
+			#if USE_NULLABLE == 1
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
 					NULL,0,NULL,&(column[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+			#endif
 
 			// primary key
 
@@ -1397,7 +1324,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// bind the column to a lob locator or buffer
-#if USE_LOBS == 1
+		#if USE_LOBS == 1
 		if (column[i].type==SQL_INFX_UDT_CLOB) {
 			erg=SQLBindCol(stmt,i+1,SQL_C_CLOB_LOCATOR,
 					loblocator[i],0,
@@ -1407,14 +1334,14 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 					loblocator[i],0,
 					indicator[i]);
 		} else {
-#endif
+		#endif
 			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 					field[i],
 					informixconn->maxitembuffersize,
 					indicator[i]);
-#if USE_LOBS == 1
+		#if USE_LOBS == 1
 		}
-#endif
+		#endif
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
@@ -1523,12 +1450,12 @@ uint16_t informixcursor::getColumnType(uint32_t i) {
 		case SQL_VARCHAR:
 			return VARCHAR_DATATYPE;
 		// Informix blob datatypes...
-#if USE_LOBS == 1
+		#if USE_LOBS == 1
 		case SQL_INFX_UDT_BLOB:
 			return BLOB_DATATYPE;
 		case SQL_INFX_UDT_CLOB:
 			return CLOB_DATATYPE;
-#endif
+		#endif
 		default:
 			return UNKNOWN_DATATYPE;
 	}
@@ -1546,9 +1473,11 @@ uint32_t informixcursor::getColumnScale(uint32_t i) {
 	return column[i].scale;
 }
 
+#if USE_NULLABLE == 1
 uint16_t informixcursor::getColumnIsNullable(uint32_t i) {
 	return column[i].nullable;
 }
+#endif
 
 uint16_t informixcursor::getColumnIsUnsigned(uint32_t i) {
 	return column[i].unsignednumber;
@@ -1603,18 +1532,8 @@ bool informixcursor::fetchRow() {
 		}
 
 		// Determine the current rownumber
-		#ifdef USE_ROWSTAT
-		uint32_t	index=0;
-		while (index<informixconn->fetchatonce &&
-			(rowstat[index]==SQL_ROW_SUCCESS ||
-			rowstat[index]==SQL_ROW_SUCCESS_WITH_INFO)) {
-			index++;
-		}
-		rownumber=totalrows+index;
-		#else
 		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 				(SQLPOINTER)&rownumber,0,NULL);
-		#endif
 
 		// In the event that there's a bug in SQLFetchScroll and it
 		// returns SQL_SUCCESS or SQL_SUCCESS_WITH_INFO even if we were
@@ -1640,14 +1559,14 @@ void informixcursor::getField(uint32_t col,
 		return;
 	}
 
-#if USE_LOBS == 1
-	// handle blobs
+	#if USE_LOBS == 1
+	// handle lobs
 	if (column[col].type==SQL_INFX_UDT_CLOB ||
 		column[col].type==SQL_INFX_UDT_BLOB) {
 		*blob=true;
 		return;
 	}
-#endif
+	#endif
 
 	// handle normal datatypes
 	*fld=&field[col][rowgroupindex*informixconn->maxitembuffersize];
@@ -1772,7 +1691,11 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 #endif
 
 void informixcursor::closeResultSet() {
-	SQLCloseCursor(stmt);
+
+	// informix doesn't like to close a null stmt
+	if (stmt) {
+		SQLCloseCursor(stmt);
+	}
 
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		delete outdatebind[i];
