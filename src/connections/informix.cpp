@@ -8,7 +8,7 @@
 #include <defines.h>
 #include <config.h>
 
-#include <infxsql.h>
+#include <infxcli.h>
 
 // it's not immediately clear how to do lobs in informix
 #define USE_LOBS 0
@@ -1289,6 +1289,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			// column nullable
 			// FIXME: informix doesn't appear to support this with
 			// SQLColAttribute, try SQLColAttributes
+			// or try FDNULLABLE/ISNULLABLE
 			#if USE_NULLABLE == 1
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
 					NULL,0,NULL,&(column[i].nullable));
@@ -1325,12 +1326,18 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 
 		// bind the column to a lob locator or buffer
 		#if USE_LOBS == 1
-		if (column[i].type==SQL_INFX_UDT_CLOB) {
+		/*if (column[i].type==SQL_INFX_UDT_CLOB) {
 			erg=SQLBindCol(stmt,i+1,SQL_C_CLOB_LOCATOR,
 					loblocator[i],0,
 					indicator[i]);
 		} else if (column[i].type==SQL_INFX_UDT_BLOB) {
 			erg=SQLBindCol(stmt,i+1,SQL_C_BLOB_LOCATOR,
+					loblocator[i],0,
+					indicator[i]);
+		} else {*/
+		if (column[i].type==SQL_INFX_UDT_CLOB ||
+			column[i].type==SQL_INFX_UDT_BLOB) {
+			erg=SQLBindCol(stmt,i+1,SQL_INFX_C_SMARTLOB_LOCATOR,
 					loblocator[i],0,
 					indicator[i]);
 		} else {
@@ -1590,9 +1597,10 @@ bool informixcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 
 	// get the length of the lob
 	SQLINTEGER	ind;
-	SQLSMALLINT	locatortype=(column[col].type==SQL_INFX_UDT_CLOB)?
+	/*SQLSMALLINT	locatortype=(column[col].type==SQL_INFX_UDT_CLOB)?
 							SQL_C_CLOB_LOCATOR:
-							SQL_C_BLOB_LOCATOR;
+							SQL_C_BLOB_LOCATOR;*/
+	SQLSMALLINT	locatortype=SQL_INFX_C_SMARTLOB_LOCATOR;
 	erg=SQLGetLength(lobstmt,locatortype,
 				loblocator[col][rowgroupindex],
 				&loblength[col][rowgroupindex],&ind);
@@ -1655,10 +1663,11 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 		// read the bytes
 		SQLINTEGER	bytesread=0;
 		SQLINTEGER	ind=0;
-		SQLSMALLINT	locatortype=
+		/*SQLSMALLINT	locatortype=
 				(column[col].type==SQL_INFX_UDT_CLOB)?
 							SQL_C_CLOB_LOCATOR:
-							SQL_C_BLOB_LOCATOR;
+							SQL_C_BLOB_LOCATOR;*/
+		SQLSMALLINT	locatortype=SQL_INFX_C_SMARTLOB_LOCATOR;
 		SQLSMALLINT	targettype=
 				(column[col].type==SQL_INFX_UDT_CLOB)?
 							SQL_C_CHAR:

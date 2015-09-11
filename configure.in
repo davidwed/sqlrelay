@@ -52,11 +52,11 @@ AC_ARG_WITH(oracle-instantclient-prefix,
 	[  --with-oracle-instantclient-prefix  Location of Oracle Instantclient],
 	ORACLE_INSTANTCLIENT_PREFIX="$withval")
 AC_ARG_ENABLE(oracle,
-	[  --disable-oracle              Don't build Oracle connection],
+	[  --disable-oracle              Don't build Oracle connection module],
 	ENABLE_ORACLE="",
 	ENABLE_ORACLE="yes")
 AC_ARG_ENABLE(oracle-rpath,
-	[  --disable-oracle-rpath        Don't use -rpath when building Oracle connection],
+	[  --disable-oracle-rpath        Don't use -rpath when building Oracle connection module],
 	ORACLEUSERPATH="",
 	ORACLEUSERPATH="yes")
 AC_SUBST(ORACLEUSERPATH)
@@ -65,11 +65,11 @@ AC_ARG_WITH(mysql-prefix,
 	MYSQLPATH="$withval",
 	MYSQLPATH="")
 AC_ARG_ENABLE(mysql,
-	[  --disable-mysql               Don't build MySQL connection],
+	[  --disable-mysql               Don't build MySQL connection module],
 	ENABLE_MYSQL="",
 	ENABLE_MYSQL="yes")
 AC_ARG_ENABLE(mysql-rpath,
-	[  --enable-mysql-rpath          Use -rpath when building MySQL connection],
+	[  --enable-mysql-rpath          Use -rpath when building MySQL connection module],
 	MYSQLUSERPATH="yes",
 	MYSQLUSERPATH="")
 AC_SUBST(MYSQLUSERPATH)
@@ -78,11 +78,11 @@ AC_ARG_WITH(postgresql-prefix,
 	POSTGRESQLPATH="$withval",
 	POSTGRESQLPATH="")
 AC_ARG_ENABLE(postgresql,
-	[  --disable-postgresql          Don't build PostgreSQL connection],
+	[  --disable-postgresql          Don't build PostgreSQL connection module],
 	ENABLE_POSTGRESQL="",
 	ENABLE_POSTGRESQL="yes")
 AC_ARG_ENABLE(postgresql-rpath,
-	[  --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection],
+	[  --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection module],
 	POSTGRESQLUSERPATH="yes",
 	POSTGRESQLUSERPATH="")
 AC_SUBST(POSTGRESQLUSERPATH)
@@ -95,11 +95,11 @@ AC_ARG_WITH(sqlite-prefix,
 	SQLITEPATH="$withval",
 	SQLITEPATH="")
 AC_ARG_ENABLE(sqlite,
-	[  --disable-sqlite              Don't build SQLite connection],
+	[  --disable-sqlite              Don't build SQLite connection module],
 	ENABLE_SQLITE="",
 	ENABLE_SQLITE="yes")
 AC_ARG_ENABLE(sqlite-rpath,
-	[  --enable-sqlite-rpath         Use -rpath when building SQLite connection],
+	[  --enable-sqlite-rpath         Use -rpath when building SQLite connection module],
 	SQLITEUSERPATH="yes",
 	SQLITEUSERPATH="")
 AC_SUBST(SQLITEUSERPATH)
@@ -108,11 +108,11 @@ AC_ARG_WITH(freetds-prefix,
 	FREETDSPATH="$withval",
 	FREETDSPATH="")
 AC_ARG_ENABLE(freetds,
-	[  --disable-freetds             Don't build FreeTDS connection],
+	[  --disable-freetds             Don't build FreeTDS connection module],
 	ENABLE_FREETDS="",
 	ENABLE_FREETDS="yes")
 AC_ARG_ENABLE(freetds-rpath,
-	[  --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection],
+	[  --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection module],
 	FREETDSUSERPATH="",
 	FREETDSUSERPATH="yes")
 AC_SUBST(FREETDSUSERPATH)
@@ -121,11 +121,11 @@ AC_ARG_WITH(sap-prefix,
 	SYBASEPATH="$withval",
 	SYBASEPATH="")
 AC_ARG_ENABLE(sap,
-	[  --disable-sap                 Don't build SAP/Sybase connection],
+	[  --disable-sap                 Don't build SAP/Sybase connection module],
 	ENABLE_SYBASE="",
 	ENABLE_SYBASE="yes")
 AC_ARG_ENABLE(sap-rpath,
-	[  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection],
+	[  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module],
 	SYBASEUSERPATH="",
 	SYBASEUSERPATH="yes")
 AC_SUBST(SYBASEUSERPATH)
@@ -134,11 +134,11 @@ AC_ARG_WITH(odbc-prefix,
 	ODBCPATH="$withval",
 	ODBCPATH="")
 AC_ARG_ENABLE(odbc,
-	[  --disable-odbc                Don't build ODBC connection],
+	[  --disable-odbc                Don't build ODBC connection module],
 	ENABLE_ODBC="",
 	ENABLE_ODBC="yes")
 AC_ARG_ENABLE(odbc-rpath,
-	[  --enable-odbc-rpath           Use -rpath when building ODBC connection],
+	[  --enable-odbc-rpath           Use -rpath when building ODBC connection module],
 	ODBCUSERPATH="yes",
 	ODBCUSERPATH="")
 AC_SUBST(ODBCUSERPATH)
@@ -151,37 +151,37 @@ AC_ARG_WITH(db2-version,
 	DB2VERSION="$withval",
 	DB2VERSION="8")
 AC_ARG_ENABLE(db2,
-	[  --disable-db2                 Don't build DB2 connection],
+	[  --disable-db2                 Don't build DB2 connection module],
 	ENABLE_DB2="",
 	ENABLE_DB2="yes")
 AC_ARG_ENABLE(db2-rpath,
-	[  --disable-db2-rpath            Use -rpath when building DB2 connection],
+	[  --disable-db2-rpath           Use -rpath when building DB2 connection module],
 	DB2USERPATH="",
 	DB2USERPATH="yes")
 AC_SUBST(DB2USERPATH)
 AC_ARG_WITH(firebird-prefix,
-	[  --with-firebird-prefix       Location of Firebird],
+	[  --with-firebird-prefix        Location of Firebird],
 	FIREBIRDPATH="$withval",
 	FIREBIRDPATH="")
 AC_ARG_ENABLE(firebird,
-	[  --disable-firebird           Don't build Firebird connection],
+	[  --disable-firebird            Don't build Firebird connection module],
 	ENABLE_FIREBIRD="",
 	ENABLE_FIREBIRD="yes")
 AC_ARG_ENABLE(firebird-rpath,
-	[  --enable-firebird-rpath      Use -rpath when building Firebird connection],
+	[  --enable-firebird-rpath       Use -rpath when building Firebird connection module],
 	FIREBIRDUSERPATH="yes",
 	FIREBIRDUSERPATH="")
 AC_SUBST(FIREBIRDUSERPATH)
 AC_ARG_WITH(informix-prefix,
-	[  --with-informix-prefix       Location of Informix],
+	[  --with-informix-prefix        Location of Informix],
 	INFORMIXPATH="$withval",
 	INFORMIXPATH="")
 AC_ARG_ENABLE(informix,
-	[  --disable-informix           Don't build Informix connection],
+	[  --disable-informix            Don't build Informix connection module],
 	ENABLE_INFORMIX="",
 	ENABLE_INFORMIX="yes")
 AC_ARG_ENABLE(informix-rpath,
-	[  --disable-informix-rpath     Don't use -rpath when building Informix connection],
+	[  --disable-informix-rpath      Don't use -rpath when building Informix connection module],
 	INFORMIXUSERPATH="",
 	INFORMIXUSERPATH="yes")
 AC_SUBST(INFORMIXUSERPATH)
@@ -190,11 +190,11 @@ AC_ARG_WITH(mdbtools-prefix,
 	MDBTOOLSPATH="$withval",
 	MDBTOOLSPATH="")
 AC_ARG_ENABLE(mdbtools,
-	[  --disable-mdbtools            Don't build MDB Tools connection],
+	[  --disable-mdbtools            Don't build MDB Tools connection module],
 	ENABLE_MDBTOOLS="",
 	ENABLE_MDBTOOLS="yes")
 AC_ARG_ENABLE(mdbtools-rpath,
-	[  --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection],
+	[  --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module],
 	MDBTOOLSUSERPATH="yes",
 	MDBTOOLSUSERPATH="")
 AC_SUBST(MDBTOOLSUSERPATH)
@@ -291,11 +291,11 @@ AC_ARG_WITH(php-ext-dir,
 	PHPEXTDIR="$withval",
 	PHPEXTDIR="")
 AC_ARG_WITH(tcl-include,
-	[  --with-tcl-include		 Location of tcl.h include file],
+	[  --with-tcl-include		Location of tcl.h include file],
 	TCLINCLUDEPATH="$withval",
 	TCLINCLUDEPATH="")
 AC_ARG_WITH(tcl-libraries,
-	[  --with-tcl-libraries		 Location of libtcl, where to install tcl module],
+	[  --with-tcl-libraries		Location of libtcl, where to install tcl module],
 	TCLLIBSPATH="$withval",
 	TCLLIBSPATH="")
 AC_ARG_ENABLE(tcl,

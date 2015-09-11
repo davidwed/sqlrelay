@@ -1622,29 +1622,29 @@ Optional Features:
   --enable-profiling            compile with -pg options
   --enable-client-rpath         Use -rpath when linking SQL Relay client programs against SQL Relay libraries
   --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries
-  --disable-oracle              Don't build Oracle connection
-  --disable-oracle-rpath        Don't use -rpath when building Oracle connection
-  --disable-mysql               Don't build MySQL connection
-  --enable-mysql-rpath          Use -rpath when building MySQL connection
-  --disable-postgresql          Don't build PostgreSQL connection
-  --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection
+  --disable-oracle              Don't build Oracle connection module
+  --disable-oracle-rpath        Don't use -rpath when building Oracle connection module
+  --disable-mysql               Don't build MySQL connection module
+  --enable-mysql-rpath          Use -rpath when building MySQL connection module
+  --disable-postgresql          Don't build PostgreSQL connection module
+  --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection module
   --disable-postgresql8-api     Use older postgresql api without native bind support
-  --disable-sqlite              Don't build SQLite connection
-  --enable-sqlite-rpath         Use -rpath when building SQLite connection
-  --disable-freetds             Don't build FreeTDS connection
-  --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection
-  --disable-sap                 Don't build SAP/Sybase connection
-  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection
-  --disable-odbc                Don't build ODBC connection
-  --enable-odbc-rpath           Use -rpath when building ODBC connection
-  --disable-db2                 Don't build DB2 connection
-  --disable-db2-rpath            Use -rpath when building DB2 connection
-  --disable-firebird           Don't build Firebird connection
-  --enable-firebird-rpath      Use -rpath when building Firebird connection
-  --disable-informix           Don't build Informix connection
-  --disable-informix-rpath     Don't use -rpath when building Informix connection
-  --disable-mdbtools            Don't build MDB Tools connection
-  --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection
+  --disable-sqlite              Don't build SQLite connection module
+  --enable-sqlite-rpath         Use -rpath when building SQLite connection module
+  --disable-freetds             Don't build FreeTDS connection module
+  --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection module
+  --disable-sap                 Don't build SAP/Sybase connection module
+  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module
+  --disable-odbc                Don't build ODBC connection module
+  --enable-odbc-rpath           Use -rpath when building ODBC connection module
+  --disable-db2                 Don't build DB2 connection module
+  --disable-db2-rpath           Use -rpath when building DB2 connection module
+  --disable-firebird            Don't build Firebird connection module
+  --enable-firebird-rpath       Use -rpath when building Firebird connection module
+  --disable-informix            Don't build Informix connection module
+  --disable-informix-rpath      Don't use -rpath when building Informix connection module
+  --disable-mdbtools            Don't build MDB Tools connection module
+  --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module
   --disable-perl                Don't build Perl api
   --disable-python              Don't build Python api
   --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library
@@ -1686,8 +1686,8 @@ Optional Packages:
   --with-odbc-prefix            Location of ODBC
   --with-db2-prefix             Location of DB2
   --with-db2-version            DB2 Version (7 or 8)
-  --with-firebird-prefix       Location of Firebird
-  --with-informix-prefix       Location of Informix
+  --with-firebird-prefix        Location of Firebird
+  --with-informix-prefix        Location of Informix
   --with-mdbtools-prefix        Location of MDB Tools
   --with-perl-prefix            Location of Perl
   --with-pod2man                Full pathname of pod2man
@@ -1702,8 +1702,8 @@ Optional Packages:
   --with-java-prefix            Location of Java
   --with-php-prefix             Location of PHP
   --with-php-ext-dir            Path to install PHP modules
-  --with-tcl-include		 Location of tcl.h include file
-  --with-tcl-libraries		 Location of libtcl, where to install tcl module
+  --with-tcl-include		Location of tcl.h include file
+  --with-tcl-libraries		Location of libtcl, where to install tcl module
   --with-erlang-prefix          Location of Erlang
   --with-mono-prefix            Location of Mono (C#)
   --with-nodejs-prefix          Location of node.js
