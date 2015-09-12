@@ -27,7 +27,7 @@
 # --without nodejs
 
 Name: sqlrelay
-Version: 0.63
+Version: 0.64
 Release: 1%{?dist}
 Summary: Persistent database connection system
 
