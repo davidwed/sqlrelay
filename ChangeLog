@@ -1,3 +1,6 @@
+0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
+	added informix connection module
+
 0.63 - suppressed ruby configure warning
 	fixed glib detection if pkg-config isn't present
 	fixed mono detection on freebsd

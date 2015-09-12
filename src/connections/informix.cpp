@@ -1408,51 +1408,97 @@ uint16_t informixcursor::getColumnNameLength(uint32_t i) {
 
 uint16_t informixcursor::getColumnType(uint32_t i) {
 	switch (column[i].type) {
-		case SQL_BIGINT:
-			return BIGINT_DATATYPE;
-		case SQL_BINARY:
-			return BINARY_DATATYPE;
-		case SQL_BIT:
-			return BIT_DATATYPE;
 		case SQL_CHAR:
+			// SQL_CHAR is returned for char and nchar
+			// FIXME: is there some way to distinguish them?
 			return CHAR_DATATYPE;
-		case SQL_TYPE_DATE:
-			return DATE_DATATYPE;
-		case SQL_DECIMAL:
-			return DECIMAL_DATATYPE;
-		case SQL_DOUBLE:
-			return DOUBLE_DATATYPE;
-		case SQL_FLOAT:
-			return FLOAT_DATATYPE;
-		case SQL_INTEGER:
-			return INTEGER_DATATYPE;
-		case SQL_LONGVARBINARY:
-			return LONGVARBINARY_DATATYPE;
-		case SQL_LONGVARCHAR:
-			return LONGVARCHAR_DATATYPE;
 		case SQL_NUMERIC:
 			return NUMERIC_DATATYPE;
-		case SQL_REAL:
-			return REAL_DATATYPE;
+		case SQL_DECIMAL:
+			// SQL_DECIMAL is returned for decimal and money
+			// FIXME: is there some way to distinguish them?
+			return DECIMAL_DATATYPE;
+		case SQL_INTEGER:
+			return INTEGER_DATATYPE;
 		case SQL_SMALLINT:
 			return SMALLINT_DATATYPE;
-		case SQL_TYPE_TIME:
-			return TIME_DATATYPE;
-		case SQL_TYPE_TIMESTAMP:
-			return TIMESTAMP_DATATYPE;
-		case SQL_TINYINT:
-			return TINYINT_DATATYPE;
-		case SQL_VARBINARY:
-			return VARBINARY_DATATYPE;
+		case SQL_FLOAT:
+			return FLOAT_DATATYPE;
+		case SQL_REAL:
+			// SQL_REAL is returned for smallfloat
+			return SMALLFLOAT_DATATYPE;
+		case SQL_DOUBLE:
+			// SQL_DOUBLE is returned for float
+			return FLOAT_DATATYPE;
+		case SQL_DATETIME:
+			// SQL_DATETIME is returned for date
+			return DATE_DATATYPE;
 		case SQL_VARCHAR:
 			return VARCHAR_DATATYPE;
-		// Informix blob datatypes...
+		case SQL_WCHAR:
+		case SQL_WVARCHAR:
+		case SQL_WLONGVARCHAR:
+		case SQL_DECFLOAT:
+			// I don't think informix actually supports these,
+			// but they're defined in infxsql.h
+			return UNKNOWN_DATATYPE;
+		case SQL_TIME:
+			// I don't think informix actually supports this,
+			// but it's defined in sqlext.h
+			return TIME_DATATYPE;
+		case SQL_TIMESTAMP:
+			// SQL_TIMESTAMP is returned for datetime
+			return DATETIME_DATATYPE;
+		case SQL_LONGVARCHAR:
+			// SQL_LONGVARCHAR is returned for text
+			return TEXT_DATATYPE;
+		case SQL_BINARY:
+			// I don't think informix actually supports this,
+			// but it's defined in sqlext.h
+			return BINARY_DATATYPE;
+		case SQL_VARBINARY:
+			// I don't think informix actually supports this,
+			// but it's defined in sqlext.h
+			return VARBINARY_DATATYPE;
+		case SQL_LONGVARBINARY:
+			// SQL_LONGVARBINARY is returned for byte
+			return BYTE_DATATYPE;
+		case SQL_BIGINT:
+			// SQL_BIGINT is returned for int8's
+			return INT8_DATATYPE;
+		case SQL_TINYINT:
+			// I don't think informix actually supports this,
+			// but it's defined in sqlext.h
+			return TINYINT_DATATYPE;
+		case SQL_BIT:
+			// SQL_BIT is returned for boolean
+			return BOOLEAN_DATATYPE;
+		case SQL_INFX_UDT_FIXED:
+		case SQL_INFX_UDT_VARYING:
+			// not sure what these are...
+			return UNKNOWN_DATATYPE;
 		#if USE_LOBS == 1
 		case SQL_INFX_UDT_BLOB:
 			return BLOB_DATATYPE;
 		case SQL_INFX_UDT_CLOB:
 			return CLOB_DATATYPE;
 		#endif
+		case SQL_INFX_UDT_LVARCHAR:
+		case SQL_INFX_RC_ROW:
+		case SQL_INFX_RC_COLLECTION:
+		case SQL_INFX_RC_LIST:
+		case SQL_INFX_RC_SET:
+		case SQL_INFX_RC_MULTISET:
+		case SQL_INFX_UNSUPPORTED:
+		case SQL_INFX_C_SMARTLOB_LOCATOR:
+		case SQL_INFX_QUALIFIER:
+			// not sure what these are...
+			return UNKNOWN_DATATYPE;
+		case SQL_INFX_DECIMAL:
+			return DECIMAL_DATATYPE;
+		case SQL_INFX_BIGINT:
+			// SQL_INFX_BIGINT is returned for bigint's
+			return BIGINT_DATATYPE;
 		default:
 			return UNKNOWN_DATATYPE;
 	}

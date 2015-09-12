@@ -198,7 +198,11 @@ typedef	enum {
 	// none added by sqlite
 	// added by sqlserver
 	UBIGINT_DATATYPE,
-	UNIQUEIDENTIFIER_DATATYPE
+	UNIQUEIDENTIFIER_DATATYPE,
+	// added by informix
+	SMALLFLOAT_DATATYPE,
+	BYTE_DATATYPE,
+	BOOLEAN_DATATYPE
 } datatype;
 
 #ifdef NEED_DATATYPESTRING
@@ -391,6 +395,10 @@ static const char	*datatypestring[] = {
 	// added by sqlserver
 	"UBIGINT",
 	"UNIQUEIDENTIFIER",
+	// added by informix
+	"SMALLFLOAT",
+	"BYTE",
+	"BOOLEAN",
 	NULL
 };
 #endif
