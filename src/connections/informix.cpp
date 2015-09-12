@@ -580,7 +580,7 @@ bool informixconnection::liveConnection(SQLINTEGER nativeerrnum,
 
 
 const char *informixconnection::pingQuery() {
-	return "select 1 from systables:sysdual";
+	return "select 1 from sysmaster:sysdual";
 }
 
 const char *informixconnection::identify() {
@@ -592,7 +592,7 @@ const char *informixconnection::dbVersion() {
 }
 
 const char *informixconnection::dbHostNameQuery() {
-	return "select dbinfo('dbname') from systables:sysdual";
+	return "select dbinfo('dbname') from sysmaster:sysdual";
 	//return "select os_nodename from sysmaster:sysmachineinfo";
 }
 
@@ -703,13 +703,13 @@ const char *informixconnection::selectDatabaseQuery() {
 }
 
 const char *informixconnection::getCurrentDatabaseQuery() {
-	return "select dbinfo('dbname') from systables:sysdual";
+	return "select dbinfo('dbname') from sysmaster:sysdual";
 }
 
 const char *informixconnection::getLastInsertIdQuery() {
-	return "select dbinfo('sqlca.sqlerrd1') from systables:sysdual";
-	//return "select dbinfo('serial8') from systables:sysdual";
-	//return "select dbinfo('bigserial') from systables:sysdual";
+	return "select dbinfo('sqlca.sqlerrd1') from sysmaster:sysdual";
+	//return "select dbinfo('serial8') from sysmaster:sysdual";
+	//return "select dbinfo('bigserial') from sysmaster:sysdual";
 }
 
 const char *informixconnection::setIsolationLevelQuery() {
@@ -860,7 +860,9 @@ bool informixcursor::inputBind(const char *variable,
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
-				0,
+				// the parameter below must be set
+				// for informix, unlike db2 and odbc
+				valuesize,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
