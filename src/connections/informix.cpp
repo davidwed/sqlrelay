@@ -233,7 +233,6 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		void	handleConnectString();
 		bool	logIn(const char **error, const char **warning);
 		const char	*logInError(const char *errmsg);
-		void	dbVersionSpecificTasks();
 		sqlrservercursor	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
@@ -287,7 +286,6 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		const char	*identity;
 
 		char		dbversion[512];
-		uint16_t	dbmajorversion;
 
 		stringbuffer	errormsg;
 };
@@ -445,7 +443,12 @@ bool informixconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
-	dbVersionSpecificTasks();
+	// get db version
+	SQLSMALLINT	dbversionlen;
+	SQLGetInfo(dbc,SQL_DBMS_VER,
+			(SQLPOINTER)dbversion,
+			(SQLSMALLINT)sizeof(dbversion),
+			&dbversionlen);
 
 	return true;
 }
@@ -467,18 +470,6 @@ const char *informixconnection::logInError(const char *errmsg) {
 					errorbuffer,1024,&errlength);
 	errormessage.append(errorbuffer,errlength);
 	return errormessage.getString();
-}
-
-void informixconnection::dbVersionSpecificTasks() {
-
-	// NOTE: keep this code because we may need it at some point
-	// get the db version
-	/*SQLSMALLINT	dbversionlen;
-	SQLGetInfo(dbc,SQL_DBMS_VER,
-			(SQLPOINTER)dbversion,
-			(SQLSMALLINT)sizeof(dbversion),
-			&dbversionlen);
-	dbmajorversion=charstring::toInteger(dbversion);*/
 }
 
 sqlrservercursor *informixconnection::newCursor(uint16_t id) {
@@ -589,7 +580,7 @@ bool informixconnection::liveConnection(SQLINTEGER nativeerrnum,
 
 
 const char *informixconnection::pingQuery() {
-	return "select 1 from systables where tabid=1";
+	return "select 1 from systables:sysdual";
 }
 
 const char *informixconnection::identify() {
@@ -601,29 +592,25 @@ const char *informixconnection::dbVersion() {
 }
 
 const char *informixconnection::dbHostNameQuery() {
-	// FIXME: implement this for informix
-	return "select "
-		"	host_name "
-		"from "
-		"	table(sysproc.env_get_sys_info())";
+	return "select dbinfo('dbname') from systables:sysdual";
+	//return "select os_nodename from sysmaster:sysmachineinfo";
 }
 
 const char *informixconnection::getDatabaseListQuery(bool wild) {
-	// FIXME: implement this for informix
 	return (wild)?
 		"select "
-		"	schemaname, "
+		"	name, "
 		"	'' as extra "
 		"from "
-		"	syscat.schemata "
+		"	sysmaster:sysdatabases "
 		"where "
-		"	schemaname like '%s'":
+		"	name like '%s'":
 
 		"select "
-		"	schemaname, "
+		"	name, "
 		"	'' as extra "
 		"from "
-		"	syscat.schemata ";
+		"	sysmaster:sysdatabases ";
 }
 
 const char *informixconnection::getTableListQuery(bool wild) {
@@ -711,23 +698,22 @@ const char *informixconnection::bindFormat() {
 }
 
 const char *informixconnection::selectDatabaseQuery() {
-	// FIXME: implement this for informix
-	return "set schema %s";
+	// FIXME: this doesn't actually work
+	return "set connection '%s'";
 }
 
 const char *informixconnection::getCurrentDatabaseQuery() {
-	// FIXME: implement this for informix
-	return "values current schema";
+	return "select dbinfo('dbname') from systables:sysdual";
 }
 
 const char *informixconnection::getLastInsertIdQuery() {
-	// FIXME: implement this for informix
-	return "values identity_val_local()";
+	return "select dbinfo('sqlca.sqlerrd1') from systables:sysdual";
+	//return "select dbinfo('serial8') from systables:sysdual";
+	//return "select dbinfo('bigserial') from systables:sysdual";
 }
 
 const char *informixconnection::setIsolationLevelQuery() {
-	// FIXME: implement this for informix
-        return "set current isolation %s";
+        return "set isolation %s";
 }
 
 informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
@@ -1395,9 +1381,11 @@ void informixcursor::errorMessage(char *errorbuffer,
 
 	// set return values
 	*errorlength=errlength;
-	*errorcode=nativeerrnum;
+	// leave it to informix to have negative numbers for error codes...
+	// the best we can do for now is turn it into a positive number
+	*errorcode=-nativeerrnum;
 	*liveconnection=informixconn->liveConnection(nativeerrnum,
-						errorbuffer,errlength);
+							errorbuffer,errlength);
 }
 
 uint64_t informixcursor::affectedRows() {
