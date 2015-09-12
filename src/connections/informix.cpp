@@ -644,13 +644,36 @@ const char *informixconnection::getTableListQuery(bool wild) {
 
 const char *informixconnection::getColumnListQuery(
 					const char *table, bool wild) {
-	// FIXME: coltype is a number and collength is impossibly large
+
+#define COLTYPE \
+		"	decode(coltype, " \
+		"		41,'boolean', " \
+		"		1,'smallint', " \
+		"		2,'int', " \
+		"		52,'bigint', " \
+		"		17,'int8', " \
+		"		5,'decimal', " \
+		"		8,'money', " \
+		"		4,'smallfloat', " \
+		"		3,'float', " \
+		"		0,'char', " \
+		"		15,'nchar', " \
+		"		13,'varchar', " \
+		"		16,'nvarchar', " \
+		"		40,'lvarchar', " \
+		"		7,'date', " \
+		"		10,'datetime', " \
+		"		12,'text', " \
+		"		11,'byte', " \
+		"		'unknown') as coltype, "
+
+	// FIXME: collength is impossibly large
 	// see col_cnvrt(), fix_nm(), and fix_dt() in dbdiff2 at
 	// http://www.iiug.org/library/faqs/informix-faq/dbdiff2.4gl.txt
 	return (wild)?
 		"select "
 		"	colname, "
-		"	coltype, "
+		COLTYPE
 		"	'' as length, "
 		"	'' as precision, "
 		"	'' as scale, "
@@ -673,7 +696,7 @@ const char *informixconnection::getColumnListQuery(
 
 		"select "
 		"	colname, "
-		"	coltype, "
+		COLTYPE
 		"	'' as length, "
 		"	'' as precision, "
 		"	'' as scale, "
