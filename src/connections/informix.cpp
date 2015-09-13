@@ -1270,11 +1270,9 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			}
 
 			// column length
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LENGTH,
-					NULL,0,NULL,&(column[i].length));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+			// SQL_COLUMN_LENGTH isn't reliable in informix.  It
+			// usually returns -1 or 0.  Just copy the result of
+			// SQL_COLUMN_PRECISION below...
 
 			// column type
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_TYPE,
@@ -1289,6 +1287,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+			column[i].length=column[i].precision;
 
 			// column scale
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_SCALE,
