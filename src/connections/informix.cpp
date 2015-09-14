@@ -11,6 +11,7 @@
 #include <infxcli.h>
 
 // it's not immediately clear how to do lobs in informix
+// (see http://www.ibm.com/developerworks/data/library/techarticle/dm-1205outinout/ for some info)
 #define USE_LOBS 0
 
 // column nullability doesn't work with SQLColAttribute

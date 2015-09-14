@@ -166,38 +166,32 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("AFFECTED ROWS: \n");
 	checkSuccess(cur->affectedRows(),1);
 	stdoutput.printf("\n");
-/*
+
 	stdoutput.printf("STORED PROCEDURE: \n");
 	// return multiple values
 	cur->sendQuery("drop procedure testproc");
-	checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 double, in in3 varchar(20), in in4 text, in in5 byte, out out1 int, out out2 double, out out3 varchar(20), out out4 text, out out5 byte) language sql begin set out1 = in1; set out2 = in2; set out3 = in3; set out4 = in4; set out5 = in5; end"),1);
-	cur->prepareQuery("call testproc(?,?,?,?,?,?,?,?,?,?)");
+	checkSuccess(cur->sendQuery("create procedure testproc(in1 int, in2 float, in3 varchar(20), out out1 int, out out2 float, out out3 varchar(20)) let out1 = in1; let out2 = in2; let out3 = in3; end procedure;"),1);
+	cur->prepareQuery("{call testproc(?,?,?,?,?,?)}");
 	cur->inputBind("1",1);
 	cur->inputBind("2",1.1,2,1);
 	cur->inputBind("3","hello");
-	cur->inputBindClob("4","text",4);
-	cur->inputBindBlob("5","byte",4);
-	cur->defineOutputBindInteger("6");
-	cur->defineOutputBindDouble("7");
-	cur->defineOutputBindString("8",20);
-	cur->defineOutputBindClob("9");
-	cur->defineOutputBindBlob("10");
+	cur->defineOutputBindInteger("4");
+	cur->defineOutputBindDouble("5");
+	cur->defineOutputBindString("6",20);
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBindInteger("6"),1);
-	checkSuccess(cur->getOutputBindDouble("7"),1.1);
-	checkSuccess(cur->getOutputBindString("8"),"hello");
-	checkSuccess(cur->getOutputBindClob("9"),"text");
-	checkSuccess(cur->getOutputBindBlob("10"),"byte");
+	checkSuccess(cur->getOutputBindInteger("4"),1);
+	checkSuccess(cur->getOutputBindDouble("5"),1.1);
+	checkSuccess(cur->getOutputBindString("6"),"hello");
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("STORED PROCEDURE RETURNING RESULT SET: \n");
-	checkSuccess(cur->sendQuery("create procedure testproc() result set 1 language sql begin declare c1 cursor with return for select * from testtable; open c1; end"),1);
-	checkSuccess(cur->sendQuery("call testproc()"),1);
+	checkSuccess(cur->sendQuery("create procedure testproc() returning boolean, smallint, varchar(40); define out1 boolean; define out2 smallint; define out3 varchar(40); foreach select testboolean,testsmallint,testvarchar into out1,out2,out3 from testtable return out1,out2,out3 with resume; end foreach; end procedure;"),1);
+	checkSuccess(cur->sendQuery("{call testproc()}"),1);
 	checkSuccess(cur->rowCount(),8);
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	stdoutput.printf("\n");
-
+/*
 	stdoutput.printf("LONG BLOB: \n");
 	cur->sendQuery("drop table testtable1");
 	cur->sendQuery("create table testtable1 (testtext text)");
