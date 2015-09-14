@@ -10,10 +10,6 @@
 
 #include <infxcli.h>
 
-// it's not immediately clear how to do lobs in informix
-// (see http://www.ibm.com/developerworks/data/library/techarticle/dm-1205outinout/ for some info)
-#define USE_LOBS 0
-
 // column nullability doesn't work with SQLColAttribute
 #define USE_NULLABLE 0
 
@@ -69,9 +65,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		void		deallocateResultSetBuffers();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-		void		encodeBlob(stringbuffer *buffer,
-						const char *data,
-						uint32_t datasize);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -98,7 +91,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
-		#if USE_LOBS == 1
 		bool		inputBindBlob(const char *variable,
 						uint16_t variablesize,
 						const char *value,
@@ -109,7 +101,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						const char *value,
 						uint32_t valuesize,
 						int16_t *isnull);
-		#endif
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
@@ -138,7 +129,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
-		#if USE_LOBS == 1
 		bool		outputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						uint16_t index,
@@ -147,7 +137,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						uint16_t variablesize,
 						uint16_t index,
 						int16_t *isnull);
-		#endif
 		bool		getLobOutputBindLength(uint16_t index,
 							uint64_t *length);
 		bool		getLobOutputBindSegment(uint16_t index,
@@ -186,31 +175,27 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 					bool *blob,
 					bool *null);
 		void		nextRow();
-		#if USE_LOBS == 1
 		bool		getLobFieldLength(uint32_t col,
 							uint64_t *length);
 		bool		getLobFieldSegment(uint32_t col,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
-		#endif
 		void		closeResultSet();
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
-		SQLHSTMT	lobstmt;
 		SQLSMALLINT	ncols;
 		SQLLEN 		affectedrows;
 
 		int32_t		selectlistsize;
 		char		**field;
-		SQLINTEGER	**loblocator;
 		SQLINTEGER	**loblength;
 		SQLLEN		**indicator;
 		informixcolumn	*column;
 
 		uint16_t	maxbindcount;
-		SQLLEN		*blobbindsize;
+		SQLLEN		*lobbindsize;
 		datebind	**outdatebind;
 		char		**outlobbind;
 		SQLLEN 		*outlobbindlen;
@@ -744,9 +729,8 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	informixconn=(informixconnection *)conn;
 	stmt=0;
-	lobstmt=0;
 	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
-	blobbindsize=new SQLLEN[maxbindcount];
+	lobbindsize=new SQLLEN[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];
 	outlobbindlen=new SQLLEN[maxbindcount];
@@ -760,7 +744,7 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 }
 
 informixcursor::~informixcursor() {
-	delete[] blobbindsize;
+	delete[] lobbindsize;
 	delete[] outdatebind;
 	delete[] outlobbind;
 	delete[] outlobbindlen;
@@ -772,14 +756,12 @@ void informixcursor::allocateResultSetBuffers(int32_t selectlistsize) {
 	if (selectlistsize==-1) {
 		this->selectlistsize=0;
 		field=NULL;
-		loblocator=NULL;
 		loblength=NULL;
 		indicator=NULL;
 		column=NULL;
 	} else {
 		this->selectlistsize=selectlistsize;
 		field=new char *[selectlistsize];
-		loblocator=new SQLINTEGER *[selectlistsize];
 		loblength=new SQLINTEGER *[selectlistsize];
 		indicator=new SQLLEN *[selectlistsize];
 		column=new informixcolumn[selectlistsize];
@@ -787,7 +769,6 @@ void informixcursor::allocateResultSetBuffers(int32_t selectlistsize) {
 			column[i].name=new char[4096];
 			field[i]=new char[informixconn->fetchatonce*
 					informixconn->maxitembuffersize];
-			loblocator[i]=new SQLINTEGER[informixconn->fetchatonce];
 			loblength[i]=new SQLINTEGER[informixconn->fetchatonce];
 			indicator[i]=new SQLLEN[informixconn->fetchatonce];
 		}
@@ -799,13 +780,11 @@ void informixcursor::deallocateResultSetBuffers() {
 		for (int32_t i=0; i<selectlistsize; i++) {
 			delete[] column[i].name;
 			delete[] field[i];
-			delete[] loblocator[i];
 			delete[] loblength[i];
 			delete[] indicator[i];
 		}
 		delete[] column;
 		delete[] field;
-		delete[] loblocator;
 		delete[] loblength;
 		delete[] indicator;
 		selectlistsize=0;
@@ -816,10 +795,6 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 
 	if (stmt) {
 		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
-	}
-	if (lobstmt) {
-		SQLFreeHandle(SQL_HANDLE_STMT,lobstmt);
-		lobstmt=0;
 	}
 
 	// allocate the cursor
@@ -841,22 +816,6 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 	return true;
-}
-
-void informixcursor::encodeBlob(stringbuffer *buffer,
-					const char *data, uint32_t datasize) {
-
-	// informix sort-of follows the SQL Standard:
-	// X'...' where ... is the blob data and each byte of blob data is
-	// converted to two hex characters..
-	// eg: hello -> X'68656C6C6F'
-	// but informix also requires that the blob() function be used
-
-	buffer->append("blob(X\'");
-	for (uint32_t i=0; i<datasize; i++) {
-		buffer->append(conn->cont->asciiToHex(data[i]));
-	}
-	buffer->append("\')");
 }
 
 bool informixcursor::inputBind(const char *variable,
@@ -979,56 +938,55 @@ bool informixcursor::inputBind(const char *variable,
 	return true;
 }
 
-#if USE_LOBS == 1
 bool informixcursor::inputBindBlob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	blobbindsize[inbindcount]=valuesize;
+	// NOTE: informix has separate BYTE and BLOB types, and this
+	// works with BYTE columns, but not with BLOB columns
+	lobbindsize[inbindcount]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
-				SQL_INFX_UDT_BLOB,
+				SQL_LONGVARBINARY,
 				valuesize,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(blobbindsize[inbindcount]));
+				&(lobbindsize[inbindcount]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
 	return true;
 }
 
-// The default implementeation of inputBindClob() just calls inputBind().
-// That works fine for versions > 7 but does not work with 7 or less.
-// Conversely, SQL_CLOB doesn't work with some versions > 7 so we can't use
-// this code with versions > 7.
 bool informixcursor::inputBindClob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	// NOTE: informix has separate TEXT and CLOB types, and this
+	// works with TEXT columns, but not with CLOB columns
+	lobbindsize[inbindcount]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
-				SQL_INFX_UDT_CLOB,
-				0,
+				SQL_LONGVARCHAR,
+				valuesize,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLLEN *)NULL);
+				&(lobbindsize[inbindcount]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
 	return true;
 }
-#endif
 
 bool informixcursor::outputBind(const char *variable, 
 					uint16_t variablesize,
@@ -1148,22 +1106,20 @@ bool informixcursor::outputBind(const char *variable,
 	return true;
 }
 
-#if USE_LOBS == 1
 bool informixcursor::outputBindBlob(const char *variable, 
 					uint16_t variablesize,
 					uint16_t index,
 					int16_t *isnull) {
 
 	outlobbind[index]=new char[informixconn->maxoutbindlobsize];
+	outlobbindlen[index]=SQL_NULL_DATA;
 
-	// FIXME: Ideally we'd bind a lob locator like we are for columns,
-	// but I can't seem to get that working.
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
 				SQL_C_BINARY,
-				SQL_INFX_UDT_BLOB,
-				0,
+				SQL_LONGVARBINARY,
+				informixconn->maxoutbindlobsize,
 				0,
 				outlobbind[index],
 				informixconn->maxoutbindlobsize,
@@ -1180,16 +1136,14 @@ bool informixcursor::outputBindClob(const char *variable,
 					int16_t *isnull) {
 
 	outlobbind[index]=new char[informixconn->maxoutbindlobsize];
+	outlobbindlen[index]=SQL_NULL_DATA;
 
-	// FIXME: Ideally we'd bind a lob locator like we are for columns,
-	// but I can't seem to get that working.
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
-				//SQL_CHAR,
-				SQL_INFX_UDT_CLOB,
-				0,
+				SQL_LONGVARCHAR,
+				informixconn->maxoutbindlobsize,
 				0,
 				outlobbind[index],
 				informixconn->maxoutbindlobsize,
@@ -1199,7 +1153,6 @@ bool informixcursor::outputBindClob(const char *variable,
 	}
 	return true;
 }
-#endif
 
 bool informixcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
 	if (outlobbindlen[index]>informixconn->maxoutbindlobsize) {
@@ -1335,31 +1288,18 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			}
 		}
 
-		// bind the column to a lob locator or buffer
-		#if USE_LOBS == 1
-		/*if (column[i].type==SQL_INFX_UDT_CLOB) {
-			erg=SQLBindCol(stmt,i+1,SQL_C_CLOB_LOCATOR,
-					loblocator[i],0,
-					indicator[i]);
-		} else if (column[i].type==SQL_INFX_UDT_BLOB) {
-			erg=SQLBindCol(stmt,i+1,SQL_C_BLOB_LOCATOR,
-					loblocator[i],0,
-					indicator[i]);
-		} else {*/
-		if (column[i].type==SQL_INFX_UDT_CLOB ||
+		if (column[i].type==SQL_LONGVARBINARY ||
 			column[i].type==SQL_INFX_UDT_BLOB) {
-			erg=SQLBindCol(stmt,i+1,SQL_INFX_C_SMARTLOB_LOCATOR,
-					loblocator[i],0,
+			erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
+					field[i],
+					informixconn->maxitembuffersize,
 					indicator[i]);
 		} else {
-		#endif
 			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 					field[i],
 					informixconn->maxitembuffersize,
 					indicator[i]);
-		#if USE_LOBS == 1
 		}
-		#endif
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
@@ -1500,12 +1440,10 @@ uint16_t informixcursor::getColumnType(uint32_t i) {
 		case SQL_INFX_UDT_VARYING:
 			// not sure what these are...
 			return UNKNOWN_DATATYPE;
-		#if USE_LOBS == 1
 		case SQL_INFX_UDT_BLOB:
 			return BLOB_DATATYPE;
 		case SQL_INFX_UDT_CLOB:
 			return CLOB_DATATYPE;
-		#endif
 		case SQL_INFX_UDT_LVARCHAR:
 		case SQL_INFX_RC_ROW:
 		case SQL_INFX_RC_COLLECTION:
@@ -1625,14 +1563,12 @@ void informixcursor::getField(uint32_t col,
 		return;
 	}
 
-	#if USE_LOBS == 1
 	// handle lobs
 	if (column[col].type==SQL_INFX_UDT_CLOB ||
 		column[col].type==SQL_INFX_UDT_BLOB) {
 		*blob=true;
 		return;
 	}
-	#endif
 
 	// handle normal datatypes
 	*fld=&field[col][rowgroupindex*informixconn->maxitembuffersize];
@@ -1643,32 +1579,24 @@ void informixcursor::nextRow() {
 	rowgroupindex++;
 }
 
-#if USE_LOBS == 1
 bool informixcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
-
-	// create a new handle if necessary
-	if (!lobstmt) {
-		erg=SQLAllocHandle(SQL_HANDLE_STMT,informixconn->dbc,&lobstmt);
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
-	}
+stdoutput.printf("getLobFieldLength()...\n");
 
 	// get the length of the lob
-	SQLINTEGER	ind;
-	/*SQLSMALLINT	locatortype=(column[col].type==SQL_INFX_UDT_CLOB)?
-							SQL_C_CLOB_LOCATOR:
-							SQL_C_BLOB_LOCATOR;*/
-	SQLSMALLINT	locatortype=SQL_INFX_C_SMARTLOB_LOCATOR;
-	erg=SQLGetLength(lobstmt,locatortype,
-				loblocator[col][rowgroupindex],
-				&loblength[col][rowgroupindex],&ind);
+	SQLLEN		ind=0;
+	SQLSMALLINT	targettype=(column[col].type==SQL_INFX_UDT_CLOB)?
+								SQL_C_CHAR:
+								SQL_C_BINARY;
+stdoutput.printf("    SQLGetData()...\n");
+	erg=SQLGetData(stmt,col+1,targettype,NULL,0,&ind);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+stdoutput.printf("        failed\n");
 		return false;
 	}
 
 	// copy out the length
-	*length=loblength[col][rowgroupindex];
+	*length=ind;
+stdoutput.printf("        success, length=%lld\n",*length);
 
 	return true;
 }
@@ -1677,25 +1605,11 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread) {
-
-	// Usually, methods to fetch lob segments return an error, or at least
-	// return that fewer characters were read than attempted, when we try
-	// to read past the end.  SQLGetSubString does not.  It allows you to
-	// read past the end and just returns a bunch of nulls if you do and
-	// doesn't indicate that anything odd has happened.  So we have to
-	// detect attempts to read past the end ourselves.
+stdoutput.printf("getLobFieldLength()...\n");
 
 	// bail if we're attempting to start reading past the end
 	if (offset>(uint64_t)loblength[col][rowgroupindex]) {
 		return false;
-	}
-
-	// create a new handle if necessary
-	if (!lobstmt) {
-		erg=SQLAllocHandle(SQL_HANDLE_STMT,informixconn->dbc,&lobstmt);
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
 	}
 
 	// prevent attempts to read past the end
@@ -1706,7 +1620,7 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 
 	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
 	uint64_t	totalbytesread=0;
-	SQLUINTEGER	bytestoread=0;
+	SQLLEN		bytestoread=0;
 	uint64_t	remainingbytestoread=charstoread;
 	for (;;) {
 
@@ -1720,26 +1634,26 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 		}
 
 		// read the bytes
-		SQLINTEGER	bytesread=0;
-		SQLINTEGER	ind=0;
-		/*SQLSMALLINT	locatortype=
-				(column[col].type==SQL_INFX_UDT_CLOB)?
-							SQL_C_CLOB_LOCATOR:
-							SQL_C_BLOB_LOCATOR;*/
-		SQLSMALLINT	locatortype=SQL_INFX_C_SMARTLOB_LOCATOR;
+		SQLLEN		ind=0;
 		SQLSMALLINT	targettype=
 				(column[col].type==SQL_INFX_UDT_CLOB)?
 							SQL_C_CHAR:
 							SQL_C_BINARY;
-		erg=SQLGetSubString(lobstmt,locatortype,
-					loblocator[col][rowgroupindex],
-					offset+1,bytestoread,
-					targettype,buffer+totalbytesread,
-					buffersize-totalbytesread,
-					&bytesread,&ind);
+stdoutput.printf("    SQLGetData()...\n");
+		erg=SQLGetData(stmt,col+1,targettype,
+					buffer+totalbytesread,
+					bytestoread,&ind);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+stdoutput.printf("        failed\n");
 			return false;
 		}
+stdoutput.printf("        success\n");
+stdoutput.printf("            ind=%lld\n",(int64_t)ind);
+
+		// determine how many bytes were read
+		uint64_t	bytesread=
+			(ind>=bytestoread || ind==SQL_NO_TOTAL)?bytestoread:ind;
+stdoutput.printf("            bytesread=%lld\n",bytesread);
 
 		// update total bytes read
 		totalbytesread=totalbytesread+bytesread;
@@ -1756,7 +1670,6 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 
 	return true;
 }
-#endif
 
 void informixcursor::closeResultSet() {
 
