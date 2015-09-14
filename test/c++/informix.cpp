@@ -103,12 +103,12 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testtable values ('t',1,1,1,1,1.1,1.1,1.1,1.1,'testchar1','testnchar1','testvarchar1','testnvarchar1','testlvarchar1','01/01/2001','2001-01-01 01:00:00',null,null)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values ('t',1,1,1,1,1.1,1.1,1.1,1.1,'testchar1','testnchar1','testvarchar1','testnvarchar1','testlvarchar1','01/01/2001','2001-01-01 01:00:00','testtext1',null)"),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,null)");
-	checkSuccess(cur->countBindVariables(),16);
+	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	checkSuccess(cur->countBindVariables(),18);
 	cur->inputBind("1","t");
 	cur->inputBind("2",2);
 	cur->inputBind("3",2);
@@ -125,8 +125,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("14","testvarlchar2");
 	cur->inputBind("15","01/01/2002");
 	cur->inputBind("16","2002-01-01 02:00:00");
-	//cur->inputBindClob("17","testtext1",9);
-	//cur->inputBindBlob("18","testbyte1",9);
+	cur->inputBindClob("17","testtext1",9);
+	cur->inputBindBlob("18","testbyte1",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1","t");
@@ -145,22 +145,23 @@ int	main(int argc, char **argv) {
 	cur->inputBind("14","testvarlchar3");
 	cur->inputBind("15","01/01/2003");
 	cur->inputBind("16","2003-01-01 03:00:00");
-	//cur->inputBindClob("17","testtext3",9);
-	//cur->inputBindBlob("18","testbyte3",9);
+	cur->inputBindClob("17","testtext3",9);
+	cur->inputBindBlob("18","testbyte3",9);
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("ARRAY OF BINDS BY POSITION: \n");
 	cur->clearBinds();
+	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,null)");
 	cur->inputBinds(bindvars,bindvals);
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testtable values ('t',5,5,5,5,5.5,5.5,5.5,5.5,'testchar5','testnchar5','testvarchar5','testnvarchar5','testlvarchar5','01/01/2005','2005-01-01 05:00:00',null,null)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values ('t',6,6,6,6,6.6,6.6,6.6,6.6,'testchar6','testnchar6','testvarchar6','testnvarchar6','testlvarchar6','01/01/2006','2006-01-01 06:00:00',null,null)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values ('t',7,7,7,7,7.7,7.7,7.7,7.7,'testchar7','testnchar7','testvarchar7','testnvarchar7','testlvarchar7','01/01/2007','2007-01-01 07:00:00',null,null)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values ('t',8,8,8,8,8.8,8.8,8.8,8.8,'testchar8','testnchar8','testvarchar8','testnvarchar8','testlvarchar8','01/01/2008','2008-01-01 08:00:00',null,null)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values ('t',5,5,5,5,5.5,5.5,5.5,5.5,'testchar5','testnchar5','testvarchar5','testnvarchar5','testlvarchar5','01/01/2005','2005-01-01 05:00:00','testtext5',null)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values ('t',6,6,6,6,6.6,6.6,6.6,6.6,'testchar6','testnchar6','testvarchar6','testnvarchar6','testlvarchar6','01/01/2006','2006-01-01 06:00:00','testtext6',null)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values ('t',7,7,7,7,7.7,7.7,7.7,7.7,'testchar7','testnchar7','testvarchar7','testnvarchar7','testlvarchar7','01/01/2007','2007-01-01 07:00:00','testtext7',null)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values ('t',8,8,8,8,8.8,8.8,8.8,8.8,'testchar8','testnchar8','testvarchar8','testnvarchar8','testlvarchar8','01/01/2008','2008-01-01 08:00:00','testtext8',null)"),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("AFFECTED ROWS: \n");
@@ -191,7 +192,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->rowCount(),8);
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	stdoutput.printf("\n");
-/*
+
 	stdoutput.printf("LONG BLOB: \n");
 	cur->sendQuery("drop table testtable1");
 	cur->sendQuery("create table testtable1 (testtext text)");
@@ -206,8 +207,10 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("select testtext from testtable1");
 	checkSuccess(cur->getFieldLength(0,"testtext"),20*1024);
 	checkSuccess(cur->getField(0,"testtext"),textval);
-	checkSuccess(cur->sendQuery("create procedure testproc(in in1 text, out out1 text) language sql begin set out1 = in1; end"),1);
-	cur->prepareQuery("call testproc(?,?)");
+	// for some reason stored procedures can only use clob types,
+	// rather than text
+	checkSuccess(cur->sendQuery("create procedure testproc(in1 clob, out out1 clob) let out1 = in1; end procedure;"),1);
+	cur->prepareQuery("{call testproc(?,?)}");
 	cur->inputBindClob("1",textval,20*1024);
 	cur->defineOutputBindClob("2");
 	checkSuccess(cur->executeQuery(),1);
@@ -215,7 +218,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getOutputBindClob("2"),textval);
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	stdoutput.printf("\n");
-*/
+
 	stdoutput.printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testsmallint"),1);
 	stdoutput.printf("\n");
@@ -383,10 +386,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest("TESTDATE"),10);
 	checkSuccess(cur->getLongest(15),19);
 	checkSuccess(cur->getLongest("TESTDATETIME"),19);
-	checkSuccess(cur->getLongest(16),0);
-	checkSuccess(cur->getLongest("TESTTEXT"),0);
-	checkSuccess(cur->getLongest(17),0);
-	checkSuccess(cur->getLongest("TESTBYTE"),0);
+	checkSuccess(cur->getLongest(16),9);
+	checkSuccess(cur->getLongest("TESTTEXT"),9);
+	checkSuccess(cur->getLongest(17),9);
+	checkSuccess(cur->getLongest("TESTBYTE"),9);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("ROW COUNT: \n");
@@ -422,7 +425,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,13),"testlvarchar1");
 	checkSuccess(cur->getField(0,14),"2001-01-01");
 	checkSuccess(cur->getField(0,15),"2001-01-01 01:00:00");
-	checkSuccess(cur->getField(0,16),"");
+	checkSuccess(cur->getField(0,16),"testtext1");
 	checkSuccess(cur->getField(0,17),"");
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(7,(uint32_t)0),"1");
@@ -441,7 +444,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,13),"testlvarchar8");
 	checkSuccess(cur->getField(7,14),"2008-01-01");
 	checkSuccess(cur->getField(7,15),"2008-01-01 08:00:00");
-	checkSuccess(cur->getField(7,16),"");
+	checkSuccess(cur->getField(7,16),"testtext8");
 	checkSuccess(cur->getField(7,17),"");
 	stdoutput.printf("\n");
 
@@ -461,7 +464,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(0,12),13);
 	checkSuccess(cur->getFieldLength(0,14),10);
 	checkSuccess(cur->getFieldLength(0,15),19);
-	checkSuccess(cur->getFieldLength(0,16),0);
+	checkSuccess(cur->getFieldLength(0,16),9);
 	checkSuccess(cur->getFieldLength(0,17),0);
 	stdoutput.printf("\n");
 	checkSuccess(cur->getFieldLength(7,(uint32_t)0),1);
@@ -479,7 +482,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(7,12),13);
 	checkSuccess(cur->getFieldLength(7,14),10);
 	checkSuccess(cur->getFieldLength(7,15),19);
-	checkSuccess(cur->getFieldLength(7,16),0);
+	checkSuccess(cur->getFieldLength(7,16),9);
 	checkSuccess(cur->getFieldLength(7,17),0);
 	stdoutput.printf("\n");
 
@@ -500,7 +503,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,"TESTLVARCHAR"),"testlvarchar1");
 	checkSuccess(cur->getField(0,"TESTDATE"),"2001-01-01");
 	checkSuccess(cur->getField(0,"TESTDATETIME"),"2001-01-01 01:00:00");
-	checkSuccess(cur->getField(0,"TESTTEXT"),"");
+	checkSuccess(cur->getField(0,"TESTTEXT"),"testtext1");
 	checkSuccess(cur->getField(0,"TESTBYTE"),"");
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(7,"TESTBOOLEAN"),"1");
@@ -519,7 +522,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,"TESTLVARCHAR"),"testlvarchar8");
 	checkSuccess(cur->getField(7,"TESTDATE"),"2008-01-01");
 	checkSuccess(cur->getField(7,"TESTDATETIME"),"2008-01-01 08:00:00");
-	checkSuccess(cur->getField(7,"TESTTEXT"),"");
+	checkSuccess(cur->getField(7,"TESTTEXT"),"testtext8");
 	checkSuccess(cur->getField(7,"TESTBYTE"),"");
 	stdoutput.printf("\n");
 
@@ -540,7 +543,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(0,"TESTLVARCHAR"),13);
 	checkSuccess(cur->getFieldLength(0,"TESTDATE"),10);
 	checkSuccess(cur->getFieldLength(0,"TESTDATETIME"),19);
-	checkSuccess(cur->getFieldLength(0,"TESTTEXT"),0);
+	checkSuccess(cur->getFieldLength(0,"TESTTEXT"),9);
 	checkSuccess(cur->getFieldLength(0,"TESTBYTE"),0);
 	stdoutput.printf("\n");
 	checkSuccess(cur->getFieldLength(7,"TESTBOOLEAN"),1);
@@ -559,7 +562,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(7,"TESTLVARCHAR"),13);
 	checkSuccess(cur->getFieldLength(7,"TESTDATE"),10);
 	checkSuccess(cur->getFieldLength(7,"TESTDATETIME"),19);
-	checkSuccess(cur->getFieldLength(7,"TESTTEXT"),0);
+	checkSuccess(cur->getFieldLength(7,"TESTTEXT"),9);
 	checkSuccess(cur->getFieldLength(7,"TESTBYTE"),0);
 	stdoutput.printf("\n");
 
@@ -581,7 +584,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(fields[13],"testlvarchar1");
 	checkSuccess(fields[14],"2001-01-01");
 	checkSuccess(fields[15],"2001-01-01 01:00:00");
-	checkSuccess(fields[16],"");
+	checkSuccess(fields[16],"testtext1");
+	checkSuccess(fields[17],"");
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIELD LENGTHS BY ARRAY: \n");
@@ -601,7 +605,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldlens[12],13);
 	checkSuccess(fieldlens[14],10);
 	checkSuccess(fieldlens[15],19);
-	checkSuccess(fieldlens[16],0);
+	checkSuccess(fieldlens[16],9);
 	checkSuccess(fieldlens[17],0);
 	stdoutput.printf("\n");
 
@@ -945,6 +949,15 @@ int	main(int argc, char **argv) {
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 	stdoutput.printf("\n");
+
+	// clobs/blobs in particular
+	/*stdoutput.printf("CLOB/BLOB: \n");
+	checkSuccess(cur->sendQuery("create table testtable (testclob clob)"),1);
+	cur->prepareQuery("insert into testtable values (?)");
+	cur->inputBindClob("1","hello",5);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("drop table testtable");
+	stdoutput.printf("\n");*/
 
 	// invalid queries...
 	stdoutput.printf("INVALID QUERIES: \n");
