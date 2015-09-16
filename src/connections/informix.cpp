@@ -539,37 +539,10 @@ bool informixconnection::liveConnection(SQLINTEGER nativeerrnum,
 					const char *errorbuffer,
 					SQLSMALLINT errlength) {
 
-	// FIXME: implement this for informix
-
-	// When the DB goes down, DB2 first reports one error:
-	// 	[IBM][CLI Driver] SQL1224N  A database agent could not be
-	//	started to service a request, or was terminated as a result of
-	//	a database system shutdown or a force command.  SQLSTATE=55032
-	//	(in this case nativeerrnum==-1224 and errlength==184)
-	// then upon repeated attempts to run a query, it reports:
-	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
-	//	(in this case nativeerrnum==-99999 and errlength==64)
-	//	(unforutnately other errors have the same error number and
-	//	length, such as "Invalid cursor state." so we have to
-	//	discriminate a bit for this one)
-	// here's another one for -1224
-	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
-	//	 accept new requests, has terminated all requests in progress,
-	//	or has terminated your particular request due to a problem with
-	//	your request.  SQLSTATE=55032
-	// We need to catch it too.
-	// When a "force application" command forcibly kills a connection on
-	// the server side, the DB2 client reports:
-	//	[IBM][CLI Driver] SQL30081N  A communication error has been
-	//	detected...
-	//	(in this case nativeerrnum==-30081 and the error length is
-	//	variable depending on the host name/ip address of the server
-	//	and other things, so we'll only test for the error number)
-	return !((nativeerrnum==-1224 && errlength==184) ||
-		(nativeerrnum==-99999 && errlength==64 &&
-		charstring::contains(errorbuffer,"Connection is closed")) ||
-		(nativeerrnum==-1224 && errlength==220) ||
-		(nativeerrnum==-30081));
+	// When the DB goes down, Informix reports:
+	// -11020: [Informix][Informix ODBC Driver]Communication link failure.
+	// (if there are other errors then I haven't seen them yet)
+	return nativeerrnum!=-11020;
 }
 
 
