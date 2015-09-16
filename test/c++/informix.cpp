@@ -948,16 +948,26 @@ int	main(int argc, char **argv) {
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
-	stdoutput.printf("\n");
 
 	// clobs/blobs in particular
-	/*stdoutput.printf("CLOB/BLOB: \n");
-	checkSuccess(cur->sendQuery("create table testtable (testclob clob)"),1);
-	cur->prepareQuery("insert into testtable values (?)");
-	cur->inputBindClob("1","hello",5);
+	stdoutput.printf("CLOB/BLOB: \n");
+	checkSuccess(cur->sendQuery("create table testtable (testclob clob, testblob blob)"),1);
+	cur->prepareQuery("insert into testtable values (?,?)");
+	cur->inputBindClob("1","testclobvalue",13);
+	cur->inputBindBlob("2","testblobvalue",13);
 	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->sendQuery("select * from testtable"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"testclobvalue");
+	checkSuccess(cur->getField(0,1),"testblobvalue");
+	checkSuccess(cur->sendQuery("create procedure testproc(out out1 clob, out out2 blob) select testclob, testblob into out1,out2 from testtable; end procedure;"),1);
+	cur->prepareQuery("{call testproc(?,?)}");
+	cur->defineOutputBindClob("1");
+	cur->defineOutputBindBlob("2");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindClob("1"),"testclobvalue");
+	checkSuccess(cur->getOutputBindBlob("2"),"testblobvalue");
 	cur->sendQuery("drop table testtable");
-	stdoutput.printf("\n");*/
+	stdoutput.printf("\n");
 
 	// invalid queries...
 	stdoutput.printf("INVALID QUERIES: \n");

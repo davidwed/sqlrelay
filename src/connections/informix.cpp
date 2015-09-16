@@ -13,7 +13,10 @@
 // column nullability doesn't work with SQLColAttribute
 #define USE_NULLABLE 0
 
-#define FETCH_AT_ONCE		10
+// multi-row fetch doesn't work with clobs/blobs because you're already on a
+// different row when SQLGetData is called to get the data for the clob/blob
+// on the first row
+#define FETCH_AT_ONCE		1
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768	
 #define MAX_OUT_BIND_LOB_SIZE	2097152
@@ -190,7 +193,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 
 		int32_t		selectlistsize;
 		char		**field;
-		SQLINTEGER	**loblength;
+		SQLLEN		**loblength;
 		SQLLEN		**indicator;
 		informixcolumn	*column;
 
@@ -200,6 +203,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		char		**outlobbind;
 		SQLLEN 		*outlobbindlen;
 		SQLLEN		sqlnulldata;
+		BOOL		truevalue;
 
 		uint64_t	rowgroupindex;
 		uint64_t	totalinrowgroup;
@@ -342,11 +346,15 @@ void informixconnection::handleConnectString() {
 
 	timeout=charstring::toInteger(cont->getConnectStringValue("timeout"));
 
-	fetchatonce=charstring::toUnsignedInteger(
+	// multi-row fetch doesn't work with clobs/blobs because you're already
+	// on a different row when SQLGetData is called to get the data for the
+	// clob/blob on the first row
+	/*fetchatonce=charstring::toUnsignedInteger(
 				cont->getConnectStringValue("fetchatonce"));
 	if (fetchatonce<1) {
 		fetchatonce=FETCH_AT_ONCE;
-	}
+	}*/
+
 	maxselectlistsize=charstring::toInteger(
 			cont->getConnectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize || maxselectlistsize<-1) {
@@ -741,6 +749,7 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(informixconn->maxselectlistsize);
+	truevalue=SQL_TRUE;
 }
 
 informixcursor::~informixcursor() {
@@ -762,14 +771,14 @@ void informixcursor::allocateResultSetBuffers(int32_t selectlistsize) {
 	} else {
 		this->selectlistsize=selectlistsize;
 		field=new char *[selectlistsize];
-		loblength=new SQLINTEGER *[selectlistsize];
+		loblength=new SQLLEN *[selectlistsize];
 		indicator=new SQLLEN *[selectlistsize];
 		column=new informixcolumn[selectlistsize];
 		for (int32_t i=0; i<selectlistsize; i++) {
 			column[i].name=new char[4096];
 			field[i]=new char[informixconn->fetchatonce*
 					informixconn->maxitembuffersize];
-			loblength[i]=new SQLINTEGER[informixconn->fetchatonce];
+			loblength[i]=new SQLLEN[informixconn->fetchatonce];
 			indicator[i]=new SQLLEN[informixconn->fetchatonce];
 		}
 	}
@@ -806,6 +815,13 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 	// set the row array size
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
 				(SQLPOINTER)informixconn->fetchatonce,0);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+
+	// enable smart-large-object automation for non-selects
+	erg=SQLSetStmtAttr(stmt,SQL_INFX_ATTR_LO_AUTOMATIC,
+					(SQLPOINTER)truevalue,0);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -944,8 +960,6 @@ bool informixcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// NOTE: informix has separate BYTE and BLOB types, and this
-	// works with BYTE columns, but not with BLOB columns
 	lobbindsize[inbindcount]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -969,13 +983,15 @@ bool informixcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// NOTE: informix has separate TEXT and CLOB types, and this
-	// works with TEXT columns, but not with CLOB columns
 	lobbindsize[inbindcount]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
-				SQL_C_CHAR,
+				// SQL_C_CHAR works as expected with TEXT
+				// columns, but when used with clobs it ends up
+				// putting a null terminator at position
+				// "valuesize".  With SQL_C_BINARY, it doesn't.
+				SQL_C_BINARY,
 				SQL_LONGVARCHAR,
 				valuesize,
 				0,
@@ -1580,23 +1596,19 @@ void informixcursor::nextRow() {
 }
 
 bool informixcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
-stdoutput.printf("getLobFieldLength()...\n");
 
 	// get the length of the lob
-	SQLLEN		ind=0;
-	SQLSMALLINT	targettype=(column[col].type==SQL_INFX_UDT_CLOB)?
-								SQL_C_CHAR:
-								SQL_C_BINARY;
-stdoutput.printf("    SQLGetData()...\n");
-	erg=SQLGetData(stmt,col+1,targettype,NULL,0,&ind);
+
+	// a valid buffer must be provided, but it's ok to fetch 0 bytes into it
+	SQLCHAR	buffer[1];
+	erg=SQLGetData(stmt,col+1,SQL_C_BINARY,buffer,0,
+					&(loblength[col][rowgroupindex]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-stdoutput.printf("        failed\n");
 		return false;
 	}
 
 	// copy out the length
-	*length=ind;
-stdoutput.printf("        success, length=%lld\n",*length);
+	*length=loblength[col][rowgroupindex];
 
 	return true;
 }
@@ -1605,7 +1617,6 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread) {
-stdoutput.printf("getLobFieldLength()...\n");
 
 	// bail if we're attempting to start reading past the end
 	if (offset>(uint64_t)loblength[col][rowgroupindex]) {
@@ -1634,26 +1645,17 @@ stdoutput.printf("getLobFieldLength()...\n");
 		}
 
 		// read the bytes
-		SQLLEN		ind=0;
-		SQLSMALLINT	targettype=
-				(column[col].type==SQL_INFX_UDT_CLOB)?
-							SQL_C_CHAR:
-							SQL_C_BINARY;
-stdoutput.printf("    SQLGetData()...\n");
-		erg=SQLGetData(stmt,col+1,targettype,
+		SQLLEN	ind=0;
+		erg=SQLGetData(stmt,col+1,SQL_C_BINARY,
 					buffer+totalbytesread,
 					bytestoread,&ind);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-stdoutput.printf("        failed\n");
 			return false;
 		}
-stdoutput.printf("        success\n");
-stdoutput.printf("            ind=%lld\n",(int64_t)ind);
 
 		// determine how many bytes were read
 		uint64_t	bytesread=
 			(ind>=bytestoread || ind==SQL_NO_TOTAL)?bytestoread:ind;
-stdoutput.printf("            bytesread=%lld\n",bytesread);
 
 		// update total bytes read
 		totalbytesread=totalbytesread+bytesread;
