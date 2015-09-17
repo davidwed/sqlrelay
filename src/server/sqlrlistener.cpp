@@ -124,6 +124,13 @@ sqlrlistener::~sqlrlistener() {
 	delete cmdl;
 
 	delete shmem;
+
+	// Delete the semset last...
+	// If the listener is killed while waiting on a semaphore, sometimes
+	// the signal doesn't interrupt the wait, and sometimes removing
+	// the semaphore during the wait causes a segfault.  The shutdown
+	// process catches this and exits, but lets make sure that everything
+	// else is cleaned up before this can even happen.
 	delete semset;
 }
 
