@@ -8,8 +8,15 @@
 #include <rudiments/process.h>
 
 sqlrlistener	*lsnr;
+bool		shutdownalready=false;
 
 void shutDown(int32_t signum) {
+
+	if (shutdownalready) {
+		process::exit(0);
+	}
+	shutdownalready=true;
+
 	delete lsnr;
 	process::exit(0);
 }
