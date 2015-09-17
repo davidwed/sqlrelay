@@ -12,6 +12,17 @@ bool		shutdownalready=false;
 
 void shutDown(int32_t signum) {
 
+	// A shutdown loop can occur sometimes, on some platforms, if:
+	// * the listener is waiting on a semaphore
+	// * the signal runs this method before interrupting the wait
+	// * the semaphore is removed
+	// * a segfault occurs
+	// * this method is run again
+	// * this method deletes lsnr again
+	// * a segfault occurs
+	// * ...
+	// So, we'll catch shutdown loops and exit cleanly.  I'm not sure
+	// what else can be done.
 	if (shutdownalready) {
 		stderror.printf("sqlr-listener: (pid=%d) "
 				"Shutdown loop detected, exiting.\n",
