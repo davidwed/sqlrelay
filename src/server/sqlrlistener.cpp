@@ -79,8 +79,6 @@ sqlrlistener::sqlrlistener() : listener() {
 }
 
 sqlrlistener::~sqlrlistener() {
-	delete semset;
-	delete shmem;
 	if (!isforkedchild && idfilename) {
 		file::remove(idfilename);
 	}
@@ -124,6 +122,9 @@ sqlrlistener::~sqlrlistener() {
 	delete sqlrpth;
 	delete cfgfl;
 	delete cmdl;
+
+	delete shmem;
+	delete semset;
 }
 
 void sqlrlistener::cleanUp() {
