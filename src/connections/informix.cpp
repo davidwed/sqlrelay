@@ -612,9 +612,31 @@ const char *informixconnection::getTableListQuery(bool wild) {
 const char *informixconnection::getColumnListQuery(
 					const char *table, bool wild) {
 
+	// informix has the most ridiculous column info...
+	// * if coltype > 256 then nulls are not allowed
+	// * coltype mod 256 is the actual column type,
+	// 	but it's a number that has to be decoded
+	// * for decimal and money:
+	//  * collength/256 is the precision
+	//  * collength mod 256 is the scale
+	// * the length of datetimes can vary widely depending on the interval
+	//   but 8 is the max (I think)
+	// * text and byte types can store 2^31 bytes but
+	//   collength is given as 56
+	// * clob and blob types can store any number of bytes but
+	//   collength is given as 72
+	// * boolean, clob and blob columns are all given as type 41, but
+	//   blobs have an extended_id of 10 and clobs 11
+	// * the default value for integer, float and date/time types has some
+	//   qualifiers prepended to it
+
 #define COLTYPE \
-		"	decode(coltype, " \
-		"		41,'boolean', " \
+		"	decode(mod(coltype,256), " \
+		"		41, " \
+		"		decode(extended_id, " \
+		"			10,'clob', " \
+		"			11,'blob', " \
+		"			'boolean'), " \
 		"		1,'smallint', " \
 		"		2,'int', " \
 		"		52,'bigint', " \
@@ -634,24 +656,76 @@ const char *informixconnection::getColumnListQuery(
 		"		11,'byte', " \
 		"		'unknown') as coltype, "
 
-	// FIXME: collength is impossibly large
-	// see col_cnvrt(), fix_nm(), and fix_dt() in dbdiff2 at
-	// http://www.iiug.org/library/faqs/informix-faq/dbdiff2.4gl.txt
+#define COLLENGTH \
+		"	decode(mod(coltype,256), " \
+		"		5,floor(collength/256), " \
+		"		8,floor(collength/256), " \
+		"		10,8, " \
+		"		12,2147483648, "\
+		"		11,2147483648, "\
+		"		collength) as length, "
+
+#define COLPREC \
+		"	decode(mod(coltype,256), " \
+		"		5,floor(collength/256), " \
+		"		8,floor(collength/256), " \
+		"		10,8, " \
+		"		12,2147483648, "\
+		"		11,2147483648, "\
+		"		collength) as precision, "
+
+#define COLSCALE \
+		"	decode(mod(coltype,256), " \
+		"		5,mod(collength,256), " \
+		"		8,mod(collength,256), " \
+		"		0) as scale, "
+
+#define COLNULLS \
+		"	case when (coltype<256) then " \
+		"'YES' else 'NO' end as nulls, "
+
+#define COLDEFAULT \
+		"	decode(mod(coltype,256), " \
+		"		41,sysdefaults.default, " \
+		"		0,sysdefaults.default, " \
+		"		15,sysdefaults.default, " \
+		"		13,sysdefaults.default, " \
+		"		16,sysdefaults.default, " \
+		"		40,sysdefaults.default, " \
+		"		substr(sysdefaults.default," \
+		"			charindex(' '," \
+		"			sysdefaults.default)+1)) as default, "
+
+	// FIXME: primary key can be gotten from:
+	// sysconstriants.constrtype  (which should be 'P')
+	// where
+	//     sysindexes.tabid = syscolumns.tabid
+	//     and
+	//     sysindexes.part1 = syscolumns.colno
+	//     and
+	//     sysconstraints.idxname=sysindexes.idxname
+	// other constrtype values: R (reference/foreign) and U (unique)
+	// but it's not clear how to get them...
+
 	return (wild)?
 		"select "
 		"	colname, "
 		COLTYPE
-		"	'' as length, "
-		"	'' as precision, "
-		"	'' as scale, "
-		"	'' as nulls, "
+		COLLENGTH
+		COLPREC
+		COLSCALE
+		COLNULLS
 		"	'' as key, "
-		"	'' as default, "
+		COLDEFAULT
 		"	'' as extra, "
 		"	'' as extra2 "
 		"from "
 		"	systables, "
 		"	syscolumns "
+		"	left outer join sysdefaults on "
+		"		sysdefaults.tabid=syscolumns.tabid "
+		"		and "
+		"		sysdefaults.colno=syscolumns.colno "
 		"where "
 		"	upper(systables.tabname)=upper('%s') "
 		"	and "
@@ -664,23 +738,27 @@ const char *informixconnection::getColumnListQuery(
 		"select "
 		"	colname, "
 		COLTYPE
-		"	'' as length, "
-		"	'' as precision, "
-		"	'' as scale, "
-		"	'' as nulls, "
+		COLLENGTH
+		COLPREC
+		COLSCALE
+		COLNULLS
 		"	'' as key, "
-		"	'' as default, "
+		COLDEFAULT
 		"	'' as extra, "
 		"	'' as extra2 "
 		"from "
 		"	systables, "
 		"	syscolumns "
+		"	left outer join sysdefaults on "
+		"		sysdefaults.tabid=syscolumns.tabid "
+		"		and "
+		"		sysdefaults.colno=syscolumns.colno "
 		"where "
 		"	upper(systables.tabname)=upper('%s') "
 		"	and "
 		"	syscolumns.tabid=systables.tabid "
 		"order by "
-		"	colno";
+		"	syscolumns.colno";
 }
 
 const char *informixconnection::bindFormat() {
