@@ -8,8 +8,19 @@
 #include <rudiments/process.h>
 
 sqlrlistener	*lsnr;
+bool		shutdownalready=false;
 
 void shutDown(int32_t signum) {
+
+	if (shutdownalready) {
+		stderror.printf("sqlr-listener: (pid=%d) "
+				"Shutdown loop detected, exiting.\n",
+				(uint32_t)process::getProcessId());
+		process::exit(0);
+	}
+
+	shutdownalready=true;
+
 	delete lsnr;
 	process::exit(0);
 }

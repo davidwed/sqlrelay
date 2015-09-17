@@ -14,12 +14,10 @@ bool			shutdownalready=false;
 
 void shutDown(int32_t signum) {
 
-	// Various situations can cause this function to get looped up, such as
-	// bugs in functions set to run at exit.  Detect a loop and just exit
-	// if that's happening.
 	if (shutdownalready) {
-		stderror.printf("(pid=%ld) Shutdown loop detected, exiting.\n",
-						(long)process::getProcessId());
+		stderror.printf("sqlr-connection (pid=%d) "
+				"Shutdown loop detected, exiting.\n",
+				(uint32_t)process::getProcessId());
 		process::exit(0);
 	}
 
@@ -45,9 +43,10 @@ void shutDown(int32_t signum) {
 		case SIGQUIT:
 		#endif
 			// These signals indicate normal termination
-			stderror.printf("(pid=%ld) Process terminated "
-					"with signal %d\n",
-					(long)process::getProcessId(),signum);
+			stderror.printf("sqlr-connection (pid=%d) "
+					"Process terminated with signal %d\n",
+					(uint32_t)process::getProcessId(),
+					signum);
 			break;
 
 		case SIGTERM:
@@ -55,18 +54,21 @@ void shutDown(int32_t signum) {
 		#ifdef SIGALRM
 		case SIGALRM:
 			// Timeout
-			stderror.printf("(pid=%ld) Process terminated "
-					"with signal %d\n",
-					(long)process::getProcessId(),signum);
+			stderror.printf("sqlr-connection (pid=%d) "
+					"Process terminated with signal %d\n",
+					(uint32_t)process::getProcessId(),
+					signum);
 			exitcode=0;
 			break;
 		#endif
 
 		default:
 			// Other signals are bugs
-			stderror.printf("(pid=%ld) Abnormal termination: "
+			stderror.printf("sqlr-connection (pid=%d) "
+					"Abnormal termination: "
 					"signal %d received\n",
-					(long)process::getProcessId(),signum);
+					(uint32_t)process::getProcessId(),
+					signum);
 			delete cont;
 			// Now reraise the signal.  We reactivate the signal's
 		   	// default handling, which is to terminate the process.
