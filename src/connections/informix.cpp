@@ -757,8 +757,7 @@ const char *informixconnection::bindFormat() {
 }
 
 const char *informixconnection::selectDatabaseQuery() {
-	// FIXME: this doesn't actually work
-	return "set connection '%s'";
+	return "database %s";
 }
 
 const char *informixconnection::getCurrentDatabaseQuery() {
@@ -1365,7 +1364,10 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 	// get the row count
 	erg=SQLRowCount(stmt,&affectedrows);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
+		// This might fail for queries like "database xxx", so we'll
+		// tolarate failure and just set affectedrows to 0.  This
+		// seems to be ok.
+		affectedrows=0;
 	}
 
 	// convert date output binds
