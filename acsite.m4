@@ -2422,7 +2422,7 @@ then
 	INFORMIXESQLLIBSPATH=""
 	INFORMIXSTATIC=""
 
-	for dir in "$INFORMIXPATH" "$INFORMIXDIR" "/opt/informix" "/usr/local/informix"
+	for dir in "$INFORMIXPATH" "$INFORMIXDIR" "/opt/informix" "/opt/IBM/informix" "/home/informix" "/usr/local/informix"
 	do
 		if ( test -z "$dir" )
 		then
