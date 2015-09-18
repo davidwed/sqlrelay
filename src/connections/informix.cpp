@@ -10,9 +10,6 @@
 
 #include <infxcli.h>
 
-// column nullability doesn't work with SQLColAttribute
-#define USE_NULLABLE 0
-
 // multi-row fetch doesn't work with clobs/blobs because you're already on a
 // different row when SQLGetData is called to get the data for the clob/blob
 // on the first row
@@ -25,22 +22,18 @@
 
 struct informixcolumn {
 	char		*name;
-	uint16_t	namelength;
-	// SQLColAttribute requires that these are signed, 32 bit integers
-	int32_t		type;
-	int32_t		length;
-	int32_t		precision;
-	int32_t		scale;
-	#if USE_NULLABLE == 1
-	int32_t		nullable;
-	#endif
-	uint16_t	primarykey;
-	uint16_t	unique;
-	uint16_t	partofkey;
-	uint16_t	unsignednumber;
-	uint16_t	zerofill;
-	uint16_t	binary;
-	uint16_t	autoincrement;
+	SQLSMALLINT	namelength;
+	SQLLEN		type;
+	SQLLEN		precision;
+	SQLLEN		scale;
+	SQLLEN		flags;
+	SQLLEN		primarykey;
+	SQLLEN		unique;
+	SQLLEN		partofkey;
+	SQLLEN		unsignednumber;
+	SQLLEN		zerofill;
+	SQLLEN		binary;
+	SQLLEN		autoincrement;
 };
 
 struct datebind {
@@ -163,9 +156,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		uint32_t	getColumnLength(uint32_t i);
 		uint32_t	getColumnPrecision(uint32_t i);
 		uint32_t	getColumnScale(uint32_t i);
-		#if USE_NULLABLE == 1
 		uint16_t	getColumnIsNullable(uint32_t i);
-		#endif
 		uint16_t	getColumnIsUnsigned(uint32_t i);
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
@@ -1284,7 +1275,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
 					column[i].name,4096,
-					(SQLSMALLINT *)&(column[i].namelength),
+					&(column[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
@@ -1302,13 +1293,15 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 				return false;
 			}
 
+			// informix doesn't support column length,
+			// so we'll just use the precision
+
 			// column precision
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_PRECISION,
 					NULL,0,NULL,&(column[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
-			column[i].length=column[i].precision;
 
 			// column scale
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_SCALE,
@@ -1318,16 +1311,13 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			}
 
 			// column nullable
-			// FIXME: informix doesn't appear to support this with
-			// SQLColAttribute, try SQLColAttributes
-			// or try FDNULLABLE/ISNULLABLE
-			#if USE_NULLABLE == 1
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
-					NULL,0,NULL,&(column[i].nullable));
+			// Informix doesn't support SQL_COLUMN_NULLABLE.
+			// Nullability is just part of the "flags".
+			erg=SQLColAttribute(stmt,i+1,SQL_INFX_ATTR_FLAGS,
+					NULL,0,NULL,&(column[i].flags));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
-			#endif
 
 			// primary key
 
@@ -1533,7 +1523,9 @@ uint16_t informixcursor::getColumnType(uint32_t i) {
 }
 
 uint32_t informixcursor::getColumnLength(uint32_t i) {
-	return column[i].length;
+	// informix doesn't support column length,
+	// so we'll just use the precision
+	return column[i].precision;
 }
 
 uint32_t informixcursor::getColumnPrecision(uint32_t i) {
@@ -1544,11 +1536,9 @@ uint32_t informixcursor::getColumnScale(uint32_t i) {
 	return column[i].scale;
 }
 
-#if USE_NULLABLE == 1
 uint16_t informixcursor::getColumnIsNullable(uint32_t i) {
-	return column[i].nullable;
+	return ISNULLABLE(column[i].flags);
 }
-#endif
 
 uint16_t informixcursor::getColumnIsUnsigned(uint32_t i) {
 	return column[i].unsignednumber;

@@ -2,6 +2,8 @@
 	added informix connection module
 	added shutdown loop detection in sqlr-listener
 
+0.63.1 - backported shutdown loop detection
+
 0.63 - suppressed ruby configure warning
 	fixed glib detection if pkg-config isn't present
 	fixed mono detection on freebsd
