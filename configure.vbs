@@ -10,6 +10,7 @@ disablesap=false
 disableodbc=false
 disabledb2=false
 disablefirebird=false
+disableinformix=false
 disableperl=false
 disablepython=false
 disableruby=false
@@ -25,6 +26,7 @@ POSTGRESQLPREFIX=""
 SYBASEPREFIX=""
 DB2PREFIX=""
 FIREBIRDPREFIX=""
+INFORMIXPREFIX=""
 PERLPREFIX=""
 PERLVERSION=""
 PYTHONPREFIX=""
@@ -71,6 +73,10 @@ for i=0 to WScript.Arguments.Count-1
 		disablefirebird=true
 	elseif mid(arg,1,18)="--firebird-prefix=" then
 		FIREBIRDPREFIX=mid(arg,19)
+	elseif arg="--disable-informix" then
+		disableinformix=true
+	elseif mid(arg,1,18)="--informix-prefix=" then
+		INFORMIXPREFIX=mid(arg,19)
 	elseif arg="--disable-perl" then
 		disableperl=true
 	elseif mid(arg,1,14)="--perl-prefix=" then
@@ -376,6 +382,17 @@ if disablefirebird=false then
 	INSTALLFIREBIRD="installdll-firebird"
 end if
 
+' informix
+if INFORMIXPREFIX="" then
+	INFORMIXPREFIX="C:\Program Files\IBM Informix Software Bundle"
+end if
+INFORMIXINCLUDES="/I"""+INFORMIXPREFIX+"\incl\cli"""
+INFORMIXLIBS="/LIBPATH:"""+INFORMIXPREFIX+"\lib"" iclit09b.lib"
+if disableinformix=false then
+	ALLINFORMIX="all-informix"
+	INSTALLINFORMIX="installdll-informix"
+end if
+
 
 ' api's...
 APIALLSUBDIRS="all-cpp all-c all-odbc"
@@ -646,6 +663,11 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@FIREBIRDLIBS@",FIREBIRDLIBS,1,-1,0)
 	content=replace(content,"@ALLFIREBIRD@",ALLFIREBIRD,1,-1,0)
 	content=replace(content,"@INSTALLFIREBIRD@",INSTALLFIREBIRD,1,-1,0)
+
+	content=replace(content,"@INFORMIXINCLUDES@",INFORMIXINCLUDES,1,-1,0)
+	content=replace(content,"@INFORMIXLIBS@",INFORMIXLIBS,1,-1,0)
+	content=replace(content,"@ALLINFORMIX@",ALLINFORMIX,1,-1,0)
+	content=replace(content,"@INSTALLINFORMIX@",INSTALLINFORMIX,1,-1,0)
 
 	' enabled apis
 	content=replace(content,"@APIALLSUBDIRS@",APIALLSUBDIRS,1,-1,0)

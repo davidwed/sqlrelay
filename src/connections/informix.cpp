@@ -1460,7 +1460,9 @@ uint16_t informixcursor::getColumnType(uint32_t i) {
 		case SQL_WCHAR:
 		case SQL_WVARCHAR:
 		case SQL_WLONGVARCHAR:
+		#ifdef SQL_DECFLOAT
 		case SQL_DECFLOAT:
+		#endif
 			// I don't think informix actually supports these,
 			// but they're defined in infxsql.h
 			return UNKNOWN_DATATYPE;
