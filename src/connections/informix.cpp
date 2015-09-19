@@ -252,7 +252,7 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 
 		const char	*informixdir;
 		const char	*servername;
-		const char	*database;
+		const char	*db;
 		const char	*lang;
 		uint32_t	timeout;
 		stringbuffer	dsn;
@@ -291,7 +291,7 @@ void informixconnection::handleConnectString() {
 	if (!servername || !servername[0]) {
 		servername=environment::getValue("INFORMIXSERVER");
 	}
-	database=cont->getConnectStringValue("database");
+	db=cont->getConnectStringValue("db");
 	cont->setUser(cont->getConnectStringValue("user"));
 	cont->setPassword(cont->getConnectStringValue("password"));
 
@@ -300,11 +300,11 @@ void informixconnection::handleConnectString() {
 	if (servername && servername[0]) {
 		dsn.append("Servername=")->append(servername);
 	}
-	if (database && database[0]) {
+	if (db && db[0]) {
 		if (dsn.getStringLength()) {
 			dsn.append(";");
 		}
-		dsn.append("Database=")->append(database);
+		dsn.append("Database=")->append(db);
 	}
 	const char	*user=cont->getUser();
 	if (user && user[0]) {

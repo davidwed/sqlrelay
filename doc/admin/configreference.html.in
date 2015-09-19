@@ -196,8 +196,8 @@ or a tnsnames-style expression such as:
 <li><b>fakebinds</b>: Postgresql 8 supports bind variables natively.  Versions prior to 8 did not, and SQL Relay had to substitute the values of bind variables into the query itself (fake binds).  In Postgresql 8, bind variables are identified by $1, $2, $3, etc. in the query, while in versions prior to 8, bind variables are identified by :var1, :var2, :var3, etc.  Converting queries and code which was written to use Postgresql 7 syntax to use Postgresql 8 syntax can be a lot of work, so this parameter is provided to make code which was written to run against Postgresql 7 work against Postgresql 8.  This parameter may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or "no" (meaning only allow Postgresql 8 syntax and use native binds).</li>
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
 <li><b>lastinsertidfunction</b>: Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Postgresql doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Postgresql.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.</li>
-</ul>
 <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
+</ul>
 </li>
 <li>For <b>sqlite</b> databases, the connect string syntax is "db=DB;identity=ID"</li>
 <ul>
@@ -264,13 +264,13 @@ or a tnsnames-style expression such as:
 <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>informix</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</li>
+<li>For <b>informix</b> databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
 <li><b>informixdir</b>: Specifies the path to the informix instance that should be used.  This is used for locating the sqlhosts file and other dependencies.  If not specified, this defaults to the value of the INFORMIXDIR environment variable, if set.</li>
-<li><b>servername</b>: The server to connect to (as defined in sqlhosts).  If not specified, this defaults to the value of the INFORMIXSERVER environment variable, if set.</li>
-<li><b>database</b>: The database instance to connect to, on the specified server.</li>
+<li><b>servername</b>: The server to connect to, as defined in sqlhosts.  If not specified, this defaults to the value of the INFORMIXSERVER environment variable, if set.</li>
+<li><b>db</b>: The database instance to connect to, on the specified server.</li>
 <li><b>informixdir</b>: The server instance to connect to.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
 <li><b>lang</b>: Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.</li>
