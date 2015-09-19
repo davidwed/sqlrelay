@@ -1106,6 +1106,11 @@ bool sqlrservercontroller::openSockets() {
 bool sqlrservercontroller::listen() {
 
 	uint16_t	sessioncount=0;
+
+	int32_t		softttl=cfgfl->getSoftTtl();
+	datetime	startdt;
+	startdt.getSystemDateAndTime();
+
 	bool		clientconnectfailed=false;
 
 	for (;;) {
@@ -1137,29 +1142,29 @@ bool sqlrservercontroller::listen() {
 
 			} else if (success==2) {
 
-				// this is a special case, basically it means
+				// This is a special case, basically it means
 				// that the listener wants the connection to
-				// reconnect to the database, just loop back
-				// so that can be handled naturally
+				// reconnect to the database.  Just loop back
+				// so that can be handled naturally.
 				loopback=true;
 				break;
 
 			} else if (success==-1) {
 
-				// if waitForClient() errors out, break out of
-				// the suspendedsession loop and loop back
-				// for another session and close connection if
-				// it is possible otherwise wait for session,
-				// but it seems that on hard load it's
-				// impossible to change handoff socket for pid
+				// If waitForClient() errors out, break out of
+				// the suspendedsession loop, loop back for
+				// another session, and close connection if
+				// it is possible.  Otherwise wait for session.
+				// But it seems that under heavy load that it's
+				// impossible to change handoff socket for pid.
 				clientconnectfailed=true;
 				break;
 
 			} else if (success==0) {
 
-				// if waitForClient() times out or otherwise
+				// If waitForClient() times out or otherwise
 				// fails to wait for someone to pick up the
-				// suspended session then roll back and break
+				// suspended session then roll back and break.
 				if (conn->isTransactional()) {
 					rollback();
 				}
@@ -1172,20 +1177,37 @@ bool sqlrservercontroller::listen() {
 
 			decrementConnectedClientCount();
 
+			// for dynamically spawned connections, bail on
+			// various conditions...
 			if (scalerspawned) {
 
+				// if the client that this was spawned for
+				// failed to connect...
 				if (clientconnectfailed) {
 					return false;
 				}
 
+				// if the ttl is 0...
 				if (!ttl) {
 					return true;
 				}
 
+				// if we've already handled some number of
+				// client sessions...
 				if (ttl>0 && cfgfl->getMaxSessionCount()) {
 					sessioncount++;
 					if (sessioncount==
 						cfgfl->getMaxSessionCount()) {
+						return true;
+					}
+				}
+
+				// if we've been alive for too long...
+				if (softttl>0) {
+					datetime	currentdt;
+					currentdt.getSystemDateAndTime();
+					if (currentdt.getEpoch()-
+						startdt.getEpoch()>=softttl) {
 						return true;
 					}
 				}

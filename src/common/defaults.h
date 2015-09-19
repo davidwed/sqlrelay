@@ -32,6 +32,10 @@
 // that were fired off to handle increased load
 #define DEFAULT_TTL "60"
 
+// default "retirement age" for connections
+// that were fired off to handle increased load
+#define DEFAULT_SOFTTTL "0"
+
 // default max client sessions for connections
 // that were fired off to handle increased load
 #define DEFAULT_MAXSESSIONCOUNT "0"

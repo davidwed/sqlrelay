@@ -3,6 +3,7 @@
 	added shutdown loop detection in sqlr-listener
 	fixed dbhostname/dbipaddress requests
 	added bind variable format validation to php pdo driver
+	added softttl parameter
 
 0.63.1 - backported shutdown loop detection
 

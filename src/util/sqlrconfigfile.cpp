@@ -41,6 +41,7 @@ void sqlrconfigfile::init() {
 	maxqueuelength=charstring::toInteger(DEFAULT_MAXQUEUELENGTH);
 	growby=charstring::toInteger(DEFAULT_GROWBY);
 	ttl=charstring::toInteger(DEFAULT_TTL);
+	softttl=charstring::toInteger(DEFAULT_SOFTTTL);
 	maxsessioncount=charstring::toInteger(DEFAULT_MAXSESSIONCOUNT);
 	endofsession=charstring::duplicate(DEFAULT_ENDOFSESSION);
 	endofsessioncommit=!charstring::compare(endofsession,"commit");
@@ -210,6 +211,10 @@ uint32_t sqlrconfigfile::getGrowBy() {
 
 int32_t sqlrconfigfile::getTtl() {
 	return ttl;
+}
+
+int32_t sqlrconfigfile::getSoftTtl() {
+	return softttl;
 }
 
 uint16_t sqlrconfigfile::getMaxSessionCount() {
@@ -1142,6 +1147,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=GROWBY_ATTRIBUTE;
 		} else if (!charstring::compare(name,"ttl")) {
 			currentattribute=TTL_ATTRIBUTE;
+		} else if (!charstring::compare(name,"softttl")) {
+			currentattribute=SOFTTTL_ATTRIBUTE;
 		} else if (!charstring::compare(name,"maxsessioncount")) {
 			currentattribute=MAXSESSIONCOUNT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"endofsession")) {
@@ -1564,7 +1571,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==GROWBY_ATTRIBUTE) {
 			growby=atouint32_t(value,DEFAULT_GROWBY,1);
 		} else if (currentattribute==TTL_ATTRIBUTE) {
-			ttl=atouint32_t(value,DEFAULT_TTL,0);
+			ttl=atoint32_t(value,DEFAULT_TTL,0);
+		} else if (currentattribute==SOFTTTL_ATTRIBUTE) {
+			softttl=atoint32_t(value,DEFAULT_SOFTTTL,0);
 		} else if (currentattribute==MAXSESSIONCOUNT_ATTRIBUTE) {
 			maxsessioncount=
 				atouint32_t(value,DEFAULT_MAXSESSIONCOUNT,0);

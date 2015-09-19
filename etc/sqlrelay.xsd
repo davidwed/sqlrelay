@@ -43,6 +43,7 @@
       <xs:attribute name="maxqueuelength" default="0"/>
       <xs:attribute name="growby" default="1"/>
       <xs:attribute name="ttl" default="60"/>
+      <xs:attribute name="softttl" default="0"/>
       <xs:attribute name="maxsessioncount" default="0"/>
       <xs:attribute name="endofsession" default="commit">
         <xs:simpleType>

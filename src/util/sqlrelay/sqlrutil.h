@@ -188,6 +188,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		uint32_t	getMaxQueueLength();
 		uint32_t	getGrowBy();
 		int32_t		getTtl();
+		int32_t		getSoftTtl();
 		uint16_t	getMaxSessionCount();
 		bool		getDynamicScaling();
 		const char	*getEndOfSession();
@@ -306,6 +307,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		uint32_t	maxqueuelength;
 		uint32_t	growby;
 		int32_t		ttl;
+		int32_t		softttl;
 		uint16_t	maxsessioncount;
 		char		*endofsession;
 		bool		endofsessioncommit;
@@ -439,6 +441,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			MAXQUEUELENGTH_ATTRIBUTE,
 			GROWBY_ATTRIBUTE,
 			TTL_ATTRIBUTE,
+			SOFTTTL_ATTRIBUTE,
 			MAXSESSIONCOUNT_ATTRIBUTE,
 			ENDOFSESSION_ATTRIBUTE,
 			SESSIONTIMEOUT_ATTRIBUTE,
