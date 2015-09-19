@@ -550,7 +550,7 @@ const char *informixconnection::dbVersion() {
 }
 
 const char *informixconnection::dbHostNameQuery() {
-	return "select dbinfo('dbname') from sysmaster:sysdual";
+	return "select dbinfo('dbhostname') from sysmaster:sysdual";
 	//return "select os_nodename from sysmaster:sysmachineinfo";
 }
 

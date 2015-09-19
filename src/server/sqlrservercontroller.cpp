@@ -810,13 +810,13 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 	incrementOpenDatabaseConnections();
 
 	// update db host name and ip address
-	// (Only do this if logging is enabled.  For now only the loggers use
-	// them, and if someone forgot to put the database host name in DNS
-	// then it can cause the connection to delay until a DNS timeout occurs
-	// to start.)
+	// (Only do this if logging is enabled.  The loggers use them, and if
+	// someone forgot to put the database host name in DNS then it can
+	// cause the connection to delay until a DNS timeout occurs.)
 	if (sqlrlg) {
-		dbhostname=conn->dbHostName();
-		dbipaddress=conn->dbIpAddress();
+		// this will cause the db host name and ip address
+		// to be fetched from the db and stored locally
+		dbHostName();
 	}
 
 	loggedin=true;
@@ -5241,10 +5241,18 @@ void sqlrservercontroller::alarmHandler(int32_t signum) {
 }
 
 const char *sqlrservercontroller::dbHostName() {
+	if (!dbhostname) {
+		dbhostname=conn->dbHostName();
+		dbipaddress=conn->dbIpAddress();
+	}
 	return dbhostname;
 }
 
 const char *sqlrservercontroller::dbIpAddress() {
+	if (!dbipaddress) {
+		dbhostname=conn->dbHostName();
+		dbipaddress=conn->dbIpAddress();
+	}
 	return dbipaddress;
 }
 

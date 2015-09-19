@@ -435,15 +435,16 @@ const char *sqlrserverconnection::dbIpAddressQuery() {
 
 const char *sqlrserverconnection::dbHostName() {
 
+	if (dbhostname) {
+		return dbhostname;
+	}
+
 	// don't get looped up...
 	if (dbhostiploop==2) {
+		dbhostiploop=0;
 		return NULL;
 	}
 	dbhostiploop++;
-
-	// re-init buffer
-	delete[] dbhostname;
-	dbhostname=NULL;
 
 	// if we have a host name query then use it, otherwise get the
 	// ip address and convert it to a host name...
@@ -451,7 +452,7 @@ const char *sqlrserverconnection::dbHostName() {
 	const char	*dbhnquery=dbHostNameQuery();
 	if (dbhnquery) {
 
-		int		dbhnquerylen=charstring::length(dbhnquery);
+		size_t		dbhnquerylen=charstring::length(dbhnquery);
 		sqlrservercursor	*dbhncur=cont->newCursor();
 		if (dbhncur->open() &&
 			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
@@ -491,15 +492,16 @@ const char *sqlrserverconnection::dbHostName() {
 
 const char *sqlrserverconnection::dbIpAddress() {
 
+	if (dbipaddress) {
+		return dbipaddress;
+	}
+
 	// don't get looped up...
 	if (dbhostiploop==2) {
+		dbhostiploop=0;
 		return NULL;
 	}
 	dbhostiploop++;
-
-	// re-init buffer
-	delete[] dbipaddress;
-	dbipaddress=NULL;
 
 	// if we have an ip address query then use it, otherwise get the
 	// host name and convert it to an ip address...
@@ -507,7 +509,7 @@ const char *sqlrserverconnection::dbIpAddress() {
 	const char	*dbiaquery=dbIpAddressQuery();
 	if (dbiaquery) {
 
-		int		dbiaquerylen=charstring::length(dbiaquery);
+		size_t		dbiaquerylen=charstring::length(dbiaquery);
 		sqlrservercursor	*dbiacur=cont->newCursor();
 		if (dbiacur->open() &&
 			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
