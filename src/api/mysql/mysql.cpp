@@ -1616,6 +1616,19 @@ static enum enum_field_types	mysqltypemap[]={
 	MYSQL_TYPE_STRING,
 	// "PG_CLASS"
 	MYSQL_TYPE_STRING,
+	// none added by sqlite
+	// added by sqlserver
+	// "UBIGINT"
+	MYSQL_TYPE_LONGLONG,
+	// "UNIQUEIDENTIFIER"
+	MYSQL_TYPE_STRING,
+	// added by informix
+	// "SMALLFLOAT"
+	MYSQL_TYPE_FLOAT,
+	// "BYTE"
+	MYSQL_TYPE_BLOB,
+	// "BOOLEAN"
+	MYSQL_TYPE_TINY,
 };
 
 enum enum_field_types map_col_type(const char *columntype, int64_t scale) {

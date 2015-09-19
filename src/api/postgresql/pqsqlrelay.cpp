@@ -1021,8 +1021,20 @@ static Oid postgresqltypemap[]={
 	// "INTERNAL"
 	2281,
 	// "OPAQUE"
-	2282
+	2282,
 	// none added by sqlite
+	// added by sqlserver
+	// "UBIGINT"
+	20,
+	// "UNIQUEIDENTIFIER"
+	26,
+	// added by informix
+	// "SMALLFLOAT"
+	700,
+	// "BYTE"
+	26,
+	// "BOOLEAN"
+	16
 };
 
 Oid PQftype(const PGresult *res, int field_num) {

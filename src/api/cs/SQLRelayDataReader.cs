@@ -1056,6 +1056,28 @@ namespace SQLRClient
                 return typeof(Byte[]);
             }
             // none added by sqlite
+            // added by sqlserver
+            else if (type == "UBIGINT")
+            {
+                return typeof(UInt64);
+            }
+            else if (type == "UNIQUEIDENTIFIER")
+            {
+                return typeof(Byte[]);
+            }
+            // added by informix
+            else if (type == "SMALLFLOAT")
+            {
+                return typeof(Single);
+            }
+            else if (type == "BYTE")
+            {
+                return typeof(Byte[]);
+            }
+            else if (type == "BOOLEAN")
+            {
+                return typeof(Boolean);
+            }
 
             // unrecognized type
             return typeof(Byte[]);

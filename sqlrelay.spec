@@ -13,6 +13,7 @@
 # --without postgresql
 # --without sqlite
 # --without sap
+# --without informix
 #
 # Language options:
 # ================
@@ -66,7 +67,7 @@ BuildRequires: rudiments-devel
 %{!?_without_nodejs:BuildRequires: ,nodejs-devel}
 
 %description
-SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
+SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2, Informix, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
 
 
 %package server-devel
@@ -204,6 +205,13 @@ Summary: SQL Relay connection plugin for SAP/Sybase
 SQL Relay connection plugin for SAP/Sybase.
 
 
+%package informix
+Summary: SQL Relay connection plugin for Informix
+
+%description informix
+SQL Relay connection plugin for Informix
+
+
 %package router
 Summary: SQL Relay query routing daemon
 
@@ -329,6 +337,7 @@ Man pages for SQL Relay.
 	%{?_without_postgresql:	--disable-postgresql} \
 	%{?_without_sqlite:	--disable-sqlite} \
 	%{?_without_sap:	--disable-sap} \
+	%{?_without_informix:	--disable-informix} \
 	%{?_without_java:	--disable-java} \
 	%{?_without_tcl:	--disable-tcl} \
 	%{?_without_erlang:	--disable-erlang} \
@@ -526,6 +535,10 @@ rm -rf %{buildroot}
 %{!?_without_sap:%files sap}
 %{!?_without_sap:%defattr(-, root, root)}
 %{!?_without_sap:%{_libexecdir}/sqlrelay/sqlrconnection_sap*}
+
+%{!?_without_informix:%files informix}
+%{!?_without_informix:%defattr(-, root, root)}
+%{!?_without_informix:%{_libexecdir}/sqlrelay/sqlrconnection_informix*}
 
 %{!?_without_router:%files router}
 %{!?_without_router:%defattr(-, root, root)}

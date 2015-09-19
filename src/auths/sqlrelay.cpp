@@ -59,6 +59,7 @@ sqlrelay::sqlrelay(xmldomnode *parameters,
 	const char	*bind2=":2";
 	const char	*db=sqlrcon->identify();
 	if (!charstring::compare(db,"db2") ||
+			!charstring::compare(db,"informix") ||
 			!charstring::compare(db,"firebird") ||
 			!charstring::compare(db,"mysql")) {
 		bind1="?";

@@ -366,7 +366,8 @@ bool sqlrimport::sequenceTagEnd() {
 		}
 		return true;
 	} else if (charstring::contains(dbtype,"postgresql") ||
-			charstring::contains(dbtype,"db2")) {
+			charstring::contains(dbtype,"db2") ||
+			charstring::contains(dbtype,"informix")) {
 		query.append("alter sequence ")->append(sequence);
 		query.append(" restart with ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {

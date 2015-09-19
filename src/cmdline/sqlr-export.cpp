@@ -246,6 +246,9 @@ bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		query.append("')");
 	} else if (charstring::contains(dbtype,"db2")) {
 		query.append("values nextval for ")->append(sequence);
+	} else if (charstring::contains(dbtype,"informix")) {
+		query.append("select ")->append(sequence);
+		query.append(".nextval from sysmaster::sysdual");
 	} else {
 		stdoutput.printf("%s doesn't support sequences.\n",dbtype);
 		return false;

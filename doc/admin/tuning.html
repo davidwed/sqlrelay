@@ -230,6 +230,26 @@ Just configure the connect string to use the local database.  For example:</p>
 <font color="#ff00ff">db=testdb</font>
 </blockquote>
 
+<span class="heading3">Informix</span>
+
+<p>Informix databases support connections over a wide range of protocols,
+including remote connections using TCP/IP sockets and local connections using
+shared memory.</p>
+
+<p>Databases are identified in the INFORMIXDIR/etc/sqlhosts file.  The second
+parameter for each database entry identifies the protocol to use to connect to
+it.  The onsoctcp protocol tells client programs to connect to the
+database using a TCP/IP socket and the onipcshm protocol tells client
+programs to connect to the database using shared memory.  For a local
+connection, use the onipcshm protocol.</p>
+
+<p>Once sqlhosts is configured, just configure SQL Relay to use that database.
+For example:</p>
+
+<blockquote>
+<font color="#ff00ff">db=testdb</font>
+</blockquote>
+
 <span class="heading3">SAP/Sybase</span>
 
 <p>As far as I can tell, SAP/Sybase only supports client connections over inet
@@ -430,7 +450,7 @@ finding it may dramatically improve that query's performance.</p>
 <a name="memoryusage"></a>
 <span class="heading2">Memory Usage</span><br>
 
-<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, SAP/Sybase, FreeTDS, MySQL, Firebird and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
+<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Informix, SAP/Sybase, FreeTDS, MySQL, Firebird and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
 
 <p>The size of the result set buffer is determined by 3 parameters:</p>
 
@@ -452,7 +472,7 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
 
-<p>The default result set buffer size for Oracle, DB2 and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  FreeTDS, MySQL, Firebird, and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
+<p>The default result set buffer size for Oracle, DB2, Informix, and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  Informix, FreeTDS, MySQL, Firebird, and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
 
 <p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.<p>
 
@@ -466,7 +486,7 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</p>
 
-<p>For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For MySQL, Firebird, and FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
+<p>For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For Informix, MySQL, Firebird, and FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
 
 <p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 

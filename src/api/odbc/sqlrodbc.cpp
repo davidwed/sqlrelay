@@ -1178,6 +1178,24 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 	if (!charstring::compare(ctype,"PG_CLASS")) {
 		return SQL_BINARY;
 	}
+	// none added by sqlite
+	// added by sqlserver
+	if (!charstring::compare(ctype,"UBIGINT")) {
+		return SQL_BIGINT;
+	}
+	if (!charstring::compare(ctype,"UNIQUEIDENTIFIER")) {
+		return SQL_BINARY;
+	}
+	// added by informix
+	if (!charstring::compare(ctype,"SMALLFLOAT")) {
+		return SQL_FLOAT;
+	}
+	if (!charstring::compare(ctype,"BYTE")) {
+		return SQL_BINARY;
+	}
+	if (!charstring::compare(ctype,"BOOLEAN")) {
+		return SQL_CHAR;
+	}
 	return SQL_CHAR;
 }
 

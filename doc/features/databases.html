@@ -34,24 +34,21 @@
 <img style="margin-left: 10px" src="../images/iodbc.png"></td>
 <td><img style="margin-left: 10px" src="../images/freetds.png">
 <br><br><img style="margin-left: 10px" src="../images/mdbtools.png"></td>
-<td><img style="margin-left: 10px" src="../images/blackray.png"></td>
 </tr>
 </table>
 </div>
 
-<p>SQL Relay supports <a target="_blank" href="http://oracle.com">Oracle</a>, <a target="_blank" href="http://www.mysql.com">MySQL</a>, <a target="_blank" href="http://postgresql.org">PostgreSQL</a>, <a target="_blank" href="http://sybase.com">Sybase</a>, <a target="_blank" href="http://www-01.ibm.com/software/data/db2/">IBM DB2</a>, <a target="_blank" href="http://www.firebirdsql.org">Firebird</a> and <a target="_blank" href="http://sqlite.org">SQLite</a> databases directly, using the native client API's for those databases.</p>
+<p>SQL Relay supports <a target="_blank" href="http://oracle.com">Oracle</a>, <a target="_blank" href="http://www.mysql.com">MySQL</a>, <a target="_blank" href="http://postgresql.org">PostgreSQL</a>, <a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>, <a target="_blank" href="http://www-01.ibm.com/software/data/db2/">IBM DB2</a>, <a target="_blank" href="http://www-01.ibm.com/software/data/informix/">Informix</a>, <a target="_blank" href="http://www.firebirdsql.org">Firebird</a> and <a target="_blank" href="http://sqlite.org">SQLite</a> databases directly, using the native client API's for those databases.</p>
 
-<p>Support is provided for Microsoft SQL Server via the <a target="_blank" href="http://www.freetds.org">FreeTDS</a> API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the Sybase database API.  So, depending on what version of Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
+<p>Support is provided for Microsoft SQL Server via the <a target="_blank" href="http://www.freetds.org">FreeTDS</a> API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the SAP/Sybase database API.  So, depending on what version of SAP/Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
 
-<p>FreeTDS supports Sybase as well.  So you can access both SQL Server and Sybase databases using FreeTDS.</p>
+<p>FreeTDS supports SAP/Sybase as well.  So you can access both SQL Server and SAP/Sybase databases using FreeTDS.</p>
 
 <p>Minimal support is provided for Microsoft Access databases via the <a target="_blank" href="http://mdbtools.sourceforge.net">MDB Tools</a> API.  Select queries are supported but DML and DDL is not.</p>
 
 <p>ODBC is supported via the <a target="_blank" href="http://www.unixodbc.org">UnixODBC</a> and <a target="_blank" href="http://www.iodbc.org">iODBC</a> libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are running SQL Relay on.</p>
 
-<p>Microsoft recently (as of July 2012) released a SQL Server ODBC driver that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
-
-<p><a target="_blank" href="http://sourceforge.net/projects/blackray/">Blackray</a> databases can also be accessed because they implement the PostgreSQL client-server protocol.</p>
+<p>Microsoft released a SQL Server ODBC driver in 2012 that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
 
 </body>
 </html>

@@ -112,6 +112,7 @@ versions of such code, with unchanged license):
 * OpenSSL and its dependencies.
 * Perl-Compatible Regular Expressions (PCRE) and its dependencies.
 * IBM DB2 database client libraries and their dependencies.
+* Informix database client libraries and their dependencies.
 * Firebird database client libraries and their dependencies.
 * FreeTDS client libraries and their dependencies.
 * MDB Tools client libraries and their dependencies.

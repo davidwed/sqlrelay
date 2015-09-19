@@ -486,13 +486,13 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>Since SQL Relay 0.37, when using Oracle, the character set can be set by setting the <b>nls_lang</b> variable in the connect string.</p>
 
-<p>Since SQL Relay 0.43, when using DB2, the character set can be set by setting the <b>lang</b> variable in the connect string.</p>
+<p>Since SQL Relay 0.43, when using DB2 or Informix, the character set can be set by setting the <b>lang</b> variable in the connect string.</p>
 
 <p>Other databases don't support any character set translation at all.  Data is just returned from the database as-is, byte-by-byte.</p>
 
 <p>In the case of Oracle, the <b>nls_lang</b> connect string variable just sets the <b>NLS_LANG</b> environment variable.  When using versions of SQL Relay older than listed above, the <b>NLS_LANG</b> environment variable must be set prior to running SQL Relay to configure the character set.</p>
 
-<p>In the case of DB2, the <b>lang</b> connect string variable just sets the <b>LANG</b> environment variable.  When using versions of SQL Relay older than listed above, the <b>LANG</b> environment variable must be set prior to running SQL Relay to configure the character set.</p>
+<p>In the case of DB2 or Informix, the <b>lang</b> connect string variable just sets the <b>LANG</b> environment variable.  When using versions of SQL Relay older than listed above, the <b>LANG</b> environment variable must be set prior to running SQL Relay to configure the character set.</p>
 
 <br><a name="oracleosauth"></a>
 <span class="heading3">How do I use Oracle's OS-Authentication (users identified externally)?</span>
