@@ -658,6 +658,7 @@
 	checkSuccess($stmt->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE),0);
 	checkSuccess($stmt->getAttribute(PDO::ATTR_AUTOCOMMIT),0);
 	checkSuccess($dbh->quote("select * from table"),null);
+	checkSuccess($stmt->bindValue(1,1,9999),true);
 	echo("\n");
 
 	$dbh->exec("drop table testtable");

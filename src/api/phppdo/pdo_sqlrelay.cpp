@@ -8,6 +8,7 @@
 #define NEED_IS_FLOAT_TYPE_CHAR
 #define NEED_IS_BLOB_TYPE_CHAR
 #include <datatypes.h>
+#include <defines.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
@@ -104,6 +105,18 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 					*pdoerr,errornumber,errormessage);
 	}
 	return errornumber;
+}
+
+void _bindFormatError(TSRMLS_DC) {
+	TSRMLS_FETCH();
+	int64_t		errornumber=
+			SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+	const char	*errormessage=
+			SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING;
+	zend_throw_exception_ex(php_pdo_get_exception(),
+					errornumber TSRMLS_CC,
+					"SQLSTATE[HY000] [%d] %s",
+					errornumber,errormessage);
 }
 
 static void clearList(singlylinkedlist< char * > *list) {
@@ -521,6 +534,22 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	// have one.
 	while (character::inSet(*name,":@$")) {
 		name++;
+	}
+
+	// validate types
+	bool	validtype=false;
+	switch (PDO_PARAM_TYPE(param->param_type)) {
+		case PDO_PARAM_NULL:
+		case PDO_PARAM_BOOL:
+		case PDO_PARAM_INT:
+		case PDO_PARAM_STR:
+		case PDO_PARAM_LOB:
+		//case PDO_PARAM_STMT:
+			validtype=true;
+	}
+	if (!validtype) {
+		_bindFormatError();
+		return 1;
 	}
 
 	// FIXME: what does this mean?
