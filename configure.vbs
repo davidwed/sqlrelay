@@ -1,3 +1,9 @@
+' run with cscript
+If InStr(LCase(WScript.FullName),"cscript") = 0 Then
+	WScript.Echo("Please run:  cscript /nologo configure.vbs")
+	WScript.Quit
+End If
+
 ' command line arguments
 OPTCPPFLAGS="/O2"
 DEBUGCPPFLAGS="/MD"
@@ -38,6 +44,52 @@ PHPPREFIX=""
 TCLPREFIX=""
 NODEJSPREFIX=""
 
+if WScript.Arguments.Count>0 then
+	if Wscript.Arguments.Item(0)="--help" then
+		WScript.Echo("Usage: cscript /nologo configure.vbs [OPTION]...")
+		WScript.Echo("")
+		WScript.Echo("Optional Features:")
+		WScript.Echo("  --enable-small-code    optimize for small code size")
+		WScript.Echo("  --enable-debug         compile with debug option")
+		WScript.Echo("  --disable-oracle       Don't build Oracle connection module")
+		WScript.Echo("  --disable-mysql        Don't build MySQL connection module")
+		WScript.Echo("  --disable-postgresql   Don't build PostgreSQL connection module")
+		WScript.Echo("  --disable-sap          Don't build SAP/Sybase connection module")
+		WScript.Echo("  --disable-odbc         Don't build ODBC connection module")
+		WScript.Echo("  --disable-db2          Don't build DB2 connection module")
+		WScript.Echo("  --disable-firebird     Don't build Firebird connection module")
+		WScript.Echo("  --disable-informix     Don't build Informix connection module")
+		WScript.Echo("  --disable-perl         Don't build Perl api")
+		WScript.Echo("  --disable-python       Don't build Python api")
+		WScript.Echo("  --disable-ruby         Don't build Ruby api")
+		WScript.Echo("  --disable-java         Don't build Java api")
+		WScript.Echo("  --disable-php          Don't build PHP api")
+		WScript.Echo("  --disable-tcl          Don't build TCL api")
+		WScript.Echo("  --disable-nodejs       Don't build node.js api")
+		WScript.Echo("  --disable-cs           Don't build C# api")
+		WScript.Echo("")
+		WScript.Echo("Optional Packages:")
+		WScript.Echo("  --with-oracle-prefix      Location of Oracle")
+		WScript.Echo("  --with-mysql-prefix       Location of MySQL")
+		WScript.Echo("  --with-postgresql-prefix  Location of PostgreSQL")
+		WScript.Echo("  --with-sap-prefix         Location of SAP/Sybase")
+		WScript.Echo("  --with-db2-prefix         Location of DB2")
+		WScript.Echo("  --with-firebird-prefix    Location of Firebird")
+		WScript.Echo("  --with-informix-prefix    Location of Informix")
+		WScript.Echo("  --with-perl-prefix        Location of Perl")
+		WScript.Echo("  --with-perl-version       Perl version")
+		WScript.Echo("  --with-python-prefix      Location of Perl")
+		WScript.Echo("  --with-python-version     Python version")
+		WScript.Echo("  --with-ruby-prefix        Location of Perl")
+		WScript.Echo("  --with-ruby-version       Ruby version")
+		WScript.Echo("  --with-java-prefix        Location of Perl")
+		WScript.Echo("  --with-php-prefix         Location of Perl")
+		WScript.Echo("  --with-tcl-prefix         Location of Perl")
+		WScript.Echo("  --with-nodejs-prefix      Location of Perl")
+		WScript.Quit
+	end if
+end if
+
 for i=0 to WScript.Arguments.Count-1
 
 	arg=Wscript.Arguments.Item(i)
@@ -49,68 +101,68 @@ for i=0 to WScript.Arguments.Count-1
 		DEBUGLDFLAGS="/debug"
 	elseif arg="--disable-oracle" then
 		disableoracle=true
-	elseif mid(arg,1,16)="--oracle-prefix=" then
-		ORACLEPREFIX=mid(arg,17)
+	elseif mid(arg,1,21)="--with-oracle-prefix=" then
+		ORACLEPREFIX=mid(arg,22)
 	elseif arg="--disable-mysql" then
 		disablemysql=true
-	elseif mid(arg,1,15)="--mysql-prefix=" then
-		MYSQLPREFIX=mid(arg,16)
+	elseif mid(arg,1,20)="--with-mysql-prefix=" then
+		MYSQLPREFIX=mid(arg,21)
 	elseif arg="--disable-postgresql" then
 		disablepostgresql=true
-	elseif mid(arg,1,20)="--postgresql-prefix=" then
-		POSTGRESQLPREFIX=mid(arg,21)
+	elseif mid(arg,1,25)="--with-postgresql-prefix=" then
+		POSTGRESQLPREFIX=mid(arg,26)
 	elseif arg="--disable-sap" then
 		disablesap=true
-	elseif mid(arg,1,16)="--sap-prefix=" then
-		SYBASEPREFIX=mid(arg,17)
+	elseif mid(arg,1,18)="--with-sap-prefix=" then
+		SYBASEPREFIX=mid(arg,19)
 	elseif arg="--disable-odbc" then
 		disableodbc=true
 	elseif arg="--disable-db2" then
 		disabledb2=true
-	elseif mid(arg,1,13)="--db2-prefix=" then
-		DB2PREFIX=mid(arg,14)
+	elseif mid(arg,1,18)="--with-db2-prefix=" then
+		DB2PREFIX=mid(arg,19)
 	elseif arg="--disable-firebird" then
 		disablefirebird=true
-	elseif mid(arg,1,18)="--firebird-prefix=" then
-		FIREBIRDPREFIX=mid(arg,19)
+	elseif mid(arg,1,23)="--with-firebird-prefix=" then
+		FIREBIRDPREFIX=mid(arg,24)
 	elseif arg="--disable-informix" then
 		disableinformix=true
-	elseif mid(arg,1,18)="--informix-prefix=" then
-		INFORMIXPREFIX=mid(arg,19)
+	elseif mid(arg,1,23)="--with-informix-prefix=" then
+		INFORMIXPREFIX=mid(arg,24)
 	elseif arg="--disable-perl" then
 		disableperl=true
-	elseif mid(arg,1,14)="--perl-prefix=" then
-		PERLPREFIX=mid(arg,15)
-	elseif mid(arg,1,15)="--perl-version=" then
-		PERLVERSION=mid(arg,16)
+	elseif mid(arg,1,19)="--with-perl-prefix=" then
+		PERLPREFIX=mid(arg,20)
+	elseif mid(arg,1,20)="--with-perl-version=" then
+		PERLVERSION=mid(arg,21)
 	elseif arg="--disable-python" then
 		disablepython=true
-	elseif mid(arg,1,16)="--python-prefix=" then
-		PYTHONPREFIX=mid(arg,17)
-	elseif mid(arg,1,17)="--python-version=" then
-		PYTHONPREFIX=mid(arg,18)
+	elseif mid(arg,1,21)="--with-python-prefix=" then
+		PYTHONPREFIX=mid(arg,22)
+	elseif mid(arg,1,22)="--with-python-version=" then
+		PYTHONPREFIX=mid(arg,23)
 	elseif arg="--disable-ruby" then
 		disableruby=true
-	elseif mid(arg,1,14)="--ruby-prefix=" then
-		RUBYPREFIX=mid(arg,15)
-	elseif mid(arg,1,15)="--ruby-version=" then
-		RUBYVERSION=mid(arg,16)
+	elseif mid(arg,1,19)="--with-ruby-prefix=" then
+		RUBYPREFIX=mid(arg,20)
+	elseif mid(arg,1,20)="--with-ruby-version=" then
+		RUBYVERSION=mid(arg,21)
 	elseif arg="--disable-java" then
 		disablejava=true
-	elseif mid(arg,1,14)="--java-prefix=" then
-		JAVAPREFIX=mid(arg,15)
+	elseif mid(arg,1,19)="--with-java-prefix=" then
+		JAVAPREFIX=mid(arg,20)
 	elseif arg="--disable-php" then
 		disablephp=true
-	elseif mid(arg,1,13)="--php-prefix=" then
-		PHPPREFIX=mid(arg,14)
+	elseif mid(arg,1,18)="--with-php-prefix=" then
+		PHPPREFIX=mid(arg,19)
 	elseif arg="--disable-tcl" then
 		disabletcl=true
-	elseif mid(arg,1,13)="--tcl-prefix=" then
-		TCLPREFIX=mid(arg,14)
+	elseif mid(arg,1,18)="--with-tcl-prefix=" then
+		TCLPREFIX=mid(arg,19)
 	elseif arg="--disable-nodejs" then
 		disablenodejs=true
-	elseif mid(arg,1,16)="--nodejs-prefix=" then
-		NODEJSPREFIX=mid(arg,17)
+	elseif mid(arg,1,21)="--with-nodejs-prefix=" then
+		NODEJSPREFIX=mid(arg,22)
 	elseif arg="--disable-cs" then
 		disablecs=true
 	end if
@@ -147,13 +199,18 @@ EXE=".exe"
 ' create file system object
 set fso=CreateObject("Scripting.FileSystemObject")
 
+' create shell object
+set WshShell=WScript.CreateObject("WScript.Shell")
+
 
 ' get top_builddir
 top_builddir=fso.GetAbsolutePathName(".")
 
 
+WScript.Echo("")
+WScript.Echo("***** Platform ***************")
+
 ' determine VC++ version and architecture
-set WshShell=WScript.CreateObject("WScript.Shell")
 set cmd=WshShell.exec("cl")
 stdout=cmd.StdOut.ReadAll()
 stderr=cmd.StdErr.ReadLine()
@@ -168,12 +225,15 @@ next
 parts=split(version,".")
 version=parts(0)
 
+WScript.Echo("Visual C++ Version: " & version)
+WScript.Echo("Visual C++ Architecture: " & arch)
+
+
 ' set some architecture-based flags
 USE_32BIT_TIME_T=""
 if arch="80x86" then
 	USE_32BIT_TIME_T="/D _USE_32BIT_TIME_T"
 end if
-
 
 
 ' determine OS Version number
@@ -193,6 +253,8 @@ else
 	end if
 	hexversion="0x0"&parts3(0)&"0"&parts3(1)
 end if
+
+WScript.Echo("Windows Version: " & hexversion)
 
 ' in general, we need to set WIN32WINNT to the hexversion
 WINVER=""
@@ -296,9 +358,13 @@ elseif version<=11 then
 
 end if
 
+WScript.Echo("******************************")
+
 
 
 ' oracle
+WScript.Echo("")
+WScript.Echo("***** Oracle *****************")
 if ORACLEPREFIX="" then
 	ORACLEPREFIX="C:\Program Files\Oracle\instantclient_12_1\sdk"
 end if
@@ -307,9 +373,19 @@ ORACLELIBS="/LIBPATH:"""+ORACLEPREFIX+"\lib\msvc"" oci.lib"
 if disableoracle=false then
 	ALLORACLE="all-oracle"
 	INSTALLORACLE="installdll-oracle"
+
+	WScript.Echo("Oracle prefix... " & ORACLEPREFIX)
+	WScript.Echo("Oracle includes... " & ORACLEINCLUDES)
+	WScript.Echo("Oracle libs... " & ORACLELIBS)
+else
+	WScript.Echo("Oracle support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' mysql
+WScript.Echo("")
+WScript.Echo("***** MySQL ******************")
 if MYSQLPREFIX="" then
 	MYSQLPREFIX="C:\Program Files\MySQL\MySQL Connector.C 6.1"
 end if
@@ -318,9 +394,19 @@ MYSQLLIBS="/LIBPATH:"""+MYSQLPREFIX+"\lib"" libmysql.lib"
 if disablemysql=false then
 	ALLMYSQL="all-mysql"
 	INSTALLMYSQL="installdll-mysql"
+
+	WScript.Echo("MySQL prefix... " & MYSQLPREFIX)
+	WScript.Echo("MySQL includes... " & MYSQLINCLUDES)
+	WScript.Echo("MySQL libs... " & MYSQLLIBS)
+else
+	WScript.Echo("MySQL support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' postgresql
+WScript.Echo("")
+WScript.Echo("***** PostgreSQL *************")
 if POSTGRESQLPREFIX="" then
 	POSTGRESQLPREFIX="C:\Program Files\PostgreSQL\9.4"
 end if
@@ -329,7 +415,15 @@ POSTGRESQLLIBS="/LIBPATH:"""+POSTGRESQLPREFIX+"\lib"" libpq.lib"
 if disablepostgresql=false then
 	ALLPOSTGRESQL="all-postgresql"
 	INSTALLPOSTGRESQL="installdll-postgresql"
+
+	WScript.Echo("PostgreSQL prefix... " & POSTGRESQLPREFIX)
+	WScript.Echo("PostgreSQL includes... " & POSTGRESQLINCLUDES)
+	WScript.Echo("PostgreSQL libs... " & POSTGRESQLLIBS)
+else
+	WScript.Echo("PostgreSQL support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' sqlite
 SQLITEINCLUDES=""
@@ -337,7 +431,10 @@ SQLITELIBS=""
 ALLSQLITE=""
 INSTALLSQLITE=""
 
+
 ' sap
+WScript.Echo("")
+WScript.Echo("***** SAP/Sybase *************")
 if SYBASEPREFIX="" then
 	SYBASEPREFIX="C:\SAP\OCS-16_0"
 end if
@@ -346,21 +443,41 @@ SYBASELIBS="/LIBPATH:"""+SYBASEPREFIX+"\lib"" libsybblk64.lib libsybct64.lib lib
 if disablesap=false then
 	ALLSYBASE="all-sap"
 	INSTALLSYBASE="installdll-sap"
+
+	WScript.Echo("SAP/Sybase prefix... " & SYBASEPREFIX)
+	WScript.Echo("SAP/Sybase includes... " & SYBASEINCLUDES)
+	WScript.Echo("SAP/Sybase libs... " & SYBASELIBS)
+else
+	WScript.Echo("SAP/Sybase support will not be built. ")
 end if
 if arch="80x86" then
 	ALLSYBASE=""
 	INSTALLSYBASE=""
+	WScript.Echo("SAP/Sybase support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' odbc
+WScript.Echo("")
+WScript.Echo("***** ODBC *******************")
 ODBCINCLUDES=""
 ODBCLIBS="user32.lib gdi32.lib odbc32.lib odbccp32.lib"
 if disableodbc=false then
 	ALLODBC="all-odbc"
 	INSTALLODBC="installdll-odbc"
+
+	WScript.Echo("ODBC includes... " & ODBCINCLUDES)
+	WScript.Echo("ODBC libs... " & ODBCLIBS)
+else
+	WScript.Echo("ODBC support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' db2
+WScript.Echo("")
+WScript.Echo("***** DB2 ********************")
 if DB2PREFIX="" then
 	DB2PREFIX="C:\Program Files\IBM\SQLLIB"
 end if
@@ -369,9 +486,19 @@ DB2LIBS="/LIBPATH:"""+DB2PREFIX+"\lib"" db2api.lib"
 if disabledb2=false then
 	ALLDB2="all-db2"
 	INSTALLDB2="installdll-db2"
+
+	WScript.Echo("DB2 prefix... " & DB2PREFIX)
+	WScript.Echo("DB2 includes... " & DB2INCLUDES)
+	WScript.Echo("DB2 libs... " & DB2LIBS)
+else
+	WScript.Echo("DB2 support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' firebid
+WScript.Echo("")
+WScript.Echo("***** Firebird ***************")
 if FIREBIRDPREFIX="" then
 	FIREBIRDPREFIX="C:\Program Files\Firebird\Firebird_2_5"
 end if
@@ -380,9 +507,19 @@ FIREBIRDLIBS="/LIBPATH:"""+FIREBIRDPREFIX+"\lib"" fbclient_ms.lib"
 if disablefirebird=false then
 	ALLFIREBIRD="all-firebird"
 	INSTALLFIREBIRD="installdll-firebird"
+
+	WScript.Echo("Firebird prefix... " & FIREBIRDPREFIX)
+	WScript.Echo("Firebird includes... " & FIREBIRDINCLUDES)
+	WScript.Echo("Firebird libs... " & FIREBIRDLIBS)
+else
+	WScript.Echo("Firebird support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' informix
+WScript.Echo("")
+WScript.Echo("***** Informix ***************")
 if INFORMIXPREFIX="" then
 	INFORMIXPREFIX="C:\Program Files\IBM Informix Software Bundle"
 end if
@@ -391,7 +528,14 @@ INFORMIXLIBS="/LIBPATH:"""+INFORMIXPREFIX+"\lib"" iclit09b.lib"
 if disableinformix=false then
 	ALLINFORMIX="all-informix"
 	INSTALLINFORMIX="installdll-informix"
+
+	WScript.Echo("Informix prefix... " & INFORMIXPREFIX)
+	WScript.Echo("Informix includes... " & INFORMIXINCLUDES)
+	WScript.Echo("Informix libs... " & INFORMIXLIBS)
+else
+	WScript.Echo("Informix support will not be built. ")
 end if
+WScript.Echo("******************************")
 
 
 ' api's...
@@ -400,15 +544,24 @@ APICLEANSUBDIRS="clean-cpp clean-c clean-odbc"
 APIINSTALLSUBDIRS="install-cpp install-c install-odbc"
 APIUNINSTALLSUBDIRS="uninstall-cpp uninstall-c uninstall-odbc"
 
+
 ' c#
+WScript.Echo("")
+WScript.Echo("***** C# *********************")
 if disablecs=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-cs"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-cs"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-cs"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-cs"
+else
+	WScript.Echo("C# support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' perl
+WScript.Echo("")
+WScript.Echo("***** Perl *******************")
 if PERLPREFIX="" then
 	PERLPREFIX="C:\Perl64"
 end if
@@ -423,9 +576,18 @@ if disableperl=false then
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-perl"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-perl"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-perl"
+
+	WScript.Echo("Perl prefix... " & PERLPREFIX)
+	WScript.Echo("Perl version... " & PERLVERSION)
+else
+	WScript.Echo("Perl support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' python
+WScript.Echo("")
+WScript.Echo("***** Python *****************")
 if PYTHONPREFIX="" then
 	PYTHONPREFIX="C:\Python27"
 end if
@@ -437,9 +599,18 @@ if disablepython=false then
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-python"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-python"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-python"
+
+	WScript.Echo("Python prefix... " & PYTHONPREFIX)
+	WScript.Echo("Python version... " & PYTHONVERSION)
+else
+	WScript.Echo("Python support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' ruby
+WScript.Echo("")
+WScript.Echo("***** Ruby *******************")
 if RUBYPREFIX="" then
 	RUBYPREFIX="C:\Ruby"
 end if
@@ -461,9 +632,18 @@ if disableruby=false then
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-ruby"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-ruby"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-ruby"
+
+	WScript.Echo("Ruby prefix... " & RUBYPREFIX)
+	WScript.Echo("Ruby version... " & RUBYVERSION)
+else
+	WScript.Echo("Ruby support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' php
+WScript.Echo("")
+WScript.Echo("***** PHP ********************")
 if PHPPREFIX="" then
 	PHPPREFIX="C:\PHP"
 end if
@@ -472,9 +652,17 @@ if disablephp=false then
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-php clean-phppdo"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-php install-phppdo"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-php uninstall-phppdo"
+
+	WScript.Echo("PHP prefix... " & PHPPREFIX)
+else
+	WScript.Echo("PHP support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' java
+WScript.Echo("")
+WScript.Echo("***** Java *******************")
 if JAVAPREFIX="" then
 	JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
 end if
@@ -483,9 +671,17 @@ if disablejava=false then
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-java"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-java"
+
+	WScript.Echo("Java prefix... " & JAVAPREFIX)
+else
+	WScript.Echo("Java support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' tcl
+WScript.Echo("")
+WScript.Echo("***** TCL ********************")
 if TCLPREFIX="" then
 	TCLPREFIX="C:\Tcl"
 end if
@@ -494,9 +690,17 @@ if disabletcl=false then
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-tcl"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-tcl"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-tcl"
+
+	WScript.Echo("TCL prefix... " & TCLPREFIX)
+else
+	WScript.Echo("TCL support will not be built. ")
 end if
+WScript.Echo("******************************")
+
 
 ' node.js
+WScript.Echo("")
+WScript.Echo("***** node.js ****************")
 if NODEJSPREFIX="" then
 	NODEJSPREFIX="C:\Program Files\nodejs"
 end if
@@ -519,7 +723,12 @@ if disablenodejs=false then
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-nodejs"
 	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-nodejs"
 	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-nodejs"
+
+	WScript.Echo("node.js prefix... " & NODEJSPREFIX)
+else
+	WScript.Echo("node.js support will not be built. ")
 end if
+WScript.Echo("******************************")
 
 
 
@@ -680,3 +889,107 @@ for i=lbound(infiles) to ubound(infiles)
 	call outfile.Write(content)
 	call outfile.Close()
 next
+
+
+' summary
+PERLBUILD="no "
+PYTHONBUILD="no "
+RUBYBUILD="no "
+PHPBUILD="no "
+PHPPDOBUILD="no "
+JAVABUILD="no "
+TCLBUILD="no "
+CSBUILD="no "
+NODEJSBUILD="no "
+ODBCBUILD="no "
+if disableperl=false then
+	PERLBUILD="yes"
+end if
+if disablepython=false then
+	PYTHONBUILD="yes"
+end if
+if disableruby=false then
+	RUBYBUILD="yes"
+end if
+if disablephp=false then
+	PHPBUILD="yes"
+end if
+if disablephp=false then
+	PHPPDOBUILD="yes"
+end if
+if disablejava=false then
+	JAVABUILD="yes"
+end if
+if disabletcl=false then
+	TCLBUILD="yes"
+end if
+if disablecs=false then
+	CSBUILD="yes"
+end if
+if disablenodejs=false then
+	NODEJSBUILD="yes"
+end if
+if disableodbc=false then
+	ODBCBUILD="yes"
+end if
+
+WScript.Echo("")
+WScript.Echo("***** Summary ***********************************************")
+WScript.Echo(" Version      : " & SQLR_VERSION)
+WSCript.Echo("")
+WSCript.Echo(" APIs         : C/C++       yes           Perl       " & PERLBUILD)
+WSCript.Echo("                Python      " & PYTHONBUILD & "           Ruby       " & RUBYBUILD)
+WSCript.Echo("                PHP         " & PHPBUILD & "           Java       " & JAVABUILD)
+WSCript.Echo("                PHP PDO     " & PHPPDOBUILD & "           ODBC       " & ODBCBUILD)
+WSCript.Echo("                TCL         " & TCLBUILD & "           C#         " & CSBUILD)
+WScript.Echo("                node.js     " & NODEJSBUILD)
+WSCript.Echo("")
+
+ORACLE8BUILD="no     "
+MYSQLBUILD="no     "
+POSTGRESQLBUILD="no     "
+FREETDSBUILD="no     "
+SYBASEBUILD="no     "
+ODBCBUILD="no     "
+DB2BUILD="no     "
+FIREBIRDBUILD="no     "
+MDBTOOLSBUILD="no     "
+INFORMIXBUILD="no     "
+if disableoracle=false then
+	ORACLE8BUILD="yes    "
+end if
+if disablemysql=false then
+	MYSQLBUILD="yes    "
+end if
+if disablepostgresql=false then
+	POSTGRESQLBUILD="yes    "
+end if
+if disablesybase=false then
+	SYBASEBUILD="yes    "
+end if
+if disableodbc=false then
+	ODBCBUILD="yes    "
+end if
+if disabledb2=false then
+	DB2BUILD="yes    "
+end if
+if disablefirebird=false then
+	FIREBIRDBUILD="yes    "
+end if
+if disableinformix=false then
+	INFORMIXBUILD="yes    "
+end if
+WScript.Echo(" Databases    : Oracle8     " & ORACLE8BUILD & "       MySQL      " & MYSQLBUILD)
+WScript.Echo("                PostgreSQL  " & POSTGRESQLBUILD & "       SAP/Sybase " & SYBASEBUILD)
+WScript.Echo("                ODBC        " & ODBCBUILD & "       DB2        " & DB2BUILD)
+WScript.Echo("                Firebird    " & FIREBIRDBUILD & "       Informix   " & INFORMIXBUILD)
+
+WScript.Echo("*************************************************************")
+WScript.Echo("")
+WScript.Echo("If you expected a Database or API that doesn't show up in the Summary")
+WScript.Echo("then the configure script probably couldn't find a package it needed to")
+WScript.Echo("build it.  You can manually specify package locations using command line")
+WScript.Echo("options.")
+WScript.Echo("")
+WScript.Echo("Type:  cscript /nologo configure.vbs --help   for a list of options.")
+WScript.Echo("")
