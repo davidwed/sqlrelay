@@ -1,5 +1,7 @@
+on error resume next
+
 ' run with cscript
-If InStr(LCase(WScript.FullName),"cscript") = 0 Then
+If InStr(LCase(WScript.FullName),"cscript")=0 Then
 	WScript.Echo("Please run:  cscript /nologo configure.vbs")
 	WScript.Quit
 End If
@@ -365,63 +367,46 @@ WScript.Echo("******************************")
 ' oracle
 WScript.Echo("")
 WScript.Echo("***** Oracle *****************")
-if ORACLEPREFIX="" then
-	ORACLEPREFIX="C:\Program Files\Oracle\instantclient_12_1\sdk"
-end if
-ORACLEINCLUDES="/I """+ORACLEPREFIX+"\include"""
-ORACLELIBS="/LIBPATH:"""+ORACLEPREFIX+"\lib\msvc"" oci.lib"
-if disableoracle=false then
-	ALLORACLE="all-oracle"
-	INSTALLORACLE="installdll-oracle"
 
-	WScript.Echo("Oracle prefix... " & ORACLEPREFIX)
-	WScript.Echo("Oracle includes... " & ORACLEINCLUDES)
-	WScript.Echo("Oracle libs... " & ORACLELIBS)
-else
-	WScript.Echo("Oracle support will not be built. ")
-end if
+configureDatabase "Oracle", "oracle", disableoracle,_
+			"C:\Program Files\Oracle","instantclient_",_
+			"sdk\include","oci.h",_
+			"sdk\lib\msvc","oci.lib","",_
+			"\include","\lib\msvc","oci.lib",_
+			ORACLEPREFIX, ORACLEINCLUDES, ORACLELIBS,_
+			ALLORACLE, INSTALLORACLE
+
 WScript.Echo("******************************")
+
 
 
 ' mysql
 WScript.Echo("")
 WScript.Echo("***** MySQL ******************")
-if MYSQLPREFIX="" then
-	MYSQLPREFIX="C:\Program Files\MySQL\MySQL Connector.C 6.1"
-end if
-MYSQLINCLUDES="/I """+MYSQLPREFIX+"\include"""
-MYSQLLIBS="/LIBPATH:"""+MYSQLPREFIX+"\lib"" libmysql.lib"
-if disablemysql=false then
-	ALLMYSQL="all-mysql"
-	INSTALLMYSQL="installdll-mysql"
 
-	WScript.Echo("MySQL prefix... " & MYSQLPREFIX)
-	WScript.Echo("MySQL includes... " & MYSQLINCLUDES)
-	WScript.Echo("MySQL libs... " & MYSQLLIBS)
-else
-	WScript.Echo("MySQL support will not be built. ")
-end if
+configureDatabase "MySQL", "mysql", disablemysql,_
+			"C:\Program Files\MySQL","MySQL Connector.C ",_
+			"include","mysql.h",_
+			"lib","libmysql.lib","",_
+			"\include","\lib","libmysql.lib",_
+			MYSQLPREFIX, MYSQLINCLUDES, MYSQLLIBS,_
+			ALLMYSQL, INSTALLMYSQL
+
 WScript.Echo("******************************")
 
 
 ' postgresql
 WScript.Echo("")
 WScript.Echo("***** PostgreSQL *************")
-if POSTGRESQLPREFIX="" then
-	POSTGRESQLPREFIX="C:\Program Files\PostgreSQL\9.4"
-end if
-POSTGRESQLINCLUDES="/I """+POSTGRESQLPREFIX+"\include"""
-POSTGRESQLLIBS="/LIBPATH:"""+POSTGRESQLPREFIX+"\lib"" libpq.lib"
-if disablepostgresql=false then
-	ALLPOSTGRESQL="all-postgresql"
-	INSTALLPOSTGRESQL="installdll-postgresql"
 
-	WScript.Echo("PostgreSQL prefix... " & POSTGRESQLPREFIX)
-	WScript.Echo("PostgreSQL includes... " & POSTGRESQLINCLUDES)
-	WScript.Echo("PostgreSQL libs... " & POSTGRESQLLIBS)
-else
-	WScript.Echo("PostgreSQL support will not be built. ")
-end if
+configureDatabase "PostgreSQL", "postgresql", disablepostgresql,_
+			"C:\Program Files\PostgreSQL","",_
+			"include","libpq-fe.h",_
+			"lib","libpq.lib","",_
+			"\include","\lib","libpq.lib",_
+			POSTGRESQLPREFIX, POSTGRESQLINCLUDES, POSTGRESQLLIBS,_
+			ALLPOSTGRESQL, INSTALLPOSTGRESQL
+
 WScript.Echo("******************************")
 
 
@@ -435,26 +420,16 @@ INSTALLSQLITE=""
 ' sap
 WScript.Echo("")
 WScript.Echo("***** SAP/Sybase *************")
-if SYBASEPREFIX="" then
-	SYBASEPREFIX="C:\SAP\OCS-16_0"
-end if
-SYBASEINCLUDES="/I """+SYBASEPREFIX+"\include"""
-SYBASELIBS="/LIBPATH:"""+SYBASEPREFIX+"\lib"" libsybblk64.lib libsybct64.lib libsybcs64.lib"
-if disablesap=false then
-	ALLSYBASE="all-sap"
-	INSTALLSYBASE="installdll-sap"
 
-	WScript.Echo("SAP/Sybase prefix... " & SYBASEPREFIX)
-	WScript.Echo("SAP/Sybase includes... " & SYBASEINCLUDES)
-	WScript.Echo("SAP/Sybase libs... " & SYBASELIBS)
-else
-	WScript.Echo("SAP/Sybase support will not be built. ")
-end if
-if arch="80x86" then
-	ALLSYBASE=""
-	INSTALLSYBASE=""
-	WScript.Echo("SAP/Sybase support will not be built. ")
-end if
+configureDatabase "SAP/SYBASE", "sap", disablesap,_
+			"C:\SAP","OCS-",_
+			"include","ctpublic.h",_
+			"lib","libsybct64.lib",_
+			"libsybblk64.lib libsybcs64.lib",_
+			"\include","\lib","libsybct64.lib",_
+			SYBASEPREFIX, SYBASEINCLUDES, SYBASELIBS,_
+			ALLSYBASE, INSTALLSYBASE
+
 WScript.Echo("******************************")
 
 
@@ -478,63 +453,48 @@ WScript.Echo("******************************")
 ' db2
 WScript.Echo("")
 WScript.Echo("***** DB2 ********************")
-if DB2PREFIX="" then
-	DB2PREFIX="C:\Program Files\IBM\SQLLIB"
-end if
-DB2INCLUDES="/I"""+DB2PREFIX+"\include"""
-DB2LIBS="/LIBPATH:"""+DB2PREFIX+"\lib"" db2api.lib"
-if disabledb2=false then
-	ALLDB2="all-db2"
-	INSTALLDB2="installdll-db2"
 
-	WScript.Echo("DB2 prefix... " & DB2PREFIX)
-	WScript.Echo("DB2 includes... " & DB2INCLUDES)
-	WScript.Echo("DB2 libs... " & DB2LIBS)
-else
-	WScript.Echo("DB2 support will not be built. ")
-end if
+configureDatabase "DB2", "db2", disabledb2,_
+			"C:\Program Files\IBM","SQLLIB",_
+			"include","sqlcli1.h",_
+			"lib","db2api.lib",_
+			"",_
+			"\include","\lib","db2api.lib",_
+			DB2PREFIX, DB2INCLUDES, DB2LIBS,_
+			ALLDB2, INSTALLDB2
+
 WScript.Echo("******************************")
 
 
 ' firebid
 WScript.Echo("")
 WScript.Echo("***** Firebird ***************")
-if FIREBIRDPREFIX="" then
-	FIREBIRDPREFIX="C:\Program Files\Firebird\Firebird_2_5"
-end if
-FIREBIRDINCLUDES="/I"""+FIREBIRDPREFIX+"\include"""
-FIREBIRDLIBS="/LIBPATH:"""+FIREBIRDPREFIX+"\lib"" fbclient_ms.lib"
-if disablefirebird=false then
-	ALLFIREBIRD="all-firebird"
-	INSTALLFIREBIRD="installdll-firebird"
 
-	WScript.Echo("Firebird prefix... " & FIREBIRDPREFIX)
-	WScript.Echo("Firebird includes... " & FIREBIRDINCLUDES)
-	WScript.Echo("Firebird libs... " & FIREBIRDLIBS)
-else
-	WScript.Echo("Firebird support will not be built. ")
-end if
+configureDatabase "Firebird", "firebird", disablefirebird,_
+			"C:\Program Files\Firebird","Firebird_",_
+			"include","ibase.h",_
+			"lib","fbclient_ms.lib",_
+			"",_
+			"\include","\lib","fbclient_ms.lib",_
+			FIREBIRDPREFIX, FIREBIRDINCLUDES, FIREBIRDLIBS,_
+			ALLFIREBIRD, INSTALLFIREBIRD
+
 WScript.Echo("******************************")
 
 
 ' informix
 WScript.Echo("")
 WScript.Echo("***** Informix ***************")
-if INFORMIXPREFIX="" then
-	INFORMIXPREFIX="C:\Program Files\IBM Informix Software Bundle"
-end if
-INFORMIXINCLUDES="/I"""+INFORMIXPREFIX+"\incl\cli"""
-INFORMIXLIBS="/LIBPATH:"""+INFORMIXPREFIX+"\lib"" iclit09b.lib"
-if disableinformix=false then
-	ALLINFORMIX="all-informix"
-	INSTALLINFORMIX="installdll-informix"
 
-	WScript.Echo("Informix prefix... " & INFORMIXPREFIX)
-	WScript.Echo("Informix includes... " & INFORMIXINCLUDES)
-	WScript.Echo("Informix libs... " & INFORMIXLIBS)
-else
-	WScript.Echo("Informix support will not be built. ")
-end if
+configureDatabase "Informix", "informix", disableinformix,_
+			"C:\Program Files","IBM Informix Software Bundle",_
+			"incl\cli","infxcli.h",_
+			"lib","iclit",_
+			"",_
+			"\incl\cli","\lib","iclit09b.lib",_
+			INFORMIXPREFIX, INFORMIXINCLUDES, INFORMIXLIBS,_
+			ALLINFORMIX, INSTALLINFORMIX
+
 WScript.Echo("******************************")
 
 
@@ -993,3 +953,137 @@ WScript.Echo("options.")
 WScript.Echo("")
 WScript.Echo("Type:  cscript /nologo configure.vbs --help   for a list of options.")
 WScript.Echo("")
+
+
+
+Sub configureDatabase(dbname, dblowername, disabledb,_
+			basefolder, subfolderpattern,_
+			includessubfolder, includespattern,_
+			libssubfolder, libpattern, extralibs,_
+			defaultincludes, defaultlibssubfolder, defaultlibs,_
+			DBPREFIX, DBINCLUDES, DBLIBS, ALLDB, INSTALLDB)
+
+	if disabledb=false then
+
+		if DBPREFIX="" then
+
+			' if no db prefix was supplied, then look for the db
+			includesfolder=""
+			libsfolder=""
+			libfile=""
+			if findHeadersAndLibs(basefolder,subfolderpattern,_
+						includessubfolder,_
+						includespattern,_
+						includesfolder,_
+						libssubfolder,_
+						libpattern,_
+						libsfolder,_
+						libfile)=true then
+
+				' if we found it then set the
+				' DBINCLUDES and DBLIBS 
+				DBINCLUDES="/I """ & includesfolder & """"
+				DBLIBS="/LIBPATH:""" & libsfolder & """ " &_
+						libfile & " " & extralibs
+			else
+				' if we didn't find it then disable the db
+				disabledb=true
+			end if
+
+		else
+
+			' if a db prefix was supplied, then just use it
+			DBINCLUDES="/I """ & DBPREFIX & defaultincludes & """"
+			'DBLIBS="""" & DBPREFIX & defaultlibs & """"
+			DBLIBS="/LIBDIR:""" & DBPREFIX & defaultlibssubfolder &_
+						 " " & defaultlibs & """"
+		end if
+	end if
+	
+	' display success or failure
+	if disabledb=false then
+		ALLDB="all-" & dblowername
+		INSTALLDB="installdll-" & dblowername
+
+		WScript.Echo(dbname & " includes... " & DBINCLUDES)
+		WScript.Echo(dbname & " libs... " & DBLIBS)
+	else
+		WScript.Echo(dbname & " support will not be built. ")
+	end if
+End Sub
+
+
+Function findHeadersAndLibs(basefolder, subfolderpattern,_
+			includessubfolder, includespattern, includesfolder,_
+			libssubfolder, libpattern, libsfolder, libfile)
+	Err.Number=0
+
+	findHeadersAndLibs=false
+
+	' open the base folder
+	Set bf=fso.GetFolder(basefolder)
+	if Err.Number<>0 then
+		return
+	end if
+
+	' get and sort its subfolders
+	' (this makes more newly versioned folders be found first)
+	Set subfolders=CreateObject("System.Collections.ArrayList")
+	for each sf in bf.SubFolders
+		subfolders.Add(sf.Name)
+	next
+	subfolders.Sort()
+
+	' run through the subfolders...
+	for each sfname in subfolders
+
+		' reset output variables
+		includesfolder=""
+		libsfolder=""
+		libfile=""
+
+		' if we find the specified subfolder pattern...
+		if InStr(sfname,subfolderpattern)>0 then
+
+			' look for the includes subfolder
+			isfname=basefolder & "\" & sfname &_
+						"\" & includessubfolder
+			Set isf=fso.GetFolder(isfname)
+			if Err.Number=0 then
+				for each fname in isf.Files
+					if InStr(fname,includespattern)>0 then
+						includesfolder=isfname
+						exit for
+					end if
+				next
+			end if
+
+			' look for the libs subfolder
+			lsfname=basefolder & "\" & sfname &_
+						"\" & libssubfolder
+			Set lsf=fso.GetFolder(lsfname)
+			if Err.Number=0 then
+				for each fname in lsf.Files
+					if InStr(fname,libpattern)>0 then
+						libsfolder=lsfname
+						if InStrRev(fname,"\")>0 then
+							libfile=_
+							Mid(fname,_
+							InStrRev(fname,"\")+1)
+						else
+							libfile=fname
+						end if
+						exit for
+					end if
+				next
+			end if
+
+			' exit if we found everything we were looking for
+			if Len(includesfolder)>0 and _
+				Len(libsfolder)>0 and Len(libfile)>0 then
+				findHeadersAndLibs=true
+				exit for
+			end if
+		end if
+	next
+End Function
