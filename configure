@@ -37369,7 +37369,7 @@ if ( test -n "$READLINELIBS" ); then
 fi
 
 echo
-echo " Command Line : Readline Support          $READLINEBUILD"
+echo " Command Line : Readline    $READLINEBUILD"
 echo
 
 PERLBUILD="no "
@@ -37416,7 +37416,6 @@ fi
 if ( test -n "$ODBCLIBS" ); then
 	ODBCBUILD="yes"
 fi
-echo "$APIS"
 echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
@@ -37518,7 +37517,6 @@ echo "options."
 echo
 echo "Type:  configure --help   for a list of options."
 echo
-
 
 if ( test -n "$PYTHONVERSION" )
 then
