@@ -924,7 +924,7 @@ end if
 if disablepostgresql=false then
 	POSTGRESQLBUILD="yes    "
 end if
-if disablesybase=false then
+if disablesap=false then
 	SYBASEBUILD="yes    "
 end if
 if disableodbc=false then
