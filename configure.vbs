@@ -962,6 +962,7 @@ Sub configureDatabase(dbname, dblowername, disabledb,_
 			libssubfolder, libpattern, extralibs,_
 			defaultincludes, defaultlibssubfolder, defaultlibs,_
 			DBPREFIX, DBINCLUDES, DBLIBS, ALLDB, INSTALLDB)
+	on error resume next
 
 	if disabledb=false then
 
@@ -994,7 +995,6 @@ Sub configureDatabase(dbname, dblowername, disabledb,_
 
 			' if a db prefix was supplied, then just use it
 			DBINCLUDES="/I """ & DBPREFIX & defaultincludes & """"
-			'DBLIBS="""" & DBPREFIX & defaultlibs & """"
 			DBLIBS="/LIBDIR:""" & DBPREFIX & defaultlibssubfolder &_
 						 " " & defaultlibs & """"
 		end if
@@ -1016,6 +1016,8 @@ End Sub
 Function findHeadersAndLibs(basefolder, subfolderpattern,_
 			includessubfolder, includespattern, includesfolder,_
 			libssubfolder, libpattern, libsfolder, libfile)
+
+	on error resume next
 	Err.Number=0
 
 	findHeadersAndLibs=false
