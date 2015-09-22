@@ -107,7 +107,7 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 	return errornumber;
 }
 
-void _bindFormatError(TSRMLS_DC) {
+void _bindFormatError() {
 	TSRMLS_FETCH();
 	int64_t		errornumber=
 			SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
