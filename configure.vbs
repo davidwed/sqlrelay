@@ -1178,10 +1178,10 @@ Sub findVersion(basefolder, fileprefix, filesuffix, apiversion)
 		if Len(fname)>prefixlen+suffixlen then
 
 			' get the beginning and end of the file
-			prefix=Left(fname,prefixlen)
-			suffix=Right(fname,suffixlen)
+			fprefix=Left(fname,prefixlen)
+			fsuffix=Right(fname,suffixlen)
 
-			if prefix=fileprefix and suffix=filesuffix then
+			if fprefix=fileprefix and fsuffix=filesuffix then
 				apiversion=Mid(fname,prefixlen+1,_
 						Len(fname)-prefixlen-suffixlen)
 				exit for
@@ -1199,10 +1199,11 @@ Sub findVersion(basefolder, fileprefix, filesuffix, apiversion)
 			if Len(sfname)>prefixlen+suffixlen then
 
 				' get the beginning and end of the folder
-				prefix=Left(sfname,prefixlen)
-				suffix=Right(sfname,suffixlen)
+				sfprefix=Left(sfname,prefixlen)
+				sfsuffix=Right(sfname,suffixlen)
 
-				if prefix=fileprefix and suffix=filesuffix then
+				if sfprefix=fileprefix and _
+					sfsuffix=filesuffix then
 					apiversion=Mid(sfname,prefixlen+1,_
 						Len(sfname)-prefixlen-suffixlen)
 					exit for
