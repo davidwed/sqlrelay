@@ -368,13 +368,15 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** Oracle *****************")
 
-configureDatabase "Oracle", "oracle", disableoracle,_
+configureDatabase "Oracle","oracle",disableoracle,_
 			"C:\Program Files\Oracle","instantclient_",_
 			"sdk\include","oci.h",_
 			"sdk\lib\msvc","oci.lib","",_
 			"\include","\lib\msvc","oci.lib",_
-			ORACLEPREFIX, ORACLEINCLUDES, ORACLELIBS,_
-			ALLORACLE, INSTALLORACLE
+			ORACLEPREFIX,ORACLEINCLUDES,ORACLELIBS,_
+			ALLORACLE,INSTALLORACLE
+
+ORACLEVERSION
 
 WScript.Echo("******************************")
 
@@ -384,13 +386,13 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** MySQL ******************")
 
-configureDatabase "MySQL", "mysql", disablemysql,_
+configureDatabase "MySQL","mysql",disablemysql,_
 			"C:\Program Files\MySQL","MySQL Connector.C ",_
 			"include","mysql.h",_
 			"lib","libmysql.lib","",_
 			"\include","\lib","libmysql.lib",_
-			MYSQLPREFIX, MYSQLINCLUDES, MYSQLLIBS,_
-			ALLMYSQL, INSTALLMYSQL
+			MYSQLPREFIX,MYSQLINCLUDES,MYSQLLIBS,_
+			ALLMYSQL,INSTALLMYSQL
 
 WScript.Echo("******************************")
 
@@ -399,13 +401,13 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** PostgreSQL *************")
 
-configureDatabase "PostgreSQL", "postgresql", disablepostgresql,_
+configureDatabase "PostgreSQL","postgresql",disablepostgresql,_
 			"C:\Program Files\PostgreSQL","",_
 			"include","libpq-fe.h",_
 			"lib","libpq.lib","",_
 			"\include","\lib","libpq.lib",_
-			POSTGRESQLPREFIX, POSTGRESQLINCLUDES, POSTGRESQLLIBS,_
-			ALLPOSTGRESQL, INSTALLPOSTGRESQL
+			POSTGRESQLPREFIX,POSTGRESQLINCLUDES,POSTGRESQLLIBS,_
+			ALLPOSTGRESQL,INSTALLPOSTGRESQL
 
 WScript.Echo("******************************")
 
@@ -421,14 +423,14 @@ INSTALLSQLITE=""
 WScript.Echo("")
 WScript.Echo("***** SAP/Sybase *************")
 
-configureDatabase "SAP/SYBASE", "sap", disablesap,_
+configureDatabase "SAP/SYBASE","sap",disablesap,_
 			"C:\SAP","OCS-",_
 			"include","ctpublic.h",_
 			"lib","libsybct64.lib",_
 			"libsybblk64.lib libsybcs64.lib",_
 			"\include","\lib","libsybct64.lib",_
-			SYBASEPREFIX, SYBASEINCLUDES, SYBASELIBS,_
-			ALLSYBASE, INSTALLSYBASE
+			SYBASEPREFIX,SYBASEINCLUDES,SYBASELIBS,_
+			ALLSYBASE,INSTALLSYBASE
 
 WScript.Echo("******************************")
 
@@ -454,14 +456,14 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** DB2 ********************")
 
-configureDatabase "DB2", "db2", disabledb2,_
+configureDatabase "DB2","db2",disabledb2,_
 			"C:\Program Files\IBM","SQLLIB",_
 			"include","sqlcli1.h",_
 			"lib","db2api.lib",_
 			"",_
 			"\include","\lib","db2api.lib",_
-			DB2PREFIX, DB2INCLUDES, DB2LIBS,_
-			ALLDB2, INSTALLDB2
+			DB2PREFIX,DB2INCLUDES,DB2LIBS,_
+			ALLDB2,INSTALLDB2
 
 WScript.Echo("******************************")
 
@@ -470,14 +472,14 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** Firebird ***************")
 
-configureDatabase "Firebird", "firebird", disablefirebird,_
+configureDatabase "Firebird","firebird",disablefirebird,_
 			"C:\Program Files\Firebird","Firebird_",_
 			"include","ibase.h",_
 			"lib","fbclient_ms.lib",_
 			"",_
 			"\include","\lib","fbclient_ms.lib",_
-			FIREBIRDPREFIX, FIREBIRDINCLUDES, FIREBIRDLIBS,_
-			ALLFIREBIRD, INSTALLFIREBIRD
+			FIREBIRDPREFIX,FIREBIRDINCLUDES,FIREBIRDLIBS,_
+			ALLFIREBIRD,INSTALLFIREBIRD
 
 WScript.Echo("******************************")
 
@@ -486,14 +488,14 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** Informix ***************")
 
-configureDatabase "Informix", "informix", disableinformix,_
+configureDatabase "Informix","informix",disableinformix,_
 			"C:\Program Files","IBM Informix Software Bundle",_
 			"incl\cli","infxcli.h",_
 			"lib","iclit",_
 			"",_
 			"\incl\cli","\lib","iclit09b.lib",_
-			INFORMIXPREFIX, INFORMIXINCLUDES, INFORMIXLIBS,_
-			ALLINFORMIX, INSTALLINFORMIX
+			INFORMIXPREFIX,INFORMIXINCLUDES,INFORMIXLIBS,_
+			ALLINFORMIX,INSTALLINFORMIX
 
 WScript.Echo("******************************")
 
@@ -522,15 +524,15 @@ WScript.Echo("******************************")
 ' perl
 WScript.Echo("")
 WScript.Echo("***** Perl *******************")
+
 if PERLPREFIX="" then
-	PERLPREFIX="C:\Perl64"
+	findPrefix "C:\","Perl",PERLPREFIX,disableperl
 end if
-if PERLVERSION="" then
-	PERLVERSION="520"
+
+if PERLPREFIX<>"" and PERLVERSION="" then
+	findVersion PERLPREFIX & "\lib\CORE","perl",".lib",PERLVERSION
 end if
-if arch="80x86" then
-	PERLPREFIX="C:\Perl"
-end if
+
 if disableperl=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-perl"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-perl"
@@ -548,12 +550,15 @@ WScript.Echo("******************************")
 ' python
 WScript.Echo("")
 WScript.Echo("***** Python *****************")
+
 if PYTHONPREFIX="" then
-	PYTHONPREFIX="C:\Python27"
+	findPrefix "C:\","Python",PYTHONPREFIX,disablepython
 end if
-if PYTHONVERSION="" then
-	PYTHONVERSION="27"
+
+if PYTHONPREFIX<>"" and PYTHONVERSION="" then
+	findVersion PYTHONPREFIX & "\libs","python",".lib",PYTHONVERSION
 end if
+
 if disablepython=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-python"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-python"
@@ -571,22 +576,34 @@ WScript.Echo("******************************")
 ' ruby
 WScript.Echo("")
 WScript.Echo("***** Ruby *******************")
+
 if RUBYPREFIX="" then
-	RUBYPREFIX="C:\Ruby"
+	findPrefix "C:\","Ruby",RUBYPREFIX,disableruby
 end if
-if RUBYVERSION="" then
-	RUBYVERSION="2.2.0"
+
+if RUBYPREFIX<>"" and RUBYVERSION="" then
+	findVersion RUBYPREFIX & "\include","ruby-","",RUBYVERSION
+
+	RUBYLIBVERSION=RUBYVERSION
+	while InStr(RUBYLIBVERSION,".")>0
+		RUBYLIBVERSION=Replace(RUBYLIBVERSION,".","")
+	wend
 end if
-RUBYLIBVERSION="220"
-RUBYVCVERSION="100"
-RUBYTARGET="x64-mswin64"
-RUBYLIBPREFIX="x64-msvcr100"
-RUBYSITEARCHDIRSUFFIX="x64-msvcr100"
-if arch="80x86" then
-	RUBYTARGET="i386-mswin32"
-	RUBYLIBPREFIX="msvcr100"
-	RUBYSITEARCHDIRSUFFIX="i386-msvcr100"
+
+if RUBYPREFIX<>"" and RUBYVERSION<>"" then
+	if arch="80x86" then
+		RUBYTARGET="i386-mswin32"
+		findVersion RUBYPREFIX & "\lib","msvcr","-ruby" & RUBYLIBVERSION & ".lib",RUBYVCVERSION
+		RUBYLIBPREFIX="msvcr" & RUBYVCVERSION
+		RUBYSITEARCHDIRSUFFIX="i386-msvcr" & RUBYVCVERSION
+	else
+		RUBYTARGET="x64-mswin64"
+		findVersion RUBYPREFIX & "\lib","x64-msvcr","-ruby" & RUBYLIBVERSION & ".lib",RUBYVCVERSION
+		RUBYLIBPREFIX="x64-msvcr" & RUBYVCVERSION
+		RUBYSITEARCHDIRSUFFIX="x64-msvcr" & RUBYVCVERSION
+	end if
 end if
+
 if disableruby=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-ruby"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-ruby"
@@ -604,9 +621,11 @@ WScript.Echo("******************************")
 ' php
 WScript.Echo("")
 WScript.Echo("***** PHP ********************")
+
 if PHPPREFIX="" then
-	PHPPREFIX="C:\PHP"
+	findPrefix "C:\","PHP",PHPPREFIX,disablephp
 end if
+
 if disablephp=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-php all-phppdo"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-php clean-phppdo"
@@ -623,9 +642,11 @@ WScript.Echo("******************************")
 ' java
 WScript.Echo("")
 WScript.Echo("***** Java *******************")
+
 if JAVAPREFIX="" then
-	JAVAPREFIX="C:\Program Files\Java\jdk1.8.0_25"
+	findPrefix "C:\Program Files\Java\","jdk",JAVAPREFIX,disablejava
 end if
+
 if disablejava=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-java"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java"
@@ -642,9 +663,11 @@ WScript.Echo("******************************")
 ' tcl
 WScript.Echo("")
 WScript.Echo("***** TCL ********************")
+
 if TCLPREFIX="" then
-	TCLPREFIX="C:\Tcl"
+	findPrefix "C:\","Tcl",TCLPREFIX,disabletcl
 end if
+
 if disabletcl=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-tcl"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-tcl"
@@ -661,9 +684,11 @@ WScript.Echo("******************************")
 ' node.js
 WScript.Echo("")
 WScript.Echo("***** node.js ****************")
+
 if NODEJSPREFIX="" then
-	NODEJSPREFIX="C:\Program Files\nodejs"
+	findPrefix "C:\Program Files\","nodejs",NODEJSPREFIX,disablenodejs
 end if
+
 NODEJSMSVSVERSION=2005
 if version=15 then
 	NODEJSMSVSVERSION=2008
@@ -678,6 +703,7 @@ elseif version=19 then
 else
 	NODEJSMSVSVERSION=2000+version-4
 end if
+
 if disablenodejs=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-nodejs"
 	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-nodejs"
@@ -1028,13 +1054,14 @@ Function findHeadersAndLibs(basefolder, subfolderpattern,_
 		return
 	end if
 
-	' get and sort its subfolders
+	' get and sort its subfolders (descending)
 	' (this makes more newly versioned folders be found first)
 	Set subfolders=CreateObject("System.Collections.ArrayList")
 	for each sf in bf.SubFolders
 		subfolders.Add(sf.Name)
 	next
 	subfolders.Sort()
+	subfolders.Reverse()
 
 	' run through the subfolders...
 	for each sfname in subfolders
@@ -1089,3 +1116,99 @@ Function findHeadersAndLibs(basefolder, subfolderpattern,_
 		end if
 	next
 End Function
+
+
+Sub findPrefix(basefolder, subfolderpattern, apiprefix, disableapi)
+
+	on error resume next
+	Err.Number=0
+
+	findPrefix=false
+	apiprefix=""
+	disableapi=true
+
+	' open the base folder
+	Set bf=fso.GetFolder(basefolder)
+	if Err.Number<>0 then
+		return
+	end if
+
+	' get and sort its subfolders (descending)
+	' (this makes more newly versioned folders be found first)
+	Set subfolders=CreateObject("System.Collections.ArrayList")
+	for each sf in bf.SubFolders
+		if InStr(sf.Name,subfolderpattern)>0 then
+			subfolders.Add(sf.Name)
+		end if
+	next
+	subfolders.Sort()
+	subfolders.Reverse()
+
+	' return the first matching subfolder (after the sort)
+	if subfolders.Count>0 then
+		apiprefix=basefolder & subfolders(0)
+		disableapi=false
+	end if
+End Sub
+
+
+Sub findVersion(basefolder, fileprefix, filesuffix, apiversion)
+
+	on error resume next
+	Err.Number=0
+
+	apiversion=""
+
+	' open the base folder
+	Set bf=fso.GetFolder(basefolder)
+	if Err.Number<>0 then
+		return
+	end if
+
+	baselen=Len(basefolder)+1
+	prefixlen=Len(fileprefix)
+	suffixlen=Len(filesuffix)
+
+	' run through its files
+	for each fname in bf.Files
+
+		fname=Mid(fname,baselen+1)
+		
+		' ignore the file if it's too short
+		if Len(fname)>prefixlen+suffixlen then
+
+			' get the beginning and end of the file
+			prefix=Left(fname,prefixlen)
+			suffix=Right(fname,suffixlen)
+
+			if prefix=fileprefix and suffix=filesuffix then
+				apiversion=Mid(fname,prefixlen+1,_
+						Len(fname)-prefixlen-suffixlen)
+				exit for
+			end if
+		end if
+	next
+
+	' if necessary, run through its folders
+	if apiversion="" then
+		for each sfname in bf.SubFolders
+
+			sfname=Mid(sfname,baselen+1)
+		
+			' ignore the folder if it's too short
+			if Len(sfname)>prefixlen+suffixlen then
+
+				' get the beginning and end of the folder
+				prefix=Left(sfname,prefixlen)
+				suffix=Right(sfname,suffixlen)
+
+				if prefix=fileprefix and suffix=filesuffix then
+					apiversion=Mid(sfname,prefixlen+1,_
+						Len(sfname)-prefixlen-suffixlen)
+					exit for
+				end if
+			end if
+		next
+	end if
+
+End Sub
