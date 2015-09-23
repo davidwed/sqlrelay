@@ -4,6 +4,7 @@
 	fixed dbhostname/dbipaddress requests
 	added bind variable format validation to php pdo driver
 	added softttl parameter
+	added db/api detection to configure.vbs
 
 0.63.1 - backported shutdown loop detection
 
