@@ -54,13 +54,15 @@ scaler::~scaler() {
 
 bool scaler::initScaler(int argc, const char **argv) {
 
-	process::handleShutDown(shutDown);
-	process::handleCrash(shutDown);
-
-	init=true;
-
 	// read the commandline
 	cmdl=new sqlrcmdline(argc,argv);
+
+	process::handleShutDown(shutDown);
+	if (!cmdl->found("-disable-crash-handler")) {
+		process::handleCrash(shutDown);
+	}
+
+	init=true;
 
 	// get the id
 	id=cmdl->getId();

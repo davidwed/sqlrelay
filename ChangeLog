@@ -5,6 +5,8 @@
 	added bind variable format validation to php pdo driver
 	added softttl parameter
 	added db/api detection to configure.vbs
+	added passwordfunction parameter to "sqlrelay" authentication module
+	added -disable-crash-handler command line option to server processes
 
 0.63.1 - backported shutdown loop detection
 

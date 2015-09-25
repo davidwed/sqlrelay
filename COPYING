@@ -4,79 +4,78 @@ SQLRelay consists of several components:
 	src/connections, src/filters, src/loggers, src/parsers, src/protocols,
 	src/pwdencs, src/queries, src/resultsettranslations, src/translations,
 	src/util, bin and init directories of the SQL Relay source distribution.
-	This component is hereafter refered to as The SQLRelay Server.
+	This component is hereafter referred to as The SQLRelay Server.
 
 *) Source code, scripts and binaries found under the src/cmdline directory of
-	the SQL Relay source distribution This component is hereafter refered
+	the SQL Relay source distribution This component is hereafter referred
 	to as The SQLRelay Command-Line Clients.
 
 *) Source code, scripts and binaries found under the src/api/c and src/api/c++
 	directories of the SQL Relay distribution. This component is 
-	hereafter refered to as The SQLRelay C/C++ API.
+	hereafter referred to as The SQLRelay C/C++ API.
 
 *) Source code, scripts and binaries found under the src/api/cs
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay C# API
+	hereafter referred to as The SQLRelay C# API
 
 *) Source code, scripts and binaries found under the src/api/erlang
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay Erlang API.
+	hereafter referred to as The SQLRelay Erlang API.
 
 *) Source code, scripts and binaries found under the src/api/java
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay Java API.
+	hereafter referred to as The SQLRelay Java API.
 
 *) Source code, scripts and binaries found under the src/api/nodejs
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay node.js API
+	hereafter referred to as The SQLRelay node.js API
 
 *) Source code, scripts and binaries found under the src/api/odbc
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay ODBC API
+	hereafter referred to as The SQLRelay ODBC API
 
 *) Source code, scripts and binaries found under the src/api/perl and 
 	src/api/perl-DBD directories of the SQL Relay distribution. This
-	component is hereafter refered to as The SQLRelay Perl API.
+	component is hereafter referred to as The SQLRelay Perl API.
 
 *) Source code, scripts and binaries found under the src/api/python
 	directory of the SQL Relay distribution. This component is 
-	hereafter refered to as The SQLRelay Python API.
+	hereafter referred to as The SQLRelay Python API.
 
 *) Source code, scripts and binaries found under the src/api/php 
 	directory of the SQL Relay source distribution. This component is 
-	hereafter refered to as The SQLRelay PHP API.
+	hereafter referred to as The SQLRelay PHP API.
 
 *) Source code, scripts and binaries found under the src/api/phppdo
 	directory of the SQL Relay source distribution. This component is 
-	hereafter refered to as The SQLRelay PHP PDO API.
+	hereafter referred to as The SQLRelay PHP PDO API.
 
 *) Source code, scripts and binaries found under the src/api/ruby 
 	directory of the SQL Relay source distribution.
-        This component is hereafter refered to as The SQLRelay Ruby API.
+        This component is hereafter referred to as The SQLRelay Ruby API.
 
 *) Source code, scripts and binaries found under the src/api/tcl
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay TCL API.
+	hereafter referred to as The SQLRelay TCL API.
 
 *) Source code, scripts and binaries found under the src/api/mysql
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay MySQL Drop-In API.
+	hereafter referred to as The SQLRelay MySQL Drop-In API.
 
 *) Source code, scripts and binaries found under the src/api/postgresql
 	directory of the SQL Relay source distribution.  This component is
-	hereafter refered to as The SQLRelay PostgreSQL Drop-In API.
+	hereafter referred to as The SQLRelay PostgreSQL Drop-In API.
 
 *) Source code, scripts and binaries found under the test directory of the
-	SQL Relay source distribution.  This component is hereafter refered
+	SQL Relay source distribution.  This component is hereafter referred
 	to as The SQLRelay Tests.
 
 *) Documentation found under the doc and man directories of the SQL Relay
-	source distribution, except for example code given within said
-	documentation.  This component is hereafter referred to as
-	The SQLRelay Documentation.
+	source distribution, except for example code within this documentation.
+	This component is hereafter referred to as The SQLRelay Documentation.
 
 *) Example code found in The SQL Relay Documentation.  This component is
-	hereafter referred to as The SQLRelay Documentation Examples.
+	hereafter referred to as The SQLRelay Examples.
 
 --------------------------------------------------------------------------------
 
@@ -448,7 +447,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 --------------------------------------------------------------------------------
 
-The SQLRelay Documentation Examples
+The SQLRelay Examples
 Copyright (c) 1999-2015  David Muse
 
 This work is covered by the FSF Unlimited License.

@@ -21,6 +21,7 @@ class SQLRSERVER_DLLSPEC sqlrelay : public sqlrauth {
 		const char	*table;
 		const char	*usercolumn;
 		const char	*passwordcolumn;
+		const char	*passwordfunction;
 		const char	*debug;
 
 		stringbuffer	query;
@@ -41,6 +42,7 @@ sqlrelay::sqlrelay(xmldomnode *parameters,
 	table=parameters->getAttributeValue("table");
 	usercolumn=parameters->getAttributeValue("usercolumn");
 	passwordcolumn=parameters->getAttributeValue("passwordcolumn");
+	passwordfunction=parameters->getAttributeValue("passwordfunction");
 	debug=parameters->getAttributeValue("debug");
 
 	sqlrcon=new sqlrconnection(host,port,socket,user,password,0,1);
@@ -77,7 +79,14 @@ sqlrelay::sqlrelay(xmldomnode *parameters,
 	query.append(" where ");
 	query.append(usercolumn)->append("=")->append(bind1);
 	query.append(" and ");
-	query.append(passwordcolumn)->append("=")->append(bind2);
+	query.append(passwordcolumn)->append("=");
+	if (passwordfunction && passwordfunction[0]) {
+		query.append(passwordfunction)->append('(');
+	}
+	query.append(bind2);
+	if (passwordfunction && passwordfunction[0]) {
+		query.append(')');
+	}
 
 	sqlrcur->prepareQuery(query.getString());
 }

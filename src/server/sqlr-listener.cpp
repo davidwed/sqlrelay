@@ -5,6 +5,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 
+#include <rudiments/commandline.h>
 #include <rudiments/process.h>
 
 sqlrlistener	*lsnr;
@@ -38,8 +39,13 @@ void shutDown(int32_t signum) {
 
 int main(int argc, const char **argv) {
 
+	commandline	cmdl(argc,argv);
+
 	// set up default signal handling
-	process::exitOnCrashOrShutDown();
+	process::exitOnShutDown();
+	if (!cmdl.found("-disable-crash-handler")) {
+		process::exitOnCrash();
+	}
 
 	#include <version.h>
 
@@ -48,9 +54,11 @@ int main(int argc, const char **argv) {
 
 	// handle kill and crash signals
 	process::handleShutDown(shutDown);
-	process::handleCrash(shutDown);
+	if (!cmdl.found("-disable-crash-handler")) {
+		process::handleCrash(shutDown);
+	}
 
-	// block all signals except SIGALRM and SIGCHLD
+	// ignore all other signals except SIGALRM and SIGCHLD
 	signalset	set;
 	set.addAllSignals();
 	set.removeShutDownSignals();

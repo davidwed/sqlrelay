@@ -116,7 +116,7 @@
 
 <p>The sqlrelay module authenticates a user against a table in a database, using another instance of SQL Relay to access that database.</p>
 
-<p>The module's <b>host</b>, <b>port</b>, <b>socket</b>, <b>user</b> and <b>password</b> paramters define which instance of SQL Relay to talk to.  The <b>table</b>, <b>usercolumn</b> and <b>passwordcolumn</b> parameters define which table and which columns within the table to authenticate against.</p>
+<p>The module's <b>host</b>, <b>port</b>, <b>socket</b>, <b>user</b> and <b>password</b> paramters define which instance of SQL Relay to talk to.  The <b>table</b>, <b>usercolumn</b> and <b>passwordcolumn</b> parameters define which table and which columns within the table to authenticate against.  If passwords aren't stored in plain text, then an optional <b>passwordfunction</b> parameter may specify the stored procedure used to encrypt the password.</p>
 
 <blockquote>
 @sqlrelay-auths-sqlrelay.conf.html@

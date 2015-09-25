@@ -18,7 +18,7 @@
 bool	iswindows;
 
 bool startListener(const char *id, const char *config,
-					const char *localstatedir) {
+			const char *localstatedir, bool disablecrashhandler) {
 
 	// start the listener
 	stdoutput.printf("\nStarting listener:\n");
@@ -31,7 +31,7 @@ bool startListener(const char *id, const char *config,
 		cmd="sqlr-listener";
  	}
 	uint16_t	i=0;
-	const char	*args[8];
+	const char	*args[9];
 	args[i++]="sqlr-listener";
 	args[i++]="-id";
 	args[i++]=id;
@@ -40,6 +40,9 @@ bool startListener(const char *id, const char *config,
 	if (charstring::length(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
+	}
+	if (disablecrashhandler) {
+		args[i++]="-disable-crash-handler";
 	}
 	args[i]=NULL;
 	
@@ -59,13 +62,14 @@ bool startListener(const char *id, const char *config,
 }
 
 
-bool startConnection(bool strace, const char *id, const char *connectionid,
-				const char *config, const char *localstatedir) {
+bool startConnection(const char *id, const char *connectionid,
+				const char *config, const char *localstatedir,
+				bool strace, bool disablecrashhandler) {
 
 	// build command to spawn
 	const char	*cmd=NULL;
 	uint16_t	i=0;
-	const char	*args[14];
+	const char	*args[15];
 	if (strace) {
 		cmd="strace";
 		args[i++]="strace";
@@ -91,6 +95,9 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
 	}
+	if (disablecrashhandler) {
+		args[i++]="-disable-crash-handler";
+	}
 	if (strace) {
 		args[i++]="&";
 	}
@@ -111,9 +118,10 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 	return true;
 }
 
-bool startConnections(sqlrconfigfile *cfgfile, bool strace,
+bool startConnections(sqlrconfigfile *cfgfile,
 				const char *id, const char *config,
-				const char *localstatedir) {
+				const char *localstatedir, bool strace,
+				bool disablecrashhandler) {
 
 	// get the connection count and total metric
 	linkedlist< connectstringcontainer *>	*connectionlist=
@@ -127,7 +135,8 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	// if no connections were defined in the config file,
 	// start 1 default one
 	if (!cfgfile->getConnectionCount()) {
-		return !startConnection(strace,id,config,localstatedir,NULL);
+		return !startConnection(id,config,localstatedir,NULL,
+						strace,disablecrashhandler);
 	}
 
 	// get number of connections
@@ -168,9 +177,9 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
-			if (!startConnection(strace,id,
-						csc->getConnectionId(),
-						config,localstatedir)) {
+			if (!startConnection(id,csc->getConnectionId(),
+						config,localstatedir,strace,
+						disablecrashhandler)) {
 				// it's ok if at least 1 connection started up
 				return (totalstarted>0 || i>0);
 			}
@@ -189,7 +198,8 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 }
 
 bool startScaler(sqlrconfigfile *cfgfile, const char *id,
-			const char *config, const char *localstatedir) {
+			const char *config, const char *localstatedir,
+			bool disablecrashhandler) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
 	if (!cfgfile->getDynamicScaling()) {
@@ -206,7 +216,7 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 		cmd="sqlr-scaler";
  	}
 	uint16_t	i=0;
-	const char	*args[8];
+	const char	*args[9];
 	args[i++]="sqlr-scaler";
 	args[i++]="-id";
 	args[i++]=id;
@@ -215,6 +225,9 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 	if (charstring::length(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
+	}
+	if (disablecrashhandler) {
+		args[i++]="-disable-crash-handler";
 	}
 	args[i]=NULL;
 
@@ -246,6 +259,8 @@ int main(int argc, const char **argv) {
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getValue("-id");
 	const char	*config=sqlrpth.getConfigFile();
+	bool		disablecrashhandler=
+				cmdl.found("-disable-crash-handler");
 
 	// on Windows, open a new console window and redirect everything to it
 	#ifdef _WIN32
@@ -297,25 +312,21 @@ int main(int argc, const char **argv) {
 		// parse the config file(s) and
 		// start listener, connections and scaler
 		if (!cfgfile.parse(config,thisid) ||
-			!startListener(thisid,config,localstatedir) ||
-			!startConnections(&cfgfile,strace,thisid,
-						config,localstatedir) ||
-			!startScaler(&cfgfile,thisid,config,localstatedir)) {
+			!startListener(thisid,
+					config,localstatedir,
+					disablecrashhandler) ||
+			!startConnections(&cfgfile,thisid,
+					config,localstatedir,
+					strace,disablecrashhandler) ||
+			!startScaler(&cfgfile,thisid,
+					config,localstatedir,
+					disablecrashhandler)) {
 			exitstatus=1;
 		}
 
 		// clean up
 		delete[] thisid;
 	}
-
-	// many thanks...
-	// these companies don't exist any more so it's
-	// probably ok not to display the attribution any more
-	/*stdoutput.printf("\n\nThanks to MP3.com for sponsoring: \n");
-	stdoutput.printf("	Clustered/Replicated database support.\n");
-	stdoutput.printf("	Perl API.\n");
-	stdoutput.printf("Thanks to FeedLounge for sponsoring: \n");
-	stdoutput.printf("	Query routing and filtering.\n");*/
 
 	// successful exit
 	process::exit(exitstatus);
