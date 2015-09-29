@@ -16,5 +16,5 @@ fi
 if ( test "$1" = "postgresql" )
 then
 	export LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
-	gdb ./postgresql
+	./postgresql
 fi

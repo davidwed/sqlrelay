@@ -685,29 +685,15 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 
 PGresult *PQdescribePrepared(PGconn *conn, const char *stmtname) {
 	debugFunction();
-
-	PGresult	*result=PQmakeEmptyPGresult(conn,PGRES_EMPTY_QUERY);
-
-	delete[] conn->error;
-	conn->error=NULL;
-	
-	// FIXME: implement this...
-
-	return result;
+	// FIXME: this could be sort-of implemented, at least enough
+	// to make PQnparams work.
+	return NULL;
 }
 
 PGresult *PQdescribePortal(PGconn *conn, const char *portalname) {
 	debugFunction();
-	debugPrintf("%s\n",portalname);
-
-	PGresult	*result=PQmakeEmptyPGresult(conn,PGRES_EMPTY_QUERY);
-
-	delete[] conn->error;
-	conn->error=NULL;
-	
-	// FIXME: implement this...
-
-	return result;
+	// SQL Relay doesn't support anything like this, 
+	return NULL;
 }
 
 ExecStatusType PQresultStatus(const PGresult *res) {
@@ -1259,15 +1245,18 @@ int PQgetisnull(const PGresult *res, int tup_num, int field_num) {
 
 int PQnparams(const PGresult *res) {
 	debugFunction();
-	// FIXME: supposed to return 0 if it's not inspecting the result of
-	// PQdescribePrepared
-	return res->sqlrcur->countBindVariables();
+	// Supposed to return 0 if it's not inspecting the result of
+	// PQdescribePrepared.  We don't currently support PQdescribePrepared
+	// so we'll always return 0.  SQL Relay does support this though,
+	// with res->sqlrcur->countBindVariables();
+	return 0;
 }
 
 Oid PQparamtype(const PGresult *res, int param_number) {
 	debugFunction();
-	// FIXME: only supposed to return 0 if it's not inspecting the
-	// result of PQdescribePrepared
+	// Supposed to return 0 if it's not inspecting the result of
+	// PQdescribePrepared.  We don't currently support PQdescribePrepared
+	// so we'll always return 0.
 	return 0;
 }
 
