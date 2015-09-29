@@ -7,6 +7,12 @@
 	added db/api detection to configure.vbs
 	added passwordfunction parameter to "sqlrelay" authentication module
 	added -disable-crash-handler command line option to server processes
+	postgresql connection module PQclear()'s the result of PQprepare() now,
+		fixing a memory leak
+	updated postgresql conneciton module to handle invalid bind variables
+		properly, and without crash
+	added various missing postgresql functions to the postgresql drop-in
+		library, most notably PQprepare, PQexecPrepared, PQexecParams
 
 0.63.1 - backported shutdown loop detection
 

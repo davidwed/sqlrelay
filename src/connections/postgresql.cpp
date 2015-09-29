@@ -8,6 +8,7 @@
 #endif
 #include <rudiments/sys.h>
 
+#include <defines.h>
 #include <datatypes.h>
 #include <config.h>
 
@@ -125,6 +126,14 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)
+		void		errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection);
+#endif
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		uint64_t	affectedRows();
@@ -164,6 +173,8 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		int		*bindlengths;
 		int		*bindformats;
 		char		*cursorname;
+
+		bool		bindformaterror;
 #endif
 };
 
@@ -178,7 +189,7 @@ postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
 	datatypecount=0;
 	datatypeids=NULL;
 	datatypenames=NULL;
-	pgconn=(PGconn *)NULL;
+	pgconn=NULL;
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	currentoid=InvalidOid;
 #endif
@@ -293,7 +304,7 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 	if (typemangling==2) {
 		PGresult	*result=PQexec(pgconn,
 					"select oid,typname from pg_type");
-		if (result==(PGresult *)NULL) {
+		if (!result) {
 			*error=logInError("Get datatypes failed");
 			return false;
 		}
@@ -405,7 +416,7 @@ const char *postgresqlconnection::dbVersion() {
 							"server_version"));
 #else
 	PGresult	*result=PQexec(pgconn,"select version()");
-	if (result==(PGresult *)NULL) {
+	if (!result) {
 		return NULL;
 	}
 
@@ -600,6 +611,7 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	bindvalues=NULL;
 	bindlengths=NULL;
 	bindformats=NULL;
+	bindformaterror=false;
 #endif
 }
 
@@ -625,7 +637,7 @@ bool postgresqlcursor::deallocateStatement() {
 		stringbuffer	rmquery;
 		rmquery.append("deallocate ")->append(cursorname);
 		pgresult=PQexec(postgresqlconn->pgconn,rmquery.getString());
-		if (pgresult==(PGresult *)NULL) {
+		if (!pgresult) {
 			return false;
 		}
 		PQclear(pgresult);
@@ -665,6 +677,9 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 		}
 	}
 
+	// reset the bind format error flag
+	bindformaterror=false;
+
 	// remove this named statement, if it exists already
 	if (!deallocateStatement()) {
 		return false;
@@ -673,21 +688,27 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// prepare the query
 	pgresult=PQprepare(postgresqlconn->pgconn,cursorname,query,0,NULL);
 
-	// handle a failed query
-	if (pgresult==(PGresult *)NULL) {
+	// handle some kind of outright failure
+	if (!pgresult) {
 		return false;
 	}
 
 	// handle errors
+	bool	result=true;
 	pgstatus=PQresultStatus(pgresult);
 	if (pgstatus==PGRES_BAD_RESPONSE ||
 		pgstatus==PGRES_NONFATAL_ERROR ||
 		pgstatus==PGRES_FATAL_ERROR) {
-		return false;
+		result=false;
+	} else {
+		deallocatestatement=true;
 	}
-	deallocatestatement=true;
 
-	return true;
+	// clean up
+	PQclear(pgresult);
+	pgresult=NULL;
+
+	return result;
 }
 
 bool postgresqlcursor::inputBind(const char *variable, 
@@ -700,7 +721,9 @@ bool postgresqlcursor::inputBind(const char *variable,
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (pos>=bindcount || bindcounter>=bindcount) {
+	// or below 0
+	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+		bindformaterror=true;
 		return true;
 	}
 
@@ -724,7 +747,9 @@ bool postgresqlcursor::inputBind(const char *variable,
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (pos>=bindcount || bindcounter>=bindcount) {
+	// or below 0
+	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+		bindformaterror=true;
 		return true;
 	}
 
@@ -745,7 +770,9 @@ bool postgresqlcursor::inputBind(const char *variable,
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (pos>=bindcount || bindcounter>=bindcount) {
+	// or below 0
+	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+		bindformaterror=true;
 		return true;
 	}
 
@@ -763,6 +790,14 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 					int16_t *isnull) {
 
 	int32_t	pos=charstring::toInteger(variable+1)-1;
+
+	// ignore attempts to bind beyond the number of
+	// variables defined when the query was prepared
+	// or below 0
+	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+		bindformaterror=true;
+		return true;
+	}
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -790,6 +825,14 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 					int16_t *isnull) {
 
 	int32_t	pos=charstring::toInteger(variable+1)-1;
+
+	// ignore attempts to bind beyond the number of
+	// variables defined when the query was prepared
+	// or below 0
+	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+		bindformaterror=true;
+		return true;
+	}
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -863,8 +906,8 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	pgresult=PQexec(postgresqlconn->pgconn,query);
 #endif
 
-	// handle a failed query
-	if (pgresult==(PGresult *)NULL) {
+	// handle some kind of outright failure
+	if (!pgresult) {
 		return false;
 	}
 
@@ -901,6 +944,30 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 
 	return true;
 }
+
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)
+void postgresqlcursor::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	const char	*errorstring=
+			(bindformaterror)?
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING:
+				PQerrorMessage(postgresqlconn->pgconn);
+	*errorlength=charstring::length(errorstring);
+	charstring::safeCopy(errorbuffer,errorbufferlength,
+					errorstring,*errorlength);
+	// PostgreSQL doesn't have an error number per-se.  We'll set it
+	// to 1 though, because 0 typically means "no error has occurred"
+	// and some apps respond that way if errorcode is set to 0.
+	// This ends up being important when using:
+	// Oracle dblink -> ODBC -> SQL Relay -> PostgreSQL
+	*errorcode=(bindformaterror)?SQLR_ERROR_INVALIDBINDVARIABLEFORMAT:1;
+	*liveconnection=(PQstatus(postgresqlconn->pgconn)==CONNECTION_OK);
+}
+#endif
 
 bool postgresqlcursor::knowsRowCount() {
 	return true;
@@ -1257,7 +1324,7 @@ void postgresqlcursor::closeResultSet() {
 
 	if (pgresult) {
 		PQclear(pgresult);
-		pgresult=(PGresult *)NULL;
+		pgresult=NULL;
 	}
 }
 

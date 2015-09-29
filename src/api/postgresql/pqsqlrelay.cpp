@@ -71,19 +71,16 @@ struct pg_conn;
 
 struct pg_result {
 	sqlrcursor	*sqlrcur;
-
 	ExecStatusType	execstatus;
-
-	pg_conn		*parent;
-
+	pg_conn		*conn;
 	int		previousnonblockingmode;
-
 	int		queryisnotselect;
 };
 
 struct pg_conn {
 
 	sqlrconnection	*sqlrcon;
+	sqlrcursor	*sqlrcur;
 
 	parameterstring	*connstr;
 
@@ -124,27 +121,6 @@ struct pg_cancel {
 // object id's
 #define InvalidOid	0
 
-// functions
-PGconn		*allocatePGconn(const char *conninfo,
-				const char *host, const char *port,
-				const char *options, const char *tty,
-				const char *db, const char *user,
-				const char *password);
-void		freePGconn(PGconn *conn);
-int		translateEncoding(const char *encoding);
-
-PGconn		*PQconnectdb(const char *conninfo);
-void		PQfinish(PGconn *conn);
-PGresult	*PQexec(PGconn *conn, const char *query);
-
-int	PQnfields(const PGresult *res);
-int	PQntuples(const PGresult *res);
-char	*PQfname(const PGresult *res, int field_num);
-int	PQgetlength(const PGresult *res, int tup_num, int field_num);
-char	*PQgetvalue(const PGresult *res, int tup_num, int field_num);
-int	PQmblen(const unsigned char *s, int encoding);
-int	PQclientEncoding(const PGconn *conn);
-
 
 typedef enum {
 	CONNECTION_OK,
@@ -171,6 +147,7 @@ PGconn *allocatePGconn(const char *conninfo,
 	PGconn	*conn=new PGconn;
 
 	conn->sqlrcon=NULL;
+	conn->sqlrcur=NULL;
 
 	conn->conninfo=(char *)conninfo;
 	if (conninfo) {
@@ -248,6 +225,7 @@ void freePGconn(PGconn *conn) {
 
 	delete conn->sqlrcon;
 	conn->sqlrcon=NULL;
+	conn->sqlrcur=NULL;
 
 	if (conn->conninfo) {
 		delete conn->connstr;
@@ -416,6 +394,18 @@ int PQclientEncoding(const PGconn *conn) {
 	return conn->clientencoding;
 }
 
+// FIXME: support encodings other than UTF8
+
+int translateEncoding(const char *encoding) {
+	debugFunction();
+	if (encoding) {
+		if (!charstring::compare(encoding,"UTF8")) {
+			return PG_UTF8;
+		}
+	}
+	return -1;
+}
+
 int PQsetClientEncoding(PGconn *conn, const char *encoding) {
 	debugFunction();
 	int	enc=translateEncoding(encoding);
@@ -482,7 +472,7 @@ void PQconninfoFree(PQconninfoOption *connOptions) {
 	debugFunction();
 }
 
-// lame... I stole this code from sqlrcursor
+// lame... I stole this code from sqlrservercontroller
 char *skipWhitespaceAndComments(const char *querybuffer) {
 	debugFunction();
 
@@ -502,7 +492,7 @@ char *skipWhitespaceAndComments(const char *querybuffer) {
 	return ptr;
 }
 
-// lame... I stole this code from sqlrcursor too
+// lame... I stole this code from sqlrservercursor
 int queryIsNotSelect(const char *querybuffer) {
 	debugFunction();
 
@@ -518,42 +508,57 @@ int queryIsNotSelect(const char *querybuffer) {
 	return 1;
 }
 
+PGresult *PQmakeEmptyPGresult(PGconn *conn, ExecStatusType status) {
+	debugFunction();
+	// Make an empty PGresult with given status (some apps find this
+	// useful). If conn is not NULL and status indicates an error, the
+	// conn's errorMessage is copied.
+	PGresult	*result=new PGresult;
+	result->sqlrcur=NULL;
+	result->execstatus=status;
+	result->conn=conn;
+	result->previousnonblockingmode=conn->nonblockingmode;
+	result->queryisnotselect=1;
+	return result;
+}
+
 void PQclear(PGresult *res) {
 	debugFunction();
 	if (res) {
-		res->parent->nonblockingmode=res->previousnonblockingmode;
+		res->conn->nonblockingmode=res->previousnonblockingmode;
 		delete res->sqlrcur;
 		delete res;
 	}
 }
 
-PGresult *PQexec(PGconn *conn, const char *query) {
+PGresult *PQprepare(PGconn *conn,
+			const char *stmtname,
+			const char *query,
+			int paramcount,
+			const Oid *paramtypes) {
 	debugFunction();
 	debugPrintf("%s\n",query);
 
-	PGresult	*result=new PGresult;
-	result->parent=conn;
-	result->previousnonblockingmode=conn->nonblockingmode;
-	result->queryisnotselect=1;
+	PGresult	*result=PQmakeEmptyPGresult(conn,PGRES_EMPTY_QUERY);
 
 	delete[] conn->error;
 	conn->error=NULL;
 
 	if (query && query[0]) {
 
-		result->sqlrcur=new sqlrcursor(conn->sqlrcon,true);
+		conn->sqlrcur=new sqlrcursor(conn->sqlrcon,true);
 
 		if (conn->removetrailingsemicolons==-1) {
 
 			const char	*dbtype=conn->sqlrcon->identify();
 			if (!dbtype) {
 				size_t	errorlen=
-					charstring::length(result->sqlrcur->
+					charstring::length(conn->sqlrcur->
 							errorMessage())+2;
 				conn->error=new char[errorlen];
 				charstring::printf(
 					conn->error,errorlen,"%s\n",
-					result->sqlrcur->errorMessage());
+					conn->sqlrcur->errorMessage());
 				PQclear(result);
 				return NULL;
 			}
@@ -564,23 +569,80 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 				(!charstring::compare(dbtype,"postgresql"))?0:1;
 		}
 
-		int	length=charstring::length(query);
+		size_t	length=charstring::length(query);
 		if (conn->removetrailingsemicolons==1) {
-			while (query[length-1]==' ' ||
-				query[length-1]=='	' ||
-				query[length-1]=='\n' ||
-				query[length-1]=='\r' ||
-				query[length-1]==';') {
+			while (character::inSet(query[length-1]," \t\n\r;")) {
 				length--;
 			}
 		}
 
-		if (result->sqlrcur->sendQuery(query,length)) {
-			if (queryIsNotSelect(query)) {
+		conn->sqlrcur->prepareQuery(query,length);
+
+		if (queryIsNotSelect(query)) {
+			result->execstatus=PGRES_COMMAND_OK;
+		} else {
+			result->execstatus=PGRES_TUPLES_OK;
+			result->queryisnotselect=0;
+		}
+	}
+
+	// Copy the result so it can be passed on to PQexecPrepared.
+	// We need to copy it because the app might delete the result
+	// returned from this method.
+	if (conn->currentresult) {
+		PQclear(conn->currentresult);
+	}
+	conn->currentresult=new PGresult(*result);
+
+	return result;
+}
+
+PGresult *PQexecPrepared(PGconn *conn,
+				const char *stmtname,
+				int paramcount,
+				const char * const *paramvalues,
+				const int *paramlengths,
+				const int *paramformats,
+				int resultformat) {
+	debugFunction();
+
+	PGresult	*result=conn->currentresult;
+	conn->currentresult=NULL;
+
+	delete[] conn->error;
+	conn->error=NULL;
+
+	if (result->execstatus!=PGRES_EMPTY_QUERY) {
+
+		result->sqlrcur=conn->sqlrcur;
+
+		if (paramvalues) {
+			for (int32_t i=0; i<paramcount; i++) {
+				// postgresql only supports binary and
+				// non-binary binds, all non-binary binds are
+				// strings and the type is inferred on the
+				// backend
+				char	*varname=charstring::parseNumber(i+1);
+				if (paramformats && paramformats[i]) {
+					result->sqlrcur->inputBindBlob(
+						varname,paramvalues[i],
+						(paramlengths)?
+						paramlengths[i]:0);
+				} else {
+					// paramlengths should be ignored
+					// for text format values
+					result->sqlrcur->inputBind(
+						varname,paramvalues[i]);
+				}
+				delete[] varname;
+			}
+		}
+
+		if (result->sqlrcur->executeQuery()) {
+			if (result->queryisnotselect) {
 				result->execstatus=PGRES_COMMAND_OK;
 			} else {
 				result->execstatus=PGRES_TUPLES_OK;
-				result->queryisnotselect=0;
 			}
 		} else {
 			size_t	errorlen=
@@ -592,11 +654,58 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 			PQclear(result);
 			result=NULL;
 		}
-
-	} else {
-		result->sqlrcur=NULL;
-		result->execstatus=PGRES_EMPTY_QUERY;
 	}
+
+	return result;
+}
+
+PGresult *PQexecParams(PGconn *conn, const char *query,
+				int paramcount,
+				const Oid *paramtypes,
+				const char * const *paramvalues,
+				const int *paramlengths,
+				const int *paramformats,
+				int resultformat) {
+	debugFunction();
+	PGresult	*result=
+			PQprepare(conn,NULL,query,paramcount,paramtypes);
+	if (!result || result->execstatus==PGRES_EMPTY_QUERY) {
+		return result;
+	}
+	PQclear(result);
+	return PQexecPrepared(conn,NULL,paramcount,
+				paramvalues,paramlengths,paramformats,
+				resultformat);
+}
+
+PGresult *PQexec(PGconn *conn, const char *query) {
+	debugFunction();
+	return PQexecParams(conn,query,0,NULL,NULL,NULL,NULL,0);
+}
+
+PGresult *PQdescribePrepared(PGconn *conn, const char *stmtname) {
+	debugFunction();
+
+	PGresult	*result=PQmakeEmptyPGresult(conn,PGRES_EMPTY_QUERY);
+
+	delete[] conn->error;
+	conn->error=NULL;
+	
+	// FIXME: implement this...
+
+	return result;
+}
+
+PGresult *PQdescribePortal(PGconn *conn, const char *portalname) {
+	debugFunction();
+	debugPrintf("%s\n",portalname);
+
+	PGresult	*result=PQmakeEmptyPGresult(conn,PGRES_EMPTY_QUERY);
+
+	delete[] conn->error;
+	conn->error=NULL;
+	
+	// FIXME: implement this...
 
 	return result;
 }
@@ -631,6 +740,13 @@ char *PQresStatus(ExecStatusType status) {
 
 char *PQresultErrorMessage(const PGresult *res) {
 	debugFunction();
+	return const_cast<char *>(res->sqlrcur->errorMessage());
+}
+
+char *PQresultErrorField(const PGresult *res, int fieldcode) {
+	debugFunction();
+	// FIXME: SQL Relay doesn't have error fields, so for now,
+	// I guess we'll return the error message for every field
 	return const_cast<char *>(res->sqlrcur->errorMessage());
 }
 
@@ -670,6 +786,28 @@ int PQfnumber(const PGresult *res, const char *field_name) {
 		}
 	}
 	return -1;
+}
+
+int PQftable(const PGresult *res, int column_number) {
+	debugFunction();
+	// SQL Relay doesn't know this bit of information
+	// so we'll return an invalid oid.
+	return InvalidOid;
+}
+
+int PQftablecol(const PGresult *res, int column_number) {
+	debugFunction();
+	// SQL Relay doesn't know this bit of information
+	// so we'll return an invalid oid.
+	return InvalidOid;
+}
+
+int PQfformat(const PGresult *res, int column_number) {
+	debugFunction();
+	if (res->sqlrcur->getColumnIsBinary(column_number)) {
+		return 1;
+	}
+	return 0;
 }
 
 static Oid postgresqltypemap[]={
@@ -1119,29 +1257,18 @@ int PQgetisnull(const PGresult *res, int tup_num, int field_num) {
 	return (res->sqlrcur->getField(tup_num,field_num)==(char *)NULL);
 }
 
-PGresult *PQmakeEmptyPGresult(PGconn *conn, ExecStatusType status) {
+int PQnparams(const PGresult *res) {
 	debugFunction();
-	// Make an empty PGresult with given status (some apps find this
-	// useful). If conn is not NULL and status indicates an error, the
-	// conn's errorMessage is copied.
-	PGresult	*result=new PGresult;
-	result->sqlrcur=NULL;
-	result->execstatus=status;
-	result->parent=conn;
-	result->previousnonblockingmode=conn->nonblockingmode;
-	return result;
+	// FIXME: supposed to return 0 if it's not inspecting the result of
+	// PQdescribePrepared
+	return res->sqlrcur->countBindVariables();
 }
 
-// FIXME: support encodings other than UTF8
-
-int translateEncoding(const char *encoding) {
+Oid PQparamtype(const PGresult *res, int param_number) {
 	debugFunction();
-	if (encoding) {
-		if (!charstring::compare(encoding,"UTF8")) {
-			return PG_UTF8;
-		}
-	}
-	return -1;
+	// FIXME: only supposed to return 0 if it's not inspecting the
+	// result of PQdescribePrepared
+	return 0;
 }
 
 int PQmblen(const unsigned char *s, int encoding) {
@@ -1197,9 +1324,10 @@ size_t PQescapeString(char *to, const char *from, size_t length) {
 	return target-to;
 }
 
-unsigned char *PQescapeBytea(unsigned char *bintext, size_t binlen,
-			  				size_t *bytealen) {
-	debugFunction();
+unsigned char *PQescapeByteaConn(PGconn *conn,
+					unsigned char *bintext,
+					size_t binlen,
+			  		size_t *bytealen) {
 	unsigned char	*vp;
 	unsigned char	*rp;
 	unsigned char	*result;
@@ -1251,6 +1379,13 @@ unsigned char *PQescapeBytea(unsigned char *bintext, size_t binlen,
 	*rp='\0';
 
 	return result;
+}
+
+unsigned char *PQescapeBytea(unsigned char *bintext,
+					size_t binlen,
+			  		size_t *bytealen) {
+	debugFunction();
+	return PQescapeByteaConn(NULL,bintext,binlen,bytealen);
 }
 
 unsigned char *PQunescapeBytea(unsigned char *strtext, size_t *retbuflen) {
@@ -1336,6 +1471,11 @@ unsigned char *PQunescapeBytea(unsigned char *strtext, size_t *retbuflen) {
 
 	*retbuflen=buflen;
 	return buffer;
+}
+
+void PQfreemem(void *ptr) {
+	debugFunction();
+	free(ptr);
 }
 
 int lo_open(PGconn *conn, Oid lobjId, int mode) {
@@ -1784,7 +1924,7 @@ do_field(const PQprintOpt *po, const PGresult *res,
 			/* Detect whether field contains non-numeric data */
 			char		ch = '0';
 
-			for (p = pval; *p; p += PQmblen((unsigned char *)p, PQclientEncoding(res->parent)))
+			for (p = pval; *p; p += PQmblen((unsigned char *)p, PQclientEncoding(res->conn)))
 			{
 				ch = *p;
 				if (!((ch >= '0' && ch <= '9') ||
@@ -2253,6 +2393,7 @@ int PQrequestCancel(PGconn *conn) {
 	debugFunction();
 	delete conn->sqlrcon;
 	conn->sqlrcon=NULL;
+	conn->sqlrcur=NULL;
 	return TRUE;
 }
 

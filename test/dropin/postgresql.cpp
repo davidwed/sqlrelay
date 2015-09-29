@@ -148,8 +148,16 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
 	checkSuccess(PQcmdTuples(pgresult),"1");
 	PQclear(pgresult);
-	query="insert into testtable values (2,2.2,2.2,2,'testchar2','testvarchar2','01/01/2002','02:00:00',NULL)";
-	pgresult=PQexec(pgconn,query);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("PQprepare/PQexecPrepared: insert\n");
+	//query="insert into testtable values (2,2.2,2.2,2,'testchar2','testvarchar2','01/01/2002','02:00:00',NULL)";
+	query="insert into testtable values ($1,$2,$3,$4,$5,$6,$7,$8,$9)";
+	pgresult=PQprepare(pgconn,NULL,query,9,NULL);
+	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
+	PQclear(pgresult);
+	const char * const paramvalues[]={"2","2.2","2.2","2","testchar2","testvarchar2","01/01/2002","02:00:00",NULL};
+	pgresult=PQexecPrepared(pgconn,NULL,9,paramvalues,NULL,NULL,0);
 	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
 	checkSuccess(PQcmdTuples(pgresult),"1");
 	PQclear(pgresult);
