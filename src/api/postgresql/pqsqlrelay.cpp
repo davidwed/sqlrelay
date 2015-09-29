@@ -282,7 +282,7 @@ PGconn *PQconnectdbParams(const char **keywords,
 	const char *password=NULL;
 
 	for (uint16_t i=0; keywords[i]; i++) {
-		stdoutput.printf("%s=%s\n",keywords[i],values[i]);
+		debugPrintf("%s=%s\n",keywords[i],values[i]);
 		if (!charstring::compare(keywords[i],"host")) {
 			host=values[i];
 		} else if (!charstring::compare(keywords[i],"hostaddr")) {

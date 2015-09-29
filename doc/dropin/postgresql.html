@@ -39,7 +39,7 @@ are configured to connect to a single database, and that database will be used
 by the client program.</p>
 
 <p>In the following example, we're running the "psql" program against an
-instance of SQL Relay running on the localhost, port 8009 against an Oracle
+instance of SQL Relay running on the localhost, port 9000 against an Oracle
 database.  This instance of SQL Relay is configured with a username/password of
 oracleuser/oraclepass.</p>
 
@@ -48,7 +48,7 @@ oracleuser/oraclepass.</p>
 <blockquote><pre><b>
 LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
 export LD_PRELOAD
-psql -h localhost -p 8009 -U oracleuser -W
+psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
 </b></pre></blockquote>
 
@@ -56,7 +56,7 @@ Password: oraclepass
 
 <blockquote><pre><b>
 setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
-psql -h localhost -p 8009 -U oracleuser -W
+psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
 </b></pre></blockquote>
 

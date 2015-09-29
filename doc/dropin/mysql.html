@@ -71,7 +71,7 @@ to connect to a single database, and that database will be used by the client
 program.</p>
 
 <p>In the following example, we're running the "mysql" program against an
-instance of SQL Relay running on the localhost, port 8009 against an Oracle
+instance of SQL Relay running on the localhost, port 9000 against an Oracle
 database.  This instance of SQL Relay is configured with a username/password
 of oracleuser/oraclepass.</p>
 
@@ -80,14 +80,14 @@ of oracleuser/oraclepass.</p>
 <blockquote><pre><b>
 LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
 export LD_PRELOAD
-mysql -h localhost -P 8009 --user=oracleuser --password=oraclepass
+mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
 </b></pre></blockquote>
 
 <p>For csh-based shells:</p>
 
 <blockquote><pre><b>
 setenv LD_PRELOAD /usr/local/firstworks/lib/libmysql51sqlrelay.so
-mysql -h localhost -P 8009 --user=oracleuser --password=oraclepass
+mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
 </b></pre></blockquote>
 
 <p>The LD_PRELOAD environment variable instructs the dynamic loader to load
