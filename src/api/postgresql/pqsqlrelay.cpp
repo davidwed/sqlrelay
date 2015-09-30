@@ -113,10 +113,103 @@ struct pg_cancel {
 	void	*extension;
 };
 
-
-
 // encodings
-#define	PG_UTF8		6
+typedef enum pg_enc {
+	PG_SQL_ASCII = 0,			/* SQL/ASCII */
+	PG_EUC_JP,				/* EUC for Japanese */
+	PG_EUC_CN,				/* EUC for Chinese */
+	PG_EUC_KR,				/* EUC for Korean */
+	PG_EUC_TW,				/* EUC for Taiwan */
+	PG_EUC_JIS_2004,			/* EUC-JIS-2004 */
+	PG_UTF8,				/* Unicode UTF8 */
+	PG_MULE_INTERNAL,			/* Mule internal code */
+	PG_LATIN1,				/* ISO-8859-1 Latin 1 */
+	PG_LATIN2,				/* ISO-8859-2 Latin 2 */
+	PG_LATIN3,				/* ISO-8859-3 Latin 3 */
+	PG_LATIN4,				/* ISO-8859-4 Latin 4 */
+	PG_LATIN5,				/* ISO-8859-9 Latin 5 */
+	PG_LATIN6,				/* ISO-8859-10 Latin6 */
+	PG_LATIN7,				/* ISO-8859-13 Latin7 */
+	PG_LATIN8,				/* ISO-8859-14 Latin8 */
+	PG_LATIN9,				/* ISO-8859-15 Latin9 */
+	PG_LATIN10,				/* ISO-8859-16 Latin10 */
+	PG_WIN1256,				/* windows-1256 */
+	PG_WIN1258,				/* Windows-1258 */
+	PG_WIN866,				/* (MS-DOS CP866) */
+	PG_WIN874,				/* windows-874 */
+	PG_KOI8R,				/* KOI8-R */
+	PG_WIN1251,				/* windows-1251 */
+	PG_WIN1252,				/* windows-1252 */
+	PG_ISO_8859_5,				/* ISO-8859-5 */
+	PG_ISO_8859_6,				/* ISO-8859-6 */
+	PG_ISO_8859_7,				/* ISO-8859-7 */
+	PG_ISO_8859_8,				/* ISO-8859-8 */
+	PG_WIN1250,				/* windows-1250 */
+	PG_WIN1253,				/* windows-1253 */
+	PG_WIN1254,				/* windows-1254 */
+	PG_WIN1255,				/* windows-1255 */
+	PG_WIN1257,				/* windows-1257 */
+	PG_KOI8U,				/* KOI8-U */
+	/* PG_ENCODING_BE_LAST points to the above entry */
+
+	/* followings are for client encoding only */
+	PG_SJIS,				/* Shift JIS (Windows-932) */
+	PG_BIG5,				/* Big5 (Windows-950) */
+	PG_GBK,					/* GBK (Windows-936) */
+	PG_UHC,					/* UHC (Windows-949) */
+	PG_GB18030,				/* GB18030 */
+	PG_JOHAB,				/* EUC for Korean JOHAB */
+	PG_SHIFT_JIS_2004,			/* Shift-JIS-2004 */
+	_PG_LAST_ENCODING_			/* mark only */
+} pg_enc;
+
+#define PG_ENCODING_BE_LAST PG_KOI8U
+
+static const char *pg_enc_str[]={
+	"SQL_ASCII",
+	"EUC_JP",
+	"EUC_CN",
+	"EUC_KR",
+	"EUC_TW",
+	"EUC_JIS_2004",
+	"UTF8",
+	"MULE_INTERNAL",
+	"LATIN1",
+	"LATIN2",
+	"LATIN3",
+	"LATIN4",
+	"LATIN5",
+	"LATIN6",
+	"LATIN7",
+	"LATIN8",
+	"LATIN9",
+	"LATIN10",
+	"WIN1256",
+	"WIN1258",
+	"WIN866",
+	"WIN874",
+	"KOI8R",
+	"WIN1251",
+	"WIN1252",
+	"ISO_8859_5",
+	"ISO_8859_6",
+	"ISO_8859_7",
+	"ISO_8859_8",
+	"WIN1250",
+	"WIN1253",
+	"WIN1254",
+	"WIN1255",
+	"WIN1257",
+	"KOI8U",
+	"SJIS",
+	"BIG5",
+	"GBK",
+	"UHC",
+	"GB18030",
+	"JOHAB",
+	"SHIFT_JIS_2004",
+	NULL
+};
 
 // object id's
 #define InvalidOid	0
@@ -394,21 +487,30 @@ int PQclientEncoding(const PGconn *conn) {
 	return conn->clientencoding;
 }
 
-// FIXME: support encodings other than UTF8
-
-int translateEncoding(const char *encoding) {
+int pg_char_to_encoding(const char *encoding) {
 	debugFunction();
-	if (encoding) {
-		if (!charstring::compare(encoding,"UTF8")) {
-			return PG_UTF8;
+	uint32_t i=0; 
+	while (pg_enc_str[i]) {
+		if (!charstring::compare(encoding,pg_enc_str[i])) {
+			return i;
 		}
 	}
 	return -1;
 }
 
+const char *pg_encoding_to_char(int encoding) {
+	debugFunction();
+	return (encoding<(int)_PG_LAST_ENCODING_)?pg_enc_str[encoding]:"";
+}
+
+int pg_valid_server_encoding_id(int encoding) {
+	debugFunction();
+	return (encoding<=PG_ENCODING_BE_LAST)?1:0;
+}
+
 int PQsetClientEncoding(PGconn *conn, const char *encoding) {
 	debugFunction();
-	int	enc=translateEncoding(encoding);
+	int	enc=pg_char_to_encoding(encoding);
 	if (enc>-1) {
 		conn->clientencoding=enc;
 		return 0;
@@ -429,17 +531,39 @@ PQnoticeProcessor PQsetNoticeProcessor(PGconn *conn,
 	return oldprocessor;
 }
 
-const char *PQparameterStatus(const PGconn *conn, const char *paramName) {
+const char *PQparameterStatus(const PGconn *conn, const char *paramname) {
 	debugFunction();
-	// psycopg2 needs these.  Ideally we'd return the correct values but
-	// for now, just return safe-ish values
-	if (!charstring::compare(paramName,"client_encoding")) {
-		return "UTF8";
-	} else if (!charstring::compare(paramName,"DateStyle")) {
+
+	if (!conn) {
+		return NULL;
+	}
+
+	// Ideally we'd return the correct values but for now,
+	// just return safe-ish values
+	if (!charstring::compare(paramname,"server_version")) {
+		return "80100";
+	} else if (!charstring::compare(paramname,"server_encoding")) {
+		return NULL;
+	} else if (!charstring::compare(paramname,"client_encoding")) {
+		return pg_encoding_to_char(conn->clientencoding);
+	} else if (!charstring::compare(paramname,"is_superuser")) {
+		return NULL;
+	} else if (!charstring::compare(paramname,"session_authorization")) {
+		return NULL;
+	} else if (!charstring::compare(paramname,"DateStyle")) {
 		// psycopg2 will run "SET DATETYPE TO 'ISO'" if this
 		// doesn't return ISO, which causes problems for
 		// non-postgresql databases
 		return "ISO";
+	} else if (!charstring::compare(paramname,"IntervalStyle")) {
+		return NULL;
+	} else if (!charstring::compare(paramname,"TimeZone")) {
+		return NULL;
+	} else if (!charstring::compare(paramname,"integer_datetimes")) {
+		return NULL;
+	} else if (!charstring::compare(paramname,
+					"standard_conforming_strings")) {
+		return NULL;
 	}
 	return NULL;
 }
@@ -1269,7 +1393,7 @@ int PQmblen(const unsigned char *s, int encoding) {
 
 int PQenv2encoding(void) {
 	debugFunction();
-	return translateEncoding(environment::getValue("PGCLIENTENCODING"));
+	return pg_char_to_encoding(environment::getValue("PGCLIENTENCODING"));
 }
 
 // Haha!  I stole these straight out of the postgresql source

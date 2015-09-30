@@ -261,9 +261,10 @@ PostgreSQL.</p>
 
 <tr><th>Function</th><th>Implemented?</th></tr>
 
-<tr><td>PQsetdbLogin</td><td>yes, but ignores the db, options and tty parameters</td></tr>
-<tr><td>PQsetdb</td><td>yes</td></tr>
-<tr><td>PQconnectdb</td><td>yes</td></tr>
+<tr><td>PQsetdbLogin</td><td>yes, but ignores the options and tty parameters</td></tr>
+<tr><td>PQsetdb</td><td>yes, but ignores the options and tty parameters</td></tr>
+<tr><td>PQconnectdb</td><td>yes, but ignores the options and tty parameters</td></tr>
+<tr><td>PQconnectdbParams</td><td>yes, but ignores the options and tty parameters</td></tr>
 <tr><td>PQfinish</td><td>yes</td></tr>
 <tr><td>PQreset</td><td>yes</td></tr>
 <tr><td>PQdb</td><td>yes</td></tr>
@@ -274,74 +275,92 @@ PostgreSQL.</p>
 <tr><td>PQtty</td><td>yes</td></tr>
 <tr><td>PQoptions</td><td>yes</td></tr>
 <tr><td>PQstatus</td><td>yes</td></tr>
+<tr><td>PQsetErrorVerbosity</td><td>has no effect</td></tr>
 <tr><td>PQerrorMessage</td><td>yes</td></tr>
-<tr><td>PQsocket</td><td>no, always returns -1</td></tr>
-<tr><td>PQbackendPID</td><td>no, always returns -1</td></tr>
-<tr><td>PQgetssl</td><td>no, always returns 0</td></tr>
+<tr><td>PQsocket</td><td>always returns -1</td></tr>
+<tr><td>PQbackendPID</td><td>always returns -1</td></tr>
+<tr><td>PQgetssl</td><td>always returns 0</td></tr>
 <tr><td>PQclientEncoding</td><td>yes</td></tr>
-<tr><td>PQsetClientEncoding</td><td>yes</td></tr>
+<tr><td>PQsetClientEncoding</td><td>has no effect</td></tr>
 <tr><td>PQsetNoticeProcessor</td><td>yes</td></tr>
+<tr><td>PQparameterStatus</td><td>returns dummy values</td></tr>
+<tr><td>PQserverVersion</td><td>returns dummy value of 80100</td></tr>
+<tr><td>PQprotocolVersion</td><td>returns dummy value of 3</td></tr>
 
 <tr><td>PQescapeString</td><td>yes</td></tr>
 <tr><td>PQescapeBytea</td><td>yes</td></tr>
+<tr><td>PQescapeByteConn</td><td>yes, but just calls PQescapeBytea</td></tr>
 <tr><td>PQunescapeBytea</td><td>yes</td></tr>
 
 <tr><td>PQclear</td><td>yes</td></tr>
+<tr><td>PQprepare</td><td>yes</td></tr>
+<tr><td>PQexecPrepared</td><td>yes</td></tr>
+<tr><td>PQexecParams</td><td>yes</td></tr>
 <tr><td>PQexec</td><td>yes</td></tr>
+<tr><td>PQdescribePrepared</td><td>always returns NULL</td></tr>
+<tr><td>PQdescribePortal</td><td>always returns NULL</td></tr>
 <tr><td>PQresultStatus</td><td>yes</td></tr>
 <tr><td>PQresStatus</td><td>yes</td></tr>
 <tr><td>PQresultErrorMessage</td><td>yes, returns the SQL Relay error string</td></tr>
+<tr><td>PQresultErrorField</td><td>yes, but just calls PQresultErrorMessage</td></tr>
 <tr><td>PQntuples</td><td>yes</td></tr>
 <tr><td>PQnfields</td><td>yes</td></tr>
 <tr><td>PQbinaryTuples</td><td>yes</td></tr>
 <tr><td>PQfname</td><td>yes</td></tr>
 <tr><td>PQfnumber</td><td>yes</td></tr>
+<tr><td>PQftable</td><td>always returns InvalidOid</td></tr>
+<tr><td>PQftablecol</td><td>always returns InvalidOid</td></tr>
+<tr><td>PQfformat</td><td>yes</td></tr>
 <tr><td>PQftype</td><td>yes</td></tr>
 <tr><td>PQfsize</td><td>yes</td></tr>
 <tr><td>PQfmod</td><td>yes</td></tr>
-<tr><td>PQcmdStatus</td><td>yes</td></tr>
-<tr><td>PQoidStatus</td><td>yes</td></tr>
-<tr><td>PQoidValue</td><td>yes</td></tr>
+<tr><td>PQcmdStatus</td><td>only returns "" or "SELECT"</td></tr>
+<tr><td>PQoidStatus</td><td>always returns "InvalidOid"</td></tr>
+<tr><td>PQoidValue</td><td>always returns InvalidOid</td></tr>
 <tr><td>PQcmdTuples</td><td>yes</td></tr>
 <tr><td>PQgetvalue</td><td>yes</td></tr>
 <tr><td>PQgetlength</td><td>yes</td></tr>
 <tr><td>PQgetisnull</td><td>yes</td></tr>
 <tr><td>PQmakeEmptyPGresult</td><td>yes</td></tr>
+<tr><td>PQnparams</td><td>always returns 0</td></tr>
+<tr><td>PQnparamtype</td><td>always returns 0</td></tr>
 
 <tr><td>PQprint</td><td>yes</td></tr>
 <tr><td>PQdisplayTuples</td><td>yes</td></tr>
 <tr><td>PQprintTuples</td><td>yes</td></tr>
 
+<tr><td>PQconninfoParse</td><td>always returns NULL</td></tr>
 <tr><td>PQconndefaults</td><td>always returns NULL</td></tr>
 <tr><td>PQconninfoFree</td><td>yes</td></tr>
 
-<tr><td>PQtrace</td><td>sort of, just calls sqlrconnection::debugOn()</td></tr>
-<tr><td>PQuntrace</td><td>sort of, just calls sqlrconnection::debugOff()</td></tr>
+<tr><td>PQtrace</td><td>just calls sqlrconnection::debugOn()</td></tr>
+<tr><td>PQuntrace</td><td>just calls sqlrconnection::debugOff()</td></tr>
 
-<tr><td>PQgetline</td><td>no, NULL terminates string and returns EOF</td></tr>
-<tr><td>PQputline</td><td>no, always returns EOF</td></tr>
-<tr><td>PQgetlineAsync</td><td>no, NULL terminates buffer and returns EOF</td></tr>
-<tr><td>PQputnbytes</td><td>no, always returns EOF</td></tr>
-<tr><td>PQendcopy</td><td>no, always returns -1 for failure</td></tr>
+<tr><td>PQgetline</td><td>NULL terminates string and returns EOF</td></tr>
+<tr><td>PQputline</td><td>always returns EOF</td></tr>
+<tr><td>PQgetlineAsync</td><td>NULL terminates buffer and returns EOF</td></tr>
+<tr><td>PQputnbytes</td><td>always returns EOF</td></tr>
+<tr><td>PQendcopy</td><td>always returns -1 for failure</td></tr>
 
-<tr><td>PQmblen</td><td>only for UTF8, always returns 1</td></tr>
-<tr><td>PQenv2encoding</td><td>only for UTF8</td></tr>
+<tr><td>PQmblen</td><td>always returns 1</td></tr>
+<tr><td>PQenv2encoding</td><td>yes</td></tr>
 
-<tr><td>PQfn</td><td>no, always returns NULL</td></tr>
+<tr><td>PQfn</td><td>does nothing, always returns NULL</td></tr>
+<tr><td>PQfreemem</td><td>yes</td></tr>
 
-<tr><td>lo_open</td><td>no, always returns -1</td></tr>
-<tr><td>lo_close</td><td>no, always returns -1</td></tr>
-<tr><td>lo_read</td><td>no, always returns -1</td></tr>
-<tr><td>lo_write</td><td>no, always returns -1</td></tr>
-<tr><td>lo_lseek</td><td>no, always returns -1</td></tr>
-<tr><td>lo_creat</td><td>no, always returns -1</td></tr>
-<tr><td>lo_tell</td><td>no, always returns -1</td></tr>
-<tr><td>lo_unlink</td><td>no, always returns -1</td></tr>
-<tr><td>lo_import</td><td>no, always returns -1</td></tr>
-<tr><td>lo_export</td><td>no, always returns -1</td></tr>
+<tr><td>lo_open</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_close</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_read</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_write</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_lseek</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_creat</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_tell</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_unlink</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_import</td><td>does nothing, always returns -1</td></tr>
+<tr><td>lo_export</td><td>does nothing, always returns -1</td></tr>
 
-<tr><td>PQnotifies</td><td>no, always returns NULL</td></tr>
-<tr><td>PQfreeNotify</td><td>no, does nothing</td></tr>
+<tr><td>PQnotifies</td><td>does nothing, always returns NULL</td></tr>
+<tr><td>PQfreeNotify</td><td>does nothing</td></tr>
 
 <tr><td colspan="2">
 The following functions implement the PostgreSQL asynchronous query API.
@@ -353,9 +372,13 @@ manner.
 <tr><td>PQconnectPoll</td><td>yes</td></tr>
 <tr><td>PQresetStart</td><td>yes</td></tr>
 <tr><td>PQresetPoll</td><td>yes</td></tr>
+<tr><td>PQgetCancel</td><td>yes</td></tr>
+<tr><td>PQfreeCancel</td><td>yes</td></tr>
+<tr><td>PQcancel</td><td>yes</td></tr>
 <tr><td>PQrequestCancel</td><td>yes</td></tr>
 <tr><td>PQsendQuery</td><td>yes</td></tr>
 <tr><td>PQgetResult</td><td>yes</td></tr>
+<tr><td>PQtransactionStatus</td><td>yes</td></tr>
 <tr><td>PQisBusy</td><td>yes</td></tr>
 <tr><td>PQconsumeInput</td><td>yes</td></tr>
 <tr><td>PQsetnonblocking</td><td>yes</td></tr>
