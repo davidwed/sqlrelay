@@ -494,6 +494,7 @@ int pg_char_to_encoding(const char *encoding) {
 		if (!charstring::compare(encoding,pg_enc_str[i])) {
 			return i;
 		}
+		i++;
 	}
 	return -1;
 }
