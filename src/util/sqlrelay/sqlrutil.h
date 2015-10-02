@@ -57,7 +57,7 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 };
 
 class SQLRUTIL_DLLSPEC listenercontainer {
-	friend class sqlrconfigfile;
+	friend class sqlrconfig;
 	public:
 				listenercontainer();
 				~listenercontainer();
@@ -83,7 +83,7 @@ class SQLRUTIL_DLLSPEC listenercontainer {
 typedef linkedlistnode< listenercontainer * >	listenernode;
 
 class SQLRUTIL_DLLSPEC usercontainer {
-	friend class sqlrconfigfile;
+	friend class sqlrconfig;
 	public:
 				usercontainer();
 				~usercontainer();
@@ -132,7 +132,7 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
 
 class SQLRUTIL_DLLSPEC routecontainer {
-	friend class sqlrconfigfile;
+	friend class sqlrconfig;
 	public:
 			routecontainer();
 			~routecontainer();
@@ -163,10 +163,10 @@ class SQLRUTIL_DLLSPEC routecontainer {
 
 typedef linkedlistnode< routecontainer * >	routenode;
 
-class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
+class SQLRUTIL_DLLSPEC sqlrconfig : public xmlsax {
 	public:
-			sqlrconfigfile(sqlrpaths *sqlrpth);
-			~sqlrconfigfile();
+			sqlrconfig(sqlrpaths *sqlrpth);
+			~sqlrconfig();
 		void	getEnabledIds(const char *config,
 					linkedlist< char * > *idlist);
 		bool	parse(const char *config, const char *id);

@@ -186,7 +186,7 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	cmdl=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdl);
-	cfgfl=new sqlrconfigfile(sqlrpth);
+	cfgfl=new sqlrconfig(sqlrpth);
 
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");

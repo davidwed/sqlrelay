@@ -12,16 +12,16 @@
 #include <defines.h>
 #include <defaults.h>
 
-sqlrconfigfile::sqlrconfigfile(sqlrpaths *sqlrpth) : xmlsax() {
+sqlrconfig::sqlrconfig(sqlrpaths *sqlrpth) : xmlsax() {
 	this->sqlrpth=sqlrpth;
 	init();
 }
 
-sqlrconfigfile::~sqlrconfigfile() {
+sqlrconfig::~sqlrconfig() {
 	clear();
 }
 
-void sqlrconfigfile::init() {
+void sqlrconfig::init() {
 	getenabledids=false;
 	currentid=NULL;
 	enabled=false;
@@ -111,7 +111,7 @@ void sqlrconfigfile::init() {
 	inend=false;
 }
 
-void sqlrconfigfile::clear() {
+void sqlrconfig::clear() {
 	delete[] currentid;
 	delete[] dbase;
 	delete[] unixport;
@@ -165,292 +165,292 @@ void sqlrconfigfile::clear() {
 	addresscount=0;
 }
 
-const char * const *sqlrconfigfile::getDefaultAddresses() {
+const char * const *sqlrconfig::getDefaultAddresses() {
 	return defaultlistener->getAddresses();
 }
 
-uint64_t sqlrconfigfile::getDefaultAddressCount() {
+uint64_t sqlrconfig::getDefaultAddressCount() {
 	return defaultlistener->getAddressCount();
 }
 
-uint16_t sqlrconfigfile::getDefaultPort() {
+uint16_t sqlrconfig::getDefaultPort() {
 	return defaultlistener->getPort();
 }
 
-const char *sqlrconfigfile::getDefaultSocket() {
+const char *sqlrconfig::getDefaultSocket() {
 	return defaultlistener->getSocket();
 }
 
-bool sqlrconfigfile::getListenOnInet() {
+bool sqlrconfig::getListenOnInet() {
 	return listenoninet;
 }
 
-bool sqlrconfigfile::getListenOnUnix() {
+bool sqlrconfig::getListenOnUnix() {
 	return listenonunix;
 }
 
-const char *sqlrconfigfile::getDbase() {
+const char *sqlrconfig::getDbase() {
 	return dbase;
 }
 
-uint32_t sqlrconfigfile::getConnections() {
+uint32_t sqlrconfig::getConnections() {
 	return connections;
 }
 
-uint32_t sqlrconfigfile::getMaxConnections() {
+uint32_t sqlrconfig::getMaxConnections() {
 	return maxconnections;
 }
 
-uint32_t sqlrconfigfile::getMaxQueueLength() {
+uint32_t sqlrconfig::getMaxQueueLength() {
 	return maxqueuelength;
 }
 
-uint32_t sqlrconfigfile::getGrowBy() {
+uint32_t sqlrconfig::getGrowBy() {
 	return growby;
 }
 
-int32_t sqlrconfigfile::getTtl() {
+int32_t sqlrconfig::getTtl() {
 	return ttl;
 }
 
-int32_t sqlrconfigfile::getSoftTtl() {
+int32_t sqlrconfig::getSoftTtl() {
 	return softttl;
 }
 
-uint16_t sqlrconfigfile::getMaxSessionCount() {
+uint16_t sqlrconfig::getMaxSessionCount() {
 	return maxsessioncount;
 }
 
-bool sqlrconfigfile::getDynamicScaling() {
+bool sqlrconfig::getDynamicScaling() {
 	return (maxconnections>connections && growby>0 && ttl>-1 &&
 		(maxlisteners==-1 || maxqueuelength<=maxlisteners));
 }
 
-const char *sqlrconfigfile::getEndOfSession() {
+const char *sqlrconfig::getEndOfSession() {
 	return endofsession;
 }
 
-bool sqlrconfigfile::getEndOfSessionCommit() {
+bool sqlrconfig::getEndOfSessionCommit() {
 	return endofsessioncommit;
 }
 
-uint32_t sqlrconfigfile::getSessionTimeout() {
+uint32_t sqlrconfig::getSessionTimeout() {
 	return sessiontimeout;
 }
 
-const char *sqlrconfigfile::getRunAsUser() {
+const char *sqlrconfig::getRunAsUser() {
 	return runasuser;
 }
 
-const char *sqlrconfigfile::getRunAsGroup() {
+const char *sqlrconfig::getRunAsGroup() {
 	return runasgroup;
 }
 
-uint16_t sqlrconfigfile::getCursors() {
+uint16_t sqlrconfig::getCursors() {
 	return cursors;
 }
 
-uint16_t sqlrconfigfile::getMaxCursors() {
+uint16_t sqlrconfig::getMaxCursors() {
 	return maxcursors;
 }
 
-uint16_t sqlrconfigfile::getCursorsGrowBy() {
+uint16_t sqlrconfig::getCursorsGrowBy() {
 	return cursorsgrowby;
 }
 
-const char *sqlrconfigfile::getAuthTier() {
+const char *sqlrconfig::getAuthTier() {
 	return authtier;
 }
 
-const char *sqlrconfigfile::getSessionHandler() {
+const char *sqlrconfig::getSessionHandler() {
 	return sessionhandler;
 }
 
-const char *sqlrconfigfile::getHandoff() {
+const char *sqlrconfig::getHandoff() {
 	return handoff;
 }
 
-bool sqlrconfigfile::getAuthOnConnection() {
+bool sqlrconfig::getAuthOnConnection() {
 	return authonconnection;
 }
 
-bool sqlrconfigfile::getAuthOnDatabase() {
+bool sqlrconfig::getAuthOnDatabase() {
 	return authondatabase;
 }
 
-const char *sqlrconfigfile::getAllowedIps() {
+const char *sqlrconfig::getAllowedIps() {
 	return allowedips;
 }
 
-const char *sqlrconfigfile::getDeniedIps() {
+const char *sqlrconfig::getDeniedIps() {
 	return deniedips;
 }
 
-const char *sqlrconfigfile::getDebug() {
+const char *sqlrconfig::getDebug() {
 	return debug;
 }
 
-bool sqlrconfigfile::getDebugTranslations() {
+bool sqlrconfig::getDebugTranslations() {
 	return debugtranslations;
 }
 
-bool sqlrconfigfile::getDebugFilters() {
+bool sqlrconfig::getDebugFilters() {
 	return debugfilters;
 }
 
-bool sqlrconfigfile::getDebugTriggers() {
+bool sqlrconfig::getDebugTriggers() {
 	return debugtriggers;
 }
 
-bool sqlrconfigfile::getDebugBindTranslations() {
+bool sqlrconfig::getDebugBindTranslations() {
 	return debugbindtranslations;
 }
 
-uint64_t sqlrconfigfile::getMaxClientInfoLength() {
+uint64_t sqlrconfig::getMaxClientInfoLength() {
 	return maxclientinfolength;
 }
 
-uint32_t sqlrconfigfile::getMaxQuerySize() {
+uint32_t sqlrconfig::getMaxQuerySize() {
 	return maxquerysize;
 }
 
-uint16_t sqlrconfigfile::getMaxBindCount() {
+uint16_t sqlrconfig::getMaxBindCount() {
 	return maxbindcount;
 }
 
-uint16_t sqlrconfigfile::getMaxBindNameLength() {
+uint16_t sqlrconfig::getMaxBindNameLength() {
 	return maxbindnamelength;
 }
 
-uint32_t sqlrconfigfile::getMaxStringBindValueLength() {
+uint32_t sqlrconfig::getMaxStringBindValueLength() {
 	return maxstringbindvaluelength;
 }
 
-uint32_t sqlrconfigfile::getMaxLobBindValueLength() {
+uint32_t sqlrconfig::getMaxLobBindValueLength() {
 	return maxlobbindvaluelength;
 }
 
-uint32_t sqlrconfigfile::getMaxErrorLength() {
+uint32_t sqlrconfig::getMaxErrorLength() {
 	return maxerrorlength;
 }
 
-int32_t sqlrconfigfile::getIdleClientTimeout() {
+int32_t sqlrconfig::getIdleClientTimeout() {
 	return idleclienttimeout;
 }
 
-int64_t sqlrconfigfile::getMaxListeners() {
+int64_t sqlrconfig::getMaxListeners() {
 	return maxlisteners;
 }
 
-uint32_t sqlrconfigfile::getListenerTimeout() {
+uint32_t sqlrconfig::getListenerTimeout() {
 	return listenertimeout;
 }
 
-bool sqlrconfigfile::getReLoginAtStart() {
+bool sqlrconfig::getReLoginAtStart() {
 	return reloginatstart;
 }
 
-bool sqlrconfigfile::getFakeInputBindVariables() {
+bool sqlrconfig::getFakeInputBindVariables() {
 	return fakeinputbindvariables;
 }
 
-bool sqlrconfigfile::getTranslateBindVariables() {
+bool sqlrconfig::getTranslateBindVariables() {
 	return translatebindvariables;
 }
 
-const char *sqlrconfigfile::getIsolationLevel() {
+const char *sqlrconfig::getIsolationLevel() {
 	return isolationlevel;
 }
 
-bool sqlrconfigfile::getIgnoreSelectDatabase() {
+bool sqlrconfig::getIgnoreSelectDatabase() {
 	return ignoreselectdb;
 }
 
-bool sqlrconfigfile::getWaitForDownDatabase() {
+bool sqlrconfig::getWaitForDownDatabase() {
 	return waitfordowndb;
 }
 
-const char *sqlrconfigfile::getDateTimeFormat() {
+const char *sqlrconfig::getDateTimeFormat() {
 	return datetimeformat;
 }
 
-const char *sqlrconfigfile::getDateFormat() {
+const char *sqlrconfig::getDateFormat() {
 	return dateformat;
 }
 
-const char *sqlrconfigfile::getTimeFormat() {
+const char *sqlrconfig::getTimeFormat() {
 	return timeformat;
 }
 
-bool sqlrconfigfile::getDateDdMm() {
+bool sqlrconfig::getDateDdMm() {
 	return dateddmm;
 }
 
-bool sqlrconfigfile::getDateYyyyDdMm() {
+bool sqlrconfig::getDateYyyyDdMm() {
 	return dateyyyyddmm;
 }
 
-const char *sqlrconfigfile::getDateDelimiters() {
+const char *sqlrconfig::getDateDelimiters() {
 	return datedelimiters;
 }
 
-bool sqlrconfigfile::getIgnoreNonDateTime() {
+bool sqlrconfig::getIgnoreNonDateTime() {
 	return ignorenondatetime;
 }
 
-linkedlist< char * > *sqlrconfigfile::getSessionStartQueries() {
+linkedlist< char * > *sqlrconfig::getSessionStartQueries() {
 	return &sessionstartqueries;
 }
 
-linkedlist< char * > *sqlrconfigfile::getSessionEndQueries() {
+linkedlist< char * > *sqlrconfig::getSessionEndQueries() {
 	return &sessionendqueries;
 }
 
-const char *sqlrconfigfile::getTranslations() {
+const char *sqlrconfig::getTranslations() {
 	return translations.getString();
 }
 
-const char *sqlrconfigfile::getFilters() {
+const char *sqlrconfig::getFilters() {
 	return filters.getString();
 }
 
-const char *sqlrconfigfile::getResultSetTranslations() {
+const char *sqlrconfig::getResultSetTranslations() {
 	return resultsettranslations.getString();
 }
 
-const char *sqlrconfigfile::getTriggers() {
+const char *sqlrconfig::getTriggers() {
 	return triggers.getString();
 }
 
-const char *sqlrconfigfile::getLoggers() {
+const char *sqlrconfig::getLoggers() {
 	return loggers.getString();
 }
 
-const char *sqlrconfigfile::getQueries() {
+const char *sqlrconfig::getQueries() {
 	return queries.getString();
 }
 
-const char *sqlrconfigfile::getPasswordEncryptions() {
+const char *sqlrconfig::getPasswordEncryptions() {
 	return passwordencryptions.getString();
 }
 
-const char *sqlrconfigfile::getAuthentications() {
+const char *sqlrconfig::getAuthentications() {
 	return authentications.getString();
 }
 
-linkedlist< listenercontainer * > *sqlrconfigfile::getListenerList() {
+linkedlist< listenercontainer * > *sqlrconfig::getListenerList() {
 	return &listenerlist;
 }
 
-linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
+linkedlist< usercontainer * > *sqlrconfig::getUserList() {
 	return &userlist;
 }
 
-linkedlist< connectstringcontainer * > *sqlrconfigfile::getConnectStringList() {
+linkedlist< connectstringcontainer * > *sqlrconfig::getConnectStringList() {
 	return &connectstringlist;
 }
 
-connectstringcontainer *sqlrconfigfile::getConnectString(
+connectstringcontainer *sqlrconfig::getConnectString(
 						const char *connectionid) {
 	for (connectstringnode *csn=connectstringlist.getFirst();
 						csn; csn=csn->getNext()) {
@@ -462,11 +462,11 @@ connectstringcontainer *sqlrconfigfile::getConnectString(
 	return NULL;
 }
 
-uint32_t sqlrconfigfile::getConnectionCount() {
+uint32_t sqlrconfig::getConnectionCount() {
 	return connectstringlist.getLength();
 }
 
-uint32_t sqlrconfigfile::getMetricTotal() {
+uint32_t sqlrconfig::getMetricTotal() {
 	// This is tallied here instead of whenever the parser runs into a
 	// metric attribute because people often forget to include metric
 	// attributes.  In that case, though each connection has a metric,
@@ -480,11 +480,11 @@ uint32_t sqlrconfigfile::getMetricTotal() {
 	return metrictotal;
 }
 
-linkedlist< routecontainer * >	*sqlrconfigfile::getRouteList() {
+linkedlist< routecontainer * >	*sqlrconfig::getRouteList() {
 	return &routelist;
 }
 
-bool sqlrconfigfile::tagStart(const char *ns, const char *name) {
+bool sqlrconfig::tagStart(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -848,7 +848,7 @@ bool sqlrconfigfile::tagStart(const char *ns, const char *name) {
 	return true;
 }
 
-bool sqlrconfigfile::tagEnd(const char *ns, const char *name) {
+bool sqlrconfig::tagEnd(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -1112,7 +1112,7 @@ bool sqlrconfigfile::tagEnd(const char *ns, const char *name) {
 	return true;
 }
 
-bool sqlrconfigfile::attributeName(const char *name) {
+bool sqlrconfig::attributeName(const char *name) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -1446,7 +1446,7 @@ bool sqlrconfigfile::attributeName(const char *name) {
 	return true;
 }
 
-bool sqlrconfigfile::attributeValue(const char *value) {
+bool sqlrconfig::attributeValue(const char *value) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -1817,7 +1817,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 	return true;
 }
 
-bool sqlrconfigfile::text(const char *string) {
+bool sqlrconfig::text(const char *string) {
 
 	if (currenttag==RUNQUERY_TAG) {
 		linkedlist< char * >	*ptr=NULL;
@@ -1834,7 +1834,7 @@ bool sqlrconfigfile::text(const char *string) {
 	return true;
 }
 
-uint32_t sqlrconfigfile::atouint32_t(const char *value,
+uint32_t sqlrconfig::atouint32_t(const char *value,
 				const char *defaultvalue, uint32_t minvalue) {
 	uint32_t	retval=charstring::toUnsignedInteger(
 						(value)?value:defaultvalue);
@@ -1844,7 +1844,7 @@ uint32_t sqlrconfigfile::atouint32_t(const char *value,
 	return retval;
 }
 
-int32_t sqlrconfigfile::atoint32_t(const char *value,
+int32_t sqlrconfig::atoint32_t(const char *value,
 				const char *defaultvalue, int32_t minvalue) {
 	int32_t	retval=charstring::toInteger((value)?value:defaultvalue);
 	if (retval<minvalue) {
@@ -1853,7 +1853,7 @@ int32_t sqlrconfigfile::atoint32_t(const char *value,
 	return retval;
 }
 
-routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
+routecontainer *sqlrconfig::routeAlreadyExists(routecontainer *cur) {
 
 	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
 
@@ -1873,7 +1873,7 @@ routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
 	return NULL;
 }
 
-void sqlrconfigfile::moveRegexList(routecontainer *cur,
+void sqlrconfig::moveRegexList(routecontainer *cur,
 					routecontainer *existing) {
 
 	for (linkedlistnode< regularexpression * > *re=
@@ -1884,7 +1884,7 @@ void sqlrconfigfile::moveRegexList(routecontainer *cur,
 	cur->getRegexList()->clear();
 }
 
-bool sqlrconfigfile::parse(const char *config, const char *id) {
+bool sqlrconfig::parse(const char *config, const char *id) {
 
 	// re-init
 	clear();
@@ -1937,7 +1937,7 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 	return done;
 }
 
-void sqlrconfigfile::getEnabledIds(const char *config,
+void sqlrconfig::getEnabledIds(const char *config,
 					linkedlist< char * > *idlist) {
 
 	// re-init
@@ -1984,7 +1984,7 @@ void sqlrconfigfile::getEnabledIds(const char *config,
 	d.close();
 }
 
-bool sqlrconfigfile::accessible() {
+bool sqlrconfig::accessible() {
 	// FIXME: implement this
 	return true;
 }

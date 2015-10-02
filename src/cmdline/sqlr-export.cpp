@@ -52,7 +52,7 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);
-	sqlrconfigfile	cfgfile(&sqlrpth);
+	sqlrconfig	cfgfile(&sqlrpth);
 
 	const char	*config=cmdline.getValue("-config");
 	const char	*id=cmdline.getValue("-id");

@@ -29,7 +29,7 @@ int main(int argc, const char **argv) {
 	// parse the command line
 	sqlrcmdline	cmdl(argc,argv);
 	sqlrpaths	sqlrpth(&cmdl);
-	sqlrconfigfile	cfgfl(&sqlrpth);
+	sqlrconfig	cfgfl(&sqlrpth);
 
 	// parse the config file
 	if (!cfgfl.parse(sqlrpth.getConfigFile(),cmdl.getId())) {

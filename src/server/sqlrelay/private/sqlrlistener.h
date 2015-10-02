@@ -94,7 +94,7 @@
 
 		sqlrcmdline	*cmdl;
 		sqlrpaths	*sqlrpth;
-		sqlrconfigfile	*cfgfl;
+		sqlrconfig	*cfgfl;
 
 		sqlrloggers	*sqlrlg;
 

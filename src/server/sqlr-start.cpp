@@ -118,7 +118,7 @@ bool startConnection(const char *id, const char *connectionid,
 	return true;
 }
 
-bool startConnections(sqlrconfigfile *cfgfile,
+bool startConnections(sqlrconfig *cfgfile,
 				const char *id, const char *config,
 				const char *localstatedir, bool strace,
 				bool disablecrashhandler) {
@@ -197,7 +197,7 @@ bool startConnections(sqlrconfigfile *cfgfile,
 	return true;
 }
 
-bool startScaler(sqlrconfigfile *cfgfile, const char *id,
+bool startScaler(sqlrconfig *cfgfile, const char *id,
 			const char *config, const char *localstatedir,
 			bool disablecrashhandler) {
 
@@ -252,7 +252,7 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline	cmdl(argc,argv);
 	sqlrpaths	sqlrpth(&cmdl);
-	sqlrconfigfile	cfgfile(&sqlrpth);
+	sqlrconfig	cfgfile(&sqlrpth);
 
 	// get the command line args
 	const char	*localstatedir=sqlrpth.getLocalStateDir();

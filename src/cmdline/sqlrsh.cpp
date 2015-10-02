@@ -1849,7 +1849,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	cmdline=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdline);
-	sqlrconfigfile	cfgfile(sqlrpth);
+	sqlrconfig	cfgfile(sqlrpth);
 
 	const char	*config=cmdline->getValue("-config");
 	const char	*id=cmdline->getValue("-id");

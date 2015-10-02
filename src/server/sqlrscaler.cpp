@@ -145,7 +145,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	config=sqlrpth->getConfigFile();
 
 	// parse the config file
-	cfgfile=new sqlrconfigfile(sqlrpth);
+	cfgfile=new sqlrconfig(sqlrpth);
 	if (cfgfile->parse(config,id)) {
 
 		// don't even start if we're not using dynamic scaling

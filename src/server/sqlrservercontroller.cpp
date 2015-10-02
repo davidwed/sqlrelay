@@ -261,7 +261,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	silent=cmdl->found("-silent");
 
 	// parse the config file
-	cfgfl=new sqlrconfigfile(sqlrpth);
+	cfgfl=new sqlrconfig(sqlrpth);
 	if (!cfgfl->parse(sqlrpth->getConfigFile(),cmdl->getId())) {
 		return false;
 	}

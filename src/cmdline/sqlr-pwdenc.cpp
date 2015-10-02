@@ -16,7 +16,7 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);
-	sqlrconfigfile	cfgfl(&sqlrpth);
+	sqlrconfig	cfgfl(&sqlrpth);
 
 	// get the command line arguments
 	const char	*config=cmdline.getValue("-config");

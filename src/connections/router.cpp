@@ -84,7 +84,7 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		bool		anymustbegin;
 		uint16_t	concount;
 
-		sqlrconfigfile	*cfgfile;
+		sqlrconfig	*cfgfile;
 
 		bool		justloggedin;
 
