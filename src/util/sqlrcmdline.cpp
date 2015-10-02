@@ -10,18 +10,8 @@ sqlrcmdline::sqlrcmdline(int argc, const char **argv) : commandline(argc,argv) {
 	if (!id[0]) {
 		id=DEFAULT_ID;
 	}
-	config=getValue("-config");
-	localstatedir=getValue("-localstatedir");
-}
-
-const char *sqlrcmdline::getConfig() const {
-	return config;
 }
 
 const char *sqlrcmdline::getId() const {
 	return id;
-}
-
-const char *sqlrcmdline::getLocalStateDir() const {
-	return localstatedir;
 }

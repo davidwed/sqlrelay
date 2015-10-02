@@ -20,12 +20,7 @@ class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 
 		const char	*getId() const;
 	private:
-		const char	*getConfig() const;
-		const char	*getLocalStateDir() const;
-
 		const char	*id;
-		const char	*config;
-		const char	*localstatedir;
 };
 
 class SQLRUTIL_DLLSPEC sqlrpaths {

@@ -13,6 +13,7 @@
 		properly, and without crash
 	added various missing postgresql functions to the postgresql drop-in
 		library, most notably PQprepare, PQexecPrepared, PQexecParams
+	simplified sqlrpaths/sqlrcmdline classes a bit
 
 0.63.1 - backported shutdown loop detection
 

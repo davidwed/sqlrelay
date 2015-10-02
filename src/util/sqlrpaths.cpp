@@ -57,8 +57,9 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 
 	char	slash=sys::getDirectorySeparator();
 
-	if (cmdl->getLocalStateDir()[0]) {
-		localstatedir=charstring::duplicate(cmdl->getLocalStateDir());
+	const char	*lsd=cmdl->getValue("-localstatedir");
+	if (lsd[0]) {
+		localstatedir=charstring::duplicate(lsd);
 		delete[] defaultlocalstatedir;
 	} else {
 		localstatedir=defaultlocalstatedir;
@@ -98,8 +99,9 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	scratch.append(sysconfdir)->append("sqlrelay.conf.d")->append(slash);
 	defaultconfigdir=scratch.detachString();
 
-	if (cmdl->getConfig()[0]) {
-		configfile=cmdl->getConfig();
+	const char	*cfg=cmdl->getValue("-config");
+	if (cfg[0]) {
+		configfile=cfg;
 	} else {
 		configfile=defaultconfigfile;
 	}
