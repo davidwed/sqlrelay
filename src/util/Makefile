@@ -2,8 +2,15 @@ top_builddir = ../..
 
 include ../../config.mk
 
-SRCS = sqlrcmdline.cpp sqlrpaths.cpp sqlrconfig.cpp
-LOBJS = sqlrcmdline.$(OBJ) sqlrpaths.$(OBJ) sqlrconfig.$(OBJ)
+SRCS = sqlrcmdline.cpp \
+	sqlrpaths.cpp \
+	sqlrconfig.cpp \
+	sqlrconfigs.cpp
+
+LOBJS = sqlrcmdline.$(OBJ) \
+	sqlrpaths.$(OBJ) \
+	sqlrconfig.$(OBJ) \
+	sqlrconfigs.$(OBJ)
 
 .SUFFIXES: .lo
 

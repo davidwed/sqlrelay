@@ -11,6 +11,9 @@ all-api:
 all-server:
 	cd server $(AND) $(MAKE) all
 
+all-configs:
+	cd configs $(AND) $(MAKE) all
+
 all-parsers:
 	cd parsers $(AND) $(MAKE) all
 
@@ -47,6 +50,7 @@ all-cmdline:
 clean:
 	cd util $(AND) $(MAKE) clean
 	cd api $(AND) $(MAKE) clean
+	cd configs $(AND) $(MAKE) clean
 	cd parsers $(AND) $(MAKE) clean
 	cd queries $(AND) $(MAKE) clean
 	cd loggers $(AND) $(MAKE) clean
@@ -70,6 +74,9 @@ install-api:
 
 install-server:
 	cd server $(AND) $(MAKE) install
+
+install-configs:
+	cd configs $(AND) $(MAKE) install
 
 install-parsers:
 	cd parsers $(AND) $(MAKE) install
@@ -107,6 +114,7 @@ install-cmdline:
 uninstall:
 	cd util $(AND) $(MAKE) uninstall
 	cd api $(AND) $(MAKE) uninstall
+	cd configs $(AND) $(MAKE) uninstall
 	cd parsers $(AND) $(MAKE) uninstall
 	cd queries $(AND) $(MAKE) uninstall
 	cd loggers $(AND) $(MAKE) uninstall

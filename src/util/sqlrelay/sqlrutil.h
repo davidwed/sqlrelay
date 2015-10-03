@@ -10,6 +10,7 @@
 #include <rudiments/regularexpression.h>
 #include <rudiments/commandline.h>
 #include <rudiments/linkedlist.h>
+#include <rudiments/dynamiclib.h>
 
 #include <sqlrelay/private/sqlrutildll.h>
 
@@ -501,6 +502,22 @@ class SQLRUTIL_DLLSPEC sqlrconfig : public xmlsax {
 		} attribute;
 
 		attribute	currentattribute;
+};
+
+class SQLRUTIL_DLLSPEC sqlrconfigs {
+	public:
+			sqlrconfigs(sqlrpaths *sqlrpth);
+			~sqlrconfigs();
+		sqlrconfig	*load(const char *urls, const char *id);
+
+	private:
+		void		loadConfig(const char *module);
+
+		sqlrpaths	*sqlrpth;
+		const char	*libexecdir;
+
+		sqlrconfig	*cfg;
+		dynamiclib	*dl;
 };
 
 #endif

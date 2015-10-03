@@ -604,6 +604,7 @@ endif
 # plugins
 PLUGINCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 PLUGINLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++
 SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient
@@ -889,11 +890,11 @@ INSTALLSUBDIRS = install-src install-bin install-etc install-init install-man in
 UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-man uninstall-doc uninstall-license uninstall-pkgconfig
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
-SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
+SRCALLSUBDIRS = all-util all-api all-server all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-server install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
 else
-SRCALLSUBDIRS = all-util all-api all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server all-cmdline
-SRCINSTALLSUBDIRS = install-util install-api install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server install-cmdline
+SRCALLSUBDIRS = all-util all-api all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server all-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server install-cmdline
 endif
 
 
