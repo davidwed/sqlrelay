@@ -622,7 +622,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		charstring::copy(tnsnamesora,home);
 		charstring::append(tnsnamesora,"/network/admin/tnsnames.ora");
 		if (!file::readable(tnsnamesora)) {
-			stderror.printf("Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cont->cfgfl->getRunAsUser(),cont->cfgfl->getRunAsGroup());
+			stderror.printf("Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cont->cfg->getRunAsUser(),cont->cfg->getRunAsGroup());
 		}
 	}
 
@@ -1962,7 +1962,7 @@ oraclecusor::oraclecusor(sqlrserverconnection *conn, uint16_t id) :
 					oracleconn->maxselectlistsize,
 					oracleconn->maxitembuffersize);
 
-	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
+	maxbindcount=conn->cont->cfg->getMaxBindCount();
 	inbindpp=new OCIBind *[maxbindcount];
 	outbindpp=new OCIBind *[maxbindcount];
 	curbindpp=new OCIBind *[maxbindcount];

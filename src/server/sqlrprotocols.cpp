@@ -33,7 +33,7 @@ bool sqlrprotocols::loadProtocols() {
 
 	// run through the protocols
 	for (linkedlistnode< listenercontainer * >
-			*node=cont->cfgfl->getListenerList()->getFirst();
+			*node=cont->cfg->getListenerList()->getFirst();
 			node; node=node->getNext()) {
 
 		const char	*protocol=node->getValue()->getProtocol();

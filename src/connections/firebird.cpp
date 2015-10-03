@@ -705,7 +705,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	allocateResultSetBuffers(firebirdconn->maxselectlistsize,
 					firebirdconn->maxitembuffersize);
 
-	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
+	maxbindcount=conn->cont->cfg->getMaxBindCount();
 	outbindcount=0;
 
 	// set up input binds

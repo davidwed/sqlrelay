@@ -189,16 +189,16 @@ class SQLRSERVER_DLLSPEC sqlrclient : public sqlrprotocol {
 
 sqlrclient::sqlrclient(sqlrservercontroller *cont) : sqlrprotocol(cont) {
 	debugFunction();
-	idleclienttimeout=cont->cfgfl->getIdleClientTimeout();
-	maxclientinfolength=cont->cfgfl->getMaxClientInfoLength();
-	maxquerysize=cont->cfgfl->getMaxQuerySize();
-	maxbindcount=cont->cfgfl->getMaxBindCount();
-	maxbindnamelength=cont->cfgfl->getMaxBindNameLength();
-	maxstringbindvaluelength=cont->cfgfl->getMaxStringBindValueLength();
-	maxlobbindvaluelength=cont->cfgfl->getMaxLobBindValueLength();
+	idleclienttimeout=cont->cfg->getIdleClientTimeout();
+	maxclientinfolength=cont->cfg->getMaxClientInfoLength();
+	maxquerysize=cont->cfg->getMaxQuerySize();
+	maxbindcount=cont->cfg->getMaxBindCount();
+	maxbindnamelength=cont->cfg->getMaxBindNameLength();
+	maxstringbindvaluelength=cont->cfg->getMaxStringBindValueLength();
+	maxlobbindvaluelength=cont->cfg->getMaxLobBindValueLength();
 	bindpool=new memorypool(512,128,100);
-	maxerrorlength=cont->cfgfl->getMaxErrorLength();
-	waitfordowndb=cont->cfgfl->getWaitForDownDatabase();
+	maxerrorlength=cont->cfg->getMaxErrorLength();
+	waitfordowndb=cont->cfg->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
 }
 

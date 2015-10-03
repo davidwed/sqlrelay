@@ -16,7 +16,7 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);
-	sqlrconfig	cfgfl(&sqlrpth);
+	sqlrconfig	cfg(&sqlrpth);
 
 	// get the command line arguments
 	const char	*config=cmdline.getValue("-config");
@@ -36,14 +36,14 @@ int main(int argc, const char **argv) {
 	}
 
 	// open the config file
-	if (!cfgfl.parse(config,id)) {
+	if (!cfg.parse(config,id)) {
 		stderror.printf("SQL Relay instance %s not found in %s\n",
 								id,config);
 		process::exit(1);
 	}
 
 	// initialize the password encryption framework
-	const char	*pwdencs=cfgfl.getPasswordEncryptions();
+	const char	*pwdencs=cfg.getPasswordEncryptions();
 	if (!charstring::length(pwdencs)) {
 		stderror.printf("password encryption id %s not found\n",
 								pwdencid);

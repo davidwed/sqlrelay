@@ -1849,7 +1849,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	cmdline=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdline);
-	sqlrconfig	cfgfile(sqlrpth);
+	sqlrconfig	cfg(sqlrpth);
 
 	const char	*config=cmdline->getValue("-config");
 	const char	*id=cmdline->getValue("-id");
@@ -1872,14 +1872,14 @@ void sqlrsh::execute(int argc, const char **argv) {
 		process::exit(1);
 	}
 
-	if (charstring::length(id) && cfgfile.parse(config,id)) {
+	if (charstring::length(id) && cfg.parse(config,id)) {
 
 		// get the host/port/socket/username/password
 		host="localhost";
-		port=cfgfile.getDefaultPort();
-		socket=cfgfile.getDefaultSocket();
+		port=cfg.getDefaultPort();
+		socket=cfg.getDefaultSocket();
 		linkedlistnode< usercontainer * >	*firstuser=
-					cfgfile.getUserList()->getFirst();
+					cfg.getUserList()->getFirst();
 		if (firstuser) {
 			usercontainer	*currentnode=firstuser->getValue();
 			user=currentnode->getUser();

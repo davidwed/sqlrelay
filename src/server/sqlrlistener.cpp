@@ -31,7 +31,7 @@ volatile sig_atomic_t	sqlrlistener::alarmrang=0;
 sqlrlistener::sqlrlistener() : listener() {
 
 	cmdl=NULL;
-	cfgfl=NULL;
+	cfg=NULL;
 
 	initialized=false;
 
@@ -86,7 +86,7 @@ sqlrlistener::~sqlrlistener() {
 
 	if (!isforkedchild) {
 		for (linkedlistnode< listenercontainer * > *node=
-					cfgfl->getListenerList()->getFirst();
+					cfg->getListenerList()->getFirst();
 					node; node=node->getNext()) {
 			const char	*unixport=node->getValue()->getSocket();
 			if (unixport) {
@@ -103,7 +103,7 @@ sqlrlistener::~sqlrlistener() {
 
 	// remove files that indicate whether the db is up or down
 	linkedlist< connectstringcontainer * >	*csl=
-					cfgfl->getConnectStringList();
+					cfg->getConnectStringList();
 	for (linkedlistnode< connectstringcontainer * > *node=csl->getFirst();
 						node; node=node->getNext()) {
 		connectstringcontainer	*cs=node->getValue();
@@ -120,7 +120,7 @@ sqlrlistener::~sqlrlistener() {
 		delete[] updown;
 	}
 	delete sqlrpth;
-	delete cfgfl;
+	delete cfg;
 	delete cmdl;
 
 	delete shmem;
@@ -186,13 +186,13 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	cmdl=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdl);
-	cfgfl=new sqlrconfig(sqlrpth);
+	cfg=new sqlrconfig(sqlrpth);
 
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");
 	}
 
-	if (!cfgfl->parse(sqlrpth->getConfigFile(),cmdl->getId())) {
+	if (!cfg->parse(sqlrpth->getConfigFile(),cmdl->getId())) {
 		return false;
 	}
 
@@ -208,19 +208,19 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	handleDynamicScaling();
 
-	const char	*loggers=cfgfl->getLoggers();
+	const char	*loggers=cfg->getLoggers();
 	if (charstring::length(loggers)) {
 		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(this,NULL);
 	}
 
-	idleclienttimeout=cfgfl->getIdleClientTimeout();
-	maxquerysize=cfgfl->getMaxQuerySize();
-	maxbindcount=cfgfl->getMaxBindCount();
-	maxbindnamelength=cfgfl->getMaxBindNameLength();
-	maxlisteners=cfgfl->getMaxListeners();
-	listenertimeout=cfgfl->getListenerTimeout();
+	idleclienttimeout=cfg->getIdleClientTimeout();
+	maxquerysize=cfg->getMaxQuerySize();
+	maxbindcount=cfg->getMaxBindCount();
+	maxbindnamelength=cfg->getMaxBindNameLength();
+	maxlisteners=cfg->getMaxListeners();
+	listenertimeout=cfg->getListenerTimeout();
 
 	setHandoffMethod();
 
@@ -269,18 +269,18 @@ void sqlrlistener::setUserAndGroup() {
 
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
-	if (charstring::compare(currentgroup,cfgfl->getRunAsGroup()) &&
-				!process::setGroup(cfgfl->getRunAsGroup())) {
+	if (charstring::compare(currentgroup,cfg->getRunAsGroup()) &&
+				!process::setGroup(cfg->getRunAsGroup())) {
 		stderror.printf("Warning: could not change group to %s\n",
-						cfgfl->getRunAsGroup());
+						cfg->getRunAsGroup());
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
-	if (charstring::compare(currentuser,cfgfl->getRunAsUser()) &&
-				!process::setUser(cfgfl->getRunAsUser())) {
+	if (charstring::compare(currentuser,cfg->getRunAsUser()) &&
+				!process::setUser(cfg->getRunAsUser())) {
 		stderror.printf("Warning: could not change user to %s\n",
-						cfgfl->getRunAsUser());
+						cfg->getRunAsUser());
 	}
 
 	// clean up
@@ -290,18 +290,18 @@ void sqlrlistener::setUserAndGroup() {
 
 bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 
-	if (!cfgfl->getDynamicScaling()) {
+	if (!cfg->getDynamicScaling()) {
 		return true;
 	}
 
-	if (!cfgfl->accessible()) {
+	if (!cfg->accessible()) {
 		stderror.printf("\nsqlr-listener error:\n");
 		stderror.printf("	This instance of SQL Relay is ");
 		stderror.printf("configured to run as:\n");
 		stderror.printf("		user: %s\n",
-						cfgfl->getRunAsUser());
+						cfg->getRunAsUser());
 		stderror.printf("		group: %s\n\n",
-						cfgfl->getRunAsGroup());
+						cfg->getRunAsGroup());
 		stderror.printf("	However, the config file %s\n",
 								configfile);
 		stderror.printf("	cannot be read by that user ");
@@ -310,18 +310,18 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 		stderror.printf("(ie. maxconnections>connections),\n");
 		stderror.printf("	new connections would be started as\n");
 		stderror.printf("		user: %s\n",
-						cfgfl->getRunAsUser());
+						cfg->getRunAsUser());
 		stderror.printf("		group: %s\n\n",
-						cfgfl->getRunAsGroup());
+						cfg->getRunAsGroup());
 		stderror.printf("	They would not be able to read the");
 		stderror.printf("config file and would shut down.\n\n");
 		stderror.printf("	To remedy this problem, make %s\n",
 								configfile);
 		stderror.printf("	readable by\n");
 		stderror.printf("		user: %s\n",
-						cfgfl->getRunAsUser());
+						cfg->getRunAsUser());
 		stderror.printf("		group: %s\n",
-						cfgfl->getRunAsGroup());
+						cfg->getRunAsGroup());
 		return false;
 	}
 	return true;
@@ -358,16 +358,16 @@ bool sqlrlistener::handlePidFile(const char *id) {
 void sqlrlistener::handleDynamicScaling() {
 
 	// get the dynamic connection scaling parameters
-	maxconnections=cfgfl->getMaxConnections();
+	maxconnections=cfg->getMaxConnections();
 
 	// if dynamic scaling isn't going to be used, disable it
-	dynamicscaling=cfgfl->getDynamicScaling();
+	dynamicscaling=cfg->getDynamicScaling();
 }
 
 void sqlrlistener::setSessionHandlerMethod() {
 	
 	usethreads=false;
-	if (!charstring::compare(cfgfl->getSessionHandler(),"thread")) {
+	if (!charstring::compare(cfg->getSessionHandler(),"thread")) {
 
 		if (!thread::supportsThreads()) {
 			stderror.printf("Warning: sessionhandler=\"thread\" "
@@ -396,7 +396,7 @@ void sqlrlistener::setSessionHandlerMethod() {
 
 void sqlrlistener::setHandoffMethod() {
 
-	if (!charstring::compare(cfgfl->getHandoff(),"pass")) {
+	if (!charstring::compare(cfg->getHandoff(),"pass")) {
 
         	// on some OS'es, force proxy, even if pass was specified...
 
@@ -449,8 +449,8 @@ void sqlrlistener::setHandoffMethod() {
 void sqlrlistener::setIpPermissions() {
 
 	// get denied and allowed ip's and compile the expressions
-	const char	*deniedips=cfgfl->getDeniedIps();
-	const char	*allowedips=cfgfl->getAllowedIps();
+	const char	*deniedips=cfg->getDeniedIps();
+	const char	*allowedips=cfg->getAllowedIps();
 	if (deniedips[0]) {
 		denied=new regularexpression(deniedips);
 	}
@@ -566,7 +566,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	}
 
 	// issue warning about ttl if necessary
-	if (cfgfl->getTtl()>0 &&
+	if (cfg->getTtl()>0 &&
 			!semset->supportsTimedSemaphoreOperations() &&
 			!sys::signalsInterruptSystemCalls()) {
 		stderror.printf("Warning: ttl forced to 0...\n"
@@ -640,7 +640,7 @@ void sqlrlistener::semError(const char *id, int semid) {
 bool sqlrlistener::listenOnClientSockets() {
 
 	linkedlist< listenercontainer * >	*listenerlist=
-						cfgfl->getListenerList();
+						cfg->getListenerList();
 
 	// count sockets and build socket arrays
 	clientsockincount=0;
@@ -873,7 +873,7 @@ void sqlrlistener::listen() {
 		int32_t	opendbconnections=shm->open_db_connections;
 
 		if (opendbconnections<
-			static_cast<int32_t>(cfgfl->getConnections())) {
+			static_cast<int32_t>(cfg->getConnections())) {
 			logDebugMessage("waiting for server "
 					"connections (sleeping 1s)");
 			snooze::macrosnooze(1);
@@ -1481,10 +1481,10 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 	// If we don't want to wait for down databases, then check to see if
 	// any of the db's are up.  If none are, then don't even wait for an
 	// available connection, just bail immediately.
-	if (!cfgfl->getWaitForDownDatabase()) {
+	if (!cfg->getWaitForDownDatabase()) {
 		*alldbsdown=true;
 		linkedlist< connectstringcontainer * >	*csl=
-					cfgfl->getConnectStringList();
+					cfg->getConnectStringList();
 		for (linkedlistnode< connectstringcontainer * > *node=
 						csl->getFirst(); node;
 						node=node->getNext()) {

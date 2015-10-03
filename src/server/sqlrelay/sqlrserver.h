@@ -577,7 +577,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		sqlrserverconnection	*conn;
 
 		// config file
-		sqlrconfig		*cfgfl;
+		sqlrconfig		*cfg;
 
 		// statistics
 		shmdata			*shm;

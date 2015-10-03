@@ -84,7 +84,7 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		bool		anymustbegin;
 		uint16_t	concount;
 
-		sqlrconfig	*cfgfile;
+		sqlrconfig	*cfg;
 
 		bool		justloggedin;
 
@@ -258,7 +258,7 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	beginquery=NULL;
 	anymustbegin=false;
 	concount=0;
-	cfgfile=NULL;
+	cfg=NULL;
 	justloggedin=false;
 	nullbindvalue=nullBindValue();
 	nonnullbindvalue=nonNullBindValue();
@@ -285,9 +285,9 @@ void routerconnection::handleConnectString() {
 
 	identity=cont->getConnectStringValue("identity");
 
-	cfgfile=cont->cfgfl;
+	cfg=cont->cfg;
 
-	linkedlist< routecontainer * >	*routelist=cont->cfgfl->getRouteList();
+	linkedlist< routecontainer * >	*routelist=cont->cfg->getRouteList();
 	concount=routelist->getLength();
 
 	cons=new sqlrconnection *[concount];
@@ -587,10 +587,10 @@ routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
 	}
 	beginquery=false;
 
-	obv=new outputbindvar[conn->cont->cfgfl->getMaxBindCount()];
+	obv=new outputbindvar[conn->cont->cfg->getMaxBindCount()];
 	obcount=0;
 
-	cbv=new cursorbindvar[conn->cont->cfgfl->getMaxBindCount()];
+	cbv=new cursorbindvar[conn->cont->cfg->getMaxBindCount()];
 	cbcount=0;
 
 	createoratemp.compile("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
@@ -650,7 +650,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
 	uint16_t	conindex=0;
-	routenode	*rcn=routerconn->cfgfile->getRouteList()->getFirst();
+	routenode	*rcn=routerconn->cfg->getRouteList()->getFirst();
 	bool	found=false;
 	while (rcn && !found) {
 		linkedlistnode< regularexpression * >	*ren=

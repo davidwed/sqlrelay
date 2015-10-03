@@ -118,29 +118,29 @@ bool startConnection(const char *id, const char *connectionid,
 	return true;
 }
 
-bool startConnections(sqlrconfig *cfgfile,
+bool startConnections(sqlrconfig *cfg,
 				const char *id, const char *config,
 				const char *localstatedir, bool strace,
 				bool disablecrashhandler) {
 
 	// get the connection count and total metric
 	linkedlist< connectstringcontainer *>	*connectionlist=
-						cfgfile->getConnectStringList();
+						cfg->getConnectStringList();
 
 	// if the metrictotal was 0, start no connections
-	if (!cfgfile->getMetricTotal()) {
+	if (!cfg->getMetricTotal()) {
 		return true;
 	}
 
 	// if no connections were defined in the config file,
 	// start 1 default one
-	if (!cfgfile->getConnectionCount()) {
+	if (!cfg->getConnectionCount()) {
 		return !startConnection(id,config,localstatedir,NULL,
 						strace,disablecrashhandler);
 	}
 
 	// get number of connections
-	int32_t	connections=cfgfile->getConnections();
+	int32_t	connections=cfg->getConnections();
 
 	// start the connections
 	connectstringnode	*csn=connectionlist->getFirst();
@@ -161,7 +161,7 @@ bool startConnections(sqlrconfig *cfgfile,
 		if (metric>0) {
 			startup=(int32_t)ceil(
 				((double)(metric*connections))/
-				((double)cfgfile->getMetricTotal()));
+				((double)cfg->getMetricTotal()));
 		} else {
 			startup=0;
 		}
@@ -197,12 +197,12 @@ bool startConnections(sqlrconfig *cfgfile,
 	return true;
 }
 
-bool startScaler(sqlrconfig *cfgfile, const char *id,
+bool startScaler(sqlrconfig *cfg, const char *id,
 			const char *config, const char *localstatedir,
 			bool disablecrashhandler) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
-	if (!cfgfile->getDynamicScaling()) {
+	if (!cfg->getDynamicScaling()) {
 		return true;
 	}
 
@@ -252,7 +252,7 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline	cmdl(argc,argv);
 	sqlrpaths	sqlrpth(&cmdl);
-	sqlrconfig	cfgfile(&sqlrpth);
+	sqlrconfig	cfg(&sqlrpth);
 
 	// get the command line args
 	const char	*localstatedir=sqlrpth.getLocalStateDir();
@@ -298,7 +298,7 @@ int main(int argc, const char **argv) {
 	if (id && id[0]) {
 		ids.append(charstring::duplicate(id));
 	} else {
-		cfgfile.getEnabledIds(config,&ids);
+		cfg.getEnabledIds(config,&ids);
 	}
 
 	// start each enabled instance
@@ -311,14 +311,14 @@ int main(int argc, const char **argv) {
 
 		// parse the config file(s) and
 		// start listener, connections and scaler
-		if (!cfgfile.parse(config,thisid) ||
+		if (!cfg.parse(config,thisid) ||
 			!startListener(thisid,
 					config,localstatedir,
 					disablecrashhandler) ||
-			!startConnections(&cfgfile,thisid,
+			!startConnections(&cfg,thisid,
 					config,localstatedir,
 					strace,disablecrashhandler) ||
-			!startScaler(&cfgfile,thisid,
+			!startScaler(&cfg,thisid,
 					config,localstatedir,
 					disablecrashhandler)) {
 			exitstatus=1;

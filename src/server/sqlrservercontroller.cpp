@@ -41,7 +41,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	conn=NULL;
 
 	cmdl=NULL;
-	cfgfl=NULL;
+	cfg=NULL;
 	semset=NULL;
 	shmem=NULL;
 	connstats=NULL;
@@ -162,7 +162,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	}
 
 	delete cmdl;
-	delete cfgfl;
+	delete cfg;
 
 	delete[] updown;
 
@@ -261,22 +261,22 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	silent=cmdl->found("-silent");
 
 	// parse the config file
-	cfgfl=new sqlrconfig(sqlrpth);
-	if (!cfgfl->parse(sqlrpth->getConfigFile(),cmdl->getId())) {
+	cfg=new sqlrconfig(sqlrpth);
+	if (!cfg->parse(sqlrpth->getConfigFile(),cmdl->getId())) {
 		return false;
 	}
 
 	// update various configurable parameters
-	maxquerysize=cfgfl->getMaxQuerySize();
-	maxbindcount=cfgfl->getMaxBindCount();
-	maxerrorlength=cfgfl->getMaxErrorLength();
-	idleclienttimeout=cfgfl->getIdleClientTimeout();
-	reformatdatetimes=(cfgfl->getDateTimeFormat() ||
-				cfgfl->getDateFormat() ||
-				cfgfl->getTimeFormat());
+	maxquerysize=cfg->getMaxQuerySize();
+	maxbindcount=cfg->getMaxBindCount();
+	maxerrorlength=cfg->getMaxErrorLength();
+	idleclienttimeout=cfg->getIdleClientTimeout();
+	reformatdatetimes=(cfg->getDateTimeFormat() ||
+				cfg->getDateFormat() ||
+				cfg->getTimeFormat());
 
 	// get password encryptions
-	const char	*pwdencs=cfgfl->getPasswordEncryptions();
+	const char	*pwdencs=cfg->getPasswordEncryptions();
 	if (pwdencs && pwdencs[0]) {
 		sqlrpe=new sqlrpwdencs(sqlrpth);
 		sqlrpe->loadPasswordEncryptions(pwdencs);
@@ -284,7 +284,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// initialize authentication
 	initLocalAuthentication();
-	const char	*auths=cfgfl->getAuthentications();
+	const char	*auths=cfg->getAuthentications();
 	if (auths && auths[0]) {
 		sqlra=new sqlrauths(sqlrpth);
 		sqlra->loadAuthenticators(auths,sqlrpe);
@@ -293,13 +293,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	setUserAndGroup();
 
 	// load database plugin
-	conn=initConnection(cfgfl->getDbase());
+	conn=initConnection(cfg->getDbase());
 	if (!conn) {
 		return false;
 	}
 
 	// get loggers
-	const char	*loggers=cfgfl->getLoggers();
+	const char	*loggers=cfg->getLoggers();
 	if (loggers && loggers[0]) {
 		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
@@ -307,7 +307,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// handle the unix socket directory
-	if (cfgfl->getListenOnUnix()) {
+	if (cfg->getListenOnUnix()) {
 		setUnixSocketDirectory();
 	}
 
@@ -317,7 +317,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// handle the connect string
-	constr=cfgfl->getConnectString(connectionid);
+	constr=cfg->getConnectString(connectionid);
 	if (!constr) {
 		stderror.printf("Error: invalid connectionid \"%s\".\n",
 								connectionid);
@@ -327,7 +327,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	initDatabaseAvailableFileName();
 
-	if (cfgfl->getListenOnUnix() && !getUnixSocket()) {
+	if (cfg->getListenOnUnix() && !getUnixSocket()) {
 		return false;
 	}
 
@@ -339,7 +339,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (conn->mustDetachBeforeLogIn() && !cmdl->found("-nodetach")) {
 		process::detach();
 	}
-	bool	reloginatstart=cfgfl->getReLoginAtStart();
+	bool	reloginatstart=cfg->getReLoginAtStart();
 	if (!reloginatstart) {
 		if (!attemptLogIn(!silent)) {
 			return false;
@@ -356,8 +356,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	initConnStats();
 
 	// get the query translators
-	debugsqlrtranslation=cfgfl->getDebugTranslations();
-	const char	*translations=cfgfl->getTranslations();
+	debugsqlrtranslation=cfg->getDebugTranslations();
+	const char	*translations=cfg->getTranslations();
 	if (translations && translations[0]) {
 		sqlrp=newParser();
 		sqlrt=new sqlrtranslations(sqlrpth,debugsqlrtranslation);
@@ -365,8 +365,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get the query filters
-	debugsqlrfilters=cfgfl->getDebugFilters();
-	const char	*filters=cfgfl->getFilters();
+	debugsqlrfilters=cfg->getDebugFilters();
+	const char	*filters=cfg->getFilters();
 	if (filters && filters[0]) {
 		if (!sqlrp) {
 			sqlrp=newParser();
@@ -377,15 +377,15 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the result set translators
 	const char	*resultsettranslations=
-				cfgfl->getResultSetTranslations();
+				cfg->getResultSetTranslations();
 	if (resultsettranslations && resultsettranslations[0]) {
 		sqlrrst=new sqlrresultsettranslations(sqlrpth);
 		sqlrrst->loadResultSetTranslations(resultsettranslations);
 	}
 
 	// get the triggers
-	debugtriggers=cfgfl->getDebugTriggers();
-	const char	*triggers=cfgfl->getTriggers();
+	debugtriggers=cfg->getDebugTriggers();
+	const char	*triggers=cfg->getTriggers();
 	if (triggers && triggers[0]) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!sqlrp) {
@@ -400,15 +400,15 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get fake input bind variable behavior
 	// (this may have already been set true by the connect string)
-	fakeinputbinds=(fakeinputbinds || cfgfl->getFakeInputBindVariables());
+	fakeinputbinds=(fakeinputbinds || cfg->getFakeInputBindVariables());
 
 	// get translate bind variable behavior
-	translatebinds=cfgfl->getTranslateBindVariables();
-	debugbindtranslation=cfgfl->getDebugBindTranslations();
+	translatebinds=cfg->getTranslateBindVariables();
+	debugbindtranslation=cfg->getDebugBindTranslations();
 
 	// initialize cursors
-	mincursorcount=cfgfl->getCursors();
-	maxcursorcount=cfgfl->getMaxCursors();
+	mincursorcount=cfg->getCursors();
+	maxcursorcount=cfg->getMaxCursors();
 	if (!initCursors(mincursorcount)) {
 		closeCursors(false);
 		logOut();
@@ -427,12 +427,12 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// increment connection counter
-	if (cfgfl->getDynamicScaling()) {
+	if (cfg->getDynamicScaling()) {
 		incrementConnectionCount();
 	}
 
 	// set the transaction isolation level
-	isolationlevel=cfgfl->getIsolationLevel();
+	isolationlevel=cfg->getIsolationLevel();
 	conn->setIsolationLevel(isolationlevel);
 
 	// get the database/schema we're using so
@@ -442,7 +442,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	markDatabaseAvailable();
 
 	// get the custom query handlers
-	const char	*queries=cfgfl->getQueries();
+	const char	*queries=cfg->getQueries();
 	if (queries && queries[0]) {
 		sqlrq=new sqlrqueries(sqlrpth);
 		sqlrq->loadQueries(queries);
@@ -479,18 +479,18 @@ void sqlrservercontroller::setUserAndGroup() {
 
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
-	if (charstring::compare(currentgroup,cfgfl->getRunAsGroup()) &&
-				!process::setGroup(cfgfl->getRunAsGroup())) {
+	if (charstring::compare(currentgroup,cfg->getRunAsGroup()) &&
+				!process::setGroup(cfg->getRunAsGroup())) {
 		stderror.printf("Warning: could not change group to %s\n",
-						cfgfl->getRunAsGroup());
+						cfg->getRunAsGroup());
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
-	if (charstring::compare(currentuser,cfgfl->getRunAsUser()) &&
-				!process::setUser(cfgfl->getRunAsUser())) {
+	if (charstring::compare(currentuser,cfg->getRunAsUser()) &&
+				!process::setUser(cfg->getRunAsUser())) {
 		stderror.printf("Warning: could not change user to %s\n",
-						cfgfl->getRunAsUser());
+						cfg->getRunAsUser());
 	}
 
 	// clean up
@@ -1006,7 +1006,7 @@ bool sqlrservercontroller::openSockets() {
 	logDebugMessage("listening on sockets...");
 
 	// get the next available unix socket and open it
-	if (cfgfl->getListenOnUnix() && unixsocketptr && unixsocketptr[0]) {
+	if (cfg->getListenOnUnix() && unixsocketptr && unixsocketptr[0]) {
 
 		if (!serversockun) {
 			serversockun=new unixsocketserver();
@@ -1038,12 +1038,12 @@ bool sqlrservercontroller::openSockets() {
 	}
 
 	// open the next available inet socket
-	if (cfgfl->getListenOnInet()) {
+	if (cfg->getListenOnInet()) {
 
 		if (!serversockin) {
 			const char * const *addresses=
-					cfgfl->getDefaultAddresses();
-			serversockincount=cfgfl->getDefaultAddressCount();
+					cfg->getDefaultAddresses();
+			serversockincount=cfg->getDefaultAddressCount();
 			serversockin=new inetsocketserver *[serversockincount];
 			bool	failed=false;
 			for (uint64_t index=0;
@@ -1107,7 +1107,7 @@ bool sqlrservercontroller::listen() {
 
 	uint16_t	sessioncount=0;
 
-	int32_t		softttl=cfgfl->getSoftTtl();
+	int32_t		softttl=cfg->getSoftTtl();
 	datetime	startdt;
 	startdt.getSystemDateAndTime();
 
@@ -1173,7 +1173,7 @@ bool sqlrservercontroller::listen() {
 			}
 		}
 
-		if (!loopback && cfgfl->getDynamicScaling()) {
+		if (!loopback && cfg->getDynamicScaling()) {
 
 			decrementConnectedClientCount();
 
@@ -1194,10 +1194,10 @@ bool sqlrservercontroller::listen() {
 
 				// if we've already handled some number of
 				// client sessions...
-				if (ttl>0 && cfgfl->getMaxSessionCount()) {
+				if (ttl>0 && cfg->getMaxSessionCount()) {
 					sessioncount++;
 					if (sessioncount==
-						cfgfl->getMaxSessionCount()) {
+						cfg->getMaxSessionCount()) {
 						return true;
 					}
 				}
@@ -1775,7 +1775,7 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 	}
 
 	// create new cursors
-	uint16_t	expandto=cursorcount+cfgfl->getCursorsGrowBy();
+	uint16_t	expandto=cursorcount+cfg->getCursorsGrowBy();
 	if (expandto>=maxcursorcount) {
 		expandto=maxcursorcount;
 	}
@@ -1806,7 +1806,7 @@ bool sqlrservercontroller::authenticate(const char *userbuffer,
 
 	// authenticate on the approprite tier
 	bool	success=false;
-	if (cfgfl->getAuthOnDatabase() && conn->supportsAuthOnDatabase()) {
+	if (cfg->getAuthOnDatabase() && conn->supportsAuthOnDatabase()) {
 		success=databaseBasedAuth(userbuffer,passwordbuffer);
 	} else {
 		success=connectionBasedAuth(userbuffer,passwordbuffer);
@@ -1838,7 +1838,7 @@ bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
 void sqlrservercontroller::initLocalAuthentication() {
 
 	// get the list of users from the config file
-	linkedlist< usercontainer * >	*userlist=cfgfl->getUserList();
+	linkedlist< usercontainer * >	*userlist=cfg->getUserList();
 	usercount=userlist->getLength();
 
 	// create an array of users and passwords and store the
@@ -1982,7 +1982,7 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 	suspendedsession=true;
 
 	// we can't wait forever for the client to resume, set a timeout
-	accepttimeout=cfgfl->getSessionTimeout();
+	accepttimeout=cfg->getSessionTimeout();
 
 	// abort all cursors that aren't suspended...
 	logDebugMessage("aborting busy cursors...");
@@ -2068,7 +2068,7 @@ bool sqlrservercontroller::rollback() {
 }
 
 bool sqlrservercontroller::selectDatabase(const char *db) {
-	return (cfgfl->getIgnoreSelectDatabase())?true:conn->selectDatabase(db);
+	return (cfg->getIgnoreSelectDatabase())?true:conn->selectDatabase(db);
 }
 
 void sqlrservercontroller::dbHasChanged() {
@@ -3696,13 +3696,13 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 
 	// handle old-school date translation first
 	if (reformatdatetimes) {
-		bool		ddmm=cfgfl->getDateDdMm();
-		bool		yyyyddmm=cfgfl->getDateYyyyDdMm();
-		bool		ignorenondatetime=cfgfl->getIgnoreNonDateTime();
-		const char	*datedelimiters=cfgfl->getDateDelimiters();
-		const char	*datetimeformat=cfgfl->getDateTimeFormat();
-		const char	*dateformat=cfgfl->getDateFormat();
-		const char	*timeformat=cfgfl->getTimeFormat();
+		bool		ddmm=cfg->getDateDdMm();
+		bool		yyyyddmm=cfg->getDateYyyyDdMm();
+		bool		ignorenondatetime=cfg->getIgnoreNonDateTime();
+		const char	*datedelimiters=cfg->getDateDelimiters();
+		const char	*datetimeformat=cfg->getDateTimeFormat();
+		const char	*dateformat=cfg->getDateFormat();
+		const char	*timeformat=cfg->getTimeFormat();
 		// FIXME: use mapColumn() here?
 		reformatDateTimes(cursor,index,
 					field,fieldlength,
@@ -3840,7 +3840,7 @@ void sqlrservercontroller::endSession() {
 	} else if (conn->isTransactional() && needcommitorrollback) {
 
 		// otherwise, commit or rollback as necessary
-		if (cfgfl->getEndOfSessionCommit()) {
+		if (cfg->getEndOfSessionCommit()) {
 			logDebugMessage("committing...");
 			commit();
 			logDebugMessage("done committing...");
@@ -4122,7 +4122,7 @@ void sqlrservercontroller::shutDown() {
 	}
 
 	// decrement the connection counter or signal the scaler to
-	if (decrementonclose && cfgfl->getDynamicScaling() && semset && shmem) {
+	if (decrementonclose && cfg->getDynamicScaling() && semset && shmem) {
 		decrementConnectionCount();
 	}
 
@@ -4152,7 +4152,7 @@ void sqlrservercontroller::shutDown() {
 	// waiting for the child to exit.  On unix-like platforms, we can
 	// handle that with SIGCHLD/waitpid().  On other platforms we can
 	// do it with a semaphore.
-	if (!decrementonclose && cfgfl->getDynamicScaling() &&
+	if (!decrementonclose && cfg->getDynamicScaling() &&
 		semset && shmem && !process::supportsGetChildStateChange()) {
 		semset->signal(11);
 	}
@@ -4930,7 +4930,7 @@ void sqlrservercontroller::incrementReLogInCount() {
 void sqlrservercontroller::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
 	for (linkedlistnode< char * > *node=
-		cfgfl->getSessionStartQueries()->getFirst();
+		cfg->getSessionStartQueries()->getFirst();
 					node; node=node->getNext()) {
 		sessionQuery(node->getValue());
 	}
@@ -4939,7 +4939,7 @@ void sqlrservercontroller::sessionStartQueries() {
 void sqlrservercontroller::sessionEndQueries() {
 	// run a configurable set of queries at the end of each session
 	for (linkedlistnode< char * > *node=
-		cfgfl->getSessionEndQueries()->getFirst();
+		cfg->getSessionEndQueries()->getFirst();
 					node; node=node->getNext()) {
 		sessionQuery(node->getValue());
 	}

@@ -32,7 +32,7 @@ scaler::scaler() {
 	shmem=NULL;
 	shm=0;
 
-	cfgfile=NULL;
+	cfg=NULL;
 	sqlrpth=NULL;
 
 	id=NULL;
@@ -145,17 +145,17 @@ bool scaler::initScaler(int argc, const char **argv) {
 	config=sqlrpth->getConfigFile();
 
 	// parse the config file
-	cfgfile=new sqlrconfig(sqlrpth);
-	if (cfgfile->parse(config,id)) {
+	cfg=new sqlrconfig(sqlrpth);
+	if (cfg->parse(config,id)) {
 
 		// don't even start if we're not using dynamic scaling
-		if (!cfgfile->getDynamicScaling()) {
+		if (!cfg->getDynamicScaling()) {
 			return false;
 		}
 
 		// run as user/group specified in the config file
-		const char	*runasuser=cfgfile->getRunAsUser();
-		const char	*runasgroup=cfgfile->getRunAsGroup();
+		const char	*runasuser=cfg->getRunAsUser();
+		const char	*runasgroup=cfg->getRunAsGroup();
 		if (runasuser[0] && runasgroup[0]) {
 
 			// get the user that we're currently running as
@@ -169,23 +169,23 @@ bool scaler::initScaler(int argc, const char **argv) {
 			// switch groups, but only if we're not currently
 			// running as the group that we should switch to
 			if (charstring::compare(currentgroup,
-						cfgfile->getRunAsGroup()) &&
+						cfg->getRunAsGroup()) &&
 					!process::setGroup(
-						cfgfile->getRunAsGroup())) {
+						cfg->getRunAsGroup())) {
 				stderror.printf("Warning: could not change ");
 				stderror.printf("group to %s\n",
-						cfgfile->getRunAsGroup());
+						cfg->getRunAsGroup());
 			}
 
 			// switch users, but only if we're not currently
 			// running as the user that we should switch to
 			if (charstring::compare(currentuser,
-						cfgfile->getRunAsUser()) &&
+						cfg->getRunAsUser()) &&
 					!process::setUser(
-						cfgfile->getRunAsUser())) {
+						cfg->getRunAsUser())) {
 				stderror.printf("Warning: could not change ");
 				stderror.printf("user to %s\n",
-						cfgfile->getRunAsUser());
+						cfg->getRunAsUser());
 			}
 
 			// clean up
@@ -199,15 +199,15 @@ bool scaler::initScaler(int argc, const char **argv) {
 		// it won't start, the scaler won't start.  However someone
 		// could get crafty and force the sqlr-scaler to start so
 		// we'll do this check just to make sure)
-		if (!cfgfile->accessible()) {
+		if (!cfg->accessible()) {
 			stderror.printf("\nsqlr-scaler error:\n");
 			stderror.printf("	This instance of ");
 			stderror.printf("SQL Relay is ");
 			stderror.printf("configured to run as:\n");
 			stderror.printf("		user: %s\n",
-						cfgfile->getRunAsUser());
+						cfg->getRunAsUser());
 			stderror.printf("		group: %s\n\n",
-						cfgfile->getRunAsGroup());
+						cfg->getRunAsGroup());
 			stderror.printf("	However, the config file %s\n",
 								config);
 			stderror.printf("	cannot be read by that user ");
@@ -218,9 +218,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 			stderror.printf("	new connections would be ");
 			stderror.printf("started as\n");
 			stderror.printf("		user: %s\n",
-						cfgfile->getRunAsUser());
+						cfg->getRunAsUser());
 			stderror.printf("		group: %s\n\n",
-						cfgfile->getRunAsGroup());
+						cfg->getRunAsGroup());
 			stderror.printf("	They would not be able to ");
 			stderror.printf("read the");
 			stderror.printf("config file and would shut down.\n\n");
@@ -228,26 +228,26 @@ bool scaler::initScaler(int argc, const char **argv) {
 			stderror.printf("make %s\n",config);
 			stderror.printf("	readable by\n");
 			stderror.printf("		user: %s\n",
-						cfgfile->getRunAsUser());
+						cfg->getRunAsUser());
 			stderror.printf("		group: %s\n",
-						cfgfile->getRunAsGroup());
+						cfg->getRunAsGroup());
 			return false;
 		}
 
 		// get the dynamic connection scaling parameters
-		maxconnections=cfgfile->getMaxConnections();
-		maxqueuelength=cfgfile->getMaxQueueLength();
-		growby=cfgfile->getGrowBy();
-		ttl=cfgfile->getTtl();
+		maxconnections=cfg->getMaxConnections();
+		maxqueuelength=cfg->getMaxQueueLength();
+		growby=cfg->getGrowBy();
+		ttl=cfg->getTtl();
 
 		// get the database type
-		dbase=cfgfile->getDbase();
+		dbase=cfg->getDbase();
 
 		// get the list of connect strings
-		connectstringlist=cfgfile->getConnectStringList();
+		connectstringlist=cfg->getConnectStringList();
 
 		// add up the connection metrics
-		metrictotal=cfgfile->getMetricTotal();
+		metrictotal=cfg->getMetricTotal();
 	}
 
 	// initialize the shared memory segment filename
@@ -314,7 +314,7 @@ void scaler::cleanUp() {
 
 	delete semset;
 	delete shmem;
-	delete cfgfile;
+	delete cfg;
 
 	delete sqlrpth;
 

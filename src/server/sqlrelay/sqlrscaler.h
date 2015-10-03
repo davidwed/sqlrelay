@@ -45,7 +45,7 @@ class SQLRSERVER_DLLSPEC scaler {
 		const char	*config;
 		const char	*dbase;
 
-		sqlrconfig	*cfgfile;
+		sqlrconfig	*cfg;
 
 		uint32_t	maxconnections;
 		uint32_t	maxqueuelength;
