@@ -32,11 +32,12 @@ scaler::scaler() {
 	shmem=NULL;
 	shm=0;
 
+	sqlrcfgs=NULL;
 	cfg=NULL;
 	sqlrpth=NULL;
 
 	id=NULL;
-	config=NULL;
+	configurl=NULL;
 	dbase=NULL;
 
 	debug=false;
@@ -141,19 +142,20 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// check for debug
 	debug=cmdl->found("-debug");
 
-	// get the config file
-	config=sqlrpth->getConfigFile();
+	// get the config url
+	configurl=sqlrpth->getConfigUrl();
 
-	// parse the config file
-	cfg=new sqlrconfig(sqlrpth);
-	if (cfg->parse(config,id)) {
+	// load the configuration
+	sqlrcfgs=new sqlrconfigs(sqlrpth);
+	cfg=sqlrcfgs->load(configurl,id);
+	if (cfg) {
 
 		// don't even start if we're not using dynamic scaling
 		if (!cfg->getDynamicScaling()) {
 			return false;
 		}
 
-		// run as user/group specified in the config file
+		// run as user/group specified in the configuration
 		const char	*runasuser=cfg->getRunAsUser();
 		const char	*runasgroup=cfg->getRunAsGroup();
 		if (runasuser[0] && runasgroup[0]) {
@@ -193,9 +195,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 			delete[] currentgroup;
 		}
 
-		// make sure user/group can read the config file
+		// make sure user/group can access the configuration
 		// (This shouldn't be necessary because if the user/group
-		// can't read the file, the sqlr-listener won't start and if
+		// can't access the file, the sqlr-listener won't start and if
 		// it won't start, the scaler won't start.  However someone
 		// could get crafty and force the sqlr-scaler to start so
 		// we'll do this check just to make sure)
@@ -208,10 +210,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 						cfg->getRunAsUser());
 			stderror.printf("		group: %s\n\n",
 						cfg->getRunAsGroup());
-			stderror.printf("	However, the config file %s\n",
-								config);
-			stderror.printf("	cannot be read by that user ");
-			stderror.printf("or group.\n\n");
+			stderror.printf("	However, the config url %s\n",
+								configurl);
+			stderror.printf("	cannot be accessed by that ");
+			stderror.printf("user or group.\n\n");
 			stderror.printf("	Since you're using ");
 			stderror.printf("dynamic scaling ");
 			stderror.printf("(ie. maxconnections>connections),\n");
@@ -222,11 +224,11 @@ bool scaler::initScaler(int argc, const char **argv) {
 			stderror.printf("		group: %s\n\n",
 						cfg->getRunAsGroup());
 			stderror.printf("	They would not be able to ");
-			stderror.printf("read the");
-			stderror.printf("config file and would shut down.\n\n");
+			stderror.printf("access the");
+			stderror.printf("config url and would shut down.\n\n");
 			stderror.printf("	To remedy this problem, ");
-			stderror.printf("make %s\n",config);
-			stderror.printf("	readable by\n");
+			stderror.printf("make %s\n",configurl);
+			stderror.printf("	accessible by\n");
 			stderror.printf("		user: %s\n",
 						cfg->getRunAsUser());
 			stderror.printf("		group: %s\n",
@@ -314,7 +316,7 @@ void scaler::cleanUp() {
 
 	delete semset;
 	delete shmem;
-	delete cfg;
+	delete sqlrcfgs;
 
 	delete sqlrpth;
 
@@ -418,9 +420,9 @@ pid_t scaler::openOneConnection() {
 	args[p++]=id;
 	args[p++]="-connectionid";
 	args[p++]=connectionid;
-	if (config && config[0]) {
+	if (configurl && configurl[0]) {
 		args[p++]="-config";
-		args[p++]=config;
+		args[p++]=configurl;
 	}
 	args[p++]="-localstatedir";
 	args[p++]=sqlrpth->getLocalStateDir();

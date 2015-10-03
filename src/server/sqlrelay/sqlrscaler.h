@@ -42,9 +42,10 @@ class SQLRSERVER_DLLSPEC scaler {
 		char		*pidfile;
 
 		const char	*id;
-		const char	*config;
+		const char	*configurl;
 		const char	*dbase;
 
+		sqlrconfigs	*sqlrcfgs;
 		sqlrconfig	*cfg;
 
 		uint32_t	maxconnections;

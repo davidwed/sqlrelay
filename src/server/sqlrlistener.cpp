@@ -31,6 +31,7 @@ volatile sig_atomic_t	sqlrlistener::alarmrang=0;
 sqlrlistener::sqlrlistener() : listener() {
 
 	cmdl=NULL;
+	sqlrcfgs=NULL;
 	cfg=NULL;
 
 	initialized=false;
@@ -120,7 +121,7 @@ sqlrlistener::~sqlrlistener() {
 		delete[] updown;
 	}
 	delete sqlrpth;
-	delete cfg;
+	delete sqlrcfgs;
 	delete cmdl;
 
 	delete shmem;
@@ -186,19 +187,20 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	cmdl=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdl);
-	cfg=new sqlrconfig(sqlrpth);
+	sqlrcfgs=new sqlrconfigs(sqlrpth);
 
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");
 	}
 
-	if (!cfg->parse(sqlrpth->getConfigFile(),cmdl->getId())) {
+	cfg=sqlrcfgs->load(sqlrpth->getConfigUrl(),cmdl->getId());
+	if (!cfg) {
 		return false;
 	}
 
 	setUserAndGroup();
 
-	if (!verifyAccessToConfigFile(sqlrpth->getConfigFile())) {
+	if (!verifyAccessToConfigUrl(sqlrpth->getConfigUrl())) {
 		return false;
 	}
 
@@ -288,7 +290,7 @@ void sqlrlistener::setUserAndGroup() {
 	delete[] currentgroup;
 }
 
-bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
+bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 
 	if (!cfg->getDynamicScaling()) {
 		return true;
@@ -302,9 +304,8 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 						cfg->getRunAsUser());
 		stderror.printf("		group: %s\n\n",
 						cfg->getRunAsGroup());
-		stderror.printf("	However, the config file %s\n",
-								configfile);
-		stderror.printf("	cannot be read by that user ");
+		stderror.printf("	However, the config url %s\n",url);
+		stderror.printf("	cannot be accessed by that user ");
 		stderror.printf("or group.\n\n");
 		stderror.printf("	Since you're using dynamic scaling ");
 		stderror.printf("(ie. maxconnections>connections),\n");
@@ -313,11 +314,10 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 						cfg->getRunAsUser());
 		stderror.printf("		group: %s\n\n",
 						cfg->getRunAsGroup());
-		stderror.printf("	They would not be able to read the");
-		stderror.printf("config file and would shut down.\n\n");
-		stderror.printf("	To remedy this problem, make %s\n",
-								configfile);
-		stderror.printf("	readable by\n");
+		stderror.printf("	They would not be able to access the");
+		stderror.printf("config url and would shut down.\n\n");
+		stderror.printf("	To remedy this problem, make %s\n",url);
+		stderror.printf("	accessible by\n");
 		stderror.printf("		user: %s\n",
 						cfg->getRunAsUser());
 		stderror.printf("		group: %s\n",

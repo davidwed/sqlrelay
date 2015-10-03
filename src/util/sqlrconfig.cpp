@@ -12,8 +12,7 @@
 #include <defines.h>
 #include <defaults.h>
 
-sqlrconfig::sqlrconfig(sqlrpaths *sqlrpth) : xmlsax() {
-	this->sqlrpth=sqlrpth;
+sqlrconfig::sqlrconfig() : xmlsax() {
 	init();
 }
 
@@ -1884,7 +1883,12 @@ void sqlrconfig::moveRegexList(routecontainer *cur,
 	cur->getRegexList()->clear();
 }
 
-bool sqlrconfig::parse(const char *config, const char *id) {
+bool sqlrconfig::load(const char *url, const char *id) {
+
+	// sanity check
+	if (!url || !url[0] || !id || !id[0]) {
+		return false;
+	}
 
 	// re-init
 	clear();
@@ -1896,49 +1900,55 @@ bool sqlrconfig::parse(const char *config, const char *id) {
 	correctid=false;
 	done=false;
 
-	// attempt to parse the config file
-	if (!config || !config[0]) {
-		config=sqlrpth->getDefaultConfigFile();
-	}
-	parseFile(config);
+	if (charstring::compare(url,"dir:",4)) {
 
-	// attempt to parse files in the config dir
-	directory	d;
-	stringbuffer	fullpath;
-	const char	*slash=(!charstring::compareIgnoringCase(
+		// attempt to parse the config file
+		parseFile(url);
+
+	} else {
+
+		// skip the protocol
+		const char	*dir=
+			(!charstring::compare(url,"dir://",6))?(url+6):(url+4);
+
+		// attempt to parse files in the config dir
+		directory	d;
+		stringbuffer	fullpath;
+		const char	*slash=(!charstring::compareIgnoringCase(
 						sys::getOperatingSystemName(),
 						"Windows"))?"\\":"/";
-	if (!done && d.open(sqlrpth->getDefaultConfigDir())) {
-		for (;;) {
-			char	*filename=d.read();
-			if (!filename) {
-				break;
-			}
-			if (charstring::compare(filename,".") &&
-				charstring::compare(filename,"..")) {
+		if (!done && d.open(dir)) {
+			for (;;) {
+				char	*filename=d.read();
+				if (!filename) {
+					break;
+				}
+				if (charstring::compare(filename,".") &&
+					charstring::compare(filename,"..")) {
 
-				fullpath.clear();
-				fullpath.append(sqlrpth->getDefaultConfigDir());
-				fullpath.append(slash);
-				fullpath.append(filename);
-				delete[] filename;
+					fullpath.clear();
+					fullpath.append(dir);
+					fullpath.append(slash);
+					fullpath.append(filename);
+					delete[] filename;
 
-				parseFile(fullpath.getString());
+					parseFile(fullpath.getString());
+				}
 			}
 		}
-	}
-	d.close();
-
-	// warn the user if the specified instance wasn't found
-	if (!done) {
-		stderror.printf("Couldn't find id %s.\n",id);
+		d.close();
 	}
 
-	return done;
+	return correctid;
 }
 
-void sqlrconfig::getEnabledIds(const char *config,
+void sqlrconfig::getEnabledIds(const char *url,
 					linkedlist< char * > *idlist) {
+
+	// sanity check
+	if (!url || !url[0]) {
+		return;
+	}
 
 	// re-init
 	clear();
@@ -1950,38 +1960,44 @@ void sqlrconfig::getEnabledIds(const char *config,
 	correctid=true;
 	done=false;
 
-	// attempt to parse the config file
-	if (!config || !config[0]) {
-		config=sqlrpth->getDefaultConfigFile();
-	}
-	parseFile(config);
+	if (charstring::compare(url,"dir:",4)) {
 
-	// attempt to parse files in the config dir
-	directory	d;
-	stringbuffer	fullpath;
-	const char	*slash=(!charstring::compareIgnoringCase(
+		// attempt to parse the config file
+		parseFile(url);
+
+	} else {
+
+		// skip the protocol
+		const char	*dir=
+			(!charstring::compare(url,"dir://",6))?(url+6):(url+4);
+
+		// attempt to parse files in the config dir
+		directory	d;
+		stringbuffer	fullpath;
+		const char	*slash=(!charstring::compareIgnoringCase(
 						sys::getOperatingSystemName(),
 						"Windows"))?"\\":"/";
-	if (d.open(sqlrpth->getDefaultConfigDir())) {
-		for (;;) {
-			char	*filename=d.read();
-			if (!filename) {
-				break;
-			}
-			if (charstring::compare(filename,".") &&
-				charstring::compare(filename,"..")) {
+		if (d.open(dir)) {
+			for (;;) {
+				char	*filename=d.read();
+				if (!filename) {
+					break;
+				}
+				if (charstring::compare(filename,".") &&
+					charstring::compare(filename,"..")) {
 
-				fullpath.clear();
-				fullpath.append(sqlrpth->getDefaultConfigDir());
-				fullpath.append(slash);
-				fullpath.append(filename);
-				delete[] filename;
+					fullpath.clear();
+					fullpath.append(dir);
+					fullpath.append(slash);
+					fullpath.append(filename);
+					delete[] filename;
 
-				parseFile(fullpath.getString());
+					parseFile(fullpath.getString());
+				}
 			}
 		}
+		d.close();
 	}
-	d.close();
 }
 
 bool sqlrconfig::accessible() {

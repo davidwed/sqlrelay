@@ -41,6 +41,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	conn=NULL;
 
 	cmdl=NULL;
+	sqlrcfgs=NULL;
 	cfg=NULL;
 	semset=NULL;
 	shmem=NULL;
@@ -162,7 +163,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	}
 
 	delete cmdl;
-	delete cfg;
+	delete sqlrcfgs;
 
 	delete[] updown;
 
@@ -260,9 +261,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	silent=cmdl->found("-silent");
 
-	// parse the config file
-	cfg=new sqlrconfig(sqlrpth);
-	if (!cfg->parse(sqlrpth->getConfigFile(),cmdl->getId())) {
+	// load the configuration
+	sqlrcfgs=new sqlrconfigs(sqlrpth);
+	cfg=sqlrcfgs->load(sqlrpth->getConfigUrl(),cmdl->getId());
+	if (!cfg) {
 		return false;
 	}
 
@@ -1837,12 +1839,12 @@ bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
 
 void sqlrservercontroller::initLocalAuthentication() {
 
-	// get the list of users from the config file
+	// get the list of users from the configuration
 	linkedlist< usercontainer * >	*userlist=cfg->getUserList();
 	usercount=userlist->getLength();
 
 	// create an array of users and passwords and store the
-	// users and passwords from the config file in them
+	// users and passwords from the configuration in them
 	users=new char *[usercount];
 	passwords=new char *[usercount];
 	passwordencryptions=new char *[usercount];
@@ -1883,9 +1885,9 @@ bool sqlrservercontroller::authenticateLocal(const char *user,
 
 				// For one-way encryption, encrypt the password
 				// that was passed in and compare it to the
-				// encrypted password in the config file.
+				// encrypted password in the configuration.
 				// For two-way encryption, decrypt the password
-				// from the config file and compare ot to the
+				// from the configuration and compare ot to the
 				// password that was passed in...
 
 				bool	retval=false;
@@ -1897,14 +1899,14 @@ bool sqlrservercontroller::authenticateLocal(const char *user,
 					pwd=pe->encrypt(password);
 
 					// compare it to the encrypted
-					// password from the config file
+					// password from the configuration
 					retval=!charstring::compare(
 							pwd,passwords[i]);
 
 				} else {
 
 					// decrypt the password
-					// from the config file
+					// from the configuration
 					pwd=pe->decrypt(passwords[i]);
 
 					// compare it to the password

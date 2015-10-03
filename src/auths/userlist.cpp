@@ -30,7 +30,7 @@ userlist::userlist(xmldomnode *parameters,
 	}
 
 	// create an array of users and passwords and store the
-	// users and passwords from the config file in them
+	// users and passwords from the configuration in them
 	// this is faster than running through the xml over and over
 	users=new const char *[usercount];
 	passwords=new const char *[usercount];
@@ -79,9 +79,9 @@ bool userlist::authenticate(sqlrserverconnection *sqlrcon,
 
 				// For one-way encryption, encrypt the password
 				// that was passed in and compare it to the
-				// encrypted password in the config file.
+				// encrypted password in the configuration.
 				// For two-way encryption, decrypt the password
-				// from the config file and compare ot to the
+				// from the configuration and compare to to the
 				// password that was passed in...
 
 				bool	retval=false;
@@ -93,14 +93,14 @@ bool userlist::authenticate(sqlrserverconnection *sqlrcon,
 					pwd=pe->encrypt(password);
 
 					// compare it to the encrypted
-					// password from the config file
+					// password from the configuration
 					retval=!charstring::compare(
 							pwd,passwords[i]);
 
 				} else {
 
 					// decrypt the password
-					// from the config file
+					// from the configuration
 					pwd=pe->decrypt(passwords[i]);
 
 					// compare it to the password

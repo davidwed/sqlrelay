@@ -490,9 +490,9 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);
-	sqlrconfig	cfg(&sqlrpth);
+	sqlrconfigs	sqlrcfgs(&sqlrpth);
 
-	const char	*config=cmdline.getValue("-config");
+	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*id=cmdline.getValue("-id");
 	const char	*host=cmdline.getValue("-host");
 	uint16_t	port=charstring::toInteger(
@@ -519,18 +519,19 @@ int main(int argc, const char **argv) {
 		stdoutput.printf("usage: \n"
 			"  sqlr-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug [filename]] [-verbose]\n"
 			"    or\n"
-			"  sqlr-import [-config configfile] -id id -file file [-commit rowcount] [-debug [filename]] [-verbose]\n");
+			"  sqlr-import [-config config] -id id -file file [-commit rowcount] [-debug [filename]] [-verbose]\n");
 		process::exit(1);
 	}
 
-	if (charstring::length(id) && cfg.parse(config,id)) {
+	sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
+	if (cfg) {
 
 		// get the host/port/socket/username/password
 		host="localhost";
-		port=cfg.getDefaultPort();
-		socket=cfg.getDefaultSocket();
+		port=cfg->getDefaultPort();
+		socket=cfg->getDefaultSocket();
 		linkedlistnode< usercontainer * >	*firstuser=
-					cfg.getUserList()->getFirst();
+					cfg->getUserList()->getFirst();
 		if (firstuser) {
 			usercontainer	*currentnode=firstuser->getValue();
 			user=currentnode->getUser();

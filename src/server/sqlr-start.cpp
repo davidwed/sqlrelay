@@ -17,7 +17,7 @@
 
 bool	iswindows;
 
-bool startListener(const char *id, const char *config,
+bool startListener(const char *id, const char *configurl,
 			const char *localstatedir, bool disablecrashhandler) {
 
 	// start the listener
@@ -36,7 +36,7 @@ bool startListener(const char *id, const char *config,
 	args[i++]="-id";
 	args[i++]=id;
 	args[i++]="-config";
-	args[i++]=config;
+	args[i++]=configurl;
 	if (charstring::length(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
@@ -62,9 +62,12 @@ bool startListener(const char *id, const char *config,
 }
 
 
-bool startConnection(const char *id, const char *connectionid,
-				const char *config, const char *localstatedir,
-				bool strace, bool disablecrashhandler) {
+bool startConnection(const char *id,
+				const char *connectionid,
+				const char *configurl,
+				const char *localstatedir,
+				bool strace,
+				bool disablecrashhandler) {
 
 	// build command to spawn
 	const char	*cmd=NULL;
@@ -90,7 +93,7 @@ bool startConnection(const char *id, const char *connectionid,
 		args[i++]=connectionid;
 	}
 	args[i++]="-config";
-	args[i++]=config;
+	args[i++]=configurl;
 	if (charstring::length(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
@@ -119,8 +122,10 @@ bool startConnection(const char *id, const char *connectionid,
 }
 
 bool startConnections(sqlrconfig *cfg,
-				const char *id, const char *config,
-				const char *localstatedir, bool strace,
+				const char *id,
+				const char *configurl,
+				const char *localstatedir,
+				bool strace,
 				bool disablecrashhandler) {
 
 	// get the connection count and total metric
@@ -132,10 +137,10 @@ bool startConnections(sqlrconfig *cfg,
 		return true;
 	}
 
-	// if no connections were defined in the config file,
+	// if no connections were defined in the configuration,
 	// start 1 default one
 	if (!cfg->getConnectionCount()) {
-		return !startConnection(id,config,localstatedir,NULL,
+		return !startConnection(id,configurl,localstatedir,NULL,
 						strace,disablecrashhandler);
 	}
 
@@ -178,7 +183,7 @@ bool startConnections(sqlrconfig *cfg,
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
 			if (!startConnection(id,csc->getConnectionId(),
-						config,localstatedir,strace,
+						configurl,localstatedir,strace,
 						disablecrashhandler)) {
 				// it's ok if at least 1 connection started up
 				return (totalstarted>0 || i>0);
@@ -197,8 +202,10 @@ bool startConnections(sqlrconfig *cfg,
 	return true;
 }
 
-bool startScaler(sqlrconfig *cfg, const char *id,
-			const char *config, const char *localstatedir,
+bool startScaler(sqlrconfig *cfg,
+			const char *id,
+			const char *configurl,
+			const char *localstatedir,
 			bool disablecrashhandler) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
@@ -221,7 +228,7 @@ bool startScaler(sqlrconfig *cfg, const char *id,
 	args[i++]="-id";
 	args[i++]=id;
 	args[i++]="-config";
-	args[i++]=config;
+	args[i++]=configurl;
 	if (charstring::length(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
@@ -252,13 +259,13 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline	cmdl(argc,argv);
 	sqlrpaths	sqlrpth(&cmdl);
-	sqlrconfig	cfg(&sqlrpth);
+	sqlrconfigs	sqlrcfgs(&sqlrpth);
 
 	// get the command line args
 	const char	*localstatedir=sqlrpth.getLocalStateDir();
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getValue("-id");
-	const char	*config=sqlrpth.getConfigFile();
+	const char	*configurl=sqlrpth.getConfigUrl();
 	bool		disablecrashhandler=
 				cmdl.found("-disable-crash-handler");
 
@@ -298,7 +305,7 @@ int main(int argc, const char **argv) {
 	if (id && id[0]) {
 		ids.append(charstring::duplicate(id));
 	} else {
-		cfg.getEnabledIds(config,&ids);
+		sqlrcfgs.getEnabledIds(configurl,&ids);
 	}
 
 	// start each enabled instance
@@ -309,17 +316,18 @@ int main(int argc, const char **argv) {
 		// get the id
 		char	*thisid=node->getValue();
 
-		// parse the config file(s) and
+		// load the configuration and
 		// start listener, connections and scaler
-		if (!cfg.parse(config,thisid) ||
+		sqlrconfig	*cfg=sqlrcfgs.load(configurl,thisid);
+		if (!cfg ||
 			!startListener(thisid,
-					config,localstatedir,
+					configurl,localstatedir,
 					disablecrashhandler) ||
-			!startConnections(&cfg,thisid,
-					config,localstatedir,
+			!startConnections(cfg,thisid,
+					configurl,localstatedir,
 					strace,disablecrashhandler) ||
-			!startScaler(&cfg,thisid,
-					config,localstatedir,
+			!startScaler(cfg,thisid,
+					configurl,localstatedir,
 					disablecrashhandler)) {
 			exitstatus=1;
 		}

@@ -4,7 +4,7 @@
 	private:
 		void	cleanUp();
 		void	setUserAndGroup();
-		bool	verifyAccessToConfigFile(const char *configfile);
+		bool	verifyAccessToConfigUrl(const char *url);
 		bool	handlePidFile(const char *id);
 		void	handleDynamicScaling();
 		void	setSessionHandlerMethod();
@@ -94,6 +94,7 @@
 
 		sqlrcmdline	*cmdl;
 		sqlrpaths	*sqlrpth;
+		sqlrconfigs	*sqlrcfgs;
 		sqlrconfig	*cfg;
 
 		sqlrloggers	*sqlrlg;

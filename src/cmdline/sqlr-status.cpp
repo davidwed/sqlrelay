@@ -28,13 +28,6 @@ int main(int argc, const char **argv) {
 
 	// parse the command line
 	sqlrcmdline	cmdl(argc,argv);
-	sqlrpaths	sqlrpth(&cmdl);
-	sqlrconfig	cfg(&sqlrpth);
-
-	// parse the config file
-	if (!cfg.parse(sqlrpth.getConfigFile(),cmdl.getId())) {
-		process::exit(0);
-	}
 	
 	// get the id filename and key
 	sqlrpaths	sqlrp(&cmdl);

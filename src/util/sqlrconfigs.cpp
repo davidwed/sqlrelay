@@ -3,7 +3,6 @@
 
 #include <sqlrelay/sqlrutil.h>
 
-#define DEBUG_MESSAGES
 #include <debugprint.h>
 
 #include <config.h>
@@ -16,7 +15,6 @@
 
 sqlrconfigs::sqlrconfigs(sqlrpaths *sqlrpth) {
 	debugFunction();
-	this->sqlrpth=sqlrpth;
 	this->libexecdir=sqlrpth->getLibExecDir();
 	cfg=NULL;
 	dl=NULL;
@@ -28,7 +26,8 @@ sqlrconfigs::~sqlrconfigs() {
 	delete dl;
 }
 
-sqlrconfig *sqlrconfigs::load(const char *urls, const char *id) {
+void sqlrconfigs::getEnabledIds(const char *urls,
+					linkedlist< char * > *idlist) {
 	debugFunction();
 
 	// separate the urls
@@ -37,17 +36,15 @@ sqlrconfig *sqlrconfigs::load(const char *urls, const char *id) {
 	charstring::split(urls,",",true,&url,&urlcount);
 
 	// for each url...
-	for (const char * const *u=url; *u; u++) {
+	for (uint64_t i=0; i<urlcount; i++) {
 
-		// clean up from the previous iteration
-		delete cfg;
-		cfg=NULL;
+		const char	*u=url[i];
 
 		// parse out the protocol
 	 	char	*protocol=NULL;
-		const char	*colon=charstring::findFirst(*u,':');
+		const char	*colon=charstring::findFirst(u,':');
 		if (colon) {
-			protocol=charstring::duplicate(*u,colon-*u);
+			protocol=charstring::duplicate(u,colon-u);
 		}
 
 		// try to load a config plugin for that protocol
@@ -61,10 +58,86 @@ sqlrconfig *sqlrconfigs::load(const char *urls, const char *id) {
 			loadConfig("xml");
 		}
 
-		// parse the configuration for the specified id
-		if (cfg && cfg->parse(*u,id)) {
-			break;
+		// get the enabled ids for the specified url
+		if (cfg) {
+			cfg->getEnabledIds(u,idlist);
 		}
+
+		// clean up
+		delete dl;
+		dl=NULL;
+		delete cfg;
+		cfg=NULL;
+	}
+
+	// clean up
+	for (uint64_t i=0; i<urlcount; i++) {
+		delete[] url[i];
+	}
+	delete[] url;
+}
+
+sqlrconfig *sqlrconfigs::load(const char *urls, const char *id) {
+	debugFunction();
+
+	// sanity check
+	if (!urls || !urls[0] || !id || !id[0]) {
+		return NULL;
+	}
+
+	debugPrintf("urls: %s\n",urls);
+	debugPrintf("id: %s\n",id);
+
+	// separate the urls
+	char		**url;
+	uint64_t	urlcount;
+	charstring::split(urls,",",true,&url,&urlcount);
+
+	// for each url...
+	for (uint64_t i=0; i<urlcount; i++) {
+
+		const char	*u=url[i];
+
+		debugPrintf("    url: %s\n",u);
+
+		// parse out the protocol
+	 	char	*protocol=NULL;
+		const char	*colon=charstring::findFirst(u,':');
+		if (colon) {
+			protocol=charstring::duplicate(u,colon-u);
+		}
+
+		// try to load a config plugin for that protocol
+	 	if (protocol) {
+	 		loadConfig(protocol);
+			delete[] protocol;
+	 	}
+
+		// fall back to the xml plugin if that plugin failed to load
+		if (!cfg) {
+			loadConfig("xml");
+		}
+
+		// load the configuration for the specified id
+		if (cfg) {
+			if (cfg->load(u,id)) {
+				break;
+			} else {
+				delete cfg;
+				cfg=NULL;
+			}
+		}
+	}
+
+	// clean up
+	for (uint64_t i=0; i<urlcount; i++) {
+		delete[] url[i];
+	}
+	delete[] url;
+
+	// warn the user if the specified instance wasn't found
+	if (!cfg) {
+		stderror.printf("Couldn't find id %s.\n",id);
 	}
 
 	return cfg;
@@ -83,9 +156,9 @@ void sqlrconfigs::loadConfig(const char *module) {
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		stdoutput.printf("failed to load config module: %s\n",module);
+		debugPrintf("failed to load config module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		debugPrintf("%s\n",error);
 		delete[] error;
 		delete dl;
 		return;
@@ -94,19 +167,19 @@ void sqlrconfigs::loadConfig(const char *module) {
 	// load the config itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrconfig_")->append(module);
-	sqlrconfig *(*newConfig)(sqlrpaths *)=
-			(sqlrconfig *(*)(sqlrpaths *))
+	sqlrconfig *(*newConfig)()=
+			(sqlrconfig *(*)())
 				dl->getSymbol(functionname.getString());
 	if (!newConfig) {
-		stdoutput.printf("failed to create config: %s\n",module);
+		debugPrintf("failed to create config: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		debugPrintf("%s\n",error);
 		delete[] error;
 		dl->close();
 		delete dl;
 		return;
 	}
-	cfg=(*newConfig)(sqlrpth);
+	cfg=(*newConfig)();
 
 #else
 	sqlrconfig	*cfg;

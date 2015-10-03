@@ -16,10 +16,10 @@ int main(int argc, const char **argv) {
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);
-	sqlrconfig	cfg(&sqlrpth);
+	sqlrconfigs	sqlrcfgs(&sqlrpth);
 
 	// get the command line arguments
-	const char	*config=cmdline.getValue("-config");
+	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*id=cmdline.getValue("-id");
 	const char	*pwdencid=cmdline.getValue("-pwdencid");
 	const char	*password=cmdline.getValue("-password");
@@ -29,21 +29,22 @@ int main(int argc, const char **argv) {
 		!charstring::length(pwdencid) ||
 		!charstring::length(password)) {
 
-		stderror.printf("usage: sqlrpwdenc [-config configfile] "
+		stderror.printf("usage: sqlrpwdenc [-config config] "
 			"-id instance -pwdencid passwordencryptionid "
 			"-password password\n");
 		process::exit(1);
 	}
 
-	// open the config file
-	if (!cfg.parse(config,id)) {
+	// load the configuration
+	sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
+	if (!cfg) {
 		stderror.printf("SQL Relay instance %s not found in %s\n",
-								id,config);
+								id,configurl);
 		process::exit(1);
 	}
 
 	// initialize the password encryption framework
-	const char	*pwdencs=cfg.getPasswordEncryptions();
+	const char	*pwdencs=cfg->getPasswordEncryptions();
 	if (!charstring::length(pwdencs)) {
 		stderror.printf("password encryption id %s not found\n",
 								pwdencid);

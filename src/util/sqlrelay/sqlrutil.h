@@ -38,7 +38,8 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 		const char	*getCacheDir();
 		const char	*getDefaultConfigFile();
 		const char	*getDefaultConfigDir();
-		const char	*getConfigFile();
+		const char	*getDefaultConfigUrl();
+		const char	*getConfigUrl();
 		const char	*getLibExecDir();
 	protected:
 		char		*localstatedir;
@@ -53,7 +54,8 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 		char		*cachedir;
 		char		*defaultconfigfile;
 		char		*defaultconfigdir;
-		const char	*configfile;
+		char		*defaultconfigurl;
+		const char	*configurl;
 		char		*libexecdir;
 };
 
@@ -166,11 +168,11 @@ typedef linkedlistnode< routecontainer * >	routenode;
 
 class SQLRUTIL_DLLSPEC sqlrconfig : public xmlsax {
 	public:
-			sqlrconfig(sqlrpaths *sqlrpth);
+			sqlrconfig();
 			~sqlrconfig();
-		void	getEnabledIds(const char *config,
+		void	getEnabledIds(const char *url,
 					linkedlist< char * > *idlist);
-		bool	parse(const char *config, const char *id);
+		bool	load(const char *url, const char *id);
 		bool	accessible();
 		const char * const	*getDefaultAddresses();
 		uint64_t		getDefaultAddressCount();
@@ -260,8 +262,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig : public xmlsax {
 
 		linkedlist< routecontainer * >	*getRouteList();
 	private:
-		sqlrpaths		*sqlrpth;
-
 		bool			getenabledids;
 		char			*currentid;
 		bool			enabled;
@@ -508,12 +508,13 @@ class SQLRUTIL_DLLSPEC sqlrconfigs {
 	public:
 			sqlrconfigs(sqlrpaths *sqlrpth);
 			~sqlrconfigs();
+		void		getEnabledIds(const char *urls,
+						linkedlist< char * > *idlist);
 		sqlrconfig	*load(const char *urls, const char *id);
 
 	private:
 		void		loadConfig(const char *module);
 
-		sqlrpaths	*sqlrpth;
 		const char	*libexecdir;
 
 		sqlrconfig	*cfg;

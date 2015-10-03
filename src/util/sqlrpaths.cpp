@@ -99,11 +99,15 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	scratch.append(sysconfdir)->append("sqlrelay.conf.d")->append(slash);
 	defaultconfigdir=scratch.detachString();
 
+	scratch.append(defaultconfigfile)->
+			append(",dir://")->append(defaultconfigdir);
+	defaultconfigurl=scratch.detachString();
+
 	const char	*cfg=cmdl->getValue("-config");
 	if (cfg[0]) {
-		configfile=cfg;
+		configurl=cfg;
 	} else {
-		configfile=defaultconfigfile;
+		configurl=defaultconfigurl;
 	}
 
 	delete[] sysconfdir;
@@ -164,8 +168,12 @@ const char *sqlrpaths::getDefaultConfigDir() {
 	return defaultconfigdir;
 }
 
-const char *sqlrpaths::getConfigFile() {
-	return configfile;
+const char *sqlrpaths::getDefaultConfigUrl() {
+	return defaultconfigurl;
+}
+
+const char *sqlrpaths::getConfigUrl() {
+	return configurl;
 }
 
 const char *sqlrpaths::getLibExecDir() {

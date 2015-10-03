@@ -1849,9 +1849,9 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	cmdline=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdline);
-	sqlrconfig	cfg(sqlrpth);
+	sqlrconfigs	sqlrcfgs(sqlrpth);
 
-	const char	*config=cmdline->getValue("-config");
+	const char	*configurl=sqlrpth->getConfigUrl();
 	const char	*id=cmdline->getValue("-id");
 	const char	*host=cmdline->getValue("-host");
 	uint16_t	port=charstring::toInteger(
@@ -1868,18 +1868,19 @@ void sqlrsh::execute(int argc, const char **argv) {
 		charstring::length(socket))) {
 
 		stdoutput.printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
-			"  or   sqlrsh [-config configfile] -id id [-script script | -command command]\n");
+			"  or   sqlrsh [-config config] -id id [-script script | -command command]\n");
 		process::exit(1);
 	}
 
-	if (charstring::length(id) && cfg.parse(config,id)) {
+	sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
+	if (cfg) {
 
 		// get the host/port/socket/username/password
 		host="localhost";
-		port=cfg.getDefaultPort();
-		socket=cfg.getDefaultSocket();
+		port=cfg->getDefaultPort();
+		socket=cfg->getDefaultSocket();
 		linkedlistnode< usercontainer * >	*firstuser=
-					cfg.getUserList()->getFirst();
+					cfg->getUserList()->getFirst();
 		if (firstuser) {
 			usercontainer	*currentnode=firstuser->getValue();
 			user=currentnode->getUser();

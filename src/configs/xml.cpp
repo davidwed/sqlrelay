@@ -6,7 +6,7 @@
 // FIXME: just a stub... implement this for real
 
 extern "C" {
-	SQLRUTIL_DLLSPEC sqlrconfig *new_sqlrconfig_xml(sqlrpaths *sqlrpth) {
-		return new sqlrconfig(sqlrpth);
+	SQLRUTIL_DLLSPEC sqlrconfig *new_sqlrconfig_xml() {
+		return new sqlrconfig();
 	}
 }
