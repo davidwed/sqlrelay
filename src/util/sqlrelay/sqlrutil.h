@@ -60,7 +60,6 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 };
 
 class SQLRUTIL_DLLSPEC listenercontainer {
-	friend class sqlrconfig;
 	public:
 				listenercontainer();
 				~listenercontainer();
@@ -86,7 +85,6 @@ class SQLRUTIL_DLLSPEC listenercontainer {
 typedef linkedlistnode< listenercontainer * >	listenernode;
 
 class SQLRUTIL_DLLSPEC usercontainer {
-	friend class sqlrconfig;
 	public:
 				usercontainer();
 				~usercontainer();
@@ -135,7 +133,6 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
 
 class SQLRUTIL_DLLSPEC routecontainer {
-	friend class sqlrconfig;
 	public:
 			routecontainer();
 			~routecontainer();
@@ -166,342 +163,103 @@ class SQLRUTIL_DLLSPEC routecontainer {
 
 typedef linkedlistnode< routecontainer * >	routenode;
 
-class SQLRUTIL_DLLSPEC sqlrconfig : public xmlsax {
+class SQLRUTIL_DLLSPEC sqlrconfig {
 	public:
 			sqlrconfig();
-			~sqlrconfig();
-		void	getEnabledIds(const char *url,
-					linkedlist< char * > *idlist);
-		bool	load(const char *url, const char *id);
-		bool	accessible();
-		const char * const	*getDefaultAddresses();
-		uint64_t		getDefaultAddressCount();
-		uint16_t		getDefaultPort();
-		const char		*getDefaultSocket();
-		bool		getListenOnInet();
-		bool		getListenOnUnix();
-		const char	*getDbase();
-		uint32_t	getConnections();
-		uint32_t	getMaxConnections();
-		uint32_t	getMaxQueueLength();
-		uint32_t	getGrowBy();
-		int32_t		getTtl();
-		int32_t		getSoftTtl();
-		uint16_t	getMaxSessionCount();
-		bool		getDynamicScaling();
-		const char	*getEndOfSession();
-		bool		getEndOfSessionCommit();
-		uint32_t	getSessionTimeout();
-		const char	*getRunAsUser();
-		const char	*getRunAsGroup();
-		uint16_t	getCursors();
-		uint16_t	getMaxCursors();
-		uint16_t	getCursorsGrowBy();
-		const char	*getAuthTier();
-		bool		getAuthOnConnection();
-		bool		getAuthOnDatabase();
-		const char	*getSessionHandler();
-		const char	*getHandoff();
-		const char	*getAllowedIps();
-		const char	*getDeniedIps();
-		const char	*getDebug();
-		bool		getDebugTranslations();
-		bool		getDebugFilters();
-		bool		getDebugTriggers();
-		bool		getDebugBindTranslations();
-		uint64_t	getMaxClientInfoLength();
-		uint32_t	getMaxQuerySize();
-		uint16_t	getMaxBindCount();
-		uint16_t	getMaxBindNameLength();
-		uint32_t	getMaxStringBindValueLength();
-		uint32_t	getMaxLobBindValueLength();
-		uint32_t	getMaxErrorLength();
-		int32_t		getIdleClientTimeout();
-		int64_t		getMaxListeners();
-		uint32_t	getListenerTimeout();
-		bool		getReLoginAtStart();
-		bool		getFakeInputBindVariables();
-		bool		getTranslateBindVariables();
-		const char	*getIsolationLevel();
-		bool		getIgnoreSelectDatabase();
-		bool		getWaitForDownDatabase();
-		const char	*getDateTimeFormat();
-		const char	*getDateFormat();
-		const char	*getTimeFormat();
-		bool		getDateDdMm();
-		bool		getDateYyyyDdMm();
-		const char	*getDateDelimiters();
-		bool		getIgnoreNonDateTime();
+		virtual ~sqlrconfig();
 
-		linkedlist< char *>	*getSessionStartQueries();
-		linkedlist< char *>	*getSessionEndQueries();
+		virtual void	getEnabledIds(const char *url,
+					linkedlist< char * > *idlist)=0;
+		virtual bool	load(const char *url, const char *id)=0;
+		virtual bool	accessible()=0;
 
-		const char	*getTranslations();
+		virtual const char * const	*getDefaultAddresses()=0;
+		virtual uint64_t		getDefaultAddressCount()=0;
+		virtual uint16_t		getDefaultPort()=0;
+		virtual const char		*getDefaultSocket()=0;
 
-		const char	*getFilters();
+		virtual bool		getListenOnInet()=0;
+		virtual bool		getListenOnUnix()=0;
+		virtual const char	*getDbase()=0;
+		virtual uint32_t	getConnections()=0;
+		virtual uint32_t	getMaxConnections()=0;
+		virtual uint32_t	getMaxQueueLength()=0;
+		virtual uint32_t	getGrowBy()=0;
+		virtual int32_t		getTtl()=0;
+		virtual int32_t		getSoftTtl()=0;
+		virtual uint16_t	getMaxSessionCount()=0;
+		virtual bool		getDynamicScaling()=0;
+		virtual const char	*getEndOfSession()=0;
+		virtual bool		getEndOfSessionCommit()=0;
+		virtual uint32_t	getSessionTimeout()=0;
+		virtual const char	*getRunAsUser()=0;
+		virtual const char	*getRunAsGroup()=0;
+		virtual uint16_t	getCursors()=0;
+		virtual uint16_t	getMaxCursors()=0;
+		virtual uint16_t	getCursorsGrowBy()=0;
+		virtual const char	*getAuthTier()=0;
+		virtual bool		getAuthOnConnection()=0;
+		virtual bool		getAuthOnDatabase()=0;
+		virtual const char	*getSessionHandler()=0;
+		virtual const char	*getHandoff()=0;
+		virtual const char	*getAllowedIps()=0;
+		virtual const char	*getDeniedIps()=0;
+		virtual const char	*getDebug()=0;
+		virtual bool		getDebugTranslations()=0;
+		virtual bool		getDebugFilters()=0;
+		virtual bool		getDebugTriggers()=0;
+		virtual bool		getDebugBindTranslations()=0;
+		virtual uint64_t	getMaxClientInfoLength()=0;
+		virtual uint32_t	getMaxQuerySize()=0;
+		virtual uint16_t	getMaxBindCount()=0;
+		virtual uint16_t	getMaxBindNameLength()=0;
+		virtual uint32_t	getMaxStringBindValueLength()=0;
+		virtual uint32_t	getMaxLobBindValueLength()=0;
+		virtual uint32_t	getMaxErrorLength()=0;
+		virtual int32_t		getIdleClientTimeout()=0;
+		virtual int64_t		getMaxListeners()=0;
+		virtual uint32_t	getListenerTimeout()=0;
+		virtual bool		getReLoginAtStart()=0;
+		virtual bool		getFakeInputBindVariables()=0;
+		virtual bool		getTranslateBindVariables()=0;
+		virtual const char	*getIsolationLevel()=0;
+		virtual bool		getIgnoreSelectDatabase()=0;
+		virtual bool		getWaitForDownDatabase()=0;
 
-		const char	*getResultSetTranslations();
+		virtual const char	*getDateTimeFormat()=0;
+		virtual const char	*getDateFormat()=0;
+		virtual const char	*getTimeFormat()=0;
+		virtual bool		getDateDdMm()=0;
+		virtual bool		getDateYyyyDdMm()=0;
+		virtual const char	*getDateDelimiters()=0;
+		virtual bool		getIgnoreNonDateTime()=0;
 
-		const char	*getTriggers();
+		virtual linkedlist< char *>	*getSessionStartQueries()=0;
+		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 
-		const char	*getLoggers();
+		virtual const char	*getTranslations()=0;
+		virtual const char	*getFilters()=0;
+		virtual const char	*getResultSetTranslations()=0;
+		virtual const char	*getTriggers()=0;
+		virtual const char	*getLoggers()=0;
+		virtual const char	*getQueries()=0;
+		virtual const char	*getPasswordEncryptions()=0;
+		virtual const char	*getAuthentications()=0;
 
-		const char	*getQueries();
+		virtual linkedlist< listenercontainer * >
+						*getListenerList()=0;
 
-		const char	*getPasswordEncryptions();
+		virtual linkedlist< usercontainer * >
+						*getUserList()=0;
 
-		const char	*getAuthentications();
+		virtual linkedlist< connectstringcontainer * >
+						*getConnectStringList()=0;
+		virtual connectstringcontainer	*getConnectString(
+						const char *connectionid)=0;
+		virtual uint32_t		getConnectionCount()=0;
+		virtual uint32_t		getMetricTotal()=0;
 
-		linkedlist< listenercontainer * >	*getListenerList();
-		linkedlist< usercontainer * >		*getUserList();
-		linkedlist< connectstringcontainer * >	*getConnectStringList();
-		connectstringcontainer	*getConnectString(
-						const char *connectionid);
-		uint32_t		getConnectionCount();
-		uint32_t		getMetricTotal();
-
-		linkedlist< routecontainer * >	*getRouteList();
-	private:
-		bool			getenabledids;
-		char			*currentid;
-		bool			enabled;
-		linkedlist< char * >	*idlist;
-
-		const char	*id;
-		bool		correctid;
-		bool		done;
-
-		void	init();
-		void	clear();
-
-		uint32_t	atouint32_t(const char *value,
-					const char *defaultvalue,
-					uint32_t minvalue);
-		int32_t		atoint32_t(const char *value,
-					const char *defaultvalue,
-					int32_t minvalue);
-
-		bool	tagStart(const char *ns, const char *name);
-		bool	attributeName(const char *name);
-		bool	attributeValue(const char *value);
-		bool	text(const char *string);
-		bool	tagEnd(const char *ns, const char *name);
-
-		routecontainer	*routeAlreadyExists(routecontainer *cur);
-		void		moveRegexList(routecontainer *cur,
-						routecontainer *existing);
-
-		char		**addresses;
-		uint64_t	addresscount;
-		uint16_t	port;
-		char		*unixport;
-		bool		listenoninet;
-		bool		listenonunix;
-		char		*dbase;
-		uint32_t	connections;
-		uint32_t	maxconnections;
-		uint32_t	maxqueuelength;
-		uint32_t	growby;
-		int32_t		ttl;
-		int32_t		softttl;
-		uint16_t	maxsessioncount;
-		char		*endofsession;
-		bool		endofsessioncommit;
-		uint32_t	sessiontimeout;
-		char		*runasuser;
-		char		*runasgroup;
-		uint16_t	cursors;
-		uint16_t	maxcursors;
-		uint16_t	cursorsgrowby;
-		char		*authtier;
-		char		*sessionhandler;
-		char		*handoff;
-		bool		authonconnection;
-		bool		authondatabase;
-		char		*allowedips;
-		char		*deniedips;
-		char		*debug;
-		bool		debugtranslations;
-		bool		debugfilters;
-		bool		debugtriggers;
-		bool		debugbindtranslations;
-		uint64_t	maxclientinfolength;
-		uint32_t	maxquerysize;
-		uint16_t	maxbindcount;
-		uint16_t	maxbindnamelength;
-		uint32_t	maxstringbindvaluelength;
-		uint32_t	maxlobbindvaluelength;
-		uint32_t	maxerrorlength;
-		int32_t		idleclienttimeout;
-		int64_t		maxlisteners;
-		uint32_t	listenertimeout;
-		bool		reloginatstart;
-		bool		fakeinputbindvariables;
-		bool		translatebindvariables;
-		char		*isolationlevel;
-		bool		ignoreselectdb;
-		bool		waitfordowndb;
-		char		*datetimeformat;
-		char		*dateformat;
-		char		*timeformat;
-		bool		dateddmm;
-		bool		dateyyyyddmm;
-		bool		dateyyyyddmmset;
-		char		*datedelimiters;
-		bool		ignorenondatetime;
-
-		bool		instart;
-		bool		inend;
-		linkedlist< char *>	sessionstartqueries;
-		linkedlist< char *>	sessionendqueries;
-
-		stringbuffer	authentications;
-		uint16_t	authenticationsdepth;
-
-		stringbuffer	translations;
-		uint16_t	translationsdepth;
-
-		stringbuffer	filters;
-		uint16_t	filtersdepth;
-
-		stringbuffer	resultsettranslations;
-		uint16_t	resultsettranslationsdepth;
-
-		stringbuffer	triggers;
-		uint16_t	triggersdepth;
-
-		stringbuffer	loggers;
-		uint16_t	loggersdepth;
-
-		stringbuffer	queries;
-		uint16_t	queriesdepth;
-
-		stringbuffer	passwordencryptions;
-		uint16_t	passwordencryptionsdepth;
-
-		listenercontainer	*currentlistener;
-		listenercontainer	*defaultlistener;
-
-		usercontainer		*currentuser;
-
-		connectstringcontainer	*currentconnect;
-		uint32_t		connectioncount;
-		uint32_t		metrictotal;
-
-		routecontainer		*currentroute;
-
-		linkedlist< listenercontainer * >	listenerlist;
-		linkedlist< usercontainer * >		userlist;
-		linkedlist< routecontainer *>		routelist;
-		linkedlist< connectstringcontainer * >	connectstringlist;
-		
-		typedef enum {
-			INSTANCE_TAG,
-			LISTENERS_TAG,
-			LISTENER_TAG,
-			AUTHENTICATIONS_TAG,
-			USERS_TAG,
-			USER_TAG,
-			SESSION_TAG,
-			START_TAG,
-			END_TAG,
-			RUNQUERY_TAG,
-			CONNECTIONS_TAG,
-			CONNECTION_TAG,
-			ROUTER_TAG,
-			ROUTE_TAG,
-			FILTER_TAG,
-			QUERY_TAG,
-	   		TRANSLATIONS_TAG,
-	   		FILTERS_TAG,
-	   		RESULTSETTRANSLATIONS_TAG,
-	   		TRIGGERS_TAG,
-	   		LOGGERS_TAG,
-	   		QUERIES_TAG,
-	   		PASSWORDENCRYPTIONS_TAG
-		} tag;
-		
-		tag currenttag;
-
-		typedef enum {
-			NO_ATTRIBUTE,
-			ID_ATTRIBUTE,
-			AUTHENTICATIONS_ATTRIBUTE,
-			ADDRESSES_ATTRIBUTE,
-			PORT_ATTRIBUTE,
-			SOCKET_ATTRIBUTE,
-			PROTOCOL_ATTRIBUTE,
-			DBASE_ATTRIBUTE,
-			CONNECTIONS_ATTRIBUTE,
-			MAXCONNECTIONS_ATTRIBUTE,
-			MAXQUEUELENGTH_ATTRIBUTE,
-			GROWBY_ATTRIBUTE,
-			TTL_ATTRIBUTE,
-			SOFTTTL_ATTRIBUTE,
-			MAXSESSIONCOUNT_ATTRIBUTE,
-			ENDOFSESSION_ATTRIBUTE,
-			SESSIONTIMEOUT_ATTRIBUTE,
-			RUNASUSER_ATTRIBUTE,
-			RUNASGROUP_ATTRIBUTE,
-			CURSORS_ATTRIBUTE,
-			MAXCURSORS_ATTRIBUTE,
-			CURSORS_GROWBY_ATTRIBUTE,
-			AUTHTIER_ATTRIBUTE,
-			SESSION_HANDLER_ATTRIBUTE,
-			HANDOFF_ATTRIBUTE,
-			DENIEDIPS_ATTRIBUTE,
-			ALLOWEDIPS_ATTRIBUTE,
-			DEBUG_ATTRIBUTE,
-			MAXCLIENTINFOLENGTH_ATTRIBUTE,
-			MAXQUERYSIZE_ATTRIBUTE,
-			MAXBINDCOUNT_ATTRIBUTE,
-			MAXBINDNAMELENGTH_ATTRIBUTE,
-			MAXSTRINGBINDVALUELENGTH_ATTRIBUTE,
-			MAXLOBBINDVALUELENGTH_ATTRIBUTE,
-			MAXERRORLENGTH_ATTRIBUTE,
-			IDLECLIENTTIMEOUT_ATTRIBUTE,
-			USER_ATTRIBUTE,
-			PASSWORD_ATTRIBUTE,
-			PASSWORDENCRYPTIONID_ATTRIBUTE,
-			CONNECTIONID_ATTRIBUTE,
-			STRING_ATTRIBUTE,
-			METRIC_ATTRIBUTE,
-			BEHINDLOADBALANCER_ATTRIBUTE,
-			ROUTER_HOST_ATTRIBUTE,
-			ROUTER_PORT_ATTRIBUTE,
-			ROUTER_SOCKET_ATTRIBUTE,
-			ROUTER_USER_ATTRIBUTE,
-			ROUTER_PASSWORD_ATTRIBUTE,
-			ROUTER_PATTERN_ATTRIBUTE,
-			MAXLISTENERS_ATTRIBUTE,
-			LISTENERTIMEOUT_ATTRIBUTE,
-			RELOGINATSTART_ATTRIBUTE,
-			TIMEQUERIES_ATTRIBUTE,
-			TIMEQUERIESSEC_ATTRIBUTE,
-			TIMEQUERIESUSEC_ATTRIBUTE,
-			FAKEINPUTBINDVARIABLES_ATTRIBUTE,
-			TRANSLATEBINDVARIABLES_ATTRIBUTE,
-			TRANSLATIONS_ATTRIBUTE,
-			FILTERS_ATTRIBUTE,
-			RESULTSETTRANSLATIONS_ATTRIBUTE,
-			TRIGGERS_ATTRIBUTE,
-			LOGGERS_ATTRIBUTE,
-			QUERIES_ATTRIBUTE,
-			PASSWORDENCRYPTIONS_ATTRIBUTE,
-			ISOLATIONLEVEL_ATTRIBUTE,
-			IGNORESELECTDB_ATTRIBUTE,
-			WAITFORDOWNDB_ATTRIBUTE,
-			DATETIMEFORMAT_ATTRIBUTE,
-			DATEFORMAT_ATTRIBUTE,
-			TIMEFORMAT_ATTRIBUTE,
-			DATEDDMM_ATTRIBUTE,
-			DATEYYYYDDMM_ATTRIBUTE,
-			DATEDELIMITERS_ATTRIBUTE,
-			IGNORENONDATETIME_ATTRIBUTE,
-			ENABLED_ATTRIBUTE,
-		} attribute;
-
-		attribute	currentattribute;
+		virtual linkedlist< routecontainer * >	*getRouteList()=0;
 };
 
 class SQLRUTIL_DLLSPEC sqlrconfigs {
@@ -511,12 +269,10 @@ class SQLRUTIL_DLLSPEC sqlrconfigs {
 		void		getEnabledIds(const char *urls,
 						linkedlist< char * > *idlist);
 		sqlrconfig	*load(const char *urls, const char *id);
-
 	private:
 		void		loadConfig(const char *module);
 
 		const char	*libexecdir;
-
 		sqlrconfig	*cfg;
 		dynamiclib	*dl;
 };
