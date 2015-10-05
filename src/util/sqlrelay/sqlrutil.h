@@ -180,7 +180,9 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual bool		getListenOnInet()=0;
 		virtual bool		getListenOnUnix()=0;
+
 		virtual const char	*getDbase()=0;
+
 		virtual uint32_t	getConnections()=0;
 		virtual uint32_t	getMaxConnections()=0;
 		virtual uint32_t	getMaxQueueLength()=0;
@@ -189,26 +191,35 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual int32_t		getSoftTtl()=0;
 		virtual uint16_t	getMaxSessionCount()=0;
 		virtual bool		getDynamicScaling()=0;
+
 		virtual const char	*getEndOfSession()=0;
 		virtual bool		getEndOfSessionCommit()=0;
 		virtual uint32_t	getSessionTimeout()=0;
+
 		virtual const char	*getRunAsUser()=0;
 		virtual const char	*getRunAsGroup()=0;
+
 		virtual uint16_t	getCursors()=0;
 		virtual uint16_t	getMaxCursors()=0;
 		virtual uint16_t	getCursorsGrowBy()=0;
+
 		virtual const char	*getAuthTier()=0;
 		virtual bool		getAuthOnConnection()=0;
 		virtual bool		getAuthOnDatabase()=0;
+
 		virtual const char	*getSessionHandler()=0;
+
 		virtual const char	*getHandoff()=0;
+
 		virtual const char	*getAllowedIps()=0;
 		virtual const char	*getDeniedIps()=0;
+
 		virtual const char	*getDebug()=0;
 		virtual bool		getDebugTranslations()=0;
 		virtual bool		getDebugFilters()=0;
 		virtual bool		getDebugTriggers()=0;
 		virtual bool		getDebugBindTranslations()=0;
+
 		virtual uint64_t	getMaxClientInfoLength()=0;
 		virtual uint32_t	getMaxQuerySize()=0;
 		virtual uint16_t	getMaxBindCount()=0;
@@ -216,14 +227,21 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual uint32_t	getMaxStringBindValueLength()=0;
 		virtual uint32_t	getMaxLobBindValueLength()=0;
 		virtual uint32_t	getMaxErrorLength()=0;
+
 		virtual int32_t		getIdleClientTimeout()=0;
+
 		virtual int64_t		getMaxListeners()=0;
 		virtual uint32_t	getListenerTimeout()=0;
+
 		virtual bool		getReLoginAtStart()=0;
+
 		virtual bool		getFakeInputBindVariables()=0;
 		virtual bool		getTranslateBindVariables()=0;
+
 		virtual const char	*getIsolationLevel()=0;
+
 		virtual bool		getIgnoreSelectDatabase()=0;
+
 		virtual bool		getWaitForDownDatabase()=0;
 
 		virtual const char	*getDateTimeFormat()=0;

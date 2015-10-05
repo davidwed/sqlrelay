@@ -64,10 +64,10 @@ void sqlrconfigs::getEnabledIds(const char *urls,
 		}
 
 		// clean up
-		delete dl;
-		dl=NULL;
 		delete cfg;
 		cfg=NULL;
+		delete dl;
+		dl=NULL;
 	}
 
 	// clean up
@@ -177,6 +177,7 @@ void sqlrconfigs::loadConfig(const char *module) {
 		delete[] error;
 		dl->close();
 		delete dl;
+		dl=NULL;
 		return;
 	}
 	cfg=(*newConfig)();
