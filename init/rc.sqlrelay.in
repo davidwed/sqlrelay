@@ -20,6 +20,10 @@
 # REQUIRE: NETWORKING
 
 
+# config url (leave empty for default)
+CONFIGURL=
+
+
 # define default message functions
 success() {
     printf success
@@ -158,7 +162,13 @@ start_sqlrelay() {
         printf " sqlrelay"
     fi
 
-    sqlr-start 0<&- 1>&- 2>&-
+    CONFIG=""
+    if ( test -n "$CONFIGURL" )
+    then
+        CONFIG="-config"
+    fi
+
+    sqlr-start $CONFIG $CONFIGURL 0<&- 1>&- 2>&-
     RETVAL=$?
     if ( test "$BSD" != "yes" )
     then
