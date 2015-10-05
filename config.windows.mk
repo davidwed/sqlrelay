@@ -344,6 +344,7 @@ SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_bu
 # plugins
 PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
 PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
+CONFIGPLUGINLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) /I$(top_builddir)\src\api\c++
 SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib
@@ -433,9 +434,9 @@ PYTHONSUFFIX = pyd
 INSTALLSUBDIRS = install-src install-bin install-etc install-doc install-license
 UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-doc uninstall-license
 
-SRCALLSUBDIRS = all-util all-api all-server all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
+SRCALLSUBDIRS = all-util all-api all-server all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
 
-SRCINSTALLSUBDIRS = install-util install-api install-server install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-server install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
 
 
 APIALLSUBDIRS = @APIALLSUBDIRS@
