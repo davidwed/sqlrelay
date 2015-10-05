@@ -342,7 +342,7 @@ SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_bu
 
 
 # plugins
-PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
+PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS /D LIBSQLRUTIL_EXPORTS
 PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
 CONFIGPLUGINLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
 
