@@ -535,8 +535,6 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 
 #else
 	sqlrserverconnection	*conn;
-	stringbuffer		connectionname;
-	connectionname.append(dbase)->append("connection");
 	#include "sqlrserverconnectionassignments.cpp"
 	{
 		conn=NULL;

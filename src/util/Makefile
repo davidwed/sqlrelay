@@ -5,7 +5,8 @@ include ../../config.mk
 SRCS = sqlrcmdline.cpp \
 	sqlrpaths.cpp \
 	sqlrconfig.cpp \
-	sqlrconfigs.cpp
+	sqlrconfigs.cpp \
+	$(STATICUTILPLUGINSRCS)
 
 LOBJS = sqlrcmdline.$(OBJ) \
 	sqlrpaths.$(OBJ) \
@@ -20,14 +21,30 @@ LOBJS = sqlrcmdline.$(OBJ) \
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(UTILCPPFLAGS) $(COMPILE) $<
 
-all: libsqlrutil.$(LIBEXT)
+all: $(STATICUTILPLUGINSRCS) libsqlrutil.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest $(STATICUTILPLUGINSRCS)
 	$(RMTREE) .libs
 
 libsqlrutil.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(UTILLIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(STATICUTILPLUGINLOBJS) $(LDFLAGS) $(LINKFLAGS) $(UTILLIBS)
+
+sqlrconfigdeclarations.cpp: sqlrconfigdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../configs/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrconfigassignments.cpp: sqlrconfigassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../configs/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay

@@ -476,10 +476,12 @@ ROUTERUSERPATH =
 
 
 # util
-ifeq ($(MINGW32),yes)
-UTILDLLEXPORTS = -DLIBSQLRUTIL_EXPORTS
+ifeq ($(SQLRELAY_ENABLE_SHARED),no)
+STATICUTILPLUGINSRCS = sqlrconfigdeclarations.cpp \
+			sqlrconfigassignments.cpp
+STATICUTILPLUGINLOBJS = $(shell ls ../configs/*.$(OBJ))
 endif
-UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(UTILDLLEXPORTS) $(DIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 UTILLIBS = $(RUDIMENTSLIBS)
 
 
@@ -893,8 +895,8 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 SRCALLSUBDIRS = all-util all-api all-server all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
 SRCINSTALLSUBDIRS = install-util install-api install-server install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
 else
-SRCALLSUBDIRS = all-util all-api all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server all-cmdline
-SRCINSTALLSUBDIRS = install-util install-api install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server install-cmdline
+SRCALLSUBDIRS = all-configs all-util all-api all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server all-cmdline
+SRCINSTALLSUBDIRS = install-configs install-util install-api install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server install-cmdline
 endif
 
 

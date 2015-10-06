@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		cfg=new_sqlrconfig_@module@();
+	} else

@@ -183,7 +183,6 @@ void sqlrconfigs::loadConfig(const char *module) {
 	cfg=(*newConfig)();
 
 #else
-	sqlrconfig	*cfg;
 	#include "sqlrconfigassignments.cpp"
 	{
 		cfg=NULL;
