@@ -1021,7 +1021,8 @@ Sub configureDatabase(dbname, dblowername, disabledb,_
 
 			' if a db prefix was supplied, then just use it
 			DBINCLUDES="/I """ & DBPREFIX & defaultincludes & """"
-			DBLIBS="/LIBDIR:""" & DBPREFIX & defaultlibssubfolder &_
+			DBLIBS="/LIBPATH:""" & DBPREFIX &_
+						 defaultlibssubfolder &_
 						 " " & defaultlibs & """"
 		end if
 	end if
