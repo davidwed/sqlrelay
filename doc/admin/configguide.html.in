@@ -19,6 +19,7 @@
 <li><a href="#sessionqueries">Session-Queries</a></li>
 <li><a href="#instances">Multiple Instances</a></li>
 <li><a href="#files">Multiple Files</a></li>
+<li><a href="#centralized">Centralized Configration</a></li>
 <li><a href="#autostart">Starting Instances Automatically</a></li>
 <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
@@ -331,6 +332,70 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </blockquote>
 
 
+<br><br><a name="centralized"></a>
+<span class="heading2">Centralized Configuration</span><br>
+
+<p>If you run SQL Relay on multiple machines, rather than maintaining configuration files on each machine, you might find it convenient to host the configuration files in a central location.</p>
+
+<p>For example, lets say you have 20 replicated database nodes behind a load balancer, and 5 servers running SQL Relay, providing database access to a large pool of web servers.  In this case, the configuration on each SQL Relay server needs to be identical.  A single configuration file could be maintained on the first SQL Relay server, and a web server could be used to serve it to the other 4.</p>
+
+<p>How would the other 4 load the file over http?  Basically by running sqlr-start something like this:</p>
+
+<blockquote>
+<code>sqlr-start -id oracleexample -config http://sqlrserver1/sqlrconfig/sqlrelay.conf</code>
+</blockquote>
+
+<p>(Assuming the first SQL Relay server is named sqlrserver1 and its webserver has the path /sqlrconfig/sqlrelay.conf aimed at /usr/local/firstworks/etc/sqlrelay.conf)</p>
+
+<p>In addition to the -id option, the sqlr-start program also takes a -config option.  The -config option can be used to specify one or more configuration file and/or configuration directory.  Configuration directories must be local, but configuration files may be either local or remotely accessible over http.</p>
+
+<p>Actually, if the Rudiments library upon which SQL Relay depends was compiled with support for libcurl, then configuration files may also be remotely accessible over other protocols supported by libcurl, such as https, ftp, scp, sftp, smb, etc.</p>
+
+<p>Examples of local files and directories:</p>
+
+<blockquote>
+<code>
+sqlr-start -id oracleexample -config /usr/local/firstworks/etc/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config file:///usr/local/firstworks/etc/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config dir:///usr/local/firstworks/etc/sqlrelay.conf.d<br/>
+</code>
+</blockquote>
+
+<p>Examples of remote files:</p>
+
+<blockquote>
+<code>
+sqlr-start -id oracleexample -config http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config http://user:password@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config https://configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config https://user:password@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config scp://user:password@configserver.mydomain.com/usr/local/firstworks/etc/sqlrelay.conf<br/>
+</code>
+</blockquote>
+
+<p>(The https and scp examples would only work if Rudiments is compiled with support for libcurl.)</p>
+
+<p>The -config option may also specify a comma-separated list of any of the above.  For example:</p>
+
+<blockquote>
+<code>sqlr-start -id oracleexample -config /usr/local/firstworks/etc/sqlrelay.conf,http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf</code>
+</blockquote>
+
+<p>The default value for the -config option is:</p>
+
+<blockquote>
+<code>/usr/local/firstworks/etc/sqlrelay.conf,dir:///usr/local/firstworks/etc/sqlrelay.conf</code>
+</blockquote>
+
+<p>In effect, if not specified, the local file /usr/local/firstworks/etc/sqlrelay.conf will be processed, followed by all of the files found under /usr/local/firstworks/etc/sqlrelay.conf.d</li>
+
+<p>When centralizing configuration files, there are a few security considerations.</p>
+
+<p>The configuration files likely contain database user/passwords as well as user/passwords for accessing SQL Relay.  To mitigate this, access to the files should be restricted to the SQL Relay servers.  The passwords may be encrypted using an encryption module as well.  See <a href="../modules/pwdencs.html">Password Encryption</a> for more information.</p>
+
+<p>It might be tempting to password-protect the files using http basic authentication.  Currently though, if sqlr-start is run with a url that contains a user/password then the user/password will be visible in a process listing.  A provision to mitigate this will be included in a future release.</p>
+
+
 <br><br><a name="autostart"></a>
 <span class="heading2">Starting Instances Automatically</span><br>
 
@@ -369,6 +434,17 @@ sqlrelay=YES
 <blockquote>
 sqlrelay_flags=""
 </blockquote>
+
+<p>Note that if you want SQL Relay to load a configuration from somewhere other than the default location (see <a href="#centralized">Centralized Configuration</a>) then you must edit the init script and set the CONFIGURL paramter (near the top of the file) to the url or list of urls that you want to load.</p>
+
+<p>For example:</p>
+
+<blockquote>
+CONFIGURL="http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf"
+</blockquote>
+
+<p>Note also, that on some platforms, after making a change to a config script, chkconfig must be run again.</p>
+
 
 <br><br><a name="advanced"></a>
 <span class="heading2">Advanced Configuration</span><br>
