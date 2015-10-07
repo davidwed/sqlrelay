@@ -18,6 +18,8 @@
 	implemented a modular configuration framework
 	config files can be loaded over protocols supported by libcurl now
 		or http if rudiments compiled withougt libcurl support
+	updated sqlr-start and sqlr-scaler not to pass the default -config
+		value if sqlr-start wasn't explicitly started with -config
 
 0.63.1 - backported shutdown loop detection
 

@@ -38,6 +38,7 @@ scaler::scaler() {
 
 	id=NULL;
 	configurl=NULL;
+	config=NULL;
 	dbase=NULL;
 
 	debug=false;
@@ -144,6 +145,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// get the config url
 	configurl=sqlrpth->getConfigUrl();
+	config=cmdl->getValue("-config");
 
 	// load the configuration
 	sqlrcfgs=new sqlrconfigs(sqlrpth);
@@ -420,9 +422,9 @@ pid_t scaler::openOneConnection() {
 	args[p++]=id;
 	args[p++]="-connectionid";
 	args[p++]=connectionid;
-	if (configurl && configurl[0]) {
+	if (config && config[0]) {
 		args[p++]="-config";
-		args[p++]=configurl;
+		args[p++]=config;
 	}
 	args[p++]="-localstatedir";
 	args[p++]=sqlrpth->getLocalStateDir();

@@ -17,7 +17,7 @@
 
 bool	iswindows;
 
-bool startListener(const char *id, const char *configurl,
+bool startListener(const char *id, const char *config,
 			const char *localstatedir, bool disablecrashhandler) {
 
 	// start the listener
@@ -35,9 +35,11 @@ bool startListener(const char *id, const char *configurl,
 	args[i++]="sqlr-listener";
 	args[i++]="-id";
 	args[i++]=id;
-	args[i++]="-config";
-	args[i++]=configurl;
-	if (charstring::length(localstatedir)) {
+	if (config && config[0]) {
+		args[i++]="-config";
+		args[i++]=config;
+	}
+	if (localstatedir && localstatedir[0]) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
 	}
@@ -64,7 +66,7 @@ bool startListener(const char *id, const char *configurl,
 
 bool startConnection(const char *id,
 				const char *connectionid,
-				const char *configurl,
+				const char *config,
 				const char *localstatedir,
 				bool strace,
 				bool disablecrashhandler) {
@@ -92,9 +94,11 @@ bool startConnection(const char *id,
 		args[i++]="-connectionid";
 		args[i++]=connectionid;
 	}
-	args[i++]="-config";
-	args[i++]=configurl;
-	if (charstring::length(localstatedir)) {
+	if (config && config[0]) {
+		args[i++]="-config";
+		args[i++]=config;
+	}
+	if (localstatedir && localstatedir[0]) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
 	}
@@ -123,7 +127,7 @@ bool startConnection(const char *id,
 
 bool startConnections(sqlrconfig *cfg,
 				const char *id,
-				const char *configurl,
+				const char *config,
 				const char *localstatedir,
 				bool strace,
 				bool disablecrashhandler) {
@@ -140,7 +144,7 @@ bool startConnections(sqlrconfig *cfg,
 	// if no connections were defined in the configuration,
 	// start 1 default one
 	if (!cfg->getConnectionCount()) {
-		return !startConnection(id,configurl,localstatedir,NULL,
+		return !startConnection(id,config,localstatedir,NULL,
 						strace,disablecrashhandler);
 	}
 
@@ -183,7 +187,7 @@ bool startConnections(sqlrconfig *cfg,
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
 			if (!startConnection(id,csc->getConnectionId(),
-						configurl,localstatedir,strace,
+						config,localstatedir,strace,
 						disablecrashhandler)) {
 				// it's ok if at least 1 connection started up
 				return (totalstarted>0 || i>0);
@@ -204,7 +208,7 @@ bool startConnections(sqlrconfig *cfg,
 
 bool startScaler(sqlrconfig *cfg,
 			const char *id,
-			const char *configurl,
+			const char *config,
 			const char *localstatedir,
 			bool disablecrashhandler) {
 
@@ -227,9 +231,11 @@ bool startScaler(sqlrconfig *cfg,
 	args[i++]="sqlr-scaler";
 	args[i++]="-id";
 	args[i++]=id;
-	args[i++]="-config";
-	args[i++]=configurl;
-	if (charstring::length(localstatedir)) {
+	if (config && config[0]) {
+		args[i++]="-config";
+		args[i++]=config;
+	}
+	if (localstatedir && localstatedir[0]) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
 	}
@@ -266,6 +272,7 @@ int main(int argc, const char **argv) {
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getValue("-id");
 	const char	*configurl=sqlrpth.getConfigUrl();
+	const char	*config=cmdl.getValue("-config");
 	bool		disablecrashhandler=
 				cmdl.found("-disable-crash-handler");
 
@@ -321,13 +328,13 @@ int main(int argc, const char **argv) {
 		sqlrconfig	*cfg=sqlrcfgs.load(configurl,thisid);
 		if (!cfg ||
 			!startListener(thisid,
-					configurl,localstatedir,
+					config,localstatedir,
 					disablecrashhandler) ||
 			!startConnections(cfg,thisid,
-					configurl,localstatedir,
+					config,localstatedir,
 					strace,disablecrashhandler) ||
 			!startScaler(cfg,thisid,
-					configurl,localstatedir,
+					config,localstatedir,
 					disablecrashhandler)) {
 			exitstatus=1;
 		}

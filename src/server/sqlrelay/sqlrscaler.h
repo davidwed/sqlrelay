@@ -43,6 +43,7 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		const char	*id;
 		const char	*configurl;
+		const char	*config;
 		const char	*dbase;
 
 		sqlrconfigs	*sqlrcfgs;
