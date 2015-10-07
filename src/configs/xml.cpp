@@ -2239,8 +2239,14 @@ bool xml::load(const char *url, const char *id) {
 
 	if (charstring::compare(url,"dir:",4)) {
 
-		// attempt to parse the config file
-		parseFile(url);
+		// attempt to parse the config file as xml
+		if (!parseFile(url)) {
+
+			// FIXME:
+			// if the file isn't xml then process
+			// it as a list of urls (some of which
+			// could be dir:// urls)...
+		}
 
 	} else {
 
@@ -2279,8 +2285,7 @@ bool xml::load(const char *url, const char *id) {
 	return correctid;
 }
 
-void xml::getEnabledIds(const char *url,
-					linkedlist< char * > *idlist) {
+void xml::getEnabledIds(const char *url, linkedlist< char * > *idlist) {
 
 	// sanity check
 	if (!url || !url[0]) {
