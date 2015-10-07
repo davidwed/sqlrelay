@@ -7,6 +7,10 @@
 #include <rudiments/environment.h>
 #include <rudiments/directory.h>
 #include <rudiments/sys.h>
+#include <rudiments/filedescriptor.h>
+#include <rudiments/file.h>
+#include <rudiments/url.h>
+#include <rudiments/filesystem.h>
 #include <rudiments/stdio.h>
 
 #include <defines.h>
@@ -17,9 +21,9 @@ class SQLRUTIL_DLLSPEC xml : public sqlrconfig, public xmlsax {
 			xml();
 			~xml();
 
-		void	getEnabledIds(const char *url,
+		void	getEnabledIds(const char *urlname,
 					linkedlist< char * > *idlist);
-		bool	load(const char *url, const char *id);
+		bool	load(const char *urlname, const char *id);
 		bool	accessible();
 
 		const char * const	*getDefaultAddresses();
@@ -113,11 +117,15 @@ class SQLRUTIL_DLLSPEC xml : public sqlrconfig, public xmlsax {
 		linkedlist< char * >	*idlist;
 
 		const char	*id;
-		bool		correctid;
+		bool		foundcorrectid;
 		bool		done;
 
 		void	init();
 		void	clear();
+
+		void	parseUrl(const char *urlname);
+		void	parseDir(const char *dir);
+		void	parseUrlList(const char *urlname);
 
 		uint32_t	atouint32_t(const char *value,
 					const char *defaultvalue,
@@ -363,7 +371,7 @@ void xml::init() {
 	enabled=false;
 	idlist=NULL;
 	id=NULL;
-	correctid=false;
+	foundcorrectid=false;
 	done=false;
 	addresses=NULL;
 	addresscount=0;
@@ -824,7 +832,8 @@ bool xml::tagStart(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
-	if (done || !correctid) {
+	// (unless we're getting enabled ids)
+	if (done || (!foundcorrectid && !getenabledids)) {
 		return true;
 	}
 
@@ -1188,7 +1197,8 @@ bool xml::tagEnd(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
-	if (done || !correctid) {
+	// (unless we're getting enabled ids)
+	if (done || (!foundcorrectid && !getenabledids)) {
 		return true;
 	}
 
@@ -1441,7 +1451,7 @@ bool xml::tagEnd(const char *ns, const char *name) {
 	}
 
 	// we're done if we've found the right instance at this point
-	if (!getenabledids && correctid &&
+	if (!getenabledids && foundcorrectid &&
 			!charstring::compare((char *)name,"instance")) {
 		done=true;
 	}
@@ -1698,7 +1708,8 @@ bool xml::attributeName(const char *name) {
 		break;
 	}
 
-	if (correctid && currentattribute==NO_ATTRIBUTE) {
+	if ((getenabledids || foundcorrectid) &&
+			currentattribute==NO_ATTRIBUTE) {
 		const char *tagname="instance";
 		switch (currenttag) {
 			case INSTANCE_TAG:
@@ -1795,13 +1806,12 @@ bool xml::attributeValue(const char *value) {
 		currentid=charstring::duplicate(value);
 	}
 
-	if (!correctid) {
+	if (!foundcorrectid && !getenabledids) {
 
 		// if we haven't found the correct id yet, check for it
-		if (currentattribute==ID_ATTRIBUTE) {
-			if (value && !charstring::compare(value,id)) {
-				correctid=true;
-			}
+		if (currentattribute==ID_ATTRIBUTE &&
+			value && !charstring::compare(value,id)) {
+			foundcorrectid=true;
 		}
 	
 	} else {
@@ -2220,10 +2230,10 @@ void xml::moveRegexList(routecontainer *cur,
 	cur->getRegexList()->clear();
 }
 
-bool xml::load(const char *url, const char *id) {
+bool xml::load(const char *urlname, const char *id) {
 
 	// sanity check
-	if (!url || !url[0] || !id || !id[0]) {
+	if (!urlname || !urlname[0] || !id || !id[0]) {
 		return false;
 	}
 
@@ -2231,64 +2241,136 @@ bool xml::load(const char *url, const char *id) {
 	clear();
 	init();
 
-	// set some variables
+	// set some stateful variables
 	getenabledids=false;
 	this->id=id;
-	correctid=false;
+	foundcorrectid=false;
 	done=false;
 
-	if (charstring::compare(url,"dir:",4)) {
+	// parse the url
+	parseUrl(urlname);
 
-		// attempt to parse the config file as xml
-		if (!parseFile(url)) {
+	return foundcorrectid;
+}
 
-			// FIXME:
-			// if the file isn't xml then process
-			// it as a list of urls (some of which
-			// could be dir:// urls)...
+
+void xml::parseUrl(const char *urlname) {
+
+	if (!charstring::compare(urlname,"dir:",4)) {
+		parseDir(urlname);
+	} else {
+		if (!parseFile(urlname)) {
+			parseUrlList(urlname);
 		}
+	}
+}
+
+void xml::parseDir(const char *urlname) {
+
+	// skip the protocol
+	const char	*dir=
+		(!charstring::compare(urlname,"dir://",6))?
+					(urlname+6):(urlname+4);
+
+	// attempt to parse files in the config dir
+	directory	d;
+	stringbuffer	fullpath;
+	const char	*slash=(!charstring::compareIgnoringCase(
+					sys::getOperatingSystemName(),
+					"Windows"))?"\\":"/";
+	if (!done && d.open(dir)) {
+		for (;;) {
+			char	*filename=d.read();
+			if (!filename) {
+				break;
+			}
+			if (charstring::compare(filename,".") &&
+				charstring::compare(filename,"..")) {
+
+				fullpath.clear();
+				fullpath.append(dir);
+				fullpath.append(slash);
+				fullpath.append(filename);
+				delete[] filename;
+
+				parseFile(fullpath.getString());
+			}
+		}
+	}
+	d.close();
+}
+
+void xml::parseUrlList(const char *urlname) {
+
+	// process the file "urlname" as a list of urls...
+	filedescriptor	*fd=NULL;
+	file	fl;
+	url	u;
+
+	// bump past file:// protocol identifiers
+	if (!charstring::compare(urlname,"file://")) {
+		urlname+=7;
+	}
+
+	// parse file or url...
+	if (charstring::contains(urlname,"://")) {
+
+		// open the url
+		if (!u.open(urlname,O_RDONLY)) {
+			return;
+		}
+
+		// set fd
+		fd=&u;
 
 	} else {
 
-		// skip the protocol
-		const char	*dir=
-			(!charstring::compare(url,"dir://",6))?(url+6):(url+4);
-
-		// attempt to parse files in the config dir
-		directory	d;
-		stringbuffer	fullpath;
-		const char	*slash=(!charstring::compareIgnoringCase(
-						sys::getOperatingSystemName(),
-						"Windows"))?"\\":"/";
-		if (!done && d.open(dir)) {
-			for (;;) {
-				char	*filename=d.read();
-				if (!filename) {
-					break;
-				}
-				if (charstring::compare(filename,".") &&
-					charstring::compare(filename,"..")) {
-
-					fullpath.clear();
-					fullpath.append(dir);
-					fullpath.append(slash);
-					fullpath.append(filename);
-					delete[] filename;
-
-					parseFile(fullpath.getString());
-				}
-			}
+		// open the file
+		if (!fl.open(urlname,O_RDONLY)) {
+			return;
 		}
-		d.close();
+
+		// optimize
+		filesystem	fs;
+		if (fs.initialize(urlname)) {
+			fl.setReadBufferSize(fs.getOptimumTransferBlockSize());
+		}
+		fl.sequentialAccess(0,fl.getSize());
+		fl.onlyOnce(0,fl.getSize());
+
+		// set fd
+		fd=&fl;
 	}
 
-	return correctid;
+	// read lines from the file
+	char	*line=NULL;
+	while (fd->read(&line,"\n")>0) {
+		
+		// trim whitespace
+		charstring::bothTrim(line,' ');
+		charstring::bothTrim(line,'\r');
+		charstring::bothTrim(line,'\n');
+		charstring::bothTrim(line,'	');
+
+		// parsethe line (skipping blank lines and comments)
+		if (line[0] && line[0]!='#') {
+			parseUrl(line);
+		}
+
+		// clean up
+		delete[] line;
+
+		// break if we found the id we were looking for
+		if (foundcorrectid) {
+			break;
+		}
+	}
 }
 
-void xml::getEnabledIds(const char *url, linkedlist< char * > *idlist) {
+void xml::getEnabledIds(const char *urlname, linkedlist< char * > *idlist) {
 
 	// sanity check
-	if (!url || !url[0]) {
+	if (!urlname || !urlname[0]) {
 		return;
 	}
 
@@ -2299,47 +2381,11 @@ void xml::getEnabledIds(const char *url, linkedlist< char * > *idlist) {
 	// set some variables
 	getenabledids=true;
 	this->idlist=idlist;
-	correctid=true;
+	foundcorrectid=false;
 	done=false;
 
-	if (charstring::compare(url,"dir:",4)) {
-
-		// attempt to parse the config file
-		parseFile(url);
-
-	} else {
-
-		// skip the protocol
-		const char	*dir=
-			(!charstring::compare(url,"dir://",6))?(url+6):(url+4);
-
-		// attempt to parse files in the config dir
-		directory	d;
-		stringbuffer	fullpath;
-		const char	*slash=(!charstring::compareIgnoringCase(
-						sys::getOperatingSystemName(),
-						"Windows"))?"\\":"/";
-		if (d.open(dir)) {
-			for (;;) {
-				char	*filename=d.read();
-				if (!filename) {
-					break;
-				}
-				if (charstring::compare(filename,".") &&
-					charstring::compare(filename,"..")) {
-
-					fullpath.clear();
-					fullpath.append(dir);
-					fullpath.append(slash);
-					fullpath.append(filename);
-					delete[] filename;
-
-					parseFile(fullpath.getString());
-				}
-			}
-		}
-		d.close();
-	}
+	// parse the url
+	parseUrl(urlname);
 }
 
 bool xml::accessible() {
