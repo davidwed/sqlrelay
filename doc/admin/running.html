@@ -28,45 +28,7 @@ sqlr-start [-id ID] [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 
 <p>When run without the -id option, <b>sqlr-start</b> starts <b>sqlr-listener</b>, <b>sqlr-scaler</b> and <b>sqlr-connection</b> daemons as appropriate for each instance in the config file(s) whose enabled parameter is set to "yes".</p>
 
-<p>The optional -config CONFIGFILE argument may be used to specify a config file or set of config files.</p>
-
-<p>CONFIGFILE file may be a local file, a directory containing a set of config files (each of which will be processed) or a remote file accessible via http, or other protocols supported by libcurl, if the Rudiments library upon which SQL Relay depends was compiled with support for libcurl.  On Linux and Unix, Rudiments is generally compiled with support for libcurl.  On Windows, Rudiments is generally not.</p>
-
-<p>Examples include:</p>
-
-<ul>
-<li>/usr/local/firstworks/etc/sqlrelay.conf</li>
-<li>C:\Program Files\firstworks\etc\sqlrelay.conf</li>
-<li>file:///usr/local/firstworks/etc/sqlrelay.conf</li>
-<li>file://C:\Program Files\firstworks\etc\sqlrelay.conf</li>
-<li>dir:///usr/local/firstworks/etc/sqlrelay.conf.d</li>
-<li>dir://C:\Program Files\firstworks\etc\sqlrelay.conf.d</li>
-<li>http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf</li>
-<li>http://user:password@configserver.mydomain.com/sqlrconfig/sqlrelay.conf</li>
-<li>scp://user:password@configserver.mydomain.com/usr/local/firstworks/etc/sqlrelay.conf</li>
-</ul>
-
-<p>CONFIGFILE may also be a comma-separated list of any of the above.  For example:</p>
-
-<ul>
-<li>/usr/local/firstworks/etc/sqlrelay.conf,http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf</li>
-</ul>
-
-<p>If not specified, on Linux and Unix, the default value for the -config option is:</p>
-
-<ul>
-<li>/usr/local/firstworks/etc/sqlrelay.conf,dir:///usr/local/firstworks/etc/sqlrelay.conf</li>
-</ul>
-
-<p>In effect, if not specified, the local file /usr/local/firstworks/etc/sqlrelay.conf will be processed, followed by all of the files found under /usr/local/firstworks/etc/sqlrelay.conf</p>
-
-<p>If not specified, on Windows, the default value for the -config option is:</p>
-
-<ul>
-<li>C:\Program Files\firstworks\etc\sqlrelay.conf,dir://C:\Program Files\firstworks\etc\sqlrelay.conf</li>
-</ul>
-
-<p>In effect, if not specified, the local file C:\Program Files\firstworks\etc\sqlrelay.conf will be processed, followed by all of the files found under C:\Program Files\usr\local\firstworks\etc\sqlrelay.conf</li>
+<p>The optional -config CONFIGFILE argument may be used to specify a config file, directory containing a set of config files, a url that resolves to a config file, or a comma-separated list of any of the above.  See the sections on <a href="configguide.html#files">Multiple Files</a> and <a href="configguide.html#centralized">Centralized Configuration</a> in the SQL Relay Configuration Guide for more info.</p>
 
 <p>If the optional -localstatedir LOCALSTATEDIR argument is used, it is passed to the programs started by <b>sqlr-start</b> as appropriate.</p>
 

@@ -366,14 +366,27 @@ sqlr-start -id oracleexample -config dir:///usr/local/firstworks/etc/sqlrelay.co
 <blockquote>
 <code>
 sqlr-start -id oracleexample -config http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
-sqlr-start -id oracleexample -config http://user:password@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config http://[/usr/local/firstworks/etc/userpwd.txt]@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/><br/>
 sqlr-start -id oracleexample -config https://configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
-sqlr-start -id oracleexample -config https://user:password@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
-sqlr-start -id oracleexample -config scp://user:password@configserver.mydomain.com/usr/local/firstworks/etc/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config https://myuser:mypassword@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config https://[/usr/local/firstworks/etc/userpwd.txt]@configserver.mydomain.com/sqlrconfig/sqlrelay.conf<br/><br/>
+sqlr-start -id oracleexample -config scp://myuser:mypassword@configserver.mydomain.com/usr/local/firstworks/etc/sqlrelay.conf<br/>
+sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/userpwd.txt]@configserver.mydomain.com/usr/local/firstworks/etc/sqlrelay.conf<br/>
 </code>
 </blockquote>
 
 <p>(The https and scp examples would only work if Rudiments is compiled with support for libcurl.)</p>
+
+<p>In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, it should contain a single line, consisting of colon-separated user and password.  For example:</p>
+
+<blockquote>
+<code>myuser:mypassword</code>
+</blockquote>
+
+<p>Password protection is recommended for remotely accessible configuration files as they may contain users and passwords for accessing the database and SQL Relay itself.</p>
+
+<p>Using user-password files is recommended over passing literal users and passwords.  User-password files can be protected with permissions, they prevent the user and password from being stored in the script that starts SQL Relay, and they prevent the user and password from being displayed in a process listing.</p>
 
 <p>The -config option may also specify a comma-separated list of any of the above.  For example:</p>
 
@@ -388,12 +401,6 @@ sqlr-start -id oracleexample -config scp://user:password@configserver.mydomain.c
 </blockquote>
 
 <p>In effect, if not specified, the local file /usr/local/firstworks/etc/sqlrelay.conf will be processed, followed by all of the files found under /usr/local/firstworks/etc/sqlrelay.conf.d</li>
-
-<p>When centralizing configuration files, there are a few security considerations.</p>
-
-<p>The configuration files likely contain database user/passwords as well as user/passwords for accessing SQL Relay.  To mitigate this, access to the files should be restricted to the SQL Relay servers.  The passwords may be encrypted using an encryption module as well.  See <a href="../modules/pwdencs.html">Password Encryption</a> for more information.</p>
-
-<p>It might be tempting to password-protect the files using http basic authentication.  Currently though, if sqlr-start is run with a url that contains a user/password then the user/password will be visible in a process listing.  A provision to mitigate this will be included in a future release.</p>
 
 
 <br><br><a name="autostart"></a>
