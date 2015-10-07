@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrutil.h>
 
+//#define DEBUG_MESSAGES
 #include <debugprint.h>
 
 #include <config.h>

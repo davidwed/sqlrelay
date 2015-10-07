@@ -164,7 +164,7 @@ start_sqlrelay() {
     CONFIG=""
     if ( test -n "$CONFIGURL" )
     then
-        CONFIG="-config \"$CONFIGURL\""
+        CONFIG="-config $CONFIGURL"
     fi
 
     sqlr-start $CONFIG 0<&- 1>&- 2>&-
