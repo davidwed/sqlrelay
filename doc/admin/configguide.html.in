@@ -443,7 +443,7 @@ sqlrelay_flags=""
 CONFIGURL="http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf"
 </blockquote>
 
-<p>Note also, that on some platforms, after making a change to a config script, chkconfig must be run again.</p>
+<p>Note also, that on some platforms, after making a change to a config script, chkconfig must be run again.  On other platforms "systemctl daemon-reload" must be run.</p>
 
 
 <br><br><a name="advanced"></a>
