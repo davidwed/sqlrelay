@@ -30,14 +30,13 @@
 <a name="platforms"></a>
 <span class="heading2">Supported Platforms</span>
 
-<p>All SQL Relay components should build and run on relatively modern versions of Linux, Unix or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Mac OS X, Haiku and Cygwin.</p>
+<p>All SQL Relay components should build and run on relatively modern versions of Linux, Unix or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, and Haiku.</p>
 
 <p>x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC and others.</p>
 
 <p>uClib/Linux-based systems are also supported.</p>
 
-<p>The command line clients and C, C++ and .NET API's should build and run natively on Windows using Visual Studio but the server components do not yet build and run natively on Windows.</p>
-
+<p>All SQL Relay components should build and run on relatively modern versions of x86 or x64 Windows as well.</p>
 
 <a name="prerequisites"></a>
 <span class="heading2">Prerequisites</span>
@@ -52,15 +51,16 @@
 <a target="_blank" href="http://www.python.org">Python</a>,
 <a target="_blank" href="http://www.ruby-lang.org">Ruby</a>,
 <a target="_blank" href="http://tcl.sourceforge.net">TCL</a>,
-<a target="_blank" href="http://java.sun.com">Java</a> or
-<a target="_blank" href="http://www.erlang.org">Erlang</a>.
+<a target="_blank" href="http://java.sun.com">Java</a>,
+<a target="_blank" href="http://www.erlang.org">Erlang</a>, or
+<a target="_blank" href="http://nodejs.org">node.js</a>.  To build the C# API on Linux/Unix, you need to install <a target="_blank" href="http://mono-project.com">Mono</a> as well.
 </p>
 
-<p>Note that the Ruby, TCL and Erlang API's are not supported natively on Windows.</p>
+<p>Note that the Erlang API is not currently supported on Windows.</p>
 
-<p>To build the API's natively on Windows, you need to install Microsoft Visual Studio or Microsoft Visual Studio Express.</p>
+<p>To build SQL Relay on Windows, you need to install Microsoft Visual Studio or Microsoft Visual Studio Express.</p>
 
-<p>To build the database connection daemons, you need to install one or more of
+<p>To build the database connection modules, you need to install one or more of
 <a target="_blank" href="http://www.oracle.com">Oracle</a>,
 <a target="_blank" href="http://web.mysql.com">MySQL</a>, 
 <a target="_blank" href="http://www.postgresql.org">PostgreSQL</a>, 
@@ -76,8 +76,6 @@
 <a target="_blank" href="http://www.microsof.com/sql/default.html">MS SQL Server</a>),
 <a target="_blank" href="http://mdbtools.sourceforge.net">MDB Tools</a> for accessing MS Access Databases.
 </p>
-
-<p>Note that the database connection components are not supported natively under Windows.</p>
 
 
 <br>
@@ -118,7 +116,7 @@ configure<br>
 make
 </b></blockquote>
 
-<p>The configure script takes lots of command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.  It also takes the --prefix option in case you want to install it somewhere other than /usr/local/firstworks.  For example:</p>
+<p>The configure script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.  It also takes the --prefix option in case you want to install it somewhere other than /usr/local/firstworks.  For example:</p>
 
 <blockquote><b>
 configure --prefix=/usr/local
@@ -164,7 +162,7 @@ make uninstall
 
 <p>You can download the most current source distribution of SQL Relay from <a target="_top" href="http://sqlrelay.sourceforge.net">sqlrelay.sourceforge.net</a>.</p>
 
-<p>For a native Windows installation, download the .zip file.</p>
+<p>For a Windows installation, download the .zip file.</p>
 
 
 <a name="winextracting"></a>
@@ -189,9 +187,9 @@ cscript /nologo configure.vbs<br>
 nmake
 </b></blockquote>
 
-<p>Currently, the build scripts assume that correct versions of various languages and databases are all available and intalled in the correct places.  If they are absent then build errors occur.  The configure.vbs script creates the file <i>config.mk</i>.  Consult this file for the locations that the build scripts expect the software to be located in.</p>
+<p>The configure.vbs script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.</p>
 
-<p>Though inconvenient, the <i>config.mk</i> file can be modified manually prior to running <b>make</b> to alter paths or exclude support for certain languages or databases.</p>
+<p>Though inconvenient, the <i>config.mk</i> file can also be modified manually prior to running <b>make</b> to alter paths or exclude support for certain languages or databases.</p>
 
 <a name="wininstalling"></a>
 <span class="heading2">Installing SQL Relay</span>
