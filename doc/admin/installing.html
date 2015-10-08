@@ -189,7 +189,7 @@ nmake
 
 <p>The configure.vbs script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.</p>
 
-<p>Though inconvenient, the <i>config.mk</i> file can also be modified manually prior to running <b>make</b> to alter paths or exclude support for certain languages or databases.</p>
+<p>Though inconvenient, the <i>config.mk</i> file can also be modified manually prior to running <b>nmake</b> to alter paths or exclude support for certain languages or databases.</p>
 
 <a name="wininstalling"></a>
 <span class="heading2">Installing SQL Relay</span>
@@ -197,13 +197,13 @@ nmake
 <p>By default, on Windows, most components are installed under C:\Program Files\Firstworks.  You should either create the appropriate directory and give yourself full access permissions or install as Administrator.</p>
 
 <blockquote><b>
-make install
+nmake install
 </b></blockquote>
 
 <p>To uninstall SQL Relay run:</p>
 
 <blockquote><b>
-make uninstall
+nmake uninstall
 </b></blockquote>
 
 <p>To run the programs and scripts that use SQL Relay, it is helpful to add C:\Program Files\Firstworks\bin to your PATH.</p>
