@@ -8,6 +8,7 @@
 <span class="heading1">SQL Relay Configuration Guide</span><br>
 
 <ul>
+<li><a href="#location">Configuration File Location</a></li>
 <li><a href="#minimal">Minimal Configuration</a></li>
 <li><a href="#connections">Database Connections</a></li>
 <li><a href="#cursors">Database Cursors</a></li>
@@ -26,13 +27,40 @@
 <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
+<br><br><a name="location"></a>
+<span class="heading2">Configuration File Location</span><br>
+
+<p>When SQL Relay is first installed, no configuration file exists.  You must create it in the appropriate location.</p>
+
+<p>This location depends on the platform and on how you installed SQL Relay.</p>
+
+<ul>
+<li>Unix and Linux</li>
+<ul>
+<li>Built from source - <b>/usr/local/firstworks/etc/sqlrelay.conf</b></li>
+<ul>
+<li>(however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)</li>
+</ul>
+<li>RPM package - <b>/etc/sqlrelay.conf</b></li>
+<li>FreeBSD package - <b>/usr/local/etc/sqlrelay.conf</b></li>
+<li>NetBSD package - <b>/usr/pkg/etc/sqlrelay.conf</b></li>
+<li>OpenBSD package - <b>/usr/local/etc/sqlrelay.conf</b></li>
+</ul>
+<li>Windows</li>
+<ul>
+<li>Built from source - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf</b></li>
+<li>Windows Installer package - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf</b></li>
+<ul>
+<li>(however, if you specified a different folder during installatoin, then it might be in a different location)
+</ul>
+</ul>
+</ul>
+
 
 <br><br><a name="minimal"></a>
 <span class="heading2">Minimal Configuration</span><br>
 
-<p>The SQL Relay configuration file is usually located at /usr/local/firstworks/etc/sqlrelay.conf</p>
-
-<p>The most minimal configuration would be something like:</p>
+<p>The most minimal SQL Relay configuration would be something like:</p>
 
 <blockquote>
 
@@ -638,13 +666,35 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 
 <p>While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files.</p>
 
-<p>The default the SQL Relay configuration directory is /usr/local/firstworks/etc/sqlrelay.conf.d</p>
+<p>The default the SQL Relay configuration directory depends on the platform and on how you installed SQL Relay.</p>
+
+<ul>
+<li>Unix and Linux</li>
+<ul>
+<li>Built from source - <b>/usr/local/firstworks/etc/sqlrelay.conf.d</b></li>
+<ul>
+<li>(however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)</li>
+</ul>
+<li>RPM package - <b>/etc/sqlrelay.conf.d</b></li>
+<li>FreeBSD package - <b>/usr/local/etc/sqlrelay.conf.d</b></li>
+<li>NetBSD package - <b>/usr/pkg/etc/sqlrelay.conf.d</b></li>
+<li>OpenBSD package - <b>/usr/local/etc/sqlrelay.conf.d</b></li>
+</ul>
+<li>Windows</li>
+<ul>
+<li>Built from source - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf.d</b></li>
+<li>Windows Installer package - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf.d</b></li>
+<ul>
+<li>(however, if you specified a different folder during installatoin, then it might be in a different location)
+</ul>
+</ul>
+</ul>
 
 <p>Additional configuration files may be created under this directory.  These files must follow the same format as the main configuration file.</p>
 
 <p>For example, if you wanted to split up oracle, sap and db2 configurations into 3 separate files, you could create:</p>
 
-<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/oracle.conf</b></p>
+<p><b>.../sqlrelay.conf.d/oracle.conf</b></p>
 
 <blockquote>
 
@@ -668,7 +718,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </font>
 </blockquote>
 
-<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/sap.conf</b></p>
+<p><b>.../sqlrelay.conf.d/sap.conf</b></p>
 
 <blockquote>
 
@@ -692,7 +742,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </font>
 </blockquote>
 
-<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/db2.conf</b></p>
+<p><b>.../sqlrelay.conf.d/db2.conf</b></p>
 
 <blockquote>
 
@@ -832,6 +882,8 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 <p>The urls in these examples all contain literal users and passwords.  User-password files can also be used as described in the section <a href="#remote">Remote Configuration Files</a>.  However, the user-password file must exist at the specified location on the local machine.</p>
 
 <p>As link files can be protected by file permissions, and the urls stored in them aren't exposed anywhere else, such as in a process listing, user-password files are not generally necessary when using link files.</p>
+
+<p>There is no limit to the depth of links.  A link file can reference another link file which references another, which references another, etc.  Too great a depth could lead to slow startup times though, especially when using remote configration files. This is especially significant when using <a href="#dynamicscaling">Dynamic Scaling</a>, as the configuration must be loaded each time a new connection is spawned.  Care should also be taken to avoid loops.</p>
 
 
 <br><br><a name="autostart"></a>
