@@ -18,6 +18,8 @@
 	implemented a modular configuration framework
 	config files can be loaded over protocols supported by libcurl now
 		or http if rudiments compiled withougt libcurl support
+	config files can now be "link files" which just refer to other local
+		config files, local config directories, or remote config files
 	updated sqlr-start and sqlr-scaler not to pass the default -config
 		value if sqlr-start wasn't explicitly started with -config
 
