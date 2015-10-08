@@ -2347,10 +2347,7 @@ void xml::parseUrlList(const char *urlname) {
 	while (fd->read(&line,"\n")>0) {
 		
 		// trim whitespace
-		charstring::bothTrim(line,' ');
-		charstring::bothTrim(line,'\r');
-		charstring::bothTrim(line,'\n');
-		charstring::bothTrim(line,'	');
+		charstring::bothTrim(line);
 
 		// parsethe line (skipping blank lines and comments)
 		if (line[0] && line[0]!='#') {
