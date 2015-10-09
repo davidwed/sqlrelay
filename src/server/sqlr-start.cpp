@@ -35,11 +35,11 @@ bool startListener(const char *id, const char *config,
 	args[i++]="sqlr-listener";
 	args[i++]="-id";
 	args[i++]=id;
-	if (config && config[0]) {
+	if (!charstring::isNullOrEmpty(config)) {
 		args[i++]="-config";
 		args[i++]=config;
 	}
-	if (localstatedir && localstatedir[0]) {
+	if (!charstring::isNullOrEmpty(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
 	}
@@ -94,11 +94,11 @@ bool startConnection(const char *id,
 		args[i++]="-connectionid";
 		args[i++]=connectionid;
 	}
-	if (config && config[0]) {
+	if (!charstring::isNullOrEmpty(config)) {
 		args[i++]="-config";
 		args[i++]=config;
 	}
-	if (localstatedir && localstatedir[0]) {
+	if (!charstring::isNullOrEmpty(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
 	}
@@ -231,11 +231,11 @@ bool startScaler(sqlrconfig *cfg,
 	args[i++]="sqlr-scaler";
 	args[i++]="-id";
 	args[i++]=id;
-	if (config && config[0]) {
+	if (!charstring::isNullOrEmpty(config)) {
 		args[i++]="-config";
 		args[i++]=config;
 	}
-	if (localstatedir && localstatedir[0]) {
+	if (!charstring::isNullOrEmpty(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
 	}
@@ -285,7 +285,7 @@ int main(int argc, const char **argv) {
 	AllocConsole();
 	stringbuffer	title;
 	title.append("SQL Relay");
-	if (id && id[0]) {
+	if (!charstring::isNullOrEmpty(id)) {
 		title.append(" - ");
 		title.append(id);
 	}
@@ -309,7 +309,7 @@ int main(int argc, const char **argv) {
 
 	// get the id
 	linkedlist< char * >	ids;
-	if (id && id[0]) {
+	if (!charstring::isNullOrEmpty(id)) {
 		ids.append(charstring::duplicate(id));
 	} else {
 		sqlrcfgs.getEnabledIds(configurl,&ids);

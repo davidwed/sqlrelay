@@ -1206,7 +1206,7 @@ bool xml::tagEnd(const char *ns, const char *name) {
 
 		// if a port or socket was specified in the instance tag then
 		// add a listener node for whatever was in the instance tag
-		if (port || unixport[0]) {
+		if (port || !charstring::isNullOrEmpty(unixport)) {
 			defaultlistener=new listenercontainer();
 			defaultlistener->setAddresses(addresses,addresscount);
 			defaultlistener->setPort(port);
@@ -2233,7 +2233,8 @@ void xml::moveRegexList(routecontainer *cur,
 bool xml::load(const char *urlname, const char *id) {
 
 	// sanity check
-	if (!urlname || !urlname[0] || !id || !id[0]) {
+	if (charstring::isNullOrEmpty(urlname) ||
+			charstring::isNullOrEmpty(id)) {
 		return false;
 	}
 
@@ -2367,7 +2368,7 @@ void xml::parseUrlList(const char *urlname) {
 void xml::getEnabledIds(const char *urlname, linkedlist< char * > *idlist) {
 
 	// sanity check
-	if (!urlname || !urlname[0]) {
+	if (charstring::isNullOrEmpty(urlname)) {
 		return;
 	}
 

@@ -301,7 +301,7 @@ void firebirdconnection::handleConnectString() {
 	// override legacy "database" parameter with modern "db" parameter
 	database=cont->getConnectStringValue("database");
 	const char	*tmp=cont->getConnectStringValue("db");
-	if (tmp && tmp[0]) {
+	if (!charstring::isNullOrEmpty(tmp)) {
 		database=tmp;
 	}
 

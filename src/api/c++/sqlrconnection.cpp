@@ -307,7 +307,7 @@ bool sqlrconnection::openSession() {
 	int	openresult=RESULT_ERROR;
 
 	// first, try for a unix connection
-	if (listenerunixport && listenerunixport[0]) {
+	if (!charstring::isNullOrEmpty(listenerunixport)) {
 
 		if (debug) {
 			debugPreStart();
@@ -514,7 +514,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 	connectioninetport=port;
 
 	// first, try for the unix port
-	if (socket && socket[0]) {
+	if (!charstring::isNullOrEmpty(socket)) {
 		connected=(ucs.connect(socket,-1,-1,
 					retrytime,tries)==RESULT_SUCCESS);
 		if (connected) {
@@ -1271,7 +1271,7 @@ bool sqlrconnection::getDebug() {
 void sqlrconnection::debugPreStart() {
 	if (webdebug==-1) {
 		const char	*docroot=environment::getValue("DOCUMENT_ROOT");
-		if (docroot && docroot[0]) {
+		if (!charstring::isNullOrEmpty(docroot)) {
 			webdebug=1;
 		} else {
 			webdebug=0;

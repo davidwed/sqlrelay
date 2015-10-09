@@ -49,7 +49,7 @@ sqlrelay::sqlrelay(xmldomnode *parameters,
 
 	if (!charstring::compareIgnoringCase(debug,"on")) {
 		sqlrcon->debugOn();
-	} else if (debug && debug[0] &&
+	} else if (!charstring::isNullOrEmpty(debug) &&
 			charstring::compareIgnoringCase(debug,"off")) {
 		sqlrcon->debugOn();
 		sqlrcon->setDebugFile(debug);
@@ -80,11 +80,11 @@ sqlrelay::sqlrelay(xmldomnode *parameters,
 	query.append(usercolumn)->append("=")->append(bind1);
 	query.append(" and ");
 	query.append(passwordcolumn)->append("=");
-	if (passwordfunction && passwordfunction[0]) {
+	if (!charstring::isNullOrEmpty(passwordfunction)) {
 		query.append(passwordfunction)->append('(');
 	}
 	query.append(bind2);
-	if (passwordfunction && passwordfunction[0]) {
+	if (!charstring::isNullOrEmpty(passwordfunction)) {
 		query.append(')');
 	}
 

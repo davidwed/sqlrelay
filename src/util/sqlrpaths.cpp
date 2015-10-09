@@ -58,7 +58,7 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	char	slash=sys::getDirectorySeparator();
 
 	const char	*lsd=cmdl->getValue("-localstatedir");
-	if (lsd[0]) {
+	if (!charstring::isNullOrEmpty(lsd)) {
 		localstatedir=charstring::duplicate(lsd);
 		delete[] defaultlocalstatedir;
 	} else {
@@ -104,7 +104,7 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	defaultconfigurl=scratch.detachString();
 
 	const char	*cfg=cmdl->getValue("-config");
-	if (cfg[0]) {
+	if (!charstring::isNullOrEmpty(cfg)) {
 		configurl=cfg;
 	} else {
 		configurl=defaultconfigurl;

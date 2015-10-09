@@ -310,21 +310,24 @@ void sapconnection::handleConnectString() {
 bool sapconnection::logIn(const char **error, const char **warning) {
 
 	// set sybase
-	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {
+	if (!charstring::isNullOrEmpty(sybase) &&
+			!environment::setValue("SYBASE",sybase)) {
 		*error=logInError(
 			"Failed to set SYBASE environment variable.",1);
 		return false;
 	}
 
 	// set lang
-	if (lang && lang[0] && !environment::setValue("LANG",lang)) {
+	if (!charstring::isNullOrEmpty(lang) &&
+			!environment::setValue("LANG",lang)) {
 		*error=logInError(
 			"Failed to set LANG environment variable.",1);
 		return false;
 	}
 
 	// set server
-	if (server && server[0] && !environment::setValue("DSQUERY",server)) {
+	if (!charstring::isNullOrEmpty(server) &&
+			!environment::setValue("DSQUERY",server)) {
 		*error=logInError(
 			"Failed to set DSQUERY environment variable.",2);
 		return false;
@@ -381,9 +384,9 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	// set the user to use
 	const char	*user=cont->getUser();
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
-			(CS_VOID *)((user && user[0])?user:""),
-			(CS_INT)charstring::length(user),
-			(CS_INT *)NULL)!=CS_SUCCEED) {
+		(CS_VOID *)((!charstring::isNullOrEmpty(user))?user:""),
+		(CS_INT)charstring::length(user),
+		(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the user",5);
 		return false;
 	}
@@ -392,35 +395,37 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	// set the password to use
 	const char	*password=cont->getPassword();
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
-			(CS_VOID *)((password && password[0])?password:""),
-			(CS_INT)charstring::length(password),
-			(CS_INT *)NULL)!=CS_SUCCEED) {
+		(CS_VOID *)((!charstring::isNullOrEmpty(password))?password:""),
+		(CS_INT)charstring::length(password),
+		(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the password",5);
 		return false;
 	}
 
 	// set application name
-	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,(CS_VOID *)"sqlrelay",8,
-			(CS_INT *)NULL)!=CS_SUCCEED) {
+	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,
+		(CS_VOID *)"sqlrelay",8,
+		(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the application name",5);
 		return false;
 	}
 
 	// set hostname
-	if (hostname && hostname[0] &&
-		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
-				(CS_INT)charstring::length(hostname),
-				(CS_INT *)NULL)!=CS_SUCCEED) {
+	if (!charstring::isNullOrEmpty(hostname) &&
+		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,
+			(CS_VOID *)hostname,
+			(CS_INT)charstring::length(hostname),
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the hostname",5);
 		return false;
 	}
 
 	// set packetsize
 	uint16_t	ps=charstring::toInteger(packetsize);
-	if (packetsize && packetsize[0] &&
+	if (!charstring::isNullOrEmpty(packetsize) &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
-				(CS_VOID *)&ps,sizeof(ps),
-				(CS_INT *)NULL)!=CS_SUCCEED) {
+			(CS_VOID *)&ps,sizeof(ps),
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the packetsize",5);
 		return false;
 	}
@@ -428,8 +433,8 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	#ifdef CS_SEC_ENCRYPTION
 	CS_INT	enc=CS_TRUE;
 	if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
-				(CS_VOID *)&enc,CS_UNUSED,
-				(CS_INT *)NULL)!=CS_SUCCEED) {
+			(CS_VOID *)&enc,CS_UNUSED,
+			(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to enable password encryption",5);
 		return false;
 	}
@@ -448,7 +453,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set language
-	if (language && language[0] &&
+	if (!charstring::isNullOrEmpty(language) &&
 		cs_locale(context,CS_SET,locale,CS_SYB_LANG,
 			(CS_CHAR *)language,
 			(CS_INT)charstring::length(language),
@@ -458,7 +463,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set charset
-	if (charset && charset[0] &&
+	if (!charstring::isNullOrEmpty(charset) &&
 		cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
 			(CS_CHAR *)charset,
 			(CS_INT)charstring::length(charset),
@@ -783,7 +788,7 @@ bool sapcursor::open() {
 	// switch to the correct database, get dbversion
 	// (only do this once per connection)
 	bool	retval=true;
-	if (sapconn->db && sapconn->db[0] && !sapconn->dbused) {
+	if (!charstring::isNullOrEmpty(sapconn->db) && !sapconn->dbused) {
 		int32_t	len=charstring::length(sapconn->db)+4;
 		char	*query=new char[len+1];
 		charstring::printf(query,len+1,"use %s",sapconn->db);

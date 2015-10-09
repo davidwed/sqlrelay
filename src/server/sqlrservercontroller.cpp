@@ -242,14 +242,15 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the connection id from the command line
 	connectionid=cmdl->getValue("-connectionid");
-	if (!connectionid[0]) {
+	if (charstring::isNullOrEmpty(connectionid)) {
 		connectionid=DEFAULT_CONNECTIONID;
 		stderror.printf("Warning: using default connectionid.\n");
 	}
 
 	// get the time to live from the command line
 	const char	*ttlstr=cmdl->getValue("-ttl");
-	ttl=(ttlstr[0])?charstring::toInteger(ttlstr):-1;
+	ttl=(!charstring::isNullOrEmpty(ttlstr))?
+				charstring::toInteger(ttlstr):-1;
 
 	// if there's no way to interrupt a semaphore wait,
 	// then force the ttl to zero
@@ -279,7 +280,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get password encryptions
 	const char	*pwdencs=cfg->getPasswordEncryptions();
-	if (pwdencs && pwdencs[0]) {
+	if (!charstring::isNullOrEmpty(pwdencs)) {
 		sqlrpe=new sqlrpwdencs(sqlrpth);
 		sqlrpe->loadPasswordEncryptions(pwdencs);
 	}	
@@ -287,7 +288,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// initialize authentication
 	initLocalAuthentication();
 	const char	*auths=cfg->getAuthentications();
-	if (auths && auths[0]) {
+	if (!charstring::isNullOrEmpty(auths)) {
 		sqlra=new sqlrauths(sqlrpth);
 		sqlra->loadAuthenticators(auths,sqlrpe);
 	}
@@ -302,7 +303,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get loggers
 	const char	*loggers=cfg->getLoggers();
-	if (loggers && loggers[0]) {
+	if (!charstring::isNullOrEmpty(loggers)) {
 		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(NULL,conn);
@@ -360,7 +361,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the query translators
 	debugsqlrtranslation=cfg->getDebugTranslations();
 	const char	*translations=cfg->getTranslations();
-	if (translations && translations[0]) {
+	if (!charstring::isNullOrEmpty(translations)) {
 		sqlrp=newParser();
 		sqlrt=new sqlrtranslations(sqlrpth,debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
@@ -369,7 +370,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the query filters
 	debugsqlrfilters=cfg->getDebugFilters();
 	const char	*filters=cfg->getFilters();
-	if (filters && filters[0]) {
+	if (!charstring::isNullOrEmpty(filters)) {
 		if (!sqlrp) {
 			sqlrp=newParser();
 		}
@@ -380,7 +381,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the result set translators
 	const char	*resultsettranslations=
 				cfg->getResultSetTranslations();
-	if (resultsettranslations && resultsettranslations[0]) {
+	if (!charstring::isNullOrEmpty(resultsettranslations)) {
 		sqlrrst=new sqlrresultsettranslations(sqlrpth);
 		sqlrrst->loadResultSetTranslations(resultsettranslations);
 	}
@@ -388,7 +389,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the triggers
 	debugtriggers=cfg->getDebugTriggers();
 	const char	*triggers=cfg->getTriggers();
-	if (triggers && triggers[0]) {
+	if (!charstring::isNullOrEmpty(triggers)) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!sqlrp) {
 			sqlrp=newParser();
@@ -445,7 +446,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the custom query handlers
 	const char	*queries=cfg->getQueries();
-	if (queries && queries[0]) {
+	if (!charstring::isNullOrEmpty(queries)) {
 		sqlrq=new sqlrqueries(sqlrpth);
 		sqlrq->loadQueries(queries);
 	}
@@ -1006,7 +1007,8 @@ bool sqlrservercontroller::openSockets() {
 	logDebugMessage("listening on sockets...");
 
 	// get the next available unix socket and open it
-	if (cfg->getListenOnUnix() && unixsocketptr && unixsocketptr[0]) {
+	if (cfg->getListenOnUnix() &&
+		!charstring::isNullOrEmpty(unixsocketptr)) {
 
 		if (!serversockun) {
 			serversockun=new unixsocketserver();

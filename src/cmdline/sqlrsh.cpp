@@ -1793,7 +1793,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				char	*cmd=readline(const_cast<char *>(
 							prmpt.getString()));
 				prmpt.clear();
-				if (cmd && cmd[0]) {
+				if (!charstring::isNullOrEmpty(cmd)) {
 					add_history(cmd);
 				} else {
 					stdoutput.printf("\n");
@@ -1905,7 +1905,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		// handle the history file
 		char		*filename=NULL;
 		const char	*home=environment::getValue("HOME");
-		if (home && home[0]) {
+		if (!charstring::isNullOrEmpty(home)) {
 			filename=new char[charstring::length(home)+16+1];
 			charstring::copy(filename,home);
 			charstring::append(filename,"/.sqlrsh_history");
@@ -1935,7 +1935,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	// clean up
 	#ifdef HAVE_READLINE
-		if (home && home[0]) {
+		if (!charstring::isNullOrEmpty(home)) {
 			write_history(filename);
 			history_truncate_file(filename,100);
 			delete[] filename;

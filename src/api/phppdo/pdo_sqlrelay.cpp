@@ -807,7 +807,7 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 					PDO_CURSOR_SCROLL TSRMLS_CC)==
 					PDO_CURSOR_FWDONLY;
 	
-	if (sql && sql[0]) {
+	if (!charstring::isNullOrEmpty(sql)) {
 		sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
 	}
 	return 1;
@@ -1269,7 +1269,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	if (!charstring::compare(debug,"1")) {
 		sqlrdbh->sqlrcon->debugOn();
 		sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
-	} else if (debug && debug[0] && charstring::compare(debug,"0")) {
+	} else if (!charstring::isNullOrEmpty(debug) &&
+				charstring::compare(debug,"0")) {
 		sqlrdbh->sqlrcon->setDebugFile(debug);
 		sqlrdbh->sqlrcon->debugOn();
 	}

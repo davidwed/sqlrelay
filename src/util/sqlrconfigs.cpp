@@ -82,7 +82,7 @@ sqlrconfig *sqlrconfigs::load(const char *urls, const char *id) {
 	debugFunction();
 
 	// sanity check
-	if (!urls || !urls[0] || !id || !id[0]) {
+	if (charstring::isNullOrEmpty(urls) || charstring::isNullOrEmpty(id)) {
 		return NULL;
 	}
 

@@ -1837,10 +1837,10 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	// Unfortunately, I'll bet that there are apps out there that need to
 	// use both, and I'll bet that I'll be revisiting this code someday.
 	stringbuffer	table;
-	if (catalogname && catalogname[0]) {
+	if (!charstring::isNullOrEmpty(catalogname)) {
 		SQLR_BuildTableName(&table,catalogname,namelength1,
 					NULL,0,tablename,namelength3);
-	} else if (schemaname && schemaname[0]) {
+	} else if (!charstring::isNullOrEmpty(schemaname)) {
 		SQLR_BuildTableName(&table,NULL,0,
 					schemaname,namelength2,
 					tablename,namelength3);
@@ -3648,8 +3648,8 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	}
 
 	// finagle sqlst
-	if (!sqlst || !sqlst[0]) {
-		if (error && error[0]) {
+	if (charstring::isNullOrEmpty(sqlst)) {
+		if (!charstring::isNullOrEmpty(error)) {
 			// General error
 			sqlst="HY000";
 		} else {
@@ -6677,7 +6677,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	char		*wild=NULL;
 	SQLRETURN	retval=SQL_ERROR;
-	if (catalogname && catalogname[0]) {
+	if (!charstring::isNullOrEmpty(catalogname)) {
 		if (namelength1==SQL_NTS) {
 			namelength1=charstring::length(catalogname);
 		}
@@ -6693,7 +6693,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		retval=
 		(stmt->cur->getDatabaseList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
-	} else if (tablename && tablename[0]) {
+	} else if (!charstring::isNullOrEmpty(tablename)) {
 		if (namelength3==SQL_NTS) {
 			namelength3=charstring::length(tablename);
 		}

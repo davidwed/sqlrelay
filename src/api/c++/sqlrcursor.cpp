@@ -936,7 +936,7 @@ void sqlrcursor::deleteOutputBindVariables() {
 }
 
 void sqlrcursor::substitution(const char *variable, const char *value) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -951,7 +951,7 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 }
 
 void sqlrcursor::substitution(const char *variable, int64_t value) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -967,7 +967,7 @@ void sqlrcursor::substitution(const char *variable, int64_t value) {
 
 void sqlrcursor::substitution(const char *variable, double value, 
 				uint32_t precision, uint32_t scale) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -992,7 +992,7 @@ void sqlrcursor::clearBinds() {
 
 void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 							uint32_t size) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -1009,7 +1009,7 @@ void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 
 void sqlrcursor::inputBindClob(const char *variable, const char *value,
 							uint32_t size) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -1025,7 +1025,7 @@ void sqlrcursor::inputBindClob(const char *variable, const char *value,
 }
 
 void sqlrcursor::inputBind(const char *variable, const char *value) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -1042,7 +1042,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 
 void sqlrcursor::inputBind(const char *variable, const char *value,
 						uint32_t valuesize) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -1058,7 +1058,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value,
 }
 
 void sqlrcursor::inputBind(const char *variable, int64_t value) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -1075,7 +1075,7 @@ void sqlrcursor::inputBind(const char *variable, int64_t value) {
 
 void sqlrcursor::inputBind(const char *variable, double value, 
 				uint32_t precision, uint32_t scale) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -1094,7 +1094,7 @@ void sqlrcursor::inputBind(const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				int32_t microsecond, const char *tz) {
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 	bool	preexisting=true;
@@ -1291,7 +1291,7 @@ void sqlrcursor::defineOutputBindCursor(const char *variable) {
 void sqlrcursor::defineOutputBindGeneric(const char *variable,
 				bindvartype_t type, uint32_t valuesize) {
 
-	if (!variable || !variable[0]) {
+	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
 
@@ -4377,7 +4377,7 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 	sqlrc->cs->write(id);
 
 	// process the result set
-	if (filename && filename[0]) {
+	if (!charstring::isNullOrEmpty(filename)) {
 		cacheToFile(filename);
 	}
 	if (rsbuffersize) {

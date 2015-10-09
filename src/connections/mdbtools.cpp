@@ -266,7 +266,7 @@ bool mdbtoolscursor::open() {
 
 	// handle db
 	const char	*dbval;
-	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
+	if (!charstring::isNullOrEmpty(mdbtoolsconn->db)) {
 		dbval=mdbtoolsconn->db;
 	} else {
 		dbval="";
@@ -336,7 +336,7 @@ bool mdbtoolscursor::getTableList(const char *wild) {
 		}
 	#endif
 	const char	*dbval;
-	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
+	if (!charstring::isNullOrEmpty(mdbtoolsconn->db)) {
 		dbval=mdbtoolsconn->db;
 	} else {
 		dbval="";
@@ -373,7 +373,7 @@ bool mdbtoolscursor::getColumnList(const char *table,
 		}
 	#endif
 	const char	*dbval;
-	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
+	if (!charstring::isNullOrEmpty(mdbtoolsconn->db)) {
 		dbval=mdbtoolsconn->db;
 	} else {
 		dbval="";

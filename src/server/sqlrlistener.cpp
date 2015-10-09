@@ -451,10 +451,10 @@ void sqlrlistener::setIpPermissions() {
 	// get denied and allowed ip's and compile the expressions
 	const char	*deniedips=cfg->getDeniedIps();
 	const char	*allowedips=cfg->getAllowedIps();
-	if (deniedips[0]) {
+	if (!charstring::isNullOrEmpty(deniedips)) {
 		denied=new regularexpression(deniedips);
 	}
-	if (allowedips[0]) {
+	if (!charstring::isNullOrEmpty(allowedips)) {
 		allowed=new regularexpression(allowedips);
 	}
 }

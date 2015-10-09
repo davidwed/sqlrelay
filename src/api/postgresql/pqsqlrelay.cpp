@@ -669,7 +669,7 @@ PGresult *PQprepare(PGconn *conn,
 	delete[] conn->error;
 	conn->error=NULL;
 
-	if (query && query[0]) {
+	if (!charstring::isNullOrEmpty(query)) {
 
 		conn->sqlrcur=new sqlrcursor(conn->sqlrcon,true);
 

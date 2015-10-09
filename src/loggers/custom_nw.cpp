@@ -111,7 +111,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	// get error, if there was one
 	static char	errorcodebuf[100+1];
 	errorcodebuf[0]='\0';
-	if (!sqlrcur->getErrorBuffer()[0]) {
+	if (charstring::isNullOrEmpty(sqlrcur->getErrorBuffer())) {
 		charstring::copy(errorcodebuf,"0");
 	} else {
 		charstring::printf(errorcodebuf,100,"%s",

@@ -288,7 +288,7 @@ void informixconnection::handleConnectString() {
 
 	// get dsn components
 	servername=cont->getConnectStringValue("servername");
-	if (!servername || !servername[0]) {
+	if (charstring::isNullOrEmpty(servername)) {
 		servername=environment::getValue("INFORMIXSERVER");
 	}
 	db=cont->getConnectStringValue("db");
@@ -297,24 +297,24 @@ void informixconnection::handleConnectString() {
 
 	// build dsn
 	dsn.clear();
-	if (servername && servername[0]) {
+	if (!charstring::isNullOrEmpty(servername)) {
 		dsn.append("Servername=")->append(servername);
 	}
-	if (db && db[0]) {
+	if (!charstring::isNullOrEmpty(db)) {
 		if (dsn.getStringLength()) {
 			dsn.append(";");
 		}
 		dsn.append("Database=")->append(db);
 	}
 	const char	*user=cont->getUser();
-	if (user && user[0]) {
+	if (!charstring::isNullOrEmpty(user)) {
 		if (dsn.getStringLength()) {
 			dsn.append(";");
 		}
 		dsn.append("LogonID=")->append(user);
 	}
 	const char	*pass=cont->getPassword();
-	if (pass && pass[0]) {
+	if (!charstring::isNullOrEmpty(pass)) {
 		if (dsn.getStringLength()) {
 			dsn.append(";");
 		}

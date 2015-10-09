@@ -7,7 +7,7 @@
 
 sqlrcmdline::sqlrcmdline(int argc, const char **argv) : commandline(argc,argv) {
 	id=getValue("-id");
-	if (!id[0]) {
+	if (charstring::isNullOrEmpty(id)) {
 		id=DEFAULT_ID;
 	}
 }

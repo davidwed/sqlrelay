@@ -599,9 +599,10 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 			schemabuffer[schemalen]='\0';
 			schema=schemabuffer;
 		}
-		tablename=(wild && wild[0])?wild:"%";
+		tablename=(!charstring::isNullOrEmpty(wild))?wild:"%";
 	} else {
-		catalog=((wild && wild[0])?wild:SQL_ALL_CATALOGS);
+		catalog=((!charstring::isNullOrEmpty(wild))?
+						wild:SQL_ALL_CATALOGS);
 	}
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,

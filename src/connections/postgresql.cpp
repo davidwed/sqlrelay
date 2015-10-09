@@ -253,22 +253,23 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 	conninfo.clear();
 	conninfo.append("user=")->append(cont->getUser());
 	conninfo.append(" password=")->append(cont->getPassword());
-	if (host && host[0]) {
+	if (!charstring::isNullOrEmpty(host)) {
 		conninfo.append(" host=")->append(host);
 	}
-	if (port && port[0]) {
+	if (!charstring::isNullOrEmpty(port)) {
 		conninfo.append(" port=")->append(port);
 	}
-	if (options && options[0]) {
+	if (!charstring::isNullOrEmpty(options)) {
 		conninfo.append(" options=")->append(options);
 	}
-	if (db && db[0]) {
+	if (!charstring::isNullOrEmpty(db)) {
 		conninfo.append(" dbname=")->append(db);
 	}
 	// sslmode isn't supported by older versions of postgresql, and
 	// including it at all will cause PQconnectdb to fail.  Remove it
 	// altogether if it's omitted or disabled.
-	if (sslmode && sslmode[0] && charstring::compare(sslmode,"disable")) {
+	if (!charstring::isNullOrEmpty(sslmode) &&
+			charstring::compare(sslmode,"disable")) {
 		conninfo.append(" sslmode=")->append(sslmode);
 	}
 	pgconn=PQconnectdb(conninfo.getString());
@@ -930,7 +931,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	// get the affected row count
 	const char	*affrows=PQcmdTuples(pgresult);
 	affectedrows=0;
-	if (affrows && affrows[0]) {
+	if (!charstring::isNullOrEmpty(affrows)) {
 		affectedrows=charstring::toInteger(affrows);
 	}
 

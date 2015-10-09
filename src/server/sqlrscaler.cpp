@@ -160,7 +160,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 		// run as user/group specified in the configuration
 		const char	*runasuser=cfg->getRunAsUser();
 		const char	*runasgroup=cfg->getRunAsGroup();
-		if (runasuser[0] && runasgroup[0]) {
+		if (!charstring::isNullOrEmpty(runasuser) &&
+			!charstring::isNullOrEmpty(runasgroup)) {
 
 			// get the user that we're currently running as
 			char	*currentuser=
@@ -422,7 +423,7 @@ pid_t scaler::openOneConnection() {
 	args[p++]=id;
 	args[p++]="-connectionid";
 	args[p++]=connectionid;
-	if (config && config[0]) {
+	if (!charstring::isNullOrEmpty(config)) {
 		args[p++]="-config";
 		args[p++]=config;
 	}

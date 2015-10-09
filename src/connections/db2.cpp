@@ -298,7 +298,7 @@ void db2connection::handleConnectString() {
 	// override legacy "server" parameter with modern "db" parameter
 	server=cont->getConnectStringValue("server");
 	const char	*tmp=cont->getConnectStringValue("db");
-	if (tmp && tmp[0]) {
+	if (!charstring::isNullOrEmpty(tmp)) {
 		server=tmp;
 	}
 

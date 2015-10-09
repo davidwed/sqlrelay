@@ -347,21 +347,24 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	// For some newer versions, a NULL host causes problems, but an empty
 	// string is safe.
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
-	const char	*hostval=(host && host[0])?host:"";
+	const char	*hostval=(!charstring::isNullOrEmpty(host))?host:"";
 #else
-	const char	*hostval=(host && host[0])?host:NULL;
+	const char	*hostval=(!charstring::isNullOrEmpty(host))?host:NULL;
 #endif
 
 	// Handle db.
-	const char	*dbval=(db && db[0])?db:"";
+	const char	*dbval=(!charstring::isNullOrEmpty(db))?db:"";
 	
 	// log in
 	const char	*user=cont->getUser();
 	const char	*password=cont->getPassword();
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	// Handle port and socket.
-	int		portval=(port && port[0])?charstring::toInteger(port):0;
-	const char	*socketval=(socket && socket[0])?socket:NULL;
+	int		portval=
+			(!charstring::isNullOrEmpty(port))?
+					charstring::toInteger(port):0;
+	const char	*socketval=
+			(!charstring::isNullOrEmpty(socket))?socket:NULL;
 	unsigned long	clientflag=0;
 	#ifdef CLIENT_MULTI_STATEMENTS
 	clientflag|=CLIENT_MULTI_STATEMENTS;
@@ -489,7 +492,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 bool mysqlconnection::changeUser(const char *newuser,
 					const char *newpassword) {
 	return !mysql_change_user(mysqlptr,newuser,newpassword,
-					(char *)((db && db[0])?db:NULL));
+			(char *)((!charstring::isNullOrEmpty(db))?db:NULL));
 }
 #endif
 
@@ -1165,7 +1168,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 			// if there was an error then return failure, otherwise
 			// the query must have been some DML or DDL
 			char	*err=(char *)mysql_error(mysqlconn->mysqlptr);
-			if (err && err[0]) {
+			if (!charstring::isNullOrEmpty(err)) {
 				return false;
 			} else {
 

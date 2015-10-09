@@ -83,16 +83,16 @@ bool postgresqlbenchconnection::connect() {
 	conninfo.clear();
 	conninfo.append("user=")->append(user);
 	conninfo.append(" password=")->append(password);
-	if (host && host[0]) {
+	if (!charstring::isNullOrEmpty(host)) {
 		conninfo.append(" host=")->append(host);
 	}
-	if (port && port[0]) {
+	if (!charstring::isNullOrEmtpty(port)) {
 		conninfo.append(" port=")->append(port);
 	}
-	if (dbname && dbname[0]) {
+	if (!charstring::isNullOrEmpty(dbname)) {
 		conninfo.append(" dbname=")->append(dbname);
 	}
-	if (sslmode && sslmode[0]) {
+	if (!charstring::isNullOrEmpty(sslmode)) {
 		conninfo.append(" sslmode=")->append(sslmode);
 	}
 	pgconn=PQconnectdb(conninfo.getString());

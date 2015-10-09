@@ -65,7 +65,7 @@ sqlrcachemanager::sqlrcachemanager(int argc, const char **argv) {
 
 	// get the scaninterval
 	const char	*scanint=cmdl->getValue("-scaninterval");
-	if (scanint && scanint[0]) {
+	if (!charstring::isNullOrEmpty(scanint)) {
 		scaninterval=charstring::toInteger(scanint);
 	} else {
 		scaninterval=DEFAULT_INTERVAL;
@@ -192,7 +192,7 @@ void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 
 void sqlrcachemanager::parseCacheDirs(const char *cachedirs) {
 
-	if (cachedirs && cachedirs[0]) {
+	if (!charstring::isNullOrEmpty(cachedirs)) {
 
 		// parse the colon delimited cachedirs string, 
 		// create a new dirnode for each directory
