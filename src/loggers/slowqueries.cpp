@@ -9,10 +9,10 @@
 #include <rudiments/filesystem.h>
 #include <rudiments/stringbuffer.h>
 
-class SQLRSERVER_DLLSPEC slowqueries : public sqlrlogger {
+class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 	public:
-			slowqueries(xmldomnode *parameters);
-			~slowqueries();
+			sqlrlogger_slowqueries(xmldomnode *parameters);
+			~sqlrlogger_slowqueries();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
@@ -30,7 +30,8 @@ class SQLRSERVER_DLLSPEC slowqueries : public sqlrlogger {
 		bool		enabled;
 };
 
-slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
+sqlrlogger_slowqueries::sqlrlogger_slowqueries(xmldomnode *parameters) :
+							sqlrlogger(parameters) {
 	querylogname=NULL;
 	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
 	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
@@ -39,12 +40,13 @@ slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
 			parameters->getAttributeValue("enabled"),"no");
 }
 
-slowqueries::~slowqueries() {
+sqlrlogger_slowqueries::~sqlrlogger_slowqueries() {
 	querylog.flushWriteBuffer(-1,-1);
 	delete[] querylogname;
 }
 
-bool slowqueries::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon) {
 
 	if (!enabled) {
 		return true;
@@ -87,12 +89,12 @@ bool slowqueries::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 
 static const char *days[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
-bool slowqueries::run(sqlrlistener *sqlrl,
-				sqlrserverconnection *sqlrcon,
-				sqlrservercursor *sqlrcur,
-				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event,
-				const char *info) {
+bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					sqlrlogger_loglevel_t level,
+					sqlrlogger_eventtype_t event,
+					const char *info) {
 
 	if (!enabled) {
 		return true;
@@ -166,6 +168,6 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_slowqueries(
 						xmldomnode *parameters) {
-		return new slowqueries(parameters);
+		return new sqlrlogger_slowqueries(parameters);
 	}
 }

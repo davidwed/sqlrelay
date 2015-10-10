@@ -9,9 +9,9 @@
 // for time_t, time(), localtime()
 #include <time.h>
 
-class SQLRSERVER_DLLSPEC sqlrcmdgstat : public sqlrquery {
+class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdgstat : public sqlrquery {
 	public:
-			sqlrcmdgstat(xmldomnode *parameters);
+			sqlrquery_sqlrcmdgstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
 		sqlrquerycursor	*newCursor(sqlrserverconnection *conn,
 							uint16_t id);
@@ -25,9 +25,10 @@ struct gs_result_row {
 	char	value[GSTAT_VALUE_LEN+1];
 };
 
-class sqlrcmdgstatcursor : public sqlrquerycursor {
+class sqlrquery_sqlrcmdgstatcursor : public sqlrquerycursor {
 	public:
-			sqlrcmdgstatcursor(sqlrserverconnection *sqlrcon,
+			sqlrquery_sqlrcmdgstatcursor(
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *parameters,
 						uint16_t id);
 
@@ -58,29 +59,33 @@ class sqlrcmdgstatcursor : public sqlrquerycursor {
 
 };
 
-sqlrcmdgstat::sqlrcmdgstat(xmldomnode *parameters) : sqlrquery(parameters) {
+sqlrquery_sqlrcmdgstat::sqlrquery_sqlrcmdgstat(xmldomnode *parameters) :
+							sqlrquery(parameters) {
 	debugFunction();
 }
 
-bool sqlrcmdgstat::match(const char *querystring,
-				uint32_t querylength) {
+bool sqlrquery_sqlrcmdgstat::match(const char *querystring,
+					uint32_t querylength) {
 	debugFunction();
 	return !charstring::compareIgnoringCase(querystring,"sqlrcmd gstat");
 }
 
-sqlrquerycursor *sqlrcmdgstat::newCursor(sqlrserverconnection *sqlrcon,
-							uint16_t id) {
-	return new sqlrcmdgstatcursor(sqlrcon,parameters,id);
+sqlrquerycursor *sqlrquery_sqlrcmdgstat::newCursor(
+						sqlrserverconnection *sqlrcon,
+						uint16_t id) {
+	return new sqlrquery_sqlrcmdgstatcursor(sqlrcon,parameters,id);
 }
 
-sqlrcmdgstatcursor::sqlrcmdgstatcursor(sqlrserverconnection *sqlrcon,
+sqlrquery_sqlrcmdgstatcursor::sqlrquery_sqlrcmdgstatcursor(
+					sqlrserverconnection *sqlrcon,
 					xmldomnode *parameters, uint16_t id) :
 					sqlrquerycursor(sqlrcon,parameters,id) {
 	rowcount=0;
 	currentrow=0;
 }
 
-bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
+bool sqlrquery_sqlrcmdgstatcursor::executeQuery(const char *query,
+							uint32_t length) {
 
 	shmdata	*gs=conn->cont->shm;
 
@@ -194,23 +199,23 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void sqlrcmdgstatcursor::setGSResult(const char *key,
-					int32_t value, uint16_t i) {
+void sqlrquery_sqlrcmdgstatcursor::setGSResult(const char *key,
+						int32_t value, uint16_t i) {
 	charstring::copy(gs_resultset[i].key,key,GSTAT_KEY_LEN);
 	gs_resultset[i].key[GSTAT_KEY_LEN]='\0';
 	charstring::printf(gs_resultset[i].value,GSTAT_VALUE_LEN,"%d",value);
 	gs_resultset[i].value[GSTAT_VALUE_LEN]='\0';
 }
 
-void sqlrcmdgstatcursor::setGSResult(const char *key,
-					const char *value, uint16_t i) {
+void sqlrquery_sqlrcmdgstatcursor::setGSResult(const char *key,
+						const char *value, uint16_t i) {
 	charstring::copy(gs_resultset[i].key,key,GSTAT_KEY_LEN);
 	gs_resultset[i].key[GSTAT_KEY_LEN]='\0';
 	charstring::copy(gs_resultset[i].value,value,GSTAT_VALUE_LEN);
 	gs_resultset[i].value[GSTAT_VALUE_LEN]='\0';
 }
 
-uint32_t sqlrcmdgstatcursor::colCount() {
+uint32_t sqlrquery_sqlrcmdgstatcursor::colCount() {
 	return 2;
 }
 
@@ -227,31 +232,31 @@ static struct colinfo_t colinfo[]={
 	{"VALUE",VARCHAR2_DATATYPE,GSTAT_VALUE_LEN,0,0}
 };
 
-const char *sqlrcmdgstatcursor::getColumnName(uint32_t col) {
+const char *sqlrquery_sqlrcmdgstatcursor::getColumnName(uint32_t col) {
 	return (col<2)?colinfo[col].name:NULL;
 }
 
-uint16_t sqlrcmdgstatcursor::getColumnType(uint32_t col) {
+uint16_t sqlrquery_sqlrcmdgstatcursor::getColumnType(uint32_t col) {
 	return (col<2)?colinfo[col].type:0;
 }
 
-uint32_t sqlrcmdgstatcursor::getColumnLength(uint32_t col) {
+uint32_t sqlrquery_sqlrcmdgstatcursor::getColumnLength(uint32_t col) {
 	return (col<2)?colinfo[col].length:0;
 }
 
-uint32_t sqlrcmdgstatcursor::getColumnPrecision(uint32_t col) {
+uint32_t sqlrquery_sqlrcmdgstatcursor::getColumnPrecision(uint32_t col) {
 	return (col<2)?colinfo[col].precision:0;
 }
 
-uint32_t sqlrcmdgstatcursor::getColumnScale(uint32_t col) {
+uint32_t sqlrquery_sqlrcmdgstatcursor::getColumnScale(uint32_t col) {
 	return (col<2)?colinfo[col].scale:0;
 }
 
-bool sqlrcmdgstatcursor::noRowsToReturn() {
+bool sqlrquery_sqlrcmdgstatcursor::noRowsToReturn() {
 	return false;
 }
 
-bool sqlrcmdgstatcursor::fetchRow() {
+bool sqlrquery_sqlrcmdgstatcursor::fetchRow() {
 	if (currentrow<rowcount) {
 		currentrow++;
 		return true;
@@ -259,11 +264,11 @@ bool sqlrcmdgstatcursor::fetchRow() {
 	return false;
 }
 
-void sqlrcmdgstatcursor::getField(uint32_t col,
-					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
-					bool *null) {
+void sqlrquery_sqlrcmdgstatcursor::getField(uint32_t col,
+						const char **field,
+						uint64_t *fieldlength,
+						bool *blob,
+						bool *null) {
 	if (col==0) {
 		*field=gs_resultset[currentrow-1].key;
 	} else if (col==1) {
@@ -279,6 +284,6 @@ void sqlrcmdgstatcursor::getField(uint32_t col,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdgstat(
 						xmldomnode *parameters) {
-		return new sqlrcmdgstat(parameters);
+		return new sqlrquery_sqlrcmdgstat(parameters);
 	}
 }

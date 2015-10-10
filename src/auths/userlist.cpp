@@ -4,10 +4,10 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC userlist : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 	public:
-			userlist(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe);
+			sqlrauth_userlist(xmldomnode *parameters,
+						sqlrpwdencs *sqlrpe);
 		bool	authenticate(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -17,9 +17,9 @@ class SQLRSERVER_DLLSPEC userlist : public sqlrauth {
 		uint64_t	usercount;
 };
 
-userlist::userlist(xmldomnode *parameters,
-				sqlrpwdencs *sqlrpe) :
-				sqlrauth(parameters,sqlrpe) {
+sqlrauth_userlist::sqlrauth_userlist(xmldomnode *parameters,
+					sqlrpwdencs *sqlrpe) :
+					sqlrauth(parameters,sqlrpe) {
 
 	users=NULL;
 	passwords=NULL;
@@ -55,8 +55,9 @@ userlist::userlist(xmldomnode *parameters,
 	}
 }
 
-bool userlist::authenticate(sqlrserverconnection *sqlrcon,
-				const char *user, const char *password) {
+bool sqlrauth_userlist::authenticate(sqlrserverconnection *sqlrcon,
+						const char *user,
+						const char *password) {
 
 	// run through the user/password arrays...
 	for (uint32_t i=0; i<usercount; i++) {
@@ -131,6 +132,6 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_userlist(
 						xmldomnode *users,
 						sqlrpwdencs *sqlrpe) {
-		return new userlist(users,sqlrpe);
+		return new sqlrauth_userlist(users,sqlrpe);
 	}
 }

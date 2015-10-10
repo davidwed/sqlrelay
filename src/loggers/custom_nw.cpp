@@ -11,10 +11,10 @@
 #include <debugprint.h>
 #include <defines.h>
 
-class SQLRSERVER_DLLSPEC custom_nw : public sqlrlogger {
+class SQLRSERVER_DLLSPEC sqlrlogger_custom_nw : public sqlrlogger {
 	public:
-			custom_nw(xmldomnode *parameters);
-			~custom_nw();
+			sqlrlogger_custom_nw(xmldomnode *parameters);
+			~sqlrlogger_custom_nw();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
@@ -34,17 +34,19 @@ class SQLRSERVER_DLLSPEC custom_nw : public sqlrlogger {
 		bool	enabled;
 };
 
-custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
+sqlrlogger_custom_nw::sqlrlogger_custom_nw(xmldomnode *parameters) :
+						sqlrlogger(parameters) {
 	querylogname=NULL;
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 }
 
-custom_nw::~custom_nw() {
+sqlrlogger_custom_nw::~sqlrlogger_custom_nw() {
 	delete[] querylogname;
 }
 
-bool custom_nw::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
+				sqlrserverconnection *sqlrcon) {
 	debugFunction();
 
 	if (!enabled) {
@@ -79,7 +81,7 @@ bool custom_nw::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 				permissions::evalPermString("rw-------"));
 }
 
-bool custom_nw::run(sqlrlistener *sqlrl,
+bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
@@ -165,7 +167,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 				charstring::length(querylogbuf));
 }
 
-int custom_nw::strescape(const char *str, char *buf, int limit) {
+int sqlrlogger_custom_nw::strescape(const char *str, char *buf, int limit) {
 	// from oracpool my_strescape()
 	register char	*q=buf;
 	const char	*strend=str+charstring::length(str);
@@ -192,9 +194,9 @@ int custom_nw::strescape(const char *str, char *buf, int limit) {
 	return (q-buf);
 }
 
-bool custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					char *buf, int limit) {
+bool sqlrlogger_custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						char *buf, int limit) {
 
 	char		*c=buf;	
 	int		remain_len=limit;
@@ -251,6 +253,6 @@ bool custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_nw(
 						xmldomnode *parameters) {
-		return new custom_nw(parameters);
+		return new sqlrlogger_custom_nw(parameters);
 	}
 }

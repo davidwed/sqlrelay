@@ -5,9 +5,9 @@
 #include <rudiments/regularexpression.h>
 #include <debugprint.h>
 
-class SQLRSERVER_DLLSPEC regex : public sqlrfilter {
+class SQLRSERVER_DLLSPEC sqlrfilter_regex : public sqlrfilter {
 	public:
-			regex(sqlrfilters *sqlrfs,
+			sqlrfilter_regex(sqlrfilters *sqlrfs,
 					xmldomnode *parameters,
 					bool debug);
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -20,9 +20,10 @@ class SQLRSERVER_DLLSPEC regex : public sqlrfilter {
 		bool	enabled;
 };
 
-regex::regex(sqlrfilters *sqlrfs,
-			xmldomnode *parameters,
-			bool debug) : sqlrfilter(sqlrfs,parameters,debug) {
+sqlrfilter_regex::sqlrfilter_regex(sqlrfilters *sqlrfs,
+					xmldomnode *parameters,
+					bool debug) :
+					sqlrfilter(sqlrfs,parameters,debug) {
 	debugFunction();
 
 	enabled=charstring::compareIgnoringCase(
@@ -36,7 +37,7 @@ regex::regex(sqlrfilters *sqlrfs,
 	re.study();
 }
 
-bool regex::run(sqlrserverconnection *sqlrcon,
+bool sqlrfilter_regex::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				const char *query) {
 	debugFunction();
@@ -59,6 +60,6 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter *new_sqlrfilter_regex(sqlrfilters *sqlrfs,
 							xmldomnode *parameters,
 							bool debug) {
-		return new regex(sqlrfs,parameters,debug);
+		return new sqlrfilter_regex(sqlrfs,parameters,debug);
 	}
 }

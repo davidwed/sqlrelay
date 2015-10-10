@@ -5,11 +5,11 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC sqlrelay : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 	public:
-			sqlrelay(xmldomnode *parameters,
+			sqlrauth_sqlrelay(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
-			~sqlrelay();
+			~sqlrauth_sqlrelay();
 		bool	authenticate(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -30,9 +30,9 @@ class SQLRSERVER_DLLSPEC sqlrelay : public sqlrauth {
 		sqlrcursor	*sqlrcur;
 };
 
-sqlrelay::sqlrelay(xmldomnode *parameters,
-				sqlrpwdencs *sqlrpe) :
-				sqlrauth(parameters,sqlrpe) {
+sqlrauth_sqlrelay::sqlrauth_sqlrelay(xmldomnode *parameters,
+					sqlrpwdencs *sqlrpe) :
+					sqlrauth(parameters,sqlrpe) {
 
 	host=parameters->getAttributeValue("host");
 	port=charstring::toInteger(parameters->getAttributeValue("port"));
@@ -91,13 +91,14 @@ sqlrelay::sqlrelay(xmldomnode *parameters,
 	sqlrcur->prepareQuery(query.getString());
 }
 
-sqlrelay::~sqlrelay() {
+sqlrauth_sqlrelay::~sqlrauth_sqlrelay() {
 	delete sqlrcur;
 	delete sqlrcon;
 }
 
-bool sqlrelay::authenticate(sqlrserverconnection *sqlrcon,
-				const char *user, const char *password) {
+bool sqlrauth_sqlrelay::authenticate(sqlrserverconnection *sqlrcon,
+						const char *user,
+						const char *password) {
 
 	sqlrcur->inputBind("1",user);
 	sqlrcur->inputBind("2",password);
@@ -112,6 +113,6 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrelay(
 						xmldomnode *users,
 						sqlrpwdencs *sqlrpe) {
-		return new sqlrelay(users,sqlrpe);
+		return new sqlrauth_sqlrelay(users,sqlrpe);
 	}
 }

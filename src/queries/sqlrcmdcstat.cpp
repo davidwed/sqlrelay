@@ -8,20 +8,21 @@
 #include <datatypes.h>
 #include <debugprint.h>
 
-class SQLRSERVER_DLLSPEC sqlrcmdcstat : public sqlrquery {
+class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdcstat : public sqlrquery {
 	public:
-			sqlrcmdcstat(xmldomnode *parameters);
+			sqlrquery_sqlrcmdcstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
 		sqlrquerycursor	*newCursor(sqlrserverconnection *conn,
 							uint16_t id);
 };
 
-class sqlrcmdcstatcursor : public sqlrquerycursor {
+class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 	public:
-			sqlrcmdcstatcursor(sqlrserverconnection *sqlrcon,
+			sqlrquery_sqlrcmdcstatcursor(
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *parameters,
 						uint16_t id);
-			~sqlrcmdcstatcursor();
+			~sqlrquery_sqlrcmdcstatcursor();
 
 		bool		executeQuery(const char *query,
 						uint32_t length);
@@ -46,22 +47,25 @@ class sqlrcmdcstatcursor : public sqlrquerycursor {
 
 };
 
-sqlrcmdcstat::sqlrcmdcstat(xmldomnode *parameters) : sqlrquery(parameters) {
+sqlrquery_sqlrcmdcstat::sqlrquery_sqlrcmdcstat(xmldomnode *parameters) :
+							sqlrquery(parameters) {
 	debugFunction();
 }
 
-bool sqlrcmdcstat::match(const char *querystring,
-				uint32_t querylength) {
+bool sqlrquery_sqlrcmdcstat::match(const char *querystring,
+					uint32_t querylength) {
 	debugFunction();
 	return !charstring::compareIgnoringCase(querystring,"sqlrcmd cstat");
 }
 
-sqlrquerycursor *sqlrcmdcstat::newCursor(sqlrserverconnection *sqlrcon,
-							uint16_t id) {
-	return new sqlrcmdcstatcursor(sqlrcon,parameters,id);
+sqlrquerycursor *sqlrquery_sqlrcmdcstat::newCursor(
+					sqlrserverconnection *sqlrcon,
+					uint16_t id) {
+	return new sqlrquery_sqlrcmdcstatcursor(sqlrcon,parameters,id);
 }
 
-sqlrcmdcstatcursor::sqlrcmdcstatcursor(sqlrserverconnection *sqlrcon,
+sqlrquery_sqlrcmdcstatcursor::sqlrquery_sqlrcmdcstatcursor(
+					sqlrserverconnection *sqlrcon,
 					xmldomnode *parameters, uint16_t id) :
 					sqlrquerycursor(sqlrcon,parameters,id) {
 	currentrow=0;
@@ -69,16 +73,17 @@ sqlrcmdcstatcursor::sqlrcmdcstatcursor(sqlrserverconnection *sqlrcon,
 	cs=NULL;
 }
 
-sqlrcmdcstatcursor::~sqlrcmdcstatcursor() {
+sqlrquery_sqlrcmdcstatcursor::~sqlrquery_sqlrcmdcstatcursor() {
 	delete[] fieldbuffer;
 }
 
-bool sqlrcmdcstatcursor::executeQuery(const char *query, uint32_t length) {
+bool sqlrquery_sqlrcmdcstatcursor::executeQuery(const char *query,
+						uint32_t length) {
 	currentrow=0;
 	return true;
 }
 
-uint32_t sqlrcmdcstatcursor::colCount() {
+uint32_t sqlrquery_sqlrcmdcstatcursor::colCount() {
 	return 9;
 }
 
@@ -102,35 +107,35 @@ static struct colinfo_t colinfo[]={
 	{"SQL_TEXT",VARCHAR2_DATATYPE,STATSQLTEXTLEN-1,0,0}
 };
 
-const char *sqlrcmdcstatcursor::getColumnName(uint32_t col) {
+const char *sqlrquery_sqlrcmdcstatcursor::getColumnName(uint32_t col) {
 	return (col<9)?colinfo[col].name:NULL;
 }
 
-uint16_t sqlrcmdcstatcursor::getColumnType(uint32_t col) {
+uint16_t sqlrquery_sqlrcmdcstatcursor::getColumnType(uint32_t col) {
 	return (col<9)?colinfo[col].type:0;
 }
 
-uint32_t sqlrcmdcstatcursor::getColumnLength(uint32_t col) {
+uint32_t sqlrquery_sqlrcmdcstatcursor::getColumnLength(uint32_t col) {
 	return (col<9)?colinfo[col].length:0;
 }
 
-uint32_t sqlrcmdcstatcursor::getColumnPrecision(uint32_t col) {
+uint32_t sqlrquery_sqlrcmdcstatcursor::getColumnPrecision(uint32_t col) {
 	return (col<9)?colinfo[col].precision:0;
 }
 
-uint32_t sqlrcmdcstatcursor::getColumnScale(uint32_t col) {
+uint32_t sqlrquery_sqlrcmdcstatcursor::getColumnScale(uint32_t col) {
 	return (col<9)?colinfo[col].scale:0;
 }
 
-uint16_t sqlrcmdcstatcursor::getColumnIsNullable(uint32_t col) {
+uint16_t sqlrquery_sqlrcmdcstatcursor::getColumnIsNullable(uint32_t col) {
 	return (col==7 || col==8)?1:0;
 }
 
-bool sqlrcmdcstatcursor::noRowsToReturn() {
+bool sqlrquery_sqlrcmdcstatcursor::noRowsToReturn() {
 	return false;
 }
 
-bool sqlrcmdcstatcursor::fetchRow() {
+bool sqlrquery_sqlrcmdcstatcursor::fetchRow() {
 	while (currentrow<MAXCONNECTIONS) {
 		cs=&(conn->cont->shm->connstats[currentrow]);
 		currentrow++;
@@ -156,7 +161,7 @@ static const char * const statenames[]={
 	"WAIT_SEMAPHORE"
 };
 
-void sqlrcmdcstatcursor::getField(uint32_t col,
+void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
 					bool *blob,
@@ -250,6 +255,6 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdcstat(
 						xmldomnode *parameters) {
-		return new sqlrcmdcstat(parameters);
+		return new sqlrquery_sqlrcmdcstat(parameters);
 	}
 }

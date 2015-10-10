@@ -6,11 +6,11 @@
 #include <rudiments/character.h>
 #include <debugprint.h>
 
-class SQLRSERVER_DLLSPEC normalize : public sqlrtranslation {
+class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 	public:
-			normalize(sqlrtranslations *sqlts,
-						xmldomnode *parameters,
-						bool debug);
+			sqlrtranslation_normalize(sqlrtranslations *sqlts,
+							xmldomnode *parameters,
+							bool debug);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
@@ -26,7 +26,8 @@ class SQLRSERVER_DLLSPEC normalize : public sqlrtranslation {
 		bool	enabled;
 };
 
-normalize::normalize(sqlrtranslations *sqlts,
+sqlrtranslation_normalize::sqlrtranslation_normalize(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
@@ -36,9 +37,9 @@ normalize::normalize(sqlrtranslations *sqlts,
 			parameters->getAttributeValue("enabled"),"no");
 }
 
-static const char symbols[]="!@#$%^&-_+=[{]}\\|;:,<.>/?";
+static const char symbols[]="!%^-_+=[{]}\\|;,<.>/";
 
-bool normalize::run(sqlrserverconnection *sqlrcon,
+bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
 					stringbuffer *translatedquery) {
@@ -196,9 +197,9 @@ bool normalize::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-bool normalize::skipQuotedStrings(const char *ptr,
-					stringbuffer *sb,
-					const char **newptr) {
+bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
+						stringbuffer *sb,
+						const char **newptr) {
 
 	bool	found=false;
 	for (;;) {
@@ -226,6 +227,6 @@ extern "C" {
 							sqlrtranslations *sqlts,
 							xmldomnode *parameters,
 							bool debug) {
-		return new normalize(sqlts,parameters,debug);
+		return new sqlrtranslation_normalize(sqlts,parameters,debug);
 	}
 }

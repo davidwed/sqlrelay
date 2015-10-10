@@ -19,12 +19,12 @@ struct pattern_t {
 	scope_t			scope;
 };
 
-class SQLRSERVER_DLLSPEC patterns : public sqlrfilter {
+class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 	public:
-			patterns(sqlrfilters *sqlrfs,
+			sqlrfilter_patterns(sqlrfilters *sqlrfs,
 					xmldomnode *parameters,
 					bool debug);
-			~patterns();
+			~sqlrfilter_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
@@ -36,7 +36,7 @@ class SQLRSERVER_DLLSPEC patterns : public sqlrfilter {
 		bool	enabled;
 };
 
-patterns::patterns(sqlrfilters *sqlrfs,
+sqlrfilter_patterns::sqlrfilter_patterns(sqlrfilters *sqlrfs,
 			xmldomnode *parameters,
 			bool debug) : sqlrfilter(sqlrfs,parameters,debug) {
 	debugFunction();
@@ -94,16 +94,16 @@ patterns::patterns(sqlrfilters *sqlrfs,
 	}
 }
 
-patterns::~patterns() {
+sqlrfilter_patterns::~sqlrfilter_patterns() {
 	for (uint32_t i=0; i<patterncount; i++) {
 		delete p[i].re;
 	}
 	delete[] p;
 }
 
-bool patterns::run(sqlrserverconnection *sqlrcon,
-				sqlrservercursor *sqlrcur,
-				const char *query) {
+bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					const char *query) {
 	debugFunction();
 
 	if (!enabled) {
@@ -232,6 +232,6 @@ extern "C" {
 			*new_sqlrfilter_patterns(sqlrfilters *sqlrfs,
 							xmldomnode *parameters,
 							bool debug) {
-		return new patterns(sqlrfs,parameters,debug);
+		return new sqlrfilter_patterns(sqlrfs,parameters,debug);
 	}
 }

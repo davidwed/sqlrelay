@@ -4,20 +4,20 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC database : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 	public:
-			database(xmldomnode *parameters,
+			sqlrauth_database(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
 		bool	authenticate(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 };
 
-database::database(xmldomnode *parameters,
-				sqlrpwdencs *sqlrpe) :
-				sqlrauth(parameters,sqlrpe) {
+sqlrauth_database::sqlrauth_database(xmldomnode *parameters,
+					sqlrpwdencs *sqlrpe) :
+					sqlrauth(parameters,sqlrpe) {
 }
 
-bool database::authenticate(sqlrserverconnection *sqlrcon,
+bool sqlrauth_database::authenticate(sqlrserverconnection *sqlrcon,
 				const char *user, const char *password) {
 	return sqlrcon->cont->databaseBasedAuth(user,password);
 }
@@ -26,6 +26,6 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_database(
 						xmldomnode *users,
 						sqlrpwdencs *sqlrpe) {
-		return new database(users,sqlrpe);
+		return new sqlrauth_database(users,sqlrpe);
 	}
 }

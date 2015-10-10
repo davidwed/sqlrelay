@@ -5,12 +5,12 @@
 #include <rudiments/character.h>
 #include <debugprint.h>
 
-class SQLRSERVER_DLLSPEC string : public sqlrfilter {
+class SQLRSERVER_DLLSPEC sqlrfilter_string : public sqlrfilter {
 	public:
-			string(sqlrfilters *sqlrfs,
+			sqlrfilter_string(sqlrfilters *sqlrfs,
 					xmldomnode *parameters,
 					bool debug);
-			~string();
+			~sqlrfilter_string();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
@@ -22,10 +22,10 @@ class SQLRSERVER_DLLSPEC string : public sqlrfilter {
 		bool	enabled;
 };
 
-string::string(sqlrfilters *sqlrfs,
-				xmldomnode *parameters,
-				bool debug) :
-				sqlrfilter(sqlrfs,parameters,debug) {
+sqlrfilter_string::sqlrfilter_string(sqlrfilters *sqlrfs,
+					xmldomnode *parameters,
+					bool debug) :
+					sqlrfilter(sqlrfs,parameters,debug) {
 	debugFunction();
 
 	enabled=charstring::compareIgnoringCase(
@@ -49,13 +49,13 @@ string::string(sqlrfilters *sqlrfs,
 	}
 }
 
-string::~string() {
+sqlrfilter_string::~sqlrfilter_string() {
 	delete[] lowerpattern;
 }
 
-bool string::run(sqlrserverconnection *sqlrcon,
-				sqlrservercursor *sqlrcur,
-				const char *query) {
+bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					const char *query) {
 	debugFunction();
 
 	if (!enabled) {
@@ -86,6 +86,6 @@ extern "C" {
 			*new_sqlrfilter_string(sqlrfilters *sqlrfs,
 							xmldomnode *parameters,
 							bool debug) {
-		return new string(sqlrfs,parameters,debug);
+		return new sqlrfilter_string(sqlrfs,parameters,debug);
 	}
 }

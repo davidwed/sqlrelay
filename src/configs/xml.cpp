@@ -16,10 +16,10 @@
 #include <defines.h>
 #include <defaults.h>
 
-class SQLRUTIL_DLLSPEC xml : public sqlrconfig, public xmlsax {
+class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 	public:
-			xml();
-			~xml();
+			sqlrconfig_xml();
+			~sqlrconfig_xml();
 
 		void	getEnabledIds(const char *urlname,
 					linkedlist< char * > *idlist);
@@ -357,15 +357,15 @@ class SQLRUTIL_DLLSPEC xml : public sqlrconfig, public xmlsax {
 		attribute	currentattribute;
 };
 
-xml::xml() : sqlrconfig(), xmlsax() {
+sqlrconfig_xml::sqlrconfig_xml() : sqlrconfig(), xmlsax() {
 	init();
 }
 
-xml::~xml() {
+sqlrconfig_xml::~sqlrconfig_xml() {
 	clear();
 }
 
-void xml::init() {
+void sqlrconfig_xml::init() {
 	getenabledids=false;
 	currentid=NULL;
 	enabled=false;
@@ -455,7 +455,7 @@ void xml::init() {
 	inend=false;
 }
 
-void xml::clear() {
+void sqlrconfig_xml::clear() {
 	delete[] currentid;
 	delete[] dbase;
 	delete[] unixport;
@@ -509,292 +509,292 @@ void xml::clear() {
 	addresscount=0;
 }
 
-const char * const *xml::getDefaultAddresses() {
+const char * const *sqlrconfig_xml::getDefaultAddresses() {
 	return defaultlistener->getAddresses();
 }
 
-uint64_t xml::getDefaultAddressCount() {
+uint64_t sqlrconfig_xml::getDefaultAddressCount() {
 	return defaultlistener->getAddressCount();
 }
 
-uint16_t xml::getDefaultPort() {
+uint16_t sqlrconfig_xml::getDefaultPort() {
 	return defaultlistener->getPort();
 }
 
-const char *xml::getDefaultSocket() {
+const char *sqlrconfig_xml::getDefaultSocket() {
 	return defaultlistener->getSocket();
 }
 
-bool xml::getListenOnInet() {
+bool sqlrconfig_xml::getListenOnInet() {
 	return listenoninet;
 }
 
-bool xml::getListenOnUnix() {
+bool sqlrconfig_xml::getListenOnUnix() {
 	return listenonunix;
 }
 
-const char *xml::getDbase() {
+const char *sqlrconfig_xml::getDbase() {
 	return dbase;
 }
 
-uint32_t xml::getConnections() {
+uint32_t sqlrconfig_xml::getConnections() {
 	return connections;
 }
 
-uint32_t xml::getMaxConnections() {
+uint32_t sqlrconfig_xml::getMaxConnections() {
 	return maxconnections;
 }
 
-uint32_t xml::getMaxQueueLength() {
+uint32_t sqlrconfig_xml::getMaxQueueLength() {
 	return maxqueuelength;
 }
 
-uint32_t xml::getGrowBy() {
+uint32_t sqlrconfig_xml::getGrowBy() {
 	return growby;
 }
 
-int32_t xml::getTtl() {
+int32_t sqlrconfig_xml::getTtl() {
 	return ttl;
 }
 
-int32_t xml::getSoftTtl() {
+int32_t sqlrconfig_xml::getSoftTtl() {
 	return softttl;
 }
 
-uint16_t xml::getMaxSessionCount() {
+uint16_t sqlrconfig_xml::getMaxSessionCount() {
 	return maxsessioncount;
 }
 
-bool xml::getDynamicScaling() {
+bool sqlrconfig_xml::getDynamicScaling() {
 	return (maxconnections>connections && growby>0 && ttl>-1 &&
 		(maxlisteners==-1 || maxqueuelength<=maxlisteners));
 }
 
-const char *xml::getEndOfSession() {
+const char *sqlrconfig_xml::getEndOfSession() {
 	return endofsession;
 }
 
-bool xml::getEndOfSessionCommit() {
+bool sqlrconfig_xml::getEndOfSessionCommit() {
 	return endofsessioncommit;
 }
 
-uint32_t xml::getSessionTimeout() {
+uint32_t sqlrconfig_xml::getSessionTimeout() {
 	return sessiontimeout;
 }
 
-const char *xml::getRunAsUser() {
+const char *sqlrconfig_xml::getRunAsUser() {
 	return runasuser;
 }
 
-const char *xml::getRunAsGroup() {
+const char *sqlrconfig_xml::getRunAsGroup() {
 	return runasgroup;
 }
 
-uint16_t xml::getCursors() {
+uint16_t sqlrconfig_xml::getCursors() {
 	return cursors;
 }
 
-uint16_t xml::getMaxCursors() {
+uint16_t sqlrconfig_xml::getMaxCursors() {
 	return maxcursors;
 }
 
-uint16_t xml::getCursorsGrowBy() {
+uint16_t sqlrconfig_xml::getCursorsGrowBy() {
 	return cursorsgrowby;
 }
 
-const char *xml::getAuthTier() {
+const char *sqlrconfig_xml::getAuthTier() {
 	return authtier;
 }
 
-const char *xml::getSessionHandler() {
+const char *sqlrconfig_xml::getSessionHandler() {
 	return sessionhandler;
 }
 
-const char *xml::getHandoff() {
+const char *sqlrconfig_xml::getHandoff() {
 	return handoff;
 }
 
-bool xml::getAuthOnConnection() {
+bool sqlrconfig_xml::getAuthOnConnection() {
 	return authonconnection;
 }
 
-bool xml::getAuthOnDatabase() {
+bool sqlrconfig_xml::getAuthOnDatabase() {
 	return authondatabase;
 }
 
-const char *xml::getAllowedIps() {
+const char *sqlrconfig_xml::getAllowedIps() {
 	return allowedips;
 }
 
-const char *xml::getDeniedIps() {
+const char *sqlrconfig_xml::getDeniedIps() {
 	return deniedips;
 }
 
-const char *xml::getDebug() {
+const char *sqlrconfig_xml::getDebug() {
 	return debug;
 }
 
-bool xml::getDebugTranslations() {
+bool sqlrconfig_xml::getDebugTranslations() {
 	return debugtranslations;
 }
 
-bool xml::getDebugFilters() {
+bool sqlrconfig_xml::getDebugFilters() {
 	return debugfilters;
 }
 
-bool xml::getDebugTriggers() {
+bool sqlrconfig_xml::getDebugTriggers() {
 	return debugtriggers;
 }
 
-bool xml::getDebugBindTranslations() {
+bool sqlrconfig_xml::getDebugBindTranslations() {
 	return debugbindtranslations;
 }
 
-uint64_t xml::getMaxClientInfoLength() {
+uint64_t sqlrconfig_xml::getMaxClientInfoLength() {
 	return maxclientinfolength;
 }
 
-uint32_t xml::getMaxQuerySize() {
+uint32_t sqlrconfig_xml::getMaxQuerySize() {
 	return maxquerysize;
 }
 
-uint16_t xml::getMaxBindCount() {
+uint16_t sqlrconfig_xml::getMaxBindCount() {
 	return maxbindcount;
 }
 
-uint16_t xml::getMaxBindNameLength() {
+uint16_t sqlrconfig_xml::getMaxBindNameLength() {
 	return maxbindnamelength;
 }
 
-uint32_t xml::getMaxStringBindValueLength() {
+uint32_t sqlrconfig_xml::getMaxStringBindValueLength() {
 	return maxstringbindvaluelength;
 }
 
-uint32_t xml::getMaxLobBindValueLength() {
+uint32_t sqlrconfig_xml::getMaxLobBindValueLength() {
 	return maxlobbindvaluelength;
 }
 
-uint32_t xml::getMaxErrorLength() {
+uint32_t sqlrconfig_xml::getMaxErrorLength() {
 	return maxerrorlength;
 }
 
-int32_t xml::getIdleClientTimeout() {
+int32_t sqlrconfig_xml::getIdleClientTimeout() {
 	return idleclienttimeout;
 }
 
-int64_t xml::getMaxListeners() {
+int64_t sqlrconfig_xml::getMaxListeners() {
 	return maxlisteners;
 }
 
-uint32_t xml::getListenerTimeout() {
+uint32_t sqlrconfig_xml::getListenerTimeout() {
 	return listenertimeout;
 }
 
-bool xml::getReLoginAtStart() {
+bool sqlrconfig_xml::getReLoginAtStart() {
 	return reloginatstart;
 }
 
-bool xml::getFakeInputBindVariables() {
+bool sqlrconfig_xml::getFakeInputBindVariables() {
 	return fakeinputbindvariables;
 }
 
-bool xml::getTranslateBindVariables() {
+bool sqlrconfig_xml::getTranslateBindVariables() {
 	return translatebindvariables;
 }
 
-const char *xml::getIsolationLevel() {
+const char *sqlrconfig_xml::getIsolationLevel() {
 	return isolationlevel;
 }
 
-bool xml::getIgnoreSelectDatabase() {
+bool sqlrconfig_xml::getIgnoreSelectDatabase() {
 	return ignoreselectdb;
 }
 
-bool xml::getWaitForDownDatabase() {
+bool sqlrconfig_xml::getWaitForDownDatabase() {
 	return waitfordowndb;
 }
 
-const char *xml::getDateTimeFormat() {
+const char *sqlrconfig_xml::getDateTimeFormat() {
 	return datetimeformat;
 }
 
-const char *xml::getDateFormat() {
+const char *sqlrconfig_xml::getDateFormat() {
 	return dateformat;
 }
 
-const char *xml::getTimeFormat() {
+const char *sqlrconfig_xml::getTimeFormat() {
 	return timeformat;
 }
 
-bool xml::getDateDdMm() {
+bool sqlrconfig_xml::getDateDdMm() {
 	return dateddmm;
 }
 
-bool xml::getDateYyyyDdMm() {
+bool sqlrconfig_xml::getDateYyyyDdMm() {
 	return dateyyyyddmm;
 }
 
-const char *xml::getDateDelimiters() {
+const char *sqlrconfig_xml::getDateDelimiters() {
 	return datedelimiters;
 }
 
-bool xml::getIgnoreNonDateTime() {
+bool sqlrconfig_xml::getIgnoreNonDateTime() {
 	return ignorenondatetime;
 }
 
-linkedlist< char * > *xml::getSessionStartQueries() {
+linkedlist< char * > *sqlrconfig_xml::getSessionStartQueries() {
 	return &sessionstartqueries;
 }
 
-linkedlist< char * > *xml::getSessionEndQueries() {
+linkedlist< char * > *sqlrconfig_xml::getSessionEndQueries() {
 	return &sessionendqueries;
 }
 
-const char *xml::getTranslations() {
+const char *sqlrconfig_xml::getTranslations() {
 	return translations.getString();
 }
 
-const char *xml::getFilters() {
+const char *sqlrconfig_xml::getFilters() {
 	return filters.getString();
 }
 
-const char *xml::getResultSetTranslations() {
+const char *sqlrconfig_xml::getResultSetTranslations() {
 	return resultsettranslations.getString();
 }
 
-const char *xml::getTriggers() {
+const char *sqlrconfig_xml::getTriggers() {
 	return triggers.getString();
 }
 
-const char *xml::getLoggers() {
+const char *sqlrconfig_xml::getLoggers() {
 	return loggers.getString();
 }
 
-const char *xml::getQueries() {
+const char *sqlrconfig_xml::getQueries() {
 	return queries.getString();
 }
 
-const char *xml::getPasswordEncryptions() {
+const char *sqlrconfig_xml::getPasswordEncryptions() {
 	return passwordencryptions.getString();
 }
 
-const char *xml::getAuthentications() {
+const char *sqlrconfig_xml::getAuthentications() {
 	return authentications.getString();
 }
 
-linkedlist< listenercontainer * > *xml::getListenerList() {
+linkedlist< listenercontainer * > *sqlrconfig_xml::getListenerList() {
 	return &listenerlist;
 }
 
-linkedlist< usercontainer * > *xml::getUserList() {
+linkedlist< usercontainer * > *sqlrconfig_xml::getUserList() {
 	return &userlist;
 }
 
-linkedlist< connectstringcontainer * > *xml::getConnectStringList() {
+linkedlist< connectstringcontainer * > *sqlrconfig_xml::getConnectStringList() {
 	return &connectstringlist;
 }
 
-connectstringcontainer *xml::getConnectString(
+connectstringcontainer *sqlrconfig_xml::getConnectString(
 						const char *connectionid) {
 	for (connectstringnode *csn=connectstringlist.getFirst();
 						csn; csn=csn->getNext()) {
@@ -806,11 +806,11 @@ connectstringcontainer *xml::getConnectString(
 	return NULL;
 }
 
-uint32_t xml::getConnectionCount() {
+uint32_t sqlrconfig_xml::getConnectionCount() {
 	return connectstringlist.getLength();
 }
 
-uint32_t xml::getMetricTotal() {
+uint32_t sqlrconfig_xml::getMetricTotal() {
 	// This is tallied here instead of whenever the parser runs into a
 	// metric attribute because people often forget to include metric
 	// attributes.  In that case, though each connection has a metric,
@@ -824,11 +824,11 @@ uint32_t xml::getMetricTotal() {
 	return metrictotal;
 }
 
-linkedlist< routecontainer * >	*xml::getRouteList() {
+linkedlist< routecontainer * >	*sqlrconfig_xml::getRouteList() {
 	return &routelist;
 }
 
-bool xml::tagStart(const char *ns, const char *name) {
+bool sqlrconfig_xml::tagStart(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -1193,7 +1193,7 @@ bool xml::tagStart(const char *ns, const char *name) {
 	return true;
 }
 
-bool xml::tagEnd(const char *ns, const char *name) {
+bool sqlrconfig_xml::tagEnd(const char *ns, const char *name) {
 
 	// don't do anything if we're already done
 	// or have not found the correct id
@@ -1458,7 +1458,7 @@ bool xml::tagEnd(const char *ns, const char *name) {
 	return true;
 }
 
-bool xml::attributeName(const char *name) {
+bool sqlrconfig_xml::attributeName(const char *name) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -1793,7 +1793,7 @@ bool xml::attributeName(const char *name) {
 	return true;
 }
 
-bool xml::attributeValue(const char *value) {
+bool sqlrconfig_xml::attributeValue(const char *value) {
 
 	// don't do anything if we're already done
 	if (done) {
@@ -2163,7 +2163,7 @@ bool xml::attributeValue(const char *value) {
 	return true;
 }
 
-bool xml::text(const char *string) {
+bool sqlrconfig_xml::text(const char *string) {
 
 	if (currenttag==RUNQUERY_TAG) {
 		linkedlist< char * >	*ptr=NULL;
@@ -2180,7 +2180,7 @@ bool xml::text(const char *string) {
 	return true;
 }
 
-uint32_t xml::atouint32_t(const char *value,
+uint32_t sqlrconfig_xml::atouint32_t(const char *value,
 				const char *defaultvalue, uint32_t minvalue) {
 	uint32_t	retval=charstring::toUnsignedInteger(
 						(value)?value:defaultvalue);
@@ -2190,7 +2190,7 @@ uint32_t xml::atouint32_t(const char *value,
 	return retval;
 }
 
-int32_t xml::atoint32_t(const char *value,
+int32_t sqlrconfig_xml::atoint32_t(const char *value,
 				const char *defaultvalue, int32_t minvalue) {
 	int32_t	retval=charstring::toInteger((value)?value:defaultvalue);
 	if (retval<minvalue) {
@@ -2199,7 +2199,7 @@ int32_t xml::atoint32_t(const char *value,
 	return retval;
 }
 
-routecontainer *xml::routeAlreadyExists(routecontainer *cur) {
+routecontainer *sqlrconfig_xml::routeAlreadyExists(routecontainer *cur) {
 
 	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
 
@@ -2219,7 +2219,7 @@ routecontainer *xml::routeAlreadyExists(routecontainer *cur) {
 	return NULL;
 }
 
-void xml::moveRegexList(routecontainer *cur,
+void sqlrconfig_xml::moveRegexList(routecontainer *cur,
 					routecontainer *existing) {
 
 	for (linkedlistnode< regularexpression * > *re=
@@ -2230,7 +2230,7 @@ void xml::moveRegexList(routecontainer *cur,
 	cur->getRegexList()->clear();
 }
 
-bool xml::load(const char *urlname, const char *id) {
+bool sqlrconfig_xml::load(const char *urlname, const char *id) {
 
 	// sanity check
 	if (charstring::isNullOrEmpty(urlname) ||
@@ -2255,7 +2255,7 @@ bool xml::load(const char *urlname, const char *id) {
 }
 
 
-void xml::parseUrl(const char *urlname) {
+void sqlrconfig_xml::parseUrl(const char *urlname) {
 
 	if (!charstring::compare(urlname,"dir:",4)) {
 		parseDir(urlname);
@@ -2266,7 +2266,7 @@ void xml::parseUrl(const char *urlname) {
 	}
 }
 
-void xml::parseDir(const char *urlname) {
+void sqlrconfig_xml::parseDir(const char *urlname) {
 
 	// skip the protocol
 	const char	*dir=
@@ -2301,7 +2301,7 @@ void xml::parseDir(const char *urlname) {
 	d.close();
 }
 
-void xml::parseUrlList(const char *urlname) {
+void sqlrconfig_xml::parseUrlList(const char *urlname) {
 
 	// process the file "urlname" as a list of urls...
 	filedescriptor	*fd=NULL;
@@ -2365,7 +2365,8 @@ void xml::parseUrlList(const char *urlname) {
 	}
 }
 
-void xml::getEnabledIds(const char *urlname, linkedlist< char * > *idlist) {
+void sqlrconfig_xml::getEnabledIds(const char *urlname,
+					linkedlist< char * > *idlist) {
 
 	// sanity check
 	if (charstring::isNullOrEmpty(urlname)) {
@@ -2386,7 +2387,7 @@ void xml::getEnabledIds(const char *urlname, linkedlist< char * > *idlist) {
 	parseUrl(urlname);
 }
 
-bool xml::accessible() {
+bool sqlrconfig_xml::accessible() {
 	// FIXME: implement this
 	return true;
 }
@@ -2394,6 +2395,6 @@ bool xml::accessible() {
 
 extern "C" {
 	SQLRUTIL_DLLSPEC sqlrconfig *new_sqlrconfig_xml() {
-		return new xml();
+		return new sqlrconfig_xml();
 	}
 }

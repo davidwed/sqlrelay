@@ -5,21 +5,22 @@
 #include <rudiments/charstring.h>
 #include <rudiments/crypt.h>
 
-class SQLRSERVER_DLLSPEC crypt_pwdenc : public sqlrpwdenc {
+class SQLRSERVER_DLLSPEC sqlrpwdenc_crypt : public sqlrpwdenc {
 	public:
-			crypt_pwdenc(xmldomnode *parameters);
+			sqlrpwdenc_crypt(xmldomnode *parameters);
 		bool	oneWay();
 		char	*encrypt(const char *value);
 };
 
-crypt_pwdenc::crypt_pwdenc(xmldomnode *parameters) : sqlrpwdenc(parameters) {
+sqlrpwdenc_crypt::sqlrpwdenc_crypt(xmldomnode *parameters) :
+					sqlrpwdenc(parameters) {
 }
 
-bool crypt_pwdenc::oneWay() {
+bool sqlrpwdenc_crypt::oneWay() {
 	return true;
 }
 
-char *crypt_pwdenc::encrypt(const char *value) {
+char *sqlrpwdenc_crypt::encrypt(const char *value) {
 
 	// the first two characters of the result string
 	// are the salt, so don't include them, if possible
@@ -36,6 +37,6 @@ char *crypt_pwdenc::encrypt(const char *value) {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_crypt(
 						xmldomnode *parameters) {
-		return new crypt_pwdenc(parameters);
+		return new sqlrpwdenc_crypt(parameters);
 	}
 }

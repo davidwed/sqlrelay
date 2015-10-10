@@ -4,29 +4,29 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/character.h>
 
-class SQLRSERVER_DLLSPEC rot : public sqlrpwdenc {
+class SQLRSERVER_DLLSPEC sqlrpwenc_rot : public sqlrpwdenc {
 	public:
-			rot(xmldomnode *parameters);
+			sqlrpwenc_rot(xmldomnode *parameters);
 		char	*encrypt(const char *value);
 		char	*decrypt(const char *value);
 	private:
 		char	*rotate(const char *value, int64_t count);
 };
 
-rot::rot(xmldomnode *parameters) : sqlrpwdenc(parameters) {
+sqlrpwenc_rot::sqlrpwenc_rot(xmldomnode *parameters) : sqlrpwdenc(parameters) {
 }
 
-char *rot::encrypt(const char *value) {
+char *sqlrpwenc_rot::encrypt(const char *value) {
 	return rotate(value,charstring::toInteger(
 				parameters->getAttributeValue("count")));
 }
 
-char *rot::decrypt(const char *value) {
+char *sqlrpwenc_rot::decrypt(const char *value) {
 	return rotate(value,-charstring::toInteger(
 				parameters->getAttributeValue("count")));
 }
 
-char *rot::rotate(const char *value, int64_t count) {
+char *sqlrpwenc_rot::rotate(const char *value, int64_t count) {
 
 	// get the size of the value passed in and
 	// allocate space for the return value
@@ -67,6 +67,6 @@ char *rot::rotate(const char *value, int64_t count) {
 extern "C" {
 	 SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_rot(
 						xmldomnode *parameters) {
-		return new rot(parameters);
+		return new sqlrpwenc_rot(parameters);
 	}
 }

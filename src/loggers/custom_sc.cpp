@@ -8,10 +8,10 @@
 #include <rudiments/datetime.h>
 #include <debugprint.h>
 
-class SQLRSERVER_DLLSPEC custom_sc : public sqlrlogger {
+class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
 	public:
-			custom_sc(xmldomnode *parameters);
-			~custom_sc();
+			sqlrlogger_custom_sc(xmldomnode *parameters);
+			~sqlrlogger_custom_sc();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
@@ -28,18 +28,20 @@ class SQLRSERVER_DLLSPEC custom_sc : public sqlrlogger {
 		bool			enabled;
 };
 
-custom_sc::custom_sc(xmldomnode *parameters) : sqlrlogger(parameters) {
+sqlrlogger_custom_sc::sqlrlogger_custom_sc(xmldomnode *parameters) :
+						sqlrlogger(parameters) {
 	querylogname=NULL;
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 }
 
-custom_sc::~custom_sc() {
+sqlrlogger_custom_sc::~sqlrlogger_custom_sc() {
 	delete[] querylogname;
 }
 
-bool custom_sc::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+bool sqlrlogger_custom_sc::init(sqlrlistener *sqlrl,
+				sqlrserverconnection *sqlrcon) {
 	debugFunction();
 
 	if (!enabled) {
@@ -79,7 +81,7 @@ bool custom_sc::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 				permissions::evalPermString("rw-------"));
 }
 
-bool custom_sc::run(sqlrlistener *sqlrl,
+bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
@@ -223,6 +225,6 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_sc(
 						xmldomnode *parameters) {
-		return new custom_sc(parameters);
+		return new sqlrlogger_custom_sc(parameters);
 	}
 }

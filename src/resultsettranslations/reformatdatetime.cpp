@@ -4,11 +4,13 @@
 #include <sqlrelay/sqlrserver.h>
 #include <debugprint.h>
 
-class SQLRSERVER_DLLSPEC reformatdatetime : public sqlrresultsettranslation {
+class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
+					public sqlrresultsettranslation {
 	public:
-			reformatdatetime(sqlrresultsettranslations *sqlrrsts,
-							xmldomnode *parameters);
-			~reformatdatetime();
+			sqlrresultsettranslation_reformatdatetime(
+					sqlrresultsettranslations *sqlrrsts,
+					xmldomnode *parameters);
+			~sqlrresultsettranslation_reformatdatetime();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
@@ -32,8 +34,10 @@ class SQLRSERVER_DLLSPEC reformatdatetime : public sqlrresultsettranslation {
 		bool	enabled;
 };
 
-reformatdatetime::reformatdatetime(sqlrresultsettranslations *sqlrrsts,
-						xmldomnode *parameters) :
+sqlrresultsettranslation_reformatdatetime::
+	sqlrresultsettranslation_reformatdatetime(
+				sqlrresultsettranslations *sqlrrsts,
+				xmldomnode *parameters) :
 				sqlrresultsettranslation(sqlrrsts,parameters) {
 
 	reformattedfield=NULL;
@@ -72,11 +76,13 @@ reformatdatetime::reformatdatetime(sqlrresultsettranslations *sqlrrsts,
 
 }
 
-reformatdatetime::~reformatdatetime() {
+sqlrresultsettranslation_reformatdatetime::
+	~sqlrresultsettranslation_reformatdatetime() {
 	delete[] reformattedfield;
 }
 
-bool reformatdatetime::run(sqlrserverconnection *sqlrcon,
+bool sqlrresultsettranslation_reformatdatetime::run(
+					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
 					uint16_t fieldindex,
@@ -110,6 +116,7 @@ extern "C" {
 			*new_sqlrresultsettranslation_reformatdatetime(
 					sqlrresultsettranslations *sqlrrsts,
 					xmldomnode *parameters) {
-		return new reformatdatetime(sqlrrsts,parameters);
+		return new sqlrresultsettranslation_reformatdatetime(
+							sqlrrsts,parameters);
 	}
 }

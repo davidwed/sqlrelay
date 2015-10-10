@@ -8,10 +8,10 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
-class SQLRSERVER_DLLSPEC debug : public sqlrlogger {
+class SQLRSERVER_DLLSPEC sqlrlogger_debug : public sqlrlogger {
 	public:
-			debug(xmldomnode *parameters);
-			~debug();
+			sqlrlogger_debug(xmldomnode *parameters);
+			~sqlrlogger_debug();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
@@ -34,7 +34,8 @@ class SQLRSERVER_DLLSPEC debug : public sqlrlogger {
 		bool			logconnection;
 };
 
-debug::debug(xmldomnode *parameters) : sqlrlogger(parameters) {
+sqlrlogger_debug::sqlrlogger_debug(xmldomnode *parameters) :
+					sqlrlogger(parameters) {
 	dbgfile=NULL;
 	debuglogger=NULL;
 	dbgfilename=NULL;
@@ -52,12 +53,13 @@ debug::debug(xmldomnode *parameters) : sqlrlogger(parameters) {
 			parameters->getAttributeValue("connection"),"no");
 }
 
-debug::~debug() {
+sqlrlogger_debug::~sqlrlogger_debug() {
 	closeDebugFile();
 	delete[] dbgfilename;
 }
 
-bool debug::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+bool sqlrlogger_debug::init(sqlrlistener *sqlrl,
+				sqlrserverconnection *sqlrcon) {
 
 	if (!enabled) {
 		return true;
@@ -88,7 +90,7 @@ bool debug::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	return true;
 }
 
-bool debug::run(sqlrlistener *sqlrl,
+bool sqlrlogger_debug::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
@@ -112,7 +114,7 @@ bool debug::run(sqlrlistener *sqlrl,
 	return true;
 }
 
-bool debug::openDebugFile() {
+bool sqlrlogger_debug::openDebugFile() {
 
 	// create the debug file
 	dbgfile=new filedestination();
@@ -138,7 +140,7 @@ bool debug::openDebugFile() {
 	return retval;
 }
 
-void debug::closeDebugFile() {
+void sqlrlogger_debug::closeDebugFile() {
 	if (dbgfile) {
 		dbgfile->close();
 		delete dbgfile;
@@ -151,6 +153,6 @@ void debug::closeDebugFile() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_debug(
 						xmldomnode *parameters) {
-		return new debug(parameters);
+		return new sqlrlogger_debug(parameters);
 	}
 }

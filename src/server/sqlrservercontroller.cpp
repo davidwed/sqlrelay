@@ -2909,7 +2909,7 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
 		return false;
 	}
 
-	if (debugsqlrtranslation) {
+	if (debugsqlrfilters) {
 		stdoutput.printf("query accepted\n");
 	}
 	return true;
