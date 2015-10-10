@@ -333,11 +333,20 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 		// get a character from the file or string
 		if (fl) {
 			if (fl->read(&ch)!=sizeof(ch)) {
-				return false;
+				// end of the command...
+				// only return false if we're at the
+				// beginning, prior to any actual command
+				return !ininitialwhitespace;
 			}
 		} else {
 			if (!*string) {
-				return false;
+				// end of the command...
+				// only return false if we're at the
+				// beginning, prior to any actual command
+				if (stringpos) {
+					*stringpos=string;
+				}
+				return !ininitialwhitespace;
 			}
 			ch=*string;
 			string++;
@@ -357,7 +366,7 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 				cmdbuffer->append(ch);
 				if (fl) {
 					if (fl->read(&ch)!=sizeof(ch)) {
-						return false;
+						return true;
 					}
 				} else {
 					ch=*string;
@@ -377,7 +386,7 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 				cmdbuffer->append(ch);
 				if (fl) {
 					if (fl->read(&ch)!=sizeof(ch)) {
-						return false;
+						return true;
 					}
 				} else {
 					ch=*string;
@@ -391,23 +400,16 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 			}
 		}
 
-		// update the string-position pointer
-		if (string && stringpos) {
-			*stringpos=string;
-		}
-
 		// look for an end of command delimiter
 		if (!insinglequotes && !indoublequotes && ch==env->delimiter) {
+			if (string && stringpos) {
+				*stringpos=string;
+			}
 			return true;
 		}
 
 		// write character to buffer and move on
 		cmdbuffer->append(ch);
-
-		// look for the end of the string
-		if (string && !*string) {
-			return true;
-		}
 	}
 }
 
@@ -1808,18 +1810,8 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				#endif
 			#endif
 			size_t	len=charstring::length(cmd);
-			done=false;
-			for (size_t i=0; i<len; i++) {
-				if (i==len-1) {
-				       if (cmd[i]==env->delimiter) {
-						done=true;
-					} else {
-						command.append(cmd[i]);
-					}
-				} else {
-					command.append(cmd[i]);
-				}
-			}
+			command.append(cmd);
+			done=(cmd[len-1]==env->delimiter);
 			if (!done) {
 				promptcount++;
 				command.append('\n');
