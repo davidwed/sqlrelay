@@ -22,6 +22,8 @@
 		config files, local config directories, or remote config files
 	updated sqlr-start and sqlr-scaler not to pass the default -config
 		value if sqlr-start wasn't explicitly started with -config
+	fixed a bug that could cause sqlrsh to act funny if the last character
+		prior to the command delimiter was a single or double quote
 
 0.63.1 - backported shutdown loop detection
 
