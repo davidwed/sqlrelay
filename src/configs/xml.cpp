@@ -11,6 +11,7 @@
 #include <rudiments/file.h>
 #include <rudiments/url.h>
 #include <rudiments/filesystem.h>
+#include <rudiments/character.h>
 #include <rudiments/stdio.h>
 
 #include <defines.h>
@@ -125,7 +126,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 
 		void	parseUrl(const char *urlname);
 		void	parseDir(const char *dir);
-		void	parseUrlList(const char *urlname);
+		void	parseLinkFile(const char *urlname);
 
 		uint32_t	atouint32_t(const char *value,
 					const char *defaultvalue,
@@ -2257,11 +2258,17 @@ bool sqlrconfig_xml::load(const char *urlname, const char *id) {
 
 void sqlrconfig_xml::parseUrl(const char *urlname) {
 
+	// skip leading whitespace
+	while (*urlname && character::isWhitespace(*urlname)) {
+		urlname++;
+	}
+
+	// parse the url as a config directory, config file or link file
 	if (!charstring::compare(urlname,"dir:",4)) {
 		parseDir(urlname);
 	} else {
 		if (!parseFile(urlname)) {
-			parseUrlList(urlname);
+			parseLinkFile(urlname);
 		}
 	}
 }
@@ -2301,7 +2308,7 @@ void sqlrconfig_xml::parseDir(const char *urlname) {
 	d.close();
 }
 
-void sqlrconfig_xml::parseUrlList(const char *urlname) {
+void sqlrconfig_xml::parseLinkFile(const char *urlname) {
 
 	// process the file "urlname" as a list of urls...
 	filedescriptor	*fd=NULL;
@@ -2350,7 +2357,7 @@ void sqlrconfig_xml::parseUrlList(const char *urlname) {
 		// trim whitespace
 		charstring::bothTrim(line);
 
-		// parsethe line (skipping blank lines and comments)
+		// parse the line (skipping blank lines and comments)
 		if (line[0] && line[0]!='#') {
 			parseUrl(line);
 		}
