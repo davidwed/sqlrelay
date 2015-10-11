@@ -5,9 +5,11 @@
 
 sqlrresultsettranslation::sqlrresultsettranslation(
 				sqlrresultsettranslations *sqlrrsts,
-				xmldomnode *parameters) {
+				xmldomnode *parameters,
+				bool debug) {
 	this->sqlrrsts=sqlrrsts;
 	this->parameters=parameters;
+	this->debug=debug;
 }
 
 sqlrresultsettranslation::~sqlrresultsettranslation() {

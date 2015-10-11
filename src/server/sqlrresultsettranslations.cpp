@@ -16,10 +16,12 @@
 	}
 #endif
 
-sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth) {
+sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth,
+								bool debug) {
 	debugFunction();
 	xmld=NULL;
 	libexecdir=sqlrpth->getLibExecDir();
+	this->debug=debug;
 }
 
 sqlrresultsettranslations::~sqlrresultsettranslations() {
@@ -122,9 +124,9 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 	stringbuffer	functionname;
 	functionname.append("new_sqlrresultsettranslation_")->append(module);
 	sqlrresultsettranslation *(*newResultSetTranslation)
-		(sqlrresultsettranslations *, xmldomnode *)=
+		(sqlrresultsettranslations *, xmldomnode *, bool)=
 		(sqlrresultsettranslation *(*)
-		(sqlrresultsettranslations *, xmldomnode *))
+		(sqlrresultsettranslations *, xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
 		stdoutput.printf("failed to create "
@@ -137,7 +139,7 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 		return;
 	}
 	sqlrresultsettranslation	*rstr=
-		(*newResultSetTranslation)(this,resultsettranslation);
+		(*newResultSetTranslation)(this,resultsettranslation,debug);
 
 #else
 	dynamiclib			*dl=NULL;
@@ -167,12 +169,20 @@ bool sqlrresultsettranslations::runResultSetTranslations(
 						uint32_t *newfieldlength) {
 	debugFunction();
 
+	*newfield=field;
+	*newfieldlength=fieldlength;
+
 	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
 						tlist.getFirst();
 						node; node=node->getNext()) {
+		if (debug) {
+			stdoutput.printf(
+				"\nrunning result set translation...\n\n");
+		}
+
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
 						fieldname,fieldindex,
-						field,fieldlength,
+						*newfield,*newfieldlength,
 						newfield,newfieldlength)) {
 			return false;
 		}

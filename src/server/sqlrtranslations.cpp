@@ -170,7 +170,7 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 						node; node=node->getNext()) {
 
 		if (debug) {
-			stdoutput.printf("running translation...\n\n");
+			stdoutput.printf("\nrunning translation...\n\n");
 		}
 
 		sqlrtranslation	*tr=node->getValue()->tr;

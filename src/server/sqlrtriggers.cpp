@@ -182,6 +182,10 @@ void sqlrtriggers::runTriggers(sqlrserverconnection *sqlrcon,
 	}
 	for (singlylinkedlistnode< sqlrtriggerplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
+		if (debug) {
+			stdoutput.printf("\nrunning %s trigger...\n\n",
+						(before)?"before":"after");
+		}
 		node->getValue()->tr->run(sqlrcon,sqlrcur,
 						querytree,before,success);
 	}

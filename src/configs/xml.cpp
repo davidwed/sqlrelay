@@ -63,6 +63,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
 		bool		getDebugBindTranslations();
+		bool		getDebugResultSetTranslations();
 		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
@@ -179,6 +180,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		bool		debugfilters;
 		bool		debugtriggers;
 		bool		debugbindtranslations;
+		bool		debugresultsettranslations;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -408,6 +410,8 @@ void sqlrconfig_xml::init() {
 	debugfilters=charstring::contains(debug,"filters");
 	debugtriggers=charstring::contains(debug,"triggers");
 	debugbindtranslations=charstring::contains(debug,"bindtranslations");
+	debugresultsettranslations=
+			charstring::contains(debug,"resultsettranslations");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -649,6 +653,10 @@ bool sqlrconfig_xml::getDebugTriggers() {
 
 bool sqlrconfig_xml::getDebugBindTranslations() {
 	return debugbindtranslations;
+}
+
+bool sqlrconfig_xml::getDebugResultSetTranslations() {
+	return debugresultsettranslations;
 }
 
 uint64_t sqlrconfig_xml::getMaxClientInfoLength() {
@@ -1988,8 +1996,12 @@ bool sqlrconfig_xml::attributeValue(const char *value) {
 							"filters");
 			debugtriggers=charstring::contains(debug,
 							"triggers");
-			debugbindtranslations=charstring::contains(debug,
+			debugbindtranslations=
+					charstring::contains(debug,
 							"bindtranslations");
+			debugresultsettranslations=
+					charstring::contains(debug,
+						"resultsettranslations");
 		} else if (currentattribute==MAXCLIENTINFOLENGTH_ATTRIBUTE) {
 			maxclientinfolength=
 				charstring::toInteger((value)?value:

@@ -66,10 +66,10 @@ void sqlrpwdencs::unloadPasswordEncryptions() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
-		sqlrpwdencplugin	*sqlrpp=node->getValue();
-		delete sqlrpp->pe;
-		delete sqlrpp->dl;
-		delete sqlrpp;
+		sqlrpwdencplugin	*sqlrpe=node->getValue();
+		delete sqlrpe->pe;
+		delete sqlrpe->dl;
+		delete sqlrpe;
 	}
 	llist.clear();
 }
@@ -145,10 +145,10 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 #endif
 
 	// add the plugin to the list
-	sqlrpwdencplugin	*sqlrpp=new sqlrpwdencplugin;
-	sqlrpp->pe=pe;
-	sqlrpp->dl=dl;
-	llist.append(sqlrpp);
+	sqlrpwdencplugin	*sqlrpe=new sqlrpwdencplugin;
+	sqlrpe->pe=pe;
+	sqlrpe->dl=dl;
+	llist.append(sqlrpe);
 }
 
 sqlrpwdenc *sqlrpwdencs::getPasswordEncryptionById(const char *id) {

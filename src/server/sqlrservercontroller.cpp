@@ -126,6 +126,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	debugsqlrfilters=false;
 	debugtriggers=false;
 	debugbindtranslation=false;
+	debugsqlrresultsettranslation=false;
 
 	cur=NULL;
 
@@ -379,10 +380,12 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get the result set translators
+	debugsqlrresultsettranslation=cfg->getDebugResultSetTranslations();
 	const char	*resultsettranslations=
 				cfg->getResultSetTranslations();
 	if (!charstring::isNullOrEmpty(resultsettranslations)) {
-		sqlrrst=new sqlrresultsettranslations(sqlrpth);
+		sqlrrst=new sqlrresultsettranslations(sqlrpth,
+						debugsqlrresultsettranslation);
 		sqlrrst->loadResultSetTranslations(resultsettranslations);
 	}
 
@@ -2414,7 +2417,10 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	const char	*query=cursor->getQueryBuffer();
 
 	if (debugsqlrtranslation) {
-		stdoutput.printf("original:\n\"%s\"\n\n",query);
+		stdoutput.printf("========================================"
+				"========================================\n\n");
+		stdoutput.printf("translating query...\n");
+		stdoutput.printf("original:\n\"%s\"\n",query);
 	}
 
 	// clear the query tree
@@ -2476,12 +2482,14 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// debug
 	if (debugbindtranslation) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
 		stdoutput.printf("translating bind variables...\n");
-		stdoutput.printf("before translation:\n%s\n",querybuffer);
+		stdoutput.printf("original:\n%s\n",querybuffer);
 	}
 	if (logEnabled()) {
 		logDebugMessage("translating bind variables...");
-		logDebugMessage("before translation:");
+		logDebugMessage("original:");
 		logDebugMessage(querybuffer);
 	}
 
@@ -2603,7 +2611,8 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	// if no translation was performed
 	if (!translated) {
 		if (debugbindtranslation) {
-			stdoutput.printf("\nno bind translation performed\n\n");
+			stdoutput.printf(
+				"\n  no bind translation performed\n\n");
 		}
 		logDebugMessage("no bind translation performed");
 		return;
@@ -2624,7 +2633,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// debug
 	if (debugbindtranslation) {
-		stdoutput.printf("\nafter translation:\n%s\n\n",querybuffer);
+		stdoutput.printf("\ntranslated:\n%s\n\n",querybuffer);
 	}
 	if (logEnabled()) {
 		logDebugMessage("translated:");
@@ -2784,6 +2793,8 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 
 	// debug and logging
 	if (debugbindtranslation) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
 		stdoutput.printf("remapping bind variables:\n");
 		stdoutput.printf("  input binds:\n");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
@@ -2897,6 +2908,8 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
 	const char	*query=cursor->getQueryBuffer();
 
 	if (debugsqlrfilters) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
 		stdoutput.printf("filtering:\n\"%s\"\n\n",query);
 	}
 
@@ -3692,40 +3705,43 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						const char **newfield,
 						uint32_t *newfieldlength) {
 
+	if (debugsqlrresultsettranslation) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
+		stdoutput.printf("translating result set "
+				"field %hd (%s)...\n",index,name);
+		stdoutput.printf("original:\n%s\n",field);
+	}
+
 	// initialize return values
 	*newfield=field;
 	*newfieldlength=fieldlength;
 
 	// handle old-school date translation first
 	if (reformatdatetimes) {
-		bool		ddmm=cfg->getDateDdMm();
-		bool		yyyyddmm=cfg->getDateYyyyDdMm();
-		bool		ignorenondatetime=cfg->getIgnoreNonDateTime();
-		const char	*datedelimiters=cfg->getDateDelimiters();
-		const char	*datetimeformat=cfg->getDateTimeFormat();
-		const char	*dateformat=cfg->getDateFormat();
-		const char	*timeformat=cfg->getTimeFormat();
 		// FIXME: use mapColumn() here?
 		reformatDateTimes(cursor,index,
-					field,fieldlength,
+					*newfield,*newfieldlength,
 					newfield,newfieldlength,
-					ddmm,yyyyddmm,
-					ignorenondatetime,
-					datedelimiters,
-					datetimeformat,
-					dateformat,timeformat);
+					cfg->getDateDdMm(),
+					cfg->getDateYyyyDdMm(),
+					cfg->getIgnoreNonDateTime(),
+					cfg->getDateDelimiters(),
+					cfg->getDateTimeFormat(),
+					cfg->getDateFormat(),
+					cfg->getTimeFormat());
 	}
 
 	// run translations
 	if (sqlrrst) {
 		// FIXME: use mapColumn() here?
-		sqlrrst->runResultSetTranslations(conn,cursor,
-							name,
-							index,
-							field,
-							fieldlength,
-							newfield,
-							newfieldlength);
+		sqlrrst->runResultSetTranslations(conn,cursor,name,index,
+						*newfield,*newfieldlength,
+						newfield,newfieldlength);
+	}
+
+	if (debugsqlrresultsettranslation) {
+		stdoutput.printf("translated:\n%s\n\n",*newfield);
 	}
 }
 
@@ -3788,10 +3804,10 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 					fraction);
 	reformattedfieldlength=charstring::length(reformattedfield);
 
-	if (debugsqlrtranslation) {
-		stdoutput.printf("converted date: "
-			"\"%s\" to \"%s\" using ddmm=%d\n",
-			field,reformattedfield,ddmm);
+	if (debugsqlrresultsettranslation) {
+		stdoutput.printf("\nconverted date "
+			"\"%s\" to \"%s\"\nusing ddmm=%d and yyyyddmm=%d\n",
+			field,reformattedfield,ddmm,yyyyddmm);
 	}
 
 	// set return values

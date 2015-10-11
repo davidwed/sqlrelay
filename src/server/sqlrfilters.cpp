@@ -163,7 +163,7 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 						node; node=node->getNext()) {
 
 		if (debug) {
-			stdoutput.printf("running filter...\n\n");
+			stdoutput.printf("\nrunning filter...\n\n");
 		}
 
 		sqlrfilter	*f=node->getValue()->f;

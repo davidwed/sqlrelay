@@ -1346,7 +1346,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
 			sqlrresultsettranslation(
 					sqlrresultsettranslations *sqlrrsts,
-					xmldomnode *parameters);
+					xmldomnode *parameters,
+					bool debug);
 		virtual	~sqlrresultsettranslation();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1360,6 +1361,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	protected:
 		sqlrresultsettranslations	*sqlrrsts;
 		xmldomnode			*parameters;
+		bool				debug;
 };
 
 
@@ -1371,7 +1373,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslationplugin {
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 	public:
-			sqlrresultsettranslations(sqlrpaths *sqlrpth);
+			sqlrresultsettranslations(sqlrpaths *sqlrpth,
+							bool debug);
 			~sqlrresultsettranslations();
 
 		bool	loadResultSetTranslations(
@@ -1391,6 +1394,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 		
 		const char	*libexecdir;
 		xmldom		*xmld;
+		bool		debug;
 
 		singlylinkedlist< sqlrresultsettranslationplugin * >	tlist;
 };
