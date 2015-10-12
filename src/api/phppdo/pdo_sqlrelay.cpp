@@ -988,6 +988,7 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 
 	// PDO handles several of these options itself.  These are the ones
 	// it doens't handle.
+	char	*temp;
 	switch (attr) {
 		case PDO_ATTR_AUTOCOMMIT:
 			// use to turn on or off auto-commit mode
@@ -1002,11 +1003,17 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			return 1;
 		case PDO_ATTR_SERVER_VERSION:
 			// database server version
-			ZVAL_STRING(retval,(char *)sqlrcon->serverVersion(),1);
+			temp=(char *)sqlrcon->serverVersion();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		case PDO_ATTR_CLIENT_VERSION:
 			// client library version
-			ZVAL_STRING(retval,(char *)sqlrcon->clientVersion(),1);
+			temp=(char *)sqlrcon->clientVersion();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		case PDO_ATTR_SERVER_INFO:
 			// server information
@@ -1036,23 +1043,40 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			return 1;
 		#endif
 		case PDO_SQLRELAY_ATTR_DB_TYPE:
-			ZVAL_STRING(retval,(char *)sqlrcon->identify(),1);
+			temp=(char *)sqlrcon->identify();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_VERSION:
-			ZVAL_STRING(retval,(char *)sqlrcon->dbVersion(),1);
+			temp=(char *)sqlrcon->dbVersion();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_HOST_NAME:
-			ZVAL_STRING(retval,(char *)sqlrcon->dbHostName(),1);
+			temp=(char *)sqlrcon->dbHostName();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_IP_ADDRESS:
-			ZVAL_STRING(retval,(char *)sqlrcon->dbIpAddress(),1);
+			temp=(char *)sqlrcon->dbIpAddress();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_BIND_FORMAT:
-			ZVAL_STRING(retval,(char *)sqlrcon->bindFormat(),1);
+			temp=(char *)sqlrcon->bindFormat();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_CURRENT_DB:
-			ZVAL_STRING(retval,
-				(char *)sqlrcon->getCurrentDatabase(),1);
+			temp=(char *)sqlrcon->getCurrentDatabase();
+			if (temp) {
+				ZVAL_STRING(retval,temp,1);
+			}
 			return 1;
 		default:
 			return 0;
