@@ -25,6 +25,7 @@
 	fixed a bug that could cause sqlrsh to act funny if the last character
 		prior to the command delimiter was a single or double quote
 	fixed a stacked result-set translation module bug
+	applied George Carrette's patch to fix potential PDO null-dereferences
 
 0.63.1 - backported shutdown loop detection
 
