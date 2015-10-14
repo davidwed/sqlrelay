@@ -56,7 +56,7 @@ $cur=SQLRelay::Cursor->new($con);
 
 # get database type
 print("IDENTIFY: \n");
-checkSuccessString($con->identify(),"oracleblah");
+checkSuccessString($con->identify(),"oracle");
 print("\n");
 
 # ping

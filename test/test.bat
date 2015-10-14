@@ -41,7 +41,7 @@ goto:end
 			set TESTFILE=%DB%.exe
 			goto:endswitch
 		:case_java
-			set TEST=run %DB%
+			set TEST=call run %DB%
 			set TESTFILE=%DB%.class
 			goto:endswitch
 		:case_nodejs
