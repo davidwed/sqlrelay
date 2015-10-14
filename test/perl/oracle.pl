@@ -15,7 +15,7 @@ sub checkUndef {
 		print("success ");
 	} else {
 		print("failure ");
-		exit 1;
+		exit(1);
 	}
 }
 
@@ -29,7 +29,7 @@ sub checkSuccess {
 	} else {
 		print("$value != $success ");
 		print("failure ");
-		exit;
+		exit(1);
 	}
 }
 
@@ -43,7 +43,7 @@ sub checkSuccessString {
 	} else {
 		print("$value != $success ");
 		print("failure ");
-		exit;
+		exit(1);
 	}
 }
 
@@ -56,7 +56,7 @@ $cur=SQLRelay::Cursor->new($con);
 
 # get database type
 print("IDENTIFY: \n");
-checkSuccessString($con->identify(),"oracle");
+checkSuccessString($con->identify(),"oracleblah");
 print("\n");
 
 # ping
