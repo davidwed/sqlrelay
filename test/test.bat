@@ -9,8 +9,7 @@ if [%DB%]==[] (
 	goto:end
 )
 
-rem for %%D in (c c++ cs java nodejs perl perldbi php phppdo python pythondb ruby tcl) do (
-for %%D in (java nodejs perl) do (
+for %%D in (c c++ cs java nodejs perl perldbi php phppdo python pythondb ruby tcl) do (
 	call:runtest %%D
 	if !ERRORLEVEL!==1 (
 		goto:end
@@ -26,6 +25,8 @@ goto:end
 	echo.
 	cd %DIR%
 
+	set TEST=[]
+	set TESTFILE=[]
 	goto case_%DIR%
 		:case_c
 			set TEST=%DB%.exe
@@ -91,11 +92,9 @@ goto:end
 			echo %DB% failed in %DIR%
 			goto:eof
 		)
-		echo "here"
 	) else (
 		echo no test found for %DB% in %DIR%
 	)
-	echo "now here"
 
 	echo.
 	echo ================================================================================

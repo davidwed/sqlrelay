@@ -13,61 +13,77 @@ do
 	cd $DIR
 
 	TEST=""
+	TESTFILE=""
 	case "$DIR" in
 		c)
 			TEST="./$1"
+			TESTFILE="$1"
 			;;
 		c++)
 			TEST="./$1"
+			TESTFILE="$1"
+			;;
+		cs)
+			TEST="mono $1.exe"
+			TESTFILE="$1.exe"
 			;;
 		java)
 			TEST="./run $1"
+			TESTFILE="$1.class"
 			;;
 		nodejs)
 			TEST="node $1.js"
+			TESTFILE="$1.js"
 			;;
 		perl)
 			TEST="perl $1.pl"
+			TESTFILE="$1.pl"
 			;;
 		perldbi)
 			TEST="perl $1.pl"
+			TESTFILE="$1.pl"
 			;;
 		php)
 			TEST="php $1.php"
+			TESTFILE="$1.php"
  			;;
 		phppdo)
 			TEST="php $1.php"
+			TESTFILE="$1.php"
 			;;
 		python)
 			TEST="python $1.py"
+			TESTFILE="$1.py"
 			;;
 		pythondb)
 			TEST="python $1.py"
+			TESTFILE="$1.py"
 			;;
 		ruby)
 			TEST="ruby $1.rb"
+			TESTFILE="$1.rb"
 			;;
 		tcl)
 			TEST="tclsh $1.tcl"
+			TESTFILE="$1.tcl"
 			;;
 	esac
 
 
-	if ( test -n "$TEST" )
+	if ( test -r "$TESTFILE" )
 	then
-		if ( test -n "`ls $1.* 2> /dev/null`" )
+		$TEST
+		echo
+		echo "test complete"
+		if ( test "$?" = "1" )
 		then
-
-			$TEST
-			if ( test "$?" = "1" )
-			then
-				echo
-				echo "$1 failed in $DIR"
-				exit
-			fi
-		else
-			echo "no test found for $1 in $DIR"
+			echo
+			echo
+			echo "$1 failed in $DIR"
+			exit
 		fi
+	else
+		echo "no test found for $1 in $DIR"
 	fi
 
 	echo
