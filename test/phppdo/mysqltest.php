@@ -29,7 +29,7 @@ function tcFailure($tc, $msg = "failure", $exit = TRUE)
 	
 	if ($exit)
 	{
-		exit(0);
+		exit(1);
 	}
 }
 

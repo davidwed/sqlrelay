@@ -9,7 +9,7 @@
 		} else {
 			echo("$value != $success ");
 			echo("failure ");
-			exit(0);
+			exit(1);
 		}
 	}
 
