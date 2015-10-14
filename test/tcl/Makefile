@@ -18,7 +18,7 @@ db2.tcl: db2.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 firebird.tcl: firebird.tcl.in
@@ -26,7 +26,7 @@ firebird.tcl: firebird.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 freetds.tcl: freetds.tcl.in
@@ -34,7 +34,7 @@ freetds.tcl: freetds.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 mysql.tcl: mysql.tcl.in
@@ -42,7 +42,7 @@ mysql.tcl: mysql.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 oracle.tcl: oracle.tcl.in
@@ -50,7 +50,7 @@ oracle.tcl: oracle.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 postgresql.tcl: postgresql.tcl.in
@@ -58,7 +58,7 @@ postgresql.tcl: postgresql.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 sqlite.tcl: sqlite.tcl.in
@@ -66,7 +66,7 @@ sqlite.tcl: sqlite.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 sap.tcl: sap.tcl.in
@@ -74,8 +74,8 @@ sap.tcl: sap.tcl.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
-	$(RM) $@.in.in $@.in.in.in
+	$(RM) $@.in.in $@.in.in.in $@.in.in.in.in
 	$(CHMOD) 755 $@
 
 clean:
-	$(RM) *.in.in *.tcl cachefile* sqlnet.log
+	$(RM) *.in.in *.in.in.in *.in.in.in.in *.tcl cachefile* sqlnet.log
