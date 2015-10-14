@@ -11,7 +11,7 @@
 			echo("failure ");
 			sqlrcur_free($cur);
 			sqlrcon_free($con);
-			exit(0);
+			exit(1);
 		}
 	}
 

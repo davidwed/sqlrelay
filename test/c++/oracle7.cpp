@@ -20,7 +20,7 @@ void checkSuccess(const char *value, const char *success) {
 			stdoutput.printf("failure ");
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -31,7 +31,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -46,7 +46,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 			stdoutput.printf("failure ");
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -57,7 +57,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -70,7 +70,7 @@ void checkSuccess(int value, int success) {
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -83,7 +83,7 @@ void checkSuccess(double value, double success) {
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -920,5 +920,4 @@ int	main(int argc, char **argv) {
 
 	delete cur;
 	delete con;
-
 }

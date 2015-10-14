@@ -24,7 +24,7 @@ void checkSuccessString(const char *value, const char *success) {
 			printf("failure ");
 			sqlrcur_free(cur);
 			sqlrcon_free(con);
-			exit(0);
+			exit(1);
 		}
 	}
 
@@ -35,7 +35,7 @@ void checkSuccessString(const char *value, const char *success) {
 		printf("failure ");
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
-		exit(0);
+		exit(1);
 	}
 }
 
@@ -51,7 +51,7 @@ void checkSuccessStringWithLength(const char *value, const char *success,
 			printf("failure ");
 			sqlrcur_free(cur);
 			sqlrcon_free(con);
-			exit(0);
+			exit(1);
 		}
 	}
 
@@ -62,7 +62,7 @@ void checkSuccessStringWithLength(const char *value, const char *success,
 		printf("failure ");
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
-		exit(0);
+		exit(1);
 	}
 }
 
@@ -75,7 +75,7 @@ void checkSuccessInt(int value, int success) {
 		printf("failure ");
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
-		exit(0);
+		exit(1);
 	}
 }
 
@@ -88,7 +88,7 @@ void checkSuccessDouble(double value, double success) {
 		printf("failure ");
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
-		exit(0);
+		exit(1);
 	}
 }
 
@@ -954,6 +954,4 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	printf("\n");
-
-	exit(0);
 }

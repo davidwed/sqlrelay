@@ -16,7 +16,7 @@ class db2 {
 			} else {
 				System.out.print(value+"!="+success+" ");
 				System.out.print("failure ");
-				System.exit(0);
+				System.exit(1);
 			}
 		}
 	
@@ -25,7 +25,7 @@ class db2 {
 		} else {
 			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -36,7 +36,7 @@ class db2 {
 		} else {
 			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -47,7 +47,7 @@ class db2 {
 		} else {
 			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	

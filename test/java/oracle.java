@@ -16,7 +16,7 @@ class oracle {
 			} else {
 				System.out.print(value+"!="+success+" ");
 				System.out.print("failure ");
-				System.exit(0);
+				System.exit(1);
 			}
 		}
 	
@@ -25,7 +25,7 @@ class oracle {
 		} else {
 			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -38,7 +38,7 @@ class oracle {
 			} else {
 				System.out.print(value+"!="+success+" ");
 				System.out.print("failure ");
-				System.exit(0);
+				System.exit(1);
 			}
 		}
 	
@@ -47,7 +47,7 @@ class oracle {
 		} else {
 			System.out.print(value+"!="+success+" ");
 			System.out.print("failure ");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -61,7 +61,7 @@ class oracle {
 				System.out.print("failure ");
 				
 				
-				System.exit(0);
+				System.exit(1);
 			}
 		}
 
@@ -70,7 +70,7 @@ class oracle {
 		for (int index=0; index<length; index++) {
 			if (value[index]!=successvalue[index]) {
 				System.out.println("failure ");
-				System.exit(0);
+				System.exit(1);
 			}
 		}
 
@@ -85,7 +85,7 @@ class oracle {
 			System.out.println("failure ");
 			
 			
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -97,7 +97,7 @@ class oracle {
 			System.out.println("failure ");
 			
 			
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -109,7 +109,7 @@ class oracle {
 			System.out.println("failure ");
 			
 			
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -977,6 +977,5 @@ class oracle {
 		checkSuccess(cur.sendQuery("create table testtable"),0);
 		checkSuccess(cur.sendQuery("create table testtable"),0);
 		System.out.println();
-	
 	}
 }

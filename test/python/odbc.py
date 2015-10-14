@@ -14,7 +14,7 @@ def checkSuccess(value,success):
 		print "wanted", type(success), ":", success
 		print "got   ", type(value), ":", value
 		print "failure"
-		sys.exit(0)
+		sys.exit(1)
 
 def main():
 

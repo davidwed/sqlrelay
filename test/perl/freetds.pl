@@ -16,7 +16,7 @@ sub checkUndef {
 		print("success ");
 	} else {
 		print("failure ");
-		exit;
+		exit 1;
 	}
 }
 

@@ -21,7 +21,7 @@ void checkSuccess(const char *value, const char *success) {
 			stdoutput.printf("failure %s!=%s\n",value,success);
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -31,7 +31,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("failure %s!=%s\n",value,success);
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -45,7 +45,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 			stdoutput.printf("failure %s!=%s\n",value,success);
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -55,7 +55,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 		stdoutput.printf("failure %s!=%s\n",value,success);
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -67,7 +67,7 @@ void checkSuccess(int value, int success) {
 		stdoutput.printf("failure %d!=%d\n",value,success);
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -79,7 +79,7 @@ void checkSuccess(double value, double success) {
 		stdoutput.printf("failure %f!=%f\n",value,success);
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 

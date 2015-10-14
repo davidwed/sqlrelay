@@ -22,7 +22,7 @@ void checkSuccess(const char *value, const char *success) {
 			stdoutput.printf("failure ");
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -33,7 +33,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -46,7 +46,7 @@ void checkSuccess(int value, int success) {
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -59,7 +59,7 @@ void checkSuccess(double value, double success) {
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -975,5 +975,4 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	stdoutput.printf("\n");
-
 }

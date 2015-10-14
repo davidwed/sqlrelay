@@ -12,7 +12,7 @@ proc checkUndef {value} {
 	} default {
 		puts "$value != $success "
 		puts "failure "
-		exit
+		exit 1
 	}
 }
 
@@ -23,7 +23,7 @@ proc checkSuccess {value success} {
 	} else {
 		puts "$value != $success "
 		puts "failure "
-		exit
+		exit 1
 	}
 }
 

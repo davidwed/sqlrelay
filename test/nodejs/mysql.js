@@ -10,7 +10,7 @@ function checkSuccess(value,success) {
 	} else {
 		console.log(value+"!="+success+" ");
 		console.log("failure ");
-		process.exit(0);
+		process.exit(1);
 	}
 }
 

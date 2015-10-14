@@ -23,7 +23,7 @@ void checkSuccess(const char *value, const char *success) {
 			stdoutput.flush();
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -36,7 +36,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.flush();
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -51,7 +51,7 @@ void checkSuccess(int value, int success) {
 		stdoutput.flush();
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
