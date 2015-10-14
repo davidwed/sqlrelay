@@ -84,13 +84,14 @@ goto:end
 
 	if exist %TESTFILE% (
 		%TEST%
-		echo.
-		echo "test complete"
 		if !ERRORLEVEL!==1 (
 			echo.
 			echo.
 			echo %DB% failed in %DIR%
 			goto:eof
+		) else (
+			echo.
+			echo "test complete"
 		)
 	) else (
 		echo no test found for %DB% in %DIR%

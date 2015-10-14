@@ -73,14 +73,15 @@ do
 	if ( test -r "$TESTFILE" )
 	then
 		$TEST
-		echo
-		echo "test complete"
 		if ( test "$?" = "1" )
 		then
 			echo
 			echo
 			echo "$1 failed in $DIR"
 			exit
+		else
+			echo
+			echo "test complete"
 		fi
 	else
 		echo "no test found for $1 in $DIR"
