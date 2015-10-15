@@ -73,7 +73,7 @@ do
 	if ( test -r "$TESTFILE" )
 	then
 		$TEST
-		if ( test "$?" == "1" )
+		if ( test "$?" = "1" )
 		then
 			echo
 			echo
