@@ -284,6 +284,7 @@ SQL Relay modules for node.js.
 
 %package doc
 Summary: Documentation for SQL Relay
+BuildArch: noarch
 
 %description doc
 Documentation for SQL Relay.
@@ -291,6 +292,7 @@ Documentation for SQL Relay.
 
 %package man
 Summary: Man pages for SQL Relay
+BuildArch: noarch
 
 %description man
 Man pages for SQL Relay.
