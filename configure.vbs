@@ -172,7 +172,7 @@ next
 
 
 ' version
-SQLR_VERSION="0.64"
+SQLR_VERSION="0.65"
 
 ' paths
 pfix="C:\\Program Files\\Firstworks"

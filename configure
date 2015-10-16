@@ -34800,7 +34800,7 @@ RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
 
 
 
-SQLR_VERSION="0.64"
+SQLR_VERSION="0.65"
 
 
 cat >>confdefs.h <<_ACEOF
