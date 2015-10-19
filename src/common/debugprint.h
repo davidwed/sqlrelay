@@ -12,7 +12,7 @@
 	#include <rudiments/permissions.h>
 	#ifdef _MSC_VER
 		//static const char	debugfile[]="C:\\sqlrdebug.txt";
-		static const char	debugfile[]="C:\\cygwin64\\home\\dmuse\\sqlrdebug.txt";
+		static const char	debugfile[]="C:\\Users\\dmuse\\Desktop\\sqlrdebug.txt";
 	#else
 		static const char	debugfile[]="/tmp/sqlrdebug.txt";
 	#endif
