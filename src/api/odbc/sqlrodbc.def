@@ -18,7 +18,6 @@ SQLDisconnect
 SQLEndTran
 SQLError
 SQLExecDirect
-SQLR_SQLExecute
 SQLExecute
 SQLFetch
 SQLFetchScroll

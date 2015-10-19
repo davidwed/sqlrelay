@@ -1,4 +1,4 @@
-0.65 -
+0.65 - removed erroneous SQLR_SQLExecute export in ODBC driver
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
