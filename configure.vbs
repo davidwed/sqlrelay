@@ -1126,29 +1126,34 @@ Sub findPrefix(basefolder, subfolderpattern, apiprefix, disableapi)
 
 	findPrefix=false
 	apiprefix=""
-	disableapi=true
 
-	' open the base folder
-	Set bf=fso.GetFolder(basefolder)
-	if Err.Number<>0 then
-		return
-	end if
+	if disableapi=false then
 
-	' get and sort its subfolders (descending)
-	' (this makes more newly versioned folders be found first)
-	Set subfolders=CreateObject("System.Collections.ArrayList")
-	for each sf in bf.SubFolders
-		if InStr(sf.Name,subfolderpattern)>0 then
-			subfolders.Add(sf.Name)
+		disableapi=true
+
+		' open the base folder
+		Set bf=fso.GetFolder(basefolder)
+		if Err.Number<>0 then
+			return
 		end if
-	next
-	subfolders.Sort()
-	subfolders.Reverse()
 
-	' return the first matching subfolder (after the sort)
-	if subfolders.Count>0 then
-		apiprefix=basefolder & subfolders(0)
-		disableapi=false
+		' get and sort its subfolders (descending)
+		' (this makes more newly versioned folders be found first)
+		Set subfolders=CreateObject("System.Collections.ArrayList")
+		for each sf in bf.SubFolders
+			if InStr(sf.Name,subfolderpattern)>0 then
+				subfolders.Add(sf.Name)
+			end if
+		next
+		subfolders.Sort()
+		subfolders.Reverse()
+
+		' return the first matching subfolder (after the sort)
+		if subfolders.Count>0 then
+			apiprefix=basefolder & subfolders(0)
+			disableapi=false
+		end if
+
 	end if
 End Sub
 
