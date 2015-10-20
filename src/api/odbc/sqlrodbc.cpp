@@ -496,6 +496,8 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 		return SQL_ERROR;
 	}
 
+	// FIXME: if targetvalue is NULL then the column should be unbound
+
 	FIELD	*field=new FIELD;
 	field->targettype=targettype;
 	field->targetvalue=targetvalue;
@@ -546,7 +548,7 @@ SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 					strlen_or_ind);
 }
 
-SQLRETURN SQL_API SQLR_SQLCancelHandle(SQLSMALLINT handletype,
+static SQLRETURN SQLR_SQLCancelHandle(SQLSMALLINT handletype,
 						SQLHANDLE handle) {
 	debugFunction();
 
@@ -1434,7 +1436,8 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 		case SQL_DESC_UNNAMED:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_UNNAMED\n");
-			if (charstring::length(stmt->cur->getColumnName(col))) {
+			if (!charstring::isNullOrEmpty(
+					stmt->cur->getColumnName(col))) {
 				*(SQLSMALLINT *)numericattribute=SQL_NAMED;
 			} else {
 				*(SQLSMALLINT *)numericattribute=SQL_UNNAMED;
@@ -1905,17 +1908,16 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Socket","",
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
-	if (charstring::length(user)) {
+	if (!charstring::isNullOrEmpty(user)) {
 		if (userlength==SQL_NTS) {
-			charstring::safeCopy(conn->user,
-						sizeof(conn->user),
-						(const char *)user);
-		} else {
-			charstring::safeCopy(conn->user,
-						sizeof(conn->user),
-						(const char *)user,
-						userlength);
+			userlength=charstring::length(user);
 		}
+		if ((size_t)userlength>=sizeof(conn->user)) {
+			userlength=sizeof(conn->user-1);
+		}
+		charstring::safeCopy(conn->user,sizeof(conn->user),
+					(const char *)user,userlength);
+		conn->user[userlength]='\0';
 	} else {
 		SQLGetPrivateProfileString((const char *)conn->dsn,
 						"User","",
@@ -1923,17 +1925,16 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						sizeof(conn->user),
 						ODBC_INI);
 	}
-	if (charstring::length(password)) {
+	if (!charstring::isNullOrEmpty(password)) {
 		if (passwordlength==SQL_NTS) {
-			charstring::safeCopy(conn->password,
-						sizeof(conn->password),
-						(const char *)password,
-						passwordlength);
-		} else {
-			charstring::safeCopy(conn->password,
-						sizeof(conn->password),
-						(const char *)password);
+			passwordlength=charstring::length(password);
 		}
+		if ((size_t)passwordlength>=sizeof(conn->password)) {
+			passwordlength=sizeof(conn->password-1);
+		}
+		charstring::safeCopy(conn->password,sizeof(conn->password),
+					(const char *)password,passwordlength);
+		conn->password[passwordlength]='\0';
 	} else {
 		SQLGetPrivateProfileString((const char *)conn->dsn,
 						"Password","",
@@ -2621,7 +2622,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 	}
 }
 
-uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
+static uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 
 	// find the length of the string
 	uint32_t	length=0;
@@ -2650,9 +2651,9 @@ uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 	}
 }
 
-SQLRETURN SQL_API SQLR_SQLExecDirect(SQLHSTMT statementhandle,
-					SQLCHAR *statementtext,
-					SQLINTEGER textlength) {
+static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
+						SQLCHAR *statementtext,
+						SQLINTEGER textlength) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -2677,7 +2678,7 @@ SQLRETURN SQL_API SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 	#ifdef DEBUG_MESSAGES
 	stringbuffer	debugstr;
 	debugstr.append(statementtext,statementtextlength);
-	debugPrintf("  statement: \"%s\",%d)\n",
+	debugPrintf("  statement: \"%s\" (%d)\n",
 			debugstr.getString(),(int)statementtextlength);
 	#endif
 	bool	result=stmt->cur->sendQuery((const char *)statementtext,
@@ -2707,7 +2708,7 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	return SQLR_SQLExecDirect(statementhandle,statementtext,textlength);
 }
 
-SQLRETURN SQL_API SQLR_SQLExecute(SQLHSTMT statementhandle) {
+static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -3479,14 +3480,14 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 		case SQL_HANDLE_ENV:
 			{
 			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
-			debugPrintf("  diagidentifier: %d\n",diagidentifier);
 			ENV	*env=(ENV *)handle;
 			if (handle==SQL_NULL_HENV || !env) {
 				debugPrintf("  NULL env handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			// nothing currently supported
-			debugPrintf("  diagidentifier: %d\n",diagidentifier);
+			debugPrintf("  diagidentifier: %d (unsupported)\n",
+								diagidentifier);
 			return SQL_NO_DATA;
 			}
 		case SQL_HANDLE_DBC:
@@ -3537,8 +3538,9 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 					break;
 				default:
 					// anything else is not supported
-					debugPrintf("  diagidentifier: %d\n",
-								diagidentifier);
+					debugPrintf("  diagidentifier: %d "
+							"(unsupported)\n",
+							diagidentifier);
 					return SQL_NO_DATA;
 			}
 
@@ -3557,18 +3559,35 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 				debugPrintf("  NULL stmt handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			if (diagidentifier==SQL_DIAG_ROW_COUNT) {
-				debugPrintf("  diagidentifier: "
-						"SQL_DIAG_ROW_COUNT\n");
-				*(SQLLEN *)diaginfo=stmt->cur->affectedRows();
-				return SQL_SUCCESS;
+			switch (diagidentifier) {
+				case SQL_DIAG_ROW_COUNT:
+					debugPrintf("  diagidentifier: "
+						"SQL_DIAG_ROW_COUNT: %lld\n",
+						stmt->cur->affectedRows());
+					*(SQLLEN *)diaginfo=
+						stmt->cur->affectedRows();
+					break;
+				case SQL_DIAG_SQLSTATE:
+					debugPrintf("  diagidentifier: "
+						"SQL_DIAG_SQLSTATE: %s\n",
+						stmt->sqlstate);
+					charstring::copy((char *)diaginfo,
+								stmt->sqlstate);
+					break;
+				default:
+					// anything else is not supported
+					debugPrintf("  diagidentifier: %d "
+							"(unsupported)\n",
+							diagidentifier);
+					return SQL_NO_DATA;
 			}
-			// anything else is not supported
-			return SQL_NO_DATA;
+
+			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_DESC:
 			debugPrintf("  handletype: SQL_HANDLE_DESC\n");
-			debugPrintf("  diagidentifier: %d\n",diagidentifier);
+			debugPrintf("  diagidentifier: %d (unsupported)\n",
+								diagidentifier);
 			// not supported
 			return SQL_NO_DATA;
 	}
@@ -3737,7 +3756,7 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 	return SQL_SUCCESS;
 }
 
-SQLRETURN SQL_API SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
+static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 					SQLUSMALLINT functionid,
 					SQLUSMALLINT *supported) {
 	debugFunction();
@@ -4127,6 +4146,7 @@ SQLRETURN SQL_API SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 			debugPrintf("  functionid: "
 				"SQL_API_SQLCANCEL "
 				"- false\n");
+			// FIXME: this is implemented, sort-of...
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLCOLUMNS:
@@ -4306,7 +4326,6 @@ SQLRETURN SQL_API SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 				debugPrintBits((uint16_t)supported[element]);
 				debugPrintf(")\n");
 			}
-
 			// clear any error that might have been set during
 			// the recursive call
 			SQLR_CONNClearError(conn);
@@ -6650,6 +6669,13 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 					SQLSMALLINT namelength4) {
 	debugFunction();
 
+	debugPrintf("  for %s.%s.%s (%s)\n",
+			(namelength1)?catalogname:(SQLCHAR *)"",
+			(namelength2)?schemaname:(SQLCHAR *)"",
+			(namelength3)?tablename:(SQLCHAR *)"",
+			(namelength4)?tabletype:(SQLCHAR *)"");
+
+
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt) {
 		debugPrintf("  NULL stmt handle\n");
@@ -6657,10 +6683,10 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	}
 
 	// FIXME: this code treats xxxname as a search pattern in all cases
-	// xxxname is a case-insensitive search pattern if:
+	// xxxname should be a case-insensitive search pattern if:
 	// * SQL_ODBC_VERSION is SQL_OV_ODBC3
 	// * SQL_ATTR_METADATA_ID is SQL_FALSE
-	// otherwise it's a case-insensitive literal
+	// otherwise it should be a case-insensitive literal
 
 	// FIXME: I suspect I'll be revisiting this in the future...
 	//
@@ -6678,6 +6704,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	char		*wild=NULL;
 	SQLRETURN	retval=SQL_ERROR;
 	if (!charstring::isNullOrEmpty(catalogname)) {
+
 		if (namelength1==SQL_NTS) {
 			namelength1=charstring::length(catalogname);
 		}
@@ -6688,12 +6715,18 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 			wild=NULL;
 		}
 
+		debugPrintf("  getting database list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 		retval=
 		(stmt->cur->getDatabaseList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
-	} else if (!charstring::isNullOrEmpty(tablename)) {
+
+	} else if (!charstring::isNullOrEmpty(schemaname)) {
+
+		debugPrintf("  schema list not supported\n");
+
+	} else {
 		if (namelength3==SQL_NTS) {
 			namelength3=charstring::length(tablename);
 		}
@@ -6704,12 +6737,14 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 			wild=NULL;
 		}
 
+		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
 	}
+
 	delete[] wild;
 	return retval;
 }
@@ -6753,36 +6788,33 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	}
 
 	// the connect string may not be null terminated, so make a copy that is
-	char	*nulltermconnstr;
 	if (cbconnstrin==SQL_NTS) {
-		nulltermconnstr=charstring::duplicate(
-					(const char *)szconnstrin);
-	} else {
-		nulltermconnstr=charstring::duplicate(
+		cbconnstrin=charstring::length(szconnstrin);
+	}
+	char	*nulltermconnstr=charstring::duplicate(
 					(const char *)szconnstrin,
 					cbconnstrin);
-	}
 	debugPrintf("  connectstring: %s\n",nulltermconnstr);
 
 	// parse out DSN, UID and PWD from the connect string
 	parameterstring	pstr;
 	pstr.parse(nulltermconnstr);
 	const char	*dsn=pstr.getValue("DSN");
-	if (!charstring::length(dsn)) {
+	if (charstring::isNullOrEmpty(dsn)) {
 		dsn=pstr.getValue("dsn");
 	}
-	const char	*username=pstr.getValue("UID");
-	if (!charstring::length(username)) {
-		username=pstr.getValue("uid");
+	const char	*uid=pstr.getValue("UID");
+	if (charstring::isNullOrEmpty(uid)) {
+		uid=pstr.getValue("uid");
 	}
-	const char	*authentication=pstr.getValue("PWD");
-	if (!charstring::length(authentication)) {
-		authentication=pstr.getValue("pwd");
+	const char	*pwd=pstr.getValue("PWD");
+	if (charstring::isNullOrEmpty(pwd)) {
+		pwd=pstr.getValue("pwd");
 	}
 
 	debugPrintf("  dsn: %s\n",dsn);
-	debugPrintf("  username: %s\n",username);
-	debugPrintf("  authentication: %s\n",authentication);
+	debugPrintf("  uid: %s\n",uid);
+	debugPrintf("  pwd: %s\n",pwd);
 
 	// for now, don't do any prompting...
 	switch (fdrivercompletion) {
@@ -6804,34 +6836,36 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 			break;
 	}
 
-	// the dsn must be valid
-	if (!charstring::length(dsn)) {
-		return SQL_ERROR;
+	// output the updated connect string
+	if (pcbconnstrout) {
+		if (cbconnstrin==SQL_NTS) {
+			*pcbconnstrout=charstring::length(szconnstrin);
+		} else {
+			*pcbconnstrout=cbconnstrin;
+		}
+		if (*pcbconnstrout>cbconnstroutmax) {
+			*pcbconnstrout=cbconnstroutmax;
+		}
+		charstring::safeCopy((char *)szconnstrout,
+					*pcbconnstrout,nulltermconnstr);
 	}
-
-	// since we don't support prompting and updating the connect string...
-	if (cbconnstrin==SQL_NTS) {
-		*pcbconnstrout=charstring::length(szconnstrin);
-	} else {
-		*pcbconnstrout=cbconnstrin;
-	}
-	*pcbconnstrout=cbconnstrin;
-	charstring::safeCopy((char *)szconnstrout,
-				*pcbconnstrout,nulltermconnstr);
-
-	// connect
-	SQLRETURN	retval=SQLR_SQLConnect(hdbc,
-					(SQLCHAR *)dsn,
-					charstring::length(dsn),
-					(SQLCHAR *)username,
-					charstring::length(username),
-					(SQLCHAR *)authentication,
-					charstring::length(authentication));
 
 	// clean up
 	delete[] nulltermconnstr;
 
-	return retval;
+	// the dsn must be valid
+	if (charstring::isNullOrEmpty(dsn)) {
+		return SQL_ERROR;
+	}
+
+	// connect
+	return SQLR_SQLConnect(hdbc,
+				(SQLCHAR *)dsn,
+				charstring::length(dsn),
+				(SQLCHAR *)uid,
+				charstring::length(uid),
+				(SQLCHAR *)pwd,
+				charstring::length(pwd));
 }
 
 SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
@@ -7911,7 +7945,7 @@ static void parseDsn(const char *dsn) {
 
 	// get the name of the dsn that we were given, bail if it's empty
 	const char	*dsnval=dsndict.getValue("DSN");
-	if (!charstring::length(dsn)) {
+	if (charstring::isNullOrEmpty(dsn)) {
 
 		// provide some defaults...
 		dsndict.setValue("Port",charstring::duplicate("9000"));

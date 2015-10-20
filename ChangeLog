@@ -1,4 +1,7 @@
 0.65 - removed erroneous SQLR_SQLExecute export in ODBC driver
+	fixed call type of internal ODBC driver functions and made them static
+	fixed --disable-API flags in configure.vbs
+	fixed bad user/password copy logic in ODBC SQLConnect function
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
