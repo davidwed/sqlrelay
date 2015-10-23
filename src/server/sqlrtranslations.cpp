@@ -235,7 +235,7 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("query tree after translation:\n");
+		stdoutput.printf("\nquery tree after translation:\n");
 		if (tree) {
 			tree->getRootNode()->print(&stdoutput);
 		}
