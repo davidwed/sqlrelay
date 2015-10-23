@@ -2,6 +2,8 @@
 	fixed call type of internal ODBC driver functions and made them static
 	fixed --disable-API flags in configure.vbs
 	fixed bad user/password copy logic in ODBC SQLConnect function
+	added missing default implementation of
+		sqlrservercursor::getColumnTypeName()
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

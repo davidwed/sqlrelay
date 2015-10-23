@@ -6,6 +6,7 @@
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
 
+#define NEED_DATATYPESTRING 1
 #include <datatypes.h>
 #include <defines.h>
 
@@ -402,7 +403,7 @@ uint16_t sqlrservercursor::getColumnType(uint32_t col) {
 }
 
 const char *sqlrservercursor::getColumnTypeName(uint32_t col) {
-	return NULL;
+	return datatypestring[getColumnType(col)];
 }
 
 uint16_t sqlrservercursor::getColumnTypeNameLength(uint32_t col) {
