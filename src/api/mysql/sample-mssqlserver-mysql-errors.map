@@ -30,7 +30,7 @@
 515:1048
 
 # Lock request time out period exceeded. -> aubit error
-1222:244
+1222:250
 
 # (SQL Relay META-ERROR) begin while already in transaction block -> aubit error
 #
