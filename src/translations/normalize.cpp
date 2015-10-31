@@ -37,8 +37,6 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 			parameters->getAttributeValue("enabled"),"no");
 }
 
-static const char symbols[]="!%^-_+=[{]}\\|;,<.>/";
-
 bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
@@ -123,7 +121,10 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			continue;
 		}
 
-		// remove spaces around symbols
+		// Remove spaces around most symbols.
+		// Parentheses, asterisks and right brackets require special
+		// handling.
+		static const char symbols[]="!%^-_+=[{}\\|;,<.>/";
 		if (*ptr==' ' &&
 			(character::inSet(*(ptr+1),symbols) ||
 			character::inSet(*(ptr-1),symbols))) {
@@ -131,11 +132,52 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			continue;
 		}
 
-		// FIXME: parentheses require special handling
-		// as they serve multiple purposes
+		// [ and ] are used to define ranges.  It's always safe to
+		// remove spaces around the [.  It's always safe to remove
+		// spaces before the ], but not after it.  We don't need to
+		// remove spaces after ] though.  If it's followed by any
+		// other symbol, then spaces will be removed by that symbol.
+		// If not, then spaces shouldn't be removed anyway.
+		if (*ptr==' ' &&
+			(*(ptr+1)=='[' || *(ptr-1)=='[' || *(ptr+1)==']')) {
+			ptr++;
+			continue;
+		}
 
-		// FIXME: asterisks require special handling
-		// as they serve multiple purposes
+		// Parentheses can be used to group expressions or to define
+		// function parameters...
+
+		// It's always safe to remove spaces after ( and before )
+		if (*ptr==' ' && (*(ptr-1)=='(' || *(ptr+1)==')')) {
+			ptr++;
+			continue;
+		}
+
+		// We don't need to remove spaces after ).  If it's followed by
+		// any other symbol, then spaces will be removed by that symbol.
+		// If not, then spaces shouldn't be removed anyway.
+
+		// We would like to remove spaces before ( but this is
+		// difficult and expensive.  We can't if the ( is preceeded by
+		// a long list of specific keywords, including column types, or
+		// in the cases of inserts and creates, an object name.  There
+		// could be other cases too.  For now, it's much easier and
+		// less expensive to stipulate that function calls might have
+		// spaces between the function name and parameters.
+
+		// Asterisks can mean either "times" or "all columns".
+		// We generally want to remove spaces around them, but we don't
+		// want to remove the space after the last "all columns"
+		// asterisk, so...
+		// Remove spaces before and after asterisks unless the asterisk
+		// is followed by a from clause.
+		if (*ptr==' ' &&
+			(*(ptr+1)=='*' ||
+			(*(ptr-1)=='*' &&
+			charstring::compare(ptr," from ",6)))) {
+			ptr++;
+			continue;
+		}
 
 		// check for end of query
 		if (!*ptr) {
