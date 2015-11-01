@@ -114,6 +114,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	// normalize the query, second pass...
 	// * remove spaces around symbols
 	ptr=pass1.getString();
+	const char	*start=ptr;
 	for (;;) {
 
 		// skip quoted strings
@@ -168,13 +169,16 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// Asterisks can mean either "times" or "all columns".
 		// We generally want to remove spaces around them, but we don't
 		// want to remove the space after the last "all columns"
-		// asterisk, so...
+		// asterisk, or before it if it's the first item in the
+		// select list so...
 		// Remove spaces before and after asterisks unless the asterisk
-		// is followed by a from clause.
+		// is followed by a from clause or preceeded by select.
 		if (*ptr==' ' &&
-			(*(ptr+1)=='*' ||
+			((*(ptr+1)=='*' &&
+				!(!charstring::compare(start,"select *",8) &&
+					ptr==start+6)) ||
 			(*(ptr-1)=='*' &&
-			charstring::compare(ptr," from ",6)))) {
+				charstring::compare(ptr," from ",6)))) {
 			ptr++;
 			continue;
 		}
@@ -202,7 +206,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	// * convert static char() calls to equivalent strings
 	// 	(if db supports static char() calls)
 	ptr=pass2.getString();
-	const char	*start=ptr;
+	start=ptr;
 	for (;;) {
 
 		// skip quoted strings
