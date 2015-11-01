@@ -22,8 +22,10 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 
 		stringbuffer	pass1;
 		stringbuffer	pass2;
+		stringbuffer	pass3;
 
 		bool	enabled;
+		bool	foreigndecimals;
 };
 
 sqlrtranslation_normalize::sqlrtranslation_normalize(
@@ -34,8 +36,14 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 	debugFunction();
 
 	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+		parameters->getAttributeValue("enabled"),"no");
+
+	foreigndecimals=!charstring::compareIgnoringCase(
+		parameters->getAttributeValue("foreign_decimals"),"yes");
 }
+
+static const char beforeset[]=" +-/*=<>(";
+static const char afterset[]=" +-/*=<>)";
 
 bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -54,6 +62,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	// clear the normalized query buffers
 	pass1.clear();
 	pass2.clear();
+	pass3.clear();
 
 	// normalize the query, first pass...
 	// * remove comments
@@ -112,13 +121,117 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	// normalize the query, second pass...
-	// * remove spaces around symbols
+	// * convert any identifiable comma-separated
+	//   decimals to period-separated decimals
 	ptr=pass1.getString();
 	const char	*start=ptr;
-	for (;;) {
+	if (!foreigndecimals) {
+		pass2.append(ptr);
+		ptr="";
+	}
+	while (*ptr) {
+
+		// skip whitespace
+		if (character::isWhitespace(*ptr)) {
+			pass2.append(*ptr);
+			ptr++;
+			continue;
+		}
 
 		// skip quoted strings
 		if (skipQuotedStrings(ptr,&pass2,&ptr)) {
+			continue;
+		}
+
+		// look for a comma, followed by a digit
+		// (unless it's at the beginning of the query)
+		if (*ptr==',' && character::isDigit(*(ptr+1)) && ptr!=start) {
+
+			// skip backwards until we find a non-number
+			// (also skip a leading negative sign)
+			const char	*before=ptr-1;
+			while (character::isDigit(*before) && before!=start) {
+				before--;
+			}
+			if (*before=='-') {
+				before--;
+			}
+
+			// skip forwards until we find a non-number
+			const char	*after=ptr+1;
+			while (character::isDigit(*after) && *after) {
+				after++;
+			}
+
+			// if various conditions are true then
+			// switch the comma to a dot...
+			//
+			// This is tricky with decimals in parentheses.
+			// Eg. How should the following be interpreted?
+			//    (111,222,333,444)
+			// The logic below breaks on spaces.
+			// Eg:
+			//    (111,222, 333,444)
+			// Would be recognized as having 2 decimals:
+			//    111,222 and 333,444
+			// and
+			//    (111, 222, 333,444)
+			// Would be recognized as having 3 decimals:
+			//    111 and 222 and 333,444
+			//
+			// Another difficult case is something like:
+			//	f(111,222)
+			// Is that 1 or 2 parameters?
+			// For now, we're calling that 2 parameters.
+			if (
+				// it's not something like (111,222)
+				!(*before=='(' && *after==')') &&
+
+				// *before is one of a valid set of characters
+				// that can preceed a decimal
+				character::inSet(*before,beforeset) &&
+
+				// *after is one of a valid set of characters
+				// that can follow a decimal
+				(character::inSet(*after,afterset) ||
+
+				// *after is at the end of the query
+				!*after ||
+
+				// *after is a comma, followed by whitespace
+				(*after==',' &&
+				character::isWhitespace(*(after+1)))
+
+				)) {
+
+				pass2.append('.');
+			} else {
+				pass2.append(',');
+			}
+
+			// move on...
+			ptr++;
+			continue;
+		}
+
+		// move on to the next character
+		pass2.append(*ptr);
+		ptr++;
+	}
+
+	if (debug) {
+		stdoutput.printf("normalized query (pass 2):\n\"%s\"\n\n",
+							pass2.getString());
+	}
+
+	// normalize the query, third pass...
+	// * remove spaces around symbols
+	ptr=pass2.getString();
+	start=ptr;
+	for (;;) {
+
+		// skip quoted strings
+		if (skipQuotedStrings(ptr,&pass3,&ptr)) {
 			continue;
 		}
 
@@ -189,23 +302,23 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// append the character
-		pass2.append(*ptr);
+		pass3.append(*ptr);
 
 		// move on to the next character
 		ptr++;
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 2):\n\"%s\"\n\n",
-							pass2.getString());
+		stdoutput.printf("normalized query (pass 3):\n\"%s\"\n\n",
+							pass3.getString());
 	}
 
-	// normalize the query, third pass...
+	// normalize the query, fourth pass...
 	// * convert static concatenations to equivalent strings
 	// FIXME:
 	// * convert static char() calls to equivalent strings
-	// 	(if db supports static char() calls)
-	ptr=pass2.getString();
+	//   (if db supports static char() calls)
+	ptr=pass3.getString();
 	start=ptr;
 	for (;;) {
 
@@ -218,7 +331,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		if (ptr!=start && !charstring::compare(ptr-1,"'||'",4)) {
 			ptr=ptr+3;
 			translatedquery->setPosition(
-				translatedquery->getPosition()-1);
+					translatedquery->getPosition()-1);
 			continue;
 		}
 
@@ -236,7 +349,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 3):\n\"%s\"\n\n",
+		stdoutput.printf("normalized query (pass 4):\n\"%s\"\n\n",
 						translatedquery->getString());
 	}
 

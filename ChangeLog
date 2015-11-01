@@ -5,6 +5,7 @@
 	added missing default implementation of
 		sqlrservercursor::getColumnTypeName()
 	added parser debug option
+	normalize translation can convert foreign decimals now
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
