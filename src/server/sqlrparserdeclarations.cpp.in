@@ -1,1 +1,1 @@
-sqlrparser	*new_sqlrparser_@module@();
+sqlrparser	*new_sqlrparser_@module@(bool debug);

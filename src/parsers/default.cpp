@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrserver.h>
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrparser *new_sqlrparser_default() {
-		return new sqlrparser();
+	SQLRSERVER_DLLSPEC sqlrparser *new_sqlrparser_default(bool debug) {
+		return new sqlrparser(debug);
 	}
 }

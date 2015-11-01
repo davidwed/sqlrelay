@@ -216,6 +216,7 @@
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
 
+		bool		debugsqlrparser;
 		bool		debugsqlrtranslation;
 		bool		debugsqlrfilters;
 		bool		debugtriggers;

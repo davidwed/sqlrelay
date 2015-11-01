@@ -122,6 +122,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 
 	decrypteddbpassword=NULL;
 
+	debugsqlrparser=false;
 	debugsqlrtranslation=false;
 	debugsqlrfilters=false;
 	debugtriggers=false;
@@ -4463,6 +4464,7 @@ void sqlrservercontroller::clearConnStats() {
 }
 
 sqlrparser *sqlrservercontroller::newParser() {
+	debugsqlrparser=cfg->getDebugParser();
 	sqlrparser	*p=newParser("enterprise",false);
 	if (!p) {
 		p=newParser("default",true);
@@ -4493,8 +4495,8 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 	// load the parser itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrparser_")->append(module);
-	sqlrparser	*(*newParser)()=
-			(sqlrparser *(*)())
+	sqlrparser	*(*newParser)(bool)=
+			(sqlrparser *(*)(bool))
 				sqlrpdl.getSymbol(functionname.getString());
 	if (!newParser) {
 		stderror.printf("failed to load parser: %s\n",module);
@@ -4504,7 +4506,7 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 		return NULL;
 	}
 
-	sqlrparser	*parser=(*newParser)();
+	sqlrparser	*parser=(*newParser)(debugsqlrparser);
 
 #else
 	sqlrparser	*parser;

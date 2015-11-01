@@ -1146,7 +1146,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 
 class SQLRSERVER_DLLSPEC sqlrparser {
 	public:
-			sqlrparser();
+			sqlrparser(bool debug);
 		virtual	~sqlrparser();
 
 		virtual	bool	parse(const char *query);
@@ -1160,6 +1160,8 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 					bool omitsiblings);
 		virtual	bool	write(xmldomnode *node, 
 					stringbuffer *output);
+	protected:
+		bool	debug;
 };
 
 

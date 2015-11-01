@@ -3,7 +3,8 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-sqlrparser::sqlrparser() {
+sqlrparser::sqlrparser(bool debug) {
+	this->debug=debug;
 }
 
 sqlrparser::~sqlrparser() {
