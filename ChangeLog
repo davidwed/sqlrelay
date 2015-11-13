@@ -6,6 +6,7 @@
 		sqlrservercursor::getColumnTypeName()
 	added parser debug option
 	normalize translation can convert foreign decimals now
+	updated missing-tnsnames.ora warning
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
