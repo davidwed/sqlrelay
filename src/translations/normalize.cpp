@@ -287,11 +287,20 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// Remove spaces before and after asterisks unless the asterisk
 		// is followed by a from clause or preceeded by select.
 		if (*ptr==' ' &&
-			((*(ptr+1)=='*' &&
-				!(!charstring::compare(start,"select *",8) &&
-					ptr==start+6)) ||
+			(
+			(
+			*(ptr+1)=='*' &&
+			!(ptr==start+6 &&
+				!charstring::compare(start,"select *",8)) &&
+			!(ptr>=start+7 &&
+				!charstring::compare(ptr-7," select *",9))
+			)
+			||
 			(*(ptr-1)=='*' &&
-				charstring::compare(ptr," from ",6)))) {
+				charstring::compare(ptr," from ",6)
+			)
+			)
+			) {
 			ptr++;
 			continue;
 		}
