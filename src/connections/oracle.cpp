@@ -9,7 +9,9 @@
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
+#include <rudiments/sys.h>
 #include <rudiments/stdio.h>
+
 #include <parsedatetime.h>
 
 #include <datatypes.h>
@@ -618,11 +620,20 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		if (!charstring::length(home)) {
 			home=environment::getValue("ORACLE_HOME");
 		}
-		char	*tnsnamesora=new char[charstring::length(home)+28];
-		charstring::copy(tnsnamesora,home);
-		charstring::append(tnsnamesora,"/network/admin/tnsnames.ora");
+		size_t	tnsnamesorasize=charstring::length(home)+28;
+		char	*tnsnamesora=new char[tnsnamesorasize];
+		charstring::printf(tnsnamesora,tnsnamesorasize,
+				"%s%cnetwork%cadmin%ctnsnames.ora",
+				home,
+				sys::getDirectorySeparator(),
+				sys::getDirectorySeparator(),
+				sys::getDirectorySeparator());
 		if (!file::readable(tnsnamesora)) {
-			stderror.printf("Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cont->cfg->getRunAsUser(),cont->cfg->getRunAsGroup());
+			stderror.printf(
+				"Warning: %s is not readable by %s:%s\n",
+				tnsnamesora,
+				cont->cfg->getRunAsUser(),
+				cont->cfg->getRunAsGroup());
 		}
 	}
 
