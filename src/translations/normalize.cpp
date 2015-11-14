@@ -297,7 +297,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			)
 			||
 			(*(ptr-1)=='*' &&
-				charstring::compare(ptr," from ",6)
+				charstring::compare(ptr," from ",6) &&
+				charstring::compare(ptr," into ",6)
 			)
 			)
 			) {
