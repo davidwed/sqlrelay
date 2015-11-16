@@ -23,10 +23,11 @@ all: db2 \
 	postgresql \
 	sqlite \
 	sap \
-	router
+	router \
+	extensions
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) informix$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) router$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) informix$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) router$(EXE) extensions$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
 db2: db2.cpp db2.$(OBJ)
@@ -75,3 +76,6 @@ sap: sap.cpp sap.$(OBJ)
 
 router: router.cpp router.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) router.$(OBJ) $(CPPTESTLIBS)
+
+extensions: extensions.cpp extensions.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) extensions.$(OBJ) $(CPPTESTLIBS)
