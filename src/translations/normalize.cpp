@@ -289,6 +289,11 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		if (*ptr==' ' &&
 			(
 			(
+			// FIXME: This is insufficient.
+			// There could be various qualifiers like unique,
+			// distinct, top # percent, etc. between the select
+			// and the *
+			// The select could be a subselect preceeded by a (.
 			*(ptr+1)=='*' &&
 			!(ptr==start+6 &&
 				!charstring::compare(start,"select *",8)) &&
