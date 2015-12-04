@@ -27,6 +27,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 		uint64_t	sec;
 		uint64_t	usec;
 		uint64_t	totalusec;
+		bool		usecommand;
 		bool		enabled;
 };
 
@@ -36,6 +37,8 @@ sqlrlogger_slowqueries::sqlrlogger_slowqueries(xmldomnode *parameters) :
 	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
 	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
 	totalusec=sec*1000000+usec;
+	usecommand=!charstring::compareIgnoringCase(
+			parameters->getAttributeValue("timer"),"command");
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 }
@@ -124,13 +127,22 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 		}
 	}
 
-	uint64_t	querysec=sqlrcur->getQueryEndSec()-
-					sqlrcur->getQueryStartSec();
-	uint64_t	queryusec=sqlrcur->getQueryEndUSec()-
-					sqlrcur->getQueryStartUSec();
-	uint64_t	querytotalusec=querysec*1000000+queryusec;
+	// calculate times
+	uint64_t	startsec=(usecommand)?sqlrcur->getCommandStartSec():
+						sqlrcur->getQueryStartSec();
+	uint64_t	startusec=(usecommand)?sqlrcur->getCommandStartUSec():
+						sqlrcur->getQueryStartUSec();
+	uint64_t	endsec=(usecommand)?sqlrcur->getCommandEndSec():
+						sqlrcur->getQueryEndSec();
+	uint64_t	endusec=(usecommand)?sqlrcur->getCommandEndUSec():
+						sqlrcur->getQueryEndUSec();
 
-	if (querytotalusec>=totalusec) {
+	uint64_t	queryusec=((endsec-startsec)*1000000)+
+							endusec-startusec;
+	double		querysec=((double)queryusec)/1000000.0;
+
+	// log times
+	if (queryusec>=totalusec) {
 
 		datetime	dt;
 		dt.getSystemDateAndTime();
@@ -149,11 +161,7 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 		logentry.append(datebuffer)->append(" :\n");
 		logentry.append(sqlrcur->getQueryBuffer());
 		logentry.append("\n");
-		logentry.append("execution time: ")->append(querysec);
-		logentry.append(".");
-		char	*usecstr=charstring::parseNumber(queryusec,6);
-		logentry.append(usecstr);
-		delete[] usecstr;
+		logentry.append("execution time: ")->append(querysec,6);
 		logentry.append("\n");
 		if ((size_t)querylog.write(logentry.getString(),
 					logentry.getStringLength())!=

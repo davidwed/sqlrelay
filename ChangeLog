@@ -10,6 +10,7 @@
 	updated sqlr-start and sqlr-scaler to run programs using fully
 		qualified path names
 	fixed query timer in sqlrsh
+	add timer="query/command" parameter to slowqueries logger
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
