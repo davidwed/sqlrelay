@@ -296,31 +296,34 @@ int main(int argc, const char **argv) {
 				cmdl.found("-disable-crash-handler");
 
 	// on Windows, open a new console window and redirect everything to it
+	// (unless that's specifically disabled)
 	#ifdef _WIN32
-	fclose(stdin);
-	fclose(stdout);
-	fclose(stderr);
-	FreeConsole();
-	AllocConsole();
-	stringbuffer	title;
-	title.append("SQL Relay");
-	if (!charstring::isNullOrEmpty(id)) {
-		title.append(" - ");
-		title.append(id);
+	if (!cmdl.found("-disable-new-window")) {
+		fclose(stdin);
+		fclose(stdout);
+		fclose(stderr);
+		FreeConsole();
+		AllocConsole();
+		stringbuffer	title;
+		title.append("SQL Relay");
+		if (!charstring::isNullOrEmpty(id)) {
+			title.append(" - ");
+			title.append(id);
+		}
+		SetConsoleTitle(title.getString());
+		*stdin=*(_fdopen(_open_osfhandle(
+					(long)GetStdHandle(STD_INPUT_HANDLE),
+					_O_TEXT),"r"));
+		setvbuf(stdin,NULL,_IONBF,0);
+		*stdout=*(_fdopen(_open_osfhandle(
+					(long)GetStdHandle(STD_OUTPUT_HANDLE),
+					_O_TEXT),"w"));
+		setvbuf(stdout,NULL,_IONBF,0);
+		*stderr=*(_fdopen(_open_osfhandle(
+					(long)GetStdHandle(STD_ERROR_HANDLE),
+					_O_TEXT),"w"));
+		setvbuf(stderr,NULL,_IONBF,0);
 	}
-	SetConsoleTitle(title.getString());
-	*stdin=*(_fdopen(_open_osfhandle(
-				(long)GetStdHandle(STD_INPUT_HANDLE),
-				_O_TEXT),"r"));
-	setvbuf(stdin,NULL,_IONBF,0);
-	*stdout=*(_fdopen(_open_osfhandle(
-				(long)GetStdHandle(STD_OUTPUT_HANDLE),
-				_O_TEXT),"w"));
-	setvbuf(stdout,NULL,_IONBF,0);
-	*stderr=*(_fdopen(_open_osfhandle(
-				(long)GetStdHandle(STD_ERROR_HANDLE),
-				_O_TEXT),"w"));
-	setvbuf(stderr,NULL,_IONBF,0);
 	iswindows=true;
 	#else
 	iswindows=false;
