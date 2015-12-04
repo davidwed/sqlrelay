@@ -52,8 +52,10 @@ bool sqlrtriggers::loadTriggers(const char *triggers) {
 					trigger->getAttributeValue("when"),
 					"before");
 
-		debugPrintf("loading trigger %s ...\n",
-				(before)?"before":"after");
+		if (debug) {
+			stdoutput.printf("loading trigger %s ...\n",
+					(before)?"before":"after");
+		}
 
 		// determine which list to put the trigger in
 		singlylinkedlist< sqlrtriggerplugin * >	*list=
@@ -107,7 +109,9 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 		}
 	}
 
-	debugPrintf("loading trigger: %s\n",module);
+	if (debug) {
+		stdoutput.printf("loading trigger: %s\n",module);
+	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the trigger module
@@ -147,6 +151,10 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	dynamiclib	*dl=NULL;
 	sqlrtrigger	*tr=NULL;
 #endif
+
+	if (debug) {
+		stdoutput.printf("success\n");
+	}
 
 	// add the plugin to the list
 	sqlrtriggerplugin	*sqltp=new sqlrtriggerplugin;

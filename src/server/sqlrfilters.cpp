@@ -93,7 +93,9 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 		}
 	}
 
-	debugPrintf("loading filter: %s\n",module);
+	if (debug) {
+		stdoutput.printf("loading filter: %s\n",module);
+	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the filter module
@@ -138,6 +140,10 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 		f=NULL;
 	}
 #endif
+
+	if (debug) {
+		stdoutput.printf("success\n");
+	}
 
 	// add the plugin to the list
 	sqlrfilterplugin	*sqlrfp=new sqlrfilterplugin;

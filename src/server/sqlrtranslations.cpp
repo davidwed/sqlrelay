@@ -98,7 +98,9 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 		}
 	}
 
-	debugPrintf("loading translation: %s\n",module);
+	if (debug) {
+		stdoutput.printf("loading translation module: %s\n",module);
+	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the translation module
@@ -143,6 +145,10 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 		tr=NULL;
 	}
 #endif
+
+	if (debug) {
+		stdoutput.printf("success\n");
+	}
 
 	// add the plugin to the list
 	sqlrtranslationplugin	*sqltp=new sqlrtranslationplugin;

@@ -101,7 +101,9 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 		}
 	}
 
-	debugPrintf("loading result set translation: %s\n",module);
+	if (debug) {
+		stdoutput.printf("loading result set translation: %s\n",module);
+	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the result set translation module
@@ -149,6 +151,10 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 		rstr=NULL;
 	}
 #endif
+
+	if (debug) {
+		stdoutput.printf("success\n");
+	}
 
 	// add the plugin to the list
 	sqlrresultsettranslationplugin	*sqlrrstp=

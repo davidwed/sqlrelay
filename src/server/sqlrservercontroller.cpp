@@ -4475,6 +4475,10 @@ sqlrparser *sqlrservercontroller::newParser() {
 sqlrparser *sqlrservercontroller::newParser(const char *module,
 						bool errorifnotfound) {
 
+	if (debugsqlrparser) {
+		stdoutput.printf("loading parser module: %s\n",module);
+	}
+
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the parser module
 	stringbuffer	modulename;
@@ -4482,9 +4486,11 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 	modulename.append("sqlrparser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!sqlrpdl.open(modulename.getString(),true,true)) {
-		if (errorifnotfound) {
+		if (debugsqlrparser || errorifnotfound) {
 			stderror.printf("failed to load parser module: %s\n",
 									module);
+		}
+		if (errorifnotfound) {
 			char	*error=sqlrpdl.getError();
 			stderror.printf("%s\n",error);
 			delete[] error;
@@ -4526,6 +4532,11 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 		delete[] error;
 #endif
 	}
+
+	if (debugsqlrparser) {
+		stdoutput.printf("success\n");
+	}
+
 	return parser;
 }
 
