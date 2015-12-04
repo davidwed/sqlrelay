@@ -57,7 +57,7 @@ WNOUNKNOWNPRAGMAS = @WNOUNKNOWNPRAGMAS@
 WNOMISMATCHEDTAGS = @WNOMISMATCHEDTAGS@
 INC = -I
 OBJ = lo
-DIRCPPFLAG = -DLOCALSTATEDIR=\"$(localstatedir)/\" -DSYSCONFDIR=\"$(sysconfdir)/\" -DLIBEXECDIR=\"$(libexecdir)/\"
+DIRCPPFLAG = -DBINDIR=\"$(bindir)/\" -DLOCALSTATEDIR=\"$(localstatedir)/\" -DSYSCONFDIR=\"$(sysconfdir)/\" -DLIBEXECDIR=\"$(libexecdir)/\"
 
 
 # linker flags

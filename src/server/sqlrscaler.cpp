@@ -401,11 +401,12 @@ bool scaler::reapChildren(pid_t connpid) {
 
 pid_t scaler::openOneConnection() {
 
-	const char	*command=NULL;
+	stringbuffer	cmd;
+	cmd.append(sqlrpth->getBinDir());
 	if (iswindows) {
-		command="sqlr-connection.exe";
+		cmd.append("sqlr-connection.exe");
 	} else {
-		command="sqlr-connection";
+		cmd.append("sqlr-connection");
 	}
 
 	char	ttlstr[20];
@@ -435,7 +436,7 @@ pid_t scaler::openOneConnection() {
 	}
 	args[p++]=NULL; // the last
 
-	pid_t	pid=process::spawn(command,args,(iswindows)?true:false);
+	pid_t	pid=process::spawn(cmd.getString(),args,(iswindows)?true:false);
 	if (pid==-1) {
 		// error
 		stderror.printf("spawn() failed: %s\n",error::getErrorString());

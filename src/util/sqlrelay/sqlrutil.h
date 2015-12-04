@@ -28,6 +28,7 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 	public:
 				sqlrpaths(sqlrcmdline *cmdl);
 				~sqlrpaths();
+		const char	*getBinDir();
 		const char	*getLocalStateDir();
 		const char	*getSockSeqFile();
 		const char	*getSocketsDir();
@@ -42,6 +43,7 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 		const char	*getConfigUrl();
 		const char	*getLibExecDir();
 	protected:
+		char		*bindir;
 		char		*localstatedir;
 		char		*tmpdir;
 		char		*sockseqfile;

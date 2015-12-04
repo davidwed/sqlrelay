@@ -17,18 +17,19 @@
 
 bool	iswindows;
 
-bool startListener(const char *id, const char *config,
+bool startListener(sqlrpaths *sqlrpth, const char *id, const char *config,
 			const char *localstatedir, bool disablecrashhandler) {
 
 	// start the listener
 	stdoutput.printf("\nStarting listener:\n");
 
 	// build command to spawn
-	const char	*cmd=NULL;
+	stringbuffer	cmd;
+	cmd.append(sqlrpth->getBinDir());
 	if (iswindows) {
-		cmd="sqlr-listener.exe";
+		cmd.append("sqlr-listener.exe");
 	} else {
-		cmd="sqlr-listener";
+		cmd.append("sqlr-listener");
  	}
 	uint16_t	i=0;
 	const char	*args[9];
@@ -56,7 +57,7 @@ bool startListener(const char *id, const char *config,
 	stdoutput.printf("\n");
 
 	// spawn the command
-	if (process::spawn(cmd,args,(iswindows)?true:false)==-1) {
+	if (process::spawn(cmd.getString(),args,(iswindows)?true:false)==-1) {
 		stdoutput.printf("\nsqlr-listener failed to start.\n");
 		return false;
 	}
@@ -64,7 +65,7 @@ bool startListener(const char *id, const char *config,
 }
 
 
-bool startConnection(const char *id,
+bool startConnection(sqlrpaths *sqlrpth, const char *id,
 				const char *connectionid,
 				const char *config,
 				const char *localstatedir,
@@ -72,19 +73,20 @@ bool startConnection(const char *id,
 				bool disablecrashhandler) {
 
 	// build command to spawn
-	const char	*cmd=NULL;
+	stringbuffer	cmd;
 	uint16_t	i=0;
 	const char	*args[15];
 	if (strace) {
-		cmd="strace";
+		cmd.append("strace");
 		args[i++]="strace";
 		args[i++]="-ff";
 		args[i++]="-o";
 	} else {
+		cmd.append(sqlrpth->getBinDir());
 		if (iswindows) {
-			cmd="sqlr-connection.exe";
+			cmd.append("sqlr-connection.exe");
 		} else {
-			cmd="sqlr-connection";
+			cmd.append("sqlr-connection");
  		}
 	}
 	args[i++]="sqlr-connection";
@@ -118,14 +120,15 @@ bool startConnection(const char *id,
 	stdoutput.printf("\n");
 
 	// spawn the command
-	if (process::spawn(cmd,args,(iswindows)?true:false)==-1) {
+	if (process::spawn(cmd.getString(),args,(iswindows)?true:false)==-1) {
 		stdoutput.printf("\nsqlr-connection failed to start.\n");
 		return false;
 	}
 	return true;
 }
 
-bool startConnections(sqlrconfig *cfg,
+bool startConnections(sqlrpaths *sqlrpth,
+				sqlrconfig *cfg,
 				const char *id,
 				const char *config,
 				const char *localstatedir,
@@ -144,7 +147,7 @@ bool startConnections(sqlrconfig *cfg,
 	// if no connections were defined in the configuration,
 	// start 1 default one
 	if (!cfg->getConnectionCount()) {
-		return !startConnection(id,config,localstatedir,NULL,
+		return !startConnection(sqlrpth,id,config,localstatedir,NULL,
 						strace,disablecrashhandler);
 	}
 
@@ -186,7 +189,7 @@ bool startConnections(sqlrconfig *cfg,
 
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
-			if (!startConnection(id,csc->getConnectionId(),
+			if (!startConnection(sqlrpth,id,csc->getConnectionId(),
 						config,localstatedir,strace,
 						disablecrashhandler)) {
 				// it's ok if at least 1 connection started up
@@ -206,7 +209,8 @@ bool startConnections(sqlrconfig *cfg,
 	return true;
 }
 
-bool startScaler(sqlrconfig *cfg,
+bool startScaler(sqlrpaths *sqlrpth,
+			sqlrconfig *cfg,
 			const char *id,
 			const char *config,
 			const char *localstatedir,
@@ -220,11 +224,12 @@ bool startScaler(sqlrconfig *cfg,
 	stdoutput.printf("\nStarting scaler:\n");
 
 	// build command to spawn
-	const char	*cmd=NULL;
+	stringbuffer	cmd;
+	cmd.append(sqlrpth->getBinDir());
 	if (iswindows) {
-		cmd="sqlr-scaler.exe";
+		cmd.append("sqlr-scaler.exe");
 	} else {
-		cmd="sqlr-scaler";
+		cmd.append("sqlr-scaler");
  	}
 	uint16_t	i=0;
 	const char	*args[9];
@@ -252,7 +257,7 @@ bool startScaler(sqlrconfig *cfg,
 	stdoutput.printf("\n");
 
 	// spawn the command
-	if (process::spawn(cmd,args,(iswindows)?true:false)==-1) {
+	if (process::spawn(cmd.getString(),args,(iswindows)?true:false)==-1) {
 		stdoutput.printf("\nsqlr-scaler failed to start.\n");
 		return false;
 	}
@@ -327,13 +332,13 @@ int main(int argc, const char **argv) {
 		// start listener, connections and scaler
 		sqlrconfig	*cfg=sqlrcfgs.load(configurl,thisid);
 		if (!cfg ||
-			!startListener(thisid,
+			!startListener(&sqlrpth,thisid,
 					config,localstatedir,
 					disablecrashhandler) ||
-			!startConnections(cfg,thisid,
+			!startConnections(&sqlrpth,cfg,thisid,
 					config,localstatedir,
 					strace,disablecrashhandler) ||
-			!startScaler(cfg,thisid,
+			!startScaler(&sqlrpth,cfg,thisid,
 					config,localstatedir,
 					disablecrashhandler)) {
 			exitstatus=1;

@@ -37,6 +37,10 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	// trim trailing slashes
 	charstring::rightTrim(prefix,'\\');
 
+	// build default bindir
+	scratch.append(prefix)->append("\\bin\\");
+	bindir=scratch.detachString();
+
 	// build default localstatedir
 	scratch.append(prefix)->append("\\var\\");
 	defaultlocalstatedir=scratch.detachString();
@@ -50,6 +54,7 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	libexecdir=scratch.detachString();
 
 #else
+	bindir=charstring::duplicate(BINDIR);
 	defaultlocalstatedir=charstring::duplicate(LOCALSTATEDIR);
 	sysconfdir=charstring::duplicate(SYSCONFDIR);
 	libexecdir=charstring::duplicate(LIBEXECDIR);
@@ -114,6 +119,7 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 }
 
 sqlrpaths::~sqlrpaths() {
+	delete[] bindir;
 	delete[] localstatedir;
 	delete[] tmpdir;
 	delete[] sockseqfile;
@@ -126,6 +132,10 @@ sqlrpaths::~sqlrpaths() {
 	delete[] defaultconfigfile;
 	delete[] defaultconfigdir;
 	delete[] libexecdir;
+}
+
+const char *sqlrpaths::getBinDir() {
+	return bindir;
 }
 
 const char *sqlrpaths::getLocalStateDir() {
