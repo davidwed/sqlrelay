@@ -215,6 +215,8 @@ class	sqlrsh {
 
 		sqlrcmdline	*cmdline;
 		sqlrpaths	*sqlrpth;
+
+		datetime	start;
 };
 
 sqlrsh::sqlrsh() {
@@ -417,6 +419,9 @@ bool sqlrsh::runCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					sqlrshenv *env, const char *command) {
 
 	int	cmdtype=commandType(command);
+
+	// init stats
+	initStats(env);
 
 	if (cmdtype>0) {
 		// if the command an internal command, run it as one
@@ -730,9 +735,6 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 				sqlrcursor *sqlrcur, sqlrshenv *env, 
 				const char *command) {
 
-	// init stats
-	initStats(env);
-
 	// handle begin, commit and rollback
 	if (!charstring::compareIgnoringCase(command,"begin")) {
 
@@ -1007,7 +1009,7 @@ void sqlrsh::initStats(sqlrshenv *env) {
 		return;
 	}
 
-	clock();
+	start.getSystemDateAndTime();
 }
 
 void sqlrsh::displayError(sqlrshenv *env,
@@ -1133,14 +1135,23 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		return;
 	}
 
-	// call clock again, display results
+	// calculate elapsed time
+	datetime	end;
+	end.getSystemDateAndTime();
+	uint64_t	startusec=start.getEpoch()*1000000+
+					start.getMicroseconds();
+	uint64_t	endusec=end.getEpoch()*1000000+
+					end.getMicroseconds();
+	double		time=((double)(endusec-startusec))/1000000;
+
+	// display stats
 	stdoutput.printf("	Rows Returned   : ");
 	stdoutput.printf("%lld\n",(long long)sqlrcur->rowCount());
 	stdoutput.printf("	Fields Returned : ");
 	stdoutput.printf("%lld\n",
 			(long long)sqlrcur->rowCount()*sqlrcur->colCount());
-	stdoutput.printf("	System time     : ");
-	stdoutput.printf("%ld\n",(long)clock());
+	stdoutput.printf("	Elapsed Time    : ");
+	stdoutput.printf("%.6f\n",time);
 	stdoutput.printf("\n");
 }
 
@@ -1649,9 +1660,6 @@ void sqlrsh::openCache(sqlrshenv *env,
 	// prepend the default cache directory.
 	stringbuffer	fn;
 	fn.append(sqlrpth->getCacheDir())->append(command);
-
-	// init stats
-	initStats(env);
 
 	// open the cached result set
 	sqlrcur->openCachedResultSet(fn.getString());
