@@ -830,6 +830,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+SQLR
 LIBEFENCE
 LIBDMALLOC
 PSQLUSERPATH
@@ -982,6 +983,7 @@ with_pthread_prefix
 with_system_libtool
 enable_dmalloc
 enable_efence
+with_sqlr
 enable_shared
 enable_static
 with_pic
@@ -1709,6 +1711,7 @@ Optional Packages:
   --with-nodejs-prefix          Location of node.js
   --with-pthread-prefix         Location of pthread library
   --with-system-libtool   use system libtool instead of ./libtool
+  --with-sqlr                   prefix to use when naming binaries
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
@@ -3280,6 +3283,15 @@ if test "${enable_efence+set}" = set; then :
   enableval=$enable_efence; LIBEFENCE="-lefence"
 else
   LIBEFENCE=""
+fi
+
+
+
+# Check whether --with-sqlr was given.
+if test "${with_sqlr+set}" = set; then :
+  withval=$with_sqlr; SQLR="$withval"
+else
+  SQLR="sqlr"
 fi
 
 

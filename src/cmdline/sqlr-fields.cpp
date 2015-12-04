@@ -40,8 +40,8 @@ int main(int argc, const char **argv) {
 		charstring::length(socket)) ||
 		!(charstring::length(table))) {
 
-		stdoutput.printf("usage: sqlr-fields -host host -port port -socket socket -table table [-debug [filename]]\n"
-			"  or   sqlr-fields  [-config config] -id id -table table [-debug [filename]]\n");
+		stdoutput.printf("usage: %s-fields -host host -port port -socket socket -table table [-debug [filename]]\n"
+			"  or   %s-fields  [-config config] -id id -table table [-debug [filename]]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 

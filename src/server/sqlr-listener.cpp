@@ -25,9 +25,9 @@ void shutDown(int32_t signum) {
 	// So, we'll catch shutdown loops and exit cleanly.  I'm not sure
 	// what else can be done.
 	if (shutdownalready) {
-		stderror.printf("sqlr-listener: (pid=%d) "
+		stderror.printf("%s-listener: (pid=%d) "
 				"Shutdown loop detected, exiting.\n",
-				(uint32_t)process::getProcessId());
+				SQLR,(uint32_t)process::getProcessId());
 		process::exit(0);
 	}
 

@@ -608,14 +608,14 @@ bool sqlrservercontroller::handlePidFile() {
 		found=(process::checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
-		stderror.printf("\nsqlr-connection error:\n");
+		stderror.printf("\n%s-connection error:\n",SQLR);
 		stderror.printf("	The pid file %s",listenerpidfile);
 		stderror.printf(" was not found.\n");
 		stderror.printf("	This usually means "
-					"that the sqlr-listener \n");
+					"that the %s-listener \n",SQLR);
 		stderror.printf("is not running.\n");
-		stderror.printf("	The sqlr-listener must be running ");
-		stderror.printf("for the sqlr-connection to start.\n\n");
+		stderror.printf("	The %s-listener must be running ",SQLR);
+		stderror.printf("for the %s-connection to start.\n\n",SQLR);
 		retval=false;
 	}
 
@@ -4171,7 +4171,7 @@ void sqlrservercontroller::shutDown() {
 	// waiting for the child to exit.  On unix-like platforms, we can
 	// handle that with SIGCHLD/waitpid().  On other platforms we can
 	// do it with a semaphore.
-	if (!decrementonclose && cfg->getDynamicScaling() &&
+	if (!decrementonclose && cfg && cfg->getDynamicScaling() &&
 		semset && shmem && !process::supportsGetChildStateChange()) {
 		semset->signal(11);
 	}

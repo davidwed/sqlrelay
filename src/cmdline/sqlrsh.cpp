@@ -1867,8 +1867,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 		charstring::length(host) ||
 		charstring::length(socket))) {
 
-		stdoutput.printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
-			"  or   sqlrsh [-config config] -id id [-script script | -command command]\n");
+		stdoutput.printf("usage: %ssh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
+			"  or   %ssh [-config config] -id id [-script script | -command command]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 

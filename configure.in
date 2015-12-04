@@ -365,6 +365,11 @@ AC_ARG_ENABLE(efence,
 	LIBEFENCE="-lefence",
 	LIBEFENCE="")
 AC_SUBST(LIBEFENCE)
+AC_ARG_WITH(sqlr,
+	[  --with-sqlr                   prefix to use when naming binaries],
+	SQLR="$withval",
+	SQLR="sqlr")
+AC_SUBST(SQLR)
 
 
 dnl Rewrite supplied paths.

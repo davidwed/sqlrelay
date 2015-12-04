@@ -65,36 +65,36 @@ LIBSQLRSERVERLOBJS = \
 
 all: $(STATICPLUGINSRCS) \
 	libsqlrserver.$(LIBEXT) \
-	sqlr-start$(EXE) \
-	sqlr-stop$(EXE) \
-	sqlr-listener$(EXE) \
-	sqlr-connection$(EXE) \
-	sqlr-scaler$(EXE) \
-	sqlr-cachemanager$(EXE)
+	$(SQLR)-start$(EXE) \
+	$(SQLR)-stop$(EXE) \
+	$(SQLR)-listener$(EXE) \
+	$(SQLR)-connection$(EXE) \
+	$(SQLR)-scaler$(EXE) \
+	$(SQLR)-cachemanager$(EXE)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest sqlr-start$(EXE) sqlr-stop$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE) $(STATICPLUGINSRCS)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(STATICPLUGINSRCS)
 	$(RMTREE) .libs
 
 libsqlrserver.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LIBSQLRSERVERLOBJS) $(STATICPLUGINLOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBSQLRSERVERLIBS) $(RUDIMENTSLIBS) $(STATICPLUGINLIBS) $(EXTRALIBS)
 
-sqlr-start$(EXE): sqlr-start.cpp sqlr-start.$(OBJ)
+$(SQLR)-start$(EXE): sqlr-start.cpp sqlr-start.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-start.$(OBJ) $(SERVERLIBS)
 
-sqlr-stop$(EXE): sqlr-stop.cpp sqlr-stop.$(OBJ)
+$(SQLR)-stop$(EXE): sqlr-stop.cpp sqlr-stop.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-stop.$(OBJ) $(SERVERLIBS)
 
-sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.$(OBJ)
+$(SQLR)-listener$(EXE): sqlr-listener.cpp sqlr-listener.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-listener.$(OBJ) $(SERVERLIBS)
 
-sqlr-connection$(EXE): sqlr-connection.cpp sqlr-connection.$(OBJ)
+$(SQLR)-connection$(EXE): sqlr-connection.cpp sqlr-connection.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-connection.$(OBJ) $(SERVERLIBS)
 
-sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
+$(SQLR)-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-scaler.$(OBJ) $(SERVERLIBS)
 
-sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
+$(SQLR)-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(SERVERLIBS)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
@@ -259,12 +259,12 @@ sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-start$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-stop$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-listener$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-connection$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-scaler$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) sqlr-cachemanager$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-start$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-stop$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-listener$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-connection$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-scaler$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-cachemanager$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(CP) sqlrelay/sqlrserver.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrserver.h
@@ -316,6 +316,12 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrserverdll.h \
 		$(includedir)/sqlrelay/private/sqlrserverincludes.h \
 		$(includedir)/sqlrelay/private/sqlrshmdata.h \
+		$(bindir)/$(SQLR)-start$(EXE) \
+		$(bindir)/$(SQLR)-stop$(EXE) \
+		$(bindir)/$(SQLR)-listener$(EXE) \
+		$(bindir)/$(SQLR)-connection$(EXE) \
+		$(bindir)/$(SQLR)-scaler$(EXE) \
+		$(bindir)/$(SQLR)-cachemanager$(EXE) \
 		$(bindir)/sqlr-start$(EXE) \
 		$(bindir)/sqlr-stop$(EXE) \
 		$(bindir)/sqlr-listener$(EXE) \

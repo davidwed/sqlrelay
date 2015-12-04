@@ -23,17 +23,21 @@ bool startListener(sqlrpaths *sqlrpth, const char *id, const char *config,
 	// start the listener
 	stdoutput.printf("\nStarting listener:\n");
 
+	// build command name
+	stringbuffer	cmdname;
+	cmdname.append(SQLR)->append("-listener");
+
 	// build command to spawn
 	stringbuffer	cmd;
-	cmd.append(sqlrpth->getBinDir());
+	cmd.append(sqlrpth->getBinDir())->append(cmdname.getString());
 	if (iswindows) {
-		cmd.append("sqlr-listener.exe");
-	} else {
-		cmd.append("sqlr-listener");
+		cmd.append("exe");
  	}
+
+	// build args
 	uint16_t	i=0;
 	const char	*args[9];
-	args[i++]="sqlr-listener";
+	args[i++]=cmdname.getString();
 	args[i++]="-id";
 	args[i++]=id;
 	if (!charstring::isNullOrEmpty(config)) {
@@ -58,7 +62,7 @@ bool startListener(sqlrpaths *sqlrpth, const char *id, const char *config,
 
 	// spawn the command
 	if (process::spawn(cmd.getString(),args,(iswindows)?true:false)==-1) {
-		stdoutput.printf("\nsqlr-listener failed to start.\n");
+		stdoutput.printf("\n%s failed to start.\n",cmdname.getString());
 		return false;
 	}
 	return true;
@@ -72,24 +76,30 @@ bool startConnection(sqlrpaths *sqlrpth, const char *id,
 				bool strace,
 				bool disablecrashhandler) {
 
+	// build command name
+	stringbuffer	cmdname;
+	cmdname.append(SQLR)->append("-connection");
+
 	// build command to spawn
 	stringbuffer	cmd;
+	if (strace) {
+		cmd.append("strace");
+	} else {
+		cmd.append(sqlrpth->getBinDir())->append(cmdname.getString());
+		if (iswindows) {
+			cmd.append(".exe");
+		}
+	}
+
+	// build args
 	uint16_t	i=0;
 	const char	*args[15];
 	if (strace) {
-		cmd.append("strace");
 		args[i++]="strace";
 		args[i++]="-ff";
 		args[i++]="-o";
-	} else {
-		cmd.append(sqlrpth->getBinDir());
-		if (iswindows) {
-			cmd.append("sqlr-connection.exe");
-		} else {
-			cmd.append("sqlr-connection");
- 		}
 	}
-	args[i++]="sqlr-connection";
+	args[i++]=cmdname.getString();
 	args[i++]="-id";
 	args[i++]=id;
 	if (connectionid) {
@@ -121,7 +131,7 @@ bool startConnection(sqlrpaths *sqlrpth, const char *id,
 
 	// spawn the command
 	if (process::spawn(cmd.getString(),args,(iswindows)?true:false)==-1) {
-		stdoutput.printf("\nsqlr-connection failed to start.\n");
+		stdoutput.printf("\n%s failed to start.\n",cmdname.getString());
 		return false;
 	}
 	return true;
@@ -223,17 +233,21 @@ bool startScaler(sqlrpaths *sqlrpth,
 
 	stdoutput.printf("\nStarting scaler:\n");
 
+	// build command name
+	stringbuffer	cmdname;
+	cmdname.append(SQLR)->append("-scaler");
+
 	// build command to spawn
 	stringbuffer	cmd;
-	cmd.append(sqlrpth->getBinDir());
+	cmd.append(sqlrpth->getBinDir())->append(cmdname.getString());
 	if (iswindows) {
-		cmd.append("sqlr-scaler.exe");
-	} else {
-		cmd.append("sqlr-scaler");
+		cmd.append(".exe");
  	}
+
+	// build args
 	uint16_t	i=0;
 	const char	*args[9];
-	args[i++]="sqlr-scaler";
+	args[i++]=cmdname.getString();
 	args[i++]="-id";
 	args[i++]=id;
 	if (!charstring::isNullOrEmpty(config)) {
@@ -258,7 +272,7 @@ bool startScaler(sqlrpaths *sqlrpth,
 
 	// spawn the command
 	if (process::spawn(cmd.getString(),args,(iswindows)?true:false)==-1) {
-		stdoutput.printf("\nsqlr-scaler failed to start.\n");
+		stdoutput.printf("\n%s failed to start.\n",cmdname.getString());
 		return false;
 	}
 	return true;

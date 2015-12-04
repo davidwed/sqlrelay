@@ -44,8 +44,8 @@ int main(int argc, const char **argv) {
 		charstring::length(socket)) ||
 		!(charstring::length(query))) {
 
-		stdoutput.printf("usage: sqlr-query -host host -port port -socket socket -user user -password password -query query [-debug [filename]] [-resultsetbuffersize rows]\n"
-			"  or   sqlr-query  [-config config] -id id -query query [-debug [filename]] [-resultsetbuffersize rows]\n");
+		stdoutput.printf("usage: %s-query -host host -port port -socket socket -user user -password password -query query [-debug [filename]] [-resultsetbuffersize rows]\n"
+			"  or   %s-query  [-config config] -id id -query query [-debug [filename]] [-resultsetbuffersize rows]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 

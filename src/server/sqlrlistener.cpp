@@ -86,12 +86,15 @@ sqlrlistener::~sqlrlistener() {
 	delete[] idfilename;
 
 	if (!isforkedchild) {
-		for (linkedlistnode< listenercontainer * > *node=
+		if (cfg && cfg->getListenerList()) {
+			for (linkedlistnode< listenercontainer * > *node=
 					cfg->getListenerList()->getFirst();
 					node; node=node->getNext()) {
-			const char	*unixport=node->getValue()->getSocket();
-			if (unixport) {
-				file::remove(unixport);
+				const char	*unixport=
+						node->getValue()->getSocket();
+				if (unixport) {
+					file::remove(unixport);
+				}
 			}
 		}
 		if (pidfile) {
@@ -103,22 +106,24 @@ sqlrlistener::~sqlrlistener() {
 	}
 
 	// remove files that indicate whether the db is up or down
-	linkedlist< connectstringcontainer * >	*csl=
-					cfg->getConnectStringList();
-	for (linkedlistnode< connectstringcontainer * > *node=csl->getFirst();
-						node; node=node->getNext()) {
-		connectstringcontainer	*cs=node->getValue();
-		const char	*connectionid=cs->getConnectionId();
-		size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
-					charstring::length(cmdl->getId())+1+
-					charstring::length(connectionid)+1;
-		char	*updown=new char[updownlen];
-		charstring::printf(updown,updownlen,
-					"%s%s-%s",
-					sqlrpth->getIpcDir(),
-					cmdl->getId(),connectionid);
-		file::remove(updown);
-		delete[] updown;
+	if (cfg && cfg->getConnectStringList()) {
+		for (linkedlistnode< connectstringcontainer * > *node=
+					cfg->getConnectStringList()->getFirst();
+					node; node=node->getNext()) {
+			connectstringcontainer	*cs=node->getValue();
+			const char	*connectionid=cs->getConnectionId();
+			size_t	updownlen=
+				charstring::length(sqlrpth->getIpcDir())+
+				charstring::length(cmdl->getId())+1+
+				charstring::length(connectionid)+1;
+			char	*updown=new char[updownlen];
+			charstring::printf(updown,updownlen,
+						"%s%s-%s",
+						sqlrpth->getIpcDir(),
+						cmdl->getId(),connectionid);
+			file::remove(updown);
+			delete[] updown;
+		}
 	}
 	delete sqlrpth;
 	delete sqlrcfgs;
@@ -297,7 +302,7 @@ bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 	}
 
 	if (!cfg->accessible()) {
-		stderror.printf("\nsqlr-listener error:\n");
+		stderror.printf("\n%s-listener error:\n",SQLR);
 		stderror.printf("	This instance of SQL Relay is ");
 		stderror.printf("configured to run as:\n");
 		stderror.printf("		user: %s\n",
@@ -338,11 +343,11 @@ bool sqlrlistener::handlePidFile(const char *id) {
 				sqlrpth->getPidDir(),id);
 
 	if (process::checkForPidFile(pidfile)!=-1) {
-		stderror.printf("\nsqlr-listener error:\n");
+		stderror.printf("\n%s-listener error:\n",SQLR);
 		stderror.printf("	The pid file %s",pidfile);
 		stderror.printf(" exists.\n");
 		stderror.printf("	This usually means that the ");
-		stderror.printf("sqlr-listener is already running for ");
+		stderror.printf("%s-listener is already running for ",SQLR);
 		stderror.printf("the \n");
 		stderror.printf("	%s",id);
 		stderror.printf(" instance.\n");
@@ -590,7 +595,7 @@ void sqlrlistener::ipcFileError(const char *idfilename) {
 
 void sqlrlistener::keyError(const char *idfilename) {
 	char	*err=error::getErrorString();
-	stderror.printf("\nsqlr-listener error:\n");
+	stderror.printf("\n%s-listener error:\n",SQLR);
 	stderror.printf("	Unable to generate a key from ");
 	stderror.printf("%s\n",idfilename);
 	stderror.printf("	Error was: %s\n\n",err);
@@ -599,10 +604,10 @@ void sqlrlistener::keyError(const char *idfilename) {
 
 void sqlrlistener::shmError(const char *id, int shmid) {
 	char	*err=error::getErrorString();
-	stderror.printf("\nsqlr-listener error:\n");
+	stderror.printf("\n%s-listener error:\n",SQLR);
 	stderror.printf("	Unable to create a shared memory ");
 	stderror.printf("segment.  This is usally because an \n");
-	stderror.printf("	sqlr-listener is already running for ");
+	stderror.printf("	%s-listener is already running for ",SQLR);
 	stderror.printf("the %s instance.\n\n",id);
 	stderror.printf("	If it is not running, something may ");
 	stderror.printf("have crashed and left an old segment\n");
@@ -617,10 +622,10 @@ void sqlrlistener::shmError(const char *id, int shmid) {
 
 void sqlrlistener::semError(const char *id, int semid) {
 	char	*err=error::getErrorString();
-	stderror.printf("\nsqlr-listener error:\n");
+	stderror.printf("\n%s-listener error:\n",SQLR);
 	stderror.printf("	Unable to create a semaphore ");
 	stderror.printf("set.  This is usally because an \n");
-	stderror.printf("	sqlr-listener is already ");
+	stderror.printf("	%s-listener is already ",SQLR);
 	stderror.printf("running for the %s",id);
 	stderror.printf(" instance.\n\n");
 	stderror.printf("	If it is not running, ");

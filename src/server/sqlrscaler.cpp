@@ -107,13 +107,13 @@ bool scaler::initScaler(int argc, const char **argv) {
 		found=(process::checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
-		stderror.printf("\nsqlr-scaler error: \n");
+		stderror.printf("\n%s-scaler error: \n",SQLR);
 		stderror.printf("	The file %s",listenerpidfile);
 		stderror.printf(" was not found.\n");
 		stderror.printf("	This usually means that the ");
-		stderror.printf("sqlr-listener is not running.\n");
-		stderror.printf("	The sqlr-listener must be running ");
-		stderror.printf("for the sqlr-scaler to start.\n\n");
+		stderror.printf("%s-listener is not running.\n",SQLR);
+		stderror.printf("	The %s-listener must be running ",SQLR);
+		stderror.printf("for the %s-scaler to start.\n\n",SQLR);
 		delete[] listenerpidfile;
 		return false;
 	}
@@ -127,11 +127,11 @@ bool scaler::initScaler(int argc, const char **argv) {
 				"%ssqlr-scaler-%s",
 				sqlrpth->getPidDir(),id);
 	if (process::checkForPidFile(pidfile)!=-1) {
-		stderror.printf("\nsqlr-scaler error:\n");
+		stderror.printf("\n%s-scaler error:\n",SQLR);
 		stderror.printf("	The pid file %s",pidfile);
 		stderror.printf(" exists.\n");
 		stderror.printf("	This usually means that the ");
-		stderror.printf("sqlr-scaler is already running for the \n");
+		stderror.printf("%s-scaler is already running for the \n",SQLR);
 		stderror.printf("	%s instance.\n",id);
 		stderror.printf("	If it is not running, please remove ");
 		stderror.printf("the file and restart.\n");
@@ -205,7 +205,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 		// could get crafty and force the sqlr-scaler to start so
 		// we'll do this check just to make sure)
 		if (!cfg->accessible()) {
-			stderror.printf("\nsqlr-scaler error:\n");
+			stderror.printf("\n%s-scaler error:\n",SQLR);
 			stderror.printf("	This instance of ");
 			stderror.printf("SQL Relay is ");
 			stderror.printf("configured to run as:\n");
@@ -401,21 +401,26 @@ bool scaler::reapChildren(pid_t connpid) {
 
 pid_t scaler::openOneConnection() {
 
+	// build command name
+	stringbuffer	cmdname;
+	cmdname.append(SQLR)->append("-connection");
+
+	// build command to spawn
 	stringbuffer	cmd;
-	cmd.append(sqlrpth->getBinDir());
+	cmd.append(sqlrpth->getBinDir())->append(cmdname.getString());
 	if (iswindows) {
-		cmd.append("sqlr-connection.exe");
-	} else {
-		cmd.append("sqlr-connection");
+		cmd.append(".exe");
 	}
 
+	// build ttl string
 	char	ttlstr[20];
 	charstring::printf(ttlstr,20,"%d",ttl);
 	ttlstr[19]='\0';
 
+	// build args
 	uint16_t	p=0;
 	const char	*args[20];
-	args[p++]="sqlr-connection";
+	args[p++]=cmdname.getString();
 	args[p++]="-silent";
 	args[p++]="-nodetach";
 	args[p++]="-ttl";

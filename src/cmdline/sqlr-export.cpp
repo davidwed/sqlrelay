@@ -87,9 +87,9 @@ int main(int argc, const char **argv) {
 			charstring::length(sequence))) {
 
 		stdoutput.printf("usage: \n"
-			"  sqlr-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n"
+			"  %s-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n"
 			"    or\n"
-			"  sqlr-export [-config config] -id id (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n");
+			"  %s-export [-config config] -id id (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 

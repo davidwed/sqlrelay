@@ -29,9 +29,9 @@ int main(int argc, const char **argv) {
 		!charstring::length(pwdencid) ||
 		!charstring::length(password)) {
 
-		stderror.printf("usage: sqlrpwdenc [-config config] "
+		stderror.printf("usage: %s-pwdenc [-config config] "
 			"-id instance -pwdencid passwordencryptionid "
-			"-password password\n");
+			"-password password\n",SQLR);
 		process::exit(1);
 	}
 

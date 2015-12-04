@@ -517,9 +517,9 @@ int main(int argc, const char **argv) {
 		!charstring::length(file)) {
 
 		stdoutput.printf("usage: \n"
-			"  sqlr-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug [filename]] [-verbose]\n"
+			"  %s-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug [filename]] [-verbose]\n"
 			"    or\n"
-			"  sqlr-import [-config config] -id id -file file [-commit rowcount] [-debug [filename]] [-verbose]\n");
+			"  %s-import [-config config] -id id -file file [-commit rowcount] [-debug [filename]] [-verbose]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 
