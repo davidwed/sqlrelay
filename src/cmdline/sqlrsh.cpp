@@ -1151,7 +1151,7 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	stdoutput.printf("%lld\n",
 			(long long)sqlrcur->rowCount()*sqlrcur->colCount());
 	stdoutput.printf("	Elapsed Time    : ");
-	stdoutput.printf("%.6f\n",time);
+	stdoutput.printf("%.6f sec\n",time);
 	stdoutput.printf("\n");
 }
 
