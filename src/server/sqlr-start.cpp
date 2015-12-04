@@ -31,7 +31,7 @@ bool startListener(sqlrpaths *sqlrpth, const char *id, const char *config,
 	stringbuffer	cmd;
 	cmd.append(sqlrpth->getBinDir())->append(cmdname.getString());
 	if (iswindows) {
-		cmd.append("exe");
+		cmd.append(".exe");
  	}
 
 	// build args
