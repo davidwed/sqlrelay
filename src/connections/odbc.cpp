@@ -279,7 +279,6 @@ char *conv_to_user_coding(char *inbuf) {
 	
 	size_t	insize=ucslen(inbuf)*2;
 	size_t	avail=insize+4;
-	//char	*outbuf=(char*)malloc(avail);
 	char	*outbuf=new char[avail];
 	char	*wrptr=outbuf;
 
@@ -321,7 +320,6 @@ char *conv_to_ucs(char *inbuf) {
 	
 	size_t	insize=charstring::length(inbuf);
 	size_t	avail=insize*2+4;
-	//char	*outbuf=(char *)malloc(avail);
 	char	*outbuf=new char[avail];
 	char	*wrptr=outbuf;
 
