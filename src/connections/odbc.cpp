@@ -241,6 +241,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 
 		const char	*identity;
 
+		const char	*odbcversion;
+
 		stringbuffer	errormessage;
 
 		char		dbversion[512];
@@ -361,6 +363,7 @@ char *conv_to_ucs(char *inbuf) {
 odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 	identity=NULL;
+	odbcversion=NULL;
 }
 
 
@@ -385,6 +388,8 @@ void odbcconnection::handleConnectString() {
 	}
 
 	identity=cont->getConnectStringValue("identity");
+
+	odbcversion=cont->getConnectStringValue("odbcversion");
 }
 
 bool odbcconnection::logIn(const char **error, const char **warning) {
@@ -397,8 +402,19 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		return false;
 	}
-	erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
-				(void *)SQL_OV_ODBC3,0);
+
+	if (!charstring::compare(odbcversion,"2")) {
+		erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
+					(void *)SQL_OV_ODBC2,0);
+#ifdef SQL_OV_ODBC3_80
+	} else if (!charstring::compare(odbcversion,"3.8")) {
+		erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
+					(void *)SQL_OV_ODBC3_80,0);
+#endif
+	} else {
+		erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
+					(void *)SQL_OV_ODBC3,0);
+	}
 #else
 	erg=SQLAllocEnv(&env);
 #endif

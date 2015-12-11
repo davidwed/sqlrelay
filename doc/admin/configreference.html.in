@@ -239,13 +239,14 @@ or a tnsnames-style expression such as:
 <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
-<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;identity=ID"</li>
+<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;identity=ID"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
 <li><b>dsn</b>: The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
 <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
+<li><b>odbcversion</b>: Tells the driver to exhibit behavior from the specified version of ODBC.  Valid values include: 2, 3, and 3.8.  Defaults to 3.  It may be necessary to set this to 2 for some drivers that only support ODBC 2.</li>
 <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 </li>
