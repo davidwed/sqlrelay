@@ -3632,18 +3632,17 @@ then
 	dnl if ( test -r "$CSC" -a -r "$SN" -a -r "$ILDASM" -a -r "$ILASM" -a -r "$GACUTIL" )
 	if ( test -r "$CSC" )
 	then
-		CSCFLAGS="-pkg:dotnet"
+		CSCFLAGS=""
 		HAVE_MONO="yes"
 	fi
 
 	if ( test -n "$HAVE_MONO" )
 	then
 
-		BASECSCFLAGS="$CSCFLAGS"
-		for flags in "" "-lib:$MONOPATH/lib/mono/4.5" "-lib:$MONOPATH/lib/mono/4.0" "-lib:$MONOPATH/lib/mono/3.5" "-lib:$MONOPATH/lib/mono/2.0"
+		for flags in "-pkg:dotnet" "-pkg:dotnet -lib:$MONOPATH/lib/mono/4.6" "-pkg:dotnet -lib:$MONOPATH/lib/mono/4.5" "-pkg:dotnet -lib:$MONOPATH/lib/mono/4.0" "-pkg:dotnet -lib:$MONOPATH/lib/mono/3.5" "-pkg:dotnet -lib:$MONOPATH/lib/mono/2.0"
 		do
 
-			CSCFLAGS="$BASECSCFLAGS $flags"
+			CSCFLAGS="$flags"
 			AC_MSG_CHECKING(whether $CSC $CSCFLAGS works)
 
 			cat << EOF > conftest.cs
@@ -3673,8 +3672,8 @@ EOF
 
 		if ( test ! -r "conftest.exe" )
 		then
-			CSCFLAGS=$BASECSCFLAGS
 			AC_MSG_WARN(The Mono API will not be built.)
+			CSCFLAGS=""
 			HAVE_MONO=""
 		fi
 
