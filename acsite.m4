@@ -3391,6 +3391,25 @@ then
 
 		AC_ERLANG_PATH_ERLC
 		AC_ERLANG_PATH_ERL
+
+		if ( test -z "$ERLC" -o -z "$ERL" )
+		then
+			for version in "" "20" "19" "18" "17" "16" "15"
+			do
+				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
+				do
+echo "$path/bin/erl$version"
+					if ( test -r "$path/bin/erl$version" -a -r "$path/bin/erlc$version")
+					then
+						ERL="$path/bin/erl$version"
+						ERLC="$path/bin/erlc$version"
+						break
+					fi
+				done
+			done
+		fi
+
+
 		if ( test -n "$ERLC" -a -n "$ERL" )
 		then
 
