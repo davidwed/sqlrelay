@@ -3394,6 +3394,7 @@ then
 
 		if ( test -z "$ERLC" -o -z "$ERL" )
 		then
+			AC_MSG_CHECKING(for alternative erlc/erl")
 			for version in "" "20" "19" "18" "17" "16" "15"
 			do
 				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
@@ -3410,6 +3411,13 @@ then
 					break
 				fi
 			done
+
+			if ( test -r "$ERL" -a -r "$ERLC" )
+			then
+				AC_MSG_RESULT($ERL $ERLC)
+			else
+				AC_MSG_RESULT(no)
+			fi
 		fi
 
 
