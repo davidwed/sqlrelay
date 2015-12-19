@@ -34275,13 +34275,17 @@ fi
 				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
 				do
 echo "$path/bin/erl$version"
-					if ( test -r "$path/bin/erl$version" -a -r "$path/bin/erlc$version")
+					if ( test -r "$path/bin/erl$version" -a -r "$path/bin/erlc$version" )
 					then
 						ERL="$path/bin/erl$version"
 						ERLC="$path/bin/erlc$version"
 						break
 					fi
 				done
+				if ( test -r "$ERL" -a -r "$ERLC" )
+				then
+					break
+				fi
 			done
 		fi
 
