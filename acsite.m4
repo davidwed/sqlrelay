@@ -3394,7 +3394,7 @@ then
 
 		if ( test -z "$ERLC" -o -z "$ERL" )
 		then
-			AC_MSG_CHECKING(for alternative erlc/erl")
+			AC_MSG_CHECKING(for alternative erlc/erl)
 			for version in "" "20" "19" "18" "17" "16" "15"
 			do
 				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
@@ -3515,6 +3515,8 @@ END
 	FW_INCLUDES(erlang,[$ERLANGINCLUDES])
 	FW_LIBS(erlang,[$ERLANGLIBS])
 
+	AC_SUBST(ERL)
+	AC_SUBST(ERLC)
 	AC_SUBST(HAVE_ERLANG)
 	AC_SUBST(ERLANGINCLUDES)
 	AC_SUBST(ERLANGLIBS)

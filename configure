@@ -34270,8 +34270,8 @@ fi
 
 		if ( test -z "$ERLC" -o -z "$ERL" )
 		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for alternative erlc/erl\"" >&5
-$as_echo_n "checking for alternative erlc/erl\"... " >&6; }
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for alternative erlc/erl" >&5
+$as_echo_n "checking for alternative erlc/erl... " >&6; }
 			for version in "" "20" "19" "18" "17" "16" "15"
 			do
 				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
@@ -34402,6 +34402,8 @@ if ( test -n "$ERLANGLIBS" )
 then
 	echo "erlang libs... $ERLANGLIBS"
 fi
+
+
 
 
 
