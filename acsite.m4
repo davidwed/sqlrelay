@@ -3398,7 +3398,6 @@ then
 			do
 				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
 				do
-echo "$path/bin/erl$version"
 					if ( test -r "$path/bin/erl$version" -a -r "$path/bin/erlc$version" )
 					then
 						ERL="$path/bin/erl$version"
@@ -3433,7 +3432,7 @@ start() ->
 END
 				cat > conftest << END
 #!/bin/sh
-$ERLC $ERLCFLAGS -b beam conftest.erl
+ERLC_EMULATOR=$ERL $ERLC $ERLCFLAGS -b beam conftest.erl
 $ERL -run conftest start -run init stop -noshell
 END
 				chmod 755 conftest
@@ -3460,7 +3459,7 @@ start() ->
 END
 				cat > conftest << END
 #!/bin/sh
-$ERLC $ERLCFLAGS -b beam conftest.erl
+ERLC_EMULATOR=$ERL $ERLC $ERLCFLAGS -b beam conftest.erl
 $ERL -run conftest start -run init stop -noshell
 END
 				chmod 755 conftest
