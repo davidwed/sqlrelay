@@ -1,4 +1,6 @@
-0.63.1 - added sqlr-listener shutdown loop detection
+0.63.1 - removed thread->detach calls (after updating rudiments to always
+		create threads in detached mode)
+	added sqlr-listener shutdown loop detection
 
 0.63 - suppressed ruby configure warning
 	fixed glib detection if pkg-config isn't present

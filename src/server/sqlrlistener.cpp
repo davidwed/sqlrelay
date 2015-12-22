@@ -1301,7 +1301,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 
 void sqlrlistener::clientSessionThread(void *attr) {
 	clientsessionattr	*csa=(clientsessionattr *)attr;
-	csa->thr->detach();
+	//csa->thr->detach();
 	csa->lsnr->clientSession(csa->clientsock,csa->protocol,csa->thr);
 	csa->lsnr->decrementBusyListeners();
 	csa->lsnr->decrementForkedListeners();
@@ -1713,7 +1713,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 void sqlrlistener::alarmThread(void *attr) {
 	alarmthreadattr	*ata=(alarmthreadattr *)attr;
-	ata->alarmthr->detach();
+	//ata->alarmthr->detach();
 	snooze::macrosnooze(ata->listenertimeout);
 	#ifdef SIGALRM
 	ata->mainthr->raiseSignal(SIGALRM);
@@ -1781,7 +1781,7 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 
 void sqlrlistener::pingDatabaseThread(void *attr) {
 	pingdatabaseattr	*pda=(pingdatabaseattr *)attr;
-	pda->thr->detach();
+	//pda->thr->detach();
 	pda->lsnr->pingDatabaseInternal(pda->connectionpid,
 					pda->unixportstr,pda->inetport);
 	delete pda->thr;
