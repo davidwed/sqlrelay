@@ -13,7 +13,7 @@ using namespace v8;
 using namespace node;
 
 // macros to deal with differences between major versions of node.js
-#if NODE_MINOR_VERSION >= 12
+#if NODE_MAJOR_VERSION > 0 || NODE_MINOR_VERSION >= 12
 
 	#define RET void
 	#define ARGS FunctionCallbackInfo<Value>
@@ -84,7 +84,7 @@ using namespace node;
 #define toString(arg) ((arg->IsNull())?NULL:*(String::Utf8Value(arg)))
 #define toArray(arg) Handle<Array>::Cast(arg);
 
-#if NODE_MINOR_VERSION >= 12
+#if NODE_MAJOR_VERSION > 0 || NODE_MINOR_VERSION >= 12
 	#define throwWrongNumberOfArguments() isolate->ThrowException(Exception::TypeError(newString("Wrong number of arguments")))
 	#define throwInvalidArgumentType() isolate->ThrowException(Exception::TypeError(newString("Invalid argument type")))
 #else
