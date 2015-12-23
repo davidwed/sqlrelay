@@ -14,6 +14,7 @@
 	added odbcversion parameter to ODBC connection
 	updated erlang api to use the C++ compiler to link
 		(needed by netbsd 7.0)
+	added major-version check to node.js api for node 4.x+
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
