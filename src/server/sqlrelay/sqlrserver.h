@@ -17,6 +17,7 @@ class sqlrpwdencs;
 class sqlrlogger;
 class sqlrloggers;
 class sqlrparser;
+class sqlrmetadata;
 class sqlrtranslation;
 class sqlrtranslations;
 class sqlrfilter;
@@ -1162,6 +1163,13 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 					stringbuffer *output);
 	protected:
 		bool	debug;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrmetadata {
+	public:
+			sqlrmetadata(bool debug);
+		virtual	~sqlrmetadata();
 };
 
 
