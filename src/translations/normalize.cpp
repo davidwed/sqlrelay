@@ -18,7 +18,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 	private:
 		bool	skipQuotedStrings(const char *ptr,
 						stringbuffer *sb,
-						const char **newptr);
+						const char **newptr,
+						bool alreadyinside);
 
 		stringbuffer	pass1;
 		stringbuffer	pass2;
@@ -98,7 +99,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass1,&ptr)) {
+		if (skipQuotedStrings(ptr,&pass1,&ptr,false)) {
 			continue;
 		}
 
@@ -139,7 +140,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass2,&ptr)) {
+		if (skipQuotedStrings(ptr,&pass2,&ptr,false)) {
 			continue;
 		}
 
@@ -231,7 +232,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	for (;;) {
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass3,&ptr)) {
+		if (skipQuotedStrings(ptr,&pass3,&ptr,false)) {
 			continue;
 		}
 
@@ -338,7 +339,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	for (;;) {
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,translatedquery,&ptr)) {
+		if (skipQuotedStrings(ptr,translatedquery,&ptr,false)) {
 			continue;
 		}
 
@@ -347,6 +348,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			ptr=ptr+3;
 			translatedquery->setPosition(
 					translatedquery->getPosition()-1);
+			skipQuotedStrings(ptr,translatedquery,&ptr,true);
 			continue;
 		}
 
@@ -373,26 +375,54 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 
 bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 						stringbuffer *sb,
-						const char **newptr) {
+						const char **newptr,
+						bool alreadyinside) {
 
 	bool	found=false;
-	for (;;) {
-		if (*ptr=='\'' || *ptr=='"') {
-			found=true;
-			char	quote=*ptr;
-			do {
-				sb->append(*ptr);
-				ptr++;
-			} while (*ptr && *ptr!=quote);
-			if (*ptr) {
-				sb->append(*ptr);
+
+	// if we're on a quote...
+	if (*ptr=='\'' || *ptr=='"' || alreadyinside) {
+
+		found=true;
+
+		// get the type of quote (single or double)
+		char	quote=(alreadyinside)?(*(ptr-1)):(*ptr);
+
+		// write the quote
+		if (!alreadyinside) {
+			sb->write(*ptr);
+			ptr++;
+		}
+
+		// until we find the end-quote...
+		do {
+
+			// if we found escaped quotes ('' or "")...
+			if (*ptr==quote && *(ptr+1)==quote) {
+				sb->write(*ptr)->write(*ptr);
+				ptr=ptr+2;
+
+			} else
+
+			// if we didn't find escaped quotes...
+			{
+				sb->write(*ptr);
 				ptr++;
 			}
-		} else {
-			*newptr=ptr;
-			return found;
+
+		} while (*ptr && *ptr!=quote);
+
+		// write the end-quote
+		if (*ptr) {
+			sb->write(*ptr);
+			ptr++;
 		}
 	}
+
+	// set output pointer
+	*newptr=ptr;
+
+	return found;
 }
 
 
