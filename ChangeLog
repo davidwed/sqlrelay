@@ -15,6 +15,7 @@
 	updated erlang api to use the C++ compiler to link (for netbsd 7.0)
 	added major-version check to node.js api for node 4.x+
 	ODBC driver's SQLGetData can deal with NULL targetvalue now
+	fixed normalize || bug
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
