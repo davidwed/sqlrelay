@@ -496,22 +496,32 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 		return SQL_ERROR;
 	}
 
-	// FIXME: if targetvalue is NULL then the column should be unbound
+	if (targetvalue) {
 
-	FIELD	*field=new FIELD;
-	field->targettype=targettype;
-	field->targetvalue=targetvalue;
-	if (bufferlength) {
-		field->bufferlength=bufferlength;
+		debugPrintf("  binding column\n");
+
+		FIELD	*field=new FIELD;
+		field->targettype=targettype;
+		field->targetvalue=targetvalue;
+		if (bufferlength) {
+			field->bufferlength=bufferlength;
+		} else {
+			field->bufferlength=SQLR_GetCColumnTypeSize(targettype);
+		}
+		field->strlen_or_ind=strlen_or_ind;
+
+		stmt->fieldlist.setValue(columnnumber-1,field);
+	
+		debugPrintf("  bufferlength (from type): %lld\n",
+					(uint64_t)field->bufferlength);
+
 	} else {
-		field->bufferlength=SQLR_GetCColumnTypeSize(targettype);
+
+		debugPrintf("  unbinding column\n");
+
+		// if targetvalue is NULL then the column should be unbound
+		stmt->fieldlist.remove(columnnumber-1);
 	}
-	field->strlen_or_ind=strlen_or_ind;
-
-	stmt->fieldlist.setValue(columnnumber-1,field);
-
-	debugPrintf("  bufferlength (from type): %lld\n",
-				(uint64_t)field->bufferlength);
 
 	return SQL_SUCCESS;
 }
