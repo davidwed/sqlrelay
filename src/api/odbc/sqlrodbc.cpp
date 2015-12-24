@@ -480,9 +480,12 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
-	debugPrintf("  columnnumber: %d\n",(int)columnnumber);
-	debugPrintf("  targettype  : %s\n",SQLR_GetCColumnTypeName(targettype));
-	debugPrintf("  bufferlength (supplied) : %lld\n",(uint64_t)bufferlength);
+	debugPrintf("  columnnumber: %d\n",
+				(int)columnnumber);
+	debugPrintf("  targettype  : %s\n",
+				SQLR_GetCColumnTypeName(targettype));
+	debugPrintf("  bufferlength (supplied) : %lld\n",
+				(uint64_t)bufferlength);
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
@@ -496,32 +499,22 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 		return SQL_ERROR;
 	}
 
-	if (targetvalue) {
+	debugPrintf("  binding column\n");
 
-		debugPrintf("  binding column\n");
-
-		FIELD	*field=new FIELD;
-		field->targettype=targettype;
-		field->targetvalue=targetvalue;
-		if (bufferlength) {
-			field->bufferlength=bufferlength;
-		} else {
-			field->bufferlength=SQLR_GetCColumnTypeSize(targettype);
-		}
-		field->strlen_or_ind=strlen_or_ind;
-
-		stmt->fieldlist.setValue(columnnumber-1,field);
-	
-		debugPrintf("  bufferlength (from type): %lld\n",
-					(uint64_t)field->bufferlength);
-
+	FIELD	*field=new FIELD;
+	field->targettype=targettype;
+	field->targetvalue=targetvalue;
+	if (bufferlength) {
+		field->bufferlength=bufferlength;
 	} else {
-
-		debugPrintf("  unbinding column\n");
-
-		// if targetvalue is NULL then the column should be unbound
-		stmt->fieldlist.remove(columnnumber-1);
+		field->bufferlength=SQLR_GetCColumnTypeSize(targettype);
 	}
+	field->strlen_or_ind=strlen_or_ind;
+
+	stmt->fieldlist.setValue(columnnumber-1,field);
+	
+	debugPrintf("  bufferlength (from type): %lld\n",
+					(uint64_t)field->bufferlength);
 
 	return SQL_SUCCESS;
 }
@@ -2847,16 +2840,21 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 				continue;
 			}
 
+			// handle the targetvalue
+			unsigned char	*targetvalue=NULL;
+			if (field->targetvalue) {
+				targetvalue=((unsigned char *)
+						field->targetvalue)+
+						(field->bufferlength*row);
+			}
+
 			// get the data into the bound column
 			SQLRETURN	getdataresult=
 					SQLR_SQLGetData(
 						statementhandle,
 						index+1,
 						field->targettype,
-						((unsigned char *)
-							field->targetvalue)+
-							(field->bufferlength*
-							row),
+						targetvalue,
 						field->bufferlength,
 						&(field->strlen_or_ind[row]));
 			if (getdataresult!=SQL_SUCCESS) {
@@ -3288,19 +3286,25 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 				*strlen_or_ind=fieldlength;
 			}
 			// make sure to null-terminate
-			charstring::safeCopy((char *)targetvalue,
-						bufferlength,
-						field,fieldlength+1);
-			debugPrintf("  value: %s\n",(char *)targetvalue);
+			if (targetvalue) {
+				charstring::safeCopy((char *)targetvalue,
+							bufferlength,
+							field,fieldlength+1);
+				debugPrintf("  value: %s\n",
+						(char *)targetvalue);
+			}
 			}
 			break;
 		case SQL_C_SSHORT:
 		case SQL_C_SHORT:
 		case SQL_C_USHORT:
 			debugPrintf("  targettype: SQL_C_(X)SHORT\n");
-			*((short *)targetvalue)=
-				(short)charstring::toInteger(field);
-			debugPrintf("  value: %d\n",*((short *)targetvalue));
+			if (targetvalue) {
+				*((short *)targetvalue)=
+					(short)charstring::toInteger(field);
+				debugPrintf("  value: %d\n",
+						*((short *)targetvalue));
+			}
 			break;
 		case SQL_C_SLONG:
 		case SQL_C_LONG:
@@ -3308,44 +3312,61 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		//	(dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
 			debugPrintf("  targettype: SQL_C_(X)LONG\n");
-			*((long *)targetvalue)=
-				(long)charstring::toInteger(field);
-			debugPrintf("  value: %ld\n",*((long *)targetvalue));
+			if (targetvalue) {
+				*((long *)targetvalue)=
+					(long)charstring::toInteger(field);
+				debugPrintf("  value: %ld\n",
+						*((long *)targetvalue));
+			}
 			break;
 		case SQL_C_FLOAT:
 			debugPrintf("  targettype: SQL_C_FLOAT\n");
-			*((float *)targetvalue)=
-				(float)charstring::toFloat(field);
-			debugPrintf("  value: %f\n",*((float *)targetvalue));
+			if (targetvalue) {
+				*((float *)targetvalue)=
+					(float)charstring::toFloat(field);
+				debugPrintf("  value: %f\n",
+						*((float *)targetvalue));
+			}
 			break;
 		case SQL_C_DOUBLE:
 			debugPrintf("  targettype: SQL_C_DOUBLE\n");
-			*((double *)targetvalue)=
-				(double)charstring::toFloat(field);
-			debugPrintf("  value: %f\n",*((double *)targetvalue));
+			if (targetvalue) {
+				*((double *)targetvalue)=
+					(double)charstring::toFloat(field);
+				debugPrintf("  value: %f\n",
+						*((double *)targetvalue));
+			}
 			break;
 		case SQL_C_BIT:
 			debugPrintf("  targettype: SQL_C_BIT\n");
-			((unsigned char *)targetvalue)[0]=
-				(charstring::contains("YyTt",field) ||
-				charstring::toInteger(field))?'1':'0';
-			debugPrintf("  value: %c\n",
+			if (targetvalue) {
+				((unsigned char *)targetvalue)[0]=
+					(charstring::contains("YyTt",field) ||
+					charstring::toInteger(field))?'1':'0';
+				debugPrintf("  value: %c\n",
 					*((unsigned char *)targetvalue));
+			}
 			break;
 		case SQL_C_STINYINT:
 		case SQL_C_TINYINT:
 		case SQL_C_UTINYINT:
 			debugPrintf("  targettype: SQL_C_(X)TINYINT\n");
-			*((char *)targetvalue)=
-				charstring::toInteger(field);
-			debugPrintf("  value: %c\n",*((char *)targetvalue));
+			if (targetvalue) {
+				*((char *)targetvalue)=
+					charstring::toInteger(field);
+				debugPrintf("  value: %c\n",
+						*((char *)targetvalue));
+			}
 			break;
 		case SQL_C_SBIGINT:
 		case SQL_C_UBIGINT:
 			debugPrintf("  targettype: SQL_C_(X)BIGINT\n");
-			*((int64_t *)targetvalue)=
-				charstring::toInteger(field);
-			debugPrintf("  value: %lld\n",*((int64_t *)targetvalue));
+			if (targetvalue) {
+				*((int64_t *)targetvalue)=
+					charstring::toInteger(field);
+				debugPrintf("  value: %lld\n",
+						*((int64_t *)targetvalue));
+			}
 			break;
 		//case SQL_C_VARBOOKMARK:
 		//	(dup of SQL_C_BINARY)
@@ -3359,39 +3380,56 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
 			}
-			bytestring::copy((void *)targetvalue,
+			if (targetvalue) {
+				bytestring::copy((void *)targetvalue,
 					(const void *)field,sizetocopy);
-			debugPrintf("  value: ");
-			debugSafePrint((char *)targetvalue,sizetocopy);
-			debugPrintf("\n");
+				debugPrintf("  value: ");
+				debugSafePrint((char *)targetvalue,sizetocopy);
+				debugPrintf("\n");
+			}
 			}
 			break;
 		case SQL_C_DATE:
 		case SQL_C_TYPE_DATE:
-			debugPrintf("  targettype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
-			SQLR_ParseDate((DATE_STRUCT *)targetvalue,field);
+			debugPrintf("  targettype: "
+					"SQL_C_DATE/SQL_C_TYPE_DATE\n");
+			if (targetvalue) {
+				SQLR_ParseDate(
+					(DATE_STRUCT *)targetvalue,field);
+			}
 			break;
 		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
-			debugPrintf("  targettype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
-			SQLR_ParseTime((TIME_STRUCT *)targetvalue,field);
+			debugPrintf("  targettype: "
+					"SQL_C_TIME/SQL_C_TYPE_TIME\n");
+			if (targetvalue) {
+				SQLR_ParseTime(
+					(TIME_STRUCT *)targetvalue,field);
+			}
 			break;
 		case SQL_C_TIMESTAMP:
 		case SQL_C_TYPE_TIMESTAMP:
 			debugPrintf("  targettype: "
 				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
-			SQLR_ParseTimeStamp(
-				(TIMESTAMP_STRUCT *)targetvalue,field);
+			if (targetvalue) {
+				SQLR_ParseTimeStamp(
+					(TIMESTAMP_STRUCT *)targetvalue,field);
+			}
 			break;
 		case SQL_C_NUMERIC:
 			debugPrintf("  targettype: SQL_C_NUMERIC\n");
-			SQLR_ParseNumeric((SQL_NUMERIC_STRUCT *)targetvalue,
-							field,fieldlength);
+			if (targetvalue) {
+				SQLR_ParseNumeric(
+					(SQL_NUMERIC_STRUCT *)targetvalue,
+					field,fieldlength);
+			}
 			break;
 		case SQL_C_GUID:
 			debugPrintf("  targettype: SQL_C_GUID\n");
-			SQLR_ParseGuid((SQLGUID *)targetvalue,
-						field,fieldlength);
+			if (targetvalue) {
+				SQLR_ParseGuid((SQLGUID *)targetvalue,
+							field,fieldlength);
+			}
 			break;
 		case SQL_C_INTERVAL_YEAR:
 		case SQL_C_INTERVAL_MONTH:
@@ -3407,9 +3445,11 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
 			debugPrintf("  targettype: SQL_C_INTERVAL_XXX\n");
-			SQLR_ParseInterval((SQL_INTERVAL_STRUCT *)
-						targetvalue,
-						field,fieldlength);
+			if (targetvalue) {
+				SQLR_ParseInterval((SQL_INTERVAL_STRUCT *)
+							targetvalue,
+							field,fieldlength);
+			}
 			break;
 		default:
 			debugPrintf("  invalid targettype\n");
