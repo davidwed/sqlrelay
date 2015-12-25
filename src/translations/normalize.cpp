@@ -281,33 +281,21 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// spaces between the function name and parameters.
 
 		// Asterisks can mean either "times" or "all columns".
-		// We generally want to remove spaces around them, but we don't
-		// want to remove the space after the last "all columns"
-		// asterisk, or before it if it's the first item in the
-		// select list so...
-		// Remove spaces before and after asterisks unless the asterisk
-		// is followed by a from clause or preceeded by select.
-		if (*ptr==' ' &&
-			(
-			(
-			// FIXME: This is insufficient.
-			// There could be various qualifiers like unique,
-			// distinct, top # percent, etc. between the select
-			// and the *
-			// The select could be a subselect preceeded by a (.
-			*(ptr+1)=='*' &&
-			!(ptr==start+6 &&
-				!charstring::compare(start,"select *",8)) &&
-			!(ptr>=start+7 &&
-				!charstring::compare(ptr-7," select *",9))
-			)
-			||
-			(*(ptr-1)=='*' &&
-				charstring::compare(ptr," from ",6) &&
-				charstring::compare(ptr," into ",6)
-			)
-			)
-			) {
+		// We generally want to remove spaces around them, but we have
+		// to be careful removing them in the "all columns" case.
+		if (ptr!=start &&
+			!charstring::compare(ptr," *",2) &&
+			charstring::compare(ptr-1,". *",3) &&
+			*(ptr+2)!=',' &&
+			charstring::compare(ptr+2," ,",2) &&
+			charstring::compare(ptr+2," from ",6) &&
+			*(ptr+2)!='\0') {
+			ptr++;
+			continue;
+		}
+		if (ptr!=start &&
+			!charstring::compare(ptr-1,"* ",2) &&
+			charstring::compare(ptr," from ",6)) {
 			ptr++;
 			continue;
 		}
