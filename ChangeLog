@@ -16,6 +16,8 @@
 	added major-version check to node.js api for node 4.x+
 	ODBC driver's SQLGetData can deal with NULL targetvalue now
 	fixed normalize || bug
+	fixed normalize bug that removed spaces around * for "all columns"
+		improperly
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
