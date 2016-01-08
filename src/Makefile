@@ -17,6 +17,9 @@ all-configs:
 all-parsers:
 	cd parsers $(AND) $(MAKE) all
 
+all-metadata:
+	cd metadata $(AND) $(MAKE) all
+
 all-queries:
 	cd queries $(AND) $(MAKE) all
 
@@ -52,6 +55,7 @@ clean:
 	cd api $(AND) $(MAKE) clean
 	cd configs $(AND) $(MAKE) clean
 	cd parsers $(AND) $(MAKE) clean
+	cd metadata $(AND) $(MAKE) clean
 	cd queries $(AND) $(MAKE) clean
 	cd loggers $(AND) $(MAKE) clean
 	cd protocols $(AND) $(MAKE) clean
@@ -80,6 +84,9 @@ install-configs:
 
 install-parsers:
 	cd parsers $(AND) $(MAKE) install
+
+install-metadata:
+	cd metadata $(AND) $(MAKE) install
 
 install-queries:
 	cd queries $(AND) $(MAKE) install
@@ -116,6 +123,7 @@ uninstall:
 	cd api $(AND) $(MAKE) uninstall
 	cd configs $(AND) $(MAKE) uninstall
 	cd parsers $(AND) $(MAKE) uninstall
+	cd metadata $(AND) $(MAKE) uninstall
 	cd queries $(AND) $(MAKE) uninstall
 	cd loggers $(AND) $(MAKE) uninstall
 	cd protocols $(AND) $(MAKE) uninstall

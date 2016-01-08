@@ -1170,6 +1170,8 @@ class SQLRSERVER_DLLSPEC sqlrmetadata {
 	public:
 			sqlrmetadata(bool debug);
 		virtual	~sqlrmetadata();
+	protected:
+		bool	debug;
 };
 
 

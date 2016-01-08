@@ -60,6 +60,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		const char	*getDeniedIps();
 		const char	*getDebug();
 		bool		getDebugParser();
+		bool		getDebugMetaData();
 		bool		getDebugTranslations();
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
@@ -178,6 +179,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		char		*deniedips;
 		char		*debug;
 		bool		debugparser;
+		bool		debugmetadata;
 		bool		debugtranslations;
 		bool		debugfilters;
 		bool		debugtriggers;
@@ -409,6 +411,7 @@ void sqlrconfig_xml::init() {
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debugparser=charstring::contains(debug,"parser");
+	debugmetadata=charstring::contains(debug,"metadata");
 	debugtranslations=charstring::contains(debug,"translations");
 	debugfilters=charstring::contains(debug,"filters");
 	debugtriggers=charstring::contains(debug,"triggers");
@@ -645,6 +648,10 @@ const char *sqlrconfig_xml::getDebug() {
 
 bool sqlrconfig_xml::getDebugParser() {
 	return debugparser;
+}
+
+bool sqlrconfig_xml::getDebugMetaData() {
+	return debugmetadata;
 }
 
 bool sqlrconfig_xml::getDebugTranslations() {
@@ -2000,6 +2007,8 @@ bool sqlrconfig_xml::attributeValue(const char *value) {
 							DEFAULT_DEBUG);
 			debugparser=charstring::contains(debug,
 							"parser");
+			debugmetadata=charstring::contains(debug,
+							"metadata");
 			debugtranslations=charstring::contains(debug,
 							"translations");
 			debugfilters=charstring::contains(debug,

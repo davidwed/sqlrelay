@@ -111,6 +111,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 
 	sqlrpr=NULL;
 	sqlrp=NULL;
+	sqlrmd=NULL;
 	sqlrt=NULL;
 	sqlrf=NULL;
 	sqlrrst=NULL;
@@ -123,6 +124,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	decrypteddbpassword=NULL;
 
 	debugsqlrparser=false;
+	debugsqlrmetadata=false;
 	debugsqlrtranslation=false;
 	debugsqlrfilters=false;
 	debugtriggers=false;
@@ -199,6 +201,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete sqlrpr;
 	delete sqlrp;
+	delete sqlrmd;
 	delete sqlrt;
 	delete sqlrf;
 	delete sqlrrst;
@@ -365,6 +368,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	const char	*translations=cfg->getTranslations();
 	if (!charstring::isNullOrEmpty(translations)) {
 		sqlrp=newParser();
+		sqlrmd=newMetaData();
 		sqlrt=new sqlrtranslations(sqlrpth,debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
 	}
@@ -375,6 +379,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (!charstring::isNullOrEmpty(filters)) {
 		if (!sqlrp) {
 			sqlrp=newParser();
+			sqlrmd=newMetaData();
 		}
 		sqlrf=new sqlrfilters(sqlrpth,debugsqlrfilters);
 		sqlrf->loadFilters(filters);
@@ -397,6 +402,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!sqlrp) {
 			sqlrp=newParser();
+			sqlrmd=newMetaData();
 		}
 		sqlrtr=new sqlrtriggers(sqlrpth,debugtriggers);
 		sqlrtr->loadTriggers(triggers);
@@ -467,10 +473,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		alarmhandler.handleSignal(SIGALRM);
 	}
 	#endif
-
-	// build getXXXList column maps
-	// FIXME: remove this?  it's done already
-	//buildColumnMaps();
 
 	return true;
 }
@@ -4540,6 +4542,83 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 	}
 
 	return parser;
+}
+
+sqlrmetadata *sqlrservercontroller::newMetaData() {
+	debugsqlrmetadata=cfg->getDebugMetaData();
+	sqlrmetadata	*md=newMetaData("enterprise",false);
+	if (!md) {
+		md=newMetaData("default",true);
+	}
+	return md;
+}
+
+sqlrmetadata *sqlrservercontroller::newMetaData(const char *module,
+						bool errorifnotfound) {
+
+	if (debugsqlrmetadata) {
+		stdoutput.printf("loading metadata module: %s\n",module);
+	}
+
+#ifdef SQLRELAY_ENABLE_SHARED
+	// load the metadata module
+	stringbuffer	modulename;
+	modulename.append(sqlrpth->getLibExecDir());
+	modulename.append("sqlrmetadata_");
+	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
+	if (!sqlrpdl.open(modulename.getString(),true,true)) {
+		if (debugsqlrmetadata || errorifnotfound) {
+			stderror.printf("failed to load metadata module: %s\n",
+									module);
+		}
+		if (errorifnotfound) {
+			char	*error=sqlrpdl.getError();
+			stderror.printf("%s\n",error);
+			delete[] error;
+		}
+		return NULL;
+	}
+
+	// load the metadata itself
+	stringbuffer	functionname;
+	functionname.append("new_sqlrmetadata_")->append(module);
+	sqlrmetadata	*(*newParser)(bool)=
+			(sqlrmetadata *(*)(bool))
+				sqlrpdl.getSymbol(functionname.getString());
+	if (!newParser) {
+		stderror.printf("failed to load metadata: %s\n",module);
+		char	*error=sqlrpdl.getError();
+		stderror.printf("%s\n",error);
+		delete[] error;
+		return NULL;
+	}
+
+	sqlrmetadata	*metadata=(*newParser)(debugsqlrmetadata);
+
+#else
+	sqlrmetadata	*metadata;
+	stringbuffer	metadataname;
+	metadataname.append(module);
+	#include "sqlrmetadataassignments.cpp"
+	{
+		metadata=NULL;
+	}
+#endif
+
+	if (!metadata) {
+		stderror.printf("failed to create metadata: %s\n",module);
+#ifdef SQLRELAY_ENABLE_SHARED
+		char	*error=sqlrpdl.getError();
+		stderror.printf("%s\n",error);
+		delete[] error;
+#endif
+	}
+
+	if (debugsqlrmetadata) {
+		stdoutput.printf("success\n");
+	}
+
+	return metadata;
 }
 
 void sqlrservercontroller::updateState(enum sqlrconnectionstate_t state) {

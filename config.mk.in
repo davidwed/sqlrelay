@@ -894,11 +894,11 @@ INSTALLSUBDIRS = install-src install-bin install-etc install-init install-man in
 UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-man uninstall-doc uninstall-license uninstall-pkgconfig
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-SRCALLSUBDIRS = all-util all-api all-server all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
-SRCINSTALLSUBDIRS = install-util install-api install-server install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
+SRCALLSUBDIRS = all-util all-api all-server all-configs all-parsers all-metadata all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
+SRCINSTALLSUBDIRS = install-util install-api install-server install-configs install-parsers install-metadata install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
 else
-SRCALLSUBDIRS = all-configs all-util all-api all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server all-cmdline
-SRCINSTALLSUBDIRS = install-configs install-util install-api install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server install-cmdline
+SRCALLSUBDIRS = all-configs all-util all-api all-parsers all-metadata all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server all-cmdline
+SRCINSTALLSUBDIRS = install-configs install-util install-api install-parsers install-metadata install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server install-cmdline
 endif
 
 
