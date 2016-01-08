@@ -13,7 +13,7 @@ include ../../../config.mk
 all: java libSQLRConnection.$(LIBEXT) libSQLRCursor.$(LIBEXT) sqlrelay.jar
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.log
 	$(RM) com/firstworks/sqlrelay/*.class sqlrelay.jar
 	$(RMTREE) .libs
 
