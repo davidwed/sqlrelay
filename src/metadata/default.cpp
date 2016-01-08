@@ -4,7 +4,9 @@
 #include <sqlrelay/sqlrserver.h>
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrmetadata *new_sqlrmetadata_default(bool debug) {
-		return new sqlrmetadata(debug);
+	SQLRSERVER_DLLSPEC sqlrmetadata *new_sqlrmetadata_default(
+						sqlrservercontroller *cont,
+						bool debug) {
+		return new sqlrmetadata(cont,debug);
 	}
 }
