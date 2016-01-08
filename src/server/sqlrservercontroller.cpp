@@ -585,8 +585,8 @@ bool sqlrservercontroller::handlePidFile() {
 	// On 64-bit windows, when running 32-bit apps, listening on an inet
 	// socket can take an especially long time.
 	uint16_t	listenertimeout=10;
-	if (!charstring::compareIgnoringCase(
-			sys::getOperatingSystemName(),"Windows")) {
+	char		*osname=sys::getOperatingSystemName();
+	if (!charstring::compareIgnoringCase(osname,"Windows")) {
 		listenertimeout=100;
 		if ((!charstring::compareIgnoringCase(
 				sys::getOperatingSystemArchitecture(),
@@ -598,6 +598,7 @@ bool sqlrservercontroller::handlePidFile() {
 			listenertimeout=200;
 		}
 	}
+	delete[] osname;
 
 	bool	retval=true;
 	bool	found=false;
