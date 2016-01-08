@@ -30,6 +30,7 @@
 	extern "C" {
 		#include "sqlrserverconnectiondeclarations.cpp"
 		#include "sqlrparserdeclarations.cpp"
+		#include "sqlrmetadatadeclarations.cpp"
 	}
 #endif
 

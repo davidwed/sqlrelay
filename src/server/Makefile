@@ -147,6 +147,22 @@ sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
+sqlrmetadatadeclarations.cpp: sqlrmetadatadeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../metadata/*.$(OBJ) | grep -v sqlre`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrmetadataassignments.cpp: sqlrmetadataassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../metadata/*.$(OBJ) | grep -v sqlre`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
 sqlrloggerdeclarations.cpp: sqlrloggerdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../loggers/*.$(OBJ)`; \

@@ -507,6 +507,8 @@ STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrprotocolassignments.cpp \
 		sqlrparserdeclarations.cpp \
 		sqlrparserassignments.cpp \
+		sqlrmetadatadeclarations.cpp \
+		sqlrmetadataassignments.cpp \
 		sqlrloggerdeclarations.cpp \
 		sqlrloggerassignments.cpp \
 		sqlrpwdencdeclarations.cpp \
@@ -524,6 +526,7 @@ STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../protocols/*.$(OBJ)) \
 		$(shell ls ../parsers/*.$(OBJ)) \
+		$(shell ls ../metadata/*.$(OBJ)) \
 		$(shell ls ../loggers/*.$(OBJ)) \
 		$(shell ls ../pwdencs/*.$(OBJ)) \
 		$(shell ls ../auths/*.$(OBJ)) \
