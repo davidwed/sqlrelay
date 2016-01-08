@@ -469,7 +469,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	#endif
 
 	// build getXXXList column maps
-	buildColumnMaps();
+	// FIXME: remove this?  it's done already
+	//buildColumnMaps();
 
 	return true;
 }
