@@ -231,6 +231,7 @@
 
 		dynamiclib	conndl;
 		dynamiclib	sqlrpdl;
+		dynamiclib	sqlrmddl;
 
 		uint16_t	cursorcount;
 		uint16_t	mincursorcount;

@@ -552,6 +552,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState(sqlrservercursor *cursor);
 
+		// query metadata
+		sqlrmetadata	*getMetaData();
+
 		// utilities
 		bool		skipComment(const char **ptr,
 						const char *endptr);
@@ -1168,10 +1171,25 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 
 class SQLRSERVER_DLLSPEC sqlrmetadata {
 	public:
-			sqlrmetadata(bool debug);
+			sqlrmetadata(sqlrservercontroller *cont, bool debug);
 		virtual	~sqlrmetadata();
+
+		virtual void	setQuery(const char *query);
+		virtual void	setQueryTree(xmldom *tree);
+
+		virtual const char	*getColumnOfAlias(const char *alias);
+		virtual const char	*getAliasOfColumn(const char *column);
+
+		virtual const char	*getTableOfAlias(const char *alias);
+		virtual const char	*getAliasOfTable(const char *table);
+
+		virtual const char	*getTableOfColumn(const char *column);
 	protected:
-		bool	debug;
+		sqlrservercontroller	*cont;
+		bool		debug;
+
+		const char	*query;
+		xmldom		*tree;
 };
 
 

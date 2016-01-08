@@ -1,1 +1,1 @@
-sqlrmetadata	*new_sqlrmetadata_@module@(bool debug);
+sqlrmetadata	*new_sqlrmetadata_@module@(sqlrservercontroller *cont, bool debug);

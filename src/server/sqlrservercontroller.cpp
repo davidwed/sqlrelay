@@ -4567,13 +4567,13 @@ sqlrmetadata *sqlrservercontroller::newMetaData(const char *module,
 	modulename.append(sqlrpth->getLibExecDir());
 	modulename.append("sqlrmetadata_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
-	if (!sqlrpdl.open(modulename.getString(),true,true)) {
+	if (!sqlrmddl.open(modulename.getString(),true,true)) {
 		if (debugsqlrmetadata || errorifnotfound) {
 			stderror.printf("failed to load metadata module: %s\n",
 									module);
 		}
 		if (errorifnotfound) {
-			char	*error=sqlrpdl.getError();
+			char	*error=sqlrmddl.getError();
 			stderror.printf("%s\n",error);
 			delete[] error;
 		}
@@ -4583,18 +4583,18 @@ sqlrmetadata *sqlrservercontroller::newMetaData(const char *module,
 	// load the metadata itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrmetadata_")->append(module);
-	sqlrmetadata	*(*newParser)(bool)=
-			(sqlrmetadata *(*)(bool))
-				sqlrpdl.getSymbol(functionname.getString());
-	if (!newParser) {
+	sqlrmetadata	*(*newMetaData)(sqlrservercontroller *,bool)=
+			(sqlrmetadata *(*)(sqlrservercontroller *,bool))
+				sqlrmddl.getSymbol(functionname.getString());
+	if (!newMetaData) {
 		stderror.printf("failed to load metadata: %s\n",module);
-		char	*error=sqlrpdl.getError();
+		char	*error=sqlrmddl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 		return NULL;
 	}
 
-	sqlrmetadata	*metadata=(*newParser)(debugsqlrmetadata);
+	sqlrmetadata	*metadata=(*newMetaData)(this,debugsqlrmetadata);
 
 #else
 	sqlrmetadata	*metadata;
@@ -4609,7 +4609,7 @@ sqlrmetadata *sqlrservercontroller::newMetaData(const char *module,
 	if (!metadata) {
 		stderror.printf("failed to create metadata: %s\n",module);
 #ifdef SQLRELAY_ENABLE_SHARED
-		char	*error=sqlrpdl.getError();
+		char	*error=sqlrmddl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 #endif
@@ -5852,4 +5852,8 @@ bool sqlrservercontroller::getLiveConnection(sqlrservercursor *cursor) {
 void sqlrservercontroller::setLiveConnection(sqlrservercursor *cursor,
 						bool liveconnection) {
 	cursor->setLiveConnection(liveconnection);
+}
+
+sqlrmetadata *sqlrservercontroller::getMetaData() {
+	return sqlrmd;
 }
