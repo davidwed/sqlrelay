@@ -480,6 +480,7 @@ void sqlrconfig_xml::clear() {
 	delete[] datetimeformat;
 	delete[] dateformat;
 	delete[] timeformat;
+	delete[] datedelimiters;
 
 	for (listenernode *ln=listenerlist.getFirst(); ln; ln=ln->getNext()) {
 		delete ln->getValue();
