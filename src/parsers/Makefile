@@ -36,3 +36,4 @@ installsharedlib:
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrparser_default.*
+	$(RM) $(libexecdir)/sqlrmetadata_*
