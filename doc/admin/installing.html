@@ -32,7 +32,7 @@
 
 <p>All SQL Relay components should build and run on relatively modern versions of Linux, Unix, or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Minix, SCO OpenServer, SCO UnixWare, GNU Hurd, Haiku and Syllable.  Other Unix or Unix-like systems may also be supported.</p>
 
-<p>x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC and others.</p>
+<p>x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC, and others.</p>
 
 <p>uClib/Linux-based systems are also supported.</p>
 
@@ -41,9 +41,15 @@
 <a name="prerequisites"></a>
 <span class="heading2">Prerequisites</span>
 
-<p>Before you can compile SQL Relay, you will need to install some pre-requisites.</p>
+<p>Before you can compile SQL Relay, you must install some pre-requisites.</p>
 
-<p>To build any part of SQL Relay, you need to install the Rudiments library.  The library is available at <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and instructions for building and installing it are available at <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
+<p>The first thing that you need is a compiler toolchain.</p>
+
+<p>GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO UnixWare is also supported.  Native compiler toolchains for other Unix platforms may work as well.</p>
+
+<p>Microsoft Visual Studio and Microsoft Visual Studio Express toolchains are supported on Windows.  Versions 2005 and greater should work.</p>
+
+<p>You also need to install the Rudiments library.  The library is available at <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and instructions for building and installing it are available at <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
 
 <p>To build the non-C/C++ API's, you need to install one or more of
 <a target="_blank" href="http://www.perl.org">Perl</a>, 
@@ -58,8 +64,6 @@
 
 <p>(Note: the Erlang API is not currently supported on Windows)</p>
 
-<p>To build SQL Relay on Windows, you need to install Microsoft Visual Studio or Microsoft Visual Studio Express.  Versions 2005 and greater should work.</p>
-
 <p>To build the database connection modules, you need to install one or more of
 <a target="_blank" href="http://www.oracle.com">Oracle</a>,
 <a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>.
@@ -71,18 +75,21 @@
 <a target="_blank" href="http://www.sqlite.org">SQLite</a>,
 </p>
 
+<p>(Note: the SQLite connection module is not currently supported on Windows)</p>
+
 <p>On Linux/Unix, you can also install 
 <a target="_blank" href="http://www.unixodbc.org">unixODBC</a> or
 <a target="_blank" href="http://www.iodbc.org">iODBC</a>
 to access databases using ODBC,
 <a target="_blank" href="http://www.freetds.org">FreeTDS</a> to access
 <a target="_blank" href="http://www.microsof.com/sql/default.html">MS SQL Server</a> (or
-<a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>), or
+<a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>), and
 <a target="_blank" href="http://mdbtools.sourceforge.net">MDB Tools</a> to access MS Access Databases.
 </p>
 
-<p>On Windows, no additional software needs to be installed to access ODBC databases, and MS SQL Server and MS Access will be accessible via ODBC.</p>
+<p>On Windows, no additional software needs to be installed to access ODBC databases, and MS SQL Server and MS Access are accessible via ODBC.</p>
 
+<p>See <a href="prerequisites.html">Installing SQL Relay Prerequisites</a> for detailed information on installing prerequisite software.</p>
 
 <br>
 <a name="unixlinux"></a>
