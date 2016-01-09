@@ -4561,6 +4561,15 @@ sqlrmetadata *sqlrservercontroller::newMetaData(const char *module,
 		stdoutput.printf("loading metadata module: %s\n",module);
 	}
 
+	if (!sqlrmdxmld.parseString(cfg->getTranslations())) {
+		if (debugsqlrmetadata) {
+			stdoutput.printf("warning: failed to parse "
+						"metadata parameters\n");
+		}
+	}
+	xmldomnode	*mdnode=sqlrmdxmld.getRootNode()->
+					getFirstTagChild("metadata");
+
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the metadata module
 	stringbuffer	modulename;
@@ -4583,8 +4592,10 @@ sqlrmetadata *sqlrservercontroller::newMetaData(const char *module,
 	// load the metadata itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrmetadata_")->append(module);
-	sqlrmetadata	*(*newMetaData)(sqlrservercontroller *,bool)=
-			(sqlrmetadata *(*)(sqlrservercontroller *,bool))
+	sqlrmetadata	*(*newMetaData)(sqlrservercontroller *,
+						xmldomnode *,bool)=
+			(sqlrmetadata *(*)(sqlrservercontroller *,
+						xmldomnode *,bool))
 				sqlrmddl.getSymbol(functionname.getString());
 	if (!newMetaData) {
 		stderror.printf("failed to load metadata: %s\n",module);
@@ -4594,7 +4605,7 @@ sqlrmetadata *sqlrservercontroller::newMetaData(const char *module,
 		return NULL;
 	}
 
-	sqlrmetadata	*metadata=(*newMetaData)(this,debugsqlrmetadata);
+	sqlrmetadata	*metadata=(*newMetaData)(this,mdnode,debugsqlrmetadata);
 
 #else
 	sqlrmetadata	*metadata;

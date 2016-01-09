@@ -1171,25 +1171,46 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 
 class SQLRSERVER_DLLSPEC sqlrmetadata {
 	public:
-			sqlrmetadata(sqlrservercontroller *cont, bool debug);
+			sqlrmetadata(sqlrservercontroller *cont,
+					xmldomnode *parameters,
+					bool debug);
 		virtual	~sqlrmetadata();
 
 		virtual void	setQuery(const char *query);
 		virtual void	setQueryTree(xmldom *tree);
 
-		virtual const char	*getColumnOfAlias(const char *alias);
-		virtual const char	*getAliasOfColumn(const char *column);
-
-		virtual const char	*getTableOfAlias(const char *alias);
-		virtual const char	*getAliasOfTable(const char *table);
-
-		virtual const char	*getTableOfColumn(const char *column);
+		virtual	dictionary< const char *, const char * >
+						*getColumnsOfAliases();
+		virtual	dictionary< const char *, const char * >
+						*getAliasesOfColumns();
+		virtual	dictionary< const char *, const char * >
+						*getTablesOfAliases();
+		virtual	dictionary< const char *, const char * >
+						*getAliasesOfTables();
+		virtual	dictionary< const char *, const char * >
+						*getTablesOfColumns();
 	protected:
+		virtual	void	collectMetaData();
+
+		virtual	void	reset();
+		virtual	void	collect();
+
 		sqlrservercontroller	*cont;
+
+		xmldomnode	*parameters;
 		bool		debug;
 
 		const char	*query;
 		xmldom		*tree;
+
+		dictionary< const char *, const char * > columnsofaliases;
+		dictionary< const char *, const char * > aliasesofcolumns;
+		dictionary< const char *, const char * > tablesofaliases;
+		dictionary< const char *, const char * > aliasesoftables;
+		dictionary< const char *, const char * > tablesofcolumns;
+		memorypool	*mdpool;
+
+		bool		dirty;
 };
 
 

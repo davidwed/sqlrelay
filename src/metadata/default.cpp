@@ -6,7 +6,8 @@
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrmetadata *new_sqlrmetadata_default(
 						sqlrservercontroller *cont,
+						xmldomnode *parameters,
 						bool debug) {
-		return new sqlrmetadata(cont,debug);
+		return new sqlrmetadata(cont,parameters,debug);
 	}
 }

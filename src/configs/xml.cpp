@@ -94,6 +94,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
 
+		const char	*getParser();
+		const char	*getMetaData();
 		const char	*getTranslations();
 		const char	*getFilters();
 		const char	*getResultSetTranslations();
@@ -215,6 +217,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		linkedlist< char *>	sessionstartqueries;
 		linkedlist< char *>	sessionendqueries;
 
+		stringbuffer	parser;
+		uint16_t	parserdepth;
+
+		stringbuffer	metadata;
+		uint16_t	metadatadepth;
+
 		stringbuffer	authentications;
 		uint16_t	authenticationsdepth;
 
@@ -259,6 +267,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 			INSTANCE_TAG,
 			LISTENERS_TAG,
 			LISTENER_TAG,
+			PARSER_TAG,
+			METADATA_TAG,
 			AUTHENTICATIONS_TAG,
 			USERS_TAG,
 			USER_TAG,
@@ -286,6 +296,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		typedef enum {
 			NO_ATTRIBUTE,
 			ID_ATTRIBUTE,
+			PARSER_ATTRIBUTE,
+			METADATA_ATTRIBUTE,
 			AUTHENTICATIONS_ATTRIBUTE,
 			ADDRESSES_ATTRIBUTE,
 			PORT_ATTRIBUTE,
@@ -443,6 +455,8 @@ void sqlrconfig_xml::init() {
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	currentroute=NULL;
 	currenttag=INSTANCE_TAG;
+	parserdepth=0;
+	metadatadepth=0;
 	authenticationsdepth=0;
 	translationsdepth=0;
 	filtersdepth=0;
@@ -774,6 +788,14 @@ linkedlist< char * > *sqlrconfig_xml::getSessionEndQueries() {
 	return &sessionendqueries;
 }
 
+const char *sqlrconfig_xml::getParser() {
+	return parser.getString();
+}
+
+const char *sqlrconfig_xml::getMetaData() {
+	return metadata.getString();
+}
+
 const char *sqlrconfig_xml::getTranslations() {
 	return translations.getString();
 }
@@ -879,6 +901,12 @@ bool sqlrconfig_xml::tagStart(const char *ns, const char *name) {
 			currentname="instance";
 			if (!charstring::compare(name,"listeners")) {
 				thistag=LISTENERS_TAG;
+			} else if (!charstring::compare(name,"parser")) {
+				thistag=PARSER_TAG;
+				parser.clear();
+			} else if (!charstring::compare(name,"metadata")) {
+				thistag=METADATA_TAG;
+				metadata.clear();
 			} else if (!charstring::compare(name,
 						"authentications")) {
 				thistag=AUTHENTICATIONS_TAG;
@@ -1051,6 +1079,32 @@ bool sqlrconfig_xml::tagStart(const char *ns, const char *name) {
 			currenttag=thistag;
 			currentlistener=new listenercontainer();
 			listenerlist.append(currentlistener);
+			break;
+		case PARSER_TAG:
+			if (!charstring::compare(name,"parser")) {
+				parserdepth=0;
+			} else {
+				parserdepth++;
+			}
+			if (parserdepth) {
+				parser.append(">");
+			}
+			parser.append("<");
+			parser.append(name);
+			currenttag=thistag;
+			break;
+		case METADATA_TAG:
+			if (!charstring::compare(name,"metadata")) {
+				metadatadepth=0;
+			} else {
+				metadatadepth++;
+			}
+			if (metadatadepth) {
+				metadata.append(">");
+			}
+			metadata.append("<");
+			metadata.append(name);
+			currenttag=thistag;
 			break;
 		case AUTHENTICATIONS_TAG:
 			if (!charstring::compare(name,"authentications")) {
@@ -1327,6 +1381,28 @@ bool sqlrconfig_xml::tagEnd(const char *ns, const char *name) {
 
 	// Close up the current tag
 	switch (currenttag) {
+		case PARSER_TAG:
+			if (!charstring::compare(name,"parser")) {
+				currenttag=INSTANCE_TAG;
+			}
+			parser.append("></");
+			parser.append(name);
+			if (!parserdepth) {
+				parser.append(">");
+			}
+			parserdepth--;
+			break;
+		case METADATA_TAG:
+			if (!charstring::compare(name,"metadata")) {
+				currenttag=INSTANCE_TAG;
+			}
+			metadata.append("></");
+			metadata.append(name);
+			if (!metadatadepth) {
+				metadata.append(">");
+			}
+			metadatadepth--;
+			break;
 		case AUTHENTICATIONS_TAG:
 			if (!charstring::compare(name,"authentications")) {
 				currenttag=INSTANCE_TAG;
@@ -1616,6 +1692,16 @@ bool sqlrconfig_xml::attributeName(const char *name) {
 		}
 		break;
 
+	case PARSER_TAG:
+		parser.append(" ")->append(name);
+		currentattribute=PARSER_ATTRIBUTE;
+		break;
+
+	case METADATA_TAG:
+		metadata.append(" ")->append(name);
+		currentattribute=METADATA_ATTRIBUTE;
+		break;
+
 	case AUTHENTICATIONS_TAG:
 		authentications.append(" ")->append(name);
 		currentattribute=AUTHENTICATIONS_ATTRIBUTE;
@@ -1745,6 +1831,12 @@ bool sqlrconfig_xml::attributeName(const char *name) {
 			case LISTENER_TAG:
 				tagname="listener";
 				break;
+			case PARSER_TAG:
+				tagname="parser";
+				break;
+			case METADATA_TAG:
+				tagname="metadata";
+				break;
 			case AUTHENTICATIONS_TAG:
 				tagname="authentications";
 				break;
@@ -1842,7 +1934,13 @@ bool sqlrconfig_xml::attributeValue(const char *value) {
 
 		// if we have found the correct id, process the attribute...
 
-		if (currenttag==AUTHENTICATIONS_TAG) {
+		if (currenttag==PARSER_TAG) {
+			parser.append("=\"");
+			parser.append(value)->append("\"");
+		} else if (currenttag==METADATA_TAG) {
+			metadata.append("=\"");
+			metadata.append(value)->append("\"");
+		} else if (currenttag==AUTHENTICATIONS_TAG) {
 			authentications.append("=\"");
 			authentications.append(value)->append("\"");
 		} else if (currenttag==TRANSLATIONS_TAG) {

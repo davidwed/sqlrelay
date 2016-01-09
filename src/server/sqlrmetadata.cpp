@@ -3,42 +3,79 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-sqlrmetadata::sqlrmetadata(sqlrservercontroller *cont, bool debug) {
+sqlrmetadata::sqlrmetadata(sqlrservercontroller *cont,
+				xmldomnode *parameters, bool debug) {
 	this->cont=cont;
+	this->parameters=parameters;
 	this->debug=debug;
-	this->query=NULL;
-	this->tree=NULL;
+	query=NULL;
+	tree=NULL;
+	mdpool=new memorypool(0,128,100);
+	this->dirty=false;
 }
 
 sqlrmetadata::~sqlrmetadata() {
+	delete mdpool;
 }
 
 void sqlrmetadata::setQuery(const char *query) {
+	reset();
+	dirty=true;
 	this->query=query;
-	this->tree=NULL;
 }
 
 void sqlrmetadata::setQueryTree(xmldom *tree) {
-	this->query=NULL;
+	reset();
+	dirty=true;
 	this->tree=tree;
 }
 
-const char *sqlrmetadata::getColumnOfAlias(const char *alias) {
-	return NULL;
+void sqlrmetadata::reset() {
+	if (dirty) {
+		this->query=NULL;
+		this->tree=NULL;
+		columnsofaliases.clear();
+		aliasesofcolumns.clear();
+		tablesofaliases.clear();
+		aliasesoftables.clear();
+		tablesofcolumns.clear();
+		mdpool->deallocate();
+		dirty=false;
+	}
 }
 
-const char *sqlrmetadata::getAliasOfColumn(const char *column) {
-	return NULL;
+void sqlrmetadata::collect() {
+	if (dirty) {
+		collectMetaData();
+		dirty=false;
+	}
 }
 
-const char *sqlrmetadata::getTableOfAlias(const char *alias) {
-	return NULL;
+void sqlrmetadata::collectMetaData() {
+	// by default, do nothing...
 }
 
-const char *sqlrmetadata::getAliasOfTable(const char *table) {
-	return NULL;
+dictionary< const char *, const char * > *sqlrmetadata::getColumnsOfAliases() {
+	collect();
+	return &columnsofaliases;
 }
 
-const char *sqlrmetadata::getTableOfColumn(const char *column) {
-	return NULL;
+dictionary< const char *, const char * > *sqlrmetadata::getAliasesOfColumns() {
+	collect();
+	return &aliasesofcolumns;
+}
+
+dictionary< const char *, const char * > *sqlrmetadata::getTablesOfAliases() {
+	collect();
+	return &tablesofaliases;
+}
+
+dictionary< const char *, const char * > *sqlrmetadata::getAliasesOfTables() {
+	collect();
+	return &aliasesoftables;
+}
+
+dictionary< const char *, const char * > *sqlrmetadata::getTablesOfColumns() {
+	collect();
+	return &tablesofcolumns;
 }

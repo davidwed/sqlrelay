@@ -260,6 +260,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual linkedlist< char *>	*getSessionStartQueries()=0;
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 
+		virtual const char	*getParser()=0;
+		virtual const char	*getMetaData()=0;
 		virtual const char	*getTranslations()=0;
 		virtual const char	*getFilters()=0;
 		virtual const char	*getResultSetTranslations()=0;

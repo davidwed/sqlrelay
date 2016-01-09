@@ -233,6 +233,8 @@
 		dynamiclib	sqlrpdl;
 		dynamiclib	sqlrmddl;
 
+		xmldom		sqlrmdxmld;
+
 		uint16_t	cursorcount;
 		uint16_t	mincursorcount;
 		uint16_t	maxcursorcount;

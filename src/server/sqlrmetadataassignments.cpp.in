@@ -1,3 +1,4 @@
 	if (!charstring::compare(metadataname.getString(),"@module@")) {
-		metadata=new_sqlrmetadata_@module@(this,debugsqlrmetadata);
+		metadata=new_sqlrmetadata_@module@(this,metadata,
+							debugsqlrmetadata);
 	} else
