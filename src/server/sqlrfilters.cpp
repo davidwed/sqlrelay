@@ -176,7 +176,17 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 
 		if (f->usesTree()) {
 
-			if (!tree && sqlrp) {
+			if (!sqlrp) {
+				if (debug) {
+					stdoutput.printf("\nfilter "
+							"requires query tree "
+							"but no parser "
+							"available...\n\n");
+				}
+				return false;
+			}
+
+			if (!tree) {
 				if (!sqlrp->parse(query)) {
 					return false;
 				}
