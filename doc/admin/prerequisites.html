@@ -15,8 +15,8 @@
 <li><a href="#fedora">Fedora</a></li>
 <li><a href="#centos">CentOS</a></li>
 <li><a href="#opensuse">OpenSuSE</a></li>
-<li><a href="#debian">Debian</a></li>
 <li><a href="#ubuntu">Ubuntu</a></li>
+<li><a href="#debian">Debian</a></li>
 </ul>
 <li><a href="#unix">Unix</a></li>
 <ul>
@@ -37,26 +37,32 @@
 <p>SQL Relay is supported on a variety of Linux/Unix systems and Windows.  Building SQL Relay on any of these platforms requires the installation of a compiler toolchain and other bits of optional software.  Instructions follow for many supported platforms.</p>
 
 
-<a name="platforms"></a>
+<a name="linux"></a>
 <span class="heading3">Linux</span>
 
 <p>SQL Relay is supported on a variety of Linux platforms including Fedora, CentOS, OpenSuSE, Debian, and Ubuntu.</p>
 
 
-<a name="platforms"></a>
+<a name="fedora"></a>
 <span class="heading4">Fedora</span>
 
 <blockquote>
 
-<p>To install all prerequisites at once, execute the following command, as root, or using sudo:</p>
+<p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">dnf -y install gcc-c++ readline-devel perl-devel php-devel php-pdo python-devel ruby-devel ruby-libs tcl-devel java-1.8.0-openjdk-devel erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel postgresql-devel firebird-devel firebird-libfbclient sqlite-devel unixODBC-devel freetds-devel mdbtools-devel mdbtools-libs</p>
+<p class="code">dnf -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo python-devel ruby-devel ruby-libs ruby tcl-devel java-1.8.0-openjdk-devel erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel postgresql-devel firebird-devel firebird-libfbclient sqlite-devel unixODBC-devel freetds-devel mdbtools-devel mdbtools-libs</p>
 
-<p>Note that modern Fedora platforms use the dnf package manager but older Fedora platforms use the yum package manager.  The syntax for the two is the same.  For older Fedora platforms, just replace dnf with yum in the command above.</p>
+<p>The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php-devel and php-pdo packages.</p>
 
-<p>Note also, that on older Fedora platforms, JDK 1.8.0 is not available so java-1.8.0-openjdk-devel must be replaced with java-1.7.0-openjdk-devel.</p>
+<p>Note that on older Fedora platforms:</p>
 
-<p>Client API's for Oracle, SAP/Sybase, DB2, and Informix are not available from dnf/yum repositories and must be installed separately.</p>
+<ul>
+<li>The yum package manager is used instead of the dnf package manager.  The syntax for the two is the same though, just replace dnf with yum in the command above.</li>
+<li>JDK 1.8.0 is not available, so java-1.8.0-openjdk-devel must be replaced with an older version.</li>
+<li>MariaDB is not available, so mariadb-devel must be replaced with mysql-devel.</li>
+</ul>
+
+<p>Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from dnf/yum repositories and must be installed separately.</p>
 
 <p>The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
 
@@ -72,67 +78,169 @@ rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
 </blockquote>
 
 
-<a name="platforms"></a>
+<a name="centos"></a>
 <span class="heading4">CentOS</span>
 
-<p>...</p>
+<blockquote>
+
+<p>To install all prerequisites at once, execute the following command, as root:</p>
+
+<p class="code">yum -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo python-devel ruby-devel ruby-libs ruby tcl-devel java-1.7.0-openjdk-devel mariadb-devel postgresql-devel sqlite-devel unixODBC-devel</p>
+
+<p>The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php-devel and php-pdo packages.</p>
+
+<p>Note that on older CentOS platforms, MariaDB is not available, so mariadb-devel must be replaced with mysql-devel.</p>
+
+<p>Packages are not available for Erlang, node.js, Mono, Firebird, FreeTDS, or MDB Tools.  If support is required for these languages or databases, then they must be built and installed from source.</p>
+
+<p>Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from yum repositories and must be installed separately.</p>
+
+<p>The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
+
+<p class="code">yum install libaio<br/>
+rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
+
+<p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
+
+<p>For DB2, you have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation.  See <a href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started with IBM DB2</a> for more information.</p>
+
+<p>For Informix, you also have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation, though it isn't necessary to create a local instance.</p>
+
+</blockquote>
 
 
-<a name="platforms"></a>
+<a name="opensuse"></a>
 <span class="heading4">OpenSuSE</span>
 
-<p>...</p>
+<blockquote>
+
+<p>To install all prerequisites at once, execute the following command, as root:</p>
+
+<p class="code">zypper install gcc-c++ make readline-devel perl php5-devel php5-pdo python-devel ruby-devel ruby2.1 tcl-devel java-1.8.0-openjdk-devel erlang nodejs-devel node-gyp mono-devel mono-data-oracle libmyqlclient-devel postgresql93-devel firebird-devel libsqlite3-devel unixODBC-devel freetds-devel mdbtools-devel</p>
+
+<p>The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-devel and php5-pdo packages.</p>
+
+<p>Note that on older OpenSuSE platforms:</p>
+
+<ul>
+<li>JDK 1.8.0 is not available, so java-1.8.0-openjdk-devel must be replaced with an older version.</li>
+<li>Ruby 2.1 is not available, so ruby2.1 must be replaced with an older version.</li>
+<li>PostgreSQL 93 is not available, so postgresql93-devel must be replaced with an older version.</li>
+</ul>
+
+<p>Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from zypper repositories and must be installed separately.</p>
+
+<p>The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
+
+<p class="code">zypper install libaio1<br/>
+rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
+
+<p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
+
+<p>For DB2, you have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation.  See <a href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started with IBM DB2</a> for more information.</p>
+
+<p>For Informix, you also have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation, though it isn't necessary to create a local instance.</p>
+
+</blockquote>
 
 
-<a name="platforms"></a>
-<span class="heading4">Debian</span>
-
-<p>...</p>
-
-
-<a name="platforms"></a>
+<a name="ubuntu"></a>
 <span class="heading4">Ubuntu</span>
 
-<p>...</p>
+<blockquote>
+
+<p>To install all prerequisites at once, execute the following command, as root:</p>
+
+<p class="code">apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel libmariadbclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev unixodbc-dev freetds-dev mdbtools-dev</p>
+
+<p>The g++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-dev package.</p>
+
+<p>Note that on older Ubuntu platforms MariaDB is not available, so libmariadbclient-dev must be replaced with libmysqlclient-devel.</li>
+
+<p>Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from apt repositories and must be installed separately.</p>
+
+<p>The simplest way to install the Oracle client API is to download the Oracle Instant Client zips from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
+
+<p class="code">apt-get install libaio1 unzip<br/>
+unzip instantclient-basic-linux.x64-12.1.0.1.0.zip<br/>
+unzip instantclient-sdk-linux.x64-12.1.0.1.0.zip<br/>
+mv instantclient_12_1 /usr/local</p>
+
+<p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
+
+<p>For DB2, you have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation.  See <a href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started with IBM DB2</a> for more information.</p>
+
+<p>For Informix, you also have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation, though it isn't necessary to create a local instance.</p>
+
+</blockquote>
 
 
-<a name="platforms"></a>
+<a name="debian"></a>
+<span class="heading4">Debian</span>
+
+<blockquote>
+
+<p>To install all prerequisites at once, execute the following command, as root:</p>
+
+<p class="code">apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel libmysqlclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev unixodbc-dev freetds-dev mdbtools-dev</p>
+
+<p>The g++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-dev package.</p>
+
+<p>Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from apt repositories and must be installed separately.</p>
+
+<p>The simplest way to install the Oracle client API is to download the Oracle Instant Client zips from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
+
+<p class="code">apt-get install libaio1 unzip<br/>
+unzip instantclient-basic-linux.x64-12.1.0.1.0.zip<br/>
+unzip instantclient-sdk-linux.x64-12.1.0.1.0.zip<br/>
+mv instantclient_12_1 /usr/local</p>
+
+<p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
+
+<p>For DB2, you have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation.  See <a href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started with IBM DB2</a> for more information.</p>
+
+<p>For Informix, you also have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation, though it isn't necessary to create a local instance.</p>
+
+</blockquote>
+
+
+<a name="unix"></a>
 <span class="heading3">Unix</span>
 
 <p>SQL Relay is supported on a variety of Unix platforms including Solaris, FreeBSD, NetBSD, OpenBSD, and Minix.</p>
 
 
-<a name="platforms"></a>
+<a name="solaris"></a>
 <span class="heading4">Solaris</span>
 
 <p>...</p>
 
 
-<a name="platforms"></a>
+<a name="freebsd"></a>
 <span class="heading4">FreeBSD</span>
 
 <p>...</p>
 
 
-<a name="platforms"></a>
+<a name="netbsd"></a>
 <span class="heading4">NetBSD</span>
 
 <p>...</p>
 
 
-<a name="platforms"></a>
+<a name="openbsd"></a>
 <span class="heading4">OpenBSD</span>
 
 <p>...</p>
 
 
-<a name="platforms"></a>
+<a name="minix"></a>
 <span class="heading4">Minix</span>
 
 <p>...</p>
 
 
-<a name="platforms"></a>
+<a name="windows"></a>
 <span class="heading3">Windows</span>
 
 <p>SQL Relay is supported on a variety of Windows platforms.</p>

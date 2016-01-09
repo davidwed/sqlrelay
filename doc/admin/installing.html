@@ -41,13 +41,13 @@
 <a name="prerequisites"></a>
 <span class="heading2">Prerequisites</span>
 
-<p>Before you can compile SQL Relay, you must install some pre-requisites.</p>
+<p>Before you can compile SQL Relay, you must install some prerequisites.</p>
 
-<p>The first thing that you need is a compiler toolchain.</p>
+<p>The first thing that you need is a compiler toolchain and make utility.</p>
 
-<p>GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO UnixWare is also supported.  Native compiler toolchains for other Unix platforms may work as well.</p>
+<p>GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO UnixWare is also supported.  Native compiler toolchains for other Unix platforms may work as well.  GNU make is also required on Linux/Unix platforms.</p>
 
-<p>Microsoft Visual Studio and Microsoft Visual Studio Express toolchains are supported on Windows.  Versions 2005 and greater should work.</p>
+<p>Microsoft Visual Studio and Microsoft Visual Studio Express toolchains are supported on Windows.  Versions 2005 and greater should work.  The nmake utility is also required, but it's provided by Visual Studio.</p>
 
 <p>You also need to install the Rudiments library.  The library is available at <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and instructions for building and installing it are available at <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
 
@@ -90,6 +90,7 @@ to access databases using ODBC,
 <p>On Windows, no additional software needs to be installed to access ODBC databases, and MS SQL Server and MS Access are accessible via ODBC.</p>
 
 <p>See <a href="prerequisites.html">Installing SQL Relay Prerequisites</a> for detailed information on installing prerequisite software.</p>
+
 
 <br>
 <a name="unixlinux"></a>
