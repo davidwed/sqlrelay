@@ -8,12 +8,134 @@
 <span class="heading1">Installing SQL Relay Prerequisites</span>
 
 <ul>
-<li><a href="#platforms">Supported Platforms</a></li>
+<li><a href="#platforms">Platforms</a></li>
+<ul>
+<li><a href="#linux">Linux</a></li>
+<ul>
+<li><a href="#fedora">Fedora</a></li>
+<li><a href="#centos">CentOS</a></li>
+<li><a href="#opensuse">OpenSuSE</a></li>
+<li><a href="#debian">Debian</a></li>
+<li><a href="#ubuntu">Ubuntu</a></li>
+</ul>
+<li><a href="#unix">Unix</a></li>
+<ul>
+<li><a href="#openbsd">Solaris</a></li>
+<li><a href="#freebsd">FreeBSD</a></li>
+<li><a href="#netbsd">NetBSD</a></li>
+<li><a href="#openbsd">OpenBSD</a></li>
+<li><a href="#openbsd">Minix</a></li>
+</ul>
+<li><a href="#windows">Windows</a></li>
+</ul>
 </ul>
 
 
 <a name="platforms"></a>
-<span class="heading2">Supported Platforms</span>
+<span class="heading2">Platforms</span>
+
+<p>SQL Relay is supported on a variety of Linux/Unix systems and Windows.  Building SQL Relay on any of these platforms requires the installation of a compiler toolchain and other bits of optional software.  Instructions follow for many supported platforms.</p>
+
+
+<a name="platforms"></a>
+<span class="heading3">Linux</span>
+
+<p>SQL Relay is supported on a variety of Linux platforms including Fedora, CentOS, OpenSuSE, Debian, and Ubuntu.</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">Fedora</span>
+
+<blockquote>
+
+<p>To install all prerequisites at once, execute the following command, as root, or using sudo:</p>
+
+<p class="code">dnf -y install gcc-c++ readline-devel perl-devel php-devel php-pdo python-devel ruby-devel ruby-libs tcl-devel java-1.8.0-openjdk-devel erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel postgresql-devel firebird-devel firebird-libfbclient sqlite-devel unixODBC-devel freetds-devel mdbtools-devel mdbtools-libs</p>
+
+<p>Note that modern Fedora platforms use the dnf package manager but older Fedora platforms use the yum package manager.  The syntax for the two is the same.  For older Fedora platforms, just replace dnf with yum in the command above.</p>
+
+<p>Note also, that on older Fedora platforms, JDK 1.8.0 is not available so java-1.8.0-openjdk-devel must be replaced with java-1.7.0-openjdk-devel.</p>
+
+<p>Client API's for Oracle, SAP/Sybase, DB2, and Informix are not available from dnf/yum repositories and must be installed separately.</p>
+
+<p>The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
+
+<p class="code">dnf install libaio<br/>
+rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
+
+<p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
+
+<p>For DB2, you have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation.  See <a href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started with IBM DB2</a> for more information.</p>
+
+<p>For Informix, you also have to download the installer from <a href="http://ibm.com">IBM</a> and perform a full installation, though it isn't necessary to create a local instance.</p>
+
+</blockquote>
+
+
+<a name="platforms"></a>
+<span class="heading4">CentOS</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">OpenSuSE</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">Debian</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">Ubuntu</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading3">Unix</span>
+
+<p>SQL Relay is supported on a variety of Unix platforms including Solaris, FreeBSD, NetBSD, OpenBSD, and Minix.</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">Solaris</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">FreeBSD</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">NetBSD</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">OpenBSD</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading4">Minix</span>
+
+<p>...</p>
+
+
+<a name="platforms"></a>
+<span class="heading3">Windows</span>
+
+<p>SQL Relay is supported on a variety of Windows platforms.</p>
 
 <p>...</p>
 
