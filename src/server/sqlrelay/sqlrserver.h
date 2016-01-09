@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #ifndef SQLRSERVER_H
@@ -17,7 +17,6 @@ class sqlrpwdencs;
 class sqlrlogger;
 class sqlrloggers;
 class sqlrparser;
-class sqlrmetadata;
 class sqlrtranslation;
 class sqlrtranslations;
 class sqlrfilter;
@@ -552,8 +551,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState(sqlrservercursor *cursor);
 
-		// query metadata
-		sqlrmetadata	*getMetaData();
+		// query parser
+		sqlrparser	*getParser();
 
 		// utilities
 		bool		skipComment(const char **ptr,
@@ -1150,7 +1149,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 
 class SQLRSERVER_DLLSPEC sqlrparser {
 	public:
-			sqlrparser(bool debug);
+			sqlrparser(xmldomnode *parameters, bool debug);
 		virtual	~sqlrparser();
 
 		virtual	bool	parse(const char *query);
@@ -1164,53 +1163,11 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 					bool omitsiblings);
 		virtual	bool	write(xmldomnode *node, 
 					stringbuffer *output);
+
+		virtual void	getMetaData(xmldomnode *node);
 	protected:
-		bool	debug;
-};
-
-
-class SQLRSERVER_DLLSPEC sqlrmetadata {
-	public:
-			sqlrmetadata(sqlrservercontroller *cont,
-					xmldomnode *parameters,
-					bool debug);
-		virtual	~sqlrmetadata();
-
-		virtual void	setQuery(const char *query);
-		virtual void	setQueryTree(xmldom *tree);
-
-		virtual	dictionary< const char *, const char * >
-						*getColumnsOfAliases();
-		virtual	dictionary< const char *, const char * >
-						*getAliasesOfColumns();
-		virtual	dictionary< const char *, const char * >
-						*getTablesOfAliases();
-		virtual	dictionary< const char *, const char * >
-						*getAliasesOfTables();
-		virtual	dictionary< const char *, const char * >
-						*getTablesOfColumns();
-	protected:
-		virtual	void	collectMetaData();
-
-		virtual	void	reset();
-		virtual	void	collect();
-
-		sqlrservercontroller	*cont;
-
 		xmldomnode	*parameters;
 		bool		debug;
-
-		const char	*query;
-		xmldom		*tree;
-
-		dictionary< const char *, const char * > columnsofaliases;
-		dictionary< const char *, const char * > aliasesofcolumns;
-		dictionary< const char *, const char * > tablesofaliases;
-		dictionary< const char *, const char * > aliasesoftables;
-		dictionary< const char *, const char * > tablesofcolumns;
-		memorypool	*mdpool;
-
-		bool		dirty;
 };
 
 

@@ -133,10 +133,6 @@
 		sqlrparser	*newParser(const char *module,
 						bool errorifnotfound);
 
-		sqlrmetadata	*newMetaData();
-		sqlrmetadata	*newMetaData(const char *module,
-						bool errorifnotfound);
-
 		void	updateClientSessionStartTime();
 		void	updateClientAddr();
 
@@ -154,7 +150,6 @@
 
 		sqlrprotocols			*sqlrpr;
 		sqlrparser			*sqlrp;
-		sqlrmetadata			*sqlrmd;
 		sqlrtranslations		*sqlrt;
 		sqlrfilters			*sqlrf;
 		sqlrresultsettranslations	*sqlrrst;
@@ -222,7 +217,6 @@
 		namevaluepairs	*outbindmappings;
 
 		bool		debugsqlrparser;
-		bool		debugsqlrmetadata;
 		bool		debugsqlrtranslation;
 		bool		debugsqlrfilters;
 		bool		debugtriggers;
@@ -233,7 +227,8 @@
 		dynamiclib	sqlrpdl;
 		dynamiclib	sqlrmddl;
 
-		xmldom		sqlrmdxmld;
+		xmldom		sqlrpxmld;
+		xmldomnode	*sqlrpnode;
 
 		uint16_t	cursorcount;
 		uint16_t	mincursorcount;

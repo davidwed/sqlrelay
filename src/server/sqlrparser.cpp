@@ -1,9 +1,10 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
 
-sqlrparser::sqlrparser(bool debug) {
+sqlrparser::sqlrparser(xmldomnode *parameters, bool debug) {
+	this->parameters=parameters;
 	this->debug=debug;
 }
 
@@ -37,4 +38,8 @@ bool sqlrparser::write(xmldomnode *node,
 
 bool sqlrparser::write(xmldomnode *node, stringbuffer *output) {
 	return false;
+}
+
+void sqlrparser::getMetaData(xmldomnode *node) {
+	// by default, do nothing...
 }
