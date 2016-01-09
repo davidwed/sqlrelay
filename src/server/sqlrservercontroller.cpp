@@ -4471,13 +4471,12 @@ sqlrparser *sqlrservercontroller::newParser() {
 
 	sqlrparser	*p=NULL;
 	if (!charstring::isNullOrEmpty(module)) {
-		p=newParser(module,false);
-	}
-	if (!p) {
+		p=newParser(module,true);
+	} else {
 		p=newParser("enterprise",false);
-	}
-	if (!p) {
-		p=newParser("default",true);
+		if (!p) {
+			p=newParser("default",true);
+		}
 	}
 	return p;
 }
