@@ -1,1 +1,1 @@
-sqlrparser	*new_sqlrparser_@module@(bool debug);
+sqlrparser	*new_sqlrparser_@module@(xmldomnode *parameters, bool debug);

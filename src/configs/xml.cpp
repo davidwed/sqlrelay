@@ -60,7 +60,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		const char	*getDeniedIps();
 		const char	*getDebug();
 		bool		getDebugParser();
-		bool		getDebugMetaData();
 		bool		getDebugTranslations();
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
@@ -95,7 +94,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		linkedlist< char *>	*getSessionEndQueries();
 
 		const char	*getParser();
-		const char	*getMetaData();
 		const char	*getTranslations();
 		const char	*getFilters();
 		const char	*getResultSetTranslations();
@@ -181,7 +179,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		char		*deniedips;
 		char		*debug;
 		bool		debugparser;
-		bool		debugmetadata;
 		bool		debugtranslations;
 		bool		debugfilters;
 		bool		debugtriggers;
@@ -219,9 +216,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 
 		stringbuffer	parser;
 		uint16_t	parserdepth;
-
-		stringbuffer	metadata;
-		uint16_t	metadatadepth;
 
 		stringbuffer	authentications;
 		uint16_t	authenticationsdepth;
@@ -268,7 +262,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 			LISTENERS_TAG,
 			LISTENER_TAG,
 			PARSER_TAG,
-			METADATA_TAG,
 			AUTHENTICATIONS_TAG,
 			USERS_TAG,
 			USER_TAG,
@@ -297,7 +290,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 			NO_ATTRIBUTE,
 			ID_ATTRIBUTE,
 			PARSER_ATTRIBUTE,
-			METADATA_ATTRIBUTE,
 			AUTHENTICATIONS_ATTRIBUTE,
 			ADDRESSES_ATTRIBUTE,
 			PORT_ATTRIBUTE,
@@ -423,7 +415,6 @@ void sqlrconfig_xml::init() {
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debugparser=charstring::contains(debug,"parser");
-	debugmetadata=charstring::contains(debug,"metadata");
 	debugtranslations=charstring::contains(debug,"translations");
 	debugfilters=charstring::contains(debug,"filters");
 	debugtriggers=charstring::contains(debug,"triggers");
@@ -456,7 +447,6 @@ void sqlrconfig_xml::init() {
 	currentroute=NULL;
 	currenttag=INSTANCE_TAG;
 	parserdepth=0;
-	metadatadepth=0;
 	authenticationsdepth=0;
 	translationsdepth=0;
 	filtersdepth=0;
@@ -664,10 +654,6 @@ bool sqlrconfig_xml::getDebugParser() {
 	return debugparser;
 }
 
-bool sqlrconfig_xml::getDebugMetaData() {
-	return debugmetadata;
-}
-
 bool sqlrconfig_xml::getDebugTranslations() {
 	return debugtranslations;
 }
@@ -792,10 +778,6 @@ const char *sqlrconfig_xml::getParser() {
 	return parser.getString();
 }
 
-const char *sqlrconfig_xml::getMetaData() {
-	return metadata.getString();
-}
-
 const char *sqlrconfig_xml::getTranslations() {
 	return translations.getString();
 }
@@ -904,9 +886,6 @@ bool sqlrconfig_xml::tagStart(const char *ns, const char *name) {
 			} else if (!charstring::compare(name,"parser")) {
 				thistag=PARSER_TAG;
 				parser.clear();
-			} else if (!charstring::compare(name,"metadata")) {
-				thistag=METADATA_TAG;
-				metadata.clear();
 			} else if (!charstring::compare(name,
 						"authentications")) {
 				thistag=AUTHENTICATIONS_TAG;
@@ -1091,19 +1070,6 @@ bool sqlrconfig_xml::tagStart(const char *ns, const char *name) {
 			}
 			parser.append("<");
 			parser.append(name);
-			currenttag=thistag;
-			break;
-		case METADATA_TAG:
-			if (!charstring::compare(name,"metadata")) {
-				metadatadepth=0;
-			} else {
-				metadatadepth++;
-			}
-			if (metadatadepth) {
-				metadata.append(">");
-			}
-			metadata.append("<");
-			metadata.append(name);
 			currenttag=thistag;
 			break;
 		case AUTHENTICATIONS_TAG:
@@ -1391,17 +1357,6 @@ bool sqlrconfig_xml::tagEnd(const char *ns, const char *name) {
 				parser.append(">");
 			}
 			parserdepth--;
-			break;
-		case METADATA_TAG:
-			if (!charstring::compare(name,"metadata")) {
-				currenttag=INSTANCE_TAG;
-			}
-			metadata.append("></");
-			metadata.append(name);
-			if (!metadatadepth) {
-				metadata.append(">");
-			}
-			metadatadepth--;
 			break;
 		case AUTHENTICATIONS_TAG:
 			if (!charstring::compare(name,"authentications")) {
@@ -1697,11 +1652,6 @@ bool sqlrconfig_xml::attributeName(const char *name) {
 		currentattribute=PARSER_ATTRIBUTE;
 		break;
 
-	case METADATA_TAG:
-		metadata.append(" ")->append(name);
-		currentattribute=METADATA_ATTRIBUTE;
-		break;
-
 	case AUTHENTICATIONS_TAG:
 		authentications.append(" ")->append(name);
 		currentattribute=AUTHENTICATIONS_ATTRIBUTE;
@@ -1834,9 +1784,6 @@ bool sqlrconfig_xml::attributeName(const char *name) {
 			case PARSER_TAG:
 				tagname="parser";
 				break;
-			case METADATA_TAG:
-				tagname="metadata";
-				break;
 			case AUTHENTICATIONS_TAG:
 				tagname="authentications";
 				break;
@@ -1937,9 +1884,6 @@ bool sqlrconfig_xml::attributeValue(const char *value) {
 		if (currenttag==PARSER_TAG) {
 			parser.append("=\"");
 			parser.append(value)->append("\"");
-		} else if (currenttag==METADATA_TAG) {
-			metadata.append("=\"");
-			metadata.append(value)->append("\"");
 		} else if (currenttag==AUTHENTICATIONS_TAG) {
 			authentications.append("=\"");
 			authentications.append(value)->append("\"");
@@ -2105,8 +2049,6 @@ bool sqlrconfig_xml::attributeValue(const char *value) {
 							DEFAULT_DEBUG);
 			debugparser=charstring::contains(debug,
 							"parser");
-			debugmetadata=charstring::contains(debug,
-							"metadata");
 			debugtranslations=charstring::contains(debug,
 							"translations");
 			debugfilters=charstring::contains(debug,

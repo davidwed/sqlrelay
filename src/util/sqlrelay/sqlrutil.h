@@ -218,7 +218,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual const char	*getDebug()=0;
 		virtual bool		getDebugParser()=0;
-		virtual bool		getDebugMetaData()=0;
 		virtual bool		getDebugTranslations()=0;
 		virtual bool		getDebugFilters()=0;
 		virtual bool		getDebugTriggers()=0;
@@ -261,7 +260,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 
 		virtual const char	*getParser()=0;
-		virtual const char	*getMetaData()=0;
 		virtual const char	*getTranslations()=0;
 		virtual const char	*getFilters()=0;
 		virtual const char	*getResultSetTranslations()=0;

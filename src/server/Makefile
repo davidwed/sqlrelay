@@ -26,7 +26,6 @@ LIBSQLRSERVERSRCS = \
 	sqlrpwdenc.cpp \
 	sqlrauths.cpp \
 	sqlrauth.cpp \
-	sqlrmetadata.cpp \
 	sqlrscaler.cpp \
 	$(STATICPLUGINSRCS)
 
@@ -54,7 +53,6 @@ LIBSQLRSERVERLOBJS = \
 	sqlrpwdenc.$(OBJ) \
 	sqlrauths.$(OBJ) \
 	sqlrauth.$(OBJ) \
-	sqlrmetadata.$(OBJ) \
 	sqlrscaler.$(OBJ)
 
 .SUFFIXES: .lo .cpp.in
@@ -142,22 +140,6 @@ sqlrparserdeclarations.cpp: sqlrparserdeclarations.cpp.in
 sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../parsers/*.$(OBJ) | grep -v sqlre`; \
-	do \
-		module=`basename $$file .$(OBJ)`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrmetadatadeclarations.cpp: sqlrmetadatadeclarations.cpp.in
-	$(RM) $@
-	for file in `ls ../metadata/*.$(OBJ) | grep -v sqlre`; \
-	do \
-		module=`basename $$file .$(OBJ)`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrmetadataassignments.cpp: sqlrmetadataassignments.cpp.in
-	$(RM) $@
-	for file in `ls ../metadata/*.$(OBJ) | grep -v sqlre`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \

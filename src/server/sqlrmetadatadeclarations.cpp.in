@@ -1,3 +1,0 @@
-sqlrmetadata	*new_sqlrmetadata_@module@(sqlrservercontroller *cont,
-						xmldomnode *parameters,
-						bool debug);
