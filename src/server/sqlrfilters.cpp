@@ -176,7 +176,7 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 
 		if (f->usesTree()) {
 
-			if (!tree) {
+			if (!tree && sqlrp) {
 				if (!sqlrp->parse(query)) {
 					return false;
 				}

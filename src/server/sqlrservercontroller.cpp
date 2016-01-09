@@ -2437,7 +2437,9 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	}
 
 	// update the query tree
-	cursor->setQueryTree(sqlrp->detachTree());
+	if (sqlrp) {
+		cursor->setQueryTree(sqlrp->detachTree());
+	}
 
 	if (debugsqlrtranslation) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
@@ -3959,7 +3961,7 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 	// FIXME: I need to refactor all of this so that this just gets
 	// run as a matter of course instead of explicitly getting run here
 	// FIXME: freetds/sybase override this method but don't do this
-	if (sqlrtr) {
+	if (sqlrtr && sqlrp) {
 		if (sqlrp->parse(dropquery.getString())) {
 			sqlrtr->runBeforeTriggers(conn,cursor,sqlrp->getTree());
 		}
@@ -3981,7 +3983,7 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 	// FIXME: I need to refactor all of this so that this just gets
 	// run as a matter of course instead of explicitly getting run here
 	// FIXME: freetds/sybase override this method but don't do this
-	if (sqlrtr) {
+	if (sqlrtr && sqlrp) {
 		sqlrtr->runAfterTriggers(conn,cursor,sqlrp->getTree(),true);
 	}
 }

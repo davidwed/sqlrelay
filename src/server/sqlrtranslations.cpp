@@ -183,7 +183,7 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 
 		if (tr->usesTree()) {
 
-			if (!tree) {
+			if (!tree && sqlrp) {
 				if (!sqlrp->parse(query)) {
 					return false;
 				}
@@ -207,7 +207,7 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 
 			bool	freequery=false;
 			if (tree) {
-				if (!sqlrp->write(&tempquerystr)) {
+				if (sqlrp && !sqlrp->write(&tempquerystr)) {
 					return false;
 				}
 				tree=NULL;
@@ -230,12 +230,12 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 	}
 
 	if (tree) {
-		if (!sqlrp->write(translatedquery)) {
+		if (sqlrp && !sqlrp->write(translatedquery)) {
 			return false;
 		}
 	} else {
 		translatedquery->append(query);
-		if (sqlrp->parse(translatedquery->getString())) {
+		if (sqlrp && sqlrp->parse(translatedquery->getString())) {
 			tree=sqlrp->getTree();
 		}
 	}
