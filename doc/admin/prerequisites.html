@@ -49,7 +49,12 @@
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">dnf -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo python-devel ruby-devel ruby-libs ruby tcl-devel java-1.8.0-openjdk-devel erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel postgresql-devel firebird-devel firebird-libfbclient sqlite-devel unixODBC-devel freetds-devel mdbtools-devel mdbtools-libs</p>
+<pre class="code">
+dnf -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo \
+python-devel ruby-devel ruby-libs ruby tcl-devel java-1.8.0-openjdk-devel \
+erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel \
+postgresql-devel firebird-devel firebird-libfbclient sqlite-devel \
+unixODBC-devel freetds-devel mdbtools-devel mdbtools-libs</pre>
 
 <p>The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php-devel and php-pdo packages.</p>
 
@@ -65,8 +70,8 @@
 
 <p>The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
 
-<p class="code">dnf install libaio<br/>
-rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*</p>
+<pre class="code">dnf install libaio
+rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*</pre>
 
 <p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
 
@@ -84,7 +89,10 @@ rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*</p>
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">yum -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo python-devel ruby-devel ruby-libs ruby tcl-devel java-1.7.0-openjdk-devel mariadb-devel postgresql-devel sqlite-devel unixODBC-devel</p>
+<pre class="code">
+yum -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo \
+python-devel ruby-devel ruby-libs ruby tcl-devel java-1.7.0-openjdk-devel \
+mariadb-devel postgresql-devel sqlite-devel unixODBC-devel</pre>
 
 <p>The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php-devel and php-pdo packages.</p>
 
@@ -96,8 +104,8 @@ rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*</p>
 
 <p>The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
 
-<p class="code">yum install libaio<br/>
-rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
+<pre class="code">yum install libaio
+rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</pre>
 
 <p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
 
@@ -115,7 +123,12 @@ rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">zypper install gcc-c++ make readline-devel perl php5-devel php5-pdo python-devel ruby-devel ruby2.1 tcl-devel java-1.8.0-openjdk-devel erlang nodejs-devel node-gyp mono-devel mono-data-oracle libmyqlclient-devel postgresql93-devel firebird-devel libsqlite3-devel unixODBC-devel freetds-devel mdbtools-devel</p>
+<pre class="code">
+zypper install gcc-c++ make readline-devel perl php5-devel php5-pdo \
+python-devel ruby-devel ruby2.1 tcl-devel java-1.8.0-openjdk-devel erlang \
+nodejs-devel node-gyp mono-devel mono-data-oracle libmyqlclient-devel \
+postgresql93-devel firebird-devel libsqlite3-devel unixODBC-devel \
+freetds-devel mdbtools-devel</pre>
 
 <p>The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-devel and php5-pdo packages.</p>
 
@@ -131,8 +144,8 @@ rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
 
 <p>The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
 
-<p class="code">zypper install libaio1<br/>
-rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
+<pre class="code">zypper install libaio1
+rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</pre>
 
 <p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> but you only have to install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
 
@@ -150,7 +163,11 @@ rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel libmariadbclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev unixodbc-dev freetds-dev mdbtools-dev</p>
+<pre class="code">
+apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev \
+tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
+libmariadbclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
+unixodbc-dev freetds-dev mdbtools-dev</pre>
 
 <p>The g++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-dev package.</p>
 
@@ -160,10 +177,10 @@ rpm -i oracle-instantclient12.1-basic oracle-instantclient12.1-devel</p>
 
 <p>The simplest way to install the Oracle client API is to download the Oracle Instant Client zips from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
 
-<p class="code">apt-get install libaio1 unzip<br/>
-unzip instantclient-basic-linux.*.zip<br/>
-unzip instantclient-sdk-linux.*.zip<br/>
-mv instantclient_12_1 /usr/local</p>
+<pre class="code">apt-get install libaio1 unzip
+unzip instantclient-basic-linux.*.zip
+unzip instantclient-sdk-linux.*.zip
+mv instantclient_12_1 /usr/local</pre>
 
 <p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> but you only have to install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
 
@@ -181,7 +198,11 @@ mv instantclient_12_1 /usr/local</p>
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel libmysqlclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev unixodbc-dev freetds-dev mdbtools-dev</p>
+<pre class="code">
+apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev \
+tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
+libmysqlclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
+unixodbc-dev freetds-dev mdbtools-dev</pre>
 
 <p>The g++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-dev package.</p>
 
@@ -189,10 +210,10 @@ mv instantclient_12_1 /usr/local</p>
 
 <p>The simplest way to install the Oracle client API is to download the Oracle Instant Client zips from <a href="http://www.oracle.com">Oracle</a> and install them using the following commands, as root:</p>
 
-<p class="code">apt-get install libaio1 unzip<br/>
-unzip instantclient-basic-linux.*.zip<br/>
-unzip instantclient-sdk-linux.*.zip<br/>
-mv instantclient_12_1 /usr/local</p>
+<pre class="code">apt-get install libaio1 unzip
+unzip instantclient-basic-linux.*.zip
+unzip instantclient-sdk-linux.*.zip
+mv instantclient_12_1 /usr/local</pre>
 
 <p>For SAP/Sybase, you have to download the ASE installer from <a href="http://sap.com">SAP</a> and install the client components.  See <a href="http://systems.firstworks.com/p/getting.html">Getting Started with SAP/Sybase</a> for more information.</p>
 
@@ -216,8 +237,11 @@ mv instantclient_12_1 /usr/local</p>
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">pkg install clang gmake readline perl php55 php55-pdo python ruby tcl86 openjdk8 erlang node npm pkgconf mono mysql56-client postgresql92-client firebird25-client sqlite3 unixODBC freetds mdbtools<br/>
-npm install node-gyp</p>
+<pre class="code">
+pkg install clang gmake readline perl php55 php55-pdo python ruby tcl86 \
+openjdk8 erlang node npm pkgconf mono mysql56-client postgresql92-client \
+firebird25-client sqlite3 unixODBC freetds mdbtools
+npm install node-gyp</pre>
 
 <p>The clang and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php55 and php55-pdo packages.</p>
 
@@ -245,8 +269,11 @@ npm install node-gyp</p>
 <blockquote>
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
-
-<p class="code">pkgin install g++ gmake readline perl php55 php55-pdo python27 ruby tcl openjdk7 erlang nodejs pkg-config mono mysql-client postgresql92-client sqlite3 unixodbc freetds mdbtools</p>
+ 
+<pre class="code">
+pkgin install g++ gmake readline perl php55 php55-pdo python27 ruby tcl \
+openjdk7 erlang nodejs pkg-config mono mysql-client postgresql92-client \
+sqlite3 unixodbc freetds mdbtools</pre>
 
 <p>The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php55 and php55-pdo packages.</p>
 
@@ -271,15 +298,17 @@ npm install node-gyp</p>
 
 <p>To install all prerequisites at once, add a line to /etc/pkg.conf like:</p>
 
-<p class="code">
+<pre class="code">
 installpath = ftp://ftp.usa.openbsd.org/pub/OpenBSD/5.8/packages/amd64/
-</p>
+</pre>
 
 <p>(replacing 5.8 with the version of OpenBSD that you are using and replacing amd64 with the architecture given by uname -m)</p>
 
 <p>... and execute the following command, as root:</p>
 
-<p class="code">pkg_add -r g++ gmake readline perl php python ruby tcl erlang node mono mariadb-client postgresql-client iodbc freetds mdbtools</p>
+<pre class="code">
+pkg_add -r g++ gmake readline perl php python ruby tcl erlang node mono \
+mariadb-client postgresql-client iodbc freetds mdbtools</pre>
 
 <p>The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.</p>
 
@@ -296,7 +325,9 @@ installpath = ftp://ftp.usa.openbsd.org/pub/OpenBSD/5.8/packages/amd64/
 
 <p>To install all prerequisites at once, execute the following command, as root:</p>
 
-<p class="code">pkgin install clang binutils gmake readline perl python27 tcl mysql postgresql84 iodbc freetds mdbtools</p>
+<pre class="code">
+pkgin install clang binutils gmake readline perl python27 tcl mysql \
+postgresql84 iodbc freetds mdbtools</pre>
 
 <p>The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.</p>
 
@@ -326,7 +357,14 @@ installpath = ftp://ftp.usa.openbsd.org/pub/OpenBSD/5.8/packages/amd64/
 
 <p>Java packages for Windows are available from <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Oracle</a>.  The installer is intuitive and the packages are is complete.</p>
 
-<p>node.js packages for Windows are available from the <a href="http://nodejs.org">node.js</a> project.  The installer is intuitive but the packages lack development files necessary to build node.js modules and they must be installed separately.  See <a href="">this article</a> for instructions.</p>
+<p>node.js packages for Windows are available from the <a href="http://nodejs.org">node.js</a> project.  The installer is intuitive but the packages lack development files necessary to build node.js modules and they must be installed separately.  To do this, execute the following commands, post-install:</p>
+
+<pre class="code">
+npm install node-gyp
+node c:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp\bin\node-gyp.js install 0.12.5
+</pre>
+
+<p>... replacing 0.12.5 with the version of node.js that you are using.</p>
 
 <p>Support for C# and other .NET languages is provided by Visual Studio.  No additional software needs to be installed to build SQL Relay's C# or ADO.NET modules.</p>
 
