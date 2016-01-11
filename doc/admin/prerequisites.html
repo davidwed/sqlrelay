@@ -261,7 +261,7 @@ npm install node-gyp</pre>
 
 <ul>
 <li>The pkgtools package manager is used instead of the pkg package manager and the syntax for the two is the different.  Replace "pkg install" with "pkg_add -r " in the command above.</li>
-<li>Clang is not available, so clang must be replaced with an g++.</li>
+<li>Clang is not available, so clang must be replaced with g++.</li>
 <li>PHP 5.5 is not available, so php55 must be replaced with an older version.</li>
 <li>TCL 8.6 is not available, so tcl86 must be replaced with an older version.</li>
 <li>JDK 1.8.0 is not available, so openjdk8 must be replaced with an older version.</li>
@@ -347,9 +347,9 @@ mariadb-client postgresql-client iodbc freetds mdbtools</pre>
 pkgin install clang binutils gmake readline perl python27 tcl mysql \
 postgresql84 iodbc freetds mdbtools</pre>
 
-<p>The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.</p>
+<p>The clang, binutils, and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.</p>
 
-<p>SQLite is instaled as part of the base installation.</p>
+<p>SQLite is installed as part of the base installation.</p>
 
 <p>Packages are not available for PHP, Ruby, OpenJDK, Erlang, node.js, Mono, Firebird or MDB Tools.  If support is required for these languages or databases, then they must be built and installed from source.</p>
 
