@@ -1,32 +1,38 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Load Balancing</title>
+<title>firstworks   SQL Relay - High Availability</title>
 <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Load Balancing</span><br><br>
+<span class="heading1">High Availability</span><br><br>
 
-<p>Solves - "I wish there was a cheap and easy way to distribute traffic to the nodes in my database cluster."</p>
+<p>Solves - "I wish there was a cheap and easy way to automatically distribute traffic to the nodes in my database cluster and manage outages."</p>
 
-<p>Load balancing distributes queries over a pool of servers to aid in scaling.</p>
-
-<p>For example, if you have a database cluster or set of replicated servers, then SQL Relay can be configured to distribute queries over them.</p>
+<p>In a database cluster or replication environment, the SQL Relay server maintains a pool of connections to the various database nodes and distributes client sessions over the pool.  SQL Relay even supports disproportionate distribution of load.  If some nodes are more powerful than others, then SQL Relay can be configured to send more traffic to the more powerful nodes.</p>
 
 <table>
 <tr>
 <td><img src="../images/cluster.png"></td>
-<td><img style="margin-left: 40px;" src="../images/replicated.png"></td>
+<td><img style="margin-left: 20px;" src="../images/replicated.png"></td>
+<td><img style="margin-left: 20px;" src="../images/replicated-disproportionate.png"></td>
 </tr>
 </table>
 
-<p>Weight metrics can be assigned as well.  If some of the database machines are more powerful than others, load can be dispoportionally distributed to them and away from the less powerful database servers.</p>
-
-<img src="../images/replicated-disproportionate.png">
+<p>If a node fails, the SQL Relay server will attempt to reestablish connections to that node, while continuing to distribute client sessions over the remaining nodes.</p>
 
 <p>Note that SQL Relay cannot currently be used to replicate databases or keep replicated databases synchronized.  If you are using SQL Relay to access replicated databases then it is assumed that there is some means by which the databases are kept synchronized external to SQL Relay.</p>
 
-<p>A complete description of load balancing with example configuration files is given <a href="../admin/ha.html">here</a>.</p>
+<p>SQL Relay supports two front-end high availability strategies as well.  Multiple instances of SQL Relay can be placed behind a load-balancing appliance, or round-robin DNS can be used to provide load-balancing and fail-over to multiple instances of SQL Relay.</p>
+
+<table>
+<tr>
+<td><img src="../images/loadbalancer.png"></td>
+<td><img style="margin-left: 20px;" src="../images/rrdns.png"></td>
+</tr>
+</table>
+
+<p>Complete descriptions of high availability strategies, with example configuration files are given <a href="../admin/ha.html">here</a>.</p>
 
 </body>
 </html>
