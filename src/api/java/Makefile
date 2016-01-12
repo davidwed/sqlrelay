@@ -10,15 +10,18 @@ include ../../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(JAVACPPFLAGS) $(COMPILE) $<
 
-all: java libSQLRConnection.$(LIBEXT) libSQLRCursor.$(LIBEXT) sqlrelay.jar
+all: com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.class com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.class libSQLRConnection.$(LIBEXT) libSQLRCursor.$(LIBEXT) sqlrelay.jar
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.log
 	$(RM) com/firstworks/sqlrelay/*.class sqlrelay.jar
 	$(RMTREE) .libs
 
-java:
-	$(JAVAC) com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)*.java
+com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.class: com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.java
+	$(JAVAC) com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.java
+
+com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.class: com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.java
+	$(JAVAC) com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.java
 
 libSQLRConnection.$(LIBEXT): com_firstworks_sqlrelay_SQLRConnection.cpp com_firstworks_sqlrelay_SQLRConnection.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRConnection.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(MODLINKFLAGS)
@@ -26,9 +29,8 @@ libSQLRConnection.$(LIBEXT): com_firstworks_sqlrelay_SQLRConnection.cpp com_firs
 libSQLRCursor.$(LIBEXT): com_firstworks_sqlrelay_SQLRCursor.cpp com_firstworks_sqlrelay_SQLRCursor.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRCursor.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(JAVARPATH) $(MODLINKFLAGS)
 
-sqlrelay.jar:
-	$(JAR) -cf $@ com/firstworks/sqlrelay/SQLRConnection.class \
-			com/firstworks/sqlrelay/SQLRCursor.class
+sqlrelay.jar: com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.class com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.class
+	$(JAR) -cf $@ com/firstworks/sqlrelay/SQLRConnection.class com/firstworks/sqlrelay/SQLRCursor.class
 
 install: $(INSTALLLIB)
 	$(CP) sqlrelay.jar $(javadir)
