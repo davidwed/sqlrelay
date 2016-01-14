@@ -14,7 +14,9 @@
 <li><a href="#connectionpooling">What is "persistent database connection pooling"?</a></li>
 <li><a href="#proxying">What is "proxying"?</a></li>
 <li><a href="#throttling">What is "throttling"?</a></li>
-<li><a href="#loadbalancing">What is "load balancing"?</a></li>
+<li><a href="#ha">What is "high availability"?</a></li>
+<li><a href="#loadbalancing">What is "load-balancing"?</a></li>
+<li><a href="#failover">What is "fail-over"?</a></li>
 <li><a href="#queryrouting">What is "query routing"?</a></li>
 <li><a href="#dropinlibs">What are "drop-in replacement libraries"?</a></li>
 <li><a href="#databases">What databases does SQL Relay support?</a></li>
@@ -163,8 +165,18 @@ Solves - "I wrote my app using the native MySQL API but the company is migrating
 
 <p>See <a href="features/throttling.html">Throttling</a>.</p>
 
+<br><a name="ha"></a>
+<span class="heading3">What is "high availability"?</span><br>
+
+<p>See <a href="features/ha.html">High Availability</a>.</p>
+
 <br><a name="loadbalancing"></a>
-<span class="heading3">What is "load balancing"?</span><br>
+<span class="heading3">What is "load-balancing"?</span><br>
+
+<p>See <a href="features/ha.html">High Availability</a>.</p>
+
+<br><a name="failover"></a>
+<span class="heading3">What is "fail-over"?</span><br>
 
 <p>See <a href="features/ha.html">High Availability</a>.</p>
 
@@ -281,21 +293,21 @@ databases?</span>
 <br><a name="routing"></a>
 <span class="heading3">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
 
-<p>Yes, see <a href="admin/router.html">Routing Queries with SQL Relay</a>.</p>
+<p>Yes, see <a href="admin/router.html">Query Routing</a>.</p>
 
 <br><a name="mysqlrouting"></a>
 <span class="heading3">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
 
 <p>Probably.  You'll need to set up SQL Relay to route queries and use the Drop-in Replacement Library for MySQL to redirect your app to use SQL Relay.</p>
 
-<p>See <a href="admin/router.html">Routing Queries with SQL Relay</a> for details on how to set up SQL Relay as a query router.</p>
+<p>See <a href="admin/router.html">Query Routing</a> for details on how to set up SQL Relay as a query router.</p>
 
 <p>See <a href="dropin/mysql.html">Using the SQL Relay drop-in replacement library for MySQL</a> for details about how to use the drop-in replacement library.</p>
 
 <br><a name="filtering"></a>
 <span class="heading3">Can SQL Relay be configured to filter out certain queries?</span>
 
-<p>Yes, see <a href="modules/filters.html">Query Filters</a>.</p>
+<p>Yes, see <a href="modules/filters.html">Query Filter Modules</a>.</p>
 
 <hr>
 
