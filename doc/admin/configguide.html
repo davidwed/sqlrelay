@@ -392,7 +392,8 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 <br><br><a name="ha"></a>
 <span class="heading2">High Availabiltiy Environments</span><br>
 
-<p>In a high availability environment, SQL Relay can be deployed as a front-end to provide load-balancing and fail-over for a set of replicated database servers or database cluster.</p>
+<p>In a high availability environment, SQL Relay can be deployed as a front-end to provide load-balancing and fail-over for a set of replicated database servers or database cluster.  Load-balancing and fail-over can also be implemented over multiple SQL Relay servers.</p>
+
 
 <br><br><a name="cluster"></a>
 <span class="heading3">Load-Balancing and Fail-Over With Replicated or Clustered Databases</span><br>
@@ -624,7 +625,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 
 <p>In this illustration, the load-balancing appliance is shown as a single machine, but in a true HA environment, there would be 2 or more appliances sharing a virtual IP.  Alternatively, rather than using an appliance, SQL Relay can be run on an application server cluster such as Linux Virtual Server.
 
-<p><a href="http://en.wikipedia.org/wiki/Round-robin_DNS">Round-robin DNS</a> can be also be used to provide load-balancing and fail-over over multiple instances of SQL Relay.</p>
+<p><a href="http://en.wikipedia.org/wiki/Round-robin_DNS">Round-robin DNS</a> can be also be used to provide load-balancing and fail-over over multiple SQL Relay servers.</p>
 
 <img src="../images/rrdns.png">
 
