@@ -15,8 +15,13 @@
 <li><a href="#dynamicscaling">Dynamic Scaling</a></li>
 <li><a href="#listener">Listener Configuration</a></li>
 <li><a href="#database">Database Configuration</a></li>
-<li><a href="#cluster">Replicated or Clustered Databases</a></li>
+<li><a href="#ha">High Availability Environments</a></li>
+<ul>
+<li><a href="#cluster">Load-Balancing and Fail-Over With Replicated or Clustered Databases</a></li>
+<li><a href="#rac">Already-Load-Balanced Databases</a></li>
 <li><a href="#router">Master-Slave Query Routing</a></li>
+<li><a href="#frontend">Front-End Load-Balancing and Fail-Over</a></li>
+</ul>
 <li><a href="#sessionqueries">Session-Queries</a></li>
 <li><a href="#instances">Multiple Instances</a></li>
 <li><a href="#directory">Configuration Directory</a></li>
@@ -84,7 +89,7 @@
 </font>
 </blockquote>
 
-<p>This configuration defines an instance of SQL Relay named <i>example</i>, secured by a user and password, that opens and maintains 5 persistent connections to the <i>orcl</i> instance of an Oracle database using <i>scott</i>/<i>tiger</i> credentials.</p>
+<p>This configuration defines an instance of SQL Relay named <i>example</i>, secured by a user and password, that opens and maintains a pool of 5 persistent connections to the <i>orcl</i> instance of an Oracle database using <i>scott</i>/<i>tiger</i> credentials.</p>
 
 <p>The instance can be started using:</p>
 
@@ -102,6 +107,8 @@ sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword
 </code>
 </blockquote>
 
+<p>SQL Relay's remote accessibility makes it valuable as a database proxy, especially for accessing databases from platforms not supported by the database vendor.  See <a href="../features/proxying.html">Proxying</a> for more information.</p>
+
 <p>It can also be accessed from the local server using <i>localhost</i>.</p>
 
 <blockquote>
@@ -116,7 +123,7 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 <br><br><a name="connections"></a>
 <span class="heading2">Database Connections</span><br>
 
-<p>By default, SQL Relay opens and maintains 5 persistent database connections, but the number of connections can be configured using the connections parameter.</p>
+<p>By default, SQL Relay opens and maintains a pool of 5 persistent database connections, but the number of connections can be configured using the connections attribute.</p>
 
 <blockquote>
 
@@ -140,9 +147,13 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 </font>
 </blockquote>
 
-<p>The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients can connect but get queued up and have to wait for one of the first 10 to disconnect before being able to access the database.</p>
+<p>The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients can connect but they will be queued up and have to wait for one of the first 10 to disconnect before being able to access the database.</p>
 
 <p>Any number of connections can be opened.  A good rule of thumb is to open as many as you can.  The optimal number is application specific though and is limited by database, system and network resources.</p>
+
+<p>Maintaining a pool of persistent database connections reduces the amount of time it takes an app to connect to the database.  This can dramatically improve performance for many.  See <a href="../features/connectionpooling.html">Persistent Database Connection Pooling</a> for more information.</p>
+
+<p>The connections attribute can also be used to throttle (limit) database access as well.  See <a href="../features/throttling.html">Throttling</a> for more information.</p>
 
 
 <br><br><a name="cursors"></a>
@@ -150,7 +161,7 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 
 <p>Database cursors are used to execute queries and step through result sets.  Most applications only need to use one cursor at a time.  Some apps require more though, either because they run nested queries, or sometimes because they just don't properly free them.</p>
 
-<p>SQL Relay maintains persistent cursors as well as connections.  By default, each connection opens one cursor, but the number of cursors opened by each connection can be configured using the cursors parameter.</p>
+<p>SQL Relay maintains persistent cursors as well as connections.  By default, each connection opens one cursor, but the number of cursors opened by each connection can be configured using the cursors attribute.</p>
 
 <blockquote>
 
@@ -182,7 +193,7 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 
 <p>Both connections and cursors can be configured to scale dynamically - open on demand and then die off when no longer needed.  This feature is useful if you have spikes in traffic during certain times of day or if your application has a few modules that occasionally need more cursors than usual.</p>
 
-<p>The maxconnections and maxcursors parameters define the upper bounds.</p>
+<p>The maxconnections and maxcursors attribute define the upper bounds.</p>
 
 <blockquote>
 
@@ -210,7 +221,7 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 
 <p>In this example, each connection will initially open 2 cursors but more will be opened as necessary, up to 10.  Each newly opened cursor will be closed as soon as it is no longer needed.</p>
 
-<p>Other parameters that control dynamic scaling behavior include:</p>
+<p>Other attributes that control dynamic scaling behavior include:</p>
 
 <ul>
 <li>maxqueuelength</li>
@@ -219,7 +230,7 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 <li>cursors_growby</li>
 </ul>
 
-<p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on these parameters.</p>
+<p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on these attributes.</p>
 
 
 <br><br><a name="listener"></a>
@@ -323,7 +334,7 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 <br><br><a name="database"></a>
 <span class="heading2">Database Configuration</span><br>
 
-<p>By default, SQL Relay assumes that it's connecting to an Oracle database, but SQL Relay supports many other databases.  The dbase parameter can be used to specify the database type.</p>
+<p>By default, SQL Relay assumes that it's connecting to an Oracle database, but SQL Relay supports many other databases.  The dbase attribute can be used to specify the database type.</p>
 
 <p>In the following example, SQL Relay is configured to connect to a SAP/Sybase database.</p>
 
@@ -373,17 +384,29 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 </font>
 </blockquote>
 
-<p>When connecting to an Oracle database, the dbase parameter may be omitted or set to "oracle".</p>
+<p>When connecting to an Oracle database, the dbase attribute may be omitted or set to "oracle".</p>
 
 <p>SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for valid dbase settings and information on connect string options for each database.</p>
 
 
+<br><br><a name="ha"></a>
+<span class="heading2">High Availabiltiy Environments</span><br>
+
+<p>In a high availability environment, SQL Relay can be deployed as a front-end to provide load-balancing and fail-over for a set of replicated database servers or database cluster.</p>
+
 <br><br><a name="cluster"></a>
-<span class="heading2">Replicated or Clustered Databases</span><br>
+<span class="heading3">Load-Balancing and Fail-Over With Replicated or Clustered Databases</span><br>
 
-<p>SQL Relay can be configured to distribute connections over the nodes of a database cluster or pool of replicated servers.  Each connection tag defines a  node to connect to.</p>
+<p>In a database cluster or replication environment, SQL Relay can be configured to maintain a pool of connections to the various database nodes and distribute client sessions over the nodes.  If an individual node fails, SQL Relay will attempt to reestablish connections to that node, while continuing to distribute client sessions over the remaining nodes.</p>
 
-<p>In this example, SQL Relay is configured to distribute over two instances of Oracle - orcl1 and orcl2</p>
+<table>
+<tr>
+<td><img src="../images/cluster.png"></td>
+<td><img style="padding-left: 40px;" src="../images/replicated.png"></td>
+</tr>
+</table>
+
+<p>In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - orcl1, orcl2, and orcl3</p>
 
 <blockquote>
 
@@ -399,8 +422,9 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;15&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl1&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl2&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl3&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 <br>
@@ -410,15 +434,51 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 
 <p>Any number of connection tags may be defined.</p>
 
-<p>The metric parameter is especially important if the nodes are heterogenous (ie. if some nodes are more powerful than others).  SQL Relay uses it to decide how many connections to open to each node.  It doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be started.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
+<p>SQL Relay also supports disproportionate distribution of load. If some nodes can handle more traffic than others, then SQL Relay can be configured to send more traffic to the more capable nodes.</p>
 
-<p>In this example, 15 is 1.5 times 10, so 1.5 as many connections will be started to orcl2 as to orcl1.  Since a total of 10 connections will be started, 4 will be started to orcl1 and 6 to orcl2.</p>
+<img src="../images/replicated-disproportionate.png">
 
-<p>A similar configuration could be used to distribute connections over the nodes of a cluster.</p>
+<p>SQL Relay uses the connection tag's metric attribute to decide how many connections to open to each node.</p>
 
-<p>When the nodes are located behind a load balancer or share a common IP address, only one connection tag should be used, with the behindloadbalancer attribute.</p>
+<blockquote>
 
-<p>In this example, SQL Relay is configured to distribute over an Oracle RAC.</p>
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;5&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;15&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;30&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<p>The metric attribute doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be opened and maintained.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
+
+<p>In the example above, 15 is 3 times 5, so 3 times as many connections will be opened to orcl2 as to orcl1.  30 is 6 times 5, so 6 times as many connections will be opened to orcl3 as orcl1.  Since a total of 10 connections will be opened, 1 will be opened to orcl1, 3 to orcl2, and 6 to orcl2.</p>
+
+
+<br><br><a name="rac"></a>
+<span class="heading3">Already-Load-Balanced Databases</span><br>
+
+<p>In a typical database cluster or replicated environment, the nodes are identifiable as separate hosts.  However, when the nodes are located behind a load-balancing appliance or running on an application cluster, such as Oracle RAC, SQL Relay cannot identity an individual node.</p>
+
+<p>In these environments, if a node goes down, SQL Relay will attempt to re-establish the connection, but rather than failing until the node comes back up, the new connection will more likely just succeed to a different node in the cluster.  Over time, this can lead to disproportionate load-balancing, with a bias toward nodes that have never gone down.</p>
+
+<p>SQL Relay manages this by “shuffling” the connections periodically.  Every so often, each database connection is re-established, giving that connection a chance to be re-established to a node that may have gone down but is now back up.</p>
+
+<p>To indicate to SQL Relay that the nodes are already-load-balanced, and need to be "shuffled" periodically, only one connection tag should be used, with the behindloadbalancer attribute set to "yes".</p>
 
 <blockquote>
 
@@ -442,13 +502,15 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 </font>
 </blockquote>
 
-<p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
-
 
 <br><br><a name="router"></a>
-<span class="heading2">Master-Slave Query Routing</span><br>
+<span class="heading3">Master-Slave Query Routing</span><br>
 
-<p>In a master-slave replication scenario, SQL Relay can be configured to route DML and DDL queries to the master and distribute selects over the slaves.</p>
+<p>The load-balancing scenarios described above all assume that master-master replication is being used.  SQL Relay supports master-slave replication as well.</p>
+
+<p>In a master-slave replication environment, SQL Relay can be configured to route DML and DDL queries to the master and distribute selects over the slaves.</p>
+
+<img src="../images/router.png">
 
 <p>This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.</p>
 
@@ -549,6 +611,27 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <p>See the <a href="router.html">Query Routing</a> for more information on query routing.</p>
 
 
+<br><br><a name="frontend"></a>
+<span class="heading3">Front-End Load-Balancing and Fail-Over</span><br>
+
+<p>If you are building out a high availability environment, or if your pool of application servers is just sufficiently large, you might want to set up a pool of SQL Relay servers between your application servers and the database.</p>
+
+<p>SQL Relay supports two front-end load-balancing and fail-over strategies.  In the first strategy, load-balancing and fail-over are provided by an appliance or application cluster.  In the second, SQL Relay provides its own load-balancing and fail-over, with some help from DNS.</p>
+
+<p>Multiple instances of SQL Relay can be placed behind a load-balancing appliance.</p>
+
+<img src="../images/loadbalancer.png">
+
+<p>In this illustration, the load-balancing appliance is shown as a single machine, but in a true HA environment, there would be 2 or more appliances sharing a virtual IP.  Alternatively, rather than using an appliance, SQL Relay can be run on an application server cluster such as Linux Virtual Server.
+
+<p><a href="http://en.wikipedia.org/wiki/Round-robin_DNS">Round-robin DNS</a> can be also be used to provide load-balancing and fail-over over multiple instances of SQL Relay.</p>
+
+<img src="../images/rrdns.png">
+
+<p>In a round-robin DNS scenario, multiple IP addresses are assigned to the same host name.  The SQL Relay client is then configured to connect to that host.  When it requests the IP addresses for the host, the client receives all of the IP addresses assigned to it, rather than just a single address.</p>
+
+<p>Round-robin DNS is so-called because, traditionally, the order of the IP addresses returned on successive requests alternated reliably, in round-robin fashion.  This behavior persists in many environments, but it is no longer guaranteed, as many modern DNS resolvers sort the list and return the IP addresses in the same order, every time.  SQL Relay clients randomize the list though, and try to connect to each of the IP addresses, one-at-a-time, until they succeed.  Doing so provides both load-balancing and fail-over without requiring an appliance or application server cluster.</p>
+
 <br><br><a name="sessionqueries"></a>
 <span class="heading2">Session-Queries</span><br>
 
@@ -558,7 +641,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 
 <p>You can use SQL Relay's session queries to work around the problem.</p>
 
-<p>In this example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.</p>
+<p>In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.</p>
 
 <blockquote>
 
