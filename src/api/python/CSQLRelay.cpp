@@ -12,11 +12,14 @@
 #if PY_MAJOR_VERSION >= 2
 #if PY_MINOR_VERSION >= 3
 	#define SUPPORTS_UNSIGNED	1
+#endif
+#endif
+
+#if PY_MAJOR_VERSION >= 3
 	#define PyString_Check PyUnicode_Check
 	#define PyString_AsString(a) PyUnicode_AsUTF8AndSize(a,NULL)
 	#define PyInt_Check PyLong_Check
 	#define PyInt_AsLong PyLong_AsLong
-#endif
 #endif
 
 
@@ -1970,7 +1973,7 @@ static PyMethodDef SQLRMethods[] = {
   {NULL,      NULL}        /* Sentinel */
 };
 
-#if PY_MINOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
 static PyModuleDef sqlrmoduledef = {
   PyModuleDef_HEAD_INIT,
   "SQLRelay.CSQLRelay",
@@ -1987,13 +1990,13 @@ static PyModuleDef sqlrmoduledef = {
 #ifdef _WIN32
 __declspec(dllexport)
 #endif
-#if PY_MINOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
 PyObject *PyInit_CSQLRelay()
 #else
 void initCSQLRelay()
 #endif
 {
-#if PY_MINOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
   PyObject	*sqlrmodule=PyModule_Create(&sqlrmoduledef);
 #else
   Py_InitModule("SQLRelay.CSQLRelay", SQLRMethods);
@@ -2010,7 +2013,7 @@ void initCSQLRelay()
     PyErr_Clear();
   }
 
-#if PY_MINOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
   return sqlrmodule;
 #endif
 }
