@@ -17,16 +17,16 @@ def main():
 	print("INSTANTIATION")
 	con=PySQLRDB.connect("sqlrserver",9000,"/tmp/test.socket","test","test",0,1)
 	cur=con.cursor()
-	print
-	print
+	print()
+	print()
 
 
 	# bind functions
 	print("BIND FUNCTIONS")
 	cur.execute("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
 	print(cur.fetchone())
-	print
-	print
+	print()
+	print()
 
 	
 	# executemany
@@ -34,7 +34,7 @@ def main():
 
 	try:
 		cur.execute("drop table temptable")
-	except PySQLRDB.DatabaseError, e:
+	except (PySQLRDB.DatabaseError) as e:
 		print(e)
 
 	cur.execute("create table temptable (col1 number, col2 char(10), col3 number(2,1))")
@@ -46,8 +46,8 @@ def main():
 	cur.execute("select * from temptable")
 	print(cur.fetchall())
 	cur.execute("drop table temptable")
-	print
-	print
+	print()
+	print()
 
 	# lots of rows
 	print("LOTS OF ROWS")
@@ -79,8 +79,8 @@ def main():
 	print("CALLPROC")
 	cur.callproc("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
 	print(cur.fetchone())
-	print
-	print
+	print()
+	print()
 
 	cur.close()
 	con.close()
