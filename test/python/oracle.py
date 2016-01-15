@@ -10,11 +10,11 @@ import string
 
 def checkSuccess(value,success):
 	if value==success:
-		print "success",
+		print("success")
 	else:
-		print "wanted", type(success), ":", success
-		print "got   ", type(value), ":", value
-		print "failure"
+		print("wanted", type(success), ":", success)
+		print("got   ", type(value), ":", value)
+		print("failure")
 		sys.exit(1)
 
 def main():
@@ -28,31 +28,31 @@ def main():
 	cur=PySQLRClient.sqlrcursor(con)
 
 	# get database type
-	print "IDENTIFY: "
+	print("IDENTIFY: ")
 	checkSuccess(con.identify(),"oracle")
-	print
+	print()
 
 	# ping
-	print "PING: "
+	print("PING: ")
 	checkSuccess(con.ping(),1)
-	print
+	print()
 
 	# drop existing table
 	cur.sendQuery("drop table testtable")
 
-	print "CREATE TEMPTABLE: "
+	print("CREATE TEMPTABLE: ")
 	checkSuccess(cur.sendQuery("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)"),1)
-	print
+	print()
 
-	print "INSERT: "
+	print("INSERT: ")
 	checkSuccess(cur.sendQuery("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1)
-	print
+	print()
 
-	print "AFFECTED ROWS: "
+	print("AFFECTED ROWS: ")
 	checkSuccess(cur.affectedRows(),1)
-	print
+	print()
 
-	print "BIND BY POSITION: "
+	print("BIND BY POSITION: ")
 	cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)")
 	checkSuccess(cur.countBindVariables(),7)
 	cur.inputBind("1",2)
@@ -72,9 +72,9 @@ def main():
 	cur.inputBindClob("6","testclob3",9)
 	cur.inputBindBlob("7","testblob3",9)
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "ARRAY OF BINDS BY POSITION: "
+	print("ARRAY OF BINDS BY POSITION: ")
 	cur.clearBinds()
 	cur.inputBinds(["1","2","3","4","5"],
 		[4,"testchar4","testvarchar4",
@@ -82,9 +82,9 @@ def main():
 	cur.inputBindClob("6","testclob7",9)
 	cur.inputBindBlob("7","testblob7",9)
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "BIND BY NAME: "
+	print("BIND BY NAME: ")
 	cur.prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)")
 	cur.inputBind("var1",5)
 	cur.inputBind("var2","testchar5")
@@ -103,9 +103,9 @@ def main():
 	cur.inputBindClob("var6","testclob6",9)
 	cur.inputBindBlob("var7","testblob6",9)
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "ARRAY OF BINDS BY NAME: "
+	print("ARRAY OF BINDS BY NAME: ")
 	cur.clearBinds()
 	cur.inputBinds(["var1","var2","var3","var4","var5"],
 		[7,"testchar7","testvarchar7",
@@ -113,9 +113,9 @@ def main():
 	cur.inputBindClob("var6","testclob7",9)
 	cur.inputBindBlob("var7","testblob7",9)
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "BIND BY NAME WITH VALIDATION: "
+	print("BIND BY NAME WITH VALIDATION: ")
 	cur.clearBinds()
 	cur.inputBind("var1",8)
 	cur.inputBind("var2","testchar8")
@@ -127,9 +127,9 @@ def main():
 	cur.inputBind("var9","junkvalue")
 	cur.validateBinds()
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "OUTPUT BIND BY NAME: "
+	print("OUTPUT BIND BY NAME: ")
 	cur.prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;")
 	cur.defineOutputBindInteger("numvar")
 	cur.defineOutputBindString("stringvar",10)
@@ -141,9 +141,9 @@ def main():
 	checkSuccess(numvar,1)
 	checkSuccess(stringvar,'hello')
 	checkSuccess(floatvar,2.5)
-	print
+	print()
 
-	print "OUTPUT BIND BY NAME: "
+	print("OUTPUT BIND BY NAME: ")
 	cur.clearBinds()
 	cur.defineOutputBindInteger("1")
 	cur.defineOutputBindString("2",10)
@@ -155,9 +155,9 @@ def main():
 	checkSuccess(numvar,1)
 	checkSuccess(stringvar,'hello')
 	checkSuccess(floatvar,2.5)
-	print
+	print()
 
-	print "OUTPUT BIND BY NAME WITH VALIDATION: "
+	print("OUTPUT BIND BY NAME WITH VALIDATION: ")
 	cur.clearBinds()
 	cur.defineOutputBindInteger("numvar")
 	cur.defineOutputBindString("stringvar",10)
@@ -171,17 +171,17 @@ def main():
 	checkSuccess(numvar,1)
 	checkSuccess(stringvar,'hello')
 	checkSuccess(floatvar,2.5)
-	print
+	print()
 
-	print "SELECT: "
+	print("SELECT: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
-	print
+	print()
 
-	print "COLUMN COUNT: "
+	print("COLUMN COUNT: ")
 	checkSuccess(cur.colCount(),7)
-	print
+	print()
 
-	print "COLUMN NAMES: "
+	print("COLUMN NAMES: ")
 	checkSuccess(cur.getColumnName(0),"TESTNUMBER")
 	checkSuccess(cur.getColumnName(1),"TESTCHAR")
 	checkSuccess(cur.getColumnName(2),"TESTVARCHAR")
@@ -197,9 +197,9 @@ def main():
 	checkSuccess(cols[4],"TESTLONG")
 	checkSuccess(cols[5],"TESTCLOB")
 	checkSuccess(cols[6],"TESTBLOB")
-	print
+	print()
 
-	print "COLUMN TYPES: "
+	print("COLUMN TYPES: ")
 	checkSuccess(cur.getColumnType(0),"NUMBER")
 	checkSuccess(cur.getColumnType('testnumber'),"NUMBER")
 	checkSuccess(cur.getColumnType(1),"CHAR")
@@ -214,9 +214,9 @@ def main():
 	checkSuccess(cur.getColumnType('testclob'),"CLOB")
 	checkSuccess(cur.getColumnType(6),"BLOB")
 	checkSuccess(cur.getColumnType('testblob'),"BLOB")
-	print
+	print()
 
-	print "COLUMN LENGTH: "
+	print("COLUMN LENGTH: ")
 	checkSuccess(cur.getColumnLength(0),22)
 	checkSuccess(cur.getColumnLength('testnumber'),22)
 	checkSuccess(cur.getColumnLength(1),40)
@@ -231,9 +231,9 @@ def main():
 	checkSuccess(cur.getColumnLength('testclob'),0)
 	checkSuccess(cur.getColumnLength(6),0)
 	checkSuccess(cur.getColumnLength('testblob'),0)
-	print
+	print()
 
-	print "LONGEST COLUMN: "
+	print("LONGEST COLUMN: ")
 	checkSuccess(cur.getLongest(0),1)
 	checkSuccess(cur.getLongest('testnumber'),1)
 	checkSuccess(cur.getLongest(1),40)
@@ -248,25 +248,25 @@ def main():
 	checkSuccess(cur.getLongest('testclob'),9)
 	checkSuccess(cur.getLongest(6),9)
 	checkSuccess(cur.getLongest('testblob'),9)
-	print
+	print()
 
-	print "ROW COUNT: "
+	print("ROW COUNT: ")
 	checkSuccess(cur.rowCount(),8)
-	print
+	print()
 
-	print "TOTAL ROWS: "
+	print("TOTAL ROWS: ")
 	checkSuccess(cur.totalRows(),0)
-	print
+	print()
 
-	print "FIRST ROW INDEX: "
+	print("FIRST ROW INDEX: ")
 	checkSuccess(cur.firstRowIndex(),0)
-	print
+	print()
 
-	print "END OF RESULT SET: "
+	print("END OF RESULT SET: ")
 	checkSuccess(cur.endOfResultSet(),1)
-	print
+	print()
 
-	print "FIELDS BY INDEX: "
+	print("FIELDS BY INDEX: ")
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"testchar1                               ")
 	checkSuccess(cur.getField(0,2),"testvarchar1")
@@ -274,7 +274,7 @@ def main():
 	checkSuccess(cur.getField(0,4),"testlong1")
 	checkSuccess(cur.getField(0,5),"testclob1")
 	checkSuccess(cur.getField(0,6),"")
-	print
+	print()
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(7,1),"testchar8                               ")
 	checkSuccess(cur.getField(7,2),"testvarchar8")
@@ -282,9 +282,9 @@ def main():
 	checkSuccess(cur.getField(7,4),"testlong8")
 	checkSuccess(cur.getField(7,5),"testclob8")
 	checkSuccess(cur.getField(7,6),"testblob8")
-	print
+	print()
 
-	print "FIELD LENGTHS BY INDEX: "
+	print("FIELD LENGTHS BY INDEX: ")
 	checkSuccess(cur.getFieldLength(0,0),1)
 	checkSuccess(cur.getFieldLength(0,1),40)
 	checkSuccess(cur.getFieldLength(0,2),12)
@@ -292,7 +292,7 @@ def main():
 	checkSuccess(cur.getFieldLength(0,4),9)
 	checkSuccess(cur.getFieldLength(0,5),9)
 	checkSuccess(cur.getFieldLength(0,6),0)
-	print
+	print()
 	checkSuccess(cur.getFieldLength(7,0),1)
 	checkSuccess(cur.getFieldLength(7,1),40)
 	checkSuccess(cur.getFieldLength(7,2),12)
@@ -300,9 +300,9 @@ def main():
 	checkSuccess(cur.getFieldLength(7,4),9)
 	checkSuccess(cur.getFieldLength(7,5),9)
 	checkSuccess(cur.getFieldLength(7,6),9)
-	print
+	print()
 
-	print "FIELDS BY NAME: "
+	print("FIELDS BY NAME: ")
 	checkSuccess(cur.getField(0,"testnumber"),1)
 	checkSuccess(cur.getField(0,"testchar"),"testchar1                               ")
 	checkSuccess(cur.getField(0,"testvarchar"),"testvarchar1")
@@ -310,7 +310,7 @@ def main():
 	checkSuccess(cur.getField(0,"testlong"),"testlong1")
 	checkSuccess(cur.getField(0,"testclob"),"testclob1")
 	checkSuccess(cur.getField(0,"testblob"),"")
-	print
+	print()
 	checkSuccess(cur.getField(7,"testnumber"),8)
 	checkSuccess(cur.getField(7,"testchar"),"testchar8                               ")
 	checkSuccess(cur.getField(7,"testvarchar"),"testvarchar8")
@@ -318,9 +318,9 @@ def main():
 	checkSuccess(cur.getField(7,"testlong"),"testlong8")
 	checkSuccess(cur.getField(7,"testclob"),"testclob8")
 	checkSuccess(cur.getField(7,"testblob"),"testblob8")
-	print
+	print()
 
-	print "FIELD LENGTHS BY NAME: "
+	print("FIELD LENGTHS BY NAME: ")
 	checkSuccess(cur.getFieldLength(0,"testnumber"),1)
 	checkSuccess(cur.getFieldLength(0,"testchar"),40)
 	checkSuccess(cur.getFieldLength(0,"testvarchar"),12)
@@ -328,7 +328,7 @@ def main():
 	checkSuccess(cur.getFieldLength(0,"testlong"),9)
 	checkSuccess(cur.getFieldLength(0,"testclob"),9)
 	checkSuccess(cur.getFieldLength(0,"testblob"),0)
-	print
+	print()
 	checkSuccess(cur.getFieldLength(7,"testnumber"),1)
 	checkSuccess(cur.getFieldLength(7,"testchar"),40)
 	checkSuccess(cur.getFieldLength(7,"testvarchar"),12)
@@ -336,9 +336,9 @@ def main():
 	checkSuccess(cur.getFieldLength(7,"testlong"),9)
 	checkSuccess(cur.getFieldLength(7,"testclob"),9)
 	checkSuccess(cur.getFieldLength(7,"testblob"),9)
-	print
+	print()
 
-	print "FIELDS BY ARRAY: "
+	print("FIELDS BY ARRAY: ")
 	fields=cur.getRow(0)
 	checkSuccess(fields[0],1)
 	checkSuccess(fields[1],"testchar1                               ")
@@ -347,9 +347,9 @@ def main():
 	checkSuccess(fields[4],"testlong1")
 	checkSuccess(fields[5],"testclob1")
 	checkSuccess(fields[6],"")
-	print
+	print()
 
-	print "FIELD LENGTHS BY ARRAY: "
+	print("FIELD LENGTHS BY ARRAY: ")
 	fieldlens=cur.getRowLengths(0)
 	checkSuccess(fieldlens[0],1)
 	checkSuccess(fieldlens[1],40)
@@ -358,9 +358,9 @@ def main():
 	checkSuccess(fieldlens[4],9)
 	checkSuccess(fieldlens[5],9)
 	checkSuccess(fieldlens[6],None)
-	print
+	print()
 
-	print "FIELDS BY DICTIONARY: "
+	print("FIELDS BY DICTIONARY: ")
 	fields=cur.getRowDictionary(0)
 	checkSuccess(fields["TESTNUMBER"],1)
 	checkSuccess(fields["TESTCHAR"],"testchar1                               ")
@@ -369,7 +369,7 @@ def main():
 	checkSuccess(fields["TESTLONG"],"testlong1")
 	checkSuccess(fields["TESTCLOB"],"testclob1")
 	checkSuccess(fields["TESTBLOB"],"")
-	print
+	print()
 	fields=cur.getRowDictionary(7)
 	checkSuccess(fields["TESTNUMBER"],8)
 	checkSuccess(fields["TESTCHAR"],"testchar8                               ")
@@ -378,9 +378,9 @@ def main():
 	checkSuccess(fields["TESTLONG"],"testlong8")
 	checkSuccess(fields["TESTCLOB"],"testclob8")
 	checkSuccess(fields["TESTBLOB"],"testblob8")
-	print
+	print()
 
-	print "FIELD LENGTHS BY DICTIONARY: "
+	print("FIELD LENGTHS BY DICTIONARY: ")
 	fieldlengths=cur.getRowLengthsDictionary(0)
 	checkSuccess(fieldlengths["TESTNUMBER"],1)
 	checkSuccess(fieldlengths["TESTCHAR"],40)
@@ -389,7 +389,7 @@ def main():
 	checkSuccess(fieldlengths["TESTLONG"],9)
 	checkSuccess(fieldlengths["TESTCLOB"],9)
 	checkSuccess(fieldlengths["TESTBLOB"],0)
-	print
+	print()
 	fieldlengths=cur.getRowLengthsDictionary(7)
 	checkSuccess(fieldlengths["TESTNUMBER"],1)
 	checkSuccess(fieldlengths["TESTCHAR"],40)
@@ -398,47 +398,47 @@ def main():
 	checkSuccess(fieldlengths["TESTLONG"],9)
 	checkSuccess(fieldlengths["TESTCLOB"],9)
 	checkSuccess(fieldlengths["TESTBLOB"],9)
-	print
+	print()
 	
-	print "INDIVIDUAL SUBSTITUTIONS: "
+	print("INDIVIDUAL SUBSTITUTIONS: ")
 	cur.prepareQuery("select $(var1),'$(var2)',$(var3) from dual")
 	cur.substitution("var1",1)
 	cur.substitution("var2","hello")
 	cur.substitution("var3",10.5556,6,4)
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "FIELDS: "
+	print("FIELDS: ")
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
 	# oracle makes this field an integer
 	#checkSuccess(cur.getField(0,2),Decimal("10.5556"))
 	checkSuccess(cur.getField(0,2),10)
-	print
+	print()
 
-	print "OUTPUT BIND: "
+	print("OUTPUT BIND: ")
 	cur.prepareQuery("begin :var1:='hello'; end;")
 	cur.defineOutputBindString("var1",10)
 	checkSuccess(cur.executeQuery(),1)
 	checkSuccess(cur.getOutputBindString("var1"),"hello")
-	print
+	print()
 
-	print "ARRAY SUBSTITUTIONS: "
+	print("ARRAY SUBSTITUTIONS: ")
 	cur.prepareQuery("select $(var1),'$(var2)',$(var3) from dual")
 	cur.substitutions(["var1","var2","var3"],
 				[1,"hello",10.5556],[0,0,6],[0,0,4])
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "FIELDS: "
+	print("FIELDS: ")
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
 	# oracle makes this field an integer
 	#checkSuccess(cur.getField(0,2),Decimal("10.5556"))
 	checkSuccess(cur.getField(0,2),10)
-	print
+	print()
 
-	print "NULLS as Nones: "
+	print("NULLS as Nones: ")
 	cur.getNullsAsNone()
 	checkSuccess(cur.sendQuery("select NULL,1,NULL from dual"),1)
 	checkSuccess(cur.getField(0,0),None)
@@ -450,38 +450,38 @@ def main():
 	checkSuccess(cur.getField(0,1),1)
 	checkSuccess(cur.getField(0,2),"")
 	cur.getNullsAsNone()
-	print
+	print()
 
-	print "RESULT SET BUFFER SIZE: "
+	print("RESULT SET BUFFER SIZE: ")
 	checkSuccess(cur.getResultSetBufferSize(),0)
 	cur.setResultSetBufferSize(2)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	checkSuccess(cur.getResultSetBufferSize(),2)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),0)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),2)
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),2)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),4)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),8)
 	checkSuccess(cur.endOfResultSet(),1)
 	checkSuccess(cur.rowCount(),8)
-	print
+	print()
 
-	print "DONT GET COLUMN INFO: "
+	print("DONT GET COLUMN INFO: ")
 	cur.dontGetColumnInfo()
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	checkSuccess(cur.getColumnName(0),None)
@@ -492,16 +492,16 @@ def main():
 	checkSuccess(cur.getColumnName(0),"TESTNUMBER")
 	checkSuccess(cur.getColumnLength(0),22)
 	checkSuccess(cur.getColumnType(0),"NUMBER")
-	print
+	print()
 
-	print "SUSPENDED SESSION: "
+	print("SUSPENDED SESSION: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
-	print
+	print()
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
@@ -510,14 +510,14 @@ def main():
 	checkSuccess(cur.getField(5,0),6)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
-	print
+	print()
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
@@ -526,14 +526,14 @@ def main():
 	checkSuccess(cur.getField(5,0),6)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
-	print
+	print()
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
@@ -542,9 +542,9 @@ def main():
 	checkSuccess(cur.getField(5,0),6)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 
-	print "SUSPENDED RESULT SET: "
+	print("SUSPENDED RESULT SET: ")
 	cur.setResultSetBufferSize(2)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	checkSuccess(cur.getField(2,0),3)
@@ -555,24 +555,24 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	checkSuccess(cur.resumeResultSet(id),1)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),8)
 	checkSuccess(cur.endOfResultSet(),1)
 	checkSuccess(cur.rowCount(),8)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "CACHED RESULT SET: "
+	print("CACHED RESULT SET: ")
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
@@ -581,13 +581,13 @@ def main():
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet(filename),1)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 
-	print "COLUMN COUNT FOR CACHED RESULT SET: "
+	print("COLUMN COUNT FOR CACHED RESULT SET: ")
 	checkSuccess(cur.colCount(),7)
-	print
+	print()
 
-	print "COLUMN NAMES FOR CACHED RESULT SET: "
+	print("COLUMN NAMES FOR CACHED RESULT SET: ")
 	checkSuccess(cur.getColumnName(0),"TESTNUMBER")
 	checkSuccess(cur.getColumnName(1),"TESTCHAR")
 	checkSuccess(cur.getColumnName(2),"TESTVARCHAR")
@@ -603,9 +603,9 @@ def main():
 	checkSuccess(cols[4],"TESTLONG")
 	checkSuccess(cols[5],"TESTCLOB")
 	checkSuccess(cols[6],"TESTBLOB")
-	print
+	print()
 
-	print "CACHED RESULT SET WITH RESULT SET BUFFER SIZE: "
+	print("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: ")
 	cur.setResultSetBufferSize(2)
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
@@ -617,18 +617,18 @@ def main():
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "FROM ONE CACHE FILE TO ANOTHER: "
+	print("FROM ONE CACHE FILE TO ANOTHER: ")
 	cur.cacheToFile("cachefile2")
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet("cachefile2"),1)
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 
-	print "FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: "
+	print("FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: ")
 	cur.setResultSetBufferSize(2)
 	cur.cacheToFile("cachefile2")
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
@@ -637,9 +637,9 @@ def main():
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: "
+	print("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: ")
 	cur.setResultSetBufferSize(2)
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
@@ -652,32 +652,32 @@ def main():
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
-	print
+	print()
 	checkSuccess(con.resumeSession(port,socket),1)
 	checkSuccess(cur.resumeCachedResultSet(id,filename),1)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),8)
 	checkSuccess(cur.endOfResultSet(),1)
 	checkSuccess(cur.rowCount(),8)
 	cur.cacheOff()
-	print
+	print()
 	checkSuccess(cur.openCachedResultSet(filename),1)
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "COMMIT AND ROLLBACK: "
+	print("COMMIT AND ROLLBACK: ")
 	secondcon=PySQLRClient.sqlrconnection("sqlrserver",9000,
 						"/tmp/test.socket",
 						"test","test")
@@ -692,51 +692,51 @@ def main():
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),9)
 	checkSuccess(con.autoCommitOff(),1)
-	print
+	print()
 
-	print "ROW RANGE:"
+	print("ROW RANGE:")
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
-	print
+	print()
 	rows=cur.getRowRange(0,5)
 	checkSuccess(rows[0][0],1)
 	checkSuccess(rows[0][1],"testchar1                               ")
 	checkSuccess(rows[0][2],"testvarchar1")
 	checkSuccess(rows[0][3],"01-JAN-01")
 	checkSuccess(rows[0][4],"testlong1")
-	print
+	print()
 	checkSuccess(rows[1][0],2)
 	checkSuccess(rows[1][1],"testchar2                               ")
 	checkSuccess(rows[1][2],"testvarchar2")
 	checkSuccess(rows[1][3],"01-JAN-02")
 	checkSuccess(rows[1][4],"testlong2")
-	print
+	print()
 	checkSuccess(rows[2][0],3)
 	checkSuccess(rows[2][1],"testchar3                               ")
 	checkSuccess(rows[2][2],"testvarchar3")
 	checkSuccess(rows[2][3],"01-JAN-03")
 	checkSuccess(rows[2][4],"testlong3")
-	print
+	print()
 	checkSuccess(rows[3][0],4)
 	checkSuccess(rows[3][1],"testchar4                               ")
 	checkSuccess(rows[3][2],"testvarchar4")
 	checkSuccess(rows[3][3],"01-JAN-04")
 	checkSuccess(rows[3][4],"testlong4")
-	print
+	print()
 	checkSuccess(rows[4][0],5)
 	checkSuccess(rows[4][1],"testchar5                               ")
 	checkSuccess(rows[4][2],"testvarchar5")
 	checkSuccess(rows[4][3],"01-JAN-05")
 	checkSuccess(rows[4][4],"testlong5")
-	print
+	print()
 	checkSuccess(rows[5][0],6)
 	checkSuccess(rows[5][1],"testchar6                               ")
 	checkSuccess(rows[5][2],"testvarchar6")
 	checkSuccess(rows[5][3],"01-JAN-06")
 	checkSuccess(rows[5][4],"testlong6")
-	print
+	print()
 
 
-	print "CLOB AND BLOB OUTPUT BIND: "
+	print("CLOB AND BLOB OUTPUT BIND: ")
 	cur.sendQuery("drop table testtable1")
 	checkSuccess(cur.sendQuery("create table testtable1 (testclob clob, testblob blob)"),1)
 	cur.prepareQuery("insert into testtable1 values ('hello',:var1)")
@@ -755,9 +755,9 @@ def main():
 	checkSuccess(blobvar,"hello")
 	checkSuccess(blobvarlength,5)
 	cur.sendQuery("drop table testtable1")
-	print
+	print()
 
-	print "NULL AND EMPTY CLOBS AND CLOBS: "
+	print("NULL AND EMPTY CLOBS AND CLOBS: ")
 	cur.getNullsAsNone()
 	cur.sendQuery("create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)")
 	cur.prepareQuery("insert into testtable1 values (:var1,:var2,:var3,:var4)")
@@ -772,9 +772,9 @@ def main():
 	checkSuccess(cur.getField(0,2),None)
 	checkSuccess(cur.getField(0,3),None)
 	cur.sendQuery("drop table testtable1")
-	print
+	print()
 
-	print "CURSOR BINDS: "
+	print("CURSOR BINDS: ")
 	checkSuccess(cur.sendQuery("create or replace package types as type cursorType is ref cursor; end;"),1)
 	checkSuccess(cur.sendQuery("create or replace function sp_testtable return types.cursortype as l_cursor    types.cursorType; begin open l_cursor for select * from testtable; return l_cursor; end;"),1)
 	cur.prepareQuery("begin  :curs:=sp_testtable; end;")
@@ -790,9 +790,9 @@ def main():
 	checkSuccess(bindcur.getField(5,0),6)
 	checkSuccess(bindcur.getField(6,0),7)
 	checkSuccess(bindcur.getField(7,0),8)
-	print
+	print()
 
-	print "LONG CLOB: "
+	print("LONG CLOB: ")
 	cur.sendQuery("drop table testtable2")
 	cur.sendQuery("create table testtable2 (testclob clob)")
 	cur.prepareQuery("insert into testtable2 values (:clobval)")
@@ -810,9 +810,9 @@ def main():
 	checkSuccess(cur.getOutputBindLength("clobbindval"),8*1024)
 	checkSuccess(clobval,clobbindvar)
 	cur.sendQuery("drop table testtable2")
-	print
+	print()
 
-	print "FINISHED SUSPENDED SESSION: "
+	print("FINISHED SUSPENDED SESSION: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),1)
 	checkSuccess(cur.getField(4,0),5)
 	checkSuccess(cur.getField(5,0),6)
@@ -829,10 +829,10 @@ def main():
 	checkSuccess(cur.getField(5,0),None)
 	checkSuccess(cur.getField(6,0),None)
 	checkSuccess(cur.getField(7,0),None)
-	print
+	print()
 
 
-	print "BIND VALIDATION: "
+	print("BIND VALIDATION: ")
 	cur.sendQuery("drop table testtable1")
 	cur.sendQuery("create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))")
 	cur.prepareQuery("insert into testtable1 values ($(var1),$(var2),$(var3))")
@@ -844,13 +844,13 @@ def main():
 	checkSuccess(cur.validBind("var2"),0)
 	checkSuccess(cur.validBind("var3"),0)
 	checkSuccess(cur.validBind("var4"),0)
-	print
+	print()
 	cur.substitution("var2",":var2")
 	checkSuccess(cur.validBind("var1"),1)
 	checkSuccess(cur.validBind("var2"),1)
 	checkSuccess(cur.validBind("var3"),0)
 	checkSuccess(cur.validBind("var4"),0)
-	print
+	print()
 	cur.substitution("var3",":var3")
 	checkSuccess(cur.validBind("var1"),1)
 	checkSuccess(cur.validBind("var2"),1)
@@ -858,29 +858,29 @@ def main():
 	checkSuccess(cur.validBind("var4"),0)
 	checkSuccess(cur.executeQuery(),1)
 	cur.sendQuery("drop table testtable1")
-	print
+	print()
 
 
 	# drop existing table
 	cur.sendQuery("drop table testtable")
 
 	# invalid queries...
-	print "INVALID QUERIES: "
+	print("INVALID QUERIES: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),0)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),0)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),0)
 	checkSuccess(cur.sendQuery("select * from testtable order by testnumber"),0)
-	print
+	print()
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
-	print
+	print()
 	checkSuccess(cur.sendQuery("create table testtable"),0)
 	checkSuccess(cur.sendQuery("create table testtable"),0)
 	checkSuccess(cur.sendQuery("create table testtable"),0)
 	checkSuccess(cur.sendQuery("create table testtable"),0)
-	print
+	print()
 
 if __name__ == "__main__":
 	main()

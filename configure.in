@@ -247,6 +247,23 @@ AC_ARG_WITH(python-dir,
 	[  --with-python-dir             Path to install Python api],
 	PYTHONDIR="$withval",
 	PYTHONDIR="")
+AC_ARG_WITH(python3-prefix,
+	[  --with-python3-prefix         Location of Python3],
+	PYTHON3PATH="$withval",
+	PYTHON3PATH="")
+AC_ARG_ENABLE(python3,
+	[  --disable-python3             Don't build Python3 api],
+	ENABLE_PYTHON3="",
+	ENABLE_PYTHON3="yes")
+AC_ARG_ENABLE(python3-rpath,
+	[  --enable-python3-rpath        Use -rpath when linking the Python3 library against the SQL Relay client library],
+	PYTHON3USERPATH="yes",
+	PYTHON3USERPATH="")
+AC_SUBST(PYTHON3USERPATH)
+AC_ARG_WITH(python3-dir,
+	[  --with-python3-dir            Path to install Python3 api],
+	PYTHON3DIR="$withval",
+	PYTHON3DIR="")
 AC_ARG_WITH(ruby-prefix,
 	[  --with-ruby-prefix            Location of Ruby],
 	RUBYPATH="$withval",
@@ -415,6 +432,9 @@ if ( test -n "$PERLPATH" -a "`echo $PERLPATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$PYTHONPATH" -a "`echo $PYTHONPATH | cut -c-3`" = "../" ); then
 	PYTHONPATH="$PWD/$PYTHONPATH"
+fi
+if ( test -n "$PYTHON3PATH" -a "`echo $PYTHON3PATH | cut -c-3`" = "../" ); then
+	PYTHON3PATH="$PWD/$PYTHON3PATH"
 fi
 if ( test -n "$RUBYPATH" -a "`echo $RUBYPATH | cut -c-3`" = "../" ); then
 	RUBYPATH="$PWD/$RUBYPATH"
@@ -696,10 +716,12 @@ echo "******************************"
 
 
 
-dnl Checks for python.
+dnl Checks for python
 echo
-echo "***** Python 2.1 or newer ****"
-FW_CHECK_PYTHON
+echo "***** Python *****************"
+FW_CHECK_PYTHON2
+FW_CHECK_PYTHON3
+FW_PYTHON_DECIDE
 echo "******************************"
 
 
@@ -1029,13 +1051,3 @@ echo "options."
 echo
 echo "Type:  configure --help   for a list of options."
 echo
-
-if ( test -n "$PYTHONVERSION" )
-then
- 	if ( test "$PYTHONVERSION" -lt "21" )
-	then
-		echo
-		echo "WARNING!  Support for Python versions prior to 2.1 is"
-		echo "          deprecated and will be removed soon."
-	fi
-fi

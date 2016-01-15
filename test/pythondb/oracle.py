@@ -14,43 +14,43 @@ def main():
 	CSQLRelay.getNumericFieldsAsNumbers()
 
 	# instantiation
-	print "INSTANTIATION"
+	print("INSTANTIATION")
 	con=PySQLRDB.connect("sqlrserver",9000,"/tmp/test.socket","test","test",0,1)
 	cur=con.cursor()
-	print
-	print
+	print()
+	print()
 
 
 	# bind functions
-	print "BIND FUNCTIONS"
+	print("BIND FUNCTIONS")
 	cur.execute("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
-	print cur.fetchone()
-	print
-	print
+	print(cur.fetchone())
+	print()
+	print()
 
 	
 	# executemany
-	print "BIND FUNCTIONS"
+	print("BIND FUNCTIONS")
 
 	try:
 		cur.execute("drop table temptable")
 	except PySQLRDB.DatabaseError, e:
-		print e
+		print(e)
 
 	cur.execute("create table temptable (col1 number, col2 char(10), col3 number(2,1))")
 	cur.execute("select * from temptable")
-	print cur.fetchmany(1)
+	print(cur.fetchmany(1))
 
 	cur.executemany("insert into temptable values (:var1,:var2,:var3)",[{'var1':1,'var2':'hello','var3':1.1},{'var1':2,'var2':'hi','var3':2.2},{'var1':3,'var2':'bye','var3':3.3}])
 	#cur.executemany("select :var1,:var2,:var3 from dual",[{'var1':1,'var2':'hello','var3':1.1},{'var1':2,'var2':'hi','var3':2.2},{'var1':3,'var2':'bye','var3':3.3}])
 	cur.execute("select * from temptable")
-	print cur.fetchall()
+	print(cur.fetchall())
 	cur.execute("drop table temptable")
-	print
-	print
+	print()
+	print()
 
 	# lots of rows
-	print "LOTS OF ROWS"
+	print("LOTS OF ROWS")
 	cur.execute("create table temptable (col1 number)")
 
 	# empty result set
@@ -67,20 +67,20 @@ def main():
 			break
 
 	if counter == 199:
-		print "success"
+		print("success")
 	else:
-		print "failed counter = "
-		print counter
+		print("failed counter = ")
+		print(counter)
 
 	# clean up
 	cur.execute("drop table temptable")
 
 	# callproc
-	print "CALLPROC"
+	print("CALLPROC")
 	cur.callproc("select :var1,:var2,:var3 from dual",{'var1':1,'var2':'hello','var3':1.1})
-	print cur.fetchone()
-	print
-	print
+	print(cur.fetchone())
+	print()
+	print()
 
 	cur.close()
 	con.close()
@@ -91,7 +91,7 @@ def main():
 	try :
 		cur.execute("select 1 from dual");
 	except UnboundLocalError, e:
-		print e
+		print(e)
 
 if __name__ == '__main__':
 	main()

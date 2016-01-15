@@ -19,6 +19,7 @@
 	fixed normalize bug that removed spaces around * for "all columns"
 		improperly
 	removed freetds warning, modern sybase has different library file names
+	updates to support python3
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

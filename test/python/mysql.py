@@ -10,11 +10,11 @@ from decimal import Decimal
 
 def checkSuccess(value,success):
 	if value==success:
-		print "success",
+		print("success")
 	else:
-		print "wanted", type(success), ":", success
-		print "got   ", type(value), ":", value
-		print "failure"
+		print("wanted", type(success), ":", success)
+		print("got   ", type(value), ":", value)
+		print("failure")
 		sys.exit(1)
 
 def main():
@@ -28,34 +28,34 @@ def main():
 	cur=PySQLRClient.sqlrcursor(con)
 
 	# get database type
-	print "IDENTIFY: "
+	print("IDENTIFY: ")
 	checkSuccess(con.identify(),"mysql")
 
 	# ping
-	print "PING: "
+	print("PING: ")
 	checkSuccess(con.ping(),1)
-	print
+	print()
 
 	# drop existing table
 	cur.sendQuery("drop table testtable")
 
 	# create a new table
-	print "CREATE TEMPTABLE: "
+	print("CREATE TEMPTABLE: ")
 	checkSuccess(cur.sendQuery("create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1)
-	print
+	print()
 
-	print "INSERT: "
+	print("INSERT: ")
 	checkSuccess(cur.sendQuery("insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)"),1)
 	checkSuccess(cur.sendQuery("insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)"),1)
 	checkSuccess(cur.sendQuery("insert into testdb.testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',NULL)"),1)
 	checkSuccess(cur.sendQuery("insert into testdb.testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',NULL)"),1)
-	print
+	print()
 
-	print "AFFECTED ROWS: "
+	print("AFFECTED ROWS: ")
 	checkSuccess(cur.affectedRows(),1)
-	print
+	print()
 
-	print "BIND BY POSITION: "
+	print("BIND BY POSITION: ")
 	cur.prepareQuery("insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)")
 	checkSuccess(cur.countBindVariables(),18)
 	cur.inputBind("1",5)
@@ -97,9 +97,9 @@ def main():
 	cur.inputBind("17",'mediumtext6')
 	cur.inputBind("18",'longtext6')
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "ARRAY OF BINDS BY POSITION: "
+	print("ARRAY OF BINDS BY POSITION: ")
 	cur.clearBinds()
 	cur.inputBinds(["1","2","3","4","5","6",
 			"7","8","9","10","11","12",
@@ -109,9 +109,9 @@ def main():
 		[0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0])
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "BIND BY POSITION WITH VALIDATION: "
+	print("BIND BY POSITION WITH VALIDATION: ")
 	cur.clearBinds()
 	cur.inputBind("1",8)
 	cur.inputBind("2",8)
@@ -133,17 +133,17 @@ def main():
 	cur.inputBind("18",'longtext8')
 	cur.validateBinds()
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "SELECT: "
+	print("SELECT: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
-	print
+	print()
 
-	print "COLUMN COUNT: "
+	print("COLUMN COUNT: ")
 	checkSuccess(cur.colCount(),19)
-	print
+	print()
 
-	print "COLUMN NAMES: "
+	print("COLUMN NAMES: ")
 	checkSuccess(cur.getColumnName(0),"testtinyint")
 	checkSuccess(cur.getColumnName(1),"testsmallint")
 	checkSuccess(cur.getColumnName(2),"testmediumint")
@@ -183,9 +183,9 @@ def main():
 	checkSuccess(cols[16],"testmediumtext")
 	checkSuccess(cols[17],"testlongtext")
 	checkSuccess(cols[18],"testtimestamp")
-	print
+	print()
 
-	print "COLUMN TYPES: "
+	print("COLUMN TYPES: ")
 	checkSuccess(cur.getColumnType(0),"TINYINT")
 	checkSuccess(cur.getColumnType(1),"SMALLINT")
 	checkSuccess(cur.getColumnType(2),"MEDIUMINT")
@@ -224,9 +224,9 @@ def main():
 	checkSuccess(cur.getColumnType("testmediumtext"),"MEDIUMBLOB")
 	checkSuccess(cur.getColumnType("testlongtext"),"LONGBLOB")
 	checkSuccess(cur.getColumnType("testtimestamp"),"TIMESTAMP")
-	print
+	print()
 
-	print "COLUMN LENGTH: "
+	print("COLUMN LENGTH: ")
 	checkSuccess(cur.getColumnLength(0),1)
 	checkSuccess(cur.getColumnLength(1),2)
 	checkSuccess(cur.getColumnLength(2),3)
@@ -265,9 +265,9 @@ def main():
 	checkSuccess(cur.getColumnLength("testmediumtext"),16777215)
 	checkSuccess(cur.getColumnLength("testlongtext"),2147483647)
 	checkSuccess(cur.getColumnLength("testtimestamp"),4)
-	print
+	print()
 
-	print "LONGEST COLUMN: "
+	print("LONGEST COLUMN: ")
 	checkSuccess(cur.getLongest(0),1)
 	checkSuccess(cur.getLongest(1),1)
 	checkSuccess(cur.getLongest(2),1)
@@ -306,25 +306,25 @@ def main():
 	checkSuccess(cur.getLongest("testmediumtext"),11)
 	checkSuccess(cur.getLongest("testlongtext"),9)
 	checkSuccess(cur.getLongest("testtimestamp"),19)
-	print
+	print()
 
-	print "ROW COUNT: "
+	print("ROW COUNT: ")
 	checkSuccess(cur.rowCount(),8)
-	print
+	print()
 
-	print "TOTAL ROWS: "
+	print("TOTAL ROWS: ")
 	checkSuccess(cur.totalRows(),8)
-	print
+	print()
 
-	print "FIRST ROW INDEX: "
+	print("FIRST ROW INDEX: ")
 	checkSuccess(cur.firstRowIndex(),0)
-	print
+	print()
 
-	print "END OF RESULT SET: "
+	print("END OF RESULT SET: ")
 	checkSuccess(cur.endOfResultSet(),1)
-	print
+	print()
 
-	print "FIELDS BY INDEX: "
+	print("FIELDS BY INDEX: ")
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),1)
 	checkSuccess(cur.getField(0,2),1)
@@ -343,7 +343,7 @@ def main():
 	checkSuccess(cur.getField(0,15),"tinytext1")
 	checkSuccess(cur.getField(0,16),"mediumtext1")
 	checkSuccess(cur.getField(0,17),"longtext1")
-	print
+	print()
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(7,1),8)
 	checkSuccess(cur.getField(7,2),8)
@@ -362,9 +362,9 @@ def main():
 	checkSuccess(cur.getField(7,15),"tinytext8")
 	checkSuccess(cur.getField(7,16),"mediumtext8")
 	checkSuccess(cur.getField(7,17),"longtext8")
-	print
+	print()
 
-	print "FIELD LENGTHS BY INDEX: "
+	print("FIELD LENGTHS BY INDEX: ")
 	checkSuccess(cur.getFieldLength(0,0),1)
 	checkSuccess(cur.getFieldLength(0,1),1)
 	checkSuccess(cur.getFieldLength(0,2),1)
@@ -383,7 +383,7 @@ def main():
 	checkSuccess(cur.getFieldLength(0,15),9)
 	checkSuccess(cur.getFieldLength(0,16),11)
 	checkSuccess(cur.getFieldLength(0,17),9)
-	print
+	print()
 	checkSuccess(cur.getFieldLength(7,0),1)
 	checkSuccess(cur.getFieldLength(7,1),1)
 	checkSuccess(cur.getFieldLength(7,2),1)
@@ -402,9 +402,9 @@ def main():
 	checkSuccess(cur.getFieldLength(7,15),9)
 	checkSuccess(cur.getFieldLength(7,16),11)
 	checkSuccess(cur.getFieldLength(7,17),9)
-	print
+	print()
 
-	print "FIELDS BY NAME: "
+	print("FIELDS BY NAME: ")
 	checkSuccess(cur.getField(0,"testtinyint"),1)
 	checkSuccess(cur.getField(0,"testsmallint"),1)
 	checkSuccess(cur.getField(0,"testmediumint"),1)
@@ -423,7 +423,7 @@ def main():
 	checkSuccess(cur.getField(0,"testtinytext"),"tinytext1")
 	checkSuccess(cur.getField(0,"testmediumtext"),"mediumtext1")
 	checkSuccess(cur.getField(0,"testlongtext"),"longtext1")
-	print
+	print()
 	checkSuccess(cur.getField(7,"testtinyint"),8)
 	checkSuccess(cur.getField(7,"testsmallint"),8)
 	checkSuccess(cur.getField(7,"testmediumint"),8)
@@ -442,9 +442,9 @@ def main():
 	checkSuccess(cur.getField(7,"testtinytext"),"tinytext8")
 	checkSuccess(cur.getField(7,"testmediumtext"),"mediumtext8")
 	checkSuccess(cur.getField(7,"testlongtext"),"longtext8")
-	print
+	print()
 
-	print "FIELD LENGTHS BY NAME: "
+	print("FIELD LENGTHS BY NAME: ")
 	checkSuccess(cur.getFieldLength(0,"testtinyint"),1)
 	checkSuccess(cur.getFieldLength(0,"testsmallint"),1)
 	checkSuccess(cur.getFieldLength(0,"testmediumint"),1)
@@ -463,7 +463,7 @@ def main():
 	checkSuccess(cur.getFieldLength(0,"testtinytext"),9)
 	checkSuccess(cur.getFieldLength(0,"testmediumtext"),11)
 	checkSuccess(cur.getFieldLength(0,"testlongtext"),9)
-	print
+	print()
 	checkSuccess(cur.getFieldLength(7,"testtinyint"),1)
 	checkSuccess(cur.getFieldLength(7,"testsmallint"),1)
 	checkSuccess(cur.getFieldLength(7,"testmediumint"),1)
@@ -482,9 +482,9 @@ def main():
 	checkSuccess(cur.getFieldLength(7,"testtinytext"),9)
 	checkSuccess(cur.getFieldLength(7,"testmediumtext"),11)
 	checkSuccess(cur.getFieldLength(7,"testlongtext"),9)
-	print
+	print()
 
-	print "FIELDS BY ARRAY: "
+	print("FIELDS BY ARRAY: ")
 	fields=cur.getRow(0)
 	checkSuccess(fields[0],1)
 	checkSuccess(fields[1],1)
@@ -504,9 +504,9 @@ def main():
 	checkSuccess(fields[15],"tinytext1")
 	checkSuccess(fields[16],"mediumtext1")
 	checkSuccess(fields[17],"longtext1")
-	print
+	print()
 
-	print "FIELD LENGTHS BY ARRAY: "
+	print("FIELD LENGTHS BY ARRAY: ")
 	fieldlens=cur.getRowLengths(0)
 	checkSuccess(fieldlens[0],1)
 	checkSuccess(fieldlens[1],1)
@@ -526,9 +526,9 @@ def main():
 	checkSuccess(fieldlens[15],9)
 	checkSuccess(fieldlens[16],11)
 	checkSuccess(fieldlens[17],9)
-	print
+	print()
 
-	print "FIELDS BY DICTIONARY: "
+	print("FIELDS BY DICTIONARY: ")
 	fields=cur.getRowDictionary(0)
 	checkSuccess(fields["testtinyint"],1)
 	checkSuccess(fields["testsmallint"],1)
@@ -548,7 +548,7 @@ def main():
 	checkSuccess(fields["testtinytext"],"tinytext1")
 	checkSuccess(fields["testmediumtext"],"mediumtext1")
 	checkSuccess(fields["testlongtext"],"longtext1")
-	print
+	print()
 	fields=cur.getRowDictionary(7)
 	checkSuccess(fields["testtinyint"],8)
 	checkSuccess(fields["testsmallint"],8)
@@ -568,9 +568,9 @@ def main():
 	checkSuccess(fields["testtinytext"],"tinytext8")
 	checkSuccess(fields["testmediumtext"],"mediumtext8")
 	checkSuccess(fields["testlongtext"],"longtext8")
-	print
+	print()
 
-	print "FIELD LENGTHS BY DICTIONARY: "
+	print("FIELD LENGTHS BY DICTIONARY: ")
 	fieldlengths=cur.getRowLengthsDictionary(0)
 	checkSuccess(fieldlengths["testtinyint"],1)
 	checkSuccess(fieldlengths["testsmallint"],1)
@@ -590,7 +590,7 @@ def main():
 	checkSuccess(fieldlengths["testtinytext"],9)
 	checkSuccess(fieldlengths["testmediumtext"],11)
 	checkSuccess(fieldlengths["testlongtext"],9)
-	print
+	print()
 	fieldlengths=cur.getRowLengthsDictionary(7)
 	checkSuccess(fieldlengths["testtinyint"],1)
 	checkSuccess(fieldlengths["testsmallint"],1)
@@ -610,36 +610,36 @@ def main():
 	checkSuccess(fieldlengths["testtinytext"],9)
 	checkSuccess(fieldlengths["testmediumtext"],11)
 	checkSuccess(fieldlengths["testlongtext"],9)
-	print
+	print()
 	
-	print "INDIVIDUAL SUBSTITUTIONS: "
+	print("INDIVIDUAL SUBSTITUTIONS: ")
 	cur.prepareQuery("select $(var1),'$(var2)',$(var3)")
 	cur.substitution("var1",1)
 	cur.substitution("var2","hello")
 	cur.substitution("var3",10.5556,6,4)
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "FIELDS: "
+	print("FIELDS: ")
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
 	checkSuccess(cur.getField(0,2),Decimal("10.5556"))
-	print
+	print()
 
-	print "ARRAY SUBSTITUTIONS: "
+	print("ARRAY SUBSTITUTIONS: ")
 	cur.prepareQuery("select $(var1),'$(var2)',$(var3)")
 	cur.substitutions(["var1","var2","var3"],
 				[1,"hello",10.5556],[0,0,6],[0,0,4])
 	checkSuccess(cur.executeQuery(),1)
-	print
+	print()
 
-	print "FIELDS: "
+	print("FIELDS: ")
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),"hello")
 	checkSuccess(cur.getField(0,2),Decimal("10.5556"))
-	print
+	print()
 
-	print "NULLS as Nones: "
+	print("NULLS as Nones: ")
 	cur.getNullsAsNone()
 	checkSuccess(cur.sendQuery("select NULL,1,NULL"),1)
 	checkSuccess(cur.getField(0,0),None)
@@ -651,59 +651,59 @@ def main():
 	checkSuccess(cur.getField(0,1),1)
 	checkSuccess(cur.getField(0,2),"")
 	cur.getNullsAsNone()
-	print
+	print()
 
-	print "RESULT SET BUFFER SIZE: "
+	print("RESULT SET BUFFER SIZE: ")
 	checkSuccess(cur.getResultSetBufferSize(),0)
 	cur.setResultSetBufferSize(2)
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
 	checkSuccess(cur.getResultSetBufferSize(),2)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),0)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),2)
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),2)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),4)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),8)
 	checkSuccess(cur.endOfResultSet(),1)
 	checkSuccess(cur.rowCount(),8)
-	print
+	print()
 
-	print "DONT GET COLUMN INFO: "
+	print("DONT GET COLUMN INFO: ")
 	cur.dontGetColumnInfo()
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
 	checkSuccess(cur.getColumnName(0),None)
 	checkSuccess(cur.getColumnLength(0),0)
 	checkSuccess(cur.getColumnType(0),None)
-	print
+	print()
 	cur.getColumnInfo()
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
 	checkSuccess(cur.getColumnName(0),"testtinyint")
 	checkSuccess(cur.getColumnLength(0),1)
 	checkSuccess(cur.getColumnType(0),"TINYINT")
-	print
+	print()
 
-	print "SUSPENDED SESSION: "
+	print("SUSPENDED SESSION: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
-	print
+	print()
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
@@ -712,14 +712,14 @@ def main():
 	checkSuccess(cur.getField(5,0),6)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
-	print
+	print()
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
@@ -728,14 +728,14 @@ def main():
 	checkSuccess(cur.getField(5,0),6)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
 	cur.suspendResultSet()
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
-	print
+	print()
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(1,0),2)
 	checkSuccess(cur.getField(2,0),3)
@@ -744,9 +744,9 @@ def main():
 	checkSuccess(cur.getField(5,0),6)
 	checkSuccess(cur.getField(6,0),7)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 
-	print "SUSPENDED RESULT SET: "
+	print("SUSPENDED RESULT SET: ")
 	cur.setResultSetBufferSize(2)
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
 	checkSuccess(cur.getField(2,0),3)
@@ -757,24 +757,24 @@ def main():
 	socket=con.getConnectionSocket()
 	checkSuccess(con.resumeSession(port,socket),1)
 	checkSuccess(cur.resumeResultSet(id),1)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),8)
 	checkSuccess(cur.endOfResultSet(),1)
 	checkSuccess(cur.rowCount(),8)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "CACHED RESULT SET: "
+	print("CACHED RESULT SET: ")
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
@@ -783,13 +783,13 @@ def main():
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet(filename),1)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 
-	print "COLUMN COUNT FOR CACHED RESULT SET: "
+	print("COLUMN COUNT FOR CACHED RESULT SET: ")
 	checkSuccess(cur.colCount(),19)
-	print
+	print()
 
-	print "COLUMN NAMES FOR CACHED RESULT SET: "
+	print("COLUMN NAMES FOR CACHED RESULT SET: ")
 	checkSuccess(cur.getColumnName(0),"testtinyint")
 	checkSuccess(cur.getColumnName(1),"testsmallint")
 	checkSuccess(cur.getColumnName(2),"testmediumint")
@@ -827,9 +827,9 @@ def main():
 	checkSuccess(cols[15],"testtinytext")
 	checkSuccess(cols[16],"testmediumtext")
 	checkSuccess(cols[17],"testlongtext")
-	print
+	print()
 
-	print "CACHED RESULT SET WITH RESULT SET BUFFER SIZE: "
+	print("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: ")
 	cur.setResultSetBufferSize(2)
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
@@ -841,18 +841,18 @@ def main():
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "FROM ONE CACHE FILE TO ANOTHER: "
+	print("FROM ONE CACHE FILE TO ANOTHER: ")
 	cur.cacheToFile("cachefile2")
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
 	cur.cacheOff()
 	checkSuccess(cur.openCachedResultSet("cachefile2"),1)
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 
-	print "FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: "
+	print("FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: ")
 	cur.setResultSetBufferSize(2)
 	cur.cacheToFile("cachefile2")
 	checkSuccess(cur.openCachedResultSet("cachefile1"),1)
@@ -861,9 +861,9 @@ def main():
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: "
+	print("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: ")
 	cur.setResultSetBufferSize(2)
 	cur.cacheToFile("cachefile1")
 	cur.setCacheTtl(200)
@@ -876,32 +876,32 @@ def main():
 	checkSuccess(con.suspendSession(),1)
 	port=con.getConnectionPort()
 	socket=con.getConnectionSocket()
-	print
+	print()
 	checkSuccess(con.resumeSession(port,socket),1)
 	checkSuccess(cur.resumeCachedResultSet(id,filename),1)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),4)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),6)
 	checkSuccess(cur.getField(7,0),8)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),6)
 	checkSuccess(cur.endOfResultSet(),0)
 	checkSuccess(cur.rowCount(),8)
 	checkSuccess(cur.getField(8,0),None)
-	print
+	print()
 	checkSuccess(cur.firstRowIndex(),8)
 	checkSuccess(cur.endOfResultSet(),1)
 	checkSuccess(cur.rowCount(),8)
 	cur.cacheOff()
-	print
+	print()
 	checkSuccess(cur.openCachedResultSet(filename),1)
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(8,0),None)
 	cur.setResultSetBufferSize(0)
-	print
+	print()
 
-	print "COMMIT AND ROLLBACK: "
+	print("COMMIT AND ROLLBACK: ")
 	# Note: Mysql's default isolation level is repeatable-read,
 	# not read-committed like most other db's.  Both sessions must
 	# commit to see the changes that each other has made.
@@ -922,11 +922,11 @@ def main():
 	checkSuccess(secondcur.getField(0,0),9)
 	checkSuccess(con.autoCommitOff(),1)
 	secondcon.commit()
-	print
+	print()
 
-	print "ROW RANGE:"
+	print("ROW RANGE:")
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),1)
-	print
+	print()
 	rows=cur.getRowRange(0,5)
 	checkSuccess(rows[0][0],1)
 	checkSuccess(rows[0][1],1)
@@ -946,7 +946,7 @@ def main():
 	checkSuccess(rows[0][15],"tinytext1")
 	checkSuccess(rows[0][16],"mediumtext1")
 	checkSuccess(rows[0][17],"longtext1")
-	print
+	print()
 	checkSuccess(rows[1][0],2)
 	checkSuccess(rows[1][1],2)
 	checkSuccess(rows[1][2],2)
@@ -965,7 +965,7 @@ def main():
 	checkSuccess(rows[1][15],"tinytext2")
 	checkSuccess(rows[1][16],"mediumtext2")
 	checkSuccess(rows[1][17],"longtext2")
-	print
+	print()
 	checkSuccess(rows[2][0],3)
 	checkSuccess(rows[2][1],3)
 	checkSuccess(rows[2][2],3)
@@ -984,7 +984,7 @@ def main():
 	checkSuccess(rows[2][15],"tinytext3")
 	checkSuccess(rows[2][16],"mediumtext3")
 	checkSuccess(rows[2][17],"longtext3")
-	print
+	print()
 	checkSuccess(rows[3][0],4)
 	checkSuccess(rows[3][1],4)
 	checkSuccess(rows[3][2],4)
@@ -1003,7 +1003,7 @@ def main():
 	checkSuccess(rows[3][15],"tinytext4")
 	checkSuccess(rows[3][16],"mediumtext4")
 	checkSuccess(rows[3][17],"longtext4")
-	print
+	print()
 	checkSuccess(rows[4][0],5)
 	checkSuccess(rows[4][1],5)
 	checkSuccess(rows[4][2],5)
@@ -1022,7 +1022,7 @@ def main():
 	checkSuccess(rows[4][15],"tinytext5")
 	checkSuccess(rows[4][16],"mediumtext5")
 	checkSuccess(rows[4][17],"longtext5")
-	print
+	print()
 	checkSuccess(rows[5][0],6)
 	checkSuccess(rows[5][1],6)
 	checkSuccess(rows[5][2],6)
@@ -1041,9 +1041,9 @@ def main():
 	checkSuccess(rows[5][15],"tinytext6")
 	checkSuccess(rows[5][16],"mediumtext6")
 	checkSuccess(rows[5][17],"longtext6")
-	print
+	print()
 
-	print "FINISHED SUSPENDED SESSION: "
+	print("FINISHED SUSPENDED SESSION: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
 	checkSuccess(cur.getField(4,0),5)
 	checkSuccess(cur.getField(5,0),6)
@@ -1060,28 +1060,28 @@ def main():
 	checkSuccess(cur.getField(5,0),None)
 	checkSuccess(cur.getField(6,0),None)
 	checkSuccess(cur.getField(7,0),None)
-	print
+	print()
 
 	# drop existing table
 	cur.sendQuery("drop table testtable")
 
 	# invalid queries...
-	print "INVALID QUERIES: "
+	print("INVALID QUERIES: ")
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),0)
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),0)
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),0)
 	checkSuccess(cur.sendQuery("select * from testtable order by testtinyint"),0)
-	print
+	print()
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
 	checkSuccess(cur.sendQuery("insert into testtable values (1,2,3,4)"),0)
-	print
+	print()
 	checkSuccess(cur.sendQuery("create table testtable"),0)
 	checkSuccess(cur.sendQuery("create table testtable"),0)
 	checkSuccess(cur.sendQuery("create table testtable"),0)
 	checkSuccess(cur.sendQuery("create table testtable"),0)
-	print
+	print()
 
 if __name__ == "__main__":
 	main()
