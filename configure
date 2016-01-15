@@ -25158,12 +25158,6 @@ $as_echo "$as_me: WARNING: FreeTDS support will not be built." >&2;}
 		fi
 	fi
 
-	FREETDSSYSTEMWARNING="no"
-	if ( test "$FREETDSLIBS" = "-lct" -a -z "$FREETDSINCLUDES" )
-	then
-		FREETDSSYSTEMWARNING="yes"
-	fi
-
 
 if ( test -n "$FREETDSINCLUDES" )
 then
@@ -37572,24 +37566,4 @@ then
 		echo "WARNING!  Support for Python versions prior to 2.1 is"
 		echo "          deprecated and will be removed soon."
 	fi
-fi
-
-if ( test "$FREETDSSYSTEMWARNING" = "yes" -a "$SYBASEBUILD" != "no     " )
-then
-	echo
-	echo "WARNING!  FreeTDS and SAP/Sybase connections will both be built"
-	echo "          but FreeTDS libraries and headers appear to have"
-	echo "          been installed in /usr/include and /usr/lib paths."
-	echo "          This will cause the SAP/Sybase connection to be compiled"
-	echo "          against the FreeTDS headers and linked against a mix"
-	echo "          of FreeTDS and SAP/Sybase libraries.  There is no good"
-	echo "          way to prevent the compiler, linker or system from"
-	echo "          searching those paths at compile, link or run time."
-	echo "          Please re-run configure, with the --disable-sap"
-	echo "          option or, if you want to build both connections,"
-	echo "          please re-install the FreeTDS headers and libraries"
-	echo "          somewhere else.  If you are positive that the headers"
-	echo "          and libraries in /usr/include and /usr/lib are in fact"
-	echo "          from SAP/Sybase, not FreeTDS, please re-run configure with"
-	echo "          the --disable-freetds option."
 fi

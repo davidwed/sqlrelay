@@ -1888,12 +1888,6 @@ then
 		fi
 	fi
 
-	FREETDSSYSTEMWARNING="no"
-	if ( test "$FREETDSLIBS" = "-lct" -a -z "$FREETDSINCLUDES" )
-	then
-		FREETDSSYSTEMWARNING="yes"
-	fi
-
 	FW_INCLUDES(freetds,[$FREETDSINCLUDES])
 	FW_LIBS(freetds,[$FREETDSLIBS])
 		
