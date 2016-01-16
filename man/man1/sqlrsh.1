@@ -13,23 +13,23 @@ It can be used interactively, or non\-interactively to run queries directly from
 .SS "Connection options:"
 .TP
 \fB\-host\fR host
-SQL Relay server host
+server host name or IP address
 .TP
 \fB\-port\fR port
-SQL Relay server port
+server port
 .TP
 \fB\-socket\fR socket
-SQL Relay server local unix socket
+server local unix socket file name
 .TP
 \fB\-user\fR user
-SQL Relay server user name
+user name
 .TP
 \fB\-password\fR password
-SQL Relay server password
+password
 .SS "Alternate connection options:"
 .TP
 \fB\-config\fR config
-SQL Relay config file
+config file
 .TP
 \fB\-id\fR instanceid
 id of an instance in the config file from which
@@ -45,25 +45,28 @@ semicolon\-separated commands/queries to run
 \fB\-quiet\fR
 omit headers and stats in output
 .TP
+\fB\-format\fR plain|csv
+sets output format to plain or csv
+.TP
 \fB\-resultsetbuffersize\fR rows
 fetch result sets using the specified number of
 rows at once
 .SH EXAMPLES
-Interactive session with server at sqlrserver:9000 as usr/pwd.
+Interactive session with server at svr:9000 as usr/pwd.
 .IP
-sqlrsh \-host sqlrserver \-port 9000 \-user usr \-password pwd
+sqlrsh \-host svr \-port 9000 \-user usr \-password pwd
 .PP
-Interactive session with local server on socket /tmp/sqlr.sock as usr/pwd.
+Interactive session with local server on socket /tmp/svr.sock as usr/pwd.
 .IP
-sqlrsh \-socket /tmp/sqlr.sock \-user usr \-password pwd
+sqlrsh \-socket /tmp/svr.sock \-user usr \-password pwd
 .PP
 Interactive session using connection info and credentials from instance myinst, as defined in the default configuration file.
 .IP
 sqlrsh \-id myinst
 .PP
-Interactive session using connection info and credentials from instance myinst, as defined in the config file ./sqlrelay.conf
+Interactive session using connection info and credentials from instance myinst, as defined in the config file ./myconfig.conf
 .IP
-sqlrsh \-config ./sqlrelay.conf \-id myinst
+sqlrsh \-config ./myconfig.conf \-id myinst
 .PP
 Non\-interactive session, running commands from ./script.sql
 .IP

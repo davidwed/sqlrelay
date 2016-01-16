@@ -21,7 +21,8 @@
 	removed freetds warning, modern sybase has different library file names
 	updates to support python3
 	added several --disable options to the configure script for unix/linux
-	removed sqlr-fields (its functionality is provided by sqlrsh)
+	removed sqlr-fields/sqlr-query and updated sqlrsh to provide the same
+		functionality
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
