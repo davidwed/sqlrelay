@@ -555,13 +555,13 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** Python *****************")
 
-if PYTHONVERSION<3 then
+if PYTHONVERSION<30 then
 	IMPORTEXCEPTIONS="import exceptions"
 	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 else
 	IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
-endif
+end if
 
 if PYTHONPREFIX="" then
 	findPrefix "C:\","Python",PYTHONPREFIX,disablepython
