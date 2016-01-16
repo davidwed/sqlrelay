@@ -442,8 +442,6 @@ rm -rf %{buildroot}
 
 %files clients
 %defattr(-, root, root)
-%{_bindir}/sqlr-fields
-%{_bindir}/sqlr-query
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import

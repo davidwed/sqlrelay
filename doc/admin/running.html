@@ -50,9 +50,7 @@ sqlr-stop [-id ID]
 <p>Several command line utilities are provided for use with SQL Relay.  The syntax for each is as follows:</p>
 
 <blockquote>
-sqlrsh -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD [-script SCRIPT | -command COMMAND]<br>
-sqlr-query -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -query QUERY<br>
-sqlr-fields -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -table TABLE<br>
+sqlrsh -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD [-script SCRIPT | -command COMMAND] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]<br>
 sqlr-export -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
 sqlr-import -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -file exportfile.xml<br>
 </blockquote>
@@ -60,9 +58,7 @@ sqlr-import -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -
 <p>or, if there's a configuration file that the client can read:</p>
 
 <blockquote>
-sqlrsh -id ID [-config CONFIGFILE] [-script SCRIPT | -command COMMAND]<br>
-sqlr-query -id ID [-config CONFIGFILE] -query QUERY<br>
-sqlr-fields -id ID [-config CONFIGFILE] -table TABLE<br>
+sqlrsh -id ID [-config CONFIGFILE] [-script SCRIPT | -command COMMAND] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]<br>
 sqlr-export -id ID [-config CONFIGFILE] (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
 sqlr-import -id ID [-config CONFIGFILE] -file exportfile.xml<br>
 </blockquote>
@@ -75,17 +71,13 @@ sqlr-import -id ID [-config CONFIGFILE] -file exportfile.xml<br>
 
 <p><b>sqlrsh</b> is an interactive query tool similar to sqlplus, mysql, psql, isql and the like.  Run it and type help; at the prompt for detailed usage instructions.  When sqlrsh starts up, it reads and executes two rc files, the system rc file (most likely /usr/local/firstworks/etc/sqlrshrc) and a personal rc file .sqlrshrc in your home directory.  These files should contain sqlrsh commands, ending in semicolons, seperated by carraige returns.  Any sqlrsh commands may be used in the rc files, even queries.  If a SCRIPT is supplied with the -script option, then the script is run and sqlrsh exits.  The script can contain any sqlrsh commands, incluing queries.  If a COMMAND is supplied with the -command option, then the command is run and sqlrsh exits.  The command can be single sqlrsh command (or query) or a list of semicolon-delimited commands (or queries).</p>
 
-<p>The <b>sqlr-query</b> command executes the query specified in the QUERY parameter and returns the result set as a quoted CSV to standard output.</p>
-
-<p>The <b>sqlr-fields</b> command returns a comma seperated list of the fields in the table specified by the TABLE argument to standard output.</p>
-
 <p>The <b>sqlr-export</b> command exports the specified table or sequence to a file from which <b>sqlr-import</b> can later re-import it.</p>
 
 <p>The <b>sqlr-import</b> command reads the specified file and imports the data contained in the file into the table or sequence specified in the file.  Note, that <b>sqlr-import</b> does not create tables or sequences, it just imports data into an already-existing table or sequence.<p>
 
 <p><b>sqlr-export</b> and <b>sqlr-import</b> may be used to export data from one database and import it into another database, even if the databases are dissimilar (eg. one is PostgreSQL and the other is MySQL), if the structures of the tables in both databases are compatible.</p>
 
-<p>On Windows, if you built SQL Relay natively using Visual Studio, then the command-line clients can be run from the Windows Command Line or DOS Prompt.  Adding C:\Program Files\Firstworks\bin to the PATH environment variable makes this easier, though is is not essential.  You could just change directories to C:\Program Files\Firstworks\bin and run the programs from there.</p>
+<p>On Windows the command-line clients can be run from the Windows Command Line.  Adding C:\Program Files\Firstworks\bin to the PATH environment variable makes this easier, though is is not essential.  You could just change directories to C:\Program Files\Firstworks\bin and run the programs from there.</p>
 
 
 <a name="status"></a>
