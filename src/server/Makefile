@@ -100,10 +100,10 @@ $(SQLR)-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(SERVERLIBS)
 
 $(SQLR)-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) $(PWDENCLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) $(SERVERLIBS)
 
 $(SQLR)-status$(EXE): sqlr-status.cpp sqlr-status.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-status.$(OBJ) $(CMDLINELIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-status.$(OBJ) $(SERVERLIBS)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@

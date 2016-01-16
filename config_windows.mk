@@ -332,7 +332,6 @@ UTILLIBS = $(RUDIMENTSLIBS) advapi32.lib
 # cmdline
 CMDLINECPPFLAGS = $(BASECPPFLAGS) /D SYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 CMDLINELIBS = /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
-PWDENCLIBS = /LIBPATH:$(top_builddir)/src/server libsqlrserver.lib /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
 
 
 # server
@@ -435,8 +434,8 @@ PYTHONSUFFIX = pyd
 
 
 # build directories
-INSTALLSUBDIRS = install-src install-bin install-etc install-doc install-license
-UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-doc uninstall-license
+INSTALLSUBDIRS = install-src install-etc install-doc install-license
+UNINSTALLSUBDIRS = uninstall-src uninstall-etc uninstall-doc uninstall-license
 
 SRCALLSUBDIRS = all-util all-api all-server all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
 

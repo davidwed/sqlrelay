@@ -505,13 +505,6 @@ UTILLIBS = $(RUDIMENTSLIBS)
 ENABLE_CMDLINE = @ENABLE_CMDLINE@
 CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
 CMDLINELIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
-PWDENCLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
-ifneq ($(strip $(libdir)),)
-ifeq ($(CLIENTUSERPATH),yes)
-CMDLINELIBS += -R $(libdir)
-PWDENCLIBS += -R $(libdir)
-endif
-endif
 
 
 # util
@@ -806,6 +799,16 @@ endif
 ifneq ($(strip $(ENABLE_ROUTER)),)
 CONNECTIONSALLTARGETS += all-router
 CONNECTIONSINSTALLTARGETS += installsharedlib-router
+endif
+
+
+# config scripts
+INSTALLCONFIG =
+ifneq ($(ENABLE_CPP),)
+INSTALLCONFIG += install-clientconfig
+endif
+ifneq ($(ENABLE_SERVER),)
+INSTALLCONFIG += install-serverconfig
 endif
 
 
