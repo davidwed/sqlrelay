@@ -848,6 +848,7 @@ OVERRIDEPERLMAN3EXT
 OVERRIDEPERLINSTALLMAN3DIR
 OVERRIDEPERLSITELIB
 OVERRIDEPERLSITEARCH
+ENABLE_ROUTER
 MDBTOOLSUSERPATH
 INFORMIXUSERPATH
 FIREBIRDUSERPATH
@@ -948,6 +949,7 @@ enable_informix_rpath
 with_mdbtools_prefix
 enable_mdbtools
 enable_mdbtools_rpath
+enable_router
 with_perl_prefix
 with_pod2man
 enable_perl
@@ -1654,6 +1656,7 @@ Optional Features:
   --disable-informix-rpath      Don't use -rpath when building Informix connection module
   --disable-mdbtools            Don't build MDB Tools connection module
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module
+  --disable-router              Don't build router connection module
   --disable-perl                Don't build Perl api
   --disable-python              Don't build Python api
   --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library
@@ -2989,6 +2992,14 @@ if test "${enable_mdbtools_rpath+set}" = set; then :
   enableval=$enable_mdbtools_rpath; MDBTOOLSUSERPATH="yes"
 else
   MDBTOOLSUSERPATH=""
+fi
+
+
+# Check whether --enable-router was given.
+if test "${enable_router+set}" = set; then :
+  enableval=$enable_router; ENABLE_ROUTER=""
+else
+  ENABLE_ROUTER="yes"
 fi
 
 
@@ -37706,6 +37717,7 @@ DB2BUILD="no     "
 FIREBIRDBUILD="no     "
 MDBTOOLSBUILD="no     "
 INFORMIXBUILD="no     "
+ROUTERBUILD="no     "
 if ( test -n "$ORACLEVERSION" ); then
 	ORACLE8BUILD="dynamic"
 	if ( test -n "$ORACLESTATIC" ); then
@@ -37772,12 +37784,15 @@ if ( test -n "$INFORMIXLIBS" ); then
 		INFORMIXBUILD="static "
 	fi
 fi
+if ( test -n "$ENABLE_ROUTER" ); then
+	ROUTERBUILD="yes   "
+fi
 echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD       SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
 echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD"
+echo "                Informix    $INFORMIXBUILD       Router     $ROUTERBUILD"
 
 echo "*************************************************************"
 echo

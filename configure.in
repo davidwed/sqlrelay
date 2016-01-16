@@ -198,6 +198,11 @@ AC_ARG_ENABLE(mdbtools-rpath,
 	MDBTOOLSUSERPATH="yes",
 	MDBTOOLSUSERPATH="")
 AC_SUBST(MDBTOOLSUSERPATH)
+AC_ARG_ENABLE(router,
+	[  --disable-router              Don't build router connection module],
+	ENABLE_ROUTER="",
+	ENABLE_ROUTER="yes")
+AC_SUBST(ENABLE_ROUTER)
 AC_ARG_WITH(perl-prefix,
 	[  --with-perl-prefix            Location of Perl],
 	PERLPATH="$withval",
@@ -969,6 +974,7 @@ DB2BUILD="no     "
 FIREBIRDBUILD="no     "
 MDBTOOLSBUILD="no     "
 INFORMIXBUILD="no     "
+ROUTERBUILD="no     "
 if ( test -n "$ORACLEVERSION" ); then
 	ORACLE8BUILD="dynamic"
 	if ( test -n "$ORACLESTATIC" ); then
@@ -1035,12 +1041,15 @@ if ( test -n "$INFORMIXLIBS" ); then
 		INFORMIXBUILD="static "
 	fi
 fi
+if ( test -n "$ENABLE_ROUTER" ); then
+	ROUTERBUILD="yes   "
+fi
 echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
 echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD       SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
 echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD"
+echo "                Informix    $INFORMIXBUILD       Router     $ROUTERBUILD"
 
 echo "*************************************************************"
 echo

@@ -785,8 +785,10 @@ ifneq ($(strip $(SYBASELIBS)),)
 CONNECTIONSALLTARGETS += all-sap
 CONNECTIONSINSTALLTARGETS += installsharedlib-sap
 endif
+ifneq ($(strip $(ENABLE_ROUTER)),)
 CONNECTIONSALLTARGETS += all-router
 CONNECTIONSINSTALLTARGETS += installsharedlib-router
+endif
 
 
 # tests

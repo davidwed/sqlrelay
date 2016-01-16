@@ -19,6 +19,7 @@ disableodbc=false
 disabledb2=false
 disablefirebird=false
 disableinformix=false
+disablerouter=false
 disableperl=false
 disablepython=false
 disableruby=false
@@ -62,6 +63,7 @@ if WScript.Arguments.Count>0 then
 		WScript.Echo("  --disable-db2          Don't build DB2 connection module")
 		WScript.Echo("  --disable-firebird     Don't build Firebird connection module")
 		WScript.Echo("  --disable-informix     Don't build Informix connection module")
+		WScript.Echo("  --disable-router       Don't build router connection module")
 		WScript.Echo("  --disable-perl         Don't build Perl api")
 		WScript.Echo("  --disable-python       Don't build Python api")
 		WScript.Echo("  --disable-ruby         Don't build Ruby api")
@@ -133,6 +135,8 @@ for i=0 to WScript.Arguments.Count-1
 		disableinformix=true
 	elseif mid(arg,1,23)="--with-informix-prefix=" then
 		INFORMIXPREFIX=mid(arg,24)
+	elseif arg="--disable-router" then
+		disablerouter=true
 	elseif arg="--disable-perl" then
 		disableperl=true
 	elseif mid(arg,1,19)="--with-perl-prefix=" then
@@ -306,7 +310,7 @@ end if
 
 
 ' determine config.h template...
-configwindowsh="config.windows.h"
+configwindowsh="config_windows.h"
 
 
 
@@ -502,6 +506,15 @@ configureDatabase "Informix","informix",disableinformix,_
 			ALLINFORMIX,INSTALLINFORMIX
 
 WScript.Echo("******************************")
+
+
+' router
+ALLROUTER=""
+INSTALLROUTER=""
+if disablerouter=false then
+	ALLROUTER="all-router"
+	INSTALLROUTER="installdll-router"
+end if
 
 
 ' api's...
@@ -732,7 +745,7 @@ WScript.Echo("******************************")
 
 ' input and output files
 infiles=Array(_
-	"config.windows.mk",_
+	"config_windows.mk",_
 	configwindowsh,_
 	"bin\\sqlrclient-config.in",_
 	"bin\\sqlrclientwrapper-config.in",_
@@ -877,6 +890,8 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@INFORMIXLIBS@",INFORMIXLIBS,1,-1,0)
 	content=replace(content,"@ALLINFORMIX@",ALLINFORMIX,1,-1,0)
 	content=replace(content,"@INSTALLINFORMIX@",INSTALLINFORMIX,1,-1,0)
+	content=replace(content,"@ALLROUTER@",ALLROUTER,1,-1,0)
+	content=replace(content,"@INSTALLROUTER@",INSTALLROUTER,1,-1,0)
 
 	' enabled apis
 	content=replace(content,"@APIALLSUBDIRS@",APIALLSUBDIRS,1,-1,0)
@@ -958,6 +973,7 @@ DB2BUILD="no     "
 FIREBIRDBUILD="no     "
 MDBTOOLSBUILD="no     "
 INFORMIXBUILD="no     "
+ROUTERBUILD="no     "
 if disableoracle=false then
 	ORACLE8BUILD="yes    "
 end if
@@ -982,10 +998,14 @@ end if
 if disableinformix=false then
 	INFORMIXBUILD="yes    "
 end if
+if disablerouter=false then
+	ROUTERBUILD="yes    "
+end if
 WScript.Echo(" Databases    : Oracle8     " & ORACLE8BUILD & "       MySQL      " & MYSQLBUILD)
 WScript.Echo("                PostgreSQL  " & POSTGRESQLBUILD & "       SAP/Sybase " & SYBASEBUILD)
 WScript.Echo("                ODBC        " & ODBCBUILD & "       DB2        " & DB2BUILD)
 WScript.Echo("                Firebird    " & FIREBIRDBUILD & "       Informix   " & INFORMIXBUILD)
+WScript.Echo("                Router      " & ROUTERBUILD
 
 WScript.Echo("*************************************************************")
 WScript.Echo("")
