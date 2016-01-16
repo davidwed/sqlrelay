@@ -1005,7 +1005,7 @@ WScript.Echo(" Databases    : Oracle8     " & ORACLE8BUILD & "       MySQL      
 WScript.Echo("                PostgreSQL  " & POSTGRESQLBUILD & "       SAP/Sybase " & SYBASEBUILD)
 WScript.Echo("                ODBC        " & ODBCBUILD & "       DB2        " & DB2BUILD)
 WScript.Echo("                Firebird    " & FIREBIRDBUILD & "       Informix   " & INFORMIXBUILD)
-WScript.Echo("                Router      " & ROUTERBUILD
+WScript.Echo("                Router      " & ROUTERBUILD)
 
 WScript.Echo("*************************************************************")
 WScript.Echo("")
