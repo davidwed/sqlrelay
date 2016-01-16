@@ -32,38 +32,46 @@ SQL Relay server password
 SQL Relay config file
 .TP
 \fB\-id\fR instanceid
-id of instance in the config file
+id of an instance in the config file from which
+to derive connection info and credentials
 .SS "Command options:"
 .TP
-\fB\-script\fR scriptfilename
+\fB\-script\fR filename
 name of file containing commands/queries to run
 .TP
 \fB\-command\fR "commands"
 semicolon\-separated commands/queries to run
+.TP
+\fB\-quiet\fR
+omit headers and stats in output
+.TP
+\fB\-resultsetbuffersize\fR rows
+fetch result sets using the specified number of
+rows at once
 .SH EXAMPLES
-Connect to an SQL Relay sever at sqlrserver:9000 using credentials usr/pwd for an interactive session.
+Interactive session with server at sqlrserver:9000 as usr/pwd.
 .IP
 sqlrsh \-host sqlrserver \-port 9000 \-user usr \-password pwd
 .PP
-Connect to an SQL Relay server on the local unix socket /tmp/sqlr.sock using credentials usr/pwd for an interactive session.
+Interactive session with local server on socket /tmp/sqlr.sock as usr/pwd.
 .IP
 sqlrsh \-socket /tmp/sqlr.sock \-user usr \-password pwd
 .PP
-Get connection info and credentials from instance myinst in the default configuration file and use them to connect to SQL Relay for an interactive session.
+Interactive session using connection info and credentials from instance myinst, as defined in the default configuration file.
 .IP
 sqlrsh \-id myinst
 .PP
-Get connection info and credentials from instance myinst in the config file ./sqlrelay.conf and use them to connect to SQL Relay for an interactive session.
+Interactive session using connection info and credentials from instance myinst, as defined in the config file ./sqlrelay.conf
 .IP
 sqlrsh \-config ./sqlrelay.conf \-id myinst
 .PP
-Get connection info and credentials from instance myinst in the default configuration file, use them to connect to SQL Relay, and run commands in the file ./script.sql
+Non\-interactive session, running commands from ./script.sql
 .IP
 sqlrsh \-id myinst \-script ./script.sql
 .PP
-Get connection info and credentials from instance myinst in the default configuration file, use them to connect to SQL Relay, and run the query "select 1 from dual".
+Non\-interactive session, running query "select 1 from dual".
 .IP
-sqlrsh \-id myinst \-command "select 1 from dual"
+sqlrsh \-id myinst \-command "select 1 from dual" \-quiet
 .SH AUTHOR
 Written by David Muse.
 .SH "REPORTING BUGS"

@@ -67,6 +67,11 @@ class sqlrshbindvalue {
 		uint32_t	outputstringbindlength;
 };
 
+enum sqlrshformat {
+	SQLRSH_FORMAT_PLAIN=0,
+	SQLRSH_FORMAT_CSV
+};
+
 class sqlrshenv {
 	public:
 			sqlrshenv();
@@ -84,6 +89,7 @@ class sqlrshenv {
 		memorypool	*inbindpool;
 		dictionary<char *, sqlrshbindvalue *>	outputbinds;
 		char		*cacheto;
+		sqlrshformat	format;
 };
 
 sqlrshenv::sqlrshenv() {
@@ -95,6 +101,7 @@ sqlrshenv::sqlrshenv() {
 	delimiter=';';
 	inbindpool=new memorypool(512,128,100);
 	cacheto=NULL;
+	format=SQLRSH_FORMAT_PLAIN;
 }
 
 sqlrshenv::~sqlrshenv() {
@@ -449,6 +456,7 @@ int sqlrsh::commandType(const char *command) {
 	// compare to known internal commands
 	if (!charstring::compareIgnoringCase(ptr,"headers",7) ||
 		!charstring::compareIgnoringCase(ptr,"stats",5) ||
+		!charstring::compareIgnoringCase(ptr,"format",6) ||
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
 		!charstring::compareIgnoringCase(ptr,"nullsasnulls",12) ||
 		!charstring::compareIgnoringCase(ptr,"autocommit",10) ||
@@ -520,6 +528,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"stats",5)) {	
 		ptr=ptr+5;
 		cmdtype=3;
+	} else if (!charstring::compareIgnoringCase(ptr,"format",6)) {	
+		ptr=ptr+6;
+		cmdtype=10;
 	} else if (!charstring::compareIgnoringCase(ptr,"debug",5)) {	
 		ptr=ptr+5;
 		cmdtype=4;
@@ -690,6 +701,16 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			sqlrcur->getNullsAsNulls();
 		} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
 			sqlrcur->getNullsAsEmptyStrings();
+		}
+		return;
+	}
+
+	// handle format
+	if (cmdtype==10) {
+		if (!charstring::compareIgnoringCase(ptr,"csv",3)) {
+			env->format=SQLRSH_FORMAT_CSV;
+		} else {
+			env->format=SQLRSH_FORMAT_PLAIN;
 		}
 		return;
 	}
@@ -1045,27 +1066,41 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	// iterate through columns
 	for (uint32_t ci=0; ci<sqlrcur->colCount(); ci++) {
 
-		// write the column name
-		name=sqlrcur->getColumnName(ci);
-		stdoutput.printf("%s",name);
-
-		// which is longer, field name or longest field
-		namelen=charstring::length(name);
-		longest=sqlrcur->getLongest(ci);
-		if (namelen>longest) {
-			longest=namelen;
-		}
-		charcount=charcount+longest;
-
-		// pad after the name with spaces
-		for (uint32_t j=namelen; j<longest; j++) {
-			stdoutput.printf(" ");
-		}
-
-		// put an extra space between names
-		if (ci<colcount-1) {
-			stdoutput.printf(" ");
+		// put a comma or extra space between field names
+		if (ci) {
+			if (env->format==SQLRSH_FORMAT_CSV) {
+				stdoutput.write(',');
+			} else {
+				stdoutput.write(' ');
+			}
 			charcount=charcount+1;
+		}
+
+		// write the column name
+		if (env->format==SQLRSH_FORMAT_CSV) {
+			stdoutput.write('\"');
+		}
+		name=sqlrcur->getColumnName(ci);
+		stdoutput.write(name);
+		if (env->format==SQLRSH_FORMAT_CSV) {
+			stdoutput.write('\"');
+		}
+		namelen=charstring::length(name);
+
+		// space-pad after the name, if necessary
+		if (env->format==SQLRSH_FORMAT_PLAIN) {
+			longest=sqlrcur->getLongest(ci);
+			if (namelen>longest) {
+				longest=namelen;
+			}
+			charcount=charcount+longest;
+
+			// pad after the name with spaces
+			for (uint32_t j=namelen; j<longest; j++) {
+				stdoutput.write(' ');
+			}
+		} else {
+			charcount=charcount+namelen+2;
 		}
 	}
 	stdoutput.printf("\n");
@@ -1093,6 +1128,15 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	while (!(sqlrcur->endOfResultSet() && i==sqlrcur->rowCount())) {
 		for (uint32_t j=0; j<colcount; j++) {
 
+			// put a comma or extra space between fields
+			if (j) {
+				if (env->format==SQLRSH_FORMAT_CSV) {
+					stdoutput.write(',');
+				} else {
+					stdoutput.write(' ');
+				}
+			}
+
 			// get the field
 			field=sqlrcur->getField(i,j);
 			fieldlength=sqlrcur->getFieldLength(i,j);
@@ -1102,26 +1146,27 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			}
 
 			// write the field
+			if (env->format==SQLRSH_FORMAT_CSV) {
+				stdoutput.write('\"');
+			}
 			stdoutput.write(field);
+			if (env->format==SQLRSH_FORMAT_CSV) {
+				stdoutput.write('\"');
+			}
 
-			// which is longer, field name or longest field
-			longest=sqlrcur->getLongest(j);
-			if (env->headers) {
-				namelen=charstring::length(
-					sqlrcur->getColumnName(j));
-				if (namelen>longest) {
-					longest=namelen;
+			// space-pad after the field, if necessary
+			if (env->format==SQLRSH_FORMAT_PLAIN) {
+				longest=sqlrcur->getLongest(j);
+				if (env->headers) {
+					namelen=charstring::length(
+						sqlrcur->getColumnName(j));
+					if (namelen>longest) {
+						longest=namelen;
+					}
 				}
-			}
-
-			// pad after the name with spaces
-			for (uint32_t k=fieldlength; k<longest; k++) {
-				stdoutput.write(' ');
-			}
-
-			// put an extra space between names
-			if (j<colcount-1) {
-				stdoutput.write(' ');
+				for (uint32_t k=fieldlength; k<longest; k++) {
+					stdoutput.write(' ');
+				}
 			}
 		}
 		stdoutput.write('\n');
@@ -1701,19 +1746,21 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("shows the current database/schema\n");
 	stdoutput.printf("	run script		- ");
 	stdoutput.printf("runs commands contained in file \"script\"\n");
-	stdoutput.printf("	headers on/off		- ");
+	stdoutput.printf("	headers on|off		- ");
 	stdoutput.printf("toggles column descriptions before result set\n");
-	stdoutput.printf("	stats on/off		- ");
+	stdoutput.printf("	stats on|off		- ");
 	stdoutput.printf("toggles statistics after result set\n");
-	stdoutput.printf("	debug on/off		- ");
+	stdoutput.printf("	format plain|csv	- ");
+	stdoutput.printf("sets output format to \"plain\" or \"csv\"\n");
+	stdoutput.printf("	debug on|off		- ");
 	stdoutput.printf("toggles debug messages\n");
-	stdoutput.printf("	nullsasnulls on/off	- ");
+	stdoutput.printf("	nullsasnulls on|off	- ");
 	stdoutput.printf("toggles getting nulls as nulls\n"
 			"					"
 			"(rather than as empty strings)\n");
-	stdoutput.printf("	autocommit on/off	- ");
+	stdoutput.printf("	autocommit on|off	- ");
 	stdoutput.printf("toggles autocommit\n");
-	stdoutput.printf("	final on/off		- ");
+	stdoutput.printf("	final on|off		- ");
 	stdoutput.printf("toggles use of one session per query\n");
 	stdoutput.printf("	delimiter [character]	- ");
 	stdoutput.printf("sets delimiter character to [character]\n\n");
@@ -1867,8 +1914,10 @@ void sqlrsh::execute(int argc, const char **argv) {
 		charstring::length(host) ||
 		charstring::length(socket))) {
 
-		stdoutput.printf("usage: %ssh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
-			"  or   %ssh [-config config] -id id [-script script | -command command]\n",SQLR,SQLR);
+		stdoutput.printf("usage:\n"
+			" %ssh -host host -port port -socket socket -user user -password password [-script script | -command command] [-quiet] [-resultsetbuffersize rows] [-format plain|csv]\n"
+			"  or\n"
+			" %ssh [-config config] -id id [-script script | -command command] [-quiet] [-resultsetbuffersize rows] [-format plain|csv]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 
@@ -1894,6 +1943,23 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	// set up an sqlrshenv
 	sqlrshenv	env;
+
+	// handle quiet flag
+	if (cmdline->found("-quiet")) {
+		env.headers=false;
+		env.stats=false;
+	}
+
+	// handle the result set buffer size
+	if (cmdline->found("-resultsetbuffersize")) {
+		env.rsbs=charstring::toInteger(
+				cmdline->getValue("-resultsetbuffersize"));
+	}
+
+	// handle the result set format
+	if (!charstring::compare(cmdline->getValue("-format"),"csv")) {
+		env.format=SQLRSH_FORMAT_CSV;
+	}
 
 	// process RC files
 	systemRcFile(&sqlrcon,&sqlrcur,&env);
@@ -1961,39 +2027,43 @@ void help(int argc, const char **argv) {
 		"\n"
 		"Options:\n"
 		"\n"
-		CONNECTION_OPTIONS
+		CONNECTIONOPTIONS
 		"\n"
 		"Command options:\n"
-		"	-script scriptfilename	name of file containing commands/queries to run\n"
+		"	-script filename	name of file containing commands/queries to run\n"
 		"	-command \"commands\"	semicolon-separated commands/queries to run\n"
+		"	-quiet			omit headers and stats in output\n"
+		"	-resultsetbuffersize rows\n"
+		"				fetch result sets using the specified number of\n"
+		"				rows at once\n"
 		"\n"
 		"Examples:\n"
 		"\n"
-		"Connect to an SQL Relay sever at sqlrserver:9000 using credentials usr/pwd for an interactive session.\n"
+		"Interactive session with server at svr:9000 as usr/pwd.\n"
 		"\n"
-		"	sqlrsh -host sqlrserver -port 9000 -user usr -password pwd\n"
+		"	%ssh -host svr -port 9000 -user usr -password pwd\n"
 		"\n"
-		"Connect to an SQL Relay server on the local unix socket /tmp/sqlr.sock using credentials usr/pwd for an interactive session.\n"
+		"Interactive session with local server on socket /tmp/svr.sock as usr/pwd.\n"
 		"\n"
-		"	sqlrsh -socket /tmp/sqlr.sock -user usr -password pwd\n"
+		"	%ssh -socket /tmp/svr.sock -user usr -password pwd\n"
 		"\n"
-		"Get connection info and credentials from instance myinst in the default configuration file and use them to connect to SQL Relay for an interactive session.\n"
-		"	sqlrsh -id myinst\n"
+		"Interactive session using connection info and credentials from instance myinst, as defined in the default configuration file.\n"
+		"	%ssh -id myinst\n"
 		"\n"
-		"Get connection info and credentials from instance myinst in the config file ./sqlrelay.conf and use them to connect to SQL Relay for an interactive session.\n"
+		"Interactive session using connection info and credentials from instance myinst, as defined in the config file ./myconfig.conf\n"
 		"\n"
-		"	sqlrsh -config ./sqlrelay.conf -id myinst\n"
+		"	%ssh -config ./myconfig.conf -id myinst\n"
 		"\n"
-		"Get connection info and credentials from instance myinst in the default configuration file, use them to connect to SQL Relay, and run commands in the file ./script.sql\n"
+		"Non-interactive session, running commands from ./script.sql\n"
 		"\n"
-		"	sqlrsh -id myinst -script ./script.sql\n"
+		"	%ssh -id myinst -script ./script.sql\n"
 		"\n"
-		"Get connection info and credentials from instance myinst in the default configuration file, use them to connect to SQL Relay, and run the query \"select 1 from dual\".\n"
+		"Non-interactive session, running query \"select 1 from dual\".\n"
 		"\n"
-		"	sqlrsh -id myinst -command \"select 1 from dual\"\n"
+		"	%ssh -id myinst -command \"select 1 from dual\" -quiet\n"
 		"\n"
-		BUGS,
-		SQLR,SQLR);
+		REPORTBUGS,
+		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
 			
 	process::exit(0);
 }
