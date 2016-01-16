@@ -1751,7 +1751,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("	stats on|off		- ");
 	stdoutput.printf("toggles statistics after result set\n");
 	stdoutput.printf("	format plain|csv	- ");
-	stdoutput.printf("sets output format to \"plain\" or \"csv\"\n");
+	stdoutput.printf("sets output format to plain or csv\n");
 	stdoutput.printf("	debug on|off		- ");
 	stdoutput.printf("toggles debug messages\n");
 	stdoutput.printf("	nullsasnulls on|off	- ");
@@ -1915,9 +1915,9 @@ void sqlrsh::execute(int argc, const char **argv) {
 		charstring::length(socket))) {
 
 		stdoutput.printf("usage:\n"
-			" %ssh -host host -port port -socket socket -user user -password password [-script script | -command command] [-quiet] [-resultsetbuffersize rows] [-format plain|csv]\n"
+			" %ssh -host host -port port -socket socket -user user -password password [-script script | -command command] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]\n"
 			"  or\n"
-			" %ssh [-config config] -id id [-script script | -command command] [-quiet] [-resultsetbuffersize rows] [-format plain|csv]\n",SQLR,SQLR);
+			" %ssh [-config config] -id id [-script script | -command command] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 
@@ -1950,15 +1950,15 @@ void sqlrsh::execute(int argc, const char **argv) {
 		env.stats=false;
 	}
 
+	// handle the result set format
+	if (!charstring::compare(cmdline->getValue("-format"),"csv")) {
+		env.format=SQLRSH_FORMAT_CSV;
+	}
+
 	// handle the result set buffer size
 	if (cmdline->found("-resultsetbuffersize")) {
 		env.rsbs=charstring::toInteger(
 				cmdline->getValue("-resultsetbuffersize"));
-	}
-
-	// handle the result set format
-	if (!charstring::compare(cmdline->getValue("-format"),"csv")) {
-		env.format=SQLRSH_FORMAT_CSV;
 	}
 
 	// process RC files
@@ -2033,6 +2033,7 @@ void help(int argc, const char **argv) {
 		"	-script filename	name of file containing commands/queries to run\n"
 		"	-command \"commands\"	semicolon-separated commands/queries to run\n"
 		"	-quiet			omit headers and stats in output\n"
+		"	-format plain|csv	sets output format to plain or csv\n"
 		"	-resultsetbuffersize rows\n"
 		"				fetch result sets using the specified number of\n"
 		"				rows at once\n"
