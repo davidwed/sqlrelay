@@ -1943,9 +1943,66 @@ void sqlrsh::execute(int argc, const char **argv) {
 	#endif
 }
 
+void help(int argc, const char **argv) {
+
+	#include <help.h>
+
+	if (argc!=2 || (charstring::compare(argv[1],"-help") &&
+			charstring::compare(argv[1],"--help"))) {
+		return;
+	}
+
+	stdoutput.printf(
+		"%ssh is the SQL Relay command line client.\n"
+		"\n"
+		"It can be used interactively, or non-interactively to run queries directly from the command line, or scripts containing queries.\n"
+		"\n"
+		"Usage: %ssh [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		"\n"
+		CONNECTION_OPTIONS
+		"\n"
+		"Command options:\n"
+		"	-script scriptfilename	name of file containing commands/queries to run\n"
+		"	-command \"commands\"	semicolon-separated commands/queries to run\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"Connect to an SQL Relay sever at sqlrserver:9000 using credentials usr/pwd for an interactive session.\n"
+		"\n"
+		"	sqlrsh -host sqlrserver -port 9000 -user usr -password pwd\n"
+		"\n"
+		"Connect to an SQL Relay server on the local unix socket /tmp/sqlr.sock using credentials usr/pwd for an interactive session.\n"
+		"\n"
+		"	sqlrsh -socket /tmp/sqlr.sock -user usr -password pwd\n"
+		"\n"
+		"Get connection info and credentials from instance myinst in the default configuration file and use them to connect to SQL Relay for an interactive session.\n"
+		"	sqlrsh -id myinst\n"
+		"\n"
+		"Get connection info and credentials from instance myinst in the config file ./sqlrelay.conf and use them to connect to SQL Relay for an interactive session.\n"
+		"\n"
+		"	sqlrsh -config ./sqlrelay.conf -id myinst\n"
+		"\n"
+		"Get connection info and credentials from instance myinst in the default configuration file, use them to connect to SQL Relay, and run commands in the file ./script.sql\n"
+		"\n"
+		"	sqlrsh -id myinst -script ./script.sql\n"
+		"\n"
+		"Get connection info and credentials from instance myinst in the default configuration file, use them to connect to SQL Relay, and run the query \"select 1 from dual\".\n"
+		"\n"
+		"	sqlrsh -id myinst -command \"select 1 from dual\"\n"
+		"\n"
+		BUGS,
+		SQLR,SQLR);
+			
+	process::exit(0);
+}
+
 int main(int argc, const char **argv) {
 
 	#include <version.h>
+
+	help(argc,argv);
 
 	#ifdef SIGPIPE
 	// ignore SIGPIPE

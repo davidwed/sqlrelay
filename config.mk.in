@@ -903,6 +903,10 @@ STRESSCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 STRESSLIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 
+# docs
+ENABLE_DOC = @ENABLE_DOC@
+
+
 # microsoft-specific
 EXE = @EXE@
 
@@ -915,8 +919,14 @@ MODULERENAME = $(top_builddir)/modulerename.sh
 
 
 # build directories
-INSTALLSUBDIRS = install-src install-bin install-etc install-init install-man install-doc install-license install-pkgconfig
-UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-man uninstall-doc uninstall-license uninstall-pkgconfig
+INSTALLSUBDIRS = install-src install-bin install-etc install-init install-license
+ifeq ($(ENABLE_CPP),yes)
+INSTALLSUBDIRS += install-pkgconfig
+endif
+ifeq ($(ENABLE_DOC),yes)
+INSTALLSUBDIRS += install-man install-doc
+endif
+UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-license uninstall-pkgconfig uninstall-man uninstall-doc
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 SRCALLSUBDIRS = all-api

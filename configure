@@ -830,6 +830,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+ENABLE_DOC
 ENABLE_UTIL
 ENABLE_SERVER
 ENABLE_CMDLINE
@@ -1005,6 +1006,7 @@ with_system_libtool
 enable_dmalloc
 enable_efence
 with_sqlr
+enable_doc
 enable_shared
 enable_static
 with_pic
@@ -1695,6 +1697,7 @@ Optional Features:
   --enable-psql-rpath           Use -rpath when linking the postgresql drop-in replacement library against the SQL Relay client library
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
+  --disable-doc                 Don't install docs or man pages
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3377,6 +3380,13 @@ else
   SQLR="sqlr"
 fi
 
+# Check whether --enable-doc was given.
+if test "${enable_doc+set}" = set; then :
+  enableval=$enable_doc; ENABLE_DOC=""
+else
+  ENABLE_DOC="yes"
+fi
+
 
 
 if ( test -z "$ENABLE_ODBC" )
@@ -3450,6 +3460,7 @@ if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
 then
 	ENABLE_UTIL=""
 fi
+
 
 
 

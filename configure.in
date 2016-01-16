@@ -385,6 +385,10 @@ AC_ARG_WITH(sqlr,
 	[  --with-sqlr                   prefix to use when naming binaries],
 	SQLR="$withval",
 	SQLR="sqlr")
+AC_ARG_ENABLE(doc,
+	[  --disable-doc                 Don't install docs or man pages],
+	ENABLE_DOC="",
+	ENABLE_DOC="yes")
 
 
 dnl tweak enabled/disabled things
@@ -498,6 +502,7 @@ AC_SUBST(ENABLE_ODBC_DRIVER)
 AC_SUBST(ENABLE_CMDLINE)
 AC_SUBST(ENABLE_SERVER)
 AC_SUBST(ENABLE_UTIL)
+AC_SUBST(ENABLE_DOC)
 
 
 dnl Rewrite supplied paths.

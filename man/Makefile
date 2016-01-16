@@ -38,3 +38,6 @@ uninstall:
 		$(mandir)/man8/sqlr-scaler.8 \
 		$(mandir)/man8/sqlr-start.8 \
 		$(mandir)/man8/sqlr-stop.8
+
+man:
+	help2man --source="SQL Relay" --no-info sqlrsh > man1/sqlrsh.1

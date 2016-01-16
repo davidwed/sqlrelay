@@ -20,6 +20,7 @@
 		improperly
 	removed freetds warning, modern sybase has different library file names
 	updates to support python3
+	added several --disable options to the configure script for unix/linux
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
