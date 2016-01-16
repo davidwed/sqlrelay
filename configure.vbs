@@ -555,6 +555,9 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** Python *****************")
 
+IMPORTEXCEPTIONS="import exceptions"
+EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+
 if PYTHONPREFIX="" then
 	findPrefix "C:\","Python",PYTHONPREFIX,disablepython
 end if
@@ -799,6 +802,8 @@ for i=lbound(infiles) to ubound(infiles)
 	' python
 	content=replace(content,"@PYTHONPREFIX@",PYTHONPREFIX,1,-1,0)
 	content=replace(content,"@PYTHONVERSION@",PYTHONVERSION,1,-1,0)
+	content=replace(content,"@IMPORTEXCEPTIONS@",IMPORTEXCEPTIONS,1,-1,0)
+	content=replace(content,"@EXCEPTIONSSTANDARDERROR@",EXCEPTIONSSTANDARDERROR,1,-1,0)
 
 	' ruby
 	content=replace(content,"@RUBYPREFIX@",RUBYPREFIX,1,-1,0)
