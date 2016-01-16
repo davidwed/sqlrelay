@@ -10,14 +10,19 @@ include ../../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(PYTHONCPPFLAGS) $(COMPILE) $<
 
-all: CSQLRelay.$(LIBEXT)
+all: CSQLRelay.$(LIBEXT) PySQLRDB.py
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest PySQLRDB.py temp.py.in
 	$(RMTREE) .libs
 
 CSQLRelay.$(LIBEXT): CSQLRelay.cpp CSQLRelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ CSQLRelay.$(OBJ) $(LDFLAGS) $(PYTHONLIBS) $(MODLINKFLAGS)
+
+PySQLRDB.py: PySQLRDB.py.in
+	$(REPLACE) @IMPORTEXCEPTIONS@ "$(IMPORTEXCEPTIONS)" PySQLRDB.py.in >> temp.py.in
+	$(REPLACE) @EXCEPTIONSSTANDARDERROR@ "$(EXCEPTIONSSTANDARDERROR)" temp.py.in >> PySQLRDB.py
+	$(RM) temp.py.in
 
 install: $(INSTALLLIB)
 	$(CP) PySQLRClient.py $(DESTDIR)$(PYTHONDIR)/site-packages/SQLRelay

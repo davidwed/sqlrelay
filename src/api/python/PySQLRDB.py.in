@@ -5,7 +5,7 @@
 
 import sys
 from time import localtime, time, mktime
-import exceptions
+@IMPORTEXCEPTIONS@
 import weakref
 from SQLRelay import CSQLRelay
 
@@ -14,10 +14,10 @@ threadsafety=1
 paramstyle='named'
 
 
-class Error(exceptions.StandardError):
+class Error(@EXCEPTIONSSTANDARDERROR@):
     pass
 
-class Warning(exceptions.StandardError):
+class Warning(@EXCEPTIONSSTANDARDERROR@):
     pass
 
 class InterfaceError(Error):
@@ -117,7 +117,7 @@ class SQLRCursor:
         CSQLRelay.executeQuery(self.cursor)
         the_error=CSQLRelay.cursorErrorMessage(self.cursor)
         if the_error:
-            raise DatabaseError, '<pre>%s</pre>' % the_error
+            raise(DatabaseError,'<pre>%s</pre>' % the_error)
         self.__set_description()
         self.rowcount=CSQLRelay.totalRows(self.cursor)
         if CSQLRelay.affectedRows(self.cursor)>0:
@@ -143,7 +143,7 @@ class SQLRCursor:
                         CSQLRelay.executeQuery(self.cursor)
                         the_error=CSQLRelay.cursorErrorMessage(self.cursor)
                         if the_error:
-                                raise DatabaseError, '<pre>%s</pre>' % the_error
+                                raise(DatabaseError,'<pre>%s</pre>' % the_error)
                         self.__set_description()
                         self.rowcount=CSQLRelay.totalRows(self.cursor)
                         if CSQLRelay.affectedRows(self.cursor)>0:
