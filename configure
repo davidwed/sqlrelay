@@ -637,7 +637,6 @@ abs_srcdir
 STATICLINK
 SONAME_VERSION_INFO
 SQLR_VERSION
-RPM_BUILD_DIR
 TOP_BUILDDIR_ABS
 NODEMODULEDIR
 NODEGYP
@@ -782,7 +781,6 @@ UWIN
 CYGWIN
 MINGW32
 UNAME
-enable_shared
 LIBTOOLGCC
 CXXCPP
 OTOOL64
@@ -832,10 +830,17 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+ENABLE_UTIL
+ENABLE_SERVER
+ENABLE_CMDLINE
+ENABLE_ODBC_DRIVER
+ENABLE_CPP
 SQLR
 LIBEFENCE
 LIBDMALLOC
 PSQLUSERPATH
+ENABLE_POSTGRESQL_DROP_IN
+ENABLE_MYSQL_DROP_IN
 CUSERPATH
 ERLANGUSERPATH
 TCLUSERPATH
@@ -863,6 +868,7 @@ ORACLEUSERPATH
 SERVERUSERPATH
 CLIENTUSERPATH
 initscript_prefix
+enable_shared
 target_alias
 host_alias
 build_alias
@@ -907,6 +913,9 @@ enable_option_checking
 enable_small_code
 enable_debug
 enable_profiling
+enable_server
+enable_client
+enable_cmdline
 with_initscript_prefix
 enable_client_rpath
 enable_server_rpath
@@ -950,6 +959,7 @@ with_mdbtools_prefix
 enable_mdbtools
 enable_mdbtools_rpath
 enable_router
+enable_odbc_driver
 with_perl_prefix
 with_pod2man
 enable_perl
@@ -987,6 +997,8 @@ enable_mono
 with_nodejs_prefix
 enable_nodejs
 enable_c_rpath
+enable_mysql_drop_in
+enable_postgresql_drop_in
 enable_psql_rpath
 with_pthread_prefix
 with_system_libtool
@@ -1631,6 +1643,9 @@ Optional Features:
   --enable-small-code           optimize for small code size
   --enable-debug                compile with -g option
   --enable-profiling            compile with -pg options
+  --disable-server              Don't build any SQL Relay server components
+  --disable-client              Don't build any SQL Relay client components
+  --disable-cmdline             Don't build any SQL Relay command line client programs
   --enable-client-rpath         Use -rpath when linking SQL Relay client programs against SQL Relay libraries
   --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries
   --disable-oracle              Don't build Oracle connection module
@@ -1657,6 +1672,7 @@ Optional Features:
   --disable-mdbtools            Don't build MDB Tools connection module
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module
   --disable-router              Don't build router connection module
+  --disable-odbc-driver         Don't build ODBC driver
   --disable-perl                Don't build Perl api
   --disable-python              Don't build Python api
   --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library
@@ -1674,7 +1690,9 @@ Optional Features:
   --disable-mono                Don't build Mono/C# api
   --disable-nodejs              Don't build node.js api
   --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library
-  --enable-psql-rpath           Use -rpath when linking the psql replacement library against the SQL Relay client library
+  --disable-mysql-drop-in       Don't build mysql drop-in-replacement library
+  --disable-postgresql-drop-in  Don't build postgresql drop-in-replacement library
+  --enable-psql-rpath           Use -rpath when linking the postgresql drop-in replacement library against the SQL Relay client library
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -2674,6 +2692,27 @@ fi
 CFLAGS="$SMALLCODE $CFLAGS"
 CXXFLAGS="$SMALLCODE $CXXFLAGS"
 
+# Check whether --enable-server was given.
+if test "${enable_server+set}" = set; then :
+  enableval=$enable_server; ENABLE_SERVER=""
+else
+  ENABLE_SERVER="yes"
+fi
+
+# Check whether --enable-client was given.
+if test "${enable_client+set}" = set; then :
+  enableval=$enable_client; ENABLE_CLIENT=""
+else
+  ENABLE_CLIENT="yes"
+fi
+
+# Check whether --enable-cmdline was given.
+if test "${enable_cmdline+set}" = set; then :
+  enableval=$enable_cmdline; ENABLE_CMDLINE=""
+else
+  ENABLE_CMDLINE="yes"
+fi
+
 
 # Check whether --with-initscript-prefix was given.
 if test "${with_initscript_prefix+set}" = set; then :
@@ -2682,7 +2721,6 @@ else
   initscript_prefix=""
 fi
 
-
 # Check whether --enable-client-rpath was given.
 if test "${enable_client_rpath+set}" = set; then :
   enableval=$enable_client_rpath; CLIENTUSERPATH="yes"
@@ -2690,14 +2728,12 @@ else
   CLIENTUSERPATH=""
 fi
 
-
 # Check whether --enable-server-rpath was given.
 if test "${enable_server_rpath+set}" = set; then :
   enableval=$enable_server_rpath; SERVERUSERPATH="yes"
 else
   SERVERUSERPATH=""
 fi
-
 
 
 # Check whether --with-rudiments-prefix was given.
@@ -2750,7 +2786,6 @@ else
 fi
 
 
-
 # Check whether --with-mysql-prefix was given.
 if test "${with_mysql_prefix+set}" = set; then :
   withval=$with_mysql_prefix; MYSQLPATH="$withval"
@@ -2773,7 +2808,6 @@ else
 fi
 
 
-
 # Check whether --with-postgresql-prefix was given.
 if test "${with_postgresql_prefix+set}" = set; then :
   withval=$with_postgresql_prefix; POSTGRESQLPATH="$withval"
@@ -2794,7 +2828,6 @@ if test "${enable_postgresql_rpath+set}" = set; then :
 else
   POSTGRESQLUSERPATH=""
 fi
-
 
 # Check whether --enable-postgresql8-api was given.
 if test "${enable_postgresql8_api+set}" = set; then :
@@ -2826,7 +2859,6 @@ else
 fi
 
 
-
 # Check whether --with-freetds-prefix was given.
 if test "${with_freetds_prefix+set}" = set; then :
   withval=$with_freetds_prefix; FREETDSPATH="$withval"
@@ -2847,7 +2879,6 @@ if test "${enable_freetds_rpath+set}" = set; then :
 else
   FREETDSUSERPATH="yes"
 fi
-
 
 
 # Check whether --with-sap-prefix was given.
@@ -2872,7 +2903,6 @@ else
 fi
 
 
-
 # Check whether --with-odbc-prefix was given.
 if test "${with_odbc_prefix+set}" = set; then :
   withval=$with_odbc_prefix; ODBCPATH="$withval"
@@ -2893,7 +2923,6 @@ if test "${enable_odbc_rpath+set}" = set; then :
 else
   ODBCUSERPATH=""
 fi
-
 
 
 # Check whether --with-db2-prefix was given.
@@ -2926,7 +2955,6 @@ else
 fi
 
 
-
 # Check whether --with-firebird-prefix was given.
 if test "${with_firebird_prefix+set}" = set; then :
   withval=$with_firebird_prefix; FIREBIRDPATH="$withval"
@@ -2947,7 +2975,6 @@ if test "${enable_firebird_rpath+set}" = set; then :
 else
   FIREBIRDUSERPATH=""
 fi
-
 
 
 # Check whether --with-informix-prefix was given.
@@ -2972,7 +2999,6 @@ else
 fi
 
 
-
 # Check whether --with-mdbtools-prefix was given.
 if test "${with_mdbtools_prefix+set}" = set; then :
   withval=$with_mdbtools_prefix; MDBTOOLSPATH="$withval"
@@ -2994,7 +3020,6 @@ else
   MDBTOOLSUSERPATH=""
 fi
 
-
 # Check whether --enable-router was given.
 if test "${enable_router+set}" = set; then :
   enableval=$enable_router; ENABLE_ROUTER=""
@@ -3002,6 +3027,12 @@ else
   ENABLE_ROUTER="yes"
 fi
 
+# Check whether --enable-odbc-driver was given.
+if test "${enable_odbc_driver+set}" = set; then :
+  enableval=$enable_odbc_driver; ENABLE_ODBC_DRIVER=""
+else
+  ENABLE_ODBC_DRIVER="yes"
+fi
 
 
 # Check whether --with-perl-prefix was given.
@@ -3035,14 +3066,12 @@ else
 fi
 
 
-
 # Check whether --with-perl-site-lib was given.
 if test "${with_perl_site_lib+set}" = set; then :
   withval=$with_perl_site_lib; OVERRIDEPERLSITELIB="$withval"
 else
   OVERRIDEPERLSITELIB=""
 fi
-
 
 
 # Check whether --with-perl-install-man3-dir was given.
@@ -3053,14 +3082,12 @@ else
 fi
 
 
-
 # Check whether --with-perl-man3-ext was given.
 if test "${with_perl_man3_ext+set}" = set; then :
   withval=$with_perl_man3_ext; OVERRIDEPERLMAN3EXT="$withval"
 else
   OVERRIDEPERLMAN3EXT=""
 fi
-
 
 
 # Check whether --with-python-prefix was given.
@@ -3083,7 +3110,6 @@ if test "${enable_python_rpath+set}" = set; then :
 else
   PYTHONUSERPATH=""
 fi
-
 
 
 # Check whether --with-python-dir was given.
@@ -3114,7 +3140,6 @@ if test "${enable_python3_rpath+set}" = set; then :
 else
   PYTHON3USERPATH=""
 fi
-
 
 
 # Check whether --with-python3-dir was given.
@@ -3148,7 +3173,6 @@ else
 fi
 
 
-
 # Check whether --with-java-prefix was given.
 if test "${with_java_prefix+set}" = set; then :
   withval=$with_java_prefix; JAVAPATH="$withval"
@@ -3171,7 +3195,6 @@ else
 fi
 
 
-
 # Check whether --with-php-prefix was given.
 if test "${with_php_prefix+set}" = set; then :
   withval=$with_php_prefix; PHPPATH="$withval"
@@ -3192,7 +3215,6 @@ if test "${enable_php_rpath+set}" = set; then :
 else
   PHPUSERPATH=""
 fi
-
 
 
 # Check whether --with-php-ext-dir was given.
@@ -3233,7 +3255,6 @@ else
 fi
 
 
-
 # Check whether --with-erlang-prefix was given.
 if test "${with_erlang_prefix+set}" = set; then :
   withval=$with_erlang_prefix; ERLANGPATH="$withval"
@@ -3254,7 +3275,6 @@ if test "${enable_erlang_rpath+set}" = set; then :
 else
   ERLANGUSERPATH=""
 fi
-
 
 
 # Check whether --with-mono-prefix was given.
@@ -3293,6 +3313,19 @@ else
   CUSERPATH=""
 fi
 
+# Check whether --enable-mysql-drop-in was given.
+if test "${enable_mysql_drop_in+set}" = set; then :
+  enableval=$enable_mysql_drop_in; ENABLE_MYSQL_DROP_IN=""
+else
+  ENABLE_MYSQL_DROP_IN="yes"
+fi
+
+# Check whether --enable-postgresql-drop-in was given.
+if test "${enable_postgresql_drop_in+set}" = set; then :
+  enableval=$enable_postgresql_drop_in; ENABLE_POSTGRESQL_DROP_IN=""
+else
+  ENABLE_POSTGRESQL_DROP_IN="yes"
+fi
 
 # Check whether --enable-psql-rpath was given.
 if test "${enable_psql_rpath+set}" = set; then :
@@ -3300,7 +3333,6 @@ if test "${enable_psql_rpath+set}" = set; then :
 else
   PSQLUSERPATH=""
 fi
-
 
 
 # Check whether --with-pthread-prefix was given.
@@ -3330,7 +3362,6 @@ cat >>confdefs.h <<_ACEOF
 #define DMALLOC 1
 _ACEOF
 
-
 # Check whether --enable-efence was given.
 if test "${enable_efence+set}" = set; then :
   enableval=$enable_efence; LIBEFENCE="-lefence"
@@ -3339,13 +3370,125 @@ else
 fi
 
 
-
 # Check whether --with-sqlr was given.
 if test "${with_sqlr+set}" = set; then :
   withval=$with_sqlr; SQLR="$withval"
 else
   SQLR="sqlr"
 fi
+
+
+
+if ( test -z "$ENABLE_ODBC" )
+then
+	ENABLE_ODBC_DRIVER=""
+fi
+
+if ( test -z "$ENABLE_SERVER" )
+then
+	ENABLE_ORACLE=""
+	ENABLE_MYSQL=""
+	ENABLE_POSTGRESQL=""
+	ENABLE_SQLITE=""
+	ENABLE_FREETDS=""
+	ENABLE_SYBASE=""
+	ENABLE_ODBC=""
+	ENABLE_DB2=""
+	ENABLE_FIREBIRD=""
+	ENABLE_INFORMIX=""
+	ENABLE_MDBTOOLS=""
+	ENABLE_ROUTER=""
+fi
+
+ENABLE_CPP="yes"
+ENABLE_ODBC_DRIVER="yes"
+if ( test -z "$ENABLE_CLIENT" )
+then
+	ENABLE_CMDLINE=""
+	ENABLE_CPP=""
+	ENABLE_ODBC_DRIVER=""
+	ENABLE_PERL=""
+	ENABLE_PYTHON=""
+	ENABLE_PYTHON3=""
+	ENABLE_RUBY=""
+	ENABLE_JAVA=""
+	ENABLE_PHP=""
+	ENABLE_TCL=""
+	ENABLE_ERLANG=""
+	ENABLE_MONO=""
+	ENABLE_NODEJS=""
+	ENABLE_MYSQL_DROP_IN=""
+	ENABLE_POSTGRESQL_DROP_IN=""
+	ENABLE_ROUTER=""
+fi
+
+if ( test "$enable_shared" = "no" )
+then
+	ENABLE_ODBC_DRIVER=""
+	ENABLE_PERL=""
+	ENABLE_PYTHON=""
+	ENABLE_PYTHON3=""
+	ENABLE_RUBY=""
+	ENABLE_JAVA=""
+	ENABLE_PHP=""
+	ENABLE_TCL=""
+	ENABLE_ERLANG=""
+	ENABLE_MONO=""
+	ENABLE_NODEJS=""
+	ENABLE_MYSQL_DROP_IN=""
+	ENABLE_POSTGRESQL_DROP_IN=""
+	else
+
+cat >>confdefs.h <<_ACEOF
+#define SQLRELAY_ENABLE_SHARED 1
+_ACEOF
+
+fi
+
+ENABLE_UTIL="yes"
+if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
+then
+	ENABLE_UTIL=""
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -15834,16 +15977,6 @@ fi
 
 
 
-
-if ( test "$enable_shared" = "yes" )
-then
-
-cat >>confdefs.h <<_ACEOF
-#define SQLRELAY_ENABLE_SHARED 1
-_ACEOF
-
-fi
-
 echo "******************************"
 
 
@@ -16534,40 +16667,6 @@ fi
 echo "******************************"
 
 
-
-echo
-echo "***** Inline Functions *******"
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking inline" >&5
-$as_echo_n "checking inline... " >&6; }
-INLINE="inline"
-if ( test "$CXX" = "icc" -o "$CXX" = "CC" )
-then
-	INLINE=""
-else
-		CXX_VERSION=`$CXX --version`
-	if ( test "$CXX_VERSION" = "2.96" )
-	then
-		INLINE=""
-	fi
-fi
-if ( test "$INLINE" = "inline" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-cat >>confdefs.h <<_ACEOF
-#define INLINE $INLINE
-_ACEOF
-
-
-echo "******************************"
-
-
 echo
 echo "***** threads ****************"
 
@@ -17085,7 +17184,9 @@ echo "******************************"
 echo
 echo "***** Libraries **************"
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for termcap" >&5
+if ( test -n "$ENABLE_CMDLINE" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for termcap" >&5
 $as_echo_n "checking for termcap... " >&6; }
 
 
@@ -17412,18 +17513,18 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-if ( test -n "$TERMCAPLIBS" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$TERMCAPLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-fi
+	fi
 
-if ( test -z "$TERMCAPLIBS" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for curses" >&5
+		if ( test -z "$TERMCAPLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for curses" >&5
 $as_echo_n "checking for curses... " >&6; }
 
 
@@ -17750,17 +17851,17 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-	if ( test -n "$CURSESLIBS" )
-	then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+		if ( test -n "$CURSESLIBS" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+		fi
 	fi
-fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for history" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for history" >&5
 $as_echo_n "checking for history... " >&6; }
 
 
@@ -18087,16 +18188,16 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-if ( test -n "$HISTORYLIBS" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$HISTORYLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-fi
+	fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for readline" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for readline" >&5
 $as_echo_n "checking for readline... " >&6; }
 
 
@@ -18423,18 +18524,18 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-if ( test -n "$READLINELIBS" )
-then
-	READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $CURSESINCLUDES $TERMCAPINCLUDES"
-	READLINELIBS="$READLINELIBS $HISTORYLIBS $CURSESLIBS $TERMCAPLIBS"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$READLINELIBS" )
+	then
+		READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $CURSESINCLUDES $TERMCAPINCLUDES"
+		READLINELIBS="$READLINELIBS $HISTORYLIBS $CURSESLIBS $TERMCAPLIBS"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-fi
+	fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether termcap/curses/history/readline work" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether termcap/curses/history/readline work" >&5
 $as_echo_n "checking whether termcap/curses/history/readline work... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -18447,7 +18548,7 @@ export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdlib.h>
-extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }
+	extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }
 int
 main ()
 {
@@ -18473,13 +18574,14 @@ export LD_LIBRARY_PATH
 
 
 
-if ( test -n "$READLINELIBS" )
-then
+	if ( test -n "$READLINELIBS" )
+	then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_READLINE 1
 _ACEOF
 
+	fi
 fi
 
 
@@ -32983,6 +33085,33 @@ $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
 
+	if ( test -z "$HAVE_PERL" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sys/vnode.h" >&5
+$as_echo_n "checking for sys/vnode.h... " >&6; }
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/vnode.h>
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+$as_echo "#define SQLRELAY_HAVE_SYS_VNODE_H 1" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+	fi
+
 
 
 
@@ -34173,6 +34302,9 @@ $as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 fi
 
 
+if ( test "$ENABLE_PHP" = "yes" )
+then
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PHP PDO" >&5
 $as_echo_n "checking for PHP PDO... " >&6; }
 	HAVE_PHP_PDO=""
@@ -34271,8 +34403,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 CPPFLAGS="$SAVECPPFLAGS"
 
 	fi
+fi
 
 echo "******************************"
+
 
 
 echo
@@ -34653,6 +34787,7 @@ fi
 echo "******************************"
 
 
+
 echo
 echo "***** Mono *******************"
 
@@ -34894,6 +35029,7 @@ fi
 echo "******************************"
 
 
+
 echo
 echo "***** node.js ****************"
 
@@ -35006,79 +35142,6 @@ $as_echo "$as_me: WARNING: The node.js API will not be built." >&2;}
 fi
 
 echo "******************************"
-
-
-
-echo
-echo "***** Headers ****************"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sys/vnode.h" >&5
-$as_echo_n "checking for sys/vnode.h... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/vnode.h>
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-$as_echo "#define SQLRELAY_HAVE_SYS_VNODE_H 1" >>confdefs.h
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-echo "******************************"
-
-
-
-echo
-echo "***** Structures *************"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking return type of signal handlers" >&5
-$as_echo_n "checking return type of signal handlers... " >&6; }
-if ${ac_cv_type_signal+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/types.h>
-#include <signal.h>
-
-int
-main ()
-{
-return *(signal (0, 0)) (0) == 1;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_type_signal=int
-else
-  ac_cv_type_signal=void
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_signal" >&5
-$as_echo "$ac_cv_type_signal" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define RETSIGTYPE $ac_cv_type_signal
-_ACEOF
-
-
-echo "******************************"
-
-
-
-RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
-
 
 
 
@@ -37645,15 +37708,21 @@ echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
 
+CMDLINEBUILD="no "
 READLINEBUILD="no "
+if ( test -n "$ENABLE_CMDLINE" ); then
+	CMDLINEBUILD="yes"
+fi
 if ( test -n "$READLINELIBS" ); then
 	READLINEBUILD="yes"
 fi
 
 echo
-echo " Command Line : Readline    $READLINEBUILD"
+echo " Command Line : Clients     $CMDLINEBUILD"
+echo "                Readline    $READLINEBUILD"
 echo
 
+CPPBUILD="no "
 PERLBUILD="no "
 PYTHONBUILD="no "
 RUBYBUILD="no "
@@ -37664,7 +37733,10 @@ TCLBUILD="no "
 ERLANGBUILD="no "
 MONOBUILD="no "
 NODEJSBUILD="no "
-ODBCBUILD="no "
+ODBCDRIVERBUILD="no "
+if ( test -n "$ENABLE_CPP" ); then
+	CPPBUILD="yes"
+fi
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
 fi
@@ -37695,16 +37767,30 @@ fi
 if ( test -n "$HAVE_NODEJS" ); then
 	NODEJSBUILD="yes"
 fi
-if ( test -n "$ODBCLIBS" ); then
-	ODBCBUILD="yes"
+if ( test -n "$ENABLE_ODBC_DRIVER" ); then
+	ODBCDRIVERBUILD="yes"
 fi
-echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
+echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
-echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCBUILD"
+echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERBUILD"
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
 echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
-echo ""
+echo
+
+
+MYSQLDIBUILD="no    "
+POSTGRESQLDIBUILD="no    "
+if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
+	MYSQLDIBUILD="yes   "
+fi
+if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
+	POSTGRESQLDIBUILD="yes   "
+fi
+echo " Drop-In Replacement Libraries:"
+echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
+echo
+
 
 ORACLE8BUILD="no     "
 MYSQLBUILD="no     "
@@ -37811,4 +37897,5 @@ then
 	echo "Python 2, however Python 3 will become the default soon."
 	echo
 	echo "To force a build for Python 3, use the  --disable-python2  option."
+	echo
 fi

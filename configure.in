@@ -18,21 +18,30 @@ AC_ARG_ENABLE(profiling,
 CFLAGS="$SMALLCODE $CFLAGS"
 CXXFLAGS="$SMALLCODE $CXXFLAGS"
 
+AC_ARG_ENABLE(server,
+	[  --disable-server              Don't build any SQL Relay server components],
+	ENABLE_SERVER="",
+	ENABLE_SERVER="yes")
+AC_ARG_ENABLE(client,
+	[  --disable-client              Don't build any SQL Relay client components],
+	ENABLE_CLIENT="",
+	ENABLE_CLIENT="yes")
+AC_ARG_ENABLE(cmdline,
+	[  --disable-cmdline             Don't build any SQL Relay command line client programs],
+	ENABLE_CMDLINE="",
+	ENABLE_CMDLINE="yes")
 AC_ARG_WITH(initscript-prefix,
 	[  --with-initscript-prefix      prefix to install initscripts under],
 	initscript_prefix="$withval",
 	initscript_prefix="")
-AC_SUBST(initscript_prefix)
 AC_ARG_ENABLE(client-rpath,
 	[  --enable-client-rpath         Use -rpath when linking SQL Relay client programs against SQL Relay libraries],
 	CLIENTUSERPATH="yes",
 	CLIENTUSERPATH="")
-AC_SUBST(CLIENTUSERPATH)
 AC_ARG_ENABLE(server-rpath,
 	[  --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries],
 	SERVERUSERPATH="yes",
 	SERVERUSERPATH="")
-AC_SUBST(SERVERUSERPATH)
 AC_ARG_WITH(rudiments-prefix,
 	[  --with-rudiments-prefix       Location of rudiments],
 	RUDIMENTSPATH="$withval",
@@ -59,7 +68,6 @@ AC_ARG_ENABLE(oracle-rpath,
 	[  --disable-oracle-rpath        Don't use -rpath when building Oracle connection module],
 	ORACLEUSERPATH="",
 	ORACLEUSERPATH="yes")
-AC_SUBST(ORACLEUSERPATH)
 AC_ARG_WITH(mysql-prefix,
 	[  --with-mysql-prefix           Location of MySQL],
 	MYSQLPATH="$withval",
@@ -72,7 +80,6 @@ AC_ARG_ENABLE(mysql-rpath,
 	[  --enable-mysql-rpath          Use -rpath when building MySQL connection module],
 	MYSQLUSERPATH="yes",
 	MYSQLUSERPATH="")
-AC_SUBST(MYSQLUSERPATH)
 AC_ARG_WITH(postgresql-prefix,
 	[  --with-postgresql-prefix      Location of PostgreSQL],
 	POSTGRESQLPATH="$withval",
@@ -85,7 +92,6 @@ AC_ARG_ENABLE(postgresql-rpath,
 	[  --enable-postgresql-rpath     Use -rpath when building PostgreSQL connection module],
 	POSTGRESQLUSERPATH="yes",
 	POSTGRESQLUSERPATH="")
-AC_SUBST(POSTGRESQLUSERPATH)
 AC_ARG_ENABLE(postgresql8-api,
 	[  --disable-postgresql8-api     Use older postgresql api without native bind support],
 	ENABLE_POSTGRESQL8API="",
@@ -102,7 +108,6 @@ AC_ARG_ENABLE(sqlite-rpath,
 	[  --enable-sqlite-rpath         Use -rpath when building SQLite connection module],
 	SQLITEUSERPATH="yes",
 	SQLITEUSERPATH="")
-AC_SUBST(SQLITEUSERPATH)
 AC_ARG_WITH(freetds-prefix,
 	[  --with-freetds-prefix         Location of FreeTDS],
 	FREETDSPATH="$withval",
@@ -115,7 +120,6 @@ AC_ARG_ENABLE(freetds-rpath,
 	[  --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection module],
 	FREETDSUSERPATH="",
 	FREETDSUSERPATH="yes")
-AC_SUBST(FREETDSUSERPATH)
 AC_ARG_WITH(sap-prefix,
 	[  --with-sap-prefix             Location of SAP/Sybase],
 	SYBASEPATH="$withval",
@@ -128,7 +132,6 @@ AC_ARG_ENABLE(sap-rpath,
 	[  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module],
 	SYBASEUSERPATH="",
 	SYBASEUSERPATH="yes")
-AC_SUBST(SYBASEUSERPATH)
 AC_ARG_WITH(odbc-prefix,
 	[  --with-odbc-prefix            Location of ODBC],
 	ODBCPATH="$withval",
@@ -141,7 +144,6 @@ AC_ARG_ENABLE(odbc-rpath,
 	[  --enable-odbc-rpath           Use -rpath when building ODBC connection module],
 	ODBCUSERPATH="yes",
 	ODBCUSERPATH="")
-AC_SUBST(ODBCUSERPATH)
 AC_ARG_WITH(db2-prefix,
 	[  --with-db2-prefix             Location of DB2],
 	DB2PATH="$withval",
@@ -158,7 +160,6 @@ AC_ARG_ENABLE(db2-rpath,
 	[  --disable-db2-rpath           Use -rpath when building DB2 connection module],
 	DB2USERPATH="",
 	DB2USERPATH="yes")
-AC_SUBST(DB2USERPATH)
 AC_ARG_WITH(firebird-prefix,
 	[  --with-firebird-prefix        Location of Firebird],
 	FIREBIRDPATH="$withval",
@@ -171,7 +172,6 @@ AC_ARG_ENABLE(firebird-rpath,
 	[  --enable-firebird-rpath       Use -rpath when building Firebird connection module],
 	FIREBIRDUSERPATH="yes",
 	FIREBIRDUSERPATH="")
-AC_SUBST(FIREBIRDUSERPATH)
 AC_ARG_WITH(informix-prefix,
 	[  --with-informix-prefix        Location of Informix],
 	INFORMIXPATH="$withval",
@@ -184,7 +184,6 @@ AC_ARG_ENABLE(informix-rpath,
 	[  --disable-informix-rpath      Don't use -rpath when building Informix connection module],
 	INFORMIXUSERPATH="",
 	INFORMIXUSERPATH="yes")
-AC_SUBST(INFORMIXUSERPATH)
 AC_ARG_WITH(mdbtools-prefix,
 	[  --with-mdbtools-prefix        Location of MDB Tools],
 	MDBTOOLSPATH="$withval",
@@ -197,12 +196,14 @@ AC_ARG_ENABLE(mdbtools-rpath,
 	[  --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module],
 	MDBTOOLSUSERPATH="yes",
 	MDBTOOLSUSERPATH="")
-AC_SUBST(MDBTOOLSUSERPATH)
 AC_ARG_ENABLE(router,
 	[  --disable-router              Don't build router connection module],
 	ENABLE_ROUTER="",
 	ENABLE_ROUTER="yes")
-AC_SUBST(ENABLE_ROUTER)
+AC_ARG_ENABLE(odbc-driver,
+	[  --disable-odbc-driver         Don't build ODBC driver],
+	ENABLE_ODBC_DRIVER="",
+	ENABLE_ODBC_DRIVER="yes")
 AC_ARG_WITH(perl-prefix,
 	[  --with-perl-prefix            Location of Perl],
 	PERLPATH="$withval",
@@ -219,22 +220,18 @@ AC_ARG_WITH(perl-site-arch,
 	[  --with-perl-site-arch         Override Perl's built-in PERLSITEARCH variable (location to install binary perl modules)],
 	OVERRIDEPERLSITEARCH="$withval",
 	OVERRIDEPERLSITEARCH="")
-	AC_SUBST(OVERRIDEPERLSITEARCH)
 AC_ARG_WITH(perl-site-lib,
 	[  --with-perl-site-lib          Override Perl's built-in PERLSITELIB variable (location to install non-binary perl modules)],
 	OVERRIDEPERLSITELIB="$withval",
 	OVERRIDEPERLSITELIB="")
-	AC_SUBST(OVERRIDEPERLSITELIB)
 AC_ARG_WITH(perl-install-man3-dir,
 	[  --with-perl-install-man3-dir  Override Perl's built-in PERLINSTALLMAN3DIR variable (location to install perl module man pages)],
 	OVERRIDEPERLINSTALLMAN3DIR="$withval",
 	OVERRIDEPERLINSTALLMAN3DIR="")
-	AC_SUBST(OVERRIDEPERLINSTALLMAN3DIR)
 AC_ARG_WITH(perl-man3-ext,
 	[  --with-perl-man3-ext          Override Perl's built-in PERLMAN3EXT variable (extension to put on perl module man pages)],
 	OVERRIDEPERLMAN3EXT="$withval",
 	OVERRIDEPERLMAN3EXT="")
-	AC_SUBST(OVERRIDEPERLMAN3EXT)
 AC_ARG_WITH(python-prefix,
 	[  --with-python-prefix          Location of Python],
 	PYTHONPATH="$withval",
@@ -247,7 +244,6 @@ AC_ARG_ENABLE(python-rpath,
 	[  --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library],
 	PYTHONUSERPATH="yes",
 	PYTHONUSERPATH="")
-AC_SUBST(PYTHONUSERPATH)
 AC_ARG_WITH(python-dir,
 	[  --with-python-dir             Path to install Python api],
 	PYTHONDIR="$withval",
@@ -264,7 +260,6 @@ AC_ARG_ENABLE(python3-rpath,
 	[  --enable-python3-rpath        Use -rpath when linking the Python3 library against the SQL Relay client library],
 	PYTHON3USERPATH="yes",
 	PYTHON3USERPATH="")
-AC_SUBST(PYTHON3USERPATH)
 AC_ARG_WITH(python3-dir,
 	[  --with-python3-dir            Path to install Python3 api],
 	PYTHON3DIR="$withval",
@@ -281,7 +276,6 @@ AC_ARG_WITH(ruby-site-arch-dir,
 	[  --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)],
 	OVERRIDERUBYSITEARCHDIR="$withval",
 	OVERRIDERUBYSITEARCHDIR="")
-	AC_SUBST(OVERRIDERUBYSITEARCHDIR)
 AC_ARG_WITH(java-prefix,
 	[  --with-java-prefix            Location of Java],
 	JAVAPATH="$withval",
@@ -294,7 +288,6 @@ AC_ARG_ENABLE(java-rpath,
 	[  --enable-java-rpath           Use -rpath when linking the Java library against the SQL Relay client library],
 	JAVAUSERPATH="yes",
 	JAVAUSERPATH="")
-AC_SUBST(JAVAUSERPATH)
 AC_ARG_WITH(php-prefix,
 	[  --with-php-prefix             Location of PHP],
 	PHPPATH="$withval",
@@ -307,7 +300,6 @@ AC_ARG_ENABLE(php-rpath,
 	[  --enable-php-rpath            Use -rpath when linking the PHP library against the SQL Relay client library],
 	PHPUSERPATH="yes",
 	PHPUSERPATH="")
-AC_SUBST(PHPUSERPATH)
 AC_ARG_WITH(php-ext-dir,
 	[  --with-php-ext-dir            Path to install PHP modules],
 	PHPEXTDIR="$withval",
@@ -328,7 +320,6 @@ AC_ARG_ENABLE(tcl-rpath,
 	[  --enable-tcl-rpath            Use -rpath when linking the TCL library against the SQL Relay client library],
 	TCLUSERPATH="yes",
 	TCLUSERPATH="")
-AC_SUBST(TCLUSERPATH)
 AC_ARG_WITH(erlang-prefix,
 	[  --with-erlang-prefix          Location of Erlang],
 	ERLANGPATH="$withval",
@@ -341,7 +332,6 @@ AC_ARG_ENABLE(erlang-rpath,
 	[  --enable-erlang-rpath         Use -rpath when linking the Erlang library against the SQL Relay client library],
 	ERLANGUSERPATH="yes",
 	ERLANGUSERPATH="")
-AC_SUBST(ERLANGUSERPATH)
 AC_ARG_WITH(mono-prefix,
 	[  --with-mono-prefix            Location of Mono (C#)],
 	MONOPATH="$withval",
@@ -362,12 +352,18 @@ AC_ARG_ENABLE(c-rpath,
 	[  --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library],
 	CUSERPATH="yes",
 	CUSERPATH="")
-AC_SUBST(CUSERPATH)
+AC_ARG_ENABLE(mysql-drop-in,
+	[  --disable-mysql-drop-in       Don't build mysql drop-in-replacement library],
+	ENABLE_MYSQL_DROP_IN="",
+	ENABLE_MYSQL_DROP_IN="yes")
+AC_ARG_ENABLE(postgresql-drop-in,
+	[  --disable-postgresql-drop-in  Don't build postgresql drop-in-replacement library],
+	ENABLE_POSTGRESQL_DROP_IN="",
+	ENABLE_POSTGRESQL_DROP_IN="yes")
 AC_ARG_ENABLE(psql-rpath,
-	[  --enable-psql-rpath           Use -rpath when linking the psql replacement library against the SQL Relay client library],
+	[  --enable-psql-rpath           Use -rpath when linking the postgresql drop-in replacement library against the SQL Relay client library],
 	PSQLUSERPATH="yes",
 	PSQLUSERPATH="")
-AC_SUBST(PSQLUSERPATH)
 AC_ARG_WITH(pthread-prefix,
 	[  --with-pthread-prefix         Location of pthread library],
 	PTHREADPATH="$withval",
@@ -381,17 +377,127 @@ AC_ARG_ENABLE(dmalloc,
 	DMALLOC="1"; LIBDMALLOC="-ldmalloc",
 	DMALLOC=""; LIBDMALLOC="")
 AC_DEFINE_UNQUOTED(DMALLOC,1,Use dmalloc)
-AC_SUBST(LIBDMALLOC)
 AC_ARG_ENABLE(efence,
 	[  --enable-efence               Use the efence library],
 	LIBEFENCE="-lefence",
 	LIBEFENCE="")
-AC_SUBST(LIBEFENCE)
 AC_ARG_WITH(sqlr,
 	[  --with-sqlr                   prefix to use when naming binaries],
 	SQLR="$withval",
 	SQLR="sqlr")
+
+
+dnl tweak enabled/disabled things
+if ( test -z "$ENABLE_ODBC" )
+then
+	ENABLE_ODBC_DRIVER=""
+fi
+
+if ( test -z "$ENABLE_SERVER" )
+then
+	ENABLE_ORACLE=""
+	ENABLE_MYSQL=""
+	ENABLE_POSTGRESQL=""
+	ENABLE_SQLITE=""
+	ENABLE_FREETDS=""
+	ENABLE_SYBASE=""
+	ENABLE_ODBC=""
+	ENABLE_DB2=""
+	ENABLE_FIREBIRD=""
+	ENABLE_INFORMIX=""
+	ENABLE_MDBTOOLS=""
+	ENABLE_ROUTER=""
+fi
+
+ENABLE_CPP="yes"
+ENABLE_ODBC_DRIVER="yes"
+if ( test -z "$ENABLE_CLIENT" )
+then
+	ENABLE_CMDLINE=""
+	ENABLE_CPP=""
+	ENABLE_ODBC_DRIVER=""
+	ENABLE_PERL=""
+	ENABLE_PYTHON=""
+	ENABLE_PYTHON3=""
+	ENABLE_RUBY=""
+	ENABLE_JAVA=""
+	ENABLE_PHP=""
+	ENABLE_TCL=""
+	ENABLE_ERLANG=""
+	ENABLE_MONO=""
+	ENABLE_NODEJS=""
+	ENABLE_MYSQL_DROP_IN=""
+	ENABLE_POSTGRESQL_DROP_IN=""
+	ENABLE_ROUTER=""
+fi
+
+if ( test "$enable_shared" = "no" )
+then
+	ENABLE_ODBC_DRIVER=""
+	ENABLE_PERL=""
+	ENABLE_PYTHON=""
+	ENABLE_PYTHON3=""
+	ENABLE_RUBY=""
+	ENABLE_JAVA=""
+	ENABLE_PHP=""
+	ENABLE_TCL=""
+	ENABLE_ERLANG=""
+	ENABLE_MONO=""
+	ENABLE_NODEJS=""
+	ENABLE_MYSQL_DROP_IN=""
+	ENABLE_POSTGRESQL_DROP_IN=""
+	dnl FIXME: disable dynamic linking against db's
+else
+	AC_DEFINE_UNQUOTED(SQLRELAY_ENABLE_SHARED,1,Platform supports shared libraries)
+fi
+
+ENABLE_UTIL="yes"
+if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
+then
+	ENABLE_UTIL=""
+fi
+
+
+dnl define substitutions related to config options
+AC_SUBST(enable_shared)
+AC_SUBST(initscript_prefix)
+AC_SUBST(CLIENTUSERPATH)
+AC_SUBST(SERVERUSERPATH)
+AC_SUBST(ORACLEUSERPATH)
+AC_SUBST(MYSQLUSERPATH)
+AC_SUBST(POSTGRESQLUSERPATH)
+AC_SUBST(SQLITEUSERPATH)
+AC_SUBST(FREETDSUSERPATH)
+AC_SUBST(SYBASEUSERPATH)
+AC_SUBST(ODBCUSERPATH)
+AC_SUBST(DB2USERPATH)
+AC_SUBST(FIREBIRDUSERPATH)
+AC_SUBST(INFORMIXUSERPATH)
+AC_SUBST(MDBTOOLSUSERPATH)
+AC_SUBST(ENABLE_ROUTER)
+AC_SUBST(OVERRIDEPERLSITEARCH)
+AC_SUBST(OVERRIDEPERLSITELIB)
+AC_SUBST(OVERRIDEPERLINSTALLMAN3DIR)
+AC_SUBST(OVERRIDEPERLMAN3EXT)
+AC_SUBST(PYTHONUSERPATH)
+AC_SUBST(PYTHON3USERPATH)
+AC_SUBST(OVERRIDERUBYSITEARCHDIR)
+AC_SUBST(JAVAUSERPATH)
+AC_SUBST(PHPUSERPATH)
+AC_SUBST(TCLUSERPATH)
+AC_SUBST(ERLANGUSERPATH)
+AC_SUBST(CUSERPATH)
+AC_SUBST(ENABLE_MYSQL_DROP_IN)
+AC_SUBST(ENABLE_POSTGRESQL_DROP_IN)
+AC_SUBST(PSQLUSERPATH)
+AC_SUBST(LIBDMALLOC)
+AC_SUBST(LIBEFENCE)
 AC_SUBST(SQLR)
+AC_SUBST(ENABLE_CPP)
+AC_SUBST(ENABLE_ODBC_DRIVER)
+AC_SUBST(ENABLE_CMDLINE)
+AC_SUBST(ENABLE_SERVER)
+AC_SUBST(ENABLE_UTIL)
 
 
 dnl Rewrite supplied paths.
@@ -489,12 +595,6 @@ dnl have to set ar here because libtool (currently) fails
 dnl to use the correct one when cross-compiling
 AC_CHECK_PROG(AR,$host_alias-ar,$host_alias-ar,ar)
 AC_SUBST(AR)
-
-if ( test "$enable_shared" = "yes" )
-then
-	AC_DEFINE_UNQUOTED(SQLRELAY_ENABLE_SHARED,1,Platform supports shared libraries)
-fi
-AC_SUBST(enable_shared)
 echo "******************************"
 
 
@@ -529,14 +629,6 @@ FW_CHECK_F_NO_BUILTIN
 echo "******************************"
 
 
-
-dnl Checks for inline keyword
-echo
-echo "***** Inline Functions *******"
-FW_CHECK_INLINE
-echo "******************************"
-
-
 dnl Checks for thread library.
 echo
 echo "***** threads ****************"
@@ -548,57 +640,60 @@ dnl Checks for libraries.
 echo
 echo "***** Libraries **************"
 
-AC_MSG_CHECKING(for termcap)
-FW_CHECK_HEADERS_AND_LIBS([/usr],[termcap],[termcap.h],[termcap],[""],[""],[TERMCAPINCLUDES],[TERMCAPLIBS],[TERMCAPLIBPATH],[TERMCAPSTATIC])
-if ( test -n "$TERMCAPLIBS" )
+if ( test -n "$ENABLE_CMDLINE" )
 then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-
-dnl if there was no termcap, try curses instead
-if ( test -z "$TERMCAPLIBS" )
-then
-	AC_MSG_CHECKING(for curses)
-	FW_CHECK_HEADERS_AND_LIBS([/usr],[curses],[curses.h],[curses],[""],[""],[CURSESINCLUDES],[CURSESLIBS],[CURSESLIBPATH],[CURSESSTATIC])
-	if ( test -n "$CURSESLIBS" )
+	AC_MSG_CHECKING(for termcap)
+	FW_CHECK_HEADERS_AND_LIBS([/usr],[termcap],[termcap.h],[termcap],[""],[""],[TERMCAPINCLUDES],[TERMCAPLIBS],[TERMCAPLIBPATH],[TERMCAPSTATIC])
+	if ( test -n "$TERMCAPLIBS" )
 	then
 		AC_MSG_RESULT(yes)
 	else
 		AC_MSG_RESULT(no)
 	fi
-fi
 
-AC_MSG_CHECKING(for history)
-FW_CHECK_HEADERS_AND_LIBS([/usr],[history],[readline/history.h],[history],[""],[""],[HISTORYINCLUDES],[HISTORYLIBS],[HISTORYLIBPATH],[HISTORYSTATIC])
-if ( test -n "$HISTORYLIBS" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
+	dnl if there was no termcap, try curses instead
+	if ( test -z "$TERMCAPLIBS" )
+	then
+		AC_MSG_CHECKING(for curses)
+		FW_CHECK_HEADERS_AND_LIBS([/usr],[curses],[curses.h],[curses],[""],[""],[CURSESINCLUDES],[CURSESLIBS],[CURSESLIBPATH],[CURSESSTATIC])
+		if ( test -n "$CURSESLIBS" )
+		then
+			AC_MSG_RESULT(yes)
+		else
+			AC_MSG_RESULT(no)
+		fi
+	fi
 
-AC_MSG_CHECKING(for readline)
-FW_CHECK_HEADERS_AND_LIBS([/usr],[readline],[readline/readline.h],[readline],[""],[""],[READLINEINCLUDES],[READLINELIBS],[READLINELIBPATH],[READLINESTATIC])
-if ( test -n "$READLINELIBS" )
-then
-	READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $CURSESINCLUDES $TERMCAPINCLUDES"
-	READLINELIBS="$READLINELIBS $HISTORYLIBS $CURSESLIBS $TERMCAPLIBS"
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
+	AC_MSG_CHECKING(for history)
+	FW_CHECK_HEADERS_AND_LIBS([/usr],[history],[readline/history.h],[history],[""],[""],[HISTORYINCLUDES],[HISTORYLIBS],[HISTORYLIBPATH],[HISTORYSTATIC])
+	if ( test -n "$HISTORYLIBS" )
+	then
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
 
-AC_MSG_CHECKING(whether termcap/curses/history/readline work)
-FW_TRY_LINK([#include <stdlib.h>
-extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }],[readline(NULL);],[$READLINEINCLUDES],[$READLINELIBS],[],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); READLINELIBS=""])
-AC_SUBST(READLINEINCLUDES)
-AC_SUBST(READLINELIBS)
+	AC_MSG_CHECKING(for readline)
+	FW_CHECK_HEADERS_AND_LIBS([/usr],[readline],[readline/readline.h],[readline],[""],[""],[READLINEINCLUDES],[READLINELIBS],[READLINELIBPATH],[READLINESTATIC])
+	if ( test -n "$READLINELIBS" )
+	then
+		READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $CURSESINCLUDES $TERMCAPINCLUDES"
+		READLINELIBS="$READLINELIBS $HISTORYLIBS $CURSESLIBS $TERMCAPLIBS"
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
 
-if ( test -n "$READLINELIBS" )
-then
-	AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
+	AC_MSG_CHECKING(whether termcap/curses/history/readline work)
+	FW_TRY_LINK([#include <stdlib.h>
+	extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }],[readline(NULL);],[$READLINEINCLUDES],[$READLINELIBS],[],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); READLINELIBS=""])
+	AC_SUBST(READLINEINCLUDES)
+	AC_SUBST(READLINELIBS)
+	
+	if ( test -n "$READLINELIBS" )
+	then
+		AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
+	fi
 fi
 
 FW_CHECK_SOCKET_LIBS
@@ -762,11 +857,13 @@ FW_CHECK_PHP_PDO
 echo "******************************"
 
 
+
 dnl Checks for Erlang.
 echo
 echo "***** Erlang *****************"
 FW_CHECK_ERLANG
 echo "******************************"
+
 
 
 dnl Checks for Mono.
@@ -776,35 +873,12 @@ FW_CHECK_MONO
 echo "******************************"
 
 
+
 dnl Checks for node.js.
 echo
 echo "***** node.js ****************"
 FW_CHECK_NODEJS
 echo "******************************"
-
-
-
-dnl Checks for header files.
-echo
-echo "***** Headers ****************"
-AC_MSG_CHECKING(for sys/vnode.h)
-AC_TRY_COMPILE([#include <sys/vnode.h>],
-[],AC_DEFINE(SQLRELAY_HAVE_SYS_VNODE_H, 1, Some systems have sys/vnode.h) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
-echo "******************************"
-
-
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-echo
-echo "***** Structures *************"
-AC_TYPE_SIGNAL
-echo "******************************"
-
-
-
-dnl Checks for rpm build directory.
-RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
-AC_SUBST(RPM_BUILD_DIR)
 
 
 
@@ -902,15 +976,21 @@ echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
 
+CMDLINEBUILD="no "
 READLINEBUILD="no "
+if ( test -n "$ENABLE_CMDLINE" ); then
+	CMDLINEBUILD="yes"
+fi
 if ( test -n "$READLINELIBS" ); then
 	READLINEBUILD="yes"
 fi
 
 echo
-echo " Command Line : Readline    $READLINEBUILD"
+echo " Command Line : Clients     $CMDLINEBUILD"
+echo "                Readline    $READLINEBUILD"
 echo
 
+CPPBUILD="no "
 PERLBUILD="no "
 PYTHONBUILD="no "
 RUBYBUILD="no "
@@ -921,7 +1001,10 @@ TCLBUILD="no "
 ERLANGBUILD="no "
 MONOBUILD="no "
 NODEJSBUILD="no "
-ODBCBUILD="no "
+ODBCDRIVERBUILD="no "
+if ( test -n "$ENABLE_CPP" ); then
+	CPPBUILD="yes"
+fi
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
 fi
@@ -952,16 +1035,30 @@ fi
 if ( test -n "$HAVE_NODEJS" ); then
 	NODEJSBUILD="yes"
 fi
-if ( test -n "$ODBCLIBS" ); then
-	ODBCBUILD="yes"
+if ( test -n "$ENABLE_ODBC_DRIVER" ); then
+	ODBCDRIVERBUILD="yes"
 fi
-echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
+echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
-echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCBUILD"
+echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERBUILD"
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
 echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
-echo ""
+echo
+
+
+MYSQLDIBUILD="no    "
+POSTGRESQLDIBUILD="no    "
+if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
+	MYSQLDIBUILD="yes   "
+fi
+if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
+	POSTGRESQLDIBUILD="yes   "
+fi
+echo " Drop-In Replacement Libraries:"
+echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
+echo
+
 
 ORACLE8BUILD="no     "
 MYSQLBUILD="no     "
@@ -1068,4 +1165,5 @@ then
 	echo "Python 2, however Python 3 will become the default soon."
 	echo
 	echo "To force a build for Python 3, use the  --disable-python2  option."
+	echo
 fi

@@ -2772,6 +2772,12 @@ then
 		fi
 	fi
 
+	if ( test -z "$HAVE_PERL" )
+	then
+		AC_MSG_CHECKING(for sys/vnode.h)
+		AC_TRY_COMPILE([#include <sys/vnode.h>],[],AC_DEFINE(SQLRELAY_HAVE_SYS_VNODE_H, 1, Some systems have sys/vnode.h) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
+	fi
+
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
 	AC_SUBST(PERLLIB)
@@ -3509,6 +3515,9 @@ fi
 
 AC_DEFUN([FW_CHECK_PHP_PDO],
 [
+if ( test "$ENABLE_PHP" = "yes" )
+then
+
 	AC_MSG_CHECKING(for PHP PDO)
 	HAVE_PHP_PDO=""
 	FW_TRY_COMPILE([#include <php.h>
@@ -3531,6 +3540,7 @@ static const zend_function_entry *test(pdo_dbh_t *dbh, int kind TSRMLS_DC) { ret
 static struct pdo_dbh_methods methods={ 0,0,0,0,0,0,0,0,0,0,0,0,test };
 ],[],[$PHPINCLUDES],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY,1,Some versions of PHP PDO don't support const zend_function_entry)],[AC_MSG_RESULT(no)])
 	fi
+fi
 ])
 
 

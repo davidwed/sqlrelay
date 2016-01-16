@@ -222,9 +222,6 @@
 /* Some iconv implementations use a const char ** parameter */
 #undef ICONV_CONST_CHAR
 
-/* Some compliers don't support the inline keyword */
-#undef INLINE
-
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
@@ -252,9 +249,6 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
 
 /* Some systems use SQLLEN * in SQLBindCol */
 #undef SQLBINDCOL_SQLLEN

@@ -70,10 +70,12 @@ all: $(STATICPLUGINSRCS) \
 	$(SQLR)-listener$(EXE) \
 	$(SQLR)-connection$(EXE) \
 	$(SQLR)-scaler$(EXE) \
-	$(SQLR)-cachemanager$(EXE)
+	$(SQLR)-cachemanager$(EXE) \
+	$(SQLR)-pwdenc$(EXE) \
+	$(SQLR)-status$(EXE)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(STATICPLUGINSRCS)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(SQLR)-pwdenc$(EXE) $(SQLR)-status$(EXE) $(STATICPLUGINSRCS)
 	$(RMTREE) .libs
 
 libsqlrserver.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)
@@ -96,6 +98,12 @@ $(SQLR)-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
 
 $(SQLR)-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(SERVERLIBS)
+
+$(SQLR)-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) $(PWDENCLIBS)
+
+$(SQLR)-status$(EXE): sqlr-status.cpp sqlr-status.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-status.$(OBJ) $(CMDLINELIBS)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@
@@ -265,6 +273,8 @@ install: $(INSTALLLIB)
 	$(LTINSTALL) $(CP) $(SQLR)-connection$(EXE) $(bindir)
 	$(LTINSTALL) $(CP) $(SQLR)-scaler$(EXE) $(bindir)
 	$(LTINSTALL) $(CP) $(SQLR)-cachemanager$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-pwdenc$(EXE) $(bindir)
+	$(LTINSTALL) $(CP) $(SQLR)-status$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(CP) sqlrelay/sqlrserver.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrserver.h
@@ -322,12 +332,16 @@ uninstall: $(UNINSTALLLIB)
 		$(bindir)/$(SQLR)-connection$(EXE) \
 		$(bindir)/$(SQLR)-scaler$(EXE) \
 		$(bindir)/$(SQLR)-cachemanager$(EXE) \
+		$(bindir)/$(SQLR)-pwdenc$(EXE) \
+		$(bindir)/$(SQLR)-status$(EXE) \
 		$(bindir)/sqlr-start$(EXE) \
 		$(bindir)/sqlr-stop$(EXE) \
 		$(bindir)/sqlr-listener$(EXE) \
 		$(bindir)/sqlr-connection$(EXE) \
 		$(bindir)/sqlr-scaler$(EXE) \
-		$(bindir)/sqlr-cachemanager$(EXE)
+		$(bindir)/sqlr-cachemanager$(EXE) \
+		$(bindir)/sqlr-pwdenc$(EXE) \
+		$(bindir)/sqlr-status$(EXE)
 	$(RMTREE) $(tmpdir) \
 		$(prefix)/lib/sqlrelay/tmp \
 		$(logdir) \
