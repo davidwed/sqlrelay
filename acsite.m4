@@ -2912,7 +2912,7 @@ then
 
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
-			AC_MSG_CHECKING(for Python.h)
+			AC_MSG_CHECKING(for Python.h (for python 2))
 			FW_TRY_COMPILE([#include <Python.h>],[PyArg_ParseTuple(NULL,NULL,NULL,NULL,NULL);],[$PYTHONINCLUDES],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); PYTHONINCLUDES=""; PYTHONDIR=""])
 		fi
 		
@@ -3054,7 +3054,7 @@ then
 
 		if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
 		then
-			AC_MSG_CHECKING(for Python.h)
+			AC_MSG_CHECKING(for Python.h (for python 3))
 			FW_TRY_COMPILE([#include <Python.h>],[PyArg_ParseTuple(NULL,NULL,NULL,NULL,NULL);],[$PYTHON3INCLUDES],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); PYTHON3INCLUDES=""; PYTHON3DIR=""])
 		fi
 		
@@ -3081,8 +3081,14 @@ AC_DEFUN([FW_PYTHON_DECIDE],
 [
 	IMPORTEXCEPTIONS="import exceptions"
 	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+	PYTHONWARN=""
 
-	if ( test "$HAVE_PYTHON3" = "yes" )
+	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "yes" )
+	then
+		PYTHONWARN="yes"
+	fi
+
+	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "" )
 	then
 		HAVE_PYTHON="$HAVE_PYTHON3"
 		PYTHONINCLUDES="$PYTHON3INCLUDES"

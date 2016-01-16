@@ -144,7 +144,7 @@ for i=0 to WScript.Arguments.Count-1
 	elseif mid(arg,1,21)="--with-python-prefix=" then
 		PYTHONPREFIX=mid(arg,22)
 	elseif mid(arg,1,22)="--with-python-version=" then
-		PYTHONPREFIX=mid(arg,23)
+		PYTHONVERSION=mid(arg,23)
 	elseif arg="--disable-ruby" then
 		disableruby=true
 	elseif mid(arg,1,19)="--with-ruby-prefix=" then
@@ -555,8 +555,13 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** Python *****************")
 
-IMPORTEXCEPTIONS="import exceptions"
-EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+if PYTHONVERSION<3 then
+	IMPORTEXCEPTIONS="import exceptions"
+	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+else
+	IMPORTEXCEPTIONS=""
+	EXCEPTIONSSTANDARDERROR="Exception"
+endif
 
 if PYTHONPREFIX="" then
 	findPrefix "C:\","Python",PYTHONPREFIX,disablepython

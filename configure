@@ -32997,170 +32997,6 @@ echo "******************************"
 echo
 echo "***** Python *****************"
 
-if ( test "$ENABLE_PYTHON" = "yes" )
-then
-
-	OVERRIDEPYTHONDIR="$PYTHONDIR"
-
-	HAVE_PYTHON=""
-	PYTHONINCLUDES=""
-	PYTHONDIR=""
-	PYTHONLIB=""
-	PYTHONVERSION=""
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-				echo "cross compiling..."
-
-	else
-
-		if ( test -n "$PYTHONPATH" )
-		then
-
-			for i in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
-			do
-				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib64/python$i/config" )
-				then
-					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
-					PYTHONDIR="$PYTHONPATH/lib64/python$i"
-				else
-					if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib/python$i/config" )
-					then
-						PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
-						PYTHONDIR="$PYTHONPATH/lib/python$i"
-					fi
-				fi
-
-				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-				then
-					PYTHONVERSION=`echo $i | sed -e "s|\.||"`
-					break
-				fi
-			done
-
-		else
-
-			for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
-			do
-				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j" "/boot/common/include/python$j"
-				do
-					PYTHONINCLUDES=""
-					for k in "mu" "m" "u" ""
-					do
-						if ( test -d "$i$k" )
-						then
-							PYTHONINCLUDES="-I$i$k"
-							if ( test -n "$PYTHONINCLUDES" )
-							then
-								PYTHONVERSION=`echo $j | sed -e "s|\.||"`
-								break
-							fi
-						fi
-					done
-					if ( test -n "$PYTHONINCLUDES" )
-					then
-						break
-					fi
-				done
-
-				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j" "/boot/common/lib/python$j"
-				do
-
-					PYTHONDIR=""
-					for k in "config" "config-$MULTIARCHDIR" "config-$j" "config-${j}mu" "config-${j}m" "config-${j}u"
-					do
-
-						if ( test -d "$i/$k" )
-						then
-																					if ( test -n "$CYGWIN" -a -r "$i/$k/libpython$j.dll.a" )
-							then
-								PYTHONDIR="$i"
-								PYTHONLIB="-L$PYTHONDIR/$k -lpython$j"
-							elif ( test -n "$DARWIN" )
-							then
-								PYTHONDIR="$i"
-								PYTHONLIB="-lpython$j"
-							else
-								PYTHONDIR="$i"
-							fi
-							if ( test -n "$PYTHONDIR" )
-							then
-								break
-							fi
-						fi
-					done
-					if ( test -n "$PYTHONDIR" )
-					then
-						break
-					fi
-				done
-
-				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-				then
-										if ( test -d "/Library/Python/$j/site-packages" )
-					then
-						PYTHONDIR="/Library/Python/$j"
-					fi
-					break
-				fi
-			done
-
-		fi
-
-		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python.h" >&5
-$as_echo_n "checking for Python.h... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$PYTHONINCLUDES"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <Python.h>
-int
-main ()
-{
-PyArg_ParseTuple(NULL,NULL,NULL,NULL,NULL);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; PYTHONINCLUDES=""; PYTHONDIR=""
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-
-		fi
-
-		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-		then
-			HAVE_PYTHON="yes"
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Python API will not be built." >&5
-$as_echo "$as_me: WARNING: The Python API will not be built." >&2;}
-		fi
-	fi
-
-
-if ( test -n "$PYTHONINCLUDES" )
-then
-	echo "python includes... $PYTHONINCLUDES"
-fi
-
-
-	if ( test -n "$OVERRIDEPYTHONDIR" )
-	then
-		PYTHONDIR="$OVERRIDEPYTHONDIR"
-	fi
-fi
-
-
 if ( test "$ENABLE_PYTHON3" = "yes" )
 then
 
@@ -33274,8 +33110,8 @@ then
 
 		if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
 		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python.h" >&5
-$as_echo_n "checking for Python.h... " >&6; }
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python.h (for python 3)" >&5
+$as_echo_n "checking for Python.h (for python 3)... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PYTHON3INCLUDES"
@@ -33325,10 +33161,180 @@ fi
 fi
 
 
+if ( test "$ENABLE_PYTHON" = "yes" )
+then
+
+	OVERRIDEPYTHONDIR="$PYTHONDIR"
+
+	HAVE_PYTHON=""
+	PYTHONINCLUDES=""
+	PYTHONDIR=""
+	PYTHONLIB=""
+	PYTHONVERSION=""
+
+	if ( test "$cross_compiling" = "yes" )
+	then
+
+				echo "cross compiling..."
+
+	else
+
+		if ( test -n "$PYTHONPATH" )
+		then
+
+			for i in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+			do
+				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib64/python$i/config" )
+				then
+					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
+					PYTHONDIR="$PYTHONPATH/lib64/python$i"
+				else
+					if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib/python$i/config" )
+					then
+						PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
+						PYTHONDIR="$PYTHONPATH/lib/python$i"
+					fi
+				fi
+
+				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+				then
+					PYTHONVERSION=`echo $i | sed -e "s|\.||"`
+					break
+				fi
+			done
+
+		else
+
+			for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+			do
+				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j" "/boot/common/include/python$j"
+				do
+					PYTHONINCLUDES=""
+					for k in "mu" "m" "u" ""
+					do
+						if ( test -d "$i$k" )
+						then
+							PYTHONINCLUDES="-I$i$k"
+							if ( test -n "$PYTHONINCLUDES" )
+							then
+								PYTHONVERSION=`echo $j | sed -e "s|\.||"`
+								break
+							fi
+						fi
+					done
+					if ( test -n "$PYTHONINCLUDES" )
+					then
+						break
+					fi
+				done
+
+				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j" "/boot/common/lib/python$j"
+				do
+
+					PYTHONDIR=""
+					for k in "config" "config-$MULTIARCHDIR" "config-$j" "config-${j}mu" "config-${j}m" "config-${j}u"
+					do
+
+						if ( test -d "$i/$k" )
+						then
+																					if ( test -n "$CYGWIN" -a -r "$i/$k/libpython$j.dll.a" )
+							then
+								PYTHONDIR="$i"
+								PYTHONLIB="-L$PYTHONDIR/$k -lpython$j"
+							elif ( test -n "$DARWIN" )
+							then
+								PYTHONDIR="$i"
+								PYTHONLIB="-lpython$j"
+							else
+								PYTHONDIR="$i"
+							fi
+							if ( test -n "$PYTHONDIR" )
+							then
+								break
+							fi
+						fi
+					done
+					if ( test -n "$PYTHONDIR" )
+					then
+						break
+					fi
+				done
+
+				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+				then
+										if ( test -d "/Library/Python/$j/site-packages" )
+					then
+						PYTHONDIR="/Library/Python/$j"
+					fi
+					break
+				fi
+			done
+
+		fi
+
+		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python.h (for python 2)" >&5
+$as_echo_n "checking for Python.h (for python 2)... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$PYTHONINCLUDES"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <Python.h>
+int
+main ()
+{
+PyArg_ParseTuple(NULL,NULL,NULL,NULL,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; PYTHONINCLUDES=""; PYTHONDIR=""
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+
+		fi
+
+		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+		then
+			HAVE_PYTHON="yes"
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Python API will not be built." >&5
+$as_echo "$as_me: WARNING: The Python API will not be built." >&2;}
+		fi
+	fi
+
+
+if ( test -n "$PYTHONINCLUDES" )
+then
+	echo "python includes... $PYTHONINCLUDES"
+fi
+
+
+	if ( test -n "$OVERRIDEPYTHONDIR" )
+	then
+		PYTHONDIR="$OVERRIDEPYTHONDIR"
+	fi
+fi
+
+
 	IMPORTEXCEPTIONS="import exceptions"
 	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+	PYTHONWARN=""
 
-	if ( test "$HAVE_PYTHON3" = "yes" )
+	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "yes" )
+	then
+		PYTHONWARN="yes"
+	fi
+
+	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "" )
 	then
 		HAVE_PYTHON="$HAVE_PYTHON3"
 		PYTHONINCLUDES="$PYTHON3INCLUDES"
@@ -37782,3 +37788,12 @@ echo "options."
 echo
 echo "Type:  configure --help   for a list of options."
 echo
+
+if ( test "$PYTHONWARN" = "yes" )
+then
+	echo
+	echo "NOTE: Python 2 and Python 3 were both found.  For now SQL Relay defaults to"
+	echo "Python 2, however Python 3 will become the default soon."
+	echo
+	echo "To force a build for Python 3, use the  --disable-python2  option."
+fi
