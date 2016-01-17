@@ -17,11 +17,13 @@ IMPORTANT NOTE:
 Since cache managers clean up after SQL Relay client applications, they need to be run on machines which run client applications that could cache result sets.  These are likely to be web or application servers, rather than the machines that run the sqlr\-listener and sqlr\-connection daemons.
 .SH OPTIONS
 .TP
-\fB\-scaninterval\fR
-\&...
+\fB\-cachedirs\fR dirs
+Colon\-delimited list of directories to scan
+for cache files.
 .TP
-\fB\-cachedirs\fR
-\&...
+\fB\-scaninterval\fR sec
+Interval, in seconds, to scan the cache
+directories.
 .SH EXAMPLES
 \&...
 .SH AUTHOR

@@ -13,17 +13,18 @@ When used with the appropriate password encryption module, passwords can be stor
 The sqlr\-pwdenc utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration file in place of the plaintext password.
 .SH OPTIONS
 .TP
-\fB\-config\fR configfile
-\&...
+\fB\-config\fR file
+Override the default config file with "file".
 .TP
 \fB\-id\fR instanceid
-\&...
+Id of an instance in the config file.
 .TP
 \fB\-pwdencid\fR passwordencryptionid
-\&...
+id of instance of passwordencryption
+module to use
 .TP
 \fB\-password\fR password
-\&...
+password to encrypt
 .SH EXAMPLES
 \&...
 .SH AUTHOR

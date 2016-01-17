@@ -13,14 +13,15 @@ The sqlr\-stop program stops sqlr\-listener, sqlr\-connection, and sqlr\-scaler 
 When run with the \fB\-id\fR argument, sqlr\-stop stops processes for the specified instance.  When run with no \fB\-id\fR argument, sqlr\-stop stops all running sqlr\-listener, sqlr\-connection, and sqlr\-scaler processes.
 .SH OPTIONS
 .TP
-\fB\-config\fR configfile
-\&...
+\fB\-config\fR file
+Override the default config file with "file".
 .TP
 \fB\-id\fR instanceid
-\&...
+Id of an instance in the config file.
 .TP
 \fB\-localstatedir\fR dir
-\&...
+Override the default directory for keeping
+working or stateful files with "dir".
 .SH AUTHOR
 Written by David Muse.
 .SH "REPORTING BUGS"

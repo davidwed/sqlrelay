@@ -13,29 +13,33 @@ Each sqlr\-connection maintains a persistent connection to a database.  Together
 sqlr\-connection is not intended to be run manually.  Rather the sqlr\-start and sqlr\-scaler processes spawn instances of sqlr\-connection as\-necessary.
 .SH OPTIONS
 .TP
-\fB\-config\fR configfile
-\&...
+\fB\-config\fR file
+Override the default config file with "file".
 .TP
 \fB\-id\fR instanceid
-\&...
+Id of an instance in the config file.
 .TP
 \fB\-localstatedir\fR dir
-\&...
+Override the default directory for keeping
+working or stateful files with "dir".
 .TP
 \fB\-scaler\fR
-\&...
+Indicates to the sqlr\-connection that it was spawned
+by the sqlr\-scaler.
 .TP
-\fB\-ttl\fR
-\&...
+\fB\-ttl\fR sec
+Time\-to\-live, in seconds.  If the lt\- is idle
+for this number of seconds, then it will exit.
 .TP
 \fB\-silent\fR
-\&...
+Suppresses log\-in errors.
 .TP
 \fB\-nodetach\fR
-\&...
+Suppresses detachment from the controlling terminal.
+Useful for debugging.
 .TP
 \fB\-disable\-crash\-handler\fR
-\&...
+Disables SIGSEGV handler, useful for debugging.
 .SH AUTHOR
 Written by David Muse.
 .SH "REPORTING BUGS"

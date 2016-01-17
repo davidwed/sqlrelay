@@ -13,23 +13,24 @@ The sqlr\-start program spawns sqlr\-listener, sqlr\-connection, and sqlr\-scale
 When run with the \fB\-id\fR argument, sqlr\-start starts processes for the specified instance.  When run with no \fB\-id\fR argument, sqlr\-start starts processes for all enabled instances.
 .SH OPTIONS
 .TP
-\fB\-config\fR configfile
-\&...
+\fB\-config\fR file
+Override the default config file with "file".
 .TP
 \fB\-id\fR instanceid
-\&...
+Id of an instance in the config file.
 .TP
 \fB\-localstatedir\fR dir
-\&...
-.TP
-\fB\-strace\fR
-\&...
+Override the default directory for keeping
+working or stateful files with "dir".
 .TP
 \fB\-disable\-crash\-handler\fR
-\&...
+Disables SIGSEGV handler, useful for debugging.
 .TP
 \fB\-disable\-new\-window\fR
-\&...
+Only valid on Windows platforms.  Spawns child
+processes in the current window, rather than
+opening a new window.  Helpful when debugging
+startup errors.
 .SH AUTHOR
 Written by David Muse.
 .SH "REPORTING BUGS"

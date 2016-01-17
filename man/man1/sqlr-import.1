@@ -14,27 +14,30 @@ sqlr\-export.
 .SS "Connection options:"
 .TP
 \fB\-host\fR host
-server host name or IP address
+Host name or IP address of the server to
+connect to.
 .TP
 \fB\-port\fR port
-server port
+Port to connect to.
 .TP
 \fB\-socket\fR socket
-server local unix socket file name
+Local unix socket file name to connect to.
+Can be used instead of host/port for making
+connections to local servers.
 .TP
 \fB\-user\fR user
-user name
+User name to authenticate with.
 .TP
 \fB\-password\fR password
-password
+Password to authenticate with.
 .SS "Alternate connection options:"
 .TP
-\fB\-config\fR configfile
-config file
+\fB\-config\fR file
+Override the default config file with "file".
 .TP
 \fB\-id\fR instanceid
-id of an instance in the config file from which
-to derive connection info and credentials
+Id of an instance in the config file from which
+to derive connection info and credentials.
 .SS "Command options:"
 .IP
 \&...
