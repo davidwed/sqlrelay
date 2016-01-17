@@ -154,7 +154,7 @@ CPPLIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 # c
 CUSERPATH = @CUSERPATH@
 CCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(WNOMISMATCHEDTAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-CLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CUSERPATH),yes)
 CLIBS += -R $(libdir)
@@ -217,8 +217,8 @@ else
 PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
 endif
 PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
-PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
-PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
+PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
 ifneq ($(strip $(libdir)),)
 ifeq ($(PERLUSERPATH),yes)
 PERLCONLIBS += -R $(libdir)
@@ -240,7 +240,7 @@ PYTHONDIR = @PYTHONDIR@
 PYTHONUSERPATH = @PYTHONUSERPATH@
 PYTHONLIB = @PYTHONLIB@
 PYTHONCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-PYTHONLIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PYTHONDIR)/site-packages/SQLRelay
+PYTHONLIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PYTHONDIR)/site-packages/SQLRelay
 ifneq ($(strip $(libdir)),)
 ifeq ($(PYTHONUSERPATH),yes)
 PYTHONLIBS += -R $(libdir)
@@ -265,7 +265,7 @@ RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
 endif
 
 RUBYCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-RUBYLIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(RUBYSITEARCHDIR)
+RUBYLIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(RUBYSITEARCHDIR)
 ifneq ($(strip $(libdir)),)
 ifeq ($(RUBYUSERPATH),yes)
 RUBYLIBS += -R $(libdir)
@@ -285,14 +285,14 @@ PHPCONFDIR = @PHPCONFDIR@
 PHPCONFSTYLE = @PHPCONFSTYLE@
 HAVE_PHP_PDO = @HAVE_PHP_PDO@
 PHPCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
 PHPLIBS += -R $(libdir)
 endif
 endif
 PHPPDOCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPPDOLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPPDOLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
 PHPPDOLIBS += -R $(libdir)
@@ -307,7 +307,7 @@ JAR = @JAR@
 JAVAINCLUDES = @JAVAINCLUDES@
 JAVAUSERPATH = @JAVAUSERPATH@
 JAVACPPFLAGS = $(WERROR) $(WNOUNKNOWNPRAGMAS) $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-JAVALIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay
+JAVALIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay
 ifneq ($(strip $(libdir)),)
 ifeq ($(JAVAUSERPATH),yes)
 JAVALIBS += -R $(libdir)
@@ -322,7 +322,7 @@ TCLLIB = @TCLLIB@
 TCLLIBSPATH = @TCLLIBSPATH@
 TCLUSERPATH = @TCLUSERPATH@
 TCLCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-TCLLIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(TCLLIBSPATH)/sqlrelay
+TCLLIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(TCLLIBSPATH)/sqlrelay
 ifneq ($(strip $(libdir)),)
 ifeq ($(TCLUSERPATH),yes)
 TCLLIBS += -R $(libdir)
@@ -341,7 +341,7 @@ ERLANG_LIB_DIR = @ERLANG_LIB_DIR@
 ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGUSERPATH = @ERLANGUSERPATH@
 ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c -L$(top_builddir)/src/api/c++ -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c -L$(top_builddir)/src/api/c++ -l$(SQLR)clientwrapper -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(ERLANGUSERPATH),yes)
 ERLANGLIBS += -R $(libdir)
@@ -355,7 +355,7 @@ NODE = @NODE@
 NODEGYP = @NODEGYP@
 NODEMODULEDIR = @NODEMODULEDIR@
 NODEJSCFLAGS = -I@TOP_BUILDDIR_ABS@/src/api/c++ $(RUDIMENTSINCLUDES)
-NODEJSLIBS = -L@TOP_BUILDDIR_ABS@/src/api/c++/.libs -lsqlrclient $(RUDIMENTSLIBS)
+NODEJSLIBS = -L@TOP_BUILDDIR_ABS@/src/api/c++/.libs -l$(SQLR)client $(RUDIMENTSLIBS)
 
 
 # mysql drop-in
@@ -389,7 +389,7 @@ MYSQLLIBS = @MYSQLLIBS@
 MYSQLLIBSPATH = @MYSQLLIBSPATH@
 MYSQLUSERPATH = @MYSQLUSERPATH@
 MYSQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS)
+MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(MYSQLUSERPATH),yes)
 MYSQLDRLIBLIBS = -R $(libdir)
@@ -403,7 +403,7 @@ POSTGRESQLLIBS = @POSTGRESQLLIBS@
 POSTGRESQLLIBSPATH = @POSTGRESQLLIBSPATH@
 POSTGRESQLUSERPATH = @POSTGRESQLUSERPATH@
 POSTGRESQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS)
+POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
 POSTGRESQLDRLIBLIBS += -R $(libdir)
@@ -440,7 +440,7 @@ ODBCLIBSPATH = @ODBCLIBSPATH@
 ODBCUSERPATH = @ODBCUSERPATH@
 ODBCUNICODE = @ODBCUNICODE@
 ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
-ODBCDRIVERLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(ODBCLIBS)
+ODBCDRIVERLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(ODBCLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(ODBCUSERPATH),yes)
 ODBCDRIVERLIBS += -R $(libdir)
@@ -503,8 +503,8 @@ UTILLIBS = $(RUDIMENTSLIBS)
 
 # cmdline
 ENABLE_CMDLINE = @ENABLE_CMDLINE@
-CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) -DSYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
-CMDLINELIBS = -L$(top_builddir)/src/util -lsqlrutil -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
+CMDLINELIBS = -L$(top_builddir)/src/util -l$(SQLR)util -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 
 # util
@@ -605,12 +605,12 @@ STATICPLUGINLIBS += -R $(SYBASELIBSPATH)
 endif
 endif
 STATICPLUGINLIBS += $(SYBASELIBS)
-STATICPLUGINLIBS += -L$(top_builddir)/src/api/c++ -lsqlrclient
+STATICPLUGINLIBS += -L$(top_builddir)/src/api/c++ -l$(SQLR)client
 endif
 
 SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
-LIBSQLRSERVERLIBS = -L$(top_builddir)/src/util -lsqlrutil
-SERVERLIBS = -L./ -lsqlrserver $(STATICPLUGINLIBS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBSQLRSERVERLIBS = -L$(top_builddir)/src/util -l$(SQLR)util
+SERVERLIBS = -L./ -l$(SQLR)server $(STATICPLUGINLIBS) -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
 	SERVERLIBS += -R $(libdir)
@@ -620,11 +620,11 @@ endif
 
 # plugins
 PLUGINCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
-PLUGINLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
-CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+PLUGINLIBS = -L$(top_builddir)/src/server -l$(SQLR)server -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(EXTRALIBS)
+CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++
-SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient
+SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
 
 LOGGERCPPFLAGS = $(PLUGINCPPFLAGS)
 
@@ -637,7 +637,7 @@ endif
 
 # connections
 CONNECTIONCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server $(RUDIMENTSINCLUDES)
-CONNECTIONLIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+CONNECTIONLIBS = -L$(top_builddir)/src/server -l$(SQLR)server -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 DB2CONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(DB2INCLUDES)
 DB2CONNECTIONLIBS = $(DB2LIBS) $(CONNECTIONLIBS)
@@ -722,7 +722,7 @@ endif
 endif
 
 ROUTERCONNECTIONCPPFLAGS = -I$(top_builddir)/src/api/c++ $(CONNECTIONCPPFLAGS)
-ROUTERCONNECTIONLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient $(CONNECTIONLIBS)
+ROUTERCONNECTIONLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(CONNECTIONLIBS)
 ifneq ($(strip $(ROUTERLIBSPATH)),)
 ifeq ($(ROUTERUSERPATH),yes)
 ROUTERCONNECTIONLIBS += -R $(ROUTERLIBSPATH)
@@ -814,10 +814,10 @@ endif
 
 # tests
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
-CPPTESTLIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
+CPPTESTLIBS = -L$(libdir) -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 CTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
-CTESTLIBS = -L$(libdir) -lsqlrclient -lsqlrclientwrapper $(RUDIMENTSLIBS) $(LIBEFENCE)
+CTESTLIBS = -L$(libdir) -l$(SQLR)client -l$(SQLR)clientwrapper $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 ODBCTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(ODBCINCLUDES)
 ODBCTESTLIBS = $(RUDIMENTSLIBS) $(ODBCLIBS) $(LIBEFENCE)
@@ -835,7 +835,7 @@ DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 # bench
 BENCHCPPFLAGS = $(BASECPPFLAGS) $(RUDIMENTSINCLUDES) -I$(top_builddir)/src/api/c++
-BENCHLIBS = -L$(top_builddir)/src/api/c++ -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS)
+BENCHLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(EXTRALIBS)
 ifneq ($(strip $(DB2LIBSPATH)),)
 ifeq ($(DB2USERPATH),yes)
 BENCHLIBS += -R $(DB2LIBSPATH)
@@ -900,7 +900,7 @@ BENCHLIBS += $(SYBASELIBS)
 
 # stress tests
 STRESSCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
-STRESSLIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
+STRESSLIBS = -L$(libdir) -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 
 # docs

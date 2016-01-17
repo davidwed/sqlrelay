@@ -13,13 +13,13 @@ LOBJS = sqlrclientwrapper.$(OBJ)
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CCPPFLAGS) $(COMPILE) $<
 
-all: libsqlrclientwrapper.$(LIBEXT)
+all: lib$(SQLR)clientwrapper.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-libsqlrclientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
+lib$(SQLR)clientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(CLIBS) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
@@ -36,13 +36,13 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) libsqlrclientwrapper.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) lib$(SQLR)clientwrapper.$(LIBEXT) $(bindir)
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrclientwrapper.lib $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)clientwrapper.lib $(libdir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrclientwrapper.$(LIBEXT) $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)clientwrapper.$(LIBEXT) $(libdir)
 	$(LTFINISH) $(libdir)
 
 uninstall: $(UNINSTALLLIB)
@@ -53,8 +53,11 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/wrapperdll.h
 
 uninstalldll:
-	$(RM) $(bindir)/libsqlrclientwrapper.$(LIBEXT) \
+	$(RM) $(bindir)/lib$(SQLR)clientwrapper.$(LIBEXT) \
+		$(libdir)/lib$(SQLR)clientwrapper.lib \
+		$(bindir)/libsqlrclientwrapper.$(LIBEXT) \
 		$(libdir)/libsqlrclientwrapper.lib
 
 uninstalllib:
-	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclientwrapper.$(LIBEXT)
+	$(LTUNINSTALL) $(RM) $(libdir)/lib$(SQLR)clientwrapper.$(LIBEXT) \
+				 $(libdir)/libsqlrclientwrapper.$(LIBEXT)

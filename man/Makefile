@@ -31,6 +31,8 @@ install:
 
 uninstall:
 	$(RM) $(mandir)/man1/sqlrsh.1 \
+		$(mandir)/man1/sqlr-export.1 \
+		$(mandir)/man1/sqlr-import.1 \
 		$(mandir)/man8/sqlr-cachemanager.8 \
 		$(mandir)/man8/sqlr-connection.8 \
 		$(mandir)/man8/sqlr-listener.8 \

@@ -136,7 +136,7 @@ CPPLIBS = $(RUDIMENTSLIBS)
 
 # c
 CCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRCLIENTWRAPPER_EXPORTS /I$(top_builddir) /I./ /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES)
-CLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+CLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # c#
@@ -177,8 +177,8 @@ PERLINC_LOCAL = $(PERLINC)
 PERLINSTALLMAN3DIR_LOCAL = $(PERLINSTALLMAN3DIR)
 PERLMAN3EXT_LOCAL = $(PERLMAN3EXT)
 PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) /I$(top_builddir) /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
-PERLCONLIBS = /LIBPATH:$(PERLLIB)\CORE perl$(PERLVERSION).lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
-PERLCURLIBS = /LIBPATH:$(PERLLIB)\CORE perl$(PERLVERSION).lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+PERLCONLIBS = /LIBPATH:$(PERLLIB)\CORE perl$(PERLVERSION).lib /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
+PERLCURLIBS = /LIBPATH:$(PERLLIB)\CORE perl$(PERLVERSION).lib /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 PERLINSTALLMAN = installman
 
 
@@ -189,7 +189,7 @@ PYTHONINCLUDES = /I$(PYTHONPREFIX)\include
 PYTHONDIR = $(PYTHONPREFIX)\Lib
 PYTHONLIB = /LIBPATH:$(PYTHONPREFIX)\libs python$(PYTHONVERSION).lib
 PYTHONCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+PYTHONLIBS = $(PYTHONLIB) /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 IMPORTEXCEPTIONS = @IMPORTEXCEPTIONS@
 EXCEPTIONSSTANDARDERROR = @EXCEPTIONSSTANDARDERROR@
 
@@ -207,7 +207,7 @@ RUBYLIB = /LIBPATH:$(RUBYPREFIX)\lib $(RUBYLIBPREFIX)-ruby$(RUBYLIBVERSION).lib
 RUBYCFLAGS = /I $(RUBYPREFIX)\include\ruby-$(RUBYVERSION) /I $(RUBYPREFIX)\include\ruby-$(RUBYVERSION)/$(RUBYTARGET)_$(RUBYVCVERSION)
 RUBYSITEARCHDIR = $(RUBYPREFIX)\lib\ruby\site_ruby\$(RUBYVERSION)\$(RUBYSITEARCHDIRSUFFIX)
 RUBYCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) /I./ /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+RUBYLIBS = $(RUBYLIB) /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # php
@@ -220,9 +220,9 @@ PHPLIB = /LIBPATH:$(PHPPREFIX)\dev php5ts.lib
 PHPCONFDIR = C:\Windows
 PHPCONFSTYLE = windows
 PHPCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PHPINCLUDES) /D COMPILE_DL=1
-PHPLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+PHPLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 PHPPDOCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PHPINCLUDES) /D COMPILE_DL=1
-PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+PHPPDOLIBS = $(PHPLIB) /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # java
@@ -231,7 +231,7 @@ JAVAC = "$(JAVAPREFIX)\bin\javac"
 JAR = "$(JAVAPREFIX)\bin\jar"
 JAVAINCLUDES = /I "$(JAVAPREFIX)\include" /I "$(JAVAPREFIX)\include\win32"
 JAVACPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS) /LIBPATH:"$(JAVAPREFIX)\lib" jvm.lib
+JAVALIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS) /LIBPATH:"$(JAVAPREFIX)\lib" jvm.lib
 
 
 # tcl
@@ -240,7 +240,7 @@ TCLINCLUDE = /I$(TCLPREFIX)\include
 TCLLIB = /LIBPATH:$(TCLPREFIX)\lib tcl86.lib
 TCLLIBSPATH = $(TCLPREFIX)\lib
 TCLCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) /I$(top_builddir) /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-TCLLIBS = $(TCLLIB) /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+TCLLIBS = $(TCLLIB) /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # erlang
@@ -252,7 +252,7 @@ ERLANG_ROOT_DIR = @ERLANG_ROOT_DIR@
 ERLANG_LIB_DIR = @ERLANG_LIB_DIR@
 ERLANG_INSTALL_LIB_DIR = @ERLANG_INSTALL_LIB_DIR@
 ERLANGCPPFLAGS = /D HAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclientwrapper.lib libsqlrclient.lib $(RUDIMENTSLIBS)
+ERLANGLIBS = $(ERLANGLIB) /LIBPATH:$(top_builddir)/src/api/c /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)clientwrapper.lib lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # node.js
@@ -260,7 +260,7 @@ NODE = "@NODEJSPREFIX@\node.exe"
 NODEGYP = $(NODE) "@NODEJSPREFIX@\node_modules\npm\node_modules\node-gyp\bin\node-gyp.js" --msvs_version=@NODEJSMSVSVERSION@
 NODEMODULEDIR = "@NODEJSPREFIX@\node_modules"
 NODEJSINCLUDEDIRS = @top_builddir@\src\api\c++;C:\Program Files\Firstworks\include
-NODEJSLIBS = @top_builddir@\src\api\c++\libsqlrclient.lib;C:\Program Files\Firstworks\lib\librudiments.lib
+NODEJSLIBS = @top_builddir@\src\api\c++\lib$(SQLR)client.lib;C:\Program Files\Firstworks\lib\librudiments.lib
 
 
 # readline
@@ -281,14 +281,14 @@ ORACLELIBS = @ORACLELIBS@
 MYSQLINCLUDES = @MYSQLINCLUDES@
 MYSQLLIBS = @MYSQLLIBS@
 MYSQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+MYSQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # postgresql
 POSTGRESQLINCLUDES = @POSTGRESQLINCLUDES@
 POSTGRESQLLIBS = @POSTGRESQLLIBS@
 POSTGRESQLDRLIBCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-POSTGRESQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+POSTGRESQLDRLIBLIBS = /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # sqlite
@@ -306,7 +306,7 @@ ODBCINCLUDES = @ODBCINCLUDES@
 ODBCLIBS = @ODBCLIBS@
 ODBCUNICODE =
 ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) /D LIBSQLRODBC_EXPORTS /I$(top_builddir) /I$(top_builddir)\src\common /I$(top_builddir)\src\api\c++ $(RUDIMENTSINCLUDES) $(ODBCINCLUDES)
-ODBCDRIVERLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS) $(ODBCLIBS) /DEF:sqlrodbc.def
+ODBCDRIVERLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS) $(ODBCLIBS) /DEF:sqlrodbc.def
 
 
 # db2
@@ -330,8 +330,8 @@ UTILLIBS = $(RUDIMENTSLIBS) advapi32.lib
 
 
 # cmdline
-CMDLINECPPFLAGS = $(BASECPPFLAGS) /D SYSTEM_SQLRSHRC=\"$(sysconfdir)/sqlrsh\" /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-CMDLINELIBS = /LIBPATH:$(top_builddir)/src/util libsqlrutil.lib /LIBPATH:$(top_builddir)/src/api/c++ libsqlrclient.lib $(RUDIMENTSLIBS)
+CMDLINECPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util /I$(top_builddir)/src/server /I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
+CMDLINELIBS = /LIBPATH:$(top_builddir)/src/util lib$(SQLR)util.lib /LIBPATH:$(top_builddir)/src/api/c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # server
@@ -340,17 +340,17 @@ STATICPLUGINOBJS =
 STATICPLUGINLIBS =
 
 SERVERCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
-LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib
-SERVERLIBS = /LIBPATH:./ libsqlrserver.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib
+SERVERLIBS = /LIBPATH:./ lib$(SQLR)server.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 
 # plugins
 PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS /D LIBSQLRUTIL_EXPORTS
-PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
-CONFIGPLUGINLIBS = /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
+PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server lib$(SQLR)server.lib /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
+CONFIGPLUGINLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) /I$(top_builddir)\src\api\c++
-SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib
+SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib
 
 LOGGERCPPFLAGS = $(PLUGINCPPFLAGS)
 
@@ -359,7 +359,7 @@ INSTALLSHAREDLIB =
 
 # connections
 CONNECTIONCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir)\ /I$(top_builddir)\src\common /I$(top_builddir)\src\util /I$(top_builddir)\src\server $(RUDIMENTSINCLUDES) /D LIBSQLRSERVER_EXPORTS
-CONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\server libsqlrserver.lib /LIBPATH:$(top_builddir)\src\util libsqlrutil.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+CONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\server lib$(SQLR)server.lib /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 DB2CONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(DB2INCLUDES)
 DB2CONNECTIONLIBS = $(DB2LIBS) $(CONNECTIONLIBS)
@@ -383,7 +383,7 @@ POSTGRESQLCONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(POSTGRESQLINCLUDES)
 POSTGRESQLCONNECTIONLIBS = $(POSTGRESQLLIBS) $(CONNECTIONLIBS)
 
 ROUTERCONNECTIONCPPFLAGS = /I$(top_builddir)\src\api\c++ $(CONNECTIONCPPFLAGS)
-ROUTERCONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(CONNECTIONLIBS)
+ROUTERCONNECTIONLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib $(CONNECTIONLIBS)
 
 SQLITECONNECTIONCPPFLAGS = $(CONNECTIONCPPFLAGS) $(SQLITEINCLUDES)
 SQLITECONNECTIONLIBS = $(SQLITELIBS) $(CONNECTIONLIBS)
@@ -399,10 +399,10 @@ CONNECTIONSINSTALLTARGETS = @INSTALLDB2@ @INSTALLFIREBIRD@ @INSTALLMYSQL@ @INSTA
 
 # tests
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
-CPPTESTLIBS = /LIBPATH:$(libdir) libsqlrclient.lib $(RUDIMENTSLIBS)
+CPPTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 CTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
-CTESTLIBS = /LIBPATH:$(libdir) libsqlrclient.lib libsqlrclientwrapper.lib $(RUDIMENTSLIBS)
+CTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib lib$(SQLR)clientwrapper.lib $(RUDIMENTSLIBS)
 
 ODBCTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(ODBCINCLUDES)
 ODBCTESTLIBS = $(RUDIMENTSLIBS) $(ODBCLIBS)
@@ -414,12 +414,12 @@ DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 # bench
 BENCHCPPFLAGS = $(BASECPPFLAGS) $(RUDIMENTSINCLUDES) /I$(top_builddir)\src\api\c++
-BENCHLIBS = /LIBPATH:$(top_builddir)\src\api\c++ libsqlrclient.lib $(RUDIMENTSLIBS) $(EXTRALIBS) $(DB2LIBS) $(FIREBIRDLIBS) $(FREETDSLIBS) $(MYSQLLIBS) $(ORACLELIBS) $(POSTGRESQLLIBS) $(SQLITELIBS) $(SYBASELIBS)
+BENCHLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib $(RUDIMENTSLIBS) $(EXTRALIBS) $(DB2LIBS) $(FIREBIRDLIBS) $(FREETDSLIBS) $(MYSQLLIBS) $(ORACLELIBS) $(POSTGRESQLLIBS) $(SQLITELIBS) $(SYBASELIBS)
 
 
 # stress tests
 STRESSCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
-STRESSLIBS = /LIBPATH:$(libdir) libsqlrclient.lib $(RUDIMENTSLIBS)
+STRESSLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib $(RUDIMENTSLIBS)
 
 
 # microsoft-specific

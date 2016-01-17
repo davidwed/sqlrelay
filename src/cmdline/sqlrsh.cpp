@@ -139,9 +139,6 @@ class	sqlrsh {
 		void	startupMessage(sqlrshenv *env,
 					const char *host, uint16_t port,
 					const char *user);
-		void	systemRcFile(sqlrconnection *sqlrcon, 
-					sqlrcursor *sqlrcur, 
-					sqlrshenv *env);
 		void	userRcFile(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
 					sqlrshenv *env);
@@ -230,11 +227,6 @@ sqlrsh::sqlrsh() {
 sqlrsh::~sqlrsh() {
 	delete cmdline;
 	delete sqlrpth;
-}
-
-void sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-						sqlrshenv *env) {
-	runScript(sqlrcon,sqlrcur,env,SYSTEM_SQLRSHRC,false);
 }
 
 void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
@@ -1964,7 +1956,6 @@ void sqlrsh::execute(int argc, const char **argv) {
 	}
 
 	// process RC files
-	systemRcFile(&sqlrcon,&sqlrcur,&env);
 	userRcFile(&sqlrcon,&sqlrcur,&env);
 
 

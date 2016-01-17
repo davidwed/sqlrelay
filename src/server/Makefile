@@ -64,7 +64,7 @@ LIBSQLRSERVERLOBJS = \
 	$(CXX) $(CXXFLAGS) $(SERVERCPPFLAGS) $(COMPILE) $<
 
 all: $(STATICPLUGINSRCS) \
-	libsqlrserver.$(LIBEXT) \
+	lib$(SQLR)server.$(LIBEXT) \
 	$(SQLR)-start$(EXE) \
 	$(SQLR)-stop$(EXE) \
 	$(SQLR)-listener$(EXE) \
@@ -78,7 +78,7 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(SQLR)-pwdenc$(EXE) $(SQLR)-status$(EXE) $(STATICPLUGINSRCS)
 	$(RMTREE) .libs
 
-libsqlrserver.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)
+lib$(SQLR)server.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LIBSQLRSERVERLOBJS) $(STATICPLUGINLOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBSQLRSERVERLIBS) $(RUDIMENTSLIBS) $(STATICPLUGINLIBS) $(EXTRALIBS)
 
 $(SQLR)-start$(EXE): sqlr-start.cpp sqlr-start.$(OBJ)
@@ -308,13 +308,13 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) libsqlrserver.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) lib$(SQLR)server.$(LIBEXT) $(bindir)
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrserver.lib $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)server.lib $(libdir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrserver.$(LIBEXT) $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)server.$(LIBEXT) $(libdir)
 	$(LTFINISH) $(libdir)
 
 uninstall: $(UNINSTALLLIB)
@@ -348,8 +348,11 @@ uninstall: $(UNINSTALLLIB)
 		$(debugdir)
 
 uninstalldll:
-	$(RM) $(bindir)/libsqlrserver.$(LIBEXT) \
+	$(RM) $(bindir)/lib$(SQLR)server.$(LIBEXT) \
+		$(libdir)/lib$(SQLR)server.lib \
+		$(bindir)/libsqlrserver.$(LIBEXT) \
 		$(libdir)/libsqlrserver.lib
 
 uninstalllib:
-	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrserver.$(LIBEXT)
+	$(LTUNINSTALL) $(RM) $(libdir)/lib$(SQLR)server.$(LIBEXT) \
+				 $(libdir)/libsqlrserver.$(LIBEXT)

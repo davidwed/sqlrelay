@@ -8,9 +8,9 @@ exec_prefix=@exec_prefix@
 version=@SQLR_VERSION@
 
 if ( test "@libdir@" = "/usr/lib" ); then
-	sqlrclientwrapper_libs="-lsqlrclientwrapper -lsqlrclient -lstdc++ "
+	sqlrclientwrapper_libs="-l@SQLR@clientwrapper -l@SQLR@client -lstdc++ "
 else
-	sqlrclientwrapper_libs="-L@libdir@ -lsqlrclientwrapper -lsqlrclient -lstdc++ "
+	sqlrclientwrapper_libs="-L@libdir@ -l@SQLR@clientwrapper -l@SQLR@client -lstdc++ "
 fi
 sqlrclientwrapper_cflags="-I@includedir@"
 

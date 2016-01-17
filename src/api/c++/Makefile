@@ -13,13 +13,13 @@ LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ) row.$(OBJ)
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPCPPFLAGS) $(COMPILE) $<
 
-all: libsqlrclient.$(LIBEXT)
+all: lib$(SQLR)client.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-libsqlrclient.$(LIBEXT): $(SRCS) $(LOBJS)
+lib$(SQLR)client.$(LIBEXT): $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(CPPLIBS)
 
 install: $(INSTALLLIB)
@@ -50,13 +50,13 @@ install: $(INSTALLLIB)
 
 installdll::
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) libsqlrclient.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) lib$(SQLR)client.$(LIBEXT) $(bindir)
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrclient.lib $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)client.lib $(libdir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrclient.$(LIBEXT) $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)client.$(LIBEXT) $(libdir)
 	$(LTFINISH) $(libdir)
 
 uninstall: $(UNINSTALLLIB)
@@ -74,8 +74,11 @@ uninstall: $(UNINSTALLLIB)
 	$(RMTREE) $(includedir)/sqlrelay
 
 uninstalldll:
-	$(RM) $(bindir)/libsqlrclient.$(LIBEXT) \
+	$(RM) $(bindir)/lib$(SQLR)client.$(LIBEXT) \
+		$(libdir)/lib$(SQLR)client.lib \
+		$(bindir)/libsqlrclient.$(LIBEXT) \
 		$(libdir)/libsqlrclient.lib
 
 uninstalllib:
-	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclient.$(LIBEXT)
+	$(LTUNINSTALL) $(RM) $(libdir)/lib$(SQLR)client.$(LIBEXT) \
+				$(libdir)/libsqlrclient.$(LIBEXT)

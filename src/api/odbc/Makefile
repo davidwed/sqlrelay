@@ -10,31 +10,33 @@ include ../../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(ODBCDRIVERCPPFLAGS) $(COMPILE) $<
 
-all: libsqlrodbc.$(LIBEXT)
+all: lib$(SQLR)odbc.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-libsqlrodbc.$(LIBEXT): sqlrodbc.cpp sqlrodbc.$(OBJ)
+lib$(SQLR)odbc.$(LIBEXT): sqlrodbc.cpp sqlrodbc.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrodbc.$(OBJ) $(LDFLAGS) $(ODBCDRIVERLIBS) $(ODBCDRIVERRPATH) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) libsqlrodbc.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) lib$(SQLR)odbc.$(LIBEXT) $(bindir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrodbc.$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libsqlrodbc.a
-	$(RM) $(libdir)/libsqlrodbc.$(LIBEXT)
+	$(LTINSTALL) $(CP) lib$(SQLR)odbc.$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/lib$(SQLR)odbc.a
+	$(RM) $(libdir)/lib$(SQLR)odbc.$(LIBEXT)
 
 uninstall: $(UNINSTALLLIB)
 
 uninstalldll:
-	$(RM) $(bindir)/libsqlrodbc*
+	$(RM) $(bindir)/lib$(SQLR)odbc* \
+		$(bindir)/libsqlrodbc*
 
 uninstalllib:
-	$(RM) $(libdir)/libsqlrodbc*
+	$(RM) $(libdir)/lib$(SQLR)odbc* \
+		$(libdir)/libsqlrodbc*

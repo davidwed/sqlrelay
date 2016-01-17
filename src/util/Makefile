@@ -21,13 +21,13 @@ LOBJS = sqlrcmdline.$(OBJ) \
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(UTILCPPFLAGS) $(COMPILE) $<
 
-all: $(STATICUTILPLUGINSRCS) libsqlrutil.$(LIBEXT)
+all: $(STATICUTILPLUGINSRCS) lib$(SQLR)util.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest $(STATICUTILPLUGINSRCS)
 	$(RMTREE) .libs
 
-libsqlrutil.$(LIBEXT): $(SRCS) $(LOBJS)
+lib$(SQLR)util.$(LIBEXT): $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(STATICUTILPLUGINLOBJS) $(LDFLAGS) $(LINKFLAGS) $(UTILLIBS)
 
 sqlrconfigdeclarations.cpp: sqlrconfigdeclarations.cpp.in
@@ -56,13 +56,13 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) libsqlrutil.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) lib$(SQLR)util.$(LIBEXT) $(bindir)
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrutil.lib $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)util.lib $(libdir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrutil.$(LIBEXT) $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)util.$(LIBEXT) $(libdir)
 	$(LTFINISH) $(libdir)
 
 uninstall: $(UNINSTALLLIB)
@@ -70,8 +70,11 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrutildll.h
 
 uninstalldll:
-	$(RM) $(bindir)/libsqlrutil.$(LIBEXT) \
+	$(RM) $(bindir)/lib$(SQLR)util.$(LIBEXT) \
+		$(libdir)/lib$(SQLR)util.lib \
+		$(bindir)/libsqlrutil.$(LIBEXT) \
 		$(libdir)/libsqlrutil.lib
 
 uninstalllib:
-	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrutil.$(LIBEXT)
+	$(LTUNINSTALL) $(RM) $(libdir)/lib$(SQLR)util.$(LIBEXT) \
+				$(libdir)/libsqlrutil.$(LIBEXT)

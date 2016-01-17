@@ -8,9 +8,9 @@ exec_prefix=@exec_prefix@
 version=@SQLR_VERSION@
 
 if ( test "@libdir@" = "/usr/lib" ); then
-	sqlrserver_libs="-lsqlrserver -lsqlrutil"
+	sqlrserver_libs="-l@SQLR@server -l@SQLR@util"
 else
-	sqlrserver_libs="-L@libdir@ -lsqlrserver -lsqlrutil"
+	sqlrserver_libs="-L@libdir@ -l@SQLR@server -l@SQLR@util"
 fi
 sqlrserver_cflags="@FPIC@ -I@includedir@"
 
