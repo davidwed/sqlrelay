@@ -101,10 +101,11 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	scratch.append(lsdir)->append("cache")->append(slash);
 	cachedir=scratch.detachString();
 
-	scratch.append(sysconfdir)->append("sqlrelay.conf");
+	scratch.append(sysconfdir)->append(SQLRELAY)->append(".conf");
 	defaultconfigfile=scratch.detachString();
 
-	scratch.append(sysconfdir)->append("sqlrelay.conf.d")->append(slash);
+	scratch.append(sysconfdir)->append(SQLRELAY)->append(".conf.d");
+	scratch.append(slash);
 	defaultconfigdir=scratch.detachString();
 
 	scratch.append(defaultconfigfile)->
