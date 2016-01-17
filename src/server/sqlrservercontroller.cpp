@@ -508,7 +508,8 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	// load the connection module
 	stringbuffer	modulename;
 	modulename.append(sqlrpth->getLibExecDir());
-	modulename.append("sqlrconnection_");
+	modulename.append(SQLR);
+	modulename.append("connection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!conndl.open(modulename.getString(),true,true)) {
 		stderror.printf("failed to load connection module: %s\n",
@@ -4494,7 +4495,8 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 	// load the parser module
 	stringbuffer	modulename;
 	modulename.append(sqlrpth->getLibExecDir());
-	modulename.append("sqlrparser_");
+	modulename.append(SQLR);
+	modulename.append("parser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!sqlrpdl.open(modulename.getString(),true,true)) {
 		if (debugsqlrparser || errorifnotfound) {

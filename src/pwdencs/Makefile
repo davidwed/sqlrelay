@@ -10,49 +10,52 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: sqlrpwdenc_rot.$(LIBEXT) \
-	sqlrpwdenc_md5.$(LIBEXT) \
-	sqlrpwdenc_crypt.$(LIBEXT)
+all: $(SQLR)pwdenc_rot.$(LIBEXT) \
+	$(SQLR)pwdenc_md5.$(LIBEXT) \
+	$(SQLR)pwdenc_crypt.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrpwdenc_rot.$(LIBEXT): rot.cpp rot.$(OBJ)
+$(SQLR)pwdenc_rot.$(LIBEXT): rot.cpp rot.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ rot.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
-sqlrpwdenc_md5.$(LIBEXT): md5.cpp md5.$(OBJ)
+$(SQLR)pwdenc_md5.$(LIBEXT): md5.cpp md5.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ md5.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
-sqlrpwdenc_crypt.$(LIBEXT): crypt.cpp crypt.$(OBJ)
+$(SQLR)pwdenc_crypt.$(LIBEXT): crypt.cpp crypt.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ crypt.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrpwdenc_rot.$(LIBEXT) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrpwdenc_md5.$(LIBEXT) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrpwdenc_crypt.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_rot.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_md5.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_crypt.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrpwdenc_rot.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrpwdenc_rot.a
-	$(RM) $(libexecdir)/sqlrpwdenc_rot.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_rot.so so $(MODULESUFFIX)
-	$(LTINSTALL) $(CP) sqlrpwdenc_md5.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrpwdenc_md5.a
-	$(RM) $(libexecdir)/sqlrpwdenc_md5.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_md5.so so $(MODULESUFFIX)
-	$(LTINSTALL) $(CP) sqlrpwdenc_crypt.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrpwdenc_crypt.a
-	$(RM) $(libexecdir)/sqlrpwdenc_crypt.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_crypt.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_rot.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_rot.a
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_rot.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)pwdenc_rot.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_md5.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_md5.a
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_md5.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)pwdenc_md5.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_crypt.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_crypt.a
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_crypt.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)pwdenc_crypt.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrpwdenc_rot.*
-	$(RM) $(libexecdir)/sqlrpwdenc_md5.*
-	$(RM) $(libexecdir)/sqlrpwdenc_crypt.*
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_rot.* \
+		$(libexecdir)/$(SQLR)pwdenc_md5.* \
+		$(libexecdir)/$(SQLR)pwdenc_crypt.* \
+		$(libexecdir)/sqlrpwdenc_rot.* \
+		$(libexecdir)/sqlrpwdenc_md5.* \
+		$(libexecdir)/sqlrpwdenc_crypt.*

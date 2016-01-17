@@ -4831,7 +4831,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_DRIVER_NAME:
 			debugPrintf("  infotype: "
 					"SQL_DRIVER_NAME\n");
-			strval="SQL Relay";
+			strval=SQL_RELAY;
 			break;
 		case SQL_DRIVER_VER:
 			debugPrintf("  infotype: "
@@ -8164,7 +8164,7 @@ static void getDsnFromUi() {
 
 static bool writeDsn() {
 	const char	*dsnname=dsndict.getValue("DSN");
-	if (SQLWriteDSNToIni(dsnname,"SQL Relay")==FALSE) {
+	if (SQLWriteDSNToIni(dsnname,SQL_RELAY)==FALSE) {
 		dsnError();
 		return false;
 	}
@@ -8292,12 +8292,19 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 			WS_CAPTION|WS_SYSMENU|WS_THICKFRAME,
 			false);
 
+	stringbuffer	reqtitle;
+	if (frequest==ODBC_ADD_DSN) {
+		reqtitle.append("Create a New Data Source to ");
+		reqtitle.append(SQL_RELAY);
+	} else {
+		reqtitle.append(SQL_RELAY);
+		reqtitle.append(" Data Source Configuration");
+	}
+
 	// create the dialog window...
 	mainwindow=CreateWindowEx(WS_EX_CONTROLPARENT,
 				sqlrwindowclass,
-				(frequest==ODBC_ADD_DSN)?
-					"Create a New Data Source to SQL Relay":
-					"SQL Relay Data Source Configuration",
+				reqtitle.getString(),
 				WS_OVERLAPPED|WS_CAPTION|
 				WS_SYSMENU|WS_THICKFRAME,
 				CW_USEDEFAULT,

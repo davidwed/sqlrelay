@@ -109,7 +109,8 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 	// load the result set translation module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
-	modulename.append("sqlrresultsettranslation_");
+	modulename.append(SQLR);
+	modulename.append("resultsettranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

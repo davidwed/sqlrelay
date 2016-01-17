@@ -10,29 +10,29 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(WERROR) $(AUTHCPPFLAGS) $(COMPILE) $<
 
-all: sqlrconfig_xml.$(LIBEXT)
+all: $(SQLR)config_xml.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrconfig_xml.$(LIBEXT): xml.cpp xml.$(OBJ)
+$(SQLR)config_xml.$(LIBEXT): xml.cpp xml.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ xml.$(OBJ) $(LDFLAGS) $(CONFIGPLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconfig_xml.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)config_xml.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconfig_xml.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrconfig_xml.a
-	$(RM) $(libexecdir)/sqlrconfig_xml.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrconfig_xml.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)config_xml.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)config_xml.a
+	$(RM) $(libexecdir)/$(SQLR)config_xml.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)config_xml.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrconfig_xml.*
+	$(RM) $(libexecdir)/$(SQLR)config_xml.* $(libexecdir)/sqlrconfig_xml.*

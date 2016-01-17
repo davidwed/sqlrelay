@@ -97,7 +97,8 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	// load the query module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
-	modulename.append("sqlrquery_");
+	modulename.append(SQLR);
+	modulename.append("query_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

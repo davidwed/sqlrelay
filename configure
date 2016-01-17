@@ -37759,7 +37759,7 @@ echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
 echo
-echo " Branding     : $SQLRELAY / $SQLR"
+echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
 
 CMDLINEBUILD="no "
 READLINEBUILD="no "

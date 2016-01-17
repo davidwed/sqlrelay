@@ -10,29 +10,30 @@ include ../../config.mk
 .cpp.obj:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: sqlrtranslation_normalize.$(LIBEXT)
+all: $(SQLR)translation_normalize.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrtranslation_normalize.$(LIBEXT): normalize.cpp normalize.$(OBJ)
+$(SQLR)translation_normalize.$(LIBEXT): normalize.cpp normalize.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ normalize.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrtranslation_normalize.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)translation_normalize.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrtranslation_normalize.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrtranslation_normalize.a
-	$(RM) $(libexecdir)/sqlrtranslation_normalize.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrtranslation_normalize.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)translation_normalize.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)translation_normalize.a
+	$(RM) $(libexecdir)/$(SQLR)translation_normalize.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)translation_normalize.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrtranslation_normalize.*
+	$(RM) $(libexecdir)/$(SQLR)translation_normalize.* \
+		$(libexecdir)/sqlrtranslation_normalize.*

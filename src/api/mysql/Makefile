@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-all: libmysql3sqlrelay.$(LIBEXT) libmysql40sqlrelay.$(LIBEXT) libmysql41sqlrelay.$(LIBEXT) libmysql50sqlrelay.$(LIBEXT) libmysql51sqlrelay.$(LIBEXT)
+all: libmysql3$(SQLRELAY).$(LIBEXT) libmysql40$(SQLRELAY).$(LIBEXT) libmysql41$(SQLRELAY).$(LIBEXT) libmysql50$(SQLRELAY).$(LIBEXT) libmysql51$(SQLRELAY).$(LIBEXT)
 
 .SUFFIXES: .lo
 
@@ -45,19 +45,19 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-libmysql3sqlrelay.$(LIBEXT): mysql.cpp mysql3.$(OBJ)
+libmysql3$(SQLRELAY).$(LIBEXT): mysql.cpp mysql3.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mysql3.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
-libmysql40sqlrelay.$(LIBEXT): mysql.cpp mysql40.$(OBJ)
+libmysql40$(SQLRELAY).$(LIBEXT): mysql.cpp mysql40.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mysql40.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
-libmysql41sqlrelay.$(LIBEXT): mysql.cpp mysql41.$(OBJ)
+libmysql41$(SQLRELAY).$(LIBEXT): mysql.cpp mysql41.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mysql41.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
-libmysql50sqlrelay.$(LIBEXT): mysql.cpp mysql50.$(OBJ)
+libmysql50$(SQLRELAY).$(LIBEXT): mysql.cpp mysql50.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mysql50.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
-libmysql51sqlrelay.$(LIBEXT): mysql.cpp mysql51.$(OBJ)
+libmysql51$(SQLRELAY).$(LIBEXT): mysql.cpp mysql51.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mysql51.$(OBJ) $(LDFLAGS) $(MYSQLDRLIBLIBS) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
@@ -69,36 +69,36 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libmysql3sqlrelay.$(LIBEXT) $(bindir)
-	$(LTINSTALL) $(CP) libmysql40sqlrelay.$(LIBEXT) $(bindir)
-	$(LTINSTALL) $(CP) libmysql41sqlrelay.$(LIBEXT) $(bindir)
-	$(LTINSTALL) $(CP) libmysql50sqlrelay.$(LIBEXT) $(bindir)
-	$(LTINSTALL) $(CP) libmysql51sqlrelay.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql3$(SQLRELAY).$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql40$(SQLRELAY).$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql41$(SQLRELAY).$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql50$(SQLRELAY).$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql51$(SQLRELAY).$(LIBEXT) $(bindir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libmysql3sqlrelay.$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql3sqlrelay.a
-	$(RM) $(libdir)/libmysql3sqlrelay.$(LIBEXT)
-	$(LTINSTALL) $(CP) libmysql40sqlrelay.$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql40sqlrelay.a
-	$(RM) $(libdir)/libmysql40sqlrelay.$(LIBEXT)
-	$(LTINSTALL) $(CP) libmysql41sqlrelay.$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql41sqlrelay.a
-	$(RM) $(libdir)/libmysql41sqlrelay.$(LIBEXT)
-	$(LTINSTALL) $(CP) libmysql50sqlrelay.$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql50sqlrelay.a
-	$(RM) $(libdir)/libmysql50sqlrelay.$(LIBEXT)
-	$(LTINSTALL) $(CP) libmysql51sqlrelay.$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql51sqlrelay.a
-	$(RM) $(libdir)/libmysql51sqlrelay.$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql3$(SQLRELAY).$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql3$(SQLRELAY).a
+	$(RM) $(libdir)/libmysql3$(SQLRELAY).$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql40$(SQLRELAY).$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql40$(SQLRELAY).a
+	$(RM) $(libdir)/libmysql40$(SQLRELAY).$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql41$(SQLRELAY).$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql41$(SQLRELAY).a
+	$(RM) $(libdir)/libmysql41$(SQLRELAY).$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql50$(SQLRELAY).$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql50$(SQLRELAY).a
+	$(RM) $(libdir)/libmysql50$(SQLRELAY).$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql51$(SQLRELAY).$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql51$(SQLRELAY).a
+	$(RM) $(libdir)/libmysql51$(SQLRELAY).$(LIBEXT)
 
 uninstall: $(UNINSTALLLIB)
 	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map
 	$(RM) $(EXAMPLEDIR)/sample-mssqlserver-mysql-errors.map
 
 uninstalldll:
-	$(RM) $(bindir)/libmysql*sqlrelay*
+	$(RM) $(bindir)/libmysql*$(SQLRELAY)* $(bindir)/libmysql*sqlrelay*
 
 uninstalllib:
-	$(RM) $(libdir)/libmysql*sqlrelay*
+	$(RM) $(libdir)/libmysql*$(SQLRELAY)* $(libdir)/libmysql*sqlrelay*

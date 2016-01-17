@@ -10,31 +10,31 @@ include ../../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(POSTGRESQLDRLIBCPPFLAGS) $(COMPILE) $<
 
-all: libpqsqlrelay.$(LIBEXT)
+all: libpq$(SQLRELAY).$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-libpqsqlrelay.$(LIBEXT): pqsqlrelay.cpp pqsqlrelay.$(OBJ)
+libpq$(SQLRELAY).$(LIBEXT): pqsqlrelay.cpp pqsqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ pqsqlrelay.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(POSTGRESQLDRLIBLIBS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) $(CP) libpqsqlrelay.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libpq$(SQLRELAY).$(LIBEXT) $(bindir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libpqsqlrelay.$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libpqsqlrelay.a
-	$(RM) $(libdir)/libpqsqlrelay.$(LIBEXT)
+	$(LTINSTALL) $(CP) libpq$(SQLRELAY).$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libpq$(SQLRELAY).a
+	$(RM) $(libdir)/libpq$(SQLRELAY).$(LIBEXT)
 
 uninstall: $(UNINSTALLLIB)
 
 uninstalldll:
-	$(RM) $(bindir)/libpqsqlrelay*
+	$(RM) $(bindir)/libpq$(SQLRELAY)* $(bindir)/libpqsqlrelay*
 
 uninstalllib:
-	$(RM) $(libdir)/libpqsqlrelay*
+	$(RM) $(libdir)/libpq$(SQLRELAY)* $(libdir)/libpqsqlrelay*

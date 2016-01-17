@@ -117,7 +117,8 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	// load the trigger module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
-	modulename.append("sqlrtrigger_");
+	modulename.append(SQLR);
+	modulename.append("trigger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

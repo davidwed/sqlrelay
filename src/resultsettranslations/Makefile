@@ -10,29 +10,30 @@ include ../../config.mk
 .cpp.obj:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: sqlrresultsettranslation_reformatdatetime.$(LIBEXT)
+all: $(SQLR)resultsettranslation_reformatdatetime.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrresultsettranslation_reformatdatetime.$(LIBEXT): reformatdatetime.cpp reformatdatetime.$(OBJ)
+$(SQLR)resultsettranslation_reformatdatetime.$(LIBEXT): reformatdatetime.cpp reformatdatetime.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ reformatdatetime.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrresultsettranslation_reformatdatetime.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)resultsettranslation_reformatdatetime.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrresultsettranslation_reformatdatetime.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrresultsettranslation_reformatdatetime.a
-	$(RM) $(libexecdir)/sqlrresultsettranslation_reformatdatetime.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrresultsettranslation_reformatdatetime.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)resultsettranslation_reformatdatetime.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)resultsettranslation_reformatdatetime.a
+	$(RM) $(libexecdir)/$(SQLR)resultsettranslation_reformatdatetime.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)resultsettranslation_reformatdatetime.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrresultsettranslation_reformatdatetime.*
+	$(RM) $(libexecdir)/$(SQLR)resultsettranslation_reformatdatetime.* \
+		$(libexecdir)/sqlrresultsettranslation_reformatdatetime.*

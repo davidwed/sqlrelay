@@ -12,52 +12,56 @@ include ../../config.mk
 
 all: all-base $(AUTHALLOPTIONALTARGETS)
 
-all-base: sqlrauth_userlist.$(LIBEXT) sqlrauth_database.$(LIBEXT)
+all-base: $(SQLR)auth_userlist.$(LIBEXT) $(SQLR)auth_database.$(LIBEXT)
 
-all-sqlrelay: sqlrauth_sqlrelay.$(LIBEXT)
+all-sqlrelay: $(SQLR)auth_sqlrelay.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrauth_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)
+$(SQLR)auth_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
-sqlrauth_database.$(LIBEXT): database.cpp database.$(OBJ)
+$(SQLR)auth_database.$(LIBEXT): database.cpp database.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ database.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
-sqlrauth_sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
+$(SQLR)auth_sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(SQLRAUTH_SQLRELAYLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrauth_userlist.$(LIBEXT) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrauth_database.$(LIBEXT) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrauth_sqlrelay.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_userlist.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_database.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB) $(AUTHINSTALLSHAREDLIBOPTIONALTARGETS)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrauth_userlist.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrauth_userlist.a
-	$(RM) $(libexecdir)/sqlrauth_userlist.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrauth_userlist.so so $(MODULESUFFIX)
-	$(LTINSTALL) $(CP) sqlrauth_database.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrauth_database.a
-	$(RM) $(libexecdir)/sqlrauth_database.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrauth_database.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)auth_userlist.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_userlist.a
+	$(RM) $(libexecdir)/$(SQLR)auth_userlist.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_userlist.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)auth_database.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_database.a
+	$(RM) $(libexecdir)/$(SQLR)auth_database.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_database.so so $(MODULESUFFIX)
 
 installsharedlib-sqlrelay:
-	$(LTINSTALL) $(CP) sqlrauth_sqlrelay.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrauth_sqlrelay.a
-	$(RM) $(libexecdir)/sqlrauth_sqlrelay.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrauth_sqlrelay.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_sqlrelay.a
+	$(RM) $(libexecdir)/$(SQLR)auth_sqlrelay.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_sqlrelay.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrauth_default.*
-	$(RM) $(libexecdir)/sqlrauth_userlist.*
-	$(RM) $(libexecdir)/sqlrauth_database.*
-	$(RM) $(libexecdir)/sqlrauth_sqlrelay.*
+	$(RM) $(libexecdir)/$(SQLR)auth_default.* \
+		$(libexecdir)/$(SQLR)auth_userlist.* \
+		$(libexecdir)/$(SQLR)auth_database.* \
+		$(libexecdir)/$(SQLR)auth_sqlrelay.* \
+		$(libexecdir)/sqlrauth_default.* \
+		$(libexecdir)/sqlrauth_userlist.* \
+		$(libexecdir)/sqlrauth_database.* \
+		$(libexecdir)/sqlrauth_sqlrelay.*

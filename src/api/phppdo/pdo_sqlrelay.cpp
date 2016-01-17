@@ -1363,9 +1363,14 @@ static PHP_MSHUTDOWN_FUNCTION(pdo_sqlrelay) {
 }
 
 static PHP_MINFO_FUNCTION(pdo_sqlrelay) {
+
+	stringbuffer	title;
+	title.append("PDO Driver for ");
+	title.append(SQL_RELAY);
+
 	php_info_print_table_start();
-	php_info_print_table_header(2, "PDO Driver for SQL Relay", "enabled");
-	php_info_print_table_row(2, "Client API version", SQLR_VERSION);
+	php_info_print_table_header(2,title.getString(),"enabled");
+	php_info_print_table_row(2,"Client API version",SQLR_VERSION);
 	php_info_print_table_end();
 }
 

@@ -106,7 +106,8 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	// load the translation module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
-	modulename.append("sqlrtranslation_");
+	modulename.append(SQLR);
+	modulename.append("translation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

@@ -97,7 +97,8 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	// load the logger module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
-	modulename.append("sqlrlogger_");
+	modulename.append(SQLR);
+	modulename.append("logger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

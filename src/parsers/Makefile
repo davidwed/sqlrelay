@@ -10,30 +10,30 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: sqlrparser_default.$(LIBEXT)
+all: $(SQLR)parser_default.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrparser_default.$(LIBEXT): default.cpp default.$(OBJ)
+$(SQLR)parser_default.$(LIBEXT): default.cpp default.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ default.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrparser_default.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)parser_default.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrparser_default.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/sqlrparser_default.a
-	$(RM) $(libexecdir)/sqlrparser_default.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/sqlrparser_default.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)parser_default.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)parser_default.a
+	$(RM) $(libexecdir)/$(SQLR)parser_default.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)parser_default.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrparser_default.*
-	$(RM) $(libexecdir)/sqlrmetadata_*
+	$(RM) $(libexecdir)/$(SQLR)parser_default.* \
+		$(libexecdir)/sqlrparser_default.*
