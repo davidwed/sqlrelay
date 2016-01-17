@@ -1815,7 +1815,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 void sqlrsh::startupMessage(sqlrshenv *env, const char *host,
 					uint16_t port, const char *user) {
 
-	stdoutput.printf("SQLRShell - ");
+	stdoutput.printf("%ssh - ",SQLR);
 	stdoutput.printf("Version %s\n",SQLR_VERSION);
 	stdoutput.printf("	Connected to: ");
 	stdoutput.printf("%s:%d as %s\n\n",host,port,user);
@@ -1905,8 +1905,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*script=cmdline->getValue("-script");
 	const char	*command=cmdline->getValue("-command");
 	
-	if (charstring::isNullOrEmpty(id) ||
-		charstring::isNullOrEmpty(host) ||
+	if (charstring::isNullOrEmpty(id) &&
+		charstring::isNullOrEmpty(host) &&
 		charstring::isNullOrEmpty(socket)) {
 
 		stdoutput.printf("usage:\n"

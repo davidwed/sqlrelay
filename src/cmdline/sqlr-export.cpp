@@ -117,10 +117,10 @@ int main(int argc, const char **argv) {
 		debugfile=cmdline.getValue("-debug");
 	}
 
-	if ((charstring::isNullOrEmpty(id) ||
-		charstring::isNullOrEmpty(host) ||
+	if ((charstring::isNullOrEmpty(id) &&
+		charstring::isNullOrEmpty(host) &&
 		charstring::isNullOrEmpty(socket)) ||
-		(charstring::isNullOrEmpty(table) ||
+		(charstring::isNullOrEmpty(table) &&
 			charstring::isNullOrEmpty(sequence))) {
 
 		stdoutput.printf("usage: \n"

@@ -546,8 +546,8 @@ int main(int argc, const char **argv) {
 	}
 	bool		verbose=cmdline.found("-verbose");
 
-	if ((charstring::isNullOrEmpty(id) ||
-		charstring::isNullOrEmpty(host) ||
+	if ((charstring::isNullOrEmpty(id) &&
+		charstring::isNullOrEmpty(host) &&
 		charstring::isNullOrEmpty(socket)) ||
 		charstring::isNullOrEmpty(file)) {
 
