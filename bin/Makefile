@@ -6,17 +6,20 @@ install: $(INSTALLCONFIG)
 
 install-clientconfig:
 	$(MKINSTALLDIRS) $(bindir)
-	$(CP) sqlrclient-config $(bindir)
-	$(CHMOD) 755 $(bindir)/sqlrclient-config
-	$(CP) sqlrclientwrapper-config $(bindir)
-	$(CHMOD) 755 $(bindir)/sqlrclientwrapper-config
+	$(CP) sqlrclient-config $(bindir)/$(SQLR)client-config
+	$(CHMOD) 755 $(bindir)/$(SQLR)client-config
+	$(CP) sqlrclientwrapper-config $(bindir)/$(SQLR)clientwrapper-config
+	$(CHMOD) 755 $(bindir)/$(SQLR)clientwrapper-config
 
 install-serverconfig:
 	$(MKINSTALLDIRS) $(bindir)
-	$(CP) sqlrserver-config $(bindir)
-	$(CHMOD) 755 $(bindir)/sqlrserver-config
+	$(CP) sqlrserver-config $(bindir)/$(SQLR)server-config
+	$(CHMOD) 755 $(bindir)/$(SQLR)server-config
 
 uninstall:
-	$(RM) $(bindir)/sqlrclient-config \
+	$(RM) $(bindir)/$(SQLR)client-config \
+		$(bindir)/$(SQLR)clientwrapper-config \
+		$(bindir)/$(SQLR)server-config \
+		$(bindir)/sqlrclient-config \
 		$(bindir)/sqlrclientwrapper-config \
 		$(bindir)/sqlrserver-config

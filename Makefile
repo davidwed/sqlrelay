@@ -36,10 +36,10 @@ install-license:
 
 install-pkgconfig:
 	$(MKINSTALLDIRS) $(libdir)/pkgconfig
-	$(CP) sqlrelay-c.pc $(libdir)/pkgconfig
-	$(CHMOD) 0644 $(libdir)/pkgconfig/sqlrelay-c.pc
-	$(CP) sqlrelay-c++.pc $(libdir)/pkgconfig
-	$(CHMOD) 0644 $(libdir)/pkgconfig/sqlrelay-c++.pc
+	$(CP) sqlrelay-c.pc $(libdir)/pkgconfig/$(SQLRELAY)-c.pc
+	$(CHMOD) 0644 $(libdir)/pkgconfig/$(SQLRELAY)-c.pc
+	$(CP) sqlrelay-c++.pc $(libdir)/pkgconfig/$(SQLRELAY)-c++.pc
+	$(CHMOD) 0644 $(libdir)/pkgconfig/$(SQLRELAY)-c++.pc
 
 uninstall: $(UNINSTALLSUBDIRS)
 	$(RMTREE) $(libexecdir)
@@ -66,7 +66,9 @@ uninstall-license:
 	$(RMTREE) $(licensedir)
 
 uninstall-pkgconfig:
-	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc \
+	$(RM) $(libdir)/pkgconfig/$(SQLRELAY)-c.pc \
+		$(libdir)/pkgconfig/$(SQLRELAY)-c++.pc \
+		$(libdir)/pkgconfig/sqlrelay-c.pc \
 		$(libdir)/pkgconfig/sqlrelay-c++.pc
 
 distclean: clean

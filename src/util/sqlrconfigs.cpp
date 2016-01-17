@@ -153,7 +153,8 @@ void sqlrconfigs::loadConfig(const char *module) {
 	// load the config module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
-	modulename.append("sqlrconfig_");
+	modulename.append(SQLR);
+	modulename.append("config_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

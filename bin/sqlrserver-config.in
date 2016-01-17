@@ -17,7 +17,7 @@ sqlrserver_cflags="@FPIC@ -I@includedir@"
 usage()
 {
 	cat <<EOF
-Usage: sqlrserver-config [OPTIONS]
+Usage: @SQLR@server-config [OPTIONS]
 Options:
 	[--prefix]
 	[--exec-prefix]

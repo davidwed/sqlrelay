@@ -5,9 +5,9 @@ libdir=@libdir@
 includedir=@includedir@
 
 
-Name: sqlrelay-c++
-Description: SQLRelay C++ client library
+Name: @SQLRELAY@-c++
+Description: @SQL_RELAY@ C++ client library
 Version: @SQLR_VERSION@
 Requires: rudiments
-Libs: -L@libdir@ -lsqlrclient 
+Libs: -L@libdir@ -l@SQLR@client 
 Cflags: -I@includedir@

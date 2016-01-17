@@ -19,13 +19,13 @@ localstatedir = "@localstatedir@"
 sysconfdir = "@sysconfdir@"
 mandir = "@mandir@"
 datadir = "@datadir@"
-docdir = $(datadir)\\doc\\sqlrelay
-licensedir = $(datadir)\\licenses\\sqlrelay
-EXAMPLEDIR = $(datadir)\\examples
-tmpdir = $(localstatedir)\\sqlrelay\\tmp
-cachedir = $(localstatedir)\\sqlrelay\\cache
-debugdir = $(localstatedir)\\sqlrelay\\debug
-logdir = $(localstatedir)\\sqlrelay\\log
+docdir = $(datadir)\\doc\\$(SQLRELAY)
+licensedir = $(datadir)\\licenses\\$(SQLRELAY)
+EXAMPLEDIR = $(datadir)\\$(SQLRELAY)\\examples
+tmpdir = $(localstatedir)\\$(SQLRELAY)\\tmp
+cachedir = $(localstatedir)\\$(SQLRELAY)\\cache
+debugdir = $(localstatedir)\\$(SQLRELAY)\\debug
+logdir = $(localstatedir)\\$(SQLRELAY)\\log
 initscript_prefix = @initscript_prefix@
 
 
@@ -90,6 +90,7 @@ LTUNINSTALL =
 LTCLEAN =
 RM = cscript /nologo @top_builddir@\rm.vbs
 RMTREE = cscript /nologo @top_builddir@\rmtree.vbs
+RMDIR = cscript /nologo @top_builddir@\rmdir.vbs
 
 
 # math library

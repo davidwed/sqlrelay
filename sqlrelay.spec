@@ -354,7 +354,7 @@ make
 
 %install
 rm -rf %{buildroot}
-make DESTDIR=%{buildroot} docdir=%{buildroot}%{_docdir}/%{name} EXAMPLEDIR=%{buildroot}%{_datadir}/examples/%{name} install
+make DESTDIR=%{buildroot} docdir=%{buildroot}%{_docdir}/%{name} install
 # get rid of some garbage
 rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 
@@ -593,7 +593,7 @@ rm -rf %{buildroot}
 %files doc
 %{_docdir}/%{name}
 %{_datadir}/licenses/%{name}
-%{_datadir}/examples/%{name}
+%{_datadir}/%{name}/examples
 
 %files man
 %{_mandir}

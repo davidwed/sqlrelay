@@ -3,19 +3,18 @@ top_builddir = ..
 include ../config.mk
 
 install:
-	$(MKINSTALLDIRS) $(sysconfdir)
 	$(MKINSTALLDIRS) $(sysconfdir)/sqlrelay.conf.d
-	$(CP) sqlrelay.conf.example $(sysconfdir)
-	$(CHMOD) 644 $(sysconfdir)/sqlrelay.conf.example
-	$(CP) sqlrelay.dtd $(sysconfdir)
-	$(CHMOD) 644 $(sysconfdir)/sqlrelay.dtd
-	$(CP) sqlrelay.xsd $(sysconfdir)
-	$(CHMOD) 644 $(sysconfdir)/sqlrelay.xsd
-	$(CP) sqlrelay.conf.example $(EXAMPLEDIR)/sqlrelay.conf
+	$(MKINSTALLDIRS) $(EXAMPLEDIR)
+	$(CP) sqlrelay.conf $(EXAMPLEDIR)/sqlrelay.conf
 	$(CHMOD) 644 $(EXAMPLEDIR)/sqlrelay.conf
 
 uninstall:
-	$(RM) $(sysconfdir)/sqlrelay.conf.example \
+	$(RM) $(EXAMPLEDIR)/sqlrelay.conf \
 		$(sysconfdir)/sqlrelay.xsd \
 		$(sysconfdir)/sqlrelay.dtd \
-		$(EXAMPLEDIR)/sqlrelay.conf
+		$(sysconfdir)/sqlrelay.conf.example \
+		$(datadir)/examples/sqlrelay.conf
+	-$(RMDIR) $(sysconfdir)/sqlrelay.conf.d 2> /dev/null
+	-$(RMDIR) $(EXAMPLEDIR) 2> /dev/null
+	-$(RMDIR) $(datadir)/$(SQLRELAY) 2> /dev/null
+	-$(RMDIR) $(datadir)/examples 2> /dev/null

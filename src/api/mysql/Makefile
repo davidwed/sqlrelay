@@ -94,8 +94,10 @@ installlib:
 	$(RM) $(libdir)/libmysql51$(SQLRELAY).$(LIBEXT)
 
 uninstall: $(UNINSTALLLIB)
-	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map
-	$(RM) $(EXAMPLEDIR)/sample-mssqlserver-mysql-errors.map
+	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map \
+		$(EXAMPLEDIR)/sample-mssqlserver-mysql-errors.map \
+		$(datadir)/examples/sample-oracle-mysql-errors.map \
+		$(datadir)/examples/sample-mssqlserver-mysql-errors.map
 
 uninstalldll:
 	$(RM) $(bindir)/libmysql*$(SQLRELAY)* $(bindir)/libmysql*sqlrelay*

@@ -17,7 +17,7 @@ sqlrclient_cflags="-I@includedir@"
 usage()
 {
 	cat <<EOF
-Usage: sqlrclient-config [OPTIONS]
+Usage: @SQLR@client-config [OPTIONS]
 Options:
 	[--prefix]
 	[--exec-prefix]

@@ -13,19 +13,19 @@ includedir = @includedir@
 libdir = @libdir@
 javadir = ${exec_prefix}/java
 dotnetdir = $(libdir)
-libexecdir = @libexecdir@/sqlrelay
+libexecdir = @libexecdir@/$(SQLRELAY)
 bindir = @bindir@
 localstatedir = @localstatedir@
 sysconfdir = @sysconfdir@
 mandir = @mandir@
 datadir = @datadir@
-docdir = ${datadir}/doc/sqlrelay
-licensedir = ${datadir}/licenses/sqlrelay
-EXAMPLEDIR = ${datadir}/examples
-tmpdir = ${localstatedir}/sqlrelay/tmp
-cachedir = ${localstatedir}/sqlrelay/cache
-debugdir = ${localstatedir}/sqlrelay/debug
-logdir = ${localstatedir}/sqlrelay/log
+docdir = ${datadir}/doc/$(SQLRELAY)
+licensedir = ${datadir}/licenses/$(SQLRELAY)
+EXAMPLEDIR = ${datadir}/$(SQLRELAY)/examples
+tmpdir = ${localstatedir}/$(SQLRELAY)/tmp
+cachedir = ${localstatedir}/$(SQLRELAY)/cache
+debugdir = ${localstatedir}/$(SQLRELAY)/debug
+logdir = ${localstatedir}/$(SQLRELAY)/log
 initscript_prefix = @initscript_prefix@
 
 
@@ -91,6 +91,7 @@ LTUNINSTALL = $(LIBTOOL) --mode=uninstall
 LTCLEAN = $(LIBTOOL) --mode=clean
 RM = rm -f
 RMTREE = rm -rf
+RMDIR = rmdir
 
 
 # command to create a symbolic link

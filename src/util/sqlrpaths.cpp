@@ -7,6 +7,8 @@
 #include <rudiments/sys.h>
 #include <rudiments/stringbuffer.h>
 
+#include <config.h>
+
 #ifdef _WIN32
 	#include <windows.h>
 #endif
@@ -50,7 +52,8 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	sysconfdir=scratch.detachString();
 
 	// libexecdir
-	scratch.append(prefix)->append("\\libexec\\sqlrelay\\");
+	scratch.append(prefix)->append("\\libexec\\");
+	scratch.append(SQLRELAY)->append("\\");
 	libexecdir=scratch.detachString();
 
 #else
@@ -70,7 +73,7 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 		localstatedir=defaultlocalstatedir;
 	}
 
-	scratch.append(localstatedir)->append("sqlrelay")->append(slash);
+	scratch.append(localstatedir)->append(SQLRELAY)->append(slash);
 	char	*lsdir=scratch.detachString();
 
 	scratch.append(lsdir)->append("tmp")->append(slash);

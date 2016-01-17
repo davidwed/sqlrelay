@@ -202,7 +202,6 @@ static void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
 
 	// print header
 	stdoutput.printf("<?xml version=\"1.0\"?>\n");
-	stdoutput.printf("<!DOCTYPE table SYSTEM \"sqlr-export.dtd\">\n");
 
 	// print table name
 	stdoutput.printf("<table name=\"%s\">\n",table);
@@ -320,7 +319,6 @@ static void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence) {
 
 	// print header
 	stdoutput.printf("<?xml version=\"1.0\"?>\n");
-	stdoutput.printf("<!DOCTYPE sequence SYSTEM \"sqlr-export.dtd\">\n");
 
 	// print sequence value
 	stdoutput.printf("<sequence name=\"%s\" value=\"%s\"/>\n",
