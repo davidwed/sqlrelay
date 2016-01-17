@@ -18,6 +18,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/thread.h>
 
+#include <config.h>
 #include <defaults.h>
 #include <defines.h>
 

@@ -17,6 +17,7 @@
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
+#include <config.h>
 #include <defaults.h>
 
 bool	scaler::shutdown=false;
