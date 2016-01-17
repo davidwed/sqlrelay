@@ -262,6 +262,12 @@
 /* Some versions of sqlite are transactional */
 #undef SQLITE_TRANSACTIONAL
 
+/* Prefix to use when naming binaries */
+#undef SQLR
+
+/* Title to use in messages */
+#undef SQLRELAY
+
 /* Platform supports shared libraries */
 #undef SQLRELAY_ENABLE_SHARED
 

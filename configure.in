@@ -382,9 +382,13 @@ AC_ARG_ENABLE(efence,
 	LIBEFENCE="-lefence",
 	LIBEFENCE="")
 AC_ARG_WITH(sqlr,
-	[  --with-sqlr                   prefix to use when naming binaries],
+	[  --with-sqlr                   prefix to use when naming binaries (default: sqlr)],
 	SQLR="$withval",
 	SQLR="sqlr")
+AC_ARG_WITH(sqlrelay,
+	[  --with-sqlrelay              title to use in messages (default: SQL Relay)],
+	SQLRELAY="$withval",
+	SQLRELAY="SQL Relay")
 AC_ARG_ENABLE(doc,
 	[  --disable-doc                 Don't install docs or man pages],
 	ENABLE_DOC="",
@@ -497,12 +501,16 @@ AC_SUBST(PSQLUSERPATH)
 AC_SUBST(LIBDMALLOC)
 AC_SUBST(LIBEFENCE)
 AC_SUBST(SQLR)
+AC_SUBST(SQLRELAY)
 AC_SUBST(ENABLE_CPP)
 AC_SUBST(ENABLE_ODBC_DRIVER)
 AC_SUBST(ENABLE_CMDLINE)
 AC_SUBST(ENABLE_SERVER)
 AC_SUBST(ENABLE_UTIL)
 AC_SUBST(ENABLE_DOC)
+
+AC_DEFINE_UNQUOTED(SQLR,["$SQLR"],Prefix to use when naming binaries)
+AC_DEFINE_UNQUOTED(SQLRELAY,["$SQLRELAY"],Title to use in messages)
 
 
 dnl Rewrite supplied paths.

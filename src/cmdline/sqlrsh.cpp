@@ -1731,10 +1731,9 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("	dbipaddress		- ");
 	stdoutput.printf("returns the ip address of the database\n");
 	stdoutput.printf("	clientversion		- ");
-	stdoutput.printf("returns the version of the SQL Relay\n");
-	stdoutput.printf("\t\t\t\t  client library\n");
+	stdoutput.printf("returns the version of the client library\n");
 	stdoutput.printf("	serverversion		- ");
-	stdoutput.printf("returns the version of the SQL Relay server\n");
+	stdoutput.printf("returns the version of the server\n");
 	stdoutput.printf("	use [database]		- ");
 	stdoutput.printf("change the current database/schema\n");
 	stdoutput.printf("	currentdb		- ");
@@ -2014,7 +2013,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%ssh is the SQL Relay command line database shell.\n"
+		"%ssh is the %s command line database shell.\n"
 		"\n"
 		"It can be used interactively, or non-interactively to run queries directly from the command line, or scripts containing queries.\n"
 		"\n"
@@ -2059,7 +2058,7 @@ static void helpmessage() {
 		"	%ssh -id myinst -command \"select * from mytable\" -quiet -format csv\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

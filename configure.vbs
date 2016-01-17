@@ -47,6 +47,7 @@ PHPPREFIX=""
 TCLPREFIX=""
 NODEJSPREFIX=""
 SQLR="sqlr"
+SQLRELAY="SQL Relay"
 
 if WScript.Arguments.Count>0 then
 	if Wscript.Arguments.Item(0)="--help" then
@@ -91,7 +92,8 @@ if WScript.Arguments.Count>0 then
 		WScript.Echo("  --with-php-prefix         Location of Perl")
 		WScript.Echo("  --with-tcl-prefix         Location of Perl")
 		WScript.Echo("  --with-nodejs-prefix      Location of Perl")
-		WScript.Echo("  --with-sqlr               prefix to use when naming binaries")
+		WScript.Echo("  --with-sqlr               prefix to use when naming binaries (default: sqlr)")
+		WScript.Echo("  --with-sqlrelay           title to use in messages (default: SQL Relay)")
 		WScript.Quit
 	end if
 end if
@@ -173,8 +175,10 @@ for i=0 to WScript.Arguments.Count-1
 		NODEJSPREFIX=mid(arg,22)
 	elseif arg="--disable-cs" then
 		disablecs=true
-	elseif mid(arg,1,21)="--with-sqlr=" then
+	elseif mid(arg,1,12)="--with-sqlr=" then
 		SQLR=mid(arg,13)
+	elseif mid(arg,1,16)="--with-sqlrelay=" then
+		SQLRELAY=mid(arg,17)
 	end if
 next
 
@@ -901,6 +905,7 @@ for i=lbound(infiles) to ubound(infiles)
 
 	' sqlr
 	content=replace(content,"@SQLR@",SQLR,1,-1,0)
+	content=replace(content,"@SQLRELAY@",SQLRELAY,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)

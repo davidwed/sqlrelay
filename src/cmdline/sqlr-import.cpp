@@ -483,7 +483,7 @@ void sqlrimport::massageField(stringbuffer *strb, const char *field) {
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-import is the SQL Relay database object import utility.\n"
+		"%s-import is the %s database object import utility.\n"
 		"\n"
 		"Import a database object from a file created previously or elsewhere using\n"
 		"sqlr-export.\n"
@@ -515,7 +515,7 @@ static void helpmessage() {
 		"	%s-import -config ./myconfig.conf -id myinst ...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

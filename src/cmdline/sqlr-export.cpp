@@ -47,7 +47,7 @@ static void csvEscapeField(const char *field, uint32_t length) {
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-export is the SQL Relay database object export utility.\n"
+		"%s-export is the %s database object export utility.\n"
 		"\n"
 		"Export a database object to a file for import later or elsewhere using\n"
 		"sqlr-import.\n"
@@ -79,7 +79,7 @@ static void helpmessage() {
 		"	%s-export -config ./myconfig.conf -id myinst ...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {
