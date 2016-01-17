@@ -1,6 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
+#include <rudiments/commandline.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 #include <rudiments/process.h>
@@ -48,7 +49,7 @@ int main(int argc, const char **argv) {
 	// parse the command line
 	sqlrcmdline	cmdl(argc,argv);
 
-	const char	*id=cmdl.getId();
+	const char	*id=cmdl.getValue("-id");
 	if (charstring::isNullOrEmpty(id)) {
 		stdoutput.printf("usage:\n"
 			" %s-status [-config config] -id id "

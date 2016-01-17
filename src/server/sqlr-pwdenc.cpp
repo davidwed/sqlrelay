@@ -47,12 +47,14 @@ int main(int argc, const char **argv) {
 	const char	*password=cmdline.getValue("-password");
 
 	// sanity check and usage message
-	if (!charstring::length(id) ||
-		!charstring::length(pwdencid) ||
-		!charstring::length(password)) {
+	if (charstring::isNullOrEmpty(id) ||
+		charstring::isNullOrEmpty(pwdencid) ||
+		charstring::isNullOrEmpty(password)) {
 
-		stderror.printf("usage: %s-pwdenc [-config config] "
-			"-id instance -pwdencid passwordencryptionid "
+		stderror.printf("usage:\n"
+			" %s-pwdenc [-config config] "
+			"-id instance \\\n"
+			"             -pwdencid passwordencryptionid "
 			"-password password\n",SQLR);
 		process::exit(1);
 	}
@@ -67,7 +69,7 @@ int main(int argc, const char **argv) {
 
 	// initialize the password encryption framework
 	const char	*pwdencs=cfg->getPasswordEncryptions();
-	if (!charstring::length(pwdencs)) {
+	if (charstring::isNullOrEmpty(pwdencs)) {
 		stderror.printf("password encryption id %s not found\n",
 								pwdencid);
 		process::exit(1);
