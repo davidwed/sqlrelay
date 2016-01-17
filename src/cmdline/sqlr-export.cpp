@@ -10,17 +10,19 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
-bool exportTable(sqlrcursor *sqlrcur,
+#include <version.h>
+
+static bool exportTable(sqlrcursor *sqlrcur,
 			const char *table, const char *format);
-void exportTableXml(sqlrcursor *sqlrcur, const char *table);
-void exportTableCsv(sqlrcursor *sqlrcur);
+static void exportTableXml(sqlrcursor *sqlrcur, const char *table);
+static void exportTableCsv(sqlrcursor *sqlrcur);
 
-bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
-			const char *sequence, const char *format);
-void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence);
-void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence);
+static bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+				const char *sequence, const char *format);
+static void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence);
+static void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence);
 
-void xmlEscapeField(const char *field, uint32_t length) {
+static void xmlEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		if (field[index]=='\'') {
 			stdoutput.printf("''");
@@ -34,7 +36,7 @@ void xmlEscapeField(const char *field, uint32_t length) {
 	}
 }
 
-void csvEscapeField(const char *field, uint32_t length) {
+static void csvEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		// backslash-escape double quotes and ignore non-ascii
 		// characters
@@ -46,9 +48,48 @@ void csvEscapeField(const char *field, uint32_t length) {
 	}
 }
 
+static void helpmessage() {
+
+	stdoutput.printf(
+		"%s-export is the SQL Relay database object export client.\n"
+		"\n"
+		"Export a database object to a file for import later or elsewhere using\n"
+		"sqlr-import.\n"
+		"\n"
+		"Usage: %s-export [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		"\n"
+		CONNECTIONOPTIONS
+		"\n"
+		"Command options:\n"
+		"	...\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"blah blah blah...\n"
+		"\n"
+		"	%s-export -host svr -port 9000 -user usr -password pwd ...\n"
+		"\n"
+		"blah blah blah...\n"
+		"\n"
+		"	%s-export -socket /tmp/svr.sock -user usr -password pwd ...\n"
+		"\n"
+		"blah blah blah...\n"
+		"	%s-export -id myinst ...\n"
+		"\n"
+		"blah blah blah...\n"
+		"\n"
+		"	%s-export -config ./myconfig.conf -id myinst ...\n"
+		"\n"
+		REPORTBUGS,
+		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+}
+
 int main(int argc, const char **argv) {
 
-	#include <version.h>
+	version(argc,argv);
+	help(argc,argv);
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);
@@ -133,7 +174,8 @@ int main(int argc, const char **argv) {
 	process::exit((result)?0:1);
 }
 
-bool exportTable(sqlrcursor *sqlrcur, const char *table, const char *format) {
+static bool exportTable(sqlrcursor *sqlrcur,
+				const char *table, const char *format) {
 
 	stringbuffer	query;
 	query.append("select * from ")->append(table);
@@ -151,7 +193,7 @@ bool exportTable(sqlrcursor *sqlrcur, const char *table, const char *format) {
 	return false;
 }
 
-void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
+static void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
 
 	// print header
 	stdoutput.printf("<?xml version=\"1.0\"?>\n");
@@ -193,7 +235,7 @@ void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
 	stdoutput.printf("</table>\n");
 }
 
-void exportTableCsv(sqlrcursor *sqlrcur) {
+static void exportTableCsv(sqlrcursor *sqlrcur) {
 
 	// print header
 	uint32_t	cols=sqlrcur->colCount();
@@ -228,7 +270,7 @@ void exportTableCsv(sqlrcursor *sqlrcur) {
 	}
 }
 
-bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+static bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				const char *sequence, const char *format) {
 
 	// the query we'll use to get the sequence depends on the database type
@@ -269,7 +311,7 @@ bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	return false;
 }
 
-void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence) {
+static void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence) {
 
 	// print header
 	stdoutput.printf("<?xml version=\"1.0\"?>\n");
@@ -280,7 +322,7 @@ void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence) {
 			sequence,sqlrcur->getField(0,(uint32_t)0));
 }
 
-void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence) {
+static void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence) {
 
 	// print header
 	stdoutput.printf("%s\n",sequence);

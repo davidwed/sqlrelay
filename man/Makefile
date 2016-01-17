@@ -8,6 +8,10 @@ install:
 	$(MKINSTALLDIRS) $(mandir)/man8
 	$(CP) man1/sqlrsh.1 $(mandir)/man1
 	$(CHMOD) 644 $(mandir)/man1/sqlrsh.1
+	$(CP) man1/sqlr-export.1 $(mandir)/man1
+	$(CHMOD) 644 $(mandir)/man1/sqlr-export.1
+	$(CP) man1/sqlr-import.1 $(mandir)/man1
+	$(CHMOD) 644 $(mandir)/man1/sqlr-import.1
 	$(CP) man8/sqlr-cachemanager.8 $(mandir)/man8
 	$(CHMOD) 644 $(mandir)/man8/sqlr-cachemanager.8
 	$(CP) man8/sqlr-connection.8 $(mandir)/man8
@@ -37,3 +41,5 @@ uninstall:
 
 man:
 	help2man --source="SQL Relay" --no-info sqlrsh > man1/sqlrsh.1
+	help2man --source="SQL Relay" --no-info sqlr-export > man1/sqlr-export.1
+	help2man --source="SQL Relay" --no-info sqlr-import > man1/sqlr-import.1

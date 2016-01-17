@@ -29,8 +29,8 @@ static void helpmessage();
 
 static void help(int argc, const char **argv) {
 
-	if (argc!=2 || (charstring::compare(argv[1],"-version") &&
-			charstring::compare(argv[1],"--version"))) {
+	if (argc!=2 || (charstring::compare(argv[1],"-help") &&
+			charstring::compare(argv[1],"--help"))) {
 		return;
 	}
 

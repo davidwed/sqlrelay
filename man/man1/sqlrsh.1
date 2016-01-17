@@ -72,9 +72,9 @@ Non\-interactive session, running commands from ./script.sql
 .IP
 sqlrsh \-id myinst \-script ./script.sql
 .PP
-Non\-interactive session, running query "select 1 from dual".
+Non\-interactive session, running query "select * from mytable" with csv output.
 .IP
-sqlrsh \-id myinst \-command "select 1 from dual" \-quiet
+sqlrsh \-id myinst \-command "select * from mytable" \-quiet \-format csv
 .SH AUTHOR
 Written by David Muse.
 .SH "REPORTING BUGS"

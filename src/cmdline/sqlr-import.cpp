@@ -12,6 +12,8 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
+#include <version.h>
+
 class sqlrimport : public xmlsax {
 	public:
 			sqlrimport(sqlrconnection *sqlrcon,
@@ -482,11 +484,48 @@ void sqlrimport::massageField(stringbuffer *strb, const char *field) {
 	}
 }
 
+static void helpmessage() {
 
+	stdoutput.printf(
+		"%s-import is the SQL Relay database object import client.\n"
+		"\n"
+		"Import a database object from a file created previously or elsewhere using\n"
+		"sqlr-export.\n"
+		"\n"
+		"Usage: %s-import [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		"\n"
+		CONNECTIONOPTIONS
+		"\n"
+		"Command options:\n"
+		"	...\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"blah blah blah...\n"
+		"\n"
+		"	%s-import -host svr -port 9000 -user usr -password pwd ...\n"
+		"\n"
+		"blah blah blah...\n"
+		"\n"
+		"	%s-import -socket /tmp/svr.sock -user usr -password pwd ...\n"
+		"\n"
+		"blah blah blah...\n"
+		"	%s-import -id myinst ...\n"
+		"\n"
+		"blah blah blah...\n"
+		"\n"
+		"	%s-import -config ./myconfig.conf -id myinst ...\n"
+		"\n"
+		REPORTBUGS,
+		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+}
 
 int main(int argc, const char **argv) {
 
-	#include <version.h>
+	version(argc,argv);
+	help(argc,argv);
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);
