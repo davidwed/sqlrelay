@@ -262,10 +262,10 @@
 /* Some versions of sqlite are transactional */
 #undef SQLITE_TRANSACTIONAL
 
-/* Prefix to use when naming binaries */
+/* replacement for "sqlr" */
 #undef SQLR
 
-/* Title to use in messages */
+/* replacement for "sqlrelay" */
 #undef SQLRELAY
 
 /* Platform supports shared libraries */
@@ -282,6 +282,9 @@
 
 /* Version */
 #undef SQLR_VERSION
+
+/* replacement for "SQL Relay" */
+#undef SQL_RELAY
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

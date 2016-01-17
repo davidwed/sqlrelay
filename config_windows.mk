@@ -4,6 +4,7 @@ SONAME_VERSION_INFO =
 SQLRELAY_ENABLE_SHARED = yes
 
 SQLR = @SQLR@
+SQLRELAY = @SQLRELAY@
 
 # installation directories
 prefix = "@prefix@"

@@ -836,6 +836,7 @@ ENABLE_SERVER
 ENABLE_CMDLINE
 ENABLE_ODBC_DRIVER
 ENABLE_CPP
+SQL_RELAY
 SQLRELAY
 SQLR
 LIBEFENCE
@@ -1008,6 +1009,7 @@ enable_dmalloc
 enable_efence
 with_sqlr
 with_sqlrelay
+with_sql_relay
 enable_doc
 enable_shared
 enable_static
@@ -1748,8 +1750,9 @@ Optional Packages:
   --with-nodejs-prefix          Location of node.js
   --with-pthread-prefix         Location of pthread library
   --with-system-libtool   use system libtool instead of ./libtool
-  --with-sqlr                   prefix to use when naming binaries (default: sqlr)
-  --with-sqlrelay              title to use in messages (default: SQL Relay)
+  --with-sqlr                   replacement for "sqlr"
+  --with-sqlrelay               replacement for "sqlrelay"
+  --with-sql-relay              replacement for "SQL Relay"
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
@@ -3388,7 +3391,15 @@ fi
 if test "${with_sqlrelay+set}" = set; then :
   withval=$with_sqlrelay; SQLRELAY="$withval"
 else
-  SQLRELAY="SQL Relay"
+  SQLRELAY="sqlrelay"
+fi
+
+
+# Check whether --with-sql-relay was given.
+if test "${with_sql_relay+set}" = set; then :
+  withval=$with_sql_relay; SQL_RELAY="$withval"
+else
+  SQL_RELAY="SQL Relay"
 fi
 
 # Check whether --enable-doc was given.
@@ -3516,6 +3527,7 @@ fi
 
 
 
+
 cat >>confdefs.h <<_ACEOF
 #define SQLR "$SQLR"
 _ACEOF
@@ -3523,6 +3535,11 @@ _ACEOF
 
 cat >>confdefs.h <<_ACEOF
 #define SQLRELAY "$SQLRELAY"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define SQL_RELAY "$SQL_RELAY"
 _ACEOF
 
 
@@ -37741,6 +37758,8 @@ echo
 echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
+echo
+echo " Branding     : $SQLRELAY / $SQLR"
 
 CMDLINEBUILD="no "
 READLINEBUILD="no "

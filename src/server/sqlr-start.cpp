@@ -301,7 +301,7 @@ static void helpmessage() {
 		"	-disable-new-window	...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {
@@ -332,7 +332,7 @@ int main(int argc, const char **argv) {
 		FreeConsole();
 		AllocConsole();
 		stringbuffer	title;
-		title.append(SQLRELAY);
+		title.append(SQL_RELAY);
 		if (!charstring::isNullOrEmpty(id)) {
 			title.append(" - ");
 			title.append(id);

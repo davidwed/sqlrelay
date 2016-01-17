@@ -382,13 +382,17 @@ AC_ARG_ENABLE(efence,
 	LIBEFENCE="-lefence",
 	LIBEFENCE="")
 AC_ARG_WITH(sqlr,
-	[  --with-sqlr                   prefix to use when naming binaries (default: sqlr)],
+	[  --with-sqlr                   replacement for "sqlr"],
 	SQLR="$withval",
 	SQLR="sqlr")
 AC_ARG_WITH(sqlrelay,
-	[  --with-sqlrelay              title to use in messages (default: SQL Relay)],
+	[  --with-sqlrelay               replacement for "sqlrelay"],
 	SQLRELAY="$withval",
-	SQLRELAY="SQL Relay")
+	SQLRELAY="sqlrelay")
+AC_ARG_WITH(sql-relay,
+	[  --with-sql-relay              replacement for "SQL Relay"],
+	SQL_RELAY="$withval",
+	SQL_RELAY="SQL Relay")
 AC_ARG_ENABLE(doc,
 	[  --disable-doc                 Don't install docs or man pages],
 	ENABLE_DOC="",
@@ -502,6 +506,7 @@ AC_SUBST(LIBDMALLOC)
 AC_SUBST(LIBEFENCE)
 AC_SUBST(SQLR)
 AC_SUBST(SQLRELAY)
+AC_SUBST(SQL_RELAY)
 AC_SUBST(ENABLE_CPP)
 AC_SUBST(ENABLE_ODBC_DRIVER)
 AC_SUBST(ENABLE_CMDLINE)
@@ -509,8 +514,9 @@ AC_SUBST(ENABLE_SERVER)
 AC_SUBST(ENABLE_UTIL)
 AC_SUBST(ENABLE_DOC)
 
-AC_DEFINE_UNQUOTED(SQLR,["$SQLR"],Prefix to use when naming binaries)
-AC_DEFINE_UNQUOTED(SQLRELAY,["$SQLRELAY"],Title to use in messages)
+AC_DEFINE_UNQUOTED(SQLR,["$SQLR"],replacement for "sqlr")
+AC_DEFINE_UNQUOTED(SQLRELAY,["$SQLRELAY"],replacement for "sqlrelay")
+AC_DEFINE_UNQUOTED(SQL_RELAY,["$SQL_RELAY"],replacement for "SQL Relay")
 
 
 dnl Rewrite supplied paths.
@@ -988,6 +994,8 @@ echo
 echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
+echo
+echo " Branding     : $SQLRELAY / $SQLR"
 
 CMDLINEBUILD="no "
 READLINEBUILD="no "

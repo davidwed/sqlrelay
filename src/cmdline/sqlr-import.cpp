@@ -515,7 +515,7 @@ static void helpmessage() {
 		"	%s-import -config ./myconfig.conf -id myinst ...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

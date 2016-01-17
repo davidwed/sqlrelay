@@ -38,7 +38,7 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLRELAY,SQLR,SQLR);
+		SQLR,SQL_RELAY,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

@@ -28,7 +28,7 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLRELAY,SQLRELAY,SQLR,SQLR);
+		SQLR,SQL_RELAY,SQL_RELAY,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {
@@ -63,7 +63,7 @@ int main(int argc, const char **argv) {
 	sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
 	if (!cfg) {
 		stderror.printf("%s instance %s not found in %s\n",
-						SQLRELAY,id,configurl);
+						SQL_RELAY,id,configurl);
 		process::exit(1);
 	}
 

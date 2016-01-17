@@ -203,7 +203,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 		if (!cfg->accessible()) {
 			stderror.printf("\n%s-scaler error:\n",SQLR);
 			stderror.printf("	This instance of ");
-			stderror.printf("%s is ",SQLRELAY);
+			stderror.printf("%s is ",SQL_RELAY);
 			stderror.printf("configured to run as:\n");
 			stderror.printf("		user: %s\n",
 						cfg->getRunAsUser());

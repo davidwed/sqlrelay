@@ -20,7 +20,7 @@ static void helpmessage() {
 		SERVEROPTIONS
 		DISABLECRASHHANDLER
 		REPORTBUGS,
-		SQLR,SQLRELAY,SQLR,SQLRELAY,SQLR,SQLR,SQLR);
+		SQLR,SQL_RELAY,SQLR,SQL_RELAY,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

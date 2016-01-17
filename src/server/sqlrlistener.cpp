@@ -304,7 +304,7 @@ bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 
 	if (!cfg->accessible()) {
 		stderror.printf("\n%s-listener error:\n",SQLR);
-		stderror.printf("	This instance of %s is ",SQLRELAY);
+		stderror.printf("	This instance of %s is ",SQL_RELAY);
 		stderror.printf("configured to run as:\n");
 		stderror.printf("		user: %s\n",
 						cfg->getRunAsUser());

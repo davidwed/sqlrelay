@@ -2049,7 +2049,7 @@ static void helpmessage() {
 		"	%ssh -id myinst -command \"select * from mytable\" -quiet -format csv\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

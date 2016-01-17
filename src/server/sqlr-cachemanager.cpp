@@ -259,7 +259,7 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLRELAY,SQLRELAY,SQLR,SQLR,SQLRELAY,SQLR);
+		SQLR,SQL_RELAY,SQL_RELAY,SQLR,SQLR,SQL_RELAY,SQLR);
 }
 
 int main(int argc, const char **argv) {
