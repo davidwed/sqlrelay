@@ -2010,7 +2010,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 static void helpmessage() {
 
 	stdoutput.printf(
-		"%ssh is the SQL Relay command line client.\n"
+		"%ssh is the SQL Relay command line database shell.\n"
 		"\n"
 		"It can be used interactively, or non-interactively to run queries directly from the command line, or scripts containing queries.\n"
 		"\n"
