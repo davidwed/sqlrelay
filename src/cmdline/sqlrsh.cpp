@@ -21,9 +21,7 @@
 #include <rudiments/memorypool.h>
 
 #include <defines.h>
-
-// for clock()
-#include <time.h>
+#include <version.h>
 
 #ifdef HAVE_READLINE
 	#include <rudiments/charstring.h>
@@ -2009,14 +2007,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 	#endif
 }
 
-void help(int argc, const char **argv) {
-
-	#include <help.h>
-
-	if (argc!=2 || (charstring::compare(argv[1],"-help") &&
-			charstring::compare(argv[1],"--help"))) {
-		return;
-	}
+static void helpmessage() {
 
 	stdoutput.printf(
 		"%ssh is the SQL Relay command line client.\n"
@@ -2059,20 +2050,17 @@ void help(int argc, const char **argv) {
 		"\n"
 		"	%ssh -id myinst -script ./script.sql\n"
 		"\n"
-		"Non-interactive session, running query \"select 1 from dual\".\n"
+		"Non-interactive session, running query \"select * from mytable\" with csv output.\n"
 		"\n"
-		"	%ssh -id myinst -command \"select 1 from dual\" -quiet\n"
+		"	%ssh -id myinst -command \"select * from mytable\" -quiet -format csv\n"
 		"\n"
 		REPORTBUGS,
 		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
-			
-	process::exit(0);
 }
 
 int main(int argc, const char **argv) {
 
-	#include <version.h>
-
+	version(argc,argv);
 	help(argc,argv);
 
 	#ifdef SIGPIPE
