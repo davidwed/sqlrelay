@@ -38,9 +38,9 @@ static void shutDown(int32_t signum) {
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-listener is the SQL Relay listener daemon.\n"
+		"%s-listener is the %s listener daemon.\n"
 		"\n"
-		"The %s-listener listens for connections from SQL Relay client applications.  When a client connects, the %s-listener hands it off to an available connection daemon or queues it until a connection daemon is available.\n"
+		"The %s-listener listens for connections from %s client applications.  When a client connects, the %s-listener hands it off to an available connection daemon or queues it until a connection daemon is available.\n"
 		"\n"
 		"The %s-listener is not intended to be run manually.  Rather the %s-start process spawns it as-necessary.\n"
 		"\n"
@@ -50,7 +50,7 @@ static void helpmessage() {
 		SERVEROPTIONS
 		DISABLECRASHHANDLER
 		REPORTBUGS,
-		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

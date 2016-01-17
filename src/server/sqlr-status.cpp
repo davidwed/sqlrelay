@@ -25,7 +25,7 @@ static void printTriggeredStatus(int32_t sem) {
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-status is the SQL Relay status utility.\n"
+		"%s-status is the %s status utility.\n"
 		"\n"
 		"The %s-status utility examines the specified instance and reports its current state, various counts, and some statistical information.\n"
 		"\n"
@@ -38,7 +38,7 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

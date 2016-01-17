@@ -6,6 +6,7 @@
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>
+#include <config.h>
 #include <debugprint.h>
 
 class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
@@ -160,11 +161,13 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 			logbuffer.append(" protocol error");
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_LOGIN:
-			logbuffer.append("SQL Relay logged in to DB ");
+			logbuffer.append(SQLRELAY);
+			logbuffer.append(" logged in to DB ");
 			logbuffer.append(sqlrcon->cont->dbIpAddress());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_LOGOUT:
-			logbuffer.append("SQL Relay logged out of DB ");
+			logbuffer.append(SQLRELAY);
+			logbuffer.append(" logged out of DB ");
 			logbuffer.append(sqlrcon->cont->dbIpAddress());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
@@ -183,10 +186,12 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 			}
 			break;
 		case SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR:
-			logbuffer.append("SQL Relay internal error");
+			logbuffer.append(SQLRELAY);
+			logbuffer.append(" internal error");
 			break;
 		case SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING:
-			logbuffer.append("SQL Relay internal warning");
+			logbuffer.append(SQLRELAY);
+			logbuffer.append(" internal warning");
 			break;
 		default:
 			// ignore all other events

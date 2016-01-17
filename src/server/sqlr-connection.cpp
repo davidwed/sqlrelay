@@ -90,9 +90,9 @@ static void shutDown(int32_t signum) {
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-connection is the SQL Relay database connection daemon.\n"
+		"%s-connection is the %s database connection daemon.\n"
 		"\n"
-		"Each %s-connection maintains a persistent connection to a database.  Together, a set of %s-connection daemons provide a database connection pool to SQL Relay client applications.\n"
+		"Each %s-connection maintains a persistent connection to a database.  Together, a set of %s-connection daemons provide a database connection pool to %s client applications.\n"
 		"\n"
 		"%s-connection is not intended to be run manually.  Rather the %s-start and %s-scaler processes spawn instances of %s-connection as-necessary.\n"
 		"\n"
@@ -110,7 +110,7 @@ static void helpmessage() {
 		"\n"
 		DISABLECRASHHANDLER
 		REPORTBUGS,
-		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

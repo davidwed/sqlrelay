@@ -285,7 +285,7 @@ static bool startScaler(sqlrpaths *sqlrpth,
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-start is the startup program for the SQL Relay server processes.\n"
+		"%s-start is the startup program for the %s server processes.\n"
 		"\n"
 		"The %s-start program spawns %s-listener, %s-connection, and %s-scaler processes.\n"
 		"\n"
@@ -301,7 +301,7 @@ static void helpmessage() {
 		"	-disable-new-window	...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {
@@ -332,7 +332,7 @@ int main(int argc, const char **argv) {
 		FreeConsole();
 		AllocConsole();
 		stringbuffer	title;
-		title.append("SQL Relay");
+		title.append(SQLRELAY);
 		if (!charstring::isNullOrEmpty(id)) {
 			title.append(" - ");
 			title.append(id);

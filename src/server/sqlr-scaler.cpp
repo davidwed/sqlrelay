@@ -8,9 +8,9 @@
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-scaler is the SQL Relay database connection scaling daemon.\n"
+		"%s-scaler is the %s database connection scaling daemon.\n"
 		"\n"
-		"The %s-scaler monitors connections from SQL Relay client applications and opens new database connections, as-necessary.\n"
+		"The %s-scaler monitors connections from %s client applications and opens new database connections, as-necessary.\n"
 		"\n"
 		"The %s-scaler is not intended to be run manually.  Rather the %s-start process spawns it as-necessary.\n"
 		"\n"
@@ -20,7 +20,7 @@ static void helpmessage() {
 		SERVEROPTIONS
 		DISABLECRASHHANDLER
 		REPORTBUGS,
-		SQLR,SQLR,SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLR,SQLRELAY,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

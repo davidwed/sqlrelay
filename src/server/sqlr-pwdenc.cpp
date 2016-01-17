@@ -11,9 +11,9 @@
 
 static void helpmessage() {
 	stdoutput.printf(
-		"%s-pwdenc is the SQL Relay password encryption utility.\n"
+		"%s-pwdenc is the %s password encryption utility.\n"
 		"\n"
-		"When used with the appropriate password encryption module, passwords can be stored in encrypted form in the SQL Relay configuration file, rather than in plain text.\n"
+		"When used with the appropriate password encryption module, passwords can be stored in encrypted form in the %s configuration file, rather than in plain text.\n"
 		"\n"
 		"The %s-pwdenc utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration file in place of the plaintext password.\n"
 		"\n"
@@ -28,7 +28,7 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQLR,SQLR);
+		SQLR,SQLRELAY,SQLRELAY,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {
@@ -62,8 +62,8 @@ int main(int argc, const char **argv) {
 	// load the configuration
 	sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
 	if (!cfg) {
-		stderror.printf("SQL Relay instance %s not found in %s\n",
-								id,configurl);
+		stderror.printf("%s instance %s not found in %s\n",
+						SQLRELAY,id,configurl);
 		process::exit(1);
 	}
 
