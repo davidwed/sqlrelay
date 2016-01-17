@@ -1,8 +1,6 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
-#include <defaults.h>
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/sys.h>
 #include <rudiments/process.h>
@@ -11,6 +9,9 @@
 #include <rudiments/file.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/stdio.h>
+#include <config.h>
+#include <defaults.h>
+#include <version.h>
 
 const char *programs[]={
 	"sqlr-listener-",
@@ -22,9 +23,14 @@ const char *programs[]={
 
 const char *suffixes[]={"",".","","",NULL};
 
+static void helpmessage() {
+	stdoutput.printf("FIXME: implement this\n");
+}
+
 int main(int argc, const char **argv) {
 
-	#include <version.h>
+	version(argc,argv);
+	help(argc,argv);
 
 	// process the command line
 	sqlrcmdline	cmdl(argc,argv);

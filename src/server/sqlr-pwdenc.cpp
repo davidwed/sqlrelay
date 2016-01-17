@@ -1,18 +1,22 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
-#include <defaults.h>
-
 #include <sqlrelay/sqlrutil.h>
 #include <sqlrelay/sqlrserver.h>
-
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
+#include <config.h>
+#include <defaults.h>
+#include <version.h>
+
+static void helpmessage() {
+	stdoutput.printf("FIXME: implement this\n");
+}
 
 int main(int argc, const char **argv) {
 
-	#include <version.h>
+	version(argc,argv);
+	help(argc,argv);
 
 	sqlrcmdline 	cmdline(argc,argv);
 	sqlrpaths	sqlrpth(&cmdline);

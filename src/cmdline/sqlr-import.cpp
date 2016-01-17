@@ -1,17 +1,14 @@
 // Copyright (c) 2005  David Muse
 // See the file COPYING for more information
 
+#include <sqlrelay/sqlrclient.h>
+#include <sqlrelay/sqlrutil.h>
+#include <rudiments/process.h>
+#include <rudiments/stdio.h>
 #include <config.h>
 #include <defaults.h>
 #define NEED_IS_NUMBER_TYPE_CHAR
 #include <datatypes.h>
-
-#include <sqlrelay/sqlrclient.h>
-#include <sqlrelay/sqlrutil.h>
-
-#include <rudiments/process.h>
-#include <rudiments/stdio.h>
-
 #include <version.h>
 
 class sqlrimport : public xmlsax {

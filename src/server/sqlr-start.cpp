@@ -1,11 +1,12 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
-#include <defaults.h>
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
+#include <config.h>
+#include <defaults.h>
+#include <version.h>
 
 #ifdef _WIN32
 	#include <stdio.h>
@@ -17,8 +18,11 @@
 
 bool	iswindows;
 
-bool startListener(sqlrpaths *sqlrpth, const char *id, const char *config,
-			const char *localstatedir, bool disablecrashhandler) {
+static bool startListener(sqlrpaths *sqlrpth,
+				const char *id,
+				const char *config,
+				const char *localstatedir,
+				bool disablecrashhandler) {
 
 	// start the listener
 	stdoutput.printf("\nStarting listener:\n");
@@ -69,7 +73,8 @@ bool startListener(sqlrpaths *sqlrpth, const char *id, const char *config,
 }
 
 
-bool startConnection(sqlrpaths *sqlrpth, const char *id,
+static bool startConnection(sqlrpaths *sqlrpth,
+				const char *id,
 				const char *connectionid,
 				const char *config,
 				const char *localstatedir,
@@ -137,7 +142,7 @@ bool startConnection(sqlrpaths *sqlrpth, const char *id,
 	return true;
 }
 
-bool startConnections(sqlrpaths *sqlrpth,
+static bool startConnections(sqlrpaths *sqlrpth,
 				sqlrconfig *cfg,
 				const char *id,
 				const char *config,
@@ -219,7 +224,7 @@ bool startConnections(sqlrpaths *sqlrpth,
 	return true;
 }
 
-bool startScaler(sqlrpaths *sqlrpth,
+static bool startScaler(sqlrpaths *sqlrpth,
 			sqlrconfig *cfg,
 			const char *id,
 			const char *config,
@@ -278,9 +283,14 @@ bool startScaler(sqlrpaths *sqlrpth,
 	return true;
 }
 
+static void helpmessage() {
+	stdoutput.printf("FIXME: implement this\n");
+}
+
 int main(int argc, const char **argv) {
 
-	#include <version.h>
+	version(argc,argv);
+	help(argc,argv);
 
 	sqlrcmdline	cmdl(argc,argv);
 	sqlrpaths	sqlrpth(&cmdl);

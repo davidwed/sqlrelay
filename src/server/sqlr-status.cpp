@@ -12,19 +12,24 @@
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
+#include <version.h>
 
-
-void printAcquisitionStatus(int32_t sem) {
+static void printAcquisitionStatus(int32_t sem) {
 	stdoutput.printf("%s (%d)\n",(sem)?"acquired    ":"not acquired",sem);
 }
 
-void printTriggeredStatus(int32_t sem) {
+static void printTriggeredStatus(int32_t sem) {
 	stdoutput.printf("%s (%d)\n",(sem)?"triggered    ":"not triggered",sem);
+}
+
+static void helpmessage() {
+	stdoutput.printf("FIXME: implement this\n");
 }
 
 int main(int argc, const char **argv) {
 
-	#include <version.h>
+	version(argc,argv);
+	help(argc,argv);
 
 	// parse the command line
 	sqlrcmdline	cmdl(argc,argv);

@@ -1,12 +1,8 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
-#include <defaults.h>
-
 #include <sqlrelay/sqlrclient.h>
 #include <sqlrelay/sqlrutil.h>
-
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/filesystem.h>
@@ -19,7 +15,8 @@
 #include <rudiments/stdio.h>
 #include <rudiments/character.h>
 #include <rudiments/memorypool.h>
-
+#include <config.h>
+#include <defaults.h>
 #include <defines.h>
 #include <version.h>
 

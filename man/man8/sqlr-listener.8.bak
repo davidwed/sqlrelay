@@ -1,0 +1,40 @@
+.\"Created with GNOME Manpages Editor Wizard
+.\"http://gmanedit.sourceforge.net
+.\"Sergio Rua <srua@gpul.org>
+.\"
+.TH sqlr-listener 8 "11 17, 2001" "connect to a TCP port and wait for queries"
+
+.SH NAME
+sqlr-listener \- connect to a TCP port and wait for queries
+
+.SH SYNOPSIS
+.B sqlr-listener
+[\fB\-id\fP \fIID\fP]
+[\fB\-config\fP \fICONFIGFILE\fP]
+
+.SH DESCRIPTION
+The job of the 
+.B sqlr-listener
+is to connect to a TCP port and wait for queries. When it gets one,
+it waits for an available connection daemon, hands off the query to
+it, waits for the result set, and hands the result set back to the
+client.
+
+.SH OPTIONS
+\fICONFIGFILE\fP is the filename of the configuration file to use. The
+default configuration file is \fI/etc/sqlrelay/sqlrelay.conf\fP.
+
+\fIID\fP is the same as the \fIID\fP argument in the
+\fBsqlr-connection\fP daemon and associates a listener with a pool of
+connections.
+
+Only one listener needs to be established for a given \fIID\fP.
+
+
+.SH SEE ALSO
+sqlr-connection(8)
+
+.SH AUTHOR
+This manual page was written by Andreas Tille <tille@debian.org>,
+for the Debian GNU/Linux system (but may be used by others).
+

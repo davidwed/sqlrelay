@@ -1,15 +1,12 @@
 // Copyright (c) 2005  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
-#include <defaults.h>
-
 #include <sqlrelay/sqlrclient.h>
 #include <sqlrelay/sqlrutil.h>
-
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
-
+#include <config.h>
+#include <defaults.h>
 #include <version.h>
 
 static bool exportTable(sqlrcursor *sqlrcur,

@@ -1,19 +1,20 @@
 // Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/stdio.h>
+#include <config.h>
+#include <version.h>
 
 sqlrservercontroller	*cont=NULL;
 volatile sig_atomic_t	shutdowninprogress=0;
 signalhandler		shutdownhandler;
 bool			shutdownalready=false;
 
-void shutDown(int32_t signum) {
+static void shutDown(int32_t signum) {
 
 	if (shutdownalready) {
 		stderror.printf("%s-connection (pid=%d) "
@@ -87,7 +88,14 @@ void shutDown(int32_t signum) {
 	process::exit(exitcode);
 }
 
+static void helpmessage() {
+	stdoutput.printf("FIXME: implement this\n");
+}
+
 int main(int argc, const char **argv) {
+
+	version(argc,argv);
+	help(argc,argv);
 
 	commandline	cmdl(argc,argv);
 
@@ -96,8 +104,6 @@ int main(int argc, const char **argv) {
 	if (!cmdl.found("-disable-crash-handler")) {
 		process::exitOnCrash();
 	}
-
-	#include <version.h>
 
 	// create the controller
 	cont=new sqlrservercontroller;

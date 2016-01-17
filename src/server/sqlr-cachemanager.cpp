@@ -9,9 +9,9 @@
 #include <rudiments/directory.h>
 #include <rudiments/process.h>
 #include <rudiments/permissions.h>
-
 #include <config.h>
 #include <defaults.h>
+#include <version.h>
 
 class dirnode {
 	friend class sqlrcachemanager;
@@ -230,16 +230,21 @@ void sqlrcachemanager::parseCacheDirs(const char *cachedirs) {
 
 sqlrcachemanager	*cacheman;
 
-void shutDown(int32_t signum) {
+static void shutDown(int32_t signum) {
 	delete cacheman;
 	process::exit(0);
 }
 
+static void helpmessage() {
+	stdoutput.printf("FIXME: implement this\n");
+}
+
 int main(int argc, const char **argv) {
 
-	process::exitOnCrashOrShutDown();
+	version(argc,argv);
+	help(argc,argv);
 
-	#include <version.h>
+	process::exitOnCrashOrShutDown();
 
 	cacheman=new sqlrcachemanager(argc,argv);
 	process::handleShutDown(shutDown);

@@ -1,17 +1,16 @@
 // Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
-
 #include <sqlrelay/sqlrserver.h>
-
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
+#include <config.h>
+#include <version.h>
 
 sqlrlistener	*lsnr;
 bool		shutdownalready=false;
 
-void shutDown(int32_t signum) {
+static void shutDown(int32_t signum) {
 
 	// A shutdown loop can occur sometimes, on some platforms, if:
 	// * the listener is waiting on a semaphore
@@ -37,7 +36,14 @@ void shutDown(int32_t signum) {
 	process::exit(0);
 }
 
+static void helpmessage() {
+	stdoutput.printf("FIXME: implement this\n");
+}
+
 int main(int argc, const char **argv) {
+
+	version(argc,argv);
+	help(argc,argv);
 
 	commandline	cmdl(argc,argv);
 
@@ -46,8 +52,6 @@ int main(int argc, const char **argv) {
 	if (!cmdl.found("-disable-crash-handler")) {
 		process::exitOnCrash();
 	}
-
-	#include <version.h>
 
 	// create the listener
 	lsnr=new sqlrlistener();
