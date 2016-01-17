@@ -67,8 +67,6 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		bool		init;
 
-		bool		debug;
-
 		sqlrpaths	*sqlrpth;
 		sqlrcmdline	*cmdl;
 

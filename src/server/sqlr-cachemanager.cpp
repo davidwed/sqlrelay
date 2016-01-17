@@ -236,7 +236,30 @@ static void shutDown(int32_t signum) {
 }
 
 static void helpmessage() {
-	stdoutput.printf("FIXME: implement this\n");
+	stdoutput.printf(
+		"%s-cachemanager is the SQL Relay client-side result-set cache manager.\n"
+		"\n"
+		"To improve the performance of frequently run queries, SQL Relay client applications can cache result sets locally and then access them rather than running the query again.  When a result set is cached, a time-to-live (expiration date) is assigned to it. The %s-cachemanager goes through the cached result sets periodically and removes the ones that have expired.\n"
+		"\n"
+		"Only one %s-cachemanager needs to be run per machine.\n"
+		"\n"
+		"IMPORTANT NOTE:\n"
+		"\n"
+		"Since cache managers clean up after SQL Relay client applications, they need to be run on machines which run client applications that could cache result sets.  These are likely to be web or application servers, rather than the machines that run the sqlr-listener and sqlr-connection daemons.\n"
+		"\n"
+		"Usage: %s-cachemanager [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		"	-scaninterval	...\n"
+		"\n"
+		"	-cachedirs	...\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"...\n"
+		"\n"
+		REPORTBUGS,
+		SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

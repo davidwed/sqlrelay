@@ -24,7 +24,19 @@ const char *programs[]={
 const char *suffixes[]={"",".","","",NULL};
 
 static void helpmessage() {
-	stdoutput.printf("FIXME: implement this\n");
+	stdoutput.printf(
+		"%s-stop is the shutdown program for the SQL Relay server processes.\n"
+		"\n"
+		"The %s-stop program stops %s-listener, %s-connection, and %s-scaler processes.\n"
+		"\n"
+		"When run with the -id argument, %s-stop stops processes for the specified instance.  When run with no -id argument, %s-stop stops all running %s-listener, %s-connection, and %s-scaler processes.\n"
+		"\n"
+		"Usage: %s-stop [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		SERVEROPTIONS
+		REPORTBUGS,
+		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

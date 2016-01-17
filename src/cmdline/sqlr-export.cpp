@@ -46,7 +46,6 @@ static void csvEscapeField(const char *field, uint32_t length) {
 }
 
 static void helpmessage() {
-
 	stdoutput.printf(
 		"%s-export is the SQL Relay database object export utility.\n"
 		"\n"

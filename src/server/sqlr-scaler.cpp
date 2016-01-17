@@ -7,7 +7,20 @@
 #include <version.h>
 
 static void helpmessage() {
-	stdoutput.printf("FIXME: implement this\n");
+	stdoutput.printf(
+		"%s-scaler is the SQL Relay database connection scaling daemon.\n"
+		"\n"
+		"The %s-scaler monitors connections from SQL Relay client applications and opens new database connections, as-necessary.\n"
+		"\n"
+		"The %s-scaler is not intended to be run manually.  Rather the %s-start process spawns it as-necessary.\n"
+		"\n"
+		"Usage: %s-scaler [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		SERVEROPTIONS
+		DISABLECRASHHANDLER
+		REPORTBUGS,
+		SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

@@ -482,7 +482,6 @@ void sqlrimport::massageField(stringbuffer *strb, const char *field) {
 }
 
 static void helpmessage() {
-
 	stdoutput.printf(
 		"%s-import is the SQL Relay database object import utility.\n"
 		"\n"

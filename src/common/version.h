@@ -48,8 +48,20 @@ static void help(int argc, const char **argv) {
 "	-password password	password\n" \
 "\n" \
 "Alternate connection options:\n" \
-"	-config config		config file\n" \
+"	-config configfile	config file\n" \
 "	-id instanceid		id of an instance in the config file from which\n" \
 "				to derive connection info and credentials\n"
+
+#define SERVEROPTIONS \
+"	-config configfile	...\n" \
+"\n" \
+"	-id instanceid		...\n" \
+"\n" \
+"	-localstatedir dir 	...\n" \
+"\n"
+
+#define DISABLECRASHHANDLER \
+"	-disable-crash-handler	...\n" \
+"\n"
 
 #define REPORTBUGS "Report bugs to <david.muse@firstworks.com>\n"

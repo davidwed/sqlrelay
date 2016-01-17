@@ -41,8 +41,6 @@ scaler::scaler() {
 	config=NULL;
 	dbase=NULL;
 
-	debug=false;
-
 	iswindows=!charstring::compareIgnoringCase(
 				sys::getOperatingSystemName(),"Windows");
 }
@@ -139,9 +137,6 @@ bool scaler::initScaler(int argc, const char **argv) {
 		pidfile=NULL;
 		return false;
 	}
-
-	// check for debug
-	debug=cmdl->found("-debug");
 
 	// get the config url
 	configurl=sqlrpth->getConfigUrl();
@@ -436,9 +431,6 @@ pid_t scaler::openOneConnection() {
 	args[p++]="-localstatedir";
 	args[p++]=sqlrpth->getLocalStateDir();
 	args[p++]="-scaler";
-	if (debug) {
-		args[p++]="-debug";
-	}
 	args[p++]=NULL; // the last
 
 	pid_t	pid=process::spawn(cmd.getString(),args,(iswindows)?true:false);

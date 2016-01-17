@@ -2005,7 +2005,6 @@ void sqlrsh::execute(int argc, const char **argv) {
 }
 
 static void helpmessage() {
-
 	stdoutput.printf(
 		"%ssh is the SQL Relay command line database shell.\n"
 		"\n"

@@ -89,7 +89,28 @@ static void shutDown(int32_t signum) {
 }
 
 static void helpmessage() {
-	stdoutput.printf("FIXME: implement this\n");
+	stdoutput.printf(
+		"%s-connection is the SQL Relay database connection daemon.\n"
+		"\n"
+		"Each %s-connection maintains a persistent connection to a database.  Together, a set of %s-connection daemons provide a database connection pool to SQL Relay client applications.\n"
+		"\n"
+		"%s-connection is not intended to be run manually.  Rather the %s-start and %s-scaler processes spawn instances of %s-connection as-necessary.\n"
+		"\n"
+		"Usage: %s-connection [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		SERVEROPTIONS
+		"	-scaler		...\n"
+		"\n"
+		"	-ttl		...\n"
+		"\n"
+		"	-silent		...\n"
+		"\n"
+		"	-nodetach	...\n"
+		"\n"
+		DISABLECRASHHANDLER
+		REPORTBUGS,
+		SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {
