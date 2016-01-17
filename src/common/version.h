@@ -54,31 +54,40 @@ static void help(int argc, const char **argv) {
 
 #define CONNECTIONOPTIONS \
 "Connection options:\n" \
-"	-host host		server host name or IP address\n" \
-"	-port port		server port\n" \
-"	-socket socket		server local unix socket file name\n" \
-"	-user user		user name\n" \
-"	-password password	password\n" \
+"	-host host		Host name or IP address of the server to\n" \
+"				connect to.\n" \
+"\n" \
+"	-port port		Port to connect to.\n" \
+"\n" \
+"	-socket socket		Local unix socket file name to connect to.\n" \
+"				Can be used instead of host/port for making\n" \
+"				connections to local servers.\n" \
+"\n" \
+"	-user user		User name to authenticate with.\n" \
+"\n" \
+"	-password password	Password to authenticate with.\n" \
 "\n" \
 "Alternate connection options:\n" \
-"	-config file		override te default config file with \"file\"\n" \
-"	-id instanceid		id of an instance in the config file from which\n" \
-"				to derive connection info and credentials\n"
+"	-config file		Override the default config file with \"file\".\n" \
+"\n" \
+"	-id instanceid		Id of an instance in the config file from which\n" \
+"				to derive connection info and credentials.\n" \
+"\n"
 
 #define CONFIGID \
-"	-config file		override the default config file with \"file\"\n" \
+"	-config file		Override the default config file with \"file\".\n" \
 "\n" \
-"	-id instanceid		id of an instance in the config file\n" \
+"	-id instanceid		Id of an instance in the config file.\n" \
 "\n"
 
 #define SERVEROPTIONS \
 CONFIGID \
-"	-localstatedir dir 	override the default directory for keeping\n" \
-"				working or stateful files with \"dir\"\n" \
+"	-localstatedir dir 	Override the default directory for keeping\n" \
+"				working or stateful files with \"dir\".\n" \
 "\n"
 
 #define DISABLECRASHHANDLER \
-"	-disable-crash-handler	disables SIGSEGV handler, useful for debugging\n" \
+"	-disable-crash-handler	Disables SIGSEGV handler, useful for debugging.\n" \
 "\n"
 
 #define REPORTBUGS "Report bugs to <david.muse@firstworks.com>\n"

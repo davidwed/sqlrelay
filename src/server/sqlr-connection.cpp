@@ -100,18 +100,21 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
-		"	-scaler		...\n"
+		"	-scaler		Indicates to the %s that it was spawned\n"
+		"			by the %s-scaler.\n"
 		"\n"
-		"	-ttl		...\n"
+		"	-ttl sec	Time-to-live, in seconds.  If the %s is idle\n"
+		"			for this number of seconds, then it will exit.\n"
 		"\n"
-		"	-silent		...\n"
+		"	-silent		Suppresses log-in errors.\n"
 		"\n"
-		"	-nodetach	...\n"
+		"	-nodetach	Suppresses detachment from the controlling terminal.\n"
+		"			Useful for debugging.\n"
 		"\n"
 		DISABLECRASHHANDLER
 		REPORTBUGS,
 		progname,SQL_RELAY,progname,progname,SQL_RELAY,
-		progname,SQLR,SQLR,progname,progname);
+		progname,SQLR,SQLR,progname,progname,progname,SQLR);
 }
 
 int main(int argc, const char **argv) {

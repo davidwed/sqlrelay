@@ -21,8 +21,10 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		CONFIGID
-		"	-pwdencid passwordencryptionid	...\n"
-		"	-password password		...\n"
+		"	-pwdencid passwordencryptionid	id of instance of passwordencryption\n"
+		"					module to use\n"
+		"\n"
+		"	-password password		password to encrypt\n"
 		"\n"
 		"Examples:\n"
 		"...\n"
