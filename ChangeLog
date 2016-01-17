@@ -23,6 +23,9 @@
 	added several --disable options to the configure script for unix/linux
 	removed sqlr-fields/sqlr-query and updated sqlrsh to provide the same
 		functionality
+	removed antiquated sqlrelay.dtd
+	moved default example directory to share/sqlrelay/examples
+	sqlrelay.conf example is installed under example directory now
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
