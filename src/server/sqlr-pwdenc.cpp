@@ -10,7 +10,25 @@
 #include <version.h>
 
 static void helpmessage() {
-	stdoutput.printf("FIXME: implement this\n");
+	stdoutput.printf(
+		"%s-pwdenc is the SQL Relay password encryption utility.\n"
+		"\n"
+		"When used with the appropriate password encryption module, passwords can be stored in encrypted form in the SQL Relay configuration file, rather than in plain text.\n"
+		"\n"
+		"The %s-pwdenc utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration file in place of the plaintext password.\n"
+		"\n"
+		"Usage: %s-pwdenc [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		CONFIGID
+		"	-pwdencid passwordencryptionid	...\n"
+		"	-password password		...\n"
+		"\n"
+		"Examples:\n"
+		"...\n"
+		"\n"
+		REPORTBUGS,
+		SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {

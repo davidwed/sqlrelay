@@ -1032,11 +1032,11 @@ void sqlrsh::displayError(sqlrshenv *env,
 				const char *message,
 				const char *error,
 				int64_t errornumber) {
-	if (charstring::length(message)) {
+	if (!charstring::isNullOrEmpty(message)) {
 		stdoutput.printf("%s\n",message);
 	}
 	stdoutput.printf("%lld:\n",(long long)errornumber);
-	if (charstring::length(error)) {
+	if (!charstring::isNullOrEmpty(error)) {
 		stdoutput.printf("%s\n\n",error);
 	}
 }
@@ -1905,14 +1905,22 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*script=cmdline->getValue("-script");
 	const char	*command=cmdline->getValue("-command");
 	
-	if (!(charstring::length(id) ||
-		charstring::length(host) ||
-		charstring::length(socket))) {
+	if (charstring::isNullOrEmpty(id) ||
+		charstring::isNullOrEmpty(host) ||
+		charstring::isNullOrEmpty(socket)) {
 
 		stdoutput.printf("usage:\n"
-			" %ssh -host host -port port -socket socket -user user -password password [-script script | -command command] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]\n"
+			" %ssh -host host -port port -socket socket "
+			"-user user -password password \\\n"
+			"        [-script script | -command command] [-quiet] "
+			"[-format plain|csv] \\\n"
+			"        [-resultsetbuffersize rows]\n"
 			"  or\n"
-			" %ssh [-config config] -id id [-script script | -command command] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]\n",SQLR,SQLR);
+			" %ssh [-config config] -id id \\\n"
+			"        [-script script | -command command] [-quiet] "
+			"[-format plain|csv] \\\n"
+			"        [-resultsetbuffersize rows]\n",
+			SQLR,SQLR);
 		process::exit(1);
 	}
 
@@ -1982,10 +1990,10 @@ void sqlrsh::execute(int argc, const char **argv) {
 		}
 	#endif
 
-	if (charstring::length(script)) {
+	if (!charstring::isNullOrEmpty(script)) {
 		// if a script was specified, run it
 		runScript(&sqlrcon,&sqlrcur,&env,script,true);
-	} else if (charstring::length(command)) {
+	} else if (!charstring::isNullOrEmpty(command)) {
 		// if a command was specified, run it
 		runCommands(&sqlrcon,&sqlrcur,&env,command);
 	} else {

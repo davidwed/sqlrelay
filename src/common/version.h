@@ -52,11 +52,14 @@ static void help(int argc, const char **argv) {
 "	-id instanceid		id of an instance in the config file from which\n" \
 "				to derive connection info and credentials\n"
 
-#define SERVEROPTIONS \
+#define CONFIGID \
 "	-config configfile	...\n" \
 "\n" \
 "	-id instanceid		...\n" \
-"\n" \
+"\n"
+
+#define SERVEROPTIONS \
+CONFIGID \
 "	-localstatedir dir 	...\n" \
 "\n"
 

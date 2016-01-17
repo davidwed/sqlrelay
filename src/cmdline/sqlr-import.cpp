@@ -432,7 +432,7 @@ bool sqlrimport::fieldTagEnd() {
 
 bool sqlrimport::text(const char *string) {
 	if (infield) {
-		if (charstring::length(string)) {
+		if (!charstring::isNullOrEmpty(string)) {
 			if (!numbercolumn[currentcol]) {
 				query.append('\'');
 			}
@@ -546,15 +546,21 @@ int main(int argc, const char **argv) {
 	}
 	bool		verbose=cmdline.found("-verbose");
 
-	if (!(charstring::length(id) ||
-		charstring::length(host) ||
-		charstring::length(socket)) ||
-		!charstring::length(file)) {
+	if ((charstring::isNullOrEmpty(id) ||
+		charstring::isNullOrEmpty(host) ||
+		charstring::isNullOrEmpty(socket)) ||
+		charstring::isNullOrEmpty(file)) {
 
 		stdoutput.printf("usage: \n"
-			"  %s-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug [filename]] [-verbose]\n"
-			"    or\n"
-			"  %s-import [-config config] -id id -file file [-commit rowcount] [-debug [filename]] [-verbose]\n",SQLR,SQLR);
+			" %s-import -host host -port port -socket socket \\\n"
+			"             -user user -password password \\\n"
+			"             -file file [-commit rowcount] "
+			"[-debug [filename]] [-verbose]\n"
+			"  or\n"
+			" %s-import [-config config] -id id \\\n"
+			"             -file file [-commit rowcount] "
+			"[-debug [filename]] [-verbose]\n",
+			SQLR,SQLR);
 		process::exit(1);
 	}
 

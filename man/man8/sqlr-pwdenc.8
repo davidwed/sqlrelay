@@ -2,10 +2,34 @@
 .TH SQLR-PWDENC "8" "January 2016" "SQL Relay" "System Administration Utilities"
 .SH NAME
 sqlr-pwdenc \- manual page for sqlr-pwdenc 0.65
+.SH SYNOPSIS
+.B sqlr-pwdenc
+[\fI\,OPTIONS\/\fR]
 .SH DESCRIPTION
-FIXME: implement this
+sqlr\-pwdenc is the SQL Relay password encryption utility.
+.PP
+When used with the appropriate password encryption module, passwords can be stored in encrypted form in the SQL Relay configuration file, rather than in plain text.
+.PP
+The sqlr\-pwdenc utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration file in place of the plaintext password.
+.SH OPTIONS
+.TP
+\fB\-config\fR configfile
+\&...
+.TP
+\fB\-id\fR instanceid
+\&...
+.TP
+\fB\-pwdencid\fR passwordencryptionid
+\&...
+.TP
+\fB\-password\fR password
+\&...
+.SH EXAMPLES
+\&...
 .SH AUTHOR
 Written by David Muse.
+.SH "REPORTING BUGS"
+Report bugs to <david.muse@firstworks.com>
 .SH COPYRIGHT
 Copyright \(co 1999\-2016 David Muse
 .br

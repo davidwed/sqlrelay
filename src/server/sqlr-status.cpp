@@ -23,7 +23,21 @@ static void printTriggeredStatus(int32_t sem) {
 }
 
 static void helpmessage() {
-	stdoutput.printf("FIXME: implement this\n");
+	stdoutput.printf(
+		"%s-status is the SQL Relay status utility.\n"
+		"\n"
+		"The %s-status utility examines the specified instance and reports its current state, various counts, and some statistical information.\n"
+		"\n"
+		"Usage: %s-status [OPTIONS]\n"
+		"\n"
+		"Options:\n"
+		SERVEROPTIONS
+		"\n"
+		"Examples:\n"
+		"...\n"
+		"\n"
+		REPORTBUGS,
+		SQLR,SQLR,SQLR);
 }
 
 int main(int argc, const char **argv) {
@@ -33,11 +47,19 @@ int main(int argc, const char **argv) {
 
 	// parse the command line
 	sqlrcmdline	cmdl(argc,argv);
+
+	const char	*id=cmdl.getId();
+	if (charstring::isNullOrEmpty(id)) {
+		stdoutput.printf("usage:\n"
+			" %s-status [-config config] -id id "
+			"[-localstatedir dir]\n",SQLR);
+		process::exit(1);
+	}
 	
 	// get the id filename and key
 	sqlrpaths	sqlrp(&cmdl);
 	stringbuffer	idfilename;
-	idfilename.append(sqlrp.getIpcDir())->append("/")->append(cmdl.getId());
+	idfilename.append(sqlrp.getIpcDir())->append("/")->append(id);
 	key_t	key=file::generateKey(idfilename.getString(),1);
 
 	// attach to the shared memory segment for the specified instance

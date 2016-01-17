@@ -103,7 +103,7 @@ int main(int argc, const char **argv) {
 	const char	*table=cmdline.getValue("-table");
 	const char	*sequence=cmdline.getValue("-sequence");
 	const char	*format=cmdline.getValue("-format");
-	if (!charstring::length(format)) {
+	if (charstring::isNullOrEmpty(format)) {
 		format="xml";
 	}
 	uint64_t	rsbs=charstring::toInteger(
@@ -117,16 +117,25 @@ int main(int argc, const char **argv) {
 		debugfile=cmdline.getValue("-debug");
 	}
 
-	if (!(charstring::length(id) ||
-		charstring::length(host) ||
-		charstring::length(socket)) ||
-		!(charstring::length(table) ||
-			charstring::length(sequence))) {
+	if ((charstring::isNullOrEmpty(id) ||
+		charstring::isNullOrEmpty(host) ||
+		charstring::isNullOrEmpty(socket)) ||
+		(charstring::isNullOrEmpty(table) ||
+			charstring::isNullOrEmpty(sequence))) {
 
 		stdoutput.printf("usage: \n"
-			"  %s-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n"
-			"    or\n"
-			"  %s-export [-config config] -id id (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n",SQLR,SQLR);
+			" %s-export -host host -port port -socket socket \\\n"
+			"             -user user -password password \\\n"
+			"             (-table table | -sequence sequence) \\\n"
+			"             [-format (xml | csv)] "
+			"[-resultsetbuffersize rows] \\\n"
+			"             [-debug [filename]]\n"
+			"  or\n"
+			" %s-export [-config config] -id id \\\n"
+			"             (-table table | -sequence sequence) \\\n"
+			"             [-format (xml | csv)] "
+			"[-resultsetbuffersize rows] \\\n"
+			"             [-debug [filename]]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 
@@ -159,9 +168,9 @@ int main(int argc, const char **argv) {
 	sqlrcur.setResultSetBufferSize(rsbs);
 
 	bool	result=false;
-	if (charstring::length(table)) {
+	if (!charstring::isNullOrEmpty(table)) {
 		result=exportTable(&sqlrcur,table,format);
-	} else if (charstring::length(sequence)) {
+	} else if (!charstring::isNullOrEmpty(sequence)) {
 		result=exportSequence(&sqlrcon,&sqlrcur,sequence,format);
 	}
 
