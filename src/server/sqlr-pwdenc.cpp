@@ -9,15 +9,15 @@
 #include <defaults.h>
 #include <version.h>
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-pwdenc is the %s password encryption utility.\n"
+		"%s is the %s password encryption utility.\n"
 		"\n"
 		"When used with the appropriate password encryption module, passwords can be stored in encrypted form in the %s configuration file, rather than in plain text.\n"
 		"\n"
-		"The %s-pwdenc utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration file in place of the plaintext password.\n"
+		"The %s utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration file in place of the plaintext password.\n"
 		"\n"
-		"Usage: %s-pwdenc [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		CONFIGID
@@ -28,7 +28,7 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQL_RELAY,SQLR,SQLR);
+		progname,SQL_RELAY,SQL_RELAY,progname,progname);
 }
 
 int main(int argc, const char **argv) {

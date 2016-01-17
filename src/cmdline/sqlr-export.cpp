@@ -45,14 +45,14 @@ static void csvEscapeField(const char *field, uint32_t length) {
 	}
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-export is the %s database object export utility.\n"
+		"%s is the %s database object export utility.\n"
 		"\n"
 		"Export a database object to a file for import later or elsewhere using\n"
-		"sqlr-import.\n"
+		"%s-import.\n"
 		"\n"
-		"Usage: %s-export [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		"\n"
@@ -65,21 +65,22 @@ static void helpmessage() {
 		"\n"
 		"blah blah blah...\n"
 		"\n"
-		"	%s-export -host svr -port 9000 -user usr -password pwd ...\n"
+		"	%s -host svr -port 9000 -user usr -password pwd ...\n"
 		"\n"
 		"blah blah blah...\n"
 		"\n"
-		"	%s-export -socket /tmp/svr.sock -user usr -password pwd ...\n"
+		"	%s -socket /tmp/svr.sock -user usr -password pwd ...\n"
 		"\n"
 		"blah blah blah...\n"
-		"	%s-export -id myinst ...\n"
+		"	%s -id myinst ...\n"
 		"\n"
 		"blah blah blah...\n"
 		"\n"
-		"	%s-export -config ./myconfig.conf -id myinst ...\n"
+		"	%s -config ./myconfig.conf -id myinst ...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
+		progname,SQL_RELAY,SQLR,progname,progname,
+		progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

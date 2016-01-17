@@ -6,21 +6,21 @@
 #include <config.h>
 #include <version.h>
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-scaler is the %s database connection scaling daemon.\n"
+		"%s is the %s database connection scaling daemon.\n"
 		"\n"
-		"The %s-scaler monitors connections from %s client applications and opens new database connections, as-necessary.\n"
+		"The %s monitors connections from %s client applications and opens new database connections, as-necessary.\n"
 		"\n"
-		"The %s-scaler is not intended to be run manually.  Rather the %s-start process spawns it as-necessary.\n"
+		"The %s is not intended to be run manually.  Rather the %s-start process spawns it as-necessary.\n"
 		"\n"
-		"Usage: %s-scaler [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
 		DISABLECRASHHANDLER
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQL_RELAY,SQLR,SQLR,SQLR);
+		progname,SQL_RELAY,progname,SQL_RELAY,progname,SQLR,progname);
 }
 
 int main(int argc, const char **argv) {

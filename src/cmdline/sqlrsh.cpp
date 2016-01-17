@@ -2002,13 +2002,13 @@ void sqlrsh::execute(int argc, const char **argv) {
 	#endif
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%ssh is the %s command line database shell.\n"
+		"%s is the %s command line database shell.\n"
 		"\n"
 		"It can be used interactively, or non-interactively to run queries directly from the command line, or scripts containing queries.\n"
 		"\n"
-		"Usage: %ssh [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		"\n"
@@ -2027,29 +2027,30 @@ static void helpmessage() {
 		"\n"
 		"Interactive session with server at svr:9000 as usr/pwd.\n"
 		"\n"
-		"	%ssh -host svr -port 9000 -user usr -password pwd\n"
+		"	%s -host svr -port 9000 -user usr -password pwd\n"
 		"\n"
 		"Interactive session with local server on socket /tmp/svr.sock as usr/pwd.\n"
 		"\n"
-		"	%ssh -socket /tmp/svr.sock -user usr -password pwd\n"
+		"	%s -socket /tmp/svr.sock -user usr -password pwd\n"
 		"\n"
 		"Interactive session using connection info and credentials from instance myinst, as defined in the default configuration file.\n"
-		"	%ssh -id myinst\n"
+		"	%s -id myinst\n"
 		"\n"
 		"Interactive session using connection info and credentials from instance myinst, as defined in the config file ./myconfig.conf\n"
 		"\n"
-		"	%ssh -config ./myconfig.conf -id myinst\n"
+		"	%s -config ./myconfig.conf -id myinst\n"
 		"\n"
 		"Non-interactive session, running commands from ./script.sql\n"
 		"\n"
-		"	%ssh -id myinst -script ./script.sql\n"
+		"	%s -id myinst -script ./script.sql\n"
 		"\n"
 		"Non-interactive session, running query \"select * from mytable\" with csv output.\n"
 		"\n"
-		"	%ssh -id myinst -command \"select * from mytable\" -quiet -format csv\n"
+		"	%s -id myinst -command \"select * from mytable\" -quiet -format csv\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		progname,SQL_RELAY,progname,progname,
+		progname,progname,progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

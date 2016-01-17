@@ -23,13 +23,13 @@ static void printTriggeredStatus(int32_t sem) {
 	stdoutput.printf("%s (%d)\n",(sem)?"triggered    ":"not triggered",sem);
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-status is the %s status utility.\n"
+		"%s is the %s status utility.\n"
 		"\n"
-		"The %s-status utility examines the specified instance and reports its current state, various counts, and some statistical information.\n"
+		"The %s utility examines the specified instance and reports its current state, various counts, and some statistical information.\n"
 		"\n"
-		"Usage: %s-status [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
@@ -38,7 +38,7 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQLR);
+		progname,SQL_RELAY,progname,progname);
 }
 
 int main(int argc, const char **argv) {

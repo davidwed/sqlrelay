@@ -88,15 +88,15 @@ static void shutDown(int32_t signum) {
 	process::exit(exitcode);
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-connection is the %s database connection daemon.\n"
+		"%s is the %s database connection daemon.\n"
 		"\n"
-		"Each %s-connection maintains a persistent connection to a database.  Together, a set of %s-connection daemons provide a database connection pool to %s client applications.\n"
+		"Each %s maintains a persistent connection to a database.  Together, a set of %s daemons provide a database connection pool to %s client applications.\n"
 		"\n"
-		"%s-connection is not intended to be run manually.  Rather the %s-start and %s-scaler processes spawn instances of %s-connection as-necessary.\n"
+		"%s is not intended to be run manually.  Rather the %s-start and %s-scaler processes spawn instances of %s as-necessary.\n"
 		"\n"
-		"Usage: %s-connection [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
@@ -110,7 +110,8 @@ static void helpmessage() {
 		"\n"
 		DISABLECRASHHANDLER
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
+		progname,SQL_RELAY,progname,progname,SQL_RELAY,
+		progname,SQLR,SQLR,progname,progname);
 }
 
 int main(int argc, const char **argv) {

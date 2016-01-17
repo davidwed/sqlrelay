@@ -481,14 +481,14 @@ void sqlrimport::massageField(stringbuffer *strb, const char *field) {
 	}
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-import is the %s database object import utility.\n"
+		"%s is the %s database object import utility.\n"
 		"\n"
 		"Import a database object from a file created previously or elsewhere using\n"
-		"sqlr-export.\n"
+		"%s-export.\n"
 		"\n"
-		"Usage: %s-import [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		"\n"
@@ -501,21 +501,22 @@ static void helpmessage() {
 		"\n"
 		"blah blah blah...\n"
 		"\n"
-		"	%s-import -host svr -port 9000 -user usr -password pwd ...\n"
+		"	%s -host svr -port 9000 -user usr -password pwd ...\n"
 		"\n"
 		"blah blah blah...\n"
 		"\n"
-		"	%s-import -socket /tmp/svr.sock -user usr -password pwd ...\n"
+		"	%s -socket /tmp/svr.sock -user usr -password pwd ...\n"
 		"\n"
 		"blah blah blah...\n"
-		"	%s-import -id myinst ...\n"
+		"	%s -id myinst ...\n"
 		"\n"
 		"blah blah blah...\n"
 		"\n"
-		"	%s-import -config ./myconfig.conf -id myinst ...\n"
+		"	%s -config ./myconfig.conf -id myinst ...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR);
+		progname,SQL_RELAY,SQLR,progname,
+		progname,progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

@@ -235,19 +235,19 @@ static void shutDown(int32_t signum) {
 	process::exit(0);
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-cachemanager is the %s client-side result-set cache manager.\n"
+		"%s is the %s client-side result-set cache manager.\n"
 		"\n"
-		"To improve the performance of frequently run queries, %s client applications can cache result sets locally and then access them rather than running the query again.  When a result set is cached, a time-to-live (expiration date) is assigned to it. The %s-cachemanager goes through the cached result sets periodically and removes the ones that have expired.\n"
+		"To improve the performance of frequently run queries, %s client applications can cache result sets locally and then access them rather than running the query again.  When a result set is cached, a time-to-live (expiration date) is assigned to it. The %s goes through the cached result sets periodically and removes the ones that have expired.\n"
 		"\n"
-		"Only one %s-cachemanager needs to be run per machine.\n"
+		"Only one %s needs to be run per machine.\n"
 		"\n"
 		"IMPORTANT NOTE:\n"
 		"\n"
 		"Since cache managers clean up after %s client applications, they need to be run on machines which run client applications that could cache result sets.  These are likely to be web or application servers, rather than the machines that run the sqlr-listener and sqlr-connection daemons.\n"
 		"\n"
-		"Usage: %s-cachemanager [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		"	-scaninterval	...\n"
@@ -259,7 +259,8 @@ static void helpmessage() {
 		"...\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQL_RELAY,SQLR,SQLR,SQL_RELAY,SQLR);
+		progname,SQL_RELAY,SQL_RELAY,progname,
+		progname,SQL_RELAY,progname);
 }
 
 int main(int argc, const char **argv) {

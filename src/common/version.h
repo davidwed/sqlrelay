@@ -3,6 +3,7 @@
 
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
+#include <rudiments/file.h>
 #include <rudiments/process.h>
 
 static void version(int argc, const char **argv) {
@@ -25,7 +26,7 @@ static void version(int argc, const char **argv) {
 	process::exit(0);
 }
 
-static void helpmessage();
+static void helpmessage(const char *progname);
 
 static void help(int argc, const char **argv) {
 
@@ -34,7 +35,19 @@ static void help(int argc, const char **argv) {
 		return;
 	}
 
-	helpmessage();
+	// strip off any leading directories
+	char	*progname=file::basename(argv[0]);
+
+	// strip off any libtool prefixes
+	if (!charstring::compare(progname,"lt-",3)) {
+		char	*tmp=charstring::duplicate(progname+3);
+		delete[] progname;
+		progname=tmp;
+	}
+
+	helpmessage(progname);
+
+	delete[] progname;
 
 	process::exit(0);
 }
@@ -48,23 +61,24 @@ static void help(int argc, const char **argv) {
 "	-password password	password\n" \
 "\n" \
 "Alternate connection options:\n" \
-"	-config configfile	config file\n" \
+"	-config file		override te default config file with \"file\"\n" \
 "	-id instanceid		id of an instance in the config file from which\n" \
 "				to derive connection info and credentials\n"
 
 #define CONFIGID \
-"	-config configfile	...\n" \
+"	-config file		override the default config file with \"file\"\n" \
 "\n" \
-"	-id instanceid		...\n" \
+"	-id instanceid		id of an instance in the config file\n" \
 "\n"
 
 #define SERVEROPTIONS \
 CONFIGID \
-"	-localstatedir dir 	...\n" \
+"	-localstatedir dir 	override the default directory for keeping\n" \
+"				working or stateful files with \"dir\"\n" \
 "\n"
 
 #define DISABLECRASHHANDLER \
-"	-disable-crash-handler	...\n" \
+"	-disable-crash-handler	disables SIGSEGV handler, useful for debugging\n" \
 "\n"
 
 #define REPORTBUGS "Report bugs to <david.muse@firstworks.com>\n"

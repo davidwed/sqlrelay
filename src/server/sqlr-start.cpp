@@ -283,25 +283,27 @@ static bool startScaler(sqlrpaths *sqlrpth,
 	return true;
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-start is the startup program for the %s server processes.\n"
+		"%s is the startup program for the %s server processes.\n"
 		"\n"
-		"The %s-start program spawns %s-listener, %s-connection, and %s-scaler processes.\n"
+		"The %s program spawns %s-listener, %s-connection, and %s-scaler processes.\n"
 		"\n"
-		"When run with the -id argument, %s-start starts processes for the specified instance.  When run with no -id argument, %s-start starts processes for all enabled instances.\n"
+		"When run with the -id argument, %s starts processes for the specified instance.  When run with no -id argument, %s starts processes for all enabled instances.\n"
 		"\n"
-		"Usage: %s-start [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
-		"	-strace			...\n"
-		"\n"
 		DISABLECRASHHANDLER
-		"	-disable-new-window	...\n"
+		"	-disable-new-window	Only valid on Windows platforms.  Spawns child\n"
+		"				processes in the current window, rather than\n"
+		"				opening a new window.  Helpful when debugging\n"
+		"				startup errors.\n"
 		"\n"
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR,SQLR);
+		progname,SQL_RELAY,progname,
+		SQLR,SQLR,SQLR,progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

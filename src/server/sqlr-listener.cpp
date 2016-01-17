@@ -36,21 +36,22 @@ static void shutDown(int32_t signum) {
 	process::exit(0);
 }
 
-static void helpmessage() {
+static void helpmessage(const char *progname) {
 	stdoutput.printf(
-		"%s-listener is the %s listener daemon.\n"
+		"%s is the %s listener daemon.\n"
 		"\n"
-		"The %s-listener listens for connections from %s client applications.  When a client connects, the %s-listener hands it off to an available connection daemon or queues it until a connection daemon is available.\n"
+		"The %s listens for connections from %s client applications.  When a client connects, the %s hands it off to an available connection daemon or queues it until a connection daemon is available.\n"
 		"\n"
-		"The %s-listener is not intended to be run manually.  Rather the %s-start process spawns it as-necessary.\n"
+		"The %s is not intended to be run manually.  Rather the %s-start process spawns it as-necessary.\n"
 		"\n"
-		"Usage: %s-listener [OPTIONS]\n"
+		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
 		DISABLECRASHHANDLER
 		REPORTBUGS,
-		SQLR,SQL_RELAY,SQLR,SQL_RELAY,SQLR,SQLR,SQLR,SQLR);
+		progname,SQL_RELAY,progname,SQL_RELAY,
+		progname,progname,SQLR,progname);
 }
 
 int main(int argc, const char **argv) {
