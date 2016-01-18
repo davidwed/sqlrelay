@@ -34,22 +34,26 @@ static void helpmessage(const char *progname) {
 		"Usage: %s [OPTIONS]\n"
 		"\n"
 		"Options:\n"
-		SERVEROPTIONS
+		CONFIG
+		LOCALSTATEDIR
 		"\n"
 		"Examples:\n"
 		"\n"
-		"Stop instance \"myinst\" as defined in the default configuration.\n"
+		"Stop instance \"myinst\" who's pid files are found in the default location.\n"
 		"	%s -id myinst\n"
 		"\n"
-		"Stop instance \"myinst\" as defined in the config file ./myconfig.conf\n"
-		"	%s -config ./myconfig.conf -id myinst\n"
+		"Stop instance \"myinst\" who's pid files are found under /opt/myapp/var\n"
+		"	%s -localstatedir /opt/myapp/var -id myinst\n"
 		"\n"
-		"Stop all running instances.\n"
+		"Stop all running instances who's pid files are found in the default location.\n"
 		"	%s\n"
+		"\n"
+		"Stop all running instances who's pid files are found under /opt/myapp/var\n"
+		"	%s -localstatedir /opt/myapp/var\n"
 		"\n",
 		progname,SQL_RELAY,progname,SQLR,SQLR,SQLR,
 		progname,progname,SQLR,SQLR,SQLR,
-		progname,progname,progname,progname);
+		progname,progname,progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

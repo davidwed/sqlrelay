@@ -76,21 +76,27 @@ static void help(int argc, const char **argv) {
 "				configuration.\n" \
 "\n"
 
-#define CONFIGID \
+#define CONFIG \
 "	-config config		Override the default configuration with the\n" \
 "				specified configuration.\n" \
 "\n" \
+
+#define CONFIGID \
+CONFIG \
 "	-id instanceid		Id of an instance, as defined in the\n" \
 "				configuration.\n" \
 "\n"
 
-#define SERVEROPTIONS \
-CONFIGID \
+#define LOCALSTATEDIR \
 "	-localstatedir dir 	Override the default directory for keeping\n" \
 "				pid files, sockets, and other working or\n" \
 "				stateful files with the specified\n" \
 "				directory.\n" \
 "\n"
+
+#define SERVEROPTIONS \
+CONFIGID \
+LOCALSTATEDIR
 
 #define DISABLECRASHHANDLER \
 "	-disable-crash-handler	Disable the built-in crash handler.\n" \
