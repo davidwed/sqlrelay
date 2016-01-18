@@ -2015,17 +2015,22 @@ static void helpmessage(const char *progname) {
 		CONNECTIONOPTIONS
 		"\n"
 		"Command options:\n"
-		"	-script filename	name of file containing commands/queries to run\n"
+		"	-script filename	Run the specified script which contains	commands\n"
+		"				or queries that could otherwise be run at the\n"
+		"				%s prompt.\n"
 		"\n"
-		"	-command \"commands\"	semicolon-separated commands/queries to run\n"
+		"	-command \"commands\"	Run the provided string which contains commands\n"
+		"				or queries that could otherwise be run at the\n"
+		"				%s prompt.\n"
 		"\n"
-		"	-quiet			omit headers and stats in output\n"
+		"	-quiet			Omit headers and stats in output.\n"
 		"\n"
-		"	-format plain|csv	sets output format to plain or csv\n"
+		"	-format plain|csv	Format the output as specified.\n"
+		"				Defaults to plain.\n"
 		"\n"
 		"	-resultsetbuffersize rows\n"
-		"				fetch result sets using the specified number of\n"
-		"				rows at once\n"
+		"				Fetch result sets using the specified number of\n"
+		"				rows at once.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
@@ -2037,10 +2042,12 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"	%s -socket /tmp/svr.sock -user usr -password pwd\n"
 		"\n"
-		"Interactive session using connection info and credentials from instance myinst, as defined in the default configuration file.\n"
+		"Interactive session using connection info and credentials from an instance\n"
+		"defined in the default configuration.\n"
 		"	%s -id myinst\n"
 		"\n"
-		"Interactive session using connection info and credentials from instance myinst, as defined in the config file ./myconfig.conf\n"
+		"Interactive session using connection info and credentials from an instance\n"
+		"defined in the config file ./myconfig.conf\n"
 		"\n"
 		"	%s -config ./myconfig.conf -id myinst\n"
 		"\n"
@@ -2051,9 +2058,8 @@ static void helpmessage(const char *progname) {
 		"Non-interactive session, running query \"select * from mytable\" with csv output.\n"
 		"\n"
 		"	%s -id myinst -command \"select * from mytable\" -quiet -format csv\n"
-		"\n"
-		REPORTBUGS,
-		progname,SQL_RELAY,progname,progname,
+		"\n",
+		progname,SQL_RELAY,progname,progname,progname,progname,
 		progname,progname,progname,progname,progname);
 }
 

@@ -301,9 +301,27 @@ static void helpmessage(const char *progname) {
 		"				opening a new window.  Helpful when debugging\n"
 		"				startup errors.\n"
 		"\n"
-		REPORTBUGS,
+		"Examples:\n"
+		"\n"
+		"Start instance \"myinst\" as defined in the default configuration.\n"
+		"\n"
+		"	%s -id myinst\n"
+		"\n"
+		"Start instance \"myinst\" as defined in the config file ./myconfig.conf\n"
+		"\n"
+		"	%s -config ./myconfig.conf -id myinst\n"
+		"\n"
+		"Start all instances enabled in the default configuration.\n"
+		"\n"
+		"	%s\n"
+		"\n"
+		"Start all instances enabled in the config file ./myconfig.conf\n"
+		"\n"
+		"	%s -config ./myconfig.conf\n"
+		"\n",
 		progname,SQL_RELAY,progname,
-		SQLR,SQLR,SQLR,progname,progname,progname);
+		SQLR,SQLR,SQLR,progname,progname,
+		progname,progname,progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

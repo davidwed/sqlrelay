@@ -35,9 +35,21 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
-		REPORTBUGS,
+		"\n"
+		"Examples:\n"
+		"\n"
+		"Stop instance \"myinst\" as defined in the default configuration.\n"
+		"	%s -id myinst\n"
+		"\n"
+		"Stop instance \"myinst\" as defined in the config file ./myconfig.conf\n"
+		"	%s -config ./myconfig.conf -id myinst\n"
+		"\n"
+		"Stop all running instances.\n"
+		"	%s\n"
+		"\n",
 		progname,SQL_RELAY,progname,SQLR,SQLR,SQLR,
-		progname,progname,SQLR,SQLR,SQLR,progname);
+		progname,progname,SQLR,SQLR,SQLR,
+		progname,progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

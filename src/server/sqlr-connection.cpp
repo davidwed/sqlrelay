@@ -111,8 +111,7 @@ static void helpmessage(const char *progname) {
 		"	-nodetach	Suppresses detachment from the controlling terminal.\n"
 		"			Useful for debugging.\n"
 		"\n"
-		DISABLECRASHHANDLER
-		REPORTBUGS,
+		DISABLECRASHHANDLER,
 		progname,SQL_RELAY,progname,progname,SQL_RELAY,
 		progname,SQLR,SQLR,progname,progname,progname,SQLR);
 }

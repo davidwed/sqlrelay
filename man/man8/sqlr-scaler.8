@@ -14,21 +14,24 @@ The sqlr\-scaler is not intended to be run manually.  Rather the sqlr\-start pro
 .SH OPTIONS
 .TP
 \fB\-config\fR file
-Override the default config file with "file".
+Override the default configuration with the
+specified configuration.
 .TP
 \fB\-id\fR instanceid
-Id of an instance in the config file.
+Id of an instance, as defined in the
+configuration.
 .TP
 \fB\-localstatedir\fR dir
 Override the default directory for keeping
-working or stateful files with "dir".
+pid files, sockets, and other working or
+stateful files with the specified
+directory.
 .TP
 \fB\-disable\-crash\-handler\fR
-Disables SIGSEGV handler, useful for debugging.
+Disable the built\-in crash handler.
+Useful for debugging.
 .SH AUTHOR
 Written by David Muse.
-.SH "REPORTING BUGS"
-Report bugs to <david.muse@firstworks.com>
 .SH COPYRIGHT
 Copyright \(co 1999\-2016 David Muse
 .br

@@ -32,28 +32,35 @@ Password to authenticate with.
 .SS "Alternate connection options:"
 .TP
 \fB\-config\fR file
-Override the default config file with "file".
+Override the default configuration with the
+specified configuration.
 .TP
 \fB\-id\fR instanceid
-Id of an instance in the config file from which
-to derive connection info and credentials.
+Derive connection info and credentials from the
+specified instance, as defined in the
+configuration.
 .SS "Command options:"
 .TP
 \fB\-script\fR filename
-name of file containing commands/queries to run
+Run the specified script which contains commands
+or queries that could otherwise be run at the
+sqlrsh prompt.
 .TP
 \fB\-command\fR "commands"
-semicolon\-separated commands/queries to run
+Run the provided string which contains commands
+or queries that could otherwise be run at the
+sqlrsh prompt.
 .TP
 \fB\-quiet\fR
-omit headers and stats in output
+Omit headers and stats in output.
 .TP
 \fB\-format\fR plain|csv
-sets output format to plain or csv
+Format the output as specified.
+Defaults to plain.
 .TP
 \fB\-resultsetbuffersize\fR rows
-fetch result sets using the specified number of
-rows at once
+Fetch result sets using the specified number of
+rows at once.
 .SH EXAMPLES
 Interactive session with server at svr:9000 as usr/pwd.
 .IP
@@ -63,11 +70,13 @@ Interactive session with local server on socket /tmp/svr.sock as usr/pwd.
 .IP
 sqlrsh \-socket /tmp/svr.sock \-user usr \-password pwd
 .PP
-Interactive session using connection info and credentials from instance myinst, as defined in the default configuration file.
+Interactive session using connection info and credentials from an instance
+defined in the default configuration.
 .IP
 sqlrsh \-id myinst
 .PP
-Interactive session using connection info and credentials from instance myinst, as defined in the config file ./myconfig.conf
+Interactive session using connection info and credentials from an instance
+defined in the config file ./myconfig.conf
 .IP
 sqlrsh \-config ./myconfig.conf \-id myinst
 .PP
@@ -80,8 +89,6 @@ Non\-interactive session, running query "select * from mytable" with csv output.
 sqlrsh \-id myinst \-command "select * from mytable" \-quiet \-format csv
 .SH AUTHOR
 Written by David Muse.
-.SH "REPORTING BUGS"
-Report bugs to <david.muse@firstworks.com>
 .SH COPYRIGHT
 Copyright \(co 1999\-2016 David Muse
 .br

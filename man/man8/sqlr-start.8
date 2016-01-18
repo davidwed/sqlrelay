@@ -14,27 +14,46 @@ When run with the \fB\-id\fR argument, sqlr\-start starts processes for the spec
 .SH OPTIONS
 .TP
 \fB\-config\fR file
-Override the default config file with "file".
+Override the default configuration with the
+specified configuration.
 .TP
 \fB\-id\fR instanceid
-Id of an instance in the config file.
+Id of an instance, as defined in the
+configuration.
 .TP
 \fB\-localstatedir\fR dir
 Override the default directory for keeping
-working or stateful files with "dir".
+pid files, sockets, and other working or
+stateful files with the specified
+directory.
 .TP
 \fB\-disable\-crash\-handler\fR
-Disables SIGSEGV handler, useful for debugging.
+Disable the built\-in crash handler.
+Useful for debugging.
 .TP
 \fB\-disable\-new\-window\fR
 Only valid on Windows platforms.  Spawns child
 processes in the current window, rather than
 opening a new window.  Helpful when debugging
 startup errors.
+.SH EXAMPLES
+Start instance "myinst" as defined in the default configuration.
+.IP
+sqlr\-start \-id myinst
+.PP
+Start instance "myinst" as defined in the config file ./myconfig.conf
+.IP
+sqlr\-start \-config ./myconfig.conf \-id myinst
+.PP
+Start all instances enabled in the default configuration.
+.IP
+sqlr\-start
+.PP
+Start all instances enabled in the config file ./myconfig.conf
+.IP
+sqlr\-start \-config ./myconfig.conf
 .SH AUTHOR
 Written by David Muse.
-.SH "REPORTING BUGS"
-Report bugs to <david.muse@firstworks.com>
 .SH COPYRIGHT
 Copyright \(co 1999\-2016 David Muse
 .br

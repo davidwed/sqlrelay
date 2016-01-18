@@ -48,8 +48,7 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
-		DISABLECRASHHANDLER
-		REPORTBUGS,
+		DISABLECRASHHANDLER,
 		progname,SQL_RELAY,progname,SQL_RELAY,
 		progname,progname,SQLR,progname);
 }

@@ -259,8 +259,7 @@ static void helpmessage(const char *progname) {
 		"Examples:\n"
 		"\n"
 		"...\n"
-		"\n"
-		REPORTBUGS,
+		"\n",
 		progname,SQL_RELAY,SQL_RELAY,progname,
 		progname,SQL_RELAY,progname);
 }

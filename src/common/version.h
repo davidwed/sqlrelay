@@ -68,26 +68,31 @@ static void help(int argc, const char **argv) {
 "	-password password	Password to authenticate with.\n" \
 "\n" \
 "Alternate connection options:\n" \
-"	-config file		Override the default config file with \"file\".\n" \
+"	-config file		Override the default configuration with the\n" \
+"				specified configuration.\n" \
 "\n" \
-"	-id instanceid		Id of an instance in the config file from which\n" \
-"				to derive connection info and credentials.\n" \
+"	-id instanceid		Derive connection info and credentials from the\n" \
+"				specified instance, as defined in the\n" \
+"				configuration.\n" \
 "\n"
 
 #define CONFIGID \
-"	-config file		Override the default config file with \"file\".\n" \
+"	-config file		Override the default configuration with the\n" \
+"				specified configuration.\n" \
 "\n" \
-"	-id instanceid		Id of an instance in the config file.\n" \
+"	-id instanceid		Id of an instance, as defined in the\n" \
+"				configuration.\n" \
 "\n"
 
 #define SERVEROPTIONS \
 CONFIGID \
 "	-localstatedir dir 	Override the default directory for keeping\n" \
-"				working or stateful files with \"dir\".\n" \
+"				pid files, sockets, and other working or\n" \
+"				stateful files with the specified\n" \
+"				directory.\n" \
 "\n"
 
 #define DISABLECRASHHANDLER \
-"	-disable-crash-handler	Disables SIGSEGV handler, useful for debugging.\n" \
+"	-disable-crash-handler	Disable the built-in crash handler.\n" \
+"				Useful for debugging.\n" \
 "\n"
-
-#define REPORTBUGS "Report bugs to <david.muse@firstworks.com>\n"

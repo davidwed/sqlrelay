@@ -33,34 +33,66 @@ Password to authenticate with.
 .SS "Alternate connection options:"
 .TP
 \fB\-config\fR file
-Override the default config file with "file".
+Override the default configuration with the
+specified configuration.
 .TP
 \fB\-id\fR instanceid
-Id of an instance in the config file from which
-to derive connection info and credentials.
+Derive connection info and credentials from the
+specified instance, as defined in the
+configuration.
 .SS "Command options:"
-.IP
-\&...
+.TP
+\fB\-file\fR filename
+Import the specified file.
+.TP
+\fB\-commitcount\fR rowcount
+Execute a commit each time the specified number
+of rows have been imported since the beginning
+or since the previous commit.
+.TP
+\fB\-debug\fR [filename]
+Write debug information to the specified file
+or to the screen if no file is specified.
+.TP
+\fB\-verbose\fR
+Display details about the import process.
 .SH EXAMPLES
-blah blah blah...
+Import a table and sequence using the server at svr:9000 as usr/pwd.
 .IP
-sqlr\-import \-host svr \-port 9000 \-user usr \-password pwd ...
+sqlr\-import \-host svr \-port 9000 \-user usr \-password pwd \e
+.IP
+\-file mytable.tbl
+.IP
+sqlr\-import \-host svr \-port 9000 \-user usr \-password pwd \e
+.IP
+\-file myseq.seq
 .PP
-blah blah blah...
+Import a table and sequence using the local server on socket /tmp/svr.sock
+as usr/pwd.
 .IP
-sqlr\-import \-socket /tmp/svr.sock \-user usr \-password pwd ...
+sqlr\-import \-socket /tmp/svr.sock \-user usr \-password pwd \e
+.IP
+\-file mytable.tbl
+.IP
+sqlr\-import \-socket /tmp/svr.sock \-user usr \-password pwd \e
+.IP
+\-file myseq.seq
 .PP
-blah blah blah...
+Import a table and sequence using connection info and credentials from
+an instance defined in the default configuration.
 .IP
-sqlr\-import \-id myinst ...
+sqlr\-import \-id myinst \-file mytable.tbl
+.IP
+sqlr\-import \-id myinst \-file myseq.seq
 .PP
-blah blah blah...
+Import a table and sequence using connection info and credentials from
+in instance defined in the config file ./myconfig.conf
 .IP
-sqlr\-import \-config ./myconfig.conf \-id myinst ...
+sqlr\-import \-config ./myconfig.conf \-id myinst \-file mytable.tbl
+.IP
+sqlr\-import \-config ./myconfig.conf \-id myinst \-file myseq.seq
 .SH AUTHOR
 Written by David Muse.
-.SH "REPORTING BUGS"
-Report bugs to <david.muse@firstworks.com>
 .SH COPYRIGHT
 Copyright \(co 1999\-2016 David Muse
 .br

@@ -8,16 +8,18 @@ sqlr-pwdenc \- manual page for sqlr-pwdenc 0.65
 .SH DESCRIPTION
 sqlr\-pwdenc is the SQL Relay password encryption utility.
 .PP
-When used with the appropriate password encryption module, passwords can be stored in encrypted form in the SQL Relay configuration file, rather than in plain text.
+When used with the appropriate password encryption module, passwords can be stored in encrypted form in the SQL Relay configuration, rather than in plain text.
 .PP
-The sqlr\-pwdenc utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration file in place of the plaintext password.
+The sqlr\-pwdenc utility can be used to encrypt a given plaintext password, using the specified instance and password encryption id.  The encrypted output may then included in the configuration in place of the plaintext password.
 .SH OPTIONS
 .TP
 \fB\-config\fR file
-Override the default config file with "file".
+Override the default configuration with the
+specified configuration.
 .TP
 \fB\-id\fR instanceid
-Id of an instance in the config file.
+Id of an instance, as defined in the
+configuration.
 .TP
 \fB\-pwdencid\fR passwordencryptionid
 id of instance of passwordencryption
@@ -26,11 +28,17 @@ module to use
 \fB\-password\fR password
 password to encrypt
 .SH EXAMPLES
-\&...
+Encrypt the password "pwd" using the password encryption module with id
+"rot16" as defined in instance "myinst" in the default configuration.
+.IP
+sqlr\-pwdenc \-id myinst \-pwdencid rot16 \-password pwd
+.PP
+Encrypt the password "pwd" using the password encryption module with id
+"rot16" as defined in instance "myinst" in the config file ./myconfig.conf.
+.IP
+sqlr\-pwdenc \-config ./myconfig.conf \-id myinst \-pwdencid rot16 \-password pwd
 .SH AUTHOR
 Written by David Muse.
-.SH "REPORTING BUGS"
-Report bugs to <david.muse@firstworks.com>
 .SH COPYRIGHT
 Copyright \(co 1999\-2016 David Muse
 .br

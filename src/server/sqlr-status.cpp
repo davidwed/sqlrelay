@@ -35,10 +35,18 @@ static void helpmessage(const char *progname) {
 		SERVEROPTIONS
 		"\n"
 		"Examples:\n"
-		"...\n"
 		"\n"
-		REPORTBUGS,
-		progname,SQL_RELAY,progname,progname);
+		"Check the status of the specified instance, as defined in the default\n"
+		"configuration.\n"
+		"\n"
+		"	%s -id myinst\n"
+		"\n"
+		"Check the status of the specified instance, as defined in the config file\n"
+		"./myconfig.conf\n"
+		"\n"
+		"	%s -config ./myconfig.conf -id myinst\n"
+		"\n",
+		progname,SQL_RELAY,progname,progname,progname,progname);
 }
 
 int main(int argc, const char **argv) {

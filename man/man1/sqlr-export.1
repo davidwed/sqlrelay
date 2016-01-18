@@ -8,8 +8,7 @@ sqlr-export \- manual page for sqlr-export 0.65
 .SH DESCRIPTION
 sqlr\-export is the SQL Relay database object export utility.
 .PP
-Export a database object to a file for import later or elsewhere using
-sqlr\-import.
+Export a database object for import later or elsewhere using sqlr\-import.
 .SH OPTIONS
 .SS "Connection options:"
 .TP
@@ -33,34 +32,65 @@ Password to authenticate with.
 .SS "Alternate connection options:"
 .TP
 \fB\-config\fR file
-Override the default config file with "file".
+Override the default configuration with the
+specified configuration.
 .TP
 \fB\-id\fR instanceid
-Id of an instance in the config file from which
-to derive connection info and credentials.
+Derive connection info and credentials from the
+specified instance, as defined in the
+configuration.
 .SS "Command options:"
-.IP
-\&...
+.TP
+\fB\-table\fR tbl
+Export the specified table.
+.TP
+\fB\-sequence\fR seq
+Export the specified sequence.
+.TP
+\fB\-format\fR xml|csv
+Format the output as specified.
+Defaults to xml.
 .SH EXAMPLES
-blah blah blah...
+Export a table and sequence using the server at svr:9000 as usr/pwd.
 .IP
-sqlr\-export \-host svr \-port 9000 \-user usr \-password pwd ...
+sqlr\-export \-host svr \-port 9000 \-user usr \-password pwd \e
+.IP
+\-table mytable > mytable.tbl
+.IP
+sqlr\-export \-host svr \-port 9000 \-user usr \-password pwd \e
+.IP
+\-sequence myseq > myseq.seq
 .PP
-blah blah blah...
+Export a table and sequence using the local server on socket /tmp/svr.sock
+as usr/pwd.
 .IP
-sqlr\-export \-socket /tmp/svr.sock \-user usr \-password pwd ...
+sqlr\-export \-socket /tmp/svr.sock \-user usr \-password pwd \e
+.IP
+\-table mytable > mytable.tbl
+.IP
+sqlr\-export \-socket /tmp/svr.sock \-user usr \-password pwd \e
+.IP
+\-sequence myseq > myseq.seq
 .PP
-blah blah blah...
+Export a table and sequence using connection info and credentials from
+an instance defined in the default configuration.
 .IP
-sqlr\-export \-id myinst ...
+sqlr\-export \-id myinst \-table mytable > mytable.tbl
+.IP
+sqlr\-export \-id myinst \-sequence myseq > myseq.seq
 .PP
-blah blah blah...
+Export a table and sequence using connection info and credentials from
+an instance defined in the config file ./myconfig.conf
 .IP
-sqlr\-export \-config ./myconfig.conf \-id myinst ...
+sqlr\-export \-config ./myconfig.conf \-id myinst \e
+.IP
+\-table mytable > mytable.tbl
+.IP
+sqlr\-export \-config ./myconfig.conf \-id myinst \e
+.IP
+\-sequence myseq > myseq.seq
 .SH AUTHOR
 Written by David Muse.
-.SH "REPORTING BUGS"
-Report bugs to <david.muse@firstworks.com>
 .SH COPYRIGHT
 Copyright \(co 1999\-2016 David Muse
 .br
