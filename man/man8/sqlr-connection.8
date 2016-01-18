@@ -13,7 +13,7 @@ Each sqlr\-connection maintains a persistent connection to a database.  Together
 sqlr\-connection is not intended to be run manually.  Rather the sqlr\-start and sqlr\-scaler processes spawn instances of sqlr\-connection as\-necessary.
 .SH OPTIONS
 .TP
-\fB\-config\fR file
+\fB\-config\fR config
 Override the default configuration with the
 specified configuration.
 .TP
@@ -32,7 +32,7 @@ Indicates to the sqlr\-connection that it was spawned
 by the sqlr\-scaler.
 .TP
 \fB\-ttl\fR sec
-Time\-to\-live, in seconds.  If the lt\- is idle
+Time\-to\-live, in seconds.  If the  is idle
 for this number of seconds, then it will exit.
 .TP
 \fB\-silent\fR

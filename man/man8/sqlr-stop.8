@@ -13,13 +13,9 @@ The sqlr\-stop program stops sqlr\-listener, sqlr\-connection, and sqlr\-scaler 
 When run with the \fB\-id\fR argument, sqlr\-stop stops processes for the specified instance.  When run with no \fB\-id\fR argument, sqlr\-stop stops all running sqlr\-listener, sqlr\-connection, and sqlr\-scaler processes.
 .SH OPTIONS
 .TP
-\fB\-config\fR file
+\fB\-config\fR config
 Override the default configuration with the
 specified configuration.
-.TP
-\fB\-id\fR instanceid
-Id of an instance, as defined in the
-configuration.
 .TP
 \fB\-localstatedir\fR dir
 Override the default directory for keeping
@@ -27,17 +23,21 @@ pid files, sockets, and other working or
 stateful files with the specified
 directory.
 .SH EXAMPLES
-Stop instance "myinst" as defined in the default configuration.
+Stop instance "myinst" who's pid files are found in the default location.
 .IP
 sqlr\-stop \-id myinst
 .PP
-Stop instance "myinst" as defined in the config file ./myconfig.conf
+Stop instance "myinst" who's pid files are found under /opt/myapp/var
 .IP
-sqlr\-stop \-config ./myconfig.conf \-id myinst
+sqlr\-stop \-localstatedir /opt/myapp/var \-id myinst
 .PP
-Stop all running instances.
+Stop all running instances who's pid files are found in the default location.
 .IP
 sqlr\-stop
+.PP
+Stop all running instances who's pid files are found under /opt/myapp/var
+.IP
+sqlr\-stop \-localstatedir /opt/myapp/var
 .SH AUTHOR
 Written by David Muse.
 .SH COPYRIGHT

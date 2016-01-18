@@ -255,10 +255,6 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"	-scaninterval sec	Interval, in seconds, to scan the cache\n"
 		"				directories.\n"
-		"\n"
-		"Examples:\n"
-		"\n"
-		"...\n"
 		"\n",
 		progname,SQL_RELAY,SQL_RELAY,progname,
 		progname,SQL_RELAY,progname);
