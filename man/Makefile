@@ -48,14 +48,14 @@ uninstall:
 		$(mandir)/man1/sqlr-query.1
 
 man:
-	help2man --source="SQL Relay" --no-info sqlrsh > man1/sqlrsh.1
-	help2man --source="SQL Relay" --no-info sqlr-export > man1/sqlr-export.1
-	help2man --source="SQL Relay" --no-info sqlr-import > man1/sqlr-import.1
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-cachemanager > man8/sqlr-cachemanager.8
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-connection > man8/sqlr-connection.8
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-listener > man8/sqlr-listener.8
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-scaler > man8/sqlr-scaler.8
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-start > man8/sqlr-start.8
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-stop > man8/sqlr-stop.8
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-status > man8/sqlr-status.8
-	help2man --source="SQL Relay" --no-info --section=8 sqlr-pwdenc > man8/sqlr-pwdenc.8
+	help2man --source="SQL Relay" --no-info ../src/cmdline/sqlrsh > man1/sqlrsh.1
+	help2man --source="SQL Relay" --no-info ../src/cmdline/sqlr-export > man1/sqlr-export.1
+	help2man --source="SQL Relay" --no-info ../src/cmdline/sqlr-import > man1/sqlr-import.1
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-cachemanager > man8/sqlr-cachemanager.8
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-connection > man8/sqlr-connection.8
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-listener > man8/sqlr-listener.8
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-scaler > man8/sqlr-scaler.8
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-start > man8/sqlr-start.8
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-stop > man8/sqlr-stop.8
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-status > man8/sqlr-status.8
+	help2man --source="SQL Relay" --no-info --section=8 ../src/server/sqlr-pwdenc > man8/sqlr-pwdenc.8
