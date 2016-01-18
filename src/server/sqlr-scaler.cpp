@@ -27,6 +27,16 @@ int main(int argc, const char **argv) {
 	version(argc,argv);
 	help(argc,argv);
 
+	commandline	cmdl(argc,argv);
+
+	if (!cmdl.found("-id")) {
+		stdoutput.printf("usage: \n"
+			" %s-scaler [-config config] -id id "
+			"[-localstatedir dir]\n",
+			SQLR);
+		process::exit(0);
+	}
+
 	{
 		scaler	s;
 		if (s.initScaler(argc,argv)) {

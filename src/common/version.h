@@ -68,7 +68,7 @@ static void help(int argc, const char **argv) {
 "	-password password	Password to authenticate with.\n" \
 "\n" \
 "Alternate connection options:\n" \
-"	-config file		Override the default configuration with the\n" \
+"	-config config		Override the default configuration with the\n" \
 "				specified configuration.\n" \
 "\n" \
 "	-id instanceid		Derive connection info and credentials from the\n" \
@@ -77,7 +77,7 @@ static void help(int argc, const char **argv) {
 "\n"
 
 #define CONFIGID \
-"	-config file		Override the default configuration with the\n" \
+"	-config config		Override the default configuration with the\n" \
 "				specified configuration.\n" \
 "\n" \
 "	-id instanceid		Id of an instance, as defined in the\n" \

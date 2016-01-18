@@ -578,14 +578,14 @@ int main(int argc, const char **argv) {
 		charstring::isNullOrEmpty(file)) {
 
 		stdoutput.printf("usage: \n"
-			" %s-import -host host -port port -socket socket \\\n"
-			"             -user user -password password \\\n"
-			"             -file file [-commitcount rowcount] "
-			"[-debug [filename]] [-verbose]\n"
+			" %s-import -host host -port port -socket socket\n"
+			"             -user user -password password\n"
+			"             -file file [-commitcount rowcount]\n"
+			"             [-debug [filename]] [-verbose]\n"
 			"  or\n"
-			" %s-import [-config config] -id id \\\n"
-			"             -file file [-commitcount rowcount] "
-			"[-debug [filename]] [-verbose]\n",
+			" %s-import [-config config] -id id\n"
+			"             -file file [-commitcount rowcount]\n"
+			"             [-debug [filename]] [-verbose]\n",
 			SQLR,SQLR);
 		process::exit(1);
 	}

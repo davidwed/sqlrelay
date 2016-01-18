@@ -64,7 +64,7 @@ int main(int argc, const char **argv) {
 
 		stderror.printf("usage:\n"
 			" %s-pwdenc [-config config] "
-			"-id instance \\\n"
+			"-id instance\n"
 			"             -pwdencid passwordencryptionid "
 			"-password password\n",SQLR);
 		process::exit(1);

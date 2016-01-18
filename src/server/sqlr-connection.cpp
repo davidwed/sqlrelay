@@ -123,6 +123,16 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
+	if (!cmdl.found("-id") || !cmdl.found("-connectionid")) {
+		stdoutput.printf("usage: \n"
+			" %s-connection [-config config] "
+			"-id id -connectionid connectionid\n"
+			"                 [-localstatedir dir] "
+			"[-scaler] [-ttl sec] [-silent] [-nodetach]\n",
+			SQLR);
+		process::exit(0);
+	}
+
 	// set up default signal handling
 	process::exitOnShutDown();
 	if (!cmdl.found("-disable-crash-handler")) {

@@ -60,6 +60,14 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
+	if (!cmdl.found("-id")) {
+		stdoutput.printf("usage:\n"
+			" %s-listener [-config config] -id id "
+			"[-localstatedir dir]\n",
+			SQLR);
+		process::exit(0);
+	}
+
 	// set up default signal handling
 	process::exitOnShutDown();
 	if (!cmdl.found("-disable-crash-handler")) {

@@ -146,17 +146,17 @@ int main(int argc, const char **argv) {
 			charstring::isNullOrEmpty(sequence))) {
 
 		stdoutput.printf("usage: \n"
-			" %s-export -host host -port port -socket socket \\\n"
-			"             -user user -password password \\\n"
-			"             (-table table | -sequence sequence) \\\n"
-			"             [-format (xml | csv)] "
-			"[-resultsetbuffersize rows] \\\n"
+			" %s-export -host host -port port -socket socket\n"
+			"             -user user -password password\n"
+			"             (-table table | -sequence sequence)\n"
+			"             [-format (xml|csv)] "
+			"[-resultsetbuffersize rows]\n"
 			"             [-debug [filename]]\n"
 			"  or\n"
-			" %s-export [-config config] -id id \\\n"
-			"             (-table table | -sequence sequence) \\\n"
-			"             [-format (xml | csv)] "
-			"[-resultsetbuffersize rows] \\\n"
+			" %s-export [-config config] -id id\n"
+			"             (-table table | -sequence sequence)\n"
+			"             [-format (xml|csv)] "
+			"[-resultsetbuffersize rows]\n"
 			"             [-debug [filename]]\n",SQLR,SQLR);
 		process::exit(1);
 	}

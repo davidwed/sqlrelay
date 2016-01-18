@@ -1902,14 +1902,14 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 		stdoutput.printf("usage:\n"
 			" %ssh -host host -port port -socket socket "
-			"-user user -password password \\\n"
+			"-user user -password password\n"
 			"        [-script script | -command command] [-quiet] "
-			"[-format plain|csv] \\\n"
+			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
 			"  or\n"
-			" %ssh [-config config] -id id \\\n"
+			" %ssh [-config config] -id id\n"
 			"        [-script script | -command command] [-quiet] "
-			"[-format plain|csv] \\\n"
+			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n",
 			SQLR,SQLR);
 		process::exit(1);
