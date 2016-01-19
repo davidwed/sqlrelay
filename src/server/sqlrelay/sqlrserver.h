@@ -554,6 +554,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		// query parser
 		sqlrparser	*getParser();
 
+		// GSS
+		gsscontext	*getGSSContext();
+
 		// utilities
 		bool		skipComment(const char **ptr,
 						const char *endptr);

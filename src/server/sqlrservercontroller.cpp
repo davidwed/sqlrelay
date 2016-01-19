@@ -5848,3 +5848,7 @@ void sqlrservercontroller::setLiveConnection(sqlrservercursor *cursor,
 sqlrparser *sqlrservercontroller::getParser() {
 	return sqlrp;
 }
+
+gsscontext *sqlrservercontroller::getGSSContext() {
+	return &gctx;
+}

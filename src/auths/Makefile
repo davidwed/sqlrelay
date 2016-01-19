@@ -12,7 +12,9 @@ include ../../config.mk
 
 all: all-base $(AUTHALLOPTIONALTARGETS)
 
-all-base: $(SQLR)auth_userlist.$(LIBEXT) $(SQLR)auth_database.$(LIBEXT)
+all-base: $(SQLR)auth_userlist.$(LIBEXT) \
+		$(SQLR)auth_database.$(LIBEXT) \
+		$(SQLR)auth_kerberos_userlist.$(LIBEXT)
 
 all-sqlrelay: $(SQLR)auth_sqlrelay.$(LIBEXT)
 
@@ -25,6 +27,9 @@ $(SQLR)auth_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)
 
 $(SQLR)auth_database.$(LIBEXT): database.cpp database.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ database.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
+$(SQLR)auth_kerberos_userlist.$(LIBEXT): kerberos_userlist.cpp kerberos_userlist.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ kerberos_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)auth_sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(SQLRAUTH_SQLRELAYLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
@@ -49,6 +54,10 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)auth_database.a
 	$(RM) $(libexecdir)/$(SQLR)auth_database.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_database.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)auth_kerberos_userlist.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_kerberos_userlist.a
+	$(RM) $(libexecdir)/$(SQLR)auth_kerberos_userlist.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_kerberos userlist.so so $(MODULESUFFIX)
 
 installsharedlib-sqlrelay:
 	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
@@ -60,8 +69,10 @@ uninstall:
 	$(RM) $(libexecdir)/$(SQLR)auth_default.* \
 		$(libexecdir)/$(SQLR)auth_userlist.* \
 		$(libexecdir)/$(SQLR)auth_database.* \
+		$(libexecdir)/$(SQLR)auth_kerberos_userlist.* \
 		$(libexecdir)/$(SQLR)auth_sqlrelay.* \
 		$(libexecdir)/sqlrauth_default.* \
 		$(libexecdir)/sqlrauth_userlist.* \
 		$(libexecdir)/sqlrauth_database.* \
+		$(libexecdir)/sqlrauth_kerberos_userlist.* \
 		$(libexecdir)/sqlrauth_sqlrelay.*
