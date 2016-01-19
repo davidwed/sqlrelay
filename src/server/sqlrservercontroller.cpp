@@ -17,6 +17,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/sys.h>
+#include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 
 #include <defines.h>
@@ -269,6 +270,34 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	cfg=sqlrcfgs->load(sqlrpth->getConfigUrl(),cmdl->getId());
 	if (!cfg) {
 		return false;
+	}
+
+	// init the gss environment
+	if (cfg->getKerberos()) {
+		if (gss::supportsGSS()) {
+
+			// set the keytab file to use
+			if (cfg->getKerberosKeytab()) {
+				environment::setValue("KRB5_KTNAME",
+						cfg->getKerberosKeytab());
+			}
+
+			// acquire service credentials from the keytab
+			if (!gcred.acquireService(cfg->getKerberosService())) {
+				stderror.printf("acquire kerberos "
+						"service failed:\n");
+				stderror.printf("%s\n",gcred.getStatus());
+				return false;
+			}
+
+			// attach the credentials to the context
+			gctx.setCredentials(&gcred);
+
+		} else {
+			stderror.printf("Warning: kerberos support requested "
+					"but platform doesn't support "
+					"kerberos\n");
+		}
 	}
 
 	// update various configurable parameters
@@ -1653,6 +1682,14 @@ int32_t sqlrservercontroller::waitForClient() {
 	//clientsock->setTcpReadBufferSize(65536);
 	clientsock->setWriteBufferSize(65536);
 	//clientsock->setTcpWriteBufferSize(65536);
+
+	// accept kerberos security context, if necessary
+	if (cfg->getKerberos() && !acceptKerberosSecurityContext()) {
+		clientsock->close();
+		delete clientsock;
+		return 0;
+	}
+
 	return 1;
 }
 
@@ -1736,6 +1773,29 @@ void sqlrservercontroller::clientSession() {
 	inclientsession=false;
 
 	logDebugMessage("done with client session");
+}
+
+bool sqlrservercontroller::acceptKerberosSecurityContext() {
+
+	if (!gss::supportsGSS()) {
+		// FIXME: log error
+		return false;
+	}
+
+	// attach the context and file descriptor to each other
+	clientsock->setGSSContext(&gctx);
+	gctx.setFileDescriptor(clientsock);
+
+	// accept the security context
+	if (!gctx.accept()) {
+		// FIXME: log error
+		return false;
+	}
+
+	// FIXME: there's currently some problem with write buffering
+	clientsock->setWriteBufferSize(0);
+
+	return true;
 }
 
 sqlrservercursor *sqlrservercontroller::getCursor(uint16_t id) {

@@ -10,6 +10,7 @@
 #include <rudiments/permissions.h>
 
 #include <defines.h>
+#include <defaults.h>
 
 sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 					const char *socket,
@@ -68,6 +69,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 			(char *)password;
 	userlen=charstring::length(user);
 	passwordlen=charstring::length(password);
+	kerberosservice=NULL;
 
 	// database id
 	id=NULL;
@@ -169,6 +171,7 @@ sqlrconnection::~sqlrconnection() {
 		delete[] listenerunixport;
 		delete[] user;
 		delete[] password;
+		delete[] kerberosservice;
 	}
 
 	// detach all cursors attached to this client
@@ -186,6 +189,26 @@ sqlrconnection::~sqlrconnection() {
 	}
 
 	debugfile.close();
+}
+
+void sqlrconnection::useKerberos(const char *service) {
+	if (copyrefs) {
+		delete[] kerberosservice;
+		kerberosservice=charstring::duplicate(
+				(!charstring::isNullOrEmpty(service))?
+					service:DEFAULT_KERBEROSSERVICE);
+	} else {
+		kerberosservice=
+			(char *)((!charstring::isNullOrEmpty(service))?
+					service:DEFAULT_KERBEROSSERVICE);
+	}
+}
+
+void sqlrconnection::useNoEncryption() {
+	if (copyrefs) {
+		delete[] kerberosservice;
+		kerberosservice=NULL;
+	}
 }
 
 void sqlrconnection::setConnectTimeout(int32_t timeoutsec,
@@ -296,6 +319,42 @@ bool sqlrconnection::openSession() {
 		return true;
 	}
 
+	ucs.dontUseNaglesAlgorithm();
+	ucs.setReadBufferSize(65536);
+	//ucs.setTcpReadBufferSize(65536);
+	ucs.setWriteBufferSize(65536);
+	//ucs.setTcpWriteBufferSize(65536);
+
+	ics.dontUseNaglesAlgorithm();
+	ics.setReadBufferSize(65536);
+	//ics.setTcpReadBufferSize(65536);
+	ics.setWriteBufferSize(65536);
+	//ics.setTcpWriteBufferSize(65536);
+
+	if (gss::supportsGSS() && kerberosservice) {
+
+		if (debug) {
+			debugPreStart();
+			debugPrint("kerberos service: ");
+			debugPrint(kerberosservice);
+			debugPrint("\n");
+			debugPreEnd();
+		}
+
+		gmech.initialize((const char *)NULL);
+		gcred.clearDesiredMechanisms();
+		gcred.addDesiredMechanism(&gmech);
+		gctx.setDesiredMechanism(&gmech);
+		gctx.setDesiredFlags(0);
+		gctx.setService(kerberosservice);
+		ucs.setGSSContext(&gctx);
+		ics.setGSSContext(&gctx);
+
+		// FIXME: there's currently some write buffer problem...
+		ucs.setWriteBufferSize(0);
+		ics.setWriteBufferSize(0);
+	}
+
 	if (debug) {
 		debugPreStart();
 		debugPrint("Connecting to listener...");
@@ -350,17 +409,16 @@ bool sqlrconnection::openSession() {
 
 	// handle failure to connect to listener
 	if (openresult!=RESULT_SUCCESS) {
+		if (debug && gss::supportsGSS() &&
+			kerberosservice && gctx.getMajorStatus()) {
+			debugPreStart();
+			debugPrint(gctx.getStatus());
+			debugPrint("\n");
+			debugPreEnd();
+		}
 		setError("Couldn't connect to the listener.");
 		return false;
 	}
-
-	// use 8k read and write buffers
-	cs->dontUseNaglesAlgorithm();
-	// FIXME: make these buffer sizes user-configurable
-	cs->setReadBufferSize(65536);
-	//cs->setTcpReadBufferSize(65536);
-	cs->setWriteBufferSize(65536);
-	//cs->setTcpWriteBufferSize(65536);
 
 	// send protocol info
 	protocol();
@@ -539,14 +597,13 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	if (connected) {
 
-		// use 8k read and write buffers
 		cs->dontUseNaglesAlgorithm();
 		// FIXME: use bandwidth delay product to tune these
 		// SO_SNDBUF=0 causes no data to ever be sent on openbsd
-		//cs->setTcpReadBufferSize(8192);
-		//cs->setTcpWriteBufferSize(0);
-		cs->setReadBufferSize(8192);
-		cs->setWriteBufferSize(8192);
+		//cs->setTcpReadBufferSize(65536);
+		//cs->setTcpWriteBufferSize(65536);
+		cs->setReadBufferSize(65536);
+		cs->setWriteBufferSize(65536);
 
 		// send protocol info
 		protocol();

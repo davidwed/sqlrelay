@@ -1902,7 +1902,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 		stdoutput.printf("usage:\n"
 			" %ssh -host host -port port -socket socket "
-			"-user user -password password\n"
+			"-user user -password password [-krb [service]]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
@@ -1934,6 +1934,11 @@ void sqlrsh::execute(int argc, const char **argv) {
 	// connect to sql relay
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
+
+	// configure kerberos
+	if (cmdline->found("-krb")) {
+		sqlrcon.useKerberos(cmdline->getValue("-krb"));
+	}
 
 	// set up an sqlrshenv
 	sqlrshenv	env;

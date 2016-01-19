@@ -50,6 +50,7 @@
 		int32_t	waitForClient();
 		bool	getProtocol();
 		void	clientSession();
+		bool	acceptKerberosSecurityContext();
 
 		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
@@ -165,6 +166,10 @@
 
 		const char	*user;
 		const char	*password;
+
+		bool		kerberos;
+		gsscredentials	gcred;
+		gsscontext	gctx;
 
 		bool		dbchanged;
 		char		*originaldb;

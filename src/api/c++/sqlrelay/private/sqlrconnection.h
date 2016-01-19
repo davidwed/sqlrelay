@@ -72,6 +72,12 @@
 		char		*password;
 		uint32_t	passwordlen;
 
+		// gss
+		char		*kerberosservice;
+		gssmechanism	gmech;
+		gsscredentials	gcred;
+		gsscontext	gctx;
+
 		// error
 		int64_t		errorno;
 		char		*error;

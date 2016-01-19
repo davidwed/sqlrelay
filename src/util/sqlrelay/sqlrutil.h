@@ -256,6 +256,10 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char	*getDateDelimiters()=0;
 		virtual bool		getIgnoreNonDateTime()=0;
 
+		virtual	bool		getKerberos()=0;
+		virtual const char	*getKerberosService()=0;
+		virtual const char	*getKerberosKeytab()=0;
+
 		virtual linkedlist< char *>	*getSessionStartQueries()=0;
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 

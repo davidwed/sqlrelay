@@ -152,3 +152,6 @@
 
 // default date delimiters
 #define DEFAULT_DATEDELIMITERS "/-.:"
+
+// default kerberos service
+#define DEFAULT_KERBEROSSERVICE SQLRELAY
