@@ -154,4 +154,4 @@
 #define DEFAULT_DATEDELIMITERS "/-.:"
 
 // default kerberos service
-#define DEFAULT_KERBEROSSERVICE SQLRELAY
+#define DEFAULT_KRBSERVICE SQLRELAY
