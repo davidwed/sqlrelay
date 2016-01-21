@@ -167,7 +167,6 @@
 		const char	*user;
 		const char	*password;
 
-		bool		kerberos;
 		gsscredentials	gcred;
 		gsscontext	gctx;
 

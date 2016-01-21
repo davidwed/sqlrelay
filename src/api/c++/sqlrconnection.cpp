@@ -196,11 +196,11 @@ void sqlrconnection::useKerberos(const char *service) {
 		delete[] kerberosservice;
 		kerberosservice=charstring::duplicate(
 				(!charstring::isNullOrEmpty(service))?
-					service:DEFAULT_KERBEROSSERVICE);
+						service:DEFAULT_KRBSERVICE);
 	} else {
 		kerberosservice=
 			(char *)((!charstring::isNullOrEmpty(service))?
-					service:DEFAULT_KERBEROSSERVICE);
+						service:DEFAULT_KRBSERVICE);
 	}
 }
 
