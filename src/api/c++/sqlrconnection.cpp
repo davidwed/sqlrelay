@@ -412,8 +412,7 @@ bool sqlrconnection::openSession() {
 		if (debug && gss::supportsGSS() &&
 			kerberosservice && gctx.getMajorStatus()) {
 			debugPreStart();
-			debugPrint(gctx.getStatus());
-			debugPrint("\n");
+			debugPrint(gctx.getMechanismMinorStatus());
 			debugPreEnd();
 		}
 		setError("Couldn't connect to the listener.");

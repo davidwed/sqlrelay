@@ -90,9 +90,9 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		const char	*getDateDelimiters();
 		bool		getIgnoreNonDateTime();
 
-		bool		getKerberos();
-		const char	*getKerberosService();
-		const char	*getKerberosKeytab();
+		bool		getKrb();
+		const char	*getKrbService();
+		const char	*getKrbKeytab();
 
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
@@ -212,9 +212,9 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		bool		dateyyyyddmmset;
 		char		*datedelimiters;
 		bool		ignorenondatetime;
-		bool		kerberos;
-		char		*kerberosservice;
-		char		*kerberoskeytab;
+		bool		krb;
+		char		*krbservice;
+		char		*krbkeytab;
 
 		bool		instart;
 		bool		inend;
@@ -369,9 +369,9 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 			DATEYYYYDDMM_ATTRIBUTE,
 			DATEDELIMITERS_ATTRIBUTE,
 			IGNORENONDATETIME_ATTRIBUTE,
-			KERBEROS_ATTRIBUTE,
-			KERBEROSSERVICE_ATTRIBUTE,
-			KERBEROSKEYTAB_ATTRIBUTE,
+			KRB_ATTRIBUTE,
+			KRBSERVICE_ATTRIBUTE,
+			KRBKEYTAB_ATTRIBUTE,
 			ENABLED_ATTRIBUTE,
 		} attribute;
 
@@ -476,9 +476,9 @@ void sqlrconfig_xml::init() {
 	dateyyyyddmmset=false;
 	datedelimiters=charstring::duplicate(DEFAULT_DATEDELIMITERS);
 	ignorenondatetime=false;
-	kerberos=false;
-	kerberosservice=charstring::duplicate(DEFAULT_KERBEROSSERVICE);
-	kerberoskeytab=NULL;
+	krb=false;
+	krbservice=charstring::duplicate(DEFAULT_KRBSERVICE);
+	krbkeytab=NULL;
 	instart=false;
 	inend=false;
 }
@@ -779,16 +779,16 @@ bool sqlrconfig_xml::getIgnoreNonDateTime() {
 	return ignorenondatetime;
 }
 
-bool sqlrconfig_xml::getKerberos() {
-	return kerberos;
+bool sqlrconfig_xml::getKrb() {
+	return krb;
 }
 
-const char *sqlrconfig_xml::getKerberosService() {
-	return kerberosservice;
+const char *sqlrconfig_xml::getKrbService() {
+	return krbservice;
 }
 
-const char *sqlrconfig_xml::getKerberosKeytab() {
-	return kerberoskeytab;
+const char *sqlrconfig_xml::getKrbKeytab() {
+	return krbkeytab;
 }
 
 linkedlist< char * > *sqlrconfig_xml::getSessionStartQueries() {
@@ -1653,12 +1653,12 @@ bool sqlrconfig_xml::attributeName(const char *name) {
 			currentattribute=DATEDELIMITERS_ATTRIBUTE;
 		} else if (!charstring::compare(name,"ignorenondatetime")) {
 			currentattribute=IGNORENONDATETIME_ATTRIBUTE;
-		} else if (!charstring::compare(name,"kerberos")) {
-			currentattribute=KERBEROS_ATTRIBUTE;
-		} else if (!charstring::compare(name,"kerberosservice")) {
-			currentattribute=KERBEROSSERVICE_ATTRIBUTE;
-		} else if (!charstring::compare(name,"kerberoskeytab")) {
-			currentattribute=KERBEROSKEYTAB_ATTRIBUTE;
+		} else if (!charstring::compare(name,"krb")) {
+			currentattribute=KRB_ATTRIBUTE;
+		} else if (!charstring::compare(name,"krbservice")) {
+			currentattribute=KRBSERVICE_ATTRIBUTE;
+		} else if (!charstring::compare(name,"krbkeytab")) {
+			currentattribute=KRBKEYTAB_ATTRIBUTE;
 		} else if (!charstring::compare(name,"enabled")) {
 			currentattribute=ENABLED_ATTRIBUTE;
 		}
@@ -2259,16 +2259,16 @@ bool sqlrconfig_xml::attributeValue(const char *value) {
 		} else if (currentattribute==IGNORENONDATETIME_ATTRIBUTE) {
 			ignorenondatetime=
 				!charstring::compareIgnoringCase(value,"yes");
-		} else if (currentattribute==KERBEROS_ATTRIBUTE) {
-			kerberos=!charstring::compareIgnoringCase(value,"yes");
-		} else if (currentattribute==KERBEROSSERVICE_ATTRIBUTE) {
-			delete[] kerberosservice;
-			kerberosservice=charstring::duplicate(value);
-		} else if (currentattribute==KERBEROSKEYTAB_ATTRIBUTE) {
-			delete[] kerberoskeytab;
-			kerberoskeytab=NULL;
+		} else if (currentattribute==KRB_ATTRIBUTE) {
+			krb=!charstring::compareIgnoringCase(value,"yes");
+		} else if (currentattribute==KRBSERVICE_ATTRIBUTE) {
+			delete[] krbservice;
+			krbservice=charstring::duplicate(value);
+		} else if (currentattribute==KRBKEYTAB_ATTRIBUTE) {
+			delete[] krbkeytab;
+			krbkeytab=NULL;
 			if (!charstring::isNullOrEmpty(value)) {
-				kerberoskeytab=charstring::duplicate(value);
+				krbkeytab=charstring::duplicate(value);
 			}
 		} else if (currentattribute==ENABLED_ATTRIBUTE) {
 			enabled=!charstring::compareIgnoringCase(value,"yes");

@@ -272,34 +272,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		return false;
 	}
 
-	// init the gss environment
-	if (cfg->getKerberos()) {
-		if (gss::supportsGSS()) {
-
-			// set the keytab file to use
-			if (cfg->getKerberosKeytab()) {
-				environment::setValue("KRB5_KTNAME",
-						cfg->getKerberosKeytab());
-			}
-
-			// acquire service credentials from the keytab
-			if (!gcred.acquireService(cfg->getKerberosService())) {
-				stderror.printf("acquire kerberos "
-						"service failed:\n");
-				stderror.printf("%s\n",gcred.getStatus());
-				return false;
-			}
-
-			// attach the credentials to the context
-			gctx.setCredentials(&gcred);
-
-		} else {
-			stderror.printf("Warning: kerberos support requested "
-					"but platform doesn't support "
-					"kerberos\n");
-		}
-	}
-
 	// update various configurable parameters
 	maxquerysize=cfg->getMaxQuerySize();
 	maxbindcount=cfg->getMaxBindCount();
@@ -325,6 +297,46 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	setUserAndGroup();
+
+	// init the gss environment
+	// Note: Do this here, after changing user/group so
+	// that it will fail if the keytab file can't be read.
+	if (cfg->getKrb()) {
+		if (gss::supportsGSS()) {
+
+			// set the keytab file to use
+			const char	*keytab=cfg->getKrbKeytab();
+			if (!charstring::isNullOrEmpty(keytab)) {
+				environment::setValue("KRB5_KTNAME",keytab);
+			}
+
+			// acquire service credentials from the keytab
+			if (!gcred.acquireService(cfg->getKrbService())) {
+				const char	*status=
+					gcred.getMechanismMinorStatus();
+				stderror.printf("kerberos acquire-"
+						"service failed:\n%s",status);
+				if (charstring::contains(status,
+							"Permission denied")) {
+					char	*user=userentry::getName(
+							process::getUserId());
+					stderror.printf("(keytab file likely "
+							"not readable by user "
+							"%s)\n",user);
+					delete[] user;
+				}
+				return false;
+			}
+
+			// attach the credentials to the context
+			gctx.setCredentials(&gcred);
+
+		} else {
+			stderror.printf("Warning: kerberos support requested "
+					"but platform doesn't support "
+					"kerberos\n");
+		}
+	}
 
 	// load database plugin
 	conn=initConnection(cfg->getDbase());
@@ -1684,7 +1696,7 @@ int32_t sqlrservercontroller::waitForClient() {
 	//clientsock->setTcpWriteBufferSize(65536);
 
 	// accept kerberos security context, if necessary
-	if (cfg->getKerberos() && !acceptKerberosSecurityContext()) {
+	if (cfg->getKrb() && !acceptKrbSecurityContext()) {
 		clientsock->close();
 		delete clientsock;
 		return 0;
@@ -1775,7 +1787,7 @@ void sqlrservercontroller::clientSession() {
 	logDebugMessage("done with client session");
 }
 
-bool sqlrservercontroller::acceptKerberosSecurityContext() {
+bool sqlrservercontroller::acceptKrbSecurityContext() {
 
 	if (!gss::supportsGSS()) {
 		// FIXME: log error
@@ -1786,15 +1798,14 @@ bool sqlrservercontroller::acceptKerberosSecurityContext() {
 	clientsock->setGSSContext(&gctx);
 	gctx.setFileDescriptor(clientsock);
 
+	// FIXME: there's currently some problem with write buffering
+	clientsock->setWriteBufferSize(0);
+
 	// accept the security context
 	if (!gctx.accept()) {
 		// FIXME: log error
 		return false;
 	}
-
-	// FIXME: there's currently some problem with write buffering
-	clientsock->setWriteBufferSize(0);
-
 	return true;
 }
 

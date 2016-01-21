@@ -3,10 +3,11 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
+#include <rudiments/stdio.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_kerberos_userlist : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_krb_userlist : public sqlrauth {
 	public:
-			sqlrauth_kerberos_userlist(xmldomnode *parameters,
+			sqlrauth_krb_userlist(xmldomnode *parameters,
 						sqlrpwdencs *sqlrpe);
 		bool	authenticate(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
@@ -15,7 +16,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_kerberos_userlist : public sqlrauth {
 		uint64_t	usercount;
 };
 
-sqlrauth_kerberos_userlist::sqlrauth_kerberos_userlist(xmldomnode *parameters,
+sqlrauth_krb_userlist::sqlrauth_krb_userlist(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe) :
 					sqlrauth(parameters,sqlrpe) {
 
@@ -36,7 +37,7 @@ sqlrauth_kerberos_userlist::sqlrauth_kerberos_userlist(xmldomnode *parameters,
 	}
 }
 
-bool sqlrauth_kerberos_userlist::authenticate(sqlrserverconnection *sqlrcon,
+bool sqlrauth_krb_userlist::authenticate(sqlrserverconnection *sqlrcon,
 						const char *user,
 						const char *password) {
 
@@ -59,9 +60,9 @@ bool sqlrauth_kerberos_userlist::authenticate(sqlrserverconnection *sqlrcon,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_kerberos_userlist(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_krb_userlist(
 						xmldomnode *users,
 						sqlrpwdencs *sqlrpe) {
-		return new sqlrauth_kerberos_userlist(users,sqlrpe);
+		return new sqlrauth_krb_userlist(users,sqlrpe);
 	}
 }
