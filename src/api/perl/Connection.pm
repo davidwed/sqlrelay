@@ -75,6 +75,15 @@ __END__
             # this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
             # environment variable.
 
+        useKerberos(const char *service);
+            # Configures this instance to use kerberos authentication
+            # and encryption and to connect to "service".  If "service"
+            # is null then the default service for SQL Relay is used.
+
+        useNoEncryption();
+            # Configures this instance to not use kerberos or SSL/TLS
+            # authentication and encryption.
+
         endSession();
             # Ends the session.
 

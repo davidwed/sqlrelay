@@ -44,6 +44,14 @@ void sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 	sqlrconref->setResponseTimeout(timeoutsec,timeoutusec);
 }
 
+void sqlrcon_useKerberos(sqlrcon sqlrconref, const char *service) {
+	sqlrconref->useKerberos(service);
+}
+
+void sqlrcon_useNoEncryption(sqlrcon sqlrconref) {
+	sqlrconref->useNoEncryption();
+}
+
 void sqlrcon_endSession(sqlrcon sqlrconref) {
 	sqlrconref->endSession();
 }

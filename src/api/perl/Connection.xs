@@ -111,6 +111,13 @@ sqlrconnection::setResponseTimeout(timeoutsec,timeoutusec)
 		int32_t		timeoutusec
 
 void
+sqlrconnection::useKerberos(service)
+		const char	*service
+
+void
+sqlrconnection::useNoEncryption()
+
+void
 sqlrconnection::endSession()
 
 bool
