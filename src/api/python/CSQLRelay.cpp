@@ -108,6 +108,27 @@ static PyObject *setResponseTimeout(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
+static PyObject *useKerberos(PyObject *self, PyObject *args) {
+  char *service;
+  long sqlrcon;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcon, &service))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  ((sqlrconnection *)sqlrcon)->useKerberos(service);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *useNoEncryption(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  ((sqlrconnection *)sqlrcon)->useNoEncryption();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", 0);
+}
+
 static PyObject *endSession(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
@@ -1851,6 +1872,8 @@ static PyMethodDef SQLRMethods[] = {
   {"setConnectTimeout", setConnectTimeout, METH_VARARGS},
   {"setAuthenticationTimeout", setAuthenticationTimeout, METH_VARARGS},
   {"setResponseTimeout", setResponseTimeout, METH_VARARGS},
+  {"useKerberos", useKerberos, METH_VARARGS},
+  {"useNoEncryption", useNoEncryption, METH_VARARGS},
   {"endSession", endSession, METH_VARARGS},
   {"suspendSession", suspendSession, METH_VARARGS},
   {"getConnectionPort", getConnectionPort, METH_VARARGS},
