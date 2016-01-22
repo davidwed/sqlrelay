@@ -112,6 +112,12 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  session but leaves the session open so 
  that another connection can connect to it 
  using resumeSession</td></tr>
+<tr><td><code><a href="#useKerberos">useKerberos</a> { service }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configures this instance to use kerberos authentication
+ and encryption and to connect to "service".</td></tr>
+<tr><td><code><a href="#useNoEncryption">useNoEncryption</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configures this instance to not use kerberos or SSL/TLS
+ authentication and</td></tr>
 </table>
 <p>
 <!-- -------------------- PROCEDURE DETAIL -------------------- -->
@@ -125,7 +131,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to wait for the 
  client to tell it when to commit.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_125">sqlrconCmd.tcl, line 125</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_141">sqlrconCmd.tcl, line 141</a>
 </dl></dl>
 
 <hr>
@@ -134,7 +140,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to perform a commit
  after every successful query.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_121">sqlrconCmd.tcl, line 121</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_137">sqlrconCmd.tcl, line 137</a>
 </dl></dl>
 
 <hr>
@@ -147,7 +153,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  commit or rollback is issued then this doesn't
  do anything unless SQL Relay is faking transaction
  blocks.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_135">sqlrconCmd.tcl, line 135</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_151">sqlrconCmd.tcl, line 151</a>
 </dl></dl>
 
 <hr>
@@ -156,7 +162,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns a string representing the format
  of the bind variables used in the db.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_101">sqlrconCmd.tcl, line 101</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_117">sqlrconCmd.tcl, line 117</a>
 </dl></dl>
 
 <hr>
@@ -164,7 +170,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc clientVersion {  }</pre>
 <dl>
 <dd>Returns the version of the sqlrelay client software.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#clientVersion_97">sqlrconCmd.tcl, line 97</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#clientVersion_113">sqlrconCmd.tcl, line 113</a>
 </dl></dl>
 
 <hr>
@@ -173,7 +179,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a commit.  Returns true if the commit
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_139">sqlrconCmd.tcl, line 139</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_155">sqlrconCmd.tcl, line 155</a>
 </dl></dl>
 
 <hr>
@@ -181,7 +187,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc dbHostName {  }</pre>
 <dl>
 <dd>Returns the host name of the database<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbHostName_88">sqlrconCmd.tcl, line 88</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbHostName_104">sqlrconCmd.tcl, line 104</a>
 </dl></dl>
 
 <hr>
@@ -189,7 +195,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc dbIpAddress {  }</pre>
 <dl>
 <dd>Returns the ip address of the database<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbIpAddress_91">sqlrconCmd.tcl, line 91</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbIpAddress_107">sqlrconCmd.tcl, line 107</a>
 </dl></dl>
 
 <hr>
@@ -197,7 +203,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc dbVersion {  }</pre>
 <dl>
 <dd>Returns the version of the database<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbVersion_85">sqlrconCmd.tcl, line 85</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbVersion_101">sqlrconCmd.tcl, line 101</a>
 </dl></dl>
 
 <hr>
@@ -205,7 +211,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc debugOff {  }</pre>
 <dl>
 <dd>Turns debugging off.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_171">sqlrconCmd.tcl, line 171</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_187">sqlrconCmd.tcl, line 187</a>
 </dl></dl>
 
 <hr>
@@ -217,7 +223,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  this is to start a query with "-- debug\n".
  Another way is to set the environment variable
  SQLR_CLIENT_DEBUG to "ON"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_168">sqlrconCmd.tcl, line 168</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_184">sqlrconCmd.tcl, line 184</a>
 </dl></dl>
 
 <hr>
@@ -225,7 +231,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc endSession {  }</pre>
 <dl>
 <dd>Ends the session.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#endSession_45">sqlrconCmd.tcl, line 45</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#endSession_61">sqlrconCmd.tcl, line 61</a>
 </dl></dl>
 
 <hr>
@@ -236,7 +242,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error the error message is available here.
  If there is no error then this method 
  returns NULL.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_151">sqlrconCmd.tcl, line 151</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_167">sqlrconCmd.tcl, line 167</a>
 </dl></dl>
 
 <hr>
@@ -247,7 +253,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error, the error number is available here.
  If there is no error then this method 
  returns 0.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_159">sqlrconCmd.tcl, line 159</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_175">sqlrconCmd.tcl, line 175</a>
 </dl></dl>
 
 <hr>
@@ -255,7 +261,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getClientInfo {  }</pre>
 <dl>
 <dd>Returns the string that was set by setClientInfo().<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_189">sqlrconCmd.tcl, line 189</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_205">sqlrconCmd.tcl, line 205</a>
 </dl></dl>
 
 <hr>
@@ -268,7 +274,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  the resumeSession {} method.
  Note: The value this method returns is only
  valid after a call to suspendSession {}.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionPort_59">sqlrconCmd.tcl, line 59</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionPort_75">sqlrconCmd.tcl, line 75</a>
 </dl></dl>
 
 <hr>
@@ -281,7 +287,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  the resumeSession {} method.
  Note: The value this method returns is only
  valid after a call to suspendSession {}.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionSocket_67">sqlrconCmd.tcl, line 67</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionSocket_83">sqlrconCmd.tcl, line 83</a>
 </dl></dl>
 
 <hr>
@@ -289,7 +295,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getCurrentDatabase {  }</pre>
 <dl>
 <dd>Returns the database/schema that is currently in use.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_109">sqlrconCmd.tcl, line 109</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_125">sqlrconCmd.tcl, line 125</a>
 </dl></dl>
 
 <hr>
@@ -298,7 +304,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns false if debugging is off and true
  if debugging is on.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_175">sqlrconCmd.tcl, line 175</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_191">sqlrconCmd.tcl, line 191</a>
 </dl></dl>
 
 <hr>
@@ -307,7 +313,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns the value of the autoincrement
  column for the last insert<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_115">sqlrconCmd.tcl, line 115</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_131">sqlrconCmd.tcl, line 131</a>
 </dl></dl>
 
 <hr>
@@ -316,7 +322,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns the type of database: 
  oracle postgresql mysql etc.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#identify_82">sqlrconCmd.tcl, line 82</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#identify_98">sqlrconCmd.tcl, line 98</a>
 </dl></dl>
 
 <hr>
@@ -325,7 +331,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the database is up and false
  if it's down.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#ping_78">sqlrconCmd.tcl, line 78</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#ping_94">sqlrconCmd.tcl, line 94</a>
 </dl></dl>
 
 <hr>
@@ -335,7 +341,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dd>Resumes a session previously left open 
  using suspendSession {}.
  Returns true on success and false on failure.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#resumeSession_72">sqlrconCmd.tcl, line 72</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#resumeSession_88">sqlrconCmd.tcl, line 88</a>
 </dl></dl>
 
 <hr>
@@ -344,7 +350,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a rollback.  Returns true if the rollback
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_143">sqlrconCmd.tcl, line 143</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_159">sqlrconCmd.tcl, line 159</a>
 </dl></dl>
 
 <hr>
@@ -352,7 +358,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc selectDatabase { database }</pre>
 <dl>
 <dd>Sets the current database/schema to "database"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_106">sqlrconCmd.tcl, line 106</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_122">sqlrconCmd.tcl, line 122</a>
 </dl></dl>
 
 <hr>
@@ -360,7 +366,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc serverVersion {  }</pre>
 <dl>
 <dd>Returns the version of the sqlrelay server software.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#serverVersion_94">sqlrconCmd.tcl, line 94</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#serverVersion_110">sqlrconCmd.tcl, line 110</a>
 </dl></dl>
 
 <hr>
@@ -371,7 +377,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  milliseconds.  Setting either parameter to -1 disables the
  timeout.   You can also set this timeout using the
  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setAuthenticationTimeout_35">sqlrconCmd.tcl, line 35</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setAuthenticationTimeout_38">sqlrconCmd.tcl, line 38</a>
 </dl></dl>
 
 <hr>
@@ -382,7 +388,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  server and ultimately included in server-side logging
  along with queries that were run by this instance of
  the client.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_186">sqlrconCmd.tcl, line 186</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_202">sqlrconCmd.tcl, line 202</a>
 </dl></dl>
 
 <hr>
@@ -393,7 +399,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  milliseconds.  Setting either parameter to -1 disables the
  timeout.  You can also set this timeout using the
  SQLR_CLIENT_CONNECT_TIMEOUT environment variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setConnectTimeout_29">sqlrconCmd.tcl, line 29</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setConnectTimeout_32">sqlrconCmd.tcl, line 32</a>
 </dl></dl>
 
 <hr>
@@ -403,7 +409,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dd>Allows you to specify a file to write debug to.
  Setting "debugfilename" to NULL or an empty string causes debug
  to be written to standard output (the default).<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setDebugFile_180">sqlrconCmd.tcl, line 180</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setDebugFile_196">sqlrconCmd.tcl, line 196</a>
 </dl></dl>
 
 <hr>
@@ -415,7 +421,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  parameter to -1 disables the timeout.  You can also set
  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
  environment variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setResponseTimeout_42">sqlrconCmd.tcl, line 42</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setResponseTimeout_45">sqlrconCmd.tcl, line 45</a>
 </dl></dl>
 
 <hr>
@@ -437,7 +443,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  connect to "server" on "port".  If it is 
  NULL or "" then no attempt will be made to 
  connect through the socket.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#sqlrconCmd_16">sqlrconCmd.tcl, line 16</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#sqlrconCmd_19">sqlrconCmd.tcl, line 19</a>
 </dl></dl>
 
 <hr>
@@ -446,7 +452,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Disconnects and ends the session if
  it hasn't been ended already.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#sqlrconDelete_21">sqlrconCmd.tcl, line 21</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#sqlrconDelete_24">sqlrconCmd.tcl, line 24</a>
 </dl></dl>
 
 <hr>
@@ -457,7 +463,26 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  session but leaves the session open so 
  that another connection can connect to it 
  using resumeSession {}.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#suspendSession_51">sqlrconCmd.tcl, line 51</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#suspendSession_67">sqlrconCmd.tcl, line 67</a>
+</dl></dl>
+
+<hr>
+<h3><a name="useKerberos">useKerberos</a></h3>
+<pre>proc useKerberos { service }</pre>
+<dl>
+<dd>Configures this instance to use kerberos authentication
+ and encryption and to connect to "service".  If "service"
+ is null then the default service for SQL Relay is used.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#useKerberos_52">sqlrconCmd.tcl, line 52</a>
+</dl></dl>
+
+<hr>
+<h3><a name="useNoEncryption">useNoEncryption</a></h3>
+<pre>proc useNoEncryption {  }</pre>
+<dl>
+<dd>Configures this instance to not use kerberos or SSL/TLS
+ authentication and encryption.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#useNoEncryption_56">sqlrconCmd.tcl, line 56</a>
 </dl></dl>
 
 <hr>
@@ -466,7 +491,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2014-09-29 at 19:24.</cite>
+<cite>File generated 2016-01-22 at 00:11.</cite>
 </font>
 </body>
 </html>

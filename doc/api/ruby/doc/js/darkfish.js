@@ -1,7 +1,7 @@
 /**
  *
  * Darkfish Page Functions
- * $Id: darkfish.js,v 1.2 2014-09-29 23:24:53 mused Exp $
+ * $Id: darkfish.js,v 1.3 2016-01-22 05:10:32 mused Exp $
  *
  * Author: Michael Granger <mgranger@laika.com>
  *
@@ -43,28 +43,6 @@ function showSource( e ) {
 function hookSourceViews() {
   $('.method-heading').click( showSource );
 };
-
-function toggleDebuggingSection() {
-  $('.debugging-section').slideToggle();
-};
-
-function hookDebuggingToggle() {
-  $('#debugging-toggle img').click( toggleDebuggingSection );
-};
-
-function hookTableOfContentsToggle() {
-  $('.indexpage li .toc-toggle').each( function() {
-    $(this).click( function() {
-      $(this).toggleClass('open');
-    });
-
-    var section = $(this).next();
-
-    $(this).click( function() {
-      section.slideToggle();
-    });
-  });
-}
 
 function hookSearch() {
   var input  = $('#search-field').eq(0);
@@ -143,13 +121,41 @@ function highlightClickTarget( event ) {
   };
 };
 
+function loadAsync(path, success) {
+  $.ajax({
+    url: rdoc_rel_prefix + path,
+    dataType: 'script',
+    success: success,
+    cache: true
+  });
+};
 
 $(document).ready( function() {
   hookSourceViews();
-  hookDebuggingToggle();
-  hookSearch();
   highlightLocationTarget();
-  hookTableOfContentsToggle();
-
   $('ul.link-list a').bind( "click", highlightClickTarget );
+
+  var search_scripts_loaded = {
+    navigation_loaded:   false,
+    search_loaded:       false,
+    search_index_loaded: false,
+    searcher_loaded:     false,
+  }
+
+  var search_success_function = function(variable) {
+    return (function (data, status, xhr) {
+      search_scripts_loaded[variable] = true;
+
+      if (search_scripts_loaded['navigation_loaded']   == true &&
+          search_scripts_loaded['search_loaded']       == true &&
+          search_scripts_loaded['search_index_loaded'] == true &&
+          search_scripts_loaded['searcher_loaded']     == true)
+        hookSearch();
+    });
+  }
+
+  loadAsync('js/navigation.js',   search_success_function('navigation_loaded'));
+  loadAsync('js/search.js',       search_success_function('search_loaded'));
+  loadAsync('js/search_index.js', search_success_function('search_index_loaded'));
+  loadAsync('js/searcher.js',     search_success_function('searcher_loaded'));
 });

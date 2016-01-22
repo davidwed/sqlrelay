@@ -7,7 +7,7 @@
 <link rev="made" href="mailto:root@localhost" />
 </head>
 
-<body style="background-color: white">
+<body>
 
 
 
@@ -81,6 +81,15 @@
             # parameter to -1 disables the timeout.  You can also set
             # this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
             # environment variable.
+
+        useKerberos(const char *service);
+            # Configures this instance to use kerberos authentication
+            # and encryption and to connect to &quot;service&quot;.  If &quot;service&quot;
+            # is null then the default service for SQL Relay is used.
+
+        useNoEncryption();
+            # Configures this instance to not use kerberos or SSL/TLS
+            # authentication and encryption.
 
         endSession();
             # Ends the session.

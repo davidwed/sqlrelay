@@ -2,76 +2,73 @@
 
 <html>
 <head>
-<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<meta charset="UTF-8">
 
 <title>class SQLRCursor - RDoc Documentation</title>
-
-<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
 
 <script type="text/javascript">
   var rdoc_rel_prefix = "./";
 </script>
 
-<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
-<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
-<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
-<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
-<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
-<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+<script src="./js/jquery.js"></script>
+<script src="./js/darkfish.js"></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
 
 
-<body id="top" class="class">
-<nav id="metadata">
-  <nav id="home-section" class="section">
-  <h3 class="section-header">
-    <a href="./index.html">Home</a>
+
+<body id="top" role="document" class="class">
+<nav role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
     <a href="./table_of_contents.html#classes">Classes</a>
     <a href="./table_of_contents.html#methods">Methods</a>
-  </h3>
-</nav>
+  </div>
+</div>
 
-
-  <nav id="search-section" class="section project-section" class="initially-hidden">
+    <div id="search-section" role="search" class="project-section initially-hidden">
   <form action="#" method="get" accept-charset="utf-8">
-    <h3 class="section-header">
-      <input type="text" name="search" placeholder="Search" id="search-field"
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search" spellcheck="false"
              title="Type to search, Up and Down to navigate, Enter to load">
-    </h3>
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
   </form>
+</div>
 
-  <ul id="search-results" class="initially-hidden"></ul>
-</nav>
-
+  </div>
 
   
-
-  <div id="file-metadata">
-    <nav id="file-list-section" class="section">
-  <h3 class="section-header">Defined In</h3>
-  <ul>
-    <li>sqlrelay.cpp
-  </ul>
-</nav>
-
-    
-  </div>
 
   <div id="class-metadata">
     
-    <nav id="parent-class-section" class="section">
-  <h3 class="section-header">Parent</h3>
+    <div id="parent-class-section" class="nav-section">
+  <h3>Parent</h3>
+
   
   <p class="link">Object
   
-</nav>
+</div>
 
     
     
     <!-- Method Quickref -->
-<nav id="method-list-section" class="section">
-  <h3 class="section-header">Methods</h3>
+<div id="method-list-section" class="nav-section">
+  <h3>Methods</h3>
 
-  <ul class="link-list">
+  <ul class="link-list" role="directory">
     
     <li ><a href="#method-c-new">::new</a>
     
@@ -244,33 +241,19 @@
     <li ><a href="#method-i-validateBinds">#validateBinds</a>
     
   </ul>
-</nav>
-
-  </div>
-
-  <div id="project-metadata">
-    
-    <nav id="classindex-section" class="section project-section">
-  <h3 class="section-header">Class and Module Index</h3>
-
-  <ul class="link-list">
-  
-    <li><a href="./SQLRConnection.html">SQLRConnection</a>
-  
-    <li><a href="./SQLRCursor.html">SQLRCursor</a>
-  
-  </ul>
-</nav>
+</div>
 
   </div>
 </nav>
 
-<div id="documentation">
-  <h1 class="class">class SQLRCursor</h1>
+<main role="main" aria-labelledby="class-SQLRCursor">
+  <h1 id="class-SQLRCursor" class="class">
+    class SQLRCursor
+  </h1>
 
-  <div id="description" class="description">
+  <section class="description">
     
-  </div><!-- description -->
+  </section>
 
   
   
@@ -284,10 +267,11 @@
 
     
 
-    <!-- Methods -->
     
-     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
-      <h3 class="section-header">Public Class Methods</h3>
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Class Methods</h3>
+       </header>
 
     
       <div id="method-c-new" class="method-detail ">
@@ -319,20 +303,22 @@
         sqlrcursor     *sqlrcur=new sqlrcursor(sqlrcon,true);
         return Data_Wrap_Struct(self,0,sqlrcur_free,(void *)sqlrcur);
 }</pre>
-          </div><!-- new-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- new-method -->
+      </div>
 
     
-    </section><!-- public-class-method-details -->
+    </section>
   
-     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
-      <h3 class="section-header">Public Instance Methods</h3>
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Instance Methods</h3>
+       </header>
 
     
       <div id="method-i-affectedRows" class="method-detail ">
@@ -362,14 +348,14 @@ returned by databases which don&#39;t support this option.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;affectedRows());
 }</pre>
-          </div><!-- affectedRows-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- affectedRows-method -->
+      </div>
 
     
       <div id="method-i-cacheOff" class="method-detail ">
@@ -397,14 +383,14 @@ returned by databases which don&#39;t support this option.</p>
         sqlrcur-&gt;cacheOff();
         return Qnil;
 }</pre>
-          </div><!-- cacheOff-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- cacheOff-method -->
+      </div>
 
     
       <div id="method-i-cacheToFile" class="method-detail ">
@@ -442,14 +428,14 @@ changes which file to cache to or a call to cacheOff() turns off caching.</p>
         sqlrcur-&gt;cacheToFile(STR2CSTR(filename));
         return Qnil;
 }</pre>
-          </div><!-- cacheToFile-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- cacheToFile-method -->
+      </div>
 
     
       <div id="method-i-clearBinds" class="method-detail ">
@@ -477,14 +463,14 @@ changes which file to cache to or a call to cacheOff() turns off caching.</p>
         sqlrcur-&gt;clearBinds();
         return Qnil;
 }</pre>
-          </div><!-- clearBinds-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- clearBinds-method -->
+      </div>
 
     
       <div id="method-i-closeResultSet" class="method-detail ">
@@ -514,14 +500,14 @@ resources for the result set are freed as well.</p>
         sqlrcur-&gt;closeResultSet();
         return Qnil;
 }</pre>
-          </div><!-- closeResultSet-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- closeResultSet-method -->
+      </div>
 
     
       <div id="method-i-colCount" class="method-detail ">
@@ -548,14 +534,14 @@ resources for the result set are freed as well.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;colCount());
 }</pre>
-          </div><!-- colCount-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- colCount-method -->
+      </div>
 
     
       <div id="method-i-countBindVariables" class="method-detail ">
@@ -583,14 +569,14 @@ defined in it and returns that number.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;countBindVariables());
 }</pre>
-          </div><!-- countBindVariables-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- countBindVariables-method -->
+      </div>
 
     
       <div id="method-i-defineOutputBindBlob" class="method-detail ">
@@ -621,14 +607,14 @@ defined in it and returns that number.</p>
         sqlrcur-&gt;defineOutputBindBlob(STR2CSTR(variable));
         return Qnil;
 }</pre>
-          </div><!-- defineOutputBindBlob-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- defineOutputBindBlob-method -->
+      </div>
 
     
       <div id="method-i-defineOutputBindClob" class="method-detail ">
@@ -659,14 +645,14 @@ defined in it and returns that number.</p>
         sqlrcur-&gt;defineOutputBindClob(STR2CSTR(variable));
         return Qnil;
 }</pre>
-          </div><!-- defineOutputBindClob-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- defineOutputBindClob-method -->
+      </div>
 
     
       <div id="method-i-defineOutputBindCursor" class="method-detail ">
@@ -697,14 +683,14 @@ defined in it and returns that number.</p>
         sqlrcur-&gt;defineOutputBindCursor(STR2CSTR(variable));
         return Qnil;
 }</pre>
-          </div><!-- defineOutputBindCursor-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- defineOutputBindCursor-method -->
+      </div>
 
     
       <div id="method-i-defineOutputBindDouble" class="method-detail ">
@@ -735,14 +721,14 @@ defined in it and returns that number.</p>
         sqlrcur-&gt;defineOutputBindDouble(STR2CSTR(variable));
         return Qnil;
 }</pre>
-          </div><!-- defineOutputBindDouble-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- defineOutputBindDouble-method -->
+      </div>
 
     
       <div id="method-i-defineOutputBindInteger" class="method-detail ">
@@ -773,14 +759,14 @@ defined in it and returns that number.</p>
         sqlrcur-&gt;defineOutputBindInteger(STR2CSTR(variable));
         return Qnil;
 }</pre>
-          </div><!-- defineOutputBindInteger-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- defineOutputBindInteger-method -->
+      </div>
 
     
       <div id="method-i-defineOutputBindString" class="method-detail ">
@@ -813,14 +799,14 @@ store the value.</p>
         sqlrcur-&gt;defineOutputBindString(STR2CSTR(variable),NUM2INT(bufferlength));
         return Qnil;
 }</pre>
-          </div><!-- defineOutputBindString-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- defineOutputBindString-method -->
+      </div>
 
     
       <div id="method-i-dontGetColumnInfo" class="method-detail ">
@@ -850,14 +836,14 @@ performance.</p>
         sqlrcur-&gt;dontGetColumnInfo();
         return Qnil;
 }</pre>
-          </div><!-- dontGetColumnInfo-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- dontGetColumnInfo-method -->
+      </div>
 
     
       <div id="method-i-endOfResultSet" class="method-detail ">
@@ -886,14 +872,14 @@ called with a parameter other than 0.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;endOfResultSet());
 }</pre>
-          </div><!-- endOfResultSet-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- endOfResultSet-method -->
+      </div>
 
     
       <div id="method-i-errorMessage" class="method-detail ">
@@ -926,14 +912,14 @@ here.  If the query succeeded then this function returns a nil.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- errorMessage-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- errorMessage-method -->
+      </div>
 
     
       <div id="method-i-errorNumber" class="method-detail ">
@@ -961,14 +947,14 @@ here.  If there is no error then this method returns 0.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;errorNumber());
 }</pre>
-          </div><!-- errorNumber-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- errorNumber-method -->
+      </div>
 
     
       <div id="method-i-executeQuery" class="method-detail ">
@@ -995,14 +981,14 @@ here.  If there is no error then this method returns 0.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;executeQuery());
 }</pre>
-          </div><!-- executeQuery-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- executeQuery-method -->
+      </div>
 
     
       <div id="method-i-fetchFromBindCursor" class="method-detail ">
@@ -1029,14 +1015,14 @@ here.  If there is no error then this method returns 0.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;fetchFromBindCursor());
 }</pre>
-          </div><!-- fetchFromBindCursor-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- fetchFromBindCursor-method -->
+      </div>
 
     
       <div id="method-i-firstRowIndex" class="method-detail ">
@@ -1064,14 +1050,14 @@ only part of the result set at a time.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;firstRowIndex());
 }</pre>
-          </div><!-- firstRowIndex-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- firstRowIndex-method -->
+      </div>
 
     
       <div id="method-i-getCacheFileName" class="method-detail ">
@@ -1104,14 +1090,14 @@ set.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- getCacheFileName-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getCacheFileName-method -->
+      </div>
 
     
       <div id="method-i-getColumnInfo" class="method-detail ">
@@ -1139,14 +1125,14 @@ set.</p>
         sqlrcur-&gt;getColumnInfo();
         return Qnil;
 }</pre>
-          </div><!-- getColumnInfo-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnInfo-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsAutoIncrement" class="method-detail ">
@@ -1183,14 +1169,14 @@ may be specified as the column name or number.</p>
                         sqlrcur-&gt;getColumnIsAutoIncrement(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsAutoIncrement-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsAutoIncrement-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsBinary" class="method-detail ">
@@ -1225,14 +1211,14 @@ may be specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnIsBinary(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsBinary-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsBinary-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsNullable" class="method-detail ">
@@ -1267,14 +1253,14 @@ may be specified as the colum name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnIsNullable(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsNullable-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsNullable-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsPartOfKey" class="method-detail ">
@@ -1309,14 +1295,14 @@ otherwise.  “col” may be specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnIsPartOfKey(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsPartOfKey-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsPartOfKey-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsPrimaryKey" class="method-detail ">
@@ -1351,14 +1337,14 @@ may be specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnIsPrimaryKey(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsPrimaryKey-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsPrimaryKey-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsUnique" class="method-detail ">
@@ -1393,14 +1379,14 @@ specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnIsUnique(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsUnique-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsUnique-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsUnsigned" class="method-detail ">
@@ -1435,14 +1421,14 @@ specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnIsUnsigned(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsUnsigned-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsUnsigned-method -->
+      </div>
 
     
       <div id="method-i-getColumnIsZeroFilled" class="method-detail ">
@@ -1477,14 +1463,14 @@ otherwise.  “col” may be specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnIsZeroFilled(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnIsZeroFilled-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnIsZeroFilled-method -->
+      </div>
 
     
       <div id="method-i-getColumnLength" class="method-detail ">
@@ -1519,14 +1505,14 @@ column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnLength(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnLength-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnLength-method -->
+      </div>
 
     
       <div id="method-i-getColumnList" class="method-detail ">
@@ -1558,14 +1544,14 @@ all columns will be returned.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;getColumnList(STR2CSTR(table),STR2CSTR(wild)));
 }</pre>
-          </div><!-- getColumnList-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnList-method -->
+      </div>
 
     
       <div id="method-i-getColumnName" class="method-detail ">
@@ -1600,14 +1586,14 @@ all columns will be returned.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- getColumnName-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnName-method -->
+      </div>
 
     
       <div id="method-i-getColumnNames" class="method-detail ">
@@ -1646,14 +1632,14 @@ all columns will be returned.</p>
         }
         return nameary;
 }</pre>
-          </div><!-- getColumnNames-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnNames-method -->
+      </div>
 
     
       <div id="method-i-getColumnPrecision" class="method-detail ">
@@ -1690,14 +1676,14 @@ may be specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnPrecision(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnPrecision-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnPrecision-method -->
+      </div>
 
     
       <div id="method-i-getColumnScale" class="method-detail ">
@@ -1733,14 +1719,14 @@ scale of 2.  “col” may be specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getColumnScale(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getColumnScale-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnScale-method -->
+      </div>
 
     
       <div id="method-i-getColumnType" class="method-detail ">
@@ -1781,14 +1767,14 @@ column name or number.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- getColumnType-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getColumnType-method -->
+      </div>
 
     
       <div id="method-i-getDatabaseList" class="method-detail ">
@@ -1819,14 +1805,14 @@ wild is empty or nil then a list of all databases/schemas will be returned.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;getDatabaseList(STR2CSTR(wild)));
 }</pre>
-          </div><!-- getDatabaseList-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getDatabaseList-method -->
+      </div>
 
     
       <div id="method-i-getField" class="method-detail ">
@@ -1870,14 +1856,14 @@ column name or number.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- getField-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getField-method -->
+      </div>
 
     
       <div id="method-i-getFieldAsDouble" class="method-detail ">
@@ -1914,14 +1900,14 @@ column name or number.</p>
         }
         return rb_float_new(result);
 }</pre>
-          </div><!-- getFieldAsDouble-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getFieldAsDouble-method -->
+      </div>
 
     
       <div id="method-i-getFieldAsInteger" class="method-detail ">
@@ -1958,14 +1944,14 @@ column name or number.</p>
         }
         return INT2NUM(result);
 }</pre>
-          </div><!-- getFieldAsInteger-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getFieldAsInteger-method -->
+      </div>
 
     
       <div id="method-i-getFieldLength" class="method-detail ">
@@ -2002,14 +1988,14 @@ as the column name or number.</p>
                                                                 NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getFieldLength-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getFieldLength-method -->
+      </div>
 
     
       <div id="method-i-getLongest" class="method-detail ">
@@ -2044,14 +2030,14 @@ be specified as the column name or number.</p>
                 return INT2NUM(sqlrcur-&gt;getLongest(NUM2INT(col)));
         }
 }</pre>
-          </div><!-- getLongest-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getLongest-method -->
+      </div>
 
     
       <div id="method-i-getNullsAsEmptyStrings" class="method-detail ">
@@ -2080,14 +2066,14 @@ empty strings.  This is the default.</p>
         sqlrcur-&gt;getNullsAsEmptyStrings();
         return Qnil;
 }</pre>
-          </div><!-- getNullsAsEmptyStrings-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getNullsAsEmptyStrings-method -->
+      </div>
 
     
       <div id="method-i-getNullsAsNils" class="method-detail ">
@@ -2116,14 +2102,14 @@ nil&#39;s.</p>
         sqlrcur-&gt;getNullsAsNulls();
         return Qnil;
 }</pre>
-          </div><!-- getNullsAsNils-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getNullsAsNils-method -->
+      </div>
 
     
       <div id="method-i-getOutputBindBlob" class="method-detail ">
@@ -2161,14 +2147,14 @@ variable.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- getOutputBindBlob-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getOutputBindBlob-method -->
+      </div>
 
     
       <div id="method-i-getOutputBindClob" class="method-detail ">
@@ -2206,14 +2192,14 @@ variable.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- getOutputBindClob-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getOutputBindClob-method -->
+      </div>
 
     
       <div id="method-i-getOutputBindCursor" class="method-detail ">
@@ -2247,14 +2233,14 @@ variable.</p>
         return Data_Wrap_Struct(csqlrcursor,0,sqlrcur_free,
                                         (void *)returnsqlrcur);
 }</pre>
-          </div><!-- getOutputBindCursor-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getOutputBindCursor-method -->
+      </div>
 
     
       <div id="method-i-getOutputBindDouble" class="method-detail ">
@@ -2286,14 +2272,14 @@ variable.</p>
         double         result=sqlrcur-&gt;getOutputBindDouble(varname);
         return rb_float_new(result);
 }</pre>
-          </div><!-- getOutputBindDouble-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getOutputBindDouble-method -->
+      </div>
 
     
       <div id="method-i-getOutputBindInteger" class="method-detail ">
@@ -2325,14 +2311,14 @@ variable.</p>
         long           result=sqlrcur-&gt;getOutputBindInteger(varname);
         return INT2NUM(result);
 }</pre>
-          </div><!-- getOutputBindInteger-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getOutputBindInteger-method -->
+      </div>
 
     
       <div id="method-i-getOutputBindLength" class="method-detail ">
@@ -2363,14 +2349,14 @@ variable.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;getOutputBindLength(STR2CSTR(variable)));
 }</pre>
-          </div><!-- getOutputBindLength-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getOutputBindLength-method -->
+      </div>
 
     
       <div id="method-i-getOutputBindString" class="method-detail ">
@@ -2407,14 +2393,14 @@ variable.</p>
                 return Qnil;
         }
 }</pre>
-          </div><!-- getOutputBindString-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getOutputBindString-method -->
+      </div>
 
     
       <div id="method-i-getResultSetBufferSize" class="method-detail ">
@@ -2442,14 +2428,14 @@ for the entire result set.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;getResultSetBufferSize());
 }</pre>
-          </div><!-- getResultSetBufferSize-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getResultSetBufferSize-method -->
+      </div>
 
     
       <div id="method-i-getResultSetId" class="method-detail ">
@@ -2479,14 +2465,14 @@ suspendResultSet().</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;getResultSetId());
 }</pre>
-          </div><!-- getResultSetId-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getResultSetId-method -->
+      </div>
 
     
       <div id="method-i-getRow" class="method-detail ">
@@ -2527,14 +2513,14 @@ suspendResultSet().</p>
         }
         return fieldary;
 }</pre>
-          </div><!-- getRow-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getRow-method -->
+      </div>
 
     
       <div id="method-i-getRowHash" class="method-detail ">
@@ -2578,14 +2564,14 @@ suspendResultSet().</p>
         }
         return fieldhash;
 }</pre>
-          </div><!-- getRowHash-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getRowHash-method -->
+      </div>
 
     
       <div id="method-i-getRowLengths" class="method-detail ">
@@ -2623,14 +2609,14 @@ suspendResultSet().</p>
         }
         return lengthary;
 }</pre>
-          </div><!-- getRowLengths-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getRowLengths-method -->
+      </div>
 
     
       <div id="method-i-getRowLengthsHash" class="method-detail ">
@@ -2667,14 +2653,14 @@ suspendResultSet().</p>
         }
         return lengthhash;
 }</pre>
-          </div><!-- getRowLengthsHash-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getRowLengthsHash-method -->
+      </div>
 
     
       <div id="method-i-getTableList" class="method-detail ">
@@ -2705,14 +2691,14 @@ empty or nil then a list of all tables will be returned.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;getTableList(STR2CSTR(wild)));
 }</pre>
-          </div><!-- getTableList-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- getTableList-method -->
+      </div>
 
     
       <div id="method-i-inputBind" class="method-detail ">
@@ -2779,14 +2765,14 @@ is faking binds.</p>
         }
         return INT2NUM(success);
 }</pre>
-          </div><!-- inputBind-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- inputBind-method -->
+      </div>
 
     
       <div id="method-i-inputBindBlob" class="method-detail ">
@@ -2826,14 +2812,14 @@ is faking binds.</p>
         }
         return INT2NUM(success);
 }</pre>
-          </div><!-- inputBindBlob-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- inputBindBlob-method -->
+      </div>
 
     
       <div id="method-i-inputBindClob" class="method-detail ">
@@ -2873,14 +2859,14 @@ is faking binds.</p>
         }
         return INT2NUM(success);
 }</pre>
-          </div><!-- inputBindClob-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- inputBindClob-method -->
+      </div>
 
     
       <div id="method-i-inputBinds" class="method-detail ">
@@ -2954,14 +2940,14 @@ may also be specified.</p>
         }
         return INT2NUM(success);
 }</pre>
-          </div><!-- inputBinds-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- inputBinds-method -->
+      </div>
 
     
       <div id="method-i-lowerCaseColumnNames" class="method-detail ">
@@ -2989,14 +2975,14 @@ may also be specified.</p>
         sqlrcur-&gt;lowerCaseColumnNames();
         return Qnil;
 }</pre>
-          </div><!-- lowerCaseColumnNames-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- lowerCaseColumnNames-method -->
+      </div>
 
     
       <div id="method-i-mixedCaseColumnNames" class="method-detail ">
@@ -3025,14 +3011,14 @@ database.  This is the default.</p>
         sqlrcur-&gt;mixedCaseColumnNames();
         return Qnil;
 }</pre>
-          </div><!-- mixedCaseColumnNames-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- mixedCaseColumnNames-method -->
+      </div>
 
     
       <div id="method-i-openCachedResultSet" class="method-detail ">
@@ -3062,14 +3048,14 @@ database.  This is the default.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;openCachedResultSet(STR2CSTR(filename)));
 }</pre>
-          </div><!-- openCachedResultSet-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- openCachedResultSet-method -->
+      </div>
 
     
       <div id="method-i-prepareFileQuery" class="method-detail ">
@@ -3100,14 +3086,14 @@ database.  This is the default.</p>
         return INT2NUM(sqlrcur-&gt;prepareFileQuery(STR2CSTR(path),
                                                 STR2CSTR(filename)));
 }</pre>
-          </div><!-- prepareFileQuery-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- prepareFileQuery-method -->
+      </div>
 
     
       <div id="method-i-prepareQuery" class="method-detail ">
@@ -3138,14 +3124,14 @@ database.  This is the default.</p>
         sqlrcur-&gt;prepareQuery(STR2CSTR(query));
         return Qnil;
 }</pre>
-          </div><!-- prepareQuery-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- prepareQuery-method -->
+      </div>
 
     
       <div id="method-i-prepareQueryWithLength" class="method-detail ">
@@ -3178,14 +3164,14 @@ used if the query contains binary data.</p>
         sqlrcur-&gt;prepareQuery(STR2CSTR(query),NUM2INT(length));
         return Qnil;
 }</pre>
-          </div><!-- prepareQueryWithLength-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- prepareQueryWithLength-method -->
+      </div>
 
     
       <div id="method-i-resumeCachedResultSet" class="method-detail ">
@@ -3219,14 +3205,14 @@ on failure.</p>
         return INT2NUM(sqlrcur-&gt;resumeCachedResultSet(NUM2INT(id),
                                                         STR2CSTR(filename)));
 }</pre>
-          </div><!-- resumeCachedResultSet-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- resumeCachedResultSet-method -->
+      </div>
 
     
       <div id="method-i-resumeResultSet" class="method-detail ">
@@ -3257,14 +3243,14 @@ on success and 0 on failure.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;resumeResultSet(NUM2INT(id)));
 }</pre>
-          </div><!-- resumeResultSet-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- resumeResultSet-method -->
+      </div>
 
     
       <div id="method-i-rowCount" class="method-detail ">
@@ -3291,14 +3277,14 @@ on success and 0 on failure.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;rowCount());
 }</pre>
-          </div><!-- rowCount-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- rowCount-method -->
+      </div>
 
     
       <div id="method-i-sendFileQuery" class="method-detail ">
@@ -3329,14 +3315,14 @@ on success and 0 on failure.</p>
         return INT2NUM(sqlrcur-&gt;sendFileQuery(STR2CSTR(path),
                                                 STR2CSTR(filename))); 
 }</pre>
-          </div><!-- sendFileQuery-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- sendFileQuery-method -->
+      </div>
 
     
       <div id="method-i-sendQuery" class="method-detail ">
@@ -3366,14 +3352,14 @@ on success and 0 on failure.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;sendQuery(STR2CSTR(query)));
 }</pre>
-          </div><!-- sendQuery-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- sendQuery-method -->
+      </div>
 
     
       <div id="method-i-sendQueryWithLength" class="method-detail ">
@@ -3405,14 +3391,14 @@ function must be used if the query contains binary data.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;sendQuery(STR2CSTR(query),NUM2INT(length)));
 }</pre>
-          </div><!-- sendQueryWithLength-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- sendQueryWithLength-method -->
+      </div>
 
     
       <div id="method-i-setCacheTtl" class="method-detail ">
@@ -3445,14 +3431,14 @@ provided it&#39;s scanning the directory containing the cache files.</p>
         sqlrcur-&gt;setCacheTtl(NUM2INT(ttl));
         return Qnil;
 }</pre>
-          </div><!-- setCacheTtl-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- setCacheTtl-method -->
+      </div>
 
     
       <div id="method-i-setResultSetBufferSize" class="method-detail ">
@@ -3484,14 +3470,14 @@ default) means buffer the entire result set.</p>
         sqlrcur-&gt;setResultSetBufferSize(NUM2INT(rows));
         return Qnil;
 }</pre>
-          </div><!-- setResultSetBufferSize-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- setResultSetBufferSize-method -->
+      </div>
 
     
       <div id="method-i-substitution" class="method-detail ">
@@ -3544,14 +3530,14 @@ decimal.  If it is a decimal then the precision and scale may be specified.</p>
         }
         return INT2NUM(result);
 }</pre>
-          </div><!-- substitution-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- substitution-method -->
+      </div>
 
     
       <div id="method-i-substitutions" class="method-detail ">
@@ -3628,14 +3614,14 @@ may also be specified.</p>
         }
         return INT2NUM(success);
 }</pre>
-          </div><!-- substitutions-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- substitutions-method -->
+      </div>
 
     
       <div id="method-i-suspendResultSet" class="method-detail ">
@@ -3665,14 +3651,14 @@ resumeResultSet() after it calls resumeSession().</p>
         sqlrcur-&gt;suspendResultSet();
         return Qnil;
 }</pre>
-          </div><!-- suspendResultSet-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- suspendResultSet-method -->
+      </div>
 
     
       <div id="method-i-totalRows" class="method-detail ">
@@ -3702,14 +3688,14 @@ databases which don&#39;t support this option.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;totalRows());
 }</pre>
-          </div><!-- totalRows-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- totalRows-method -->
+      </div>
 
     
       <div id="method-i-upperCaseColumnNames" class="method-detail ">
@@ -3737,14 +3723,14 @@ databases which don&#39;t support this option.</p>
         sqlrcur-&gt;upperCaseColumnNames();
         return Qnil;
 }</pre>
-          </div><!-- upperCaseColumnNames-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- upperCaseColumnNames-method -->
+      </div>
 
     
       <div id="method-i-validBind" class="method-detail ">
@@ -3774,14 +3760,14 @@ databases which don&#39;t support this option.</p>
         Data_Get_Struct(self,sqlrcursor,sqlrcur);
         return INT2NUM(sqlrcur-&gt;validBind(STR2CSTR(variable)));
 }</pre>
-          </div><!-- validBind-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- validBind-method -->
+      </div>
 
     
       <div id="method-i-validateBinds" class="method-detail ">
@@ -3812,26 +3798,25 @@ calling this function</p>
         sqlrcur-&gt;validateBinds();
         return Qnil;
 }</pre>
-          </div><!-- validateBinds-source -->
+          </div>
           
         </div>
 
         
 
         
-      </div><!-- validateBinds-method -->
+      </div>
 
     
-    </section><!-- public-instance-method-details -->
+    </section>
   
-  </section><!-- 5Buntitled-5D -->
+  </section>
+</main>
 
-</div><!-- documentation -->
 
-
-<footer id="validator-badges">
-  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
-  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.1.
-  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+<footer id="validator-badges" role="contentinfo">
+  <p><a href="http://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="http://docs.seattlerb.org/rdoc/">RDoc</a> 4.2.0.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
 </footer>
 
