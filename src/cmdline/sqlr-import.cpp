@@ -579,7 +579,8 @@ int main(int argc, const char **argv) {
 
 		stdoutput.printf("usage: \n"
 			" %s-import -host host -port port -socket socket\n"
-			"             -user user -password password\n"
+			"             [-user user -password password] "
+			"[-krb [service]]\n"
 			"             -file file [-commitcount rowcount]\n"
 			"             [-debug [filename]] [-verbose]\n"
 			"  or\n"
@@ -608,6 +609,10 @@ int main(int argc, const char **argv) {
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
+
+	if (cmdline.found("-krb")) {
+		sqlrcon.useKerberos(cmdline.getValue("-krb"));
+	}
 
 	if (debug) {
 		if (debugfile) {

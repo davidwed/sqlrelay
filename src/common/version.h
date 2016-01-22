@@ -74,6 +74,9 @@ static void help(int argc, const char **argv) {
 "	-id instanceid		Derive connection info and credentials from the\n" \
 "				specified instance, as defined in the\n" \
 "				configuration.\n" \
+"\n" \
+"	-krb [service]		Use kerberos authentication and encryption.\n" \
+"				Specifying the service to use is optional.\n" \
 "\n"
 
 #define CONFIG \

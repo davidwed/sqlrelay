@@ -1902,12 +1902,12 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 		stdoutput.printf("usage:\n"
 			" %ssh -host host -port port -socket socket "
-			"-user user -password password [-krb [service]]\n"
+			"[-user user -password password] [-krb [service]]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
 			"  or\n"
-			" %ssh [-config config] -id id\n"
+			" %ssh [-config config] -id id [-krb [service]]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n",
