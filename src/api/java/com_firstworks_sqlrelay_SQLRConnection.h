@@ -41,6 +41,24 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setResponseTi
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    useKerberos
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_useKerberos
+  (JNIEnv *env, jobject self, jstring service);
+
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    useNoEncryption
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_useNoEncryption
+  (JNIEnv *, jobject);
+
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    endSession
  * Signature: ()V
  */

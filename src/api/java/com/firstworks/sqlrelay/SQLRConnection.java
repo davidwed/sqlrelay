@@ -55,6 +55,19 @@ public class SQLRConnection {
 	public native void	setResponseTimeout(int timeoutsec,
 							int timeoutusec);
 
+
+
+	/** Configures this instance to use kerberos authentication
+	 *  and encryption and to connect to "service".  If "service"
+	 *  is null then the default service for SQL Relay is used. */
+	public native void	useKerberos(String service);
+
+	/** Configures this instance to not use kerberos or SSL/TLS
+	 *  authentication and encryption. */
+	public native void	useNoEncryption();
+
+
+
 	/** Ends the session. */
 	public native void	endSession();
 
