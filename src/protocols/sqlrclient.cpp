@@ -223,6 +223,14 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 
 		// get a command from the client
 		if (!getCommand(&command)) {
+			// Make sure to set the exit status to something other
+			// than the default (error) in this case.  Load
+			// balancers often check to be sure a service is
+			// still running by just connecting and disconnecting.
+			// We don't want an error making its way into the logs
+			// for each of these checks, or log analyzers will
+			// generate a bunch of false-positives.
+			status=SQLRCLIENTEXITSTATUS_CLOSED_CONNECTION;
 			break;
 		}
 
