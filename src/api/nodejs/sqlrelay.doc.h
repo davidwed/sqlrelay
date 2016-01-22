@@ -29,20 +29,34 @@ class SQLRConnection {
 		 *  milliseconds.  Setting either parameter to -1 disables the
 		 *  timeout.  You can also set this timeout using the
 		 *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
-		setConnectTimeout(var timeoutsec, var timeoutusec);
+		function setConnectTimeout(var timeoutsec, var timeoutusec);
 
 		/** Sets the authentication timeout in seconds and
 		 *  milliseconds.  Setting either parameter to -1 disables the
 		 *  timeout.   You can also set this timeout using the
 		 *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
-		setAuthenticationTimeout(var timeoutsec, var timeoutusec);
+		function setAuthenticationTimeout(var timeoutsec,
+							var timeoutusec);
 
 		/** Sets the response timeout (for queries, commits, rollbacks,
 		 *  pings, etc.) in seconds and milliseconds.  Setting either
 		 *  parameter to -1 disables the timeout.  You can also set
 		 *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
 		 *  environment variable. */
-		setResponseTimeout(var timeoutsec, var timeoutusec);
+		function setResponseTimeout(var timeoutsec, var timeoutusec);
+
+
+
+		/** Configures this instance to use kerberos authentication
+		 *  and encryption and to connect to "service".  If "service"
+		 *  is null then the default service for SQL Relay is used. */
+		function useKerberos(var service);
+
+		/** Configures this instance to not use kerberos or SSL/TLS
+		 *  authentication and encryption. */
+		function useNoEncryption();
+
+
 
 		/** Ends the session. */
 		function	endSession();

@@ -107,6 +107,8 @@ class SQLRConnection : public ObjectWrap {
 		static RET	setConnectTimeout(const ARGS &args);
 		static RET	setAuthenticationTimeout(const ARGS &args);
 		static RET	setResponseTimeout(const ARGS &args);
+		static RET	useKerberos(const ARGS &args);
+		static RET	useNoEncryption(const ARGS &args);
 		static RET	endSession(const ARGS &args);
 		static RET	suspendSession(const ARGS &args);
 		static RET	getConnectionPort(const ARGS &args);
@@ -261,6 +263,8 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setAuthenticationTimeout",
 						setAuthenticationTimeout);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setResponseTimeout",setResponseTimeout);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"useKerberos",useKerberos);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"useNoEncryption",useNoEncryption);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"endSession",endSession);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"suspendSession",suspendSession);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getConnectionPort",getConnectionPort);
@@ -365,6 +369,28 @@ RET SQLRConnection::setResponseTimeout(const ARGS &args) {
 
 	sqlrcon(args)->setResponseTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
+
+	returnVoid();
+}
+
+RET SQLRConnection::useKerberos(const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,1);
+
+	sqlrcon(args)->useKerberos(toString(args[0]));
+
+	returnVoid();
+}
+
+RET SQLRConnection::useNoEncryption(const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,0);
+
+	sqlrcon(args)->useNoEncryption();
 
 	returnVoid();
 }
