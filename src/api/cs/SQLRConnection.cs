@@ -74,6 +74,21 @@ public class SQLRConnection : IDisposable
     {
         sqlrcon_setResponseTimeout(sqlrconref, timeoutsec, timeoutusec);
     }
+
+    /** Configures this instance to use kerberos authentication
+     *  and encryption and to connect to "service".  If "service"
+     *  is null then the default service for SQL Relay is used. */
+    public void useKerberos(String service)
+    {
+        sqlrcon_useKerberos(sqlrconref, service);
+    } 
+
+    /** Configures this instance to not use kerberos or SSL/TLS
+     *  authentication and encryption. */
+    public void useNoEncryption()
+    {
+        sqlrcon_useNoEncryption(sqlrconref);
+    }
     
     /** Ends the session. */
     public void endSession()
@@ -309,6 +324,12 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_setResponseTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_useKerberos(IntPtr sqlrconref, String service);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_useNoEncryption(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_endSession(IntPtr sqlrconref);
