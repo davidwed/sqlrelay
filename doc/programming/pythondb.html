@@ -1,11 +1,11 @@
 <html>
 <head>
-<title>firstworks   Programming with SQL Relay using the Python DB API</title>
+<title>firstworks   Programming with SQL Relay using the Python DB-API</title>
 <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Programming with SQL Relay using the Python DB API</span><br><br>
+<span class="heading1">Programming with SQL Relay using the Python DB-API</span><br><br>
 
 <ul>
 <li><a href="#session">Establishing a Session</a></li>
@@ -129,7 +129,7 @@ cur=con.cursor()
 <span class="heading2">Bind Variables</span><br><br>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  The Python DB API provides a means
+of the query is dynamically generated.  The Python DB-API provides a means
 for using bind variables in those queries.</p>
 
 <p>For a detailed discussion of binds, see 
@@ -162,7 +162,7 @@ bind and execute a query once, then re-bind and re-execute the query
 over and over without re-preparing it.  If your backend database natively 
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
-<p>The Python DB API supports this paradigm via the executemany method.  If you
+<p>The Python DB-API supports this paradigm via the executemany method.  If you
 pass in a list of parameter dictionaries, the query will be re-executed for
 each dictionary of bind variable/values.</p>
 
@@ -520,7 +520,7 @@ result=cur.fetchone()[0]
 
 <p>In Sybase and Microsoft SQL Server, stored procedures return values
 through output parameters rather than as return values of the procedure
-itself.  However, the SQL Relay Python DBdriver does not currently support
+itself.  However, the SQL Relay Python DB-API driver does not currently support
 output parameters.</p>
 
 
@@ -706,13 +706,13 @@ each database that SQL Relay supports.</p>
 as return values of the procedure itself.  If a procedure needs to return
 multiple values, it can return one of them as the return value of the procedure
 itself, but the rest must be returned through output parameters.  However, the
-SQL Relay Python DB driver does not currently support output parameters.</p>
+SQL Relay Python DB-API driver does not currently support output parameters.</p>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
 <p>In Sybase and Microsoft SQL Server, stored procedures return values
 through output parameters rather than as return values of the procedure
-itself.  However, the SQL Relay Python DB driver does not currently support
+itself.  However, the SQL Relay Python DB-API driver does not currently support
 output parameters.</p>
 
 <span class="heading4">Firebird</span><br>
@@ -875,7 +875,7 @@ each database that SQL Relay supports.</p>
 
 <p>Stored procedures in Oracle can return open cursors as return values or
 output parameters.  A client-side cursor can be bound to this open cursor and
-rows can be fetched from it.  However, the SQL Relay Python DB driver does not
+rows can be fetched from it.  However, the SQL Relay Python DB-API driver does not
 currently support output parameters.</p>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
@@ -994,7 +994,7 @@ result=cur.fetchall()
 
 <p>Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.</p>
 
-<p>Unfortunately Python DB doesn't expose a generic method for getting the last insert id, but when using the SQLite database, you can get the last insert id by running the query:</p>
+<p>Unfortunately Python DB-API doesn't expose a generic method for getting the last insert id, but when using the SQLite database, you can get the last insert id by running the query:</p>
 
 <blockquote>
 <b>select last insert rowid</b>
