@@ -21,7 +21,7 @@ com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.class: com$(SLASH)fi
 	$(JAVAC) com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.java
 
 com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.class: com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.java
-	$(JAVAC) com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.java
+	$(JAVAC) -classpath $(top_builddir)/src/api/java com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.java
 
 libSQLRConnection.$(LIBEXT): com_firstworks_sqlrelay_SQLRConnection.cpp com_firstworks_sqlrelay_SQLRConnection.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRConnection.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(MODLINKFLAGS)
