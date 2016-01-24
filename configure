@@ -33332,9 +33332,6 @@ CPPFLAGS="$SAVECPPFLAGS"
 		if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
 		then
 			HAVE_PYTHON3="yes"
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Python API will not be built." >&5
-$as_echo "$as_me: WARNING: The Python API will not be built." >&2;}
 		fi
 	fi
 
@@ -33496,9 +33493,6 @@ CPPFLAGS="$SAVECPPFLAGS"
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
 			HAVE_PYTHON="yes"
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Python API will not be built." >&5
-$as_echo "$as_me: WARNING: The Python API will not be built." >&2;}
 		fi
 	fi
 
@@ -33541,6 +33535,12 @@ fi
 
 
 
+
+	if ( test "$HAVE_PYTHON" = "" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Python API will not be built." >&5
+$as_echo "$as_me: WARNING: The Python API will not be built." >&2;}
+	fi
 
 echo "******************************"
 

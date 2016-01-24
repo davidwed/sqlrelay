@@ -2925,8 +2925,6 @@ then
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
 			HAVE_PYTHON="yes"
-		else
-			AC_MSG_WARN(The Python API will not be built.)
 		fi
 	fi
 
@@ -3067,8 +3065,6 @@ then
 		if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
 		then
 			HAVE_PYTHON3="yes"
-		else
-			AC_MSG_WARN(The Python API will not be built.)
 		fi
 	fi
 
@@ -3110,6 +3106,11 @@ AC_DEFUN([FW_PYTHON_DECIDE],
 	AC_SUBST(PYTHONLIB)
 	AC_SUBST(IMPORTEXCEPTIONS)
 	AC_SUBST(EXCEPTIONSSTANDARDERROR)
+
+	if ( test "$HAVE_PYTHON" = "" )
+	then
+		AC_MSG_WARN(The Python API will not be built.)
+	fi
 ])
 
 
