@@ -349,10 +349,6 @@ bool sqlrconnection::openSession() {
 		gctx.setService(kerberosservice);
 		ucs.setGSSContext(&gctx);
 		ics.setGSSContext(&gctx);
-
-		// FIXME: there's currently some write buffer problem...
-		ucs.setWriteBufferSize(0);
-		ics.setWriteBufferSize(0);
 	}
 
 	if (debug) {

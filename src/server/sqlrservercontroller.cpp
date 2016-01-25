@@ -1798,9 +1798,6 @@ bool sqlrservercontroller::acceptKrbSecurityContext() {
 	clientsock->setGSSContext(&gctx);
 	gctx.setFileDescriptor(clientsock);
 
-	// FIXME: there's currently some problem with write buffering
-	clientsock->setWriteBufferSize(0);
-
 	// accept the security context
 	if (!gctx.accept()) {
 		// FIXME: log error
