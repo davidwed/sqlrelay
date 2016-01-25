@@ -671,6 +671,7 @@ TCLLIBSPATH
 TCLLIB
 TCLINCLUDE
 HAVE_TCL
+CURSORCLASSPATH
 JAVAINCLUDES
 JAR
 JAVAC
@@ -16171,6 +16172,20 @@ $as_echo "yes" >&6; }
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	fi
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+HAVE_SCO_UW=""
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for UnixWare" >&5
+$as_echo_n "checking for UnixWare... " >&6; }
+if ( test "`uname -s`" = "UnixWare" -a "`uname os_provider 2> /dev/null`" = "SCO" )
+then
+	HAVE_SCO_UW="yes"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
 else
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -33929,6 +33944,13 @@ if ( test -n "$JAVAINCLUDES" )
 then
 	echo "java includes... $JAVAINCLUDES"
 fi
+
+
+	CURSORCLASSPATH=""
+	if ( test "$HAVE_SCO_UW" = "" )
+	then
+		CURSORCLASSPATH="-classpath \$(top_builddir)/src/api/java"
+	fi
 
 
 

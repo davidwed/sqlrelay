@@ -615,6 +615,19 @@ else
 fi
 ])
 
+AC_DEFUN([FW_CHECK_SCO_UW],
+[
+HAVE_SCO_UW=""
+AC_MSG_CHECKING(for UnixWare)
+if ( test "`uname -s`" = "UnixWare" -a "`uname os_provider 2> /dev/null`" = "SCO" )
+then
+	HAVE_SCO_UW="yes"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+])
+
 
 AC_DEFUN([FW_CHECK_F_NO_BUILTIN],
 [
@@ -3381,11 +3394,18 @@ EOF
 	fi
 
 	FW_INCLUDES(java,[$JAVAINCLUDES])
+
+	CURSORCLASSPATH=""
+	if ( test "$HAVE_SCO_UW" = "" )
+	then
+		CURSORCLASSPATH="-classpath \$(top_builddir)/src/api/java"
+	fi
 		
 	AC_SUBST(HAVE_JAVA)
 	AC_SUBST(JAVAC)
 	AC_SUBST(JAR)
 	AC_SUBST(JAVAINCLUDES)
+	AC_SUBST(CURSORCLASSPATH)
 fi
 ])
 

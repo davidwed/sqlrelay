@@ -306,6 +306,7 @@ JAVAINCLUDES = @JAVAINCLUDES@
 JAVAUSERPATH = @JAVAUSERPATH@
 JAVACPPFLAGS = $(WERROR) $(WNOUNKNOWNPRAGMAS) $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
 JAVALIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay
+CURSORCLASSPATH=@CURSORCLASSPATH@
 ifneq ($(strip $(libdir)),)
 ifeq ($(JAVAUSERPATH),yes)
 JAVALIBS += -R $(libdir)
