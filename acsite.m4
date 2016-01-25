@@ -235,11 +235,7 @@ AC_DEFUN([FW_CHECK_USE_SYSTEM_LIBTOOL],
 if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
 then
   LIBTOOL="libtool"
-  LIBTOOLGCC="libtool"
-else
-  LIBTOOLGCC="$LIBTOOL.gcc"
 fi
-AC_SUBST(LIBTOOLGCC)
 ])
 
 

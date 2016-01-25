@@ -781,7 +781,6 @@ UWIN
 CYGWIN
 MINGW32
 UNAME
-LIBTOOLGCC
 CXXCPP
 OTOOL64
 OTOOL
@@ -15982,11 +15981,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
 then
   LIBTOOL="libtool"
-  LIBTOOLGCC="libtool"
-else
-  LIBTOOLGCC="$LIBTOOL.gcc"
 fi
-
 
 
 # Extract the first word of "$host_alias-ar", so it can be a program name with args.
