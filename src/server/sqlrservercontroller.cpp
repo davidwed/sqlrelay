@@ -1794,9 +1794,6 @@ bool sqlrservercontroller::acceptKrbSecurityContext() {
 		logInternalError(NULL,"failed to accept security "
 					"context (kerberos requested but "
 					"not supported)");
-		logDebugMessage("failed to accept krb security context "
-					"(kerberos requested but "
-					"not supported)");
 		return false;
 	}
 
@@ -1808,7 +1805,6 @@ bool sqlrservercontroller::acceptKrbSecurityContext() {
 	bool	retval=gctx.accept();
 	if (!retval) {
 		logInternalError(NULL,"failed to accept krb security context");
-		logDebugMessage("failed to accept krb security context");
 	}
 
 	logDebugMessage("done accepting krb security context");
