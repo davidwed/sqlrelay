@@ -1056,6 +1056,9 @@ bool sqlrservercontroller::openSockets() {
 
 		if (!serversockun) {
 			serversockun=new unixsocketserver();
+			if (cfg->getKrb() && gss::supportsGSS()) {
+				serversockun->setGSSContext(&gctx);
+			}
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				debugstr.clear();
@@ -1100,6 +1103,9 @@ bool sqlrservercontroller::openSockets() {
 					continue;
 				}
 				serversockin[index]=new inetsocketserver();
+				if (cfg->getKrb() && gss::supportsGSS()) {
+					serversockin[i]->setGSSContext(&gctx);
+				}
 				if (serversockin[index]->
 					listen(addresses[index],inetport,5)) {
 

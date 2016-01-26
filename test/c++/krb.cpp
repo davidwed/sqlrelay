@@ -605,7 +605,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType((uint32_t)0),"NUMBER");
 	stdoutput.printf("\n");
 
-#if 0
 	stdoutput.printf("SUSPENDED SESSION: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),1);
 	cur->suspendResultSet();
@@ -683,7 +682,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->rowCount(),8);
 	cur->setResultSetBufferSize(0);
 	stdoutput.printf("\n");
-#endif
 
 	stdoutput.printf("CACHED RESULT SET: \n");
 	cur->cacheToFile("cachefile1");
@@ -754,7 +752,6 @@ int	main(int argc, char **argv) {
 	cur->setResultSetBufferSize(0);
 	stdoutput.printf("\n");
 
-#if 0
 	stdoutput.printf("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
 	cur->setResultSetBufferSize(2);
 	cur->cacheToFile("cachefile1");
@@ -793,7 +790,6 @@ int	main(int argc, char **argv) {
 	cur->setResultSetBufferSize(0);
 	delete[] filename;
 	stdoutput.printf("\n");
-#endif
 
 	stdoutput.printf("COMMIT AND ROLLBACK: \n");
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
@@ -812,7 +808,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->autoCommitOff(),1);
 	stdoutput.printf("\n");
 
-#if 0
 	stdoutput.printf("FINISHED SUSPENDED SESSION: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testnumber"),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),"5");
@@ -831,7 +826,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(6,(uint32_t)0),NULL);
 	checkSuccess(cur->getField(7,(uint32_t)0),NULL);
 	stdoutput.printf("\n");
-#endif
 
 	stdoutput.printf("CLOB AND BLOB OUTPUT BIND: \n");
 	cur->sendQuery("drop table testtable1");
