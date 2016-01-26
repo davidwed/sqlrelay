@@ -1056,9 +1056,6 @@ bool sqlrservercontroller::openSockets() {
 
 		if (!serversockun) {
 			serversockun=new unixsocketserver();
-			if (cfg->getKrb() && gss::supportsGSS()) {
-				serversockun->setGSSContext(&gctx);
-			}
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				debugstr.clear();
@@ -1103,9 +1100,6 @@ bool sqlrservercontroller::openSockets() {
 					continue;
 				}
 				serversockin[index]=new inetsocketserver();
-				if (cfg->getKrb() && gss::supportsGSS()) {
-					serversockin[i]->setGSSContext(&gctx);
-				}
 				if (serversockin[index]->
 					listen(addresses[index],inetport,5)) {
 
@@ -1660,7 +1654,6 @@ int32_t sqlrservercontroller::waitForClient() {
 		// If we're in the middle of a suspended session, wait for
 		// a client to reconnect...
 
-
 		if (listener::listen(accepttimeout,0)<1) {
 			logInternalError(NULL,"wait for client connect failed");
 			return 0;
@@ -1696,10 +1689,10 @@ int32_t sqlrservercontroller::waitForClient() {
 	// set up the socket
 	clientsock->translateByteOrder();
 	clientsock->dontUseNaglesAlgorithm();
-	clientsock->setReadBufferSize(65536);
 	//clientsock->setTcpReadBufferSize(65536);
-	clientsock->setWriteBufferSize(65536);
 	//clientsock->setTcpWriteBufferSize(65536);
+	clientsock->setReadBufferSize(65536);
+	clientsock->setWriteBufferSize(65536);
 
 	// accept kerberos security context, if necessary
 	if (cfg->getKrb() && !acceptKrbSecurityContext()) {
@@ -1795,8 +1788,15 @@ void sqlrservercontroller::clientSession() {
 
 bool sqlrservercontroller::acceptKrbSecurityContext() {
 
+	logDebugMessage("accepting krb security context");
+
 	if (!gss::supportsGSS()) {
-		// FIXME: log error
+		logInternalError(NULL,"failed to accept security "
+					"context (kerberos requested but "
+					"not supported)");
+		logDebugMessage("failed to accept krb security context "
+					"(kerberos requested but "
+					"not supported)");
 		return false;
 	}
 
@@ -1805,11 +1805,14 @@ bool sqlrservercontroller::acceptKrbSecurityContext() {
 	gctx.setFileDescriptor(clientsock);
 
 	// accept the security context
-	if (!gctx.accept()) {
-		// FIXME: log error
-		return false;
+	bool	retval=gctx.accept();
+	if (!retval) {
+		logInternalError(NULL,"failed to accept krb security context");
+		logDebugMessage("failed to accept krb security context");
 	}
-	return true;
+
+	logDebugMessage("done accepting krb security context");
+	return retval;
 }
 
 sqlrservercursor *sqlrservercontroller::getCursor(uint16_t id) {

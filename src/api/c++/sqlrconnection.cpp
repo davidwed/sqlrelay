@@ -204,7 +204,7 @@ void sqlrconnection::useKerberos(const char *service) {
 						service:DEFAULT_KRBSERVICE);
 	}
 
-	if (gss::supportsGSS() && !charstring::isNullOrEmpty(kerberosservice)) {
+	if (gss::supportsGSS()) {
 
 		if (debug) {
 			debugPreStart();
@@ -220,8 +220,6 @@ void sqlrconnection::useKerberos(const char *service) {
 		gctx.setDesiredMechanism(&gmech);
 		gctx.setDesiredFlags(0);
 		gctx.setService(kerberosservice);
-		ucs.setGSSContext(&gctx);
-		ics.setGSSContext(&gctx);
 	}
 }
 
@@ -433,9 +431,25 @@ void sqlrconnection::reConfigureSockets() {
 	ics.setWriteBufferSize(65536);
 
 	if (gss::supportsGSS() && !charstring::isNullOrEmpty(kerberosservice)) {
+
+		if (debug) {
+			debugPreStart();
+			debugPrint("kerberos encryption/"
+					"authentication enabled\n");
+			debugPreEnd();
+		}
+
 		ucs.setGSSContext(&gctx);
 		ics.setGSSContext(&gctx);
+
 	} else {
+
+		if (debug) {
+			debugPreStart();
+			debugPrint("encryption disabled");
+			debugPreEnd();
+		}
+
 		ucs.setGSSContext(NULL);
 		ics.setGSSContext(NULL);
 	}
@@ -567,6 +581,12 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		endSession();
 	}
 
+	if (debug) {
+		debugPreStart();
+		debugPrint("Resuming Session: ");
+		debugPreEnd();
+	}
+
 	// set the connectionunixport and connectioninetport values
 	if (copyrefs) {
 		if (charstring::length(socket)<=MAXPATHLEN) {
@@ -598,12 +618,6 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		if (connected) {
 			cs=&ics;
 		}
-	}
-
-	if (debug) {
-		debugPreStart();
-		debugPrint("Resuming Session: ");
-		debugPreEnd();
 	}
 
 	if (connected) {
