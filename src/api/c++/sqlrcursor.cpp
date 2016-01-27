@@ -146,9 +146,50 @@ enum columncase {
 };
 
 
+class sqlrclientbindvar {
+	friend class sqlrcursor;
+	friend class sqlrcursorprivate;
+	private:
+		char	*variable;
+		union {
+			char	*stringval;
+			int64_t	integerval;
+			struct {
+				double		value;
+				uint32_t	precision;
+				uint32_t	scale;
+			} doubleval;
+			struct {
+				int16_t	year;
+				int16_t	month;
+				int16_t	day;
+				int16_t	hour;
+				int16_t	minute;
+				int16_t	second;
+				int32_t	microsecond;
+				char	*tz;
+			} dateval;
+			char		*lobval;
+			uint16_t	cursorid;
+		} value;
+		uint32_t	valuesize;
+		uint32_t	resultvaluesize;
+
+		sqlrclientbindvartype_t 	type;
+
+		bool		send;
+
+		bool		substituted;
+		bool		donesubstituting;
+};
+
+
 class sqlrcursorprivate {
 	friend class sqlrcursor;
 	private:
+		sqlrclientbindvar	*findVar(const char *variable,
+					dynamicarray<sqlrclientbindvar> *vars);
+
 		bool		_resumed;
 		bool		_cached;
 
@@ -233,6 +274,22 @@ class sqlrcursorprivate {
 		uint16_t	_cursorid;
 		bool		_havecursorid;
 };
+
+// This method is a member of sqlrcursorprivate, rather than sqlrcuror, because
+// if it were a member of sqlrcursor, then it would have to be defined in the
+// header file.  If it were, then since it references a
+// dynamicarray<sqlrclientbindvar>, older compilers would also require that
+// sqlrclientbindvar be defined in the header file as well.  To avoid all of
+// that, it's part of sqlrcursorprivate.
+sqlrclientbindvar *sqlrcursorprivate::findVar(const char *variable,
+					dynamicarray<sqlrclientbindvar> *vars) {
+	for (uint16_t i=0; i<vars->getLength(); i++) {
+		if (!charstring::compare((*vars)[i].variable,variable)) {
+			return &((*vars)[i]);
+		}
+	}
+	return NULL;
+}
 
 
 sqlrcursor::sqlrcursor(sqlrconnection *sqlrc, bool copyreferences) {
@@ -1192,7 +1249,7 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_subvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_subvars);
 	if (!bv) {
 		bv=&(*pvt->_subvars)[pvt->_subvars->getLength()];
 		preexisting=false;
@@ -1207,7 +1264,7 @@ void sqlrcursor::substitution(const char *variable, int64_t value) {
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_subvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_subvars);
 	if (!bv) {
 		bv=&(*pvt->_subvars)[pvt->_subvars->getLength()];
 		preexisting=false;
@@ -1223,7 +1280,7 @@ void sqlrcursor::substitution(const char *variable, double value,
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_subvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_subvars);
 	if (!bv) {
 		bv=&(*pvt->_subvars)[pvt->_subvars->getLength()];
 		preexisting=false;
@@ -1248,7 +1305,7 @@ void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_inbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
 		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
 		preexisting=false;
@@ -1265,7 +1322,7 @@ void sqlrcursor::inputBindClob(const char *variable, const char *value,
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_inbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
 		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
 		preexisting=false;
@@ -1281,7 +1338,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_inbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
 		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
 		preexisting=false;
@@ -1298,7 +1355,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value,
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_inbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
 		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
 		preexisting=false;
@@ -1314,7 +1371,7 @@ void sqlrcursor::inputBind(const char *variable, int64_t value) {
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_inbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
 		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
 		preexisting=false;
@@ -1331,7 +1388,7 @@ void sqlrcursor::inputBind(const char *variable, double value,
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_inbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
 		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
 		preexisting=false;
@@ -1350,7 +1407,7 @@ void sqlrcursor::inputBind(const char *variable,
 		return;
 	}
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_inbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
 		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
 		preexisting=false;
@@ -1493,16 +1550,6 @@ void sqlrcursor::lobVar(sqlrclientbindvar *var,
 	}
 }
 
-sqlrclientbindvar *sqlrcursor::findVar(const char *variable,
-					dynamicarray<sqlrclientbindvar> *vars) {
-	for (uint16_t i=0; i<vars->getLength(); i++) {
-		if (!charstring::compare((*vars)[i].variable,variable)) {
-			return &((*vars)[i]);
-		}
-	}
-	return NULL;
-}
-
 void sqlrcursor::initVar(sqlrclientbindvar *var,
 				const char *variable,
 				bool preexisting) {
@@ -1574,7 +1621,7 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 	}
 
 	bool			preexisting=true;
-	sqlrclientbindvar	*bv=findVar(variable,pvt->_outbindvars);
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_outbindvars);
 	if (!bv) {
 		bv=&(*pvt->_outbindvars)[pvt->_outbindvars->getLength()];
 		preexisting=false;

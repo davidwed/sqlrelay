@@ -60,11 +60,9 @@
 						const char *value,
 						uint32_t size,
 						sqlrclientbindvartype_t type);
-		sqlrclientbindvar	*findVar(const char *variable,
-					dynamicarray<sqlrclientbindvar> *vars);
 		void	initVar(sqlrclientbindvar *var,
-					const char *variable,
-					bool preexisting);
+						const char *variable,
+						bool preexisting);
 		void	performSubstitution(stringbuffer *buffer,
 							uint16_t which);
 		bool	runQuery(const char *query);
