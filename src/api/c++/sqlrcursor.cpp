@@ -33,14 +33,14 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	this->sqlrc=sqlrc;
 
 	// put self in connection's cursor list
-	if (sqlrc->lastcursor) {
-		sqlrc->lastcursor->next=this;
-		prev=sqlrc->lastcursor;
+	if (sqlrc->lastcursor()) {
+		sqlrc->lastcursor()->next=this;
+		prev=sqlrc->lastcursor();
 	} else {
-		sqlrc->firstcursor=this;
+		sqlrc->firstcursor(this);
 		prev=NULL;
 	}
-	sqlrc->lastcursor=this;
+	sqlrc->lastcursor(this);
 	next=NULL;
 
 	// session state
@@ -110,7 +110,7 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 sqlrcursor::~sqlrcursor() {
 
 	// abort result set if necessary
-	if (sqlrc && !sqlrc->endsessionsent && !sqlrc->suspendsessionsent) {
+	if (sqlrc && !sqlrc->endsessionsent() && !sqlrc->suspendsessionsent()) {
 		closeResultSet(true);
 	}
 
@@ -144,23 +144,23 @@ sqlrcursor::~sqlrcursor() {
 
 		// remove self from connection's cursor list
 		if (!next && !prev) {
-			sqlrc->firstcursor=NULL;
-			sqlrc->lastcursor=NULL;
+			sqlrc->firstcursor(NULL);
+			sqlrc->lastcursor(NULL);
 		} else {
 			sqlrcursor	*temp=next;
 			if (next) {
 				next->prev=prev;
 			} else {
-				sqlrc->lastcursor=prev;
+				sqlrc->lastcursor(prev);
 			}
 			if (prev) {
 				prev->next=temp;
 			} else {
-				sqlrc->firstcursor=next;
+				sqlrc->firstcursor(next);
 			}
 		}
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Deallocated cursor\n");
 			sqlrc->debugPreEnd();
@@ -175,7 +175,7 @@ sqlrcursor::~sqlrcursor() {
 
 void sqlrcursor::setResultSetBufferSize(uint64_t rows) {
 	rsbuffersize=rows;
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Result Set Buffer Size: ");
 		sqlrc->debugPrint((int64_t)rows);
@@ -242,7 +242,7 @@ void sqlrcursor::cacheOff() {
 void sqlrcursor::startCaching() {
 
 	if (!resumed) {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Caching data to ");
 			sqlrc->debugPrint(cachedestname);
@@ -250,7 +250,7 @@ void sqlrcursor::startCaching() {
 			sqlrc->debugPreEnd();
 		}
 	} else {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Resuming caching data to ");
 			sqlrc->debugPrint(cachedestname);
@@ -302,7 +302,7 @@ void sqlrcursor::startCaching() {
 
 	} else {
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Error caching data to ");
 			sqlrc->debugPrint(cachedestname);
@@ -497,7 +497,7 @@ void sqlrcursor::finishCaching() {
 		return;
 	}
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Finishing caching.\n");
 		sqlrc->debugPreEnd();
@@ -533,7 +533,7 @@ bool sqlrcursor::getDatabaseList(const char *wild) {
 
 bool sqlrcursor::getDatabaseList(const char *wild,
 					sqlrclientlistformat_t listformat) {
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("getting database list");
 		if (wild) {
@@ -553,7 +553,7 @@ bool sqlrcursor::getTableList(const char *wild) {
 
 bool sqlrcursor::getTableList(const char *wild,
 					sqlrclientlistformat_t listformat) {
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("getting table list");
 		if (wild) {
@@ -574,7 +574,7 @@ bool sqlrcursor::getColumnList(const char *table, const char *wild) {
 bool sqlrcursor::getColumnList(const char *table,
 				const char *wild,
 				sqlrclientlistformat_t listformat) {
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("getting column list for: \"");
 		sqlrc->debugPrint(table);
@@ -611,27 +611,27 @@ bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 	endofresultset=false;
 
 	// tell the server we want to get a db list
-	sqlrc->cs->write(command);
+	sqlrc->cs()->write(command);
 
 	// tell the server whether we'll need a cursor or not
 	sendCursorStatus();
 
 	// send the list format
-	sqlrc->cs->write((uint16_t)listformat);
+	sqlrc->cs()->write((uint16_t)listformat);
 
 	// send the wild parameter
 	uint32_t	len=charstring::length(wild);
-	sqlrc->cs->write(len);
+	sqlrc->cs()->write(len);
 	if (len) {
-		sqlrc->cs->write(wild,len);
+		sqlrc->cs()->write(wild,len);
 	}
 
 	// send the table parameter
 	if (table) {
 		len=charstring::length(table);
-		sqlrc->cs->write(len);
+		sqlrc->cs()->write(len);
 		if (len) {
-			sqlrc->cs->write(table,len);
+			sqlrc->cs()->write(table,len);
 		}
 	}
 
@@ -734,7 +734,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 		fullpath[0]='\0';
 
 		// debug info
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("File name ");
 			if (path) {
@@ -753,7 +753,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 		fullpath[counter]='\0';
 
 		// debug info
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("File: ");
 			sqlrc->debugPrint(fullpath);
@@ -771,7 +771,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 		charstring::append(err,"The file ");
 		charstring::append(err,fullpath);
 		charstring::append(err," could not be opened.\n");
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint(err);
 			sqlrc->debugPreEnd();
@@ -1833,29 +1833,29 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 	if (!reexecute) {
 
 		// tell the server we're sending a query
-		sqlrc->cs->write((uint16_t)NEW_QUERY);
+		sqlrc->cs()->write((uint16_t)NEW_QUERY);
 
 		// tell the server whether we'll need a cursor or not
 		sendCursorStatus();
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Sending Client Info:");
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPrint("Length: ");
-			sqlrc->debugPrint((int64_t)sqlrc->clientinfolen);
+			sqlrc->debugPrint((int64_t)sqlrc->clientinfolen());
 			sqlrc->debugPrint("\n");
-			sqlrc->debugPrint(sqlrc->clientinfo);
+			sqlrc->debugPrint(sqlrc->clientinfo());
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
 
 		// send the client info
 		// FIXME: arguably this should be its own command
-		sqlrc->cs->write(sqlrc->clientinfolen);
-		sqlrc->cs->write(sqlrc->clientinfo,sqlrc->clientinfolen);
+		sqlrc->cs()->write(sqlrc->clientinfolen());
+		sqlrc->cs()->write(sqlrc->clientinfo(),sqlrc->clientinfolen());
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Sending Query:");
 			sqlrc->debugPrint("\n");
@@ -1868,12 +1868,12 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		}
 
 		// send the query
-		sqlrc->cs->write(querylen);
-		sqlrc->cs->write(query,querylen);
+		sqlrc->cs()->write(querylen);
+		sqlrc->cs()->write(query,querylen);
 
 	} else {
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Requesting re-execution of ");
 			sqlrc->debugPrint("previous query.");
@@ -1885,10 +1885,10 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		}
 
 		// tell the server we're sending a query
-		sqlrc->cs->write((uint16_t)REEXECUTE_QUERY);
+		sqlrc->cs()->write((uint16_t)REEXECUTE_QUERY);
 
 		// send the cursor id to the server
-		sqlrc->cs->write(cursorid);
+		sqlrc->cs()->write(cursorid);
 	}
 
 	return true;
@@ -1899,12 +1899,12 @@ void sqlrcursor::sendCursorStatus() {
 	if (havecursorid) {
 
 		// tell the server we already have a cursor
-		sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
+		sqlrc->cs()->write((uint16_t)DONT_NEED_NEW_CURSOR);
 
 		// send the cursor id to the server
-		sqlrc->cs->write(cursorid);
+		sqlrc->cs()->write(cursorid);
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Requesting Cursor: ");
 			sqlrc->debugPrint((int64_t)cursorid);
@@ -1915,9 +1915,9 @@ void sqlrcursor::sendCursorStatus() {
 	} else {
 
 		// tell the server we need a cursor
-		sqlrc->cs->write((uint16_t)NEED_NEW_CURSOR);
+		sqlrc->cs()->write((uint16_t)NEED_NEW_CURSOR);
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Requesting a new cursor.\n");
 			sqlrc->debugPreEnd();
@@ -1938,7 +1938,7 @@ void sqlrcursor::sendInputBinds() {
 		}
 	}
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending ");
 		sqlrc->debugPrint((int64_t)count);
@@ -1947,7 +1947,7 @@ void sqlrcursor::sendInputBinds() {
 	}
 
 	// write the input bind variables/values to the server.
-	sqlrc->cs->write(count);
+	sqlrc->cs()->write(count);
 	uint16_t	size;
 	i=0;
 	while (i<count) {
@@ -1959,9 +1959,9 @@ void sqlrcursor::sendInputBinds() {
 
 		// send the variable
 		size=charstring::length((*inbindvars)[i].variable);
-		sqlrc->cs->write(size);
-		sqlrc->cs->write((*inbindvars)[i].variable,(size_t)size);
-		if (sqlrc->debug) {
+		sqlrc->cs()->write(size);
+		sqlrc->cs()->write((*inbindvars)[i].variable,(size_t)size);
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint((*inbindvars)[i].variable);
 			sqlrc->debugPrint("(");
@@ -1969,26 +1969,26 @@ void sqlrcursor::sendInputBinds() {
 		}
 
 		// send the type
-		sqlrc->cs->write((uint16_t)(*inbindvars)[i].type);
+		sqlrc->cs()->write((uint16_t)(*inbindvars)[i].type);
 
 		// send the value
 		if ((*inbindvars)[i].type==BINDVARTYPE_NULL) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPrint(":NULL)\n");
 				sqlrc->debugPreEnd();
 			}
 
 		} else if ((*inbindvars)[i].type==BINDVARTYPE_STRING) {
 
-			sqlrc->cs->write((*inbindvars)[i].valuesize);
+			sqlrc->cs()->write((*inbindvars)[i].valuesize);
 			if ((*inbindvars)[i].valuesize>0) {
-				sqlrc->cs->write((*inbindvars)[i].
+				sqlrc->cs()->write((*inbindvars)[i].
 							value.stringval,
 					(size_t)(*inbindvars)[i].valuesize);
 			}
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPrint(":STRING)=");
 				sqlrc->debugPrint((*inbindvars)[i].
 							value.stringval);
@@ -2002,10 +2002,10 @@ void sqlrcursor::sendInputBinds() {
 
 		} else if ((*inbindvars)[i].type==BINDVARTYPE_INTEGER) {
 
-			sqlrc->cs->write((uint64_t)(*inbindvars)[i].
+			sqlrc->cs()->write((uint64_t)(*inbindvars)[i].
 							value.integerval);
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPrint(":LONG)=");
 				sqlrc->debugPrint((int64_t)(*inbindvars)[i].
 							value.integerval);
@@ -2015,14 +2015,14 @@ void sqlrcursor::sendInputBinds() {
 
 		} else if ((*inbindvars)[i].type==BINDVARTYPE_DOUBLE) {
 
-			sqlrc->cs->write((double)(*inbindvars)[i].value.
+			sqlrc->cs()->write((double)(*inbindvars)[i].value.
 							doubleval.value);
-			sqlrc->cs->write((*inbindvars)[i].value.
+			sqlrc->cs()->write((*inbindvars)[i].value.
 							doubleval.precision);
-			sqlrc->cs->write((*inbindvars)[i].value.
+			sqlrc->cs()->write((*inbindvars)[i].value.
 							doubleval.scale);
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPrint(":DOUBLE)=");
 				sqlrc->debugPrint((*inbindvars)[i].value.
 							doubleval.value);
@@ -2038,27 +2038,27 @@ void sqlrcursor::sendInputBinds() {
 
 		} else if ((*inbindvars)[i].type==BINDVARTYPE_DATE) {
 
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs()->write((uint16_t)
 					(*inbindvars)[i].value.dateval.year);
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs()->write((uint16_t)
 					(*inbindvars)[i].value.dateval.month);
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs()->write((uint16_t)
 					(*inbindvars)[i].value.dateval.day);
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs()->write((uint16_t)
 					(*inbindvars)[i].value.dateval.hour);
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs()->write((uint16_t)
 					(*inbindvars)[i].value.dateval.minute);
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs()->write((uint16_t)
 					(*inbindvars)[i].value.dateval.second);
-			sqlrc->cs->write((uint32_t)
+			sqlrc->cs()->write((uint32_t)
 					(*inbindvars)[i].value.
 							dateval.microsecond);
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs()->write((uint16_t)
 					charstring::length(
 					(*inbindvars)[i].value.dateval.tz));
-			sqlrc->cs->write((*inbindvars)[i].value.dateval.tz);
+			sqlrc->cs()->write((*inbindvars)[i].value.dateval.tz);
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPrint(":DATE)=");
 				sqlrc->debugPrint((int64_t)
 					(*inbindvars)[i].value.dateval.year);
@@ -2091,14 +2091,14 @@ void sqlrcursor::sendInputBinds() {
 		} else if ((*inbindvars)[i].type==BINDVARTYPE_BLOB ||
 				(*inbindvars)[i].type==BINDVARTYPE_CLOB) {
 
-			sqlrc->cs->write((*inbindvars)[i].valuesize);
+			sqlrc->cs()->write((*inbindvars)[i].valuesize);
 			if ((*inbindvars)[i].valuesize>0) {
-				sqlrc->cs->write((*inbindvars)[i].
+				sqlrc->cs()->write((*inbindvars)[i].
 					value.lobval,
 					(size_t)(*inbindvars)[i].valuesize);
 			}
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				if ((*inbindvars)[i].type==
 							BINDVARTYPE_BLOB) {
 					sqlrc->debugPrint(":BLOB)=");
@@ -2138,7 +2138,7 @@ void sqlrcursor::sendOutputBinds() {
 		}
 	}
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending ");
 		sqlrc->debugPrint((int64_t)count);
@@ -2147,7 +2147,7 @@ void sqlrcursor::sendOutputBinds() {
 	}
 
 	// write the output bind variables to the server.
-	sqlrc->cs->write(count);
+	sqlrc->cs()->write(count);
 	uint16_t	size;
 	i=0;
 	while (i<count) {
@@ -2159,17 +2159,17 @@ void sqlrcursor::sendOutputBinds() {
 
 		// send the variable, type and size that the buffer needs to be
 		size=charstring::length((*outbindvars)[i].variable);
-		sqlrc->cs->write(size);
-		sqlrc->cs->write((*outbindvars)[i].variable,(size_t)size);
-		sqlrc->cs->write((uint16_t)(*outbindvars)[i].type);
+		sqlrc->cs()->write(size);
+		sqlrc->cs()->write((*outbindvars)[i].variable,(size_t)size);
+		sqlrc->cs()->write((uint16_t)(*outbindvars)[i].type);
 		if ((*outbindvars)[i].type==BINDVARTYPE_STRING ||
 			(*outbindvars)[i].type==BINDVARTYPE_BLOB ||
 			(*outbindvars)[i].type==BINDVARTYPE_CLOB ||
 			(*outbindvars)[i].type==BINDVARTYPE_NULL) {
-			sqlrc->cs->write((*outbindvars)[i].valuesize);
+			sqlrc->cs()->write((*outbindvars)[i].valuesize);
 		}
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint((*outbindvars)[i].variable);
 			const char	*bindtype=NULL;
@@ -2220,19 +2220,19 @@ void sqlrcursor::sendOutputBinds() {
 void sqlrcursor::sendGetColumnInfo() {
 
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Send Column Info: yes\n");
 			sqlrc->debugPreEnd();
 		}
-		sqlrc->cs->write((uint16_t)SEND_COLUMN_INFO);
+		sqlrc->cs()->write((uint16_t)SEND_COLUMN_INFO);
 	} else {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Send Column Info: no\n");
 			sqlrc->debugPreEnd();
 		}
-		sqlrc->cs->write((uint16_t)DONT_SEND_COLUMN_INFO);
+		sqlrc->cs()->write((uint16_t)DONT_SEND_COLUMN_INFO);
 	}
 }
 
@@ -2312,7 +2312,7 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 
 bool sqlrcursor::skipAndFetch(bool getallrows, uint64_t rowtoget) {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Skipping and Fetching\n");
 		if (!getallrows) {
@@ -2338,7 +2338,7 @@ bool sqlrcursor::skipAndFetch(bool getallrows, uint64_t rowtoget) {
 
 void sqlrcursor::fetchRows() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Fetching ");
 		sqlrc->debugPrint((int64_t)rsbuffersize);
@@ -2352,7 +2352,7 @@ void sqlrcursor::fetchRows() {
 	}
 
 	// otherwise, send to the connection the number of rows to send back
-	sqlrc->cs->write(rsbuffersize);
+	sqlrc->cs()->write(rsbuffersize);
 }
 
 bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
@@ -2388,7 +2388,7 @@ bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
 		skip=(rowtoget-(rowtoget%rsbuffersize))-rowcount; 
 		rowcount=rowcount+skip;
 	}
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Skipping ");
 		sqlrc->debugPrint((int64_t)skip);
@@ -2398,13 +2398,13 @@ bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
 
 	// if we're reading from a connection, send the connection the 
 	// number of rows to skip
-	sqlrc->cs->write(skip);
+	sqlrc->cs()->write(skip);
 	return true;
 }
 
 uint16_t sqlrcursor::getErrorStatus() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Checking For An Error...\n");
 		sqlrc->debugPreEnd();
@@ -2412,8 +2412,8 @@ uint16_t sqlrcursor::getErrorStatus() {
 
 	// get a flag indicating whether there's been an error or not
 	uint16_t	err;
-	int32_t	result=getShort(&err,sqlrc->responsetimeoutsec,
-					sqlrc->responsetimeoutusec);
+	int32_t	result=getShort(&err,sqlrc->responsetimeoutsec(),
+					sqlrc->responsetimeoutusec());
 	if (result==RESULT_TIMEOUT) {
 		setError("Timeout while determining whether "
 				"an error occurred or not.\n");
@@ -2426,7 +2426,7 @@ uint16_t sqlrcursor::getErrorStatus() {
 	}
 
 	if (err==NO_ERROR_OCCURRED) {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("none.\n");
 			sqlrc->debugPreEnd();
@@ -2435,7 +2435,7 @@ uint16_t sqlrcursor::getErrorStatus() {
 		return NO_ERROR_OCCURRED;
 	}
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("error!!!\n");
 		sqlrc->debugPreEnd();
@@ -2445,12 +2445,12 @@ uint16_t sqlrcursor::getErrorStatus() {
 
 bool sqlrcursor::getCursorId() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Getting Cursor ID...\n");
 		sqlrc->debugPreEnd();
 	}
-	if (sqlrc->cs->read(&cursorid)!=sizeof(uint16_t)) {
+	if (sqlrc->cs()->read(&cursorid)!=sizeof(uint16_t)) {
 		if (!error) {
 			char	*err=error::getErrorString();
 			stringbuffer	errstr;
@@ -2463,7 +2463,7 @@ bool sqlrcursor::getCursorId() {
 		return false;
 	}
 	havecursorid=true;
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Cursor ID: ");
 		sqlrc->debugPrint((int64_t)cursorid);
@@ -2477,7 +2477,7 @@ bool sqlrcursor::getSuspended() {
 
 	// see if the result set of that cursor is actually suspended
 	uint16_t	suspendedresultset;
-	if (sqlrc->cs->read(&suspendedresultset)!=sizeof(uint16_t)) {
+	if (sqlrc->cs()->read(&suspendedresultset)!=sizeof(uint16_t)) {
 		setError("Failed to determine whether "
 			"the session was suspended or not.\n "
 			"A network error may have ocurred.");
@@ -2489,7 +2489,7 @@ bool sqlrcursor::getSuspended() {
 		// If it was suspended the server will send the index of the 
 		// last row from the previous result set.
 		// Initialize firstrowindex and rowcount from this index.
-		if (sqlrc->cs->read(&firstrowindex)!=sizeof(uint64_t)) {
+		if (sqlrc->cs()->read(&firstrowindex)!=sizeof(uint64_t)) {
 			setError("Failed to get the index of the "
 				"last row of a previously suspended result "
 				"set.\n A network error may have ocurred.");
@@ -2497,7 +2497,7 @@ bool sqlrcursor::getSuspended() {
 		}
 		rowcount=firstrowindex+1;
 	
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Previous result set was ");
 	       		sqlrc->debugPrint("suspended at row index: ");
@@ -2508,7 +2508,7 @@ bool sqlrcursor::getSuspended() {
 
 	} else {
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Previous result set was ");
 	       		sqlrc->debugPrint("not suspended.\n");
@@ -2520,7 +2520,7 @@ bool sqlrcursor::getSuspended() {
 
 bool sqlrcursor::parseColumnInfo() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Parsing Column Info\n");
 		sqlrc->debugPrint("Actual row count: ");
@@ -2539,20 +2539,20 @@ bool sqlrcursor::parseColumnInfo() {
 			setError("Failed to get the number of actual rows.\n A network error may have occurred.");
 			return false;
 		}
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint((int64_t)actualrows);
 			sqlrc->debugPreEnd();
 		}
 	} else {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("unknown");
 			sqlrc->debugPreEnd();
 		}
 	}
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPrint("Affected row count: ");
@@ -2571,20 +2571,20 @@ bool sqlrcursor::parseColumnInfo() {
 			setError("Failed to get the number of affected rows.\n A network error may have occurred.");
 			return false;
 		}
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint((int64_t)affectedrows);
 			sqlrc->debugPreEnd();
 		}
 	} else {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("unknown");
 			sqlrc->debugPreEnd();
 		}
 	}
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();
@@ -2601,7 +2601,7 @@ bool sqlrcursor::parseColumnInfo() {
 		setError("Failed to get the column count.\n A network error may have occurred.");
 		return false;
 	}
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Column count: ");
 		sqlrc->debugPrint((int64_t)colcount);
@@ -2725,7 +2725,7 @@ bool sqlrcursor::parseColumnInfo() {
 			// initialize the longest value
 			currentcol->longest=0;
 	
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("\"");
 				sqlrc->debugPrint(currentcol->name);
@@ -2806,7 +2806,7 @@ void sqlrcursor::createColumnBuffers() {
 
 bool sqlrcursor::parseOutputBinds() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Receiving Output Bind Values: \n");
 		sqlrc->debugPreEnd();
@@ -2820,7 +2820,7 @@ bool sqlrcursor::parseOutputBinds() {
 	// get the bind values
 	for (;;) {
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("	getting type...\n");
 			sqlrc->debugPreEnd();
@@ -2834,7 +2834,7 @@ bool sqlrcursor::parseOutputBinds() {
 			return false;
 		}
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("	done getting type: ");
 			sqlrc->debugPrint((int64_t)type);
@@ -2849,7 +2849,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 		} else if (type==NULL_DATA) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("	NULL output bind\n");
 				sqlrc->debugPreEnd();
@@ -2895,14 +2895,14 @@ bool sqlrcursor::parseOutputBinds() {
 				}
 			} 
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPrint("		");
 				sqlrc->debugPrint("done fetching.\n");
 			}
 
 		} else if (type==STRING_DATA) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("	STRING output bind\n");
 				sqlrc->debugPreEnd();
@@ -2917,7 +2917,7 @@ bool sqlrcursor::parseOutputBinds() {
 			(*outbindvars)[count].resultvaluesize=length;
 			(*outbindvars)[count].value.stringval=new char[length+1];
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		length=");
 				sqlrc->debugPrint((int64_t)length);
@@ -2934,7 +2934,7 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 			(*outbindvars)[count].value.stringval[length]='\0';
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		");
 				sqlrc->debugPrint("done fetching\n");
@@ -2943,7 +2943,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 		} else if (type==INTEGER_DATA) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("	INTEGER output bind\n");
 				sqlrc->debugPreEnd();
@@ -2957,7 +2957,7 @@ bool sqlrcursor::parseOutputBinds() {
 				return false;
 			}
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		");
 				sqlrc->debugPrint("done fetching\n");
@@ -2966,7 +2966,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 		} else if (type==DOUBLE_DATA) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("	DOUBLE output bind\n");
 				sqlrc->debugPreEnd();
@@ -2999,7 +2999,7 @@ bool sqlrcursor::parseOutputBinds() {
 				return false;
 			}
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		");
 				sqlrc->debugPrint("done fetching\n");
@@ -3008,7 +3008,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 		} else if (type==DATE_DATA) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("	DATE output bind\n");
 				sqlrc->debugPreEnd();
@@ -3092,7 +3092,7 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 			(*outbindvars)[count].value. dateval.tz[length]='\0';
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		");
 				sqlrc->debugPrint("done fetching\n");
@@ -3101,7 +3101,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 		} else if (type==CURSOR_DATA) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("	CURSOR output bind\n");
 				sqlrc->debugPreEnd();
@@ -3116,7 +3116,7 @@ bool sqlrcursor::parseOutputBinds() {
 				return false;
 			}
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		");
 				sqlrc->debugPrint("done fetching\n");
@@ -3125,7 +3125,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 		} else {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("	LOB/CLOB ");
 				sqlrc->debugPrint("output bind\n");
@@ -3141,7 +3141,7 @@ bool sqlrcursor::parseOutputBinds() {
 				return false;
 			}
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		length=");
 				sqlrc->debugPrint((int64_t)totallength);
@@ -3156,7 +3156,7 @@ bool sqlrcursor::parseOutputBinds() {
 			uint32_t	length;
 			for (;;) {
 
-				if (sqlrc->debug) {
+				if (sqlrc->debug()) {
 					sqlrc->debugPreStart();
 					sqlrc->debugPrint("		");
 					sqlrc->debugPrint("fetching...\n");
@@ -3199,7 +3199,7 @@ bool sqlrcursor::parseOutputBinds() {
 				offset=offset+length;
 			}
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("		");
 				sqlrc->debugPrint("done fetching.\n");
@@ -3216,7 +3216,7 @@ bool sqlrcursor::parseOutputBinds() {
 			(*outbindvars)[count].resultvaluesize=totallength;
 		}
 
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint((*outbindvars)[count].variable);
 			sqlrc->debugPrint("=");
@@ -3290,7 +3290,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 bool sqlrcursor::parseData() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Parsing Data\n");
 		sqlrc->debugPreEnd();
@@ -3298,7 +3298,7 @@ bool sqlrcursor::parseData() {
 
 	// if we're already at the end of the result set, then just return
 	if (endofresultset) {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Already at the end of the result set\n");
 			sqlrc->debugPreEnd();
@@ -3332,7 +3332,7 @@ bool sqlrcursor::parseData() {
 		// check for the end of the result set
 		if (type==END_RESULT_SET) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("Got end of result set.\n");
 				sqlrc->debugPreEnd();
@@ -3356,7 +3356,7 @@ bool sqlrcursor::parseData() {
 				}
 				currentrow=rows[rowbuffercount];
 			} else {
-				if (sqlrc->debug) {
+				if (sqlrc->debug()) {
 					sqlrc->debugPreStart();
 					sqlrc->debugPrint("Creating extra rows.\n");
 					sqlrc->debugPreEnd();
@@ -3480,7 +3480,7 @@ bool sqlrcursor::parseData() {
 		// add the buffer to the current row
 		currentrow->addField(colindex,buffer,length);
 	
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			if (buffer) {
 				if (type==END_LONG_DATA) {
@@ -3519,7 +3519,7 @@ bool sqlrcursor::parseData() {
 
 			colindex=0;
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
@@ -3570,7 +3570,7 @@ void sqlrcursor::createExtraRowArray() {
 
 void sqlrcursor::getErrorFromServer() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Getting Error From Server\n");
 		sqlrc->debugPreEnd();
@@ -3587,7 +3587,7 @@ void sqlrcursor::getErrorFromServer() {
 
 			// get the error string
 			error=new char[length+1];
-			sqlrc->cs->read(error,length);
+			sqlrc->cs()->read(error,length);
 			error[length]='\0';
 
 			networkerror=false;
@@ -3604,7 +3604,7 @@ void sqlrcursor::getErrorFromServer() {
 
 void sqlrcursor::setError(const char *err) {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Setting Error\n");
 		sqlrc->debugPreEnd();
@@ -3615,7 +3615,7 @@ void sqlrcursor::setError(const char *err) {
 
 void sqlrcursor::handleError() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint((int64_t)errorno);
 		sqlrc->debugPrint(":\n");
@@ -3648,15 +3648,15 @@ bool sqlrcursor::fetchRowIntoBuffer(bool getallrows, uint64_t row,
 	// fetch more data from the connection
 	while (row>=(firstrowindex+rsbuffersize) && !endofresultset) {
 
-		if (sqlrc->connected || (cachesource && cachesourceind)) {
+		if (sqlrc->connected() || (cachesource && cachesourceind)) {
 
 			clearRows();
 
 			// if we're not fetching from a cached result set,
 			// tell the server to send one 
 			if (!cachesource && !cachesourceind) {
-				sqlrc->cs->write((uint16_t)FETCH_RESULT_SET);
-				sqlrc->cs->write(cursorid);
+				sqlrc->cs()->write((uint16_t)FETCH_RESULT_SET);
+				sqlrc->cs()->write(cursorid);
 			}
 
 			if (!skipAndFetch(getallrows,row) || !parseData()) {
@@ -3685,7 +3685,7 @@ int32_t sqlrcursor::getShort(uint16_t *integer,
 	if (cachesource && cachesourceind) {
 		return cachesource->read(integer);
 	} else {
-		return sqlrc->cs->read(integer,timeoutsec,timeoutusec);
+		return sqlrc->cs()->read(integer,timeoutsec,timeoutusec);
 	}
 }
 
@@ -3696,7 +3696,7 @@ int32_t sqlrcursor::getShort(uint16_t *integer) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(integer);
 	} else {
-		return sqlrc->cs->read(integer);
+		return sqlrc->cs()->read(integer);
 	}
 }
 
@@ -3707,7 +3707,7 @@ int32_t sqlrcursor::getLong(uint32_t *integer) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(integer);
 	} else {
-		return sqlrc->cs->read(integer);
+		return sqlrc->cs()->read(integer);
 	}
 }
 
@@ -3718,7 +3718,7 @@ int32_t sqlrcursor::getLongLong(uint64_t *integer) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(integer);
 	} else {
-		return sqlrc->cs->read(integer);
+		return sqlrc->cs()->read(integer);
 	}
 }
 
@@ -3729,7 +3729,7 @@ int32_t sqlrcursor::getString(char *string, int32_t size) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(string,size);
 	} else {
-		return sqlrc->cs->read(string,size);
+		return sqlrc->cs()->read(string,size);
 	}
 }
 
@@ -3740,13 +3740,13 @@ int32_t sqlrcursor::getDouble(double *value) {
 	if (cachesource && cachesourceind) {
 		return cachesource->read(value);
 	} else {
-		return sqlrc->cs->read(value);
+		return sqlrc->cs()->read(value);
 	}
 }
 
 bool sqlrcursor::fetchFromBindCursor() {
 
-	if (!endofresultset || !sqlrc->connected) {
+	if (!endofresultset || !sqlrc->connected()) {
 		return false;
 	}
 
@@ -3758,10 +3758,10 @@ bool sqlrcursor::fetchFromBindCursor() {
 	endofresultset=false;
 
 	// tell the server we're fetching from a bind cursor
-	sqlrc->cs->write((uint16_t)FETCH_FROM_BIND_CURSOR);
+	sqlrc->cs()->write((uint16_t)FETCH_FROM_BIND_CURSOR);
 
 	// send the cursor id to the server
-	sqlrc->cs->write((uint16_t)cursorid);
+	sqlrc->cs()->write((uint16_t)cursorid);
 
 	sendGetColumnInfo();
 
@@ -3776,7 +3776,7 @@ bool sqlrcursor::fetchFromBindCursor() {
 
 bool sqlrcursor::openCachedResultSet(const char *filename) {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Opening cached result set: ");
 		sqlrc->debugPrint(filename);
@@ -3910,7 +3910,7 @@ const char * const *sqlrcursor::getColumnNames() {
 	}
 
 	if (!columnnamearray) {
-		if (sqlrc->debug) {
+		if (sqlrc->debug()) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("Creating Column Arrays...\n");
 			sqlrc->debugPreEnd();
@@ -4108,8 +4108,8 @@ int64_t sqlrcursor::errorNumber() {
 	// the message to see which code to return
 	if (error) {
 		return errorno;
-	} else if (sqlrc->error) {
-		return sqlrc->errorno;
+	} else if (sqlrc->error()) {
+		return sqlrc->errorno();
 	}
 	return 0;
 }
@@ -4117,8 +4117,8 @@ int64_t sqlrcursor::errorNumber() {
 const char *sqlrcursor::errorMessage() {
 	if (error) {
 		return error;
-	} else if (sqlrc->error) {
-		return sqlrc->error;
+	} else if (sqlrc->error()) {
+		return sqlrc->error();
 	}
 	return NULL;
 }
@@ -4320,16 +4320,16 @@ void sqlrcursor::createFieldLengths() {
 
 void sqlrcursor::suspendResultSet() {
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Suspending Result Set\n");
 		sqlrc->debugPreEnd();
 	}
 
-	if (sqlrc->connected && !cached) {
+	if (sqlrc->connected() && !cached) {
 
-		sqlrc->cs->write((uint16_t)SUSPEND_RESULT_SET);
-		sqlrc->cs->write(cursorid);
+		sqlrc->cs()->write((uint16_t)SUSPEND_RESULT_SET);
+		sqlrc->cs()->write(cursorid);
 
 		sqlrc->flushWriteBuffer();
 	}
@@ -4353,7 +4353,7 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 	}
 	clearResultSet();
 
-	if (!sqlrc->connected) {
+	if (!sqlrc->connected()) {
 		return false;
 	}
 
@@ -4361,7 +4361,7 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 	resumed=true;
 	endofresultset=false;
 
-	if (sqlrc->debug) {
+	if (sqlrc->debug()) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Resuming Result Set of Cursor: ");
 		sqlrc->debugPrint((int64_t)id);
@@ -4370,11 +4370,11 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 	}
 
 	// tell the server we want to resume the result set
-	sqlrc->cs->write((uint16_t)RESUME_RESULT_SET);
+	sqlrc->cs()->write((uint16_t)RESUME_RESULT_SET);
 
 	// send the id of the cursor we want to 
 	// resume the result set of to the server
-	sqlrc->cs->write(id);
+	sqlrc->cs()->write(id);
 
 	// process the result set
 	if (!charstring::isNullOrEmpty(filename)) {
@@ -4403,9 +4403,9 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 	// won't have to abort the result set in that case, the server will
 	// do it.
 
-	if (sqlrc->connected || cached) {
+	if (sqlrc->connected() || cached) {
 		if (cachedest && cachedestind) {
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("Getting the rest of the result set, since this is a cached result set.\n");
 				sqlrc->debugPreEnd();
@@ -4416,9 +4416,9 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 				// if we're not fetching from a cached result 
 				// set tell the server to send one 
 				if (!cachesource && !cachesourceind) {
-					sqlrc->cs->write((uint16_t)
+					sqlrc->cs()->write((uint16_t)
 							FETCH_RESULT_SET);
-					sqlrc->cs->write(cursorid);
+					sqlrc->cs()->write(cursorid);
 				}
 
 				// parseData should call finishCaching when
@@ -4432,7 +4432,7 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 			}
 		} else if (closeremote && havecursorid) {
 
-			if (sqlrc->debug) {
+			if (sqlrc->debug()) {
 				sqlrc->debugPreStart();
 				sqlrc->debugPrint("Aborting Result "
 							"Set For Cursor: ");
@@ -4441,9 +4441,9 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 				sqlrc->debugPreEnd();
 			}
 
-			sqlrc->cs->write((uint16_t)ABORT_RESULT_SET);
-			sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
-			sqlrc->cs->write(cursorid);
+			sqlrc->cs()->write((uint16_t)ABORT_RESULT_SET);
+			sqlrc->cs()->write((uint16_t)DONT_NEED_NEW_CURSOR);
+			sqlrc->cs()->write(cursorid);
 			sqlrc->flushWriteBuffer();
 		}
 	}
@@ -4576,7 +4576,7 @@ char *sqlrcursor::getQueryTree() {
 	endofresultset=false;
 
 	// tell the server we want to get a db list
-	sqlrc->cs->write((uint16_t)GET_QUERY_TREE);
+	sqlrc->cs()->write((uint16_t)GET_QUERY_TREE);
 
 	// tell the server whether we'll need a cursor or not
 	sendCursorStatus();
@@ -4598,13 +4598,13 @@ char *sqlrcursor::getQueryTree() {
 
 	// get the size of the tree
 	uint64_t	querytreelen;
-	if (sqlrc->cs->read(&querytreelen)!=sizeof(uint64_t)) {
+	if (sqlrc->cs()->read(&querytreelen)!=sizeof(uint64_t)) {
 		return NULL;
 	}
 
 	// get the tree itself
 	char	*querytree=new char[querytreelen+1];
-	if ((uint64_t)sqlrc->cs->read(querytree,querytreelen)!=querytreelen) {
+	if ((uint64_t)sqlrc->cs()->read(querytree,querytreelen)!=querytreelen) {
 		delete[] querytree;
 		return NULL;
 	}

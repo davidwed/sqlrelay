@@ -41,85 +41,22 @@
 
 		void	flushWriteBuffer();
 
-		// clients
-		inetsocketclient	ics;
-		unixsocketclient	ucs;
-		socketclient		*cs;
+		socketclient	*cs();
+		bool		endsessionsent();
+		bool		suspendsessionsent();
+		bool		connected();
+		int32_t		responsetimeoutsec();
+		int32_t		responsetimeoutusec();
+		int64_t		errorno();
+		char		*error();
+		char		*clientinfo();
+		uint64_t	clientinfolen();
+		bool		debug();
+		void		firstcursor(sqlrcursor *cur);
+		void		lastcursor(sqlrcursor *cur);
+		sqlrcursor	*lastcursor();
 
-		// session state
-		bool	endsessionsent;
-		bool	suspendsessionsent;
-		bool	connected;
-
-		// connection
-		char		*server;
-		uint16_t	listenerinetport;
-		uint16_t	connectioninetport;
-		char		*listenerunixport;
-		const char	*connectionunixport;
-		char		connectionunixportbuffer[MAXPATHLEN+1];
-		int32_t		connecttimeoutsec;
-		int32_t		connecttimeoutusec;
-		int32_t		authtimeoutsec;
-		int32_t		authtimeoutusec;
-		int32_t		responsetimeoutsec;
-		int32_t		responsetimeoutusec;
-		int32_t		retrytime;
-		int32_t		tries;
-
-		// authentication
-		char		*user;
-		uint32_t	userlen;
-		char		*password;
-		uint32_t	passwordlen;
-
-		// gss
-		char		*kerberosservice;
-		gssmechanism	gmech;
-		gsscredentials	gcred;
-		gsscontext	gctx;
-
-		// error
-		int64_t		errorno;
-		char		*error;
-
-		// identify
-		char		*id;
-
-		// db version
-		char		*dbversion;
-
-		// db host name
-		char		*dbhostname;
-
-		// db ip address
-		char		*dbipaddress;
-
-		// server version
-		char		*serverversion;
-
-		// current database name
-		char		*currentdbname;
-
-		// bind format
-		char		*bindformat;
-
-		// client info
-		char		*clientinfo;
-		uint64_t	clientinfolen;
-
-		// debug
-		bool		debug;
-		int32_t		webdebug;
-		int		(*printfunction)(const char *,...);
-		file		debugfile;
-
-		// copy references flag
-		bool		copyrefs;
-
-		// cursor list
-		sqlrcursor	*firstcursor;
-		sqlrcursor	*lastcursor;
+		sqlrconnectionprivate	*pvt;
 
 	public:
 		sqlrconnection(const char *server, uint16_t port,

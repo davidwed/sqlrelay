@@ -12,6 +12,91 @@
 #include <defines.h>
 #include <defaults.h>
 
+class sqlrconnectionprivate {
+	friend class sqlrconnection;
+	private:
+
+		// clients
+		inetsocketclient	_ics;
+		unixsocketclient	_ucs;
+		socketclient		*_cs;
+
+		// session state
+		bool	_endsessionsent;
+		bool	_suspendsessionsent;
+		bool	_connected;
+
+		// connection
+		char		*_server;
+		uint16_t	_listenerinetport;
+		uint16_t	_connectioninetport;
+		char		*_listenerunixport;
+		const char	*_connectionunixport;
+		char		_connectionunixportbuffer[MAXPATHLEN+1];
+		int32_t		_connecttimeoutsec;
+		int32_t		_connecttimeoutusec;
+		int32_t		_authtimeoutsec;
+		int32_t		_authtimeoutusec;
+		int32_t		_responsetimeoutsec;
+		int32_t		_responsetimeoutusec;
+		int32_t		_retrytime;
+		int32_t		_tries;
+
+		// authentication
+		char		*_user;
+		uint32_t	_userlen;
+		char		*_password;
+		uint32_t	_passwordlen;
+
+		// gss
+		char		*_kerberosservice;
+		gssmechanism	_gmech;
+		gsscredentials	_gcred;
+		gsscontext	_gctx;
+
+		// error
+		int64_t		_errorno;
+		char		*_error;
+
+		// identify
+		char		*_id;
+
+		// db version
+		char		*_dbversion;
+
+		// db host name
+		char		*_dbhostname;
+
+		// db ip address
+		char		*_dbipaddress;
+
+		// server version
+		char		*_serverversion;
+
+		// current database name
+		char		*_currentdbname;
+
+		// bind format
+		char		*_bindformat;
+
+		// client info
+		char		*_clientinfo;
+		uint64_t	_clientinfolen;
+
+		// debug
+		bool		_debug;
+		int32_t		_webdebug;
+		int		(*_printfunction)(const char *,...);
+		file		_debugfile;
+
+		// copy references flag
+		bool		_copyrefs;
+
+		// cursor list
+		sqlrcursor	*_firstcursor;
+		sqlrcursor	*_lastcursor;
+};
+
 sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 					const char *socket,
 					const char *user, const char *password, 
@@ -33,75 +118,77 @@ void sqlrconnection::init(const char *server, uint16_t port,
 					int32_t retrytime, int32_t tries,
 					bool copyreferences) {
 
-	copyrefs=copyreferences;
+	pvt=new sqlrconnectionprivate;
+
+	pvt->_copyrefs=copyreferences;
 
 	// retry reads if they get interrupted by signals
-	ucs.translateByteOrder();
-	ucs.retryInterruptedReads();
-	ics.retryInterruptedReads();
-	cs=&ucs;
+	pvt->_ucs.translateByteOrder();
+	pvt->_ucs.retryInterruptedReads();
+	pvt->_ics.retryInterruptedReads();
+	pvt->_cs=&pvt->_ucs;
 
 	// connection
-	this->server=(copyrefs)?
+	this->pvt->_server=(pvt->_copyrefs)?
 			charstring::duplicate(server):
 			(char *)server;
-	listenerinetport=port;
-	listenerunixport=(copyrefs)?
+	pvt->_listenerinetport=port;
+	pvt->_listenerunixport=(pvt->_copyrefs)?
 				charstring::duplicate(socket):
 				(char *)socket;
-	this->retrytime=retrytime;
-	this->tries=tries;
+	this->pvt->_retrytime=retrytime;
+	this->pvt->_tries=tries;
 
 	// initialize timeouts
 	setTimeoutFromEnv("SQLR_CLIENT_CONNECT_TIMEOUT",
-				&connecttimeoutsec,&connecttimeoutusec);
+				&pvt->_connecttimeoutsec,&pvt->_connecttimeoutusec);
 	setTimeoutFromEnv("SQLR_CLIENT_AUTHENTICATION_TIMEOUT",
-				&authtimeoutsec,&authtimeoutusec);
+				&pvt->_authtimeoutsec,&pvt->_authtimeoutusec);
 	setTimeoutFromEnv("SQLR_CLIENT_RESPONSE_TIMEOUT",
-				&responsetimeoutsec,&responsetimeoutusec);
+				&pvt->_responsetimeoutsec,&pvt->_responsetimeoutusec);
 
 	// authentication
-	this->user=(copyrefs)?
+	this->pvt->_user=(pvt->_copyrefs)?
 			charstring::duplicate(user):
 			(char *)user;
-	this->password=(copyrefs)?
+	this->pvt->_password=(pvt->_copyrefs)?
 			charstring::duplicate(password):
 			(char *)password;
-	userlen=charstring::length(user);
-	passwordlen=charstring::length(password);
-	kerberosservice=NULL;
+	pvt->_userlen=charstring::length(user);
+	pvt->_passwordlen=charstring::length(password);
+	pvt->_kerberosservice=NULL;
 
 	// database id
-	id=NULL;
+	pvt->_id=NULL;
 
 	// db version
-	dbversion=NULL;
+	pvt->_dbversion=NULL;
 
 	// db host name
-	dbhostname=NULL;
+	pvt->_dbhostname=NULL;
 
 	// db ip address
-	dbipaddress=NULL;
+	pvt->_dbipaddress=NULL;
 
 	// server version
-	serverversion=NULL;
+	pvt->_serverversion=NULL;
 
 	// current database name
-	currentdbname=NULL;
+	pvt->_currentdbname=NULL;
 
 	// bind format
-	bindformat=NULL;
+	pvt->_bindformat=NULL;
 
 	// client info
-	clientinfo=NULL;
-	clientinfolen=0;
+	pvt->_clientinfo=NULL;
+	pvt->_clientinfolen=0;
 
 	// session state
-	connected=false;
+	pvt->_connected=false;
 	clearSessionFlags();
 
 	// debug print function
-	printfunction=NULL;
+	pvt->_printfunction=NULL;
 
 	// enable/disable debug
 	const char	*sqlrdebug=environment::getValue("SQLRDEBUG");
@@ -114,138 +201,140 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	const char	*noset[]={"NO","OFF","FALSE","N","F","0",
 					"no","off","false","n","f",
 					"No","Off","False",NULL};
-	debug=(sqlrdebug && *sqlrdebug && !charstring::inSet(sqlrdebug,noset));
-	if (debug && !charstring::inSet(sqlrdebug,yesset) &&
+	pvt->_debug=(sqlrdebug && *sqlrdebug && !charstring::inSet(sqlrdebug,noset));
+	if (pvt->_debug && !charstring::inSet(sqlrdebug,yesset) &&
 			!charstring::inSet(sqlrdebug,noset)) {
 		setDebugFile(sqlrdebug);
 	}
-	webdebug=-1;
+	pvt->_webdebug=-1;
 
 	// copy references, delete cursors flags
-	copyrefs=false;
+	pvt->_copyrefs=false;
 
 	// error
-	errorno=0;
-	error=NULL;
+	pvt->_errorno=0;
+	pvt->_error=NULL;
 
 	// cursor list
-	firstcursor=NULL;
-	lastcursor=NULL;
+	pvt->_firstcursor=NULL;
+	pvt->_lastcursor=NULL;
 }
 
 void sqlrconnection::clearSessionFlags() {
 
 	// indicate that the session hasn't been suspended or ended
-	endsessionsent=false;
-	suspendsessionsent=false;
+	pvt->_endsessionsent=false;
+	pvt->_suspendsessionsent=false;
 }
 
 sqlrconnection::~sqlrconnection() {
 
 	// unless it was already ended or suspended, end the session
-	if (!endsessionsent && !suspendsessionsent) {
+	if (!pvt->_endsessionsent && !pvt->_suspendsessionsent) {
 		endSession();
 	}
 
 	// deallocate id
-	delete[] id;
+	delete[] pvt->_id;
 
 	// deallocate dbversion
-	delete[] dbversion;
+	delete[] pvt->_dbversion;
 
 	// deallocate db host name
-	delete[] dbhostname;
+	delete[] pvt->_dbhostname;
 
 	// deallocate db ip address
-	delete[] dbipaddress;
+	delete[] pvt->_dbipaddress;
 
 	// deallocate bindformat
-	delete[] bindformat;
+	delete[] pvt->_bindformat;
 
 	// deallocate client info
-	delete[] clientinfo;
+	delete[] pvt->_clientinfo;
 
 	// deallocate copied references
-	if (copyrefs) {
-		delete[] server;
-		delete[] listenerunixport;
-		delete[] user;
-		delete[] password;
-		delete[] kerberosservice;
+	if (pvt->_copyrefs) {
+		delete[] pvt->_server;
+		delete[] pvt->_listenerunixport;
+		delete[] pvt->_user;
+		delete[] pvt->_password;
+		delete[] pvt->_kerberosservice;
 	}
 
 	// detach all cursors attached to this client
-	sqlrcursor	*currentcursor=firstcursor;
+	sqlrcursor	*currentcursor=pvt->_firstcursor;
 	while (currentcursor) {
-		firstcursor=currentcursor;
+		pvt->_firstcursor=currentcursor;
 		currentcursor=currentcursor->next;
-		firstcursor->sqlrc=NULL;
+		pvt->_firstcursor->sqlrc=NULL;
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Deallocated connection\n");
 		debugPreEnd();
 	}
 
-	debugfile.close();
+	pvt->_debugfile.close();
+
+	delete pvt;
 }
 
 void sqlrconnection::useKerberos(const char *service) {
 
-	if (copyrefs) {
-		delete[] kerberosservice;
-		kerberosservice=charstring::duplicate(
+	if (pvt->_copyrefs) {
+		delete[] pvt->_kerberosservice;
+		pvt->_kerberosservice=charstring::duplicate(
 				(!charstring::isNullOrEmpty(service))?
 						service:DEFAULT_KRBSERVICE);
 	} else {
-		kerberosservice=
+		pvt->_kerberosservice=
 			(char *)((!charstring::isNullOrEmpty(service))?
 						service:DEFAULT_KRBSERVICE);
 	}
 
 	if (gss::supportsGSS()) {
 
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("kerberos service: ");
-			debugPrint(kerberosservice);
+			debugPrint(pvt->_kerberosservice);
 			debugPrint("\n");
 			debugPreEnd();
 		}
 
-		gmech.initialize((const char *)NULL);
-		gcred.clearDesiredMechanisms();
-		gcred.addDesiredMechanism(&gmech);
-		gctx.setDesiredMechanism(&gmech);
-		gctx.setDesiredFlags(0);
-		gctx.setService(kerberosservice);
+		pvt->_gmech.initialize((const char *)NULL);
+		pvt->_gcred.clearDesiredMechanisms();
+		pvt->_gcred.addDesiredMechanism(&pvt->_gmech);
+		pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
+		pvt->_gctx.setDesiredFlags(0);
+		pvt->_gctx.setService(pvt->_kerberosservice);
 	}
 }
 
 void sqlrconnection::useNoEncryption() {
-	if (copyrefs) {
-		delete[] kerberosservice;
-		kerberosservice=NULL;
+	if (pvt->_copyrefs) {
+		delete[] pvt->_kerberosservice;
+		pvt->_kerberosservice=NULL;
 	}
 }
 
 void sqlrconnection::setConnectTimeout(int32_t timeoutsec,
 					int32_t timeoutusec) {
-	connecttimeoutsec=timeoutsec;
-	connecttimeoutusec=timeoutusec;
+	pvt->_connecttimeoutsec=timeoutsec;
+	pvt->_connecttimeoutusec=timeoutusec;
 }
 
 void sqlrconnection::setAuthenticationTimeout(int32_t timeoutsec,
 						int32_t timeoutusec) {
-	authtimeoutsec=timeoutsec;
-	authtimeoutusec=timeoutusec;
+	pvt->_authtimeoutsec=timeoutsec;
+	pvt->_authtimeoutusec=timeoutusec;
 }
 
 void sqlrconnection::setResponseTimeout(int32_t timeoutsec,
 						int32_t timeoutusec) {
-	responsetimeoutsec=timeoutsec;
-	responsetimeoutusec=timeoutusec;
+	pvt->_responsetimeoutsec=timeoutsec;
+	pvt->_responsetimeoutusec=timeoutusec;
 }
 
 void sqlrconnection::setTimeoutFromEnv(const char *var,
@@ -265,14 +354,14 @@ void sqlrconnection::setTimeoutFromEnv(const char *var,
 
 void sqlrconnection::endSession() {
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Ending Session\n");
 		debugPreEnd();
 	}
 
 	// abort each cursor's result set
-	sqlrcursor	*currentcursor=firstcursor;
+	sqlrcursor	*currentcursor=pvt->_firstcursor;
 	while (currentcursor) {
 		// FIXME: do we need to clearResultSet() here too?
 		if (!currentcursor->endofresultset) {
@@ -283,21 +372,21 @@ void sqlrconnection::endSession() {
 	}
 
 	// write an END_SESSION to the connection
-	if (connected) {
-		cs->write((uint16_t)END_SESSION);
+	if (pvt->_connected) {
+		pvt->_cs->write((uint16_t)END_SESSION);
 		flushWriteBuffer();
-		endsessionsent=true;
+		pvt->_endsessionsent=true;
 		closeConnection();
 	}
 }
 
 void sqlrconnection::flushWriteBuffer() {
-	cs->flushWriteBuffer(-1,-1);
+	pvt->_cs->flushWriteBuffer(-1,-1);
 }
 
 void sqlrconnection::closeConnection() {
-	cs->close();
-	connected=false;
+	pvt->_cs->close();
+	pvt->_connected=false;
 }
 
 bool sqlrconnection::suspendSession() {
@@ -308,16 +397,16 @@ bool sqlrconnection::suspendSession() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Suspending Session\n");
 		debugPreEnd();
 	}
 
 	// suspend the session
-	cs->write((uint16_t)SUSPEND_SESSION);
+	pvt->_cs->write((uint16_t)SUSPEND_SESSION);
 	flushWriteBuffer();
-	suspendsessionsent=true;
+	pvt->_suspendsessionsent=true;
 
 	// check for error
 	if (gotError()) {
@@ -334,13 +423,13 @@ bool sqlrconnection::suspendSession() {
 
 bool sqlrconnection::openSession() {
 
-	if (connected) {
+	if (pvt->_connected) {
 		return true;
 	}
 
 	reConfigureSockets();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Connecting to listener...");
 		debugPrint("\n");
@@ -351,53 +440,54 @@ bool sqlrconnection::openSession() {
 	int	openresult=RESULT_ERROR;
 
 	// first, try for a unix connection
-	if (!charstring::isNullOrEmpty(listenerunixport)) {
+	if (!charstring::isNullOrEmpty(pvt->_listenerunixport)) {
 
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("Unix socket: ");
-			debugPrint(listenerunixport);
+			debugPrint(pvt->_listenerunixport);
 			debugPrint("\n");
 			debugPreEnd();
 		}
 
-		openresult=ucs.connect(listenerunixport,
-						connecttimeoutsec,
-						connecttimeoutusec,
-						retrytime,tries);
+		openresult=pvt->_ucs.connect(pvt->_listenerunixport,
+						pvt->_connecttimeoutsec,
+						pvt->_connecttimeoutusec,
+						pvt->_retrytime,pvt->_tries);
 		if (openresult==RESULT_SUCCESS) {
-			cs=&ucs;
+			pvt->_cs=&pvt->_ucs;
 		}
 	}
 
 	// then try for an inet connection
-	if (openresult!=RESULT_SUCCESS && listenerinetport) {
+	if (openresult!=RESULT_SUCCESS && pvt->_listenerinetport) {
 
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("Inet socket: ");
-			debugPrint(server);
+			debugPrint(pvt->_server);
 			debugPrint(":");
-			debugPrint((int64_t)listenerinetport);
+			debugPrint((int64_t)pvt->_listenerinetport);
 			debugPrint("\n");
 			debugPreEnd();
 		}
 
-		openresult=ics.connect(server,listenerinetport,
-						connecttimeoutsec,
-						connecttimeoutusec,
-						retrytime,tries);
+		openresult=pvt->_ics.connect(pvt->_server,
+						pvt->_listenerinetport,
+						pvt->_connecttimeoutsec,
+						pvt->_connecttimeoutusec,
+						pvt->_retrytime,pvt->_tries);
 		if (openresult==RESULT_SUCCESS) {
-			cs=&ics;
+			pvt->_cs=&pvt->_ics;
 		}
 	}
 
 	// handle failure to connect to listener
 	if (openresult!=RESULT_SUCCESS) {
-		if (debug && gss::supportsGSS() &&
-			kerberosservice && gctx.getMajorStatus()) {
+		if (pvt->_debug && gss::supportsGSS() &&
+			pvt->_kerberosservice && pvt->_gctx.getMajorStatus()) {
 			debugPreStart();
-			debugPrint(gctx.getMechanismMinorStatus());
+			debugPrint(pvt->_gctx.getMechanismMinorStatus());
 			debugPreEnd();
 		}
 		setError("Couldn't connect to the listener.");
@@ -411,81 +501,82 @@ bool sqlrconnection::openSession() {
 	authenticate();
 
 	// if we made it here then everything went well and we are successfully
-	// connected and authenticated with the connection daemon
-	connected=true;
+	// pvt->_connected and authenticated with the connection daemon
+	pvt->_connected=true;
 	return true;
 }
 
 void sqlrconnection::reConfigureSockets() {
 
-	ucs.dontUseNaglesAlgorithm();
-	//ucs.setTcpReadBufferSize(65536);
-	//ucs.setTcpWriteBufferSize(65536);
-	ucs.setReadBufferSize(65536);
-	ucs.setWriteBufferSize(65536);
+	pvt->_ucs.dontUseNaglesAlgorithm();
+	//pvt->_ucs.setTcpReadBufferSize(65536);
+	//pvt->_ucs.setTcpWriteBufferSize(65536);
+	pvt->_ucs.setReadBufferSize(65536);
+	pvt->_ucs.setWriteBufferSize(65536);
 
-	ics.dontUseNaglesAlgorithm();
-	//ics.setTcpReadBufferSize(65536);
-	//ics.setTcpWriteBufferSize(65536);
-	ics.setReadBufferSize(65536);
-	ics.setWriteBufferSize(65536);
+	pvt->_ics.dontUseNaglesAlgorithm();
+	//pvt->_ics.setTcpReadBufferSize(65536);
+	//pvt->_ics.setTcpWriteBufferSize(65536);
+	pvt->_ics.setReadBufferSize(65536);
+	pvt->_ics.setWriteBufferSize(65536);
 
-	if (gss::supportsGSS() && !charstring::isNullOrEmpty(kerberosservice)) {
+	if (gss::supportsGSS() &&
+		!charstring::isNullOrEmpty(pvt->_kerberosservice)) {
 
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("kerberos encryption/"
 					"authentication enabled\n");
 			debugPreEnd();
 		}
 
-		ucs.setGSSContext(&gctx);
-		ics.setGSSContext(&gctx);
+		pvt->_ucs.setGSSContext(&pvt->_gctx);
+		pvt->_ics.setGSSContext(&pvt->_gctx);
 
 	} else {
 
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("encryption disabled");
 			debugPreEnd();
 		}
 
-		ucs.setGSSContext(NULL);
-		ics.setGSSContext(NULL);
+		pvt->_ucs.setGSSContext(NULL);
+		pvt->_ics.setGSSContext(NULL);
 	}
 }
 
 void sqlrconnection::protocol() {
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Protocol : sqlrclient version 1\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)PROTOCOLVERSION);
-	cs->write((uint16_t)1);
+	pvt->_cs->write((uint16_t)PROTOCOLVERSION);
+	pvt->_cs->write((uint16_t)1);
 }
 
 void sqlrconnection::authenticate() {
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Authenticating : ");
-		debugPrint(user);
+		debugPrint(pvt->_user);
 		debugPrint(":");
-		debugPrint(password);
+		debugPrint(pvt->_password);
 		debugPrint("\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)AUTHENTICATE);
+	pvt->_cs->write((uint16_t)AUTHENTICATE);
 
-	cs->write(userlen);
-	cs->write(user,userlen);
+	pvt->_cs->write(pvt->_userlen);
+	pvt->_cs->write(pvt->_user,pvt->_userlen);
 
-	cs->write(passwordlen);
-	cs->write(password,passwordlen);
+	pvt->_cs->write(pvt->_passwordlen);
+	pvt->_cs->write(pvt->_password,pvt->_passwordlen);
 
 	flushWriteBuffer();
 }
@@ -494,7 +585,7 @@ bool sqlrconnection::getNewPort() {
 
 	// get the size of the unix port string
 	uint16_t	size;
-	if (cs->read(&size)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size)!=sizeof(uint16_t)) {
 		setError("Failed to get the size of the unix connection port.\n A network error may have ocurred.");
 		return false;
 	}
@@ -513,22 +604,22 @@ bool sqlrconnection::getNewPort() {
 	}
 
 	// get the unix port string
-	if (size && cs->read(connectionunixportbuffer,size)!=size) {
+	if (size && pvt->_cs->read(pvt->_connectionunixportbuffer,size)!=size) {
 		setError("Failed to get the unix connection port.\n A network error may have ocurred.");
 		return false;
 	}
-	connectionunixportbuffer[size]='\0';
-	connectionunixport=connectionunixportbuffer;
+	pvt->_connectionunixportbuffer[size]='\0';
+	pvt->_connectionunixport=pvt->_connectionunixportbuffer;
 
 	// get the inet port
-	if (cs->read(&connectioninetport)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&pvt->_connectioninetport)!=sizeof(uint16_t)) {
 		setError("Failed to get the inet connection port.\n A network error may have ocurred.");
 		return false;
 	}
 
 	// the server will send 0 for both the size of the unixport and 
 	// the inet port if a server error occurred
-	if (!size && !connectioninetport) {
+	if (!size && !pvt->_connectioninetport) {
 		setError("An error occurred on the server.");
 		return false;
 	}
@@ -537,95 +628,99 @@ bool sqlrconnection::getNewPort() {
 
 uint16_t sqlrconnection::getConnectionPort() {
 
-	if (!suspendsessionsent && !openSession()) {
+	if (!pvt->_suspendsessionsent && !openSession()) {
 		return 0;
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Getting connection port: ");
-		debugPrint((int64_t)connectioninetport);
+		debugPrint((int64_t)pvt->_connectioninetport);
 		debugPrint("\n");
 		debugPreEnd();
 	}
 
-	return connectioninetport;
+	return pvt->_connectioninetport;
 }
 
 const char *sqlrconnection::getConnectionSocket() {
 
-	if (!suspendsessionsent && !openSession()) {
+	if (!pvt->_suspendsessionsent && !openSession()) {
 		return NULL;
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Getting connection socket: ");
-		if (connectionunixport) {
-			debugPrint(connectionunixport);
+		if (pvt->_connectionunixport) {
+			debugPrint(pvt->_connectionunixport);
 		}
 		debugPrint("\n");
 		debugPreEnd();
 	}
 
-	if (connectionunixport) {
-		return connectionunixport;
+	if (pvt->_connectionunixport) {
+		return pvt->_connectionunixport;
 	}
 	return NULL;
 }
 
 bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
-	// if already connected, end the session
-	if (connected) {
+	// if already pvt->_connected, end the session
+	if (pvt->_connected) {
 		endSession();
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Resuming Session: ");
 		debugPreEnd();
 	}
 
 	// set the connectionunixport and connectioninetport values
-	if (copyrefs) {
+	if (pvt->_copyrefs) {
 		if (charstring::length(socket)<=MAXPATHLEN) {
-			charstring::copy(connectionunixportbuffer,socket);
-			connectionunixport=connectionunixportbuffer;
+			charstring::copy(pvt->_connectionunixportbuffer,socket);
+			pvt->_connectionunixport=pvt->_connectionunixportbuffer;
 		} else {
-			connectionunixport="";
+			pvt->_connectionunixport="";
 		}
 	} else {
-		connectionunixport=(char *)socket;
+		pvt->_connectionunixport=(char *)socket;
 	}
-	connectioninetport=port;
+	pvt->_connectioninetport=port;
 
 	reConfigureSockets();
 
 	// first, try for the unix port
 	if (!charstring::isNullOrEmpty(socket)) {
-		connected=(ucs.connect(socket,-1,-1,
-					retrytime,tries)==RESULT_SUCCESS);
-		if (connected) {
-			cs=&ucs;
+		pvt->_connected=(pvt->_ucs.connect(
+					socket,-1,-1,
+					pvt->_retrytime,
+					pvt->_tries)==RESULT_SUCCESS);
+		if (pvt->_connected) {
+			pvt->_cs=&pvt->_ucs;
 		}
 	}
 
 	// then try for the inet port
-	if (connected!=RESULT_SUCCESS) {
-		connected=(ics.connect(server,port,-1,-1,
-					retrytime,tries)==RESULT_SUCCESS);
-		if (connected) {
-			cs=&ics;
+	if (pvt->_connected!=RESULT_SUCCESS) {
+		pvt->_connected=(pvt->_ics.connect(
+					pvt->_server,port,-1,-1,
+					pvt->_retrytime,
+					pvt->_tries)==RESULT_SUCCESS);
+		if (pvt->_connected) {
+			pvt->_cs=&pvt->_ics;
 		}
 	}
 
-	if (connected) {
+	if (pvt->_connected) {
 
 		// send protocol info
 		protocol();
 
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("success");
 			debugPrint("\n");
@@ -633,7 +728,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		}
 		clearSessionFlags();
 	} else {
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("failure");
 			debugPrint("\n");
@@ -641,7 +736,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		}
 	}
 
-	return connected;
+	return pvt->_connected;
 }
 
 bool sqlrconnection::ping() {
@@ -652,13 +747,13 @@ bool sqlrconnection::ping() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Pinging...\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)PING);
+	pvt->_cs->write((uint16_t)PING);
 	flushWriteBuffer();
 
 	return !gotError();
@@ -672,14 +767,14 @@ const char *sqlrconnection::identify() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Identifying...\n");
 		debugPreEnd();
 	}
 
 	// tell the server we want the identity of the db
-	cs->write((uint16_t)IDENTIFY);
+	pvt->_cs->write((uint16_t)IDENTIFY);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -688,32 +783,32 @@ const char *sqlrconnection::identify() {
 
 	// get the identity size
 	uint16_t	size;
-	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to identify.\n "
 			"A network error may have ocurred.");
 		return NULL;
 	}
 
 	// get the identity
-	delete[] id;
-	id=new char[size+1];
-	if (cs->read(id,size)!=size) {
+	delete[] pvt->_id;
+	pvt->_id=new char[size+1];
+	if (pvt->_cs->read(pvt->_id,size)!=size) {
 		setError("Failed to identify.\n "
 			"A network error may have ocurred.");
-		delete[] id;
-		id=NULL;
+		delete[] pvt->_id;
+		pvt->_id=NULL;
 		return NULL;
 	}
-	id[size]='\0';
+	pvt->_id[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(id);
+		debugPrint(pvt->_id);
 		debugPrint("\n");
 		debugPreEnd();
 	}
-	return id;
+	return pvt->_id;
 }
 
 const char *sqlrconnection::dbVersion() {
@@ -724,7 +819,7 @@ const char *sqlrconnection::dbVersion() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("DB Version...");
 		debugPrint("\n");
@@ -732,7 +827,7 @@ const char *sqlrconnection::dbVersion() {
 	}
 
 	// tell the server we want the db version
-	cs->write((uint16_t)DBVERSION);
+	pvt->_cs->write((uint16_t)DBVERSION);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -741,32 +836,32 @@ const char *sqlrconnection::dbVersion() {
 
 	// get the db version size
 	uint16_t	size;
-	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get DB version.\n "
 			"A network error may have ocurred.");
 		return NULL;
 	} 
 
 	// get the db version
-	delete[] dbversion;
-	dbversion=new char[size+1];
-	if (cs->read(dbversion,size)!=size) {
+	delete[] pvt->_dbversion;
+	pvt->_dbversion=new char[size+1];
+	if (pvt->_cs->read(pvt->_dbversion,size)!=size) {
 		setError("Failed to get DB version.\n "
 			"A network error may have ocurred.");
-		delete[] dbversion;
-		dbversion=NULL;
+		delete[] pvt->_dbversion;
+		pvt->_dbversion=NULL;
 		return NULL;
 	}
-	dbversion[size]='\0';
+	pvt->_dbversion[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(dbversion);
+		debugPrint(pvt->_dbversion);
 		debugPrint("\n");
 		debugPreEnd();
 	}
-	return dbversion;
+	return pvt->_dbversion;
 }
 
 const char *sqlrconnection::dbHostName() {
@@ -777,7 +872,7 @@ const char *sqlrconnection::dbHostName() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("DB Host Name...");
 		debugPrint("\n");
@@ -785,7 +880,7 @@ const char *sqlrconnection::dbHostName() {
 	}
 
 	// tell the server we want the db host name
-	cs->write((uint16_t)DBHOSTNAME);
+	pvt->_cs->write((uint16_t)DBHOSTNAME);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -794,32 +889,32 @@ const char *sqlrconnection::dbHostName() {
 
 	// get the db host name size
 	uint16_t	size;
-	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get DB host name.\n "
 				"A network error may have ocurred.");
 		return NULL;
 	}
 
 	// get the db host name
-	delete[] dbhostname;
-	dbhostname=new char[size+1];
-	if (cs->read(dbhostname,size)!=size) {
+	delete[] pvt->_dbhostname;
+	pvt->_dbhostname=new char[size+1];
+	if (pvt->_cs->read(pvt->_dbhostname,size)!=size) {
 		setError("Failed to get DB host name.\n "
 				"A network error may have ocurred.");
-		delete[] dbhostname;
-		dbhostname=NULL;
+		delete[] pvt->_dbhostname;
+		pvt->_dbhostname=NULL;
 		return NULL;
 	}
-	dbhostname[size]='\0';
+	pvt->_dbhostname[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(dbhostname);
+		debugPrint(pvt->_dbhostname);
 		debugPrint("\n");
 		debugPreEnd();
 	}
-	return dbhostname;
+	return pvt->_dbhostname;
 }
 
 const char *sqlrconnection::dbIpAddress() {
@@ -830,7 +925,7 @@ const char *sqlrconnection::dbIpAddress() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("DB Ip Address...");
 		debugPrint("\n");
@@ -838,7 +933,7 @@ const char *sqlrconnection::dbIpAddress() {
 	}
 
 	// tell the server we want the db ip address
-	cs->write((uint16_t)DBIPADDRESS);
+	pvt->_cs->write((uint16_t)DBIPADDRESS);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -847,32 +942,32 @@ const char *sqlrconnection::dbIpAddress() {
 
 	// get the db ip address size
 	uint16_t	size;
-	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get DB ip address.\n "
 				"A network error may have ocurred.");
 		return NULL;
 	}
 
 	// get the db ip address
-	delete[] dbipaddress;
-	dbipaddress=new char[size+1];
-	if (cs->read(dbipaddress,size)!=size) {
+	delete[] pvt->_dbipaddress;
+	pvt->_dbipaddress=new char[size+1];
+	if (pvt->_cs->read(pvt->_dbipaddress,size)!=size) {
 		setError("Failed to get DB ip address.\n "
 				"A network error may have ocurred.");
-		delete[] dbipaddress;
-		dbipaddress=NULL;
+		delete[] pvt->_dbipaddress;
+		pvt->_dbipaddress=NULL;
 		return NULL;
 	}
-	dbipaddress[size]='\0';
+	pvt->_dbipaddress[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(dbipaddress);
+		debugPrint(pvt->_dbipaddress);
 		debugPrint("\n");
 		debugPreEnd();
 	}
-	return dbipaddress;
+	return pvt->_dbipaddress;
 }
 
 const char *sqlrconnection::serverVersion() {
@@ -883,7 +978,7 @@ const char *sqlrconnection::serverVersion() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Server Version...");
 		debugPrint("\n");
@@ -891,7 +986,7 @@ const char *sqlrconnection::serverVersion() {
 	}
 
 	// tell the server we want the server version
-	cs->write((uint16_t)SERVERVERSION);
+	pvt->_cs->write((uint16_t)SERVERVERSION);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -900,32 +995,32 @@ const char *sqlrconnection::serverVersion() {
 
 	// get the server version size
 	uint16_t	size;
-	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get Server version.\n "
 			"A network error may have ocurred.");
 		return NULL;
 	}
 
 	// get the server version
-	delete[] serverversion;
-	serverversion=new char[size+1];
-	if (cs->read(serverversion,size)!=size) {
+	delete[] pvt->_serverversion;
+	pvt->_serverversion=new char[size+1];
+	if (pvt->_cs->read(pvt->_serverversion,size)!=size) {
 		setError("Failed to get Server version.\n "
 			"A network error may have ocurred.");
-		delete[] serverversion;
-		serverversion=NULL;
+		delete[] pvt->_serverversion;
+		pvt->_serverversion=NULL;
 		return NULL;
 	}
-	serverversion[size]='\0';
+	pvt->_serverversion[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(serverversion);
+		debugPrint(pvt->_serverversion);
 		debugPrint("\n");
 		debugPreEnd();
 	}
-	return serverversion;
+	return pvt->_serverversion;
 }
 
 const char *sqlrconnection::clientVersion() {
@@ -940,7 +1035,7 @@ const char *sqlrconnection::bindFormat() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("bind format...");
 		debugPrint("\n");
@@ -948,7 +1043,7 @@ const char *sqlrconnection::bindFormat() {
 	}
 
 	// tell the server we want the bind format
-	cs->write((uint16_t)BINDFORMAT);
+	pvt->_cs->write((uint16_t)BINDFORMAT);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -958,32 +1053,32 @@ const char *sqlrconnection::bindFormat() {
 
 	// get the bindformat size
 	uint16_t	size;
-	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get bind format.\n"
 			" A network error may have ocurred.");
 		return NULL;
 	}
 
 	// get the bindformat
-	delete[] bindformat;
-	bindformat=new char[size+1];
-	if (cs->read(bindformat,size)!=size) {
+	delete[] pvt->_bindformat;
+	pvt->_bindformat=new char[size+1];
+	if (pvt->_cs->read(pvt->_bindformat,size)!=size) {
 		setError("Failed to get bind format.\n "
 			"A network error may have ocurred.");
-		delete[] bindformat;
-		bindformat=NULL;
+		delete[] pvt->_bindformat;
+		pvt->_bindformat=NULL;
 		return NULL;
 	}
-	bindformat[size]='\0';
+	pvt->_bindformat[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(bindformat);
+		debugPrint(pvt->_bindformat);
 		debugPrint("\n");
 		debugPreEnd();
 	}
-	return bindformat;
+	return pvt->_bindformat;
 }
 
 bool sqlrconnection::selectDatabase(const char *database) {
@@ -998,7 +1093,7 @@ bool sqlrconnection::selectDatabase(const char *database) {
 		return 0;
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Selecting database ");
 		debugPrint(database);
@@ -1007,13 +1102,13 @@ bool sqlrconnection::selectDatabase(const char *database) {
 	}
 
 	// tell the server we want to select a db
-	cs->write((uint16_t)SELECT_DATABASE);
+	pvt->_cs->write((uint16_t)SELECT_DATABASE);
 
 	// send the database name
 	uint32_t	len=charstring::length(database);
-	cs->write(len);
+	pvt->_cs->write(len);
 	if (len) {
-		cs->write(database,len);
+		pvt->_cs->write(database,len);
 	}
 	flushWriteBuffer();
 
@@ -1028,7 +1123,7 @@ const char *sqlrconnection::getCurrentDatabase() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Getting the current database...\n");
 		debugPreEnd();
@@ -1037,7 +1132,7 @@ const char *sqlrconnection::getCurrentDatabase() {
 	clearError();
 
 	// tell the server we want to select a db
-	cs->write((uint16_t)GET_CURRENT_DATABASE);
+	pvt->_cs->write((uint16_t)GET_CURRENT_DATABASE);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -1046,32 +1141,32 @@ const char *sqlrconnection::getCurrentDatabase() {
 
 	// get the current db name size
 	uint16_t	size;
-	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get the current database.\n "
 				"A network error may have ocurred.");
 		return NULL;
 	}
 
 	// get the current db name
-	delete[] currentdbname;
-	currentdbname=new char[size+1];
-	if (cs->read(currentdbname,size)!=size) {
+	delete[] pvt->_currentdbname;
+	pvt->_currentdbname=new char[size+1];
+	if (pvt->_cs->read(pvt->_currentdbname,size)!=size) {
 		setError("Failed to get the current database.\n "
 				"A network error may have ocurred.");
-		delete[] currentdbname;
-		currentdbname=NULL;
+		delete[] pvt->_currentdbname;
+		pvt->_currentdbname=NULL;
 		return NULL;
 	}
-	currentdbname[size]='\0';
+	pvt->_currentdbname[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(currentdbname);
+		debugPrint(pvt->_currentdbname);
 		debugPrint("\n");
 		debugPreEnd();
 	}
-	return currentdbname;
+	return pvt->_currentdbname;
 }
 
 uint64_t sqlrconnection::getLastInsertId() {
@@ -1082,14 +1177,14 @@ uint64_t sqlrconnection::getLastInsertId() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Getting the last insert id...\n");
 		debugPreEnd();
 	}
 
 	// tell the server we want the last insert id
-	cs->write((uint16_t)GET_LAST_INSERT_ID);
+	pvt->_cs->write((uint16_t)GET_LAST_INSERT_ID);
 	flushWriteBuffer();
 
 	if (gotError()) {
@@ -1098,13 +1193,13 @@ uint64_t sqlrconnection::getLastInsertId() {
 
 	// get the last insert id
 	uint64_t	id=0;
-	if (cs->read(&id)!=sizeof(uint64_t)) {
+	if (pvt->_cs->read(&id)!=sizeof(uint64_t)) {
 		setError("Failed to get the last insert id.\n"
 				"A network error may have ocurred.");
 		return 0;
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Got the last insert id: ");
 		debugPrint((int64_t)id);
@@ -1130,15 +1225,15 @@ bool sqlrconnection::autoCommit(bool on) {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint((on)?"Setting autocommit on\n":
 				"Setting autocommit off\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)AUTOCOMMIT);
-	cs->write(on);
+	pvt->_cs->write((uint16_t)AUTOCOMMIT);
+	pvt->_cs->write(on);
 	flushWriteBuffer();
 
 	return !gotError();
@@ -1152,13 +1247,13 @@ bool sqlrconnection::begin() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Beginning...\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)BEGIN);
+	pvt->_cs->write((uint16_t)BEGIN);
 	flushWriteBuffer();
 
 	return !gotError();
@@ -1172,13 +1267,13 @@ bool sqlrconnection::commit() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Committing...\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)COMMIT);
+	pvt->_cs->write((uint16_t)COMMIT);
 	flushWriteBuffer();
 
 	return !gotError();
@@ -1192,46 +1287,46 @@ bool sqlrconnection::rollback() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Rolling Back...\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)ROLLBACK);
+	pvt->_cs->write((uint16_t)ROLLBACK);
 	flushWriteBuffer();
 
 	return !gotError();
 }
 
 const char *sqlrconnection::errorMessage() {
-	return error;
+	return pvt->_error;
 }
 
 int64_t sqlrconnection::errorNumber() {
-	return errorno;
+	return pvt->_errorno;
 }
 
 void sqlrconnection::clearError() {
-	delete[] error;
-	error=NULL;
-	errorno=0;
+	delete[] pvt->_error;
+	pvt->_error=NULL;
+	pvt->_errorno=0;
 }
 
 void sqlrconnection::setError(const char *err) {
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Setting Error\n");
 		debugPreEnd();
 	}
 
-	delete[] error;
-	error=charstring::duplicate(err);
+	delete[] pvt->_error;
+	pvt->_error=charstring::duplicate(err);
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint(error);
+		debugPrint(pvt->_error);
 		debugPrint("\n");
 		debugPreEnd();
 	}
@@ -1241,7 +1336,7 @@ uint16_t sqlrconnection::getError() {
 
 	clearError();
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Checking for error\n");
 		debugPreEnd();
@@ -1249,8 +1344,8 @@ uint16_t sqlrconnection::getError() {
 
 	// get whether an error occurred or not
 	uint16_t	status;
-	if (cs->read(&status,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&status,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get the error status.\n"
 				"A network error may have ocurred.");
 		return ERROR_OCCURRED;
@@ -1258,7 +1353,7 @@ uint16_t sqlrconnection::getError() {
 
 	// if no error occurred, return that
 	if (status==NO_ERROR_OCCURRED) {
-		if (debug) {
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("No error occurred\n");
 			debugPreEnd();
@@ -1266,14 +1361,14 @@ uint16_t sqlrconnection::getError() {
 		return status;
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("An error occurred\n");
 		debugPreEnd();
 	}
 
 	// get the error code
-	if (cs->read((uint64_t *)&errorno)!=sizeof(uint64_t)) {
+	if (pvt->_cs->read((uint64_t *)&pvt->_errorno)!=sizeof(uint64_t)) {
 		setError("Failed to get the error code.\n"
 				"A network error may have ocurred.");
 		return status;
@@ -1281,27 +1376,27 @@ uint16_t sqlrconnection::getError() {
 
 	// get the error size
 	uint16_t	size;
-	if (cs->read(&size)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&size)!=sizeof(uint16_t)) {
 		setError("Failed to get the error size.\n"
 				"A network error may have ocurred.");
 		return status;
 	}
 
 	// get the error string
-	error=new char[size+1];
-	if (cs->read(error,size)!=size) {
+	pvt->_error=new char[size+1];
+	if (pvt->_cs->read(pvt->_error,size)!=size) {
 		setError("Failed to get the error string.\n"
 				"A network error may have ocurred.");
 		return status;
 	}
-	error[size]='\0';
+	pvt->_error[size]='\0';
 
-	if (debug) {
+	if (pvt->_debug) {
 		debugPreStart();
 		debugPrint("Got error:\n");
-		debugPrint(errorno);
+		debugPrint(pvt->_errorno);
 		debugPrint(": ");
-		debugPrint(error);
+		debugPrint(pvt->_error);
 		debugPrint("\n");
 		debugPreEnd();
 	}
@@ -1320,88 +1415,88 @@ bool sqlrconnection::gotError() {
 }
 
 void sqlrconnection::debugOn() {
-	debug=true;
+	pvt->_debug=true;
 }
 
 void sqlrconnection::debugOff() {
-	debug=false;
+	pvt->_debug=false;
 }
 
 void sqlrconnection::setDebugFile(const char *filename) {
-	debugfile.close();
+	pvt->_debugfile.close();
 	error::clearError();
 	if (filename && *filename &&
-		!debugfile.open(filename,O_WRONLY|O_APPEND) &&
+		!pvt->_debugfile.open(filename,O_WRONLY|O_APPEND) &&
 				error::getErrorNumber()==ENOENT) {
-		debugfile.create(filename,
+		pvt->_debugfile.create(filename,
 				permissions::evalPermString("rw-r--r--"));
 	}
 }
 
 bool sqlrconnection::getDebug() {
-	return debug;
+	return pvt->_debug;
 }
 
 void sqlrconnection::debugPreStart() {
-	if (webdebug==-1) {
+	if (pvt->_webdebug==-1) {
 		const char	*docroot=environment::getValue("DOCUMENT_ROOT");
 		if (!charstring::isNullOrEmpty(docroot)) {
-			webdebug=1;
+			pvt->_webdebug=1;
 		} else {
-			webdebug=0;
+			pvt->_webdebug=0;
 		}
 	}
-	if (webdebug==1) {
+	if (pvt->_webdebug==1) {
 		debugPrint("<pre>\n");
 	}
 }
 
 void sqlrconnection::debugPreEnd() {
-	if (webdebug==1) {
+	if (pvt->_webdebug==1) {
 		debugPrint("</pre>\n");
 	}
 }
 
 void sqlrconnection::debugPrintFunction(
 				int (*printfunction)(const char *,...)) {
-	this->printfunction=printfunction;
+	this->pvt->_printfunction=printfunction;
 }
 
 void sqlrconnection::debugPrint(const char *string) {
-	if (printfunction) {
-		(*printfunction)("%s",string);
-	} else if (debugfile.getFileDescriptor()!=-1) {
-		debugfile.printf("%s",string);
+	if (pvt->_printfunction) {
+		(*pvt->_printfunction)("%s",string);
+	} else if (pvt->_debugfile.getFileDescriptor()!=-1) {
+		pvt->_debugfile.printf("%s",string);
 	} else {
 		stdoutput.printf("%s",string);
 	}
 }
 
 void sqlrconnection::debugPrint(int64_t number) {
-	if (printfunction) {
-		(*printfunction)("%lld",(long long)number);
-	} else if (debugfile.getFileDescriptor()!=-1) {
-		debugfile.printf("%lld",(long long)number);
+	if (pvt->_printfunction) {
+		(*pvt->_printfunction)("%lld",(long long)number);
+	} else if (pvt->_debugfile.getFileDescriptor()!=-1) {
+		pvt->_debugfile.printf("%lld",(long long)number);
 	} else {
 		stdoutput.printf("%lld",(long long)number);
 	}
 }
 
 void sqlrconnection::debugPrint(double number) {
-	if (printfunction) {
-		(*printfunction)("%f",number);
-	} else if (debugfile.getFileDescriptor()!=-1) {
-		debugfile.printf("%f",number);
+	if (pvt->_printfunction) {
+		(*pvt->_printfunction)("%f",number);
+	} else if (pvt->_debugfile.getFileDescriptor()!=-1) {
+		pvt->_debugfile.printf("%f",number);
 	} else {
 		stdoutput.printf("%f",number);
 	}
 }
 
 void sqlrconnection::debugPrint(char character) {
-	if (printfunction) {
-		(*printfunction)("%c",character);
-	} else if (debugfile.getFileDescriptor()!=-1) {
-		debugfile.printf("%c",character);
+	if (pvt->_printfunction) {
+		(*pvt->_printfunction)("%c",character);
+	} else if (pvt->_debugfile.getFileDescriptor()!=-1) {
+		pvt->_debugfile.printf("%c",character);
 	} else {
 		stdoutput.printf("%c",character);
 	}
@@ -1438,11 +1533,67 @@ void sqlrconnection::debugPrintClob(const char *clob, uint32_t length) {
 }
 
 void sqlrconnection::setClientInfo(const char *clientinfo) {
-	delete[] this->clientinfo;
-	this->clientinfo=charstring::duplicate(clientinfo);
-	clientinfolen=charstring::length(clientinfo);
+	delete[] this->pvt->_clientinfo;
+	this->pvt->_clientinfo=charstring::duplicate(clientinfo);
+	pvt->_clientinfolen=charstring::length(clientinfo);
 }
 
 const char *sqlrconnection::getClientInfo() const {
-	return clientinfo;
+	return pvt->_clientinfo;
+}
+
+socketclient *sqlrconnection::cs() {
+	return pvt->_cs;
+}
+
+bool sqlrconnection::endsessionsent() {
+	return pvt->_endsessionsent;
+}
+
+bool sqlrconnection::suspendsessionsent() {
+	return pvt->_suspendsessionsent;
+}
+
+bool sqlrconnection::connected() {
+	return pvt->_connected;
+}
+
+int32_t sqlrconnection::responsetimeoutsec() {
+	return pvt->_responsetimeoutsec;
+}
+
+int32_t sqlrconnection::responsetimeoutusec() {
+	return pvt->_responsetimeoutusec;
+}
+
+int64_t sqlrconnection::errorno() {
+	return pvt->_errorno;
+}
+
+char *sqlrconnection::error() {
+	return pvt->_error;
+}
+
+char *sqlrconnection::clientinfo() {
+	return pvt->_clientinfo;
+}
+
+uint64_t sqlrconnection::clientinfolen() {
+	return pvt->_clientinfolen;
+}
+
+bool sqlrconnection::debug() {
+	return pvt->_debug;
+}
+
+void sqlrconnection::firstcursor(sqlrcursor *cur) {
+	pvt->_firstcursor=cur;
+}
+
+void sqlrconnection::lastcursor(sqlrcursor *cur) {
+	pvt->_lastcursor=cur;
+}
+
+sqlrcursor *sqlrconnection::lastcursor() {
+	return pvt->_lastcursor;
 }
