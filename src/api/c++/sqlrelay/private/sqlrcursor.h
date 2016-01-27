@@ -28,23 +28,25 @@
 		void	sendOutputBinds();
 		void	sendGetColumnInfo();
 		void	defineOutputBindGeneric(const char *variable,
-						bindvartype_t type,
+						sqlrclientbindvartype_t type,
 						uint32_t valuesize);
-		void	stringVar(bindvar *var,
-					const char *variable,
-					const char *value);
-		void	stringVar(bindvar *var,
-					const char *variable,
-					const char *value,
-					uint32_t valuesize);
-		void	integerVar(bindvar *var,
-					const char *variable,
-					int64_t value);
-		void	doubleVar(bindvar *var, const char *variable, 
+		void	stringVar(sqlrclientbindvar *var,
+						const char *variable,
+						const char *value);
+		void	stringVar(sqlrclientbindvar *var,
+						const char *variable,
+						const char *value,
+						uint32_t valuesize);
+		void	integerVar(sqlrclientbindvar *var,
+						const char *variable,
+						int64_t value);
+		void	doubleVar(sqlrclientbindvar *var,
+						const char *variable, 
 						double value,
 						uint32_t precision,
 						uint32_t scale);
-		void	dateVar(bindvar *var, const char *variable,
+		void	dateVar(sqlrclientbindvar *var,
+						const char *variable,
 						int16_t year,
 						int16_t month,
 						int16_t day,
@@ -53,12 +55,14 @@
 						int16_t second,
 						int32_t microsecond,
 						const char *tz);
-		void	lobVar(bindvar *var, const char *variable,
-					const char *value, uint32_t size,
-					bindvartype_t type);
-		bindvar	*findVar(const char *variable,
-					dynamicarray<bindvar> *vars);
-		void	initVar(bindvar *var,
+		void	lobVar(sqlrclientbindvar *var,
+						const char *variable,
+						const char *value,
+						uint32_t size,
+						sqlrclientbindvartype_t type);
+		sqlrclientbindvar	*findVar(const char *variable,
+					dynamicarray<sqlrclientbindvar> *vars);
+		void	initVar(sqlrclientbindvar *var,
 					const char *variable,
 					bool preexisting);
 		void	performSubstitution(stringbuffer *buffer,
@@ -112,9 +116,9 @@
 
 		char	*getRowStorage(int32_t length);
 		void	createRowBuffers();
-		column	*getColumn(uint32_t index);
-		column	*getColumn(const char *name);
-		column	*getColumnInternal(uint32_t index);
+		sqlrclientcolumn	*getColumn(uint32_t index);
+		sqlrclientcolumn	*getColumn(const char *name);
+		sqlrclientcolumn	*getColumnInternal(uint32_t index);
 		char	*getColStorage(int32_t length);
 		void	createColumnBuffers();
 

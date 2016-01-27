@@ -15,20 +15,20 @@
 	#define SQLRCLIENT_DLLSPEC
 #endif
 
-enum bindvartype_t {
-	BINDVARTYPE_NULL=0,
-	BINDVARTYPE_STRING,
-	BINDVARTYPE_INTEGER,
-	BINDVARTYPE_DOUBLE,
-	BINDVARTYPE_BLOB,
-	BINDVARTYPE_CLOB,
-	BINDVARTYPE_CURSOR,
-	BINDVARTYPE_DATE
+enum sqlrclientbindvartype_t {
+	SQLRCLIENTBINDVARTYPE_NULL=0,
+	SQLRCLIENTBINDVARTYPE_STRING,
+	SQLRCLIENTBINDVARTYPE_INTEGER,
+	SQLRCLIENTBINDVARTYPE_DOUBLE,
+	SQLRCLIENTBINDVARTYPE_BLOB,
+	SQLRCLIENTBINDVARTYPE_CLOB,
+	SQLRCLIENTBINDVARTYPE_CURSOR,
+	SQLRCLIENTBINDVARTYPE_DATE
 };
 
-// older compilers require bindvar to be defined here because of the reference
-// to dynamicvar<bindvar> in private/sqlrcursor.h
-class bindvar {
+// older compilers require sqlrclientbindvar to be defined here because of the
+// reference to dynamicvar<sqlrclientbindvar> in private/sqlrcursor.h
+class sqlrclientbindvar {
 	friend class sqlrcursor;
 	private:
 		char	*variable;
@@ -55,7 +55,9 @@ class bindvar {
 		} value;
 		uint32_t	valuesize;
 		uint32_t	resultvaluesize;
-		bindvartype_t 	type;
+
+		sqlrclientbindvartype_t 	type;
+
 		bool		send;
 
 		bool		substituted;
@@ -69,7 +71,6 @@ enum sqlrclientlistformat_t {
 };
 
 class sqlrconnectionprivate;
-class sqlrcursorprivate;
-class column;
-class bindvar;
 class sqlrcursor;
+class sqlrcursorprivate;
+class sqlrclientcolumn;
