@@ -6,6 +6,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/linkedlist.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/parameterstring.h>
 #include <rudiments/charstring.h>
 #include <rudiments/character.h>

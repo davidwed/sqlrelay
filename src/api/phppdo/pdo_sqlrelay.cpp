@@ -11,6 +11,7 @@
 #include <defines.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/charstring.h>
 #include <rudiments/character.h>
 

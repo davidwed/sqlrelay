@@ -54,7 +54,6 @@ class sqlrconnectionprivate {
 		// gss
 		char		*_kerberosservice;
 		gssmechanism	_gmech;
-		gsscredentials	_gcred;
 		gsscontext	_gctx;
 
 		// error
@@ -307,8 +306,6 @@ void sqlrconnection::useKerberos(const char *service) {
 		}
 
 		pvt->_gmech.initialize((const char *)NULL);
-		pvt->_gcred.clearDesiredMechanisms();
-		pvt->_gcred.addDesiredMechanism(&pvt->_gmech);
 		pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
 		pvt->_gctx.setDesiredFlags(0);
 		pvt->_gctx.setService(pvt->_kerberosservice);
