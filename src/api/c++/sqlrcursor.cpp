@@ -144,7 +144,7 @@ enum columncase {
 	LOWER_CASE
 };
 
-class bindvar {
+/*class bindvar {
 	friend class sqlrcursor;
 	private:
 		char	*variable;
@@ -176,7 +176,7 @@ class bindvar {
 
 		bool		substituted;
 		bool		donesubstituting;
-};
+};*/
 
 
 class sqlrcursorprivate {
