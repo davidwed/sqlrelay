@@ -26,6 +26,8 @@ enum bindvartype_t {
 	BINDVARTYPE_DATE
 };
 
+// older compilers require bindvar to be defined here because of the reference
+// to dynamicvar<bindvar> in private/sqlrcursor.h
 class bindvar {
 	friend class sqlrcursor;
 	private:
