@@ -11,9 +11,12 @@
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
 #include <rudiments/permissions.h>
-
 #include <defines.h>
 #include <defaults.h>
+
+#ifndef MAXPATHLEN
+        #define MAXPATHLEN 256
+#endif
 
 class sqlrconnectionprivate {
 	friend class sqlrconnection;
