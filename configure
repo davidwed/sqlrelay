@@ -35212,15 +35212,18 @@ fi
 echo "******************************"
 
 
-
-SQLR_VERSION="0.65"
+SQLR_VERSION="0.65.0"
 
 
 cat >>confdefs.h <<_ACEOF
 #define SQLR_VERSION "$SQLR_VERSION"
 _ACEOF
 
-SONAME_VERSION_INFO="1:0:0"
+
+
+SONAME_VERSION_INFO="2:0:0"
+
+
 
 
 

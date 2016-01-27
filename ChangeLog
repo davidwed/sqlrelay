@@ -1,4 +1,4 @@
-0.65 - removed erroneous SQLR_SQLExecute export in ODBC driver
+0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static
 	fixed --disable-API flags in configure.vbs
 	fixed bad user/password copy logic in ODBC SQLConnect function
@@ -28,6 +28,7 @@
 	sqlrelay.conf example is installed under example directory now
 	Python DB -> Python DB-API in the docs
 	moved private members and support classes into C++ API's .cpp files
+	removed -revision during link and adopted Semantic Versioning 2.0
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

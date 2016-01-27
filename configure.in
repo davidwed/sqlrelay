@@ -901,19 +901,28 @@ FW_CHECK_NODEJS
 echo "******************************"
 
 
-
-dnl Default build variables.
-SQLR_VERSION="0.65"
+dnl Semantic Versioning
+dnl Given a version number MAJOR.MINOR.PATCH, increment the:
+dnl 1. MAJOR when you make backwards-incompatible API changes
+dnl    (and set MINOR and PATCH to 0)
+dnl 2. MINOR when you add backwards-compatible features
+dnl    (and set PATCH to 0)
+dnl 3. PATCH when you make backwards-compatible fixes
+SQLR_VERSION="0.65.0"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
+
+
 dnl rules for CURRENT:REVISION:AGE version info:
 dnl apply the following rules in order:
 dnl if library source changed at all,         c:r:a -> c:r+1:a
 dnl if interfaces added, removed, or changed, c:r:a -> c+1:0:a
 dnl if interfaces added,                      c:r:a -> c:r:a+1
 dnl if interfaces removed,                    c:r:a -> c:r:0
-SONAME_VERSION_INFO="1:0:0"
+SONAME_VERSION_INFO="2:0:0"
 AC_SUBST(SONAME_VERSION_INFO)
+
+
 AC_SUBST(STATICLINK)
 AC_PREFIX_DEFAULT(/usr/local/firstworks)
 AC_CONFIG_HEADER(config.h)
