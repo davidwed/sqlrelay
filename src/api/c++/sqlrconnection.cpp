@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2013  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <config.h>
@@ -129,15 +129,15 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_cs=&pvt->_ucs;
 
 	// connection
-	this->pvt->_server=(pvt->_copyrefs)?
+	pvt->_server=(pvt->_copyrefs)?
 			charstring::duplicate(server):
 			(char *)server;
 	pvt->_listenerinetport=port;
 	pvt->_listenerunixport=(pvt->_copyrefs)?
 				charstring::duplicate(socket):
 				(char *)socket;
-	this->pvt->_retrytime=retrytime;
-	this->pvt->_tries=tries;
+	pvt->_retrytime=retrytime;
+	pvt->_tries=tries;
 
 	// initialize timeouts
 	setTimeoutFromEnv("SQLR_CLIENT_CONNECT_TIMEOUT",
@@ -148,10 +148,10 @@ void sqlrconnection::init(const char *server, uint16_t port,
 				&pvt->_responsetimeoutsec,&pvt->_responsetimeoutusec);
 
 	// authentication
-	this->pvt->_user=(pvt->_copyrefs)?
+	pvt->_user=(pvt->_copyrefs)?
 			charstring::duplicate(user):
 			(char *)user;
-	this->pvt->_password=(pvt->_copyrefs)?
+	pvt->_password=(pvt->_copyrefs)?
 			charstring::duplicate(password):
 			(char *)password;
 	pvt->_userlen=charstring::length(user);
@@ -265,8 +265,8 @@ sqlrconnection::~sqlrconnection() {
 	sqlrcursor	*currentcursor=pvt->_firstcursor;
 	while (currentcursor) {
 		pvt->_firstcursor=currentcursor;
-		currentcursor=currentcursor->next;
-		pvt->_firstcursor->sqlrc=NULL;
+		currentcursor=currentcursor->next();
+		pvt->_firstcursor->sqlrc(NULL);
 	}
 
 	if (pvt->_debug) {
@@ -364,11 +364,11 @@ void sqlrconnection::endSession() {
 	sqlrcursor	*currentcursor=pvt->_firstcursor;
 	while (currentcursor) {
 		// FIXME: do we need to clearResultSet() here too?
-		if (!currentcursor->endofresultset) {
+		if (!currentcursor->endofresultset()) {
 			currentcursor->closeResultSet(false);
 		}
-		currentcursor->havecursorid=false;
-		currentcursor=currentcursor->next;
+		currentcursor->havecursorid(false);
+		currentcursor=currentcursor->next();
 	}
 
 	// write an END_SESSION to the connection
@@ -1459,7 +1459,7 @@ void sqlrconnection::debugPreEnd() {
 
 void sqlrconnection::debugPrintFunction(
 				int (*printfunction)(const char *,...)) {
-	this->pvt->_printfunction=printfunction;
+	pvt->_printfunction=printfunction;
 }
 
 void sqlrconnection::debugPrint(const char *string) {
@@ -1533,8 +1533,8 @@ void sqlrconnection::debugPrintClob(const char *clob, uint32_t length) {
 }
 
 void sqlrconnection::setClientInfo(const char *clientinfo) {
-	delete[] this->pvt->_clientinfo;
-	this->pvt->_clientinfo=charstring::duplicate(clientinfo);
+	delete[] pvt->_clientinfo;
+	pvt->_clientinfo=charstring::duplicate(clientinfo);
 	pvt->_clientinfolen=charstring::length(clientinfo);
 }
 

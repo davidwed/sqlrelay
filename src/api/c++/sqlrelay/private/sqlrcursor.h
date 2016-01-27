@@ -120,89 +120,12 @@
 
 		void	closeResultSet(bool closeremote);
 
-		bool		resumed;
-		bool		cached;
+		bool		endofresultset();
+		void		sqlrc(sqlrconnection *sqlrc);
+		sqlrcursor	*next();
+		void		havecursorid(bool havecursorid);
 
-		// query
-		char		*querybuffer;
-		const char	*queryptr;
-		uint32_t	querylen;
-		char		*fullpath;
-		bool		reexecute;
-
-		// substitution variables
-		dynamicarray<bindvar>	*subvars;
-		bool			dirtysubs;
-
-		// bind variables
-		dynamicarray<bindvar>	*inbindvars;
-		dynamicarray<bindvar>	*outbindvars;
-		bool			validatebinds;
-		bool			dirtybinds;
-
-		// result set
-		uint64_t	rsbuffersize;
-		uint16_t	sendcolumninfo;
-		uint16_t	sentcolumninfo;
-
-		uint16_t	suspendresultsetsent;
-		bool		endofresultset;
-
-		uint16_t	columntypeformat;
-		uint32_t	colcount;
-		uint32_t	previouscolcount;
-
-		columncase	colcase;
-
-		column		*columns;
-		column		*extracolumns;
-		memorypool	*colstorage;
-		char		**columnnamearray;
-
-		uint64_t	firstrowindex;
-		uint64_t	rowcount;
-		uint64_t	previousrowcount;
-		uint16_t	knowsactualrows;
-		uint64_t	actualrows;
-		uint16_t	knowsaffectedrows;
-		uint64_t	affectedrows;
-
-		row		**rows;
-		row		**extrarows;
-		memorypool	*rowstorage;
-		row		*firstextrarow;
-		char		***fields;
-		uint32_t	**fieldlengths;
-
-		bool		returnnulls;
-
-		// result set caching
-		bool		cacheon;
-		int32_t		cachettl;
-		char		*cachedestname;
-		char		*cachedestindname;
-		file		*cachedest;
-		file		*cachedestind;
-		file		*cachesource;
-		file		*cachesourceind;
-
-		// error
-		int64_t		errorno;
-		char		*error;
-
-		// copy references flag
-		bool		copyrefs;
-
-		// parent connection
-		sqlrconnection	*sqlrc;
-
-		// next/previous pointers
-		sqlrcursor	*next;
-		sqlrcursor	*prev;
-
-		// cursor id
-		uint16_t	cursorid;
-		bool		havecursorid;
+		sqlrcursorprivate	*pvt;
 
 	public:
 		sqlrcursor(sqlrconnection *sqlrcon, bool copyreferences);
