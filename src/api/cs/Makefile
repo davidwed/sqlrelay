@@ -24,7 +24,7 @@ AssemblyInfo.cs: AssemblyInfo.cs.in
 	$(REPLACE) @SQLR_VERSION@ $(SQLR_VERSION) AssemblyInfo.cs.in > AssemblyInfo.cs
 
 SQLRClient.dll.config: SQLRClient.dll.config.in
-	$(REPLACE) @SONAME_VERSION_INFO@ $(SONAME_VERSION_INFO) SQLRClient.dll.config.in > tempfile
+	$(REPLACE) @SONAME_VERSION_INFO@ "$(SONAME_VERSION_INFO)" SQLRClient.dll.config.in > tempfile
 	$(REPLACE) ":" "." tempfile > SQLRClient.dll.config
 	$(RM) tempfile
 
