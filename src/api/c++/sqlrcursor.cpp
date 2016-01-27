@@ -3,6 +3,8 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/memorypool.h>
+#include <rudiments/file.h>
 #include <rudiments/charstring.h>
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>

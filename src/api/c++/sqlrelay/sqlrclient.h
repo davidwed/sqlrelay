@@ -4,7 +4,7 @@
 #ifndef SQLRCLIENT_H
 #define SQLRCLIENT_H
 
-#include <sqlrelay/private/sqlrincludes.h>
+#include <sqlrelay/private/sqlrclientincludes.h>
 
 class SQLRCLIENT_DLLSPEC sqlrconnection {
 	public:

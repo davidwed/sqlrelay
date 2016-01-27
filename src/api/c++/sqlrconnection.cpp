@@ -3,6 +3,9 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/inetsocketclient.h>
+#include <rudiments/unixsocketclient.h>
+#include <rudiments/file.h>
 #include <rudiments/environment.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>

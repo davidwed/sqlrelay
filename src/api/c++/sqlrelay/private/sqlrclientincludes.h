@@ -1,12 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the COPYING file for more information.
 
-#include <rudiments/inetsocketclient.h>
-#include <rudiments/unixsocketclient.h>
 #include <rudiments/dynamicarray.h>
-#include <rudiments/memorypool.h>
 #include <rudiments/stringbuffer.h>
-#include <rudiments/file.h>
+#include <rudiments/socketclient.h>
 
 #ifdef _WIN32
 	#ifdef LIBSQLRCLIENT_EXPORTS
