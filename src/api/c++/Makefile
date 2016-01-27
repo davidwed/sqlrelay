@@ -31,8 +31,6 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
 	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
-	$(CP) sqlrelay/private/sqlrdefines.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrdefines.h
 	$(CP) sqlrelay/private/sqlrincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrincludes.h
 	$(CP) sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
