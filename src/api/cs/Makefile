@@ -15,18 +15,13 @@ SRCS = SQLRConnection.cs \
 	SQLRelayType.cs \
 	AssemblyInfo.cs
 
-all: SQLRClient.dll SQLRClient.dll.config
+all: SQLRClient.dll
 
 clean:
-	$(RM) *.snk *.il *.dll.in *.dll *.mdb AssemblyInfo.cs SQLRClient.dll.config tempfile
+	$(RM) *.snk *.il *.dll.in *.dll *.mdb AssemblyInfo.cs
 
 AssemblyInfo.cs: AssemblyInfo.cs.in
 	$(REPLACE) @SQLR_VERSION@ $(SQLR_VERSION) AssemblyInfo.cs.in > AssemblyInfo.cs
-
-SQLRClient.dll.config: SQLRClient.dll.config.in
-	$(REPLACE) @SONAME_VERSION_INFO@ "$(SONAME_VERSION_INFO)" SQLRClient.dll.config.in > tempfile
-	$(REPLACE) ":" "." tempfile > SQLRClient.dll.config
-	$(RM) tempfile
 
 SQLRClient.dll: $(SRCS)
 	$(CSC) $(CSCFLAGS) /optimize /target:library /out:$@ $(SRCS)

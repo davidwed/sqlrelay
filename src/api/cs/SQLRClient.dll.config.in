@@ -1,3 +1,0 @@
-<configuration>
-	<dllmap dll="libsqlrclientwrapper.dll" target="libsqlrclientwrapper.so.@SONAME_VERSION_INFO@"/>
-</configuration>
