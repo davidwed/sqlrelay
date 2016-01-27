@@ -14,8 +14,168 @@
 #define NEED_DATATYPESTRING
 #include <datatypes.h>
 
+#ifndef MAXPATHLEN
+	#define MAXPATHLEN 256
+#endif
+
 // we're optimistic that the average query will contain 16 bind variables
 #define OPTIMISTIC_BIND_COUNT 16
+
+// we're optimistic that the average query will contain 15 columns whose names
+// average 10 characters in length
+#define OPTIMISTIC_COLUMN_COUNT 15
+#define OPTIMISTIC_AVERAGE_COLUMN_NAME_LENGTH 10
+#define OPTIMISTIC_COLUMN_DATA_SIZE OPTIMISTIC_COLUMN_COUNT*\
+					OPTIMISTIC_AVERAGE_COLUMN_NAME_LENGTH
+
+// we're optimistic that the average query will contain 15 rows whose fields
+// average 15 characters in length
+#define OPTIMISTIC_ROW_COUNT 15
+#define OPTIMISTIC_AVERAGE_FIELD_LENGTH 15
+#define OPTIMISTIC_RESULT_SET_SIZE OPTIMISTIC_COLUMN_COUNT*\
+					OPTIMISTIC_ROW_COUNT*\
+					OPTIMISTIC_AVERAGE_FIELD_LENGTH
+
+
+
+class row {
+	friend class sqlrcursor;
+	private:
+			row(uint32_t colcount);
+			~row();
+		void	resize(uint32_t colcount);
+		void	addField(uint32_t column, 
+				const char *buffer, uint32_t length);
+
+		char		*getField(uint32_t column) const;
+		uint32_t	getFieldLength(uint32_t column) const;
+
+		row	*next;
+
+		char		*fields[OPTIMISTIC_COLUMN_COUNT];
+		uint32_t	fieldlengths[OPTIMISTIC_COLUMN_COUNT];
+		char		**extrafields;
+		uint32_t	*extrafieldlengths;
+
+		uint32_t	colcount;
+};
+
+row::row(uint32_t colcount) {
+	this->colcount=colcount;
+	if (colcount>=OPTIMISTIC_COLUMN_COUNT) {
+		extrafields=new char *[colcount-OPTIMISTIC_COLUMN_COUNT];
+		extrafieldlengths=new uint32_t
+					[colcount-OPTIMISTIC_COLUMN_COUNT];
+	} else {
+		extrafields=NULL;
+		extrafieldlengths=NULL;
+	}
+}
+
+row::~row() {
+	delete[] extrafields;
+	delete[] extrafieldlengths;
+}
+
+void row::resize(uint32_t colcount) {
+	this->colcount=colcount;
+	if (colcount>=OPTIMISTIC_COLUMN_COUNT) {
+		delete[] extrafields;
+		delete[] extrafieldlengths;
+		extrafields=new char *[colcount-OPTIMISTIC_COLUMN_COUNT];
+		extrafieldlengths=new uint32_t
+					[colcount-OPTIMISTIC_COLUMN_COUNT];
+	}
+}
+
+void row::addField(uint32_t column, const char *buffer, uint32_t length) {
+	if (column<OPTIMISTIC_COLUMN_COUNT) {
+		fields[column]=(char *)buffer;
+		fieldlengths[column]=length;
+	} else {
+		extrafields[column-OPTIMISTIC_COLUMN_COUNT]=(char *)buffer;
+		extrafieldlengths[column-OPTIMISTIC_COLUMN_COUNT]=length;
+	}
+}
+
+char *row::getField(uint32_t column) const {
+	if (column<OPTIMISTIC_COLUMN_COUNT) {
+		return fields[column];
+	} else {
+		return extrafields[column-OPTIMISTIC_COLUMN_COUNT];
+	}
+}
+
+uint32_t row::getFieldLength(uint32_t column) const {
+	if (column<OPTIMISTIC_COLUMN_COUNT) {
+		return fieldlengths[column];
+	} else {
+		return extrafieldlengths[column-OPTIMISTIC_COLUMN_COUNT];
+	}
+}
+
+
+class column {
+	public:
+		char		*name;
+		uint16_t	type;
+		char		*typestring;
+		uint16_t	typestringlength;
+		uint32_t	length;
+		uint32_t	longest;
+		unsigned char	longdatatype;
+		uint32_t	precision;
+		uint32_t	scale;
+		uint16_t	nullable;
+		uint16_t	primarykey;
+		uint16_t	unique;
+		uint16_t	partofkey;
+		uint16_t	unsignednumber;
+		uint16_t	zerofill;
+		uint16_t	binary;
+		uint16_t	autoincrement;
+};
+
+enum columncase {
+	MIXED_CASE,
+	UPPER_CASE,
+	LOWER_CASE
+};
+
+class bindvar {
+	friend class sqlrcursor;
+	private:
+		char	*variable;
+		union {
+			char	*stringval;
+			int64_t	integerval;
+			struct {
+				double		value;
+				uint32_t	precision;
+				uint32_t	scale;
+			} doubleval;
+			struct {
+				int16_t	year;
+				int16_t	month;
+				int16_t	day;
+				int16_t	hour;
+				int16_t	minute;
+				int16_t	second;
+				int32_t	microsecond;
+				char	*tz;
+			} dateval;
+			char		*lobval;
+			uint16_t	cursorid;
+		} value;
+		uint32_t	valuesize;
+		uint32_t	resultvaluesize;
+		bindvartype_t 	type;
+		bool		send;
+
+		bool		substituted;
+		bool		donesubstituting;
+};
+
 
 class sqlrcursorprivate {
 	friend class sqlrcursor;

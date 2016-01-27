@@ -6,9 +6,6 @@
 
 #include <sqlrelay/private/sqlrincludes.h>
 
-class sqlrconnectionprivate;
-class sqlrcursorprivate;
-
 class SQLRCLIENT_DLLSPEC sqlrconnection {
 	public:
 			/** Initiates a connection to "server" on "port"

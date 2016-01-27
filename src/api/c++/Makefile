@@ -2,8 +2,8 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-SRCS = sqlrconnection.cpp sqlrcursor.cpp row.cpp
-LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ) row.$(OBJ)
+SRCS = sqlrconnection.cpp sqlrcursor.cpp
+LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ)
 
 .SUFFIXES: .lo
 
@@ -29,14 +29,6 @@ install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/sqlrclient.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
-	$(CP) sqlrelay/private/bindvar.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/bindvar.h
-	$(CP) sqlrelay/private/column.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/column.h
-	$(CP) sqlrelay/private/row.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/row.h
-	$(CP) sqlrelay/private/listformat.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/listformat.h
 	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
 	$(CP) sqlrelay/private/sqlrdefines.h $(includedir)/sqlrelay/private

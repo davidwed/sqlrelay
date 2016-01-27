@@ -10,11 +10,26 @@
 #include <rudiments/file.h>
 
 #include <sqlrelay/private/dll.h>
-#include <sqlrelay/private/sqlrdefines.h>
 
-#include <sqlrelay/private/row.h>
-#include <sqlrelay/private/column.h>
-#include <sqlrelay/private/bindvar.h>
-#include <sqlrelay/private/listformat.h>
+enum bindvartype_t {
+	BINDVARTYPE_NULL=0,
+	BINDVARTYPE_STRING,
+	BINDVARTYPE_INTEGER,
+	BINDVARTYPE_DOUBLE,
+	BINDVARTYPE_BLOB,
+	BINDVARTYPE_CLOB,
+	BINDVARTYPE_CURSOR,
+	BINDVARTYPE_DATE
+};
 
+enum sqlrclientlistformat_t {
+	SQLRCLIENTLISTFORMAT_NULL=0,
+	SQLRCLIENTLISTFORMAT_MYSQL,
+	SQLRCLIENTLISTFORMAT_ODBC
+};
+
+class sqlrconnectionprivate;
+class sqlrcursorprivate;
+class column;
+class bindvar;
 class sqlrcursor;
