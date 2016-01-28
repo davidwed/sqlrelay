@@ -29,6 +29,7 @@
 	Python DB -> Python DB-API in the docs
 	moved private members and support classes into C++ API's .cpp files
 	removed -revision during link and adopted Semantic Versioning 2.0
+	added missing get*List methods to Java API
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
