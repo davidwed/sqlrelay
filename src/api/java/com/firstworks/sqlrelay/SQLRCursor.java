@@ -69,6 +69,22 @@ public class SQLRCursor {
 	public native void	cacheOff();
 
 
+	/** Sends a query that returns a list of
+	 *  databases/schemas matching "wild".  If wild is empty
+	 *  or NULL then a list of all databases/schemas will be
+	 *  returned. */
+	public native boolean	getDatabaseList(String wild);
+	/** Sends a query that returns a list of tables
+	 *  matching "wild".  If wild is empty or NULL then
+	 *  a list of all tables will be returned. */
+	public native boolean	getTableList(String wild);
+	/** Sends a query that returns a list of columns
+	 *  in the table specified by the "table" parameter
+	 *  matching "wild".  If wild is empty or NULL then
+	 *  a list of all columns will be returned. */
+	public native boolean	getColumnList(String table, String wild);
+
+
 	/** Sends "query" and gets a result set.  */
 	public native boolean	sendQuery(String query);
 	/** Sends the query in file "path"/"filename" 
