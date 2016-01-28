@@ -245,7 +245,7 @@ static void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
 	// print rows
 	stdoutput.printf("<rows>\n");
 	uint64_t	row=0;
-	for (;;) {
+	do {
 		stdoutput.printf("	<row>\n");
 		for (uint32_t col=0; col<cols; col++) {
 			const char	*field=sqlrcur->getField(row,col);
@@ -258,10 +258,7 @@ static void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
 		}
 		stdoutput.printf("	</row>\n");
 		row++;
-		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
-			break;
-		}
-	}
+	} while (!sqlrcur->endOfResultSet() || row<sqlrcur->rowCount());
 	stdoutput.printf("</rows>\n");
 	stdoutput.printf("</table>\n");
 }

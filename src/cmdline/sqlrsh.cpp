@@ -1111,12 +1111,13 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	const char	*field;
 	uint32_t	fieldlength;
 
-	uint32_t	i=0;
-	while (!(sqlrcur->endOfResultSet() && i==sqlrcur->rowCount())) {
-		for (uint32_t j=0; j<colcount; j++) {
+	bool		done=false;
+	for (uint64_t row=0; !done; row++) {
+
+		for (uint32_t col=0; col<colcount; col++) {
 
 			// put a comma or extra space between fields
-			if (j) {
+			if (col) {
 				if (env->format==SQLRSH_FORMAT_CSV) {
 					stdoutput.write(',');
 				} else {
@@ -1125,8 +1126,22 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			}
 
 			// get the field
-			field=sqlrcur->getField(i,j);
-			fieldlength=sqlrcur->getFieldLength(i,j);
+			field=sqlrcur->getField(row,col);
+
+			// check for end-of-result-set condition
+			// (since nullsasnulls might be set, we have to do 
+			// a bit more than just check for a NULL)
+			if (!col && !field &&
+				sqlrcur->endOfResultSet() &&
+				row==sqlrcur->rowCount()) {
+				done=true;
+				break;
+			}
+
+			// get the field length
+			fieldlength=sqlrcur->getFieldLength(row,col);
+
+			// handle nulls
 			if (!field) {
 				field="NULL";
 				fieldlength=4;
@@ -1143,21 +1158,20 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 			// space-pad after the field, if necessary
 			if (env->format==SQLRSH_FORMAT_PLAIN) {
-				longest=sqlrcur->getLongest(j);
+				longest=sqlrcur->getLongest(col);
 				if (env->headers) {
 					namelen=charstring::length(
-						sqlrcur->getColumnName(j));
+						sqlrcur->getColumnName(col));
 					if (namelen>longest) {
 						longest=namelen;
 					}
 				}
-				for (uint32_t k=fieldlength; k<longest; k++) {
+				for (uint32_t i=fieldlength; i<longest; i++) {
 					stdoutput.write(' ');
 				}
 			}
 		}
 		stdoutput.write('\n');
-		i++;
 	}
 }
 
