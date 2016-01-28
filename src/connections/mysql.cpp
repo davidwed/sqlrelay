@@ -560,13 +560,17 @@ const char *mysqlconnection::getTableListQuery(bool wild) {
 			"from "
 			"	information_schema.tables "
 			"where "
+			"	table_type='BASE TABLE' "
+			"	and "
 			"	table_name like '%s'"
 			:
 			"select "
 			"	table_name, "
 			"	NULL "
 			"from "
-			"	information_schema.tables";
+			"	information_schema.tables "
+			"where "
+			"	table_type='BASE TABLE'";
 }
 
 const char *mysqlconnection::getColumnListQuery(
