@@ -389,8 +389,6 @@ rm -rf %{buildroot}
 %files
 %defattr(-, root, root)
 %{_sysconfdir}/sqlrelay.conf.d
-%config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
-%config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
 /etc/init.d/sqlrelay
 /etc/init.d/sqlrcachemanager
