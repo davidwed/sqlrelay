@@ -40,6 +40,7 @@ installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_database.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_krb_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB) $(AUTHINSTALLSHAREDLIBOPTIONALTARGETS)
