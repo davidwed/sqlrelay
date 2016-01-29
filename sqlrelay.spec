@@ -417,11 +417,7 @@ rm -rf %{buildroot}
 %files server-devel
 %defattr(-, root, root)
 %{_bindir}/sqlrserver-config
-%{_includedir}/sqlrelay
-%{_includedir}/sqlrelay/private
 %{_includedir}/sqlrelay/sqlrserver.h
-%{_includedir}/sqlrelay/private/sqlrconnection.h
-%{_includedir}/sqlrelay/private/sqlrcursor.h
 %{_includedir}/sqlrelay/private/sqlrlistener.h
 %{_includedir}/sqlrelay/private/sqlrserverconnection.h
 %{_includedir}/sqlrelay/private/sqlrservercontroller.h
@@ -456,13 +452,13 @@ rm -rf %{buildroot}
 %files client-devel-c++
 %defattr(-, root, root)
 %{_bindir}/sqlrclient-config
+%{_includedir}/sqlrelay
+%{_includedir}/sqlrelay/private
 %{_includedir}/sqlrelay/sqlrclient.h
-%{_includedir}/sqlrelay/private/bindvar.h
-%{_includedir}/sqlrelay/private/column.h
-%{_includedir}/sqlrelay/private/dll.h
-%{_includedir}/sqlrelay/private/row.h
-%{_includedir}/sqlrelay/private/sqlrdefines.h
-%{_includedir}/sqlrelay/private/sqlrincludes.h
+%{_includedir}/sqlrelay/private/sqlrclientdll.h
+%{_includedir}/sqlrelay/private/sqlrclientincludes.h
+%{_includedir}/sqlrelay/private/sqlrconnection.h
+%{_includedir}/sqlrelay/private/sqlrcursor.h
 %{_libdir}/libsqlrclient.a
 %{_libdir}/libsqlrclient.la
 %{_libdir}/libsqlrclient.so
