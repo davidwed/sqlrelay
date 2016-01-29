@@ -399,8 +399,8 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-start*
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver-*.so.*
-%{_libdir}/libsqlrutil-*.so.*
+%{_libdir}/libsqlrserver.so.*
+%{_libdir}/libsqlrutil.so.*
 %{_libexecdir}/sqlrelay
 %{_libexecdir}/sqlrelay/sqlrlogger_*
 %{_libexecdir}/sqlrelay/sqlrquery_*
@@ -447,11 +447,11 @@ rm -rf %{buildroot}
 
 %files client-runtime-c++
 %defattr(-, root, root)
-%{_libdir}/libsqlrclient-*.so.*
+%{_libdir}/libsqlrclient.so.*
 
 %files client-runtime-c
 %defattr(-, root, root)
-%{_libdir}/libsqlrclientwrapper-*.so.*
+%{_libdir}/libsqlrclientwrapper.so.*
 
 %files client-devel-c++
 %defattr(-, root, root)
@@ -481,17 +481,17 @@ rm -rf %{buildroot}
 
 %files client-postgresql
 %defattr(-, root, root)
-%{_libdir}/libpqsqlrelay-*.so.*
+%{_libdir}/libpqsqlrelay.so.*
 %{_libdir}/libpqsqlrelay.so
 
 %files client-mysql
 %defattr(-, root, root)
-%{_libdir}/libmysql*sqlrelay-*.so.*
+%{_libdir}/libmysql*sqlrelay.so.*
 %{_libdir}/libmysql*sqlrelay.so
 
 %{!?_without_odbc:%files client-odbc}
 %{!?_without_odbc:%defattr(-, root, root)}
-%{!?_without_odbc:%{_libdir}/libsqlrodbc-*.so.*}
+%{!?_without_odbc:%{_libdir}/libsqlrodbc.so.*}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc.so}
 
 %{!?_without_db2:%files db2}
