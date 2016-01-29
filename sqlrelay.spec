@@ -455,7 +455,6 @@ rm -rf %{buildroot}
 %{_includedir}/sqlrelay
 %{_includedir}/sqlrelay/private
 %{_includedir}/sqlrelay/sqlrclient.h
-%{_includedir}/sqlrelay/private/sqlrclientdll.h
 %{_includedir}/sqlrelay/private/sqlrclientincludes.h
 %{_includedir}/sqlrelay/private/sqlrconnection.h
 %{_includedir}/sqlrelay/private/sqlrcursor.h

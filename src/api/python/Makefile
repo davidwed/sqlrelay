@@ -13,7 +13,7 @@ include ../../../config.mk
 all: CSQLRelay.$(LIBEXT) PySQLRDB.py
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest PySQLRDB.py temp.py.in
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest PySQLRDB.py temp.py.in *.pyc
 	$(RMTREE) .libs
 
 CSQLRelay.$(LIBEXT): CSQLRelay.cpp CSQLRelay.$(OBJ)
