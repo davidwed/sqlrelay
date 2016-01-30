@@ -37,7 +37,7 @@
 signalhandler		sqlrservercontroller::alarmhandler;
 volatile sig_atomic_t	sqlrservercontroller::alarmrang=0;
 
-sqlrservercontroller::sqlrservercontroller() : listener() {
+sqlrservercontroller::sqlrservercontroller() {
 
 	conn=NULL;
 
@@ -1024,7 +1024,7 @@ bool sqlrservercontroller::openSockets() {
 				debugstr.append(unixsocket);
 				logDebugMessage(debugstr.getString());
 
-				addReadFileDescriptor(serversockun);
+				lsnr.addReadFileDescriptor(serversockun);
 
 			} else {
 				debugstr.clear();
@@ -1075,7 +1075,7 @@ bool sqlrservercontroller::openSockets() {
 						inetport);
 					logDebugMessage(string);
 	
-					addReadFileDescriptor(
+					lsnr.addReadFileDescriptor(
 							serversockin[index]);
 
 				} else {
@@ -1615,13 +1615,14 @@ int32_t sqlrservercontroller::waitForClient() {
 		// If we're in the middle of a suspended session, wait for
 		// a client to reconnect...
 
-		if (listener::listen(accepttimeout,0)<1) {
+		if (lsnr.listen(accepttimeout,0)<1) {
 			logInternalError(NULL,"wait for client connect failed");
 			return 0;
 		}
 
 		// get the first socket that had data available...
-		filedescriptor	*fd=getReadReadyList()->getFirst()->getValue();
+		filedescriptor	*fd=lsnr.getReadReadyList()->
+						getFirst()->getValue();
 
 		inetsocketserver	*iss=NULL;
 		for (uint64_t index=0; index<serversockincount; index++) {
@@ -4103,7 +4104,7 @@ void sqlrservercontroller::closeSuspendedSessionSockets() {
 				"a previously suspended session...");
 	}
 	if (serversockun) {
-		removeFileDescriptor(serversockun);
+		lsnr.removeFileDescriptor(serversockun);
 		delete serversockun;
 		serversockun=NULL;
 	}
@@ -4111,7 +4112,7 @@ void sqlrservercontroller::closeSuspendedSessionSockets() {
 		for (uint64_t index=0;
 				index<serversockincount;
 				index++) {
-			removeFileDescriptor(serversockin[index]);
+			lsnr.removeFileDescriptor(serversockin[index]);
 			delete serversockin[index];
 			serversockin[index]=NULL;
 		}
@@ -4152,7 +4153,7 @@ void sqlrservercontroller::shutDown() {
 	logOut();
 
 	// clear the pool
-	removeAllFileDescriptors();
+	lsnr.removeAllFileDescriptors();
 
 	// close, clean up all sockets
 	delete serversockun;

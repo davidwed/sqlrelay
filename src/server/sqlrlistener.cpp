@@ -29,7 +29,7 @@
 signalhandler		sqlrlistener::alarmhandler;
 volatile sig_atomic_t	sqlrlistener::alarmrang=0;
 
-sqlrlistener::sqlrlistener() : listener() {
+sqlrlistener::sqlrlistener() {
 
 	cmdl=NULL;
 	sqlrcfgs=NULL;
@@ -707,7 +707,7 @@ bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
 
 			if (clientsockin[ind]->
 					listen(addresses[index],port,15)) {
-				addReadFileDescriptor(clientsockin[ind]);
+				lsnr.addReadFileDescriptor(clientsockin[ind]);
 				listening=true;
 			} else {
 				stringbuffer	info;
@@ -751,7 +751,8 @@ bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
 
 		if (clientsockun[clientsockunindex]->
 				listen(lc->getSocket(),0000,15)) {
-			addReadFileDescriptor(clientsockun[clientsockunindex]);
+			lsnr.addReadFileDescriptor(
+					clientsockun[clientsockunindex]);
 			listening=true;
 		} else {
 			stringbuffer	info;
@@ -790,7 +791,7 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 	bool	success=handoffsockun->listen(handoffsockname,0066,15);
 
 	if (success) {
-		addReadFileDescriptor(handoffsockun);
+		lsnr.addReadFileDescriptor(handoffsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on handoff socket: ");
@@ -823,7 +824,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 						removehandoffsockname,0066,15);
 
 	if (success) {
-		addReadFileDescriptor(removehandoffsockun);
+		lsnr.addReadFileDescriptor(removehandoffsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on deregistration socket: ");
@@ -855,7 +856,7 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	bool	success=fixupsockun->listen(fixupsockname,0066,15);
 
 	if (success) {
-		addReadFileDescriptor(fixupsockun);
+		lsnr.addReadFileDescriptor(fixupsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on fixup socket: ");
@@ -908,14 +909,13 @@ filedescriptor *sqlrlistener::waitForTraffic() {
 
 	// wait for data on one of the sockets...
 	// if something bad happened, return an invalid file descriptor
-	if (listener::listen(-1,-1)<1) {
+	if (lsnr.listen(-1,-1)<1) {
 		return NULL;
 	}
 
 	// return first file descriptor that had data available or an invalid
 	// file descriptor on error
-	filedescriptor	*fd=
-		listener::getReadReadyList()->getFirst()->getValue();
+	filedescriptor	*fd=lsnr.getReadReadyList()->getFirst()->getValue();
 
 	logDebugMessage("finished waiting for traffic");
 

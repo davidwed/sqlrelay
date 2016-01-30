@@ -29,7 +29,7 @@ class sqlrquery;
 class sqlrquerycursor;
 class sqlrqueries;
 
-class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
+class SQLRSERVER_DLLSPEC sqlrlistener {
 	public:
 			sqlrlistener();
 			~sqlrlistener();
@@ -117,7 +117,7 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 		int16_t			isnull;
 };
 
-class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
+class SQLRSERVER_DLLSPEC sqlrservercontroller {
 	public:
 			sqlrservercontroller();
 		virtual	~sqlrservercontroller();
@@ -578,6 +578,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 
 		const char	*asciiToHex(unsigned char ch);
 		const char	*asciiToOctal(unsigned char ch);
+
+		// listener
+		listener		lsnr;
 
 		// connection
 		sqlrserverconnection	*conn;

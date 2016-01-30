@@ -84,6 +84,8 @@
 
 		static void	alarmHandler(int32_t signum);
 
+		listener	lsnr;
+
 		uint32_t	maxconnections;
 		bool		dynamicscaling;
 
