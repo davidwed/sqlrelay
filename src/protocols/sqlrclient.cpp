@@ -8,6 +8,8 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/datetime.h>
+#include <rudiments/userentry.h>
+#include <rudiments/process.h>
 
 #include <datatypes.h>
 #include <defines.h>
@@ -29,6 +31,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		sqlrclientexitstatus_t	clientSession();
 	private:
+		bool	acceptGSSSecurityContext();
 		bool	getCommand(uint16_t *command);
 		sqlrservercursor	*getCursor(uint16_t command);
 		void	noAvailableCursors(uint16_t command);
@@ -201,6 +204,42 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(sqlrservercontroller *cont) :
 	maxerrorlength=cont->cfg->getMaxErrorLength();
 	waitfordowndb=cont->cfg->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
+
+	if (cont->cfg->getKrb()) {
+		if (gss::supportsGSS()) {
+
+			// set the keytab file to use
+			const char	*keytab=cont->cfg->getKrbKeytab();
+			if (!charstring::isNullOrEmpty(keytab)) {
+				environment::setValue("KRB5_KTNAME",keytab);
+			}
+
+			// acquire service credentials from the keytab
+			if (!gcred.acquireService(cont->cfg->getKrbService())) {
+				const char	*status=
+					gcred.getMechanismMinorStatus();
+				stderror.printf("kerberos acquire-"
+						"service failed:\n%s",status);
+				if (charstring::contains(status,
+							"Permission denied")) {
+					char	*user=userentry::getName(
+							process::getUserId());
+					stderror.printf("(keytab file likely "
+							"not readable by user "
+							"%s)\n",user);
+					delete[] user;
+				}
+			}
+
+			// attach the credentials to the context
+			gctx.setCredentials(&gcred);
+
+		} else {
+			stderror.printf("Warning: kerberos support requested "
+					"but platform doesn't support "
+					"kerberos\n");
+		}
+	}
 }
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
@@ -223,7 +262,7 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
 
 	// accept GSS security context, if necessary
-	if (cont->cfg->getKrb() && !cont->acceptGSSSecurityContext()) {
+	if (cont->cfg->getKrb() && !acceptGSSSecurityContext()) {
 		return status;
 	}
 
@@ -458,6 +497,33 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 
 	// return the exit status
 	return status;
+}
+
+bool sqlrprotocol_sqlrclient::acceptGSSSecurityContext() {
+
+	cont->logDebugMessage("accepting gss security context");
+
+	if (!gss::supportsGSS()) {
+		cont->logInternalError(NULL,
+					"failed to accept gss security "
+					"context (kerberos requested but "
+					"not supported)");
+		return false;
+	}
+
+	// attach the context and file descriptor to each other
+	clientsock->setGSSContext(&gctx);
+	gctx.setFileDescriptor(clientsock);
+
+	// accept the security context
+	bool	retval=gctx.accept();
+	if (!retval) {
+		cont->logInternalError(NULL,"failed to accept gss "
+						"security context");
+	}
+
+	cont->logDebugMessage("done accepting gss security context");
+	return retval;
 }
 
 bool sqlrprotocol_sqlrclient::getCommand(uint16_t *command) {

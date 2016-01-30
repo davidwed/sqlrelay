@@ -53,6 +53,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	clientsock=NULL;
 
 	protocol=NULL;
+	currentprotocol=NULL;
 
 	user=NULL;
 	password=NULL;
@@ -272,6 +273,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		return false;
 	}
 
+	setUserAndGroup();
+
 	// update various configurable parameters
 	maxquerysize=cfg->getMaxQuerySize();
 	maxbindcount=cfg->getMaxBindCount();
@@ -294,48 +297,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (!charstring::isNullOrEmpty(auths)) {
 		sqlra=new sqlrauths(sqlrpth);
 		sqlra->loadAuthenticators(auths,sqlrpe);
-	}
-
-	setUserAndGroup();
-
-	// init the gss environment
-	// Note: Do this here, after changing user/group so
-	// that it will fail if the keytab file can't be read.
-	if (cfg->getKrb()) {
-		if (gss::supportsGSS()) {
-
-			// set the keytab file to use
-			const char	*keytab=cfg->getKrbKeytab();
-			if (!charstring::isNullOrEmpty(keytab)) {
-				environment::setValue("KRB5_KTNAME",keytab);
-			}
-
-			// acquire service credentials from the keytab
-			if (!gcred.acquireService(cfg->getKrbService())) {
-				const char	*status=
-					gcred.getMechanismMinorStatus();
-				stderror.printf("kerberos acquire-"
-						"service failed:\n%s",status);
-				if (charstring::contains(status,
-							"Permission denied")) {
-					char	*user=userentry::getName(
-							process::getUserId());
-					stderror.printf("(keytab file likely "
-							"not readable by user "
-							"%s)\n",user);
-					delete[] user;
-				}
-				return false;
-			}
-
-			// attach the credentials to the context
-			gctx.setCredentials(&gcred);
-
-		} else {
-			stderror.printf("Warning: kerberos support requested "
-					"but platform doesn't support "
-					"kerberos\n");
-		}
 	}
 
 	// load database plugin
@@ -1736,11 +1697,11 @@ void sqlrservercontroller::clientSession() {
 	logClientConnected();
 
 	// have client session using the appropriate protocol
-	sqlrprotocol		*proto=sqlrpr->getProtocol(protocol);
+	currentprotocol=sqlrpr->getProtocol(protocol);
 	sqlrclientexitstatus_t	exitstatus=SQLRCLIENTEXITSTATUS_ERROR;
-	if (proto) {
-		proto->setClientSocket(clientsock);
-		exitstatus=proto->clientSession();
+	if (currentprotocol) {
+		currentprotocol->setClientSocket(clientsock);
+		exitstatus=currentprotocol->clientSession();
 	} else {
 		closeClientConnection(0);
 	}
@@ -1769,31 +1730,6 @@ void sqlrservercontroller::clientSession() {
 	inclientsession=false;
 
 	logDebugMessage("done with client session");
-}
-
-bool sqlrservercontroller::acceptGSSSecurityContext() {
-
-	logDebugMessage("accepting gss security context");
-
-	if (!gss::supportsGSS()) {
-		logInternalError(NULL,"failed to accept security "
-					"context (kerberos requested but "
-					"not supported)");
-		return false;
-	}
-
-	// attach the context and file descriptor to each other
-	clientsock->setGSSContext(&gctx);
-	gctx.setFileDescriptor(clientsock);
-
-	// accept the security context
-	bool	retval=gctx.accept();
-	if (!retval) {
-		logInternalError(NULL,"failed to accept gss security context");
-	}
-
-	logDebugMessage("done accepting gss security context");
-	return retval;
 }
 
 sqlrservercursor *sqlrservercontroller::getCursor(uint16_t id) {
@@ -5848,5 +5784,5 @@ sqlrparser *sqlrservercontroller::getParser() {
 }
 
 gsscontext *sqlrservercontroller::getGSSContext() {
-	return &gctx;
+	return (currentprotocol)?currentprotocol->getGSSContext():NULL;
 }

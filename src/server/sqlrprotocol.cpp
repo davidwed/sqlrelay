@@ -14,3 +14,7 @@ sqlrprotocol::~sqlrprotocol() {
 void sqlrprotocol::setClientSocket(filedescriptor *clientsock) {
 	this->clientsock=clientsock;
 }
+
+gsscontext *sqlrprotocol::getGSSContext() {
+	return &gctx;
+}

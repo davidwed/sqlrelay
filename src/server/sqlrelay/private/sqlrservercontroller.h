@@ -162,12 +162,10 @@
 		filedescriptor	*clientsock;
 
 		char		*protocol;
+		sqlrprotocol	*currentprotocol;
 
 		const char	*user;
 		const char	*password;
-
-		gsscredentials	gcred;
-		gsscontext	gctx;
 
 		bool		dbchanged;
 		char		*originaldb;

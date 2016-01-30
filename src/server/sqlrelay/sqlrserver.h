@@ -554,9 +554,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		// query parser
 		sqlrparser	*getParser();
 
-		// Kerberos/GSS
+		// gss
 		gsscontext	*getGSSContext();
-		bool		acceptGSSSecurityContext();
 
 		// utilities
 		bool		skipComment(const char **ptr,
@@ -966,11 +965,16 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 		void	setClientSocket(filedescriptor *clientsock);
 
+		virtual gsscontext		*getGSSContext();
+
 		virtual sqlrclientexitstatus_t	clientSession()=0;
 
 	protected:
 		sqlrservercontroller	*cont;
 		filedescriptor		*clientsock;
+
+		gsscredentials	gcred;
+		gsscontext	gctx;
 };
 
 
