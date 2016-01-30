@@ -541,7 +541,7 @@ void sqlrconnection::reConfigureSockets() {
 
 		if (pvt->_debug) {
 			debugPreStart();
-			debugPrint("encryption disabled");
+			debugPrint("encryption disabled\n");
 			debugPreEnd();
 		}
 

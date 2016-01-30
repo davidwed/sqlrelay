@@ -205,6 +205,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(sqlrservercontroller *cont) :
 	waitfordowndb=cont->cfg->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
 
+	// FIXME: the kerberos settings below should come from the
+	// listener tag, rather than from the instance tag
 	if (cont->cfg->getKrb()) {
 		if (gss::supportsGSS()) {
 

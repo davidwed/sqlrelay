@@ -1693,6 +1693,12 @@ bool sqlrconfig_xml::attributeName(const char *name) {
 			currentattribute=SOCKET_ATTRIBUTE;
 		} else if (!charstring::compare(name,"protocol")) {
 			currentattribute=PROTOCOL_ATTRIBUTE;
+		} else if (!charstring::compare(name,"krb")) {
+			currentattribute=KRB_ATTRIBUTE;
+		} else if (!charstring::compare(name,"krbservice")) {
+			currentattribute=KRBSERVICE_ATTRIBUTE;
+		} else if (!charstring::compare(name,"krbkeytab")) {
+			currentattribute=KRBKEYTAB_ATTRIBUTE;
 		}
 		break;
 
@@ -2278,15 +2284,27 @@ bool sqlrconfig_xml::attributeValue(const char *value) {
 			ignorenondatetime=
 				!charstring::compareIgnoringCase(value,"yes");
 		} else if (currentattribute==KRB_ATTRIBUTE) {
-			krb=!charstring::compareIgnoringCase(value,"yes");
+			if (currenttag==INSTANCE_TAG) {
+				krb=!charstring::compareIgnoringCase(
+								value,"yes");
+			} else if (currenttag==LISTENER_TAG) {
+				currentlistener->setKrb(
+					!charstring::compareIgnoringCase(
+								value,"yes"));
+			}
 		} else if (currentattribute==KRBSERVICE_ATTRIBUTE) {
-			delete[] krbservice;
-			krbservice=charstring::duplicate(value);
+			if (currenttag==INSTANCE_TAG) {
+				delete[] krbservice;
+				krbservice=charstring::duplicate(value);
+			} else if (currenttag==LISTENER_TAG) {
+				currentlistener->setKrbService(value);
+			}
 		} else if (currentattribute==KRBKEYTAB_ATTRIBUTE) {
-			delete[] krbkeytab;
-			krbkeytab=NULL;
-			if (!charstring::isNullOrEmpty(value)) {
+			if (currenttag==INSTANCE_TAG) {
+				delete[] krbkeytab;
 				krbkeytab=charstring::duplicate(value);
+			} else if (currenttag==LISTENER_TAG) {
+				currentlistener->setKrbKeytab(value);
 			}
 		} else if (currentattribute==ENABLED_ATTRIBUTE) {
 			enabled=!charstring::compareIgnoringCase(value,"yes");
