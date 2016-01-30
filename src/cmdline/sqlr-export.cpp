@@ -9,16 +9,6 @@
 #include <defaults.h>
 #include <version.h>
 
-static bool exportTable(sqlrcursor *sqlrcur,
-			const char *table, const char *format);
-static void exportTableXml(sqlrcursor *sqlrcur, const char *table);
-static void exportTableCsv(sqlrcursor *sqlrcur);
-
-static bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
-				const char *sequence, const char *format);
-static void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence);
-static void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence);
-
 static void xmlEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		if (field[index]=='\'') {
@@ -43,6 +33,158 @@ static void csvEscapeField(const char *field, uint32_t length) {
 			stdoutput.printf("%c",field[index]);
 		}
 	}
+}
+
+static void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
+
+	// print header
+	stdoutput.printf("<?xml version=\"1.0\"?>\n");
+
+	// print table name
+	stdoutput.printf("<table name=\"%s\">\n",table);
+
+	// print columns
+	uint32_t	cols=sqlrcur->colCount();
+	stdoutput.printf("<columns count=\"%d\">\n",cols);
+	for (uint32_t j=0; j<cols; j++) {
+		stdoutput.printf("	<column name=\"%s\" type=\"%s\"/>\n",
+			sqlrcur->getColumnName(j),sqlrcur->getColumnType(j));
+	}
+	stdoutput.printf("</columns>\n");
+
+	// print rows
+	stdoutput.printf("<rows>\n");
+	uint64_t	row=0;
+	do {
+		stdoutput.printf("	<row>\n");
+		for (uint32_t col=0; col<cols; col++) {
+			const char	*field=sqlrcur->getField(row,col);
+			if (!field) {
+				break;
+			}
+			stdoutput.printf("	<field>");
+			xmlEscapeField(field,sqlrcur->getFieldLength(row,col));
+			stdoutput.printf("</field>\n");
+		}
+		stdoutput.printf("	</row>\n");
+		row++;
+	} while (!sqlrcur->endOfResultSet() || row<sqlrcur->rowCount());
+	stdoutput.printf("</rows>\n");
+	stdoutput.printf("</table>\n");
+}
+
+static void exportTableCsv(sqlrcursor *sqlrcur) {
+
+	// print header
+	uint32_t	cols=sqlrcur->colCount();
+	for (uint32_t j=0; j<cols; j++) {
+		if (j) {
+			stdoutput.printf(",");
+		}
+		stdoutput.printf("%s",sqlrcur->getColumnName(j));
+	}
+	stdoutput.printf("\n");
+
+	// print rows
+	uint64_t	row=0;
+	for (;;) {
+		for (uint32_t col=0; col<cols; col++) {
+			const char	*field=sqlrcur->getField(row,col);
+			if (!field) {
+				break;
+			}
+			if (col) {
+				stdoutput.printf(",");
+			}
+			stdoutput.printf("\"");
+			csvEscapeField(field,sqlrcur->getFieldLength(row,col));
+			stdoutput.printf("\"");
+		}
+		stdoutput.printf("\n");
+		row++;
+		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
+			break;
+		}
+	}
+}
+
+static bool exportTable(sqlrcursor *sqlrcur,
+				const char *table, const char *format) {
+
+	stringbuffer	query;
+	query.append("select * from ")->append(table);
+	if (sqlrcur->sendQuery(query.getString())) {
+
+		if (!charstring::compareIgnoringCase(format,"csv")) {
+			exportTableCsv(sqlrcur);
+		} else {
+			exportTableXml(sqlrcur,table);
+		}
+		return true;
+	}
+
+	stdoutput.printf("%s\n",sqlrcur->errorMessage());
+	return false;
+}
+
+static void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence) {
+
+	// print header
+	stdoutput.printf("<?xml version=\"1.0\"?>\n");
+
+	// print sequence value
+	stdoutput.printf("<sequence name=\"%s\" value=\"%s\"/>\n",
+			sequence,sqlrcur->getField(0,(uint32_t)0));
+}
+
+static void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence) {
+
+	// print header
+	stdoutput.printf("%s\n",sequence);
+
+	// print sequence value
+	stdoutput.printf("\"%s\"\n",sqlrcur->getField(0,(uint32_t)0));
+}
+
+static bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+				const char *sequence, const char *format) {
+
+	// the query we'll use to get the sequence depends on the database type
+	const char	*dbtype=sqlrcon->identify();
+
+	stringbuffer	query;
+	if (charstring::contains(dbtype,"firebird") ||
+		charstring::contains(dbtype,"interbase")) {
+		query.append("select gen_id(")->append(sequence);
+		query.append(",1) from rdb$database");
+	} else if (charstring::contains(dbtype,"oracle")) {
+		query.append("select ")->append(sequence);
+		query.append(".nextval from dual");
+	} else if (charstring::contains(dbtype,"postgresql")) {
+		query.append("select nextval('")->append(sequence);
+		query.append("')");
+	} else if (charstring::contains(dbtype,"db2")) {
+		query.append("values nextval for ")->append(sequence);
+	} else if (charstring::contains(dbtype,"informix")) {
+		query.append("select ")->append(sequence);
+		query.append(".nextval from sysmaster::sysdual");
+	} else {
+		stdoutput.printf("%s doesn't support sequences.\n",dbtype);
+		return false;
+	}
+
+	if (sqlrcur->sendQuery(query.getString())) {
+
+		if (!charstring::compareIgnoringCase(format,"csv")) {
+			exportSequenceCsv(sqlrcur,sequence);
+		} else {
+			exportSequenceXml(sqlrcur,sequence);
+		}
+		return true;
+	}
+
+	stdoutput.printf("%s\n",sqlrcur->errorMessage());
+	return false;
 }
 
 static void helpmessage(const char *progname) {
@@ -225,156 +367,4 @@ int main(int argc, const char **argv) {
 	sqlrcon.endSession();
 
 	process::exit((result)?0:1);
-}
-
-static bool exportTable(sqlrcursor *sqlrcur,
-				const char *table, const char *format) {
-
-	stringbuffer	query;
-	query.append("select * from ")->append(table);
-	if (sqlrcur->sendQuery(query.getString())) {
-
-		if (!charstring::compareIgnoringCase(format,"csv")) {
-			exportTableCsv(sqlrcur);
-		} else {
-			exportTableXml(sqlrcur,table);
-		}
-		return true;
-	}
-
-	stdoutput.printf("%s\n",sqlrcur->errorMessage());
-	return false;
-}
-
-static void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
-
-	// print header
-	stdoutput.printf("<?xml version=\"1.0\"?>\n");
-
-	// print table name
-	stdoutput.printf("<table name=\"%s\">\n",table);
-
-	// print columns
-	uint32_t	cols=sqlrcur->colCount();
-	stdoutput.printf("<columns count=\"%d\">\n",cols);
-	for (uint32_t j=0; j<cols; j++) {
-		stdoutput.printf("	<column name=\"%s\" type=\"%s\"/>\n",
-			sqlrcur->getColumnName(j),sqlrcur->getColumnType(j));
-	}
-	stdoutput.printf("</columns>\n");
-
-	// print rows
-	stdoutput.printf("<rows>\n");
-	uint64_t	row=0;
-	do {
-		stdoutput.printf("	<row>\n");
-		for (uint32_t col=0; col<cols; col++) {
-			const char	*field=sqlrcur->getField(row,col);
-			if (!field) {
-				break;
-			}
-			stdoutput.printf("	<field>");
-			xmlEscapeField(field,sqlrcur->getFieldLength(row,col));
-			stdoutput.printf("</field>\n");
-		}
-		stdoutput.printf("	</row>\n");
-		row++;
-	} while (!sqlrcur->endOfResultSet() || row<sqlrcur->rowCount());
-	stdoutput.printf("</rows>\n");
-	stdoutput.printf("</table>\n");
-}
-
-static void exportTableCsv(sqlrcursor *sqlrcur) {
-
-	// print header
-	uint32_t	cols=sqlrcur->colCount();
-	for (uint32_t j=0; j<cols; j++) {
-		if (j) {
-			stdoutput.printf(",");
-		}
-		stdoutput.printf("%s",sqlrcur->getColumnName(j));
-	}
-	stdoutput.printf("\n");
-
-	// print rows
-	uint64_t	row=0;
-	for (;;) {
-		for (uint32_t col=0; col<cols; col++) {
-			const char	*field=sqlrcur->getField(row,col);
-			if (!field) {
-				break;
-			}
-			if (col) {
-				stdoutput.printf(",");
-			}
-			stdoutput.printf("\"");
-			csvEscapeField(field,sqlrcur->getFieldLength(row,col));
-			stdoutput.printf("\"");
-		}
-		stdoutput.printf("\n");
-		row++;
-		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
-			break;
-		}
-	}
-}
-
-static bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
-				const char *sequence, const char *format) {
-
-	// the query we'll use to get the sequence depends on the database type
-	const char	*dbtype=sqlrcon->identify();
-
-	stringbuffer	query;
-	if (charstring::contains(dbtype,"firebird") ||
-		charstring::contains(dbtype,"interbase")) {
-		query.append("select gen_id(")->append(sequence);
-		query.append(",1) from rdb$database");
-	} else if (charstring::contains(dbtype,"oracle")) {
-		query.append("select ")->append(sequence);
-		query.append(".nextval from dual");
-	} else if (charstring::contains(dbtype,"postgresql")) {
-		query.append("select nextval('")->append(sequence);
-		query.append("')");
-	} else if (charstring::contains(dbtype,"db2")) {
-		query.append("values nextval for ")->append(sequence);
-	} else if (charstring::contains(dbtype,"informix")) {
-		query.append("select ")->append(sequence);
-		query.append(".nextval from sysmaster::sysdual");
-	} else {
-		stdoutput.printf("%s doesn't support sequences.\n",dbtype);
-		return false;
-	}
-
-	if (sqlrcur->sendQuery(query.getString())) {
-
-		if (!charstring::compareIgnoringCase(format,"csv")) {
-			exportSequenceCsv(sqlrcur,sequence);
-		} else {
-			exportSequenceXml(sqlrcur,sequence);
-		}
-		return true;
-	}
-
-	stdoutput.printf("%s\n",sqlrcur->errorMessage());
-	return false;
-}
-
-static void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence) {
-
-	// print header
-	stdoutput.printf("<?xml version=\"1.0\"?>\n");
-
-	// print sequence value
-	stdoutput.printf("<sequence name=\"%s\" value=\"%s\"/>\n",
-			sequence,sqlrcur->getField(0,(uint32_t)0));
-}
-
-static void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence) {
-
-	// print header
-	stdoutput.printf("%s\n",sequence);
-
-	// print sequence value
-	stdoutput.printf("\"%s\"\n",sqlrcur->getField(0,(uint32_t)0));
 }
