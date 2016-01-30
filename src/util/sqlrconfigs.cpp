@@ -42,7 +42,7 @@ void sqlrconfigs::getEnabledIds(const char *urls,
 		const char	*u=url[i];
 
 		// parse out the protocol
-	 	char	*protocol=NULL;
+	 	char		*protocol=NULL;
 		const char	*colon=charstring::findFirst(u,':');
 		if (colon) {
 			protocol=charstring::duplicate(u,colon-u);

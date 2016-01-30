@@ -2412,6 +2412,11 @@ void sqlrconfig_xml::parseUrl(const char *urlname) {
 		urlname++;
 	}
 
+	// bump past xml:// protocol identifiers
+	if (!charstring::compare(urlname,"xml://",6)) {
+		urlname+=6;
+	}
+
 	// parse the url as a config directory, config file or link file
 	if (!charstring::compare(urlname,"dir:",4)) {
 		parseDir(urlname);
@@ -2465,8 +2470,13 @@ void sqlrconfig_xml::parseLinkFile(const char *urlname) {
 	url	u;
 
 	// bump past file:// protocol identifiers
-	if (!charstring::compare(urlname,"file://")) {
+	if (!charstring::compare(urlname,"file://",7)) {
 		urlname+=7;
+	}
+
+	// bump past xml:// protocol identifiers
+	if (!charstring::compare(urlname,"xml://",6)) {
+		urlname+=6;
 	}
 
 	// parse file or url...
