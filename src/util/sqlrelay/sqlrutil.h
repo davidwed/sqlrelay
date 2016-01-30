@@ -71,17 +71,26 @@ class SQLRUTIL_DLLSPEC listenercontainer {
 		void		setPort(uint16_t port);
 		void		setSocket(const char *socket);
 		void		setProtocol(const char *protocol);
+		void		setKrb(bool krb);
+		void		setKrbService(const char *krbservice);
+		void		setKrbKeytab(const char *krbkeytab);
 		const char * const *getAddresses();
 		uint64_t	getAddressCount();
 		uint16_t	getPort();
 		const char	*getSocket();
 		const char	*getProtocol();
+		bool		getKrb();
+		const char	*getKrbService();
+		const char	*getKrbKeytab();
 	private:
 		char		**addresses;
 		uint64_t	addresscount;
 		uint16_t	port;
 		char		*socket;
 		char		*protocol;
+		bool		krb;
+		char		*krbservice;
+		char		*krbkeytab;
 };
 
 typedef linkedlistnode< listenercontainer * >	listenernode;
@@ -179,6 +188,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual uint64_t		getDefaultAddressCount()=0;
 		virtual uint16_t		getDefaultPort()=0;
 		virtual const char		*getDefaultSocket()=0;
+		virtual bool			getDefaultKrb()=0;
+		virtual const char		*getDefaultKrbService()=0;
 
 		virtual bool		getListenOnInet()=0;
 		virtual bool		getListenOnUnix()=0;

@@ -50,7 +50,6 @@
 		int32_t	waitForClient();
 		bool	getProtocol();
 		void	clientSession();
-		bool	acceptKrbSecurityContext();
 
 		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);

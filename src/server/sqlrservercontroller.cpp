@@ -1686,21 +1686,6 @@ int32_t sqlrservercontroller::waitForClient() {
 		}
 	}
 
-	// set up the socket
-	clientsock->translateByteOrder();
-	clientsock->dontUseNaglesAlgorithm();
-	//clientsock->setTcpReadBufferSize(65536);
-	//clientsock->setTcpWriteBufferSize(65536);
-	clientsock->setReadBufferSize(65536);
-	clientsock->setWriteBufferSize(65536);
-
-	// accept kerberos security context, if necessary
-	if (cfg->getKrb() && !acceptKrbSecurityContext()) {
-		clientsock->close();
-		delete clientsock;
-		return 0;
-	}
-
 	return 1;
 }
 
@@ -1786,9 +1771,9 @@ void sqlrservercontroller::clientSession() {
 	logDebugMessage("done with client session");
 }
 
-bool sqlrservercontroller::acceptKrbSecurityContext() {
+bool sqlrservercontroller::acceptGSSSecurityContext() {
 
-	logDebugMessage("accepting krb security context");
+	logDebugMessage("accepting gss security context");
 
 	if (!gss::supportsGSS()) {
 		logInternalError(NULL,"failed to accept security "
@@ -1804,10 +1789,10 @@ bool sqlrservercontroller::acceptKrbSecurityContext() {
 	// accept the security context
 	bool	retval=gctx.accept();
 	if (!retval) {
-		logInternalError(NULL,"failed to accept krb security context");
+		logInternalError(NULL,"failed to accept gss security context");
 	}
 
-	logDebugMessage("done accepting krb security context");
+	logDebugMessage("done accepting gss security context");
 	return retval;
 }
 

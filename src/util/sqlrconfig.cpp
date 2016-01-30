@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrutil.h>
 
+#include <config.h>
 #include <defaults.h>
 
 sqlrconfig::sqlrconfig() {
@@ -17,6 +18,9 @@ listenercontainer::listenercontainer() {
 	addresscount=0;
 	socket=NULL;
 	protocol=charstring::duplicate(DEFAULT_PROTOCOL);
+	krb=false;
+	krbservice=charstring::duplicate(DEFAULT_KRBSERVICE);
+	krbkeytab=NULL;
 }
 
 listenercontainer::~listenercontainer() {
@@ -26,6 +30,8 @@ listenercontainer::~listenercontainer() {
 	delete[] addresses;
 	delete[] socket;
 	delete[] protocol;
+	delete[] krbservice;
+	delete[] krbkeytab;
 }
 
 void listenercontainer::setAddresses(char **addresses,
@@ -52,6 +58,20 @@ void listenercontainer::setProtocol(const char *protocol) {
 	this->protocol=charstring::duplicate(protocol);
 }
 
+void listenercontainer::setKrb(bool krb) {
+	this->krb=krb;
+}
+
+void listenercontainer::setKrbService(const char *krbservice) {
+	delete[] this->krbservice;
+	this->krbservice=charstring::duplicate(krbservice);
+}
+
+void listenercontainer::setKrbKeytab(const char *krbkeytab) {
+	delete[] this->krbkeytab;
+	this->krbkeytab=charstring::duplicate(krbkeytab);
+}
+
 const char * const *listenercontainer::getAddresses() {
 	return addresses;
 }
@@ -70,6 +90,18 @@ const char *listenercontainer::getSocket() {
 
 const char *listenercontainer::getProtocol() {
 	return protocol;
+}
+
+bool listenercontainer::getKrb() {
+	return krb;
+}
+
+const char *listenercontainer::getKrbService() {
+	return krbservice;
+}
+
+const char *listenercontainer::getKrbKeytab() {
+	return krbkeytab;
 }
 
 

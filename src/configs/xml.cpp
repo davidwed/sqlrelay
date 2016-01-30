@@ -31,6 +31,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		uint64_t		getDefaultAddressCount();
 		uint16_t		getDefaultPort();
 		const char		*getDefaultSocket();
+		bool			getDefaultKrb();
+		const char		*getDefaultKrbService();
 
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
@@ -552,6 +554,14 @@ uint16_t sqlrconfig_xml::getDefaultPort() {
 
 const char *sqlrconfig_xml::getDefaultSocket() {
 	return defaultlistener->getSocket();
+}
+
+bool sqlrconfig_xml::getDefaultKrb() {
+	return defaultlistener->getKrb();
+}
+
+const char *sqlrconfig_xml::getDefaultKrbService() {
+	return defaultlistener->getKrbService();
 }
 
 bool sqlrconfig_xml::getListenOnInet() {
@@ -1291,6 +1301,14 @@ bool sqlrconfig_xml::tagEnd(const char *ns, const char *name) {
 			defaultlistener->setPort(
 				charstring::toInteger(DEFAULT_PORT));
 			listenerlist.append(defaultlistener);
+		}
+
+		// if a default listener was defined, then give it the kerberos
+		// settings that were specified in the instance tag too
+		if (defaultlistener) {
+			defaultlistener->setKrb(krb);
+			defaultlistener->setKrbService(krbservice);
+			defaultlistener->setKrbKeytab(krbkeytab);
 		}
 
 		// reset flags

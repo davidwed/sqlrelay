@@ -1898,18 +1898,22 @@ void sqlrsh::execute(int argc, const char **argv) {
 	sqlrpth=new sqlrpaths(cmdline);
 	sqlrconfigs	sqlrcfgs(sqlrpth);
 
+	// get command-line options
 	const char	*configurl=sqlrpth->getConfigUrl();
-	const char	*id=cmdline->getValue("-id");
-	const char	*host=cmdline->getValue("-host");
+	const char	*id=cmdline->getValue("id");
+	const char	*host=cmdline->getValue("host");
 	uint16_t	port=charstring::toInteger(
-				(cmdline->found("-port"))?
-				cmdline->getValue("-port"):DEFAULT_PORT);
-	const char	*socket=cmdline->getValue("-socket");
-	const char	*user=cmdline->getValue("-user");
-	const char	*password=cmdline->getValue("-password");
-	const char	*script=cmdline->getValue("-script");
-	const char	*command=cmdline->getValue("-command");
+				(cmdline->found("port"))?
+				cmdline->getValue("port"):DEFAULT_PORT);
+	const char	*socket=cmdline->getValue("socket");
+	const char	*user=cmdline->getValue("user");
+	const char	*password=cmdline->getValue("password");
+	bool		krb=cmdline->found("krb");
+	const char	*krbservice=cmdline->getValue("krb");
+	const char	*script=cmdline->getValue("script");
+	const char	*command=cmdline->getValue("command");
 	
+	// at least id, host, or socket is required
 	if (charstring::isNullOrEmpty(id) &&
 		charstring::isNullOrEmpty(host) &&
 		charstring::isNullOrEmpty(socket)) {
@@ -1921,7 +1925,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
 			"  or\n"
-			" %ssh [-config config] -id id [-krb [service]]\n"
+			" %ssh [-config config] -id id\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n",
@@ -1929,49 +1933,63 @@ void sqlrsh::execute(int argc, const char **argv) {
 		process::exit(1);
 	}
 
-	sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
-	if (cfg) {
-
-		// get the host/port/socket/username/password
-		host="localhost";
-		port=cfg->getDefaultPort();
-		socket=cfg->getDefaultSocket();
-		linkedlistnode< usercontainer * >	*firstuser=
-					cfg->getUserList()->getFirst();
-		if (firstuser) {
-			usercontainer	*currentnode=firstuser->getValue();
-			user=currentnode->getUser();
-			password=currentnode->getPassword();
+	// if an id was specified, then get various values from the config file
+	if (!charstring::isNullOrEmpty(id)) {
+		sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
+		if (cfg) {
+			if (!cmdline->found("host")) {
+				host="localhost";
+			}
+			if (!cmdline->found("port")) {
+				port=cfg->getDefaultPort();
+			}
+			if (!cmdline->found("socket")) {
+				socket=cfg->getDefaultSocket();
+			}
+			if (!cmdline->found("krb")) {
+				krb=cfg->getDefaultKrb();
+				krbservice=cfg->getDefaultKrbService();
+			}
+			linkedlistnode< usercontainer * >
+				*firstuser=cfg->getUserList()->getFirst();
+			if (firstuser) {
+				usercontainer	*currentnode=
+						firstuser->getValue();
+				if (!cmdline->found("user")) {
+					user=currentnode->getUser();
+					password=currentnode->getPassword();
+				}
+			}
 		}
 	}
 
-	// connect to sql relay
+	// configure sql relay connection
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	// configure kerberos
-	if (cmdline->found("-krb")) {
-		sqlrcon.useKerberos(cmdline->getValue("-krb"));
+	if (krb) {
+		sqlrcon.useKerberos(krbservice);
 	}
 
 	// set up an sqlrshenv
 	sqlrshenv	env;
 
 	// handle quiet flag
-	if (cmdline->found("-quiet")) {
+	if (cmdline->found("quiet")) {
 		env.headers=false;
 		env.stats=false;
 	}
 
 	// handle the result set format
-	if (!charstring::compare(cmdline->getValue("-format"),"csv")) {
+	if (!charstring::compare(cmdline->getValue("format"),"csv")) {
 		env.format=SQLRSH_FORMAT_CSV;
 	}
 
 	// handle the result set buffer size
-	if (cmdline->found("-resultsetbuffersize")) {
+	if (cmdline->found("resultsetbuffersize")) {
 		env.rsbs=charstring::toInteger(
-				cmdline->getValue("-resultsetbuffersize"));
+				cmdline->getValue("resultsetbuffersize"));
 	}
 
 	// process RC files

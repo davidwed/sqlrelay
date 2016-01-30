@@ -212,12 +212,26 @@ sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
 sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	debugFunction();
 
+	// set up the socket
+	clientsock->translateByteOrder();
+	clientsock->dontUseNaglesAlgorithm();
+	//clientsock->setTcpReadBufferSize(65536);
+	//clientsock->setTcpWriteBufferSize(65536);
+	clientsock->setReadBufferSize(65536);
+	clientsock->setWriteBufferSize(65536);
+
+	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
+
+	// accept GSS security context, if necessary
+	if (cont->cfg->getKrb() && !cont->acceptGSSSecurityContext()) {
+		return status;
+	}
+
 	// During each session, the client will send a series of commands.
 	// The session ends when the client ends it or when certain commands
 	// fail.
 	bool			loop=true;
 	bool			endsession=true;
-	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
 	uint16_t		command;
 	do {
 

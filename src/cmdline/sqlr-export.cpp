@@ -113,32 +113,36 @@ int main(int argc, const char **argv) {
 	sqlrpaths	sqlrpth(&cmdline);
 	sqlrconfigs	sqlrcfgs(&sqlrpth);
 
+	// get command-line options
 	const char	*configurl=sqlrpth.getConfigUrl();
-	const char	*id=cmdline.getValue("-id");
-	const char	*host=cmdline.getValue("-host");
+	const char	*id=cmdline.getValue("id");
+	const char	*host=cmdline.getValue("host");
 	uint16_t	port=charstring::toInteger(
-				(cmdline.found("-port"))?
-					cmdline.getValue("-port"):DEFAULT_PORT);
-	const char	*socket=cmdline.getValue("-socket");
-	const char	*user=cmdline.getValue("-user");
-	const char	*password=cmdline.getValue("-password");
-	const char	*table=cmdline.getValue("-table");
-	const char	*sequence=cmdline.getValue("-sequence");
-	const char	*format=cmdline.getValue("-format");
+				(cmdline.found("port"))?
+				cmdline.getValue("port"):DEFAULT_PORT);
+	const char	*socket=cmdline.getValue("socket");
+	const char	*user=cmdline.getValue("user");
+	const char	*password=cmdline.getValue("password");
+	bool		krb=cmdline.found("krb");
+	const char	*krbservice=cmdline.getValue("krb");
+	const char	*table=cmdline.getValue("table");
+	const char	*sequence=cmdline.getValue("sequence");
+	const char	*format=cmdline.getValue("format");
 	if (charstring::isNullOrEmpty(format)) {
 		format="xml";
 	}
 	uint64_t	rsbs=charstring::toInteger(
-				cmdline.getValue("-resultsetbuffersize"));
+				cmdline.getValue("resultsetbuffersize"));
 	if (!rsbs) {
 		rsbs=100;
 	}
-	bool		debug=cmdline.found("-debug");
+	bool		debug=cmdline.found("debug");
 	const char	*debugfile=NULL;
 	if (debug) {
-		debugfile=cmdline.getValue("-debug");
+		debugfile=cmdline.getValue("debug");
 	}
 
+	// at least id, host or socket, and table or sequence are required
 	if ((charstring::isNullOrEmpty(id) &&
 		charstring::isNullOrEmpty(host) &&
 		charstring::isNullOrEmpty(socket)) ||
@@ -162,29 +166,46 @@ int main(int argc, const char **argv) {
 		process::exit(1);
 	}
 
-	sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
-	if (cfg) {
-
-		// get the host/port/socket/username/password
-		host="localhost";
-		port=cfg->getDefaultPort();
-		socket=cfg->getDefaultSocket();
-		linkedlistnode< usercontainer * >       *firstuser=
-					cfg->getUserList()->getFirst();
-		if (firstuser) {
-			usercontainer   *currentnode=firstuser->getValue();
-			user=currentnode->getUser();
-			password=currentnode->getPassword();
+	// if an id was specified, then get various values from the config file
+	if (!charstring::isNullOrEmpty(id)) {
+		sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
+		if (cfg) {
+			if (!cmdline.found("host")) {
+				host="localhost";
+			}
+			if (!cmdline.found("port")) {
+				port=cfg->getDefaultPort();
+			}
+			if (!cmdline.found("socket")) {
+				socket=cfg->getDefaultSocket();
+			}
+			if (!cmdline.found("krb")) {
+				krb=cfg->getDefaultKrb();
+				krbservice=cfg->getDefaultKrbService();
+			}
+			linkedlistnode< usercontainer * >
+				*firstuser=cfg->getUserList()->getFirst();
+			if (firstuser) {
+				usercontainer   *currentnode=
+						firstuser->getValue();
+				if (!cmdline.found("user")) {
+					user=currentnode->getUser();
+					password=currentnode->getPassword();
+				}
+			}
 		}
 	}
 
+	// configure sql relay connection
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 
-	if (cmdline.found("-krb")) {
-		sqlrcon.useKerberos(cmdline.getValue("-krb"));
+	// configure kerberos
+	if (krb) {
+		sqlrcon.useKerberos(krbservice);
 	}
 
+	// configure debug
 	if (debug) {
 		if (debugfile) {
 			sqlrcon.setDebugFile(debugfile);
