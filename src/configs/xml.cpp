@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrutil.h>
+#include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
 #include <rudiments/directory.h>
@@ -2412,9 +2413,11 @@ void sqlrconfig_xml::parseUrl(const char *urlname) {
 		urlname++;
 	}
 
-	// bump past xml:// protocol identifiers
+	// bump past xml protocol identifiers
 	if (!charstring::compare(urlname,"xml://",6)) {
 		urlname+=6;
+	} else if (!charstring::compare(urlname,"xml:",4)) {
+		urlname+=4;
 	}
 
 	// parse the url as a config directory, config file or link file
@@ -2469,15 +2472,20 @@ void sqlrconfig_xml::parseLinkFile(const char *urlname) {
 	file	fl;
 	url	u;
 
-	// bump past file:// protocol identifiers
+	// bump past file protocol identifiers
 	if (!charstring::compare(urlname,"file://",7)) {
 		urlname+=7;
+	} else if (!charstring::compare(urlname,"file:",5)) {
+		urlname+=5;
 	}
 
-	// bump past xml:// protocol identifiers
+	// bump past xml protocol identifiers
 	if (!charstring::compare(urlname,"xml://",6)) {
 		urlname+=6;
+	} else if (!charstring::compare(urlname,"xml:",4)) {
+		urlname+=4;
 	}
+
 
 	// parse file or url...
 	if (charstring::contains(urlname,"://")) {
