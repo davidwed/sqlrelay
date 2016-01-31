@@ -4,12 +4,12 @@
 #ifndef SQLRUTIL_H
 #define SQLRUTIL_H
 
-#include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/parameterstring.h>
 #include <rudiments/regularexpression.h>
 #include <rudiments/commandline.h>
 #include <rudiments/linkedlist.h>
+#include <rudiments/xmldomnode.h>
 #include <rudiments/dynamiclib.h>
 
 #include <sqlrelay/private/sqlrutildll.h>
@@ -283,6 +283,17 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char	*getQueries()=0;
 		virtual const char	*getPasswordEncryptions()=0;
 		virtual const char	*getAuthentications()=0;
+
+		virtual xmldomnode	*getListenersXml()=0;
+		virtual xmldomnode	*getParserXml()=0;
+		virtual xmldomnode	*getTranslationsXml()=0;
+		virtual xmldomnode	*getFiltersXml()=0;
+		virtual xmldomnode	*getResultSetTranslationsXml()=0;
+		virtual xmldomnode	*getTriggersXml()=0;
+		virtual xmldomnode	*getLoggersXml()=0;
+		virtual xmldomnode	*getQueriesXml()=0;
+		virtual xmldomnode	*getPasswordEncryptionsXml()=0;
+		virtual xmldomnode	*getAuthenticationsXml()=0;
 
 		virtual linkedlist< listenercontainer * >
 						*getListenerList()=0;

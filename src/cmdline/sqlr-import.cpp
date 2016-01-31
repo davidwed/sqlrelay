@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <sqlrelay/sqlrutil.h>
+#include <rudiments/xmlsax.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 #include <config.h>

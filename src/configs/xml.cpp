@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/xmlsax.h>
+#include <rudiments/xmldomnode.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
 #include <rudiments/directory.h>
@@ -109,6 +110,17 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		const char	*getQueries();
 		const char	*getPasswordEncryptions();
 		const char	*getAuthentications();
+
+		xmldomnode	*getListenersXml();
+		xmldomnode	*getParserXml();
+		xmldomnode	*getTranslationsXml();
+		xmldomnode	*getFiltersXml();
+		xmldomnode	*getResultSetTranslationsXml();
+		xmldomnode	*getTriggersXml();
+		xmldomnode	*getLoggersXml();
+		xmldomnode	*getQueriesXml();
+		xmldomnode	*getPasswordEncryptionsXml();
+		xmldomnode	*getAuthenticationsXml();
 
 		linkedlist< listenercontainer * >	*getListenerList();
 
@@ -844,6 +856,46 @@ const char *sqlrconfig_xml::getPasswordEncryptions() {
 
 const char *sqlrconfig_xml::getAuthentications() {
 	return authentications.getString();
+}
+
+xmldomnode *sqlrconfig_xml::getListenersXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getParserXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getTranslationsXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getFiltersXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getResultSetTranslationsXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getTriggersXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getLoggersXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getQueriesXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getPasswordEncryptionsXml() {
+	return NULL;
+}
+
+xmldomnode *sqlrconfig_xml::getAuthenticationsXml() {
+	return NULL;
 }
 
 linkedlist< listenercontainer * > *sqlrconfig_xml::getListenerList() {
