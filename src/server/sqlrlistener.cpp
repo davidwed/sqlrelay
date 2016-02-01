@@ -584,7 +584,6 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 				"calls\n");
 	}
 
-
 	return true;
 }
 
@@ -1012,13 +1011,14 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	}
 
 	clientsock->dontUseNaglesAlgorithm();
+	// FIXME: not the same as the client or connection?
 	clientsock->setReadBufferSize(8192);
 	clientsock->setWriteBufferSize(8192);
 
 	// Don't fork unless we have to.
 	//
 	// If there are no busy listeners and there are available connections,
-	// then we don't need to fork a child, otherwise we do.
+	// then we don't need to fork a child.  Otherwise we do.
 	//
 	// It's possible that getValue(2) will be 0, indicating no connections
 	// are available, but one will become available immediately after this
@@ -1426,7 +1426,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 	return retval;
 }
 
-bool sqlrlistener::acquireShmAccess() {
+bool sqlrlistener::acquireShmAccess(thread *thr) {
 
 	logDebugMessage("acquiring exclusive shm access");
 
@@ -1442,7 +1442,9 @@ bool sqlrlistener::acquireShmAccess() {
 	if (sys::signalsInterruptSystemCalls()) {
 		semset->dontRetryInterruptedOperations();
 		do {
+//stdoutput.printf("%lld: before\n",(uint64_t)thr);
 			result=semset->waitWithUndo(1);
+//stdoutput.printf("%lld: after result=%d error=%d alarmrang=%d\n",(uint64_t)thr,result,error::getErrorNumber(),alarmrang);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
 		semset->retryInterruptedOperations();
@@ -1623,7 +1625,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		bool	alldbsdown=false;
 
 		// acquire access to the shared memory
-		bool	ok=acquireShmAccess();
+		bool	ok=acquireShmAccess(thr);
 
 		if (ok) {
 
@@ -1671,12 +1673,12 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		delete alarmthread;
 		delete ata;
 
-		// wait for the connection to let us know that it's ready
-		// to have a client handed off to it
-		waitForConnectionToBeReadyForHandoff();
-
 		// execute this only if code above executed without errors...
 		if (ok) {
+
+			// wait for the connection to let us know that it's
+			// ready to have a client handed off to it
+			waitForConnectionToBeReadyForHandoff();
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(shm->connectionid)) {

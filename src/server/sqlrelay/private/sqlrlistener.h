@@ -34,7 +34,7 @@
 					const char *protocol, thread *thr);
 		void    errorClientSession(filedescriptor *clientsock,
 					int64_t errnum, const char *err);
-		bool	acquireShmAccess();
+		bool	acquireShmAccess(thread *thr);
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(bool *alldbsdown);
 		bool	doneAcceptingAvailableConnection();
