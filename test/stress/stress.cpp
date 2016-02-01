@@ -2,6 +2,7 @@
 // See the file COPYING for more information.
 
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/commandline.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/thread.h>
 #include <rudiments/charstring.h>
@@ -12,19 +13,21 @@
 const char	*host;
 uint16_t	port;
 const char	*sock;
-const char	*login;
+const char	*user;
 const char	*password;
-int64_t		threadcount;
-int64_t		cursorcount;
+int64_t		concount;
+int64_t		curcount;
 
 void runQuery(void *id) {
 
 	uint64_t	threadid=(uint64_t)id;
 	uint32_t	seed=threadid;
 
+	stdoutput.printf("%lld: starting\n",threadid);
+
 	for (;;) {
 								
-		sqlrconnection	sqlrcon(host,port,sock,login,password,0,1);
+		sqlrconnection	sqlrcon(host,port,sock,user,password,0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 
 		stringbuffer	query;
@@ -101,12 +104,12 @@ void runQuery(void *id) {
 			times=randomnumber::scaleNumber(seed,1,4);
 			stdoutput.printf("%lld: selecting %d times with "
 					"%lld nested cursors\n",
-					threadid,times,cursorcount);
+					threadid,times,curcount);
 			for (int64_t i=0; i<times; i++) {
 				sqlrcursor	**cursors=
-						new sqlrcursor *[cursorcount];
+						new sqlrcursor *[curcount];
 				cursors[0]=&sqlrcur;
-				for (int64_t j=0; j<cursorcount; j++) {
+				for (int64_t j=0; j<curcount; j++) {
 					if (j) {
 						cursors[j]=
 						new sqlrcursor(&sqlrcon);
@@ -121,43 +124,53 @@ void runQuery(void *id) {
 						cursors[j]->errorMessage());
 					}
 				}
-				for (int32_t j=1; j<cursorcount; j++) {
+				for (int32_t j=1; j<curcount; j++) {
 					delete cursors[j];
 				}
 				delete cursors;
 			}
 	
 			// drop the table
+			stdoutput.printf("%lld: dropping table\n",threadid);
 			query.clear();
 			query.append("drop table test")->append(threadid);
 			sqlrcur.sendQuery(query.getString());
 		}
+
+		stdoutput.printf("%lld: disconnecting\n",threadid);
 	}
 }
 
-int main(int argc, char **argv) {
+int main(int argc, const char **argv) {
 
-	if (argc<3) {
-		stdoutput.printf("usage: stress connectioncount cursorcount\n");
+	commandline	cmdl(argc,argv);
+
+	if (!cmdl.found("host") || !cmdl.found("port") ||
+			!cmdl.found("user") || !cmdl.found("password") ||
+			!cmdl.found("concount") || !cmdl.found("curcount")) {
+		stdoutput.printf("usage: stress -host host -port port -socket socket -user user -password password -concount concount -curcount curcount\n");
 		process::exit(1);
 	}
 
-	host="sqlrserver";
-	port=9000;
-	sock="/tmp/test.socket";
-	login="test";
-	password="test";
-	threadcount=charstring::toInteger(argv[1]);
-	cursorcount=charstring::toInteger(argv[2]);
+	host=cmdl.getValue("host");
+	port=charstring::toUnsignedInteger(cmdl.getValue("port"));
+	sock=cmdl.getValue("socket");
+	user=cmdl.getValue("user");
+	password=cmdl.getValue("password");
+	concount=charstring::toUnsignedInteger(cmdl.getValue("concount"));
+	curcount=charstring::toUnsignedInteger(cmdl.getValue("curcount"));
 
-	thread	*th=new thread[threadcount];
+	thread	*th=new thread[concount];
 
-	for (int64_t i=0; i<threadcount; i++) {
+	stdoutput.printf("starting %lld threads\n",concount);
+	for (int64_t i=0; i<concount; i++) {
 		th[i].setFunction((void *(*)(void *))runQuery);
-		th[i].run((void *)i);
+		if (!th[i].run((void *)i)) {
+			stdoutput.printf("%lld: failed to start\n",i);
+		}
 	}
 
-	for (int64_t i=0; i<threadcount; i++) {
+	for (int64_t i=0; i<concount; i++) {
 		th[i].join(NULL);
 	}
 	delete[] th;
