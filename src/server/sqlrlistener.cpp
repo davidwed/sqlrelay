@@ -1431,6 +1431,7 @@ bool sqlrlistener::acquireShmAccess(thread *thr) {
 	logDebugMessage("acquiring exclusive shm access");
 
 	// don't even begin to wait if the alarm already rang
+	// FIXME: trouble here... alarmrang isn't local to this thread
 	if (alarmrang) {
 		logDebugMessage("timeout occured");
 		return false;
@@ -1438,13 +1439,14 @@ bool sqlrlistener::acquireShmAccess(thread *thr) {
 
 	// Loop, waiting.  Bail if interrupted by an alarm.
 	// FIXME: refactor this, similarly to controller
+	// FIXME: trouble here...
+	// 	* the alarm doesn't reliably interrupt the wait
+	//	* alarmrang isn't local to this thread
 	bool	result=true;
 	if (sys::signalsInterruptSystemCalls()) {
 		semset->dontRetryInterruptedOperations();
 		do {
-//stdoutput.printf("%lld: before\n",(uint64_t)thr);
 			result=semset->waitWithUndo(1);
-//stdoutput.printf("%lld: after result=%d error=%d alarmrang=%d\n",(uint64_t)thr,result,error::getErrorNumber(),alarmrang);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
 		semset->retryInterruptedOperations();
@@ -1455,6 +1457,7 @@ bool sqlrlistener::acquireShmAccess(thread *thr) {
 	}
 
 	// handle alarm...
+	// FIXME: trouble here... alarmrang isn't local to this thread
 	if (alarmrang) {
 		logDebugMessage("timeout occured");
 		return false;
@@ -1510,6 +1513,7 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 	logDebugMessage("waiting for an available connection");
 
 	// don't even begin to wait if the alarm already rang
+	// FIXME: trouble here... alarmrang isn't local to this thread
 	if (alarmrang) {
 		logDebugMessage("timeout occured");
 		return false;
@@ -1517,6 +1521,9 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 
 	// Loop, waiting.  Bail if interrupted by an alarm.
 	// FIXME: refactor this, similarly to controller
+	// FIXME: trouble here... the alarm doesn't reliably interrupt the wait,
+	// and alarmrang isn't local to this thread, so checking it isn't
+	// reliable
 	bool	result=true;
 	if (sys::signalsInterruptSystemCalls()) {
 		semset->dontRetryInterruptedOperations();
@@ -1532,6 +1539,7 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 	}
 
 	// handle alarm...
+	// FIXME: trouble here... alarmrang isn't local to this thread
 	if (alarmrang) {
 		logDebugMessage("timeout occured");
 		return false;
@@ -1604,6 +1612,8 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// set an alarm
 		bool	alarmon=false;
 		if (usealarm) {
+			// FIXME: trouble here...
+			// alarmrang isn't local to this thread
 			alarmrang=0;
 			if (isforkedthread) {
 				alarmthread=new thread;
@@ -1700,6 +1710,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		}
 
 		// return an error if the timeout was reached
+		// FIXME: trouble here... alarmrang isn't local to this thread
 		if (alarmrang) {
 			logDebugMessage("failed to get "
 					"a connection: timeout");
@@ -2291,6 +2302,7 @@ void sqlrlistener::logInternalError(const char *info) {
 }
 
 void sqlrlistener::alarmHandler(int32_t signum) {
+	// FIXME: trouble here... alarmrang isn't local to the calling thread
 	alarmrang=1;
 	#ifdef SIGALRM
 	alarmhandler.handleSignal(SIGALRM);
