@@ -6,6 +6,7 @@
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>
+#include <rudiments/error.h>
 #include <config.h>
 #include <debugprint.h>
 
@@ -103,7 +104,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 	file	querylog2;
 	if (querylog2.open(querylogname,O_RDONLY)) {
 		ino_t	inode1=querylog.getInode();
-		ino_t	inode2=querylog.getInode();
+		ino_t	inode2=querylog2.getInode();
 		querylog2.close();
 		if (inode1!=inode2) {
 			init(sqlrl,sqlrcon);
