@@ -10,7 +10,7 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(STRESSCPPFLAGS) $(COMPILE) $<
 
-all: socketeater stress
+all: socketeater stress connectdisconnect
 
 socketeater: socketeater.cpp socketeater.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) socketeater.$(OBJ) $(STRESSLIBS)
@@ -18,6 +18,9 @@ socketeater: socketeater.cpp socketeater.$(OBJ)
 stress: stress.cpp stress.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) stress.$(OBJ) $(STRESSLIBS)
 
+connectdisconnect: connectdisconnect.cpp connectdisconnect.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) connectdisconnect.$(OBJ) $(STRESSLIBS)
+
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest socketeater$(EXE) stress$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest socketeater$(EXE) stress$(EXE) connectdisconnect$(EXE)
 	$(RMTREE) .libs
