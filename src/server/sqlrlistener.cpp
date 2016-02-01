@@ -1612,11 +1612,11 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				alarmthread->setFunction(
 					(void*(*)(void*))alarmThread);
 				alarmthread->setArgument(ata);
-				alarmthread->run();
+				alarmon=alarmthread->run();
 			} else {
 				signalmanager::alarm(listenertimeout);
+				alarmon=true;
 			}
-			alarmon=true;
 		}
 
 		// set "all db's down" flag
@@ -1635,7 +1635,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			ok=acceptAvailableConnection(&alldbsdown);
 
 			// turn off the alarm
-			if (usealarm) {
+			if (usealarm && alarmon) {
 				if (isforkedthread) {
 					alarmthread->cancel();
 				} else {
@@ -1732,6 +1732,13 @@ void sqlrlistener::alarmThread(void *attr) {
 	#ifdef SIGALRM
 	ata->mainthr->raiseSignal(SIGALRM);
 	#endif
+
+	// Wait to be cancelled.  The parent thread will eventually attempt to
+	// cancel this thread, and cancelling a detached thread that has
+	// already exited will crash on many platforms.
+	for (;;) {
+		snooze::macrosnooze(1);
+	}
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
