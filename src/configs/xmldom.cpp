@@ -105,15 +105,15 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
 
-		const char	*getParser();
-		const char	*getTranslations();
-		const char	*getFilters();
-		const char	*getResultSetTranslations();
-		const char	*getTriggers();
-		const char	*getLoggers();
-		const char	*getQueries();
-		const char	*getPasswordEncryptions();
-		const char	*getAuthentications();
+		xmldomnode	*getParser();
+		xmldomnode	*getTranslations();
+		xmldomnode	*getFilters();
+		xmldomnode	*getResultSetTranslations();
+		xmldomnode	*getTriggers();
+		xmldomnode	*getLoggers();
+		xmldomnode	*getQueries();
+		xmldomnode	*getPasswordEncryptions();
+		xmldomnode	*getAuths();
 
 		linkedlist< listenercontainer * >	*getListenerList();
 
@@ -234,16 +234,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		xmldomnode	*queriesxml;
 		xmldomnode	*pwdencsxml;
 		xmldomnode	*authsxml;
-
-		stringbuffer	parser;
-		stringbuffer	translations;
-		stringbuffer	filters;
-		stringbuffer	resultsettranslations;
-		stringbuffer	triggers;
-		stringbuffer	loggers;
-		stringbuffer	queries;
-		stringbuffer	pwdencs;
-		stringbuffer	auths;
 
 		uint32_t	metrictotal;
 
@@ -667,40 +657,40 @@ linkedlist< char * > *sqlrconfig_xmldom::getSessionEndQueries() {
 	return &sessionendqueries;
 }
 
-const char *sqlrconfig_xmldom::getParser() {
-	return parser.getString();
+xmldomnode *sqlrconfig_xmldom::getParser() {
+	return parserxml;
 }
 
-const char *sqlrconfig_xmldom::getTranslations() {
-	return translations.getString();
+xmldomnode *sqlrconfig_xmldom::getTranslations() {
+	return translationsxml;
 }
 
-const char *sqlrconfig_xmldom::getFilters() {
-	return filters.getString();
+xmldomnode *sqlrconfig_xmldom::getFilters() {
+	return filtersxml;
 }
 
-const char *sqlrconfig_xmldom::getResultSetTranslations() {
-	return resultsettranslations.getString();
+xmldomnode *sqlrconfig_xmldom::getResultSetTranslations() {
+	return resultsettranslationsxml;
 }
 
-const char *sqlrconfig_xmldom::getTriggers() {
-	return triggers.getString();
+xmldomnode *sqlrconfig_xmldom::getTriggers() {
+	return triggersxml;
 }
 
-const char *sqlrconfig_xmldom::getLoggers() {
-	return loggers.getString();
+xmldomnode *sqlrconfig_xmldom::getLoggers() {
+	return loggersxml;
 }
 
-const char *sqlrconfig_xmldom::getQueries() {
-	return queries.getString();
+xmldomnode *sqlrconfig_xmldom::getQueries() {
+	return queriesxml;
 }
 
-const char *sqlrconfig_xmldom::getPasswordEncryptions() {
-	return pwdencs.getString();
+xmldomnode *sqlrconfig_xmldom::getPasswordEncryptions() {
+	return pwdencsxml;
 }
 
-const char *sqlrconfig_xmldom::getAuthentications() {
-	return auths.getString();
+xmldomnode *sqlrconfig_xmldom::getAuths() {
+	return authsxml;
 }
 
 linkedlist< listenercontainer * > *sqlrconfig_xmldom::getListenerList() {
@@ -1144,10 +1134,9 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// add missing authentications tag
-	xmldomnode	*authentications=
-				instance->getFirstTagChild("authentications");
-	if (authentications->isNullNode()) {
-		authentications=instance->insertTag("authentications",1);
+	xmldomnode	*auths=instance->getFirstTagChild("authentications");
+	if (auths->isNullNode()) {
+		auths=instance->insertTag("authentications",1);
 	}
 
 	// users -> auth_userlist
@@ -1155,16 +1144,14 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*users=instance->getFirstTagChild("users");
 	if (!users->isNullNode()) {
 
-		xmldomnode	*authentication=
-				authentications->insertTag("authentication",0);
-		authentication->setAttributeValue("module","userlist");
+		xmldomnode	*auth=auths->insertTag("authentication",0);
+		auth->setAttributeValue("module","userlist");
 
 		for (xmldomnode *user=users->getFirstTagChild("user");
 				!user->isNullNode();
 				user=user->getNextTagSibling("user")) {
 
-			xmldomnode	*authuser=
-					authentication->appendTag("user");
+			xmldomnode	*authuser=auth->appendTag("user");
 
 			xmldomnode	*userattr=
 					user->getAttribute("user");
@@ -1208,12 +1195,11 @@ void sqlrconfig_xmldom::normalizeTree() {
 	if (!attr->isNullNode() && 
 		!charstring::compare(attr->getValue(),"database")) {
 
-		xmldomnode	*authentication=
-			(addeduserlist)?
-				authentications->insertTag("authentication",1):
-				authentications->insertTag("authentication",0);
+		xmldomnode	*auth=(addeduserlist)?
+					auths->insertTag("authentication",1):
+					auths->insertTag("authentication",0);
 
-		authentication->setAttributeValue("module","database");
+		auth->setAttributeValue("module","database");
 
 		instance->deleteAttribute(attr);
 	}
@@ -1567,16 +1553,6 @@ void sqlrconfig_xmldom::getTreeValues() {
 	queriesxml=instance->getFirstTagChild("queries");
 	pwdencsxml=instance->getFirstTagChild("passwordencryptions");
 	authsxml=instance->getFirstTagChild("authentications");
-
-	parserxml->print(&parser);
-	translationsxml->print(&translations);
-	filtersxml->print(&filters);
-	resultsettranslationsxml->print(&resultsettranslations);
-	triggersxml->print(&triggers);
-	loggersxml->print(&loggers);
-	queriesxml->print(&queries);
-	pwdencsxml->print(&pwdencs);
-	authsxml->print(&auths);
 
 	// listeners tag...
 	for (xmldomnode *listener=listenersxml->getFirstTagChild("listener");

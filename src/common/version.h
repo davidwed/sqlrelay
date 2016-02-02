@@ -63,9 +63,9 @@ static void help(int argc, const char **argv) {
 "				Can be used instead of host/port for making\n" \
 "				connections to local servers.\n" \
 "\n" \
-"	-user user		User name to authenticate with.\n" \
+"	-user user		User name to auth with.\n" \
 "\n" \
-"	-password password	Password to authenticate with.\n" \
+"	-password password	Password to auth with.\n" \
 "\n" \
 "Alternate connection options:\n" \
 "	-config config		Override the default configuration with the\n" \

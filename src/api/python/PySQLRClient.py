@@ -28,7 +28,7 @@ class sqlrconnection:
 
     def __init__(self, host, port, socket, user, password, retrytime=0, tries=1):
         """ 
-        Opens a connection to the sqlrelay server and authenticates with
+        Opens a connection to the sqlrelay server and auths with
         user and password.  Failed connections are retried for tries times,
         waiting retrytime seconds between each try.  If tries is 0 then retries
         will continue forever.  If retrytime is 0 then retries will be attempted

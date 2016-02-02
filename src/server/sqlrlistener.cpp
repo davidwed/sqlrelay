@@ -216,8 +216,8 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	handleDynamicScaling();
 
-	const char	*loggers=cfg->getLoggers();
-	if (charstring::length(loggers)) {
+	xmldomnode	*loggers=cfg->getLoggers();
+	if (!loggers->isNullNode()) {
 		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(this,NULL);

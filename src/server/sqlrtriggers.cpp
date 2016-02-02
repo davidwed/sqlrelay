@@ -11,7 +11,6 @@
 
 sqlrtriggers::sqlrtriggers(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	xmld=NULL;
 	libexecdir=sqlrpth->getLibExecDir();
 	this->debug=debug;
 }
@@ -19,32 +18,15 @@ sqlrtriggers::sqlrtriggers(sqlrpaths *sqlrpth, bool debug) {
 sqlrtriggers::~sqlrtriggers() {
 	debugFunction();
 	unloadTriggers();
-	delete xmld;
 }
 
-bool sqlrtriggers::loadTriggers(const char *triggers) {
+bool sqlrtriggers::loadTriggers(xmldomnode *parameters) {
 	debugFunction();
 
 	unloadTriggers();
 
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the triggers
-	if (!xmld->parseString(triggers)) {
-		return false;
-	}
-
-	// get the triggers tag
-	xmldomnode	*triggersnode=
-			xmld->getRootNode()->getFirstTagChild("triggers");
-	if (triggersnode->isNullNode()) {
-		return false;
-	}
-
 	// run through the trigger list
-	for (xmldomnode *trigger=triggersnode->getFirstTagChild();
+	for (xmldomnode *trigger=parameters->getFirstTagChild();
 		!trigger->isNullNode(); trigger=trigger->getNextTagSibling()) {
 
 		// get whether to run before or after a query

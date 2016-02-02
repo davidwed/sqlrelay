@@ -48,7 +48,7 @@ class sqlrconnectionprivate {
 		int32_t		_retrytime;
 		int32_t		_tries;
 
-		// authentication
+		// auth
 		char		*_user;
 		uint32_t	_userlen;
 		char		*_password;
@@ -501,11 +501,11 @@ bool sqlrconnection::openSession() {
 	// send protocol info
 	protocol();
 
-	// authenticate
-	authenticate();
+	// auth
+	auth();
 
 	// if we made it here then everything went well and we are successfully
-	// pvt->_connected and authenticated with the connection daemon
+	// pvt->_connected and auth'ed with the connection daemon
 	pvt->_connected=true;
 	return true;
 }
@@ -562,11 +562,11 @@ void sqlrconnection::protocol() {
 	pvt->_cs->write((uint16_t)1);
 }
 
-void sqlrconnection::authenticate() {
+void sqlrconnection::auth() {
 
 	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint("Authenticating : ");
+		debugPrint("Auth'ing : ");
 		debugPrint(pvt->_user);
 		debugPrint(":");
 		debugPrint(pvt->_password);
@@ -574,7 +574,7 @@ void sqlrconnection::authenticate() {
 		debugPreEnd();
 	}
 
-	pvt->_cs->write((uint16_t)AUTHENTICATE);
+	pvt->_cs->write((uint16_t)AUTH);
 
 	pvt->_cs->write(pvt->_userlen);
 	pvt->_cs->write(pvt->_user,pvt->_userlen);

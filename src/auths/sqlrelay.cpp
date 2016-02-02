@@ -10,7 +10,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 			sqlrauth_sqlrelay(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
 			~sqlrauth_sqlrelay();
-		bool	authenticate(sqlrserverconnection *sqlrcon,
+		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
 		const char	*host;
@@ -96,7 +96,7 @@ sqlrauth_sqlrelay::~sqlrauth_sqlrelay() {
 	delete sqlrcon;
 }
 
-bool sqlrauth_sqlrelay::authenticate(sqlrserverconnection *sqlrcon,
+bool sqlrauth_sqlrelay::auth(sqlrserverconnection *sqlrcon,
 						const char *user,
 						const char *password) {
 

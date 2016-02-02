@@ -36,7 +36,7 @@ struct sqlrconnstatistics {
 	enum sqlrconnectionstate_t	state;
 	uint32_t			index;
 	uint32_t			nconnect;
-	uint32_t			nauthenticate;
+	uint32_t			nauth;
 	uint32_t			nsuspend_session;
 	uint32_t			nend_session;
 	uint32_t			nping;

@@ -19,39 +19,21 @@
 
 sqlrpwdencs::sqlrpwdencs(sqlrpaths *sqlrpth) {
 	debugFunction();
-	xmld=NULL;
 	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrpwdencs::~sqlrpwdencs() {
 	debugFunction();
 	unloadPasswordEncryptions();
-	delete xmld;
 }
 
-bool sqlrpwdencs::loadPasswordEncryptions(const char *pwdencs) {
+bool sqlrpwdencs::loadPasswordEncryptions(xmldomnode *parameters) {
 	debugFunction();
 
 	unloadPasswordEncryptions();
 
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the password encryptions
-	if (!xmld->parseString(pwdencs)) {
-		return false;
-	}
-
-	// get the password encryptions tag
-	xmldomnode	*pwdencsnode=
-		xmld->getRootNode()->getFirstTagChild("passwordencryptions");
-	if (pwdencsnode->isNullNode()) {
-		return false;
-	}
-
 	// run through the password encryption list
-	for (xmldomnode *pwdenc=pwdencsnode->getFirstTagChild();
+	for (xmldomnode *pwdenc=parameters->getFirstTagChild();
 		!pwdenc->isNullNode(); pwdenc=pwdenc->getNextTagSibling()) {
 
 		debugPrintf("loading password encryption ...\n");

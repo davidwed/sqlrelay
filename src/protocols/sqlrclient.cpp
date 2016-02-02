@@ -35,7 +35,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getCommand(uint16_t *command);
 		sqlrservercursor	*getCursor(uint16_t command);
 		void	noAvailableCursors(uint16_t command);
-		bool	authenticateCommand();
+		bool	authCommand();
 		bool	getUserFromClient();
 		bool	getPasswordFromClient();
 		void	suspendSessionCommand();
@@ -308,9 +308,9 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 		} else
 
 		// these commands are all handled at the connection level
-		if (command==AUTHENTICATE) {
-			cont->incrementAuthenticateCount();
-			if (authenticateCommand()) {
+		if (command==AUTH) {
+			cont->incrementAuthCount();
+			if (authCommand()) {
 				cont->beginSession();
 				continue;
 			}
@@ -659,15 +659,15 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	clientsock->flushWriteBuffer(-1,-1);
 }
 
-bool sqlrprotocol_sqlrclient::authenticateCommand() {
+bool sqlrprotocol_sqlrclient::authCommand() {
 	debugFunction();
 
-	cont->logDebugMessage("authenticate");
+	cont->logDebugMessage("auth");
 
-	// get the user/password from the client and authenticate
+	// get the user/password from the client and auth
 	if (getUserFromClient() &&
 		getPasswordFromClient() &&
-		cont->authenticate(userbuffer,passwordbuffer)) {
+		cont->auth(userbuffer,passwordbuffer)) {
 		return true;
 	}
 

@@ -8,7 +8,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 	public:
 			sqlrauth_database(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
-		bool	authenticate(sqlrserverconnection *sqlrcon,
+		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 };
 
@@ -17,7 +17,7 @@ sqlrauth_database::sqlrauth_database(xmldomnode *parameters,
 					sqlrauth(parameters,sqlrpe) {
 }
 
-bool sqlrauth_database::authenticate(sqlrserverconnection *sqlrcon,
+bool sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
 				const char *user, const char *password) {
 	return sqlrcon->cont->databaseBasedAuth(user,password);
 }

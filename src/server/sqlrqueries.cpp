@@ -17,39 +17,21 @@
 
 sqlrqueries::sqlrqueries(sqlrpaths *sqlrpth) {
 	debugFunction();
-	xmld=NULL;
 	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrqueries::~sqlrqueries() {
 	debugFunction();
 	unloadQueries();
-	delete xmld;
 }
 
-bool sqlrqueries::loadQueries(const char *queries) {
+bool sqlrqueries::loadQueries(xmldomnode *parameters) {
 	debugFunction();
 
 	unloadQueries();
 
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the queries
-	if (!xmld->parseString(queries)) {
-		return false;
-	}
-
-	// get the queries tag
-	xmldomnode	*queriesnode=
-			xmld->getRootNode()->getFirstTagChild("queries");
-	if (queriesnode->isNullNode()) {
-		return false;
-	}
-
 	// run through the query list
-	for (xmldomnode *query=queriesnode->getFirstTagChild();
+	for (xmldomnode *query=parameters->getFirstTagChild();
 		!query->isNullNode(); query=query->getNextTagSibling()) {
 
 		debugPrintf("loading query ...\n");

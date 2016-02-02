@@ -19,52 +19,33 @@
 
 sqlrauths::sqlrauths(sqlrpaths *sqlrpth) {
 	debugFunction();
-	xmld=NULL;
 	this->libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrauths::~sqlrauths() {
 	debugFunction();
-	unloadAuthenticators();
-	delete xmld;
+	unloadAuths();
 }
 
-bool sqlrauths::loadAuthenticators(const char *auths,
-					sqlrpwdencs *sqlrpe) {
+bool sqlrauths::loadAuths(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
 	debugFunction();
 
-	unloadAuthenticators();
-
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the auths
-	if (!xmld->parseString(auths)) {
-		return false;
-	}
-
-	// get the auths tag
-	xmldomnode	*authsnode=
-		xmld->getRootNode()->getFirstTagChild("authentications");
-	if (authsnode->isNullNode()) {
-		return false;
-	}
+	unloadAuths();
 
 	// run through each set of auths
-	for (xmldomnode *auth=authsnode->getFirstTagChild("authentication");
+	for (xmldomnode *auth=parameters->getFirstTagChild("authentication");
 			!auth->isNullNode();
 			auth=auth->getNextTagSibling("authentication")) {
 
-		debugPrintf("loading authenticator ...\n");
+		debugPrintf("loading auth ...\n");
 
 		// load password encryption
-		loadAuthenticator(auth,sqlrpe);
+		loadAuth(auth,sqlrpe);
 	}
 	return true;
 }
 
-void sqlrauths::unloadAuthenticators() {
+void sqlrauths::unloadAuths() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
@@ -76,11 +57,10 @@ void sqlrauths::unloadAuthenticators() {
 	llist.clear();
 }
 
-void sqlrauths::loadAuthenticator(xmldomnode *auth,
-					sqlrpwdencs *sqlrpe) {
+void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 	debugFunction();
 
-	// get the authenticator name
+	// get the auth name
 	const char	*module=auth->getAttributeValue("module");
 	if (!charstring::length(module)) {
 		// try "file", that's what it used to be called
@@ -91,7 +71,7 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 		}
 	}
 
-	debugPrintf("loading authenticator: %s\n",module);
+	debugPrintf("loading auth: %s\n",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the password encryption module
@@ -102,8 +82,7 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		stdoutput.printf("failed to load authentication "
-					"module: %s\n",module);
+		stdoutput.printf("failed to load auth module: %s\n",module);
 		char	*error=dl->getError();
 		stdoutput.printf("%s\n",error);
 		delete[] error;
@@ -114,13 +93,11 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 	// load the password encryption itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrauth_")->append(module);
-	sqlrauth *(*newAuthenticator)(xmldomnode *,
-					sqlrpwdencs *)=
-			(sqlrauth *(*)(xmldomnode *,
-					sqlrpwdencs *))
+	sqlrauth *(*newAuth)(xmldomnode *, sqlrpwdencs *)=
+			(sqlrauth *(*)(xmldomnode *, sqlrpwdencs *))
 				dl->getSymbol(functionname.getString());
-	if (!newAuthenticator) {
-		stdoutput.printf("failed to create authenticator: %s\n",module);
+	if (!newAuth) {
+		stdoutput.printf("failed to create auth: %s\n",module);
 		char	*error=dl->getError();
 		stdoutput.printf("%s\n",error);
 		delete[] error;
@@ -128,7 +105,7 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 		delete dl;
 		return;
 	}
-	sqlrauth	*au=(*newAuthenticator)(auth,sqlrpe);
+	sqlrauth	*au=(*newAuth)(auth,sqlrpe);
 
 #else
 
@@ -147,12 +124,12 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 	llist.append(sqlrap);
 }
 
-bool sqlrauths::authenticate(sqlrserverconnection *sqlrcon,
+bool sqlrauths::auth(sqlrserverconnection *sqlrcon,
 				const char *user, const char *password) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
-		if (node->getValue()->au->authenticate(sqlrcon,user,password)) {
+		if (node->getValue()->au->auth(sqlrcon,user,password)) {
 			return true;
 		}
 	}

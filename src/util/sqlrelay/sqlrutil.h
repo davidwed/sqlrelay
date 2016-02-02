@@ -276,15 +276,15 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual linkedlist< char *>	*getSessionStartQueries()=0;
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 
-		virtual const char	*getParser()=0;
-		virtual const char	*getTranslations()=0;
-		virtual const char	*getFilters()=0;
-		virtual const char	*getResultSetTranslations()=0;
-		virtual const char	*getTriggers()=0;
-		virtual const char	*getLoggers()=0;
-		virtual const char	*getQueries()=0;
-		virtual const char	*getPasswordEncryptions()=0;
-		virtual const char	*getAuthentications()=0;
+		virtual xmldomnode	*getParser()=0;
+		virtual xmldomnode	*getTranslations()=0;
+		virtual xmldomnode	*getFilters()=0;
+		virtual xmldomnode	*getResultSetTranslations()=0;
+		virtual xmldomnode	*getTriggers()=0;
+		virtual xmldomnode	*getLoggers()=0;
+		virtual xmldomnode	*getQueries()=0;
+		virtual xmldomnode	*getPasswordEncryptions()=0;
+		virtual xmldomnode	*getAuths()=0;
 
 		virtual linkedlist< listenercontainer * >
 						*getListenerList()=0;

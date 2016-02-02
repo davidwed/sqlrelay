@@ -79,8 +79,8 @@ int main(int argc, const char **argv) {
 	}
 
 	// initialize the password encryption framework
-	const char	*pwdencs=cfg->getPasswordEncryptions();
-	if (charstring::isNullOrEmpty(pwdencs)) {
+	xmldomnode	*pwdencs=cfg->getPasswordEncryptions();
+	if (pwdencs->isNullNode()) {
 		stderror.printf("password encryption id %s not found\n",
 								pwdencid);
 		process::exit(1);

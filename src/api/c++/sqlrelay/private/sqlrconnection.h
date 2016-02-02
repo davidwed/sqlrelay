@@ -18,7 +18,7 @@
 		void	closeConnection();
 
 		void	protocol();
-		void	authenticate();
+		void	auth();
 		bool	getNewPort();
 
 		void	clearSessionFlags();

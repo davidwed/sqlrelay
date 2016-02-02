@@ -285,18 +285,17 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 				cfg->getTimeFormat());
 
 	// get password encryptions
-	const char	*pwdencs=cfg->getPasswordEncryptions();
-	if (!charstring::isNullOrEmpty(pwdencs)) {
+	xmldomnode	*pwdencs=cfg->getPasswordEncryptions();
+	if (!pwdencs->isNullNode()) {
 		sqlrpe=new sqlrpwdencs(sqlrpth);
 		sqlrpe->loadPasswordEncryptions(pwdencs);
 	}	
 
-	// initialize authentication
-	initLocalAuthentication();
-	const char	*auths=cfg->getAuthentications();
-	if (!charstring::isNullOrEmpty(auths)) {
+	// initialize auth
+	xmldomnode	*auths=cfg->getAuths();
+	if (!auths->isNullNode()) {
 		sqlra=new sqlrauths(sqlrpth);
-		sqlra->loadAuthenticators(auths,sqlrpe);
+		sqlra->loadAuths(auths,sqlrpe);
 	}
 
 	// load database plugin
@@ -306,8 +305,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get loggers
-	const char	*loggers=cfg->getLoggers();
-	if (!charstring::isNullOrEmpty(loggers)) {
+	xmldomnode	*loggers=cfg->getLoggers();
+	if (!loggers->isNullNode()) {
 		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(NULL,conn);
@@ -364,8 +363,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the query translators
 	debugsqlrtranslation=cfg->getDebugTranslations();
-	const char	*translations=cfg->getTranslations();
-	if (!charstring::isNullOrEmpty(translations)) {
+	xmldomnode	*translations=cfg->getTranslations();
+	if (!translations->isNullNode()) {
 		sqlrp=newParser();
 		sqlrt=new sqlrtranslations(sqlrpth,debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
@@ -373,8 +372,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the query filters
 	debugsqlrfilters=cfg->getDebugFilters();
-	const char	*filters=cfg->getFilters();
-	if (!charstring::isNullOrEmpty(filters)) {
+	xmldomnode	*filters=cfg->getFilters();
+	if (!filters->isNullNode()) {
 		if (!sqlrp) {
 			sqlrp=newParser();
 		}
@@ -384,9 +383,9 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the result set translators
 	debugsqlrresultsettranslation=cfg->getDebugResultSetTranslations();
-	const char	*resultsettranslations=
+	xmldomnode	*resultsettranslations=
 				cfg->getResultSetTranslations();
-	if (!charstring::isNullOrEmpty(resultsettranslations)) {
+	if (!resultsettranslations->isNullNode()) {
 		sqlrrst=new sqlrresultsettranslations(sqlrpth,
 						debugsqlrresultsettranslation);
 		sqlrrst->loadResultSetTranslations(resultsettranslations);
@@ -394,8 +393,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the triggers
 	debugtriggers=cfg->getDebugTriggers();
-	const char	*triggers=cfg->getTriggers();
-	if (!charstring::isNullOrEmpty(triggers)) {
+	xmldomnode	*triggers=cfg->getTriggers();
+	if (!triggers->isNullNode()) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!sqlrp) {
 			sqlrp=newParser();
@@ -451,8 +450,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	markDatabaseAvailable();
 
 	// get the custom query handlers
-	const char	*queries=cfg->getQueries();
-	if (!charstring::isNullOrEmpty(queries)) {
+	xmldomnode	*queries=cfg->getQueries();
+	if (!queries->isNullNode()) {
 		sqlrq=new sqlrqueries(sqlrpth);
 		sqlrq->loadQueries(queries);
 	}
@@ -1799,18 +1798,13 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 	return cur[firstnewcursor];
 }
 
-bool sqlrservercontroller::authenticate(const char *userbuffer,
+bool sqlrservercontroller::auth(const char *userbuffer,
 						const char *passwordbuffer) {
 
-	logDebugMessage("authenticate...");
+	logDebugMessage("auth...");
 
-	// authenticate on the approprite tier
-	bool	success=false;
-	if (cfg->getAuthOnDatabase() && conn->supportsAuthOnDatabase()) {
-		success=databaseBasedAuth(userbuffer,passwordbuffer);
-	} else {
-		success=connectionBasedAuth(userbuffer,passwordbuffer);
-	}
+	// auth on the approprite tier
+	bool	success=connectionBasedAuth(userbuffer,passwordbuffer);
 
 	if (success) {
 		updateCurrentUser(userbuffer,charstring::length(userbuffer));
@@ -1822,10 +1816,9 @@ bool sqlrservercontroller::authenticate(const char *userbuffer,
 bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
-	// handle connection-based authentication
+	// handle connection-based auth
 	bool	retval=
-		(authenticateLocal(userbuffer,passwordbuffer) ||
-		(sqlra && sqlra->authenticate(conn,userbuffer,passwordbuffer)));
+		(sqlra && sqlra->auth(conn,userbuffer,passwordbuffer));
 	if (retval) {
 		logDebugMessage("auth succeeded on connection");
 	} else {
@@ -1833,105 +1826,6 @@ bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
 						"invalid user/password");
 	}
 	return retval;
-}
-
-void sqlrservercontroller::initLocalAuthentication() {
-
-	// get the list of users from the configuration
-	linkedlist< usercontainer * >	*userlist=cfg->getUserList();
-	if (!userlist) {
-		return;
-	}
-	usercount=userlist->getLength();
-
-	// create an array of users and passwords and store the
-	// users and passwords from the configuration in them
-	users=new char *[usercount];
-	passwords=new char *[usercount];
-	passwordencryptions=new char *[usercount];
-
-	usernode	*current=userlist->getFirst();
-	for (uint32_t i=0; i<usercount; i++) {
-		users[i]=charstring::duplicate(
-				current->getValue()->getUser());
-		passwords[i]=charstring::duplicate(
-				current->getValue()->getPassword());
-		passwordencryptions[i]=charstring::duplicate(
-				current->getValue()->getPasswordEncryption());
-		current=current->getNext();
-	}
-}
-
-bool sqlrservercontroller::authenticateLocal(const char *user,
-						const char *password) {
-
-	// run through the user/password arrays...
-	for (uint32_t i=0; i<usercount; i++) {
-
-		// if the user matches...
-		if (!charstring::compare(user,users[i])) {
-
-			if (sqlrpe &&
-				charstring::length(passwordencryptions[i])) {
-
-				// if password encryption is being used...
-
-				// get the module
-				sqlrpwdenc	*pe=
-					sqlrpe->getPasswordEncryptionById(
-							passwordencryptions[i]);
-				if (!pe) {
-					return false;
-				}
-
-				// For one-way encryption, encrypt the password
-				// that was passed in and compare it to the
-				// encrypted password in the configuration.
-				// For two-way encryption, decrypt the password
-				// from the configuration and compare ot to the
-				// password that was passed in...
-
-				bool	retval=false;
-				char	*pwd=NULL;
-				if (pe->oneWay()) {
-
-					// encrypt the password
-					// that was passed in
-					pwd=pe->encrypt(password);
-
-					// compare it to the encrypted
-					// password from the configuration
-					retval=!charstring::compare(
-							pwd,passwords[i]);
-
-				} else {
-
-					// decrypt the password
-					// from the configuration
-					pwd=pe->decrypt(passwords[i]);
-
-					// compare it to the password
-					// that was passed in
-					retval=!charstring::compare(
-							password,pwd);
-				}
-
-				// clean up
-				delete[] pwd;
-
-				// return true/false
-				return retval;
-
-			} else {
-
-				// if password encryption isn't being used,
-				// return true if the passwords match
-				return !charstring::compare(password,
-								passwords[i]);
-			}
-		}
-	}
-	return false;
 }
 
 bool sqlrservercontroller::databaseBasedAuth(const char *userbuffer,
@@ -1944,13 +1838,12 @@ bool sqlrservercontroller::databaseBasedAuth(const char *userbuffer,
 		charstring::compare(lastuserbuffer,userbuffer) ||
 		charstring::compare(lastpasswordbuffer,passwordbuffer)) {
 
-		// change authentication 
+		// change auth
 		logDebugMessage("change user");
 		authsuccess=conn->changeUser(userbuffer,passwordbuffer);
 
 		// keep a record of which user we're changing to
-		// and whether that user was successful in 
-		// authenticating
+		// and whether that user was successful in auth
 		charstring::copy(lastuserbuffer,userbuffer);
 		charstring::copy(lastpasswordbuffer,passwordbuffer);
 		lastauthsuccess=authsuccess;
@@ -4064,7 +3957,7 @@ void sqlrservercontroller::closeClientConnection(uint32_t bytes) {
 	// that the client will get the the entire result set without
 	// requiring the client to send data back indicating so.
 	//
-	// Also, if authentication fails, the client could send an entire query
+	// Also, if auth fails, the client could send an entire query
 	// and bind vars before it reads the error and closes the socket.
 	// We have to absorb all of that data.  We shouldn't just loop forever
 	// though, that would provide a point of entry for a DOS attack.  We'll
@@ -4464,8 +4357,7 @@ void sqlrservercontroller::clearConnStats() {
 
 sqlrparser *sqlrservercontroller::newParser() {
 
-	sqlrpxmld.parseString(cfg->getParser());
-	sqlrpnode=sqlrpxmld.getRootNode()->getFirstTagChild("parser");
+	sqlrpnode=cfg->getParser();
 	const char	*module=sqlrpnode->getAttributeValue("module");
 
 	debugsqlrparser=cfg->getDebugParser();
@@ -4766,11 +4658,11 @@ void sqlrservercontroller::incrementTotalErrors() {
 	semset->signalWithUndo(9);
 }
 
-void sqlrservercontroller::incrementAuthenticateCount() {
+void sqlrservercontroller::incrementAuthCount() {
 	if (!connstats) {
 		return;
 	}
-	connstats->nauthenticate++;
+	connstats->nauth++;
 }
 
 void sqlrservercontroller::incrementSuspendSessionCount() {

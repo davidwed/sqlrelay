@@ -18,7 +18,6 @@
 
 sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	xmld=NULL;
 	tree=NULL;
 	this->debug=debug;
 	temptablepool=new memorypool(0,128,100);
@@ -29,34 +28,17 @@ sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
 sqlrtranslations::~sqlrtranslations() {
 	debugFunction();
 	unloadTranslations();
-	delete xmld;
 	delete temptablepool;
 	delete tempindexpool;
 }
 
-bool sqlrtranslations::loadTranslations(const char *translations) {
+bool sqlrtranslations::loadTranslations(xmldomnode *parameters) {
 	debugFunction();
 
 	unloadTranslations();
 
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the translations
-	if (!xmld->parseString(translations)) {
-		return false;
-	}
-
-	// get the translations tag
-	xmldomnode	*translationsnode=
-			xmld->getRootNode()->getFirstTagChild("translations");
-	if (translationsnode->isNullNode()) {
-		return false;
-	}
-
 	// run through the translation list
-	for (xmldomnode *translation=translationsnode->getFirstTagChild();
+	for (xmldomnode *translation=parameters->getFirstTagChild();
 				!translation->isNullNode();
 				translation=translation->getNextTagSibling()) {
 

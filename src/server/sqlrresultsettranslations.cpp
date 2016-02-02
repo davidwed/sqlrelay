@@ -19,7 +19,6 @@
 sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth,
 								bool debug) {
 	debugFunction();
-	xmld=NULL;
 	libexecdir=sqlrpth->getLibExecDir();
 	this->debug=debug;
 }
@@ -27,35 +26,16 @@ sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth,
 sqlrresultsettranslations::~sqlrresultsettranslations() {
 	debugFunction();
 	unloadResultSetTranslations();
-	delete xmld;
 }
 
 bool sqlrresultsettranslations::loadResultSetTranslations(
-					const char *resultsettranslations) {
+					xmldomnode *parameters) {
 	debugFunction();
 
 	unloadResultSetTranslations();
 
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the result set translations
-	if (!xmld->parseString(resultsettranslations)) {
-		return false;
-	}
-
-	// get the result set translations tag
-	xmldomnode	*resultsettranslationsnode=
-			xmld->getRootNode()->getFirstTagChild(
-						"resultsettranslations");
-	if (resultsettranslationsnode->isNullNode()) {
-		return false;
-	}
-
 	// run through the result set translation list
-	for (xmldomnode *resultsettranslation=
-				resultsettranslationsnode->getFirstTagChild();
+	for (xmldomnode *resultsettranslation=parameters->getFirstTagChild();
 			!resultsettranslation->isNullNode();
 			resultsettranslation=
 				resultsettranslation->getNextTagSibling()) {

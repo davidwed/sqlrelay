@@ -55,7 +55,7 @@
 // when we need more cursors, allocate this many more in one shot
 #define DEFAULT_CURSORS_GROWBY "1"
 
-// default tier to authenticate users on
+// default tier to auth users on
 #define DEFAULT_AUTHTIER "connection"
 
 // default method to use for handing client sessions

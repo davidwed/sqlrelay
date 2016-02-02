@@ -17,39 +17,21 @@
 
 sqlrloggers::sqlrloggers(sqlrpaths *sqlrpth) {
 	debugFunction();
-	xmld=NULL;
 	libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrloggers::~sqlrloggers() {
 	debugFunction();
 	unloadLoggers();
-	delete xmld;
 }
 
-bool sqlrloggers::loadLoggers(const char *loggers) {
+bool sqlrloggers::loadLoggers(xmldomnode *parameters) {
 	debugFunction();
 
 	unloadLoggers();
 
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the loggers
-	if (!xmld->parseString(loggers)) {
-		return false;
-	}
-
-	// get the loggers tag
-	xmldomnode	*loggersnode=
-			xmld->getRootNode()->getFirstTagChild("loggers");
-	if (loggersnode->isNullNode()) {
-		return false;
-	}
-
 	// run through the logger list
-	for (xmldomnode *logger=loggersnode->getFirstTagChild();
+	for (xmldomnode *logger=parameters->getFirstTagChild();
 		!logger->isNullNode(); logger=logger->getNextTagSibling()) {
 
 		debugPrintf("loading logger ...\n");

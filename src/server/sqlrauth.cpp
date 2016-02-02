@@ -12,7 +12,7 @@ sqlrauth::sqlrauth(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
 sqlrauth::~sqlrauth() {
 }
 
-bool sqlrauth::authenticate(sqlrserverconnection *sqlrcon,
-				const char *user, const char *password) {
+bool sqlrauth::auth(sqlrserverconnection *sqlrcon,
+			const char *user, const char *password) {
 	return false;
 }

@@ -22,7 +22,7 @@
 #define IDENTIFY 8
 #define COMMIT 9
 #define ROLLBACK 10
-#define AUTHENTICATE 11
+#define AUTH 11
 #define AUTOCOMMIT 12
 #define REEXECUTE_QUERY 13
 #define FETCH_FROM_BIND_CURSOR 14

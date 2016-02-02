@@ -53,9 +53,6 @@
 
 		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		void	initLocalAuthentication();
-		bool	authenticateLocal(const char *user,
-						const char *password);
 
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();
@@ -228,7 +225,6 @@
 		dynamiclib	sqlrpdl;
 		dynamiclib	sqlrmddl;
 
-		xmldom		sqlrpxmld;
 		xmldomnode	*sqlrpnode;
 
 		uint16_t	cursorcount;

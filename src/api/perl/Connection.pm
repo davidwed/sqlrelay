@@ -38,7 +38,7 @@ __END__
         new(server, port, socket, user, password, retrytime, tries);
             # Initiates a connection to "server" on "port"
             # or to the unix "socket" on the local machine
-            # and authenticates with "user" and "password".
+            # and auths with "user" and "password".
             # Failed connections will be retried for 
             # "tries" times, waiting "retrytime" seconds between each
             # try.  If "tries" is 0 then retries will continue forever.

@@ -18,7 +18,6 @@
 
 sqlrfilters::sqlrfilters(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	xmld=NULL;
 	this->debug=debug;
 	libexecdir=sqlrpth->getLibExecDir();
 }
@@ -26,32 +25,15 @@ sqlrfilters::sqlrfilters(sqlrpaths *sqlrpth, bool debug) {
 sqlrfilters::~sqlrfilters() {
 	debugFunction();
 	unloadFilters();
-	delete xmld;
 }
 
-bool sqlrfilters::loadFilters(const char *filters) {
+bool sqlrfilters::loadFilters(xmldomnode *parameters) {
 	debugFunction();
 
 	unloadFilters();
 
-	// create the parser
-	delete xmld;
-	xmld=new xmldom();
-
-	// parse the filters
-	if (!xmld->parseString(filters)) {
-		return false;
-	}
-
-	// get the filters tag
-	xmldomnode	*filtersnode=
-			xmld->getRootNode()->getFirstTagChild("filters");
-	if (filtersnode->isNullNode()) {
-		return false;
-	}
-
 	// run through the filter list
-	for (xmldomnode *filter=filtersnode->getFirstTagChild();
+	for (xmldomnode *filter=parameters->getFirstTagChild();
 				!filter->isNullNode();
 				filter=filter->getNextTagSibling()) {
 

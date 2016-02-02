@@ -29,7 +29,7 @@ static void sqlrcon_free(void *sqlrcon) {
  *  new(host, port, socket, user, password, retrytime, tries)
  *
  *  Initiates a connection to "host" on "port" or to the unix "socket" on
- *  the local machine and authenticates with "user" and "password".  Failed
+ *  the local machine and auths with "user" and "password".  Failed
  *  connections will be retried for "tries" times, waiting "retrytime" seconds
  *  between each try.  If "tries" is 0 then retries will continue forever.  If
  *  "retrytime" is 0 then retries will be attempted on a default interval.  If

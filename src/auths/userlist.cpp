@@ -8,7 +8,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 	public:
 			sqlrauth_userlist(xmldomnode *parameters,
 						sqlrpwdencs *sqlrpe);
-		bool	authenticate(sqlrserverconnection *sqlrcon,
+		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
 		const char	**users;
@@ -55,7 +55,7 @@ sqlrauth_userlist::sqlrauth_userlist(xmldomnode *parameters,
 	}
 }
 
-bool sqlrauth_userlist::authenticate(sqlrserverconnection *sqlrcon,
+bool sqlrauth_userlist::auth(sqlrserverconnection *sqlrcon,
 						const char *user,
 						const char *password) {
 
