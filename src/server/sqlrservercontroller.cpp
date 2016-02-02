@@ -1839,6 +1839,9 @@ void sqlrservercontroller::initLocalAuthentication() {
 
 	// get the list of users from the configuration
 	linkedlist< usercontainer * >	*userlist=cfg->getUserList();
+	if (!userlist) {
+		return;
+	}
 	usercount=userlist->getLength();
 
 	// create an array of users and passwords and store the

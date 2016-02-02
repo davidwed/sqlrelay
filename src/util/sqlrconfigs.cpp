@@ -57,6 +57,7 @@ void sqlrconfigs::getEnabledIds(const char *urls,
 		// fall back to the xml plugin if that plugin failed to load
 		if (!cfg) {
 			loadConfig("xml");
+			//loadConfig("xmldom");
 		}
 
 		// get the enabled ids for the specified url
@@ -117,6 +118,7 @@ sqlrconfig *sqlrconfigs::load(const char *urls, const char *id) {
 		// fall back to the xml plugin if that plugin failed to load
 		if (!cfg) {
 			loadConfig("xml");
+			//loadConfig("xmldom");
 		}
 
 		// load the configuration for the specified id
