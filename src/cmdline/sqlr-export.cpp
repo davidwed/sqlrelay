@@ -325,15 +325,9 @@ int main(int argc, const char **argv) {
 				krb=cfg->getDefaultKrb();
 				krbservice=cfg->getDefaultKrbService();
 			}
-			linkedlistnode< usercontainer * >
-				*firstuser=cfg->getUserList()->getFirst();
-			if (firstuser) {
-				usercontainer   *currentnode=
-						firstuser->getValue();
-				if (!cmdline.found("user")) {
-					user=currentnode->getUser();
-					password=currentnode->getPassword();
-				}
+			if (!cmdline.found("user")) {
+				user=cfg->getDefaultUser();
+				password=cfg->getDefaultPassword();
 			}
 		}
 	}

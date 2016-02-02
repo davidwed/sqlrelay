@@ -36,6 +36,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char		*getDefaultSocket();
 		bool			getDefaultKrb();
 		const char		*getDefaultKrbService();
+		const char		*getDefaultUser();
+		const char		*getDefaultPassword();
 
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
@@ -150,6 +152,9 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		void	parseUrl(const char *urlname);
 		void	normalizeTree();
 		void	getTreeValues();
+		routecontainer	*routeAlreadyExists(routecontainer *cur);
+		void		moveRegexList(routecontainer *cur,
+						routecontainer *existing);
 		uint32_t	atouint32_t(const char *value,
 						const char *defaultvalue,
 						uint32_t minvalue);
@@ -246,6 +251,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		linkedlist< connectstringcontainer * >	connectstringlist;
 
 		listenercontainer	*defaultlistener;
+		const char		*defaultuser;
+		const char		*defaultpassword;
 
 		bool		ininstancetag;
 		bool		inidattribute;
@@ -253,7 +260,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getattributes;
 };
 
-sqlrconfig_xmldom::sqlrconfig_xmldom() : sqlrconfig(), xmldom() {
+sqlrconfig_xmldom::sqlrconfig_xmldom() : sqlrconfig(), xmldom(false) {
 	debugFunction();
 
 	init();
@@ -404,6 +411,14 @@ bool sqlrconfig_xmldom::getDefaultKrb() {
 
 const char *sqlrconfig_xmldom::getDefaultKrbService() {
 	return (defaultlistener)?defaultlistener->getKrbService():NULL;
+}
+
+const char *sqlrconfig_xmldom::getDefaultUser() {
+	return defaultuser;
+}
+
+const char *sqlrconfig_xmldom::getDefaultPassword() {
+	return defaultpassword;
 }
 
 bool sqlrconfig_xmldom::getListenOnInet() {
@@ -1026,8 +1041,6 @@ void sqlrconfig_xmldom::normalizeTree() {
 		instance=next;
 	}
 
-	// update...
-
 	// get the instance
 	instance=getRootNode()->getFirstTagChild("instance");
 
@@ -1061,13 +1074,13 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
-	// missing listeners tag
+	// add missing listeners tag
 	xmldomnode	*listeners=instance->getFirstTagChild("listeners");
 	if (listeners->isNullNode()) {
 		listeners=instance->insertTag("listeners",0);
 	}
 
-	// instance.addresses/port/socket/etc. -> listener
+	// addresses/port/socket/etc. in instance -> listener
 	xmldomnode	*addresses=instance->getAttribute("addresses");
 	xmldomnode	*port=instance->getAttribute("port");
 	xmldomnode	*socket=instance->getAttribute("socket");
@@ -1122,7 +1135,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
 	}
 	
-	// normalize address, port, socket...
+	// normalize listeners
 	for (xmldomnode *listener=listeners->getFirstTagChild("listener");
 			!listener->isNullNode();
 			listener=listener->getNextTagSibling("listener")) {
@@ -1155,14 +1168,15 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
-	// missing authentications tag
+	// add missing authentications tag
 	xmldomnode	*authentications=
 				instance->getFirstTagChild("authentications");
 	if (authentications->isNullNode()) {
 		authentications=instance->insertTag("authentications",1);
 	}
 
-	//  users -> auth_userlist
+	// users -> auth_userlist
+	bool		addeduserlist=false;
 	xmldomnode	*users=instance->getFirstTagChild("users");
 	if (!users->isNullNode()) {
 
@@ -1210,16 +1224,33 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 
 		users->getParent()->deleteChild(users);
+
+		addeduserlist=true;
 	}
 
-	// connections...
+	// authtier="database" -> auth_database
+	attr=instance->getAttribute("authtier");
+	if (!attr->isNullNode() && 
+		!charstring::compare(attr->getValue(),"database")) {
+
+		xmldomnode	*authentication=
+			(addeduserlist)?
+				authentications->insertTag("authentication",1):
+				authentications->insertTag("authentication",0);
+
+		authentication->setAttributeValue("module","database");
+
+		instance->deleteAttribute(attr);
+	}
+
+	// normalize connections
 	uint32_t	connectioncount=0;
 	xmldomnode	*conns=instance->getFirstTagChild("connections");
 	for (xmldomnode *conn=conns->getFirstTagChild("connection");
 			!conn->isNullNode();
 			conn=conn->getNextTagSibling("connection")) {
 
-		// connection id
+		// add missing connection id
 		const char	*connid=conn->getAttributeValue("connectionid");
 		if (charstring::isNullOrEmpty(connid)) {
 			stringbuffer	connectionid;
@@ -1238,9 +1269,63 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
-	// FIXME: authtier="database" -> auth_database
+	// datetimeformat -> resultsettranslation_reformatdatetime
+	xmldomnode	*dtformat=instance->getAttribute("datetimeformat");
+	xmldomnode	*dateformat=instance->getAttribute("dateformat");
+	xmldomnode	*timeformat=instance->getAttribute("timeformat");
+	xmldomnode	*dateddmm=instance->getAttribute("dateddmm");
+	xmldomnode	*dateyyyyddmm=instance->getAttribute("dateyyyyddmm");
+	xmldomnode	*datedelims=instance->getAttribute("datedelimiters");
+	if (!dtformat->isNullNode() ||
+		!dateformat->isNullNode() ||
+		!timeformat->isNullNode() ||
+		!dateddmm->isNullNode() ||
+		!dateyyyyddmm->isNullNode() ||
+		!datedelims->isNullNode()) {
 
-	// FIXME: datetimeformat -> resultsettranslation
+		// get/add resultsettranslations tag
+		xmldomnode	*rstrans=
+			instance->getFirstTagChild("resultsettranslations");
+		if (rstrans->isNullNode()) {
+			rstrans=instance->appendTag("resultsettranslations");
+		}
+
+		// add resultsettranslation tag
+		xmldomnode	*rst=
+			rstrans->insertTag("resultsettranslation",0);
+		rst->setAttributeValue("module","reformatdatetime");
+
+		if (!dtformat->isNullNode()) {
+			rst->setAttributeValue("datetimeformat",
+						dtformat->getValue());
+			instance->deleteAttribute(dtformat);
+		}
+		if (!dateformat->isNullNode()) {
+			rst->setAttributeValue("dateformat",
+						dateformat->getValue());
+			instance->deleteAttribute(dateformat);
+		}
+		if (!timeformat->isNullNode()) {
+			rst->setAttributeValue("timeformat",
+						timeformat->getValue());
+			instance->deleteAttribute(timeformat);
+		}
+		if (!dateddmm->isNullNode()) {
+			rst->setAttributeValue("dateddmm",
+						dateddmm->getValue());
+			instance->deleteAttribute(dateddmm);
+		}
+		if (!dateyyyyddmm->isNullNode()) {
+			rst->setAttributeValue("dateyyyyddmm",
+						dateyyyyddmm->getValue());
+			instance->deleteAttribute(dateyyyyddmm);
+		}
+		if (!datedelims->isNullNode()) {
+			rst->setAttributeValue("datedelims",
+						datedelims->getValue());
+			instance->deleteAttribute(datedelims);
+		}
+	}
 }
 
 void sqlrconfig_xmldom::getTreeValues() {
@@ -1613,7 +1698,81 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 
 
-	// FIXME: route list
+	// route list
+	for (xmldomnode *route=instance->
+				getFirstTagChild("router")->
+				getFirstTagChild("route");
+			!route->isNullNode();
+			route=route->getNextTagSibling("route")) {
+		
+		// add an item to the route list
+		routecontainer	*r=new routecontainer();
+		r->setIsFilter(false);
+		r->setHost(route->getAttributeValue("host"));
+		r->setPort(atouint32_t(
+				route->getAttributeValue("port"),"0",0));
+		r->setSocket(route->getAttributeValue("socket"));
+		r->setUser(route->getAttributeValue("user"));
+		r->setPassword(route->getAttributeValue("password"));
+
+		for (xmldomnode *query=route->getFirstTagChild("query");
+				!query->isNullNode();
+				query=query->getNextTagSibling("query")) {
+			const char	*pattern=
+					query->getAttributeValue("pattern");
+			regularexpression	*re=
+				new regularexpression(
+					(pattern)?pattern:
+						DEFAULT_ROUTER_PATTERN);
+			r->getRegexList()->append(re);
+		}
+
+		routecontainer	*er=routeAlreadyExists(r);
+		if (er) {
+			moveRegexList(r,er);
+			delete r;
+		} else {
+			routelist.append(r);
+		}
+	}
+
+	// default user/password
+	xmldomnode	*defaultusertag=
+			instance->getFirstTagChild("authentications")->
+						getFirstTagDescendent("user");
+	defaultuser=defaultusertag->getAttributeValue("user");
+	defaultpassword=defaultusertag->getAttributeValue("password");
+}
+
+routecontainer *sqlrconfig_xmldom::routeAlreadyExists(routecontainer *cur) {
+
+	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
+
+		routecontainer	*rc=rn->getValue();
+		if (!charstring::compare(rc->getHost(),
+					cur->getHost()) &&
+			rc->getPort()==cur->getPort() &&
+			!charstring::compare(rc->getSocket(),
+						cur->getSocket()) &&
+			!charstring::compare(rc->getUser(),
+						cur->getUser()) &&
+			!charstring::compare(rc->getPassword(),
+						cur->getPassword())) {
+			return rc;
+		}
+	}
+	return NULL;
+}
+
+void sqlrconfig_xmldom::moveRegexList(routecontainer *cur,
+					routecontainer *existing) {
+
+	for (linkedlistnode< regularexpression * > *re=
+				cur->getRegexList()->getFirst();
+						re; re=re->getNext()) {
+		existing->getRegexList()->append(re->getValue());
+	}
+	cur->getRegexList()->clear();
 }
 
 uint32_t sqlrconfig_xmldom::atouint32_t(const char *value,

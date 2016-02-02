@@ -190,6 +190,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char		*getDefaultSocket()=0;
 		virtual bool			getDefaultKrb()=0;
 		virtual const char		*getDefaultKrbService()=0;
+		virtual const char		*getDefaultUser()=0;
+		virtual const char		*getDefaultPassword()=0;
 
 		virtual bool		getListenOnInet()=0;
 		virtual bool		getListenOnUnix()=0;

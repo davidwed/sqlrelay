@@ -35,6 +35,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		const char		*getDefaultSocket();
 		bool			getDefaultKrb();
 		const char		*getDefaultKrbService();
+		const char		*getDefaultUser();
+		const char		*getDefaultPassword();
 
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
@@ -267,6 +269,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xml : public sqlrconfig, public xmlsax {
 		listenercontainer	*defaultlistener;
 
 		usercontainer		*currentuser;
+		usercontainer		*defaultuser;
 
 		connectstringcontainer	*currentconnect;
 		uint32_t		connectioncount;
@@ -459,6 +462,7 @@ void sqlrconfig_xml::init() {
 	currentlistener=NULL;
 	defaultlistener=NULL;
 	currentuser=NULL;
+	defaultuser=NULL;
 	currentconnect=NULL;
 	connectioncount=0;
 	metrictotal=0;
@@ -575,6 +579,14 @@ bool sqlrconfig_xml::getDefaultKrb() {
 
 const char *sqlrconfig_xml::getDefaultKrbService() {
 	return defaultlistener->getKrbService();
+}
+
+const char *sqlrconfig_xml::getDefaultUser() {
+	return (defaultuser)?defaultuser->getUser():NULL;
+}
+
+const char *sqlrconfig_xml::getDefaultPassword() {
+	return (defaultuser)?defaultuser->getPassword():NULL;
 }
 
 bool sqlrconfig_xml::getListenOnInet() {
@@ -1432,6 +1444,15 @@ bool sqlrconfig_xml::tagEnd(const char *ns, const char *name) {
 			if (!defaultlistener) {
 				defaultlistener=
 					listenerlist.getFirst()->getValue();
+			}
+		}
+
+		// get the "default" user if it hasn't already been defined
+		if (!defaultuser) {
+			linkedlistnode<usercontainer *> *node=
+						userlist.getFirst();
+			if (node) {
+				defaultuser=node->getValue();
 			}
 		}
 
