@@ -90,14 +90,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getIgnoreSelectDatabase();
 		bool		getWaitForDownDatabase();
 
-		const char	*getDateTimeFormat();
-		const char	*getDateFormat();
-		const char	*getTimeFormat();
-		bool		getDateDdMm();
-		bool		getDateYyyyDdMm();
-		const char	*getDateDelimiters();
-		bool		getIgnoreNonDateTime();
-
 		bool		getKrb();
 		const char	*getKrbService();
 		const char	*getKrbKeytab();
@@ -116,8 +108,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		xmldomnode	*getAuths();
 
 		linkedlist< listenercontainer * >	*getListenerList();
-
-		linkedlist< usercontainer * >		*getUserList();
 
 		linkedlist< connectstringcontainer * >	*getConnectStringList();
 		connectstringcontainer	*getConnectString(
@@ -209,14 +199,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*isolationlevel;
 		bool		ignoreselectdb;
 		bool		waitfordowndb;
-		const char	*datetimeformat;
-		const char	*dateformat;
-		const char	*timeformat;
-		bool		dateddmm;
-		bool		dateyyyyddmm;
-		bool		dateyyyyddmmset;
-		const char	*datedelimiters;
-		bool		ignorenondatetime;
 		bool		krb;
 		const char	*krbservice;
 		const char	*krbkeytab;
@@ -333,14 +315,6 @@ void sqlrconfig_xmldom::init() {
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
-	datetimeformat=NULL;
-	dateformat=NULL;
-	timeformat=NULL;
-	dateddmm=false;
-	dateyyyyddmm=false;
-	dateyyyyddmmset=false;
-	datedelimiters=DEFAULT_DATEDELIMITERS;
-	ignorenondatetime=false;
 	krb=false;
 	krbservice=DEFAULT_KRBSERVICE;
 	krbkeytab=NULL;
@@ -609,34 +583,6 @@ bool sqlrconfig_xmldom::getWaitForDownDatabase() {
 	return waitfordowndb;
 }
 
-const char *sqlrconfig_xmldom::getDateTimeFormat() {
-	return datetimeformat;
-}
-
-const char *sqlrconfig_xmldom::getDateFormat() {
-	return dateformat;
-}
-
-const char *sqlrconfig_xmldom::getTimeFormat() {
-	return timeformat;
-}
-
-bool sqlrconfig_xmldom::getDateDdMm() {
-	return dateddmm;
-}
-
-bool sqlrconfig_xmldom::getDateYyyyDdMm() {
-	return dateyyyyddmm;
-}
-
-const char *sqlrconfig_xmldom::getDateDelimiters() {
-	return datedelimiters;
-}
-
-bool sqlrconfig_xmldom::getIgnoreNonDateTime() {
-	return ignorenondatetime;
-}
-
 bool sqlrconfig_xmldom::getKrb() {
 	return krb;
 }
@@ -695,10 +641,6 @@ xmldomnode *sqlrconfig_xmldom::getAuths() {
 
 linkedlist< listenercontainer * > *sqlrconfig_xmldom::getListenerList() {
 	return &listenerlist;
-}
-
-linkedlist< usercontainer * > *sqlrconfig_xmldom::getUserList() {
-	return NULL;
 }
 
 linkedlist< connectstringcontainer * > *sqlrconfig_xmldom::
@@ -1476,56 +1418,6 @@ void sqlrconfig_xmldom::getTreeValues() {
 	attr=instance->getAttribute("waitfordowndatabase");
 	if (!attr->isNullNode()) {
 		waitfordowndb=!charstring::compare(attr->getValue(),"yes");
-	}
-	attr=instance->getAttribute("datatimeformat");
-	if (!attr->isNullNode()) {
-		datetimeformat=attr->getValue();
-		if (!dateformat) {
-			dateformat=attr->getValue();
-		}
-		if (!timeformat) {
-			timeformat=attr->getValue();
-		}
-	}
-	attr=instance->getAttribute("dateformat");
-	if (!attr->isNullNode()) {
-		dateformat=attr->getValue();
-		if (!datetimeformat) {
-			datetimeformat=attr->getValue();
-		}
-		if (!timeformat) {
-			timeformat=attr->getValue();
-		}
-	}
-	attr=instance->getAttribute("timeformat");
-	if (!attr->isNullNode()) {
-		timeformat=attr->getValue();
-		if (!datetimeformat) {
-			datetimeformat=attr->getValue();
-		}
-		if (!dateformat) {
-			dateformat=attr->getValue();
-		}
-	}
-	attr=instance->getAttribute("dateddmm");
-	if (!attr->isNullNode()) {
-		dateddmm=!charstring::compare(attr->getValue(),"yes");
-		if (!dateyyyyddmmset) {
-			dateyyyyddmm=dateddmm;
-		}
-	}
-	attr=instance->getAttribute("dateyyyyddmm");
-	if (!attr->isNullNode()) {
-		dateyyyyddmm=!charstring::compare(attr->getValue(),"yes");
-		dateyyyyddmmset=true;
-	}
-	attr=instance->getAttribute("datedelimiters");
-	if (!attr->isNullNode()) {
-		datedelimiters=attr->getValue();
-	}
-	attr=instance->getAttribute("ignorenondatetime");
-	if (!attr->isNullNode()) {
-		ignorenondatetime=!charstring::compare(attr->getValue(),"yes");
 	}
 	attr=instance->getAttribute("krb");
 	if (!attr->isNullNode()) {

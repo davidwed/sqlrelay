@@ -261,14 +261,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual bool		getWaitForDownDatabase()=0;
 
-		virtual const char	*getDateTimeFormat()=0;
-		virtual const char	*getDateFormat()=0;
-		virtual const char	*getTimeFormat()=0;
-		virtual bool		getDateDdMm()=0;
-		virtual bool		getDateYyyyDdMm()=0;
-		virtual const char	*getDateDelimiters()=0;
-		virtual bool		getIgnoreNonDateTime()=0;
-
 		virtual	bool		getKrb()=0;
 		virtual const char	*getKrbService()=0;
 		virtual const char	*getKrbKeytab()=0;
@@ -288,9 +280,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual linkedlist< listenercontainer * >
 						*getListenerList()=0;
-
-		virtual linkedlist< usercontainer * >
-						*getUserList()=0;
 
 		virtual linkedlist< connectstringcontainer * >
 						*getConnectStringList()=0;

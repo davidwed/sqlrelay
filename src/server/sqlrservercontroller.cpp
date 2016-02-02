@@ -144,7 +144,6 @@ sqlrservercontroller::sqlrservercontroller() {
 	dbhostname=NULL;
 	dbipaddress=NULL;
 
-	reformatdatetimes=false;
 	reformattedfield=NULL;
 	reformattedfieldlength=0;
 
@@ -280,9 +279,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	maxbindcount=cfg->getMaxBindCount();
 	maxerrorlength=cfg->getMaxErrorLength();
 	idleclienttimeout=cfg->getIdleClientTimeout();
-	reformatdatetimes=(cfg->getDateTimeFormat() ||
-				cfg->getDateFormat() ||
-				cfg->getTimeFormat());
 
 	// get password encryptions
 	xmldomnode	*pwdencs=cfg->getPasswordEncryptions();
@@ -3609,21 +3605,6 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	// initialize return values
 	*newfield=field;
 	*newfieldlength=fieldlength;
-
-	// handle old-school date translation first
-	if (reformatdatetimes) {
-		// FIXME: use mapColumn() here?
-		reformatDateTimes(cursor,index,
-					*newfield,*newfieldlength,
-					newfield,newfieldlength,
-					cfg->getDateDdMm(),
-					cfg->getDateYyyyDdMm(),
-					cfg->getIgnoreNonDateTime(),
-					cfg->getDateDelimiters(),
-					cfg->getDateTimeFormat(),
-					cfg->getDateFormat(),
-					cfg->getTimeFormat());
-	}
 
 	// run translations
 	if (sqlrrst) {

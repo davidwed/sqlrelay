@@ -150,8 +150,5 @@
 // default interval that the cachemanager will scan on
 #define DEFAULT_INTERVAL 30
 
-// default date delimiters
-#define DEFAULT_DATEDELIMITERS "/-.:"
-
 // default kerberos service
 #define DEFAULT_KRBSERVICE SQLRELAY

@@ -270,7 +270,6 @@
 		const char	*dbhostname;
 		const char	*dbipaddress;
 
-		bool		reformatdatetimes;
 		char		*reformattedfield;
 		uint32_t	reformattedfieldlength;
 
