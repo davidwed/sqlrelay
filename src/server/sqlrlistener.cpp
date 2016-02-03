@@ -1598,11 +1598,13 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				alarmthread->setFunction(
 					(void*(*)(void*))alarmThread);
 				alarmthread->setArgument(ata);
-				alarmthread->run();
+				if (alarmthread->run()) {
+					alarmon=true;
+				}
 			} else {
 				signalmanager::alarm(listenertimeout);
+				alarmon=true;
 			}
-			alarmon=true;
 		}
 
 		// set "all db's down" flag
@@ -1621,7 +1623,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			ok=acceptAvailableConnection(&alldbsdown);
 
 			// turn off the alarm
-			if (usealarm) {
+			if (usealarm && alarmon) {
 				if (isforkedthread) {
 					alarmthread->cancel();
 				} else {
@@ -1657,12 +1659,12 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		delete alarmthread;
 		delete ata;
 
-		// wait for the connection to let us know that it's ready
-		// to have a client handed off to it
-		waitForConnectionToBeReadyForHandoff();
-
 		// execute this only if code above executed without errors...
 		if (ok) {
+
+			// wait for the connection to let us know that it's
+			// ready to have a client handed off to it
+			waitForConnectionToBeReadyForHandoff();
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(shm->connectionid)) {
@@ -1718,6 +1720,10 @@ void sqlrlistener::alarmThread(void *attr) {
 	#ifdef SIGALRM
 	ata->mainthr->raiseSignal(SIGALRM);
 	#endif
+	// wait to be cancelled
+	for (;;) {
+		snooze::macrosnooze(1);
+	}
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {

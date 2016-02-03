@@ -1699,7 +1699,7 @@ void sqlrservercontroller::clientSession() {
 			info="client suspended the session";
 			break;
 		default:
-			info="an error occurred";
+			info="server closed connection";
 			break;
 	}
 	logClientDisconnected(info);
