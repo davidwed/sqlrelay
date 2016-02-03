@@ -190,6 +190,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char		*getDefaultSocket()=0;
 		virtual bool			getDefaultKrb()=0;
 		virtual const char		*getDefaultKrbService()=0;
+		virtual const char		*getDefaultKrbKeytab()=0;
 		virtual const char		*getDefaultUser()=0;
 		virtual const char		*getDefaultPassword()=0;
 
@@ -260,10 +261,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getIgnoreSelectDatabase()=0;
 
 		virtual bool		getWaitForDownDatabase()=0;
-
-		virtual	bool		getKrb()=0;
-		virtual const char	*getKrbService()=0;
-		virtual const char	*getKrbKeytab()=0;
 
 		virtual linkedlist< char *>	*getSessionStartQueries()=0;
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;

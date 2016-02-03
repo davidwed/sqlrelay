@@ -207,17 +207,19 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(sqlrservercontroller *cont) :
 
 	// FIXME: the kerberos settings below should come from the
 	// listener tag, rather than from the instance tag
-	if (cont->cfg->getKrb()) {
+	if (cont->cfg->getDefaultKrb()) {
 		if (gss::supportsGSS()) {
 
 			// set the keytab file to use
-			const char	*keytab=cont->cfg->getKrbKeytab();
+			const char	*keytab=
+					cont->cfg->getDefaultKrbKeytab();
 			if (!charstring::isNullOrEmpty(keytab)) {
 				environment::setValue("KRB5_KTNAME",keytab);
 			}
 
 			// acquire service credentials from the keytab
-			if (!gcred.acquireService(cont->cfg->getKrbService())) {
+			if (!gcred.acquireService(
+					cont->cfg->getDefaultKrbService())) {
 				const char	*status=
 					gcred.getMechanismMinorStatus();
 				stderror.printf("kerberos acquire-"
@@ -264,7 +266,9 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
 
 	// accept GSS security context, if necessary
-	if (cont->cfg->getKrb() && !acceptGSSSecurityContext()) {
+	// FIXME: the kerberos settings below should come from the
+	// listener tag, rather than from the instance tag
+	if (cont->cfg->getDefaultKrb() && !acceptGSSSecurityContext()) {
 		return status;
 	}
 
@@ -278,14 +282,6 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 
 		// get a command from the client
 		if (!getCommand(&command)) {
-			// Make sure to set the exit status to something other
-			// than the default (error) in this case.  Load
-			// balancers often check to be sure a service is
-			// still running by just connecting and disconnecting.
-			// We don't want an error making its way into the logs
-			// for each of these checks, or log analyzers will
-			// generate a bunch of false-positives.
-			status=SQLRCLIENTEXITSTATUS_CLOSED_CONNECTION;
 			break;
 		}
 

@@ -33,6 +33,9 @@
 	removed errant information_schema views from getTableList with mysql
 	fixed several subtle listenertimeout-related bugs
 	fixed inode-check in logger modules - works correctly with logrotate
+	change "an error occurred" to "server closed connection" to reduce
+		false-positives from log analyzers - "real" errors will still
+		be reported elsewhere
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

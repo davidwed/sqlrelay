@@ -37,6 +37,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char		*getDefaultSocket();
 		bool			getDefaultKrb();
 		const char		*getDefaultKrbService();
+		const char		*getDefaultKrbKeytab();
 		const char		*getDefaultUser();
 		const char		*getDefaultPassword();
 
@@ -89,10 +90,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
 		bool		getWaitForDownDatabase();
-
-		bool		getKrb();
-		const char	*getKrbService();
-		const char	*getKrbKeytab();
 
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
@@ -199,9 +196,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*isolationlevel;
 		bool		ignoreselectdb;
 		bool		waitfordowndb;
-		bool		krb;
-		const char	*krbservice;
-		const char	*krbkeytab;
 
 		linkedlist< char *>	sessionstartqueries;
 		linkedlist< char *>	sessionendqueries;
@@ -315,9 +309,6 @@ void sqlrconfig_xmldom::init() {
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
-	krb=false;
-	krbservice=DEFAULT_KRBSERVICE;
-	krbkeytab=NULL;
 
 	defaultlistener=NULL;
 }
@@ -376,6 +367,10 @@ bool sqlrconfig_xmldom::getDefaultKrb() {
 
 const char *sqlrconfig_xmldom::getDefaultKrbService() {
 	return (defaultlistener)?defaultlistener->getKrbService():NULL;
+}
+
+const char *sqlrconfig_xmldom::getDefaultKrbKeytab() {
+	return (defaultlistener)?defaultlistener->getKrbKeytab():NULL;
 }
 
 const char *sqlrconfig_xmldom::getDefaultUser() {
@@ -581,18 +576,6 @@ bool sqlrconfig_xmldom::getIgnoreSelectDatabase() {
 
 bool sqlrconfig_xmldom::getWaitForDownDatabase() {
 	return waitfordowndb;
-}
-
-bool sqlrconfig_xmldom::getKrb() {
-	return krb;
-}
-
-const char *sqlrconfig_xmldom::getKrbService() {
-	return krbservice;
-}
-
-const char *sqlrconfig_xmldom::getKrbKeytab() {
-	return krbkeytab;
 }
 
 linkedlist< char * > *sqlrconfig_xmldom::getSessionStartQueries() {
@@ -1073,6 +1056,17 @@ void sqlrconfig_xmldom::normalizeTree() {
 			listener->setAttributeValue(
 					"port",DEFAULT_PORT);
 		}
+
+		// krb but no service -> default service
+		xmldomnode	*krbservice=
+				instance->getAttribute("krbservice");
+		if (krbservice->isNullNode() &&
+			!charstring::compare(
+				listener->getAttributeValue("addresses"),
+				"yes") ) {
+			listener->setAttributeValue("krbservice",
+						DEFAULT_KRBSERVICE);
+		}
 	}
 
 	// add missing authentications tag
@@ -1418,18 +1412,6 @@ void sqlrconfig_xmldom::getTreeValues() {
 	attr=instance->getAttribute("waitfordowndatabase");
 	if (!attr->isNullNode()) {
 		waitfordowndb=!charstring::compare(attr->getValue(),"yes");
-	}
-	attr=instance->getAttribute("krb");
-	if (!attr->isNullNode()) {
-		krb=!charstring::compare(attr->getValue(),"yes");
-	}
-	attr=instance->getAttribute("krbservice");
-	if (!attr->isNullNode()) {
-		krbservice=attr->getValue();
-	}
-	attr=instance->getAttribute("krbkeytab");
-	if (!attr->isNullNode()) {
-		krbkeytab=attr->getValue();
 	}
 
 

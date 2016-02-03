@@ -1715,8 +1715,29 @@ void sqlrservercontroller::clientSession() {
 		case SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION:
 			info="client suspended the session";
 			break;
+		case SQLRCLIENTEXITSTATUS_ERROR:
 		default:
-			info="an error occurred";
+			// Don't use the word "error" here.
+			//
+			// Conditions that result in SQLRCLIENTEXITSTATUS_ERROR
+			// might not warrant investigation by operations staff.
+			//
+			// For example:
+			// * Programs can crash or exit at just the right
+			// 	moment.
+			// * Load balancers often check to be sure a service is
+			// 	still running by just connecting and
+			// 	disconnecting.
+			// * Ad-hock sqlrsh users might supply invalid
+			//	credentials.
+			//
+			// We don't want "error" making its way into the logs
+			// or log analyzers will generate a bunch of
+			// false-positives.
+			//
+			// If a "real" error occurs, it will be reported
+			// elsewhere.
+			info="server closed connection";
 			break;
 	}
 	logClientDisconnected(info);
