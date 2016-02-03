@@ -182,8 +182,14 @@ void heartbeatTest(void *id) {
 				}
 
 				stdoutput.printf("%lld: sending %d "
-						"bytes of garbage\n",
+						"bytes of garbage - ",
 						threadid,garbagesize);
+				stdoutput.safePrint(gbg,
+						(garbagesize<=4)?garbagesize:4);
+				if (garbagesize>4) {
+					stdoutput.write("...");
+				}
+				stdoutput.write('\n');
 				isc.write(gbg,garbagesize);
 			}
 
