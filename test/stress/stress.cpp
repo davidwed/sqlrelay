@@ -9,6 +9,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
 #include <rudiments/snooze.h>
+#include <rudiments/inetsocketclient.h>
 
 const char	*host;
 uint16_t	port;
@@ -17,16 +18,22 @@ const char	*user;
 const char	*password;
 int64_t		concount;
 int64_t		curcount;
+bool		terminated;
+uint32_t	garbage;
 
-void runQuery(void *id) {
+void shutDown(int32_t signum) {
+	terminated=true;
+}
+
+void queriesTest(void *id) {
 
 	uint64_t	threadid=(uint64_t)id;
 	uint32_t	seed=threadid;
 
 	stdoutput.printf("%lld: starting\n",threadid);
 
-	for (;;) {
-								
+	while (!terminated) {
+
 		sqlrconnection	sqlrcon(host,port,sock,user,password,0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 
@@ -38,6 +45,7 @@ void runQuery(void *id) {
 
 		// drop the table (just in case)
 		query.append("drop table test")->append(threadid);
+
 		if (!sqlrcur.sendQuery(query.getString())) {
 			// loop back if we couldn't connect to the listener
 			if (charstring::contains(sqlrcur.errorMessage(),
@@ -69,7 +77,8 @@ void runQuery(void *id) {
 				query.append("col")->append(i)->append(" int");
 			}
 			query.append(")");
-			if (!sqlrcur.sendQuery(query.getString())) {
+			if (!terminated &&
+				!sqlrcur.sendQuery(query.getString())) {
 				stdoutput.printf("%lld: create table - %s\n",
 					threadid,sqlrcur.errorMessage());
 			}
@@ -92,7 +101,8 @@ void runQuery(void *id) {
 					query.append(value);
 				}
 				query.append(")");
-				if (!sqlrcur.sendQuery(query.getString())) {
+				if (!terminated &&
+					!sqlrcur.sendQuery(query.getString())) {
 					stdoutput.printf("%lld: insert - %s\n",
 					threadid,sqlrcur.errorMessage());
 				}
@@ -117,7 +127,8 @@ void runQuery(void *id) {
 					query.clear();
 					query.append("select * from test");
 					query.append(threadid);
-					if (!cursors[j]->sendQuery(
+					if (!terminated &&
+						!cursors[j]->sendQuery(
 							query.getString())) {
 						stdoutput.printf(
 						"%lld: select - %s\n",threadid,
@@ -141,14 +152,63 @@ void runQuery(void *id) {
 	}
 }
 
+void heartbeatTest(void *id) {
+
+	uint64_t	threadid=(uint64_t)id;
+	uint32_t	seed=threadid;
+
+	inetsocketclient	isc;
+
+	uint64_t	i=0;
+	while (!terminated) {
+
+		if (isc.connect(host,port,-1,-1,0,1)==RESULT_SUCCESS) {
+
+			stdoutput.printf(
+				"%lld: %d: connect success\n",threadid,i);
+
+			if (garbage) {
+
+				seed=randomnumber::generateNumber(seed);
+				int32_t	garbagesize=
+					randomnumber::scaleNumber(
+							seed,1,garbage);
+
+				char	*gbg=new char[garbagesize];
+				for (int32_t i=0; i<garbagesize; i++) {
+					seed=randomnumber::generateNumber(seed);
+					gbg[i]=randomnumber::scaleNumber(
+								seed,0,255);
+				}
+
+				stdoutput.printf("%lld: sending %d "
+						"bytes of garbage\n",
+						threadid,garbagesize);
+				isc.write(gbg,garbagesize);
+			}
+
+		} else {
+			stdoutput.printf(
+				"%lld: %d: connect failed\n",threadid,i);
+		}
+
+		isc.close();
+		i++;
+	}
+}
+
 int main(int argc, const char **argv) {
+
+	terminated=false;
+
+	process::handleShutDown(shutDown);
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("host") || !cmdl.found("port") ||
-			!cmdl.found("user") || !cmdl.found("password") ||
-			!cmdl.found("concount") || !cmdl.found("curcount")) {
-		stdoutput.printf("usage: stress -host host -port port -socket socket -user user -password password -concount concount -curcount curcount\n");
+	if (!cmdl.found("host") ||
+			!cmdl.found("port") ||
+			!cmdl.found("concount")) {
+		stdoutput.printf("usage: stress -host host -port port -socket socket -user user -password password -concount concount -curcount curcount [-heartbeat|-garbage [size]]\n");
 		process::exit(1);
 	}
 
@@ -159,12 +219,22 @@ int main(int argc, const char **argv) {
 	password=cmdl.getValue("password");
 	concount=charstring::toUnsignedInteger(cmdl.getValue("concount"));
 	curcount=charstring::toUnsignedInteger(cmdl.getValue("curcount"));
+	garbage=0;
+	if (cmdl.found("garbage")) {
+		garbage=charstring::toUnsignedInteger(cmdl.getValue("garbage"));
+		if (garbage==0) {
+			garbage=100;
+		}
+	}
+	bool	heartbeat=(garbage || cmdl.found("heartbeat"));
 
 	thread	*th=new thread[concount];
 
 	stdoutput.printf("starting %lld threads\n",concount);
 	for (int64_t i=0; i<concount; i++) {
-		th[i].setFunction((void *(*)(void *))runQuery);
+		th[i].setFunction((heartbeat)?
+					(void *(*)(void *))heartbeatTest:
+					((void *(*)(void *))queriesTest));
 		if (!th[i].run((void *)i)) {
 			stdoutput.printf("%lld: failed to start\n",i);
 		}
