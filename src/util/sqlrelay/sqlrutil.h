@@ -265,6 +265,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual linkedlist< char *>	*getSessionStartQueries()=0;
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 
+		virtual xmldomnode	*getListeners()=0;
 		virtual xmldomnode	*getParser()=0;
 		virtual xmldomnode	*getTranslations()=0;
 		virtual xmldomnode	*getFilters()=0;

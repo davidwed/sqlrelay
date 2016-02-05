@@ -48,11 +48,11 @@ sqlrlistener::sqlrlistener() {
 	sqlrpth=NULL;
 
 	clientsockin=NULL;
-	clientsockinproto=NULL;
+	clientsockinprotoindex=NULL;
 	clientsockincount=0;
 	clientsockinindex=0;
 	clientsockun=NULL;
-	clientsockunproto=NULL;
+	clientsockunprotoindex=NULL;
 	clientsockuncount=0;
 	clientsockunindex=0;
 
@@ -150,12 +150,12 @@ void sqlrlistener::cleanUp() {
 		delete clientsockin[csind];
 	}
 	delete[] clientsockin;
-	delete[] clientsockinproto;
+	delete[] clientsockinprotoindex;
 	for (csind=0; csind<clientsockuncount; csind++) {
 		delete clientsockun[csind];
 	}
 	delete[] clientsockun;
-	delete[] clientsockunproto;
+	delete[] clientsockunprotoindex;
 
 	if (!isforkedchild && handoffsockname) {
 		file::remove(handoffsockname);
@@ -661,23 +661,26 @@ bool sqlrlistener::listenOnClientSockets() {
 		}
 	}
 	clientsockin=new inetsocketserver *[clientsockincount];
-	clientsockinproto=new const char *[clientsockincount];
+	clientsockinprotoindex=new uint16_t[clientsockincount];
 	clientsockinindex=0;
 	clientsockun=new unixsocketserver *[clientsockuncount];
-	clientsockunproto=new const char *[clientsockuncount];
+	clientsockunprotoindex=new uint16_t[clientsockuncount];
 	clientsockunindex=0;
 
 	// listen on sockets
 	bool	listening=false;
+	uint16_t	protocolindex=0;
 	for (node=listenerlist->getFirst(); node; node=node->getNext()) {
-		if (listenOnClientSocket(node->getValue())) {
+		if (listenOnClientSocket(protocolindex,node->getValue())) {
 			listening=true;
 		}
+		protocolindex++;
 	}
 	return listening;
 }
 
-bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
+bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
+						listenercontainer *lc) {
 
 	// init return value
 	bool	listening=false;
@@ -693,16 +696,7 @@ bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
 
 			uint64_t	ind=clientsockinindex+index;
 			clientsockin[ind]=new inetsocketserver();
-			clientsockinproto[ind]=lc->getProtocol();
-
-			// for the default protocol, use an empty string
-			// the listener has to pass the protocol to the
-			// connection and this makes that even faster for
-			// the default protocol
-			if (!charstring::compare(clientsockinproto[ind],
-							DEFAULT_PROTOCOL)) {
-				clientsockinproto[ind]="";
-			}
+			clientsockinprotoindex[ind]=protocolindex;
 
 			if (clientsockin[ind]->
 					listen(addresses[index],port,15)) {
@@ -738,15 +732,7 @@ bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
 	if (charstring::length(lc->getSocket())) {
 
 		clientsockun[clientsockunindex]=new unixsocketserver();
-		clientsockunproto[clientsockunindex]=lc->getProtocol();
-
-		// for the default protocol, use an empty string
-		// the listener has to pass the protocol to the connection
-		// and this makes that even faster for the default protocol
-		if (!charstring::compare(clientsockunproto[clientsockunindex],
-							DEFAULT_PROTOCOL)) {
-			clientsockunproto[clientsockunindex]="";
-		}
+		clientsockunprotoindex[clientsockunindex]=protocolindex;
 
 		if (clientsockun[clientsockunindex]->
 				listen(lc->getSocket(),0000,15)) {
@@ -964,11 +950,11 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	uint64_t 		csind=0;
 	inetsocketserver	*iss=NULL;
 	unixsocketserver	*uss=NULL;
-	const char		*protocol=NULL;
+	uint16_t		protocolindex=0;
 	for (csind=0; csind<clientsockincount; csind++) {
 		if (fd==clientsockin[csind]) {
 			iss=clientsockin[csind];
-			protocol=clientsockinproto[csind];
+			protocolindex=clientsockinprotoindex[csind];
 			break;
 		}
 	}
@@ -976,7 +962,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		for (csind=0; csind<clientsockuncount; csind++) {
 			if (fd==clientsockun[csind]) {
 				uss=clientsockun[csind];
-				protocol=clientsockunproto[csind];
+				protocolindex=clientsockunprotoindex[csind];
 				break;
 			}
 		}
@@ -1033,10 +1019,10 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	// happen, getValue(10) would return something greater than 0 and we
 	// would have forked anyway.
 	if (dynamicscaling || getBusyListeners() || !semset->getValue(2)) {
-		forkChild(clientsock,protocol);
+		forkChild(clientsock,protocolindex);
 	} else {
 		incrementBusyListeners();
-		clientSession(clientsock,protocol,NULL);
+		clientSession(clientsock,protocolindex,NULL);
 		decrementBusyListeners();
 	}
 
@@ -1201,10 +1187,11 @@ struct clientsessionattr {
 	thread		*thr;
 	sqlrlistener	*lsnr;
 	filedescriptor	*clientsock;
-	const char	*protocol;
+	uint16_t	protocolindex;
 };
 
-void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
+void sqlrlistener::forkChild(filedescriptor *clientsock,
+					uint16_t protocolindex) {
 
 	// increment the number of "forked listeners"
 	// do this before we actually fork to prevent a race condition where
@@ -1237,7 +1224,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 		csa->thr=thr;
 		csa->lsnr=this;
 		csa->clientsock=clientsock;
-		csa->protocol=protocol;
+		csa->protocolindex=protocolindex;
 		thr->setFunction((void*(*)(void*))clientSessionThread);
 		thr->setArgument(csa);
 
@@ -1279,7 +1266,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 			sqlrlg->initLoggers(this,NULL);
 		}
 
-		clientSession(clientsock,protocol,NULL);
+		clientSession(clientsock,protocolindex,NULL);
 
 		decrementBusyListeners();
 		decrementForkedListeners();
@@ -1316,7 +1303,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 void sqlrlistener::clientSessionThread(void *attr) {
 	clientsessionattr	*csa=(clientsessionattr *)attr;
 	csa->thr->detach();
-	csa->lsnr->clientSession(csa->clientsock,csa->protocol,csa->thr);
+	csa->lsnr->clientSession(csa->clientsock,csa->protocolindex,csa->thr);
 	csa->lsnr->decrementBusyListeners();
 	csa->lsnr->decrementForkedListeners();
 	delete csa->thr;
@@ -1324,13 +1311,14 @@ void sqlrlistener::clientSessionThread(void *attr) {
 }
 
 void sqlrlistener::clientSession(filedescriptor *clientsock,
-					const char *protocol, thread *thr) {
+					uint16_t protocolindex,
+					thread *thr) {
 
 	if (dynamicscaling) {
 		incrementConnectedClientCount();
 	}
 
-	bool	passstatus=handOffOrProxyClient(clientsock,protocol,thr);
+	bool	passstatus=handOffOrProxyClient(clientsock,protocolindex,thr);
 
 	// If the handoff failed, decrement the connected client count.
 	// If it had succeeded then the connection daemon would
@@ -1347,7 +1335,7 @@ void sqlrlistener::clientSession(filedescriptor *clientsock,
 }
 
 bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
-						const char *protocol,
+						uint16_t protocolindex,
 						thread *thr) {
 
 	unixsocketclient	connectionsock;
@@ -1383,9 +1371,8 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 		// tell the connection what handoff mode to expect
 		connectionsock.write(handoffmode);
 
-		// tell the connection what protocol to use
-		connectionsock.write((uint16_t)charstring::length(protocol));
-		connectionsock.write(protocol);
+		// tell the connection which protocol to use
+		connectionsock.write(protocolindex);
 
 		if (handoffmode==HANDOFF_PASS) {
 

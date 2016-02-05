@@ -26,38 +26,30 @@ sqlrprotocols::~sqlrprotocols() {
 	unloadProtocols();
 }
 
-bool sqlrprotocols::loadProtocols() {
+bool sqlrprotocols::loadProtocols(xmldomnode *parameters) {
 	debugFunction();
 
 	unloadProtocols();
 
-	// run through the protocols
-	for (linkedlistnode< listenercontainer * >
-			*node=cont->cfg->getListenerList()->getFirst();
-			node; node=node->getNext()) {
-
-		const char	*protocol=node->getValue()->getProtocol();
-
-		// don't load this protocol if it was loaded previously
-		sqlrprotocolplugin	*pp=NULL;
-		if (protos.getValue(protocol,&pp)) {
-			debugPrintf("skipping protocol %s "
-					" (already loaded)...\n",protocol);
-			continue;
-		}
+	// run through the listeners
+	uint16_t	i=0;
+	for (xmldomnode *listener=parameters->getFirstTagChild();
+			!listener->isNullNode();
+			listener=listener->getNextTagSibling()) {
 
 		debugPrintf("loading protocol ...\n");
 
-		// load password encryption
-		loadProtocol(protocol);
+		// load protocol
+		loadProtocol(i,listener);
+
+		i++;
 	}
 	return true;
 }
 
 void sqlrprotocols::unloadProtocols() {
 	debugFunction();
-	for (linkedlistnode< dictionarynode< const char *,
-						sqlrprotocolplugin * > *>
+	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
 			*node=protos.getList()->getFirst();
 			node; node=node->getNext()) {
 		sqlrprotocolplugin	*sqlrpp=node->getValue()->getValue();
@@ -68,14 +60,21 @@ void sqlrprotocols::unloadProtocols() {
 	protos.clear();
 }
 
-void sqlrprotocols::loadProtocol(const char *module) {
-
+void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	debugFunction();
+
+	// ignore any non-listener entries
+	if (charstring::compare(listener->getName(),"listener")) {
+		return;
+	}
+
+	// get the protocol name
+	const char	*module=listener->getAttributeValue("protocol");
 
 	debugPrintf("loading protocol: %s\n",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
-	// load the password encryption module
+	// load the protocol module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
 	modulename.append(SQLR);
@@ -91,11 +90,13 @@ void sqlrprotocols::loadProtocol(const char *module) {
 		return;
 	}
 
-	// load the password encryption itself
+	// load the protocol itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrprotocol_")->append(module);
-	sqlrprotocol *(*newProtocol)(sqlrservercontroller *)=
-			(sqlrprotocol *(*)(sqlrservercontroller *))
+	sqlrprotocol *(*newProtocol)
+				(sqlrservercontroller *, xmldomnode *)=
+			(sqlrprotocol *(*)
+				(sqlrservercontroller *, xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
 		stdoutput.printf("failed to create protocol: %s\n",module);
@@ -106,7 +107,7 @@ void sqlrprotocols::loadProtocol(const char *module) {
 		delete dl;
 		return;
 	}
-	sqlrprotocol	*pr=(*newProtocol)(cont);
+	sqlrprotocol	*pr=(*newProtocol)(cont,listener);
 
 #else
 
@@ -122,13 +123,13 @@ void sqlrprotocols::loadProtocol(const char *module) {
 	sqlrprotocolplugin	*sqlrpp=new sqlrprotocolplugin;
 	sqlrpp->pr=pr;
 	sqlrpp->dl=dl;
-	protos.setValue(module,sqlrpp);
+	protos.setValue(index,sqlrpp);
 }
 
-sqlrprotocol *sqlrprotocols::getProtocol(const char *module) {
+sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
 	debugFunction();
 	sqlrprotocolplugin	*pp=NULL;
-	if (!protos.getValue(module,&pp)) {
+	if (!protos.getValue(index,&pp)) {
 		return NULL;
 	}
 	return pp->pr;

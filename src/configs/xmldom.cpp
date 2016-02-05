@@ -94,6 +94,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
 
+		xmldomnode	*getListeners();
 		xmldomnode	*getParser();
 		xmldomnode	*getTranslations();
 		xmldomnode	*getFilters();
@@ -586,6 +587,10 @@ linkedlist< char * > *sqlrconfig_xmldom::getSessionEndQueries() {
 	return &sessionendqueries;
 }
 
+xmldomnode *sqlrconfig_xmldom::getListeners() {
+	return listenersxml;
+}
+
 xmldomnode *sqlrconfig_xmldom::getParser() {
 	return parserxml;
 }
@@ -1030,12 +1035,20 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!listener->isNullNode();
 			listener=listener->getNextTagSibling("listener")) {
 
+		bool	hasprotocol=!listener->
+				getAttribute("protocol")->isNullNode();
 		bool	hasaddresses=!listener->
 				getAttribute("addresses")->isNullNode();
 		bool	hasport=!listener->
 				getAttribute("port")->isNullNode();
 		bool	hassocket=!listener->
 				getAttribute("socket")->isNullNode();
+
+		// no protocol -> default protocol
+		if (!hasprotocol) {
+			listener->setAttributeValue(
+					"protocol",DEFAULT_PROTOCOL);
+		}
 
 		// nothing specified -> default address, default port, no socket
 		if (!hasaddresses && !hasport && !hassocket) {

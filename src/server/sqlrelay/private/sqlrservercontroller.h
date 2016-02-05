@@ -158,7 +158,7 @@
 
 		filedescriptor	*clientsock;
 
-		char		*protocol;
+		uint16_t	protocolindex;
 		sqlrprotocol	*currentprotocol;
 
 		const char	*user;

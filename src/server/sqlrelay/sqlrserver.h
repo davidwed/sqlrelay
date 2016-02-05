@@ -963,7 +963,8 @@ enum sqlrclientexitstatus_t {
 
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
-			sqlrprotocol(sqlrservercontroller *cont);
+			sqlrprotocol(sqlrservercontroller *cont,
+					xmldomnode *parameters);
 		virtual	~sqlrprotocol();
 
 		void	setClientSocket(filedescriptor *clientsock);
@@ -974,6 +975,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 	protected:
 		sqlrservercontroller	*cont;
+		xmldomnode		*parameters;
+
 		filedescriptor		*clientsock;
 
 		gsscredentials	gcred;
@@ -993,16 +996,16 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 						sqlrpaths *sqlrpth);
 			~sqlrprotocols();
 
-		bool		loadProtocols();
-		sqlrprotocol	*getProtocol(const char *module);
+		bool		loadProtocols(xmldomnode *listeners);
+		sqlrprotocol	*getProtocol(uint16_t port);
 	private:
 		void	unloadProtocols();
-		void	loadProtocol(const char *module);
+		void	loadProtocol(uint16_t index, xmldomnode *listener);
 
 		sqlrservercontroller	*cont;
 		const char		*libexecdir;
 
-		dictionary< const char *, sqlrprotocolplugin * >	protos;
+		dictionary< uint16_t , sqlrprotocolplugin * >	protos;
 };
 
 

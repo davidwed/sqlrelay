@@ -52,7 +52,7 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	clientsock=NULL;
 
-	protocol=NULL;
+	protocolindex=0;
 	currentprotocol=NULL;
 
 	user=NULL;
@@ -173,8 +173,6 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete[] originaldb;
 
 	delete sqlrpth;
-
-	delete[] protocol;
 
 	for (uint32_t i=0; i<usercount; i++) {
 		delete[] users[i];
@@ -454,7 +452,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// init client protocols
 	sqlrpr=new sqlrprotocols(this,sqlrpth);
-	sqlrpr->loadProtocols();
+	sqlrpr->loadProtocols(cfg->getListeners());
 
 	// set a handler for SIGALARMs, if necessary
 	#ifdef SIGALRM
@@ -1648,30 +1646,12 @@ int32_t sqlrservercontroller::waitForClient() {
 
 bool sqlrservercontroller::getProtocol() {
 
-	logDebugMessage("getting the client protocol...");
+	logDebugMessage("getting the protocol index...");
 
-	// get protocol length
-	uint16_t	protocollen=0;
-	if (handoffsockun.read(&protocollen)!=sizeof(uint16_t)) {
-		logDebugMessage("failed to get the client protocol length");
+	// get protocol index
+	if (handoffsockun.read(&protocolindex)!=sizeof(uint16_t)) {
+		logDebugMessage("failed to get the client protocol index");
 		return false;
-	}
-
-	// get the protocol string
-	delete[] protocol;
-	protocol=NULL;
-	if (!protocollen) {
-		protocol=charstring::duplicate(DEFAULT_PROTOCOL);
-	} else {
-		protocol=new char[protocollen+1];
-		if (handoffsockun.read(protocol,protocollen)!=protocollen) {
-			logDebugMessage("failed to get the "
-					"client protocol string");
-			delete[] protocol;
-			protocol=NULL;
-			return false;
-		}
-		protocol[protocollen]='\0';
 	}
 
 	logDebugMessage("done getting the client protocol...");
@@ -1693,7 +1673,7 @@ void sqlrservercontroller::clientSession() {
 	logClientConnected();
 
 	// have client session using the appropriate protocol
-	currentprotocol=sqlrpr->getProtocol(protocol);
+	currentprotocol=sqlrpr->getProtocol(protocolindex);
 	sqlrclientexitstatus_t	exitstatus=SQLRCLIENTEXITSTATUS_ERROR;
 	if (currentprotocol) {
 		currentprotocol->setClientSocket(clientsock);

@@ -12,6 +12,7 @@
 #include <rudiments/process.h>
 
 #include <datatypes.h>
+#include <defaults.h>
 #include <defines.h>
 
 //#define DEBUG_MESSAGES 1
@@ -26,7 +27,8 @@ enum sqlrclientquerytype_t {
 
 class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 	public:
-			sqlrprotocol_sqlrclient(sqlrservercontroller *cont);
+			sqlrprotocol_sqlrclient(sqlrservercontroller *cont,
+							xmldomnode *parameters);
 		virtual	~sqlrprotocol_sqlrclient();
 
 		sqlrclientexitstatus_t	clientSession();
@@ -165,6 +167,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		stringbuffer	debugstr;
 
+		bool		krb;
+
 		int32_t		idleclienttimeout;
 
 		uint64_t	maxclientinfolength;
@@ -190,9 +194,12 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		char		lobbuffer[32768];
 };
 
-sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(sqlrservercontroller *cont) :
-							sqlrprotocol(cont) {
+sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
+					sqlrservercontroller *cont,
+					xmldomnode *parameters) :
+					sqlrprotocol(cont,parameters) {
 	debugFunction();
+
 	idleclienttimeout=cont->cfg->getIdleClientTimeout();
 	maxclientinfolength=cont->cfg->getMaxClientInfoLength();
 	maxquerysize=cont->cfg->getMaxQuerySize();
@@ -204,26 +211,32 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(sqlrservercontroller *cont) :
 	maxerrorlength=cont->cfg->getMaxErrorLength();
 	waitfordowndb=cont->cfg->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
+	krb=!charstring::compare(parameters->getAttributeValue("krb"),"yes");
 
-	// FIXME: the kerberos settings below should come from the
-	// listener tag, rather than from the instance tag
-	if (cont->cfg->getDefaultKrb()) {
+	if (krb) {
 		if (gss::supportsGSS()) {
 
 			// set the keytab file to use
 			const char	*keytab=
-					cont->cfg->getDefaultKrbKeytab();
+				parameters->getAttributeValue("krbkeytab");
 			if (!charstring::isNullOrEmpty(keytab)) {
 				environment::setValue("KRB5_KTNAME",keytab);
 			}
 
+			// set the service to use
+			const char	*service=
+				parameters->getAttributeValue("krbservice");
+			if (charstring::isNullOrEmpty(service)) {
+				service=DEFAULT_KRBSERVICE;
+			}
+
 			// acquire service credentials from the keytab
-			if (!gcred.acquireService(
-					cont->cfg->getDefaultKrbService())) {
+			if (!gcred.acquireService(service)) {
 				const char	*status=
 					gcred.getMechanismMinorStatus();
 				stderror.printf("kerberos acquire-"
-						"service failed:\n%s",status);
+						"service %s failed:\n%s",
+						service,status);
 				if (charstring::contains(status,
 							"Permission denied")) {
 					char	*user=userentry::getName(
@@ -266,9 +279,7 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
 
 	// accept GSS security context, if necessary
-	// FIXME: the kerberos settings below should come from the
-	// listener tag, rather than from the instance tag
-	if (cont->cfg->getDefaultKrb() && !acceptGSSSecurityContext()) {
+	if (krb && !acceptGSSSecurityContext()) {
 		return status;
 	}
 
@@ -3229,7 +3240,8 @@ bool sqlrprotocol_sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_sqlrclient(
-						sqlrservercontroller *cont) {
-		return new sqlrprotocol_sqlrclient(cont);
+						sqlrservercontroller *cont,
+						xmldomnode *parameters) {
+		return new sqlrprotocol_sqlrclient(cont,parameters);
 	}
 }

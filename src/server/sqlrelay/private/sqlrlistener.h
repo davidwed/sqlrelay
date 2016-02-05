@@ -17,7 +17,7 @@
 		void	semError(const char *id, int semid);
 		void	setStartTime();
 		bool	listenOnClientSockets();
-		bool	listenOnClientSocket(listenercontainer *lc);
+		bool	listenOnClientSocket(uint16_t protocolindex, listenercontainer *lc);
 		bool	listenOnHandoffSocket(const char *id);
 		bool	listenOnDeregistrationSocket(const char *id);
 		bool	listenOnFixupSocket(const char *id);
@@ -28,10 +28,11 @@
 		bool	fixup(filedescriptor *sock);
 		bool	deniedIp(filedescriptor *clientsock);
 		void	forkChild(filedescriptor *clientsock,
-					const char *protocol);
+					uint16_t protocolindex);
 		static void	clientSessionThread(void *attr);
 		void	clientSession(filedescriptor *clientsock,
-					const char *protocol, thread *thr);
+					uint16_t protocolindex,
+					thread *thr);
 		void    errorClientSession(filedescriptor *clientsock,
 					int64_t errnum, const char *err);
 		bool	acquireShmAccess(thread *thr);
@@ -40,7 +41,8 @@
 		bool	doneAcceptingAvailableConnection();
 		void	waitForConnectionToBeReadyForHandoff();
 		bool	handOffOrProxyClient(filedescriptor *sock,
-					const char *protocol, thread *thr);
+					uint16_t protocolindex,
+					thread *thr);
 		bool	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
@@ -111,12 +113,12 @@
 		bool	initialized;
 
 		inetsocketserver	**clientsockin;
-		const char 		**clientsockinproto;
+		uint16_t		*clientsockinprotoindex;
 		uint64_t		clientsockincount;
 		uint64_t		clientsockinindex;
 
 		unixsocketserver	**clientsockun;
-		const char		**clientsockunproto;
+		uint16_t		*clientsockunprotoindex;
 		uint64_t		clientsockuncount;
 		uint64_t		clientsockunindex;
 
