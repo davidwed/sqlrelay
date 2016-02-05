@@ -87,13 +87,15 @@ sqlrlistener::~sqlrlistener() {
 	delete[] idfilename;
 
 	if (!isforkedchild) {
-		if (cfg && cfg->getListenerList()) {
-			for (linkedlistnode< listenercontainer * > *node=
-					cfg->getListenerList()->getFirst();
-					node; node=node->getNext()) {
+		if (cfg && !cfg->getListeners()->isNullNode()) {
+			for (xmldomnode *node=
+				cfg->getListeners()->
+					getFirstTagChild("listener");
+				!node->isNullNode();
+				node=node->getNextTagSibling("listener")) {
 				const char	*unixport=
-						node->getValue()->getSocket();
-				if (unixport) {
+					node->getAttributeValue("socket");
+				if (!charstring::isNullOrEmpty(unixport)) {
 					file::remove(unixport);
 				}
 			}
@@ -644,19 +646,23 @@ void sqlrlistener::semError(const char *id, int semid) {
 
 bool sqlrlistener::listenOnClientSockets() {
 
-	linkedlist< listenercontainer * >	*listenerlist=
-						cfg->getListenerList();
+	xmldomnode	*listenerlist=cfg->getListeners();
 
 	// count sockets and build socket arrays
 	clientsockincount=0;
 	clientsockuncount=0;
-	linkedlistnode< listenercontainer * >	*node;
-	for (node=listenerlist->getFirst(); node; node=node->getNext()) {
-		if (node->getValue()->getPort()) {
-			clientsockincount=clientsockincount+
-					node->getValue()->getAddressCount();
+	for (xmldomnode	*node=listenerlist->getFirstTagChild("listener");
+			!node->isNullNode();
+			node=node->getNextTagSibling("listener")) {
+		uint64_t	addrcount=0;
+		charstring::split(node->getAttributeValue("addresses"),
+						",",true,NULL,&addrcount);
+		if (!charstring::isNullOrEmpty(
+				node->getAttributeValue("port"))) {
+			clientsockincount=clientsockincount+addrcount;
 		}
-		if (charstring::length(node->getValue()->getSocket())) {
+		if (!charstring::isNullOrEmpty(
+				node->getAttributeValue("socket"))) {
 			clientsockuncount=clientsockuncount+1;
 		}
 	}
@@ -668,10 +674,12 @@ bool sqlrlistener::listenOnClientSockets() {
 	clientsockunindex=0;
 
 	// listen on sockets
-	bool	listening=false;
+	bool		listening=false;
 	uint16_t	protocolindex=0;
-	for (node=listenerlist->getFirst(); node; node=node->getNext()) {
-		if (listenOnClientSocket(protocolindex,node->getValue())) {
+	for (xmldomnode	*node=listenerlist->getFirstTagChild("listener");
+			!node->isNullNode();
+			node=node->getNextTagSibling("listener")) {
+		if (listenOnClientSocket(protocolindex,node)) {
 			listening=true;
 		}
 		protocolindex++;
@@ -680,26 +688,37 @@ bool sqlrlistener::listenOnClientSockets() {
 }
 
 bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
-						listenercontainer *lc) {
+						xmldomnode *ln) {
 
 	// init return value
 	bool	listening=false;
 
 	// get addresses/inet port and unix port to listen on
-	const char * const *addresses=lc->getAddresses();
-	uint16_t	port=lc->getPort();
+	const char	*addresses=ln->getAttributeValue("addresses");
+	uint16_t	port=charstring::toUnsignedInteger(
+					ln->getAttributeValue("port"));
+
+	// split addresses
+	char		**addr=NULL;
+	uint64_t	addrcount=0;
+	charstring::split(addresses,",",true,&addr,&addrcount);
+
+	// trim them too
+	uint64_t	index;
+	for (index=0; index<addrcount; index++) {
+		charstring::bothTrim(addr[index]);
+	}
 
 	// attempt to listen on the inet ports (on each specified address)
-	if (port && lc->getAddressCount()) {
+	if (port && addrcount) {
 
-		for (uint64_t index=0; index<lc->getAddressCount(); index++) {
+		for ( index=0; index<addrcount; index++) {
 
 			uint64_t	ind=clientsockinindex+index;
 			clientsockin[ind]=new inetsocketserver();
 			clientsockinprotoindex[ind]=protocolindex;
 
-			if (clientsockin[ind]->
-					listen(addresses[index],port,15)) {
+			if (clientsockin[ind]->listen(addr[index],port,15)) {
 				lsnr.addReadFileDescriptor(clientsockin[ind]);
 				listening=true;
 			} else {
@@ -717,7 +736,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 					"Make sure that no other "
 					"processes are listening "
 					"on that port.\n\n",
-					addresses[index],port,err);
+					addr[index],port,err);
 				delete[] err;
 
 				delete clientsockin[ind];
@@ -729,24 +748,24 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 	}
 
 	// attempt to listen on the unix socket
-	if (charstring::length(lc->getSocket())) {
+	const char	*sock=ln->getAttributeValue("socket");
+	if (!charstring::isNullOrEmpty(sock)) {
 
 		clientsockun[clientsockunindex]=new unixsocketserver();
 		clientsockunprotoindex[clientsockunindex]=protocolindex;
 
-		if (clientsockun[clientsockunindex]->
-				listen(lc->getSocket(),0000,15)) {
+		if (clientsockun[clientsockunindex]->listen(sock,0000,15)) {
 			lsnr.addReadFileDescriptor(
 					clientsockun[clientsockunindex]);
 			listening=true;
 		} else {
 			stringbuffer	info;
 			info.append("failed to listen on client socket: ");
-			info.append(lc->getSocket());
+			info.append(sock);
 			logInternalError(info.getString());
 
 			stderror.printf("Could not listen on unix socket: ");
-			stderror.printf("%s\n",lc->getSocket());
+			stderror.printf("%s\n",sock);
 			stderror.printf("Make sure that the file and ");
 			stderror.printf("directory are readable and writable.");
 			stderror.printf("\n\n");
@@ -756,6 +775,11 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 		}
 
 		clientsockunindex++;
+	}
+
+	// clean up addresses
+	for (index=0; index<addrcount; index++) {
+		delete[] addr[index];
 	}
 
 	return listening;

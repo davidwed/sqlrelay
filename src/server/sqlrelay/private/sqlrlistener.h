@@ -17,7 +17,8 @@
 		void	semError(const char *id, int semid);
 		void	setStartTime();
 		bool	listenOnClientSockets();
-		bool	listenOnClientSocket(uint16_t protocolindex, listenercontainer *lc);
+		bool	listenOnClientSocket(uint16_t protocolindex,
+							xmldomnode *ln);
 		bool	listenOnHandoffSocket(const char *id);
 		bool	listenOnDeregistrationSocket(const char *id);
 		bool	listenOnFixupSocket(const char *id);
