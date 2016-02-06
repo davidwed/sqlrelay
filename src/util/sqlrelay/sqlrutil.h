@@ -184,15 +184,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool	load(const char *url, const char *id)=0;
 		virtual bool	accessible()=0;
 
-		virtual const char * const	*getDefaultAddresses()=0;
-		virtual uint64_t		getDefaultAddressCount()=0;
-		virtual uint16_t		getDefaultPort()=0;
-		virtual const char		*getDefaultSocket()=0;
-		virtual bool			getDefaultKrb()=0;
-		virtual const char		*getDefaultKrbService()=0;
-		virtual const char		*getDefaultKrbKeytab()=0;
-		virtual const char		*getDefaultUser()=0;
-		virtual const char		*getDefaultPassword()=0;
+		virtual const char 	*getDefaultAddresses()=0;
+		virtual uint16_t	getDefaultPort()=0;
+		virtual const char	*getDefaultSocket()=0;
+		virtual bool		getDefaultKrb()=0;
+		virtual const char	*getDefaultKrbService()=0;
+		virtual const char	*getDefaultKrbKeytab()=0;
+		virtual const char	*getDefaultUser()=0;
+		virtual const char	*getDefaultPassword()=0;
 
 		virtual bool		getListenOnInet()=0;
 		virtual bool		getListenOnUnix()=0;
@@ -275,9 +274,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual xmldomnode	*getQueries()=0;
 		virtual xmldomnode	*getPasswordEncryptions()=0;
 		virtual xmldomnode	*getAuths()=0;
-
-		virtual linkedlist< listenercontainer * >
-						*getListenerList()=0;
 
 		virtual linkedlist< connectstringcontainer * >
 						*getConnectStringList()=0;

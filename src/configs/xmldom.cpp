@@ -31,15 +31,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool	load(const char *urlname, const char *id);
 		bool	accessible();
 
-		const char * const	*getDefaultAddresses();
-		uint64_t		getDefaultAddressCount();
-		uint16_t		getDefaultPort();
-		const char		*getDefaultSocket();
-		bool			getDefaultKrb();
-		const char		*getDefaultKrbService();
-		const char		*getDefaultKrbKeytab();
-		const char		*getDefaultUser();
-		const char		*getDefaultPassword();
+		const char	*getDefaultAddresses();
+		uint16_t	getDefaultPort();
+		const char	*getDefaultSocket();
+		bool		getDefaultKrb();
+		const char	*getDefaultKrbService();
+		const char	*getDefaultKrbKeytab();
+		const char	*getDefaultUser();
+		const char	*getDefaultPassword();
 
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
@@ -104,8 +103,6 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		xmldomnode	*getQueries();
 		xmldomnode	*getPasswordEncryptions();
 		xmldomnode	*getAuths();
-
-		linkedlist< listenercontainer * >	*getListenerList();
 
 		linkedlist< connectstringcontainer * >	*getConnectStringList();
 		connectstringcontainer	*getConnectString(
@@ -214,13 +211,18 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 
 		uint32_t	metrictotal;
 
-		linkedlist< listenercontainer * >	listenerlist;
 		linkedlist< routecontainer *>		routelist;
 		linkedlist< connectstringcontainer * >	connectstringlist;
 
-		listenercontainer	*defaultlistener;
-		const char		*defaultuser;
-		const char		*defaultpassword;
+		xmldomnode	*defaultlistener;
+		const char	*defaultaddresses;
+		uint16_t	defaultport;
+		const char	*defaultsocket;
+		bool		defaultkrb;
+		const char	*defaultkrbkeytab;
+		const char	*defaultkrbservice;
+		const char	*defaultuser;
+		const char	*defaultpassword;
 
 		bool		ininstancetag;
 		bool		inidattribute;
@@ -312,15 +314,18 @@ void sqlrconfig_xmldom::init() {
 	waitfordowndb=true;
 
 	defaultlistener=NULL;
+	defaultaddresses=NULL;
+	defaultport=0;
+	defaultsocket=NULL;
+	defaultkrb=false;
+	defaultkrbkeytab=NULL;
+	defaultkrbservice=NULL;
+	defaultuser=NULL;
+	defaultpassword=NULL;
 }
 
 void sqlrconfig_xmldom::clear() {
 	debugFunction();
-
-	for (listenernode *ln=listenerlist.getFirst(); ln; ln=ln->getNext()) {
-		delete ln->getValue();
-	}
-	listenerlist.clear();
 
 	for (connectstringnode *csn=connectstringlist.getFirst();
 						csn; csn=csn->getNext()) {
@@ -346,32 +351,28 @@ void sqlrconfig_xmldom::clear() {
 	sessionendqueries.clear();
 }
 
-const char * const *sqlrconfig_xmldom::getDefaultAddresses() {
-	return (defaultlistener)?defaultlistener->getAddresses():NULL;
-}
-
-uint64_t sqlrconfig_xmldom::getDefaultAddressCount() {
-	return (defaultlistener)?defaultlistener->getAddressCount():0;
+const char *sqlrconfig_xmldom::getDefaultAddresses() {
+	return defaultaddresses;
 }
 
 uint16_t sqlrconfig_xmldom::getDefaultPort() {
-	return (defaultlistener)?defaultlistener->getPort():0;
+	return defaultport;
 }
 
 const char *sqlrconfig_xmldom::getDefaultSocket() {
-	return (defaultlistener)?defaultlistener->getSocket():NULL;
+	return defaultsocket;
 }
 
 bool sqlrconfig_xmldom::getDefaultKrb() {
-	return (defaultlistener)?defaultlistener->getKrb():false;
+	return defaultkrb;
 }
 
 const char *sqlrconfig_xmldom::getDefaultKrbService() {
-	return (defaultlistener)?defaultlistener->getKrbService():NULL;
+	return defaultkrbservice;
 }
 
 const char *sqlrconfig_xmldom::getDefaultKrbKeytab() {
-	return (defaultlistener)?defaultlistener->getKrbKeytab():NULL;
+	return defaultkrbkeytab;
 }
 
 const char *sqlrconfig_xmldom::getDefaultUser() {
@@ -625,10 +626,6 @@ xmldomnode *sqlrconfig_xmldom::getPasswordEncryptions() {
 
 xmldomnode *sqlrconfig_xmldom::getAuths() {
 	return authsxml;
-}
-
-linkedlist< listenercontainer * > *sqlrconfig_xmldom::getListenerList() {
-	return &listenerlist;
 }
 
 linkedlist< connectstringcontainer * > *sqlrconfig_xmldom::
@@ -1075,8 +1072,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 				instance->getAttribute("krbservice");
 		if (krbservice->isNullNode() &&
 			!charstring::compare(
-				listener->getAttributeValue("addresses"),
-				"yes") ) {
+				listener->getAttributeValue("krb"),"yes") ) {
 			listener->setAttributeValue("krbservice",
 						DEFAULT_KRBSERVICE);
 		}
@@ -1441,58 +1437,46 @@ void sqlrconfig_xmldom::getTreeValues() {
 	pwdencsxml=instance->getFirstTagChild("passwordencryptions");
 	authsxml=instance->getFirstTagChild("authentications");
 
+
 	// listeners tag...
-	for (xmldomnode *listener=listenersxml->getFirstTagChild("listener");
-			!listener->isNullNode();
-			listener=listener->getNextTagSibling("listener")) {
+	defaultlistener=NULL;
+	for (xmldomnode *node=listenersxml->getFirstTagChild("listener");
+				!node->isNullNode();
+				node=node->getNextTagSibling("listener")) {
 
-		// listen on inet/unix...
-		if (!listener->getAttribute("port")->isNullNode()) {
-			listenoninet=true;
-		}
-		if (!listener->getAttribute("socket")->isNullNode()) {
-			listenonunix=true;
-		}
-
-		// add an item to the listener list
-		listenercontainer	*l=new listenercontainer();
-		const char	*addresses=
-				listener->getAttributeValue("addresses");
-		if (charstring::isNullOrEmpty(addresses)) {
-			addresses=DEFAULT_ADDRESS;
-		}
-		char		**addr=NULL;
-		uint64_t	addrcount=0;
-		charstring::split(addresses,",",true,&addr,&addrcount);
-		uint64_t	index;
-		for (index=0; index<addrcount; index++) {
-			charstring::bothTrim(addr[index]);
-		}
-		l->setAddresses(addr,addrcount);
-		l->setPort(atouint32_t(
-				listener->getAttributeValue("port"),"0",0));
-		l->setSocket(listener->getAttributeValue("socket"));
-		l->setKrb(!charstring::compare(
-				listener->getAttributeValue("krb"),"yes"));
-		l->setKrbService(listener->getAttributeValue("krbservice"));
-		l->setKrbKeytab(listener->getAttributeValue("krbkeytab"));
-		listenerlist.append(l);
-	}
-
-	// get the default listener...
-	// use the first listener for the default protocol,
-	// or just use the first listener if that doesn't work
-	for (listenernode *node=listenerlist.getFirst();
-				node; node=node->getNext()) {
-		listenercontainer	*l=node->getValue();
-		if (!charstring::compare(l->getProtocol(),DEFAULT_PROTOCOL)) {
-			defaultlistener=l;
+		// get the default listener...
+		// use the first listener for the default protocol,
+		if (!defaultlistener &&
+			!charstring::compare(
+					node->getAttributeValue("protocol"),
+					DEFAULT_PROTOCOL)) {
+			defaultlistener=node;
 			break;
 		}
+
+		// listen on inet/unix...
+		if (!node->getAttribute("port")->isNullNode()) {
+			listenoninet=true;
+		}
+		if (!node->getAttribute("socket")->isNullNode()) {
+			listenonunix=true;
+		}
 	}
+
+	// just use the first listener if no default listener was found yet
 	if (!defaultlistener) {
-		defaultlistener=listenerlist.getFirst()->getValue();
+		defaultlistener=listenersxml->getFirstTagChild("listener");
 	}
+
+	// default listener parameters
+	defaultaddresses=defaultlistener->getAttributeValue("addresses");
+	defaultport=charstring::toUnsignedInteger(
+			defaultlistener->getAttributeValue("port"));
+	defaultsocket=defaultlistener->getAttributeValue("socket");
+	defaultkrb=!charstring::compare(
+			defaultlistener->getAttributeValue("krb"),"yes");
+	defaultkrbkeytab=defaultlistener->getAttributeValue("krbkeytab");
+	defaultkrbservice=defaultlistener->getAttributeValue("krbservice");
 
 
 	// session queries

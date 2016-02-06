@@ -1006,101 +1006,104 @@ bool sqlrservercontroller::openSockets() {
 
 	// get the next available unix socket and open it
 	if (cfg->getListenOnUnix() &&
-		!charstring::isNullOrEmpty(unixsocketptr)) {
+		!charstring::isNullOrEmpty(unixsocketptr) &&
+		!serversockun) {
 
-		if (!serversockun) {
-			serversockun=new unixsocketserver();
-			if (serversockun->listen(unixsocket,0000,5)) {
+		serversockun=new unixsocketserver();
+		if (serversockun->listen(unixsocket,0000,5)) {
 
-				debugstr.clear();
-				debugstr.append("listening on unix socket: ");
-				debugstr.append(unixsocket);
-				logDebugMessage(debugstr.getString());
+			debugstr.clear();
+			debugstr.append("listening on unix socket: ");
+			debugstr.append(unixsocket);
+			logDebugMessage(debugstr.getString());
 
-				lsnr.addReadFileDescriptor(serversockun);
+			lsnr.addReadFileDescriptor(serversockun);
 
-			} else {
-				debugstr.clear();
-				debugstr.append("failed to listen on socket: ");
-				debugstr.append(unixsocket);
-				logInternalError(NULL,debugstr.getString());
+		} else {
+			debugstr.clear();
+			debugstr.append("failed to listen on socket: ");
+			debugstr.append(unixsocket);
+			logInternalError(NULL,debugstr.getString());
 
-				stderror.printf("Could not listen on ");
-				stderror.printf("unix socket: ");
-				stderror.printf("%s\n",unixsocket);
-				stderror.printf("Make sure that the file and ");
-				stderror.printf("directory are readable ");
-				stderror.printf("and writable.\n\n");
-				delete serversockun;
-				return false;
-			}
+			stderror.printf("Could not listen on ");
+			stderror.printf("unix socket: ");
+			stderror.printf("%s\n",unixsocket);
+			stderror.printf("Make sure that the file and ");
+			stderror.printf("directory are readable ");
+			stderror.printf("and writable.\n\n");
+			delete serversockun;
+			return false;
 		}
 	}
 
+	bool	retval=true;
+
 	// open the next available inet socket
-	if (cfg->getListenOnInet()) {
+	if (cfg->getListenOnInet() && !serversockin) {
 
-		if (!serversockin) {
-			const char * const *addresses=
-					cfg->getDefaultAddresses();
-			serversockincount=cfg->getDefaultAddressCount();
-			serversockin=new inetsocketserver *[serversockincount];
-			bool	failed=false;
-			for (uint64_t index=0;
-					index<serversockincount;
-					index++) {
-				serversockin[index]=NULL;
-				if (failed) {
-					continue;
-				}
-				serversockin[index]=new inetsocketserver();
-				if (serversockin[index]->
-					listen(addresses[index],inetport,5)) {
+		const char	*addresses=cfg->getDefaultAddresses();
 
-					if (!inetport) {
-						inetport=serversockin[index]->
-								getPort();
-					}
+		char		**addr=NULL;
+		uint64_t	addrcount=0;
+		charstring::split(addresses,",",true,&addr,&addrcount);
 
-					char	string[33];
-					charstring::printf(string,33,
-						"listening on inet socket: %d",
-						inetport);
-					logDebugMessage(string);
-	
-					lsnr.addReadFileDescriptor(
-							serversockin[index]);
+		serversockincount=addrcount;
+		serversockin=new inetsocketserver *[addrcount];
 
-				} else {
-					debugstr.clear();
-					debugstr.append("failed to listen "
-							"on port: ");
-					debugstr.append(inetport);
-					logInternalError(NULL,
-							debugstr.getString());
-
-					stderror.printf("Could not listen on ");
-					stderror.printf("inet socket: ");
-					stderror.printf("%d\n\n",inetport);
-					failed=true;
-				}
+		uint64_t	index=0;
+		for (index=0; index<serversockincount; index++) {
+			serversockin[index]=NULL;
+			if (!retval) {
+				continue;
 			}
-			if (failed) {
-				for (uint64_t index=0;
-						index<serversockincount;
-						index++) {
-					delete serversockin[index];
+			serversockin[index]=new inetsocketserver();
+			if (serversockin[index]->
+				listen(addr[index],inetport,5)) {
+
+				if (!inetport) {
+					inetport=serversockin[index]->getPort();
 				}
-				delete[] serversockin;
-				serversockincount=0;
-				return false;
+
+				char	string[33];
+				charstring::printf(string,33,
+					"listening on inet socket: %d",
+					inetport);
+				logDebugMessage(string);
+
+				lsnr.addReadFileDescriptor(serversockin[index]);
+
+			} else {
+				debugstr.clear();
+				debugstr.append("failed to listen on port: ");
+				debugstr.append(inetport);
+				logInternalError(NULL,debugstr.getString());
+
+				stderror.printf("Could not listen on ");
+				stderror.printf("inet socket: ");
+				stderror.printf("%d\n\n",inetport);
+				retval=false;
 			}
 		}
+
+		if (!retval) {
+			// clean up
+			for (index=0; index<serversockincount; index++) {
+				delete serversockin[index];
+			}
+			delete[] serversockin;
+			serversockincount=0;
+		}
+
+		// clean up addresses
+		for (index=0; index<addrcount; index++) {
+			delete[] addr[index];
+		}
+		delete[] addr;
 	}
 
 	logDebugMessage("done listening on sockets");
 
-	return true;
+	return retval;
 }
 
 bool sqlrservercontroller::listen() {
