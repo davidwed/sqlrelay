@@ -1078,10 +1078,23 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
-	// add missing authentications tag
+	// authentications -> auths
 	xmldomnode	*auths=instance->getFirstTagChild("authentications");
+	if (!auths->isNullNode()) {
+		auths->setName("auths");
+	}
+
+	// add missing auths tag
+	auths=instance->getFirstTagChild("auths");
 	if (auths->isNullNode()) {
-		auths=instance->insertTag("authentications",1);
+		auths=instance->insertTag("auths",1);
+	}
+
+	// authentication -> auth
+	for (xmldomnode *auth=auths->getFirstTagChild("authentication");
+			!auth->isNullNode();
+			auth=auth->getNextTagSibling("authentication")) {
+		auth->setName("auth");
 	}
 
 	// users -> auth_userlist
@@ -1089,7 +1102,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*users=instance->getFirstTagChild("users");
 	if (!users->isNullNode()) {
 
-		xmldomnode	*auth=auths->insertTag("authentication",0);
+		xmldomnode	*auth=auths->insertTag("auth",0);
 		auth->setAttributeValue("module","userlist");
 
 		for (xmldomnode *user=users->getFirstTagChild("user");
@@ -1141,8 +1154,8 @@ void sqlrconfig_xmldom::normalizeTree() {
 		!charstring::compare(attr->getValue(),"database")) {
 
 		xmldomnode	*auth=(addeduserlist)?
-					auths->insertTag("authentication",1):
-					auths->insertTag("authentication",0);
+					auths->insertTag("auth",1):
+					auths->insertTag("auth",0);
 
 		auth->setAttributeValue("module","database");
 
@@ -1435,7 +1448,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	loggersxml=instance->getFirstTagChild("loggers");
 	queriesxml=instance->getFirstTagChild("queries");
 	pwdencsxml=instance->getFirstTagChild("passwordencryptions");
-	authsxml=instance->getFirstTagChild("authentications");
+	authsxml=instance->getFirstTagChild("auths");
 
 
 	// listeners tag...
@@ -1576,8 +1589,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 
 	// default user/password
-	xmldomnode	*defaultusertag=
-			instance->getFirstTagChild("authentications")->
+	xmldomnode	*defaultusertag=instance->getFirstTagChild("auths")->
 						getFirstTagDescendent("user");
 	defaultuser=defaultusertag->getAttributeValue("user");
 	defaultpassword=defaultusertag->getAttributeValue("password");

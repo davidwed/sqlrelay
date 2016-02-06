@@ -1,11 +1,11 @@
 <html>
 <head>
-<title>SQL Relay - Extension Modules - Authentication</title>
+<title>SQL Relay - Extension Modules - Auth</title>
 <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Authentication Modules</span><br><br>
+<span class="heading1">Auth Modules</span><br><br>
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
@@ -18,11 +18,11 @@
 <br><a name="introduction"></a>
 <span class="heading2">Introduction</span><br>
 
-<p>SQL Relay provides two built-in authentication mechanisms, configurable by the authtier attribute of the instance tag.  If authtier="connection" then users are authenticated against a static list.  If authtier="database" then users are authenticated against the database itself and users must log into SQL Relay using a user/password combination that would be valid to log into the database directly.</p>
+<p>SQL Relay provides two built-in auth mechanisms, configurable by the <i>authtier</i> attribute of the instance tag.  If authtier="connection" then users are authenticated/authorized against a static list.  If authtier="database" then users are authenticated/authorized against the database itself and users must log into SQL Relay using a user/password combination that would be valid to log into the database directly.</p>
 
-<p>Authentication modules allow the SQL Relay server programs to authenticate users in some other manner.<p>
+<p>Auth modules allow the SQL Relay server programs to authenticate/authorize users in some other manner.<p>
 
-<p>The <i>authentications</i> section of the sqlrelay.conf file indicates which authentication modules to load and what parameters to use when executing them.</p>
+<p>The <i>auths</i> section of the sqlrelay.conf file indicates which auth modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
 
@@ -33,13 +33,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password1&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password3&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
@@ -51,7 +51,7 @@
 
 <p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
 
-<p>Authentication modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
+<p>Auth modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
 
@@ -62,18 +62,18 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password1&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password3&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentication&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/auth.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auth&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/auth.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user4&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password4&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user5&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password5&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentication&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auth&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
@@ -81,12 +81,12 @@
 </font>
 </blockquote>
 
-<p>At startup, the SQL Relay server creates instances of the specified authentication modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  If a module successfully authenticates a user, then the client is allowed to continue its session.  If a module fails to authenticate a user, then the credentials are passed on to the next module.  If all modules fail to authenticate a user, then the client is not allowed to continue its session.</p>
+<p>At startup, the SQL Relay server creates instances of the specified auth modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  If a module successfully authenticates/authorizes a user, then the client is allowed to continue its session.  If a module fails to authenticate/authorize a user, then the credentials are passed on to the next module.  If all modules fail to authenticate/authorize a user, then the client is not allowed to continue its session.</p>
 
 <br><a name="available"></a>
 <span class="heading2">Available Modules</span><br>
 
-<p>Currently, the following authentication modules are available:</p>
+<p>Currently, the following auth modules are available:</p>
 
 <b>
 <ul>
@@ -99,9 +99,9 @@
 <br><br>
 <span class="heading3">userlist</span><br>
 
-<p>The userlist module authenticates a user against a static list of valid user/password combinations.  In fact, it has the same behavior as the default behavior of SQL Relay.  The only difference is that the syntax in the config file is a little different.</p>
+<p>The userlist module authenticates/authorizes a user against a static list of valid user/password combinations.  In fact, it has the same behavior as the default behavior of SQL Relay.  The only difference is that the syntax in the config file is a little different.</p>
 
-<p>When using the userlist authentication module, rather than using the <i>users</i> tag to specify valid users...</p>
+<p>When using the userlist auth module, rather than using the <i>users</i> tag to specify valid users...</p>
 
 <blockquote>
 
@@ -135,13 +135,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password1&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password2&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;password3&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
@@ -165,13 +165,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">passwordencryption</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;rot&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;rot16&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>count</b></font>=<font color="#ff00ff">&quot;16&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/passwordencryptions&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;cnffjbeq4&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>passwordencryptionid</b></font>=<font color="#ff00ff">&quot;rot13&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;cnffjbeq5&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>passwordencryptionid</b></font>=<font color="#ff00ff">&quot;rot13&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;user3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;fqiimeht8&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>passwordencryptionid</b></font>=<font color="#ff00ff">&quot;rot16&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
@@ -179,24 +179,24 @@
 </font>
 </blockquote>
 
-<p>Since the userlist authentication module appears to provide the exact same functionality as the built-in <i>users</i> tag, why would you want to use it instead of just using the built-in <i>users</i> tag?</p>
+<p>Since the userlist auth module appears to provide the exact same functionality as the built-in <i>users</i> tag, why would you want to use it instead of just using the built-in <i>users</i> tag?</p>
 
-<p>The <i>users</i> tag is evaluated prior to evaluating any modules.  So, you must use the userlist module if you are stacking authentication modules, and want to use a different authentication module first, falling back to a static list of users if it fails.</p>
+<p>The <i>users</i> tag is evaluated prior to evaluating any modules.  So, you must use the userlist module if you are stacking auth modules, and want to use a different auth module first, falling back to a static list of users if it fails.</p>
 
 <br><br>
 <span class="heading3">database</span><br>
 
-<p>The database module authenticates a user against the database itself.  This causes SQL Relay to switch which user it is logged into the database as.</p>
+<p>The database module authenticates/authorizes a user against the database itself.  This causes SQL Relay to switch which user it is logged into the database as.</p>
 
 <p>When using SQL Relay with Oracle 8i or higher, it switches users without logging out.  The database connection must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to SQL Relay as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
 
 <p>When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is somewhat ineffecient and defeats the value of keeping persistent database connections but might be useful for particular applications.</p>
 
-<p><b>NOTE:</b> Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router uses to use database authentication but not the router instance itself.  If database authentication is used for that instance, authentication will fail.</p>
+<p><b>NOTE:</b> Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router uses to use it but not the router instance itself.  If database auth is used for that instance, then auth will fail.</p>
 
 <p>Using the database module has the same behavior as setting authtier="database" in the config file.  The only difference is that the syntax in the config file is different.</p>
 
-<p>When using the database authentication module, rather than using authtier="database"...</p>
+<p>When using the database auth module, rather than using authtier="database"...</p>
 
 <blockquote>
 
@@ -224,9 +224,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;database&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;database&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
@@ -234,18 +234,18 @@
 </font>
 </blockquote>
 
-<p>Since the userlist authentication module appears to provide the exact same functionality as the built-in <i>authtier</i> attribute, why would you want to use it instead of just using the built-in <i>authtier</i> attribute?</p>
+<p>Since the userlist auth module appears to provide the exact same functionality as the built-in <i>authtier</i> attribute, why would you want to use it instead of just using the built-in <i>authtier</i> attribute?</p>
 
-<p>There is no specific advantage to using the module instead of the attribute, other than consistency.  If you're using other authentication modules in other instances, then you might also want to use the database authentication module in this instance.</p>
+<p>There is no specific advantage to using the module instead of the attribute, other than consistency.  If you're using other auth modules in other instances, then you might also want to use the database auth module in this instance.</p>
 
-<p>Note also, that the database authentication module should not be used in a stacked configuration.  Or, at least, using it in a stacked configuration could lead to unexpected results.  When using database authentication, each connection is left logged in as the most recently authenticated user.  If an SQL Relay user is authenticated by some other method, then there is no guarantee what user it will access the database as.</p>
+<p>Note also, that the database auth module should not be used in a stacked configuration.  Or, at least, using it in a stacked configuration could lead to unexpected results.  When using database authentication/authorization, each connection is left logged in as the most recently authenticated/authorized user.  If an SQL Relay user is authenticated/authorized by some other method, then there is no guarantee what user it will access the database as.</p>
 
 <br><br>
 <span class="heading3">sqlrelay</span><br>
 
-<p>The sqlrelay module authenticates a user against a table in a database, using another instance of SQL Relay to access that database.</p>
+<p>The sqlrelay module authenticates/authorizes a user against a table in a database, using another instance of SQL Relay to access that database.</p>
 
-<p>The module's <b>host</b>, <b>port</b>, <b>socket</b>, <b>user</b> and <b>password</b> paramters define which instance of SQL Relay to talk to.  The <b>table</b>, <b>usercolumn</b> and <b>passwordcolumn</b> parameters define which table and which columns within the table to authenticate against.  If passwords aren't stored in plain text, then an optional <b>passwordfunction</b> parameter may specify the stored procedure used to encrypt the password.</p>
+<p>The module's <b>host</b>, <b>port</b>, <b>socket</b>, <b>user</b> and <b>password</b> paramters define which instance of SQL Relay to talk to.  The <b>table</b>, <b>usercolumn</b> and <b>passwordcolumn</b> parameters define which table and which columns within the table to authenticate/authorize against.  If passwords aren't stored in plain text, then an optional <b>passwordfunction</b> parameter may specify the stored procedure used to encrypt the password.</p>
 
 <blockquote>
 
@@ -256,12 +256,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/auth.socket&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/auth.socket&quot;</font><br>
 <font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;auth&quot;</font><br>
 <font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>table</b></font>=<font color="#ff00ff">&quot;user&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>usercolumn</b></font>=<font color="#ff00ff">&quot;User&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>passwordcolumn</b></font>=<font color="#ff00ff">&quot;Password&quot;</font><br>
 <font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>passwordfunction</b></font>=<font color="#ff00ff">&quot;password&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
@@ -272,9 +272,9 @@
 <br><a name="custom"></a>
 <span class="heading2">Custom Modules</span><br>
 
-<p>You can create your own custom authentication modules too.</p>
+<p>You can create your own custom auth modules too.</p>
 
-<p>SQL Relay provides a base class for authentication modules, called sqlrauth, defined in the header file: sqlrserver.h</p>
+<p>SQL Relay provides a base class for auth modules, called sqlrauth, defined in the header file: sqlrserver.h</p>
 
 <blockquote>
 
@@ -301,11 +301,11 @@
 
 <p>By default, the destructor does nothing.</p>
 
-<p>authenticate() does nothing by default and returns false, indicating that authentication failed.</p>
+<p>auth() does nothing by default and returns false, indicating that authentication/authorization failed.</p>
 
 <p>A custom module module must contain a class that inherits from sqlrauth, implements the necessary methods, and implements a function to return an instance of the class.</p>
 
-<p>Lets say we want to create a custom authentication module that authenticates a user against a hardcoded list of users.</p>
+<p>Lets say we want to create a custom auth module that authenticates/authorizes a user against a hardcoded list of users.</p>
 
 <p>We can create the file hardcoded.cpp:</p>
 
@@ -364,7 +364,7 @@ hardcoded::hardcoded(xmldomnode *parameters,<br>
 </font>
 </blockquote>
 
-<p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The authenticate() method compares the user and password to a hardcoded list and returns true if it matches or false if it doesn't.</p>
+<p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The auth() method compares the user and password to a hardcoded list and returns true if it matches or false if it doesn't.</p>
 
 <p>Note the "new_sqlrauth_hardcoded()" function which just allocates an instance of hardcoded and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrauth_<i>modulename</i>" and take xmldomnode * and sqlrpwdencs * parameters.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
 
@@ -397,7 +397,7 @@ link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libs
 
 <p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
 
-<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "authentications" section:</p>
+<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "auths" section:</p>
 
 <blockquote>
 
@@ -408,9 +408,9 @@ link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libs
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">authentication</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;hardcoded&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/authentications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;hardcoded&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>

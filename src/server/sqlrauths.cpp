@@ -33,9 +33,9 @@ bool sqlrauths::loadAuths(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
 	unloadAuths();
 
 	// run through each set of auths
-	for (xmldomnode *auth=parameters->getFirstTagChild("authentication");
+	for (xmldomnode *auth=parameters->getFirstTagChild("auth");
 			!auth->isNullNode();
-			auth=auth->getNextTagSibling("authentication")) {
+			auth=auth->getNextTagSibling("auth")) {
 
 		debugPrintf("loading auth ...\n");
 
