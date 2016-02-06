@@ -36,6 +36,9 @@
 	change "an error occurred" to "server closed connection" to reduce
 		false-positives from log analyzers - "real" errors will still
 		be reported elsewhere
+	refactored the config file parser
+	added support for kerberos authentication and encryption
+	added krb_userlist auth module
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
