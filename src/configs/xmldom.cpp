@@ -1464,7 +1464,6 @@ void sqlrconfig_xmldom::getTreeValues() {
 					node->getAttributeValue("protocol"),
 					DEFAULT_PROTOCOL)) {
 			defaultlistener=node;
-			break;
 		}
 
 		// listen on inet/unix...
