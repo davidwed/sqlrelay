@@ -59,7 +59,6 @@ class sqlrconnectionprivate {
 		char		*_krbservice;
 		char		*_krbmech;
 		char		*_krbflags;
-		bool		_krbacquired;
 		gsscredentials	_gcred;
 		gssmechanism	_gmech;
 		gsscontext	_gctx;

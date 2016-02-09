@@ -1922,8 +1922,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 		stdoutput.printf("usage:\n"
 			" %ssh -host host -port port -socket socket\n"
-			"       [-user user] [-password password]\n"
-			"       [-krb] [-krbservice svc] [-krbmech mech] "
+			"        [-user user] [-password password]\n"
+			"        [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
