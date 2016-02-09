@@ -467,10 +467,10 @@ bool sqlrconnection::openSession() {
 		} else {
 			if (pvt->_debug) {
 				debugPreStart();
-				debugPrint("failed to acquire "
-						"kerberos credentials for: ");
-				debugPrint(pvt->_user);
-				debugPrint("\n");
+				if (pvt->_gcred.getMajorStatus()) {
+					debugPrint(pvt->_gcred.
+						getMechanismMinorStatus());
+				}
 				debugPreEnd();
 			}
 			setError("Failed to acquire kerberos credentials.");
