@@ -55,7 +55,12 @@ class sqlrconnectionprivate {
 		uint32_t	_passwordlen;
 
 		// gss
-		char		*_kerberosservice;
+		bool		_krb;
+		char		*_krbservice;
+		char		*_krbmech;
+		char		*_krbflags;
+		bool		_krbacquired;
+		gsscredentials	_gcred;
 		gssmechanism	_gmech;
 		gsscontext	_gctx;
 
@@ -161,7 +166,8 @@ void sqlrconnection::init(const char *server, uint16_t port,
 			(char *)password;
 	pvt->_userlen=charstring::length(user);
 	pvt->_passwordlen=charstring::length(password);
-	pvt->_kerberosservice=NULL;
+	pvt->_krbservice=NULL;
+	pvt->_krbmech=NULL;
 
 	// database id
 	pvt->_id=NULL;
@@ -264,7 +270,8 @@ sqlrconnection::~sqlrconnection() {
 		delete[] pvt->_listenerunixport;
 		delete[] pvt->_user;
 		delete[] pvt->_password;
-		delete[] pvt->_kerberosservice;
+		delete[] pvt->_krbservice;
+		delete[] pvt->_krbmech;
 	}
 
 	// detach all cursors attached to this client
@@ -287,45 +294,52 @@ sqlrconnection::~sqlrconnection() {
 }
 
 void sqlrconnection::useKerberos(const char *service) {
-	return useKerberos(service,NULL,NULL);
+	useKerberos(service,NULL,NULL);
 }
 
 void sqlrconnection::useKerberos(const char *service,
 					const char *mech,
 					const char *flags) {
 
+	if (!gss::supportsGSS()) {
+		return;
+	}
+
+	pvt->_krb=true;
+
 	if (pvt->_copyrefs) {
-		delete[] pvt->_kerberosservice;
-		pvt->_kerberosservice=charstring::duplicate(
-				(!charstring::isNullOrEmpty(service))?
-						service:DEFAULT_KRBSERVICE);
+		delete[] pvt->_krbservice;
+		pvt->_krbservice=charstring::duplicate(
+			(!charstring::isNullOrEmpty(service))?
+					service:DEFAULT_KRBSERVICE);
+		delete[] pvt->_krbmech;
+		pvt->_krbmech=charstring::duplicate(mech);
+		delete[] pvt->_krbflags;
+		pvt->_krbflags=charstring::duplicate(flags);
 	} else {
-		pvt->_kerberosservice=
-			(char *)((!charstring::isNullOrEmpty(service))?
-						service:DEFAULT_KRBSERVICE);
+		pvt->_krbservice=(char *)
+			(!charstring::isNullOrEmpty(service)?
+					service:DEFAULT_KRBSERVICE);
+		pvt->_krbmech=(char *)mech;
+		pvt->_krbflags=(char *)flags;
 	}
 
-	if (gss::supportsGSS()) {
-
-		if (pvt->_debug) {
-			debugPreStart();
-			debugPrint("kerberos service: ");
-			debugPrint(pvt->_kerberosservice);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-
-		pvt->_gmech.initialize(mech);
-		pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
-		pvt->_gctx.setDesiredFlags(flags);
-		pvt->_gctx.setService(pvt->_kerberosservice);
-	}
+	pvt->_gmech.initialize(pvt->_krbmech);
+	pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
+	pvt->_gctx.setDesiredFlags(pvt->_krbflags);
+	pvt->_gctx.setService(pvt->_krbservice);
+	pvt->_gctx.setCredentials(&pvt->_gcred);
 }
 
 void sqlrconnection::useNoEncryption() {
+	pvt->_krb=false;
 	if (pvt->_copyrefs) {
-		delete[] pvt->_kerberosservice;
-		pvt->_kerberosservice=NULL;
+		delete[] pvt->_krbservice;
+		pvt->_krbservice=NULL;
+		delete[] pvt->_krbmech;
+		pvt->_krbmech=NULL;
+		delete[] pvt->_krbflags;
+		pvt->_krbflags=NULL;
 	}
 }
 
@@ -437,6 +451,33 @@ bool sqlrconnection::openSession() {
 		return true;
 	}
 
+	// acquire kerberos credentials, if necessary
+	if (pvt->_krb && !pvt->_gcred.acquired() &&
+				!charstring::isNullOrEmpty(pvt->_user)) {
+
+		if (pvt->_gcred.acquireForUser(pvt->_user)) {
+			if (pvt->_debug) {
+				debugPreStart();
+				debugPrint("acquired kerberos "
+						"credentials for: ");
+				debugPrint(pvt->_user);
+				debugPrint("\n");
+				debugPreEnd();
+			}
+		} else {
+			if (pvt->_debug) {
+				debugPreStart();
+				debugPrint("failed to acquire "
+						"kerberos credentials for: ");
+				debugPrint(pvt->_user);
+				debugPrint("\n");
+				debugPreEnd();
+			}
+			setError("Failed to acquire kerberos credentials.");
+			return false;
+		}
+	}
+
 	reConfigureSockets();
 
 	if (pvt->_debug) {
@@ -495,7 +536,7 @@ bool sqlrconnection::openSession() {
 	// handle failure to connect to listener
 	if (openresult!=RESULT_SUCCESS) {
 		if (pvt->_debug && gss::supportsGSS() &&
-			pvt->_kerberosservice && pvt->_gctx.getMajorStatus()) {
+			pvt->_krb && pvt->_gctx.getMajorStatus()) {
 			debugPreStart();
 			debugPrint(pvt->_gctx.getMechanismMinorStatus());
 			debugPreEnd();
@@ -511,7 +552,7 @@ bool sqlrconnection::openSession() {
 	auth();
 
 	// if we made it here then everything went well and we are successfully
-	// pvt->_connected and auth'ed with the connection daemon
+	// connected and sent auth info to the connection daemon
 	pvt->_connected=true;
 	return true;
 }
@@ -530,13 +571,27 @@ void sqlrconnection::reConfigureSockets() {
 	pvt->_ics.setReadBufferSize(65536);
 	pvt->_ics.setWriteBufferSize(65536);
 
-	if (gss::supportsGSS() &&
-		!charstring::isNullOrEmpty(pvt->_kerberosservice)) {
+	if (gss::supportsGSS() && pvt->_krb) {
 
 		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("kerberos encryption/"
 					"authentication enabled\n");
+			debugPrint("  service: ");
+			if (pvt->_krbservice) {
+				debugPrint(pvt->_krbservice);
+			}
+			debugPrint("\n");
+			debugPrint("  mech: ");
+			if (pvt->_krbmech) {
+				debugPrint(pvt->_krbmech);
+			}
+			debugPrint("\n");
+			debugPrint("  flags: ");
+			if (pvt->_krbflags) {
+				debugPrint(pvt->_krbflags);
+			}
+			debugPrint("\n");
 			debugPreEnd();
 		}
 
@@ -572,7 +627,7 @@ void sqlrconnection::auth() {
 
 	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint("Auth'ing : ");
+		debugPrint("Authing : ");
 		debugPrint(pvt->_user);
 		debugPrint(":");
 		debugPrint(pvt->_password);
