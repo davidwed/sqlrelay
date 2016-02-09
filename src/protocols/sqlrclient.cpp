@@ -216,18 +216,11 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	if (krb) {
 		if (gss::supportsGSS()) {
 
-			// initialize the gss context
-			gmech.initialize(
-				parameters->getAttributeValue("krbmech"));
-			gctx.setDesiredMechanism(&gmech);
-			gctx.setDesiredFlags(
-				parameters->getAttributeValue("krbflags"));
-
 			// set the keytab file to use
 			const char	*keytab=
 				parameters->getAttributeValue("krbkeytab");
 			if (!charstring::isNullOrEmpty(keytab)) {
-				environment::setValue("KRB5_KTNAME",keytab);
+				gcred.setKeytab(keytab);
 			}
 
 			// set the service to use
@@ -237,8 +230,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 				service=DEFAULT_KRBSERVICE;
 			}
 
-			// acquire service credentials from the keytab
-			if (!gcred.acquireService(service)) {
+			// acquire service credentials
+			if (!gcred.acquireForService(service)) {
 				const char	*status=
 					gcred.getMechanismMinorStatus();
 				stderror.printf("kerberos acquire-"
@@ -255,7 +248,12 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 				}
 			}
 
-			// attach the credentials to the context
+			// initialize the gss context
+			gmech.initialize(
+				parameters->getAttributeValue("krbmech"));
+			gctx.setDesiredMechanism(&gmech);
+			gctx.setDesiredFlags(
+				parameters->getAttributeValue("krbflags"));
 			gctx.setCredentials(&gcred);
 
 		} else {
