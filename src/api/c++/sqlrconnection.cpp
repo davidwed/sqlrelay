@@ -642,7 +642,9 @@ void sqlrconnection::auth() {
 	pvt->_cs->write(pvt->_passwordlen);
 	pvt->_cs->write(pvt->_password,pvt->_passwordlen);
 
-	flushWriteBuffer();
+	// I don't think this needs to be here...
+	// Just commenting it out for now though.
+	//flushWriteBuffer();
 }
 
 bool sqlrconnection::getNewPort() {

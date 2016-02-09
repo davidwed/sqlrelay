@@ -41,6 +41,7 @@
 	added krb_userlist auth module
 	renamed "authentication" to "auth" (for authentication/authorization,
 		also matches module name prefix) in config file and docs
+	removed an errant flushWriteBuffer after client auth
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
