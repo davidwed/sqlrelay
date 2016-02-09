@@ -1909,7 +1909,9 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*user=cmdline->getValue("user");
 	const char	*password=cmdline->getValue("password");
 	bool		krb=cmdline->found("krb");
-	const char	*krbservice=cmdline->getValue("krb");
+	const char	*krbservice=cmdline->getValue("krbservice");
+	const char	*krbmech=cmdline->getValue("krbmech");
+	const char	*krbflags=cmdline->getValue("krbflags");
 	const char	*script=cmdline->getValue("script");
 	const char	*command=cmdline->getValue("command");
 	
@@ -1919,8 +1921,10 @@ void sqlrsh::execute(int argc, const char **argv) {
 		charstring::isNullOrEmpty(socket)) {
 
 		stdoutput.printf("usage:\n"
-			" %ssh -host host -port port -socket socket "
-			"[-user user -password password] [-krb [service]]\n"
+			" %ssh -host host -port port -socket socket\n"
+			"       [-user user] [-password password]\n"
+			"       [-krb] [-krbservice svc] [-krbmech mech] "
+			"[-krbflags flags]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
@@ -1948,7 +1952,15 @@ void sqlrsh::execute(int argc, const char **argv) {
 			}
 			if (!cmdline->found("krb")) {
 				krb=cfg->getDefaultKrb();
+			}
+			if (!cmdline->found("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
+			}
+			if (!cmdline->found("krbmech")) {
+				krbmech=cfg->getDefaultKrbMech();
+			}
+			if (!cmdline->found("krbflags")) {
+				krbflags=cfg->getDefaultKrbFlags();
 			}
 			if (!cmdline->found("user")) {
 				user=cfg->getDefaultUser();
@@ -1963,7 +1975,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	// configure kerberos
 	if (krb) {
-		sqlrcon.useKerberos(krbservice);
+		sqlrcon.useKerberos(krbservice,krbmech,krbflags);
 	}
 
 	// set up an sqlrshenv

@@ -216,6 +216,13 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	if (krb) {
 		if (gss::supportsGSS()) {
 
+			// initialize the gss context
+			gmech.initialize(
+				parameters->getAttributeValue("krbmech"));
+			gctx.setDesiredMechanism(&gmech);
+			gctx.setDesiredFlags(
+				parameters->getAttributeValue("krbflags"));
+
 			// set the keytab file to use
 			const char	*keytab=
 				parameters->getAttributeValue("krbkeytab");

@@ -37,6 +37,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDefaultKrb();
 		const char	*getDefaultKrbService();
 		const char	*getDefaultKrbKeytab();
+		const char	*getDefaultKrbMech();
+		const char	*getDefaultKrbFlags();
 		const char	*getDefaultUser();
 		const char	*getDefaultPassword();
 
@@ -221,6 +223,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		defaultkrb;
 		const char	*defaultkrbkeytab;
 		const char	*defaultkrbservice;
+		const char	*defaultkrbmech;
+		const char	*defaultkrbflags;
 		const char	*defaultuser;
 		const char	*defaultpassword;
 
@@ -320,6 +324,8 @@ void sqlrconfig_xmldom::init() {
 	defaultkrb=false;
 	defaultkrbkeytab=NULL;
 	defaultkrbservice=NULL;
+	defaultkrbmech=NULL;
+	defaultkrbflags=NULL;
 	defaultuser=NULL;
 	defaultpassword=NULL;
 }
@@ -373,6 +379,14 @@ const char *sqlrconfig_xmldom::getDefaultKrbService() {
 
 const char *sqlrconfig_xmldom::getDefaultKrbKeytab() {
 	return defaultkrbkeytab;
+}
+
+const char *sqlrconfig_xmldom::getDefaultKrbMech() {
+	return defaultkrbmech;
+}
+
+const char *sqlrconfig_xmldom::getDefaultKrbFlags() {
+	return defaultkrbflags;
 }
 
 const char *sqlrconfig_xmldom::getDefaultUser() {
@@ -979,12 +993,16 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*krb=instance->getAttribute("krb");
 	xmldomnode	*krbservice=instance->getAttribute("krbservice");
 	xmldomnode	*krbkeytab=instance->getAttribute("krbkeytab");
+	xmldomnode	*krbmech=instance->getAttribute("krbmech");
+	xmldomnode	*krbflags=instance->getAttribute("krbflags");
 	if (!addresses->isNullNode() ||
 			!port->isNullNode() ||
 			!socket->isNullNode() ||
 			!krb->isNullNode() ||
 			!krbservice->isNullNode() ||
-			!krbkeytab->isNullNode()) {
+			!krbkeytab->isNullNode() ||
+			!krbmech->isNullNode() ||
+			!krbflags->isNullNode()) {
 
 		xmldomnode	*listener=listeners->insertTag("listener",0);
 		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
@@ -1018,6 +1036,16 @@ void sqlrconfig_xmldom::normalizeTree() {
 			listener->setAttributeValue("krbkeytab",
 							krbkeytab->getValue());
 			instance->deleteAttribute(krbkeytab);
+		}
+		if (!krbmech->isNullNode()) {
+			listener->setAttributeValue("krbmech",
+							krbmech->getValue());
+			instance->deleteAttribute(krbmech);
+		}
+		if (!krbflags->isNullNode()) {
+			listener->setAttributeValue("krbflags",
+							krbflags->getValue());
+			instance->deleteAttribute(krbflags);
 		}
 	}
 
@@ -1489,6 +1517,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 			defaultlistener->getAttributeValue("krb"),"yes");
 	defaultkrbkeytab=defaultlistener->getAttributeValue("krbkeytab");
 	defaultkrbservice=defaultlistener->getAttributeValue("krbservice");
+	defaultkrbmech=defaultlistener->getAttributeValue("krbmech");
+	defaultkrbflags=defaultlistener->getAttributeValue("krbflags");
 
 
 	// session queries

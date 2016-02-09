@@ -75,9 +75,15 @@ static void help(int argc, const char **argv) {
 "				specified instance, as defined in the\n" \
 "				configuration.\n" \
 "\n" \
-"	-krb [service]		Use kerberos authentication and encryption.\n" \
-"				Specifying the service to use is optional.\n" \
-"\n"
+"	-krb			Use kerberos authentication and encryption.\n" \
+"\n" \
+"	-krbservice svc		Use the specified kerberos service.\n" \
+"\n" \
+"	-krbmech mech		Use the specified kerberos mechanism.\n" \
+"\n" \
+"	-krbflags flags		Use the specified kerberos flags,\n" \
+"				comma-separated.\n" \
+"\n" \
 
 #define CONFIG \
 "	-config config		Override the default configuration with the\n" \

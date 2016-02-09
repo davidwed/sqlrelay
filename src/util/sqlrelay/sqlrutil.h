@@ -61,59 +61,6 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 		char		*libexecdir;
 };
 
-class SQLRUTIL_DLLSPEC listenercontainer {
-	public:
-				listenercontainer();
-				~listenercontainer();
-
-		void		setAddresses(char **addresses,
-						uint64_t addresscount);
-		void		setPort(uint16_t port);
-		void		setSocket(const char *socket);
-		void		setProtocol(const char *protocol);
-		void		setKrb(bool krb);
-		void		setKrbService(const char *krbservice);
-		void		setKrbKeytab(const char *krbkeytab);
-		const char * const *getAddresses();
-		uint64_t	getAddressCount();
-		uint16_t	getPort();
-		const char	*getSocket();
-		const char	*getProtocol();
-		bool		getKrb();
-		const char	*getKrbService();
-		const char	*getKrbKeytab();
-	private:
-		char		**addresses;
-		uint64_t	addresscount;
-		uint16_t	port;
-		char		*socket;
-		char		*protocol;
-		bool		krb;
-		char		*krbservice;
-		char		*krbkeytab;
-};
-
-typedef linkedlistnode< listenercontainer * >	listenernode;
-
-class SQLRUTIL_DLLSPEC usercontainer {
-	public:
-				usercontainer();
-				~usercontainer();
-
-		void		setUser(const char *user);
-		void		setPassword(const char *password);
-		void		setPasswordEncryption(const char *pwdenc);
-		const char	*getUser();
-		const char	*getPassword();
-		const char	*getPasswordEncryption();
-	private:
-		char	*user;
-		char	*password;
-		char	*pwdenc;
-};
-
-typedef linkedlistnode< usercontainer * >	usernode;
-
 class SQLRUTIL_DLLSPEC connectstringcontainer {
 	public:
 				connectstringcontainer();
@@ -190,6 +137,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getDefaultKrb()=0;
 		virtual const char	*getDefaultKrbService()=0;
 		virtual const char	*getDefaultKrbKeytab()=0;
+		virtual const char	*getDefaultKrbMech()=0;
+		virtual const char	*getDefaultKrbFlags()=0;
 		virtual const char	*getDefaultUser()=0;
 		virtual const char	*getDefaultPassword()=0;
 

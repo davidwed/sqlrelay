@@ -980,6 +980,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		filedescriptor		*clientsock;
 
 		gsscredentials	gcred;
+		gssmechanism	gmech;
 		gsscontext	gctx;
 };
 

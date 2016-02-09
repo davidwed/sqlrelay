@@ -565,7 +565,9 @@ int main(int argc, const char **argv) {
 	const char	*user=cmdline.getValue("user");
 	const char	*password=cmdline.getValue("password");
 	bool		krb=cmdline.found("krb");
-	const char	*krbservice=cmdline.getValue("krb");
+	const char	*krbservice=cmdline.getValue("krbservice");
+	const char	*krbmech=cmdline.getValue("krbmech");
+	const char	*krbflags=cmdline.getValue("krbflags");
 	const char	*file=cmdline.getValue("file");
 	uint64_t	commitcount=charstring::toInteger(
 					cmdline.getValue("commitcount"));
@@ -584,8 +586,9 @@ int main(int argc, const char **argv) {
 
 		stdoutput.printf("usage: \n"
 			" %s-import -host host -port port -socket socket\n"
-			"             [-user user -password password] "
-			"[-krb [service]]\n"
+			"             [-user user -password password]\n"
+			"             [-krb] [-krbservice svc] [-krbmech mech] "
+			"[-krbflags flags]\n"
 			"             -file file [-commitcount rowcount]\n"
 			"             [-debug [filename]] [-verbose]\n"
 			"  or\n"
@@ -611,7 +614,15 @@ int main(int argc, const char **argv) {
 			}
 			if (!cmdline.found("krb")) {
 				krb=cfg->getDefaultKrb();
+			}
+			if (!cmdline.found("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
+			}
+			if (!cmdline.found("krbmech")) {
+				krbmech=cfg->getDefaultKrbMech();
+			}
+			if (!cmdline.found("krbflags")) {
+				krbflags=cfg->getDefaultKrbFlags();
 			}
 			if (!cmdline.found("user")) {
 				user=cfg->getDefaultUser();
@@ -626,7 +637,7 @@ int main(int argc, const char **argv) {
 
 	// configure kerberos
 	if (krb) {
-		sqlrcon.useKerberos(krbservice);
+		sqlrcon.useKerberos(krbservice,krbmech,krbflags);
 	}
 
 	// configure debug

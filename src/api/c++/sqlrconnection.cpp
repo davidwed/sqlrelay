@@ -287,6 +287,12 @@ sqlrconnection::~sqlrconnection() {
 }
 
 void sqlrconnection::useKerberos(const char *service) {
+	return useKerberos(service,NULL,NULL);
+}
+
+void sqlrconnection::useKerberos(const char *service,
+					const char *mech,
+					const char *flags) {
 
 	if (pvt->_copyrefs) {
 		delete[] pvt->_kerberosservice;
@@ -309,9 +315,9 @@ void sqlrconnection::useKerberos(const char *service) {
 			debugPreEnd();
 		}
 
-		pvt->_gmech.initialize((const char *)NULL);
+		pvt->_gmech.initialize(mech);
 		pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
-		pvt->_gctx.setDesiredFlags(0);
+		pvt->_gctx.setDesiredFlags(flags);
 		pvt->_gctx.setService(pvt->_kerberosservice);
 	}
 }
