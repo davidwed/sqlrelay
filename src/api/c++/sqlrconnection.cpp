@@ -627,7 +627,7 @@ void sqlrconnection::auth() {
 
 	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint("Authing : ");
+		debugPrint("Auth : ");
 		debugPrint(pvt->_user);
 		debugPrint(":");
 		debugPrint(pvt->_password);
