@@ -9,12 +9,14 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/dynamiclib.h>
 
-#ifdef _WIN32
-	#ifdef SQLRUTIL_EXPORTS
-		#define SQLRUTIL_DLLSPEC __declspec(dllexport)
+#ifndef SQLRUTIL_DLLSPEC
+	#ifdef _WIN32
+		#ifdef SQLRUTIL_EXPORTS
+			#define SQLRUTIL_DLLSPEC __declspec(dllexport)
+		#else
+			#define SQLRUTIL_DLLSPEC __declspec(dllimport)
+		#endif
 	#else
-		#define SQLRUTIL_DLLSPEC __declspec(dllimport)
+		#define SQLRUTIL_DLLSPEC
 	#endif
-#else
-	#define SQLRUTIL_DLLSPEC
 #endif

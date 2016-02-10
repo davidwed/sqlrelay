@@ -6,8 +6,6 @@
 
 #include <sqlrelay/private/sqlrclientwrapperincludes.h>
 
-extern "C" {
-
 /** @file
  *  @defgroup sqlrclientwrapper sqlrclientwrapper */
 
@@ -1048,7 +1046,5 @@ SQLRCLIENT_DLLSPEC
 void	sqlrcur_closeResultSet(sqlrcur sqlrcurref);
 
 #include <sqlrelay/private/sqlrclientwrapper.h>
-
-}
 
 #endif
