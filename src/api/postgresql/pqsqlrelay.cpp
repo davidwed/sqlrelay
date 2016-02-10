@@ -31,8 +31,6 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 
 extern "C" {
 
-#include <debugprint.h>
-
 #define TRUE	1
 #define FALSE	0
 

@@ -3,6 +3,7 @@
 
 #include <config.h>
 
+//#define DEBUG_MESSAGES 1
 #include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/stringbuffer.h>
@@ -15,8 +16,6 @@
 #include <defaults.h>
 #include <defines.h>
 
-//#define DEBUG_MESSAGES 1
-#include <debugprint.h>
 
 enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_QUERY=0,

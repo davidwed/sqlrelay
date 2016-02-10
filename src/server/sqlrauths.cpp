@@ -3,8 +3,6 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <debugprint.h>
-
 #include <rudiments/xmldomnode.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>

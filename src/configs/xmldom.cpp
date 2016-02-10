@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <config.h>
+//#define DEBUG_MESSAGES
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/xmldom.h>
 #include <rudiments/stringbuffer.h>
@@ -18,8 +19,6 @@
 
 #include <defines.h>
 #include <defaults.h>
-//#define DEBUG_MESSAGES
-#include <debugprint.h>
 
 class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 	public:

@@ -26,6 +26,8 @@
 
 #include <sqlrelay/private/sqlrshmdata.h>
 
+#include <sqlrelay/private/sqlrserverdebugprint.h>
+
 class SQLRSERVER_DLLSPEC handoffsocketnode {
 	friend class sqlrlistener;
 	private:

@@ -21,8 +21,6 @@
 
 extern "C" {
 
-#include <debugprint.h>
-
 #define CR_UNKNOWN_ERROR	2000
 #define MYSQL_NO_DATA		100
 #define REFRESH_GRANT		1

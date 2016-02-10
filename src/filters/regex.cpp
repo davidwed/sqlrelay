@@ -3,7 +3,6 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/regularexpression.h>
-#include <debugprint.h>
 
 class SQLRSERVER_DLLSPEC sqlrfilter_regex : public sqlrfilter {
 	public:

@@ -4,7 +4,6 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 #include <datatypes.h>
-#include <debugprint.h>
 
 // for time_t, time(), localtime()
 #include <time.h>

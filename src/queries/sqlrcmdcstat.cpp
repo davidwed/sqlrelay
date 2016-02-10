@@ -6,7 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
 #include <datatypes.h>
-#include <debugprint.h>
 
 class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdcstat : public sqlrquery {
 	public:

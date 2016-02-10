@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#include <debugprint.h>
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 					public sqlrresultsettranslation {

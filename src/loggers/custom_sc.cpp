@@ -8,7 +8,6 @@
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
 #include <config.h>
-#include <debugprint.h>
 
 class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
 	public:

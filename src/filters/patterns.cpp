@@ -4,7 +4,6 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/regularexpression.h>
 #include <rudiments/character.h>
-#include <debugprint.h>
 
 enum scope_t {
 	SCOPE_QUERY=0,

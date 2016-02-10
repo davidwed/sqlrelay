@@ -4,7 +4,6 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/character.h>
-#include <debugprint.h>
 
 class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 	public:

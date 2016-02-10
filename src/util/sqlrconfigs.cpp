@@ -1,10 +1,8 @@
 // Copyright (c) 2015  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrutil.h>
-
 //#define DEBUG_MESSAGES
-#include <debugprint.h>
+#include <sqlrelay/sqlrutil.h>
 
 #include <config.h>
 

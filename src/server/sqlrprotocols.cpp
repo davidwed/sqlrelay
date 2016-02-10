@@ -3,8 +3,6 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <debugprint.h>
-
 #include <rudiments/stdio.h>
 
 #include <config.h>

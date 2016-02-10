@@ -12,6 +12,7 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/dynamiclib.h>
 
+#include <sqlrelay/private/sqlrutildebugprint.h>
 #include <sqlrelay/private/sqlrutildll.h>
 
 class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {

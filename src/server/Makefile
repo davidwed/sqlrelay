@@ -287,6 +287,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrservercontroller.h
 	$(CP) sqlrelay/private/sqlrservercursor.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrservercursor.h
+	$(CP) sqlrelay/private/sqlrserverdebugprint.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverdebugprint.h
 	$(CP) sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverdll.h
 	$(CP) sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private

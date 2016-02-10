@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#include <debugprint.h>
 
 #include <rudiments/process.h>
 #include <rudiments/character.h>

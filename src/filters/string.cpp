@@ -3,7 +3,6 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/character.h>
-#include <debugprint.h>
 
 class SQLRSERVER_DLLSPEC sqlrfilter_string : public sqlrfilter {
 	public:

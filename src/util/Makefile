@@ -51,6 +51,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/sqlrutil.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrutil.h
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
+	$(CP) sqlrelay/private/sqlrutildebugprint.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrutildebugprint.h
 	$(CP) sqlrelay/private/sqlrutildll.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrutildll.h
 
@@ -67,6 +69,7 @@ installlib:
 
 uninstall: $(UNINSTALLLIB)
 	$(RM) $(includedir)/sqlrelay/sqlrutil.h \
+		$(includedir)/sqlrelay/private/sqlrutildebugprint.h \
 		$(includedir)/sqlrelay/private/sqlrutildll.h
 
 uninstalldll:
