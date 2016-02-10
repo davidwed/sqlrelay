@@ -165,7 +165,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 			(char *)password;
 	pvt->_userlen=charstring::length(user);
 	pvt->_passwordlen=charstring::length(password);
-	pvt->_krb=true;
+	pvt->_krb=false;
 	pvt->_krbservice=NULL;
 	pvt->_krbmech=NULL;
 	pvt->_krbflags=NULL;
@@ -273,6 +273,7 @@ sqlrconnection::~sqlrconnection() {
 		delete[] pvt->_password;
 		delete[] pvt->_krbservice;
 		delete[] pvt->_krbmech;
+		delete[] pvt->_krbflags;
 	}
 
 	// detach all cursors attached to this client
