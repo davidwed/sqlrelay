@@ -1,14 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/private/sqlrserverdll.h>
-
+#include <sqlrelay/sqlrserver.h>
 #include <sqlrelay/sqlrutil.h>
-
-#include <rudiments/semaphoreset.h>
-#include <rudiments/sharedmemory.h>
-
-#include <sqlrelay/private/sqlrshmdata.h>
 
 // for pid_t
 #include <sys/types.h>
