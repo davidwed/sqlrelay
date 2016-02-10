@@ -6,6 +6,8 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
+//#define DEBUG_MESSAGES
+#include <rudiments/debugprint.h>
 
 #include <config.h>
 

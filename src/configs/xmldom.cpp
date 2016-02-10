@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <config.h>
-//#define DEBUG_MESSAGES
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/xmldom.h>
 #include <rudiments/stringbuffer.h>
@@ -16,6 +15,8 @@
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
+//#define DEBUG_MESSAGES
+#include <rudiments/debugprint.h>
 
 #include <defines.h>
 #include <defaults.h>

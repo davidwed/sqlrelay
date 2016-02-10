@@ -3,8 +3,6 @@
 
 #include <config.h>
 
-//#define DEBUG_MESSAGES 1
-//#define DEBUG_TO_FILE 1
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/linkedlist.h>
@@ -15,6 +13,10 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
+//#define DEBUG_MESSAGES 1
+//#define DEBUG_TO_FILE 1
+//static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
+#include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
 #ifdef _WIN32

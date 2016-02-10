@@ -4,6 +4,8 @@
 #include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/stdio.h>
+//#define DEBUG_MESSAGES 1
+#include <rudiments/debugprint.h>
 
 #include <config.h>
 

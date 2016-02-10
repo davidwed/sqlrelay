@@ -11,6 +11,8 @@
 #include <rudiments/file.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/stdio.h>
+//#define DEBUG_MESSAGES
+#include <rudiments/debugprint.h>
 #include <locale.h>
 
 #define NEED_DATATYPESTRING 1

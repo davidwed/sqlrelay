@@ -3,7 +3,6 @@
 
 #include <config.h>
 
-//#define DEBUG_MESSAGES 1
 #include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/stringbuffer.h>
@@ -11,6 +10,8 @@
 #include <rudiments/datetime.h>
 #include <rudiments/userentry.h>
 #include <rudiments/process.h>
+//#define DEBUG_MESSAGES 1
+#include <rudiments/debugprint.h>
 
 #include <datatypes.h>
 #include <defaults.h>

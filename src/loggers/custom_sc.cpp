@@ -7,6 +7,8 @@
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
+//#define DEBUG_MESSAGES 1
+#include <rudiments/debugprint.h>
 #include <config.h>
 
 class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {

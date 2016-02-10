@@ -1,8 +1,6 @@
 // Copyright (c) 1999-2001  David Muse
 // See the COPYING file for more information.
 
-#include <sqlrelay/private/sqlrclientdebugprint.h>
-
 #include <rudiments/dynamicarray.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/socketclient.h>

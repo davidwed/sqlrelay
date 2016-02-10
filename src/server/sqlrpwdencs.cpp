@@ -6,6 +6,8 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
+//#define DEBUG_MESSAGES 1
+#include <rudiments/debugprint.h>
 
 #include <config.h>
 

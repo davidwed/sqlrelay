@@ -5,6 +5,8 @@
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
+//#define DEBUG_MESSAGES 1
+#include <rudiments/debugprint.h>
 #include <datatypes.h>
 
 class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdcstat : public sqlrquery {

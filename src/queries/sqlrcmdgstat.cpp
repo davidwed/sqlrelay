@@ -3,6 +3,8 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
+//#define DEBUG_MESSAGES 1
+#include <rudiments/debugprint.h>
 #include <datatypes.h>
 
 // for time_t, time(), localtime()

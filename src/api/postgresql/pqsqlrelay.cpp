@@ -19,6 +19,8 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 #include <rudiments/character.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
+//#define DEBUG_MESSAGES 1
+#include <rudiments/debugprint.h>
 
 #define NEED_DATATYPESTRING	1
 #include <datatypes.h>

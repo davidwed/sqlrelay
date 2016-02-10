@@ -35,8 +35,6 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
 	$(CP) sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
-	$(CP) sqlrelay/private/sqlrclientdebugprint.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientdebugprint.h
 
 installdll::
 	$(MKINSTALLDIRS) $(bindir)
@@ -62,7 +60,6 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/private/listformat.h \
 		$(includedir)/private/sqlrdefines.h \
 		$(includedir)/private/sqlrincludes.h \
-		$(includedir)/private/sqlrclientdebugprint.h \
 		$(includedir)/private/sqlrclientdll.h \
 		$(includedir)/private/dll.h \
 	$(RMTREE) $(includedir)/sqlrelay
