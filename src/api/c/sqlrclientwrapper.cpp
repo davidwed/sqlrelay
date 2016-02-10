@@ -1,11 +1,9 @@
 /* Copyright (c) 2000-2001  David Muse
    See the file COPYING for more information */
 
-#include <sqlrelay/sqlrclient.h>
+#include <sqlrelay/sqlrclientwrapper.h>
 
 extern "C" {
-
-#include <sqlrelay/sqlrclientwrapper.h>
 
 sqlrcon sqlrcon_alloc(const char *server, uint16_t port, const char *socket,
 				const char *user, const char *password, 
