@@ -6,7 +6,7 @@
 #include <rudiments/socketclient.h>
 
 #ifdef _WIN32
-	#ifdef LIBSQLRCLIENT_EXPORTS
+	#ifdef SQLRCLIENT_EXPORTS
 		#define SQLRCLIENT_DLLSPEC __declspec(dllexport)
 	#else
 		#define SQLRCLIENT_DLLSPEC __declspec(dllimport)

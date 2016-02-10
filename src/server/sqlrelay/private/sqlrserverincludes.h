@@ -1,8 +1,6 @@
 // Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/private/sqlrserverdll.h>
-
 #include <sqlrelay/sqlrutil.h>
 
 #include <rudiments/signalclasses.h>
@@ -23,6 +21,16 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 #include <rudiments/dynamiclib.h>
+
+#ifdef _WIN32
+	#ifdef SQLRSERVER_EXPORTS
+		#define SQLRSERVER_DLLSPEC __declspec(dllexport)
+	#else
+		#define SQLRSERVER_DLLSPEC __declspec(dllimport)
+	#endif
+#else
+	#define SQLRSERVER_DLLSPEC
+#endif
 
 #include <sqlrelay/private/sqlrshmdata.h>
 

@@ -29,10 +29,10 @@ install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/sqlrclientwrapper.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclientwrapper.h
+	$(CP) sqlrelay/private/sqlrclientwrapperincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientwrapperincludes.h
 	$(CP) sqlrelay/private/sqlrclientwrapper.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientwrapper.h
-	$(CP) sqlrelay/private/wrapperdll.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/wrapperdll.h
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
@@ -49,7 +49,9 @@ uninstall: $(UNINSTALLLIB)
 	$(RMTREE) $(cachedir)
 	$(RM) $(includedir)/sqlrclientwrapper.h \
 		$(includedir)/sqlrelay/sqlrclientwrapper.h \
+		$(includedir)/sqlrelay/private/sqlrclientwrapperincludes.h \
 		$(includedir)/sqlrelay/private/sqlrclientwrapper.h \
+		$(includedir)/sqlrelay/private/sqlrclientwrapperdll.h \
 		$(includedir)/sqlrelay/private/wrapperdll.h
 
 uninstalldll:

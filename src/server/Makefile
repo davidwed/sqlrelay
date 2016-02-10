@@ -287,8 +287,6 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrservercontroller.h
 	$(CP) sqlrelay/private/sqlrservercursor.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrservercursor.h
-	$(CP) sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverdll.h
 	$(CP) sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverincludes.h
 	$(CP) sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
@@ -323,9 +321,9 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrserverconnection.h \
 		$(includedir)/sqlrelay/private/sqlrservercontroller.h \
 		$(includedir)/sqlrelay/private/sqlrservercursor.h \
-		$(includedir)/sqlrelay/private/sqlrserverdll.h \
 		$(includedir)/sqlrelay/private/sqlrserverincludes.h \
 		$(includedir)/sqlrelay/private/sqlrshmdata.h \
+		$(includedir)/sqlrelay/private/sqlrserverdll.h \
 		$(bindir)/$(SQLR)-start$(EXE) \
 		$(bindir)/$(SQLR)-stop$(EXE) \
 		$(bindir)/$(SQLR)-listener$(EXE) \

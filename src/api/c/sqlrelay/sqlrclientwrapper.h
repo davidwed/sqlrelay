@@ -4,8 +4,7 @@
 #ifndef SQLRCLIENTWRAPPER_H
 #define SQLRCLIENTWRAPPER_H
 
-#include <rudiments/private/inttypes.h>
-#include <sqlrelay/private/wrapperdll.h>
+#include <sqlrelay/private/sqlrclientwrapperincludes.h>
 
 /** @file
  *  @defgroup sqlrclientwrapper sqlrclientwrapper */

@@ -4,15 +4,7 @@
 #ifndef SQLRUTIL_H
 #define SQLRUTIL_H
 
-#include <rudiments/stringbuffer.h>
-#include <rudiments/parameterstring.h>
-#include <rudiments/regularexpression.h>
-#include <rudiments/commandline.h>
-#include <rudiments/linkedlist.h>
-#include <rudiments/xmldomnode.h>
-#include <rudiments/dynamiclib.h>
-
-#include <sqlrelay/private/sqlrutildll.h>
+#include <sqlrelay/private/sqlrutilincludes.h>
 
 class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 	friend class sqlrpaths;
