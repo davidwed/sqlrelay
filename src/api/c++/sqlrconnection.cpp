@@ -671,38 +671,8 @@ void sqlrconnection::reConfigureSockets() {
 
 
 	if (pvt->_usekrb) {
-		pvt->_gmech.clear();
-		pvt->_gmech.initialize(pvt->_krbmech);
 
-		pvt->_gctx.close();
-		pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
-		pvt->_gctx.setDesiredFlags(pvt->_krbflags);
-		pvt->_gctx.setService(pvt->_krbservice);
-		pvt->_gctx.setCredentials(&pvt->_gcred);
-
-		pvt->_ctx=&pvt->_gctx;
-
-	} else if (pvt->_usetls) {
-
-		pvt->_tctx.close();
-		pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
-		pvt->_tctx.setPrivateKeyFile(pvt->_tlspvtkey,
-						pvt->_tlspvtkeypwd);
-		pvt->_tctx.setCiphers(pvt->_tlsciphers);
-		pvt->_tctx.setCertificateAuthorityFile(pvt->_tlscafile);
-		pvt->_tctx.setCertificateAuthorityPath(pvt->_tlscapath);
-
-		pvt->_ctx=&pvt->_tctx;
-	} else {
-		pvt->_ctx=NULL;
-	}
-
-	pvt->_ucs.setSecurityContext(pvt->_ctx);
-	pvt->_ics.setSecurityContext(pvt->_ctx);
-
-	if (pvt->_debug) {
-		if (pvt->_usekrb && gss::supportsGSS()) {
-
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("kerberos encryption/"
 					"authentication enabled\n");
@@ -722,9 +692,22 @@ void sqlrconnection::reConfigureSockets() {
 			}
 			debugPrint("\n");
 			debugPreEnd();
+		}
 
-		} else if (pvt->_usetls && tls::supportsTLS()) {
+		pvt->_gmech.clear();
+		pvt->_gmech.initialize(pvt->_krbmech);
 
+		pvt->_gctx.close();
+		pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
+		pvt->_gctx.setDesiredFlags(pvt->_krbflags);
+		pvt->_gctx.setService(pvt->_krbservice);
+		pvt->_gctx.setCredentials(&pvt->_gcred);
+
+		pvt->_ctx=&pvt->_gctx;
+
+	} else if (pvt->_usetls) {
+
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("TLS encryption/authentication enabled\n");
 			debugPrint("  cert: ");
@@ -758,13 +741,31 @@ void sqlrconnection::reConfigureSockets() {
 			}
 			debugPrint("\n");
 			debugPreEnd();
+		}
 
-		} else {
+		pvt->_tctx.close();
+		pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
+		pvt->_tctx.setPrivateKeyFile(pvt->_tlspvtkey,
+						pvt->_tlspvtkeypwd);
+		pvt->_tctx.setCiphers(pvt->_tlsciphers);
+		pvt->_tctx.setCertificateAuthorityFile(pvt->_tlscafile);
+		pvt->_tctx.setCertificateAuthorityPath(pvt->_tlscapath);
+
+		pvt->_ctx=&pvt->_tctx;
+
+	} else {
+
+		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("encryption disabled\n");
 			debugPreEnd();
 		}
+
+		pvt->_ctx=NULL;
 	}
+
+	pvt->_ucs.setSecurityContext(pvt->_ctx);
+	pvt->_ics.setSecurityContext(pvt->_ctx);
 }
 
 void sqlrconnection::protocol() {
