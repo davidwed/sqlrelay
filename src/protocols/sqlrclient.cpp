@@ -335,7 +335,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					parameters->getAttributeValue(
 								"tlsdepth"));
 			if (depth>0) {
-				tctx.setVerifyDepth(depth);
+				tctx.setVerificationDepth(depth);
 			}
 
 			// use the tls context

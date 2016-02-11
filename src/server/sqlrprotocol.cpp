@@ -20,6 +20,6 @@ gsscontext *sqlrprotocol::getGSSContext() {
 	return &gctx;
 }
 
-tlsservercontext *sqlrprotocol::getTLSContext() {
+tlscontext *sqlrprotocol::getTLSContext() {
 	return &tctx;
 }

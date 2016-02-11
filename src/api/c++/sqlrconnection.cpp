@@ -66,15 +66,15 @@ class sqlrconnectionprivate {
 		gsscontext	_gctx;
 
 		// tls
-		bool			_usetls;
-		char			*_tlscert;
-		char			*_tlspvtkey;
-		char			*_tlspvtkeypwd;
-		char			*_tlsciphers;
-		char			*_tlscafile;
-		char			*_tlscapath;
-		uint32_t		_tlsdepth;
-		tlsclientcontext	_tctx;
+		bool		_usetls;
+		char		*_tlscert;
+		char		*_tlspvtkey;
+		char		*_tlspvtkeypwd;
+		char		*_tlsciphers;
+		char		*_tlscafile;
+		char		*_tlscapath;
+		uint32_t	_tlsdepth;
+		tlscontext	_tctx;
 
 		securitycontext	*_ctx;
 
@@ -750,7 +750,7 @@ void sqlrconnection::reConfigureSockets() {
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);
 		pvt->_tctx.setCertificateAuthorityFile(pvt->_tlscafile);
 		pvt->_tctx.setCertificateAuthorityPath(pvt->_tlscapath);
-		pvt->_tctx.setVerifyDepth(pvt->_tlsdepth);
+		pvt->_tctx.setVerificationDepth(pvt->_tlsdepth);
 
 		pvt->_ctx=&pvt->_tctx;
 

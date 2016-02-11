@@ -42,7 +42,7 @@ bool sqlrauth_tls_userlist::auth(sqlrserverconnection *sqlrcon,
 						const char *password) {
 
 	// get the security context
-	tlsservercontext	*ctx=sqlrcon->cont->getTLSContext();
+	tlscontext	*ctx=sqlrcon->cont->getTLSContext();
 	if (!ctx) {
 		return false;
 	}

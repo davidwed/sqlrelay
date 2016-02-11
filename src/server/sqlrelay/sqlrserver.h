@@ -552,13 +552,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		sqlrcursorstate_t	getState(sqlrservercursor *cursor);
 
 		// query parser
-		sqlrparser		*getParser();
+		sqlrparser	*getParser();
 
 		// gss
-		gsscontext		*getGSSContext();
+		gsscontext	*getGSSContext();
 
 		// tls
-		tlsservercontext	*getTLSContext();
+		tlscontext	*getTLSContext();
 
 		// utilities
 		bool		skipComment(const char **ptr,
@@ -972,8 +972,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 		void	setClientSocket(filedescriptor *clientsock);
 
-		virtual gsscontext		*getGSSContext();
-		virtual tlsservercontext	*getTLSContext();
+		virtual gsscontext	*getGSSContext();
+		virtual tlscontext	*getTLSContext();
 
 		virtual sqlrclientexitstatus_t	clientSession()=0;
 
@@ -983,10 +983,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 		filedescriptor		*clientsock;
 
-		gsscredentials		gcred;
-		gssmechanism		gmech;
-		gsscontext		gctx;
-		tlsservercontext	tctx;
+		gsscredentials	gcred;
+		gssmechanism	gmech;
+		gsscontext	gctx;
+		tlscontext	tctx;
 };
 
 

@@ -5668,6 +5668,6 @@ gsscontext *sqlrservercontroller::getGSSContext() {
 	return (currentprotocol)?currentprotocol->getGSSContext():NULL;
 }
 
-tlsservercontext *sqlrservercontroller::getTLSContext() {
+tlscontext *sqlrservercontroller::getTLSContext() {
 	return (currentprotocol)?currentprotocol->getTLSContext():NULL;
 }
