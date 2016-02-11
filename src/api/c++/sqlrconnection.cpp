@@ -73,6 +73,7 @@ class sqlrconnectionprivate {
 		char			*_tlsciphers;
 		char			*_tlscafile;
 		char			*_tlscapath;
+		uint32_t		_tlsdepth;
 		tlsclientcontext	_tctx;
 
 		securitycontext	*_ctx;
@@ -190,6 +191,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_tlspvtkeypwd=NULL;
 	pvt->_tlscafile=NULL;
 	pvt->_tlscapath=NULL;
+	pvt->_tlsdepth=0;
 
 	pvt->_ctx=NULL;
 
@@ -365,7 +367,8 @@ void sqlrconnection::enableTLS(const char *cert,
 					const char *pvtkeypwd,
 					const char *ciphers,
 					const char *cafile,
-					const char *capath) {
+					const char *capath,
+					uint32_t depth) {
 
 	// clear any existing configuration
 	if (pvt->_usekrb || pvt->_usetls) {
@@ -399,6 +402,7 @@ void sqlrconnection::enableTLS(const char *cert,
 		pvt->_tlscafile=(char *)cafile;
 		pvt->_tlscapath=(char *)capath;
 	}
+	pvt->_tlsdepth=depth;
 }
 
 void sqlrconnection::useNoEncryption() {
@@ -428,6 +432,7 @@ void sqlrconnection::disableEncryption() {
 		delete[] pvt->_tlscapath;
 		pvt->_tlscapath=NULL;
 	}
+	pvt->_tlsdepth=0;
 	pvt->_usekrb=false;
 	pvt->_usetls=false;
 }
@@ -742,6 +747,9 @@ void sqlrconnection::reConfigureSockets() {
 				debugPrint(pvt->_tlscapath);
 			}
 			debugPrint("\n");
+			debugPrint("  depth: ");
+			debugPrint((int64_t)pvt->_tlsdepth);
+			debugPrint("\n");
 			debugPreEnd();
 		}
 
@@ -752,6 +760,7 @@ void sqlrconnection::reConfigureSockets() {
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);
 		pvt->_tctx.setCertificateAuthorityFile(pvt->_tlscafile);
 		pvt->_tctx.setCertificateAuthorityPath(pvt->_tlscapath);
+		pvt->_tctx.setVerifyDepth(pvt->_tlsdepth);
 
 		pvt->_ctx=&pvt->_tctx;
 

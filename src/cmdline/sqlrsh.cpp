@@ -1919,6 +1919,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*tlsciphers=cmdline->getValue("tlsciphers");
 	const char	*tlscafile=cmdline->getValue("tlscafile");
 	const char	*tlscapath=cmdline->getValue("tlscapath");
+	uint32_t	tlsdepth=charstring::toUnsignedInteger(
+					cmdline->getValue("tlsdepth"));
 	const char	*script=cmdline->getValue("script");
 	const char	*command=cmdline->getValue("command");
 	
@@ -1935,8 +1937,9 @@ void sqlrsh::execute(int argc, const char **argv) {
 			"        [-tls] [-tlscert certfile]\n"
 			"            [-tlspvtkey keyfile] "
 			"[-tlspvtkeypassword password]\n"
-			"            [-tlsciphers cipherlist] "
-			"[-tlscafile cafile] [-tlscapath capath]\n"
+			"            [-tlsciphers cipherlist]\n"
+			"            [-tlscafile cafile] [-tlscapath capath] "
+			"[-tlsdepth depth]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
@@ -1996,7 +1999,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
 	} else if (usetls) {
 		sqlrcon.enableTLS(tlscert,tlspvtkey,tlspvtkeypwd,
-					tlsciphers,tlscafile,tlscapath);
+				tlsciphers,tlscafile,tlscapath,tlsdepth);
 	}
 
 	// set up an sqlrshenv

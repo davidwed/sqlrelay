@@ -329,6 +329,15 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 				tctx.setCiphers(ciphers);
 			}
 
+			// get the verification depth
+			int32_t	depth=
+				charstring::toInteger(
+					parameters->getAttributeValue(
+								"tlsdepth"));
+			if (depth>0) {
+				tctx.setVerifyDepth(depth);
+			}
+
 			// use the tls context
 			ctx=&tctx;
 

@@ -1021,6 +1021,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*tlscafile=instance->getAttribute("tlscafile");
 	xmldomnode	*tlscapath=instance->getAttribute("tlscapath");
 	xmldomnode	*tlsciphers=instance->getAttribute("tlsciphers");
+	xmldomnode	*tlsdepth=instance->getAttribute("tlsdepth");
 	if (!addresses->isNullNode() ||
 			!port->isNullNode() ||
 			!socket->isNullNode() ||
@@ -1036,7 +1037,8 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!tlsdhcert->isNullNode() ||
 			!tlscafile->isNullNode() ||
 			!tlscapath->isNullNode() ||
-			!tlsciphers->isNullNode()) {
+			!tlsciphers->isNullNode() ||
+			!tlsdepth->isNullNode()) {
 
 		xmldomnode	*listener=listeners->insertTag("listener",0);
 		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
@@ -1120,6 +1122,11 @@ void sqlrconfig_xmldom::normalizeTree() {
 			listener->setAttributeValue("tlsciphers",
 						tlsciphers->getValue());
 			instance->deleteAttribute(tlsciphers);
+		}
+		if (!tlsdepth->isNullNode()) {
+			listener->setAttributeValue("tlsdepth",
+						tlsdepth->getValue());
+			instance->deleteAttribute(tlsdepth);
 		}
 	}
 

@@ -76,7 +76,8 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 					const char *pvtkeypwd,
 					const char *ciphers,
 					const char *cafile,
-					const char *capath);
+					const char *capath,
+					uint32_t depth);
 
 		/** Configures this instance to not use kerberos or SSL/TLS
 		 *  authentication and encryption. */
