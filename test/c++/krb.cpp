@@ -120,7 +120,7 @@ int	main(int argc, char **argv) {
 	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
 	cur=new sqlrcursor(con);
-	con->useKerberos(NULL);
+	con->enableKerberos(NULL,NULL,NULL);
 
 	// get database type
 	stdoutput.printf("IDENTIFY: \n");
@@ -793,9 +793,9 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("COMMIT AND ROLLBACK: \n");
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
-							"test","test",0,1);
+								NULL,NULL,0,1);
 	secondcur=new sqlrcursor(secondcon);
-	secondcon->useKerberos(NULL);
+	secondcon->enableKerberos(NULL,NULL,NULL);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
 	checkSuccess(con->commit(),1);

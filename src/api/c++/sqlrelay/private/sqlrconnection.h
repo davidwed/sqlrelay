@@ -15,6 +15,8 @@
 					int32_t *timeoutusec);
 		bool	openSession();
 		void	reConfigureSockets();
+		bool	validateServer();
+		void	setConnectFailedError();
 		void	closeConnection();
 
 		void	protocol();

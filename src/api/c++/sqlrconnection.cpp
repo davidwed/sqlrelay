@@ -628,27 +628,20 @@ bool sqlrconnection::openSession() {
 	}
 
 	// validate server, if necessary
-	if (pvt->_usetls &&
-		!charstring::isNullOrEmpty(pvt->_tlscafile) &&
-		!charstring::isNullOrEmpty(pvt->_tlscapath) &&
-		!pvt->_tctx.peerCertificateIsValid()) {
+	if (!validateServer()) {
+		pvt->_cs->close();
 		openresult=RESULT_ERROR;
 	}
 
 	// handle failures
 	if (openresult!=RESULT_SUCCESS) {
-		if (pvt->_usekrb && pvt->_gctx.getMajorStatus()) {
-			setError(pvt->_gctx.getMechanismMinorStatus());
-		} else if (pvt->_usetls && pvt->_tctx.getError()) {
-			stringbuffer	err;
-			err.append("TLS error: ");
-			err.append(pvt->_tctx.getErrorString());
-			setError(err.getString());
-		} else {
-			setError("Couldn't connect to the listener.");
-		}
+		setConnectFailedError();
 		return false;
 	}
+
+	// if we made it here then everything went
+	// well and we are successfully connected
+	pvt->_connected=true;
 
 	// send protocol info
 	protocol();
@@ -656,9 +649,6 @@ bool sqlrconnection::openSession() {
 	// auth
 	auth();
 
-	// if we made it here then everything went well and we are successfully
-	// connected and sent auth info to the connection daemon
-	pvt->_connected=true;
 	return true;
 }
 
@@ -777,6 +767,26 @@ void sqlrconnection::reConfigureSockets() {
 
 	pvt->_ucs.setSecurityContext(pvt->_ctx);
 	pvt->_ics.setSecurityContext(pvt->_ctx);
+}
+
+bool sqlrconnection::validateServer() {
+	return (!pvt->_usetls ||
+		charstring::isNullOrEmpty(pvt->_tlscafile) ||
+		charstring::isNullOrEmpty(pvt->_tlscapath) ||
+		pvt->_tctx.peerCertificateIsValid());
+}
+
+void sqlrconnection::setConnectFailedError() {
+	if (pvt->_usekrb && pvt->_gctx.getMajorStatus()) {
+		setError(pvt->_gctx.getMechanismMinorStatus());
+	} else if (pvt->_usetls && pvt->_tctx.getError()) {
+		stringbuffer	err;
+		err.append("TLS error: ");
+		err.append(pvt->_tctx.getErrorString());
+		setError(err.getString());
+	} else {
+		setError("Couldn't connect to the listener.");
+	}
 }
 
 void sqlrconnection::protocol() {
@@ -954,6 +964,12 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		}
 	}
 
+	// validate server, if necessary
+	if (!validateServer()) {
+		pvt->_cs->close();
+		pvt->_connected=false;
+	}
+
 	if (pvt->_connected) {
 
 		// send protocol info
@@ -967,6 +983,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		}
 		clearSessionFlags();
 	} else {
+		setConnectFailedError();
 		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("failure");

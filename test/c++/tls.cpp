@@ -120,10 +120,10 @@ int	main(int argc, char **argv) {
 	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
 	cur=new sqlrcursor(con);
-	con->useTLS("/usr/local/firstworks/etc/client.pem",
+	con->enableTLS("/usr/local/firstworks/etc/client.pem",
 			"/usr/local/firstworks/etc/client.pem",NULL,
 			NULL,
-			"/usr/local/firstworks/etc/ca.pem",NULL);
+			"/usr/local/firstworks/etc/ca.pem",NULL,0);
 
 	// get database type
 	stdoutput.printf("IDENTIFY: \n");
@@ -798,10 +798,10 @@ int	main(int argc, char **argv) {
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
-	secondcon->useTLS("/usr/local/firstworks/etc/client.pem",
+	secondcon->enableTLS("/usr/local/firstworks/etc/client.pem",
 			"/usr/local/firstworks/etc/client.pem",NULL,
 			NULL,
-			"/usr/local/firstworks/etc/ca.pem",NULL);
+			"/usr/local/firstworks/etc/ca.pem",NULL,0);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
 	checkSuccess(con->commit(),1);
