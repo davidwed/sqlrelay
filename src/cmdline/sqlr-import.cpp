@@ -637,7 +637,7 @@ int main(int argc, const char **argv) {
 
 	// configure kerberos
 	if (krb) {
-		sqlrcon.useKerberos(krbservice,krbmech,krbflags);
+		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
 	}
 
 	// configure debug

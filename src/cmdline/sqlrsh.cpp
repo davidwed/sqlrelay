@@ -1993,10 +1993,10 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	// configure kerberos/tls
 	if (usekrb) {
-		sqlrcon.useKerberos(krbservice,krbmech,krbflags);
+		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
 	} else if (usetls) {
-		sqlrcon.useTLS(tlscert,tlspvtkey,tlspvtkeypwd,
-				tlsciphers,tlscafile,tlscapath);
+		sqlrcon.enableTLS(tlscert,tlspvtkey,tlspvtkeypwd,
+					tlsciphers,tlscafile,tlscapath);
 	}
 
 	// set up an sqlrshenv
