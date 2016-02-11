@@ -75,7 +75,8 @@ static void help(int argc, const char **argv) {
 "				specified instance, as defined in the\n" \
 "				configuration.\n" \
 "\n" \
-"	-krb			Use kerberos authentication and encryption.\n" \
+"\n" \
+"	-krb			Use Kerberos authentication and encryption.\n" \
 "\n" \
 "	-krbservice svc		Use the specified kerberos service.\n" \
 "\n" \
@@ -84,11 +85,34 @@ static void help(int argc, const char **argv) {
 "	-krbflags flags		Use the specified kerberos flags,\n" \
 "				comma-separated.\n" \
 "\n" \
+"\n" \
+"	-tls			Use TLS/SSL authentication and encrpyiton.\n" \
+"\n" \
+"	-tlscert file		Use the specified certificate chain file.\n" \
+"\n" \
+"	-tlspvtkey file		Use the private key from the specified file.\n" \
+"\n" \
+"	-tlspvtkeypassword pwd	Use the specified password to acess the private\n" \
+"				key in the file specified by -tlspvtkey.\n" \
+"\n" \
+"	-tlsciphers \"list\"	Allow the specified list of ciphers.  The\n" \
+"				list should be quoted and the ciphers should be\n" \
+"				separated by spaces.\n" \
+"\n" \
+"	-tlscafile file		Verify the server's certificate against the\n" \
+"				specified certificate authority certificate.\n" \
+"\n" \
+"	-tlscapath path		Verify the server's certificate against all\n" \
+"				certificates found in the specified path.\n" \
+"\n" \
+"	-tlsdepth depth 	Set the maximum certificate chain verification\n" \
+"				depth to the specified depth.\n" \
+"\n"
 
 #define CONFIG \
 "	-config config		Override the default configuration with the\n" \
 "				specified configuration.\n" \
-"\n" \
+"\n"
 
 #define CONFIGID \
 CONFIG \

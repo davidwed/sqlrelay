@@ -564,10 +564,19 @@ int main(int argc, const char **argv) {
 	const char	*socket=cmdline.getValue("socket");
 	const char	*user=cmdline.getValue("user");
 	const char	*password=cmdline.getValue("password");
-	bool		krb=cmdline.found("krb");
+	bool		usekrb=cmdline.found("krb");
 	const char	*krbservice=cmdline.getValue("krbservice");
 	const char	*krbmech=cmdline.getValue("krbmech");
 	const char	*krbflags=cmdline.getValue("krbflags");
+	bool		usetls=cmdline.found("tls");
+	const char	*tlscert=cmdline.getValue("tlscert");
+	const char	*tlspvtkey=cmdline.getValue("tlspvtkey");
+	const char	*tlspvtkeypwd=cmdline.getValue("tlspvtkeypassword");
+	const char	*tlsciphers=cmdline.getValue("tlsciphers");
+	const char	*tlscafile=cmdline.getValue("tlscafile");
+	const char	*tlscapath=cmdline.getValue("tlscapath");
+	uint32_t	tlsdepth=charstring::toUnsignedInteger(
+					cmdline.getValue("tlsdepth"));
 	const char	*file=cmdline.getValue("file");
 	uint64_t	commitcount=charstring::toInteger(
 					cmdline.getValue("commitcount"));
@@ -589,6 +598,12 @@ int main(int argc, const char **argv) {
 			"             [-user user -password password]\n"
 			"             [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
+			"             [-tls] [-tlscert certfile]\n"
+			"                [-tlspvtkey keyfile] "
+			"[-tlspvtkeypassword password]\n"
+			"                [-tlsciphers cipherlist]\n"
+			"                [-tlscafile cafile] "
+			"[-tlscapath capath] [-tlsdepth depth]\n"
 			"             -file file [-commitcount rowcount]\n"
 			"             [-debug [filename]] [-verbose]\n"
 			"  or\n"
@@ -613,7 +628,7 @@ int main(int argc, const char **argv) {
 				socket=cfg->getDefaultSocket();
 			}
 			if (!cmdline.found("krb")) {
-				krb=cfg->getDefaultKrb();
+				usekrb=cfg->getDefaultKrb();
 			}
 			if (!cmdline.found("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
@@ -623,6 +638,12 @@ int main(int argc, const char **argv) {
 			}
 			if (!cmdline.found("krbflags")) {
 				krbflags=cfg->getDefaultKrbFlags();
+			}
+			if (!cmdline.found("tls")) {
+				usetls=cfg->getDefaultTls();
+			}
+			if (!cmdline.getValue("tlsciphers")) {
+				tlsciphers=cfg->getDefaultTlsCiphers();
 			}
 			if (!cmdline.found("user")) {
 				user=cfg->getDefaultUser();
@@ -636,8 +657,11 @@ int main(int argc, const char **argv) {
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	// configure kerberos
-	if (krb) {
+	if (usekrb) {
 		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
+	} else if (usetls) {
+		sqlrcon.enableTLS(tlscert,tlspvtkey,tlspvtkeypwd,
+				tlsciphers,tlscafile,tlscapath,tlsdepth);
 	}
 
 	// configure debug
