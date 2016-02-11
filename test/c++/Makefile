@@ -25,10 +25,11 @@ all: db2 \
 	sap \
 	router \
 	extensions \
-	krb
+	krb \
+	tls
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) informix$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) router$(EXE) extensions$(EXE) krb$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) informix$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) router$(EXE) extensions$(EXE) krb$(EXE) tls$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
 db2: db2.cpp db2.$(OBJ)
@@ -83,3 +84,6 @@ extensions: extensions.cpp extensions.$(OBJ)
 
 krb: krb.cpp krb.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) krb.$(OBJ) $(CPPTESTLIBS)
+
+tls: tls.cpp tls.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tls.$(OBJ) $(CPPTESTLIBS)

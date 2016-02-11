@@ -126,11 +126,16 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char 	*getDefaultAddresses()=0;
 		virtual uint16_t	getDefaultPort()=0;
 		virtual const char	*getDefaultSocket()=0;
+
 		virtual bool		getDefaultKrb()=0;
 		virtual const char	*getDefaultKrbService()=0;
 		virtual const char	*getDefaultKrbKeytab()=0;
 		virtual const char	*getDefaultKrbMech()=0;
 		virtual const char	*getDefaultKrbFlags()=0;
+
+		virtual bool		getDefaultTls()=0;
+		virtual const char	*getDefaultTlsCiphers()=0;
+
 		virtual const char	*getDefaultUser()=0;
 		virtual const char	*getDefaultPassword()=0;
 

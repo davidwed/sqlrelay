@@ -19,3 +19,7 @@ void sqlrprotocol::setClientSocket(filedescriptor *clientsock) {
 gsscontext *sqlrprotocol::getGSSContext() {
 	return &gctx;
 }
+
+tlsservercontext *sqlrprotocol::getTLSContext() {
+	return &tctx;
+}

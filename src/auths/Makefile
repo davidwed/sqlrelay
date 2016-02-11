@@ -14,7 +14,8 @@ all: all-base $(AUTHALLOPTIONALTARGETS)
 
 all-base: $(SQLR)auth_userlist.$(LIBEXT) \
 		$(SQLR)auth_database.$(LIBEXT) \
-		$(SQLR)auth_krb_userlist.$(LIBEXT)
+		$(SQLR)auth_krb_userlist.$(LIBEXT) \
+		$(SQLR)auth_tls_userlist.$(LIBEXT)
 
 all-sqlrelay: $(SQLR)auth_sqlrelay.$(LIBEXT)
 
@@ -31,6 +32,9 @@ $(SQLR)auth_database.$(LIBEXT): database.cpp database.$(OBJ)
 $(SQLR)auth_krb_userlist.$(LIBEXT): krb_userlist.cpp krb_userlist.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ krb_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+$(SQLR)auth_tls_userlist.$(LIBEXT): tls_userlist.cpp tls_userlist.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ tls_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 $(SQLR)auth_sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(SQLRAUTH_SQLRELAYLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
@@ -41,6 +45,7 @@ installdll:
 	$(LTINSTALL) $(CP) $(SQLR)auth_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_database.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_krb_userlist.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_tls_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB) $(AUTHINSTALLSHAREDLIBOPTIONALTARGETS)
@@ -59,6 +64,10 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)auth_krb_userlist.a
 	$(RM) $(libexecdir)/$(SQLR)auth_krb_userlist.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_krb userlist.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)auth_tls_userlist.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_tls_userlist.a
+	$(RM) $(libexecdir)/$(SQLR)auth_tls_userlist.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_tls userlist.so so $(MODULESUFFIX)
 
 installsharedlib-sqlrelay:
 	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
@@ -71,6 +80,7 @@ uninstall:
 		$(libexecdir)/$(SQLR)auth_userlist.* \
 		$(libexecdir)/$(SQLR)auth_database.* \
 		$(libexecdir)/$(SQLR)auth_krb_userlist.* \
+		$(libexecdir)/$(SQLR)auth_tls_userlist.* \
 		$(libexecdir)/$(SQLR)auth_kerberos_userlist.* \
 		$(libexecdir)/$(SQLR)auth_sqlrelay.* \
 		$(libexecdir)/sqlrauth_default.* \

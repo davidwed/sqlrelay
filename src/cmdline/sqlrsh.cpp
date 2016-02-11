@@ -1908,10 +1908,17 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*socket=cmdline->getValue("socket");
 	const char	*user=cmdline->getValue("user");
 	const char	*password=cmdline->getValue("password");
-	bool		krb=cmdline->found("krb");
+	bool		usekrb=cmdline->found("krb");
 	const char	*krbservice=cmdline->getValue("krbservice");
 	const char	*krbmech=cmdline->getValue("krbmech");
 	const char	*krbflags=cmdline->getValue("krbflags");
+	bool		usetls=cmdline->found("tls");
+	const char	*tlscert=cmdline->getValue("tlscert");
+	const char	*tlspvtkey=cmdline->getValue("tlspvtkey");
+	const char	*tlspvtkeypwd=cmdline->getValue("tlspvtkeypassword");
+	const char	*tlsciphers=cmdline->getValue("tlsciphers");
+	const char	*tlscafile=cmdline->getValue("tlscafile");
+	const char	*tlscapath=cmdline->getValue("tlscapath");
 	const char	*script=cmdline->getValue("script");
 	const char	*command=cmdline->getValue("command");
 	
@@ -1925,6 +1932,11 @@ void sqlrsh::execute(int argc, const char **argv) {
 			"        [-user user] [-password password]\n"
 			"        [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
+			"        [-tls] [-tlscert certfile]\n"
+			"            [-tlspvtkey keyfile] "
+			"[-tlspvtkeypassword password]\n"
+			"            [-tlsciphers cipherlist] "
+			"[-tlscafile cafile] [-tlscapath capath]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
@@ -1951,7 +1963,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 				socket=cfg->getDefaultSocket();
 			}
 			if (!cmdline->found("krb")) {
-				krb=cfg->getDefaultKrb();
+				usekrb=cfg->getDefaultKrb();
 			}
 			if (!cmdline->found("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
@@ -1961,6 +1973,12 @@ void sqlrsh::execute(int argc, const char **argv) {
 			}
 			if (!cmdline->found("krbflags")) {
 				krbflags=cfg->getDefaultKrbFlags();
+			}
+			if (!cmdline->found("tls")) {
+				usetls=cfg->getDefaultTls();
+			}
+			if (!cmdline->getValue("tlsciphers")) {
+				tlsciphers=cfg->getDefaultTlsCiphers();
 			}
 			if (!cmdline->found("user")) {
 				user=cfg->getDefaultUser();
@@ -1973,9 +1991,12 @@ void sqlrsh::execute(int argc, const char **argv) {
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 
-	// configure kerberos
-	if (krb) {
+	// configure kerberos/tls
+	if (usekrb) {
 		sqlrcon.useKerberos(krbservice,krbmech,krbflags);
+	} else if (usetls) {
+		sqlrcon.useTLS(tlscert,tlspvtkey,tlspvtkeypwd,
+				tlsciphers,tlscafile,tlscapath);
 	}
 
 	// set up an sqlrshenv

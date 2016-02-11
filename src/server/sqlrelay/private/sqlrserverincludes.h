@@ -21,6 +21,8 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 #include <rudiments/dynamiclib.h>
+#include <rudiments/gss.h>
+#include <rudiments/tls.h>
 
 #ifndef SQLRSERVER_DLLSPEC
 	#ifdef _WIN32

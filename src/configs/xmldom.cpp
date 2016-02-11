@@ -34,11 +34,16 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getDefaultAddresses();
 		uint16_t	getDefaultPort();
 		const char	*getDefaultSocket();
+
 		bool		getDefaultKrb();
 		const char	*getDefaultKrbService();
 		const char	*getDefaultKrbKeytab();
 		const char	*getDefaultKrbMech();
 		const char	*getDefaultKrbFlags();
+
+		bool		getDefaultTls();
+		const char	*getDefaultTlsCiphers();
+
 		const char	*getDefaultUser();
 		const char	*getDefaultPassword();
 
@@ -225,6 +230,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*defaultkrbservice;
 		const char	*defaultkrbmech;
 		const char	*defaultkrbflags;
+		bool		defaulttls;
+		const char	*defaulttlsciphers;
 		const char	*defaultuser;
 		const char	*defaultpassword;
 
@@ -326,6 +333,8 @@ void sqlrconfig_xmldom::init() {
 	defaultkrbservice=NULL;
 	defaultkrbmech=NULL;
 	defaultkrbflags=NULL;
+	defaulttls=false;
+	defaulttlsciphers=NULL;
 	defaultuser=NULL;
 	defaultpassword=NULL;
 }
@@ -387,6 +396,14 @@ const char *sqlrconfig_xmldom::getDefaultKrbMech() {
 
 const char *sqlrconfig_xmldom::getDefaultKrbFlags() {
 	return defaultkrbflags;
+}
+
+bool sqlrconfig_xmldom::getDefaultTls() {
+	return defaulttls;
+}
+
+const char *sqlrconfig_xmldom::getDefaultTlsCiphers() {
+	return defaulttlsciphers;
 }
 
 const char *sqlrconfig_xmldom::getDefaultUser() {
@@ -995,6 +1012,15 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*krbkeytab=instance->getAttribute("krbkeytab");
 	xmldomnode	*krbmech=instance->getAttribute("krbmech");
 	xmldomnode	*krbflags=instance->getAttribute("krbflags");
+	xmldomnode	*tls=instance->getAttribute("tls");
+	xmldomnode	*tlscert=instance->getAttribute("tlscert");
+	xmldomnode	*tlspvtkey=instance->getAttribute("tlspvtkey");
+	xmldomnode	*tlspvtkeypassword=instance->getAttribute(
+							"tlspvtkeypassword");
+	xmldomnode	*tlsdhcert=instance->getAttribute("tlsdhcert");
+	xmldomnode	*tlscafile=instance->getAttribute("tlscafile");
+	xmldomnode	*tlscapath=instance->getAttribute("tlscapath");
+	xmldomnode	*tlsciphers=instance->getAttribute("tlsciphers");
 	if (!addresses->isNullNode() ||
 			!port->isNullNode() ||
 			!socket->isNullNode() ||
@@ -1002,7 +1028,15 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!krbservice->isNullNode() ||
 			!krbkeytab->isNullNode() ||
 			!krbmech->isNullNode() ||
-			!krbflags->isNullNode()) {
+			!krbflags->isNullNode() ||
+			!tls->isNullNode() ||
+			!tlscert->isNullNode() ||
+			!tlspvtkey->isNullNode() ||
+			!tlspvtkeypassword->isNullNode() ||
+			!tlsdhcert->isNullNode() ||
+			!tlscafile->isNullNode() ||
+			!tlscapath->isNullNode() ||
+			!tlsciphers->isNullNode()) {
 
 		xmldomnode	*listener=listeners->insertTag("listener",0);
 		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
@@ -1046,6 +1080,46 @@ void sqlrconfig_xmldom::normalizeTree() {
 			listener->setAttributeValue("krbflags",
 							krbflags->getValue());
 			instance->deleteAttribute(krbflags);
+		}
+		if (!tls->isNullNode()) {
+			listener->setAttributeValue("tls",
+							tls->getValue());
+			instance->deleteAttribute(tls);
+		}
+		if (!tlscert->isNullNode()) {
+			listener->setAttributeValue("tlscert",
+							tlscert->getValue());
+			instance->deleteAttribute(tlscert);
+		}
+		if (!tlspvtkey->isNullNode()) {
+			listener->setAttributeValue("tlspvtkey",
+							tlspvtkey->getValue());
+			instance->deleteAttribute(tlspvtkey);
+		}
+		if (!tlspvtkeypassword->isNullNode()) {
+			listener->setAttributeValue("tlspvtkeypassword",
+						tlspvtkeypassword->getValue());
+			instance->deleteAttribute(tlspvtkeypassword);
+		}
+		if (!tlsdhcert->isNullNode()) {
+			listener->setAttributeValue("tlsdhcert",
+						tlsdhcert->getValue());
+			instance->deleteAttribute(tlsdhcert);
+		}
+		if (!tlscafile->isNullNode()) {
+			listener->setAttributeValue("tlscafile",
+						tlscafile->getValue());
+			instance->deleteAttribute(tlscafile);
+		}
+		if (!tlscapath->isNullNode()) {
+			listener->setAttributeValue("tlscapath",
+						tlscapath->getValue());
+			instance->deleteAttribute(tlscapath);
+		}
+		if (!tlsciphers->isNullNode()) {
+			listener->setAttributeValue("tlsciphers",
+						tlsciphers->getValue());
+			instance->deleteAttribute(tlsciphers);
 		}
 	}
 
@@ -1519,6 +1593,9 @@ void sqlrconfig_xmldom::getTreeValues() {
 	defaultkrbservice=defaultlistener->getAttributeValue("krbservice");
 	defaultkrbmech=defaultlistener->getAttributeValue("krbmech");
 	defaultkrbflags=defaultlistener->getAttributeValue("krbflags");
+	defaulttls=!charstring::compare(
+			defaultlistener->getAttributeValue("tls"),"yes");
+	defaulttlsciphers=defaultlistener->getAttributeValue("tlsciphers");
 
 
 	// session queries
@@ -1618,8 +1695,9 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 
 	// default user/password
-	xmldomnode	*defaultusertag=instance->getFirstTagChild("auths")->
-						getFirstTagDescendent("user");
+	xmldomnode	*defaultusertag=instance->getFirstTagChild("auths")->							getFirstTagChild(
+						"auth","module","userlist")->
+						getFirstTagChild("user");
 	defaultuser=defaultusertag->getAttributeValue("user");
 	defaultpassword=defaultusertag->getAttributeValue("password");
 }

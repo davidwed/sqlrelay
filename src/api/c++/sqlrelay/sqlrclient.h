@@ -69,6 +69,15 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 					const char *mech,
 					const char *flags);
 
+		/** Configures this instance to use SSL/TLS authentication
+		 *  and encryption... */
+		void	useTLS(const char *cert,
+					const char *pvtkey,
+					const char *pvtkeypwd,
+					const char *ciphers,
+					const char *cafile,
+					const char *capath);
+
 		/** Configures this instance to not use kerberos or SSL/TLS
 		 *  authentication and encryption. */
 		void	useNoEncryption();

@@ -5667,3 +5667,7 @@ sqlrparser *sqlrservercontroller::getParser() {
 gsscontext *sqlrservercontroller::getGSSContext() {
 	return (currentprotocol)?currentprotocol->getGSSContext():NULL;
 }
+
+tlsservercontext *sqlrservercontroller::getTLSContext() {
+	return (currentprotocol)?currentprotocol->getTLSContext():NULL;
+}

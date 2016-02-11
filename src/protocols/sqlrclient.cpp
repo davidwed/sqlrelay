@@ -17,7 +17,6 @@
 #include <defaults.h>
 #include <defines.h>
 
-
 enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_QUERY=0,
 	SQLRCLIENTQUERYTYPE_DATABASE_LIST,
@@ -33,7 +32,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		sqlrclientexitstatus_t	clientSession();
 	private:
-		bool	acceptGSSSecurityContext();
+		bool	acceptSecurityContext();
 		bool	getCommand(uint16_t *command);
 		sqlrservercursor	*getCursor(uint16_t command);
 		void	noAvailableCursors(uint16_t command);
@@ -167,7 +166,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		stringbuffer	debugstr;
 
-		bool		krb;
+		securitycontext	*ctx;
+		bool		usekrb;
+		bool		usetls;
 
 		int32_t		idleclienttimeout;
 
@@ -211,9 +212,11 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	maxerrorlength=cont->cfg->getMaxErrorLength();
 	waitfordowndb=cont->cfg->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
-	krb=!charstring::compare(parameters->getAttributeValue("krb"),"yes");
+	ctx=NULL;
+	usekrb=!charstring::compare(parameters->getAttributeValue("krb"),"yes");
+	usetls=!charstring::compare(parameters->getAttributeValue("tls"),"yes");
 
-	if (krb) {
+	if (usekrb) {
 		if (gss::supportsGSS()) {
 
 			// set the keytab file to use
@@ -256,10 +259,83 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 				parameters->getAttributeValue("krbflags"));
 			gctx.setCredentials(&gcred);
 
+			// use the gss context
+			ctx=&gctx;
+
 		} else {
 			stderror.printf("Warning: kerberos support requested "
 					"but platform doesn't support "
 					"kerberos\n");
+		}
+	} else if (usetls) {
+		if (tls::supportsTLS()) {
+
+			// get the certificate chain file to use
+			const char	*cert=
+				parameters->getAttributeValue("tlscert");
+			if (!charstring::isNullOrEmpty(cert)) {
+				tctx.setCertificateChainFile(cert);
+				// FIXME: not-found warning
+			}
+
+			// get the private key to use (and password)
+			const char	*pvtkey=
+				parameters->getAttributeValue("tlspvtkey");
+			const char	*pvtkeypwd=
+				parameters->getAttributeValue(
+						"tlspvtkeypassword");
+			if (!charstring::isNullOrEmpty(pvtkey)) {
+				tctx.setPrivateKeyFile(pvtkey,pvtkeypwd);
+				// FIXME: not-found warning
+			}
+
+			// get the Diffie-Hellman key exchange cert file to use
+			const char	*dhcert=
+				parameters->getAttributeValue("tlsdhcert");
+			if (!charstring::isNullOrEmpty(dhcert)) {
+				tctx.useDiffieHellmanKeyExchange(dhcert);
+				// FIXME: not-found warning
+			}
+
+			// get the certificate authority file to use
+			const char	*cafile=
+				parameters->getAttributeValue("tlscafile");
+			if (!charstring::isNullOrEmpty(cafile)) {
+				tctx.setCertificateAuthorityFile(cafile);
+				// FIXME: not-found warning
+			}
+
+			// get the certificate authority path to use
+			const char	*capath=
+				parameters->getAttributeValue("tlscapath");
+			if (!charstring::isNullOrEmpty(capath)) {
+				tctx.setCertificateAuthorityPath(capath);
+				// FIXME: not-found warning
+			}
+
+			// if a cafile or capath was specified, then
+			// make sure to request the client's certificate,
+			// we apparently would like to validate it against
+			// a ca
+			if (!charstring::isNullOrEmpty(cafile) ||
+				!charstring::isNullOrEmpty(capath)) {
+				tctx.verifyPeer();
+			}
+
+			// get the cipher list to use
+			const char	*ciphers=
+				parameters->getAttributeValue("tlsciphers");
+			if (!charstring::isNullOrEmpty(ciphers)) {
+				tctx.setCiphers(ciphers);
+			}
+
+			// use the tls context
+			ctx=&tctx;
+
+		} else {
+			stderror.printf("Warning: TLS support requested "
+					"but platform doesn't support "
+					"TLS\n");
 		}
 	}
 }
@@ -284,7 +360,7 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
 
 	// accept GSS security context, if necessary
-	if (krb && !acceptGSSSecurityContext()) {
+	if (!acceptSecurityContext()) {
 		return status;
 	}
 
@@ -513,30 +589,40 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	return status;
 }
 
-bool sqlrprotocol_sqlrclient::acceptGSSSecurityContext() {
+bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
+
+	if (!usekrb && !usetls) {
+		return true;
+	}
 
 	cont->logDebugMessage("accepting gss security context");
 
-	if (!gss::supportsGSS()) {
+	if (usekrb && !gss::supportsGSS()) {
 		cont->logInternalError(NULL,
-					"failed to accept gss security "
-					"context (kerberos requested but "
-					"not supported)");
+				"failed to accept gss security "
+				"context (kerberos requested but "
+				"not supported)");
+		return false;
+	} else if (usetls && !tls::supportsTLS()) {
+		cont->logInternalError(NULL,
+				"failed to accept tls security "
+				"context (tls requested but "
+				"not supported)");
 		return false;
 	}
 
 	// attach the context and file descriptor to each other
-	clientsock->setGSSContext(&gctx);
-	gctx.setFileDescriptor(clientsock);
+	clientsock->setSecurityContext(ctx);
+	ctx->setFileDescriptor(clientsock);
 
 	// accept the security context
-	bool	retval=gctx.accept();
+	bool	retval=ctx->accept();
 	if (!retval) {
-		cont->logInternalError(NULL,"failed to accept gss "
-						"security context");
+		cont->logInternalError(NULL,
+			"failed to accept security context");
 	}
 
-	cont->logDebugMessage("done accepting gss security context");
+	cont->logDebugMessage("done accepting security context");
 	return retval;
 }
 

@@ -11,6 +11,8 @@
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
 #include <rudiments/permissions.h>
+#include <rudiments/gss.h>
+#include <rudiments/tls.h>
 #include <defines.h>
 #include <defaults.h>
 
@@ -55,13 +57,25 @@ class sqlrconnectionprivate {
 		uint32_t	_passwordlen;
 
 		// gss
-		bool		_krb;
+		bool		_usekrb;
 		char		*_krbservice;
 		char		*_krbmech;
 		char		*_krbflags;
 		gsscredentials	_gcred;
 		gssmechanism	_gmech;
 		gsscontext	_gctx;
+
+		// tls
+		bool			_usetls;
+		char			*_tlscert;
+		char			*_tlspvtkey;
+		char			*_tlspvtkeypwd;
+		char			*_tlsciphers;
+		char			*_tlscafile;
+		char			*_tlscapath;
+		tlsclientcontext	_tctx;
+
+		securitycontext	*_ctx;
 
 		// error
 		int64_t		_errorno;
@@ -165,10 +179,19 @@ void sqlrconnection::init(const char *server, uint16_t port,
 			(char *)password;
 	pvt->_userlen=charstring::length(user);
 	pvt->_passwordlen=charstring::length(password);
-	pvt->_krb=false;
+	pvt->_usekrb=false;
 	pvt->_krbservice=NULL;
 	pvt->_krbmech=NULL;
 	pvt->_krbflags=NULL;
+
+	pvt->_usetls=false;
+	pvt->_tlscert=NULL;
+	pvt->_tlspvtkey=NULL;
+	pvt->_tlspvtkeypwd=NULL;
+	pvt->_tlscafile=NULL;
+	pvt->_tlscapath=NULL;
+
+	pvt->_ctx=NULL;
 
 	// database id
 	pvt->_id=NULL;
@@ -274,6 +297,11 @@ sqlrconnection::~sqlrconnection() {
 		delete[] pvt->_krbservice;
 		delete[] pvt->_krbmech;
 		delete[] pvt->_krbflags;
+		delete[] pvt->_tlscert;
+		delete[] pvt->_tlspvtkey;
+		delete[] pvt->_tlspvtkeypwd;
+		delete[] pvt->_tlscafile;
+		delete[] pvt->_tlscapath;
 	}
 
 	// detach all cursors attached to this client
@@ -303,11 +331,16 @@ void sqlrconnection::useKerberos(const char *service,
 					const char *mech,
 					const char *flags) {
 
+	// clear any existing configuration
+	if (pvt->_usekrb || pvt->_usetls) {
+		useNoEncryption();
+	}
+
 	if (!gss::supportsGSS()) {
 		return;
 	}
 
-	pvt->_krb=true;
+	pvt->_usekrb=true;
 
 	if (pvt->_copyrefs) {
 		delete[] pvt->_krbservice;
@@ -331,10 +364,73 @@ void sqlrconnection::useKerberos(const char *service,
 	pvt->_gctx.setDesiredFlags(pvt->_krbflags);
 	pvt->_gctx.setService(pvt->_krbservice);
 	pvt->_gctx.setCredentials(&pvt->_gcred);
+
+	pvt->_ctx=&pvt->_gctx;
+}
+
+void sqlrconnection::useTLS(const char *cert,
+					const char *pvtkey,
+					const char *pvtkeypwd,
+					const char *ciphers,
+					const char *cafile,
+					const char *capath) {
+
+	// clear any existing configuration
+	if (pvt->_usekrb || pvt->_usetls) {
+		useNoEncryption();
+	}
+
+	if (!tls::supportsTLS()) {
+		return;
+	}
+
+	pvt->_usetls=true;
+
+	if (pvt->_copyrefs) {
+		delete[] pvt->_tlscert;
+		pvt->_tlscert=charstring::duplicate(cert);
+		delete[] pvt->_tlspvtkey;
+		pvt->_tlspvtkey=charstring::duplicate(pvtkey);
+		delete[] pvt->_tlspvtkeypwd;
+		pvt->_tlspvtkeypwd=charstring::duplicate(pvtkeypwd);
+		delete[] pvt->_tlsciphers;
+		pvt->_tlsciphers=charstring::duplicate(ciphers);
+		delete[] pvt->_tlscafile;
+		pvt->_tlscafile=charstring::duplicate(cafile);
+		delete[] pvt->_tlscapath;
+		pvt->_tlscapath=charstring::duplicate(capath);
+	} else {
+		pvt->_tlscert=(char *)cert;
+		pvt->_tlspvtkey=(char *)pvtkey;
+		pvt->_tlspvtkeypwd=(char *)pvtkeypwd;
+		pvt->_tlsciphers=(char *)ciphers;
+		pvt->_tlscafile=(char *)cafile;
+		pvt->_tlscapath=(char *)capath;
+	}
+
+	pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
+	pvt->_tctx.setPrivateKeyFile(pvt->_tlspvtkey,pvt->_tlspvtkeypwd);
+	pvt->_tctx.setCiphers(pvt->_tlsciphers);
+	pvt->_tctx.setCertificateAuthorityFile(pvt->_tlscafile);
+	pvt->_tctx.setCertificateAuthorityPath(pvt->_tlscapath);
+
+	pvt->_ctx=&pvt->_tctx;
 }
 
 void sqlrconnection::useNoEncryption() {
-	pvt->_krb=false;
+
+	pvt->_ctx=NULL;
+
+	pvt->_ucs.setSecurityContext(NULL);
+	pvt->_ics.setSecurityContext(NULL);
+
+	if (pvt->_usekrb) {
+		pvt->_gctx.close();
+	}
+	if (pvt->_usetls) {
+		pvt->_tctx.close();
+	}
+
 	if (pvt->_copyrefs) {
 		delete[] pvt->_krbservice;
 		pvt->_krbservice=NULL;
@@ -342,7 +438,22 @@ void sqlrconnection::useNoEncryption() {
 		pvt->_krbmech=NULL;
 		delete[] pvt->_krbflags;
 		pvt->_krbflags=NULL;
+
+		delete[] pvt->_tlscert;
+		pvt->_tlscert=NULL;
+		delete[] pvt->_tlspvtkey;
+		pvt->_tlspvtkey=NULL;
+		delete[] pvt->_tlspvtkeypwd;
+		pvt->_tlspvtkeypwd=NULL;
+		delete[] pvt->_tlsciphers;
+		pvt->_tlsciphers=NULL;
+		delete[] pvt->_tlscafile;
+		pvt->_tlscafile=NULL;
+		delete[] pvt->_tlscapath;
+		pvt->_tlscapath=NULL;
 	}
+	pvt->_usekrb=false;
+	pvt->_usetls=false;
 }
 
 void sqlrconnection::setConnectTimeout(int32_t timeoutsec,
@@ -454,7 +565,7 @@ bool sqlrconnection::openSession() {
 	}
 
 	// acquire kerberos credentials, if necessary
-	if (pvt->_krb && !pvt->_gcred.acquired() &&
+	if (pvt->_usekrb && !pvt->_gcred.acquired() &&
 				!charstring::isNullOrEmpty(pvt->_user)) {
 
 		if (pvt->_gcred.acquireForUser(pvt->_user)) {
@@ -537,11 +648,20 @@ bool sqlrconnection::openSession() {
 
 	// handle failure to connect to listener
 	if (openresult!=RESULT_SUCCESS) {
-		if (pvt->_debug && gss::supportsGSS() &&
-			pvt->_krb && pvt->_gctx.getMajorStatus()) {
-			debugPreStart();
-			debugPrint(pvt->_gctx.getMechanismMinorStatus());
-			debugPreEnd();
+		if (pvt->_debug) {
+			if (pvt->_usekrb &&
+				pvt->_gctx.getMajorStatus()) {
+				debugPreStart();
+				debugPrint(pvt->_gctx.
+						getMechanismMinorStatus());
+				debugPreEnd();
+			} else if (pvt->_usetls &&
+				pvt->_tctx.getErrorString()) {
+				debugPreStart();
+				debugPrint(pvt->_tctx.getErrorString());
+				debugPrint("\n");
+				debugPreEnd();
+			}
 		}
 		setError("Couldn't connect to the listener.");
 		return false;
@@ -573,9 +693,12 @@ void sqlrconnection::reConfigureSockets() {
 	pvt->_ics.setReadBufferSize(65536);
 	pvt->_ics.setWriteBufferSize(65536);
 
-	if (gss::supportsGSS() && pvt->_krb) {
+	pvt->_ucs.setSecurityContext(pvt->_ctx);
+	pvt->_ics.setSecurityContext(pvt->_ctx);
 
-		if (pvt->_debug) {
+	if (pvt->_debug) {
+		if (pvt->_usekrb && gss::supportsGSS()) {
+
 			debugPreStart();
 			debugPrint("kerberos encryption/"
 					"authentication enabled\n");
@@ -595,21 +718,48 @@ void sqlrconnection::reConfigureSockets() {
 			}
 			debugPrint("\n");
 			debugPreEnd();
-		}
 
-		pvt->_ucs.setGSSContext(&pvt->_gctx);
-		pvt->_ics.setGSSContext(&pvt->_gctx);
+		} else if (pvt->_usetls && tls::supportsTLS()) {
 
-	} else {
+			debugPreStart();
+			debugPrint("TLS encryption/authentication enabled\n");
+			debugPrint("  cert: ");
+			if (pvt->_tlscert) {
+				debugPrint(pvt->_tlscert);
+			}
+			debugPrint("\n");
+			debugPrint("  private key: ");
+			if (pvt->_tlspvtkey) {
+				debugPrint(pvt->_tlspvtkey);
+			}
+			debugPrint("\n");
+			debugPrint("  private key password: ");
+			if (pvt->_tlspvtkeypwd) {
+				debugPrint(pvt->_tlspvtkeypwd);
+			}
+			debugPrint("\n");
+			debugPrint("  ciphers: ");
+			if (pvt->_tlsciphers) {
+				debugPrint(pvt->_tlsciphers);
+			}
+			debugPrint("\n");
+			debugPrint("  ca file: ");
+			if (pvt->_tlscafile) {
+				debugPrint(pvt->_tlscafile);
+			}
+			debugPrint("\n");
+			debugPrint("  ca path: ");
+			if (pvt->_tlscapath) {
+				debugPrint(pvt->_tlscapath);
+			}
+			debugPrint("\n");
+			debugPreEnd();
 
-		if (pvt->_debug) {
+		} else {
 			debugPreStart();
 			debugPrint("encryption disabled\n");
 			debugPreEnd();
 		}
-
-		pvt->_ucs.setGSSContext(NULL);
-		pvt->_ics.setGSSContext(NULL);
 	}
 }
 
