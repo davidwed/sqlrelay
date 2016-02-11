@@ -622,24 +622,26 @@ bool sqlrconnection::openSession() {
 		}
 	}
 
-	// handle failure to connect to listener
+	// validate server, if necessary
+	if (pvt->_usetls &&
+		!charstring::isNullOrEmpty(pvt->_tlscafile) &&
+		!charstring::isNullOrEmpty(pvt->_tlscapath) &&
+		!pvt->_tctx.peerCertificateIsValid()) {
+		openresult=RESULT_ERROR;
+	}
+
+	// handle failures
 	if (openresult!=RESULT_SUCCESS) {
-		if (pvt->_debug) {
-			if (pvt->_usekrb &&
-				pvt->_gctx.getMajorStatus()) {
-				debugPreStart();
-				debugPrint(pvt->_gctx.
-						getMechanismMinorStatus());
-				debugPreEnd();
-			} else if (pvt->_usetls &&
-				pvt->_tctx.getErrorString()) {
-				debugPreStart();
-				debugPrint(pvt->_tctx.getErrorString());
-				debugPrint("\n");
-				debugPreEnd();
-			}
+		if (pvt->_usekrb && pvt->_gctx.getMajorStatus()) {
+			setError(pvt->_gctx.getMechanismMinorStatus());
+		} else if (pvt->_usetls && pvt->_tctx.getError()) {
+			stringbuffer	err;
+			err.append("TLS error: ");
+			err.append(pvt->_tctx.getErrorString());
+			setError(err.getString());
+		} else {
+			setError("Couldn't connect to the listener.");
 		}
-		setError("Couldn't connect to the listener.");
 		return false;
 	}
 
