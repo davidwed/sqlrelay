@@ -41,9 +41,14 @@ bool sqlrauth_krb_userlist::auth(sqlrserverconnection *sqlrcon,
 						const char *user,
 						const char *password) {
 
-	// get the principal that initiated the security context
-	const char	*initiator=sqlrcon->cont->
-					getGSSContext()->getInitiator();
+	// get the security context
+	gsscontext	*ctx=sqlrcon->cont->getGSSContext();
+	if (!ctx) {
+		return false;
+	}
+
+	// get the initiating principal
+	const char	*initiator=ctx->getInitiator();
 	if (charstring::isNullOrEmpty(initiator)) {
 		return false;
 	}

@@ -44,27 +44,23 @@ bool sqlrauth_tls_userlist::auth(sqlrserverconnection *sqlrcon,
 	// get the security context
 	tlsservercontext	*ctx=sqlrcon->cont->getTLSContext();
 	if (!ctx) {
-stdoutput.printf("auth failed: no ctx\n");
 		return false;
 	}
 
 	// validate the peer certificate
 	if (!ctx->peerCertificateIsValid()) {
-stdoutput.printf("auth failed: invalid cert\n");
 		return false;
 	}
 
 	// get the peer certificate
 	tlscertificate	*cert=ctx->getPeerCertificate();
 	if (!cert) {
-stdoutput.printf("auth failed: no cert\n");
 		return false;
 	}
 
 	// get the common name from the cert
 	const char	*commonname=cert->getCommonName();
 	if (!commonname) {
-stdoutput.printf("auth failed: no common name\n");
 		return false;
 	}
 
@@ -76,7 +72,6 @@ stdoutput.printf("auth failed: no common name\n");
 			return true;
 		}
 	}
-stdoutput.printf("auth failed: \"%s\" not a valid common name\n",commonname);
 	return false;
 }
 
