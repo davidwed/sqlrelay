@@ -68,21 +68,6 @@ class sqlrconnection:
         """
         return CSQLRelay.setResponseTimeout(self.connection, timeoutsec, timeoutusec)
 
-    def useKerberos(self, service):
-        """
-        Configures this instance to use kerberos authentication
-        and encryption and to connect to "service".  If "service"
-        is null then the default service for SQL Relay is used.
-        """
-        return CSQLRelay.useKerberos(self.connection, service)
-
-    def useNoEncryption(self):
-        """
-        Configures this instance to not use kerberos or SSL/TLS
-        authentication and encryption.
-        """
-        return CSQLRelay.useNoEncryption(self.connection)
-
     def endSession(self):
         """
         Ends the current session.

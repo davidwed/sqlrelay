@@ -63,19 +63,6 @@ void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 
 
 /** @ingroup sqlrclientwrapper
- *  Configures this instance to use kerberos authentication
- *  and encryption and to connect to "service".  If "service"
- *  is null then the default service for SQL Relay is used. */
-void	sqlrcon_useKerberos(sqlrcon sqlrconref, const char *service);
-
-/** @ingroup sqlrclientwrapper
- *  Configures this instance to not use kerberos or SSL/TLS
- *  authentication and encryption. */
-void	sqlrcon_useNoEncryption(sqlrcon sqlrconref);
-
-
-
-/** @ingroup sqlrclientwrapper
  *  Ends the session. */
 SQLRCLIENT_DLLSPEC
 void	sqlrcon_endSession(sqlrcon sqlrconref);

@@ -106,29 +106,6 @@ static VALUE sqlrcon_setResponseTimeout(VALUE self,
 	return Qnil;
 }
 
-/**
- *  call-seq:
- *  useKerberos(service)
- *
- *  Configures this instance to use kerberos authentication
- *  and encryption and to connect to "service".  If "service"
- *  is null then the default service for SQL Relay is used. */
-static VALUE sqlrcon_useKerberos(VALUE self, VALUE service) {
-	sqlrconnection	*sqlrcon;
-	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->useKerberos(STR2CSTR(service));
-	return Qnil;
-}
-
-/** Configures this instance to not use kerberos or SSL/TLS
- *  authentication and encryption. */
-static VALUE sqlrcon_useNoEncryption(VALUE self) {
-	sqlrconnection	*sqlrcon;
-	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->useNoEncryption();
-	return Qnil;
-}
-
 /** Ends the session. */
 static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
@@ -450,10 +427,6 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_setAuthenticationTimeout,2);
 	rb_define_method(csqlrconnection,"setResponseTimeout",
 				(CAST)sqlrcon_setResponseTimeout,2);
-	rb_define_method(csqlrconnection,"useKerberos",
-				(CAST)sqlrcon_useKerberos,0);
-	rb_define_method(csqlrconnection,"useNoEncryption",
-				(CAST)sqlrcon_useNoEncryption,0);
 	rb_define_method(csqlrconnection,"endSession",
 				(CAST)sqlrcon_endSession,0);
 	rb_define_method(csqlrconnection,"suspendSession",

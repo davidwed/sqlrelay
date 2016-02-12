@@ -59,33 +59,6 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 
 
 
-		/** Configures this instance to use kerberos authentication
-		 *  and encryption.  Kerberos "service", "mech" and "flags"
-		 *  may be specified or left NULL if not required.  If
-		 *  "service" is NULL then the default service for SQL Relay
-		 *  is used. */
-		void	useKerberos(const char *service);
-		void	enableKerberos(const char *service,
-					const char *mech,
-					const char *flags);
-
-		/** Configures this instance to use SSL/TLS authentication
-		 *  and encryption... */
-		void	enableTLS(const char *cert,
-					const char *pvtkey,
-					const char *pvtkeypwd,
-					const char *ciphers,
-					const char *cafile,
-					const char *capath,
-					uint32_t depth);
-
-		/** Configures this instance to not use kerberos or SSL/TLS
-		 *  authentication and encryption. */
-		void	useNoEncryption();
-		void	disableEncryption();
-
-
-
 		/** Ends the session. */
 		void	endSession();
 

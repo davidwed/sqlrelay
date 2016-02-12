@@ -45,7 +45,7 @@
         new(server, port, socket, user, password, retrytime, tries);
             # Initiates a connection to &quot;server&quot; on &quot;port&quot;
             # or to the unix &quot;socket&quot; on the local machine
-            # and authenticates with &quot;user&quot; and &quot;password&quot;.
+            # and auths with &quot;user&quot; and &quot;password&quot;.
             # Failed connections will be retried for 
             # &quot;tries&quot; times, waiting &quot;retrytime&quot; seconds between each
             # try.  If &quot;tries&quot; is 0 then retries will continue forever.
@@ -81,15 +81,6 @@
             # parameter to -1 disables the timeout.  You can also set
             # this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
             # environment variable.
-
-        useKerberos(const char *service);
-            # Configures this instance to use kerberos authentication
-            # and encryption and to connect to &quot;service&quot;.  If &quot;service&quot;
-            # is null then the default service for SQL Relay is used.
-
-        useNoEncryption();
-            # Configures this instance to not use kerberos or SSL/TLS
-            # authentication and encryption.
 
         endSession();
             # Ends the session.

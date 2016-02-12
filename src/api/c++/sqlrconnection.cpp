@@ -325,10 +325,6 @@ sqlrconnection::~sqlrconnection() {
 	delete pvt;
 }
 
-void sqlrconnection::useKerberos(const char *service) {
-	enableKerberos(service,NULL,NULL);
-}
-
 void sqlrconnection::enableKerberos(const char *service,
 					const char *mech,
 					const char *flags) {
@@ -403,10 +399,6 @@ void sqlrconnection::enableTLS(const char *cert,
 		pvt->_tlscapath=(char *)capath;
 	}
 	pvt->_tlsdepth=depth;
-}
-
-void sqlrconnection::useNoEncryption() {
-	disableEncryption();
 }
 
 void sqlrconnection::disableEncryption() {

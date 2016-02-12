@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.12 2016-01-22 04:49:41 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.13 2016-02-12 21:26:22 mused Exp $
  */
 
 #include <tcl.h>
@@ -1822,8 +1822,6 @@ void sqlrconDelete(ClientData data) {
  *  $con setConnectTimeout
  *  $con setAuthenticationTimeout
  *  $con setResponseTimeout
- *  $con useKerberos
- *  $con useNoEncryption
  *  $con endSession
  *  $con suspendSession
  *  $con getConnectionPort
@@ -1861,8 +1859,6 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "setConnectTimeout",
     "setAuthenticationTimeout",
     "setResponseTimeout",
-    "useKerberos",
-    "useNoEncryption",
     "endSession",
     "suspendSession",
     "getConnectionPort",
@@ -1896,8 +1892,6 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_SETCONNECTTIMEOUT,
     SQLR_SETAUTHENTICATIONTIMEOUT,
     SQLR_SETRESPONSETIMEOUT,
-    SQLR_USEKERBEROS,
-    SQLR_USENOENCRYPTION,
     SQLR_ENDSESSION,
     SQLR_SUSPENDSESSION,
     SQLR_GETCONNECTIONPORT,
@@ -1992,22 +1986,6 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     con->setResponseTimeout(timeoutsec,timeoutusec);
-    break;
-  }
-  case SQLR_USEKERBEROS: {
-    if (objc != 3) {
-      Tcl_WrongNumArgs(interp,2, objv, "service");
-      return TCL_ERROR;
-    }
-    con->useKerberos(Tcl_GetString(objv[2]));
-    break;
-  }
-  case SQLR_USENOENCRYPTION: {
-    if (objc > 2) {
-      Tcl_WrongNumArgs(interp, 2, objv, NULL);
-      return TCL_ERROR;
-    }
-    con->useNoEncryption();
     break;
   }
   case SQLR_ENDSESSION: {

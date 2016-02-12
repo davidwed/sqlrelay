@@ -328,34 +328,6 @@ int main() {
 			ENCODE_VOID;   
 		}
 
-
-		if (strcmp("useKerberos", command) == TRUE) {
-			char service[2000];
-
-			// check number of arguments
-		    	if (arity != 1) return ERR_NUMBER_OF_ARGS;
-
-			// get input parameters
-			if (ei_decode_string(buf, &index, &service[0])) { 
-				return ERR_DECODING_ARGS;
-			}
-
-			// call function and encode result 
-			sqlrcon_useKerberos(con, service); 	
-			ENCODE_VOID;   
-		}
-
-
-		if (strcmp("useNoEncryption", command) == TRUE) {
-			// check number of arguments
-		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
-
-			// call function and encode result 
-			sqlrcon_useNoEncryption(con); 	
-			ENCODE_VOID;   
-		}
-
-
 		if (strcmp("endSession", command) == TRUE) {
 			// check number of arguments
 		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;

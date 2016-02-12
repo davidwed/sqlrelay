@@ -7,7 +7,7 @@
 % API
 -export([start/0, start/1, stop/0]).
 
--export([alloc/7, connectionFree/0, cursorFree/0, useKerberos/1, useNoEncryption/0, endSession/0, suspendSession/0, resumeSession/2]).
+-export([alloc/7, connectionFree/0, cursorFree/0, endSession/0, suspendSession/0, resumeSession/2]).
 -export([ping/0, identify/0, dbVersion/0, dbHostName/0, dbIpAddress/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
 -export([selectDatabase/1, getCurrentDatabase/0]).
 -export([getConnectionPort/0, getConnectionSocket/0]).
@@ -99,10 +99,6 @@ ping() -> call_port({ping}).
 connectionFree() -> erase("connection"), call_port({connectionFree}).
 
 cursorFree() -> erase("cursor"), call_port({cursorFree}).
-
-useKerberos(Service) when is_list(Service) -> call_port({useKerberos, Service}).
-
-useNoEncryption() -> call_port({useNoEncryption}).
 
 endSession() -> call_port({endSession}).
 

@@ -161,33 +161,6 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setresponsetimeout) {
 	}
 }
 
-DLEXPORT ZEND_FUNCTION(sqlrcon_usekerberos) {
-	zval **sqlrcon,**service;
-	if (ZEND_NUM_ARGS() != 2 || 
-		zend_get_parameters_ex(2,&sqlrcon,&service) == FAILURE) {
-		WRONG_PARAM_COUNT;
-	}
-	convert_to_string_ex(service);
-	sqlrconnection *connection=NULL;
-	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
-	if (connection) {
-		connection->useKerberos((*service)->value.str.val);
-	}
-}
-
-DLEXPORT ZEND_FUNCTION(sqlrcon_usenoencryption) {
-	zval **sqlrcon;
-	if (ZEND_NUM_ARGS() != 1 || 
-		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
-		WRONG_PARAM_COUNT;
-	}
-	sqlrconnection *connection=NULL;
-	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
-	if (connection) {
-		connection->useNoEncryption();
-	}
-}
-
 DLEXPORT ZEND_FUNCTION(sqlrcon_endsession) {
 	zval **sqlrcon;
 	if (ZEND_NUM_ARGS() != 1 || 
@@ -2355,8 +2328,6 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_setconnecttimeout,NULL)
 	ZEND_FE(sqlrcon_setauthenticationtimeout,NULL)
 	ZEND_FE(sqlrcon_setresponsetimeout,NULL)
-	ZEND_FE(sqlrcon_usekerberos,NULL)
-	ZEND_FE(sqlrcon_usenoencryption,NULL)
 	ZEND_FE(sqlrcon_endsession,NULL)
 	ZEND_FE(sqlrcon_suspendsession,NULL)
 	ZEND_FE(sqlrcon_getconnectionport,NULL)

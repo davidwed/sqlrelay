@@ -62,25 +62,14 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 
 
 
-<font color="#208020"># Configures this instance to use kerberos authentication</font>
-<font color="#208020"># and encryption and to connect to &#34;service&#34;.  If &#34;service&#34;</font>
-<font color="#208020"># is null then the default service for SQL Relay is used.</font>
-<strong><a name="useKerberos_52">proc <a href="sqlrconCmd.tcl-annot.html#useKerberos">useKerberos</a></a></strong><a name="useKerberos"></a> {service}
-
-<font color="#208020"># Configures this instance to not use kerberos or SSL/TLS</font>
-<font color="#208020"># authentication and encryption.</font>
-<strong><a name="useNoEncryption_56">proc <a href="sqlrconCmd.tcl-annot.html#useNoEncryption">useNoEncryption</a></a></strong><a name="useNoEncryption"></a> {}
-
-
-
 <font color="#208020"># Ends the session.</font>
-<strong><a name="endSession_61">proc <a href="sqlrconCmd.tcl-annot.html#endSession">endSession</a></a></strong><a name="endSession"></a> {} 
+<strong><a name="endSession_50">proc <a href="sqlrconCmd.tcl-annot.html#endSession">endSession</a></a></strong><a name="endSession"></a> {} 
 
 <font color="#208020"># Disconnects this connection from the current</font>
 <font color="#208020"># session but leaves the session open so </font>
 <font color="#208020"># that another connection can connect to it </font>
 <font color="#208020"># using resumeSession {}.</font>
-<strong><a name="suspendSession_67">proc <a href="sqlrconCmd.tcl-annot.html#suspendSession">suspendSession</a></a></strong><a name="suspendSession"></a> {} 
+<strong><a name="suspendSession_56">proc <a href="sqlrconCmd.tcl-annot.html#suspendSession">suspendSession</a></a></strong><a name="suspendSession"></a> {} 
 
 <font color="#208020"># Returns the inet port that the connection is </font>
 <font color="#208020"># communicating over. This parameter may be </font>
@@ -88,7 +77,7 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># the resumeSession {} method.</font>
 <font color="#208020"># Note: The value this method returns is only</font>
 <font color="#208020"># valid after a call to suspendSession {}.</font>
-<strong><a name="getConnectionPort_75">proc <a href="sqlrconCmd.tcl-annot.html#getConnectionPort">getConnectionPort</a></a></strong><a name="getConnectionPort"></a> {} 
+<strong><a name="getConnectionPort_64">proc <a href="sqlrconCmd.tcl-annot.html#getConnectionPort">getConnectionPort</a></a></strong><a name="getConnectionPort"></a> {} 
 
 <font color="#208020"># Returns the unix socket that the connection </font>
 <font color="#208020"># is communicating over. This parameter may be </font>
@@ -96,65 +85,65 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># the resumeSession {} method.</font>
 <font color="#208020"># Note: The value this method returns is only</font>
 <font color="#208020"># valid after a call to suspendSession {}.</font>
-<strong><a name="getConnectionSocket_83">proc <a href="sqlrconCmd.tcl-annot.html#getConnectionSocket">getConnectionSocket</a></a></strong><a name="getConnectionSocket"></a> {} 
+<strong><a name="getConnectionSocket_72">proc <a href="sqlrconCmd.tcl-annot.html#getConnectionSocket">getConnectionSocket</a></a></strong><a name="getConnectionSocket"></a> {} 
 
 <font color="#208020"># Resumes a session previously left open </font>
 <font color="#208020"># using suspendSession {}.</font>
 <font color="#208020"># Returns true on success and false on failure.</font>
-<strong><a name="resumeSession_88">proc <a href="sqlrconCmd.tcl-annot.html#resumeSession">resumeSession</a></a></strong><a name="resumeSession"></a> {port socket} 
+<strong><a name="resumeSession_77">proc <a href="sqlrconCmd.tcl-annot.html#resumeSession">resumeSession</a></a></strong><a name="resumeSession"></a> {port socket} 
 
 
 
 <font color="#208020"># Returns true if the database is up and false</font>
 <font color="#208020"># if it's down.</font>
-<strong><a name="ping_94">proc <a href="sqlrconCmd.tcl-annot.html#ping">ping</a></a></strong><a name="ping"></a> {} 
+<strong><a name="ping_83">proc <a href="sqlrconCmd.tcl-annot.html#ping">ping</a></a></strong><a name="ping"></a> {} 
 
 <font color="#208020"># Returns the type of database: </font>
 <font color="#208020"># oracle postgresql mysql etc.</font>
-<strong><a name="identify_98">proc <a href="sqlrconCmd.tcl-annot.html#identify">identify</a></a></strong><a name="identify"></a> {} 
+<strong><a name="identify_87">proc <a href="sqlrconCmd.tcl-annot.html#identify">identify</a></a></strong><a name="identify"></a> {} 
 
 <font color="#208020"># Returns the version of the database</font>
-<strong><a name="dbVersion_101">proc <a href="sqlrconCmd.tcl-annot.html#dbVersion">dbVersion</a></a></strong><a name="dbVersion"></a> {} 
+<strong><a name="dbVersion_90">proc <a href="sqlrconCmd.tcl-annot.html#dbVersion">dbVersion</a></a></strong><a name="dbVersion"></a> {} 
 
 <font color="#208020"># Returns the host name of the database</font>
-<strong><a name="dbHostName_104">proc <a href="sqlrconCmd.tcl-annot.html#dbHostName">dbHostName</a></a></strong><a name="dbHostName"></a> {} 
+<strong><a name="dbHostName_93">proc <a href="sqlrconCmd.tcl-annot.html#dbHostName">dbHostName</a></a></strong><a name="dbHostName"></a> {} 
 
 <font color="#208020"># Returns the ip address of the database</font>
-<strong><a name="dbIpAddress_107">proc <a href="sqlrconCmd.tcl-annot.html#dbIpAddress">dbIpAddress</a></a></strong><a name="dbIpAddress"></a> {} 
+<strong><a name="dbIpAddress_96">proc <a href="sqlrconCmd.tcl-annot.html#dbIpAddress">dbIpAddress</a></a></strong><a name="dbIpAddress"></a> {} 
 
 <font color="#208020"># Returns the version of the sqlrelay server software.</font>
-<strong><a name="serverVersion_110">proc <a href="sqlrconCmd.tcl-annot.html#serverVersion">serverVersion</a></a></strong><a name="serverVersion"></a> {} 
+<strong><a name="serverVersion_99">proc <a href="sqlrconCmd.tcl-annot.html#serverVersion">serverVersion</a></a></strong><a name="serverVersion"></a> {} 
 
 <font color="#208020"># Returns the version of the sqlrelay client software.</font>
-<strong><a name="clientVersion_113">proc <a href="sqlrconCmd.tcl-annot.html#clientVersion">clientVersion</a></a></strong><a name="clientVersion"></a> {} 
+<strong><a name="clientVersion_102">proc <a href="sqlrconCmd.tcl-annot.html#clientVersion">clientVersion</a></a></strong><a name="clientVersion"></a> {} 
 
 <font color="#208020"># Returns a string representing the format</font>
 <font color="#208020"># of the bind variables used in the db.</font>
-<strong><a name="bindFormat_117">proc <a href="sqlrconCmd.tcl-annot.html#bindFormat">bindFormat</a></a></strong><a name="bindFormat"></a> {} 
+<strong><a name="bindFormat_106">proc <a href="sqlrconCmd.tcl-annot.html#bindFormat">bindFormat</a></a></strong><a name="bindFormat"></a> {} 
 
 
 
 <font color="#208020"># Sets the current database/schema to &#34;database&#34;</font>
-<strong><a name="selectDatabase_122">proc <a href="sqlrconCmd.tcl-annot.html#selectDatabase">selectDatabase</a></a></strong><a name="selectDatabase"></a> {database} 
+<strong><a name="selectDatabase_111">proc <a href="sqlrconCmd.tcl-annot.html#selectDatabase">selectDatabase</a></a></strong><a name="selectDatabase"></a> {database} 
 
 <font color="#208020"># Returns the database/schema that is currently in use.</font>
-<strong><a name="getCurrentDatabase_125">proc <a href="sqlrconCmd.tcl-annot.html#getCurrentDatabase">getCurrentDatabase</a></a></strong><a name="getCurrentDatabase"></a> {} 
+<strong><a name="getCurrentDatabase_114">proc <a href="sqlrconCmd.tcl-annot.html#getCurrentDatabase">getCurrentDatabase</a></a></strong><a name="getCurrentDatabase"></a> {} 
 
 
 
 <font color="#208020"># Returns the value of the autoincrement</font>
 <font color="#208020"># column for the last insert</font>
-<strong><a name="getLastInsertId_131">proc <a href="sqlrconCmd.tcl-annot.html#getLastInsertId">getLastInsertId</a></a></strong><a name="getLastInsertId"></a> {} 
+<strong><a name="getLastInsertId_120">proc <a href="sqlrconCmd.tcl-annot.html#getLastInsertId">getLastInsertId</a></a></strong><a name="getLastInsertId"></a> {} 
 
 
 
 <font color="#208020"># Instructs the database to perform a commit</font>
 <font color="#208020"># after every successful query.</font>
-<strong><a name="autoCommitOn_137">proc <a href="sqlrconCmd.tcl-annot.html#autoCommitOn">autoCommitOn</a></a></strong><a name="autoCommitOn"></a> {} 
+<strong><a name="autoCommitOn_126">proc <a href="sqlrconCmd.tcl-annot.html#autoCommitOn">autoCommitOn</a></a></strong><a name="autoCommitOn"></a> {} 
 
 <font color="#208020"># Instructs the database to wait for the </font>
 <font color="#208020"># client to tell it when to commit.</font>
-<strong><a name="autoCommitOff_141">proc <a href="sqlrconCmd.tcl-annot.html#autoCommitOff">autoCommitOff</a></a></strong><a name="autoCommitOff"></a> {} 
+<strong><a name="autoCommitOff_130">proc <a href="sqlrconCmd.tcl-annot.html#autoCommitOff">autoCommitOff</a></a></strong><a name="autoCommitOff"></a> {} 
 
 
 
@@ -164,15 +153,15 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># commit or rollback is issued then this doesn't</font>
 <font color="#208020"># do anything unless SQL Relay is faking transaction</font>
 <font color="#208020"># blocks.</font>
-<strong><a name="begin_151">proc <a href="sqlrconCmd.tcl-annot.html#begin">begin</a></a></strong><a name="begin"></a> {} 
+<strong><a name="begin_140">proc <a href="sqlrconCmd.tcl-annot.html#begin">begin</a></a></strong><a name="begin"></a> {} 
 
 <font color="#208020"># Issues a commit.  Returns true if the commit</font>
 <font color="#208020"># succeeded false if it failed.</font>
-<strong><a name="commit_155">proc <a href="sqlrconCmd.tcl-annot.html#commit">commit</a></a></strong><a name="commit"></a> {} 
+<strong><a name="commit_144">proc <a href="sqlrconCmd.tcl-annot.html#commit">commit</a></a></strong><a name="commit"></a> {} 
 
 <font color="#208020"># Issues a rollback.  Returns true if the rollback</font>
 <font color="#208020"># succeeded false if it failed.</font>
-<strong><a name="rollback_159">proc <a href="sqlrconCmd.tcl-annot.html#rollback">rollback</a></a></strong><a name="rollback"></a> {} 
+<strong><a name="rollback_148">proc <a href="sqlrconCmd.tcl-annot.html#rollback">rollback</a></a></strong><a name="rollback"></a> {} 
 
 
 
@@ -180,7 +169,7 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># error the error message is available here.</font>
 <font color="#208020"># If there is no error then this method </font>
 <font color="#208020"># returns NULL.</font>
-<strong><a name="errorMessage_167">proc <a href="sqlrconCmd.tcl-annot.html#errorMessage">errorMessage</a></a></strong><a name="errorMessage"></a> {} 
+<strong><a name="errorMessage_156">proc <a href="sqlrconCmd.tcl-annot.html#errorMessage">errorMessage</a></a></strong><a name="errorMessage"></a> {} 
 
 
 
@@ -188,7 +177,7 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># error, the error number is available here.</font>
 <font color="#208020"># If there is no error then this method </font>
 <font color="#208020"># returns 0.</font>
-<strong><a name="errorNumber_175">proc <a href="sqlrconCmd.tcl-annot.html#errorNumber">errorNumber</a></a></strong><a name="errorNumber"></a> {}
+<strong><a name="errorNumber_164">proc <a href="sqlrconCmd.tcl-annot.html#errorNumber">errorNumber</a></a></strong><a name="errorNumber"></a> {}
 
 
 
@@ -197,28 +186,28 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># this is to start a query with &#34;-- debug\n&#34;.</font>
 <font color="#208020"># Another way is to set the environment variable</font>
 <font color="#208020"># SQLR_CLIENT_DEBUG to &#34;ON&#34;</font>
-<strong><a name="debugOn_184">proc <a href="sqlrconCmd.tcl-annot.html#debugOn">debugOn</a></a></strong><a name="debugOn"></a> {} 
+<strong><a name="debugOn_173">proc <a href="sqlrconCmd.tcl-annot.html#debugOn">debugOn</a></a></strong><a name="debugOn"></a> {} 
 
 <font color="#208020"># Turns debugging off.</font>
-<strong><a name="debugOff_187">proc <a href="sqlrconCmd.tcl-annot.html#debugOff">debugOff</a></a></strong><a name="debugOff"></a> {} 
+<strong><a name="debugOff_176">proc <a href="sqlrconCmd.tcl-annot.html#debugOff">debugOff</a></a></strong><a name="debugOff"></a> {} 
 
 <font color="#208020"># Returns false if debugging is off and true</font>
 <font color="#208020"># if debugging is on.</font>
-<strong><a name="getDebug_191">proc <a href="sqlrconCmd.tcl-annot.html#getDebug">getDebug</a></a></strong><a name="getDebug"></a> {} 
+<strong><a name="getDebug_180">proc <a href="sqlrconCmd.tcl-annot.html#getDebug">getDebug</a></a></strong><a name="getDebug"></a> {} 
 
 <font color="#208020"># Allows you to specify a file to write debug to.</font>
 <font color="#208020"># Setting &#34;debugfilename&#34; to NULL or an empty string causes debug</font>
 <font color="#208020"># to be written to standard output (the default).</font>
-<strong><a name="setDebugFile_196">proc <a href="sqlrconCmd.tcl-annot.html#setDebugFile">setDebugFile</a></a></strong><a name="setDebugFile"></a> {debugfilename}
+<strong><a name="setDebugFile_185">proc <a href="sqlrconCmd.tcl-annot.html#setDebugFile">setDebugFile</a></a></strong><a name="setDebugFile"></a> {debugfilename}
 
 <font color="#208020"># Allows you to set a string that will be passed to the</font>
 <font color="#208020"># server and ultimately included in server-side logging</font>
 <font color="#208020"># along with queries that were run by this instance of</font>
 <font color="#208020"># the client.</font>
-<strong><a name="setClientInfo_202">proc <a href="sqlrconCmd.tcl-annot.html#setClientInfo">setClientInfo</a></a></strong><a name="setClientInfo"></a> {clientinfo} 
+<strong><a name="setClientInfo_191">proc <a href="sqlrconCmd.tcl-annot.html#setClientInfo">setClientInfo</a></a></strong><a name="setClientInfo"></a> {clientinfo} 
 
 <font color="#208020"># Returns the string that was set by setClientInfo().</font>
-<strong><a name="getClientInfo_205">proc <a href="sqlrconCmd.tcl-annot.html#getClientInfo">getClientInfo</a></a></strong><a name="getClientInfo"></a> {} 
+<strong><a name="getClientInfo_194">proc <a href="sqlrconCmd.tcl-annot.html#getClientInfo">getClientInfo</a></a></strong><a name="getClientInfo"></a> {} 
 </pre>
 <hr>
 <font size="-2">
@@ -226,7 +215,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2016-01-22 at 00:11.</cite>
+<cite>File generated 2016-02-12 at 16:25.</cite>
 </font>
 </body>
 </html>

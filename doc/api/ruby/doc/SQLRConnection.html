@@ -136,10 +136,6 @@
     
     <li ><a href="#method-i-suspendSession">#suspendSession</a>
     
-    <li ><a href="#method-i-useKerberos">#useKerberos</a>
-    
-    <li ><a href="#method-i-useNoEncryption">#useNoEncryption</a>
-    
   </ul>
 </div>
 
@@ -191,13 +187,13 @@
         <div class="method-description">
           
           <p>Initiates a connection to “host” on “port” or to the unix “socket” on the
-local machine and authenticates with “user” and “password”.  Failed
-connections will be retried for “tries” times, waiting “retrytime” seconds
-between each try.  If “tries” is 0 then retries will continue forever.  If
-“retrytime” is 0 then retries will be attempted on a default interval.  If
-the “socket” parameter is nether nil nor “” then an attempt will be made to
-connect through it before attempting to connect to “host” on “port”.  If it
-is nil or “” then no attempt will be made to connect through the socket.</p>
+local machine and auths with “user” and “password”.  Failed connections
+will be retried for “tries” times, waiting “retrytime” seconds between each
+try.  If “tries” is 0 then retries will continue forever.  If “retrytime”
+is 0 then retries will be attempted on a default interval.  If the “socket”
+parameter is nether nil nor “” then an attempt will be made to connect
+through it before attempting to connect to “host” on “port”.  If it is nil
+or “” then no attempt will be made to connect through the socket.</p>
           
           
 
@@ -1435,82 +1431,6 @@ sqlrcon_resumeSession().</p>
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
         return INT2NUM(sqlrcon-&gt;suspendSession());
-}</pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-useKerberos" class="method-detail ">
-        
-        
-        <div class="method-heading">
-          <span class="method-callseq">
-            useKerberos(service)
-          </span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-        
-
-        <div class="method-description">
-          
-          <p>Configures this instance to use kerberos authentication and encryption and
-to connect to “service”.  If “service” is null then the default service for
-SQL Relay is used.</p>
-          
-          
-
-          
-          <div class="method-source-code" id="useKerberos-source">
-            <pre>static VALUE sqlrcon_useKerberos(VALUE self, VALUE service) {
-        sqlrconnection *sqlrcon;
-        Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;useKerberos(STR2CSTR(service));
-        return Qnil;
-}</pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-useNoEncryption" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">useNoEncryption</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>Configures this instance to not use kerberos or SSL/TLS authentication and
-encryption.</p>
-          
-          
-
-          
-          <div class="method-source-code" id="useNoEncryption-source">
-            <pre>static VALUE sqlrcon_useNoEncryption(VALUE self) {
-        sqlrconnection *sqlrcon;
-        Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;useNoEncryption();
-        return Qnil;
 }</pre>
           </div>
           
