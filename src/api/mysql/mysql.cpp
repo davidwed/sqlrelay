@@ -211,7 +211,7 @@ struct MYSQL_TIME {
 	unsigned int	second;
 	unsigned long	second_part;
 	my_bool		neg;
-	enum enum_mysql_timestamp_type	time_type;;
+	enum enum_mysql_timestamp_type	time_type;
 };
 
 // This is the same for all versions of mysql that I've ever seen
@@ -2331,29 +2331,6 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_TIME:
 			case MYSQL_TYPE_DATETIME:
 			case MYSQL_TYPE_NEWDATE: {
-				// convert to a mysql-native string and bind...
-				// (we can use a local varaible because we've
-				// told the API to copy references)
-				/*MYSQL_TIME	*tm=
-						(MYSQL_TIME *)bind[i].buffer;
-
-				unsigned int	first=tm->month;
-				unsigned int	second=tm->day;
-				if (!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_MYSQL_DATE_DDMM"),
-					"yes")) {
-					first=tm->day;
-					second=tm->month;
-				}
-
-				char	buffer[20];
-				charstring::printf(buffer,20,
-						"%04d/%02d/%02d %02d:%02d:%02d",
-						tm->year,first,second,
-						tm->hour,tm->minute,tm->second);
-				cursor->inputBind(variable,buffer);*/
-
 				MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
 				cursor->inputBind(variable,
@@ -2410,7 +2387,6 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_GEOMETRY: {
 				// FIXME: what should I do here?
 				return 1;
-				break;
 			}
 			default: {
 				// FIXME: what should I do here?
