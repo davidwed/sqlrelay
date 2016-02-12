@@ -271,72 +271,49 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 		if (tls::supportsTLS()) {
 
 			// get the certificate chain file to use
-			const char	*cert=
-				parameters->getAttributeValue("tlscert");
-			if (!charstring::isNullOrEmpty(cert)) {
-				tctx.setCertificateChainFile(cert);
-				// FIXME: not-found warning
-			}
+			// FIXME: not-found warning
+			tctx.setCertificateChainFile(
+				parameters->getAttributeValue("tlscert"));
 
 			// get the private key to use (and password)
-			const char	*pvtkey=
-				parameters->getAttributeValue("tlspvtkey");
-			const char	*pvtkeypwd=
-				parameters->getAttributeValue(
-						"tlspvtkeypassword");
-			if (!charstring::isNullOrEmpty(pvtkey)) {
-				tctx.setPrivateKeyFile(pvtkey,pvtkeypwd);
-				// FIXME: not-found warning
-			}
+			// FIXME: not-found warning
+			tctx.setPrivateKeyFile(
+			parameters->getAttributeValue("tlspvtkey"),
+			parameters->getAttributeValue("tlspvtkeypassword"));
 
-			// get the Diffie-Hellman key exchange cert file to use
-			const char	*dhcert=
-				parameters->getAttributeValue("tlsdhcert");
-			if (!charstring::isNullOrEmpty(dhcert)) {
-				tctx.useDiffieHellmanKeyExchange(dhcert);
-				// FIXME: not-found warning
-			}
+			// get the key exchange cert file to use
+			// FIXME: not-found warning
+			tctx.setKeyExchangeCertificate(
+				parameters->getAttributeValue("tlskecert"));
 
 			// get the certificate authority file to use
+			// FIXME: not-found warning
 			const char	*cafile=
 				parameters->getAttributeValue("tlscafile");
-			if (!charstring::isNullOrEmpty(cafile)) {
-				tctx.setCertificateAuthorityFile(cafile);
-				// FIXME: not-found warning
-			}
+			tctx.setCertificateAuthorityFile(cafile);
 
 			// get the certificate authority path to use
+			// FIXME: not-found warning
 			const char	*capath=
 				parameters->getAttributeValue("tlscapath");
-			if (!charstring::isNullOrEmpty(capath)) {
-				tctx.setCertificateAuthorityPath(capath);
-				// FIXME: not-found warning
-			}
+			tctx.setCertificateAuthorityPath(capath);
 
 			// if a cafile or capath was specified, then
 			// make sure to request the client's certificate,
 			// we apparently would like to validate it against
 			// a ca
-			if (!charstring::isNullOrEmpty(cafile) ||
-				!charstring::isNullOrEmpty(capath)) {
-				tctx.verifyPeer();
-			}
+			tctx.setValidatePeer(
+				(!charstring::isNullOrEmpty(cafile) ||
+					!charstring::isNullOrEmpty(capath)));
 
 			// get the cipher list to use
-			const char	*ciphers=
-				parameters->getAttributeValue("tlsciphers");
-			if (!charstring::isNullOrEmpty(ciphers)) {
-				tctx.setCiphers(ciphers);
-			}
+			tctx.setCiphers(
+				parameters->getAttributeValue("tlsciphers"));
 
 			// get the verification depth
-			int32_t	depth=
+			tctx.setValidationDepth(
 				charstring::toInteger(
-					parameters->getAttributeValue(
-								"tlsdepth"));
-			if (depth>0) {
-				tctx.setVerificationDepth(depth);
-			}
+				parameters->getAttributeValue("tlsdepth")));
 
 			// use the tls context
 			ctx=&tctx;

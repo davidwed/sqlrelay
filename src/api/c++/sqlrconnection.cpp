@@ -750,7 +750,7 @@ void sqlrconnection::reConfigureSockets() {
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);
 		pvt->_tctx.setCertificateAuthorityFile(pvt->_tlscafile);
 		pvt->_tctx.setCertificateAuthorityPath(pvt->_tlscapath);
-		pvt->_tctx.setVerificationDepth(pvt->_tlsdepth);
+		pvt->_tctx.setValidationDepth(pvt->_tlsdepth);
 
 		pvt->_ctx=&pvt->_tctx;
 
