@@ -99,11 +99,11 @@ static void help(int argc, const char **argv) {
 "				list should be quoted and the ciphers should be\n" \
 "				separated by spaces.\n" \
 "\n" \
-"	-tlscafile file		Verify the server's certificate against the\n" \
-"				specified certificate authority certificate.\n" \
-"\n" \
-"	-tlscapath path		Verify the server's certificate against all\n" \
-"				certificates found in the specified path.\n" \
+"	-tlsca file		Verify the server's certificate against the\n" \
+"				specified certificate authority file or, if\n" \
+"				\"file\" is a directory, then against all\n" \
+"				certificate authority files found in that\n" \
+"				directory.\n" \
 "\n" \
 "	-tlsdepth depth 	Set the maximum certificate chain verification\n" \
 "				depth to the specified depth.\n" \

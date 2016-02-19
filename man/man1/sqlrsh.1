@@ -71,13 +71,12 @@ Allow the specified list of ciphers.  The
 list should be quoted and the ciphers should be
 separated by spaces.
 .TP
-\fB\-tlscafile\fR file
+\fB\-tlsca\fR file
 Verify the server's certificate against the
-specified certificate authority certificate.
-.TP
-\fB\-tlscapath\fR path
-Verify the server's certificate against all
-certificates found in the specified path.
+specified certificate authority file or, if
+"file" is a directory, then against all
+certificate authority files found in that
+directory.
 .TP
 \fB\-tlsdepth\fR depth
 Set the maximum certificate chain verification
