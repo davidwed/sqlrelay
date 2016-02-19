@@ -1917,8 +1917,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*tlspvtkey=cmdline->getValue("tlspvtkey");
 	const char	*tlspvtkeypwd=cmdline->getValue("tlspvtkeypassword");
 	const char	*tlsciphers=cmdline->getValue("tlsciphers");
-	const char	*tlscafile=cmdline->getValue("tlscafile");
-	const char	*tlscapath=cmdline->getValue("tlscapath");
+	const char	*tlsca=cmdline->getValue("tlsca");
 	uint32_t	tlsdepth=charstring::toUnsignedInteger(
 					cmdline->getValue("tlsdepth"));
 	const char	*script=cmdline->getValue("script");
@@ -1938,8 +1937,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 			"            [-tlspvtkey keyfile] "
 			"[-tlspvtkeypassword password]\n"
 			"            [-tlsciphers cipherlist]\n"
-			"            [-tlscafile cafile] [-tlscapath capath] "
-			"[-tlsdepth depth]\n"
+			"            [-tlsca ca] [-tlsdepth depth]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
@@ -1999,7 +1997,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
 	} else if (usetls) {
 		sqlrcon.enableTLS(tlscert,tlspvtkey,tlspvtkeypwd,
-				tlsciphers,tlscafile,tlscapath,tlsdepth);
+					tlsciphers,tlsca,tlsdepth);
 	}
 
 	// set up an sqlrshenv

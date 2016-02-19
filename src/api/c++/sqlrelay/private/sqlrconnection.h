@@ -15,7 +15,6 @@
 					int32_t *timeoutusec);
 		bool	openSession();
 		void	reConfigureSockets();
-		bool	validateServer();
 		void	setConnectFailedError();
 		void	closeConnection();
 
@@ -73,8 +72,7 @@
 					const char *pvtkey,
 					const char *pvtkeypwd,
 					const char *ciphers,
-					const char *cafile,
-					const char *capath,
+					const char *ca,
 					uint32_t depth);
 		void	disableEncryption();
 

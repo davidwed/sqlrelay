@@ -71,8 +71,7 @@ class sqlrconnectionprivate {
 		char		*_tlspvtkey;
 		char		*_tlspvtkeypwd;
 		char		*_tlsciphers;
-		char		*_tlscafile;
-		char		*_tlscapath;
+		char		*_tlsca;
 		uint32_t	_tlsdepth;
 		tlscontext	_tctx;
 
@@ -189,8 +188,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_tlscert=NULL;
 	pvt->_tlspvtkey=NULL;
 	pvt->_tlspvtkeypwd=NULL;
-	pvt->_tlscafile=NULL;
-	pvt->_tlscapath=NULL;
+	pvt->_tlsca=NULL;
 	pvt->_tlsdepth=0;
 
 	pvt->_ctx=NULL;
@@ -302,8 +300,7 @@ sqlrconnection::~sqlrconnection() {
 		delete[] pvt->_tlscert;
 		delete[] pvt->_tlspvtkey;
 		delete[] pvt->_tlspvtkeypwd;
-		delete[] pvt->_tlscafile;
-		delete[] pvt->_tlscapath;
+		delete[] pvt->_tlsca;
 	}
 
 	// detach all cursors attached to this client
@@ -362,8 +359,7 @@ void sqlrconnection::enableTLS(const char *cert,
 					const char *pvtkey,
 					const char *pvtkeypwd,
 					const char *ciphers,
-					const char *cafile,
-					const char *capath,
+					const char *ca,
 					uint32_t depth) {
 
 	// clear any existing configuration
@@ -386,17 +382,14 @@ void sqlrconnection::enableTLS(const char *cert,
 		pvt->_tlspvtkeypwd=charstring::duplicate(pvtkeypwd);
 		delete[] pvt->_tlsciphers;
 		pvt->_tlsciphers=charstring::duplicate(ciphers);
-		delete[] pvt->_tlscafile;
-		pvt->_tlscafile=charstring::duplicate(cafile);
-		delete[] pvt->_tlscapath;
-		pvt->_tlscapath=charstring::duplicate(capath);
+		delete[] pvt->_tlsca;
+		pvt->_tlsca=charstring::duplicate(ca);
 	} else {
 		pvt->_tlscert=(char *)cert;
 		pvt->_tlspvtkey=(char *)pvtkey;
 		pvt->_tlspvtkeypwd=(char *)pvtkeypwd;
 		pvt->_tlsciphers=(char *)ciphers;
-		pvt->_tlscafile=(char *)cafile;
-		pvt->_tlscapath=(char *)capath;
+		pvt->_tlsca=(char *)ca;
 	}
 	pvt->_tlsdepth=depth;
 }
@@ -419,10 +412,8 @@ void sqlrconnection::disableEncryption() {
 		pvt->_tlspvtkeypwd=NULL;
 		delete[] pvt->_tlsciphers;
 		pvt->_tlsciphers=NULL;
-		delete[] pvt->_tlscafile;
-		pvt->_tlscafile=NULL;
-		delete[] pvt->_tlscapath;
-		pvt->_tlscapath=NULL;
+		delete[] pvt->_tlsca;
+		pvt->_tlsca=NULL;
 	}
 	pvt->_tlsdepth=0;
 	pvt->_usekrb=false;
@@ -619,12 +610,6 @@ bool sqlrconnection::openSession() {
 		}
 	}
 
-	// validate server, if necessary
-	if (!validateServer()) {
-		pvt->_cs->close();
-		openresult=RESULT_ERROR;
-	}
-
 	// handle failures
 	if (openresult!=RESULT_SUCCESS) {
 		setConnectFailedError();
@@ -719,14 +704,9 @@ void sqlrconnection::reConfigureSockets() {
 				debugPrint(pvt->_tlsciphers);
 			}
 			debugPrint("\n");
-			debugPrint("  ca file: ");
-			if (pvt->_tlscafile) {
-				debugPrint(pvt->_tlscafile);
-			}
-			debugPrint("\n");
-			debugPrint("  ca path: ");
-			if (pvt->_tlscapath) {
-				debugPrint(pvt->_tlscapath);
+			debugPrint("  ca: ");
+			if (pvt->_tlsca) {
+				debugPrint(pvt->_tlsca);
 			}
 			debugPrint("\n");
 			debugPrint("  depth: ");
@@ -740,8 +720,7 @@ void sqlrconnection::reConfigureSockets() {
 		pvt->_tctx.setPrivateKeyFile(pvt->_tlspvtkey,
 						pvt->_tlspvtkeypwd);
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);
-		pvt->_tctx.setCertificateAuthorityFile(pvt->_tlscafile);
-		pvt->_tctx.setCertificateAuthorityPath(pvt->_tlscapath);
+		pvt->_tctx.setCertificateAuthority(pvt->_tlsca);
 		pvt->_tctx.setValidationDepth(pvt->_tlsdepth);
 
 		pvt->_ctx=&pvt->_tctx;
@@ -759,13 +738,6 @@ void sqlrconnection::reConfigureSockets() {
 
 	pvt->_ucs.setSecurityContext(pvt->_ctx);
 	pvt->_ics.setSecurityContext(pvt->_ctx);
-}
-
-bool sqlrconnection::validateServer() {
-	return (!pvt->_usetls ||
-		charstring::isNullOrEmpty(pvt->_tlscafile) ||
-		charstring::isNullOrEmpty(pvt->_tlscapath) ||
-		pvt->_tctx.peerCertificateIsValid());
 }
 
 void sqlrconnection::setConnectFailedError() {
@@ -954,12 +926,6 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		if (pvt->_connected) {
 			pvt->_cs=&pvt->_ics;
 		}
-	}
-
-	// validate server, if necessary
-	if (!validateServer()) {
-		pvt->_cs->close();
-		pvt->_connected=false;
 	}
 
 	if (pvt->_connected) {

@@ -281,30 +281,11 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 			parameters->getAttributeValue("tlspvtkey"),
 			parameters->getAttributeValue("tlspvtkeypassword"));
 
-			// get the key exchange cert file to use
-			// FIXME: not-found warning
-			tctx.setKeyExchangeCertificate(
-				parameters->getAttributeValue("tlskecert"));
-
 			// get the certificate authority file to use
 			// FIXME: not-found warning
-			const char	*cafile=
-				parameters->getAttributeValue("tlscafile");
-			tctx.setCertificateAuthorityFile(cafile);
-
-			// get the certificate authority path to use
-			// FIXME: not-found warning
-			const char	*capath=
-				parameters->getAttributeValue("tlscapath");
-			tctx.setCertificateAuthorityPath(capath);
-
-			// if a cafile or capath was specified, then
-			// make sure to request the client's certificate,
-			// we apparently would like to validate it against
-			// a ca
-			tctx.setValidatePeer(
-				(!charstring::isNullOrEmpty(cafile) ||
-					!charstring::isNullOrEmpty(capath)));
+			const char	*ca=
+				parameters->getAttributeValue("tlsca");
+			tctx.setCertificateAuthority(ca);
 
 			// get the cipher list to use
 			tctx.setCiphers(

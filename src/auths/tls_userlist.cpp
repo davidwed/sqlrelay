@@ -47,11 +47,6 @@ bool sqlrauth_tls_userlist::auth(sqlrserverconnection *sqlrcon,
 		return false;
 	}
 
-	// validate the peer certificate
-	if (!ctx->peerCertificateIsValid()) {
-		return false;
-	}
-
 	// get the peer certificate
 	tlscertificate	*cert=ctx->getPeerCertificate();
 	if (!cert) {
