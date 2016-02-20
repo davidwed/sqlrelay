@@ -275,11 +275,10 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 			tctx.setCertificateChainFile(
 				parameters->getAttributeValue("tlscert"));
 
-			// get the private key to use (and password)
+			// get the private key password to use
 			// FIXME: not-found warning
-			tctx.setPrivateKeyFile(
-			parameters->getAttributeValue("tlspvtkey"),
-			parameters->getAttributeValue("tlspvtkeypassword"));
+			tctx.setPrivateKeyPassword(
+			parameters->getAttributeValue("tlspassword"));
 
 			// get the certificate authority file to use
 			// FIXME: not-found warning

@@ -69,8 +69,7 @@
 					const char *mech,
 					const char *flags);
 		void	enableTLS(const char *cert,
-					const char *pvtkey,
-					const char *pvtkeypwd,
+					const char *password,
 					const char *ciphers,
 					const char *ca,
 					uint32_t depth);

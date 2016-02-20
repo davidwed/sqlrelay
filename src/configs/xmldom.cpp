@@ -1014,9 +1014,8 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*krbflags=instance->getAttribute("krbflags");
 	xmldomnode	*tls=instance->getAttribute("tls");
 	xmldomnode	*tlscert=instance->getAttribute("tlscert");
-	xmldomnode	*tlspvtkey=instance->getAttribute("tlspvtkey");
-	xmldomnode	*tlspvtkeypassword=instance->getAttribute(
-							"tlspvtkeypassword");
+	xmldomnode	*tlspassword=instance->getAttribute(
+							"tlspassword");
 	xmldomnode	*tlsca=instance->getAttribute("tlsca");
 	xmldomnode	*tlsciphers=instance->getAttribute("tlsciphers");
 	xmldomnode	*tlsdepth=instance->getAttribute("tlsdepth");
@@ -1030,8 +1029,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!krbflags->isNullNode() ||
 			!tls->isNullNode() ||
 			!tlscert->isNullNode() ||
-			!tlspvtkey->isNullNode() ||
-			!tlspvtkeypassword->isNullNode() ||
+			!tlspassword->isNullNode() ||
 			!tlsca->isNullNode() ||
 			!tlsciphers->isNullNode() ||
 			!tlsdepth->isNullNode()) {
@@ -1089,15 +1087,10 @@ void sqlrconfig_xmldom::normalizeTree() {
 							tlscert->getValue());
 			instance->deleteAttribute(tlscert);
 		}
-		if (!tlspvtkey->isNullNode()) {
-			listener->setAttributeValue("tlspvtkey",
-							tlspvtkey->getValue());
-			instance->deleteAttribute(tlspvtkey);
-		}
-		if (!tlspvtkeypassword->isNullNode()) {
-			listener->setAttributeValue("tlspvtkeypassword",
-						tlspvtkeypassword->getValue());
-			instance->deleteAttribute(tlspvtkeypassword);
+		if (!tlspassword->isNullNode()) {
+			listener->setAttributeValue("tlspassword",
+						tlspassword->getValue());
+			instance->deleteAttribute(tlspassword);
 		}
 		if (!tlsca->isNullNode()) {
 			listener->setAttributeValue("tlsca",

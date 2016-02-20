@@ -90,10 +90,8 @@ static void help(int argc, const char **argv) {
 "\n" \
 "	-tlscert file		Use the specified certificate chain file.\n" \
 "\n" \
-"	-tlspvtkey file		Use the private key from the specified file.\n" \
-"\n" \
-"	-tlspvtkeypassword pwd	Use the specified password to acess the private\n" \
-"				key in the file specified by -tlspvtkey.\n" \
+"	-tlspassword pwd	Use the specified password to acess the private\n" \
+"				key in the file specified by -tlscert.\n" \
 "\n" \
 "	-tlsciphers \"list\"	Allow the specified list of ciphers.  The\n" \
 "				list should be quoted and the ciphers should be\n" \

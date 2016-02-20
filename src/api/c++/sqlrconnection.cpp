@@ -68,8 +68,7 @@ class sqlrconnectionprivate {
 		// tls
 		bool		_usetls;
 		char		*_tlscert;
-		char		*_tlspvtkey;
-		char		*_tlspvtkeypwd;
+		char		*_tlspassword;
 		char		*_tlsciphers;
 		char		*_tlsca;
 		uint32_t	_tlsdepth;
@@ -186,8 +185,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 
 	pvt->_usetls=false;
 	pvt->_tlscert=NULL;
-	pvt->_tlspvtkey=NULL;
-	pvt->_tlspvtkeypwd=NULL;
+	pvt->_tlspassword=NULL;
 	pvt->_tlsca=NULL;
 	pvt->_tlsdepth=0;
 
@@ -298,8 +296,7 @@ sqlrconnection::~sqlrconnection() {
 		delete[] pvt->_krbmech;
 		delete[] pvt->_krbflags;
 		delete[] pvt->_tlscert;
-		delete[] pvt->_tlspvtkey;
-		delete[] pvt->_tlspvtkeypwd;
+		delete[] pvt->_tlspassword;
 		delete[] pvt->_tlsca;
 	}
 
@@ -356,8 +353,7 @@ void sqlrconnection::enableKerberos(const char *service,
 }
 
 void sqlrconnection::enableTLS(const char *cert,
-					const char *pvtkey,
-					const char *pvtkeypwd,
+					const char *password,
 					const char *ciphers,
 					const char *ca,
 					uint32_t depth) {
@@ -376,18 +372,15 @@ void sqlrconnection::enableTLS(const char *cert,
 	if (pvt->_copyrefs) {
 		delete[] pvt->_tlscert;
 		pvt->_tlscert=charstring::duplicate(cert);
-		delete[] pvt->_tlspvtkey;
-		pvt->_tlspvtkey=charstring::duplicate(pvtkey);
-		delete[] pvt->_tlspvtkeypwd;
-		pvt->_tlspvtkeypwd=charstring::duplicate(pvtkeypwd);
+		delete[] pvt->_tlspassword;
+		pvt->_tlspassword=charstring::duplicate(password);
 		delete[] pvt->_tlsciphers;
 		pvt->_tlsciphers=charstring::duplicate(ciphers);
 		delete[] pvt->_tlsca;
 		pvt->_tlsca=charstring::duplicate(ca);
 	} else {
 		pvt->_tlscert=(char *)cert;
-		pvt->_tlspvtkey=(char *)pvtkey;
-		pvt->_tlspvtkeypwd=(char *)pvtkeypwd;
+		pvt->_tlspassword=(char *)password;
 		pvt->_tlsciphers=(char *)ciphers;
 		pvt->_tlsca=(char *)ca;
 	}
@@ -406,10 +399,8 @@ void sqlrconnection::disableEncryption() {
 
 		delete[] pvt->_tlscert;
 		pvt->_tlscert=NULL;
-		delete[] pvt->_tlspvtkey;
-		pvt->_tlspvtkey=NULL;
-		delete[] pvt->_tlspvtkeypwd;
-		pvt->_tlspvtkeypwd=NULL;
+		delete[] pvt->_tlspassword;
+		pvt->_tlspassword=NULL;
 		delete[] pvt->_tlsciphers;
 		pvt->_tlsciphers=NULL;
 		delete[] pvt->_tlsca;
@@ -689,14 +680,9 @@ void sqlrconnection::reConfigureSockets() {
 				debugPrint(pvt->_tlscert);
 			}
 			debugPrint("\n");
-			debugPrint("  private key: ");
-			if (pvt->_tlspvtkey) {
-				debugPrint(pvt->_tlspvtkey);
-			}
-			debugPrint("\n");
 			debugPrint("  private key password: ");
-			if (pvt->_tlspvtkeypwd) {
-				debugPrint(pvt->_tlspvtkeypwd);
+			if (pvt->_tlspassword) {
+				debugPrint(pvt->_tlspassword);
 			}
 			debugPrint("\n");
 			debugPrint("  ciphers: ");
@@ -717,8 +703,7 @@ void sqlrconnection::reConfigureSockets() {
 
 		pvt->_tctx.close();
 		pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
-		pvt->_tctx.setPrivateKeyFile(pvt->_tlspvtkey,
-						pvt->_tlspvtkeypwd);
+		pvt->_tctx.setPrivateKeyPassword(pvt->_tlspassword);
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);
 		pvt->_tctx.setCertificateAuthority(pvt->_tlsca);
 		pvt->_tctx.setValidationDepth(pvt->_tlsdepth);

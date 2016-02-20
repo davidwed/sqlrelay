@@ -1914,8 +1914,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*krbflags=cmdline->getValue("krbflags");
 	bool		usetls=cmdline->found("tls");
 	const char	*tlscert=cmdline->getValue("tlscert");
-	const char	*tlspvtkey=cmdline->getValue("tlspvtkey");
-	const char	*tlspvtkeypwd=cmdline->getValue("tlspvtkeypassword");
+	const char	*tlspassword=cmdline->getValue("tlspassword");
 	const char	*tlsciphers=cmdline->getValue("tlsciphers");
 	const char	*tlsca=cmdline->getValue("tlsca");
 	uint32_t	tlsdepth=charstring::toUnsignedInteger(
@@ -1934,8 +1933,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 			"        [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
 			"        [-tls] [-tlscert certfile]\n"
-			"            [-tlspvtkey keyfile] "
-			"[-tlspvtkeypassword password]\n"
+			"            [-tlspassword password]\n"
 			"            [-tlsciphers cipherlist]\n"
 			"            [-tlsca ca] [-tlsdepth depth]\n"
 			"        [-script script | -command command] [-quiet] "
@@ -1996,7 +1994,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 	if (usekrb) {
 		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
 	} else if (usetls) {
-		sqlrcon.enableTLS(tlscert,tlspvtkey,tlspvtkeypwd,
+		sqlrcon.enableTLS(tlscert,tlspassword,
 					tlsciphers,tlsca,tlsdepth);
 	}
 
