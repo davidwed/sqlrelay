@@ -276,23 +276,27 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 				parameters->getAttributeValue("tlscert"));
 
 			// get the private key password to use
-			// FIXME: not-found warning
 			tctx.setPrivateKeyPassword(
-			parameters->getAttributeValue("tlspassword"));
+				parameters->getAttributeValue("tlspassword"));
+
+			// get whether to validate
+			tctx.setValidatePeer(
+				!charstring::compare(
+				parameters->getAttributeValue("tlsvalidate"),
+				"yes"));
 
 			// get the certificate authority file to use
 			// FIXME: not-found warning
-			const char	*ca=
-				parameters->getAttributeValue("tlsca");
-			tctx.setCertificateAuthority(ca);
+			tctx.setCertificateAuthority(
+				parameters->getAttributeValue("tlsca"));
 
 			// get the cipher list to use
 			tctx.setCiphers(
 				parameters->getAttributeValue("tlsciphers"));
 
-			// get the verification depth
+			// get the validation depth
 			tctx.setValidationDepth(
-				charstring::toInteger(
+				charstring::toUnsignedInteger(
 				parameters->getAttributeValue("tlsdepth")));
 
 			// use the tls context

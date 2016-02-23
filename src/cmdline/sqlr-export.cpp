@@ -273,8 +273,13 @@ int main(int argc, const char **argv) {
 	const char	*tlscert=cmdline.getValue("tlscert");
 	const char	*tlspassword=cmdline.getValue("tlspassword");
 	const char	*tlsciphers=cmdline.getValue("tlsciphers");
+	bool		tlsvalidate=true;
+	if (cmdline.found("tlsvalidate")) {
+		tlsvalidate=charstring::compare(
+				cmdline.getValue("tlsvalidate"),"no");
+	}
 	const char	*tlsca=cmdline.getValue("tlsca");
-	uint32_t	tlsdepth=charstring::toUnsignedInteger(
+	uint16_t	tlsdepth=charstring::toUnsignedInteger(
 					cmdline.getValue("tlsdepth"));
 	const char	*table=cmdline.getValue("table");
 	const char	*sequence=cmdline.getValue("sequence");
@@ -308,7 +313,8 @@ int main(int argc, const char **argv) {
 			"             [-tls] [-tlscert certfile]\n"
 			"                [-tlspassword password]\n"
 			"                [-tlsciphers cipherlist]\n"
-			"                [-tlsca ca] [-tlsdepth depth]\n"
+			"                [-tlsvalidate (yes|no)] [-tlsca ca] "
+			"[-tlsdepth depth]\n"
 			"             (-table table | -sequence sequence)\n"
 			"             [-format (xml|csv)] "
 			"[-resultsetbuffersize rows]\n"
@@ -368,8 +374,8 @@ int main(int argc, const char **argv) {
 	if (usekrb) {
 		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
 	} else if (usetls) {
-		sqlrcon.enableTLS(tlscert,tlspassword,
-					tlsciphers,tlsca,tlsdepth);
+		sqlrcon.enableTLS(tlscert,tlspassword,tlsciphers,
+					tlsvalidate,tlsca,tlsdepth);
 	}
 
 	// configure debug

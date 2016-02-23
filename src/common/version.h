@@ -97,13 +97,16 @@ static void help(int argc, const char **argv) {
 "				list should be quoted and the ciphers should be\n" \
 "				separated by spaces.\n" \
 "\n" \
-"	-tlsca file		Verify the server's certificate against the\n" \
-"				specified certificate authority file or, if\n" \
-"				\"file\" is a directory, then against all\n" \
-"				certificate authority files found in that\n" \
-"				directory.\n" \
+"	-tlsvalidate		Validate the server's certificate.\n" \
 "\n" \
-"	-tlsdepth depth 	Set the maximum certificate chain verification\n" \
+"	-tlsca file		Use the specified certificate authority file\n" \
+"				when validating the server's certificate.  Or,\n" \
+"				if \"file\" is a directory, then use all\n" \
+"				certificate authority files found in that\n" \
+"				directory when validating the server's\n" \
+"				certifictate.\n" \
+"\n" \
+"	-tlsdepth depth 	Set the maximum certificate chain validation\n" \
 "				depth to the specified depth.\n" \
 "\n"
 

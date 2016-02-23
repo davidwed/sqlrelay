@@ -70,8 +70,9 @@ class sqlrconnectionprivate {
 		char		*_tlscert;
 		char		*_tlspassword;
 		char		*_tlsciphers;
+		bool		_tlsvalidate;
 		char		*_tlsca;
-		uint32_t	_tlsdepth;
+		uint16_t	_tlsdepth;
 		tlscontext	_tctx;
 
 		securitycontext	*_ctx;
@@ -186,6 +187,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_usetls=false;
 	pvt->_tlscert=NULL;
 	pvt->_tlspassword=NULL;
+	pvt->_tlsvalidate=false;
 	pvt->_tlsca=NULL;
 	pvt->_tlsdepth=0;
 
@@ -355,8 +357,9 @@ void sqlrconnection::enableKerberos(const char *service,
 void sqlrconnection::enableTLS(const char *cert,
 					const char *password,
 					const char *ciphers,
+					bool validate,
 					const char *ca,
-					uint32_t depth) {
+					uint16_t depth) {
 
 	// clear any existing configuration
 	if (pvt->_usekrb || pvt->_usetls) {
@@ -384,6 +387,7 @@ void sqlrconnection::enableTLS(const char *cert,
 		pvt->_tlsciphers=(char *)ciphers;
 		pvt->_tlsca=(char *)ca;
 	}
+	pvt->_tlsvalidate=validate;
 	pvt->_tlsdepth=depth;
 }
 
@@ -406,6 +410,7 @@ void sqlrconnection::disableEncryption() {
 		delete[] pvt->_tlsca;
 		pvt->_tlsca=NULL;
 	}
+	pvt->_tlsvalidate=false;
 	pvt->_tlsdepth=0;
 	pvt->_usekrb=false;
 	pvt->_usetls=false;
@@ -690,6 +695,11 @@ void sqlrconnection::reConfigureSockets() {
 				debugPrint(pvt->_tlsciphers);
 			}
 			debugPrint("\n");
+			debugPrint("  validate: ");
+			if (pvt->_tlsvalidate) {
+				debugPrint((int64_t)pvt->_tlsvalidate);
+			}
+			debugPrint("\n");
 			debugPrint("  ca: ");
 			if (pvt->_tlsca) {
 				debugPrint(pvt->_tlsca);
@@ -705,6 +715,7 @@ void sqlrconnection::reConfigureSockets() {
 		pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
 		pvt->_tctx.setPrivateKeyPassword(pvt->_tlspassword);
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);
+		pvt->_tctx.setValidatePeer(pvt->_tlsvalidate);
 		pvt->_tctx.setCertificateAuthority(pvt->_tlsca);
 		pvt->_tctx.setValidationDepth(pvt->_tlsdepth);
 

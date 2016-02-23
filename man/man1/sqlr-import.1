@@ -60,27 +60,28 @@ Use TLS/SSL authentication and encrpyiton.
 \fB\-tlscert\fR file
 Use the specified certificate chain file.
 .TP
-\fB\-tlspvtkey\fR file
-Use the private key from the specified file.
-.TP
-\fB\-tlspvtkeypassword\fR pwd
+\fB\-tlspassword\fR pwd
 Use the specified password to acess the private
-key in the file specified by \fB\-tlspvtkey\fR.
+key in the file specified by \fB\-tlscert\fR.
 .TP
 \fB\-tlsciphers\fR "list"
 Allow the specified list of ciphers.  The
 list should be quoted and the ciphers should be
 separated by spaces.
 .TP
+\fB\-tlsvalidate\fR
+Validate the server's certificate.
+.TP
 \fB\-tlsca\fR file
-Verify the server's certificate against the
-specified certificate authority file or, if
-"file" is a directory, then against all
+Use the specified certificate authority file
+when validating the server's certificate.  Or,
+if "file" is a directory, then use all
 certificate authority files found in that
-directory.
+directory when validating the server's
+certifictate.
 .TP
 \fB\-tlsdepth\fR depth
-Set the maximum certificate chain verification
+Set the maximum certificate chain validation
 depth to the specified depth.
 .SS "Command options:"
 .TP

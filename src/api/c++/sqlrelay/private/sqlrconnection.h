@@ -71,8 +71,9 @@
 		void	enableTLS(const char *cert,
 					const char *password,
 					const char *ciphers,
+					bool validate,
 					const char *ca,
-					uint32_t depth);
+					uint16_t depth);
 		void	disableEncryption();
 
 	friend class sqlrcursor;
