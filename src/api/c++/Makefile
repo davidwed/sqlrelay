@@ -61,7 +61,7 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/private/sqlrdefines.h \
 		$(includedir)/private/sqlrincludes.h \
 		$(includedir)/private/sqlrclientdll.h \
-		$(includedir)/private/dll.h \
+		$(includedir)/private/dll.h
 	$(RMTREE) $(includedir)/sqlrelay
 
 uninstalldll:
