@@ -26,6 +26,7 @@
 
 extern "C" {
 	#ifndef WIN32
+		#include <math.h>
 		#ifdef __cplusplus
 			#undef __cplusplus
 			#define cpluspluswasdefined
