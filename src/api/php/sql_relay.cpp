@@ -26,7 +26,16 @@
 
 extern "C" {
 	#ifndef WIN32
+
+		// On some platforms (solaris), stdio.h must be included prior
+		// to including math.h or FILE will get redefined.
+		#include <stdio.h>
+
+		// php.h ultimately includes math.h and on some platforms,
+		// __cplusplus to be defined when including it.  Manually
+		// including it prior to including php.h solves this problem.
 		#include <math.h>
+
 		#ifdef __cplusplus
 			#undef __cplusplus
 			#define cpluspluswasdefined
