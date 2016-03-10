@@ -329,7 +329,7 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 
 	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
 
-	// accept GSS security context, if necessary
+	// accept security context, if necessary
 	if (!acceptSecurityContext()) {
 		return status;
 	}
@@ -565,7 +565,7 @@ bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
 		return true;
 	}
 
-	cont->logDebugMessage("accepting gss security context");
+	cont->logDebugMessage("accepting security context");
 
 	if (usekrb && !gss::supportsGSS()) {
 		cont->logInternalError(NULL,

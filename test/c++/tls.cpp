@@ -801,7 +801,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("COMMIT AND ROLLBACK: \n");
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
-							"test","test",0,1);
+							NULL,NULL,0,1);
 	secondcur=new sqlrcursor(secondcon);
 	secondcon->enableTLS(cert,NULL,NULL,true,ca,0);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);

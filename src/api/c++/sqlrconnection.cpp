@@ -883,7 +883,13 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint("Resuming Session: ");
+		debugPrint("Resuming Session: \n");
+		debugPrint("port: ");
+		debugPrint((int64_t)port);
+		debugPrint("\n");
+		debugPrint("socket: ");
+		debugPrint(socket);
+		debugPrint("\n");
 		debugPreEnd();
 	}
 
