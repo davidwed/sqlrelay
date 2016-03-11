@@ -70,7 +70,7 @@ class sqlrconnectionprivate {
 		char		*_tlscert;
 		char		*_tlspassword;
 		char		*_tlsciphers;
-		bool		_tlsvalidate;
+		char		*_tlsvalidate;
 		char		*_tlsca;
 		uint16_t	_tlsdepth;
 		tlscontext	_tctx;
@@ -187,7 +187,9 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_usetls=false;
 	pvt->_tlscert=NULL;
 	pvt->_tlspassword=NULL;
-	pvt->_tlsvalidate=false;
+	pvt->_tlsvalidate=(pvt->_copyrefs)?
+				charstring::duplicate("no"):
+				(char *)"no";
 	pvt->_tlsca=NULL;
 	pvt->_tlsdepth=0;
 
@@ -357,7 +359,7 @@ void sqlrconnection::enableKerberos(const char *service,
 void sqlrconnection::enableTLS(const char *cert,
 					const char *password,
 					const char *ciphers,
-					bool validate,
+					const char *validate,
 					const char *ca,
 					uint16_t depth) {
 
@@ -379,15 +381,17 @@ void sqlrconnection::enableTLS(const char *cert,
 		pvt->_tlspassword=charstring::duplicate(password);
 		delete[] pvt->_tlsciphers;
 		pvt->_tlsciphers=charstring::duplicate(ciphers);
+		delete[] pvt->_tlsvalidate;
+		pvt->_tlsvalidate=charstring::duplicate(validate);
 		delete[] pvt->_tlsca;
 		pvt->_tlsca=charstring::duplicate(ca);
 	} else {
 		pvt->_tlscert=(char *)cert;
 		pvt->_tlspassword=(char *)password;
 		pvt->_tlsciphers=(char *)ciphers;
+		pvt->_tlsvalidate=(char *)validate;
 		pvt->_tlsca=(char *)ca;
 	}
-	pvt->_tlsvalidate=validate;
 	pvt->_tlsdepth=depth;
 }
 
@@ -395,24 +399,26 @@ void sqlrconnection::disableEncryption() {
 
 	if (pvt->_copyrefs) {
 		delete[] pvt->_krbservice;
-		pvt->_krbservice=NULL;
 		delete[] pvt->_krbmech;
-		pvt->_krbmech=NULL;
 		delete[] pvt->_krbflags;
-		pvt->_krbflags=NULL;
 
 		delete[] pvt->_tlscert;
-		pvt->_tlscert=NULL;
 		delete[] pvt->_tlspassword;
-		pvt->_tlspassword=NULL;
 		delete[] pvt->_tlsciphers;
-		pvt->_tlsciphers=NULL;
+		delete[] pvt->_tlsvalidate;
 		delete[] pvt->_tlsca;
-		pvt->_tlsca=NULL;
 	}
-	pvt->_tlsvalidate=false;
-	pvt->_tlsdepth=0;
+	pvt->_krbservice=NULL;
+	pvt->_krbmech=NULL;
+	pvt->_krbflags=NULL;
+	pvt->_tlscert=NULL;
 	pvt->_usekrb=false;
+
+	pvt->_tlspassword=NULL;
+	pvt->_tlsciphers=NULL;
+	pvt->_tlsvalidate=NULL;
+	pvt->_tlsca=NULL;
+	pvt->_tlsdepth=0;
 	pvt->_usetls=false;
 }
 
@@ -612,6 +618,69 @@ bool sqlrconnection::openSession() {
 		return false;
 	}
 
+	// if tls is enabled and we're using an inet socket,
+	// then we may need to validate the host
+	if (pvt->_usetls && pvt->_cs==&pvt->_ics) {
+
+		bool		validated=true;
+
+		// get the common name from the cert
+		tlscertificate	*cert=NULL;
+		const char	*commonname=NULL;
+		if (!charstring::compareIgnoringCase(
+					pvt->_tlsvalidate,"ca+",3)) {
+			cert=((tlscontext *)pvt->_ctx)->getPeerCertificate();
+			commonname=cert->getCommonName();
+		}
+
+		// validate the host name or domain
+		if (!charstring::compareIgnoringCase(
+					pvt->_tlsvalidate,"ca+host")) {
+			if (pvt->_debug) {
+				debugPreStart();
+				debugPrint(pvt->_tlsvalidate);
+				debugPrint(": ");
+				debugPrint(pvt->_server);
+				debugPrint("=");
+				debugPrint(commonname);
+				debugPrint("\n");
+				debugPreEnd();
+			}
+			validated=!charstring::compareIgnoringCase(
+						pvt->_server,commonname);
+		} else if (!charstring::compareIgnoringCase(
+					pvt->_tlsvalidate,"ca+domain")) {
+			const char	*serverdomain=pvt->_server;
+			const char	*commonnamedomain=commonname;
+			const char	*dot=
+					charstring::findFirst(pvt->_server,'.');
+			if (dot) {
+				serverdomain=dot+1;
+			}
+			dot=charstring::findFirst(commonname,'.');
+			if (dot) {
+				commonnamedomain=dot+1;
+			}
+			if (pvt->_debug) {
+				debugPreStart();
+				debugPrint(": ");
+				debugPrint(serverdomain);
+				debugPrint("=");
+				debugPrint(commonnamedomain);
+				debugPrint("\n");
+				debugPreEnd();
+			}
+			validated=!charstring::compareIgnoringCase(
+						serverdomain,commonnamedomain);
+		}
+
+		if (!validated) {
+			setError("TLS error: common name mismatch");
+			pvt->_cs->close();
+			return false;
+		}
+	}
+
 	// if we made it here then everything went
 	// well and we are successfully connected
 	pvt->_connected=true;
@@ -697,7 +766,7 @@ void sqlrconnection::reConfigureSockets() {
 			debugPrint("\n");
 			debugPrint("  validate: ");
 			if (pvt->_tlsvalidate) {
-				debugPrint((int64_t)pvt->_tlsvalidate);
+				debugPrint(pvt->_tlsvalidate);
 			}
 			debugPrint("\n");
 			debugPrint("  ca: ");
@@ -715,7 +784,8 @@ void sqlrconnection::reConfigureSockets() {
 		pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
 		pvt->_tctx.setPrivateKeyPassword(pvt->_tlspassword);
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);
-		pvt->_tctx.setValidatePeer(pvt->_tlsvalidate);
+		pvt->_tctx.setValidatePeer(!charstring::compareIgnoringCase(
+						pvt->_tlsvalidate,"ca",2));
 		pvt->_tctx.setCertificateAuthority(pvt->_tlsca);
 		pvt->_tctx.setValidationDepth(pvt->_tlsdepth);
 

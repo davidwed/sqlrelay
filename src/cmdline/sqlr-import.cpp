@@ -572,10 +572,9 @@ int main(int argc, const char **argv) {
 	const char	*tlscert=cmdline.getValue("tlscert");
 	const char	*tlspassword=cmdline.getValue("tlspassword");
 	const char	*tlsciphers=cmdline.getValue("tlsciphers");
-	bool		tlsvalidate=true;
+	const char	*tlsvalidate="no";
 	if (cmdline.found("tlsvalidate")) {
-		tlsvalidate=charstring::compare(
-				cmdline.getValue("tlsvalidate"),"no");
+		tlsvalidate=cmdline.getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline.getValue("tlsca");
 	uint16_t	tlsdepth=charstring::toUnsignedInteger(
@@ -598,20 +597,20 @@ int main(int argc, const char **argv) {
 
 		stdoutput.printf("usage: \n"
 			" %s-import -host host -port port -socket socket\n"
-			"             [-user user -password password]\n"
-			"             [-krb] [-krbservice svc] [-krbmech mech] "
+			"        [-user user -password password]\n"
+			"        [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
-			"             [-tls] [-tlscert certfile]\n"
-			"                [-tlspassword password]\n"
-			"                [-tlsciphers cipherlist]\n"
-			"                [-tlsvalidate (yes|no)] [-tlsca ca] "
+			"        [-tls] [-tlscert certfile] "
+			"[-tlspassword password]\n"
+			"        [-tlsciphers cipherlist]\n"
+			"        [-tlsvalidate (yes|no)] [-tlsca ca] "
 			"[-tlsdepth depth]\n"
-			"             -file file [-commitcount rowcount]\n"
-			"             [-debug [filename]] [-verbose]\n"
+			"        -file file [-commitcount rowcount]\n"
+			"        [-debug [filename]] [-verbose]\n"
 			"  or\n"
 			" %s-import [-config config] -id id\n"
-			"             -file file [-commitcount rowcount]\n"
-			"             [-debug [filename]] [-verbose]\n",
+			"        -file file [-commitcount rowcount]\n"
+			"        [-debug [filename]] [-verbose]\n",
 			SQLR,SQLR);
 		process::exit(1);
 	}

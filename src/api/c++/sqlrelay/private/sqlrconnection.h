@@ -71,7 +71,7 @@
 		void	enableTLS(const char *cert,
 					const char *password,
 					const char *ciphers,
-					bool validate,
+					const char *validate,
 					const char *ca,
 					uint16_t depth);
 		void	disableEncryption();

@@ -273,10 +273,9 @@ int main(int argc, const char **argv) {
 	const char	*tlscert=cmdline.getValue("tlscert");
 	const char	*tlspassword=cmdline.getValue("tlspassword");
 	const char	*tlsciphers=cmdline.getValue("tlsciphers");
-	bool		tlsvalidate=true;
+	const char	*tlsvalidate="no";
 	if (cmdline.found("tlsvalidate")) {
-		tlsvalidate=charstring::compare(
-				cmdline.getValue("tlsvalidate"),"no");
+		tlsvalidate=cmdline.getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline.getValue("tlsca");
 	uint16_t	tlsdepth=charstring::toUnsignedInteger(
@@ -307,24 +306,24 @@ int main(int argc, const char **argv) {
 
 		stdoutput.printf("usage: \n"
 			" %s-export -host host -port port -socket socket\n"
-			"             [-user user -password password]\n"
-			"             [-krb] [-krbservice svc] [-krbmech mech] "
+			"        [-user user -password password]\n"
+			"        [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
-			"             [-tls] [-tlscert certfile]\n"
-			"                [-tlspassword password]\n"
-			"                [-tlsciphers cipherlist]\n"
-			"                [-tlsvalidate (yes|no)] [-tlsca ca] "
-			"[-tlsdepth depth]\n"
-			"             (-table table | -sequence sequence)\n"
-			"             [-format (xml|csv)] "
+			"        [-tls] [-tlscert certfile]\n"
+			"        [-tlspassword password]\n"
+			"        [-tlsciphers cipherlist]\n"
+			"        [-tlsvalidate (no|ca|ca+domain|ca+host)]\n"
+			"        [-tlsca ca] [-tlsdepth depth]\n"
+			"        (-table table | -sequence sequence)\n"
+			"        [-format (xml|csv)] "
 			"[-resultsetbuffersize rows]\n"
-			"             [-debug [filename]]\n"
+			"        [-debug [filename]]\n"
 			"  or\n"
 			" %s-export [-config config] -id id\n"
-			"             (-table table | -sequence sequence)\n"
-			"             [-format (xml|csv)] "
+			"        (-table table | -sequence sequence)\n"
+			"        [-format (xml|csv)] "
 			"[-resultsetbuffersize rows]\n"
-			"             [-debug [filename]]\n",SQLR,SQLR);
+			"        [-debug [filename]]\n",SQLR,SQLR);
 		process::exit(1);
 	}
 

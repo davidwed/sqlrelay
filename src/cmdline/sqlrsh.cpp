@@ -1916,10 +1916,9 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*tlscert=cmdline->getValue("tlscert");
 	const char	*tlspassword=cmdline->getValue("tlspassword");
 	const char	*tlsciphers=cmdline->getValue("tlsciphers");
-	bool		tlsvalidate=true;
+	const char	*tlsvalidate="no";
 	if (cmdline->found("tlsvalidate")) {
-		tlsvalidate=charstring::compare(
-				cmdline->getValue("tlsvalidate"),"no");
+		tlsvalidate=cmdline->getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline->getValue("tlsca");
 	uint16_t	tlsdepth=charstring::toUnsignedInteger(
@@ -1937,11 +1936,11 @@ void sqlrsh::execute(int argc, const char **argv) {
 			"        [-user user] [-password password]\n"
 			"        [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
-			"        [-tls] [-tlscert certfile]\n"
-			"            [-tlspassword password]\n"
-			"            [-tlsciphers cipherlist]\n"
-			"            [-tlsvalidate (yes|no)] [-tlsca ca] "
-			"[-tlsdepth depth]\n"
+			"        [-tls] [-tlscert certfile] "
+			"[-tlspassword password]\n"
+			"        [-tlsciphers cipherlist]\n"
+			"        [-tlsvalidate (no|ca|ca+domain|ca+host)]\n"
+			"        [-tlsca ca] [-tlsdepth depth]\n"
 			"        [-script script | -command command] [-quiet] "
 			"[-format (plain|csv)]\n"
 			"        [-resultsetbuffersize rows]\n"
