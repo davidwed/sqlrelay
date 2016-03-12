@@ -62,7 +62,8 @@ void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 
 
 
-/** Enables Kerberos authentication and encryption.
+/** @ingroup sqlrclientwrapper
+ *  Enables Kerberos authentication and encryption.
  *
  *  "service" indicates the Kerberos service name of the
  *  SQL Relay server.  If left empty or NULL then the service
@@ -102,7 +103,8 @@ void	sqlrcon_enableKerberos(sqlrcon sqlrconref,
 					const char *mech,
 					const char *flags);
 
-/** Enables TLS/SSL encryption, and optionally authentication.
+/** @ingroup sqlrclientwrapper
+ *  Enables TLS/SSL encryption, and optionally authentication.
  *
  *  "version" specifies the TLS/SSL protocol version that the
  *  client will attempt to use.  Valid values include SSL2,
@@ -177,7 +179,8 @@ void	sqlrcon_enableTls(sqlrcon sqlrconref,
 				const char *ca,
 				uint16_t depth);
 
-/** Disables encryption. */
+/** @ingroup sqlrclientwrapper
+  * Disables encryption. */
 void	sqlrcon_disableEncryption(sqlrcon sqlrconref);
 
 
