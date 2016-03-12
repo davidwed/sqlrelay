@@ -65,15 +65,5 @@
 					const char *user, const char *password, 
 					int32_t retrytime, int32_t tries,
 					bool copyreferences);
-		void	enableKerberos(const char *service,
-					const char *mech,
-					const char *flags);
-		void	enableTLS(const char *cert,
-					const char *password,
-					const char *ciphers,
-					const char *validate,
-					const char *ca,
-					uint16_t depth);
-		void	disableEncryption();
 
 	friend class sqlrcursor;

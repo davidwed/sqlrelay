@@ -88,6 +88,8 @@ static void help(int argc, const char **argv) {
 "\n" \
 "	-tls			Use TLS/SSL authentication and encrpyiton.\n" \
 "\n" \
+"	-tlsversion version	Use the specified TLS/SSL version.\n" \
+"\n" \
 "	-tlscert file		Use the specified certificate chain file.\n" \
 "\n" \
 "	-tlspassword pwd	Use the specified password to acess the private\n" \

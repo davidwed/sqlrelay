@@ -570,6 +570,7 @@ int main(int argc, const char **argv) {
 	const char	*krbflags=cmdline.getValue("krbflags");
 	bool		usetls=cmdline.found("tls");
 	const char	*tlscert=cmdline.getValue("tlscert");
+	const char	*tlsversion=cmdline.getValue("tlsversion");
 	const char	*tlspassword=cmdline.getValue("tlspassword");
 	const char	*tlsciphers=cmdline.getValue("tlsciphers");
 	const char	*tlsvalidate="no";
@@ -600,8 +601,8 @@ int main(int argc, const char **argv) {
 			"        [-user user -password password]\n"
 			"        [-krb] [-krbservice svc] [-krbmech mech] "
 			"[-krbflags flags]\n"
-			"        [-tls] [-tlscert certfile] "
-			"[-tlspassword password]\n"
+			"        [-tls] [-tlsversion version]\n"
+			"        [-tlscert certfile] [-tlspassword password]\n"
 			"        [-tlsciphers cipherlist]\n"
 			"        [-tlsvalidate (yes|no)] [-tlsca ca] "
 			"[-tlsdepth depth]\n"
@@ -661,8 +662,8 @@ int main(int argc, const char **argv) {
 	if (usekrb) {
 		sqlrcon.enableKerberos(krbservice,krbmech,krbflags);
 	} else if (usetls) {
-		sqlrcon.enableTLS(tlscert,tlspassword,tlsciphers,
-					tlsvalidate,tlsca,tlsdepth);
+		sqlrcon.enableTls(tlsversion,tlscert,tlspassword,tlsciphers,
+						tlsvalidate,tlsca,tlsdepth);
 	}
 
 	// configure debug

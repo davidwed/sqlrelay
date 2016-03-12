@@ -111,6 +111,25 @@ sqlrconnection::setResponseTimeout(timeoutsec,timeoutusec)
 		int32_t		timeoutusec
 
 void
+sqlrconnection::enableKerberos(service,mech,flags)
+		const char	*service
+		const char	*mech
+		const char	*flags
+
+void
+sqlrconnection::enableTls(version,cert,password,ciphers,validate,ca,depth)
+		const char	*version
+		const char	*cert
+		const char	*password
+		const char	*ciphers
+		const char	*validate
+		const char	*ca
+		uint16_t	depth
+
+void
+sqlrconnection::disableEncryption()
+
+void
 sqlrconnection::endSession()
 
 bool

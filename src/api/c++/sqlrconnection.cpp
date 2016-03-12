@@ -67,6 +67,7 @@ class sqlrconnectionprivate {
 
 		// tls
 		bool		_usetls;
+		char		*_tlsversion;
 		char		*_tlscert;
 		char		*_tlspassword;
 		char		*_tlsciphers;
@@ -185,6 +186,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_krbflags=NULL;
 
 	pvt->_usetls=false;
+	pvt->_tlsversion=NULL;
 	pvt->_tlscert=NULL;
 	pvt->_tlspassword=NULL;
 	pvt->_tlsvalidate=(pvt->_copyrefs)?
@@ -299,8 +301,10 @@ sqlrconnection::~sqlrconnection() {
 		delete[] pvt->_krbservice;
 		delete[] pvt->_krbmech;
 		delete[] pvt->_krbflags;
+		delete[] pvt->_tlsversion;
 		delete[] pvt->_tlscert;
 		delete[] pvt->_tlspassword;
+		delete[] pvt->_tlsvalidate;
 		delete[] pvt->_tlsca;
 	}
 
@@ -356,7 +360,8 @@ void sqlrconnection::enableKerberos(const char *service,
 	}
 }
 
-void sqlrconnection::enableTLS(const char *cert,
+void sqlrconnection::enableTls(const char *version,
+					const char *cert,
 					const char *password,
 					const char *ciphers,
 					const char *validate,
@@ -375,6 +380,8 @@ void sqlrconnection::enableTLS(const char *cert,
 	pvt->_usetls=true;
 
 	if (pvt->_copyrefs) {
+		delete[] pvt->_tlsversion;
+		pvt->_tlsversion=charstring::duplicate(version);
 		delete[] pvt->_tlscert;
 		pvt->_tlscert=charstring::duplicate(cert);
 		delete[] pvt->_tlspassword;
@@ -386,6 +393,7 @@ void sqlrconnection::enableTLS(const char *cert,
 		delete[] pvt->_tlsca;
 		pvt->_tlsca=charstring::duplicate(ca);
 	} else {
+		pvt->_tlsversion=(char *)version;
 		pvt->_tlscert=(char *)cert;
 		pvt->_tlspassword=(char *)password;
 		pvt->_tlsciphers=(char *)ciphers;
@@ -402,6 +410,7 @@ void sqlrconnection::disableEncryption() {
 		delete[] pvt->_krbmech;
 		delete[] pvt->_krbflags;
 
+		delete[] pvt->_tlsversion;
 		delete[] pvt->_tlscert;
 		delete[] pvt->_tlspassword;
 		delete[] pvt->_tlsciphers;
@@ -411,9 +420,10 @@ void sqlrconnection::disableEncryption() {
 	pvt->_krbservice=NULL;
 	pvt->_krbmech=NULL;
 	pvt->_krbflags=NULL;
-	pvt->_tlscert=NULL;
 	pvt->_usekrb=false;
 
+	pvt->_tlsversion=NULL;
+	pvt->_tlscert=NULL;
 	pvt->_tlspassword=NULL;
 	pvt->_tlsciphers=NULL;
 	pvt->_tlsvalidate=NULL;
@@ -749,6 +759,10 @@ void sqlrconnection::reConfigureSockets() {
 		if (pvt->_debug) {
 			debugPreStart();
 			debugPrint("TLS encryption/authentication enabled\n");
+			debugPrint("  version: ");
+			if (pvt->_tlsversion) {
+				debugPrint(pvt->_tlsversion);
+			}
 			debugPrint("  cert: ");
 			if (pvt->_tlscert) {
 				debugPrint(pvt->_tlscert);
@@ -781,6 +795,7 @@ void sqlrconnection::reConfigureSockets() {
 		}
 
 		pvt->_tctx.close();
+		//pvt->_tctx.setProtocolVersion(pvt->_tlsversion);
 		pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
 		pvt->_tctx.setPrivateKeyPassword(pvt->_tlspassword);
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);

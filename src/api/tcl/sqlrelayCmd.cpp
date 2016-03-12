@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.13 2016-02-12 21:26:22 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.14 2016-03-12 05:41:50 mused Exp $
  */
 
 #include <tcl.h>
@@ -1822,6 +1822,9 @@ void sqlrconDelete(ClientData data) {
  *  $con setConnectTimeout
  *  $con setAuthenticationTimeout
  *  $con setResponseTimeout
+ *  $con enableKerberos
+ *  $con enableTls
+ *  $con disableEncryption
  *  $con endSession
  *  $con suspendSession
  *  $con getConnectionPort
@@ -1859,6 +1862,9 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "setConnectTimeout",
     "setAuthenticationTimeout",
     "setResponseTimeout",
+    "enableKerberos",
+    "enableTls",
+    "disableEncryption",
     "endSession",
     "suspendSession",
     "getConnectionPort",
@@ -1892,6 +1898,9 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_SETCONNECTTIMEOUT,
     SQLR_SETAUTHENTICATIONTIMEOUT,
     SQLR_SETRESPONSETIMEOUT,
+    SQLR_ENABLEKERBEROS,
+    SQLR_ENABLETLS,
+    SQLR_DISABLEENCRYPTION,
     SQLR_ENDSESSION,
     SQLR_SUSPENDSESSION,
     SQLR_GETCONNECTIONPORT,
@@ -1986,6 +1995,58 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     con->setResponseTimeout(timeoutsec,timeoutusec);
+    break;
+  }
+  case SQLR_ENABLEKERBEROS: {
+    const char *service;
+    const char *mech;
+    const char *flags;
+
+    if (objc != 5) {
+      Tcl_WrongNumArgs(interp, 3, objv, "service mech flags");
+      return TCL_ERROR;
+    }
+
+    service = Tcl_GetString(objv[2]);
+    mech = Tcl_GetString(objv[3]);
+    flags = Tcl_GetString(objv[4]);
+
+    con->enableKerberos(service, mech, flags);
+    break;
+  }
+  case SQLR_ENABLETLS: {
+    const char *version;
+    const char *cert;
+    const char *password;
+    const char *ciphers;
+    const char *validate;
+    const char *ca;
+    int depth;
+
+    if (objc != 9) {
+      Tcl_WrongNumArgs(interp, 7, objv, "version cert password ciphers validate ca depth");
+      return TCL_ERROR;
+    }
+
+    version = Tcl_GetString(objv[2]);
+    cert = Tcl_GetString(objv[3]);
+    password = Tcl_GetString(objv[4]);
+    ciphers = Tcl_GetString(objv[5]);
+    validate = Tcl_GetString(objv[6]);
+    ca = Tcl_GetString(objv[7]);
+    if (Tcl_GetIntFromObj(interp, objv[8], &depth) != TCL_OK) {
+      return TCL_ERROR;
+    }
+
+    con->enableTls(version, cert, password, ciphers, validate, ca, depth);
+    break;
+  }
+  case SQLR_DISABLEENCRYPTION: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    con->disableEncryption();
     break;
   }
   case SQLR_ENDSESSION: {

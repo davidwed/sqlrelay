@@ -44,6 +44,29 @@ void sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 	sqlrconref->setResponseTimeout(timeoutsec,timeoutusec);
 }
 
+void sqlrcon_enableKerberos(sqlrcon sqlrconref,
+					const char *service,
+					const char *mech,
+					const char *flags) {
+	sqlrconref->enableKerberos(service,mech,flags);
+}
+
+void sqlrcon_enableTls(sqlrcon sqlrconref,
+				const char *version,
+				const char *cert,
+				const char *password,
+				const char *ciphers,
+				const char *validate,
+				const char *ca,
+				uint16_t depth) {
+	sqlrconref->enableTls(version,cert,password,ciphers,validate,ca,depth);
+}
+
+void sqlrcon_disableEncryption(sqlrcon sqlrconref) {
+	sqlrconref->disableEncryption();
+}
+
+
 void sqlrcon_endSession(sqlrcon sqlrconref) {
 	sqlrconref->endSession();
 }

@@ -328,6 +328,77 @@ int main() {
 			ENCODE_VOID;   
 		}
 
+		if (strcmp("enableKerberos", command) == TRUE) {
+                	char service[128];
+			char mech[128];
+			char flags[512];
+
+			// check number of arguments
+		    	if (arity != 3) return ERR_NUMBER_OF_ARGS;
+
+			// get arguments
+			if (ei_decode_string(buf, &index, &service[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &mech[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &flags[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			sqlrcon_enableKerberos(con,service,mech,flags);
+			ENCODE_VOID;   
+		}
+
+		if (strcmp("enableTls", command) == TRUE) {
+                	char version[128];
+                	char cert[1024];
+			char password[128];
+			char ciphers[1024];
+			char validate[16];
+			char ca[1024];
+			long depth;
+
+			// check number of arguments
+		    	if (arity != 3) return ERR_NUMBER_OF_ARGS;
+
+			// get arguments
+			if (ei_decode_string(buf, &index, &version[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &cert[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &password[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &ciphers[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &validate[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_string(buf, &index, &ca[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+			if (ei_decode_long(buf, &index, &depth)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			sqlrcon_enableTls(con,version,cert,password,ciphers,validate,ca,depth);
+			ENCODE_VOID;   
+		}
+
+		if (strcmp("disableEncryption", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// call function and encode result 
+			sqlrcon_disableEncryption(con);
+			ENCODE_VOID;   
+		}
+
 		if (strcmp("endSession", command) == TRUE) {
 			// check number of arguments
 		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;

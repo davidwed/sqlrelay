@@ -107,6 +107,9 @@ class SQLRConnection : public ObjectWrap {
 		static RET	setConnectTimeout(const ARGS &args);
 		static RET	setAuthenticationTimeout(const ARGS &args);
 		static RET	setResponseTimeout(const ARGS &args);
+		static RET	enableKerberos(const ARGS &args);
+		static RET	enableTls(const ARGS &args);
+		static RET	disableEncryption(const ARGS &args);
 		static RET	endSession(const ARGS &args);
 		static RET	suspendSession(const ARGS &args);
 		static RET	getConnectionPort(const ARGS &args);
@@ -261,6 +264,9 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setAuthenticationTimeout",
 						setAuthenticationTimeout);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setResponseTimeout",setResponseTimeout);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"enableKerberos",enableKerberos);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"enableTls",enableTls);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"disableEncryption",disableEncryption);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"endSession",endSession);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"suspendSession",suspendSession);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getConnectionPort",getConnectionPort);
@@ -365,6 +371,47 @@ RET SQLRConnection::setResponseTimeout(const ARGS &args) {
 
 	sqlrcon(args)->setResponseTimeout(args[0]->Int32Value(),
 						args[1]->Int32Value());
+
+	returnVoid();
+}
+
+RET SQLRConnection::enableKerberos(const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,3);
+
+	sqlrcon(args)->enableKerberos(toString(args[0]),
+					toString(args[1]),
+					toString(args[2]));
+
+	returnVoid();
+}
+
+RET SQLRConnection::enableTls(const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,7);
+
+	sqlrcon(args)->enableTls(toString(args[0]),
+					toString(args[1]),
+					toString(args[2]),
+					toString(args[3]),
+					toString(args[4]),
+					toString(args[5]),
+					args[6]->Uint32Value());
+
+	returnVoid();
+}
+
+RET SQLRConnection::disableEncryption(const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,0);
+
+	sqlrcon(args)->disableEncryption();
 
 	returnVoid();
 }

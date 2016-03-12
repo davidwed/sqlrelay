@@ -108,6 +108,52 @@ static PyObject *setResponseTimeout(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
+static PyObject *enableKerberos(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  char *service;
+  char *mech;
+  char *flags;
+  if (!PyArg_ParseTuple(args, "lsss", &sqlrcon, &service, &mech, &flags))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  ((sqlrconnection *)sqlrcon)->enableKerberos(service,mech,flags);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *enableTls(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  char *version;
+  char *cert;
+  char *password;
+  char *ciphers;
+  char *validate;
+  char *ca;
+  uint16_t depth;
+  if (!PyArg_ParseTuple(args,
+#ifdef SUPPORTS_UNSIGNED
+		"lssssssH",
+#else
+		"lssssssh",
+#endif
+		&sqlrcon, &version, &cert, &password, &ciphers, &validate, &ca, &depth))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  ((sqlrconnection *)sqlrcon)->enableTls(version,cert,password,ciphers,validate,ca,depth);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *disableEncryption(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  ((sqlrconnection *)sqlrcon)->disableEncryption();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", 0);
+}
+
 static PyObject *endSession(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
@@ -1851,6 +1897,9 @@ static PyMethodDef SQLRMethods[] = {
   {"setConnectTimeout", setConnectTimeout, METH_VARARGS},
   {"setAuthenticationTimeout", setAuthenticationTimeout, METH_VARARGS},
   {"setResponseTimeout", setResponseTimeout, METH_VARARGS},
+  {"enableKerberos", enableKerberos, METH_VARARGS},
+  {"enableTls", enableTls, METH_VARARGS},
+  {"disableEncryption", disableEncryption, METH_VARARGS},
   {"endSession", endSession, METH_VARARGS},
   {"suspendSession", suspendSession, METH_VARARGS},
   {"getConnectionPort", getConnectionPort, METH_VARARGS},

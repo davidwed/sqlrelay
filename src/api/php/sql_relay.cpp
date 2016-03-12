@@ -171,6 +171,55 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setresponsetimeout) {
 	}
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcon_enablekerberos) {
+	zval **sqlrcon,**service,**mech,**flags;
+	if (ZEND_NUM_ARGS() != 3 || 
+		zend_get_parameters_ex(3,&sqlrcon,&service,&mech,&flags) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(service);
+	convert_to_string_ex(mech);
+	convert_to_string_ex(flags);
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		connection->enableKerberos((*service)->value.str.val,(*mech)->value.str.val,(*flags)->value.str.val);
+	}
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_enabletls) {
+	zval **sqlrcon,**version,**cert,**password,**ciphers,**validate,**ca,**depth;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(version);
+	convert_to_string_ex(cert);
+	convert_to_string_ex(password);
+	convert_to_string_ex(ciphers);
+	convert_to_string_ex(validate);
+	convert_to_string_ex(ca);
+	convert_to_long_ex(depth);
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		connection->enableTls((*version)->value.str.val,(*cert)->value.str.val,(*password)->value.str.val,(*ciphers)->value.str.val,(*validate)->value.str.val,(*ca)->value.str.val,(*depth)->value.lval);
+	}
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_disableencryption) {
+	zval **sqlrcon;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		connection->disableEncryption();
+	}
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_endsession) {
 	zval **sqlrcon;
 	if (ZEND_NUM_ARGS() != 1 || 
@@ -2338,6 +2387,9 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_setconnecttimeout,NULL)
 	ZEND_FE(sqlrcon_setauthenticationtimeout,NULL)
 	ZEND_FE(sqlrcon_setresponsetimeout,NULL)
+	ZEND_FE(sqlrcon_enablekerberos,NULL)
+	ZEND_FE(sqlrcon_enabletls,NULL)
+	ZEND_FE(sqlrcon_disableencryption,NULL)
 	ZEND_FE(sqlrcon_endsession,NULL)
 	ZEND_FE(sqlrcon_suspendsession,NULL)
 	ZEND_FE(sqlrcon_getconnectionport,NULL)

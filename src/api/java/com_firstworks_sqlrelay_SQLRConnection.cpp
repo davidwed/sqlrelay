@@ -111,6 +111,58 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setResponseTi
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    enableKerberos
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_enableKerberos
+  (JNIEnv *env, jobject self, jstring service, jstring mech, jstring flags) {
+	char	*servicestring=conGetStringUTFChars(env,service,0);
+	char	*mechstring=conGetStringUTFChars(env,mech,0);
+	char	*flagsstring=conGetStringUTFChars(env,flags,0);
+	getSqlrConnection(env,self)->enableKerberos(
+					servicestring,mechstring,flagsstring);
+	conReleaseStringUTFChars(env,flags,flagsstring);
+	conReleaseStringUTFChars(env,mech,mechstring);
+	conReleaseStringUTFChars(env,service,servicestring);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    enableTls
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;S)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_enableTls
+  (JNIEnv *env, jobject self, jstring version, jstring cert, jstring password, jstring ciphers, jstring validate, jstring ca, short depth) {
+	char	*versionstring=conGetStringUTFChars(env,version,0);
+	char	*certstring=conGetStringUTFChars(env,cert,0);
+	char	*passwordstring=conGetStringUTFChars(env,password,0);
+	char	*ciphersstring=conGetStringUTFChars(env,ciphers,0);
+	char	*validatestring=conGetStringUTFChars(env,validate,0);
+	char	*castring=conGetStringUTFChars(env,ca,0);
+	getSqlrConnection(env,self)->
+			enableTls(versionstring,certstring,passwordstring,
+					ciphersstring,validatestring,castring,
+					depth);
+	conReleaseStringUTFChars(env,ca,castring);
+	conReleaseStringUTFChars(env,validate,validatestring);
+	conReleaseStringUTFChars(env,ciphers,ciphersstring);
+	conReleaseStringUTFChars(env,password,passwordstring);
+	conReleaseStringUTFChars(env,cert,certstring);
+	conReleaseStringUTFChars(env,version,versionstring);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    disableEncryption
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_disableEncryption
+  (JNIEnv *env, jobject self) {
+	getSqlrConnection(env,self)->disableEncryption();
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    endSession
  * Signature: ()V
  */

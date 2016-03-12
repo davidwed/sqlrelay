@@ -62,6 +62,126 @@ void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 
 
 
+/** Enables Kerberos authentication and encryption.
+ *
+ *  "service" indicates the Kerberos service name of the
+ *  SQL Relay server.  If left empty or NULL then the service
+ *  name "sqlrelay" will be used. "sqlrelay" is the default
+ *  service name of the SQL Relay server.  Note that on Windows
+ *  platforms the service name must be fully qualified,
+ *  including the host name.  For example:
+ *  "sqlrelay@sqlrserver.firstworks.com".
+ *
+ *  "mech" indicates the specific Kerberos mechanism to use.
+ *  On Linux/Unix platforms, this should be a string
+ *  representation of the mechnaism's OID, such as:
+ *      { 1 2 840 113554 1 2 2 }
+ *  On Windows platforms, this should be a string like:
+ *      Kerberos
+ *  If left empty or NULL then the default mechanism will be
+ *  used.  Only set this if you know that you have a good
+ *  reason to.
+ *
+ *  "flags" indicates what Kerberos flags to use.  Multiple
+ *  flags may be specified, separated by commas.  If left
+ *  empty or NULL then a defalt set of flags will be used.
+ *  Only set this if you know that you have a good reason to.
+ *
+ *  Valid flags include:
+ *   * GSS_C_MUTUAL_FLAG
+ *   * GSS_C_REPLAY_FLAG
+ *   * GSS_C_SEQUENCE_FLAG
+ *   * GSS_C_CONF_FLAG
+ *   * GSS_C_INTEG_FLAG
+ *
+ *  For a full list of flags, consult the GSSAPI documentation,
+ *  though note that only the flags listed above are supported
+ *  on Windows. */
+void	sqlrcon_enableKerberos(sqlrcon sqlrconref,
+					const char *service,
+					const char *mech,
+					const char *flags);
+
+/** Enables TLS/SSL encryption, and optionally authentication.
+ *
+ *  "version" specifies the TLS/SSL protocol version that the
+ *  client will attempt to use.  Valid values include SSL2,
+ *  SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of
+ *  TLS, as supported by and enabled in the underlying TLS/SSL
+ *  library.  If left blank or empty then the highest supported
+ *  version will be negotiated.
+ *
+ *  "cert" is the file name of the certificate chain file to
+ *  send to the SQL Relay server.  This is only necessary if
+ *  the SQL Relay server is configured to authenticate and
+ *  authorize clients by certificate.
+ *
+ *  If "cert" contains a password-protected private key, then
+ *  "password" may be supplied to access it.  If the private
+ *  key is not password-protected, then this argument is
+ *  ignored, and may be left empty or NULL.
+ *
+ *  "ciphers" is a list of ciphers to allow.  Ciphers may be
+ *  separated by spaces, commas, or colons.  If "ciphers" is
+ *  empty or NULL then a default set is used.  Only set this if
+ *  you know that you have a good reason to.
+ *
+ *  For a list of valid ciphers on Linux/Unix platforms, see:
+ *      man ciphers
+ *
+ *  For a list of valid ciphers on Windows platforms, see:
+ *      https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx
+ *  On Windows platforms, the ciphers (alg_id's) should omit
+ *  CALG_ and may be given with underscores or dashes.
+ *  For example: 3DES_112
+ *
+ *  "validate" indicates whether to validate the SQL Relay's
+ *  server certificate, and may be set to one of the following:
+ *      "no" - Don't validate the server's certificate.
+ *      "ca" - Validate that the server's certificate was
+ *             signed by a trusted certificate authority.
+ *      "ca+host" - Perform "ca" validation and also validate
+ *             that the common name in the certificate matches
+ *             the host parameter.  (Falls back to "ca"
+ *             validation when a unix socket is used.)
+ *      "ca+domain" - Perform "ca" validation and also validate
+ *             that the domain name of the common name in the
+ *             certificate matches the domain name of the host
+ *             parameter.  (Falls back to "ca" validation when
+ *             a unix socket is used.)
+ *
+ *  "ca" is the location of a certificate authority file to
+ *  use, in addition to the system's root certificates, when
+ *  validating the SQL Relay server's certificate.  This is
+ *  useful if the SQL Relay server's certificate is self-signed.
+ *
+ *  On Windows, "ca" must be a file name.
+ *
+ *  On non-Windows systems, "ca" can be either a file or
+ *  directory name.  If it is a directory name, then all
+ *  certificate authority files found in that directory will be
+ *  used.  If it a file name, then only that file will be used.
+ *
+ *
+ *  Note that the supported "cert" and "ca" file formats may
+ *  vary between platforms.  A variety of file formats are
+ *  generally supported on Linux/Unix platfoms (.pem, .pfx,
+ *  etc.) but only the .pfx format is currently supported on
+ *  Windows. */
+void	sqlrcon_enableTls(sqlrcon sqlrconref,
+				const char *version,
+				const char *cert,
+				const char *password,
+				const char *ciphers,
+				const char *validate,
+				const char *ca,
+				uint16_t depth);
+
+/** Disables encryption. */
+void	sqlrcon_disableEncryption(sqlrcon sqlrconref);
+
+
+
 /** @ingroup sqlrclientwrapper
  *  Ends the session. */
 SQLRCLIENT_DLLSPEC
