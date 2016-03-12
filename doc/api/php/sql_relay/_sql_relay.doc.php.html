@@ -43,7 +43,7 @@
 <div class="evenrow">
 	
 	<div>
-		<span class="method-title"></span> (line <span class="line-number">551</span>)
+		<span class="method-title"></span> (line <span class="line-number">659</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -119,7 +119,7 @@
 <div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_autoCommitOff</span> (line <span class="line-number">131</span>)
+		<span class="method-title">sqlrcon_autoCommitOff</span> (line <span class="line-number">239</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -146,7 +146,7 @@
 <div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_autoCommitOn</span> (line <span class="line-number">127</span>)
+		<span class="method-title">sqlrcon_autoCommitOn</span> (line <span class="line-number">235</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -173,7 +173,7 @@
 <div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_bindFormat</span> (line <span class="line-number">105</span>)
+		<span class="method-title">sqlrcon_bindFormat</span> (line <span class="line-number">213</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -200,7 +200,7 @@
 <div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_clientVersion</span> (line <span class="line-number">100</span>)
+		<span class="method-title">sqlrcon_clientVersion</span> (line <span class="line-number">208</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -227,7 +227,7 @@
 <div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_commit</span> (line <span class="line-number">138</span>)
+		<span class="method-title">sqlrcon_commit</span> (line <span class="line-number">246</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -254,7 +254,7 @@
 <div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_dbHostName</span> (line <span class="line-number">88</span>)
+		<span class="method-title">sqlrcon_dbHostName</span> (line <span class="line-number">196</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -281,7 +281,7 @@
 <div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_dbIpAddress</span> (line <span class="line-number">92</span>)
+		<span class="method-title">sqlrcon_dbIpAddress</span> (line <span class="line-number">200</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -308,7 +308,7 @@
 <div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_dbVersion</span> (line <span class="line-number">84</span>)
+		<span class="method-title">sqlrcon_dbVersion</span> (line <span class="line-number">192</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -335,7 +335,7 @@
 <div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_debugOff</span> (line <span class="line-number">169</span>)
+		<span class="method-title">sqlrcon_debugOff</span> (line <span class="line-number">277</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -362,7 +362,7 @@
 <div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_debugOn</span> (line <span class="line-number">165</span>)
+		<span class="method-title">sqlrcon_debugOn</span> (line <span class="line-number">273</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -386,11 +386,124 @@
 		
 	
 </div>
-<a name="functionsqlrcon_endSession" id="functionsqlrcon_endSession"><!-- --></a>
+<a name="functionsqlrcon_disableEncryption" id="functionsqlrcon_disableEncryption"><!-- --></a>
 <div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_endSession</span> (line <span class="line-number">45</span>)
+		<span class="method-title">sqlrcon_disableEncryption</span> (line <span class="line-number">149</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Disables encryption.</p>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_disableEncryption
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_enableKerberos" id="functionsqlrcon_enableKerberos"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_enableKerberos</span> (line <span class="line-number">78</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Enables Kerberos authentication and encryption.</p>
+<p class="description"><p>&quot;service&quot; indicates the Kerberos service name of the   SQL Relay server.  If left empty or NULL then the service   name &quot;sqlrelay&quot; will be used. &quot;sqlrelay&quot; is the default   service name of the SQL Relay server.  Note that on Windows   platforms the service name must be fully qualified,   including the host name.  For example:   &quot;sqlrelay@sqlrserver.firstworks.com&quot;.</p><p>&quot;mech&quot; indicates the specific Kerberos mechanism to use.   On Linux/Unix platforms, this should be a string   representation of the mechnaism's OID, such as:       { 1 2 840 113554 1 2 2 }   On Windows platforms, this should be a string like:       Kerberos   If left empty or NULL then the default mechanism will be   used.  Only set this if you know that you have a good   reason to.</p><p>&quot;flags&quot; indicates what Kerberos flags to use.  Multiple   flags may be specified, separated by commas.  If left   empty or NULL then a defalt set of flags will be used.   Only set this if you know that you have a good reason to.</p><p>Valid flags include:    * GSS_C_MUTUAL_FLAG    * GSS_C_REPLAY_FLAG    * GSS_C_SEQUENCE_FLAG    * GSS_C_CONF_FLAG    * GSS_C_INTEG_FLAG</p><p>For a full list of flags, consult the GSSAPI documentation,   though note that only the flags listed above are supported   on Windows.</p></p>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_enableKerberos
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$service</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$mech</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$flags</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$service</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$mech</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$flags</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_enableTls" id="functionsqlrcon_enableTls"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_enableTls</span> (line <span class="line-number">146</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Enables TLS/SSL encryption, and optionally authentication.</p>
+<p class="description"><p>&quot;version&quot; specifies the TLS/SSL protocol version that the   client will attempt to use.  Valid values include SSL2,   SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of   TLS, as supported by and enabled in the underlying TLS/SSL   library.  If left blank or empty then the highest supported   version will be negotiated.</p><p>&quot;cert&quot; is the file name of the certificate chain file to   send to the SQL Relay server.  This is only necessary if   the SQL Relay server is configured to authenticate and   authorize clients by certificate.</p><p>If &quot;cert&quot; contains a password-protected private key, then   &quot;password&quot; may be supplied to access it.  If the private   key is not password-protected, then this argument is   ignored, and may be left empty or NULL.</p><p>&quot;ciphers&quot; is a list of ciphers to allow.  Ciphers may be   separated by spaces, commas, or colons.  If &quot;ciphers&quot; is   empty or NULL then a default set is used.  Only set this if   you know that you have a good reason to.</p><p>For a list of valid ciphers on Linux/Unix platforms, see:       man ciphers</p><p>For a list of valid ciphers on Windows platforms, see:       https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx   On Windows platforms, the ciphers (alg_id's) should omit   CALG_ and may be given with underscores or dashes.   For example: 3DES_112</p><p>&quot;validate&quot; indicates whether to validate the SQL Relay's   server certificate, and may be set to one of the following:       &quot;no&quot; - Don't validate the server's certificate.       &quot;ca&quot; - Validate that the server's certificate was              signed by a trusted certificate authority.       &quot;ca+host&quot; - Perform &quot;ca&quot; validation and also validate              that the common name in the certificate matches              the host parameter.  (Falls back to &quot;ca&quot;              validation when a unix socket is used.)       &quot;ca+domain&quot; - Perform &quot;ca&quot; validation and also validate              that the domain name of the common name in the              certificate matches the domain name of the host              parameter.  (Falls back to &quot;ca&quot; validation when              a unix socket is used.)</p><p>&quot;ca&quot; is the location of a certificate authority file to   use, in addition to the system's root certificates, when   validating the SQL Relay server's certificate.  This is   useful if the SQL Relay server's certificate is self-signed.</p><p>On Windows, &quot;ca&quot; must be a file name.</p><p>On non-Windows systems, &quot;ca&quot; can be either a file or   directory name.  If it is a directory name, then all   certificate authority files found in that directory will be   used.  If it a file name, then only that file will be used.</p><p>Note that the supported &quot;cert&quot; and &quot;ca&quot; file formats may   vary between platforms.  A variety of file formats are   generally supported on Linux/Unix platfoms (.pem, .pfx,   etc.) but only the .pfx format is currently supported on   Windows.</p></p>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_enableTls
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$version</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$cert</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$password</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$ciphers</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$validate</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$ca</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$depth</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$version</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$cert</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$password</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$ciphers</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$validate</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$ca</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$depth</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_endSession" id="functionsqlrcon_endSession"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_endSession</span> (line <span class="line-number">153</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -414,10 +527,10 @@
 	
 </div>
 <a name="functionsqlrcon_errorMessage" id="functionsqlrcon_errorMessage"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_errorMessage</span> (line <span class="line-number">150</span>)
+		<span class="method-title">sqlrcon_errorMessage</span> (line <span class="line-number">258</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -442,10 +555,10 @@
 	
 </div>
 <a name="functionsqlrcon_errorNumber" id="functionsqlrcon_errorNumber"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_errorNumber</span> (line <span class="line-number">156</span>)
+		<span class="method-title">sqlrcon_errorNumber</span> (line <span class="line-number">264</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -469,7 +582,7 @@
 	
 </div>
 <a name="functionsqlrcon_free" id="functionsqlrcon_free"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
 		<span class="method-title">sqlrcon_free</span> (line <span class="line-number">17</span>)
@@ -496,10 +609,10 @@
 	
 </div>
 <a name="functionsqlrcon_getClientInfo" id="functionsqlrcon_getClientInfo"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_getClientInfo</span> (line <span class="line-number">187</span>)
+		<span class="method-title">sqlrcon_getClientInfo</span> (line <span class="line-number">295</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -523,10 +636,10 @@
 	
 </div>
 <a name="functionsqlrcon_getConnectionPort" id="functionsqlrcon_getConnectionPort"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_getConnectionPort</span> (line <span class="line-number">58</span>)
+		<span class="method-title">sqlrcon_getConnectionPort</span> (line <span class="line-number">166</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -550,10 +663,10 @@
 	
 </div>
 <a name="functionsqlrcon_getConnectionSocket" id="functionsqlrcon_getConnectionSocket"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_getConnectionSocket</span> (line <span class="line-number">65</span>)
+		<span class="method-title">sqlrcon_getConnectionSocket</span> (line <span class="line-number">173</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -577,10 +690,10 @@
 	
 </div>
 <a name="functionsqlrcon_getCurrentDatabase" id="functionsqlrcon_getCurrentDatabase"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_getCurrentDatabase</span> (line <span class="line-number">115</span>)
+		<span class="method-title">sqlrcon_getCurrentDatabase</span> (line <span class="line-number">223</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -604,10 +717,10 @@
 	
 </div>
 <a name="functionsqlrcon_getDebug" id="functionsqlrcon_getDebug"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_getDebug</span> (line <span class="line-number">173</span>)
+		<span class="method-title">sqlrcon_getDebug</span> (line <span class="line-number">281</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -631,10 +744,10 @@
 	
 </div>
 <a name="functionsqlrcon_getLastInsertId" id="functionsqlrcon_getLastInsertId"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_getLastInsertId</span> (line <span class="line-number">121</span>)
+		<span class="method-title">sqlrcon_getLastInsertId</span> (line <span class="line-number">229</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -658,10 +771,10 @@
 	
 </div>
 <a name="functionsqlrcon_identify" id="functionsqlrcon_identify"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_identify</span> (line <span class="line-number">80</span>)
+		<span class="method-title">sqlrcon_identify</span> (line <span class="line-number">188</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -685,10 +798,10 @@
 	
 </div>
 <a name="functionsqlrcon_ping" id="functionsqlrcon_ping"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_ping</span> (line <span class="line-number">76</span>)
+		<span class="method-title">sqlrcon_ping</span> (line <span class="line-number">184</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -712,10 +825,10 @@
 	
 </div>
 <a name="functionsqlrcon_resumeSession" id="functionsqlrcon_resumeSession"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_resumeSession</span> (line <span class="line-number">70</span>)
+		<span class="method-title">sqlrcon_resumeSession</span> (line <span class="line-number">178</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -746,10 +859,10 @@
 	
 </div>
 <a name="functionsqlrcon_rollback" id="functionsqlrcon_rollback"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_rollback</span> (line <span class="line-number">143</span>)
+		<span class="method-title">sqlrcon_rollback</span> (line <span class="line-number">251</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -773,10 +886,10 @@
 	
 </div>
 <a name="functionsqlrcon_selectDatabase" id="functionsqlrcon_selectDatabase"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_selectDatabase</span> (line <span class="line-number">111</span>)
+		<span class="method-title">sqlrcon_selectDatabase</span> (line <span class="line-number">219</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -803,10 +916,10 @@
 	
 </div>
 <a name="functionsqlrcon_serverVersion" id="functionsqlrcon_serverVersion"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_serverVersion</span> (line <span class="line-number">96</span>)
+		<span class="method-title">sqlrcon_serverVersion</span> (line <span class="line-number">204</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -830,7 +943,7 @@
 	
 </div>
 <a name="functionsqlrcon_setAuthenticationTimeout" id="functionsqlrcon_setAuthenticationTimeout"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
 		<span class="method-title">sqlrcon_setAuthenticationTimeout</span> (line <span class="line-number">33</span>)
@@ -863,10 +976,10 @@
 	
 </div>
 <a name="functionsqlrcon_setClientInfo" id="functionsqlrcon_setClientInfo"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_setClientInfo</span> (line <span class="line-number">184</span>)
+		<span class="method-title">sqlrcon_setClientInfo</span> (line <span class="line-number">292</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -893,7 +1006,7 @@
 	
 </div>
 <a name="functionsqlrcon_setConnectTimeout" id="functionsqlrcon_setConnectTimeout"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
 		<span class="method-title">sqlrcon_setConnectTimeout</span> (line <span class="line-number">26</span>)
@@ -926,10 +1039,10 @@
 	
 </div>
 <a name="functionsqlrcon_setDebugFile" id="functionsqlrcon_setDebugFile"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_setDebugFile</span> (line <span class="line-number">178</span>)
+		<span class="method-title">sqlrcon_setDebugFile</span> (line <span class="line-number">286</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -957,7 +1070,7 @@
 	
 </div>
 <a name="functionsqlrcon_setResponseTimeout" id="functionsqlrcon_setResponseTimeout"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
 		<span class="method-title">sqlrcon_setResponseTimeout</span> (line <span class="line-number">41</span>)
@@ -991,10 +1104,10 @@
 	
 </div>
 <a name="functionsqlrcon_suspendSession" id="functionsqlrcon_suspendSession"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcon_suspendSession</span> (line <span class="line-number">51</span>)
+		<span class="method-title">sqlrcon_suspendSession</span> (line <span class="line-number">159</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1018,10 +1131,10 @@
 	
 </div>
 <a name="functionsqlrcur_affectedRows" id="functionsqlrcur_affectedRows"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_affectedRows</span> (line <span class="line-number">476</span>)
+		<span class="method-title">sqlrcur_affectedRows</span> (line <span class="line-number">584</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1045,10 +1158,10 @@
 	
 </div>
 <a name="functionsqlrcur_alloc" id="functionsqlrcur_alloc"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_alloc</span> (line <span class="line-number">196</span>)
+		<span class="method-title">sqlrcur_alloc</span> (line <span class="line-number">304</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1073,10 +1186,10 @@
 	
 </div>
 <a name="functionsqlrcur_cacheOff" id="functionsqlrcur_cacheOff"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_cacheOff</span> (line <span class="line-number">268</span>)
+		<span class="method-title">sqlrcur_cacheOff</span> (line <span class="line-number">376</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1100,10 +1213,10 @@
 	
 </div>
 <a name="functionsqlrcur_cacheToFile" id="functionsqlrcur_cacheToFile"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_cacheToFile</span> (line <span class="line-number">253</span>)
+		<span class="method-title">sqlrcur_cacheToFile</span> (line <span class="line-number">361</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1131,10 +1244,10 @@
 	
 </div>
 <a name="functionsqlrcur_clearBinds" id="functionsqlrcur_clearBinds"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_clearBinds</span> (line <span class="line-number">384</span>)
+		<span class="method-title">sqlrcur_clearBinds</span> (line <span class="line-number">492</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1158,10 +1271,10 @@
 	
 </div>
 <a name="functionsqlrcur_closeResultSet" id="functionsqlrcur_closeResultSet"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_closeResultSet</span> (line <span class="line-number">666</span>)
+		<span class="method-title">sqlrcur_closeResultSet</span> (line <span class="line-number">774</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1185,10 +1298,10 @@
 	
 </div>
 <a name="functionsqlrcur_colCount" id="functionsqlrcur_colCount"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_colCount</span> (line <span class="line-number">458</span>)
+		<span class="method-title">sqlrcur_colCount</span> (line <span class="line-number">566</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1212,10 +1325,10 @@
 	
 </div>
 <a name="functionsqlrcur_countBindVariables" id="functionsqlrcur_countBindVariables"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_countBindVariables</span> (line <span class="line-number">389</span>)
+		<span class="method-title">sqlrcur_countBindVariables</span> (line <span class="line-number">497</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1239,10 +1352,10 @@
 	
 </div>
 <a name="functionsqlrcur_defineOutputBindBlob" id="functionsqlrcur_defineOutputBindBlob"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_defineOutputBindBlob</span> (line <span class="line-number">370</span>)
+		<span class="method-title">sqlrcur_defineOutputBindBlob</span> (line <span class="line-number">478</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1269,10 +1382,10 @@
 	
 </div>
 <a name="functionsqlrcur_defineOutputBindClob" id="functionsqlrcur_defineOutputBindClob"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_defineOutputBindClob</span> (line <span class="line-number">374</span>)
+		<span class="method-title">sqlrcur_defineOutputBindClob</span> (line <span class="line-number">482</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1299,10 +1412,10 @@
 	
 </div>
 <a name="functionsqlrcur_defineOutputBindCursor" id="functionsqlrcur_defineOutputBindCursor"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_defineOutputBindCursor</span> (line <span class="line-number">378</span>)
+		<span class="method-title">sqlrcur_defineOutputBindCursor</span> (line <span class="line-number">486</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1329,10 +1442,10 @@
 	
 </div>
 <a name="functionsqlrcur_defineOutputBindDouble" id="functionsqlrcur_defineOutputBindDouble"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_defineOutputBindDouble</span> (line <span class="line-number">366</span>)
+		<span class="method-title">sqlrcur_defineOutputBindDouble</span> (line <span class="line-number">474</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1359,10 +1472,10 @@
 	
 </div>
 <a name="functionsqlrcur_defineOutputBindInteger" id="functionsqlrcur_defineOutputBindInteger"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_defineOutputBindInteger</span> (line <span class="line-number">362</span>)
+		<span class="method-title">sqlrcur_defineOutputBindInteger</span> (line <span class="line-number">470</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1389,10 +1502,10 @@
 	
 </div>
 <a name="functionsqlrcur_defineOutputBindString" id="functionsqlrcur_defineOutputBindString"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_defineOutputBindString</span> (line <span class="line-number">358</span>)
+		<span class="method-title">sqlrcur_defineOutputBindString</span> (line <span class="line-number">466</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1423,10 +1536,10 @@
 	
 </div>
 <a name="functionsqlrcur_dontGetColumnInfo" id="functionsqlrcur_dontGetColumnInfo"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_dontGetColumnInfo</span> (line <span class="line-number">220</span>)
+		<span class="method-title">sqlrcur_dontGetColumnInfo</span> (line <span class="line-number">328</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1450,10 +1563,10 @@
 	
 </div>
 <a name="functionsqlrcur_endOfResultSet" id="functionsqlrcur_endOfResultSet"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_endOfResultSet</span> (line <span class="line-number">487</span>)
+		<span class="method-title">sqlrcur_endOfResultSet</span> (line <span class="line-number">595</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1477,10 +1590,10 @@
 	
 </div>
 <a name="functionsqlrcur_errorMessage" id="functionsqlrcur_errorMessage"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_errorMessage</span> (line <span class="line-number">494</span>)
+		<span class="method-title">sqlrcur_errorMessage</span> (line <span class="line-number">602</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1504,10 +1617,10 @@
 	
 </div>
 <a name="functionsqlrcur_errorNumber" id="functionsqlrcur_errorNumber"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_errorNumber</span> (line <span class="line-number">500</span>)
+		<span class="method-title">sqlrcur_errorNumber</span> (line <span class="line-number">608</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1531,10 +1644,10 @@
 	
 </div>
 <a name="functionsqlrcur_executeQuery" id="functionsqlrcur_executeQuery"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_executeQuery</span> (line <span class="line-number">406</span>)
+		<span class="method-title">sqlrcur_executeQuery</span> (line <span class="line-number">514</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1558,10 +1671,10 @@
 	
 </div>
 <a name="functionsqlrcur_fetchFromBindCursor" id="functionsqlrcur_fetchFromBindCursor"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_fetchFromBindCursor</span> (line <span class="line-number">410</span>)
+		<span class="method-title">sqlrcur_fetchFromBindCursor</span> (line <span class="line-number">518</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1585,10 +1698,10 @@
 	
 </div>
 <a name="functionsqlrcur_firstRowIndex" id="functionsqlrcur_firstRowIndex"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_firstRowIndex</span> (line <span class="line-number">481</span>)
+		<span class="method-title">sqlrcur_firstRowIndex</span> (line <span class="line-number">589</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1612,10 +1725,10 @@
 	
 </div>
 <a name="functionsqlrcur_free" id="functionsqlrcur_free"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_free</span> (line <span class="line-number">200</span>)
+		<span class="method-title">sqlrcur_free</span> (line <span class="line-number">308</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1639,10 +1752,10 @@
 	
 </div>
 <a name="functionsqlrcur_getCacheFileName" id="functionsqlrcur_getCacheFileName"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getCacheFileName</span> (line <span class="line-number">264</span>)
+		<span class="method-title">sqlrcur_getCacheFileName</span> (line <span class="line-number">372</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1666,10 +1779,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnInfo" id="functionsqlrcur_getColumnInfo"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnInfo</span> (line <span class="line-number">224</span>)
+		<span class="method-title">sqlrcur_getColumnInfo</span> (line <span class="line-number">332</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1693,10 +1806,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsAutoIncrement" id="functionsqlrcur_getColumnIsAutoIncrement"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsAutoIncrement</span> (line <span class="line-number">628</span>)
+		<span class="method-title">sqlrcur_getColumnIsAutoIncrement</span> (line <span class="line-number">736</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1724,10 +1837,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsBinary" id="functionsqlrcur_getColumnIsBinary"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsBinary</span> (line <span class="line-number">623</span>)
+		<span class="method-title">sqlrcur_getColumnIsBinary</span> (line <span class="line-number">731</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1755,10 +1868,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsNullable" id="functionsqlrcur_getColumnIsNullable"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsNullable</span> (line <span class="line-number">593</span>)
+		<span class="method-title">sqlrcur_getColumnIsNullable</span> (line <span class="line-number">701</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1785,10 +1898,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsPartOfKey" id="functionsqlrcur_getColumnIsPartOfKey"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsPartOfKey</span> (line <span class="line-number">608</span>)
+		<span class="method-title">sqlrcur_getColumnIsPartOfKey</span> (line <span class="line-number">716</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1815,10 +1928,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsPrimaryKey" id="functionsqlrcur_getColumnIsPrimaryKey"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsPrimaryKey</span> (line <span class="line-number">598</span>)
+		<span class="method-title">sqlrcur_getColumnIsPrimaryKey</span> (line <span class="line-number">706</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1846,10 +1959,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsUnique" id="functionsqlrcur_getColumnIsUnique"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsUnique</span> (line <span class="line-number">603</span>)
+		<span class="method-title">sqlrcur_getColumnIsUnique</span> (line <span class="line-number">711</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1876,10 +1989,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsUnsigned" id="functionsqlrcur_getColumnIsUnsigned"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsUnsigned</span> (line <span class="line-number">613</span>)
+		<span class="method-title">sqlrcur_getColumnIsUnsigned</span> (line <span class="line-number">721</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1907,10 +2020,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnIsZeroFilled" id="functionsqlrcur_getColumnIsZeroFilled"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnIsZeroFilled</span> (line <span class="line-number">618</span>)
+		<span class="method-title">sqlrcur_getColumnIsZeroFilled</span> (line <span class="line-number">726</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1938,10 +2051,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnLength" id="functionsqlrcur_getColumnLength"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnLength</span> (line <span class="line-number">574</span>)
+		<span class="method-title">sqlrcur_getColumnLength</span> (line <span class="line-number">682</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -1968,10 +2081,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnList" id="functionsqlrcur_getColumnList"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnList</span> (line <span class="line-number">287</span>)
+		<span class="method-title">sqlrcur_getColumnList</span> (line <span class="line-number">395</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2001,10 +2114,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnName" id="functionsqlrcur_getColumnName"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnName</span> (line <span class="line-number">564</span>)
+		<span class="method-title">sqlrcur_getColumnName</span> (line <span class="line-number">672</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2031,10 +2144,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnNames" id="functionsqlrcur_getColumnNames"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnNames</span> (line <span class="line-number">560</span>)
+		<span class="method-title">sqlrcur_getColumnNames</span> (line <span class="line-number">668</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2058,10 +2171,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnPrecision" id="functionsqlrcur_getColumnPrecision"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnPrecision</span> (line <span class="line-number">581</span>)
+		<span class="method-title">sqlrcur_getColumnPrecision</span> (line <span class="line-number">689</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2088,10 +2201,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnScale" id="functionsqlrcur_getColumnScale"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnScale</span> (line <span class="line-number">587</span>)
+		<span class="method-title">sqlrcur_getColumnScale</span> (line <span class="line-number">695</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2118,10 +2231,10 @@
 	
 </div>
 <a name="functionsqlrcur_getColumnType" id="functionsqlrcur_getColumnType"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getColumnType</span> (line <span class="line-number">569</span>)
+		<span class="method-title">sqlrcur_getColumnType</span> (line <span class="line-number">677</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2148,10 +2261,10 @@
 	
 </div>
 <a name="functionsqlrcur_getDatabaseList" id="functionsqlrcur_getDatabaseList"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getDatabaseList</span> (line <span class="line-number">276</span>)
+		<span class="method-title">sqlrcur_getDatabaseList</span> (line <span class="line-number">384</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2179,10 +2292,10 @@
 	
 </div>
 <a name="functionsqlrcur_getField" id="functionsqlrcur_getField"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getField</span> (line <span class="line-number">519</span>)
+		<span class="method-title">sqlrcur_getField</span> (line <span class="line-number">627</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2212,10 +2325,10 @@
 	
 </div>
 <a name="functionsqlrcur_getFieldAsDouble" id="functionsqlrcur_getFieldAsDouble"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getFieldAsDouble</span> (line <span class="line-number">529</span>)
+		<span class="method-title">sqlrcur_getFieldAsDouble</span> (line <span class="line-number">637</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2245,10 +2358,10 @@
 	
 </div>
 <a name="functionsqlrcur_getFieldAsInteger" id="functionsqlrcur_getFieldAsInteger"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getFieldAsInteger</span> (line <span class="line-number">524</span>)
+		<span class="method-title">sqlrcur_getFieldAsInteger</span> (line <span class="line-number">632</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2278,10 +2391,10 @@
 	
 </div>
 <a name="functionsqlrcur_getFieldLength" id="functionsqlrcur_getFieldLength"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getFieldLength</span> (line <span class="line-number">536</span>)
+		<span class="method-title">sqlrcur_getFieldLength</span> (line <span class="line-number">644</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2311,10 +2424,10 @@
 	
 </div>
 <a name="functionsqlrcur_getLongest" id="functionsqlrcur_getLongest"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getLongest</span> (line <span class="line-number">633</span>)
+		<span class="method-title">sqlrcur_getLongest</span> (line <span class="line-number">741</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2342,10 +2455,10 @@
 	
 </div>
 <a name="functionsqlrcur_getNullsAsEmptyStrings" id="functionsqlrcur_getNullsAsEmptyStrings"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getNullsAsEmptyStrings</span> (line <span class="line-number">507</span>)
+		<span class="method-title">sqlrcur_getNullsAsEmptyStrings</span> (line <span class="line-number">615</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2369,10 +2482,10 @@
 	
 </div>
 <a name="functionsqlrcur_getNullsAsNulls" id="functionsqlrcur_getNullsAsNulls"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getNullsAsNulls</span> (line <span class="line-number">512</span>)
+		<span class="method-title">sqlrcur_getNullsAsNulls</span> (line <span class="line-number">620</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2396,10 +2509,10 @@
 	
 </div>
 <a name="functionsqlrcur_getOutputBindBlob" id="functionsqlrcur_getOutputBindBlob"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getOutputBindBlob</span> (line <span class="line-number">432</span>)
+		<span class="method-title">sqlrcur_getOutputBindBlob</span> (line <span class="line-number">540</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2426,10 +2539,10 @@
 	
 </div>
 <a name="functionsqlrcur_getOutputBindClob" id="functionsqlrcur_getOutputBindClob"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getOutputBindClob</span> (line <span class="line-number">437</span>)
+		<span class="method-title">sqlrcur_getOutputBindClob</span> (line <span class="line-number">545</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2456,10 +2569,10 @@
 	
 </div>
 <a name="functionsqlrcur_getOutputBindDouble" id="functionsqlrcur_getOutputBindDouble"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getOutputBindDouble</span> (line <span class="line-number">427</span>)
+		<span class="method-title">sqlrcur_getOutputBindDouble</span> (line <span class="line-number">535</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2486,10 +2599,10 @@
 	
 </div>
 <a name="functionsqlrcur_getOutputBindInteger" id="functionsqlrcur_getOutputBindInteger"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getOutputBindInteger</span> (line <span class="line-number">422</span>)
+		<span class="method-title">sqlrcur_getOutputBindInteger</span> (line <span class="line-number">530</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2516,10 +2629,10 @@
 	
 </div>
 <a name="functionsqlrcur_getOutputBindLength" id="functionsqlrcur_getOutputBindLength"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getOutputBindLength</span> (line <span class="line-number">442</span>)
+		<span class="method-title">sqlrcur_getOutputBindLength</span> (line <span class="line-number">550</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2546,10 +2659,10 @@
 	
 </div>
 <a name="functionsqlrcur_getOutputBindString" id="functionsqlrcur_getOutputBindString"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getOutputBindString</span> (line <span class="line-number">417</span>)
+		<span class="method-title">sqlrcur_getOutputBindString</span> (line <span class="line-number">525</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2576,10 +2689,10 @@
 	
 </div>
 <a name="functionsqlrcur_getResultSetBufferSize" id="functionsqlrcur_getResultSetBufferSize"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getResultSetBufferSize</span> (line <span class="line-number">212</span>)
+		<span class="method-title">sqlrcur_getResultSetBufferSize</span> (line <span class="line-number">320</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2603,10 +2716,10 @@
 	
 </div>
 <a name="functionsqlrcur_getResultSetId" id="functionsqlrcur_getResultSetId"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getResultSetId</span> (line <span class="line-number">648</span>)
+		<span class="method-title">sqlrcur_getResultSetId</span> (line <span class="line-number">756</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2630,10 +2743,10 @@
 	
 </div>
 <a name="functionsqlrcur_getRow" id="functionsqlrcur_getRow"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getRow</span> (line <span class="line-number">542</span>)
+		<span class="method-title">sqlrcur_getRow</span> (line <span class="line-number">650</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2660,10 +2773,10 @@
 	
 </div>
 <a name="functionsqlrcur_getRowAssoc" id="functionsqlrcur_getRowAssoc"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getRowAssoc</span> (line <span class="line-number">547</span>)
+		<span class="method-title">sqlrcur_getRowAssoc</span> (line <span class="line-number">655</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2690,10 +2803,10 @@
 	
 </div>
 <a name="functionsqlrcur_getRowLenghtsAssoc" id="functionsqlrcur_getRowLenghtsAssoc"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getRowLenghtsAssoc</span> (line <span class="line-number">556</span>)
+		<span class="method-title">sqlrcur_getRowLenghtsAssoc</span> (line <span class="line-number">664</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2720,10 +2833,10 @@
 	
 </div>
 <a name="functionsqlrcur_getTableList" id="functionsqlrcur_getTableList"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_getTableList</span> (line <span class="line-number">281</span>)
+		<span class="method-title">sqlrcur_getTableList</span> (line <span class="line-number">389</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2750,10 +2863,10 @@
 	
 </div>
 <a name="functionsqlrcur_inputBind" id="functionsqlrcur_inputBind"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_inputBind</span> (line <span class="line-number">337</span>)
+		<span class="method-title">sqlrcur_inputBind</span> (line <span class="line-number">445</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2790,10 +2903,10 @@
 	
 </div>
 <a name="functionsqlrcur_inputBindBlob" id="functionsqlrcur_inputBindBlob"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_inputBindBlob</span> (line <span class="line-number">347</span>)
+		<span class="method-title">sqlrcur_inputBindBlob</span> (line <span class="line-number">455</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2826,10 +2939,10 @@
 	
 </div>
 <a name="functionsqlrcur_inputBindClob" id="functionsqlrcur_inputBindClob"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_inputBindClob</span> (line <span class="line-number">351</span>)
+		<span class="method-title">sqlrcur_inputBindClob</span> (line <span class="line-number">459</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2862,10 +2975,10 @@
 	
 </div>
 <a name="functionsqlrcur_lowerCaseColumnNames" id="functionsqlrcur_lowerCaseColumnNames"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_lowerCaseColumnNames</span> (line <span class="line-number">239</span>)
+		<span class="method-title">sqlrcur_lowerCaseColumnNames</span> (line <span class="line-number">347</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2889,10 +3002,10 @@
 	
 </div>
 <a name="functionsqlrcur_mixedCaseColumnNames" id="functionsqlrcur_mixedCaseColumnNames"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_mixedCaseColumnNames</span> (line <span class="line-number">231</span>)
+		<span class="method-title">sqlrcur_mixedCaseColumnNames</span> (line <span class="line-number">339</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2916,10 +3029,10 @@
 	
 </div>
 <a name="functionsqlrcur_openCachedResultSet" id="functionsqlrcur_openCachedResultSet"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_openCachedResultSet</span> (line <span class="line-number">452</span>)
+		<span class="method-title">sqlrcur_openCachedResultSet</span> (line <span class="line-number">560</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2946,10 +3059,10 @@
 	
 </div>
 <a name="functionsqlrcur_prepareFileQuery" id="functionsqlrcur_prepareFileQuery"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_prepareFileQuery</span> (line <span class="line-number">317</span>)
+		<span class="method-title">sqlrcur_prepareFileQuery</span> (line <span class="line-number">425</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -2979,10 +3092,10 @@
 	
 </div>
 <a name="functionsqlrcur_prepareQuery" id="functionsqlrcur_prepareQuery"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_prepareQuery</span> (line <span class="line-number">308</span>)
+		<span class="method-title">sqlrcur_prepareQuery</span> (line <span class="line-number">416</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3009,10 +3122,10 @@
 	
 </div>
 <a name="functionsqlrcur_prepareQueryWithLength" id="functionsqlrcur_prepareQueryWithLength"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_prepareQueryWithLength</span> (line <span class="line-number">313</span>)
+		<span class="method-title">sqlrcur_prepareQueryWithLength</span> (line <span class="line-number">421</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3042,10 +3155,10 @@
 	
 </div>
 <a name="functionsqlrcur_resumeCachedResultSet" id="functionsqlrcur_resumeCachedResultSet"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_resumeCachedResultSet</span> (line <span class="line-number">659</span>)
+		<span class="method-title">sqlrcur_resumeCachedResultSet</span> (line <span class="line-number">767</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3075,10 +3188,10 @@
 	
 </div>
 <a name="functionsqlrcur_resumeResultSet" id="functionsqlrcur_resumeResultSet"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_resumeResultSet</span> (line <span class="line-number">653</span>)
+		<span class="method-title">sqlrcur_resumeResultSet</span> (line <span class="line-number">761</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3106,10 +3219,10 @@
 	
 </div>
 <a name="functionsqlrcur_rowCount" id="functionsqlrcur_rowCount"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_rowCount</span> (line <span class="line-number">462</span>)
+		<span class="method-title">sqlrcur_rowCount</span> (line <span class="line-number">570</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3133,10 +3246,10 @@
 	
 </div>
 <a name="functionsqlrcur_sendFileQuery" id="functionsqlrcur_sendFileQuery"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_sendFileQuery</span> (line <span class="line-number">302</span>)
+		<span class="method-title">sqlrcur_sendFileQuery</span> (line <span class="line-number">410</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3166,10 +3279,10 @@
 	
 </div>
 <a name="functionsqlrcur_sendQuery" id="functionsqlrcur_sendQuery"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_sendQuery</span> (line <span class="line-number">293</span>)
+		<span class="method-title">sqlrcur_sendQuery</span> (line <span class="line-number">401</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3196,10 +3309,10 @@
 	
 </div>
 <a name="functionsqlrcur_sendQueryWithLength" id="functionsqlrcur_sendQueryWithLength"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_sendQueryWithLength</span> (line <span class="line-number">298</span>)
+		<span class="method-title">sqlrcur_sendQueryWithLength</span> (line <span class="line-number">406</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3229,10 +3342,10 @@
 	
 </div>
 <a name="functionsqlrcur_setCacheTtl" id="functionsqlrcur_setCacheTtl"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_setCacheTtl</span> (line <span class="line-number">259</span>)
+		<span class="method-title">sqlrcur_setCacheTtl</span> (line <span class="line-number">367</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3259,10 +3372,10 @@
 	
 </div>
 <a name="functionsqlrcur_setResultSetBufferSize" id="functionsqlrcur_setResultSetBufferSize"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_setResultSetBufferSize</span> (line <span class="line-number">207</span>)
+		<span class="method-title">sqlrcur_setResultSetBufferSize</span> (line <span class="line-number">315</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3290,10 +3403,10 @@
 	
 </div>
 <a name="functionsqlrcur_substitution" id="functionsqlrcur_substitution"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_substitution</span> (line <span class="line-number">323</span>)
+		<span class="method-title">sqlrcur_substitution</span> (line <span class="line-number">431</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3330,10 +3443,10 @@
 	
 </div>
 <a name="functionsqlrcur_suspendResultSet" id="functionsqlrcur_suspendResultSet"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_suspendResultSet</span> (line <span class="line-number">641</span>)
+		<span class="method-title">sqlrcur_suspendResultSet</span> (line <span class="line-number">749</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3357,10 +3470,10 @@
 	
 </div>
 <a name="functionsqlrcur_totalRows" id="functionsqlrcur_totalRows"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_totalRows</span> (line <span class="line-number">469</span>)
+		<span class="method-title">sqlrcur_totalRows</span> (line <span class="line-number">577</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3385,10 +3498,10 @@
 	
 </div>
 <a name="functionsqlrcur_upperCaseColumnNames" id="functionsqlrcur_upperCaseColumnNames"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_upperCaseColumnNames</span> (line <span class="line-number">235</span>)
+		<span class="method-title">sqlrcur_upperCaseColumnNames</span> (line <span class="line-number">343</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3412,10 +3525,10 @@
 	
 </div>
 <a name="functionsqlrcur_validateBinds" id="functionsqlrcur_validateBinds"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_validateBinds</span> (line <span class="line-number">396</span>)
+		<span class="method-title">sqlrcur_validateBinds</span> (line <span class="line-number">504</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3440,10 +3553,10 @@
 	
 </div>
 <a name="functionsqlrcur_validBind" id="functionsqlrcur_validBind"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div>
-		<span class="method-title">sqlrcur_validBind</span> (line <span class="line-number">400</span>)
+		<span class="method-title">sqlrcur_validBind</span> (line <span class="line-number">508</span>)
 	</div> 
 
 	<!-- ========== Info from phpDoc block ========= -->
@@ -3474,7 +3587,7 @@
 	</div>
 	
 	<p class="notes" id="credit">
-		Documentation generated on Fri, 12 Feb 2016 21:24:50 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+		Documentation generated on Sat, 12 Mar 2016 06:04:49 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
 	</p>
 	</div></body>
 </html>

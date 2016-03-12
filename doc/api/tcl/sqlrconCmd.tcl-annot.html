@@ -45,6 +45,12 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <tr><td><code><a href="#debugOn">debugOn</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Causes verbose debugging information to be 
  sent to standard output.</td></tr>
+<tr><td><code><a href="#disableEncryption">disableEncryption</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disables</td></tr>
+<tr><td><code><a href="#enableKerberos">enableKerberos</a> { service mech flags }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enables Kerberos authentication and encryption.</td></tr>
+<tr><td><code><a href="#enableTls">enableTls</a> { version cert password ciphers validate ca depth }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enables TLS/SSL encryption, and optionally authentication.</td></tr>
 <tr><td><code><a href="#endSession">endSession</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ends the</td></tr>
 <tr><td><code><a href="#errorMessage">errorMessage</a> {  }</code><br>
@@ -125,7 +131,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to wait for the 
  client to tell it when to commit.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_130">sqlrconCmd.tcl, line 130</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_240">sqlrconCmd.tcl, line 240</a>
 </dl></dl>
 
 <hr>
@@ -134,7 +140,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to perform a commit
  after every successful query.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_126">sqlrconCmd.tcl, line 126</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_236">sqlrconCmd.tcl, line 236</a>
 </dl></dl>
 
 <hr>
@@ -147,7 +153,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  commit or rollback is issued then this doesn't
  do anything unless SQL Relay is faking transaction
  blocks.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_140">sqlrconCmd.tcl, line 140</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_250">sqlrconCmd.tcl, line 250</a>
 </dl></dl>
 
 <hr>
@@ -156,7 +162,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns a string representing the format
  of the bind variables used in the db.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_106">sqlrconCmd.tcl, line 106</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_216">sqlrconCmd.tcl, line 216</a>
 </dl></dl>
 
 <hr>
@@ -164,7 +170,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc clientVersion {  }</pre>
 <dl>
 <dd>Returns the version of the sqlrelay client software.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#clientVersion_102">sqlrconCmd.tcl, line 102</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#clientVersion_212">sqlrconCmd.tcl, line 212</a>
 </dl></dl>
 
 <hr>
@@ -173,7 +179,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a commit.  Returns true if the commit
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_144">sqlrconCmd.tcl, line 144</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_254">sqlrconCmd.tcl, line 254</a>
 </dl></dl>
 
 <hr>
@@ -181,7 +187,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc dbHostName {  }</pre>
 <dl>
 <dd>Returns the host name of the database<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbHostName_93">sqlrconCmd.tcl, line 93</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbHostName_203">sqlrconCmd.tcl, line 203</a>
 </dl></dl>
 
 <hr>
@@ -189,7 +195,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc dbIpAddress {  }</pre>
 <dl>
 <dd>Returns the ip address of the database<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbIpAddress_96">sqlrconCmd.tcl, line 96</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbIpAddress_206">sqlrconCmd.tcl, line 206</a>
 </dl></dl>
 
 <hr>
@@ -197,7 +203,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc dbVersion {  }</pre>
 <dl>
 <dd>Returns the version of the database<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbVersion_90">sqlrconCmd.tcl, line 90</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbVersion_200">sqlrconCmd.tcl, line 200</a>
 </dl></dl>
 
 <hr>
@@ -205,7 +211,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc debugOff {  }</pre>
 <dl>
 <dd>Turns debugging off.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_176">sqlrconCmd.tcl, line 176</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_286">sqlrconCmd.tcl, line 286</a>
 </dl></dl>
 
 <hr>
@@ -217,7 +223,130 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  this is to start a query with "-- debug\n".
  Another way is to set the environment variable
  SQLR_CLIENT_DEBUG to "ON"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_173">sqlrconCmd.tcl, line 173</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_283">sqlrconCmd.tcl, line 283</a>
+</dl></dl>
+
+<hr>
+<h3><a name="disableEncryption">disableEncryption</a></h3>
+<pre>proc disableEncryption {  }</pre>
+<dl>
+<dd>Disables encryption.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#disableEncryption_155">sqlrconCmd.tcl, line 155</a>
+</dl></dl>
+
+<hr>
+<h3><a name="enableKerberos">enableKerberos</a></h3>
+<pre>proc enableKerberos { service mech flags }</pre>
+<dl>
+<dd>Enables Kerberos authentication and encryption.
+
+ "service" indicates the Kerberos service name of the
+ SQL Relay server.  If left empty or NULL then the service
+ name "sqlrelay" will be used. "sqlrelay" is the default
+ service name of the SQL Relay server.  Note that on Windows
+ platforms the service name must be fully qualified,
+ including the host name.  For example:
+ "sqlrelay@sqlrserver.firstworks.com".
+
+ "mech" indicates the specific Kerberos mechanism to use.
+ On Linux/Unix platforms, this should be a string
+ representation of the mechnaism's OID, such as:
+     { 1 2 840 113554 1 2 2 }
+ On Windows platforms, this should be a string like:
+     Kerberos
+ If left empty or NULL then the default mechanism will be
+ used.  Only set this if you know that you have a good
+ reason to.
+
+ "flags" indicates what Kerberos flags to use.  Multiple
+ flags may be specified, separated by commas.  If left
+ empty or NULL then a defalt set of flags will be used.
+ Only set this if you know that you have a good reason to.
+
+ Valid flags include:
+  * GSS_C_MUTUAL_FLAG
+  * GSS_C_REPLAY_FLAG
+  * GSS_C_SEQUENCE_FLAG
+  * GSS_C_CONF_FLAG
+  * GSS_C_INTEG_FLAG
+
+ For a full list of flags, consult the GSSAPI documentation,
+ though note that only the flags listed above are supported
+ on Windows. */<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#enableKerberos_84">sqlrconCmd.tcl, line 84</a>
+</dl></dl>
+
+<hr>
+<h3><a name="enableTls">enableTls</a></h3>
+<pre>proc enableTls { version cert password ciphers validate ca depth }</pre>
+<dl>
+<dd>Enables TLS/SSL encryption, and optionally authentication.
+
+ "version" specifies the TLS/SSL protocol version that the
+ client will attempt to use.  Valid values include SSL2,
+ SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of
+ TLS, as supported by and enabled in the underlying TLS/SSL
+ library.  If left blank or empty then the highest supported
+ version will be negotiated.
+
+ "cert" is the file name of the certificate chain file to
+ send to the SQL Relay server.  This is only necessary if
+ the SQL Relay server is configured to authenticate and
+ authorize clients by certificate.
+
+ If "cert" contains a password-protected private key, then
+ "password" may be supplied to access it.  If the private
+ key is not password-protected, then this argument is
+ ignored, and may be left empty or NULL.
+
+ "ciphers" is a list of ciphers to allow.  Ciphers may be
+ separated by spaces, commas, or colons.  If "ciphers" is
+ empty or NULL then a default set is used.  Only set this if
+ you know that you have a good reason to.
+
+ For a list of valid ciphers on Linux/Unix platforms, see:
+     man ciphers
+
+ For a list of valid ciphers on Windows platforms, see:
+     https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx
+ On Windows platforms, the ciphers (alg_id's) should omit
+ CALG_ and may be given with underscores or dashes.
+ For example: 3DES_112
+
+ "validate" indicates whether to validate the SQL Relay's
+ server certificate, and may be set to one of the following:
+     "no" - Don't validate the server's certificate.
+     "ca" - Validate that the server's certificate was
+            signed by a trusted certificate authority.
+     "ca+host" - Perform "ca" validation and also validate
+            that the common name in the certificate matches
+            the host parameter.  (Falls back to "ca"
+            validation when a unix socket is used.)
+     "ca+domain" - Perform "ca" validation and also validate
+            that the domain name of the common name in the
+            certificate matches the domain name of the host
+            parameter.  (Falls back to "ca" validation when
+            a unix socket is used.)
+
+ "ca" is the location of a certificate authority file to
+ use, in addition to the system's root certificates, when
+ validating the SQL Relay server's certificate.  This is
+ useful if the SQL Relay server's certificate is self-signed.
+
+ On Windows, "ca" must be a file name.
+
+ On non-Windows systems, "ca" can be either a file or
+ directory name.  If it is a directory name, then all
+ certificate authority files found in that directory will be
+ used.  If it a file name, then only that file will be used.
+
+
+ Note that the supported "cert" and "ca" file formats may
+ vary between platforms.  A variety of file formats are
+ generally supported on Linux/Unix platfoms (.pem, .pfx,
+ etc.) but only the .pfx format is currently supported on
+ Windows. */<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#enableTls_152">sqlrconCmd.tcl, line 152</a>
 </dl></dl>
 
 <hr>
@@ -225,7 +354,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc endSession {  }</pre>
 <dl>
 <dd>Ends the session.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#endSession_50">sqlrconCmd.tcl, line 50</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#endSession_160">sqlrconCmd.tcl, line 160</a>
 </dl></dl>
 
 <hr>
@@ -236,7 +365,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error the error message is available here.
  If there is no error then this method 
  returns NULL.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_156">sqlrconCmd.tcl, line 156</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_266">sqlrconCmd.tcl, line 266</a>
 </dl></dl>
 
 <hr>
@@ -247,7 +376,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error, the error number is available here.
  If there is no error then this method 
  returns 0.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_164">sqlrconCmd.tcl, line 164</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_274">sqlrconCmd.tcl, line 274</a>
 </dl></dl>
 
 <hr>
@@ -255,7 +384,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getClientInfo {  }</pre>
 <dl>
 <dd>Returns the string that was set by setClientInfo().<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_194">sqlrconCmd.tcl, line 194</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_304">sqlrconCmd.tcl, line 304</a>
 </dl></dl>
 
 <hr>
@@ -268,7 +397,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  the resumeSession {} method.
  Note: The value this method returns is only
  valid after a call to suspendSession {}.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionPort_64">sqlrconCmd.tcl, line 64</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionPort_174">sqlrconCmd.tcl, line 174</a>
 </dl></dl>
 
 <hr>
@@ -281,7 +410,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  the resumeSession {} method.
  Note: The value this method returns is only
  valid after a call to suspendSession {}.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionSocket_72">sqlrconCmd.tcl, line 72</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getConnectionSocket_182">sqlrconCmd.tcl, line 182</a>
 </dl></dl>
 
 <hr>
@@ -289,7 +418,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getCurrentDatabase {  }</pre>
 <dl>
 <dd>Returns the database/schema that is currently in use.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_114">sqlrconCmd.tcl, line 114</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_224">sqlrconCmd.tcl, line 224</a>
 </dl></dl>
 
 <hr>
@@ -298,7 +427,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns false if debugging is off and true
  if debugging is on.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_180">sqlrconCmd.tcl, line 180</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_290">sqlrconCmd.tcl, line 290</a>
 </dl></dl>
 
 <hr>
@@ -307,7 +436,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns the value of the autoincrement
  column for the last insert<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_120">sqlrconCmd.tcl, line 120</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_230">sqlrconCmd.tcl, line 230</a>
 </dl></dl>
 
 <hr>
@@ -316,7 +445,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns the type of database: 
  oracle postgresql mysql etc.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#identify_87">sqlrconCmd.tcl, line 87</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#identify_197">sqlrconCmd.tcl, line 197</a>
 </dl></dl>
 
 <hr>
@@ -325,7 +454,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the database is up and false
  if it's down.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#ping_83">sqlrconCmd.tcl, line 83</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#ping_193">sqlrconCmd.tcl, line 193</a>
 </dl></dl>
 
 <hr>
@@ -335,7 +464,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dd>Resumes a session previously left open 
  using suspendSession {}.
  Returns true on success and false on failure.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#resumeSession_77">sqlrconCmd.tcl, line 77</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#resumeSession_187">sqlrconCmd.tcl, line 187</a>
 </dl></dl>
 
 <hr>
@@ -344,7 +473,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a rollback.  Returns true if the rollback
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_148">sqlrconCmd.tcl, line 148</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_258">sqlrconCmd.tcl, line 258</a>
 </dl></dl>
 
 <hr>
@@ -352,7 +481,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc selectDatabase { database }</pre>
 <dl>
 <dd>Sets the current database/schema to "database"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_111">sqlrconCmd.tcl, line 111</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_221">sqlrconCmd.tcl, line 221</a>
 </dl></dl>
 
 <hr>
@@ -360,7 +489,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc serverVersion {  }</pre>
 <dl>
 <dd>Returns the version of the sqlrelay server software.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#serverVersion_99">sqlrconCmd.tcl, line 99</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#serverVersion_209">sqlrconCmd.tcl, line 209</a>
 </dl></dl>
 
 <hr>
@@ -382,7 +511,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  server and ultimately included in server-side logging
  along with queries that were run by this instance of
  the client.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_191">sqlrconCmd.tcl, line 191</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_301">sqlrconCmd.tcl, line 301</a>
 </dl></dl>
 
 <hr>
@@ -403,7 +532,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dd>Allows you to specify a file to write debug to.
  Setting "debugfilename" to NULL or an empty string causes debug
  to be written to standard output (the default).<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setDebugFile_185">sqlrconCmd.tcl, line 185</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setDebugFile_295">sqlrconCmd.tcl, line 295</a>
 </dl></dl>
 
 <hr>
@@ -457,7 +586,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  session but leaves the session open so 
  that another connection can connect to it 
  using resumeSession {}.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#suspendSession_56">sqlrconCmd.tcl, line 56</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#suspendSession_166">sqlrconCmd.tcl, line 166</a>
 </dl></dl>
 
 <hr>
@@ -466,7 +595,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2016-02-12 at 16:25.</cite>
+<cite>File generated 2016-03-12 at 01:05.</cite>
 </font>
 </body>
 </html>

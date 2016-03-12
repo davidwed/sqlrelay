@@ -58,6 +58,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae1e7f0aaa3879a7c1df8c8e550d2cb98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9325e1bd783bd22c3497eac38dd8db13"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_connection.html#a9325e1bd783bd22c3497eac38dd8db13">setResponseTimeout</a> (var timeoutsec, var timeoutusec)</td></tr>
 <tr class="separator:a9325e1bd783bd22c3497eac38dd8db13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbe5ac7c3ed23c78851c2abfcb0c0e50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_connection.html#afbe5ac7c3ed23c78851c2abfcb0c0e50">enableKerberos</a> (var service, var mech, var flags)</td></tr>
+<tr class="separator:afbe5ac7c3ed23c78851c2abfcb0c0e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1fb6797e689d29468380cf9bb98d718"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_connection.html#af1fb6797e689d29468380cf9bb98d718">enableTls</a> (var version, var cert, var password, var ciphers, var validate, var ca, var depth)</td></tr>
+<tr class="separator:af1fb6797e689d29468380cf9bb98d718"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a7c8089cc8fc85f83cf88d4d5601b19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_connection.html#a5a7c8089cc8fc85f83cf88d4d5601b19">disableEncryption</a> ()</td></tr>
+<tr class="separator:a5a7c8089cc8fc85f83cf88d4d5601b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20b76511ac49ea63881c1ec06d78cd04"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_connection.html#a20b76511ac49ea63881c1ec06d78cd04">endSession</a> ()</td></tr>
 <tr class="separator:a20b76511ac49ea63881c1ec06d78cd04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a703549b5b280676fb223b1b24727d25a"><td class="memItemLeft" align="right" valign="top">var&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_connection.html#a703549b5b280676fb223b1b24727d25a">suspendSession</a> ()</td></tr>
@@ -350,6 +356,134 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with "-- debug\n". Yet another way is to set the environment variable SQLR_CLIENT_DEBUG to "ON" </p>
+
+</div>
+</div>
+<a class="anchor" id="a5a7c8089cc8fc85f83cf88d4d5601b19"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SQLRConnection::disableEncryption </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Disables encryption. </p>
+
+</div>
+</div>
+<a class="anchor" id="afbe5ac7c3ed23c78851c2abfcb0c0e50"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SQLRConnection::enableKerberos </td>
+          <td>(</td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>mech</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>flags</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enables Kerberos authentication and encryption.</p>
+<p>"service" indicates the Kerberos service name of the SQL Relay server. If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server. Note that on Windows platforms the service name must be fully qualified, including the host name. For example: "sqlrelay@sqlrserver.firstworks.com".</p>
+<p>"mech" indicates the specific Kerberos mechanism to use. On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as: { 1 2 840 113554 1 2 2 } On Windows platforms, this should be a string like: Kerberos If left empty or NULL then the default mechanism will be used. Only set this if you know that you have a good reason to.</p>
+<p>"flags" indicates what Kerberos flags to use. Multiple flags may be specified, separated by commas. If left empty or NULL then a defalt set of flags will be used. Only set this if you know that you have a good reason to.</p>
+<p>Valid flags include:</p><ul>
+<li>GSS_C_MUTUAL_FLAG</li>
+<li>GSS_C_REPLAY_FLAG</li>
+<li>GSS_C_SEQUENCE_FLAG</li>
+<li>GSS_C_CONF_FLAG</li>
+<li>GSS_C_INTEG_FLAG</li>
+</ul>
+<p>For a full list of flags, consult the GSSAPI documentation, though note that only the flags listed above are supported on Windows. </p>
+
+</div>
+</div>
+<a class="anchor" id="af1fb6797e689d29468380cf9bb98d718"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SQLRConnection::enableTls </td>
+          <td>(</td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>version</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>cert</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>password</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>ciphers</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>validate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>ca</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">var&#160;</td>
+          <td class="paramname"><em>depth</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enables TLS/SSL encryption, and optionally authentication.</p>
+<p>"version" specifies the TLS/SSL protocol version that the client will attempt to use. Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library. If left blank or empty then the highest supported version will be negotiated.</p>
+<p>"cert" is the file name of the certificate chain file to send to the SQL Relay server. This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.</p>
+<p>If "cert" contains a password-protected private key, then "password" may be supplied to access it. If the private key is not password-protected, then this argument is ignored, and may be left empty or NULL.</p>
+<p>"ciphers" is a list of ciphers to allow. Ciphers may be separated by spaces, commas, or colons. If "ciphers" is empty or NULL then a default set is used. Only set this if you know that you have a good reason to.</p>
+<p>For a list of valid ciphers on Linux/Unix platforms, see: man ciphers</p>
+<p>For a list of valid ciphers on Windows platforms, see: <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx">https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx</a> On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes. For example: 3DES_112</p>
+<p>"validate" indicates whether to validate the SQL Relay's server certificate, and may be set to one of the following: "no" - Don't validate the server's certificate. "ca" - Validate that the server's certificate was signed by a trusted certificate authority. "ca+host" - Perform "ca" validation and also validate that the common name in the certificate matches the host parameter. (Falls back to "ca" validation when a unix socket is used.) "ca+domain" - Perform "ca" validation and also validate that the domain name of the common name in the certificate matches the domain name of the host parameter. (Falls back to "ca" validation when a unix socket is used.)</p>
+<p>"ca" is the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate. This is useful if the SQL Relay server's certificate is self-signed.</p>
+<p>On Windows, "ca" must be a file name.</p>
+<p>On non-Windows systems, "ca" can be either a file or directory name. If it is a directory name, then all certificate authority files found in that directory will be used. If it a file name, then only that file will be used.</p>
+<p>Note that the supported "cert" and "ca" file formats may vary between platforms. A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows. </p>
 
 </div>
 </div>
@@ -739,7 +873,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 12 2016 16:24:36 for SQL Relay node.js API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 12 2016 01:04:21 for SQL Relay node.js API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>
