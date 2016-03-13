@@ -15,7 +15,7 @@ def main():
 
 	# instantiation
 	print("INSTANTIATION")
-	con=PySQLRDB.connect("sqlrserver",9000,"/tmp/test.socket","test","test",0,1,krb='yes')
+	con=PySQLRDB.connect("sqlrserver",9000,"/tmp/test.socket","","",0,1,krb='yes')
 	cur=con.cursor()
 	print()
 	print()

@@ -115,9 +115,7 @@ static PyObject *enableKerberos(PyObject *self, PyObject *args) {
   char *flags;
   if (!PyArg_ParseTuple(args, "lsss", &sqlrcon, &service, &mech, &flags))
     return NULL;
-  Py_BEGIN_ALLOW_THREADS
   ((sqlrconnection *)sqlrcon)->enableKerberos(service,mech,flags);
-  Py_END_ALLOW_THREADS
   return Py_BuildValue("h", 0);
 }
 
@@ -138,9 +136,7 @@ static PyObject *enableTls(PyObject *self, PyObject *args) {
 #endif
 		&sqlrcon, &version, &cert, &password, &ciphers, &validate, &ca, &depth))
     return NULL;
-  Py_BEGIN_ALLOW_THREADS
   ((sqlrconnection *)sqlrcon)->enableTls(version,cert,password,ciphers,validate,ca,depth);
-  Py_END_ALLOW_THREADS
   return Py_BuildValue("h", 0);
 }
 
