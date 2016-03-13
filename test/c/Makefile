@@ -13,7 +13,7 @@ include ../../config.mk
 all: db2 freetds firebird mysql oracle postgresql sqlite sap
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracle$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracle$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) krb$(EXE) tls$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
 db2: db2.c db2.$(OBJ)
@@ -39,3 +39,9 @@ sqlite: sqlite.c sqlite.$(OBJ)
 
 sap: sap.c sap.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) sap.$(OBJ) $(CTESTLIBS)
+
+krb: krb.c krb.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) krb.$(OBJ) $(CTESTLIBS)
+
+tls: tls.c tls.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tls.$(OBJ) $(CTESTLIBS)
