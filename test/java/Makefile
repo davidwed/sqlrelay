@@ -10,6 +10,7 @@ all: db2.class\
 	postgresql.class \
 	sqlite.class \
 	sap.class \
+	tls.class \
 	run.bat
 
 clean:
@@ -39,8 +40,11 @@ sqlite.class: sqlite.java
 sap.class: sap.java
 	$(JAVAC) -classpath $(javadir)/sqlrelay.jar sap.java
 
-test.class: test.java
-	$(JAVAC) -classpath $(javadir)/sqlrelay.jar test.java
+tls.class: tls.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar tls.java
+
+krb.class: krb.java
+	$(JAVAC) -classpath $(javadir)/sqlrelay.jar krb.java
 
 run.bat: run.batch
 	$(CP) run.batch run.bat
