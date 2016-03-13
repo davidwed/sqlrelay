@@ -29,6 +29,11 @@ proc checkSuccess {value success} {
 
 set cert "/usr/local/firstworks/etc/client.pem"
 set ca "/usr/local/firstworks/etc/ca.pem"
+set OS [lindex $tcl_platform(os) 0]
+if { $OS == "Windows" } {
+	set cert "C:\\Program Files\\Firstworks\\etc\\client.pfx"
+	set ca "C:\\Program Files\\Firstworks\\etc\\ca.pfx"
+}
 
 # instantiation
 set con [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "" -password "" -retrytime 0 -tries 1]

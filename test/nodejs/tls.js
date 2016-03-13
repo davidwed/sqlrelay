@@ -42,8 +42,8 @@ var	fieldlens;
 var	cert="/usr/local/firstworks/etc/client.pem";
 var	ca="/usr/local/firstworks/etc/ca.pem";
 if (/^win/.test(process.platform)) {
-	cert="C:\\Program Files\\Firstworks\\etc\\client.pem";
-	ca="C:\\Program Files\\Firstworks\\etc\\ca.pem";
+	cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
+	ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
 }
 
 	
