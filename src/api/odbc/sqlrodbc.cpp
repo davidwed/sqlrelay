@@ -89,6 +89,18 @@ struct CONN {
 	char				password[1024];
 	int32_t				retrytime;
 	int32_t				tries;
+	char				krb[16];
+	char				krbservice[16];
+	char				krbmech[128];
+	char				krbflags[1024];
+	char				tls[16];
+	char				tlsversion[16];
+	char				tlscert[1024];
+	char				tlspassword[1024];
+	char				tlsciphers[1024];
+	char				tlsvalidate[1024];
+	char				tlsca[1024];
+	uint16_t			tlsdepth;
 	bool				debug;
 	bool				attrmetadataid;
 };
@@ -1956,6 +1968,54 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","",
+					conn->krb,sizeof(conn->krb),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Krbservice","",
+					conn->krbservice,
+					sizeof(conn->krbservice),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Krbmech","",
+					conn->krbmech,
+					sizeof(conn->krbmech),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Krbflags","",
+					conn->krbflags,
+					sizeof(conn->krbflags),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tls","",
+					conn->tls,sizeof(conn->tls),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlsversion","",
+					conn->tlsversion,
+					sizeof(conn->tlsversion),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlscert","",
+					conn->tlscert,
+					sizeof(conn->tlscert),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlspassword","",
+					conn->tlspassword,
+					sizeof(conn->tlspassword),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlsciphers","",
+					conn->tlsciphers,
+					sizeof(conn->tlsciphers),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlsvalidate","",
+					conn->tlsvalidate,
+					sizeof(conn->tlsvalidate),
+					ODBC_INI);
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlsca","",
+					conn->tlsca,
+					sizeof(conn->tlsca),
+					ODBC_INI);
+	char	tlsdepthbuf[6];
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlsdepth","",
+					tlsdepthbuf,
+					sizeof(tlsdepthbuf),
+					ODBC_INI);
+	conn->tlsdepth=(uint16_t)charstring::toUnsignedInteger(tlsdepthbuf);
 	char	debugbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Debug","0",
 					debugbuf,sizeof(debugbuf),
@@ -1971,6 +2031,18 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  Password: %s\n",conn->password);
 	debugPrintf("  RetryTime: %d\n",(int)conn->retrytime);
 	debugPrintf("  Tries: %d\n",(int)conn->tries);
+	debugPrintf("  Krb: %s\n",conn->krb);
+	debugPrintf("  Krbservice: %s\n",conn->krbservice);
+	debugPrintf("  Krbmech: %s\n",conn->krbmech);
+	debugPrintf("  Krbflags: %s\n",conn->krbflags);
+	debugPrintf("  Tls: %s\n",conn->tls);
+	debugPrintf("  Tlsversion: %s\n",conn->tlsversion);
+	debugPrintf("  Tlscert: %s\n",conn->tlscert);
+	debugPrintf("  Tlspassword: %s\n",conn->tlspassword);
+	debugPrintf("  Tlsciphers: %s\n",conn->tlsciphers);
+	debugPrintf("  Tlsvalidate: %s\n",conn->tlsvalidate);
+	debugPrintf("  Tlsca: %s\n",conn->tlsca);
+	debugPrintf("  Tlsdepth: %d\n",conn->tlsdepth);
 	debugPrintf("  Debug: %d\n",(int)conn->debug);
 
 	// create connection
@@ -1983,13 +2055,28 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					conn->tries,
 					true);
 
-	#ifdef DEBUG_MESSAGES
-	conn->con->debugOn();
-	#endif
+	// enable kerberos or tls
+	if (!charstring::compare(conn->krb,"yes")) {
+		conn->con->enableKerberos(conn->krbservice,
+							conn->krbmech,
+							conn->krbflags);
+	} else if (!charstring::compare(conn->tls,"yes")) {
+		conn->con->enableTls(conn->tlsversion,
+						conn->tlscert,
+						conn->tlspassword,
+						conn->tlsciphers,
+						conn->tlsvalidate,
+						conn->tlsca,
+						conn->tlsdepth);
+	}
 
 	if (conn->debug) {
 		conn->con->debugOn();
 	}
+
+	#ifdef DEBUG_MESSAGES
+	conn->con->debugOn();
+	#endif
 
 	return SQL_SUCCESS;
 }
