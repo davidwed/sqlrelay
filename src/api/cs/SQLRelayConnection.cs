@@ -21,6 +21,18 @@ namespace SQLRClient
         private String _password = null;
         private Int32 _retrytime = 0;
         private Int32 _tries = 1;
+        private String _krb = null;
+        private String _krbservice = null;
+        private String _krbmech = null;
+        private String _krbflags = null;
+        private String _tls = null;
+        private String _tlsversion = null;
+        private String _tlscert = null;
+        private String _tlspassword = null;
+        private String _tlsciphers = null;
+        private String _tlsvalidate = null;
+        private String _tlsca = null;
+        private UInt16 _tlsdepth = 0;
         private String _db = null;
         private Boolean _debug = false;
 
@@ -109,6 +121,18 @@ namespace SQLRClient
                 _retrytime = 0;
                 _tries = 0;
                 _db = null;
+                _krb = null;
+                _krbservice = null;
+                _krbmech = null;
+                _krbflags = null;
+                _tls = null;
+                _tlsversion = null;
+                _tlscert = null;
+                _tlspassword = null;
+                _tlsciphers = null;
+                _tlsvalidate = null;
+                _tlsca = null;
+                _tlsdepth = 0;
                 _debug = false;
 
                 // parse the connection string
@@ -159,6 +183,54 @@ namespace SQLRClient
                     else if (subparts[0] == "Initial Catalog")
                     {
                         _db = subparts[1];
+                    }
+                    else if (subparts[0] == "Krb")
+                    {
+                        _krb = subparts[1];
+                    }
+                    else if (subparts[0] == "Krbservice")
+                    {
+                        _krbservice = subparts[1];
+                    }
+                    else if (subparts[0] == "Krbmech")
+                    {
+                        _krbmech = subparts[1];
+                    }
+                    else if (subparts[0] == "Krbflags")
+                    {
+                        _krbflags = subparts[1];
+                    }
+                    else if (subparts[0] == "Tls")
+                    {
+                        _tls = subparts[1];
+                    }
+                    else if (subparts[0] == "Tlsversion")
+                    {
+                        _tlsversion = subparts[1];
+                    }
+                    else if (subparts[0] == "Tlscert")
+                    {
+                        _tlscert = subparts[1];
+                    }
+                    else if (subparts[0] == "Tlspassword")
+                    {
+                        _tlspassword = subparts[1];
+                    }
+                    else if (subparts[0] == "Tlsciphers")
+                    {
+                        _tlsciphers = subparts[1];
+                    }
+                    else if (subparts[0] == "Tlsvalidate")
+                    {
+                        _tlsvalidate = subparts[1];
+                    }
+                    else if (subparts[0] == "Tlsca")
+                    {
+                        _tlsca = subparts[1];
+                    }
+                    else if (subparts[0] == "Tlsdepth")
+                    {
+                        _tlsdepth = Convert.ToUInt16(subparts[1]);
                     }
                     else if (subparts[0] == "Debug")
                     {
@@ -240,12 +312,22 @@ namespace SQLRClient
 
             _connectionstate = ConnectionState.Open;
             _sqlrcon = new SQLRConnection(_host, _port, _socket, _user, _password, _retrytime, _tries);
-            ChangeDatabase(_db);
+
+            if (_krb == "yes")
+            {
+                _sqlrcon.enableKerberos(_krbservice, _krbmech, _krbflags);
+            }
+            else if (_tls == "yes")
+            {
+                _sqlrcon.enableTls(_tlsversion, _tlscert, _tlspassword, _tlsciphers, _tlsvalidate, _tlsca, _tlsdepth);
+            }
 
             if (_debug)
             {
                 _sqlrcon.debugOn();
             }
+
+            ChangeDatabase(_db);
         }
 
         /** Closes the connection to the database.  This is the preferred

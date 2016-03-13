@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-all: local oracle
+all: local oracle krb tls
 
 clean:
 	$(RM) *.exe *.dll *.dll.config *.pdb
@@ -13,3 +13,9 @@ local:
 
 oracle: oracle.cs
 	$(CSC) $(CSCFLAGS) /out:oracle.exe oracle.cs /reference:SQLRClient.dll
+
+krb: krb.cs
+	$(CSC) $(CSCFLAGS) /out:krb.exe krb.cs /reference:SQLRClient.dll
+
+tls: tls.cs
+	$(CSC) $(CSCFLAGS) /out:tls.exe tls.cs /reference:SQLRClient.dll
