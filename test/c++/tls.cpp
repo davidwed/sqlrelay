@@ -128,7 +128,7 @@ int	main(int argc, char **argv) {
 	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
 	cur=new sqlrcursor(con);
-	con->enableTLS(cert,NULL,NULL,true,ca,0);
+	con->enableTls(NULL,cert,NULL,NULL,"ca",ca,0);
 
 	// get database type
 	stdoutput.printf("IDENTIFY: \n");
@@ -803,7 +803,7 @@ int	main(int argc, char **argv) {
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
 	secondcur=new sqlrcursor(secondcon);
-	secondcon->enableTLS(cert,NULL,NULL,true,ca,0);
+	secondcon->enableTls(NULL,cert,NULL,NULL,"ca",ca,0);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
 	checkSuccess(con->commit(),1);

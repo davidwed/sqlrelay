@@ -63,6 +63,18 @@ sub connect {
 	$dsn{'host'}='localhost';
 	$dsn{'port'}=9000;
 	$dsn{'socket'}='';
+	$dsn{'krb'}='';
+	$dsn{'krbservice'}='';
+	$dsn{'krbmech'}='';
+	$dsn{'krbflags'}='';
+	$dsn{'tls'}='';
+	$dsn{'tlsversion'}='';
+	$dsn{'tlscert'}='';
+	$dsn{'tlspassword'}='';
+	$dsn{'tlsciphers'}='';
+	$dsn{'tlsvalidate'}='';
+	$dsn{'tlsca'}='';
+	$dsn{'tlsdepth'}=0;
 	$dsn{'retrytime'}=0;
 	$dsn{'tries'}=1;
 	$dsn{'debug'}=0;
@@ -95,6 +107,21 @@ sub connect {
 	} elsif ($dsn{'debug'} ne "0") {
 		$connection->setDebugFile($dsn{'debug'});
 		$connection->debugOn();
+	}
+
+	# turn on kerberos or tls
+	if ($dsn{'krb'} eq "yes") {
+		$connection->enableKerberos($dsn{'krbservice'},
+						$dsn{'krbmech'},
+						$dsn{'krbflags'});
+	} elsif ($dsn{'tls'} eq "yes") {
+		$connection->enableTls($dsn{'tlsversion'},
+					$dsn{'tlscert'},
+					$dsn{'tlspassword'},
+					$dsn{'tlsciphers'},
+					$dsn{'tlsvalidate'},
+					$dsn{'tlsca'},
+					$dsn{'tlsdepth'});
 	}
 
 	# if we're not doing lazy connects, then do something lightweight

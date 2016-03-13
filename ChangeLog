@@ -45,6 +45,7 @@
 	moved debugprint stuff into rudiments
 	added support for tls authentication and encryption
 	added tls_userlist auth module
+	fixed long-standing copyrefs bug
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

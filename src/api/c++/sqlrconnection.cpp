@@ -189,6 +189,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_tlsversion=NULL;
 	pvt->_tlscert=NULL;
 	pvt->_tlspassword=NULL;
+	pvt->_tlsciphers=NULL;
 	pvt->_tlsvalidate=(pvt->_copyrefs)?
 				charstring::duplicate("no"):
 				(char *)"no";
@@ -247,9 +248,6 @@ void sqlrconnection::init(const char *server, uint16_t port,
 		setDebugFile(sqlrdebug);
 	}
 	pvt->_webdebug=-1;
-
-	// copy references, delete cursors flags
-	pvt->_copyrefs=false;
 
 	// error
 	pvt->_errorno=0;
