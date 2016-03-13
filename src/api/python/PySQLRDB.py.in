@@ -45,16 +45,20 @@ class NotSupportedError(DatabaseError):
     pass
 
 
-def connect(host, port, socket, user, password, retrytime=0, tries=1):
-    return SQLRConnection(host, port, socket, user, password, retrytime, tries)
+def connect(host, port, socket, user, password, retrytime=0, tries=1, krb='no', krbservice='', krbmech='', krbflags='', tls='no', tlsversion='', tlscert='', tlspassword='', tlsciphers='', tlsvalidate='', tlsca='', tlsdepth=0):
+    return SQLRConnection(host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth)
 
 
 class SQLRConnection:
 
     connection=None
 
-    def __init__(self, host, port, socket, user, password, retrytime, tries):
+    def __init__(self, host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth):
         self.connection=CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
+        if krb=='yes':
+                CSQLRelay.enableKerberos(self.connection, krbservice, krbmech, krbflags)
+        elif tls=='yes':
+                CSQLRelay.enableTls(self.connection, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth)
         self._cursors=weakref.WeakValueDictionary()
 
     def __del__(self):
@@ -81,7 +85,7 @@ class SQLRConnection:
 
     def cursor(self):
         cursor=SQLRCursor(self.connection)
-        self._cursors[id(cursor)]=cursor;
+        self._cursors[id(cursor)]=cursor
         return cursor
 
 
