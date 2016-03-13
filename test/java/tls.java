@@ -143,6 +143,11 @@ class tls {
 
 		String		cert="/usr/local/firstworks/etc/client.pem";
 		String		ca="/usr/local/firstworks/etc/ca.pem";
+		if (System.getProperty("os.name").
+			toLowerCase().indexOf("win")>=0) {
+			cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
+			ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
+		}
 	
 	
 		// instantiation

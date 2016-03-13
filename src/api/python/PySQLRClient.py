@@ -106,6 +106,7 @@ class sqlrconnection:
         though note that only the flags listed above are supported
         on Windows.
         """
+        return CSQLRelay.enableKerberos(self.connection, service, mech, flags)
 
     def enableTls(self, version, cert, password, ciphers, validate, ca, depth):
         """
@@ -176,11 +177,13 @@ class sqlrconnection:
         etc.) but only the .pfx format is currently supported on
         Windows. */
         """
+        return CSQLRelay.enableTls(self.connection, version, cert, password, ciphers, validate, ca, depth)
 
     def disableEncryption(self):
         """
         Disables encryption.
         """
+        return CSQLRelay.disableEncryption(self.connection)
 
     def endSession(self):
         """

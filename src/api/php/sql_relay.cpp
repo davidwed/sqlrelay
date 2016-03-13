@@ -173,8 +173,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setresponsetimeout) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_enablekerberos) {
 	zval **sqlrcon,**service,**mech,**flags;
-	if (ZEND_NUM_ARGS() != 3 || 
-		zend_get_parameters_ex(3,&sqlrcon,&service,&mech,&flags) == FAILURE) {
+	if (ZEND_NUM_ARGS() != 4 || 
+		zend_get_parameters_ex(4,&sqlrcon,&service,&mech,&flags) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
 	convert_to_string_ex(service);
@@ -189,8 +189,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_enablekerberos) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_enabletls) {
 	zval **sqlrcon,**version,**cert,**password,**ciphers,**validate,**ca,**depth;
-	if (ZEND_NUM_ARGS() != 1 || 
-		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+	if (ZEND_NUM_ARGS() != 8 || 
+		zend_get_parameters_ex(8,&sqlrcon,&version,&cert,&password,&ciphers,&validate,&ca,&depth) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
 	convert_to_string_ex(version);

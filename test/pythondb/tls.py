@@ -12,11 +12,11 @@ import platform
 
 def main():
 
-        tlscert="/usr/local/firstworks/etc/client.pem"
-        tlsca="/usr/local/firstworks/etc/ca.pem"
-        if platform.system()=="Windows":
-                tlscert="C:\\Program Files\\Firstworks\\etc\\client.pem"
-                tlsca="C:\\Program Files\\Firstworks\\etc\\ca.pem"
+	tlscert="/usr/local/firstworks/etc/client.pem"
+	tlsca="/usr/local/firstworks/etc/ca.pem"
+	if platform.system()=="Windows":
+		tlscert="C:\\Program Files\\Firstworks\\etc\\client.pfx"
+		tlsca="C:\\Program Files\\Firstworks\\etc\\ca.pfx"
 
 	CSQLRelay.getNumericFieldsAsNumbers()
 
