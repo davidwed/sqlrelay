@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.14 2016-03-12 05:41:50 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.15 2016-03-13 19:39:54 mused Exp $
  */
 
 #include <tcl.h>
@@ -2002,7 +2002,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     const char *mech;
     const char *flags;
 
-    if (objc != 5) {
+    if (objc > 5) {
       Tcl_WrongNumArgs(interp, 3, objv, "service mech flags");
       return TCL_ERROR;
     }
@@ -2023,7 +2023,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     const char *ca;
     int depth;
 
-    if (objc != 9) {
+    if (objc > 9) {
       Tcl_WrongNumArgs(interp, 7, objv, "version cert password ciphers validate ca depth");
       return TCL_ERROR;
     }
@@ -2401,14 +2401,6 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
   if (charstring::compare("",server,1) == 0 && charstring::compare("", socket, 1) == 0) {
     Tcl_AppendResult(interp, 
 		     "-server name or -socket name required", (char *)NULL);
-    return TCL_ERROR;
-  }
-  if (charstring::compare("", user, 1) == 0) {
-    Tcl_AppendResult(interp, "-user username required", (char *)NULL);
-    return TCL_ERROR;
-  }
-  if (charstring::compare("", password, 1) == 0) {
-    Tcl_AppendResult(interp, "-password password required", (char *)NULL);
     return TCL_ERROR;
   }
 
