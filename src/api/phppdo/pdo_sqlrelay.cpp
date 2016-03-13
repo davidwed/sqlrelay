@@ -1270,6 +1270,18 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		{"dontgetcolumninfo",(char *)"0",0},
 		{"nullsasnulls",(char *)"0",0},
 		{"lazyconnect",(char *)"1",0},
+		{"krb",(char *)"no",0},
+		{"krbservice",(char *)"",0},
+		{"krbmech",(char *)"",0},
+		{"krbflags",(char *)"",0},
+		{"tls",(char *)"no",0},
+		{"tlsversion",(char *)"",0},
+		{"tlscert",(char *)"",0},
+		{"tlspassword",(char *)"",0},
+		{"tlsciphers",(char *)"",0},
+		{"tlsvalidate",(char *)"",0},
+		{"tlsca",(char *)"",0},
+		{"tlsdepth",(char *)"0",0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1283,6 +1295,18 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*debug=options[5].optval;
 	bool		lazyconnect=(charstring::toInteger(
 						options[6].optval)>0);
+	const char	*krb=options[10].optval;
+	const char	*krbservice=options[11].optval;
+	const char	*krbmech=options[12].optval;
+	const char	*krbflags=options[13].optval;
+	const char	*tls=options[14].optval;
+	const char	*tlsversion=options[15].optval;
+	const char	*tlscert=options[16].optval;
+	const char	*tlspassword=options[17].optval;
+	const char	*tlsciphers=options[18].optval;
+	const char	*tlsvalidate=options[19].optval;
+	const char	*tlsca=options[20].optval;
+	uint16_t	tlsdepth=charstring::toInteger(options[21].optval);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1291,6 +1315,18 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 							dbh->password,
 							tries,retrytime,
 							true);
+
+	// enable kerberos or tls
+	if (!charstring::compare(krb,"yes")) {
+		sqlrdbh->sqlrcon->enableKerberos(krbservice,krbmech,krbflags);
+	} else if (!charstring::compare(tls,"yes")) {
+		sqlrdbh->sqlrcon->enableTls(tlsversion,
+						tlscert,tlspassword,
+						tlsciphers,tlsvalidate,
+						tlsca,tlsdepth);
+	}
+
+	// enable debug
 	if (!charstring::compare(debug,"1")) {
 		sqlrdbh->sqlrcon->debugOn();
 		sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
