@@ -127,6 +127,11 @@ int	main(int argc, char **argv) {
 	char	query[4000+25];
 	const char	*clobbindvar;
 
+	const char	*service=NULL;
+	#ifdef _WIN32
+		service="sqlrelay@fedora22x64.firstworks.com";
+	#endif
+
 
 	// instantiation
 	con=sqlrcon_alloc("sqlrserver",9000,"/tmp/test.socket",NULL,NULL,0,1);

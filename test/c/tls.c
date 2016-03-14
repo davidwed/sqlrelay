@@ -7,14 +7,6 @@
 
 #include <stdio.h>
 
-#ifdef _WIN32
-	const char	*cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
-	const char	*ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
-#else
-	const char	*cert="/usr/local/firstworks/etc/client.pem";
-	const char	*ca="/usr/local/firstworks/etc/ca.pem";
-#endif
-
 sqlrcon	con;
 sqlrcur	cur;
 sqlrcur	bindcur;
@@ -134,6 +126,13 @@ int	main(int argc, char **argv) {
 	int	i;
 	char	query[4000+25];
 	const char	*clobbindvar;
+
+	const char	*cert="/usr/local/firstworks/etc/client.pem";
+	const char	*ca="/usr/local/firstworks/etc/ca.pem";
+	#ifdef _WIN32
+		cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
+		ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
+	#endif
 
 
 	// instantiation
