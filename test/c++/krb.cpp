@@ -118,7 +118,7 @@ int	main(int argc, char **argv) {
 
 	const char	*service=NULL;
 	#ifdef _WIN32
-		service="sqlrelay@fedora22x64.firstworks.com";
+		service="sqlrelay/fedora22x64.firstworks.com@AD.FIRSTWORKS.COM";
 	#endif
 
 	// instantiation
@@ -800,7 +800,7 @@ int	main(int argc, char **argv) {
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 								NULL,NULL,0,1);
 	secondcur=new sqlrcursor(secondcon);
-	secondcon->enableKerberos(NULL,NULL,NULL);
+	secondcon->enableKerberos(service,NULL,NULL);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
 	checkSuccess(con->commit(),1);

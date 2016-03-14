@@ -129,7 +129,7 @@ int	main(int argc, char **argv) {
 
 	const char	*service=NULL;
 	#ifdef _WIN32
-		service="sqlrelay@fedora22x64.firstworks.com";
+		service="sqlrelay/fedora22x64.firstworks.com@AD.FIRSTWORKS.COM";
 	#endif
 
 
