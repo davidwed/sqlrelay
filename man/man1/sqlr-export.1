@@ -75,20 +75,16 @@ separated by spaces.
 Certificate validation option.
 "no" \- Don't validate the server's certificate.
 "ca" \- Validate that the server's certificate
-.TP
-was signed by a trusted certificate
-authority.
-.TP
+was signed by a trusted certificate authority.
 "ca+host" \- Perform "ca" validation and also
-validate that the common name in the
-certificate matches the host parameter.
+validate that the common name in the certificate
+matches the host parameter.
 (Falls back to "ca" validation when a
 unix socket is used.)
-.TP
 "ca+domain" \- Perform "ca" validation and also
-validate that the domain name of the
-common name in the certificate matches
-the domain name of the host parameter.
+validate that the domain name of the common name
+in the certificate matches the domain name of
+the host parameter.
 (Falls back to "ca" validation when a
 unix socket is used.)
 .TP
