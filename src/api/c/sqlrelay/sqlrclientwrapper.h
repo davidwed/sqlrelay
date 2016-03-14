@@ -48,6 +48,7 @@ void	sqlrcon_setConnectTimeout(sqlrcon sqlrconref,
  *  milliseconds.  Setting either parameter to -1 disables the
  *  timeout.   You can also set this timeout using the
  *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
+SQLRCLIENT_DLLSPEC
 void	sqlrcon_setAuthenticationTimeout(sqlrcon sqlrconref,
 				int32_t timeoutsec, int32_t timeoutusec);
 
@@ -57,6 +58,7 @@ void	sqlrcon_setAuthenticationTimeout(sqlrcon sqlrconref,
  *  parameter to -1 disables the timeout.  You can also set
  *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
  *  environment variable. */
+SQLRCLIENT_DLLSPEC
 void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 				int32_t timeoutsec, int32_t timeoutusec);
 
@@ -98,6 +100,7 @@ void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
  *  For a full list of flags, consult the GSSAPI documentation,
  *  though note that only the flags listed above are supported
  *  on Windows. */
+SQLRCLIENT_DLLSPEC
 void	sqlrcon_enableKerberos(sqlrcon sqlrconref,
 					const char *service,
 					const char *mech,
@@ -170,6 +173,7 @@ void	sqlrcon_enableKerberos(sqlrcon sqlrconref,
  *  generally supported on Linux/Unix platfoms (.pem, .pfx,
  *  etc.) but only the .pfx format is currently supported on
  *  Windows. */
+SQLRCLIENT_DLLSPEC
 void	sqlrcon_enableTls(sqlrcon sqlrconref,
 				const char *version,
 				const char *cert,
@@ -181,6 +185,7 @@ void	sqlrcon_enableTls(sqlrcon sqlrconref,
 
 /** @ingroup sqlrclientwrapper
   * Disables encryption. */
+SQLRCLIENT_DLLSPEC
 void	sqlrcon_disableEncryption(sqlrcon sqlrconref);
 
 

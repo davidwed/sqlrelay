@@ -49,6 +49,10 @@ sub checkSuccessString {
 
 $cert="/usr/local/firstworks/etc/client.pem";
 $ca="/usr/local/firstworks/etc/ca.pem";
+if ($^O eq "MSWin32") {
+	$cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
+	$ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
+}
 
 
 # instantiation

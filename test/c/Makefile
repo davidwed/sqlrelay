@@ -10,7 +10,7 @@ include ../../config.mk
 .c.obj:
 	$(CC) $(CFLAGS) $(CTESTCPPFLAGS) $(COMPILE) $<
 
-all: db2 freetds firebird mysql oracle postgresql sqlite sap
+all: db2 freetds firebird mysql oracle postgresql sqlite sap krb tls
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) freetds$(EXE) firebird$(EXE) mysql$(EXE) oracle$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) krb$(EXE) tls$(EXE) cachefile* sqlnet.log

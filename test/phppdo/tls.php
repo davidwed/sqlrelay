@@ -20,7 +20,7 @@
 	$password="";
 	$tlscert="/usr/local/firstworks/etc/client.pem";
 	$tlsca="/usr/local/firstworks/etc/ca.pem";
-	if (strtoupper(substr(PHP_OS,0,3))==='Win') {
+	if (strtoupper(substr(PHP_OS,0,3))==='WIN') {
 		$tlscert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
 		$tlsca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
 	}
