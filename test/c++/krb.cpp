@@ -115,12 +115,13 @@ int	main(int argc, char **argv) {
 	const char	*arraybindvars[6]={"var1","var2","var3","var4","var5",NULL};
 	const char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
 	uint32_t	*fieldlens;
+	const char	*service="sqlrelay@fedora22x64.firstworks.com";
 
 	// instantiation
 	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
 	cur=new sqlrcursor(con);
-	con->enableKerberos(NULL,NULL,NULL);
+	con->enableKerberos(service,NULL,NULL);
 
 	// get database type
 	stdoutput.printf("IDENTIFY: \n");

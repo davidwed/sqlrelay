@@ -13,6 +13,7 @@
 #include <rudiments/permissions.h>
 #include <rudiments/gss.h>
 #include <rudiments/tls.h>
+#include <rudiments/sys.h>
 #include <defines.h>
 #include <defaults.h>
 
@@ -340,6 +341,12 @@ void sqlrconnection::enableKerberos(const char *service,
 
 	pvt->_usekrb=true;
 
+	// "Negotiate" is Windows' default mech.  Force Kerberos instead.
+	if (!charstring::compare(sys::getOperatingSystemName(),"Windows",7) &&
+					charstring::isNullOrEmpty(mech)) {
+		mech="Kerberos";
+	}
+
 	if (pvt->_copyrefs) {
 		delete[] pvt->_krbservice;
 		pvt->_krbservice=charstring::duplicate(
@@ -538,34 +545,10 @@ bool sqlrconnection::openSession() {
 		return true;
 	}
 
-	// acquire kerberos credentials, if necessary
-	if (pvt->_usekrb && !pvt->_gcred.acquired() &&
-				!charstring::isNullOrEmpty(pvt->_user)) {
-
-		if (pvt->_gcred.acquireForUser(pvt->_user)) {
-			if (pvt->_debug) {
-				debugPreStart();
-				debugPrint("acquired kerberos "
-						"credentials for: ");
-				debugPrint(pvt->_user);
-				debugPrint("\n");
-				debugPreEnd();
-			}
-		} else {
-			if (pvt->_debug) {
-				debugPreStart();
-				if (pvt->_gcred.getMajorStatus()) {
-					debugPrint(pvt->_gcred.
-						getMechanismMinorStatus());
-				}
-				debugPreEnd();
-			}
-			setError("Failed to acquire kerberos credentials.");
-			return false;
-		}
+	if (!reConfigureSockets()) {
+		pvt->_connected=false;
+		return false;
 	}
-
-	reConfigureSockets();
 
 	if (pvt->_debug) {
 		debugPreStart();
@@ -702,7 +685,7 @@ bool sqlrconnection::openSession() {
 	return true;
 }
 
-void sqlrconnection::reConfigureSockets() {
+bool sqlrconnection::reConfigureSockets() {
 
 	pvt->_ucs.dontUseNaglesAlgorithm();
 	//pvt->_ucs.setTcpReadBufferSize(65536);
@@ -743,6 +726,36 @@ void sqlrconnection::reConfigureSockets() {
 
 		pvt->_gmech.clear();
 		pvt->_gmech.initialize(pvt->_krbmech);
+
+		pvt->_gcred.clearDesiredMechanisms();
+		pvt->_gcred.addDesiredMechanism(&pvt->_gmech);
+
+		if (!pvt->_gcred.acquired() &&
+				!charstring::isNullOrEmpty(pvt->_user)) {
+
+			if (pvt->_gcred.acquireForUser(pvt->_user)) {
+				if (pvt->_debug) {
+					debugPreStart();
+					debugPrint("acquired kerberos "
+							"credentials for: ");
+					debugPrint(pvt->_user);
+					debugPrint("\n");
+					debugPreEnd();
+				}
+			} else {
+				if (pvt->_debug) {
+					debugPreStart();
+					if (pvt->_gcred.getMajorStatus()) {
+						debugPrint(pvt->_gcred.
+						getMechanismMinorStatus());
+					}
+					debugPreEnd();
+				}
+				setError("Failed to acquire "
+						"kerberos credentials.");
+				return false;
+			}
+		}
 
 		pvt->_gctx.close();
 		pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
@@ -817,6 +830,8 @@ void sqlrconnection::reConfigureSockets() {
 
 	pvt->_ucs.setSecurityContext(pvt->_ctx);
 	pvt->_ics.setSecurityContext(pvt->_ctx);
+
+	return true;
 }
 
 void sqlrconnection::setConnectFailedError() {
@@ -989,7 +1004,10 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 	}
 	pvt->_connectioninetport=port;
 
-	reConfigureSockets();
+	if (!reConfigureSockets()) {
+		pvt->_connected=false;
+		return false;
+	}
 
 	// first, try for the unix port
 	if (!charstring::isNullOrEmpty(socket)) {
@@ -1003,7 +1021,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 	}
 
 	// then try for the inet port
-	if (pvt->_connected!=RESULT_SUCCESS) {
+	if (!pvt->_connected) {
 		pvt->_connected=(pvt->_ics.connect(
 					pvt->_server,port,-1,-1,
 					pvt->_retrytime,

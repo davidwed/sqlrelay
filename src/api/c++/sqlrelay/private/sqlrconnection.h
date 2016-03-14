@@ -14,7 +14,7 @@
 					int32_t *timeoutsec,
 					int32_t *timeoutusec);
 		bool	openSession();
-		void	reConfigureSockets();
+		bool	reConfigureSockets();
 		void	setConnectFailedError();
 		void	closeConnection();
 
