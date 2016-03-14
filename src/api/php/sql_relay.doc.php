@@ -47,8 +47,8 @@ function sqlrcon_setResponseTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
  *  name "sqlrelay" will be used. "sqlrelay" is the default
  *  service name of the SQL Relay server.  Note that on Windows
  *  platforms the service name must be fully qualified,
- *  including the host name.  For example:
- *  "sqlrelay@sqlrserver.firstworks.com".
+ *  including the host and realm name.  For example:
+ *  "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".
  *
  *  "mech" indicates the specific Kerberos mechanism to use.
  *  On Linux/Unix platforms, this should be a string

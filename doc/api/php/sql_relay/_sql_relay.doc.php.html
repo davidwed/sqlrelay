@@ -422,7 +422,7 @@
 
 	<!-- ========== Info from phpDoc block ========= -->
 <p class="short-description">Enables Kerberos authentication and encryption.</p>
-<p class="description"><p>&quot;service&quot; indicates the Kerberos service name of the   SQL Relay server.  If left empty or NULL then the service   name &quot;sqlrelay&quot; will be used. &quot;sqlrelay&quot; is the default   service name of the SQL Relay server.  Note that on Windows   platforms the service name must be fully qualified,   including the host name.  For example:   &quot;sqlrelay@sqlrserver.firstworks.com&quot;.</p><p>&quot;mech&quot; indicates the specific Kerberos mechanism to use.   On Linux/Unix platforms, this should be a string   representation of the mechnaism's OID, such as:       { 1 2 840 113554 1 2 2 }   On Windows platforms, this should be a string like:       Kerberos   If left empty or NULL then the default mechanism will be   used.  Only set this if you know that you have a good   reason to.</p><p>&quot;flags&quot; indicates what Kerberos flags to use.  Multiple   flags may be specified, separated by commas.  If left   empty or NULL then a defalt set of flags will be used.   Only set this if you know that you have a good reason to.</p><p>Valid flags include:    * GSS_C_MUTUAL_FLAG    * GSS_C_REPLAY_FLAG    * GSS_C_SEQUENCE_FLAG    * GSS_C_CONF_FLAG    * GSS_C_INTEG_FLAG</p><p>For a full list of flags, consult the GSSAPI documentation,   though note that only the flags listed above are supported   on Windows.</p></p>
+<p class="description"><p>&quot;service&quot; indicates the Kerberos service name of the   SQL Relay server.  If left empty or NULL then the service   name &quot;sqlrelay&quot; will be used. &quot;sqlrelay&quot; is the default   service name of the SQL Relay server.  Note that on Windows   platforms the service name must be fully qualified,   including the host and realm name.  For example:   &quot;sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM&quot;.</p><p>&quot;mech&quot; indicates the specific Kerberos mechanism to use.   On Linux/Unix platforms, this should be a string   representation of the mechnaism's OID, such as:       { 1 2 840 113554 1 2 2 }   On Windows platforms, this should be a string like:       Kerberos   If left empty or NULL then the default mechanism will be   used.  Only set this if you know that you have a good   reason to.</p><p>&quot;flags&quot; indicates what Kerberos flags to use.  Multiple   flags may be specified, separated by commas.  If left   empty or NULL then a defalt set of flags will be used.   Only set this if you know that you have a good reason to.</p><p>Valid flags include:    * GSS_C_MUTUAL_FLAG    * GSS_C_REPLAY_FLAG    * GSS_C_SEQUENCE_FLAG    * GSS_C_CONF_FLAG    * GSS_C_INTEG_FLAG</p><p>For a full list of flags, consult the GSSAPI documentation,   though note that only the flags listed above are supported   on Windows.</p></p>
 
 	
 	<div class="method-signature">
@@ -3587,7 +3587,7 @@
 	</div>
 	
 	<p class="notes" id="credit">
-		Documentation generated on Sat, 12 Mar 2016 06:04:49 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+		Documentation generated on Mon, 14 Mar 2016 07:01:54 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
 	</p>
 	</div></body>
 </html>

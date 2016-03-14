@@ -612,7 +612,7 @@ Data descriptors inherited from <a href="exceptions.html#BaseException">exceptio
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="SQLRConnection-__del__"><strong>__del__</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="SQLRConnection-__init__"><strong>__init__</strong></a>(self, host, port, socket, user, password, retrytime, tries)</dt></dl>
+<dl><dt><a name="SQLRConnection-__init__"><strong>__init__</strong></a>(self, host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth)</dt></dl>
 
 <dl><dt><a name="SQLRConnection-close"><strong>close</strong></a>(self)</dt></dl>
 
@@ -726,7 +726,7 @@ Data descriptors inherited from <a href="exceptions.html#BaseException">exceptio
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-connect"><strong>connect</strong></a>(host, port, socket, user, password, retrytime<font color="#909090">=0</font>, tries<font color="#909090">=1</font>)</dt></dl>
+<td width="100%"><dl><dt><a name="-connect"><strong>connect</strong></a>(host, port, socket, user, password, retrytime<font color="#909090">=0</font>, tries<font color="#909090">=1</font>, krb<font color="#909090">='no'</font>, krbservice<font color="#909090">=''</font>, krbmech<font color="#909090">=''</font>, krbflags<font color="#909090">=''</font>, tls<font color="#909090">='no'</font>, tlsversion<font color="#909090">=''</font>, tlscert<font color="#909090">=''</font>, tlspassword<font color="#909090">=''</font>, tlsciphers<font color="#909090">=''</font>, tlsvalidate<font color="#909090">=''</font>, tlsca<font color="#909090">=''</font>, tlsdepth<font color="#909090">=0</font>)</dt></dl>
  <dl><dt><a name="-localtime"><strong>localtime</strong></a>(...)</dt><dd><tt><a href="#-localtime">localtime</a>([seconds])&nbsp;-&gt;&nbsp;(tm_year,tm_mon,tm_mday,tm_hour,tm_min,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tm_sec,tm_wday,tm_yday,tm_isdst)<br>
 &nbsp;<br>

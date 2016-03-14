@@ -442,7 +442,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Enables Kerberos authentication and encryption.</p>
-<p>"service" indicates the Kerberos service name of the SQL Relay server. If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server. Note that on Windows platforms the service name must be fully qualified, including the host name. For example: "sqlrelay@sqlrserver.firstworks.com".</p>
+<p>"service" indicates the Kerberos service name of the SQL Relay server. If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server. Note that on Windows platforms the service name must be fully qualified, including the host and realm name. For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</p>
 <p>"mech" indicates the specific Kerberos mechanism to use. On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as: { 1 2 840 113554 1 2 2 } On Windows platforms, this should be a string like: Kerberos If left empty or NULL then the default mechanism will be used. Only set this if you know that you have a good reason to.</p>
 <p>"flags" indicates what Kerberos flags to use. Multiple flags may be specified, separated by commas. If left empty or NULL then a defalt set of flags will be used. Only set this if you know that you have a good reason to.</p>
 <p>Valid flags include:</p><ul>
@@ -910,7 +910,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 12 2016 01:03:09 for SQL Relay C++ API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Mar 14 2016 03:01:26 for SQL Relay C++ API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>
