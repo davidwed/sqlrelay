@@ -6,14 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
-#ifdef _WIN32
-	const char	*cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
-	const char	*ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
-#else
-	const char	*cert="/usr/local/firstworks/etc/client.pem";
-	const char	*ca="/usr/local/firstworks/etc/ca.pem";
-#endif
-
 sqlrconnection	*con;
 sqlrcursor	*cur;
 sqlrconnection	*secondcon;
@@ -123,6 +115,13 @@ int	main(int argc, char **argv) {
 	const char	*arraybindvars[6]={"var1","var2","var3","var4","var5",NULL};
 	const char	*arraybindvals[5]={"7","testchar7","testvarchar7","01-JAN-2007","testlong7"};
 	uint32_t	*fieldlens;
+
+	const char	*cert="/usr/local/firstworks/etc/client.pem";
+	const char	*ca="/usr/local/firstworks/etc/ca.pem";
+	#ifdef _WIN32
+		cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
+		ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
+	#endif
 
 	// instantiation
 	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
