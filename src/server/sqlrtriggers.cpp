@@ -30,22 +30,27 @@ bool sqlrtriggers::loadTriggers(xmldomnode *parameters) {
 	for (xmldomnode *trigger=parameters->getFirstTagChild();
 		!trigger->isNullNode(); trigger=trigger->getNextTagSibling()) {
 
-		// get whether to run before or after a query
-		bool	before=!charstring::compare(
-					trigger->getAttributeValue("when"),
-					"before");
-
-		if (debug) {
-			stdoutput.printf("loading trigger %s ...\n",
-					(before)?"before":"after");
+		// add trigger to before list
+		if (charstring::contains(
+				trigger->getAttributeValue("when"),
+				"before")) {
+			if (debug) {
+				stdoutput.printf("loading trigger "
+							"before ...\n");
+			}
+			loadTrigger(trigger,&beforetriggers);
 		}
 
-		// determine which list to put the trigger in
-		singlylinkedlist< sqlrtriggerplugin * >	*list=
-				(before)?&beforetriggers:&aftertriggers;
-
-		// load trigger
-		loadTrigger(trigger,list);
+		// add trigger to after list
+		if (charstring::contains(
+				trigger->getAttributeValue("when"),
+				"after")) {
+			if (debug) {
+				stdoutput.printf("loading trigger "
+							"after ...\n");
+			}
+			loadTrigger(trigger,&aftertriggers);
+		}
 	}
 	return true;
 }
