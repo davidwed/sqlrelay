@@ -613,59 +613,7 @@ bool sqlrconnection::openSession() {
 	// then we may need to validate the host
 	if (pvt->_usetls && pvt->_cs==&pvt->_ics) {
 
-		bool		validated=true;
-
-		// get the common name from the cert
-		tlscertificate	*cert=NULL;
-		const char	*commonname=NULL;
-		if (!charstring::compareIgnoringCase(
-					pvt->_tlsvalidate,"ca+",3)) {
-			cert=((tlscontext *)pvt->_ctx)->getPeerCertificate();
-			commonname=cert->getCommonName();
-		}
-
-		// validate the host name or domain
-		if (!charstring::compareIgnoringCase(
-					pvt->_tlsvalidate,"ca+host")) {
-			if (pvt->_debug) {
-				debugPreStart();
-				debugPrint(pvt->_tlsvalidate);
-				debugPrint(": ");
-				debugPrint(pvt->_server);
-				debugPrint("=");
-				debugPrint(commonname);
-				debugPrint("\n");
-				debugPreEnd();
-			}
-			validated=!charstring::compareIgnoringCase(
-						pvt->_server,commonname);
-		} else if (!charstring::compareIgnoringCase(
-					pvt->_tlsvalidate,"ca+domain")) {
-			const char	*serverdomain=pvt->_server;
-			const char	*commonnamedomain=commonname;
-			const char	*dot=
-					charstring::findFirst(pvt->_server,'.');
-			if (dot) {
-				serverdomain=dot+1;
-			}
-			dot=charstring::findFirst(commonname,'.');
-			if (dot) {
-				commonnamedomain=dot+1;
-			}
-			if (pvt->_debug) {
-				debugPreStart();
-				debugPrint(": ");
-				debugPrint(serverdomain);
-				debugPrint("=");
-				debugPrint(commonnamedomain);
-				debugPrint("\n");
-				debugPreEnd();
-			}
-			validated=!charstring::compareIgnoringCase(
-						serverdomain,commonnamedomain);
-		}
-
-		if (!validated) {
+		if (!validateCertificate()) {
 			setError("TLS error: common name mismatch");
 			pvt->_cs->close();
 			return false;
@@ -684,6 +632,91 @@ bool sqlrconnection::openSession() {
 
 	return true;
 }
+
+bool sqlrconnection::validateCertificate() {
+
+	// get the subject alternate names and common name from the cert
+	tlscertificate		*cert=NULL;
+	linkedlist< char * >	*sans=NULL;
+	const char		*commonname=NULL;
+	if (!charstring::compareIgnoringCase(pvt->_tlsvalidate,"ca+",3)) {
+		cert=((tlscontext *)pvt->_ctx)->getPeerCertificate();
+		sans=cert->getSubjectAlternateNames();
+		commonname=cert->getCommonName();
+	}
+
+	// should we validate the host name or domain?
+	bool	host=!charstring::compareIgnoringCase(
+					pvt->_tlsvalidate,"ca+host");
+
+	// get the server name to validate against
+	const char	*server=pvt->_server;
+	if (!host) {
+		const char	*dot=charstring::findFirst(server,'.');
+		if (dot) {
+			server=dot+1;
+		}
+	}
+
+	// if there are any subject alternate
+	// names then validate against those
+	if (sans->getLength()) {
+
+		for (linkedlistnode< char * > *node=sans->getFirst();
+					node; node=node->getNext()) {
+
+			const char	*san=node->getValue();
+			if (!host) {
+				const char	*dot=
+					charstring::findFirst(san,'.');
+				if (dot) {
+					san=dot+1;
+				}
+			}
+
+			if (pvt->_debug) {
+				debugPreStart();
+				debugPrint(pvt->_tlsvalidate);
+				debugPrint(": ");
+				debugPrint(server);
+				debugPrint("=");
+				debugPrint(san);
+				debugPrint("\n");
+				debugPreEnd();
+			}
+
+			if (!charstring::compareIgnoringCase(server,san)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	// if there were no subject alternate names
+	// then just validate against the common name
+	if (!host) {
+		const char	*dot=charstring::findFirst(commonname,'.');
+		if (dot) {
+			commonname=dot+1;
+		}
+	}
+
+	if (pvt->_debug) {
+		debugPreStart();
+		debugPrint(pvt->_tlsvalidate);
+		debugPrint(": ");
+		debugPrint(server);
+		debugPrint("=");
+		debugPrint(commonname);
+		debugPrint("\n");
+		debugPreEnd();
+	}
+
+	return !charstring::compareIgnoringCase(server,commonname);
+}
+
 
 bool sqlrconnection::reConfigureSockets() {
 
