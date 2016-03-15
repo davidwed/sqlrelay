@@ -811,14 +811,17 @@ certificate, and may be set to one of the following:</p>
 &quot;ca&quot; - Validate that the server&#39;s certificate was
        signed by a trusted certificate authority.
 &quot;ca+host&quot; - Perform &quot;ca&quot; validation and also validate
-       that the common name in the certificate matches
-       the host parameter.  (Falls back to &quot;ca&quot;
-       validation when a unix socket is used.)
+       that one of the subject altenate names (or the
+       common name if no SANs are present) in the
+       certificate matches the host parameter.
+       (Falls back to &quot;ca&quot; validation when a unix
+       socket is used.)
 &quot;ca+domain&quot; - Perform &quot;ca&quot; validation and also validate
-       that the domain name of the common name in the
-       certificate matches the domain name of the host
-       parameter.  (Falls back to &quot;ca&quot; validation when
-       a unix socket is used.)</pre>
+       that the domain name of one of the subject
+       alternate names (or the common name if no SANs
+       are present) in the certificate matches the
+       domain name of the host parameter.  (Falls back
+       to &quot;ca&quot; validation when a unix socket is used.)</pre>
 
 <p>“ca” is the location of a certificate authority file to use, in addition to
 the system&#39;s root certificates, when validating the SQL Relay

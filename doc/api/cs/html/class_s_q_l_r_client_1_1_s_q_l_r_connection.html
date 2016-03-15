@@ -423,7 +423,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
       </table>
 </div><div class="memdoc">
 <p>Enables Kerberos authentication and encryption.</p>
-<p>"service" indicates the Kerberos service name of the SQL Relay server. If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server. Note that on Windows platforms the service name must be fully qualified, including the host name. For example: "sqlrelay@sqlrserver.firstworks.com".</p>
+<p>"service" indicates the Kerberos service name of the SQL Relay server. If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server. Note that on Windows platforms the service name must be fully qualified, including the host and realm name. For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</p>
 <p>"mech" indicates the specific Kerberos mechanism to use. On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as: { 1 2 840 113554 1 2 2 } On Windows platforms, this should be a string like: Kerberos If left empty or NULL then the default mechanism will be used. Only set this if you know that you have a good reason to.</p>
 <p>"flags" indicates what Kerberos flags to use. Multiple flags may be specified, separated by commas. If left empty or NULL then a defalt set of flags will be used. Only set this if you know that you have a good reason to.</p>
 <p>Valid flags include:</p><ul>
@@ -497,7 +497,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
 <p>"ciphers" is a list of ciphers to allow. Ciphers may be separated by spaces, commas, or colons. If "ciphers" is empty or NULL then a default set is used. Only set this if you know that you have a good reason to.</p>
 <p>For a list of valid ciphers on Linux/Unix platforms, see: man ciphers</p>
 <p>For a list of valid ciphers on Windows platforms, see: <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx">https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx</a> On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes. For example: 3DES_112</p>
-<p>"validate" indicates whether to validate the SQL Relay's server certificate, and may be set to one of the following: "no" - Don't validate the server's certificate. "ca" - Validate that the server's certificate was signed by a trusted certificate authority. "ca+host" - Perform "ca" validation and also validate that the common name in the certificate matches the host parameter. (Falls back to "ca" validation when a unix socket is used.) "ca+domain" - Perform "ca" validation and also validate that the domain name of the common name in the certificate matches the domain name of the host parameter. (Falls back to "ca" validation when a unix socket is used.)</p>
+<p>"validate" indicates whether to validate the SQL Relay's server certificate, and may be set to one of the following: "no" - Don't validate the server's certificate. "ca" - Validate that the server's certificate was signed by a trusted certificate authority. "ca+host" - Perform "ca" validation and also validate that one of the subject altenate names (or the common name if no SANs are present) in the certificate matches the host parameter. (Falls back to "ca" validation when a unix socket is used.) "ca+domain" - Perform "ca" validation and also validate that the domain name of one of the subject alternate names (or the common name if no SANs are present) in the certificate matches the domain name of the host parameter. (Falls back to "ca" validation when a unix socket is used.)</p>
 <p>"ca" is the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate. This is useful if the SQL Relay server's certificate is self-signed.</p>
 <p>On Windows, "ca" must be a file name.</p>
 <p>On non-Windows systems, "ca" can be either a file or directory name. If it is a directory name, then all certificate authority files found in that directory will be used. If it a file name, then only that file will be used.</p>
@@ -907,7 +907,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 12 2016 01:03:33 for SQL Relay C# API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 15 2016 02:50:39 for SQL Relay C# API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>
