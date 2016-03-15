@@ -53,18 +53,35 @@ bool sqlrauth_tls_userlist::auth(sqlrserverconnection *sqlrcon,
 		return false;
 	}
 
-	// get the common name from the cert
-	const char	*commonname=cert->getCommonName();
-	if (!commonname) {
+	// get the subject alternate names and common name from the cert
+	linkedlist< char * >	*sans=cert->getSubjectAlternateNames();
+	const char		*commonname=cert->getCommonName();
+	if (!sans->getLength() && !commonname) {
 		return false;
 	}
 
 	// run through the user/password arrays...
 	for (uint32_t i=0; i<usercount; i++) {
 
-		// if the common name matches...
-		if (!charstring::compare(commonname,users[i])) {
-			return true;
+		if (sans->getLength()) {
+
+			// if subject alternate names were
+			// present then validate against those
+			for (linkedlistnode< char * > *node=sans->getFirst();
+						node; node=node->getNext()) {
+				if (!charstring::compare(
+						node->getValue(),users[i])) {
+					return true;
+				}
+			}
+
+		} else {
+
+			// if no subject alternate names were present then
+			// validate against the common name
+			if (!charstring::compare(commonname,users[i])) {
+				return true;
+			}
 		}
 	}
 	return false;
