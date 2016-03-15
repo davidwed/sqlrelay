@@ -137,14 +137,17 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 		 *      "ca" - Validate that the server's certificate was
 		 *             signed by a trusted certificate authority.
 		 *      "ca+host" - Perform "ca" validation and also validate
-		 *             that the common name in the certificate matches
-		 *             the host parameter.  (Falls back to "ca"
-		 *             validation when a unix socket is used.)
+		 *             that one of the subject altenate names (or the
+		 *             common name if no SANs are present) in the
+		 *             certificate matches the host parameter.
+		 *             (Falls back to "ca" validation when a unix
+		 *             socket is used.)
 		 *      "ca+domain" - Perform "ca" validation and also validate
-		 *             that the domain name of the common name in the
-		 *             certificate matches the domain name of the host
-		 *             parameter.  (Falls back to "ca" validation when
-		 *             a unix socket is used.)
+		 *             that the domain name of one of the subject
+		 *             alternate names (or the common name if no SANs
+		 *             are present) in the certificate matches the
+		 *             domain name of the host parameter.  (Falls back
+		 *             to "ca" validation when a unix socket is used.)
 		 *
 		 *  "ca" is the location of a certificate authority file to
 		 *  use, in addition to the system's root certificates, when

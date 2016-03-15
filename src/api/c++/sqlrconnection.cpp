@@ -839,7 +839,7 @@ bool sqlrconnection::reConfigureSockets() {
 		}
 
 		pvt->_tctx.close();
-		//pvt->_tctx.setProtocolVersion(pvt->_tlsversion);
+		pvt->_tctx.setProtocolVersion(pvt->_tlsversion);
 		pvt->_tctx.setCertificateChainFile(pvt->_tlscert);
 		pvt->_tctx.setPrivateKeyPassword(pvt->_tlspassword);
 		pvt->_tctx.setCiphers(pvt->_tlsciphers);

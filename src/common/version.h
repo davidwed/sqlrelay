@@ -105,16 +105,18 @@ static void help(int argc, const char **argv) {
 "				\"ca\" - Validate that the server's certificate\n" \
 "				was signed by a trusted certificate authority.\n" \
 "				\"ca+host\" - Perform \"ca\" validation and also\n" \
-"				validate that the common name in the certificate\n" \
-"				matches the host parameter.\n" \
-"				(Falls back to \"ca\" validation when a\n" \
-"				unix socket is used.)\n" \
+"				validate that one of the subject alternate names\n" \
+"				(or common name if no SANs are present) in the \n" \
+"				certificate matches the host parameter.\n" \
+"				(Falls back to \"ca\" validation when a unix\n" \
+"				socket is used.)\n" \
 "				\"ca+domain\" - Perform \"ca\" validation and also\n" \
-"				validate that the domain name of the common name\n" \
-"				in the certificate matches the domain name of\n" \
-"				the host parameter.\n" \
-"				(Falls back to \"ca\" validation when a\n" \
-"				unix socket is used.)\n" \
+"				validate that the domain name of one of the\n" \
+"				subject alternate naames (or common name if no\n" \
+"				SANs are present) in the certificate matches\n" \
+"				the domain name of the host parameter.\n" \
+"				(Falls back to \"ca\" validation when a unix\n" \
+"				socket is used.)\n" \
 "\n" \
 "	-tlsca file		Use the specified certificate authority file\n" \
 "				when validating the server's certificate.  Or,\n" \

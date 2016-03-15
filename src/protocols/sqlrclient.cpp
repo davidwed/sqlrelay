@@ -270,6 +270,10 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	} else if (usetls) {
 		if (tls::supportsTLS()) {
 
+			// get the protocol version to use
+			tctx.setProtocolVersion(
+				parameters->getAttributeValue("tlsversion"));
+
 			// get the certificate chain file to use
 			// FIXME: not-found warning
 			tctx.setCertificateChainFile(

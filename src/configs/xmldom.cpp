@@ -1013,6 +1013,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*krbmech=instance->getAttribute("krbmech");
 	xmldomnode	*krbflags=instance->getAttribute("krbflags");
 	xmldomnode	*tls=instance->getAttribute("tls");
+	xmldomnode	*tlsversion=instance->getAttribute("tlsversion");
 	xmldomnode	*tlscert=instance->getAttribute("tlscert");
 	xmldomnode	*tlspassword=instance->getAttribute("tlspassword");
 	xmldomnode	*tlsvalidate=instance->getAttribute("tlsvalidate");
@@ -1028,6 +1029,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!krbmech->isNullNode() ||
 			!krbflags->isNullNode() ||
 			!tls->isNullNode() ||
+			!tlsversion->isNullNode() ||
 			!tlscert->isNullNode() ||
 			!tlspassword->isNullNode() ||
 			!tlsvalidate->isNullNode() ||
@@ -1082,6 +1084,11 @@ void sqlrconfig_xmldom::normalizeTree() {
 			listener->setAttributeValue("tls",
 							tls->getValue());
 			instance->deleteAttribute(tls);
+		}
+		if (!tlsversion->isNullNode()) {
+			listener->setAttributeValue("tlsversion",
+							tlsversion->getValue());
+			instance->deleteAttribute(tlsversion);
 		}
 		if (!tlscert->isNullNode()) {
 			listener->setAttributeValue("tlscert",
