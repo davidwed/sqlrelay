@@ -7,9 +7,11 @@
 
 <span class="heading1">Programming with SQL Relay using ODBC</span><br><br>
 
-<p>The SQL Relay distribution provides an ODBC driver, enabling applications which use ODBC on Unix or Linux to access SQL Relay.  The driver is not currently supported on Windows.</p>
+<p>The SQL Relay distribution provides an ODBC driver, enabling applications which use ODBC to access SQL Relay.</p>
 
-<p>With unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)</p>
+<p>On Windows, just use the ODBC control panel to create a DSN.</p>
+
+<p>On Unix or Linux platforms, using unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)</p>
 
 <blockquote>
 <pre>
@@ -125,7 +127,7 @@ export ODBCINST=/sw/etc/odbcinst.ini
 export ODBCINI=/sw/etc/odbc.ini
 </pre></blockquote>
 
-<p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN defined in /etc/odbc.ini.</p> 
+<p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN that you defined.</p> 
 
 <p>You can also use SQL Relay with any language that supports ODBC directly or has a database abstraction layer that supports ODBC.  For example, lets say you have an existing PHP app that uses MDB2 to connect to Oracle and you want to use SQL Relay with it.  There is no PHP MDB2 driver for SQL Relay, but since MDB2 suppots ODBC, you could use:</p>
 
