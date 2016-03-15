@@ -3274,6 +3274,22 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	dt.getSystemDateAndTime();
 	cursor->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
 
+	// on failure get the error (unless it's already been set)
+	// get it here rather than below because with some db's
+	// after-triggers can mask the error
+	if (!success && !cursor->getErrorNumber()) {
+		uint32_t	errorlength;
+		int64_t		errnum;
+		bool		liveconnection;
+		errorMessage(cursor,
+				cursor->getErrorBuffer(),
+				maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
+		cursor->setErrorLength(errorlength);
+		cursor->setErrorNumber(errnum);
+		cursor->setLiveConnection(liveconnection);
+	}
+
 	// reset total rows fetched
 	cursor->clearTotalRowsFetched();
 
@@ -3304,20 +3320,6 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			conn->getAutoCommit()) {
 		logDebugMessage("commit necessary...");
 		success=commit();
-	}
-
-	// on failure get the error (unless it's already been set)
-	if (!success && !cursor->getErrorNumber()) {
-		uint32_t	errorlength;
-		int64_t		errnum;
-		bool		liveconnection;
-		errorMessage(cursor,
-				cursor->getErrorBuffer(),
-				maxerrorlength,
-				&errorlength,&errnum,&liveconnection);
-		cursor->setErrorLength(errorlength);
-		cursor->setErrorNumber(errnum);
-		cursor->setLiveConnection(liveconnection);
 	}
 	
 	logDebugMessage((success)?"executing query succeeded":
