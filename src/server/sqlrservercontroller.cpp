@@ -3286,7 +3286,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// handle after-triggers
 	if (enabletriggers && sqlrtr) {
 		sqlrtr->runAfterTriggers(conn,cursor,
-					cursor->getQueryTree(),true);
+					cursor->getQueryTree(),success);
 	}
 
 	// was the query a commit or rollback?
