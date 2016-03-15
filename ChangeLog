@@ -48,6 +48,7 @@
 	fixed long-standing copyrefs bug
 	when calling after-triggers, "success" flag is set correctly now
 	fixed bug where after-triggers could mask failed queries
+	added support for "before and after" triggers
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module
