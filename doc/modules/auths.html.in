@@ -50,6 +50,8 @@
 <li>userlist</li>
 <li>database</li>
 <li>sqlrelay</li>
+<li>krb_userlist</li>
+<li>tls_userlist</li>
 </ul>
 </b>
 
@@ -121,6 +123,40 @@
 <blockquote>
 @sqlrelay-auths-sqlrelay.conf.html@
 </blockquote>
+
+<br><br>
+<span class="heading3">krb_userlist</span><br>
+
+<p>The krb_userlist module authorizes a Kerberos-authenticated or Active Directory-authenticated user against a static list of valid users.</p>
+
+<blockquote>
+@sqlrelay-auths-krb_userlist.conf.html@
+</blockquote>
+
+<p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about configuring Kerberos and Active Directory authentication and encryption.</p>
+
+<br><br>
+<span class="heading3">tls_userlist</span><br>
+
+<p>The tls_userlist module authorizes the Subject Alternative Names or Common Name provided in the client-provided TLS/SSL certificate against a static list of valid names.</p>
+
+<blockquote>
+@sqlrelay-auths-tls_userlist.conf.html@
+</blockquote>
+
+<p>If the client's certificate contains Subject Alternative Names then each SAN is compared to each entry in the list.  If a match is found then the client is authorized.</p>
+
+<p>If the client's certificate does not contain Subject Alternative Names, then the Common Name is compared to each entry in the list.  If a match is found then the client is authorized.</p>
+
+<p>Note that this module only works if:</p>
+
+<ul>
+<li>TLS/SSL is enabled on the server-side.</li>
+<li>TLS Validation is enabled on the server-side.</li>
+<li>The client sends a certificate.</li>
+</ul>
+
+<p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about configuring TLS/SSL authentication and encryption.</p>
 
 <br><a name="custom"></a>
 <span class="heading2">Custom Modules</span><br>
