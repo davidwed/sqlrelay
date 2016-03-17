@@ -1221,6 +1221,11 @@ void sqlrcursor::deleteInputBindVariables() {
 					SQLRCLIENTBINDVARTYPE_CLOB) {
 				delete[] (*pvt->_inbindvars)[i].value.lobval;
 			}
+			if ((*pvt->_inbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_DATE) {
+				delete[] (*pvt->_inbindvars)[i].
+							value.dateval.tz;
+			}
 		}
 	}
 }
@@ -1240,6 +1245,10 @@ void sqlrcursor::deleteOutputBindVariables() {
 			(*pvt->_outbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_CLOB) {
 			delete[] (*pvt->_outbindvars)[i].value.lobval;
+		}
+		if ((*pvt->_outbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_DATE) {
+			delete[] (*pvt->_outbindvars)[i].value.dateval.tz;
 		}
 	}
 }
@@ -3565,7 +3574,8 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			(*pvt->_outbindvars)[count].value. dateval.tz[length]='\0';
+			(*pvt->_outbindvars)[count].
+					value.dateval.tz[length]='\0';
 
 			if (pvt->_sqlrc->debug()) {
 				pvt->_sqlrc->debugPreStart();
@@ -5020,11 +5030,7 @@ void sqlrcursor::clearRows() {
 	for (uint32_t i=0; i<rowbuffercount; i++) {
 	        for (uint32_t j=0; j<pvt->_colcount; j++) {
 			if (getColumnInternal(j)->longdatatype) {
-				// don't delete null columns
-				// (who's lengths will be 0)
-				if (getFieldLengthInternal(i,j)) {
-					delete[] getFieldInternal(i,j);
-				}
+				delete[] getFieldInternal(i,j);
 			}
 		}
 	}

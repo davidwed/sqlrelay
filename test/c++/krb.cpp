@@ -617,6 +617,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -633,6 +634,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -649,6 +651,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -671,6 +674,7 @@ int	main(int argc, char **argv) {
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
 	checkSuccess(cur->endOfResultSet(),0);
@@ -773,6 +777,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
 	checkSuccess(cur->endOfResultSet(),0);
@@ -811,6 +816,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
 	checkSuccess(con->autoCommitOff(),1);
+	delete secondcur;
+	delete secondcon;
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FINISHED SUSPENDED SESSION: \n");
@@ -825,6 +832,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	checkSuccess(cur->resumeResultSet(id),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),NULL);
 	checkSuccess(cur->getField(5,(uint32_t)0),NULL);

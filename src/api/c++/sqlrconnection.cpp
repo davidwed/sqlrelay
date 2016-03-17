@@ -342,10 +342,12 @@ void sqlrconnection::enableKerberos(const char *service,
 	pvt->_usekrb=true;
 
 	// "Negotiate" is Windows' default mech.  Force Kerberos instead.
-	if (!charstring::compare(sys::getOperatingSystemName(),"Windows",7) &&
-					charstring::isNullOrEmpty(mech)) {
+	char	*os=sys::getOperatingSystemName();
+	if (!charstring::compare(os,"Windows",7) &&
+			charstring::isNullOrEmpty(mech)) {
 		mech="Kerberos";
 	}
+	delete[] os;
 
 	if (pvt->_copyrefs) {
 		delete[] pvt->_krbservice;
