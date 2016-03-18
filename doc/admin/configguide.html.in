@@ -632,7 +632,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <li>The <b>krb</b> parameter enables (or disables) Kerberos authentication and encryption.</li>
 <li>The <b>krbservice</b> parameter specifies which Kerberos service to use.  This parameter is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.</li>
 <li>The <b>krbkeytab</b> parameter specifies the location of the keytab file containing the key for the specified Kerberos service.  This parameter is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab</li>
-<li>The <b>krb_userlist</b> auth module authorizes a set of Kerberos-authenticated users.  Note that users are specified in both user@REALM (Kerberos) format and REALM/user (Active Directory) format to support users authenticated against both systems.  See <a href="../modules/auth.html">Extension Modules - Auth</a> for more information about auth modules.</li>
+<li>The <b>krb_userlist</b> auth module authorizes a set of Kerberos-authenticated users.  Note that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.  See <a href="../modules/auths.html">Extension Modules - Auth</a> for more information about auth modules.</li>
 </ul>
 
 <p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the krbkeytab parameter.</p>
@@ -796,7 +796,7 @@ sqlrsh -host <i>sqlrserver.firstworks.com</i> -user sqlruser -password sqlrpassw
 <ul>
 <li>The <b>tlsvalidate</b> parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.</li>
 <li>The <b>tlsca</b> parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.</li>
-<li>The <b>tls_userlist</b> auth module authorizes the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) against a list of valid names.  See <a href="../modules/auth.html">Extension Modules - Auth</a> for more information about auth modules.</li>
+<li>The <b>tls_userlist</b> auth module authorizes the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) against a list of valid names.  See <a href="../modules/auths.html">Extension Modules - Auth</a> for more information about auth modules.</li>
 </ul>
 
 <p>To access the instance, the client must provide, at minimum, a certificate, as follows:</p>

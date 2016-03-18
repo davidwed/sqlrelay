@@ -133,7 +133,7 @@
 @sqlrelay-auths-krb_userlist.conf.html@
 </blockquote>
 
-<p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about configuring Kerberos and Active Directory authentication and encryption.</p>
+<p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about configuring Kerberos and Active Directory encryption and authentication.</p>
 
 <br><br>
 <span class="heading3">tls_userlist</span><br>
@@ -156,7 +156,7 @@
 <li>The client sends a certificate.</li>
 </ul>
 
-<p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about configuring TLS/SSL authentication and encryption.</p>
+<p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about configuring TLS/SSL encryption and authentication.</p>
 
 <br><a name="custom"></a>
 <span class="heading2">Custom Modules</span><br>
