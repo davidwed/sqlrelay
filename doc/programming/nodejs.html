@@ -48,6 +48,10 @@ query is run.</p>
 connections, so care should be taken to minimize the length of a
 session.</p>
 
+<p>Sessions can also be encrypted and authenticated using Kerberos/Active Directory or TLS/SSL.  The enableKerberos() method is provided to enable Kerberos/Active Directory encryption and authentication and the enableTls() method is provided to enable TLS/SSL encryption and authentication.  The disableEncryption() method is provided to disable any previously enabled encryption.</p>
+
+<p>See the <a href="../api/nodejs/html/class_s_q_l_r_connection.html">SQLRConnection class reference</a> for information about these methods and the SQL Relay Configuration Guide for more information about <a href="../admin/configguide.html#krb">Kerberos/Active Directory</a> and <a href="../admin/configguide.html#tls">TLS/SSL</a> configurations.  In particular, note that user and password are not typically used when using Kerberos/AD.</p>
+
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 

@@ -106,6 +106,10 @@ query is run.</p>
 connections, so care should be taken to minimize the length of a
 session.</p>
 
+<p>Sessions can also be encrypted and authenticated using Kerberos/Active Directory or TLS/SSL.  The sqlrcon_enableKerberos() function is provided to enable Kerberos/Active Directory encryption and authentication and the sqlrcon_enableTls() function is provided to enable TLS/SSL encryption and authentication.  The sqlrcon_disableEncryption() function is provided to disable any previously enabled encryption.</p>
+
+<p>See the <a href="../api/c/html/group_sqlrclientwrapper.html">C API reference</a> for information about these functions and the SQL Relay Configuration Guide for more information about <a href="../admin/configguide.html#krb">Kerberos/Active Directory</a> and <a href="../admin/configguide.html#tls">TLS/SSL</a> configurations.  In particular, note that user and password are not typically used when using Kerberos/AD.</p>
+
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -155,13 +159,13 @@ the session open between them.</p>
 <p>If you need to execute a commit or rollback, you should use the 
 sqlrcon_commit() and sqlrcon_rollback() functions rather than sending a "commit"
 or "rollback" query.  There are two reasons for this.  First, it's much more 
-efficient to call the methods.  Second, if you're writing code that can run on 
+efficient to call the functions.  Second, if you're writing code that can run on 
 transactional or non-transactional databases, some non-transactional databases 
 will throw errors if they receive a "commit" or "rollback" query, but by calling
 the sqlrcon_commit() and sqlrcon_rollback() functions you instruct the database
-connection daemon to call the commit and rollback API methods for that database
+connection daemon to call the commit and rollback API functions for that database
 rather than issuing them as queries.  If the API's have no commit or rollback 
-methods, the calls do nothing and the database throws no error.</p>
+functions, the calls do nothing and the database throws no error.</p>
 
 <p>You can also turn Autocommit on or off with the sqlrcon_autoCommitOn() and 
 sqlrcon_autoCommitOff() functions.  When Autocommit is on, the database 
@@ -226,7 +230,7 @@ main() {
 <span class="heading2">Substitution and Bind Variables</span><br><br>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  The SQL Relay API provides methods for
+of the query is dynamically generated.  The SQL Relay API provides functions for
 making substitutions and binds in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
@@ -270,7 +274,7 @@ you can call countBindVariables() after preparing the query.</p>
 
 <p>If you're using a database with an embedded procedural language, you may
 want to retrieve data from function calls.  To facilitate this, SQL Relay
-provides methods for defining and retrieving output bind variables.</p>
+provides functions for defining and retrieving output bind variables.</p>
 
 <blockquote>
 <pre>
@@ -304,12 +308,12 @@ main() {
 </pre>
 </blockquote>
 
-<p>The getOutputBindString() method returns a NULL value as an empty string.  
+<p>The getOutputBindString() function returns a NULL value as an empty string.  
 If you would it to come back as a NULL instead, you can call the 
-getNullsAsNulls() method.  To revert to the default behavior, you can
+getNullsAsNulls() function.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().</p>
 
-<p>You can insert data into BLOB and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
+<p>You can insert data into BLOB and CLOB columns using the inputBindBlob(), inputBindClob() functions.</p>
 
 <blockquote>
 <pre>
@@ -505,13 +509,13 @@ main() {
 
 <p>The sqlrcur_getFieldByIndex(), sqlrcur_getFieldByName() and sqlrcur_getRow() 
 functions return NULL fields as empty strings.  If you would like them to come 
-back as NULL's instead, you can call the sqlrcur_getNullsAsNulls() method.  To 
+back as NULL's instead, you can call the sqlrcur_getNullsAsNulls() function.  To 
 revert to the default behavior, you can call sqlrcur_getNullsAsEmptyStrings().</p>
 
 <p>If you want to access the result set, but don't care about the
 column information (column names, types or sizes) and don't mind getting
 fields by their numeric index instead of by name,  you can call the
-sqlrcur_dontGetColumnInfo() method prior to executing your query.  This can 
+sqlrcur_dontGetColumnInfo() function prior to executing your query.  This can 
 result in a performance improvement, especially when many queries with small
 result sets are executed in rapid succession.  You can call 
 sqlrcur_getColumnInfo() again later to turn off this feature.</p>
@@ -539,8 +543,8 @@ you're done with the result set.</p>
 <p>If you call sqlrcur_setResultSetBufferSize() and forget what you set it to, 
 you can always call sqlrcur_getResultSetBufferSize().</p>
 
-<p>When buffering a result set in chunks, the sqlrcur_rowCount() method returns
-the number of rows returned so far.  The sqlrcur_firstRowIndex() method returns 
+<p>When buffering a result set in chunks, the sqlrcur_rowCount() function returns
+the number of rows returned so far.  The sqlrcur_firstRowIndex() function returns 
 the index of the first row of the currently buffered chunk.</p>
 
 <blockquote>
@@ -2033,7 +2037,7 @@ instead of sqlrcur_resumeResultSet() however.</p>
 
 <p>Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.</p>
 
-<p>SQL Relay provides the sqlrcon_getLastInsertId() method to get this value.</p>
+<p>SQL Relay provides the sqlrcon_getLastInsertId() function to get this value.</p>
 
 <p>When using the SQLite database, you can also get the last insert id by running the query:</p>
 

@@ -101,6 +101,10 @@ query is run.</p>
 connections, so care should be taken to minimize the length of a
 session.</p>
 
+<p>Sessions can also be encrypted and authenticated using Kerberos/Active Directory or TLS/SSL.  The enableKerberos() function is provided to enable Kerberos/Active Directory encryption and authentication and the enableTls() function is provided to enable TLS/SSL encryption and authentication.  The disableEncryption() function is provided to disable any previously enabled encryption.</p>
+
+<p>See the <a href="../api/php/index.html">PHP API reference</a> for information about these functions and the SQL Relay Configuration Guide for more information about <a href="../admin/configguide.html#krb">Kerberos/Active Directory</a> and <a href="../admin/configguide.html#tls">TLS/SSL</a> configurations.  In particular, note that user and password are not typically used when using Kerberos/AD.</p>
+
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -217,7 +221,7 @@ query failed.  You can find out why by calling sqlrcur_errorMessage().</p>
 <span class="heading2">Substitution and Bind Variables</span><br><br>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  The SQL Relay API provides methods for
+of the query is dynamically generated.  The SQL Relay API provides functions for
 making substitutions and binds in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
@@ -260,7 +264,7 @@ you can call countBindVariables() after preparing the query.</p>
 
 <p>If you're using a database with an embedded procedural language, you may
 want to retrieve data from function calls.  To facilitate this, SQL Relay
-provides methods for defining and retrieving output bind variables.</p>
+provides functions for defining and retrieving output bind variables.</p>
 
 <blockquote>
 <pre>
@@ -293,13 +297,13 @@ provides methods for defining and retrieving output bind variables.</p>
 </pre>
 </blockquote>
 
-<p>The getOutputBindString() method returns a NULL value as an empty string.  
+<p>The getOutputBindString() function returns a NULL value as an empty string.  
 If you would it to come back as a NULL instead, you can call the 
-getNullsAsNulls() method.  To revert to the default behavior, you can
+getNullsAsNulls() function.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().</p>
 
 <p>You can insert data into BLOB and CLOB columns using the inputBindBlob(),
-inputBindClob() methods.</p>
+inputBindClob() functions.</p>
 
 <blockquote>
 <pre>
@@ -2003,7 +2007,7 @@ instead of sqlrcur_resumeResultSet() however.</p>
 
 <p>Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.</p>
 
-<p>SQL Relay provides the sqlrcon_getLastInsertId() method to get this value.</p>
+<p>SQL Relay provides the sqlrcon_getLastInsertId() function to get this value.</p>
 
 <p>When using the SQLite database, you can also get the last insert id by running the query:</p>
 
