@@ -29,6 +29,8 @@
 <li><a href="#router">Master-Slave Query Routing</a></li>
 <li><a href="#frontend">Front-End Load-Balancing and Fail-Over</a></li>
 </ul>
+<li><a href="#krb">Kerberos and Active Directory Encryption and Authentication</a></li>
+<li><a href="#tls">TLS/SSL Encryption and Authentication</a></li>
 <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
@@ -599,6 +601,7 @@ sqlr-start -id oracleexample -config dir:///home/myuser/mysqlrelay.conf.d<br/>
 sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf</br>
 sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf,dir:///home/myuser/mysqrelay.conf.d</br>
 sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf,dir:///home/myuser/mysqrelay-1.conf.d,dir:///home/myuser/mysqrelay-2.conf.d</br>
+</code>
 </blockquote>
 
 <p>Files and directories are processed in the order that they are specified.</p>
@@ -1003,6 +1006,297 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <p>In a round-robin DNS scenario, multiple IP addresses are assigned to the same host name.  The SQL Relay client is then configured to connect to that host.  When it requests the IP addresses for the host, the client receives all of the IP addresses assigned to it, rather than just a single address.</p>
 
 <p>Round-robin DNS is so-called because, traditionally, the order of the IP addresses returned on successive requests alternated reliably, in round-robin fashion.  This behavior persists in many environments, but it is no longer guaranteed, as many modern DNS resolvers sort the list and return the IP addresses in the same order, every time.  SQL Relay clients randomize the list though, and try to connect to each of the IP addresses, one-at-a-time, until they succeed.  Doing so provides both load-balancing and fail-over without requiring an appliance or application server cluster.</p>
+
+
+<br><br><a name="krb"></a>
+<span class="heading2">Kerberos and Active Directory Encryption and Authentication</span><br>
+
+<p>SQL Relay supports Kerberos encryption and authentication.</p>
+
+<p>When Kerberos encryption and authentication is used:</p>
+
+<ul>
+<li>All communications between the SQL Relay client and SQL Relay server are encrypted.</li>
+<li>A user who has authenticated against a Kerberos KDC or Active Directory Domain Controller can access SQL Relay without having to provide additional credentials.</li>
+</ul>
+
+<p>On Linux and Unix systems, both server and client environments must be "Kerberized".  See <a href="http://systems.firstowrks.com/p/kerberos.html">Getting Started with Kerberos</a> for detailed instructions.</p>
+
+<p>On Windows systems, both server and client must join an Active Directory Domain.  Note that this is only available on Professional or Server versions of Windows.  Home versions cannot join Active Directory Domains.</p>
+
+<p>The following configuration configures an instance of SQL Relay to use Kerberos authentication and encryption:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>krb</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>krbservice</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>krbkeytab</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrelay.keytab&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;krb_userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;dmuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;kmuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;imuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;smuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auth&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<ul>
+<li>The <b>krb</b> parameter enables (or disables) Kerberos authentication and encryption.</li>
+<li>The <b>krbservice</b> parameter specifies which Kerberos service to use.  This parameter is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.</li>
+<li>The <b>krbkeytab</b> parameter specifies the location of the keytab file containing the key for the specified Kerberos service.  This parameter is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab</li>
+<li>The <b>krb_userlist</b> auth module authorizes a set of Kerberos-authenticated users.  Note that users are specified in both user@REALM (Kerberos) format and REALM/user (Active Directory) format to support users authenticated against both systems.  See <a href="../modules/auth.html">Extension Modules - Auth</a> for more information about auth modules.</li>
+</ul>
+
+<p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the krbkeytab parameter.</p>
+
+<p>To start the instance on a Windows system, you must be logged in as a user that can proxy the service specified by the krbservice parameter (or it's default value of "sqlrelay" if omitted).</p>
+
+<p>If those criteria are met, starting the Kerberized instance of SQL Relay is the same as starting any other instance:</p>
+
+<blockquote>
+<code>
+sqlr-start -id example
+</code>
+</blockquote>
+
+<p>To access the instance, you must acquire a Kerberos ticket-granting ticket.  On a Linux or Unix system, this typically involves running <i>kinit</i>, though a fully Kerberized environment may acquire this during login.  On a Windows system, you must log in as an Active Directory domain user.</p>
+
+<p>After acquiring the ticket-granting ticket, the instance of SQL Relay may be accessed from a Linux or Unix system as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -krb
+</code>
+</blockquote>
+
+<p>From a Windows system, it may be necessary to specify the fully qualified Kerberos service name as well:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -krb -krbservice sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM
+</code>
+</blockquote>
+
+<p>Note the absence of user and password parameters.</p>
+
+<p>Kerberos authentication establishes trust between the user who acquired the ticket-granting ticket (the user running the client program) and the service (the SQL Relay server) as follows:</p>
+
+<ul>
+<li>The client program uses the user's ticket-granting ticket to acquire a ticket for the sqlrelay service.</li>
+<li>The client program then uses this service ticket to establish a security context with the SQL Relay server.</li>
+<li>During this process the client program sends the SQL Relay server the user name that was used to acquire the original ticket-granting ticket.</li>
+<li>If the security context can be successfully established, then the SQL Relay server can trust that the client program is being run by the user that it says it is.</li>
+</ul>
+
+<p>Once the SQL Relay server trusts that the client is being run by the user that it says it is, the krb_userlist auth module authorizes that user against the list of valid users.</p>
+
+<p>While Kerberos authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:</p>
+
+<ul>
+<li>The client program may have to acquire a service ticket from another server (the Kerberos KDC or Active Directory Domain Controller) prior to connecting to the SQL Relay server.</li>
+<li>When establishing the secure session, a significant amount of data must be sent back and forth between the client and server over multiple network round-trips.</li>
+<li>Kerberos imposes a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.</li>
+<li>Without dedicated encryption hardware and a Kerberos implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.</li>
+</ul>
+
+<p>Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.</p>
+
+
+<br><br><a name="tls"></a>
+<span class="heading2">TLS/SSL Encryption and Authentication</span><br>
+
+<p>SQL Relay supports TLS/SSL encryption and authentication.</p>
+
+<p>When TLS/SSL encryption and authentication is used:</p>
+
+<ul>
+<li>All communications between the SQL Relay client and SQL Relay server are encrypted.</li>
+<li>SQL Relay clients and servers may optionally validate each other's certificates and identities.</li>
+</ul>
+
+<p>When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.  Linux and Unix systems support a variety of certificate formats, including the popular .pem format.  On Windows systems, only the .pfx certificate format is currently supported.  Instructions for creating self-signed certificates and converting between certificate formats can be found at <a href="http://systems.firstowrks.com/p/tls.html">Getting Started with TLS/SSL</a>.</p>
+
+<p>The following configuration enables TLS/SSL security for an instance of SQL relay:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>tls</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>tlscert</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrserver.pem&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<ul>
+<li>The <b>tls</b> parameter enables (or disables) TLS/SSL encryption.</li>
+<li>The <b>tlscert</b> parameter specifies a TLS/SSL certificate to use.  A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.</li>
+</ul>
+
+<p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:</p>
+
+<blockquote>
+<code>
+sqlr-start -id example
+</code>
+</blockquote>
+
+<p>The instance may be accessed as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword -tls -tlsvalidate no
+</code>
+</blockquote>
+
+<p>This establishes a TLS/SSL-encrypted session but does not validate the server's certificate or identity.  The session will only continue if the server's certificate is is well-formed and hasn't expired, <b>but the client is still vulnerable to various attacks</b>.</p>
+
+<br>
+
+<p>For a more secure session, the client may validate that the server's certificate was signed by a trusted certificate authority, known to the system, as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword -tls -tlsvalidate ca
+</code>
+</blockquote>
+
+<p>If the server's certificate is self-signed, then the certificate authority won't be known to the system, but it's certificate may be specified by the tlsca parameter as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/sqlrca.pem
+</code>
+</blockquote>
+
+<p>(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)</p>
+
+<p>This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, <b>but the client is still vulnerable to various attacks</b>.</p>
+
+<br>
+
+<p>For a more secure session, the client may validate that the host name provided by the server's certificate matches the host name that the client meant to connect to, as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver.firstworks.com</i> -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+</code>
+</blockquote>
+
+<p>(.pem files are specified in this example, but on Windows systems, .pfx files must be used)</p>
+
+<p>Note that the fully qualified host name was provided.  Note also the use of the ca+host value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the host name will also be validated.  If the certificate contains Subject Alternative Names, then the host name will be compared to each of them.  If no Subject Alternative Names are provided then the host name will be compared to the certificate's Common Name.  The session will only continue if the sever's certificate and identity are both valid.</p>
+
+<br>
+
+<p>Unless self-signed, certificates can be expensive, so certificates are often shared by multiple servers across a domain.  To manage environments like this, the host name validation can be relaxed as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver.firstworks.com</i> -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/sqlrca.pem
+</code>
+</blockquote>
+
+<p>(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)</p>
+
+<p>Note that the fully qualified host name was provided.  Note also the use of the ca+domain value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the domain name portion of the host name will also be validated.  If the certificate contains Subject Alternative Names, then the domain name portion of the host name will be compared to the domain name portion of each of them.  If no Subject Alternative Names are provided then the domain name portion of the host name will be compared to the domain name portion of the certificate's Common Name.  The session will only continue if the sever's certificate and domain identity are both valid.</p>
+
+<br>
+
+<p>For a more secure session, the server may request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.</p>
+
+<p>The following configuration enables these checks for an instance of SQL relay:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tls</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tlscert</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrserver.pem&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tlsvalidate</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tlsca</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrca.pem&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;tls_userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient1.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient2.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient3.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient4.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auth&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<ul>
+<li>The <b>tlsvalidate</b> parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.</li>
+<li>The <b>tlsca</b> parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.</li>
+<li>The <b>tls_userlist</b> auth module authorizes the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) against a list of valid names.  See <a href="../modules/auth.html">Extension Modules - Auth</a> for more information about auth modules.</li>
+</ul>
+
+<p>To access the instance, the client must provide, at minimum, a certificate, as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -tls -tlsvalidate no -tlscert /usr/local/firstworks/etc/sqlrclient.pem
+</code>
+</blockquote>
+
+<p>(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)</p>
+
+<p>Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the tls_userlist auth module authorizes the name provided by the certificate against the list of valid names.</p>
+
+<p>In a more likely use case, cross-validation occurs - the client validates the server and the server validates the client, as follows:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver.firstworks.com</i> -tls -tlscert /usr/local/firstworks/etc/sqlrclient.pem -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+</code>
+</blockquote>
+
+<p>(.pem files are specified in this example, but on Windows systems, .pfx files must be used)</p>
+
+<p>In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.</p>
+
+<p>While TLS/SSL authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:</p>
+
+<ul>
+<li>When establishing the secure session, a significant amount of data must be sent back and forth between the client and server over multiple network round-trips.</li>
+<li>Some TLS/SSL implementations impose a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.</li>
+<li>Without dedicated encryption hardware and a TLS/SSL implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.</li>
+</ul>
+
+<p>Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.</p>
+
 
 
 <br><br><a name="advanced"></a>
