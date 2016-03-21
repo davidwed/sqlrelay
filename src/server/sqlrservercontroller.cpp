@@ -4194,22 +4194,20 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 
 	// Wait.  Bail if ttl is exceeded
 	bool	result=false;
-	if (ttl>0) {
-		if (semset->supportsTimedSemaphoreOperations()) {
-			result=semset->waitWithUndo(0,ttl,0);
-		} else if (sys::signalsInterruptSystemCalls()) {
-			semset->dontRetryInterruptedOperations();
-			alarmrang=0;
-			signalmanager::alarm(ttl);
-			do {
-				error::setErrorNumber(0);
-				result=semset->waitWithUndo(0);
-			} while (!result &&
-					error::getErrorNumber()==EINTR &&
-					!alarmrang);
-			signalmanager::alarm(0);
-			semset->retryInterruptedOperations();
-		}
+	if (ttl>0 && semset->supportsTimedSemaphoreOperations()) {
+		result=semset->waitWithUndo(0,ttl,0);
+	} else if (ttl>0 && sys::signalsInterruptSystemCalls()) {
+		semset->dontRetryInterruptedOperations();
+		alarmrang=0;
+		signalmanager::alarm(ttl);
+		do {
+			error::setErrorNumber(0);
+			result=semset->waitWithUndo(0);
+		} while (!result &&
+				error::getErrorNumber()==EINTR &&
+				!alarmrang);
+		signalmanager::alarm(0);
+		semset->retryInterruptedOperations();
 	} else {
 		result=semset->waitWithUndo(0);
 	}
@@ -4244,22 +4242,20 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 
 	// Wait.  Bail if ttl is exceeded
 	bool	result=false;
-	if (ttl>0) {
-		if (semset->supportsTimedSemaphoreOperations()) {
-			result=semset->wait(3,ttl,0);
-		} else if (sys::signalsInterruptSystemCalls()) {
-			semset->dontRetryInterruptedOperations();
-			alarmrang=0;
-			signalmanager::alarm(ttl);
-			do {
-				error::setErrorNumber(0);
-				result=semset->wait(3);
-			} while (!result &&
-					error::getErrorNumber()==EINTR &&
-					!alarmrang);
-			signalmanager::alarm(0);
-			semset->retryInterruptedOperations();
-		}
+	if (ttl>0 && semset->supportsTimedSemaphoreOperations()) {
+		result=semset->wait(3,ttl,0);
+	} else if (ttl>0 && sys::signalsInterruptSystemCalls()) {
+		semset->dontRetryInterruptedOperations();
+		alarmrang=0;
+		signalmanager::alarm(ttl);
+		do {
+			error::setErrorNumber(0);
+			result=semset->wait(3);
+		} while (!result &&
+				error::getErrorNumber()==EINTR &&
+				!alarmrang);
+		signalmanager::alarm(0);
+		semset->retryInterruptedOperations();
 	} else {
 		result=semset->wait(3);
 	}

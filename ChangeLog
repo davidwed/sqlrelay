@@ -31,7 +31,9 @@
 	removed -revision during link and adopted Semantic Versioning 2.0
 	added missing get*List methods to Java API
 	removed errant information_schema views from getTableList with mysql
-	fixed several subtle listenertimeout-related bugs
+	refactored listenertimeout to use timed semaphore ops and only fall
+		back to an alarm if the system doesn't support timed sem ops
+		and the instance isn't configured to use threads
 	fixed inode-check in logger modules - works correctly with logrotate
 	change "an error occurred" to "server closed connection" to reduce
 		false-positives from log analyzers - "real" errors will still

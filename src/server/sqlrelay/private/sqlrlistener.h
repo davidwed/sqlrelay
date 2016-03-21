@@ -36,9 +36,11 @@
 					thread *thr);
 		void    errorClientSession(filedescriptor *clientsock,
 					int64_t errnum, const char *err);
-		bool	acquireShmAccess(thread *thr);
+		bool	acquireShmAccess(thread *thr, bool *timeout);
 		bool	releaseShmAccess();
-		bool	acceptAvailableConnection(bool *alldbsdown);
+		bool	acceptAvailableConnection(thread *thr,
+							bool *alldbsdown,
+							bool *timeout);
 		bool	doneAcceptingAvailableConnection();
 		void	waitForConnectionToBeReadyForHandoff();
 		bool	handOffOrProxyClient(filedescriptor *sock,
@@ -50,7 +52,6 @@
 					uint16_t *unixportstrlen,
 					filedescriptor *sock,
 					thread *thr);
-		static void	alarmThread(void *attr);
 		bool	findMatchingSocket(uint32_t connectionpid,
 					filedescriptor *connectionsock);
 		bool	requestFixup(uint32_t connectionpid,

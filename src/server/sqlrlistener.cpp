@@ -575,8 +575,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// issue warning about ttl if necessary
 	if (cfg->getTtl()>0 &&
-			!semset->supportsTimedSemaphoreOperations() &&
-			!sys::signalsInterruptSystemCalls()) {
+		!semset->supportsTimedSemaphoreOperations() &&
+		!sys::signalsInterruptSystemCalls()) {
 		stderror.printf("Warning: ttl forced to 0...\n"
 				"         semaphore waits cannot be "
 				"interrupted:\n"
@@ -584,6 +584,18 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 				"semaphore operations and\n"
 				"         signals don't interrupt system "
 				"calls\n");
+	}
+
+	// issue warning about listener timeout if necessary
+	if (cfg->getListenerTimeout()>0 &&
+		!charstring::compare(cfg->getSessionHandler(),"thread") &&
+		thread::supportsThreads() &&
+		!semset->supportsTimedSemaphoreOperations()) {
+		stderror.printf("Warning: listenertimeout disabled...\n"
+				"         sessionhandler=\"thread\" requested "
+				"(or defaulted) but system doesn't\n"
+				"         support timed semaphore "
+				"operations\n");
 	}
 
 	return true;
@@ -1437,39 +1449,39 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 	return retval;
 }
 
-bool sqlrlistener::acquireShmAccess(thread *thr) {
+bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
 
 	logDebugMessage("acquiring exclusive shm access");
 
-	// don't even begin to wait if the alarm already rang
-	// FIXME: trouble here... alarmrang isn't local to this thread
-	if (alarmrang) {
-		logDebugMessage("timeout occured");
-		return false;
-	}
-
-	// Loop, waiting.  Bail if interrupted by an alarm.
-	// FIXME: refactor this, similarly to controller
-	// FIXME: trouble here...
-	// 	* the alarm doesn't reliably interrupt the wait
-	//	* alarmrang isn't local to this thread
+	// Loop, waiting.  Bail if timeout occurred
 	bool	result=true;
-	if (sys::signalsInterruptSystemCalls()) {
+	*timeout=false;
+	if (listenertimeout>0 && semset->supportsTimedSemaphoreOperations()) {
+		result=semset->waitWithUndo(1,listenertimeout,0);
+		*timeout=(!result && error::getErrorNumber()==EAGAIN);
+	} else if (listenertimeout>0 &&
+			!thr && sys::signalsInterruptSystemCalls()) {
+		// We can't use this when using threads because alarmrang isn't
+		// thread-local and there's no way to make it be.  Also, the
+		// alarm doesn't reliably interrupt the wait() when it's called
+		// from a thread, at least not on Linux.  Hopefully platforms
+		// that supports threads also supports timed semaphore ops.
 		semset->dontRetryInterruptedOperations();
+		alarmrang=0;
+		signalmanager::alarm(listenertimeout);
 		do {
 			result=semset->waitWithUndo(1);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
+		*timeout=(alarmrang==1);
+		signalmanager::alarm(0);
 		semset->retryInterruptedOperations();
 	} else {
-		do {
-			result=semset->waitWithUndo(1,0,500000000);
-		} while (!result && alarmrang!=1);
+		result=semset->waitWithUndo(1);
 	}
 
 	// handle alarm...
-	// FIXME: trouble here... alarmrang isn't local to this thread
-	if (alarmrang) {
+	if (*timeout) {
 		logDebugMessage("timeout occured");
 		return false;
 	}
@@ -1498,7 +1510,9 @@ bool sqlrlistener::releaseShmAccess() {
 	return true;
 }
 
-bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
+bool sqlrlistener::acceptAvailableConnection(thread *thr,
+						bool *alldbsdown,
+						bool *timeout) {
 
 	// If we don't want to wait for down databases, then check to see if
 	// any of the db's are up.  If none are, then don't even wait for an
@@ -1523,35 +1537,38 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 
 	logDebugMessage("waiting for an available connection");
 
-	// don't even begin to wait if the alarm already rang
-	// FIXME: trouble here... alarmrang isn't local to this thread
-	if (alarmrang) {
-		logDebugMessage("timeout occured");
-		return false;
-	}
-
-	// Loop, waiting.  Bail if interrupted by an alarm.
-	// FIXME: refactor this, similarly to controller
-	// FIXME: trouble here... the alarm doesn't reliably interrupt the wait,
-	// and alarmrang isn't local to this thread, so checking it isn't
-	// reliable
+	// Loop, waiting.  Bail if timeout occurred
+	// FIXME: Some of the listenertimeout might have already been consumed
+	// by acquireShmAccess().  Arguably, we should wait for the remaining
+	// listenertimeout here, rather than the entire listenertimeout.
 	bool	result=true;
-	if (sys::signalsInterruptSystemCalls()) {
+	*timeout=false;
+	if (listenertimeout>0 && semset->supportsTimedSemaphoreOperations()) {
+		result=semset->wait(2,listenertimeout,0);
+		*timeout=(!result && error::getErrorNumber()==EAGAIN);
+	} else if (listenertimeout>0 &&
+			!thr && sys::signalsInterruptSystemCalls()) {
+		// We can't use this when using threads because alarmrang isn't
+		// thread-local and there's no way to make it be.  Also, the
+		// alarm doesn't reliably interrupt the wait() when it's called
+		// from a thread, at least not on Linux.  Hopefully platforms
+		// that supports threads also supports timed semaphore ops.
 		semset->dontRetryInterruptedOperations();
+		alarmrang=0;
+		signalmanager::alarm(listenertimeout);
 		do {
 			result=semset->wait(2);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
+		*timeout=(alarmrang==1);
+		signalmanager::alarm(0);
 		semset->retryInterruptedOperations();
 	} else {
-		do {
-			result=semset->wait(2,0,500000000);
-		} while (!result && alarmrang!=1);
+		result=semset->wait(2);
 	}
 
 	// handle alarm...
-	// FIXME: trouble here... alarmrang isn't local to this thread
-	if (alarmrang) {
+	if (*timeout) {
 		logDebugMessage("timeout occured");
 		return false;
 	}
@@ -1596,12 +1613,6 @@ void sqlrlistener::waitForConnectionToBeReadyForHandoff() {
 	logDebugMessage("done waiting for connection to be ready for handoff");
 }
 
-struct alarmthreadattr {
-	thread		*alarmthr;
-	thread		*mainthr;
-	uint64_t	listenertimeout;
-};
-
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
@@ -1609,44 +1620,16 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					filedescriptor *sock,
 					thread *thr) {
 
-	// use an alarm, if we're a forked child and a timeout is set
-	bool	usealarm=((isforkedthread || isforkedchild) && listenertimeout);
-
 	for (;;) {
 
 		logDebugMessage("getting a connection...");
 
-		// set up an alarm thread, should we need it
-		thread		*alarmthread=NULL;
-		alarmthreadattr	*ata=NULL;
-
-		// set an alarm
-		bool	alarmon=false;
-		if (usealarm) {
-			// FIXME: trouble here...
-			// alarmrang isn't local to this thread
-			alarmrang=0;
-			if (isforkedthread) {
-				alarmthread=new thread;
-				ata=new alarmthreadattr;
-				ata->alarmthr=alarmthread;
-				ata->mainthr=thr;
-				ata->listenertimeout=listenertimeout;
-				alarmthread->setFunction(
-					(void*(*)(void*))alarmThread);
-				alarmthread->setArgument(ata);
-				alarmon=alarmthread->run();
-			} else {
-				signalmanager::alarm(listenertimeout);
-				alarmon=true;
-			}
-		}
-
 		// set "all db's down" flag
 		bool	alldbsdown=false;
 
-		// acquire access to the shared memory
-		bool	ok=acquireShmAccess(thr);
+		// acquire access to the shared memory	
+		bool	timeout=false;
+		bool	ok=acquireShmAccess(thr,&timeout);
 
 		if (ok) {
 
@@ -1655,17 +1638,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// at the end, no matter what...
 
 			// wait for an available connection
-			ok=acceptAvailableConnection(&alldbsdown);
-
-			// turn off the alarm
-			if (usealarm && alarmon) {
-				if (isforkedthread) {
-					alarmthread->cancel();
-				} else {
-					signalmanager::alarm(0);
-				}
-				alarmon=false;
-			}
+			ok=acceptAvailableConnection(thr,&alldbsdown,&timeout);
 
 			if (ok) {
 
@@ -1680,19 +1653,6 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// release access to the shared memory
 			ok=(releaseShmAccess() && ok);
 		}
-
-		// turn off the alarm
-		if (usealarm && alarmon) {
-			if (isforkedthread) {
-				alarmthread->cancel();
-			} else {
-				signalmanager::alarm(0);
-			}
-		}
-
-		// clean up alarm thread stuff
-		delete alarmthread;
-		delete ata;
 
 		// execute this only if code above executed without errors...
 		if (ok) {
@@ -1720,9 +1680,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
 
-		// return an error if the timeout was reached
-		// FIXME: trouble here... alarmrang isn't local to this thread
-		if (alarmrang) {
+		if (timeout) {
 			logDebugMessage("failed to get "
 					"a connection: timeout");
 			sock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
@@ -1746,22 +1704,6 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			sock->flushWriteBuffer(-1,-1);
 			return false;
 		}
-	}
-}
-
-void sqlrlistener::alarmThread(void *attr) {
-	alarmthreadattr	*ata=(alarmthreadattr *)attr;
-	ata->alarmthr->detach();
-	snooze::macrosnooze(ata->listenertimeout);
-	#ifdef SIGALRM
-	ata->mainthr->raiseSignal(SIGALRM);
-	#endif
-
-	// Wait to be cancelled.  The parent thread will eventually attempt to
-	// cancel this thread, and cancelling a detached thread that has
-	// already exited will crash on many platforms.
-	for (;;) {
-		snooze::macrosnooze(1);
 	}
 }
 
@@ -2313,7 +2255,6 @@ void sqlrlistener::logInternalError(const char *info) {
 }
 
 void sqlrlistener::alarmHandler(int32_t signum) {
-	// FIXME: trouble here... alarmrang isn't local to the calling thread
 	alarmrang=1;
 	#ifdef SIGALRM
 	alarmhandler.handleSignal(SIGALRM);
