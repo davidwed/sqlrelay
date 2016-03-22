@@ -10,10 +10,10 @@ include ../../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(ODBCDRIVERCPPFLAGS) $(COMPILE) $<
 
-all: lib$(SQLR)odbc.$(LIBEXT)
+all: sqlrodbc.def lib$(SQLR)odbc.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.def
 	$(RMTREE) .libs
 
 lib$(SQLR)odbc.$(LIBEXT): sqlrodbc.cpp sqlrodbc.$(OBJ)
@@ -40,3 +40,9 @@ uninstalldll:
 uninstalllib:
 	$(RM) $(libdir)/lib$(SQLR)odbc* \
 		$(libdir)/libsqlrodbc*
+
+sqlrodbc.def:
+	echo "LIBRARY LIBSQLRODBC" > $@
+	echo "EXPORTS" >> $@
+	grep " SQL_API " *.cpp | cut -d' ' -f3 | cut -d'(' -f1 >> $@
+	grep " INSTAPI " *.cpp | cut -d' ' -f3 | cut -d'(' -f1 >> $@
