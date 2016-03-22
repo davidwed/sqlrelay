@@ -97,7 +97,7 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
-		bool		changeUser(const char *newuser,
+		bool		changeProxiedUser(const char *newuser,
 						const char *newpassword);
 #endif
 		bool		supportsTransactionBlocks();
@@ -1012,14 +1012,13 @@ void oracleconnection::logOut() {
 }
 
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
-bool oracleconnection::changeUser(const char *newuser,
+bool oracleconnection::changeProxiedUser(const char *newuser,
 					const char *newpassword) {
 
-	// if the database we're connected to doesn't
-	// support proxy credentials, use the sqlrconnection
-	// class's default changeUser() method
+	// fail if the database we're connected to
+	// doesn't support proxy credentials
 	if (!supportsproxycredentials) {
-		return sqlrserverconnection::changeUser(newuser,newpassword);
+		return false;
 	}
 
 	// delete any previously existing "newsessions"

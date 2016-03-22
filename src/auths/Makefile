@@ -14,6 +14,7 @@ all: all-base $(AUTHALLOPTIONALTARGETS)
 
 all-base: $(SQLR)auth_userlist.$(LIBEXT) \
 		$(SQLR)auth_database.$(LIBEXT) \
+		$(SQLR)auth_proxied.$(LIBEXT) \
 		$(SQLR)auth_krb_userlist.$(LIBEXT) \
 		$(SQLR)auth_tls_userlist.$(LIBEXT)
 
@@ -28,6 +29,9 @@ $(SQLR)auth_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)
 
 $(SQLR)auth_database.$(LIBEXT): database.cpp database.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ database.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
+$(SQLR)auth_proxied.$(LIBEXT): proxied.cpp proxied.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ proxied.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)auth_krb_userlist.$(LIBEXT): krb_userlist.cpp krb_userlist.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ krb_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
@@ -44,6 +48,7 @@ installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_database.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_proxied.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_krb_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_tls_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
@@ -60,6 +65,10 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)auth_database.a
 	$(RM) $(libexecdir)/$(SQLR)auth_database.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_database.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)auth_proxied.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_proxied.a
+	$(RM) $(libexecdir)/$(SQLR)auth_proxied.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_proxied.so so $(MODULESUFFIX)
 	$(LTINSTALL) $(CP) $(SQLR)auth_krb_userlist.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/$(SQLR)auth_krb_userlist.a
 	$(RM) $(libexecdir)/$(SQLR)auth_krb_userlist.$(LIBEXT)
@@ -79,6 +88,7 @@ uninstall:
 	$(RM) $(libexecdir)/$(SQLR)auth_default.* \
 		$(libexecdir)/$(SQLR)auth_userlist.* \
 		$(libexecdir)/$(SQLR)auth_database.* \
+		$(libexecdir)/$(SQLR)auth_proxied.* \
 		$(libexecdir)/$(SQLR)auth_krb_userlist.* \
 		$(libexecdir)/$(SQLR)auth_tls_userlist.* \
 		$(libexecdir)/$(SQLR)auth_kerberos_userlist.* \
@@ -86,6 +96,7 @@ uninstall:
 		$(libexecdir)/sqlrauth_default.* \
 		$(libexecdir)/sqlrauth_userlist.* \
 		$(libexecdir)/sqlrauth_database.* \
+		$(libexecdir)/sqlrauth_proxied.* \
 		$(libexecdir)/sqlrauth_krb_userlist.* \
 		$(libexecdir)/sqlrauth_kerberos_userlist.* \
 		$(libexecdir)/sqlrauth_sqlrelay.*

@@ -57,6 +57,9 @@
 		stdin/out/err to be in non-blocking mode sometimes (fixes bug
 		where PHP's that used the SQL Relay API would cause apache
 		workers to hang closing connections after a graceful restart)
+	made auth_database module always re-login
+	added auth_proxied module to support Oracle's (and potentially other
+		databases') n-tier/proxied authentication 
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

@@ -189,10 +189,6 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
-#ifdef HAVE_MYSQL_CHANGE_USER
-		bool		changeUser(const char *newuser,
-						const char *newpassword);
-#endif
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
@@ -487,14 +483,6 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 
 	return true;
 }
-
-#ifdef HAVE_MYSQL_CHANGE_USER
-bool mysqlconnection::changeUser(const char *newuser,
-					const char *newpassword) {
-	return !mysql_change_user(mysqlptr,newuser,newpassword,
-			(char *)((!charstring::isNullOrEmpty(db))?db:NULL));
-}
-#endif
 
 sqlrservercursor *mysqlconnection::newCursor(uint16_t id) {
 	return (sqlrservercursor *)new mysqlcursor((sqlrserverconnection *)this,id);

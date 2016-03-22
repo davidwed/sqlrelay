@@ -1250,17 +1250,20 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// authtier="database" -> auth_database
+	// authtier="proxied" -> auth_proxied
 	attr=instance->getAttribute("authtier");
-	if (!attr->isNullNode() && 
-		!charstring::compare(attr->getValue(),"database")) {
+	if (!attr->isNullNode()) {
+		if (!charstring::compare(attr->getValue(),"database") ||
+			!charstring::compare(attr->getValue(),"proxied")) {
 
-		xmldomnode	*auth=(addeduserlist)?
+			xmldomnode	*auth=(addeduserlist)?
 					auths->insertTag("auth",1):
 					auths->insertTag("auth",0);
 
-		auth->setAttributeValue("module","database");
+			auth->setAttributeValue("module",attr->getValue());
 
-		instance->deleteAttribute(attr);
+			instance->deleteAttribute(attr);
+		}
 	}
 
 	// normalize connections

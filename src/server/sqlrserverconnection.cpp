@@ -41,9 +41,9 @@ bool sqlrserverconnection::supportsAuthOnDatabase() {
 	return true;
 }
 
-bool sqlrserverconnection::changeUser(const char *newuser,
-					const char *newpassword) {
-	return cont->changeUser(newuser,newpassword);
+bool sqlrserverconnection::changeProxiedUser(const char *newuser,
+						const char *newpassword) {
+	return false;
 }
 
 bool sqlrserverconnection::autoCommitOn() {

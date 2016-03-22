@@ -79,7 +79,6 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	lastuserbuffer[0]='\0';
 	lastpasswordbuffer[0]='\0';
-	lastauthsuccess=false;
 
 	needcommitorrollback=false;
 
@@ -1799,67 +1798,41 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 }
 
 bool sqlrservercontroller::auth(const char *userbuffer,
-						const char *passwordbuffer) {
+				const char *passwordbuffer) {
 
 	logDebugMessage("auth...");
 
-	// auth on the approprite tier
-	bool	success=connectionBasedAuth(userbuffer,passwordbuffer);
-
+	// authenticate
+	bool	success=(sqlra && sqlra->auth(conn,userbuffer,passwordbuffer));
 	if (success) {
+		logDebugMessage("auth success");
 		updateCurrentUser(userbuffer,charstring::length(userbuffer));
+	} else {
+		logDebugMessage("auth failed");
+		logClientConnectionRefused("auth failed");
 	}
-
 	return success;
 }
 
-bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
-						const char *passwordbuffer) {
-
-	// handle connection-based auth
-	bool	retval=
-		(sqlra && sqlra->auth(conn,userbuffer,passwordbuffer));
-	if (retval) {
-		logDebugMessage("auth succeeded on connection");
-	} else {
-		logClientConnectionRefused("auth failed on connection: "
-						"invalid user/password");
-	}
-	return retval;
+const char *sqlrservercontroller::getLastUser() {
+	return lastuserbuffer;
 }
 
-bool sqlrservercontroller::databaseBasedAuth(const char *userbuffer,
-						const char *passwordbuffer) {
+const char *sqlrservercontroller::getLastPassword() {
+	return lastpasswordbuffer;
+}
 
-	// if the user we want to change to is different from the
-	// user that's currently proxied, try to change to that user
-	bool	authsuccess;
-	if ((!lastuserbuffer[0] && !lastpasswordbuffer[0]) || 
-		charstring::compare(lastuserbuffer,userbuffer) ||
-		charstring::compare(lastpasswordbuffer,passwordbuffer)) {
+void sqlrservercontroller::setLastUser(const char *user) {
+	charstring::copy(lastuserbuffer,(user)?user:"");
+}
 
-		// change auth
-		logDebugMessage("change user");
-		authsuccess=conn->changeUser(userbuffer,passwordbuffer);
-
-		// keep a record of which user we're changing to
-		// and whether that user was successful in auth
-		charstring::copy(lastuserbuffer,userbuffer);
-		charstring::copy(lastpasswordbuffer,passwordbuffer);
-		lastauthsuccess=authsuccess;
-	}
-
-	if (lastauthsuccess) {
-		logDebugMessage("auth succeeded on database");
-	} else {
-		logClientConnectionRefused("auth failed on database: "
-						"invalid user/password");
-	}
-	return lastauthsuccess;
+void sqlrservercontroller::setLastPassword(const char *password) {
+	charstring::copy(lastpasswordbuffer,(password)?password:"");
 }
 
 bool sqlrservercontroller::changeUser(const char *newuser,
 					const char *newpassword) {
+	logDebugMessage("change user");
 	closeCursors(false);
 	logOut();
 	setUser(newuser);

@@ -51,9 +51,6 @@
 		bool	getProtocol();
 		void	clientSession();
 
-		bool	connectionBasedAuth(const char *userbuffer,
-						const char *passwordbuffer);
-
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();
 		bool	interceptQuery(sqlrservercursor *cursor,
@@ -185,7 +182,6 @@
 
 		char		lastuserbuffer[USERSIZE];
 		char		lastpasswordbuffer[USERSIZE];
-		bool		lastauthsuccess;
 
 		bool		autocommitforthissession;
 
