@@ -1929,7 +1929,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 			userlength=charstring::length(user);
 		}
 		if ((size_t)userlength>=sizeof(conn->user)) {
-			userlength=sizeof(conn->user-1);
+			userlength=sizeof(conn->user)-1;
 		}
 		charstring::safeCopy(conn->user,sizeof(conn->user),
 					(const char *)user,userlength);
@@ -1946,7 +1946,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 			passwordlength=charstring::length(password);
 		}
 		if ((size_t)passwordlength>=sizeof(conn->password)) {
-			passwordlength=sizeof(conn->password-1);
+			passwordlength=sizeof(conn->password)-1;
 		}
 		charstring::safeCopy(conn->password,sizeof(conn->password),
 					(const char *)password,passwordlength);
