@@ -51,6 +51,12 @@
 	when calling after-triggers, "success" flag is set correctly now
 	fixed bug where after-triggers could mask failed queries
 	added support for "before and after" triggers
+	moved call to set stdinput to use blocking mode from
+		rudiments::stdiofiledescriptor to sqlrsh, as doing it in every
+		case caused problems with apps like Apache, which need
+		stdin/out/err to be in non-blocking mode sometimes (fixes bug
+		where PHP's that used the SQL Relay API would cause apache
+		workers to hang closing connections after a graceful restart)
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

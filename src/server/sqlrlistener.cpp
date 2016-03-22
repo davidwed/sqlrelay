@@ -1265,7 +1265,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		thr->setArgument(csa);
 
 		// run the thread
-		if (thr->run()) {
+		if (thr->runDetached()) {
 			isforkedthread=true;
 			return;
 		}
@@ -1338,7 +1338,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 
 void sqlrlistener::clientSessionThread(void *attr) {
 	clientsessionattr	*csa=(clientsessionattr *)attr;
-	csa->thr->detach();
 	csa->lsnr->clientSession(csa->clientsock,csa->protocolindex,csa->thr);
 	csa->lsnr->decrementBusyListeners();
 	csa->lsnr->decrementForkedListeners();
@@ -1751,7 +1750,7 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 		thr->setArgument(pda);
 
 		// run the thread
-		thr->run();
+		thr->runDetached();
 		return;
 	}
 
@@ -1768,7 +1767,6 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 
 void sqlrlistener::pingDatabaseThread(void *attr) {
 	pingdatabaseattr	*pda=(pingdatabaseattr *)attr;
-	pda->thr->detach();
 	pda->lsnr->pingDatabaseInternal(pda->connectionpid,
 					pda->unixportstr,pda->inetport);
 	delete pda->thr;

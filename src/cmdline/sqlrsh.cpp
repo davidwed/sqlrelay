@@ -1836,6 +1836,11 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	int		exitprogram=0;
 	uint32_t	promptcount;
 
+	// Blocking mode is apparently not the default on some systems
+	// (Syllable for sure, maybe others) and this causes hilariously
+	// odd behavior when reading standard input.
+	stdinput.useBlockingMode();
+
 	while (!exitprogram) {
 
 		// prompt the user
