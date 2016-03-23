@@ -144,10 +144,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setPassword(const char *password);
 		const char	*getUser();
 		const char	*getPassword();
-		void		setLastUser(const char *user);
-		void		setLastPassword(const char *password);
-		const char	*getLastUser();
-		const char	*getLastPassword();
 		bool		auth(const char *userbuffer,
 						const char *passwordbuffer);
 		bool		changeUser(const char *newuser,
@@ -613,6 +609,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 					const char **warning)=0;
 		virtual	void	logOut()=0;
 
+		virtual	bool	changeUser(const char *newuser,
+						const char *newpassword);
 		virtual	bool	changeProxiedUser(const char *newuser,
 						const char *newpassword);
 

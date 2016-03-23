@@ -77,9 +77,6 @@ sqlrservercontroller::sqlrservercontroller() {
 	passwordencryptions=NULL;
 	usercount=0;
 
-	lastuserbuffer[0]='\0';
-	lastpasswordbuffer[0]='\0';
-
 	needcommitorrollback=false;
 
 	autocommitforthissession=false;
@@ -1812,22 +1809,6 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 		logClientConnectionRefused("auth failed");
 	}
 	return success;
-}
-
-const char *sqlrservercontroller::getLastUser() {
-	return lastuserbuffer;
-}
-
-const char *sqlrservercontroller::getLastPassword() {
-	return lastpasswordbuffer;
-}
-
-void sqlrservercontroller::setLastUser(const char *user) {
-	charstring::copy(lastuserbuffer,(user)?user:"");
-}
-
-void sqlrservercontroller::setLastPassword(const char *password) {
-	charstring::copy(lastpasswordbuffer,(password)?password:"");
 }
 
 bool sqlrservercontroller::changeUser(const char *newuser,

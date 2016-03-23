@@ -59,7 +59,9 @@
 		workers to hang closing connections after a graceful restart)
 	made auth_database module always re-login
 	added auth_proxied module to support Oracle's (and potentially other
-		databases') n-tier/proxied authentication 
+		databases') n-tier/proxied authentication
+	fixed a long-standing bug where passwords weren't checked when
+		switching between oracle n-tier authenticated users
 
 0.64 - fixed bug in sqlrsh that caused it to filter out non-ascii characters
 	added informix connection module

@@ -180,9 +180,6 @@
 		char		**passwords;
 		char		**passwordencryptions;
 
-		char		lastuserbuffer[USERSIZE];
-		char		lastpasswordbuffer[USERSIZE];
-
 		bool		autocommitforthissession;
 
 		bool		translatebegins;
