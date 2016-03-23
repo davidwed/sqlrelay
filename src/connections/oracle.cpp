@@ -1028,6 +1028,11 @@ bool oracleconnection::changeProxiedUser(const char *newuser,
 		newsession=NULL;
 	}
 
+	// clean up
+	OCISessionEnd(svc,err,newsession,OCI_DEFAULT);
+	OCIHandleFree(newsession,OCI_HTYPE_SESSION);
+	newsession=NULL;
+
 	// create a session handle for the new user
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&newsession,
 				(ub4)OCI_HTYPE_SESSION,
@@ -1041,7 +1046,16 @@ bool oracleconnection::changeProxiedUser(const char *newuser,
 				(ub4)charstring::length(newuser),
 				(ub4)OCI_ATTR_USERNAME,err);
 
-	// don't set the password, use the proxy
+	// set the password
+	// (this isn't usually necessary, as proxy users are trusted to switch
+	// between the accounts they're configured to proxy, but we specifically
+	// want to validate the password, so we'll include it)
+	OCIAttrSet((dvoid *)newsession,(ub4)OCI_HTYPE_SESSION,
+				(dvoid *)newpassword,
+				(ub4)charstring::length(newpassword),
+				(ub4)OCI_ATTR_PASSWORD,err);
+
+	// use the proxy
 	OCIAttrSet((dvoid *)newsession,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)session,(ub4)0,
 				(ub4)OCI_ATTR_PROXY_CREDENTIALS,err);
