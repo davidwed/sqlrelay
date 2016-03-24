@@ -79,6 +79,7 @@ installsharedlib:
 	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_tls userlist.so so $(MODULESUFFIX)
 
 installsharedlib-sqlrelay:
+	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/$(SQLR)auth_sqlrelay.a
 	$(RM) $(libexecdir)/$(SQLR)auth_sqlrelay.$(LIBEXT)
