@@ -85,18 +85,8 @@ void checkSuccess(double value, double success) {
 
 int	main(int argc, char **argv) {
 
-	int64_t		numvar;
-	const char	*clobvar;
-	uint32_t	clobvarlength;
-	const char	*blobvar;
-	uint32_t	blobvarlength;
-	const char	*stringvar;
-	double		floatvar;	
 	const char * const *cols;
 	const char * const *fields;
-	uint16_t	port;
-	char		*socket;
-	uint16_t	id;
 	uint32_t	*fieldlens;
 
 	// instantiation
@@ -126,8 +116,8 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable2");
 
 	stdoutput.printf("CREATE TESTTABLES: \n");
-	checkSuccess(cur->sendQuery("create table testtable1 (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp) type=innodb"),1);
-	checkSuccess(cur->sendQuery("create table testtable2 (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp) type=innodb"),1);
+	checkSuccess(cur->sendQuery("create table testtable1 (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
+	checkSuccess(cur->sendQuery("create table testtable2 (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("BEGIN TRANSCTION: \n");
@@ -247,6 +237,8 @@ int	main(int argc, char **argv) {
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
+
+	con->commit();
 
 	stdoutput.printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
@@ -458,6 +450,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldlens[6],10);
 	checkSuccess(fieldlens[7],8);
 	stdoutput.printf("\n");
+
+	checkSuccess(con->commit(),1);
 
 	stdoutput.printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
@@ -674,10 +668,6 @@ int	main(int argc, char **argv) {
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
-	checkSuccess(secondcur->sendQuery("select count(*) from testtable1"),1);
-	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
-	checkSuccess(secondcur->sendQuery("select count(*) from testtable2"),1);
-	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
 	checkSuccess(con->commit(),1);
 	checkSuccess(secondcon->commit(),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable1"),1);
@@ -695,231 +685,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->autoCommitOff(),1);
 	checkSuccess(secondcon->autoCommitOff(),1);
 	checkSuccess(cur->sendQuery("begin"),1);
-	stdoutput.printf("\n");
-
-	stdoutput.printf("OUTPUT BIND BY POSITION: \n");
-	cur->prepareQuery("begin  :1:=1; :2:='hello'; :3:=2.5; end;");
-	cur->defineOutputBindInteger("1");
-	cur->defineOutputBindString("2",10);
-	cur->defineOutputBindDouble("3");
-	checkSuccess(cur->executeQuery(),1);
-	numvar=cur->getOutputBindInteger("1");
-	stringvar=cur->getOutputBindString("2");
-	floatvar=cur->getOutputBindDouble("3");
-	checkSuccess(numvar,1);
-	checkSuccess(stringvar,"hello");
-	checkSuccess(floatvar,2.5);
-	stdoutput.printf("\n");
-
-	stdoutput.printf("OUTPUT BIND BY NAME: \n");
-	cur->prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
-	cur->defineOutputBindInteger("numvar");
-	cur->defineOutputBindString("stringvar",10);
-	cur->defineOutputBindDouble("floatvar");
-	checkSuccess(cur->executeQuery(),1);
-	numvar=cur->getOutputBindInteger("numvar");
-	stringvar=cur->getOutputBindString("stringvar");
-	floatvar=cur->getOutputBindDouble("floatvar");
-	checkSuccess(numvar,1);
-	checkSuccess(stringvar,"hello");
-	checkSuccess(floatvar,2.5);
-	stdoutput.printf("\n");
-
-	stdoutput.printf("OUTPUT BIND BY NAME WITH VALIDATION: \n");
-	cur->clearBinds();
-	cur->defineOutputBindInteger("numvar");
-	cur->defineOutputBindString("stringvar",10);
-	cur->defineOutputBindDouble("floatvar");
-	cur->defineOutputBindString("dummyvar",10);
-	cur->validateBinds();
-	checkSuccess(cur->executeQuery(),1);
-	numvar=cur->getOutputBindInteger("numvar");
-	stringvar=cur->getOutputBindString("stringvar");
-	floatvar=cur->getOutputBindDouble("floatvar");
-	checkSuccess(numvar,1);
-	checkSuccess(stringvar,"hello");
-	checkSuccess(floatvar,2.5);
-	stdoutput.printf("\n");
-
-	stdoutput.printf("CLOB AND BLOB OUTPUT BIND: \n");
-	cur->sendQuery("drop table testtable3");
-	checkSuccess(cur->sendQuery("create table testtable3 (testclob clob, testblob blob)"),1);
-	cur->prepareQuery("insert into testtable3 values ('hello',:var1)");
-	cur->inputBindBlob("var1","hello",5);
-	checkSuccess(cur->executeQuery(),1);
-	cur->prepareQuery("begin select testclob into :clobvar from testtable3;  select testblob into :blobvar from testtable3; end;");
-	cur->defineOutputBindClob("clobvar");
-	cur->defineOutputBindBlob("blobvar");
-	checkSuccess(cur->executeQuery(),1);
-	clobvar=cur->getOutputBindClob("clobvar");
-	clobvarlength=cur->getOutputBindLength("clobvar");
-	blobvar=cur->getOutputBindBlob("blobvar");
-	blobvarlength=cur->getOutputBindLength("blobvar");
-	checkSuccess(clobvar,"hello",5);
-	checkSuccess(clobvarlength,5);
-	checkSuccess(blobvar,"hello",5);
-	checkSuccess(blobvarlength,5);
-	cur->sendQuery("drop table testtable3");
-	stdoutput.printf("\n");
-
-	stdoutput.printf("NULL AND EMPTY CLOBS AND CLOBS: \n");
-	cur->getNullsAsNulls();
-	cur->sendQuery("create table testtable3 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
-	cur->prepareQuery("insert into testtable3 values (:var1,:var2,:var3,:var4)");
-	cur->inputBindClob("var1","",0);
-	cur->inputBindClob("var2",NULL,0);
-	cur->inputBindBlob("var3","",0);
-	cur->inputBindBlob("var4",NULL,0);
-	checkSuccess(cur->executeQuery(),1);
-	cur->sendQuery("select * from testtable3");
-	checkSuccess(cur->getField(0,(uint32_t)0),NULL);
-	checkSuccess(cur->getField(0,1),NULL);
-	checkSuccess(cur->getField(0,2),NULL);
-	checkSuccess(cur->getField(0,3),NULL);
-	cur->sendQuery("drop table testtable3");
-	stdoutput.printf("\n");
-
-
-	stdoutput.printf("LONG CLOB: \n");
-	cur->sendQuery("drop table testtable3");
-	cur->sendQuery("create table testtable3 (testclob clob)");
-	cur->prepareQuery("insert into testtable3 values (:clobval)");
-	char	clobval[8*1024+1];
-	for (int i=0; i<8*1024; i++) {
-		clobval[i]='C';
-	}
-	clobval[8*1024]='\0';
-	cur->inputBindClob("clobval",clobval,8*1024);
-	checkSuccess(cur->executeQuery(),1);
-	cur->sendQuery("select testclob from testtable3");
-	checkSuccess(clobval,cur->getField(0,"testclob"));
-	cur->prepareQuery("begin select testclob into :clobbindval from testtable3; end;");
-	cur->defineOutputBindClob("clobbindval");
-	checkSuccess(cur->executeQuery(),1);
-	const char	*clobbindvar=cur->getOutputBindClob("clobbindval");
-	checkSuccess(cur->getOutputBindLength("clobbindval"),8*1024);
-	checkSuccess(clobval,clobbindvar);
-	cur->sendQuery("drop table testtable3");
-	stdoutput.printf("\n");
-
-
-	stdoutput.printf("LONG OUTPUT BIND\n");
-	cur->sendQuery("drop table testtable3");
-	cur->sendQuery("create table testtable3 (testval varchar2(4000))");
-	char	testval[4001];
-	testval[4000]='\0';
-	cur->prepareQuery("insert into testtable3 values (:testval)");
-	for (int i=0; i<4000; i++) {
-		testval[i]='C';
-	}
-	cur->inputBind("testval",testval);
-	checkSuccess(cur->executeQuery(),1);
-	cur->sendQuery("select testval from testtable3");
-	checkSuccess(testval,cur->getField(0,"testval"));
-	char	query[4000+25];
-	charstring::printf(query,sizeof(query),
-				"begin :bindval:='%s'; end;",testval);
-	cur->prepareQuery(query);
-	cur->defineOutputBindString("bindval",4000);
-	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBindLength("bindval"),4000);
-	checkSuccess(cur->getOutputBindString("bindval"),testval);
-	cur->sendQuery("drop table testtable3");
-	stdoutput.printf("\n");
-
-	stdoutput.printf("NEGATIVE INPUT BIND\n");
-	cur->sendQuery("drop table testtable3");
-	cur->sendQuery("create table testtable3 (testval number)");
-	cur->prepareQuery("insert into testtable3 values (:testval)");
-	cur->inputBind("testval",-1);
-	checkSuccess(cur->executeQuery(),1);
-	cur->sendQuery("select testval from testtable3");
-	checkSuccess(cur->getField(0,"testval"),"-1");
-	cur->sendQuery("drop table testtable3");
-	stdoutput.printf("\n");
-
-
-	stdoutput.printf("CURSOR BINDS: \n");
-	checkSuccess(cur->sendQuery("create table testtable3 (testnumber number)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (1)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (2)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (3)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (4)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (5)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (6)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (7)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable3 values (8)"),1);
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
-	checkSuccess(cur->sendQuery("create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable3 where testnumber>value; return l_cursor; end;"),1);
-	cur->prepareQuery("begin  :curs1:=sp_testtable(5);  :curs2:=sp_testtable(0); end;");
-	cur->defineOutputBindCursor("curs1");
-	cur->defineOutputBindCursor("curs2");
-	checkSuccess(cur->executeQuery(),1);
-	sqlrcursor	*bindcur1=cur->getOutputBindCursor("curs1");
-	checkSuccess(bindcur1->fetchFromBindCursor(),1);
-	checkSuccess(bindcur1->getField(0,(uint32_t)0),"6");
-	checkSuccess(bindcur1->getField(1,(uint32_t)0),"7");
-	checkSuccess(bindcur1->getField(2,(uint32_t)0),"8");
-	delete bindcur1;
-	sqlrcursor	*bindcur2=cur->getOutputBindCursor("curs2");
-	checkSuccess(bindcur2->fetchFromBindCursor(),1);
-	checkSuccess(bindcur2->getField(0,(uint32_t)0),"1");
-	checkSuccess(bindcur2->getField(1,(uint32_t)0),"2");
-	checkSuccess(bindcur2->getField(2,(uint32_t)0),"3");
-	delete bindcur2;
-	checkSuccess(cur->sendQuery("drop package types"),1);
-	cur->sendQuery("drop table testtable3");
-	stdoutput.printf("\n");
-
-
-	// temporary tables
-	stdoutput.printf("TEMPORARY TABLES: \n");
-	cur->sendQuery("drop table temptabledelete\n");
-	cur->sendQuery("create global temporary table temptabledelete (col1 number) on commit delete rows");
-	checkSuccess(cur->sendQuery("insert into temptabledelete values (1)"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	checkSuccess(con->commit(),1);
-	checkSuccess(cur->sendQuery("begin"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	cur->sendQuery("drop table temptabledelete\n");
-	stdoutput.printf("\n");
-	cur->sendQuery("drop table temptablepreserve\n");
-	cur->sendQuery("create global temporary table temptablepreserve (col1 number) on commit preserve rows");
-	checkSuccess(cur->sendQuery("insert into temptablepreserve values (1)"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	checkSuccess(con->commit(),1);
-	checkSuccess(cur->sendQuery("begin"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	con->endSession();
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("begin"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	cur->sendQuery("drop table temptablepreserve\n");
-	stdoutput.printf("\n");
-
-	stdoutput.printf("FINISHED SUSPENDED SESSION: \n");
-	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
-	checkSuccess(cur->getField(4,(uint32_t)0),"5");
-	checkSuccess(cur->getField(5,(uint32_t)0),"6");
-	checkSuccess(cur->getField(6,(uint32_t)0),"7");
-	checkSuccess(cur->getField(7,(uint32_t)0),"8");
-	id=cur->getResultSetId();
-	cur->suspendResultSet();
-	checkSuccess(con->suspendSession(),1);
-	port=con->getConnectionPort();
-	socket=charstring::duplicate(con->getConnectionSocket());
-	checkSuccess(con->resumeSession(port,socket),1);
-	checkSuccess(cur->resumeResultSet(id),1);
-	checkSuccess(cur->getField(4,(uint32_t)0),NULL);
-	checkSuccess(cur->getField(5,(uint32_t)0),NULL);
-	checkSuccess(cur->getField(6,(uint32_t)0),NULL);
-	checkSuccess(cur->getField(7,(uint32_t)0),NULL);
 	stdoutput.printf("\n");
 
 	// drop existing table
