@@ -263,7 +263,7 @@ int	main(int argc, char **argv) {
 	numvar=cur->getOutputBindInteger("1");
 	stringvar=cur->getOutputBindString("2");
 	floatvar=cur->getOutputBindDouble("3");
-	cur->getOutputBindDate("datevar",&year,&month,&day,
+	cur->getOutputBindDate("4",&year,&month,&day,
 					&hour,&minute,&second,&microsecond,&tz);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
