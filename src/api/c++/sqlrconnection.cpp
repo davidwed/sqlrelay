@@ -637,15 +637,26 @@ bool sqlrconnection::openSession() {
 
 bool sqlrconnection::validateCertificate() {
 
-	// get the subject alternate names and common name from the cert
-	tlscertificate		*cert=NULL;
-	linkedlist< char * >	*sans=NULL;
-	const char		*commonname=NULL;
-	if (!charstring::compareIgnoringCase(pvt->_tlsvalidate,"ca+",3)) {
-		cert=((tlscontext *)pvt->_ctx)->getPeerCertificate();
-		sans=cert->getSubjectAlternateNames();
-		commonname=cert->getCommonName();
+	// If we're not doing any validation then just return true. If we're
+	// just doing ca validation then the connect would have failed if the
+	// certificate was invalid, so we can just return true for that too.
+	if (!charstring::compareIgnoringCase(pvt->_tlsvalidate,"no") ||
+		!charstring::compareIgnoringCase(pvt->_tlsvalidate,"ca")) {
+		return true;
 	}
+
+	// get the cert from the server
+	tlscertificate		*cert=((tlscontext *)pvt->_ctx)->
+						getPeerCertificate();
+	if (!cert) {
+		// this should never happen, the connect()
+		// should have failed if no cert was supplied
+		return false;
+	}
+
+	// get the subject alternate names and common name from the cert
+	linkedlist< char * >	*sans=cert->getSubjectAlternateNames();
+	const char		*commonname=cert->getCommonName();
 
 	// should we validate the host name or domain?
 	bool	host=!charstring::compareIgnoringCase(
@@ -662,7 +673,7 @@ bool sqlrconnection::validateCertificate() {
 
 	// if there are any subject alternate
 	// names then validate against those
-	if (sans->getLength()) {
+	if (sans && sans->getLength()) {
 
 		for (linkedlistnode< char * > *node=sans->getFirst();
 					node; node=node->getNext()) {
