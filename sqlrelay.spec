@@ -422,11 +422,9 @@ rm -rf %{buildroot}
 %{_includedir}/sqlrelay/private/sqlrserverconnection.h
 %{_includedir}/sqlrelay/private/sqlrservercontroller.h
 %{_includedir}/sqlrelay/private/sqlrservercursor.h
-%{_includedir}/sqlrelay/private/sqlrserverdll.h
 %{_includedir}/sqlrelay/private/sqlrserverincludes.h
 %{_includedir}/sqlrelay/private/sqlrshmdata.h
 %{_includedir}/sqlrelay/sqlrutil.h
-%{_includedir}/sqlrelay/private/sqlrutildll.h
 %{_libdir}/libsqlrserver.a
 %{_libdir}/libsqlrserver.la
 %{_libdir}/libsqlrserver.so
@@ -468,7 +466,6 @@ rm -rf %{buildroot}
 %{_bindir}/sqlrclientwrapper-config
 %{_includedir}/sqlrelay/sqlrclientwrapper.h
 %{_includedir}/sqlrelay/private/sqlrclientwrapper.h
-%{_includedir}/sqlrelay/private/wrapperdll.h
 %{_libdir}/libsqlrclientwrapper.a
 %{_libdir}/libsqlrclientwrapper.la
 %{_libdir}/libsqlrclientwrapper.so
