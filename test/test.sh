@@ -78,7 +78,7 @@ do
 			echo
 			echo
 			echo "$1 failed in $DIR"
-			exit
+			read
 		else
 			echo
 			echo "test complete"

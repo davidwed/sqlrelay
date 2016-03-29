@@ -88,6 +88,7 @@ goto:end
 			echo.
 			echo.
 			echo %DB% failed in %DIR%
+			set /p prompt=
 			goto:eof
 		) else (
 			echo.
