@@ -12,6 +12,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
+		bool		first;
 		stringbuffer	lastuser;
 		stringbuffer	lastpassword;
 };
@@ -19,10 +20,20 @@ class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 sqlrauth_database::sqlrauth_database(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe) :
 					sqlrauth(parameters,sqlrpe) {
+	first=true;
 }
 
 bool sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
 				const char *user, const char *password) {
+
+	// if this is the first time, initialize the lastuser/lastpassword
+	// from the user/password that was originally used to log in to the
+	// database
+	if (first) {
+		lastuser.append(sqlrcon->cont->getUser());
+		lastpassword.append(sqlrcon->cont->getPassword());
+		first=false;
+	}
 
 	// if the user we want to change to is different from the user
 	// that's currently logged in, then try to change to that user
