@@ -618,9 +618,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <li>A user who has authenticated against a Kerberos KDC or Active Directory Domain Controller can access SQL Relay without having to provide additional credentials.</li>
 </ul>
 
-<p>On Linux and Unix systems, both server and client environments must be "Kerberized".  See <a href="http://systems.firstowrks.com/p/kerberos.html">Getting Started with Kerberos</a> for detailed instructions.</p>
-
-<p>On Windows systems, both server and client must join an Active Directory Domain.  Note that this is only available on Professional or Server versions of Windows.  Home versions cannot join Active Directory Domains.</p>
+<p>On Linux and Unix systems, both server and client environments must be "Kerberized".  <!--See <a href="http://systems.firstowrks.com/p/kerberos.html">Getting Started with Kerberos</a> for detailed instructions.-->  On Windows systems, both server and client must join an Active Directory Domain.  Note that this is only available on Professional or Server versions of Windows.  Home versions cannot join Active Directory Domains.</p>
 
 <p>The following configuration configures an instance of SQL Relay to use Kerberos authentication and encryption:</p>
 
@@ -702,7 +700,9 @@ sqlrsh -host <i>sqlrserver</i> -krb -krbservice sqlrelay/sqlrserver.firstworks.c
 <li>SQL Relay clients and servers may optionally validate each other's certificates and identities.</li>
 </ul>
 
-<p>When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.  Linux and Unix systems support a variety of certificate formats, including the popular .pem format.  On Windows systems, only the .pfx certificate format is currently supported.  Instructions for creating self-signed certificates and converting between certificate formats can be found at <a href="http://systems.firstowrks.com/p/tls.html">Getting Started with TLS/SSL</a>.</p>
+<p>When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.  Linux and Unix systems support a variety of certificate formats, including the popular .pem format.  On Windows systems, only the .pfx certificate format is currently supported.
+<!--Instructions for creating self-signed certificates and converting between certificate formats can be found at <a href="http://systems.firstowrks.com/p/tls.html">Getting Started with TLS/SSL</a>.-->
+</p>
 
 <p>The following configuration enables TLS/SSL security for an instance of SQL relay:</p>
 
