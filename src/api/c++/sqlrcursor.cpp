@@ -3823,6 +3823,7 @@ bool sqlrcursor::parseData() {
 	uint32_t		colindex=0;
 	sqlrclientcolumn	*currentcol;
 	sqlrclientrow		*currentrow=NULL;
+	bool			firstrow=true;
 
 	// set firstrowindex to the index of the first row in the buffer
 	pvt->_firstrowindex=pvt->_rowcount;
@@ -4027,7 +4028,10 @@ bool sqlrcursor::parseData() {
 		currentcol=getColumnInternal(colindex);
 
 		// set whether this column is a "long type" or not
-		currentcol->longdatatype=(type==END_LONG_DATA)?1:0;
+		// (unless it's already set)
+		if (firstrow || !currentcol->longdatatype) {
+			currentcol->longdatatype=(type==END_LONG_DATA)?1:0;
+		}
 
 		if (pvt->_sendcolumninfo==SEND_COLUMN_INFO && 
 				pvt->_sentcolumninfo==SEND_COLUMN_INFO) {
@@ -4055,6 +4059,8 @@ bool sqlrcursor::parseData() {
 				rowbuffercount==pvt->_rsbuffersize) {
 				break;
 			}
+
+			firstrow=false;
 		}
 	}
 
@@ -5030,7 +5036,18 @@ void sqlrcursor::clearRows() {
 	for (uint32_t i=0; i<rowbuffercount; i++) {
 	        for (uint32_t j=0; j<pvt->_colcount; j++) {
 			if (getColumnInternal(j)->longdatatype) {
-				delete[] getFieldInternal(i,j);
+				char		*field=getFieldInternal(i,j);
+				uint32_t	len=getFieldLengthInternal(i,j);
+				// Null lobs might be stored as a NULL or as
+				// an empty string.  In either case (and in no
+				// other case) the length will be 0.  In the
+				// case of a NULL there's nothing to delete.
+				// In the case of an empty string, the memory
+				// will be allocated from the rowstorage pool
+				// and shouldn't be deallocated here.
+				if (len) {
+					delete[] field;
+				}
 			}
 		}
 	}
