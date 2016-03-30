@@ -67,7 +67,7 @@ int	main(int argc, char **argv) {
 
 	const char	*bindvars[13]={"1","2","3","4","5","6","7","8","9","10","11","12",NULL};
 	const char	*bindvals[12]={"4","4","4","4.4","4.4","4.4",
-			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob1",NULL};
+			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob4",NULL};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};
@@ -121,8 +121,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("8","testvarchar2");
 	cur->inputBind("9","01/01/2002");
 	cur->inputBind("10","02:00:00");
-	cur->inputBindClob("11","testclob1",9);
-	cur->inputBindBlob("12","testblob1",9);
+	cur->inputBindClob("11","testclob2",9);
+	cur->inputBindBlob("12","testblob2",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",3);
