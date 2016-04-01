@@ -1,3 +1,5 @@
+0.66.0 -
+
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static
 	fixed --disable-API flags in configure.vbs
