@@ -40,15 +40,16 @@ int main(int argc, const char **argv) {
 	if (cmdl.found("help") || cmdl.found("h")) {
 		stdoutput.printf(
 			"usage: sqlr-bench \\\n"
-			"	-db [db] \\\n"
-			"	-connectstring [connectstring] \\\n"
-			"	-queries [total-query-count] \\\n"
-			"	-rows [rows-per-query] \\\n"
-			"	-cols [columns-per-row] \\\n"
-			"	-colsize [characters-per-column] \\\n"
-			"	-iterations [iterations-per-test] \\\n"
-			"	-dbonly|-sqlrelayonly \\\n"
-			"	-debug\n");
+			"	[-db db2|firebird|freetds|mysql|"
+			"oracle|postgresql|sap|sqlite] \\\n"
+			"	[-connectstring connectstring] \\\n"
+			"	[-queries total-query-count] \\\n"
+			"	[-rows rows-per-query] \\\n"
+			"	[-cols columns-per-row] \\\n"
+			"	[-colsize characters-per-column] \\\n"
+			"	[-iterations iterations-per-test] \\\n"
+			"	[-dbonly|-sqlrelayonly] \\\n"
+			"	[-debug]\n");
 		process::exit(1);
 	}
 

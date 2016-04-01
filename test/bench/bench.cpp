@@ -253,9 +253,9 @@ void benchmarks::benchSelect(const char *selectquery,
 	}
 
 	// display stats
-	stdoutput.printf("\nqueries rows cols colsize\n");
-	stdoutput.printf("   % 4lld % 4lld % 4d    % 4d\n",
-					queries,rows,cols,colsize);
+	stdoutput.printf("\nqueries rows cols colsize iterations\n");
+	stdoutput.printf("   % 4lld % 4lld % 4d    % 4d       % 4d\n",
+					queries,rows,cols,colsize,iterations);
 	stdoutput.printf("connections    queries-per-cx  "
 				"seconds  queries-per-second\n");
 

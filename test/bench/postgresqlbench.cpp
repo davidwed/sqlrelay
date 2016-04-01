@@ -86,7 +86,7 @@ bool postgresqlbenchconnection::connect() {
 	if (!charstring::isNullOrEmpty(host)) {
 		conninfo.append(" host=")->append(host);
 	}
-	if (!charstring::isNullOrEmtpty(port)) {
+	if (!charstring::isNullOrEmpty(port)) {
 		conninfo.append(" port=")->append(port);
 	}
 	if (!charstring::isNullOrEmpty(dbname)) {
