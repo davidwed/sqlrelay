@@ -37,7 +37,7 @@ LOBJS = bench.$(OBJ) \
 all: sqlr-bench
 
 clean:
-	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest
+	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest *.png *.csv
 
 db2bench.lo: db2bench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(DB2INCLUDES) $(COMPILE) $< $(OUT)$@

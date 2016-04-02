@@ -6,6 +6,8 @@
 #include <rudiments/parameterstring.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/randomnumber.h>
+#include <rudiments/dictionary.h>
+#include <rudiments/linkedlist.h>
 
 class benchconnection;
 class benchcursor;
@@ -22,7 +24,7 @@ class benchmarks {
 						bool debug);
 		virtual	~benchmarks();
 		void	shutDown();
-		void	run();
+		bool	run(dictionary< float, linkedlist< float > *> *stats);
 
 	protected:
 		benchconnection	*con;
@@ -35,7 +37,9 @@ class benchmarks {
 		void	benchSelect(const char *selectquery,
 					uint64_t queries,
 					uint64_t rows, uint32_t cols,
-					uint32_t colsize, uint16_t iterations);
+					uint32_t colsize, uint16_t iterations,
+					dictionary< float,
+						linkedlist< float > *> *stats);
 
 		const char	*connectstring;
 		const char	*db;

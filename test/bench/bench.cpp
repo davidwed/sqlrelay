@@ -2,9 +2,6 @@
 // See the file COPYING for more information
 #include <rudiments/datetime.h>
 
-// for pow()
-#include <math.h>
-
 #include "bench.h"
 
 benchmarks::benchmarks(const char *connectstring,
@@ -42,7 +39,7 @@ void benchmarks::shutDown() {
 	shutdown=true;
 }
 
-void benchmarks::run() {
+bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
 
 	// connect and open
 	if (debug) {
@@ -59,116 +56,78 @@ void benchmarks::run() {
 	}
 
 	// drop table (just in case)
+	stdoutput.printf("  dropping table...\n");
 	const char	*dropquery="drop table testtable";
 	if (debug) {
-		stdoutput.printf("dropping table:\n%s\n",dropquery);
+		stdoutput.printf("%s\n",dropquery);
 	}
 	cur->query(dropquery,false);
 
 	// handle shutdown
 	if (shutdown) {
-		return;
+		return false;
 	}
 
 	const char	*selectquery="select * from testtable";
-	uint32_t	colfactor=4;
-	uint32_t	colcount=pow((double)2,(double)colfactor);
-	while (colcount<=cols && !shutdown) {
 
-		uint32_t	rowfactor=6;
-		uint32_t	rowcount=pow((double)2,(double)rowfactor);
-		while (rowcount<=rows && !shutdown) {
+	// create
+	stdoutput.printf("  creating table with %d columns...\n",cols);
+	char	*createquery=createQuery(cols,colsize);
+	if (debug) {
+		stdoutput.printf("%s\n",createquery);
+	}
+	if (!cur->query(createquery,false)) {
+		stdoutput.printf("error creating table\n");
+	}
+	delete[] createquery;
 
-			// create
-			char	*createquery=createQuery(colcount,colsize);
-			if (debug) {
-				stdoutput.printf("creating table with "
-							"%d columns:\n%s\n",
-								colcount,
-								createquery);
-			}
-			if (!cur->query(createquery,false)) {
-				stdoutput.printf("error creating table\n");
-			}
-			delete[] createquery;
-
-			// insert
-			if (debug) {
-				stdoutput.printf("inserting %lld rows:\n",
-								rowcount);
-			}
-			for (uint64_t i=0; i<rowcount && !shutdown; i++) {
-				char	*insertquery=
-					insertQuery(colcount,colsize);
-				if (debug) {
-					stdoutput.printf("  row %lld\n%s\n",
-								i,insertquery);
-				}
-				bool	result=cur->query(insertquery,false);
-				if (!result) {
-					stdoutput.printf(
-						"error inserting rows\n");
-				}
-				delete[] insertquery;
-			}
-
-			// select
-			if (debug) {
-				stdoutput.printf("selecting %lld rows, "
-						"%ld columns:\n%s\n",
-						rowcount,colcount,selectquery);
-			}
-			if (!shutdown) {
-				benchSelect(selectquery,queries,
-						rowcount,colcount,colsize,
-						iterations);
-			}
-
-			// re-connect
-			if (debug) {
-				stdoutput.printf("re-connecting\n");
-			}
-			if (!con->connect()) {
-				stdoutput.printf("error connecting\n");
-			}
-			if (debug) {
-				stdoutput.printf("re-opening\n");
-			}
-			if (!cur->open()) {
-				stdoutput.printf("error opening\n");
-			}
-
-			// drop
-			if (debug) {
-				stdoutput.printf("dropping table:\n%s\n",
-								dropquery);
-			}
-			if (!cur->query(dropquery,false)) {
-				stdoutput.printf("error dropping table\n");
-			}
-
-			// 1, 2, 4, 8, 16...rows
-			if (rowcount==rows) {
-				rowcount++;
-			} else {
-				rowfactor++;
-				rowcount=pow((double)2,(double)rowfactor);
-				if (rowcount>rows) {
-					rowcount=rows;
-				}
-			}
+	// insert
+	stdoutput.printf("  inserting %lld rows...\n",rows);
+	for (uint64_t i=0; i<rows && !shutdown; i++) {
+		char	*insertquery=
+			insertQuery(cols,colsize);
+		if (debug) {
+			stdoutput.printf("  row %lld\n%s\n",i,insertquery);
 		}
-
-		// 1, 2, 4, 8, 16...cols
-		if (colcount==cols) {
-			colcount++;
-		} else {
-			colfactor++;
-			colcount=pow((double)2,(double)colfactor);
-			if (colcount>cols) {
-				colcount=cols;
-			}
+		bool	result=cur->query(insertquery,false);
+		if (!result) {
+			stdoutput.printf("error inserting rows\n");
+			shutdown=true;
 		}
+		delete[] insertquery;
+	}
+
+	// select
+	stdoutput.printf("  selecting...\n",rows,cols);
+	if (debug) {
+		stdoutput.printf("%s\n",rows,cols,selectquery);
+	}
+	if (!shutdown) {
+		benchSelect(selectquery,queries,rows,cols,
+					colsize,iterations,stats);
+	}
+
+	// re-connect
+	if (debug) {
+		stdoutput.printf("re-connecting\n");
+	}
+	if (!con->connect()) {
+		stdoutput.printf("error connecting\n");
+	}
+	if (debug) {
+		stdoutput.printf("re-opening\n");
+	}
+	if (!cur->open()) {
+		stdoutput.printf("error opening\n");
+	}
+
+	// drop
+	stdoutput.printf("  dropping table...\n");
+	if (debug) {
+		stdoutput.printf("%s\n",dropquery);
+	}
+	if (!cur->query(dropquery,false)) {
+		stdoutput.printf("error dropping table\n");
 	}
 
 	// close and disconnect
@@ -184,6 +143,8 @@ void benchmarks::run() {
 	if (!con->disconnect()) {
 		stdoutput.printf("error disconnecting\n");
 	}
+
+	return !shutdown;
 }
 
 char *benchmarks::createQuery(uint32_t cols, uint32_t colsize) {
@@ -228,10 +189,12 @@ void benchmarks::appendRandomString(stringbuffer *str, uint32_t colsize) {
 	}
 }
 
-void benchmarks::benchSelect(const char *selectquery,
-				uint64_t queries, uint64_t rows,
-				uint32_t cols, uint32_t colsize,
-				uint16_t iterations) {
+void benchmarks::benchSelect(
+			const char *selectquery,
+			uint64_t queries, uint64_t rows,
+			uint32_t cols, uint32_t colsize,
+			uint16_t iterations,
+			dictionary< float, linkedlist< float > *> *stats) {
 
 	// close and disconnect
 	if (debug) {
@@ -256,32 +219,20 @@ void benchmarks::benchSelect(const char *selectquery,
 	stdoutput.printf("\nqueries rows cols colsize iterations\n");
 	stdoutput.printf("   % 4lld % 4lld % 4d    % 4d       % 4d\n",
 					queries,rows,cols,colsize,iterations);
-	stdoutput.printf("connections    queries-per-cx  "
-				"seconds  queries-per-second\n");
+	stdoutput.printf("queries-per-cx  queries-per-second\n");
 
 	// run selects
-	for (uint64_t concount=1; concount<=queries && !shutdown; concount++) {
+	uint64_t	qcount=1;
+	for (uint64_t ccount=queries; ccount>=1 && !shutdown; ccount--) {
 
-		// for this set, figure out how many connections to run
-		// and how many queries to run per connection
-		uint64_t	actualconcount=concount;
-		uint64_t	queriespercon=queries/actualconcount;
-		if (queries%actualconcount) {
-			actualconcount++;
-		}
+		// get start time
+		datetime	start;
+		start.getSystemDateAndTime();
 
 		// run all of this some number of times and average the results
-		float		avgsec=0;
 		for (uint16_t iter=0; iter<iterations && !shutdown; iter++) {
 
-			// keep track of how many queries we've actually run
-			uint64_t	queriesrun=0;
-
-			// get start time
-			datetime	start;
-			start.getSystemDateAndTime();
-
-			for (uint64_t i=0; i<actualconcount && !shutdown; i++) {
+			for (uint64_t i=0; i<ccount && !shutdown; i++) {
 
 				// connect and open
 				if (debug) {
@@ -302,14 +253,7 @@ void benchmarks::benchSelect(const char *selectquery,
 				}
 
 				// run some number of queries per connection
-				uint64_t	queriestorun=
-						queriesrun+queriespercon;
-				if (queriestorun>queries) {
-					queriestorun=queries;
-				}
-				for (uint64_t j=queriesrun;
-						j<queriestorun && !shutdown;
-						j++) {
+				for (uint64_t j=0; j<qcount && !shutdown; j++) {
 
 					if (debug) {
 						stdoutput.printf(
@@ -318,6 +262,7 @@ void benchmarks::benchSelect(const char *selectquery,
 					if (!cur->query(selectquery,true)) {
 						stdoutput.printf(
 						"error selecting rows\n");
+						shutdown=true;
 					}
 				}
 
@@ -337,22 +282,6 @@ void benchmarks::benchSelect(const char *selectquery,
 				}
 			}
 
-			// get end time
-			datetime	end;
-			end.getSystemDateAndTime();
-
-			// calculate total time
-			uint32_t	sec=end.getEpoch()-start.getEpoch();
-			int32_t		usec=end.getMicroseconds()-
-						start.getMicroseconds();
- 			if (usec<0) {
-				sec--;
-				usec=usec+1000000;
-			}
-
-			// tally seconds
-			avgsec=avgsec+(float)sec+(((float)usec)/1000000.0);
-
 			// progress
 			if (iterations>=100) {
 				if (!((iter+1)%(iterations/10))) {
@@ -368,21 +297,45 @@ void benchmarks::benchSelect(const char *selectquery,
 				}
 			}
 		}
-		
-		// average seconds
-		avgsec=avgsec/iterations;
 
-		// calcualate queries per second
-		float	qps=((float)queries)/avgsec;
+		// get end time
+		datetime	end;
+		end.getSystemDateAndTime();
+
+		// calculate total time
+		uint32_t	sec=end.getEpoch()-start.getEpoch();
+		int32_t		usec=end.getMicroseconds()-
+					start.getMicroseconds();
+ 		if (usec<0) {
+			sec--;
+			usec=usec+1000000;
+		}
+
+		// total seconds
+		float	totalsec=(float)sec+(((float)usec)/1000000.0);
+
+		// average number of seconds per query
+		float	spq=totalsec/(iterations*ccount*qcount);
+
+		// average number of queries per second
+		float	qps=1.0/spq;
+		
+		// calcualate queries per connection
+		float	qpc=(float)qcount;
 
 		// display stats
-		stdoutput.printf(" % 4lld(% 4lld) % 8.2f(% 4lld+% 2lld)"
-					" % 4.6f % 4.2f\n",
-					concount,actualconcount,
-					(float)queries/(float)concount,
-					queries/concount,
-					queries%concount,
-					avgsec,qps);
+		stdoutput.printf("          % 4lld             % 4.2f\n",
+								qcount,qps);
+
+		// update stats
+		linkedlist< float >	*d=stats->getValue(qpc);
+		if (!d) {
+			d=new linkedlist< float >();
+			stats->setValue(qpc,d);
+		}
+		d->append(qps);
+
+		qcount++;
 	}
 }
 
