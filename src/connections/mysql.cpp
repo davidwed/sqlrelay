@@ -102,6 +102,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
+#ifdef HAVE_MYSQL_COMMIT
+		bool		queryIsNotSelect();
+#endif
 		void		errorMessage(char *errorbuffer,
 						uint32_t errorbufferlength,
 						uint32_t *errorlength,
@@ -1203,6 +1206,21 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 	return true;
 }
+
+#ifdef HAVE_MYSQL_COMMIT
+bool mysqlcursor::queryIsNotSelect() {
+	// Kludge.  The controller uses this to decide whether to run a
+	// commit/rollback at the end of the session.  If it returns true
+	// for any query during the session then commit/rollback will be run.
+	// MySQL needs a commit/rollback to be run even if only selects were
+	// run.  (I originally thought this was only true if the isolation level
+	// is set to repeatable-read (the default) but it appears to be
+	// necessary for all isolation levels.)  We'll trick the controller
+	// into running commit/rollback no matter what by returning true for
+	// any query.
+	return true;
+}
+#endif
 
 void mysqlcursor::errorMessage(char *errorbuffer,
 					uint32_t errorbufferlength,
