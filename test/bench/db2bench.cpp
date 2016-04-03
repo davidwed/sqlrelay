@@ -39,6 +39,7 @@ class db2benchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
+		bool	commit();
 
 	private:
 		const char	*dbname;
@@ -133,6 +134,10 @@ bool db2benchconnection::disconnect() {
 	SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 	SQLFreeHandle(SQL_HANDLE_ENV,env);
 	return true;
+}
+
+bool db2benchconnection::commit() {
+	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_COMMIT)==SQL_SUCCESS);
 }
 
 

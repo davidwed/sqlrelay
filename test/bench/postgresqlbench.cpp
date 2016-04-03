@@ -15,6 +15,7 @@ class postgresqlbenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
+		bool	commit();
 
 	private:
 		const char	*host;
@@ -109,6 +110,11 @@ bool postgresqlbenchconnection::connect() {
 bool postgresqlbenchconnection::disconnect() {
 	PQfinish(pgconn);
 	return true;
+}
+
+bool postgresqlbenchconnection::commit() {
+	postgresqlbenchcursor	cur(this);
+	return cur.query("commit",false);
 }
 
 

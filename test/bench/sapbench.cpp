@@ -25,6 +25,7 @@ class sapbenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
+		bool	commit();
 
 	private:
 		const char	*sybase;
@@ -210,6 +211,11 @@ bool sapbenchconnection::disconnect() {
 	ct_exit(context,CS_UNUSED);
 	cs_ctx_drop(context);
 	return true;
+}
+
+bool sapbenchconnection::commit() {
+	sapbenchcursor	cur(this);
+	return cur.query("commit",false);
 }
 
 CS_RETCODE sapbenchconnection::csMessageCallback(CS_CONTEXT *ctxt, 

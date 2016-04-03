@@ -15,6 +15,7 @@ class sqlrelaybenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
+		bool	commit();
 
 	private:
 		const char	*host;
@@ -84,6 +85,9 @@ bool sqlrelaybenchconnection::disconnect() {
 	return true;
 }
 
+bool sqlrelaybenchconnection::commit() {
+	return sqlrcon->commit();
+}
 
 sqlrelaybenchcursor::sqlrelaybenchcursor(benchconnection *con) :
 							benchcursor(con) {

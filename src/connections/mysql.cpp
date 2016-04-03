@@ -206,6 +206,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
+		const char	*setIsolationLevelQuery();
 		bool		getLastInsertId(uint64_t *id);
 		bool		autoCommitOn();
 		bool		autoCommitOff();
@@ -604,6 +605,10 @@ const char *mysqlconnection::selectDatabaseQuery() {
 
 const char *mysqlconnection::getCurrentDatabaseQuery() {
 	return "select database()";
+}
+
+const char *mysqlconnection::setIsolationLevelQuery() {
+	return "set session transaction isolation level %s";
 }
 
 bool mysqlconnection::getLastInsertId(uint64_t *id) {

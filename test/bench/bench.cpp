@@ -97,6 +97,11 @@ bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
 		delete[] insertquery;
 	}
 
+	// commit
+	if (!con->commit()) {
+		stdoutput.printf("error committing\n");
+	}
+
 	// select
 	stdoutput.printf("  selecting...\n",rows,cols);
 	if (debug) {
@@ -107,20 +112,6 @@ bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
 					colsize,iterations,stats);
 	}
 
-	// re-connect
-	if (debug) {
-		stdoutput.printf("re-connecting\n");
-	}
-	if (!con->connect()) {
-		stdoutput.printf("error connecting\n");
-	}
-	if (debug) {
-		stdoutput.printf("re-opening\n");
-	}
-	if (!cur->open()) {
-		stdoutput.printf("error opening\n");
-	}
-
 	// drop
 	stdoutput.printf("  dropping table...\n");
 	if (debug) {
@@ -128,6 +119,11 @@ bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
 	}
 	if (!cur->query(dropquery,false)) {
 		stdoutput.printf("error dropping table\n");
+	}
+
+	// commit
+	if (!con->commit()) {
+		stdoutput.printf("error committing\n");
 	}
 
 	// close and disconnect

@@ -15,6 +15,7 @@ class freetdsbenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
+		bool	commit();
 
 	private:
 		const char	*sybase;
@@ -74,6 +75,10 @@ bool freetdsbenchconnection::connect() {
 }
 
 bool freetdsbenchconnection::disconnect() {
+	return true;
+}
+
+bool freetdsbenchconnection::commit() {
 	return true;
 }
 
