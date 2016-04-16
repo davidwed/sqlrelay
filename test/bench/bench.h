@@ -63,7 +63,6 @@ class benchconnection {
 
 		virtual	bool	connect()=0;
 		virtual	bool	disconnect()=0;
-		virtual	bool	commit()=0;
 
 	protected:
 		const char	*getParam(const char *param);

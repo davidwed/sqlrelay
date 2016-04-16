@@ -25,7 +25,6 @@ class sapbenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
-		bool	commit();
 
 	private:
 		const char	*sybase;
@@ -191,11 +190,11 @@ bool sapbenchconnection::connect() {
 	CS_INT	resultstype;
 	CS_INT	results=ct_results(cmd,&resultstype);
 	if (results==CS_FAIL) {
-		stdoutput.printf("ct_results (CS_FAIL) failed\n");
+		stdoutput.printf("connect: ct_results (CS_FAIL) failed\n");
 		return false;
 	}
 	if (resultstype==CS_CMD_FAIL) {
-		stdoutput.printf("ct_results (CS_CMD_FAIL) failed\n");
+		stdoutput.printf("connect: ct_results (CS_CMD_FAIL) failed\n");
 		return false;
 	}
 	ct_cancel(NULL,cmd,CS_CANCEL_ALL);
@@ -213,28 +212,23 @@ bool sapbenchconnection::disconnect() {
 	return true;
 }
 
-bool sapbenchconnection::commit() {
-	sapbenchcursor	cur(this);
-	return cur.query("commit",false);
-}
-
 CS_RETCODE sapbenchconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 							CS_CLIENTMSG *msgp) {
-	//stdoutput.printf("message: %s\n",msgp->msgstring);
+	stdoutput.printf("message: %s\n",msgp->msgstring);
 	return CS_SUCCEED;
 }
 
 CS_RETCODE sapbenchconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
 							CS_CONNECTION *cnn,
 							CS_CLIENTMSG *msgp) {
-	//stdoutput.printf("message: %s\n",msgp->msgstring);
+	stdoutput.printf("message: %s\n",msgp->msgstring);
 	return CS_SUCCEED;
 }
 
 CS_RETCODE sapbenchconnection::serverMessageCallback(CS_CONTEXT *ctxt, 
 							CS_CONNECTION *cnn,
 							CS_SERVERMSG *msgp) {
-	//stdoutput.printf("message: %s\n",msgp->text);
+	stdoutput.printf("message: %s\n",msgp->text);
 	return CS_SUCCEED;
 }
 
@@ -260,13 +254,13 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 	// initialize number of columns
 	ncols=0;
 
-	bool	select=false;
+	bool	cursorcmd=false;
 	if (!charstring::compare(query,"select ",7)) {
 
 		// initiate a cursor command
 		if (ct_cursor(cmd,CS_CURSOR_DECLARE,
-					(CS_CHAR *)"cur",
-					(CS_INT)3,
+					(CS_CHAR *)"1",
+					(CS_INT)1,
 					(CS_CHAR *)query,
 					charstring::length(query),
 					CS_READ_ONLY)!=CS_SUCCEED) {
@@ -291,7 +285,7 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 			return false;
 		}
 
-		select=true;
+		cursorcmd=true;
 
 	} else {
 
@@ -314,17 +308,17 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 
 		CS_INT	results=ct_results(cmd,&resultstype);
 		if (results==CS_FAIL) {
-			stdoutput.printf("ct_results (CS_FAIL) failed\n");
+			stdoutput.printf("query: ct_results (CS_FAIL) failed\n");
 			return false;
 		}
 		if (resultstype==CS_CMD_FAIL) {
-			//stdoutput.printf("ct_results (CS_CMD_FAIL) failed\n");
+			stdoutput.printf("query: ct_results (CS_CMD_FAIL) failed\n");
 			return false;
 		}
 
 		// DDL/DML
-		if (!select && resultstype==CS_CMD_SUCCEED) {
-			return true;
+		if (!cursorcmd) {
+			return (resultstype==CS_CMD_SUCCEED);
 		}
 
 		// select

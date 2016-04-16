@@ -2,6 +2,7 @@
 	updated mysql connection to run commit/rollback at the end of every
 		session even if only selects were run, to make sure metadata
 		locks are released
+	renamed sqlrclientexitstatus_t to clientsessionexitstatus_t
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

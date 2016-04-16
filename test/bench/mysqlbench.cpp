@@ -25,7 +25,6 @@ class mysqlbenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
-		bool	commit();
 
 	private:
 		const char	*host;
@@ -136,11 +135,6 @@ bool mysqlbenchconnection::disconnect() {
 	mysql_close(&mysql);
 	return true;
 }
-
-bool mysqlbenchconnection::commit() {
-	return !mysql_commit(&mysql);
-}
-
 
 mysqlbenchcursor::mysqlbenchcursor(benchconnection *con) : benchcursor(con) {
 	mbcon=(mysqlbenchconnection *)con;

@@ -1673,7 +1673,8 @@ void sqlrservercontroller::clientSession() {
 
 	// have client session using the appropriate protocol
 	currentprotocol=sqlrpr->getProtocol(protocolindex);
-	sqlrclientexitstatus_t	exitstatus=SQLRCLIENTEXITSTATUS_ERROR;
+	clientsessionexitstatus_t	exitstatus=
+					CLIENTSESSIONEXITSTATUS_ERROR;
 	if (currentprotocol) {
 		currentprotocol->setClientSocket(clientsock);
 		exitstatus=currentprotocol->clientSession();
@@ -1685,20 +1686,21 @@ void sqlrservercontroller::clientSession() {
 
 	const char	*info;
 	switch (exitstatus) {
-		case SQLRCLIENTEXITSTATUS_CLOSED_CONNECTION:
+		case CLIENTSESSIONEXITSTATUS_CLOSED_CONNECTION:
 			info="client closed connection";
 			break;
-		case SQLRCLIENTEXITSTATUS_ENDED_SESSION:
+		case CLIENTSESSIONEXITSTATUS_ENDED_SESSION:
 			info="client ended the session";
 			break;
-		case SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION:
+		case CLIENTSESSIONEXITSTATUS_SUSPENDED_SESSION:
 			info="client suspended the session";
 			break;
-		case SQLRCLIENTEXITSTATUS_ERROR:
+		case CLIENTSESSIONEXITSTATUS_ERROR:
 		default:
 			// Don't use the word "error" here.
 			//
-			// Conditions that result in SQLRCLIENTEXITSTATUS_ERROR
+			// Conditions that result in
+			// CLIENTSESSIONEXITSTATUS_ERROR
 			// might not warrant investigation by operations staff.
 			//
 			// For example:

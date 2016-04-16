@@ -15,7 +15,6 @@ class postgresqlbenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
-		bool	commit();
 
 	private:
 		const char	*host;
@@ -74,6 +73,7 @@ postgresqlbenchconnection::postgresqlbenchconnection(
 	if (!charstring::length(sslmode)) {
 		sslmode="disable";
 	}
+	pgconn=NULL;
 }
 
 postgresqlbenchconnection::~postgresqlbenchconnection() {
@@ -111,12 +111,6 @@ bool postgresqlbenchconnection::disconnect() {
 	PQfinish(pgconn);
 	return true;
 }
-
-bool postgresqlbenchconnection::commit() {
-	postgresqlbenchcursor	cur(this);
-	return cur.query("commit",false);
-}
-
 
 postgresqlbenchcursor::postgresqlbenchcursor(benchconnection *con) :
 							benchcursor(con) {

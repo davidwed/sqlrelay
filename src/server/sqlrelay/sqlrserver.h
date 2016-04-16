@@ -954,11 +954,11 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 };
 
 
-enum sqlrclientexitstatus_t {
-	SQLRCLIENTEXITSTATUS_ERROR=0,
-	SQLRCLIENTEXITSTATUS_CLOSED_CONNECTION,
-	SQLRCLIENTEXITSTATUS_ENDED_SESSION,
-	SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION
+enum clientsessionexitstatus_t {
+	CLIENTSESSIONEXITSTATUS_ERROR=0,
+	CLIENTSESSIONEXITSTATUS_CLOSED_CONNECTION,
+	CLIENTSESSIONEXITSTATUS_ENDED_SESSION,
+	CLIENTSESSIONEXITSTATUS_SUSPENDED_SESSION
 };
 
 class SQLRSERVER_DLLSPEC sqlrprotocol {
@@ -972,7 +972,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		virtual gsscontext	*getGSSContext();
 		virtual tlscontext	*getTLSContext();
 
-		virtual sqlrclientexitstatus_t	clientSession()=0;
+		virtual clientsessionexitstatus_t	clientSession()=0;
 
 	protected:
 		sqlrservercontroller	*cont;

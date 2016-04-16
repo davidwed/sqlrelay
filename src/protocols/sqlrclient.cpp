@@ -30,7 +30,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 							xmldomnode *parameters);
 		virtual	~sqlrprotocol_sqlrclient();
 
-		sqlrclientexitstatus_t	clientSession();
+		clientsessionexitstatus_t	clientSession();
 	private:
 		bool	acceptSecurityContext();
 		bool	getCommand(uint16_t *command);
@@ -320,7 +320,7 @@ sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
 	delete[] clientinfo;
 }
 
-sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
+clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	debugFunction();
 
 	// set up the socket
@@ -331,7 +331,7 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	clientsock->setReadBufferSize(65536);
 	clientsock->setWriteBufferSize(65536);
 
-	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
+	clientsessionexitstatus_t	status=CLIENTSESSIONEXITSTATUS_ERROR;
 
 	// accept security context, if necessary
 	if (!acceptSecurityContext()) {
@@ -381,12 +381,12 @@ sqlrclientexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 		} else if (command==SUSPEND_SESSION) {
 			cont->incrementSuspendSessionCount();
 			suspendSessionCommand();
-			status=SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION;
+			status=CLIENTSESSIONEXITSTATUS_SUSPENDED_SESSION;
 			endsession=false;
 			break;
 		} else if (command==END_SESSION) {
 			cont->incrementEndSessionCount();
-			status=SQLRCLIENTEXITSTATUS_ENDED_SESSION;
+			status=CLIENTSESSIONEXITSTATUS_ENDED_SESSION;
 			break;
 		} else if (command==PING) {
 			cont->incrementPingCount();

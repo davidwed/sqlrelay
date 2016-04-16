@@ -32,7 +32,6 @@ class oraclebenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
-		bool	commit();
 
 	private:
 		const char	*sid;
@@ -245,10 +244,6 @@ bool oraclebenchconnection::disconnect() {
 	OCIHandleFree(err,OCI_HTYPE_ERROR);
 	OCIHandleFree(env,OCI_HTYPE_ENV);
 	return true;
-}
-
-bool oraclebenchconnection::commit() {
-	return (OCITransCommit(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
 }
 
 oraclebenchcursor::oraclebenchcursor(benchconnection *con) : benchcursor(con) {

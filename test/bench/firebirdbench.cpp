@@ -13,7 +13,6 @@ class firebirdbenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
-		bool	commit();
 
 	private:
 		const char	*db;
@@ -71,11 +70,6 @@ bool firebirdbenchconnection::connect() {
 bool firebirdbenchconnection::disconnect() {
 	return true;
 }
-
-bool firebirdbenchconnection::commit() {
-	return true;
-}
-
 
 firebirdbenchcursor::firebirdbenchcursor(benchconnection *con) :
 							benchcursor(con) {

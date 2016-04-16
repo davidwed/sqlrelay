@@ -15,7 +15,6 @@ class sqlitebenchconnection : public benchconnection {
 
 		bool	connect();
 		bool	disconnect();
-		bool	commit();
 
 	private:
 		const char	*db;
@@ -67,12 +66,6 @@ bool sqlitebenchconnection::connect() {
 bool sqlitebenchconnection::disconnect() {
 	return true;
 }
-
-bool sqlitebenchconnection::commit() {
-	sqlitebenchcursor	con(this);
-	return con.query("commit",true);
-}
-
 
 sqlitebenchcursor::sqlitebenchcursor(benchconnection *con) :
 							benchcursor(con) {
