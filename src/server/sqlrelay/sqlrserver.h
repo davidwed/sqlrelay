@@ -146,6 +146,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getPassword();
 		bool		auth(const char *userbuffer,
 						const char *passwordbuffer);
+		bool		auth(const char *userbuffer,
+						const char *passwordbuffer,
+						const char *method,
+						const char *extra);
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 
@@ -1017,9 +1021,16 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 			sqlrauth(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
 		virtual	~sqlrauth();
+		virtual void	setParameter(const char *name,
+							const char *value);
 		virtual	bool	auth(sqlrserverconnection *sqlrcon,
 							const char *user,
 							const char *password);
+		virtual	bool	auth(sqlrserverconnection *sqlrcon,
+							const char *user,
+							const char *password,
+							const char *method,
+							const char *extra);
 	protected:
 		xmldomnode		*parameters;
 		sqlrpwdencs		*sqlrpe;
@@ -1040,6 +1051,9 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		bool	loadAuths(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
+		bool	auth(sqlrserverconnection *sqlrcon,
+					const char *user, const char *password,
+					const char *method, const char *extra);
 	private:
 		void	unloadAuths();
 		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);

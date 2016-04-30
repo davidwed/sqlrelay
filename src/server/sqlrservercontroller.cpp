@@ -1813,6 +1813,27 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 	return success;
 }
 
+bool sqlrservercontroller::auth(const char *userbuffer,
+				const char *passwordbuffer,
+				const char *method,
+				const char *extra) {
+
+	logDebugMessage("auth...");
+
+	// authenticate
+	bool	success=(sqlra && sqlra->auth(conn,userbuffer,
+						passwordbuffer,
+						method,extra));
+	if (success) {
+		logDebugMessage("auth success");
+		updateCurrentUser(userbuffer,charstring::length(userbuffer));
+	} else {
+		logDebugMessage("auth failed");
+		logClientConnectionRefused("auth failed");
+	}
+	return success;
+}
+
 bool sqlrservercontroller::changeUser(const char *newuser,
 					const char *newpassword) {
 	logDebugMessage("change user");

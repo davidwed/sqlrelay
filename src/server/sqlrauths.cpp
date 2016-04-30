@@ -135,3 +135,17 @@ bool sqlrauths::auth(sqlrserverconnection *sqlrcon,
 	}
 	return false;
 }
+
+bool sqlrauths::auth(sqlrserverconnection *sqlrcon,
+				const char *user, const char *password,
+				const char *method, const char *extra) {
+	debugFunction();
+	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
+						node; node=node->getNext()) {
+		if (node->getValue()->au->auth(sqlrcon,user,password,
+							method,extra)) {
+			return true;
+		}
+	}
+	return false;
+}
