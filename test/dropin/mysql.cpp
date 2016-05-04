@@ -464,5 +464,57 @@ int	main(int argc, char **argv) {
 	// mysql_odbc_escape_string
 	// myodbc_remove_escape
 
+
+	stdoutput.printf("mysql_stmt_init:\n");
+	MYSQL_STMT	*stmt=mysql_stmt_init(&mysql);
+	checkSuccess((int)(stmt!=NULL),1);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_prepare: create\n");
+	query="create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)";
+	checkSuccess(mysql_stmt_prepare(stmt,query,
+				charstring::length(query)),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_execute: create\n");
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_prepare/execute: insert\n");
+	query="insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_prepare/execute: insert\n");
+	query="insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_prepare/execute: select\n");
+	query="select * from testdb.testtable";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_fetch:\n");
+	checkSuccess(mysql_stmt_fetch(stmt),0);
+	// FIXME: check columns and rows...
+	checkSuccess(mysql_stmt_fetch(stmt),0);
+	checkSuccess(mysql_stmt_fetch(stmt),MYSQL_NO_DATA);
+	stdoutput.printf("\n");
+
+
+	stdoutput.printf("mysql_stmt_prepare/execute: drop\n");
+	query="drop table testdb.testtable";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_close:\n");
+	checkSuccess(mysql_stmt_close(stmt),0);
+	stdoutput.printf("\n");
+
 	mysql_close(&mysql);
 }
