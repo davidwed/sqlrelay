@@ -36,6 +36,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	errorlength=0;
 	errnum=0;
 	liveconnection=true;
+	errorsetmanually=false;
 
 	setCommandStart(0,0);
 	setCommandEnd(0,0);
@@ -863,6 +864,7 @@ void sqlrservercursor::incrementTotalRowsFetched() {
 
 void sqlrservercursor::clearError() {
 	setError(NULL,0,true);
+	errorsetmanually=false;
 }
 
 void sqlrservercursor::setError(const char *err, int64_t errn, bool liveconn) {
@@ -874,6 +876,7 @@ void sqlrservercursor::setError(const char *err, int64_t errn, bool liveconn) {
 	error[errorlength]='\0';
 	errnum=errn;
 	liveconnection=liveconn;
+	errorsetmanually=true;
 }
 
 char *sqlrservercursor::getErrorBuffer() {
@@ -902,4 +905,12 @@ bool sqlrservercursor::getLiveConnection() {
 
 void sqlrservercursor::setLiveConnection(bool liveconnection) {
 	this->liveconnection=liveconnection;
+}
+
+bool sqlrservercursor::getErrorSetManually() {
+	return errorsetmanually;
+}
+
+void sqlrservercursor::setErrorSetManually(bool errorsetmanually) {
+	this->errorsetmanually=errorsetmanually;
 }

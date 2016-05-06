@@ -708,6 +708,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		void		setErrorNumber(uint32_t errnum);
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
+		bool		getErrorSetManually();
+		void		setErrorSetManually(bool errorsetmanually);
 
 		sqlrservercontroller	*cont;
 
@@ -951,6 +953,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		void		setErrorNumber(uint32_t errnum);
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
+		bool		getErrorSetManually();
+		void		setErrorSetManually(bool errorsetmanually);
 
 		sqlrserverconnection	*conn;
 

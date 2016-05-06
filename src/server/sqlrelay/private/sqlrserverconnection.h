@@ -13,6 +13,7 @@
 		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
+		bool		errorsetmanually;
 
 		char		*dbhostname;
 		char		*dbipaddress;

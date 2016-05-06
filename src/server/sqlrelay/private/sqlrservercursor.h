@@ -34,6 +34,7 @@
 		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
+		bool		errorsetmanually;
 
 		sqlrcursorstate_t	state;
 

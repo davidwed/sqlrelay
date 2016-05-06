@@ -42,6 +42,8 @@
 	#define MAX_ITEM_BUFFER_SIZE	32768
 #endif
 
+#define GET_COLINFO_DURING_PREPARE 1
+
 class mysqlconnection;
 
 class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
@@ -824,11 +826,45 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	// prepare the statement
-	if (!mysql_stmt_prepare(stmt,query,length)) {
-		stmtfreeresult=true;
-		return true;
+	if (mysql_stmt_prepare(stmt,query,length)) {
+		return false;
 	}
-	return false;
+
+	stmtfreeresult=true;
+
+#ifdef GET_COLINFO_DURING_PREPARE
+	// get the column count
+	ncols=mysql_stmt_field_count(stmt);
+	if (ncols>mysqlconn->maxselectlistsize &&
+		mysqlconn->maxselectlistsize!=-1) {
+		// mysql_stmt_bind_result expects:
+		// "the array (fieldbind) to contain one element for
+		// each colun of the result set."
+		// If there isn't, then mysql_stmt_bind_result will
+		// run off the end of the array, wreaking havoc.
+		// So, bail with an error if we don't have enough
+		// columns.
+		stringbuffer	err;
+		err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
+		err.append(" (")->append(mysqlconn->maxselectlistsize);
+		err.append('<')->append(ncols)->append(')');
+		setError(err.getString(),
+			SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
+		return false;
+	}
+
+	// get the metadata
+	mysqlresult=NULL;
+	if (ncols) {
+		mysqlresult=mysql_stmt_result_metadata(stmt);
+	}
+
+	// bind the fields
+	if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
+		return false;
+	}
+#endif
+	return true;
 }
 #endif
 
@@ -1084,6 +1120,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		checkForTempTable(query,length);
 
+#ifndef GET_COLINFO_DURING_PREPARE
 		// get the column count
 		ncols=mysql_stmt_field_count(stmt);
 		if (ncols>mysqlconn->maxselectlistsize &&
@@ -1103,6 +1140,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
 			return false;
 		}
+#endif
 
 		// allocate buffers, if necessary
 		if (mysqlconn->maxselectlistsize==-1) {
@@ -1110,6 +1148,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 					mysqlconn->maxitembuffersize);
 		}
 
+#ifndef GET_COLINFO_DURING_PREPARE
 		// get the metadata
 		mysqlresult=NULL;
 		if (ncols) {
@@ -1120,6 +1159,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
 			return false;
 		}
+#endif
 
 		// store the result set
 		// FIXME: this causes the entire result set to be buffered,

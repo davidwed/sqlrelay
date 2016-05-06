@@ -18,6 +18,7 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 	errorlength=0;
 	errnum=0;
 	liveconnection=false;
+	errorsetmanually=false;
 
 	autocommit=false;
 	fakeautocommit=false;
@@ -657,6 +658,7 @@ bool sqlrserverconnection::getFakeAutoCommit() {
 
 void sqlrserverconnection::clearError() {
 	setError(NULL,0,true);
+	errorsetmanually=false;
 }
 
 void sqlrserverconnection::setError(const char *err,
@@ -670,6 +672,7 @@ void sqlrserverconnection::setError(const char *err,
 	error[errorlength]='\0';
 	errnum=errn;
 	liveconnection=liveconn;
+	errorsetmanually=true;
 }
 
 char *sqlrserverconnection::getErrorBuffer() {
@@ -698,4 +701,12 @@ bool sqlrserverconnection::getLiveConnection() {
 
 void sqlrserverconnection::setLiveConnection(bool liveconnection) {
 	this->liveconnection=liveconnection;
+}
+
+bool sqlrserverconnection::getErrorSetManually() {
+	return errorsetmanually;
+}
+
+void sqlrserverconnection::setErrorSetManually(bool errorsetmanually) {
+	this->errorsetmanually=errorsetmanually;
 }

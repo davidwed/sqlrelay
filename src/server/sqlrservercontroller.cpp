@@ -2006,8 +2006,22 @@ void sqlrservercontroller::errorMessage(char *errorbuffer,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection) {
-	conn->errorMessage(errorbuffer,errorbuffersize,
-					errorlength,errorcode,liveconnection);
+	if (conn->getErrorSetManually()) {
+		*errorlength=conn->getErrorLength();
+		charstring::safeCopy(errorbuffer,
+					errorbuffersize,
+					conn->getErrorBuffer(),
+					cfg->getMaxErrorLength());
+		*errorcode=conn->getErrorNumber();
+		*liveconnection=conn->getLiveConnection();
+		conn->setErrorSetManually(false);
+	} else {
+		conn->errorMessage(errorbuffer,
+					errorbuffersize,
+					errorlength,
+					errorcode,
+					liveconnection);
+	}
 }
 
 void sqlrservercontroller::clearError() {
@@ -3197,6 +3211,10 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			cursor->setErrorLength(errorlength);
 			cursor->setErrorNumber(errnum);
 			cursor->setLiveConnection(liveconnection);
+stdoutput.printf("errornumber=%d\n",cursor->getErrorNumber());
+stdoutput.printf("errorlength=%d\n",cursor->getErrorLength());
+stdoutput.printf("errorstring=%s\n",cursor->getErrorBuffer());
+stdoutput.printf("liveconn=%d\n",cursor->getLiveConnection());
 
 			return false;
 		}
@@ -5291,8 +5309,22 @@ void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection) {
-	cursor->errorMessage(errorbuffer,errorbuffersize,
-					errorlength,errorcode,liveconnection);
+	if (cursor->getErrorSetManually()) {
+		*errorlength=cursor->getErrorLength();
+		charstring::safeCopy(errorbuffer,
+					errorbuffersize,
+					cursor->getErrorBuffer(),
+					cfg->getMaxErrorLength());
+		*errorcode=cursor->getErrorNumber();
+		*liveconnection=cursor->getLiveConnection();
+		cursor->setErrorSetManually(false);
+	} else {
+		cursor->errorMessage(errorbuffer,
+					errorbuffersize,
+					errorlength,
+					errorcode,
+					liveconnection);
+	}
 }
 
 bool sqlrservercontroller::knowsRowCount(sqlrservercursor *cursor) {
