@@ -1,6 +1,7 @@
 #include <mysql.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/stdio.h>
 #include <config.h>
 
@@ -498,10 +499,110 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("mysql_stmt_field_count:\n");
+	checkSuccess(mysql_stmt_field_count(stmt),19);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_fetch_field/mysql_field_tell:\n");
+	result=mysql_stmt_result_metadata(stmt);
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),1);
+	checkSuccess(field->name,"testtinyint");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),2);
+	checkSuccess(field->name,"testsmallint");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),3);
+	checkSuccess(field->name,"testmediumint");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),4);
+	checkSuccess(field->name,"testint");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),5);
+	checkSuccess(field->name,"testbigint");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),6);
+	checkSuccess(field->name,"testfloat");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),7);
+	checkSuccess(field->name,"testreal");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),8);
+	checkSuccess(field->name,"testdecimal");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),9);
+	checkSuccess(field->name,"testdate");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),10);
+	checkSuccess(field->name,"testtime");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),11);
+	checkSuccess(field->name,"testdatetime");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),12);
+	checkSuccess(field->name,"testyear");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),13);
+	checkSuccess(field->name,"testchar");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),14);
+	checkSuccess(field->name,"testtext");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),15);
+	checkSuccess(field->name,"testvarchar");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),16);
+	checkSuccess(field->name,"testtinytext");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),17);
+	checkSuccess(field->name,"testmediumtext");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),18);
+	checkSuccess(field->name,"testlongtext");
+	field=mysql_fetch_field(result);
+	checkSuccess(mysql_field_tell(result),19);
+	checkSuccess(field->name,"testtimestamp");
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_bind_result:\n");
+	MYSQL_BIND	fieldbind[19];
+	char		fieldbuffer[19*1024];
+	my_bool		isnull[19];
+	unsigned long	fieldlength[19];
+	for (uint16_t i=0; i<19; i++) {
+		bytestring::zero(&fieldbind[i],sizeof(MYSQL_BIND));
+		fieldbind[i].buffer_type=MYSQL_TYPE_STRING;
+		fieldbind[i].buffer=&fieldbuffer[i*1024];
+		fieldbind[i].buffer_length=1024;
+		fieldbind[i].is_null=&isnull[i];
+		fieldbind[i].length=&fieldlength[i];
+	}
+	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
+	stdoutput.printf("\n");
+
 	stdoutput.printf("mysql_stmt_fetch:\n");
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	// FIXME: check columns and rows...
+	checkSuccess(*((char *)fieldbind[0].buffer),1);
+	checkSuccess(*((uint16_t *)fieldbind[1].buffer),1);
+	checkSuccess(*((uint32_t *)fieldbind[2].buffer),1);
+	checkSuccess(*((uint32_t *)fieldbind[3].buffer),1);
+	checkSuccess(*((uint64_t *)fieldbind[4].buffer),1);
+	checkSuccess((const char *)fieldbind[5].buffer,"1.1");
+	checkSuccess((const char *)fieldbind[6].buffer,"1.1");
+	checkSuccess((const char *)fieldbind[7].buffer,"1.1");
+	checkSuccess((const char *)fieldbind[8].buffer,"2001-01-01");
+	checkSuccess((const char *)fieldbind[9].buffer,"01:00:00");
+	checkSuccess((const char *)fieldbind[10].buffer,"2001-01-01 01:00:00");
+	checkSuccess((const char *)fieldbind[11].buffer,"2001");
+	checkSuccess((const char *)fieldbind[12].buffer,"char1");
+	checkSuccess((const char *)fieldbind[13].buffer,"text1");
+	checkSuccess((const char *)fieldbind[14].buffer,"varchar1");
+	checkSuccess((const char *)fieldbind[15].buffer,"tinytext1");
+	checkSuccess((const char *)fieldbind[16].buffer,"mediumtext1");
+	checkSuccess((const char *)fieldbind[17].buffer,"longtext1");
+	stdoutput.printf("\n");
 	checkSuccess(mysql_stmt_fetch(stmt),0);
+	stdoutput.printf("\n");
 	checkSuccess(mysql_stmt_fetch(stmt),MYSQL_NO_DATA);
 	stdoutput.printf("\n");
 
