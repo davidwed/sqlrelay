@@ -5,6 +5,9 @@
 	renamed sqlrclientexitstatus_t to clientsessionexitstatus_t
 	updated all db connection modules to reinit the column count during
 		prepare rather than execute
+	fixed bug where server-side errors set by conn/cursor->setError()
+		could inadverntantly be overriden during the next call to
+		conn/cursor->errorMessage()
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

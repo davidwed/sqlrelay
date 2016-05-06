@@ -42,8 +42,6 @@
 	#define MAX_ITEM_BUFFER_SIZE	32768
 #endif
 
-#define GET_COLINFO_DURING_PREPARE 1
-
 class mysqlconnection;
 
 class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
@@ -59,9 +57,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
+#endif
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-#endif
 		bool		supportsNativeBinds(const char *query,
 							uint32_t length);
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -783,7 +781,6 @@ bool mysqlcursor::close() {
 }
 #endif
 
-#ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize column count
@@ -797,6 +794,8 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		mysqlconn->commit();
 		mysqlconn->firstquery=false;
 	}
+
+#ifdef HAVE_MYSQL_STMT_PREPARE
 
 	// reset the bind format error flag
 	bindformaterror=false;
@@ -832,7 +831,6 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	stmtfreeresult=true;
 
-#ifdef GET_COLINFO_DURING_PREPARE
 	// get the column count
 	ncols=mysql_stmt_field_count(stmt);
 	if (ncols>mysqlconn->maxselectlistsize &&
@@ -864,9 +862,9 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 #endif
+
 	return true;
 }
-#endif
 
 bool mysqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -1120,46 +1118,11 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		checkForTempTable(query,length);
 
-#ifndef GET_COLINFO_DURING_PREPARE
-		// get the column count
-		ncols=mysql_stmt_field_count(stmt);
-		if (ncols>mysqlconn->maxselectlistsize &&
-			mysqlconn->maxselectlistsize!=-1) {
-			// mysql_stmt_bind_result expects:
-			// "the array (fieldbind) to contain one element for
-			// each colun of the result set."
-			// If there isn't, then mysql_stmt_bind_result will
-			// run off the end of the array, wreaking havoc.
-			// So, bail with an error if we don't have enough
-			// columns.
-			stringbuffer	err;
-			err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
-			err.append(" (")->append(mysqlconn->maxselectlistsize);
-			err.append('<')->append(ncols)->append(')');
-			setError(err.getString(),
-				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
-			return false;
-		}
-#endif
-
 		// allocate buffers, if necessary
 		if (mysqlconn->maxselectlistsize==-1) {
 			allocateResultSetBuffers(ncols,
 					mysqlconn->maxitembuffersize);
 		}
-
-#ifndef GET_COLINFO_DURING_PREPARE
-		// get the metadata
-		mysqlresult=NULL;
-		if (ncols) {
-			mysqlresult=mysql_stmt_result_metadata(stmt);
-		}
-
-		// bind the fields
-		if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
-			return false;
-		}
-#endif
 
 		// store the result set
 		// FIXME: this causes the entire result set to be buffered,
@@ -1178,22 +1141,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		affectedrows=mysql_stmt_affected_rows(stmt);
 
 	} else {
-
-#else
-
-		// initialize column count
-		ncols=0;
-
-		// if this if the first query of the session, do a commit first,
-		// doing this will refresh this connection with any data
-		// committed by other connections, which is what would happen
-		// if a new client connected directly to mysql
-		// (if HAVE_MYSQL_STMT_PREPARE is defined,
-		// then this is done in prepareQuery())
-		if (mysqlconn->firstquery) {
-			mysqlconn->commit();
-			mysqlconn->firstquery=false;
-		}
 #endif
 
 		// initialize result set

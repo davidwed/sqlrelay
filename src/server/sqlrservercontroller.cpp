@@ -3211,10 +3211,6 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			cursor->setErrorLength(errorlength);
 			cursor->setErrorNumber(errnum);
 			cursor->setLiveConnection(liveconnection);
-stdoutput.printf("errornumber=%d\n",cursor->getErrorNumber());
-stdoutput.printf("errorlength=%d\n",cursor->getErrorLength());
-stdoutput.printf("errorstring=%s\n",cursor->getErrorBuffer());
-stdoutput.printf("liveconn=%d\n",cursor->getLiveConnection());
 
 			return false;
 		}
