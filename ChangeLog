@@ -3,6 +3,8 @@
 		session even if only selects were run, to make sure metadata
 		locks are released
 	renamed sqlrclientexitstatus_t to clientsessionexitstatus_t
+	updated all db connection modules to reinit the column count during
+		prepare rather than execute
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

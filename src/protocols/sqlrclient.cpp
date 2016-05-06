@@ -2688,6 +2688,7 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 			sendNullField();
 		} else if (blob) {
 			sendLobField(cursor,i);
+			// FIXME: move closeLob() into sendLobField()?
 			cont->closeLobField(cursor,i);
 		} else {
 			const char	*newfield=NULL;
