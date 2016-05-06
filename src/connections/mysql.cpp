@@ -784,6 +784,9 @@ bool mysqlcursor::close() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
+	// initialize column count
+	ncols=0;
+
 	// if this if the first query of the session, do a commit first,
 	// doing this will refresh this connection with any data committed
 	// by other connections, which is what would happen if a new client
@@ -1063,8 +1066,7 @@ bool mysqlcursor::inputBindClob(const char *variable,
 
 bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
-	// initialize counts
-	ncols=0;
+	// initialize row count
 	nrows=0;
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -1138,6 +1140,10 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 	} else {
 
 #else
+
+		// initialize column count
+		ncols=0;
+
 		// if this if the first query of the session, do a commit first,
 		// doing this will refresh this connection with any data
 		// committed by other connections, which is what would happen

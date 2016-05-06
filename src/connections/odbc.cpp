@@ -71,7 +71,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		allocateStatementHandle();
-		void		initializeRowAndColumnCounts();
+		void		initializeColCounts();
+		void		initializeRowCounts();
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -583,8 +584,9 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 		return false;
 	}
 
-	// initialize row and column counts
-	odbccur->initializeRowAndColumnCounts();
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
 
 	// get the table/database list
 	char		catalogbuffer[1024];
@@ -640,8 +642,9 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 		return false;
 	}
 
-	// initialize row and column counts
-	odbccur->initializeRowAndColumnCounts();
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
 
 	// SQLColumns takes non-const arguments, so we have to make
 	// copies of the various arguments that we want to pass in.
@@ -726,6 +729,9 @@ odbccursor::~odbccursor() {
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
+
+	// initialize column count
+	initializeColCounts();
 
 	// allocate the statement handle
 	if (!allocateStatementHandle()) {
@@ -1120,7 +1126,7 @@ bool odbccursor::bindValueIsNull(short isnull) {
 bool odbccursor::executeQuery(const char *query, uint32_t length) {
 
 	// initialize counts
-	initializeRowAndColumnCounts();
+	initializeRowCounts();
 
 	// execute the query
 	erg=SQLExecute(stmt);
@@ -1171,8 +1177,11 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void odbccursor::initializeRowAndColumnCounts() {
+void odbccursor::initializeColCounts() {
 	ncols=0;
+}
+
+void odbccursor::initializeRowCounts() {
 	row=0;
 	maxrow=0;
 	totalrows=0;

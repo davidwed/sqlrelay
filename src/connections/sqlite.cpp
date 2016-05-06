@@ -426,6 +426,9 @@ bool sqlitecursor::supportsNativeBinds(const char *query, uint32_t length) {
 #ifdef HAVE_SQLITE3_STMT
 bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 
+	// initialize column count
+	ncolumn=0;
+
 	// clear any errors
 	sqliteconn->clearErrors();
 
@@ -633,9 +636,9 @@ int sqlitecursor::runQuery(const char *query) {
 	#endif
 
 	// reset counters and flags
-	ncolumn=0;
 	nrow=0;
 	#ifndef HAVE_SQLITE3_STMT
+	ncolumn=0;
 	rowindex=0;
 	#endif
 	lastinsertrowid=false;

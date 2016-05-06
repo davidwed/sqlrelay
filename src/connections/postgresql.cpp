@@ -649,6 +649,9 @@ bool postgresqlcursor::deallocateStatement() {
 
 bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
+	// initialize the column count
+	ncols=0;
+
 	// store inbindcount here, otherwise if rebinding/reexecution occurs and
 	// the client tries to bind more variables than were defined when the
 	// query was prepared, it would cause the inputBind methods to attempt
@@ -885,8 +888,7 @@ void postgresqlcursor::encodeBlob(stringbuffer *buffer,
 
 bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 
-	// initialize the counts
-	ncols=0;
+	// initialize the row counts
 	nrows=0;
 	currentrow=-1;
 

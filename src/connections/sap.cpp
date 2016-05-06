@@ -860,6 +860,9 @@ bool sapcursor::close() {
 
 bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 
+	// initialize column count
+	ncols=0;
+
 	clean=true;
 
 	this->query=(char *)query;
@@ -1229,8 +1232,7 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 	sapconn->errorcode=0;
 	sapconn->liveconnection=true;
 
-	// initialize return values
-	ncols=0;
+	// initialize row counts
 	affectedrows=0;
 	row=0;
 	maxrow=0;

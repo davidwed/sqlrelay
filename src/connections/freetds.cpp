@@ -1103,6 +1103,9 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 	// it here
 	closeResultSet();
 
+	// initialize column count
+	ncols=0;
+
 	clean=true;
 
 	this->query=(char *)query;
@@ -1505,8 +1508,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	}
 	clean=false;
 
-	// initialize return values
-	ncols=0;
+	// initialize row counts
 	affectedrows=0;
 	row=0;
 	maxrow=0;

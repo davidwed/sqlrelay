@@ -791,6 +791,9 @@ void firebirdcursor::deallocateResultSetBuffers() {
 
 bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 
+	// initialize column count
+	outsqlda->sqld=0;
+
 	// are we executing a stored procedure
 	queryisexecsp=executeprocedure.match(query);
 
@@ -1416,7 +1419,6 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// describe the cursor
-	outsqlda->sqld=0;
 	if (isc_dsql_describe(firebirdconn->error,&stmt,1,outsqlda)) {
 		return false;
 	}

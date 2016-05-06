@@ -847,6 +847,9 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
 	}
 
+	// initialize column count
+	ncols=0;
+
 	// allocate the cursor
 	erg=SQLAllocHandle(SQL_HANDLE_STMT,informixconn->dbc,&stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1237,8 +1240,7 @@ bool informixcursor::getLobOutputBindSegment(uint16_t index,
 
 bool informixcursor::executeQuery(const char *query, uint32_t length) {
 
-	// initialize counts
-	ncols=0;
+	// initialize row counts
 	rowgroupindex=0;
 	totalinrowgroup=0;
 	totalrows=0;

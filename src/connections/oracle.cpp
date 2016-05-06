@@ -2195,6 +2195,9 @@ bool oraclecursor::close() {
 
 bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 
+	// initialize column count
+	ncols=0;
+
 	// keep a pointer to the query and length in case it needs to be 
 	// reprepared later
 	this->query=(char *)query;
@@ -3067,7 +3070,6 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 	row=0;
 	maxrow=0;
 	totalrows=0;
-	ncols=0;
 
 	// get the type of the query (select, insert, update, etc...)
 	if (OCIAttrGet(stmt,OCI_HTYPE_STMT,

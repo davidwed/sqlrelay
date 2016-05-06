@@ -813,6 +813,9 @@ void db2cursor::deallocateResultSetBuffers() {
 
 bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 
+	// initialize column count
+	ncols=0;
+
 	if (stmt) {
 		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
 	}
@@ -1243,8 +1246,7 @@ bool db2cursor::getLobOutputBindSegment(uint16_t index,
 
 bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
-	// initialize counts
-	ncols=0;
+	// initialize row counts
 	rowgroupindex=0;
 	totalinrowgroup=0;
 	totalrows=0;
