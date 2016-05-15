@@ -1028,7 +1028,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 			sqlrauth(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe);
+					sqlrpwdencs *sqlrpe,
+					bool debug);
 		virtual	~sqlrauth();
 		virtual void	setParameter(const char *name,
 							const char *value);
@@ -1043,6 +1044,7 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 	protected:
 		xmldomnode		*parameters;
 		sqlrpwdencs		*sqlrpe;
+		bool			debug;
 };
 
 
@@ -1054,7 +1056,7 @@ class SQLRSERVER_DLLSPEC sqlrauthplugin {
 
 class SQLRSERVER_DLLSPEC sqlrauths {
 	public:
-			sqlrauths(sqlrpaths *sqlrpth);
+			sqlrauths(sqlrpaths *sqlrpth, bool debug);
 			~sqlrauths();
 
 		bool	loadAuths(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
@@ -1068,6 +1070,7 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);
 
 		const char	*libexecdir;
+		bool		debug;
 
 		singlylinkedlist< sqlrauthplugin * >	llist;
 };

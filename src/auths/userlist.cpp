@@ -7,7 +7,8 @@
 class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 	public:
 			sqlrauth_userlist(xmldomnode *parameters,
-						sqlrpwdencs *sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug);
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -18,8 +19,9 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 };
 
 sqlrauth_userlist::sqlrauth_userlist(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe) :
-					sqlrauth(parameters,sqlrpe) {
+					sqlrpwdencs *sqlrpe,
+					bool debug) :
+					sqlrauth(parameters,sqlrpe,debug) {
 
 	users=NULL;
 	passwords=NULL;
@@ -131,7 +133,8 @@ bool sqlrauth_userlist::auth(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_userlist(
 						xmldomnode *users,
-						sqlrpwdencs *sqlrpe) {
-		return new sqlrauth_userlist(users,sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug) {
+		return new sqlrauth_userlist(users,sqlrpe,debug);
 	}
 }

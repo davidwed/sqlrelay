@@ -8,7 +8,8 @@
 class SQLRSERVER_DLLSPEC sqlrauth_proxied : public sqlrauth {
 	public:
 			sqlrauth_proxied(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug);
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -17,8 +18,9 @@ class SQLRSERVER_DLLSPEC sqlrauth_proxied : public sqlrauth {
 };
 
 sqlrauth_proxied::sqlrauth_proxied(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe) :
-					sqlrauth(parameters,sqlrpe) {
+					sqlrpwdencs *sqlrpe,
+					bool debug) :
+					sqlrauth(parameters,sqlrpe,debug) {
 }
 
 bool sqlrauth_proxied::auth(sqlrserverconnection *sqlrcon,
@@ -50,7 +52,8 @@ bool sqlrauth_proxied::auth(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_proxied(
 						xmldomnode *users,
-						sqlrpwdencs *sqlrpe) {
-		return new sqlrauth_proxied(users,sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug) {
+		return new sqlrauth_proxied(users,sqlrpe,debug);
 	}
 }

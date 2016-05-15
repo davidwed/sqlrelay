@@ -8,7 +8,8 @@
 class SQLRSERVER_DLLSPEC sqlrauth_krb_userlist : public sqlrauth {
 	public:
 			sqlrauth_krb_userlist(xmldomnode *parameters,
-						sqlrpwdencs *sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug);
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -17,8 +18,9 @@ class SQLRSERVER_DLLSPEC sqlrauth_krb_userlist : public sqlrauth {
 };
 
 sqlrauth_krb_userlist::sqlrauth_krb_userlist(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe) :
-					sqlrauth(parameters,sqlrpe) {
+						sqlrpwdencs *sqlrpe,
+						bool debug) :
+					sqlrauth(parameters,sqlrpe,debug) {
 
 	users=NULL;
 	usercount=parameters->getChildCount();
@@ -67,7 +69,8 @@ bool sqlrauth_krb_userlist::auth(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_krb_userlist(
 						xmldomnode *users,
-						sqlrpwdencs *sqlrpe) {
-		return new sqlrauth_krb_userlist(users,sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug) {
+		return new sqlrauth_krb_userlist(users,sqlrpe,debug);
 	}
 }

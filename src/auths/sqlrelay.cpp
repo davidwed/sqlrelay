@@ -8,7 +8,8 @@
 class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 	public:
 			sqlrauth_sqlrelay(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug);
 			~sqlrauth_sqlrelay();
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
@@ -22,7 +23,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 		const char	*usercolumn;
 		const char	*passwordcolumn;
 		const char	*passwordfunction;
-		const char	*debug;
+		const char	*sqlrdebug;
 
 		stringbuffer	query;
 
@@ -31,8 +32,9 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 };
 
 sqlrauth_sqlrelay::sqlrauth_sqlrelay(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe) :
-					sqlrauth(parameters,sqlrpe) {
+					sqlrpwdencs *sqlrpe,
+					bool debug) :
+					sqlrauth(parameters,sqlrpe,debug) {
 
 	host=parameters->getAttributeValue("host");
 	port=charstring::toInteger(parameters->getAttributeValue("port"));
@@ -43,16 +45,16 @@ sqlrauth_sqlrelay::sqlrauth_sqlrelay(xmldomnode *parameters,
 	usercolumn=parameters->getAttributeValue("usercolumn");
 	passwordcolumn=parameters->getAttributeValue("passwordcolumn");
 	passwordfunction=parameters->getAttributeValue("passwordfunction");
-	debug=parameters->getAttributeValue("debug");
+	sqlrdebug=parameters->getAttributeValue("debug");
 
 	sqlrcon=new sqlrconnection(host,port,socket,user,password,0,1);
 
-	if (!charstring::compareIgnoringCase(debug,"on")) {
+	if (!charstring::compareIgnoringCase(sqlrdebug,"on")) {
 		sqlrcon->debugOn();
-	} else if (!charstring::isNullOrEmpty(debug) &&
-			charstring::compareIgnoringCase(debug,"off")) {
+	} else if (!charstring::isNullOrEmpty(sqlrdebug) &&
+			charstring::compareIgnoringCase(sqlrdebug,"off")) {
 		sqlrcon->debugOn();
-		sqlrcon->setDebugFile(debug);
+		sqlrcon->setDebugFile(sqlrdebug);
 	}
 
 	sqlrcur=new sqlrcursor(sqlrcon);
@@ -112,7 +114,8 @@ bool sqlrauth_sqlrelay::auth(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrelay(
 						xmldomnode *users,
-						sqlrpwdencs *sqlrpe) {
-		return new sqlrauth_sqlrelay(users,sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug) {
+		return new sqlrauth_sqlrelay(users,sqlrpe,debug);
 	}
 }

@@ -17,9 +17,10 @@
 	}
 #endif
 
-sqlrauths::sqlrauths(sqlrpaths *sqlrpth) {
+sqlrauths::sqlrauths(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	this->libexecdir=sqlrpth->getLibExecDir();
+	this->debug=debug;
 }
 
 sqlrauths::~sqlrauths() {
@@ -93,8 +94,8 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 	// load the password encryption itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrauth_")->append(module);
-	sqlrauth *(*newAuth)(xmldomnode *, sqlrpwdencs *)=
-			(sqlrauth *(*)(xmldomnode *, sqlrpwdencs *))
+	sqlrauth *(*newAuth)(xmldomnode *, sqlrpwdencs *, bool)=
+			(sqlrauth *(*)(xmldomnode *, sqlrpwdencs *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newAuth) {
 		stdoutput.printf("failed to create auth: %s\n",module);
@@ -105,7 +106,7 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 		delete dl;
 		return;
 	}
-	sqlrauth	*au=(*newAuth)(auth,sqlrpe);
+	sqlrauth	*au=(*newAuth)(auth,sqlrpe,debug);
 
 #else
 

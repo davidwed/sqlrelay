@@ -127,6 +127,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	debugbindtranslation=false;
 	debugsqlrresultsettranslation=false;
 	debugsqlrprotocols=false;
+	debugsqlrauths=false;
 
 	cur=NULL;
 
@@ -283,9 +284,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}	
 
 	// initialize auth
+	debugsqlrauths=cfg->getDebugAuths();
 	xmldomnode	*auths=cfg->getAuths();
 	if (!auths->isNullNode()) {
-		sqlra=new sqlrauths(sqlrpth);
+		sqlra=new sqlrauths(sqlrpth,debugsqlrauths);
 		sqlra->loadAuths(auths,sqlrpe);
 	}
 

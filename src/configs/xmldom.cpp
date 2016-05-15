@@ -81,6 +81,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugBindTranslations();
 		bool		getDebugResultSetTranslations();
 		bool		getDebugProtocols();
+		bool		getDebugAuths();
 		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
@@ -187,6 +188,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugbindtranslations;
 		bool		debugresultsettranslations;
 		bool		debugprotocols;
+		bool		debugauths;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -305,6 +307,7 @@ void sqlrconfig_xmldom::init() {
 	debugresultsettranslations=
 			charstring::contains(debug,"resultsettranslations");
 	debugprotocols=charstring::contains(debug,"protocols");
+	debugauths=charstring::contains(debug,"auths");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -552,6 +555,10 @@ bool sqlrconfig_xmldom::getDebugResultSetTranslations() {
 
 bool sqlrconfig_xmldom::getDebugProtocols() {
 	return debugprotocols;
+}
+
+bool sqlrconfig_xmldom::getDebugAuths() {
+	return debugauths;
 }
 
 uint64_t sqlrconfig_xmldom::getMaxClientInfoLength() {
@@ -1479,6 +1486,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 		debugresultsettranslations=
 			charstring::contains(debug,"resultsettranslations");
 		debugprotocols=charstring::contains(debug,"protocols");
+		debugauths=charstring::contains(debug,"auths");
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {
