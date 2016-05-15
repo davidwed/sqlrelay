@@ -210,9 +210,10 @@
 		bool		debugsqlrparser;
 		bool		debugsqlrtranslation;
 		bool		debugsqlrfilters;
-		bool		debugtriggers;
+		bool		debugsqlrtriggers;
 		bool		debugbindtranslation;
 		bool		debugsqlrresultsettranslation;
+		bool		debugsqlrprotocols;
 
 		dynamiclib	conndl;
 		dynamiclib	sqlrpdl;

@@ -123,9 +123,10 @@ sqlrservercontroller::sqlrservercontroller() {
 	debugsqlrparser=false;
 	debugsqlrtranslation=false;
 	debugsqlrfilters=false;
-	debugtriggers=false;
+	debugsqlrtriggers=false;
 	debugbindtranslation=false;
 	debugsqlrresultsettranslation=false;
+	debugsqlrprotocols=false;
 
 	cur=NULL;
 
@@ -382,14 +383,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get the triggers
-	debugtriggers=cfg->getDebugTriggers();
+	debugsqlrtriggers=cfg->getDebugTriggers();
 	xmldomnode	*triggers=cfg->getTriggers();
 	if (!triggers->isNullNode()) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!sqlrp) {
 			sqlrp=newParser();
 		}
-		sqlrtr=new sqlrtriggers(sqlrpth,debugtriggers);
+		sqlrtr=new sqlrtriggers(sqlrpth,debugsqlrtriggers);
 		sqlrtr->loadTriggers(triggers);
 	}
 
@@ -447,7 +448,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// init client protocols
-	sqlrpr=new sqlrprotocols(this,sqlrpth);
+	debugsqlrprotocols=cfg->getDebugProtocols();
+	sqlrpr=new sqlrprotocols(this,sqlrpth,debugsqlrprotocols);
 	sqlrpr->loadProtocols(cfg->getListeners());
 
 	// set a handler for SIGALARMs, if necessary
