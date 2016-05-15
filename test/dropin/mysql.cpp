@@ -6,13 +6,13 @@
 #include <config.h>
 
 void checkSuccess(const char *value, const char *success) {
-	//stdoutput.printf("\"%s\"=\"%s\"\n",value,success);
 
 	if (!success) {
 		if (!value) {
 			stdoutput.printf("success ");
 			return;
 		} else {
+			stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 			stdoutput.printf("failure ");
 			process::exit(0);
 		}
@@ -21,17 +21,18 @@ void checkSuccess(const char *value, const char *success) {
 	if (!charstring::compare(value,success)) {
 		stdoutput.printf("success ");
 	} else {
+		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 		stdoutput.printf("failure ");
 		process::exit(0);
 	}
 }
 
 void checkSuccess(int value, int success) {
-	//stdoutput.printf("\"%d\"=\"%d\"\n",value,success);
 
 	if (value==success) {
 		stdoutput.printf("success ");
 	} else {
+		stdoutput.printf("\"%d\"!=\"%d\"\n",value,success);
 		stdoutput.printf("failure ");
 		process::exit(0);
 	}
@@ -69,7 +70,6 @@ int	main(int argc, char **argv) {
 					(long)mysql);
 #endif
 	stdoutput.printf("\n");
-
 #ifdef HAVE_MYSQL_PING
 	stdoutput.printf("mysql_ping\n");
 	checkSuccess(mysql_ping(&mysql),0);
@@ -465,12 +465,10 @@ int	main(int argc, char **argv) {
 	// mysql_odbc_escape_string
 	// myodbc_remove_escape
 
-
 	stdoutput.printf("mysql_stmt_init:\n");
 	MYSQL_STMT	*stmt=mysql_stmt_init(&mysql);
 	checkSuccess((int)(stmt!=NULL),1);
 	stdoutput.printf("\n");
-
 	stdoutput.printf("mysql_stmt_prepare: create\n");
 	query="create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)";
 	checkSuccess(mysql_stmt_prepare(stmt,query,
@@ -582,11 +580,11 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_fetch:\n");
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	checkSuccess(*((char *)fieldbind[0].buffer),1);
-	checkSuccess(*((uint16_t *)fieldbind[1].buffer),1);
-	checkSuccess(*((uint32_t *)fieldbind[2].buffer),1);
-	checkSuccess(*((uint32_t *)fieldbind[3].buffer),1);
-	checkSuccess(*((uint64_t *)fieldbind[4].buffer),1);
+	checkSuccess((const char *)fieldbind[0].buffer,"1");
+	checkSuccess((const char *)fieldbind[1].buffer,"1");
+	checkSuccess((const char *)fieldbind[2].buffer,"1");
+	checkSuccess((const char *)fieldbind[3].buffer,"1");
+	checkSuccess((const char *)fieldbind[4].buffer,"1");
 	checkSuccess((const char *)fieldbind[5].buffer,"1.1");
 	checkSuccess((const char *)fieldbind[6].buffer,"1.1");
 	checkSuccess((const char *)fieldbind[7].buffer,"1.1");
@@ -602,10 +600,27 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[17].buffer,"longtext1");
 	stdoutput.printf("\n");
 	checkSuccess(mysql_stmt_fetch(stmt),0);
+	checkSuccess((const char *)fieldbind[0].buffer,"2");
+	checkSuccess((const char *)fieldbind[1].buffer,"2");
+	checkSuccess((const char *)fieldbind[2].buffer,"2");
+	checkSuccess((const char *)fieldbind[3].buffer,"2");
+	checkSuccess((const char *)fieldbind[4].buffer,"2");
+	checkSuccess((const char *)fieldbind[5].buffer,"2.1");
+	checkSuccess((const char *)fieldbind[6].buffer,"2.1");
+	checkSuccess((const char *)fieldbind[7].buffer,"2.1");
+	checkSuccess((const char *)fieldbind[8].buffer,"2002-01-01");
+	checkSuccess((const char *)fieldbind[9].buffer,"02:00:00");
+	checkSuccess((const char *)fieldbind[10].buffer,"2002-01-01 02:00:00");
+	checkSuccess((const char *)fieldbind[11].buffer,"2002");
+	checkSuccess((const char *)fieldbind[12].buffer,"char2");
+	checkSuccess((const char *)fieldbind[13].buffer,"text2");
+	checkSuccess((const char *)fieldbind[14].buffer,"varchar2");
+	checkSuccess((const char *)fieldbind[15].buffer,"tinytext2");
+	checkSuccess((const char *)fieldbind[16].buffer,"mediumtext2");
+	checkSuccess((const char *)fieldbind[17].buffer,"longtext2");
 	stdoutput.printf("\n");
 	checkSuccess(mysql_stmt_fetch(stmt),MYSQL_NO_DATA);
 	stdoutput.printf("\n");
-
 
 	stdoutput.printf("mysql_stmt_prepare/execute: drop\n");
 	query="drop table testdb.testtable";
@@ -616,6 +631,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);
 	stdoutput.printf("\n");
+
 
 	mysql_close(&mysql);
 }
