@@ -27,7 +27,8 @@ enum sqlrclientquerytype_t {
 class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 	public:
 			sqlrprotocol_sqlrclient(sqlrservercontroller *cont,
-							xmldomnode *parameters);
+							xmldomnode *parameters,
+							bool debug);
 		virtual	~sqlrprotocol_sqlrclient();
 
 		clientsessionexitstatus_t	clientSession();
@@ -197,8 +198,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					sqlrservercontroller *cont,
-					xmldomnode *parameters) :
-					sqlrprotocol(cont,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+					sqlrprotocol(cont,parameters,debug) {
 	debugFunction();
 
 	idleclienttimeout=cont->cfg->getIdleClientTimeout();
@@ -3307,7 +3309,8 @@ bool sqlrprotocol_sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_sqlrclient(
 						sqlrservercontroller *cont,
-						xmldomnode *parameters) {
-		return new sqlrprotocol_sqlrclient(cont,parameters);
+						xmldomnode *parameters,
+						bool debug) {
+		return new sqlrprotocol_sqlrclient(cont,parameters,debug);
 	}
 }

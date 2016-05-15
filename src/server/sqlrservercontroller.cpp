@@ -4931,6 +4931,10 @@ void sqlrservercontroller::fakeInputBinds() {
 	fakeinputbinds=true;
 }
 
+void sqlrservercontroller::dontFakeInputBinds() {
+	fakeinputbinds=false;
+}
+
 bool sqlrservercontroller::getFakeInputBinds() {
 	return fakeinputbinds;
 }

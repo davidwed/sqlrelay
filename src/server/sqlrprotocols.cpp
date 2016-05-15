@@ -15,10 +15,12 @@
 	}
 #endif
 
-sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont, sqlrpaths *sqlrpth) {
+sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont,
+				sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	this->cont=cont;
 	libexecdir=sqlrpth->getLibExecDir();
+	this->debug=debug;
 }
 
 sqlrprotocols::~sqlrprotocols() {
@@ -94,9 +96,9 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrprotocol_")->append(module);
 	sqlrprotocol *(*newProtocol)
-				(sqlrservercontroller *, xmldomnode *)=
+				(sqlrservercontroller *, xmldomnode *, bool)=
 			(sqlrprotocol *(*)
-				(sqlrservercontroller *, xmldomnode *))
+				(sqlrservercontroller *, xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
 		stdoutput.printf("failed to create protocol: %s\n",module);
@@ -107,7 +109,7 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 		delete dl;
 		return;
 	}
-	sqlrprotocol	*pr=(*newProtocol)(cont,listener);
+	sqlrprotocol	*pr=(*newProtocol)(cont,listener,debug);
 
 #else
 

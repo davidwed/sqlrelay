@@ -3,9 +3,12 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont, xmldomnode *parameters) {
+sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
+				xmldomnode *parameters,
+				bool debug) {
 	this->cont=cont;
 	this->parameters=parameters;
+	this->debug=debug;
 	this->clientsock=NULL;
 }
 

@@ -178,6 +178,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(int16_t isnull);
 		void		fakeInputBinds();
+		void		dontFakeInputBinds();
 		bool		getFakeInputBinds();
 		memorypool	*getBindMappingsPool();
 
@@ -972,7 +973,8 @@ enum clientsessionexitstatus_t {
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
 			sqlrprotocol(sqlrservercontroller *cont,
-					xmldomnode *parameters);
+					xmldomnode *parameters,
+					bool debug);
 		virtual	~sqlrprotocol();
 
 		void	setClientSocket(filedescriptor *clientsock);
@@ -985,6 +987,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 	protected:
 		sqlrservercontroller	*cont;
 		xmldomnode		*parameters;
+		bool			debug;
 
 		filedescriptor		*clientsock;
 
@@ -1004,7 +1007,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocolplugin {
 class SQLRSERVER_DLLSPEC sqlrprotocols {
 	public:
 			sqlrprotocols(sqlrservercontroller *cont,
-						sqlrpaths *sqlrpth);
+						sqlrpaths *sqlrpth,
+						bool debug);
 			~sqlrprotocols();
 
 		bool		loadProtocols(xmldomnode *listeners);
@@ -1015,6 +1019,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 
 		sqlrservercontroller	*cont;
 		const char		*libexecdir;
+		bool			debug;
 
 		dictionary< uint16_t , sqlrprotocolplugin * >	protos;
 };
