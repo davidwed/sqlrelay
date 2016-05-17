@@ -628,6 +628,34 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("mysql_stmt_prepare/execute: select with even NULLS\n");
+	query="select 1,NULL,1,NULL,1,NULL";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
+	checkSuccess(mysql_stmt_fetch(stmt),0);
+	checkSuccess(isnull[0],0);
+	checkSuccess(isnull[1],1);
+	checkSuccess(isnull[2],0);
+	checkSuccess(isnull[3],1);
+	checkSuccess(isnull[4],0);
+	checkSuccess(isnull[5],1);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_prepare/execute: select with odd NULLS\n");
+	query="select NULL,1,NULL,1,NULL,1";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
+	checkSuccess(mysql_stmt_fetch(stmt),0);
+	checkSuccess(isnull[0],1);
+	checkSuccess(isnull[1],0);
+	checkSuccess(isnull[2],1);
+	checkSuccess(isnull[3],0);
+	checkSuccess(isnull[4],1);
+	checkSuccess(isnull[5],0);
+	stdoutput.printf("\n");
+
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);
 	stdoutput.printf("\n");
