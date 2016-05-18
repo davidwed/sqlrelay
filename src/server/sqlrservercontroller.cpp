@@ -22,6 +22,16 @@
 
 #include <defines.h>
 #include <defaults.h>
+#define NEED_DATATYPESTRING
+#define NEED_IS_BIT_TYPE_CHAR
+#define NEED_IS_BOOL_TYPE_CHAR
+#define NEED_IS_FLOAT_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_CHAR
+#define NEED_IS_BLOB_TYPE_CHAR
+#define NEED_IS_UNSIGNED_TYPE_CHAR
+#define NEED_IS_BINARY_TYPE_CHAR
+#define NEED_IS_DATETIME_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_INT
 #define NEED_IS_DATETIME_TYPE_INT
 #include <datatypes.h>
 #define NEED_CONVERT_DATE_TIME
@@ -2301,6 +2311,50 @@ const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
 
 uint16_t sqlrservercontroller::countBindVariables(const char *query) {
 	return ::countBindVariables(query);
+}
+
+bool sqlrservercontroller::isBitType(const char *type) {
+	return ::isBitTypeChar(type);
+}
+
+bool sqlrservercontroller::isBoolType(const char *type) {
+	return ::isBoolTypeChar(type);
+}
+
+bool sqlrservercontroller::isFloatType(const char *type) {
+	return ::isFloatTypeChar(type);
+}
+
+bool sqlrservercontroller::isNumberType(const char *type) {
+	return ::isNumberTypeChar(type);
+}
+
+bool sqlrservercontroller::isNumberType(int16_t type) {
+	return ::isNumberTypeInt(type);
+}
+
+bool sqlrservercontroller::isBlobType(const char *type) {
+	return ::isBlobTypeChar(type);
+}
+
+bool sqlrservercontroller::isUnsignedType(const char *type) {
+	return ::isUnsignedTypeChar(type);
+}
+
+bool sqlrservercontroller::isBinaryType(const char *type) {
+	return ::isBinaryTypeChar(type);
+}
+
+bool sqlrservercontroller::isDateTimeType(const char *type) {
+	return ::isDateTimeTypeChar(type);
+}
+
+bool sqlrservercontroller::isDateTimeType(int16_t type) {
+	return ::isDateTimeTypeInt(type);
+}
+
+const char * const *sqlrservercontroller::dataTypeStrings() {
+	return datatypestring;
 }
 
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
