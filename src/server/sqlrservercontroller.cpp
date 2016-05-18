@@ -26,6 +26,7 @@
 #include <datatypes.h>
 #define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
+#include <countbindvariables.h>
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
@@ -2296,6 +2297,10 @@ static const char *asciitooctal[]={
 
 const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
 	return asciitooctal[ch];
+}
+
+uint16_t sqlrservercontroller::countBindVariables(const char *query) {
+	return ::countBindVariables(query);
 }
 
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
