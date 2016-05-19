@@ -657,7 +657,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with binds\n");
-	query="select ?,?,?,?,?";
+	query="select ?,?,?,?,?,?,?,?,?,?,?";
 	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
 	MYSQL_BIND	bind[19];
 	unsigned long	bindlength[19];
@@ -691,16 +691,18 @@ int	main(int argc, char **argv) {
 	bindlength[3]=sizeof(longlongval);
 	bind[3].length=&bindlength[3];
 
-	bind[4].buffer_type=MYSQL_TYPE_STRING;
-	bind[4].buffer=(void *)"1";
-	bind[4].buffer_length=1;
-	bindlength[4]=1;
+	float	floatval=1.1;
+	bind[4].buffer_type=MYSQL_TYPE_FLOAT;
+	bind[4].buffer=&floatval;
+	bind[4].buffer_length=sizeof(floatval);
+	bindlength[4]=sizeof(floatval);
 	bind[4].length=&bindlength[4];
 
-	/*bind[5].buffer_type=MYSQL_TYPE_STRING;
-	bind[5].buffer=(void *)"1";
-	bind[5].buffer_length=1;
-	bindlength[5]=1;
+	double	doubleval=1.1;
+	bind[5].buffer_type=MYSQL_TYPE_DOUBLE;
+	bind[5].buffer=&doubleval;
+	bind[5].buffer_length=sizeof(doubleval);
+	bindlength[5]=sizeof(doubleval);
 	bind[5].length=&bindlength[5];
 
 	bind[6].buffer_type=MYSQL_TYPE_STRING;
@@ -709,77 +711,29 @@ int	main(int argc, char **argv) {
 	bindlength[6]=1;
 	bind[6].length=&bindlength[6];
 
-	bind[7].buffer_type=MYSQL_TYPE_STRING;
+	bind[7].buffer_type=MYSQL_TYPE_VAR_STRING;
 	bind[7].buffer=(void *)"1";
 	bind[7].buffer_length=1;
 	bindlength[7]=1;
 	bind[7].length=&bindlength[7];
 
-	bind[8].buffer_type=MYSQL_TYPE_STRING;
+	bind[8].buffer_type=MYSQL_TYPE_TINY_BLOB;
 	bind[8].buffer=(void *)"1";
 	bind[8].buffer_length=1;
 	bindlength[8]=1;
 	bind[8].length=&bindlength[8];
 
-	bind[9].buffer_type=MYSQL_TYPE_STRING;
+	bind[9].buffer_type=MYSQL_TYPE_MEDIUM_BLOB;
 	bind[9].buffer=(void *)"1";
 	bind[9].buffer_length=1;
 	bindlength[9]=1;
 	bind[9].length=&bindlength[9];
 
-	bind[10].buffer_type=MYSQL_TYPE_STRING;
+	bind[10].buffer_type=MYSQL_TYPE_LONG_BLOB;
 	bind[10].buffer=(void *)"1";
 	bind[10].buffer_length=1;
 	bindlength[10]=1;
 	bind[10].length=&bindlength[10];
-
-	bind[11].buffer_type=MYSQL_TYPE_STRING;
-	bind[11].buffer=(void *)"1";
-	bind[11].buffer_length=1;
-	bindlength[11]=1;
-	bind[11].length=&bindlength[11];
-
-	bind[12].buffer_type=MYSQL_TYPE_STRING;
-	bind[12].buffer=(void *)"1";
-	bind[12].buffer_length=1;
-	bindlength[12]=1;
-	bind[12].length=&bindlength[12];
-
-	bind[13].buffer_type=MYSQL_TYPE_STRING;
-	bind[13].buffer=(void *)"1";
-	bind[13].buffer_length=1;
-	bindlength[13]=1;
-	bind[13].length=&bindlength[13];
-
-	bind[14].buffer_type=MYSQL_TYPE_STRING;
-	bind[14].buffer=(void *)"1";
-	bind[14].buffer_length=1;
-	bindlength[14]=1;
-	bind[14].length=&bindlength[14];
-
-	bind[15].buffer_type=MYSQL_TYPE_STRING;
-	bind[15].buffer=(void *)"1";
-	bind[15].buffer_length=1;
-	bindlength[15]=1;
-	bind[15].length=&bindlength[15];
-
-	bind[16].buffer_type=MYSQL_TYPE_STRING;
-	bind[16].buffer=(void *)"1";
-	bind[16].buffer_length=1;
-	bindlength[16]=1;
-	bind[16].length=&bindlength[16];
-
-	bind[17].buffer_type=MYSQL_TYPE_STRING;
-	bind[17].buffer=(void *)"1";
-	bind[17].buffer_length=1;
-	bindlength[17]=1;
-	bind[17].length=&bindlength[17];
-
-	bind[18].buffer_type=MYSQL_TYPE_STRING;
-	bind[18].buffer=(void *)"1";
-	bind[18].buffer_length=1;
-	bindlength[18]=1;
-	bind[18].length=&bindlength[18];*/
 
 	checkSuccess(mysql_stmt_bind_param(stmt,bind),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
@@ -789,21 +743,13 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[1].buffer,"1");
 	checkSuccess((const char *)fieldbind[2].buffer,"1");
 	checkSuccess((const char *)fieldbind[3].buffer,"1");
-	checkSuccess((const char *)fieldbind[4].buffer,"1");
-	/*checkSuccess((const char *)fieldbind[5].buffer,"1");
+	//checkSuccess((const char *)fieldbind[4].buffer,"1.1");
+	//checkSuccess((const char *)fieldbind[5].buffer,"1.1");
 	checkSuccess((const char *)fieldbind[6].buffer,"1");
 	checkSuccess((const char *)fieldbind[7].buffer,"1");
 	checkSuccess((const char *)fieldbind[8].buffer,"1");
 	checkSuccess((const char *)fieldbind[9].buffer,"1");
 	checkSuccess((const char *)fieldbind[10].buffer,"1");
-	checkSuccess((const char *)fieldbind[11].buffer,"1");
-	checkSuccess((const char *)fieldbind[12].buffer,"1");
-	checkSuccess((const char *)fieldbind[13].buffer,"1");
-	checkSuccess((const char *)fieldbind[14].buffer,"1");
-	checkSuccess((const char *)fieldbind[15].buffer,"1");
-	checkSuccess((const char *)fieldbind[16].buffer,"1");
-	checkSuccess((const char *)fieldbind[17].buffer,"1");
-	checkSuccess((const char *)fieldbind[18].buffer,"1");*/
 	stdoutput.printf("\n");
 
 
