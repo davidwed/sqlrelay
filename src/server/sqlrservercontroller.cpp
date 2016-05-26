@@ -3275,6 +3275,13 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			cursor->setErrorNumber(errnum);
 			cursor->setLiveConnection(liveconnection);
 
+			debugstr.clear();
+			debugstr.append("prepare failed: ");
+			debugstr.append("\"");
+			debugstr.append(cursor->getErrorBuffer(),errorlength);
+			debugstr.append("\"");
+			logDebugMessage(debugstr.getString());
+
 			return false;
 		}
 
@@ -3306,6 +3313,13 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			cursor->setErrorLength(errorlength);
 			cursor->setErrorNumber(errnum);
 			cursor->setLiveConnection(liveconnection);
+
+			debugstr.clear();
+			debugstr.append("handle binds failed: ");
+			debugstr.append("\"");
+			debugstr.append(cursor->getErrorBuffer(),errorlength);
+			debugstr.append("\"");
+			logDebugMessage(debugstr.getString());
 
 			return false;
 		}
@@ -3342,6 +3356,13 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		cursor->setErrorLength(errorlength);
 		cursor->setErrorNumber(errnum);
 		cursor->setLiveConnection(liveconnection);
+
+		debugstr.clear();
+		debugstr.append("execute failed: ");
+		debugstr.append("\"");
+		debugstr.append(cursor->getErrorBuffer(),errorlength);
+		debugstr.append("\"");
+		logDebugMessage(debugstr.getString());
 	}
 
 	// reset total rows fetched
