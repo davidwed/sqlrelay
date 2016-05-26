@@ -709,7 +709,25 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	usestmtprepare=true;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
-			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start|CHECK|check|REPAIR|repair)\\s+)|((begin|BEGIN)\\s*)");
+			"^\\s*(("
+				"create|CREATE|"
+				"drop|DROP|"
+				"procedure|PROCEDURE|"
+				"function|FUNCTION|"
+				"use|USE|"
+				"call|CALL|"
+				"start|START|"
+				"check|CHECK|"
+				"repair|REPAIR|"
+				"savepoint|SAVEPOINT|"
+				"release|RELEASE|"
+				"connect|CONNECT|"
+				"unlock|UNLOCK"
+			")\\s+)|"
+			"(("
+				"begin|BEGIN|"
+				"rollback|ROLLBACK"
+			")\\s*)");
 	unsupportedbystmt.study();
 
 	allocateResultSetBuffers(mysqlconn->maxselectlistsize,
