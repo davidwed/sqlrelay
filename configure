@@ -3433,7 +3433,6 @@ then
 fi
 
 ENABLE_CPP="yes"
-ENABLE_ODBC_DRIVER="yes"
 if ( test -z "$ENABLE_CLIENT" )
 then
 	ENABLE_CMDLINE=""
