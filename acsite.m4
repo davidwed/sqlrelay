@@ -3518,6 +3518,9 @@ then
 	fi
 	AC_MSG_RESULT($PHPCONFDIR - $PHPCONFSTYLE style)
 
+	dnl strip trailing / from PHPEXTDIR or libtool might complain
+	PHPEXTDIR="`echo $PHPEXTDIR | sed -e 's|/$||'`"
+
 	AC_SUBST(HAVE_PHP)
 	AC_SUBST(PHPINCLUDES)
 	AC_SUBST(PHPEXTDIR)

@@ -34359,6 +34359,8 @@ $as_echo_n "checking for PHP config directory... " >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFDIR - $PHPCONFSTYLE style" >&5
 $as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 
+		PHPEXTDIR="`echo $PHPEXTDIR | sed -e 's|/$||'`"
+
 
 
 
