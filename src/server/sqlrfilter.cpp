@@ -29,3 +29,22 @@ bool sqlrfilter::run(sqlrserverconnection *sqlrcon,
 				xmldom *querytree) {
 	return true;
 }
+
+void sqlrfilter::getError(const char **err, int64_t *errn) {
+	const char	*error=parameters->getAttributeValue("error");
+	const char	*errno=parameters->getAttributeValue("errornumber");
+	if (err) {
+		if (!charstring::isNullOrEmpty(error)) {
+			*err=error;
+		} else {
+			*err=NULL;
+		}
+	}
+	if (errn) {
+		if (!charstring::isNullOrEmpty(errno)) {
+			*errn=charstring::toInteger(errno);
+		} else {
+			*errn=0;
+		}
+	}
+}

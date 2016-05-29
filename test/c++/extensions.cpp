@@ -364,7 +364,10 @@ int	main(int argc, char **argv) {
 
 	printf("FILTERS:\n");
 	checkSuccess(cur->sendQuery("select * from badstring"),0);
+	checkSuccess(cur->errorMessage(),"badstring encountered");
 	checkSuccess(cur->sendQuery("select * from badregex"),0);
+	checkSuccess(cur->errorMessage(),"badregex encountered");
+	checkSuccess(cur->errorNumber(),100);
 	checkSuccess(cur->sendQuery("select * from badpattern"),0);
 	printf("\n\n");
 

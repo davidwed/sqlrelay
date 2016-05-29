@@ -2861,7 +2861,10 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
 	}
 
 	// apply filters
-	if (!sqlrf->runFilters(conn,cursor,sqlrp,query)) {
+	const char	*err=NULL;
+	int64_t		errn=0;
+	if (!sqlrf->runFilters(conn,cursor,sqlrp,query,&err,&errn)) {
+		setError(cursor,err,errn,true);
 		logFilterViolation(cursor);
 		if (debugsqlrfilters) {
 			stdoutput.printf("query filtered out\n");

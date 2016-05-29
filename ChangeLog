@@ -10,6 +10,7 @@
 		conn/cursor->errorMessage()
 	added several more queries to mysql stmt-api blacklist
 	configure option --disable-odbc-driver actually works now
+	filters can specify an error string and error number now
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

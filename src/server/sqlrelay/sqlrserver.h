@@ -1367,6 +1367,8 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
+
+		virtual void	getError(const char **err, int64_t *errn);
 	protected:
 		sqlrfilters		*sqlrfs;
 		xmldomnode		*parameters;
@@ -1389,7 +1391,9 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 		bool	runFilters(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						sqlrparser *sqlrp,
-						const char *query);
+						const char *query,
+						const char **err,
+						int64_t *errn);
 	private:
 		void	unloadFilters();
 		void	loadFilter(xmldomnode *filter);

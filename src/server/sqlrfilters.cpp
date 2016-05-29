@@ -139,7 +139,9 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrparser *sqlrp,
-					const char *query) {
+					const char *query,
+					const char **err,
+					int64_t *errn) {
 	debugFunction();
 
 	if (!query) {
@@ -184,12 +186,14 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 			}
 
 			if (!f->run(sqlrcon,sqlrcur,tree)) {
+				f->getError(err,errn);
 				return false;
 			}
 
 		} else {
 
 			if (!f->run(sqlrcon,sqlrcur,query)) {
+				f->getError(err,errn);
 				return false;
 			}
 		}
