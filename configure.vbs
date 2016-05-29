@@ -11,6 +11,8 @@ OPTCPPFLAGS="/O2"
 DEBUGCPPFLAGS="/MD"
 DEBUGLDFLAGS=""
 
+disableutil=false
+disableserver=false
 disableoracle=false
 disablemysql=false
 disablepostgresql=false
@@ -20,6 +22,8 @@ disabledb2=false
 disablefirebird=false
 disableinformix=false
 disablerouter=false
+disableodbcdriver=false
+disablecpp=false
 disableperl=false
 disablepython=false
 disableruby=false
@@ -28,6 +32,8 @@ disablephp=false
 disabletcl=false
 disablenodejs=false
 disablecs=false
+disablecmdline=false
+disabledoc=false
 
 ORACLEPREFIX=""
 MYSQLPREFIX=""
@@ -66,6 +72,7 @@ if WScript.Arguments.Count>0 then
 		WScript.Echo("  --disable-firebird     Don't build Firebird connection module")
 		WScript.Echo("  --disable-informix     Don't build Informix connection module")
 		WScript.Echo("  --disable-router       Don't build router connection module")
+		WScript.Echo("  --disable-odbc-driver  Don't build ODBC driver")
 		WScript.Echo("  --disable-perl         Don't build Perl api")
 		WScript.Echo("  --disable-python       Don't build Python api")
 		WScript.Echo("  --disable-ruby         Don't build Ruby api")
@@ -141,6 +148,8 @@ for i=0 to WScript.Arguments.Count-1
 		INFORMIXPREFIX=mid(arg,24)
 	elseif arg="--disable-router" then
 		disablerouter=true
+	elseif arg="--disable-odbc-driver" then
+		disableodbcdriver=true
 	elseif arg="--disable-perl" then
 		disableperl=true
 	elseif mid(arg,1,19)="--with-perl-prefix=" then
@@ -183,8 +192,40 @@ for i=0 to WScript.Arguments.Count-1
 		SQLRELAY=mid(arg,17)
 	elseif mid(arg,1,17)="--with-sql-relay=" then
 		SQL_RELAY=mid(arg,18)
+	elseif mid(arg,1,16)="--disable-server" then
+		disableserver=true
+		disableoracle=true
+		disablemysql=true
+		disablepostgresql=true
+		disablesap=true
+		disableodbc=true
+		disabledb2=true
+		disablefirebird=true
+		disableinformix=true
+		disablerouter=true
+	elseif mid(arg,1,16)="--disable-client" then
+		disablecmdline=true
+		disableodbcdriver=true
+		disablecpp=true
+		disableperl=true
+		disablepython=true
+		disableruby=true
+		disablejava=true
+		disablephp=true
+		disabletcl=true
+		disablecs=true
+		disablenodejs=true
+		disablerouter=true
+	elseif mid(arg,1,17)="--disable-cmdline" then
+		disablecmdline=true
+	elseif mid(arg,1,13)="--disable-doc" then
+		disabledoc=true
 	end if
 next
+
+if disableserver=true and disablecmdline=true then
+	disableutil=true
+end if
 
 
 ' version
@@ -379,6 +420,24 @@ end if
 WScript.Echo("******************************")
 
 
+' util
+ALLUTIL=""
+INSTALLUTIL=""
+if disableutil=false then
+	ALLUTIL="all-util"
+	INSTALLUTIL="install-util"
+end if
+
+
+' server
+ALLSERVER=""
+INSTALLSERVER=""
+if disableserver=false then
+	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections"
+	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections"
+end if
+
+
 
 ' oracle
 WScript.Echo("")
@@ -402,8 +461,10 @@ WScript.Echo("******************************")
 WScript.Echo("")
 WScript.Echo("***** MySQL ******************")
 
+'"MySQL Connector.C ",_
 configureDatabase "MySQL","mysql",disablemysql,_
-			"C:\Program Files\MySQL","MySQL Connector.C ",_
+			"C:\Program Files\MySQL",_
+			"MySQL Connector C ",_
 			"include","mysql.h",_
 			"lib","libmysql.lib","",_
 			"\include","\lib","libmysql.lib",_
@@ -525,11 +586,32 @@ if disablerouter=false then
 end if
 
 
+' cmdline programs
+ALLCMDLINE=""
+INSTALLCMDLINE=""
+if disablecmdline=false then
+	ALLCMDLINE="all-cmdline"
+	INSTALLCMDLINE="install-cmdline"
+end if
+
+
 ' api's...
-APIALLSUBDIRS="all-cpp all-c all-odbc"
-APICLEANSUBDIRS="clean-cpp clean-c clean-odbc"
-APIINSTALLSUBDIRS="install-cpp install-c install-odbc"
-APIUNINSTALLSUBDIRS="uninstall-cpp uninstall-c uninstall-odbc"
+APIALLSUBDIRS=""
+APICLEANSUBDIRS=""
+APIINSTALLSUBDIRS=""
+APIUNINSTALLSUBDIRS=""
+if disablecpp=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-cpp all-c"
+	APICLEANSUBDIRS=" clean-cpp clean-c"
+	APIINSTALLSUBDIRS=" install-cpp install-c"
+	APIUNINSTALLSUBDIRS=" uninstall-cpp uninstall-c"
+end if
+if disableodbcdriver=false then
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-odbc"
+	APICLEANSUBDIRS=" clean-odbc"
+	APIINSTALLSUBDIRS=" install-odbc"
+	APIUNINSTALLSUBDIRS=" uninstall-odbc"
+end if
 
 
 ' c#
@@ -750,6 +832,13 @@ end if
 WScript.Echo("******************************")
 
 
+' docs
+INSTALLDOC=""
+if disabledoc=false then
+	INSTALLDOC="install-doc"
+end if
+
+
 
 ' input and output files
 infiles=Array(_
@@ -853,6 +942,14 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@NODEJSPREFIX@",NODEJSPREFIX,1,-1,0)
 	content=replace(content,"@NODEJSMSVSVERSION@",NODEJSMSVSVERSION,1,-1,0)
 
+	' util library
+	content=replace(content,"@ALLUTIL@",ALLUTIL,1,-1,0)
+	content=replace(content,"@INSTALLUTIL@",INSTALLUTIL,1,-1,0)
+
+	' server programs
+	content=replace(content,"@ALLSERVER@",ALLSERVER,1,-1,0)
+	content=replace(content,"@INSTALLSERVER@",INSTALLSERVER,1,-1,0)
+
 	' connections
 	content=replace(content,"@ORACLEINCLUDES@",ORACLEINCLUDES,1,-1,0)
 	content=replace(content,"@ORACLELIBS@",ORACLELIBS,1,-1,0)
@@ -901,6 +998,13 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@ALLROUTER@",ALLROUTER,1,-1,0)
 	content=replace(content,"@INSTALLROUTER@",INSTALLROUTER,1,-1,0)
 
+	' cmdline programs
+	content=replace(content,"@ALLCMDLINE@",ALLCMDLINE,1,-1,0)
+	content=replace(content,"@INSTALLCMDLINE@",INSTALLCMDLINE,1,-1,0)
+
+	' docs
+	content=replace(content,"@INSTALLDOC@",INSTALLDOC,1,-1,0)
+
 	' enabled apis
 	content=replace(content,"@APIALLSUBDIRS@",APIALLSUBDIRS,1,-1,0)
 	content=replace(content,"@APICLEANSUBDIRS@",APICLEANSUBDIRS,1,-1,0)
@@ -920,16 +1024,25 @@ next
 
 
 ' summary
+CMDLINEBUILD="no "
+CPPBUILD="no "
 PERLBUILD="no "
 PYTHONBUILD="no "
 RUBYBUILD="no "
 PHPBUILD="no "
 PHPPDOBUILD="no "
+ODBCDRIVERBUILD="no "
 JAVABUILD="no "
 TCLBUILD="no "
 CSBUILD="no "
 NODEJSBUILD="no "
 ODBCBUILD="no "
+if disablecmdline=false then
+	CMDLINEBUILD="yes"
+end if
+if disablecpp=false then
+	CPPBUILD="yes"
+end if
 if disableperl=false then
 	PERLBUILD="yes"
 end if
@@ -944,6 +1057,9 @@ if disablephp=false then
 end if
 if disablephp=false then
 	PHPPDOBUILD="yes"
+end if
+if disableodbcdriver=false then
+	ODBCDRIVERBUILD="yes"
 end if
 if disablejava=false then
 	JAVABUILD="yes"
@@ -965,10 +1081,14 @@ WScript.Echo("")
 WScript.Echo("***** Summary ***********************************************")
 WScript.Echo(" Version      : " & SQLR_VERSION)
 WSCript.Echo("")
-WSCript.Echo(" APIs         : C/C++       yes           Perl       " & PERLBUILD)
+WScript.Echo(" Branding     : " & SQL_RELAY & " / " & SQLRELAY & " / " & SQLR)
+WSCript.Echo("")
+WScript.Echo(" Command Line : Clients     " & CMDLINEBUILD)
+WSCript.Echo("")
+WSCript.Echo(" APIs         : C/C++       " & CPPBUILD & "           Perl       " & PERLBUILD)
 WSCript.Echo("                Python      " & PYTHONBUILD & "           Ruby       " & RUBYBUILD)
 WSCript.Echo("                PHP         " & PHPBUILD & "           Java       " & JAVABUILD)
-WSCript.Echo("                PHP PDO     " & PHPPDOBUILD & "           ODBC       " & ODBCBUILD)
+WSCript.Echo("                PHP PDO     " & PHPPDOBUILD & "           ODBC       " & ODBCDRIVERBUILD)
 WSCript.Echo("                TCL         " & TCLBUILD & "           C#         " & CSBUILD)
 WScript.Echo("                node.js     " & NODEJSBUILD)
 WSCript.Echo("")

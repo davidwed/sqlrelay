@@ -439,12 +439,12 @@ PYTHONSUFFIX = pyd
 
 
 # build directories
-INSTALLSUBDIRS = install-src install-etc install-doc install-license
+INSTALLSUBDIRS = install-src install-etc @INSTALLDOC@ install-license
 UNINSTALLSUBDIRS = uninstall-src uninstall-etc uninstall-doc uninstall-license
 
-SRCALLSUBDIRS = all-util all-api all-server all-configs all-parsers all-queries all-loggers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-cmdline
+SRCALLSUBDIRS = @ALLUTIL@ all-api @ALLSERVER@ @ALLCMDLINE@
 
-SRCINSTALLSUBDIRS = install-util install-api install-server install-configs install-parsers install-queries install-loggers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-cmdline
+SRCINSTALLSUBDIRS = @INSTALLUTIL@ @INSTALLSERVER@ @INSTALLCMDLINE@
 
 
 APIALLSUBDIRS = @APIALLSUBDIRS@
