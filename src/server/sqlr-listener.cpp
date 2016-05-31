@@ -83,6 +83,9 @@ int main(int argc, const char **argv) {
 		process::handleCrash(shutDown);
 	}
 
+	// handle child processes
+	process::waitForChildren();
+
 	// ignore all other signals except SIGALRM and SIGCHLD
 	signalset	set;
 	set.addAllSignals();

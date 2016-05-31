@@ -334,6 +334,8 @@
 		operation
 	subtly tweaked freeing of Oracle column-info buffers to work around
 		a crash that could occur after using a cursor bind
+	fixed sessionhandler="process"/zombie bug by adding SIGCHLD handler
+		back to sqlr-listener
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
