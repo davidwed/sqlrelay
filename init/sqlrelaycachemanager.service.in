@@ -1,0 +1,11 @@
+[Unit]
+Description=SQL Relay Cache Manager
+After=network.target
+
+[Service]
+Environment=LD_LIBRARY_PATH=@libdir@
+ExecStart=@bindir@/sqlr-cachemanager
+Type=forking
+
+[Install]
+WantedBy=multi-user.target

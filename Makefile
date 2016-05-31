@@ -86,6 +86,10 @@ distclean: clean
 		init/rc.sqlrcachemanager \
 		init/com.firstworks.sqlrelay.plist \
 		init/com.firstworks.sqlrcachemanager.plist \
+		init/sqlrelay.service \
+		init/sqlrelay.service.in.in \
+		init/sqlrelaycachemanager.service \
+		init/sqlrelaycachemanager.service.in.in \
 		libtool \
 		libtool.gcc \
 		sqlrelay-c.pc \

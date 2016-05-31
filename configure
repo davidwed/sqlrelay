@@ -37772,6 +37772,8 @@ sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.
 mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
 mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
+sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
+sed -e "s|@bindir@|$bindir|g" init/sqlrelaycachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelaycachemanager.service
 
 
 
