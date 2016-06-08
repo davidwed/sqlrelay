@@ -61,10 +61,15 @@ extern "C" {
 #include <config.h>
 
 #if PHP_MAJOR_VERSION >= 7
+	#define ZVAL zval
 	#define zend_rsrc_list_entry zend_resource
 	#define ZEND_REGISTER_RESOURCE(a,b,c) RETURN_RES(zend_register_resource(b,c))
-	#define ZEND_FETCH_RESOURCE(a,b,c,d,e,f) if ((a=(b)zend_fetch_resource(Z_RES_P(c),e,f)) == NULL) { RETURN_FALSE; }
-	#define ZVAL zval*
+	#define ZEND_FETCH_RESOURCE(a,b,c,d,e,f) if ((a=(b)zend_fetch_resource(Z_RES_P((zval *)&c),e,f)) == NULL) { RETURN_FALSE; }
+	#define ZEND_LIST_DELETE(a) zend_list_delete(Z_RES_P(&a));
+	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(&a)
+	#define CONVERT_TO_LONG_EX(a) convert_to_long_ex(&a)
+	#define CONVERT_TO_DOUBLE_EX(a) convert_to_double_ex(&a)
+	#define CONVERT_TO_ARRAY_EX(a) convert_to_array_ex(&a)
 	#define RET_STRING(a,b) RETURN_STR(zend_string_init(a,charstring::length(a),0))
 	#define RET_STRINGL(a,b,c) RETURN_STR(zend_string_init(a,b,0))
 	#define Z_TYPE_PP Z_TYPE_P
@@ -72,12 +77,18 @@ extern "C" {
 	#define ADD_NEXT_INDEX_STRING(a,b,c) add_next_index_string(a,zend_string_init(b,charstring::length(b),0)->val)
 	#define ADD_NEXT_INDEX_STRINGL(a,b,c,d) add_next_index_stringl(a,zend_string_init(b,c,0)->val,c)
 	#define HASH_INDEX_FIND(a,b,c) c=zend_hash_index_find(a,b)
-	#define STR_VAL(a) Z_STRVAL(*a)
-	#define LVAL(a) Z_LVAL(*a)
-	#define DVAL(a) Z_DVAL(*a)
-	#define ARRVAL(a) Z_ARRVAL(*a)
+	#define STR_VAL(a) Z_STRVAL(a)
+	#define LVAL(a) Z_LVAL(a)
+	#define DVAL(a) Z_DVAL(a)
+	#define ARRVAL(a) Z_ARRVAL(a)
+	#define TYPE(a) Z_TYPE_P(&a)
 #else
 	#define ZVAL zval**
+	#define ZEND_LIST_DELETE(a) zend_list_delete(LVAL(a));
+	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(a)
+	#define CONVERT_TO_LONG_EX(a) convert_to_long_ex(a)
+	#define CONVERT_TO_DOUBLE_EX(a) convert_to_double_ex(a)
+	#define CONVERT_TO_ARRAY_EX(a) convert_to_array_ex(a)
 	#define RET_STRING RETURN_STRING
 	#define RET_STRINGL RETURN_STRINGL
 	#define ADD_ASSOC_STRINGL(a,b,c,d,e) add_assoc_stringl(a,b,c,d,e)
@@ -89,6 +100,7 @@ extern "C" {
 	#define LVAL(a) (*a)->value.lval
 	#define DVAL(a) (*a)->value.dval
 	#define ARRVAL(a) (*a)->value.ht
+	#define TYPE(a) Z_TYPE_PP(a)
 #endif
 
 extern "C" {
@@ -137,13 +149,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_alloc) {
 			&user,&password,&retrytime,&tries ) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(server);
-	convert_to_long_ex(port);
-	convert_to_string_ex(socket);
-	convert_to_string_ex(user);
-	convert_to_string_ex(password);
-	convert_to_long_ex(retrytime);
-	convert_to_long_ex(tries);
+	CONVERT_TO_STRING_EX(server);
+	CONVERT_TO_LONG_EX(port);
+	CONVERT_TO_STRING_EX(socket);
+	CONVERT_TO_STRING_EX(user);
+	CONVERT_TO_STRING_EX(password);
+	CONVERT_TO_LONG_EX(retrytime);
+	CONVERT_TO_LONG_EX(tries);
 	connection=new sqlrconnection(
 			STR_VAL(server),
 			LVAL(port),
@@ -165,7 +177,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_free) {
 	}
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
-	zend_list_delete(LVAL(sqlrcon));
+	ZEND_LIST_DELETE(sqlrcon);
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_setconnecttimeout) {
@@ -176,8 +188,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setconnecttimeout) {
 		zend_get_parameters_ex(3,&sqlrcur,&timeoutsec,&timeoutusec) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(timeoutsec);
-	convert_to_long_ex(timeoutusec);
+	CONVERT_TO_LONG_EX(timeoutsec);
+	CONVERT_TO_LONG_EX(timeoutusec);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcur,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -193,8 +205,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setauthenticationtimeout) {
 		zend_get_parameters_ex(3,&sqlrcur,&timeoutsec,&timeoutusec) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(timeoutsec);
-	convert_to_long_ex(timeoutusec);
+	CONVERT_TO_LONG_EX(timeoutsec);
+	CONVERT_TO_LONG_EX(timeoutusec);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcur,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -210,8 +222,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setresponsetimeout) {
 		zend_get_parameters_ex(3,&sqlrcur,&timeoutsec,&timeoutusec) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(timeoutsec);
-	convert_to_long_ex(timeoutusec);
+	CONVERT_TO_LONG_EX(timeoutsec);
+	CONVERT_TO_LONG_EX(timeoutusec);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcur,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -228,9 +240,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_enablekerberos) {
 		zend_get_parameters_ex(4,&sqlrcon,&service,&mech,&flags) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(service);
-	convert_to_string_ex(mech);
-	convert_to_string_ex(flags);
+	CONVERT_TO_STRING_EX(service);
+	CONVERT_TO_STRING_EX(mech);
+	CONVERT_TO_STRING_EX(flags);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -253,13 +265,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_enabletls) {
 		zend_get_parameters_ex(8,&sqlrcon,&version,&cert,&password,&ciphers,&validate,&ca,&depth) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(version);
-	convert_to_string_ex(cert);
-	convert_to_string_ex(password);
-	convert_to_string_ex(ciphers);
-	convert_to_string_ex(validate);
-	convert_to_string_ex(ca);
-	convert_to_long_ex(depth);
+	CONVERT_TO_STRING_EX(version);
+	CONVERT_TO_STRING_EX(cert);
+	CONVERT_TO_STRING_EX(password);
+	CONVERT_TO_STRING_EX(ciphers);
+	CONVERT_TO_STRING_EX(validate);
+	CONVERT_TO_STRING_EX(ca);
+	CONVERT_TO_LONG_EX(depth);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -359,8 +371,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_resumesession) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(port);
-	convert_to_string_ex(socket);
+	CONVERT_TO_LONG_EX(port);
+	CONVERT_TO_STRING_EX(socket);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -458,7 +470,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setdebugfile) {
 		zend_get_parameters_ex(2,&sqlrcon,&filename) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(filename);
+	CONVERT_TO_STRING_EX(filename);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -473,7 +485,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setclientinfo) {
 		zend_get_parameters_ex(2,&sqlrcon,&clientinfo) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(clientinfo);
+	CONVERT_TO_STRING_EX(clientinfo);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
@@ -522,7 +534,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_free) {
 	}
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
-	zend_list_delete(LVAL(sqlrcur));
+	ZEND_LIST_DELETE(sqlrcur);
 }
 
 DLEXPORT ZEND_FUNCTION(sqlrcur_setresultsetbuffersize) {
@@ -532,7 +544,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_setresultsetbuffersize) {
 		zend_get_parameters_ex(2,&sqlrcur,&rows) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(rows);
+	CONVERT_TO_LONG_EX(rows);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -628,7 +640,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_cachetofile) {
 		zend_get_parameters_ex(2,&sqlrcur,&filename) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(filename);
+	CONVERT_TO_STRING_EX(filename);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -643,7 +655,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_setcachettl) {
 		zend_get_parameters_ex(2,&sqlrcur,&ttl) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(ttl);
+	CONVERT_TO_LONG_EX(ttl);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -690,7 +702,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getdatabaselist) {
 		zend_get_parameters_ex(2,&sqlrcur,&wild) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(wild);
+	CONVERT_TO_STRING_EX(wild);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -708,7 +720,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_gettablelist) {
 		zend_get_parameters_ex(2,&sqlrcur,&wild) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(wild);
+	CONVERT_TO_STRING_EX(wild);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -727,8 +739,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnlist) {
 		zend_get_parameters_ex(3,&sqlrcur,&table,&wild) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(table);
-	convert_to_string_ex(wild);
+	CONVERT_TO_STRING_EX(table);
+	CONVERT_TO_STRING_EX(wild);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -747,7 +759,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_sendquery) {
 		zend_get_parameters_ex(2,&sqlrcur,&query) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(query);
+	CONVERT_TO_STRING_EX(query);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -766,8 +778,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_sendquerywithlength) {
 		zend_get_parameters_ex(3,&sqlrcur,&query,&length) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(query);
-	convert_to_long_ex(length);
+	CONVERT_TO_STRING_EX(query);
+	CONVERT_TO_LONG_EX(length);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -788,8 +800,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_sendfilequery) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(path);
-	convert_to_string_ex(filename);
+	CONVERT_TO_STRING_EX(path);
+	CONVERT_TO_STRING_EX(filename);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -808,7 +820,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_preparequery) {
 		zend_get_parameters_ex(2,&sqlrcur,&query) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(query);
+	CONVERT_TO_STRING_EX(query);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -824,8 +836,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_preparequerywithlength) {
 		zend_get_parameters_ex(3,&sqlrcur,&query,&length) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(query);
-	convert_to_long_ex(length);
+	CONVERT_TO_STRING_EX(query);
+	CONVERT_TO_LONG_EX(length);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -844,8 +856,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_preparefilequery) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(path);
-	convert_to_string_ex(filename);
+	CONVERT_TO_STRING_EX(path);
+	CONVERT_TO_STRING_EX(filename);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -871,29 +883,29 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_substitution) {
 			WRONG_PARAM_COUNT;
 		}
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(value)==IS_STRING) {
-			convert_to_string_ex(value);
+		if (TYPE(value)==IS_STRING) {
+			CONVERT_TO_STRING_EX(value);
 			cursor->substitution(STR_VAL(variable),
 						STR_VAL(value));
 			RETURN_LONG(1);
-		} else if (Z_TYPE_PP(value)==IS_LONG) {
-			convert_to_long_ex(value);
+		} else if (TYPE(value)==IS_LONG) {
+			CONVERT_TO_LONG_EX(value);
 			cursor->substitution(STR_VAL(variable),
 						LVAL(value));
 			RETURN_LONG(1);
-		} else if (ZEND_NUM_ARGS()==5 && Z_TYPE_PP(value)==IS_DOUBLE) {
-			convert_to_double_ex(value);
+		} else if (ZEND_NUM_ARGS()==5 && TYPE(value)==IS_DOUBLE) {
+			CONVERT_TO_DOUBLE_EX(value);
 			cursor->substitution(
 				STR_VAL(variable),
 				DVAL(value),
 				(unsigned short)LVAL(precision),
 				(unsigned short)LVAL(scale));
 			RETURN_LONG(1);
-		} else if (Z_TYPE_PP(value)==IS_NULL) {
+		} else if (TYPE(value)==IS_NULL) {
 			cursor->substitution(
 				STR_VAL(variable),
 				(const char *)NULL);
@@ -953,12 +965,12 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
 			}
 		}
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(value)==IS_STRING) {
-			convert_to_string_ex(value);
+		if (TYPE(value)==IS_STRING) {
+			CONVERT_TO_STRING_EX(value);
 			if (ZEND_NUM_ARGS() == 4 && LVAL(length)>0) {
 				cursor->inputBind(
 					STR_VAL(variable),
@@ -970,20 +982,20 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
 					STR_VAL(value));
 			}
 			RETURN_LONG(1);
-		} else if (Z_TYPE_PP(value)==IS_LONG) {
-			convert_to_long_ex(value);
+		} else if (TYPE(value)==IS_LONG) {
+			CONVERT_TO_LONG_EX(value);
 			cursor->inputBind(STR_VAL(variable),
 						LVAL(value));
 			RETURN_LONG(1);
-		} else if (ZEND_NUM_ARGS()==5 && Z_TYPE_PP(value)==IS_DOUBLE) {
-			convert_to_double_ex(value);
+		} else if (ZEND_NUM_ARGS()==5 && TYPE(value)==IS_DOUBLE) {
+			CONVERT_TO_DOUBLE_EX(value);
 			cursor->inputBind(
 				STR_VAL(variable),
 				DVAL(value),
 				(unsigned short)LVAL(precision),
 				(unsigned short)LVAL(scale));
 			RETURN_LONG(1);
-		} else if (Z_TYPE_PP(value)==IS_NULL) {
+		} else if (TYPE(value)==IS_NULL) {
 			cursor->inputBind(
 				STR_VAL(variable),
 				(const char *)NULL);
@@ -1003,9 +1015,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbindblob) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
-	convert_to_string_ex(value);
-	convert_to_long_ex(size);
+	CONVERT_TO_STRING_EX(variable);
+	CONVERT_TO_STRING_EX(value);
+	CONVERT_TO_LONG_EX(size);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1027,9 +1039,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbindclob) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
-	convert_to_string_ex(value);
-	convert_to_long_ex(size);
+	CONVERT_TO_STRING_EX(variable);
+	CONVERT_TO_STRING_EX(value);
+	CONVERT_TO_LONG_EX(size);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1050,8 +1062,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_defineoutputbindstring) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
-	convert_to_long_ex(length);
+	CONVERT_TO_STRING_EX(variable);
+	CONVERT_TO_LONG_EX(length);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1068,7 +1080,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_defineoutputbindinteger) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1083,7 +1095,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_defineoutputbinddouble) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1099,7 +1111,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_defineoutputbindblob) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1115,7 +1127,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_defineoutputbindclob) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1131,7 +1143,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_defineoutputbindcursor) {
 					== FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1159,12 +1171,12 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_substitutions) {
 				&precisions,&scales)== FAILURE) {
 			WRONG_PARAM_COUNT;
 		} else {
-			convert_to_array_ex(precisions);
-			convert_to_array_ex(scales);
+			CONVERT_TO_ARRAY_EX(precisions);
+			CONVERT_TO_ARRAY_EX(scales);
 		}
 	}
-	convert_to_array_ex(variables);
-	convert_to_array_ex(values);
+	CONVERT_TO_ARRAY_EX(variables);
+	CONVERT_TO_ARRAY_EX(values);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	long	success=1;
@@ -1172,28 +1184,24 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_substitutions) {
 		for (i=0; i<ARRVAL(variables)->nNumOfElements; i++) {
 			HASH_INDEX_FIND(ARRVAL(variables),i,var);
 			HASH_INDEX_FIND(ARRVAL(values),i,val);
-			if (Z_TYPE_PP(val)==IS_STRING) {
-				convert_to_string_ex(val);
-				cursor->substitution(STR_VAL(var),
-							STR_VAL(val));
-			} else if (Z_TYPE_PP(val)==IS_LONG) {
-				convert_to_long_ex(val);
-				cursor->substitution(STR_VAL(var),
-							LVAL(val));
-			} else if (ZEND_NUM_ARGS()==5 && Z_TYPE_PP(val)==IS_DOUBLE) {
+			if (TYPE(val)==IS_STRING) {
+				CONVERT_TO_STRING_EX(val);
+				cursor->substitution(STR_VAL(var),STR_VAL(val));
+			} else if (TYPE(val)==IS_LONG) {
+				CONVERT_TO_LONG_EX(val);
+				cursor->substitution(STR_VAL(var),LVAL(val));
+			} else if (ZEND_NUM_ARGS()==5 && TYPE(val)==IS_DOUBLE) {
 				HASH_INDEX_FIND(ARRVAL(precisions),i,precision);
 				HASH_INDEX_FIND(ARRVAL(scales),i,scale);
-				convert_to_double_ex(val);
-				convert_to_long_ex(precision);
-				convert_to_long_ex(scale);
+				CONVERT_TO_DOUBLE_EX(val);
+				CONVERT_TO_LONG_EX(precision);
+				CONVERT_TO_LONG_EX(scale);
 				cursor->substitution(
 					STR_VAL(var),
 					DVAL(val),
-					(unsigned short)
-						LVAL(precision),
-					(unsigned short)
-						LVAL(scale));
-			} else if (Z_TYPE_PP(val)==IS_NULL) {
+					(unsigned short)LVAL(precision),
+					(unsigned short)LVAL(scale));
+			} else if (TYPE(val)==IS_NULL) {
 				cursor->substitution(STR_VAL(var),
 							(const char *)NULL);
 			} else {
@@ -1224,12 +1232,12 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbinds) {
 				&precisions,&scales)== FAILURE) {
 			WRONG_PARAM_COUNT;
 		} else {
-			convert_to_array_ex(precisions);
-			convert_to_array_ex(scales);
+			CONVERT_TO_ARRAY_EX(precisions);
+			CONVERT_TO_ARRAY_EX(scales);
 		}
 	}
-	convert_to_array_ex(variables);
-	convert_to_array_ex(values);
+	CONVERT_TO_ARRAY_EX(variables);
+	CONVERT_TO_ARRAY_EX(values);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	long	success=1;
@@ -1237,28 +1245,24 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbinds) {
 		for (i=0; i<zend_hash_num_elements(ARRVAL(variables)); i++) {
 			HASH_INDEX_FIND(ARRVAL(variables),i,var);
 			HASH_INDEX_FIND(ARRVAL(values),i,val);
-			if (Z_TYPE_PP(val)==IS_STRING) {
-				convert_to_string_ex(val);
-				cursor->inputBind(STR_VAL(var),
-							STR_VAL(val));
-			} else if (Z_TYPE_PP(val)==IS_LONG) {
-				convert_to_long_ex(val);
-				cursor->inputBind(STR_VAL(var),
-							LVAL(val));
-			} else if (ZEND_NUM_ARGS()==5 && Z_TYPE_PP(val)==IS_DOUBLE) {
+			if (TYPE(val)==IS_STRING) {
+				CONVERT_TO_STRING_EX(val);
+				cursor->inputBind(STR_VAL(var),STR_VAL(val));
+			} else if (TYPE(val)==IS_LONG) {
+				CONVERT_TO_LONG_EX(val);
+				cursor->inputBind(STR_VAL(var),LVAL(val));
+			} else if (ZEND_NUM_ARGS()==5 && TYPE(val)==IS_DOUBLE) {
 				HASH_INDEX_FIND(ARRVAL(precisions),i,precision);
 				HASH_INDEX_FIND(ARRVAL(scales),i,scale);
-				convert_to_long_ex(precision);
-				convert_to_long_ex(scale);
-				convert_to_double_ex(val);
+				CONVERT_TO_LONG_EX(precision);
+				CONVERT_TO_LONG_EX(scale);
+				CONVERT_TO_DOUBLE_EX(val);
 				cursor->inputBind(
 					STR_VAL(var),
 					DVAL(val),
-					(unsigned short)
-						LVAL(precision),
-					(unsigned short)
-						LVAL(scale));
-			} else if (Z_TYPE_PP(val)==IS_NULL) {
+					(unsigned short)LVAL(precision),
+					(unsigned short)LVAL(scale));
+			} else if (TYPE(val)==IS_NULL) {
 				cursor->inputBind(STR_VAL(var),
 							(const char *)NULL);
 			} else {
@@ -1290,7 +1294,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_validbind) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1341,7 +1345,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindstring) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1363,7 +1367,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindblob) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1385,7 +1389,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindclob) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1406,7 +1410,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindinteger) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1424,7 +1428,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbinddouble) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1442,7 +1446,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindlength) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1459,7 +1463,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindcursor) {
 		zend_get_parameters_ex(2,&sqlrcur,&variable) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(variable);
+	CONVERT_TO_STRING_EX(variable);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (!cursor) {
@@ -1479,7 +1483,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_opencachedresultset) {
 		zend_get_parameters_ex(2,&sqlrcur,&filename) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(filename);
+	CONVERT_TO_STRING_EX(filename);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1657,16 +1661,16 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getField(LVAL(row),LVAL(col));
 			rl=cursor->getFieldLength(LVAL(row),LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getField(LVAL(row),
 						STR_VAL(col));
 			rl=cursor->getFieldLength(LVAL(row),
@@ -1688,16 +1692,16 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldasinteger) {
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getFieldAsInteger(LVAL(row),
 							LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getFieldAsInteger(LVAL(row),
 							STR_VAL(col));
 		}
@@ -1715,16 +1719,16 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldasdouble) {
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getFieldAsDouble(LVAL(row),
 							LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getFieldAsDouble(LVAL(row),
 							STR_VAL(col));
 		}
@@ -1742,16 +1746,16 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldlength) {
 		zend_get_parameters_ex(3,&sqlrcur,&row,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getFieldLength(LVAL(row),
 							LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getFieldLength(LVAL(row),
 							STR_VAL(col));
 		}
@@ -1770,7 +1774,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (!cursor) {
@@ -1807,7 +1811,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 		WRONG_PARAM_COUNT;
 	}
 
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
@@ -1848,7 +1852,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengths) {
 		zend_get_parameters_ex(2,&sqlrcur,&row) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (!cursor) {
@@ -1877,7 +1881,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengthsassoc) {
 		WRONG_PARAM_COUNT;
 	}
 
-	convert_to_long_ex(row);
+	CONVERT_TO_LONG_EX(row);
 
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
@@ -1935,7 +1939,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnname) {
 		zend_get_parameters_ex(2,&sqlrcur,&col) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(col);
+	CONVERT_TO_LONG_EX(col);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -1958,11 +1962,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumntype) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnType(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnType(STR_VAL(col));
 		}
 		if (r) {
@@ -1983,11 +1987,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnlength) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnLength(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnLength(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2006,11 +2010,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnprecision) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnPrecision(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnPrecision(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2029,11 +2033,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnscale) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnScale(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnScale(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2052,11 +2056,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisnullable) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsNullable(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsNullable(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2075,11 +2079,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisprimarykey) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsPrimaryKey(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsPrimaryKey(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2098,11 +2102,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunique) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsUnique(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsUnique(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2121,11 +2125,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnispartofkey) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsPartOfKey(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsPartOfKey(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2144,11 +2148,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisunsigned) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsUnsigned(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsUnsigned(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2167,11 +2171,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumniszerofilled) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsZeroFilled(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsZeroFilled(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2190,11 +2194,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisbinary) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsBinary(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsBinary(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2213,11 +2217,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnisautoincrement) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getColumnIsAutoIncrement(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getColumnIsAutoIncrement(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2236,11 +2240,11 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getlongest) {
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
-		if (Z_TYPE_PP(col)==IS_LONG) {
-			convert_to_long_ex(col);
+		if (TYPE(col)==IS_LONG) {
+			CONVERT_TO_LONG_EX(col);
 			r=cursor->getLongest(LVAL(col));
-		} else if (Z_TYPE_PP(col)==IS_STRING) {
-			convert_to_string_ex(col);
+		} else if (TYPE(col)==IS_STRING) {
+			CONVERT_TO_STRING_EX(col);
 			r=cursor->getLongest(STR_VAL(col));
 		}
 		RETURN_LONG(r);
@@ -2285,7 +2289,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_resumeresultset) {
 		zend_get_parameters_ex(2,&sqlrcur,&id) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(id);
+	CONVERT_TO_LONG_EX(id);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -2304,8 +2308,8 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_resumecachedresultset) {
 		zend_get_parameters_ex(3,&sqlrcur,&id,&filename) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_long_ex(id);
-	convert_to_string_ex(filename);
+	CONVERT_TO_LONG_EX(id);
+	CONVERT_TO_STRING_EX(filename);
 	sqlrcursor *cursor=NULL;
 	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
 	if (cursor) {
@@ -2353,7 +2357,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_selectdatabase) {
 		zend_get_parameters_ex(2,&sqlrcon,&database) == FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
-	convert_to_string_ex(database);
+	CONVERT_TO_STRING_EX(database);
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
