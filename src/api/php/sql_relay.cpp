@@ -60,6 +60,12 @@ extern "C" {
 
 #include <config.h>
 
+#if PHP_MAJOR_VERSION >= 7
+	#define zend_rsrc_list_entry zend_resource
+	#define ZEND_REGISTER_RESOURCE(a,b,c) a=zend_register_resource(b,c)
+	#define ZEND_FETCH_RESOURCE(a,b,c,d,e,f) a=(b)zend_fetch_resource(c,e,f)
+#endif
+
 extern "C" {
 
 #ifdef _WIN32
