@@ -25,7 +25,15 @@ endif
 all:
 
 install:
-	if ( test -d "/etc/init.d" ); \
+	if ( test -d "/lib/systemd/system" ); \
+	then \
+		$(CP) sqlrelay.service $(initroot)/lib/systemd/system; \
+		$(CP) sqlrcachemanager.service $(initroot)/lib/systemd/system; \
+	elif ( test -d "/usr/lib/systemd/system" ); \
+	then \
+		$(CP) sqlrelay.service $(initroot)/usr/lib/systemd/system; \
+		$(CP) sqlrcachemanager.service $(initroot)/usr/lib/systemd/system; \
+	elif ( test -d "/etc/init.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/init.d; \
 		$(CP) rc.sqlrelay $(initroot)/etc/init.d/sqlrelay; \
@@ -74,7 +82,26 @@ install:
 		$(CHMOD) 644 $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
 	fi
 ifeq ($(initroot),)
-	if ( test -x "/sbin/chkconfig" ); \
+	if ( test -x "/bin/systemctl" ); \
+	then \
+		echo "here"; \
+		/bin/systemctl enable sqlrelay.service; \
+		echo "now here"; \
+		/bin/systemctl enable sqlrcachemanager.service; \
+		echo "and now here"; \
+	elif ( test -x "/usr/bin/systemctl" ); \
+	then \
+		/usr/bin/systemctl enable sqlrelay.service; \
+		/usr/bin/systemctl enable sqlrcachemanager.service; \
+	elif ( test -x "/sbin/systemctl" ); \
+	then \
+		/sbin/systemctl enable sqlrelay.service; \
+		/sbin/systemctl enable sqlrcachemanager.service; \
+	elif ( test -x "/usr/sbin/systemctl" ); \
+	then \
+		/usr/sbin/systemctl enable sqlrelay.service; \
+		/usr/sbin/systemctl enable sqlrcachemanager.service; \
+	elif ( test -x "/sbin/chkconfig" ); \
 	then \
 		/sbin/chkconfig --add sqlrelay; \
 		/sbin/chkconfig --add sqlrcachemanager; \
@@ -134,17 +161,62 @@ ifeq ($(initroot),)
 endif
 
 uninstall:
-	if ( test -x "/sbin/chkconfig" -a -n \
+	if ( test -x "/bin/systemctl" -a -n \
+		"`/bin/systemctl --state=LOAD --full list-unit-files sqlrelay.service 2> /dev/null | grep sqlrelay\.service`" ); \
+	then \
+		/bin/systemctl stop sqlrelay.service; \
+		/bin/systemctl disable sqlrelay.service; \
+	elif ( test -x "/usr/bin/systemctl" -a -n \
+		"`/usr/bin/systemctl --state=LOAD --full list-unit-files sqlrelay.service 2> /dev/null | grep sqlrelay\.service`" ); \
+	then \
+		/usr/bin/systemctl stop sqlrelay.service; \
+		/usr/bin/systemctl disable sqlrelay.service; \
+	elif ( test -x "/sbin/systemctl" -a -n \
+		"`/sbin/systemctl --state=LOAD --full list-unit-files sqlrelay.service 2> /dev/null | grep sqlrelay\.service`" ); \
+	then \
+		/sbin/systemctl stop sqlrelay.service; \
+		/sbin/systemctl disable sqlrelay.service; \
+	elif ( test -x "/usr/sbin/systemctl" -a -n \
+		"`/usr/sbin/systemctl --state=LOAD --full list-unit-files sqlrelay.service 2> /dev/null | grep sqlrelay\.service`" ); \
+	then \
+		/usr/sbin/systemctl stop sqlrelay.service; \
+		/usr/sbin/systemctl disable sqlrelay.service; \
+	elif ( test -x "/sbin/chkconfig" -a -n \
 		"`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); \
 	then \
 		/sbin/chkconfig --del sqlrelay; \
 	fi
-	if ( test -x "/sbin/chkconfig" -a -n \
+	if ( test -x "/bin/systemctl" -a -n \
+		"`/bin/systemctl --state=LOAD --full list-unit-files sqlrcachemanager.service 2> /dev/null | grep sqlrcachemanager\.service 2> /dev/null`" ); \
+	then \
+		/bin/systemctl stop sqlrcachemanager.service; \
+		/bin/systemctl disable sqlrcachemanager.service; \
+	elif ( test -x "/usr/bin/systemctl" -a -n \
+		"`/usr/bin/systemctl --state=LOAD --full list-unit-files sqlrcachemanager.service 2> /dev/null | grep sqlrcachemanager\.service` 2> /dev/null" ); \
+	then \
+		/usr/bin/systemctl stop sqlrcachemanager.service; \
+		/usr/bin/systemctl disable sqlrcachemanager.service; \
+	elif ( test -x "/sbin/systemctl" -a -n \
+		"`/sbin/systemctl --state=LOAD --full list-unit-files sqlrcachemanager.service 2> /dev/null | grep sqlrcachemanager\.service 2> /dev/null`" ); \
+	then \
+		/sbin/systemctl stop sqlrcachemanager.service; \
+		/sbin/systemctl disable sqlrcachemanager.service; \
+	elif ( test -x "/usr/sbin/systemctl" -a -n \
+		"`/usr/sbin/systemctl --state=LOAD --full list-unit-files sqlrcachemanager.service 2> /dev/null | grep sqlrcachemanager\.service` 2> /dev/null" ); \
+	then \
+		/usr/sbin/systemctl stop sqlrcachemanager.service; \
+		/usr/sbin/systemctl disable sqlrcachemanager.service; \
+	elif ( test -x "/sbin/chkconfig" -a -n \
 		"`/sbin/chkconfig --list sqlrcachemanager 2> /dev/null`"); \
 	then \
 		/sbin/chkconfig --del sqlrcachemanager; \
 	fi
-	$(RM) $(initroot)/etc/rc.d/init.d/sqlrelay \
+	$(RM) \
+		$(initroot)/lib/systemd/system/sqlrelay.service \
+		$(initroot)/lib/systemd/system/sqlrcachemanager.service \
+		$(initroot)/usr/lib/systemd/system/sqlrelay.service \
+		$(initroot)/usr/lib/systemd/system/sqlrcachemanager.service \
+		$(initroot)/etc/rc.d/init.d/sqlrelay \
 		$(initroot)/etc/rc.d/init.d/sqlrcachemanager \
 		$(initroot)/etc/rc.d/rc.sqlrelay \
 		$(initroot)/etc/rc.d/rc.sqlrcachemanager \
