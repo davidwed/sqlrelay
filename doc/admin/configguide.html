@@ -744,13 +744,35 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 
 <p>...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
 
-<p>When installed on most platforms, SQL Relay creates an init script in the appropriate place under /etc.  This init script calls sqlr-start with no -id option.  If configured to run at boot, it will start all instances for which enabled="yes" is configured.</p>
+<p>When installed on most platforms, SQL Relay creates a systemd service file (usually in /usr/lib/systemd/system or /lib/systemd/system) or an init script in the appropriate place under /etc.  These call sqlr-start with no -id option.  If configured to run at boot, they will start all instances for which enabled="yes" is configured.</p>
 
-<p>How to enable the init script depends on what platform you are using.</p>
+<p>How to enable the service file or init script depends on what platform you are using.</p>
 
-<p>On Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.</p>
+<p>On systemd-enabled Linux, this usually involves running:</p>
 
-<p>Redhat-derived Linux distributions have a chkconfig command that can do this for you.  Debian-derived Linux distributions provide the update-rc.d command.  Older versions of Solaris provide svcadm.  Newer versions of Solaris provide smf.</p>
+<blockquote>
+systemctl enable sqlrelay.service
+</blockquote>
+
+<p>On non-systemd-enabled Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.  This can be done manually, but most platforms provide utilities to do it for you.</p>
+
+<p>Redhat-derived Linux distributions have a chkconfig command that can do this for you:</p>
+
+<blockquote>
+chkconfig --add sqlrelay
+</blockquote>
+
+<p>Debian-derived Linux distributions provide the update-rc.d command:</p>
+
+<blockquote>
+update-rc.d sqlrelay defaults
+</blockquote>
+
+<p>Solaris provides svcadm:</p>
+
+<blockquote>
+svcadm enable sqlrelay
+</blockquote>
 
 <p>On FreeBSD you must add a line to /etc/rc.conf like:</p>
 
