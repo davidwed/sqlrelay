@@ -38,6 +38,29 @@ extern "C" {
 #include <pdo/php_pdo_driver.h>
 #include <zend_exceptions.h>
 
+#if PHP_MAJOR_VERSION >= 7
+
+	#define PHP_STREAM_COPY_TO_MEM(a,b,c,d) php_stream_copy_to_mem(a,b,c)
+
+	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b)
+
+	#define RET_STRING(a,b) \
+		RETURN_STR(zend_string_init(a,charstring::length(a),0))
+
+	#define ADD_ASSOC_STRING(a,b,c,d) \
+		add_assoc_string(a,b,zend_string_init(c,d,0)->val)
+#else
+
+	#define PHP_STREAM_COPY_TO_MEM(a,b,c,d) php_stream_copy_to_mem(a,b,c,d)
+
+	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b,c)
+
+	#define RET_STRING RETURN_STRING
+
+	#define ADD_ASSOC_STRING(a,b,c,d) \
+		add_assoc_string(a,b,c,d)
+#endif
+
 #define sqlrelayError(s) \
 	_sqlrelayError(s,NULL,__FILE__,__LINE__ TSRMLS_CC)
 #define sqlrelayErrorStmt(s) \
@@ -413,7 +436,7 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 				SEPARATE_ZVAL(&param->parameter);
 				Z_TYPE_P(param->parameter)=IS_STRING;
 				Z_STRLEN_P(param->parameter)=
-					php_stream_copy_to_mem(strm,
+					PHP_STREAM_COPY_TO_MEM(strm,
 						&Z_STRVAL_P(param->parameter),
 						PHP_STREAM_COPY_ALL,0);
 				sqlrcur->inputBindBlob(name,
@@ -483,7 +506,7 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 					sqlrcur->getOutputBindInteger(name));
 			return 1;
 		case PDO_PARAM_STR:
-			ZVAL_STRING(param->parameter,
+			MY_ZVAL_STRING(param->parameter,
 				(char *)sqlrcur->getOutputBindString(name),1);
 			return 1;
 		case PDO_PARAM_LOB:
@@ -631,7 +654,7 @@ static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 
 	// native type
 	const char	*type=sqlrcur->getColumnType(colno);
-	add_assoc_string(returnvalue,"native_type",(char *)((type)?type:""),1);
+	ADD_ASSOC_STRING(returnvalue,"native_type",(char *)((type)?type:""),1);
 
 
 	// pdo type
@@ -1006,14 +1029,14 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			// database server version
 			temp=(char *)sqlrcon->serverVersion();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_ATTR_CLIENT_VERSION:
 			// client library version
 			temp=(char *)sqlrcon->clientVersion();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_ATTR_SERVER_INFO:
@@ -1046,37 +1069,37 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 		case PDO_SQLRELAY_ATTR_DB_TYPE:
 			temp=(char *)sqlrcon->identify();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_VERSION:
 			temp=(char *)sqlrcon->dbVersion();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_HOST_NAME:
 			temp=(char *)sqlrcon->dbHostName();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_IP_ADDRESS:
 			temp=(char *)sqlrcon->dbIpAddress();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_BIND_FORMAT:
 			temp=(char *)sqlrcon->bindFormat();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_CURRENT_DB:
 			temp=(char *)sqlrcon->getCurrentDatabase();
 			if (temp) {
-				ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		default:
@@ -1099,7 +1122,7 @@ static PHP_METHOD(PDO_SQLRELAY, getConnectionSocket) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 	const char	*socket=sqlrcon->getConnectionSocket();
-	RETURN_STRING((char *)socket,1);
+	RET_STRING((char *)socket,1);
 }
 
 static PHP_METHOD(PDO_SQLRELAY, suspendSession) {
