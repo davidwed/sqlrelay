@@ -32,7 +32,7 @@ bool sqlrfilter::run(sqlrserverconnection *sqlrcon,
 
 void sqlrfilter::getError(const char **err, int64_t *errn) {
 	const char	*error=parameters->getAttributeValue("error");
-	const char	*errno=parameters->getAttributeValue("errornumber");
+	const char	*errnum=parameters->getAttributeValue("errornumber");
 	if (err) {
 		if (!charstring::isNullOrEmpty(error)) {
 			*err=error;
@@ -41,8 +41,8 @@ void sqlrfilter::getError(const char **err, int64_t *errn) {
 		}
 	}
 	if (errn) {
-		if (!charstring::isNullOrEmpty(errno)) {
-			*errn=charstring::toInteger(errno);
+		if (!charstring::isNullOrEmpty(errnum)) {
+			*errn=charstring::toInteger(errnum);
 		} else {
 			*errn=0;
 		}
