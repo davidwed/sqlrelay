@@ -602,15 +602,15 @@ APIINSTALLSUBDIRS=""
 APIUNINSTALLSUBDIRS=""
 if disablecpp=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-cpp all-c"
-	APICLEANSUBDIRS=" clean-cpp clean-c"
-	APIINSTALLSUBDIRS=" install-cpp install-c"
-	APIUNINSTALLSUBDIRS=" uninstall-cpp uninstall-c"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-cpp clean-c"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-cpp install-c"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+" uninstall-cpp uninstall-c"
 end if
 if disableodbcdriver=false then
 	APIALLSUBDIRS=APIALLSUBDIRS+" all-odbc"
-	APICLEANSUBDIRS=" clean-odbc"
-	APIINSTALLSUBDIRS=" install-odbc"
-	APIUNINSTALLSUBDIRS=" uninstall-odbc"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-odbc"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-odbc"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+" uninstall-odbc"
 end if
 
 
