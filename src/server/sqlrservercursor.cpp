@@ -159,6 +159,7 @@ void sqlrservercursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				int32_t microsecond, const char *tz) {
+
 	const char	*format=
 			conn->cont->cfg->getFakeInputBindVariablesDateFormat();
 	if (!charstring::isNullOrEmpty(format)) {
@@ -170,11 +171,12 @@ void sqlrservercursor::dateToString(char *buffer, uint16_t buffersize,
 							microsecond);
 		charstring::safeCopy(buffer,buffersize,newdate);
 		delete[] newdate;
-	} else {
-		charstring::printf(buffer,buffersize,
+		return;
+	}
+
+	charstring::printf(buffer,buffersize,
 				"%04d-%02d-%02d %02d:%02d:%02d",
 				year,month,day,hour,minute,second);
-	}
 }
 
 bool sqlrservercursor::inputBind(const char *variable,

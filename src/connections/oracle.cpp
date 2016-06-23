@@ -2316,6 +2316,21 @@ void oraclecursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				int32_t microsecond, const char *tz) {
+
+	const char	*format=
+			conn->cont->cfg->getFakeInputBindVariablesDateFormat();
+	if (!charstring::isNullOrEmpty(format)) {
+		// FIXME: it'd be nice if we could pass buffer/buffersize
+		// into convertDateTime
+		char	*newdate=conn->cont->convertDateTime(format,
+							year,month,day,
+							hour,minute,second,
+							microsecond);
+		charstring::safeCopy(buffer,buffersize,newdate);
+		delete[] newdate;
+		return;
+	}
+
 	// typically oracle just wants DD-MON-YYYY but if hour,
 	// minute and second are non-zero then use them too
 	if (hour && minute && second) {
