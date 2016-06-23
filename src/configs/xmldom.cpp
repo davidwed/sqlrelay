@@ -94,6 +94,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		uint32_t	getListenerTimeout();
 		bool		getReLoginAtStart();
 		bool		getFakeInputBindVariables();
+		const char	*getFakeInputBindVariablesDateFormat();
 		bool		getTranslateBindVariables();
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
@@ -201,6 +202,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		uint32_t	listenertimeout;
 		bool		reloginatstart;
 		bool		fakeinputbindvariables;
+		const char	*fakeinputbindvariablesdateformat;
 		bool		translatebindvariables;
 		const char	*isolationlevel;
 		bool		ignoreselectdb;
@@ -324,6 +326,7 @@ void sqlrconfig_xmldom::init() {
 	reloginatstart=!charstring::compare(DEFAULT_RELOGINATSTART,"yes");
 	fakeinputbindvariables=!charstring::compare(
 					DEFAULT_FAKEINPUTBINDVARIABLES,"yes");
+	fakeinputbindvariablesdateformat=NULL;
 	translatebindvariables=!charstring::compare(
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	isolationlevel=NULL;
@@ -607,6 +610,10 @@ bool sqlrconfig_xmldom::getReLoginAtStart() {
 
 bool sqlrconfig_xmldom::getFakeInputBindVariables() {
 	return fakeinputbindvariables;
+}
+
+const char *sqlrconfig_xmldom::getFakeInputBindVariablesDateFormat() {
+	return fakeinputbindvariablesdateformat;
 }
 
 bool sqlrconfig_xmldom::getTranslateBindVariables() {
@@ -1537,6 +1544,10 @@ void sqlrconfig_xmldom::getTreeValues() {
 	if (!attr->isNullNode()) {
 		fakeinputbindvariables=!charstring::compare(
 						attr->getValue(),"yes");
+	}
+	attr=instance->getAttribute("fakeinputbindvariablesdateformat");
+	if (!attr->isNullNode()) {
+		fakeinputbindvariablesdateformat=attr->getValue();
 	}
 	attr=instance->getAttribute("translatebindvariables");
 	if (!attr->isNullNode()) {

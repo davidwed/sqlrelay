@@ -201,6 +201,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getReLoginAtStart()=0;
 
 		virtual bool		getFakeInputBindVariables()=0;
+		virtual const char	*getFakeInputBindVariablesDateFormat()=0;
 		virtual bool		getTranslateBindVariables()=0;
 
 		virtual const char	*getIsolationLevel()=0;
