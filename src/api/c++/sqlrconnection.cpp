@@ -273,6 +273,9 @@ sqlrconnection::~sqlrconnection() {
 		endSession();
 	}
 
+	// deallocate error
+	delete[] pvt->_error;
+
 	// deallocate id
 	delete[] pvt->_id;
 
