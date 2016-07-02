@@ -517,6 +517,27 @@ WScript.Echo("")
 WScript.Echo("***** ODBC *******************")
 ODBCINCLUDES=""
 ODBCLIBS="user32.lib gdi32.lib odbc32.lib odbccp32.lib"
+
+' VS2015 requires legacy_stdio_definitions.lib or
+' __vsnwprintf_s will be unresolved
+set WshShell=WScript.CreateObject("WScript.Shell")
+set cmd=WshShell.exec("cl")
+stdout=cmd.StdOut.ReadAll()
+stderr=cmd.StdErr.ReadLine()
+parts=split(stderr)
+arch=parts(ubound(parts))
+version=""
+for i=lbound(parts) to ubound(parts)
+	if parts(i)="Version" then
+		version=parts(i+1)
+	end if
+next
+parts=split(version,".")
+version=parts(0)
+if version=19 then
+	ODBCLIBS=ODBCLIBS+" legacy_stdio_definitions.lib"
+end if
+
 if disableodbc=false then
 	ALLODBC="all-odbc"
 	INSTALLODBC="installdll-odbc"
