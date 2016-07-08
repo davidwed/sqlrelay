@@ -125,6 +125,7 @@ extern "C" {
 	#define HASH_INDEX_FIND(a,b,c) zend_hash_index_find(a,b,(void **)&c)
 #endif
 
+// old enough versions of PHP don't support TSRMLS macros
 #ifndef TSRMLS_DC
 	#define TSRMLS_DC
 #endif
