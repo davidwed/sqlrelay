@@ -3966,7 +3966,7 @@ then
 		NODEGYP=""
 		NODEDIR=""
 		NODEMAJORVERSION=""
-		NODECXXFLAGS=""
+		NODEJSCXXFLAGS=""
 		AC_MSG_CHECKING(for node)
 
 		for path in "$NODEJSPATH" "/usr" "/" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
@@ -4008,10 +4008,10 @@ then
 		dnl node >= 6.x requires -std=c++11 and sometimes
 		dnl node-gyp doesn't enable it automatically
 		AC_MSG_CHECKING(for node major version)
-		NODEMAJORVERSION=`$NODE --version 2> /dev/null | tr -d'v' | cut -d'.' -f1`
+		NODEMAJORVERSION=`$NODE --version 2> /dev/null | tr -d 'v' | cut -d'.' -f1`
 		if ( test "$NODEMAJORVERSION" -ge "6" )
 		then
-			NODECXXFLAGS="-std=c++11"
+			NODEJSCXXFLAGS="-std=c++11"
 		fi
 		
 
@@ -4058,7 +4058,7 @@ then
 	AC_SUBST(NODE)
 	AC_SUBST(NODEGYP)
 	AC_SUBST(NODEMODULEDIR)
-	AC_SUBST(NODECXXFLAGS)
+	AC_SUBST(NODEJSCXXFLAGS)
 	AC_SUBST(TOP_BUILDDIR_ABS)
 fi
 ])
