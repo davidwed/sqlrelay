@@ -125,6 +125,13 @@ extern "C" {
 	#define HASH_INDEX_FIND(a,b,c) zend_hash_index_find(a,b,(void **)&c)
 #endif
 
+#ifndef TSRMLS_DC
+	#define TSRMLS_DC
+#endif
+#ifndef TSRMLS_CC
+	#define TSRMLS_CC
+#endif
+
 extern "C" {
 
 #ifdef _WIN32
