@@ -4,6 +4,10 @@
 #ifdef _WIN32
 	#include <rudiments/private/winsock.h>
 	#define DLEXPORT __declspec(dllexport)
+
+	// works around "The C++ Standard Library forbids macroizing keywords.""
+	// with VC2012 and up
+	#define _XKEYCHECK_H
 #else
 	#define DLEXPORT
 #endif
