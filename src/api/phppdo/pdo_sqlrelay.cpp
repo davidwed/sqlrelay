@@ -40,25 +40,79 @@ extern "C" {
 
 #if PHP_MAJOR_VERSION >= 7
 
-	#define PHP_STREAM_COPY_TO_MEM(a,b,c,d) php_stream_copy_to_mem(a,b,c)
+	#define ZVAL zval*
 
-	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b)
+	#define GET_PARAMETERS zend_parse_parameters
+	#define PARAMS(a) a,
+
+	#define PHP_STREAM_COPY_TO_MEM(a,b) php_stream_copy_to_mem(a,PHP_STREAM_COPY_ALL,0)
+	#define PHP_STREAM_TO_ZVAL(a,b) php_stream_to_zval(a,&b)
+
+	#define MY_ZVAL_NULL(a) ZVAL_NULL(&a)
+	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(&a,b)
+	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(&a,b)
+	#define MY_ZVAL_BOOL_P(a,b) ZVAL_BOOL(a,b)
+	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(&a,b)
+	#define MY_ZVAL_STRING_P(a,b,c) ZVAL_STRING(a,b)
 
 	#define RET_STRING(a,b) \
 		RETURN_STR(zend_string_init(a,charstring::length(a),0))
 
 	#define ADD_ASSOC_STRING(a,b,c,d) \
 		add_assoc_string(a,b,zend_string_init(c,d,0)->val)
+
+	#define CONVERT_TO_STRING(a) convert_to_string(&(a))
+	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(&(a))
+	#define CONVERT_TO_LONG(a) convert_to_long(&(a))
+	#define CONVERT_TO_LONG_EX(a) convert_to_long_ex(&(a))
+
+	#define SVAL(a) Z_STRVAL(a)
+	#define SLEN(a) Z_STRLEN(a)
+	#define LVAL(a) Z_LVAL(a)
+	#define TYPE(a) Z_TYPE(a)
+
+	#define ISTRUE(a) (Z_TYPE_P(a)==IS_TRUE)
+
+	#define MAKE_STD_ZVAL(a)
+
+	#define ADD_NEXT_INDEX_STRING(a,b) add_next_index_string(a,b)
+
+	#define zend_object_store_get_object(a) Z_OBJ_P(a)
 #else
 
-	#define PHP_STREAM_COPY_TO_MEM(a,b,c,d) php_stream_copy_to_mem(a,b,c,d)
+	#define ZVAL zval**
 
+	#define GET_PARAMETERS zend_get_parameters_ex
+	#define PARAMS(a)
+
+	#define PHP_STREAM_COPY_TO_MEM(a,b) php_stream_copy_to_mem(a,b,PHP_STREAM_COPY_ALL,0)
+	#define PHP_STREAM_TO_ZVAL(a,b) php_stream_to_zval(a,b)
+
+	#define MY_ZVAL_NULL(a) ZVAL_NULL(a)
+	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(a,b)
+	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(a,b)
+	#define MY_ZVAL_BOOL_P(a,b) ZVAL_BOOL(a,b)
 	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b,c)
+	#define MY_ZVAL_STRING_P(a,b,c) ZVAL_STRING(a,b,c)
 
 	#define RET_STRING RETURN_STRING
 
 	#define ADD_ASSOC_STRING(a,b,c,d) \
 		add_assoc_string(a,b,c,d)
+
+	#define CONVERT_TO_STRING(a) convert_to_string(a)
+	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(a)
+	#define CONVERT_TO_LONG(a) convert_to_long(a)
+	#define CONVERT_TO_LONG_EX(a) convert_to_long_ex(a)
+
+	#define SVAL(a) Z_STRVAL_P(a)
+	#define SLEN(a) Z_STRLEN_P(a)
+	#define LVAL(a) Z_LVAL_P(a)
+	#define TYPE(a) Z_TYPE_P(a)
+
+	#define ISTRUE(a) (Z_BVAL_P(a)==TRUE)
+
+	#define ADD_NEXT_INDEX_STRING(a,b) add_next_index_string(a,b,1)
 #endif
 
 #define sqlrelayError(s) \
@@ -260,10 +314,14 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	const char	*n=sqlrcur->getColumnName(colno);
-	char		*name=estrdup((n)?n:"");
 	const char	*type=sqlrcur->getColumnType(colno);
+#if PHP_MAJOR_VERSION >= 7
+	stmt->columns[colno].name=zend_string_init(n,charstring::length(n),0);
+#else
+	char		*name=estrdup((n)?n:"");
 	stmt->columns[colno].name=name;
 	stmt->columns[colno].namelen=charstring::length(name);
+#endif
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
 		if (isFloatTypeChar(type)) {
@@ -359,30 +417,30 @@ static int sqlrcursorSubstitutionPreExec(sqlrstatement *sqlrstmt,
 			return 1;
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
-			convert_to_long(param->parameter);
-			sqlrcur->substitution(nm,Z_LVAL_P(param->parameter));
+			CONVERT_TO_LONG(param->parameter);
+			sqlrcur->substitution(nm,LVAL(param->parameter));
 			return 1;
 		case PDO_PARAM_STR:
-			convert_to_string(param->parameter);
-			str=new char[Z_STRLEN_P(param->parameter)+3];
+			CONVERT_TO_STRING(param->parameter);
+			str=new char[SLEN(param->parameter)+3];
 			charstring::copy(str,"'");
 			charstring::append(str,
-					Z_STRVAL_P(param->parameter),
-					Z_STRLEN_P(param->parameter));
-			str[Z_STRLEN_P(param->parameter)+1]='\0';
+					SVAL(param->parameter),
+					SLEN(param->parameter));
+			str[SLEN(param->parameter)+1]='\0';
 			charstring::append(str,"'");
 			sqlrstmt->subvarstrings.append(str);
 			sqlrcur->substitution(nm,str);
 			return 1;
 		case PDO_PARAM_LOB:
-			if (Z_TYPE_P(param->parameter)==IS_STRING) {
-				convert_to_string(param->parameter);
-				str=new char[Z_STRLEN_P(param->parameter)+3];
+			if (TYPE(param->parameter)==IS_STRING) {
+				CONVERT_TO_STRING(param->parameter);
+				str=new char[SLEN(param->parameter)+3];
 				charstring::copy(str,"'");
 				charstring::append(str,
-						Z_STRVAL_P(param->parameter),
-						Z_STRLEN_P(param->parameter));
-				str[Z_STRLEN_P(param->parameter)+1]='\0';
+						SVAL(param->parameter),
+						SLEN(param->parameter));
+				str[SLEN(param->parameter)+1]='\0';
 				charstring::append(str,"'");
 				sqlrstmt->subvarstrings.append(str);
 				sqlrcur->substitution(nm,str);
@@ -407,25 +465,25 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
 			// handle NULLs/empty-strings
-			if (Z_TYPE_P(param->parameter)==IS_NULL) {
+			if (TYPE(param->parameter)==IS_NULL) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 				return 1;
 			}
-			convert_to_long(param->parameter);
-			sqlrcur->inputBind(name,Z_LVAL_P(param->parameter));
+			CONVERT_TO_LONG(param->parameter);
+			sqlrcur->inputBind(name,LVAL(param->parameter));
 			return 1;
 		case PDO_PARAM_STR:
-			convert_to_string(param->parameter);
-			sqlrcur->inputBind(name,Z_STRVAL_P(param->parameter),
-						Z_STRLEN_P(param->parameter));
+			CONVERT_TO_STRING(param->parameter);
+			sqlrcur->inputBind(name,SVAL(param->parameter),
+						SLEN(param->parameter));
 			return 1;
 		case PDO_PARAM_LOB:
-			if (Z_TYPE_P(param->parameter)==IS_STRING) {
-				convert_to_string(param->parameter);
+			if (TYPE(param->parameter)==IS_STRING) {
+				CONVERT_TO_STRING(param->parameter);
 				sqlrcur->inputBindBlob(name,
-						Z_STRVAL_P(param->parameter),
-						Z_STRLEN_P(param->parameter));
-			} else if (Z_TYPE_P(param->parameter)==IS_RESOURCE) {
+						SVAL(param->parameter),
+						SLEN(param->parameter));
+			} else if (TYPE(param->parameter)==IS_RESOURCE) {
 				TSRMLS_FETCH();
 				php_stream	*strm=NULL;
 				php_stream_from_zval_no_verify(
@@ -434,14 +492,18 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 					return 0;
 				}
 				SEPARATE_ZVAL(&param->parameter);
+#if PHP_MAJOR_VERSION >= 7
+				Z_TYPE_INFO(param->parameter)=IS_STRING;
+				param->parameter.value.str=
+#else
 				Z_TYPE_P(param->parameter)=IS_STRING;
-				Z_STRLEN_P(param->parameter)=
+				SLEN(param->parameter)=
+#endif
 					PHP_STREAM_COPY_TO_MEM(strm,
-						&Z_STRVAL_P(param->parameter),
-						PHP_STREAM_COPY_ALL,0);
+						&SVAL(param->parameter));
 				sqlrcur->inputBindBlob(name,
-						Z_STRVAL_P(param->parameter),
-						Z_STRLEN_P(param->parameter));
+						SVAL(param->parameter),
+						SLEN(param->parameter));
 			}
 			return 1;
 		case PDO_PARAM_STMT:
@@ -495,14 +557,14 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
-			ZVAL_NULL(param->parameter);
+			MY_ZVAL_NULL(param->parameter);
 			return 1;
 		case PDO_PARAM_INT:
-			ZVAL_LONG(param->parameter,
+			MY_ZVAL_LONG(param->parameter,
 					sqlrcur->getOutputBindInteger(name));
 			return 1;
 		case PDO_PARAM_BOOL:
-			ZVAL_BOOL(param->parameter,
+			MY_ZVAL_BOOL(param->parameter,
 					sqlrcur->getOutputBindInteger(name));
 			return 1;
 		case PDO_PARAM_STR:
@@ -512,11 +574,11 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 		case PDO_PARAM_LOB:
 			{
 			php_stream	*strm=NULL;
-			if (Z_TYPE_P(param->parameter)==IS_STRING) {
+			if (TYPE(param->parameter)==IS_STRING) {
 				TSRMLS_FETCH();
 				strm=php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
-			} else if (Z_TYPE_P(param->parameter)==IS_RESOURCE) {
+			} else if (TYPE(param->parameter)==IS_RESOURCE) {
 				TSRMLS_FETCH();
 				php_stream_from_zval_no_verify(
 						strm,&param->parameter);
@@ -529,8 +591,8 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 				sqlrcur->getOutputBindBlob(name),
 				sqlrcur->getOutputBindLength(name));
 			php_stream_seek(strm,0,SEEK_SET);
-			if (Z_TYPE_P(param->parameter)==IS_STRING) {
-				php_stream_to_zval(strm,param->parameter);
+			if (TYPE(param->parameter)==IS_STRING) {
+				PHP_STREAM_TO_ZVAL(strm,param->parameter);
 			}
 			}
 			return 1;
@@ -551,7 +613,14 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 
 	stringbuffer	paramname;
 	paramname.append((uint64_t)param->paramno+1);
-	const char	*name=(param->name)?param->name:paramname.getString();
+#if PHP_MAJOR_VERSION >= 7
+	// FIXME: will this work, or will val always exist?
+	const char	*name=(param->name->val)?
+				param->name->val:paramname.getString();
+#else
+	const char	*name=(param->name)?
+				param->name:paramname.getString();
+#endif
 
 	// Chop any :, @ or $'s off of the front of the name.  We have to
 	// iterate because PDO itself prepends a : if the name doesn't already
@@ -609,7 +678,7 @@ static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 			return 1;
 		case PDO_SQLRELAY_ATTR_DONT_GET_COLUMN_INFO:
 			convert_to_boolean(val);
-			if (Z_BVAL_P(val)==TRUE) {
+			if (ISTRUE(val)) {
 				sqlrcur->dontGetColumnInfo();
 			} else {
 				sqlrcur->getColumnInfo();
@@ -617,7 +686,7 @@ static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 			return 1;
 		case PDO_SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS:
 			convert_to_boolean(val);
-			if (Z_BVAL_P(val)==TRUE) {
+			if (ISTRUE(val)) {
 				sqlrcur->getNullsAsEmptyStrings();
 			} else {
 				sqlrcur->getNullsAsNulls();
@@ -678,28 +747,28 @@ static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 	MAKE_STD_ZVAL(flags);
 	array_init(flags);
 	if (sqlrcur->getColumnIsNullable(colno)) {
-		add_next_index_string(flags,"nullable",1);
+		ADD_NEXT_INDEX_STRING(flags,"nullable");
 	}
 	if (sqlrcur->getColumnIsPrimaryKey(colno)) {
-		add_next_index_string(flags,"primary_key",1);
+		ADD_NEXT_INDEX_STRING(flags,"primary_key");
 	}
 	if (sqlrcur->getColumnIsUnique(colno)) {
-		add_next_index_string(flags,"unique",1);
+		ADD_NEXT_INDEX_STRING(flags,"unique");
 	}
 	if (sqlrcur->getColumnIsPartOfKey(colno)) {
-		add_next_index_string(flags,"part_of_key",1);
+		ADD_NEXT_INDEX_STRING(flags,"part_of_key");
 	}
 	if (sqlrcur->getColumnIsUnsigned(colno)) {
-		add_next_index_string(flags,"unsigned",1);
+		ADD_NEXT_INDEX_STRING(flags,"unsigned");
 	}
 	if (sqlrcur->getColumnIsZeroFilled(colno)) {
-		add_next_index_string(flags,"zero_filled",1);
+		ADD_NEXT_INDEX_STRING(flags,"zero_filled");
 	}
 	if (sqlrcur->getColumnIsBinary(colno)) {
-		add_next_index_string(flags,"binary",1);
+		ADD_NEXT_INDEX_STRING(flags,"binary");
 	}
 	if (sqlrcur->getColumnIsAutoIncrement(colno)) {
-		add_next_index_string(flags,"auto_increment",1);
+		ADD_NEXT_INDEX_STRING(flags,"auto_increment");
 	}
 	add_assoc_zval(returnvalue,"flags",flags);
 	return 1;
@@ -774,7 +843,12 @@ static void sqlrconnectionRewriteQuery(const char *query,
 }
 
 static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
-					long sqllen, pdo_stmt_t *stmt,
+#if PHP_MAJOR_VERSION >= 7
+					unsigned long sqllen,
+#else
+					long sqllen,
+#endif
+					pdo_stmt_t *stmt,
 					zval *driveroptions TSRMLS_DC) {
 
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
@@ -839,7 +913,12 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 
 static long sqlrconnectionExecute(pdo_dbh_t *dbh,
 					const char *sql,
-					long sqllen TSRMLS_DC) {
+#if PHP_MAJOR_VERSION >= 7
+					unsigned long sqllen TSRMLS_DC
+#else
+					long sqllen TSRMLS_DC
+#endif
+					) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrcursor	sqlrcur((sqlrconnection *)sqlrdbh->sqlrcon);
 	if (sqlrcur.sendQuery(sql,sqllen)) {
@@ -888,9 +967,9 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 		case PDO_ATTR_AUTOCOMMIT:
 			// use to turn on or off auto-commit mode
 			convert_to_boolean(val);
-			if (dbh->auto_commit^Z_BVAL_P(val)) {
-				dbh->auto_commit=Z_BVAL_P(val);
-				if (Z_BVAL_P(val)==TRUE) {
+			if (dbh->auto_commit!=ISTRUE(val)) {
+				dbh->auto_commit=ISTRUE(val);
+				if (ISTRUE(val)) {
 					sqlrcon->autoCommitOn();
 				} else {
 					sqlrcon->autoCommitOff();
@@ -945,7 +1024,7 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
 			convert_to_boolean(val);
-			sqlrdbh->usesubvars=Z_BVAL_P(val);
+			sqlrdbh->usesubvars=ISTRUE(val);
 			return 1;
 		#endif
 		case PDO_SQLRELAY_ATTR_CURRENT_DB:
@@ -961,7 +1040,13 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 }
 
 static char *sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
-				const char *name, unsigned int *len TSRMLS_DC) {
+					const char *name,
+#if PHP_MAJOR_VERSION >= 7
+					unsigned long *len TSRMLS_DC
+#else
+					unsigned int *len TSRMLS_DC
+#endif
+					) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	char	*id=php_pdo_int64_to_str(
 				((sqlrconnection *)sqlrdbh->sqlrcon)->
@@ -987,7 +1072,7 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 		// with both.
 		char	*msg=(char *)sqlrcur->errorMessage();
 		if (msg) {
-			add_next_index_string(info,msg,1);
+			ADD_NEXT_INDEX_STRING(info,msg);
 		}
 	} else if (dbh) {
 		sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
@@ -998,7 +1083,7 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 		// with both.
 		char	*msg=(char *)sqlrcon->errorMessage();
 		if (msg) {
-			add_next_index_string(info,msg,1);
+			ADD_NEXT_INDEX_STRING(info,msg);
 		}
 	}
 	return 1;
@@ -1016,7 +1101,7 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 	switch (attr) {
 		case PDO_ATTR_AUTOCOMMIT:
 			// use to turn on or off auto-commit mode
-			ZVAL_BOOL(retval,dbh->auto_commit);
+			MY_ZVAL_BOOL_P(retval,dbh->auto_commit);
 			return 1;
 		case PDO_ATTR_PREFETCH:
 			// configure the prefetch size for drivers
@@ -1029,14 +1114,14 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			// database server version
 			temp=(char *)sqlrcon->serverVersion();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		case PDO_ATTR_CLIENT_VERSION:
 			// client library version
 			temp=(char *)sqlrcon->clientVersion();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		case PDO_ATTR_SERVER_INFO:
@@ -1063,43 +1148,43 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 		#ifdef HAVE_PHP_PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
-			ZVAL_BOOL(retval,sqlrdbh->usesubvars);
+			MY_ZVAL_BOOL_P(retval,sqlrdbh->usesubvars);
 			return 1;
 		#endif
 		case PDO_SQLRELAY_ATTR_DB_TYPE:
 			temp=(char *)sqlrcon->identify();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_VERSION:
 			temp=(char *)sqlrcon->dbVersion();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_HOST_NAME:
 			temp=(char *)sqlrcon->dbHostName();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_IP_ADDRESS:
 			temp=(char *)sqlrcon->dbIpAddress();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_BIND_FORMAT:
 			temp=(char *)sqlrcon->bindFormat();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_CURRENT_DB:
 			temp=(char *)sqlrcon->getCurrentDatabase();
 			if (temp) {
-				MY_ZVAL_STRING(retval,temp,1);
+				MY_ZVAL_STRING_P(retval,temp,1);
 			}
 			return 1;
 		default:
@@ -1139,10 +1224,13 @@ static PHP_METHOD(PDO_SQLRELAY, suspendSession) {
 
 static PHP_METHOD(PDO_SQLRELAY, resumeSession) {
 
-	zval	**port;
-	zval	**socket;
+	ZVAL	port;
+	ZVAL	socket;
 	if (ZEND_NUM_ARGS()!=2 ||
-		zend_get_parameters_ex(2,&port,&socket)==FAILURE) {
+		GET_PARAMETERS(ZEND_NUM_ARGS() TSRMLS_CC,
+				PARAMS("zz")
+				&port,
+				&socket)==FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
 
@@ -1153,8 +1241,14 @@ static PHP_METHOD(PDO_SQLRELAY, resumeSession) {
 		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
-	if (sqlrcon->resumeSession((*port)->value.lval,
-					(*socket)->value.str.val)) {
+	if (sqlrcon->resumeSession(
+				#if PHP_MAJOR_VERSION >= 7
+					Z_LVAL_P(port),Z_STRVAL_P(socket)
+				#else
+					(*port)->value.lval,
+					(*socket)->value.str.val
+				#endif
+				)) {
 		RETURN_TRUE;
 	}
 	sqlrelayError(dbh);
@@ -1203,8 +1297,11 @@ static PHP_METHOD(PDO_SQLRELAY, suspendResultSet) {
 
 static PHP_METHOD(PDO_SQLRELAY, resumeResultSet) {
 
-	zval	**id;
-	if (ZEND_NUM_ARGS()!=1 || zend_get_parameters_ex(1,&id)==FAILURE) {
+	ZVAL	id;
+	if (ZEND_NUM_ARGS()!=1 ||
+		GET_PARAMETERS(ZEND_NUM_ARGS() TSRMLS_CC,
+				PARAMS("z")
+				&id)==FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
 
@@ -1214,7 +1311,13 @@ static PHP_METHOD(PDO_SQLRELAY, resumeResultSet) {
 		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
-	if (sqlrcur->resumeResultSet((*id)->value.lval)) {
+	if (sqlrcur->resumeResultSet(
+				#if PHP_MAJOR_VERSION >= 7
+					Z_LVAL_P(id)
+				#else
+					(*id)->value.lval
+				#endif
+				)) {
 		stmt->executed=true;
 		stmt->column_count=sqlrcur->colCount();
 		stmt->columns=(pdo_column_data *)
@@ -1251,7 +1354,8 @@ static
 const
 #endif
 zend_function_entry *sqlrelayGetDriverMethods(pdo_dbh_t *dbh,
-							int kind TSRMLS_DC) {
+						int kind TSRMLS_DC
+						) {
 	switch (kind) {
 		case PDO_DBH_DRIVER_METHOD_KIND_DBH:
 			return sqlrelayConnectionFunctions;
@@ -1352,7 +1456,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	// enable debug
 	if (!charstring::compare(debug,"1")) {
 		sqlrdbh->sqlrcon->debugOn();
-		sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
+		sqlrdbh->sqlrcon->debugPrintFunction(
+				(int (*)(const char *,...))zend_printf);
 	} else if (!charstring::isNullOrEmpty(debug) &&
 				charstring::compare(debug,"0")) {
 		sqlrdbh->sqlrcon->setDebugFile(debug);
