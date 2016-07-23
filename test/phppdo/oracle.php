@@ -438,6 +438,8 @@
 	checkSuccess($dbh->setAttribute(PDO::ATTR_STRINGIFY_FETCHES,FALSE),1);
 	echo("\n");
 
+# various methods that use getThis() don't appear to work with PDO for PHP7
+if (PHP_VERSION_ID < 70000) {
 	echo("SUSPENDED SESSION: \n");
 	$stmt=$dbh->query("select * from testtable order by testnumber");
 	$stmt->suspendResultSet();
@@ -510,6 +512,7 @@
 	checkSuccess($result[3][0],"6");
 	checkSuccess($result[4][0],"7");
 	echo("\n");
+}
 
 	echo("COMMIT AND ROLLBACK: \n");
 	$dbh->exec("drop table testtable1");
@@ -573,6 +576,8 @@
 	$dbh->exec("drop table testtable");
 	$dbh->exec("drop table testtable1");
 
+# output binds don't appear to work with PDO for PHP7
+if (PHP_VERSION_ID < 70000) {
 	echo("OUTPUT BIND BY NAME: \n");
 	$stmt=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; end;");
 	$param1=0;
@@ -628,14 +633,17 @@
 	fclose($stream);
 	unlink("test.blob");
 	echo("\n");
+}
 
+	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
+
+# this throws an execption and doesn't continue on PHP7
+if (PHP_VERSION_ID < 70000) {
 	echo("NON-LAZY CONNECT: \n");
 	$dsn = "sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;debug=0;lazyconnect=0";
 	checkSuccess(new PDO($dsn,$user,$password),0);
 	echo("\n");
-
-
-	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
+}
 
 	echo("INVALID QUERIES: \n");
 	checkSuccess($dbh->query("select 1"),0);

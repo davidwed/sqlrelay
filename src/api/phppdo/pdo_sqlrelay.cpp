@@ -48,18 +48,19 @@ extern "C" {
 	#define PHP_STREAM_COPY_TO_MEM(a,b) php_stream_copy_to_mem(a,PHP_STREAM_COPY_ALL,0)
 	#define PHP_STREAM_TO_ZVAL(a,b) php_stream_to_zval(a,&b)
 
-	#define MY_ZVAL_NULL(a) ZVAL_NULL(&a)
-	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(&a,b)
-	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(&a,b)
+	#define MY_ZVAL_NULL(a) ZVAL_NULL(&(a))
+	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(&(a),b)
+	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(&(a),b)
 	#define MY_ZVAL_BOOL_P(a,b) ZVAL_BOOL(a,b)
-	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(&a,b)
+	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(&(a),b)
 	#define MY_ZVAL_STRING_P(a,b,c) ZVAL_STRING(a,b)
 
 	#define RET_STRING(a,b) \
 		RETURN_STR(zend_string_init(a,charstring::length(a),0))
 
 	#define ADD_ASSOC_STRING(a,b,c,d) \
-		add_assoc_string(a,b,zend_string_init(c,d,0)->val)
+		add_assoc_string(a,b,\
+			zend_string_init(c,charstring::length(c),0)->val)
 
 	#define CONVERT_TO_STRING(a) convert_to_string(&(a))
 	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(&(a))
@@ -75,7 +76,9 @@ extern "C" {
 
 	#define MAKE_STD_ZVAL(a)
 
-	#define ADD_NEXT_INDEX_STRING(a,b) add_next_index_string(a,b)
+	#define ADD_NEXT_INDEX_STRING(a,b) add_next_index_string(&a,b)
+	#define ADD_NEXT_INDEX_STRING_P(a,b) add_next_index_string(a,b)
+	#define ADD_ASSOC_ZVAL(a,b,c) add_assoc_zval(a,b,&c)
 
 	#define zend_object_store_get_object(a) Z_OBJ_P(a)
 #else
@@ -97,8 +100,7 @@ extern "C" {
 
 	#define RET_STRING RETURN_STRING
 
-	#define ADD_ASSOC_STRING(a,b,c,d) \
-		add_assoc_string(a,b,c,d)
+	#define ADD_ASSOC_STRING(a,b,c,d) add_assoc_string(a,b,c,d)
 
 	#define CONVERT_TO_STRING(a) convert_to_string(a)
 	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(a)
@@ -113,6 +115,8 @@ extern "C" {
 	#define ISTRUE(a) (Z_BVAL_P(a)==TRUE)
 
 	#define ADD_NEXT_INDEX_STRING(a,b) add_next_index_string(a,b,1)
+	#define ADD_NEXT_INDEX_STRING_P(a,b) add_next_index_string(a,b,1)
+	#define ADD_ASSOC_ZVAL(a,b,c) add_assoc_zval(a,b,c)
 #endif
 
 #define sqlrelayError(s) \
@@ -614,8 +618,8 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	stringbuffer	paramname;
 	paramname.append((uint64_t)param->paramno+1);
 #if PHP_MAJOR_VERSION >= 7
-	// FIXME: will this work, or will val always exist?
-	const char	*name=(param->name->val)?
+	const char	*name=(param->name &&
+				param->name->len)?
 				param->name->val:paramname.getString();
 #else
 	const char	*name=(param->name)?
@@ -743,9 +747,14 @@ static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 
 
 	// flags
+#if PHP_MAJOR_VERSION >= 7
+	zval	flags;
+	array_init(&flags);
+#else
 	zval	*flags=NULL;
 	MAKE_STD_ZVAL(flags);
 	array_init(flags);
+#endif
 	if (sqlrcur->getColumnIsNullable(colno)) {
 		ADD_NEXT_INDEX_STRING(flags,"nullable");
 	}
@@ -770,7 +779,7 @@ static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 	if (sqlrcur->getColumnIsAutoIncrement(colno)) {
 		ADD_NEXT_INDEX_STRING(flags,"auto_increment");
 	}
-	add_assoc_zval(returnvalue,"flags",flags);
+	ADD_ASSOC_ZVAL(returnvalue,"flags",flags);
 	return 1;
 }
 
@@ -1072,7 +1081,7 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 		// with both.
 		char	*msg=(char *)sqlrcur->errorMessage();
 		if (msg) {
-			ADD_NEXT_INDEX_STRING(info,msg);
+			ADD_NEXT_INDEX_STRING_P(info,msg);
 		}
 	} else if (dbh) {
 		sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
@@ -1083,7 +1092,7 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 		// with both.
 		char	*msg=(char *)sqlrcon->errorMessage();
 		if (msg) {
-			ADD_NEXT_INDEX_STRING(info,msg);
+			ADD_NEXT_INDEX_STRING_P(info,msg);
 		}
 	}
 	return 1;
