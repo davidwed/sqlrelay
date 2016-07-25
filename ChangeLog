@@ -17,6 +17,7 @@
 	legacy_stdio_definitions.lib is now included when building ODBC with
 		VS2015
 	added support for PHP7
+	added -wait option to sqlr-start
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

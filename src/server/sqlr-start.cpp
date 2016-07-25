@@ -3,6 +3,11 @@
 
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/process.h>
+#include <rudiments/inetsocketclient.h>
+#include <rudiments/unixsocketclient.h>
+#include <rudiments/directory.h>
+#include <rudiments/error.h>
+#include <rudiments/snooze.h>
 #include <rudiments/stdio.h>
 #include <config.h>
 #include <defaults.h>
@@ -284,6 +289,50 @@ static bool startScaler(sqlrpaths *sqlrpth,
 	return true;
 }
 
+static bool waitForInstance(sqlrpaths *sqlrpth,
+				sqlrconfig *cfg,
+				const char *thisid) {
+
+	stdoutput.printf("\nWaiting for instance...\n");
+
+	bool	retval=false;
+	for (uint16_t i=0; i<30; i++) {
+
+		// try to connect
+		if (cfg->getListenOnUnix()) {
+			unixsocketclient	s;
+			if (s.connect(cfg->getDefaultSocket(),1,0,0,1)==
+							RESULT_SUCCESS) {
+				retval=true;
+				break;
+			}
+
+		} else if (cfg->getListenOnInet()) {
+			inetsocketclient	s;
+			if (s.connect("localhost",
+					cfg->getDefaultPort(),1,0,0,1)==
+							RESULT_SUCCESS) {
+				retval=true;
+				break;
+			}
+		}
+
+		// FIXME: Ideally, rather than waiting 30 seconds, we'd check
+		// to see if the sqlr-connections are still running and bail if
+		// they aren't.
+
+		// wait a second and try again
+		snooze::macrosnooze(1);
+	}
+
+	if (retval) {
+		stdoutput.printf("Instance is ready.\n");
+	} else {
+		stdoutput.printf("Instance failed to start.\n");
+	}
+	return true;
+}
+
 static void helpmessage(const char *progname) {
 	stdoutput.printf(
 		"%s is the startup program for the %s server processes.\n"
@@ -301,6 +350,11 @@ static void helpmessage(const char *progname) {
 		"				processes in the current window, rather than\n"
 		"				opening a new window.  Helpful when debugging\n"
 		"				startup errors.\n"
+		"\n"
+		"	-wait			Wait up to 30 seconds for each instance to\n"
+		"				become ready before exiting and exit with\n"
+		"				status 1 if an instance failed to become ready\n"
+		"				in the allotted time.\n"
 		"\n"
 		"Examples:\n"
 		"\n"
@@ -342,6 +396,7 @@ int main(int argc, const char **argv) {
 	const char	*config=cmdl.getValue("-config");
 	bool		disablecrashhandler=
 				cmdl.found("-disable-crash-handler");
+	bool		wait=cmdl.found("-wait");
 
 	// on Windows, open a new console window and redirect everything to it
 	// (unless that's specifically disabled)
@@ -405,7 +460,8 @@ int main(int argc, const char **argv) {
 					strace,disablecrashhandler) ||
 			!startScaler(&sqlrpth,cfg,thisid,
 					config,localstatedir,
-					disablecrashhandler)) {
+					disablecrashhandler) ||
+			(wait && !waitForInstance(&sqlrpth,cfg,thisid))) {
 			exitstatus=1;
 		}
 
