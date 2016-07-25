@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-all: local oracle krb tls
+all: local oracle krb tls unicode
 
 clean:
 	$(RM) *.exe *.dll *.dll.config *.pdb
@@ -19,3 +19,6 @@ krb: krb.cs
 
 tls: tls.cs
 	$(CSC) $(CSCFLAGS) /out:tls.exe tls.cs /reference:SQLRClient.dll
+
+unicode: unicode.cs
+	$(CSC) $(CSCFLAGS) /out:unicode.exe unicode.cs /reference:SQLRClient.dll

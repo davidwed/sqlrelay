@@ -167,7 +167,7 @@ public class SQLRCursor : IDisposable
     /** Sends "query" directly and gets a result set. */
     public Boolean sendQuery(String query)
     {
-        return sqlrcur_sendQuery(sqlrcurref, query) != 0;
+        return sqlrcur_sendQueryWithLength(sqlrcurref, query, (uint)System.Text.Encoding.Default.GetByteCount(query)) != 0;
     }
 
     /** Sends "query" with length "length" directly and gets a result set. This
@@ -188,7 +188,7 @@ public class SQLRCursor : IDisposable
     /** Prepare to execute "query". */
     public void prepareQuery(String query)
     {
-        sqlrcur_prepareQuery(sqlrcurref, query);
+        sqlrcur_prepareQueryWithLength(sqlrcurref, query, (uint)System.Text.Encoding.Default.GetByteCount(query));
     }
 
     /** Prepare to execute "query" with length "length".  This function must be
@@ -256,7 +256,7 @@ public class SQLRCursor : IDisposable
     /** Defines a String input bind variable. */
     public void inputBind(String variable, String val)
     {
-        sqlrcur_inputBindString(sqlrcurref, variable, val);
+        sqlrcur_inputBindStringWithLength(sqlrcurref, variable, val, (uint)System.Text.Encoding.Default.GetByteCount(val));
     }
 
     /** Defines a String input bind variable. */
