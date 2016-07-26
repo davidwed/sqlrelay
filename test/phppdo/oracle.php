@@ -634,13 +634,18 @@ if (PHP_VERSION_ID < 70000) {
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
 
-# this throws an execption and doesn't continue on PHP7
-if (PHP_VERSION_ID < 70000) {
-	echo("NON-LAZY CONNECT: \n");
-	$dsn = "sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;debug=0;lazyconnect=0";
-	checkSuccess(new PDO($dsn,$user,$password),0);
-	echo("\n");
-}
+	# this throws an execption and doesn't continue on PHP7
+	try {
+
+		echo("NON-LAZY CONNECT: \n");
+		$dsn = "sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;debug=0;lazyconnect=0";
+		checkSuccess(new PDO($dsn,$user,$password),0);
+		echo("\n");
+
+	} catch (Exception $e) {
+		echo($e->getMessage());
+		echo("\n");
+	}
 
 	echo("INVALID QUERIES: \n");
 	checkSuccess($dbh->query("select 1"),0);
