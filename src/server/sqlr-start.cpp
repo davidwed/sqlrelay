@@ -289,6 +289,7 @@ static bool startScaler(sqlrpaths *sqlrpth,
 	return true;
 }
 
+#ifndef _WIN32
 static bool waitForInstance(sqlrpaths *sqlrpth,
 				sqlrconfig *cfg,
 				const char *thisid) {
@@ -332,6 +333,7 @@ static bool waitForInstance(sqlrpaths *sqlrpth,
 	}
 	return true;
 }
+#endif
 
 static void helpmessage(const char *progname) {
 	stdoutput.printf(
@@ -351,11 +353,13 @@ static void helpmessage(const char *progname) {
 		"				opening a new window.  Helpful when debugging\n"
 		"				startup errors.\n"
 		"\n"
+#ifndef _WIN32
 		"	-wait			Wait up to 30 seconds for each instance to\n"
 		"				become ready before exiting and exit with\n"
 		"				status 1 if an instance failed to become ready\n"
 		"				in the allotted time.\n"
 		"\n"
+#endif
 		"Examples:\n"
 		"\n"
 		"Start instance \"myinst\" as defined in the default configuration.\n"
@@ -396,7 +400,9 @@ int main(int argc, const char **argv) {
 	const char	*config=cmdl.getValue("-config");
 	bool		disablecrashhandler=
 				cmdl.found("-disable-crash-handler");
+	#ifndef _WIN32
 	bool		wait=cmdl.found("-wait");
+	#endif
 
 	// on Windows, open a new console window and redirect everything to it
 	// (unless that's specifically disabled)
@@ -460,8 +466,11 @@ int main(int argc, const char **argv) {
 					strace,disablecrashhandler) ||
 			!startScaler(&sqlrpth,cfg,thisid,
 					config,localstatedir,
-					disablecrashhandler) ||
-			(wait && !waitForInstance(&sqlrpth,cfg,thisid))) {
+					disablecrashhandler)
+			#ifndef _WIN32
+			|| (wait && !waitForInstance(&sqlrpth,cfg,thisid))
+			#endif
+			) {
 			exitstatus=1;
 		}
 
