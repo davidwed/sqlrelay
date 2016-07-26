@@ -17,7 +17,8 @@
 	legacy_stdio_definitions.lib is now included when building ODBC with
 		VS2015
 	added support for PHP7
-	added -wait option to sqlr-start
+	added -wait option to sqlr-start for non-Windows
+	disabled -disable-new-window option to sqlr-start for non-Windows
 	non-ascii character encodings work with the C# API now
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver

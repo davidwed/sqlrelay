@@ -80,7 +80,9 @@ extern "C" {
 	#define ADD_NEXT_INDEX_STRING_P(a,b) add_next_index_string(a,b)
 	#define ADD_ASSOC_ZVAL(a,b,c) add_assoc_zval(a,b,&c)
 
-	#define zend_object_store_get_object(a) Z_OBJ_P(a)
+	#define	getStmt()	(pdo_stmt_t *)Z_PDO_STMT_P(getThis())
+	#define	getDbh()	(pdo_dbh_t *)Z_PDO_DBH_P(getThis())
+
 #else
 
 	#define ZVAL zval**
@@ -117,6 +119,9 @@ extern "C" {
 	#define ADD_NEXT_INDEX_STRING(a,b) add_next_index_string(a,b,1)
 	#define ADD_NEXT_INDEX_STRING_P(a,b) add_next_index_string(a,b,1)
 	#define ADD_ASSOC_ZVAL(a,b,c) add_assoc_zval(a,b,c)
+
+	#define	getStmt()	(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC)
+	#define getDbh()	(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 #endif
 
 #define sqlrelayError(s) \
@@ -1202,8 +1207,7 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 }
 
 static PHP_METHOD(PDO_SQLRELAY, getConnectionPort) {
-	pdo_dbh_t	*dbh=
-		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_dbh_t	*dbh=getDbh();
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 	uint16_t	port=sqlrcon->getConnectionPort();
@@ -1211,8 +1215,7 @@ static PHP_METHOD(PDO_SQLRELAY, getConnectionPort) {
 }
 
 static PHP_METHOD(PDO_SQLRELAY, getConnectionSocket) {
-	pdo_dbh_t	*dbh=
-		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_dbh_t	*dbh=getDbh();
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 	const char	*socket=sqlrcon->getConnectionSocket();
@@ -1220,8 +1223,7 @@ static PHP_METHOD(PDO_SQLRELAY, getConnectionSocket) {
 }
 
 static PHP_METHOD(PDO_SQLRELAY, suspendSession) {
-	pdo_dbh_t	*dbh=
-		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_dbh_t	*dbh=getDbh();
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 	if (sqlrcon->suspendSession()) {
@@ -1246,8 +1248,7 @@ static PHP_METHOD(PDO_SQLRELAY, resumeSession) {
 	convert_to_long_ex(port);
 	convert_to_string_ex(socket);
 
-	pdo_dbh_t	*dbh=
-		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_dbh_t	*dbh=getDbh();
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 	if (sqlrcon->resumeSession(
@@ -1265,8 +1266,7 @@ static PHP_METHOD(PDO_SQLRELAY, resumeSession) {
 }
 
 static PHP_METHOD(PDO_SQLRELAY, endSession) {
-	pdo_dbh_t	*dbh=
-		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_dbh_t	*dbh=getDbh();
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 	sqlrcon->endSession();
@@ -1287,8 +1287,7 @@ static zend_function_entry sqlrelayConnectionFunctions[] = {
 };
 
 static PHP_METHOD(PDO_SQLRELAY, getResultSetId) {
-	pdo_stmt_t	*stmt=
-		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_stmt_t	*stmt=getStmt();
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	uint16_t	id=sqlrcur->getResultSetId();
@@ -1296,8 +1295,7 @@ static PHP_METHOD(PDO_SQLRELAY, getResultSetId) {
 }
 
 static PHP_METHOD(PDO_SQLRELAY, suspendResultSet) {
-	pdo_stmt_t	*stmt=
-		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_stmt_t	*stmt=getStmt();
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	sqlrcur->suspendResultSet();
@@ -1316,8 +1314,7 @@ static PHP_METHOD(PDO_SQLRELAY, resumeResultSet) {
 
 	convert_to_long_ex(id);
 
-	pdo_stmt_t	*stmt=
-		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	pdo_stmt_t	*stmt=getStmt();
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	if (sqlrcur->resumeResultSet(

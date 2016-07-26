@@ -438,8 +438,6 @@
 	checkSuccess($dbh->setAttribute(PDO::ATTR_STRINGIFY_FETCHES,FALSE),1);
 	echo("\n");
 
-# various methods that use getThis() don't appear to work with PDO for PHP7
-if (PHP_VERSION_ID < 70000) {
 	echo("SUSPENDED SESSION: \n");
 	$stmt=$dbh->query("select * from testtable order by testnumber");
 	$stmt->suspendResultSet();
@@ -512,7 +510,6 @@ if (PHP_VERSION_ID < 70000) {
 	checkSuccess($result[3][0],"6");
 	checkSuccess($result[4][0],"7");
 	echo("\n");
-}
 
 	echo("COMMIT AND ROLLBACK: \n");
 	$dbh->exec("drop table testtable1");
