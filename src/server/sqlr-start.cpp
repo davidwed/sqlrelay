@@ -348,11 +348,12 @@ static void helpmessage(const char *progname) {
 		"Options:\n"
 		SERVEROPTIONS
 		DISABLECRASHHANDLER
-		"	-disable-new-window	Only valid on Windows platforms.  Spawns child\n"
-		"				processes in the current window, rather than\n"
-		"				opening a new window.  Helpful when debugging\n"
-		"				startup errors.\n"
+#ifdef _WIN32
+		"	-disable-new-window	Spawns child processes in the current window,\n"
+		"				rather than opening a new window.  Helpful\n"
+		"				when debugging startup errors.\n"
 		"\n"
+#endif
 #ifndef _WIN32
 		"	-wait			Wait up to 30 seconds for each instance to\n"
 		"				become ready before exiting and exit with\n"
