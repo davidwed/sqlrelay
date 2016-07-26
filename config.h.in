@@ -1,8 +1,5 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
-/* On some platforms */
-#undef ADD_NEWLINE_AFTER_READ_FROM_STDIN
-
 /* On some platforms NewObjectArray requires a cast */
 #undef CAST_NEW_OBJECT_ARRAY
 
@@ -159,9 +156,6 @@
 /* Some versions of postgresql have PQsetNoticeProcessor */
 #undef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 
-/* Do we have readline */
-#undef HAVE_READLINE
-
 /* Some systems have SQLConnectW */
 #undef HAVE_SQLCONNECTW
 
@@ -222,8 +216,7 @@
 /* Some iconv implementations use a const char ** parameter */
 #undef ICONV_CONST_CHAR
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Mingw32 environment */

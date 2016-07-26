@@ -264,11 +264,6 @@ NODEJSINCLUDEDIRS = @top_builddir@\src\api\c++;C:\Program Files\Firstworks\inclu
 NODEJSLIBS = @top_builddir@\src\api\c++\lib$(SQLR)client.lib;C:\Program Files\Firstworks\lib\librudiments.lib
 
 
-# readline
-READLINEINCLUDES =
-READLINELIBS =
-
-
 # libsocket
 SOCKETLIBS =
 

@@ -366,11 +366,6 @@ ENABLE_POSTGRESQL_DROP_IN = @ENABLE_POSTGRESQL_DROP_IN@
 PSQLUSERPATH = @PSQLUSERPATH@
 
 
-# readline
-READLINEINCLUDES = @READLINEINCLUDES@
-READLINELIBS = @READLINELIBS@
-
-
 # libsocket
 SOCKETLIBS = @SOCKETLIBS@
 
@@ -505,7 +500,7 @@ UTILLIBS = $(RUDIMENTSLIBS)
 
 # cmdline
 ENABLE_CMDLINE = @ENABLE_CMDLINE@
-CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(READLINEINCLUDES)
+CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 CMDLINELIBS = -L$(top_builddir)/src/util -l$(SQLR)util -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 

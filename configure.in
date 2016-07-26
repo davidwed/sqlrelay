@@ -659,62 +659,6 @@ dnl Checks for libraries.
 echo
 echo "***** Libraries **************"
 
-if ( test -n "$ENABLE_CMDLINE" )
-then
-	AC_MSG_CHECKING(for termcap)
-	FW_CHECK_HEADERS_AND_LIBS([/usr],[termcap],[termcap.h],[termcap],[""],[""],[TERMCAPINCLUDES],[TERMCAPLIBS],[TERMCAPLIBPATH],[TERMCAPSTATIC])
-	if ( test -n "$TERMCAPLIBS" )
-	then
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-
-	dnl if there was no termcap, try curses instead
-	if ( test -z "$TERMCAPLIBS" )
-	then
-		AC_MSG_CHECKING(for curses)
-		FW_CHECK_HEADERS_AND_LIBS([/usr],[curses],[curses.h],[curses],[""],[""],[CURSESINCLUDES],[CURSESLIBS],[CURSESLIBPATH],[CURSESSTATIC])
-		if ( test -n "$CURSESLIBS" )
-		then
-			AC_MSG_RESULT(yes)
-		else
-			AC_MSG_RESULT(no)
-		fi
-	fi
-
-	AC_MSG_CHECKING(for history)
-	FW_CHECK_HEADERS_AND_LIBS([/usr],[history],[readline/history.h],[history],[""],[""],[HISTORYINCLUDES],[HISTORYLIBS],[HISTORYLIBPATH],[HISTORYSTATIC])
-	if ( test -n "$HISTORYLIBS" )
-	then
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-
-	AC_MSG_CHECKING(for readline)
-	FW_CHECK_HEADERS_AND_LIBS([/usr],[readline],[readline/readline.h],[readline],[""],[""],[READLINEINCLUDES],[READLINELIBS],[READLINELIBPATH],[READLINESTATIC])
-	if ( test -n "$READLINELIBS" )
-	then
-		READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $CURSESINCLUDES $TERMCAPINCLUDES"
-		READLINELIBS="$READLINELIBS $HISTORYLIBS $CURSESLIBS $TERMCAPLIBS"
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-
-	AC_MSG_CHECKING(whether termcap/curses/history/readline work)
-	FW_TRY_LINK([#include <stdlib.h>
-	extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }],[readline(NULL);],[$READLINEINCLUDES],[$READLINELIBS],[],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); READLINELIBS=""])
-	AC_SUBST(READLINEINCLUDES)
-	AC_SUBST(READLINELIBS)
-	
-	if ( test -n "$READLINELIBS" )
-	then
-		AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
-	fi
-fi
-
 FW_CHECK_SOCKET_LIBS
 AC_CHECK_LIB(dl,dlopen,DLLIB=-ldl,DLLIB="")
 AC_SUBST(DLLIB)
@@ -1009,17 +953,12 @@ echo
 echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
 
 CMDLINEBUILD="no "
-READLINEBUILD="no "
 if ( test -n "$ENABLE_CMDLINE" ); then
 	CMDLINEBUILD="yes"
-fi
-if ( test -n "$READLINELIBS" ); then
-	READLINEBUILD="yes"
 fi
 
 echo
 echo " Command Line : Clients     $CMDLINEBUILD"
-echo "                Readline    $READLINEBUILD"
 echo
 
 CPPBUILD="no "

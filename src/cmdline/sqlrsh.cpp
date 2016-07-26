@@ -15,27 +15,11 @@
 #include <rudiments/stdio.h>
 #include <rudiments/character.h>
 #include <rudiments/memorypool.h>
+#include <rudiments/prompt.h>
 #include <config.h>
 #include <defaults.h>
 #include <defines.h>
 #include <version.h>
-
-#ifdef HAVE_READLINE
-	#include <rudiments/charstring.h>
-	// This is an interesting story...
-	// readline 2's include files don't list any parameters for any of
-	// the functions.  This is fine for C, but not C++, at least not with
-	// the compiler I'm using, even with the extern "C" {} bit.
-	// This is fixed in readline 4, but, to maintain compatibility with 
-	// readline 2, I define the functions myself.
-	extern "C" {
-		extern char *readline(char *prompt);
-		extern void add_history(char *line);
-		extern void read_history(char *file);
-		extern void write_history(char *file);
-		extern void history_truncate_file(char *file, int line);
-	}
-#endif
 
 class sqlrshbindvalue {
 	public:
@@ -210,16 +194,16 @@ class	sqlrsh {
 		void	displayHelp(sqlrshenv *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, sqlrshenv *env);
-		void	prompt(unsigned long promptcount);
 
 		sqlrcmdline	*cmdline;
 		sqlrpaths	*sqlrpth;
 
 		datetime	start;
+
+		prompt		pr;
 };
 
 sqlrsh::sqlrsh() {
-
 	cmdline=NULL;
 	sqlrpth=NULL;
 }
@@ -1849,26 +1833,14 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		// get the command
 		bool	done=false;
 		while (!done) {
-			#ifdef HAVE_READLINE
-				prmpt.append(promptcount);
-				prmpt.append("> ");
-				char	*cmd=readline(const_cast<char *>(
-							prmpt.getString()));
-				prmpt.clear();
-				if (!charstring::isNullOrEmpty(cmd)) {
-					add_history(cmd);
-				} else {
-					stdoutput.printf("\n");
-				}
-			#else
-				prompt(promptcount);
-				char	cmd[1024];
-				ssize_t	bytes=stdinput.read(cmd,1024);
-				cmd[bytes-1]='\0';
-				#ifdef ADD_NEWLINE_AFTER_READ_FROM_STDIN
-					stdoutput.printf("\n");
-				#endif
-			#endif
+
+			prmpt.append(promptcount);
+			prmpt.append("> ");
+			pr.setPrompt(prmpt.getString());
+			prmpt.clear();
+
+			char	*cmd=pr.read();
+
 			size_t	len=charstring::length(cmd);
 			command.append(cmd);
 			done=(cmd[len-1]==env->delimiter);
@@ -1876,9 +1848,6 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				promptcount++;
 				command.append('\n');
 			}
-			#ifdef HAVE_READLINE
-				delete[] cmd;
-			#endif
 		}
 
 		char	*cmd=command.detachString();
@@ -1891,10 +1860,6 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		// clean up
 		delete[] cmd;
 	}
-}
-
-void sqlrsh::prompt(unsigned long promptcount) {
-	stdoutput.printf("%ld> ",promptcount);
 }
 
 void sqlrsh::execute(int argc, const char **argv) {
@@ -2033,26 +1998,15 @@ void sqlrsh::execute(int argc, const char **argv) {
 	userRcFile(&sqlrcon,&sqlrcur,&env);
 
 
-	#ifdef HAVE_READLINE
-
-		// handle the history file
-		char		*filename=NULL;
-		const char	*home=environment::getValue("HOME");
-		if (!charstring::isNullOrEmpty(home)) {
-			filename=new char[charstring::length(home)+16+1];
-			charstring::copy(filename,home);
-			charstring::append(filename,"/.sqlrsh_history");
-
-			// create the history file if it doesn't exist now
-			file	historyfile;
-			if (historyfile.open(filename,
-				O_WRONLY|O_CREAT|O_APPEND,
-				permissions::evalPermString("rw-rw-r--"))) {
-				historyfile.close();
-				read_history(filename);
-			}
-		}
-	#endif
+	// handle the history file
+	const char	*home=environment::getValue("HOME");
+	if (!charstring::isNullOrEmpty(home)) {
+		char	*filename=new char[charstring::length(home)+16+1];
+		charstring::copy(filename,home);
+		charstring::append(filename,"/.sqlrsh_history");
+		pr.setHistoryFile(filename);
+		pr.setMaxHistoryLines(100);
+	}
 
 	if (!charstring::isNullOrEmpty(script)) {
 		// if a script was specified, run it
@@ -2067,13 +2021,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 	}
 
 	// clean up
-	#ifdef HAVE_READLINE
-		if (!charstring::isNullOrEmpty(home)) {
-			write_history(filename);
-			history_truncate_file(filename,100);
-			delete[] filename;
-		}
-	#endif
+	pr.flushHistory();
 }
 
 static void helpmessage(const char *progname) {

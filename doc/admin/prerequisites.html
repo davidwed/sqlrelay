@@ -52,7 +52,7 @@
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
 <pre class="code">
-dnf -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo \
+dnf -y install gcc-c++ make perl-devel php-devel php-pdo \
 python-devel ruby-devel ruby-libs ruby tcl-devel java-1.8.0-openjdk-devel \
 erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel \
 postgresql-devel firebird-devel firebird-libfbclient sqlite-devel \
@@ -94,7 +94,7 @@ rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*</pre>
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
 <pre class="code">
-yum -y install gcc-c++ make readline-devel perl-devel php-devel php-pdo \
+yum -y install gcc-c++ make perl-devel php-devel php-pdo \
 python-devel ruby-devel ruby-libs ruby tcl-devel java-1.7.0-openjdk-devel \
 mariadb-devel postgresql-devel sqlite-devel unixODBC-devel</pre>
 
@@ -130,7 +130,7 @@ rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*</pre>
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
 <pre class="code">
-zypper install gcc-c++ make readline-devel perl php5-devel php5-pdo \
+zypper install gcc-c++ make perl php5-devel php5-pdo \
 python-devel ruby-devel ruby2.1 tcl-devel java-1.8.0-openjdk-devel erlang \
 nodejs-devel node-gyp mono-devel mono-data-oracle libmyqlclient-devel \
 postgresql93-devel firebird-devel libsqlite3-devel unixODBC-devel \
@@ -172,7 +172,7 @@ rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*</pre>
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
 <pre class="code">
-apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev \
+apt-get install g++ make perl php5-dev python-dev ruby-dev \
 tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
 libmariadbclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
 unixodbc-dev freetds-dev mdbtools-dev</pre>
@@ -209,7 +209,7 @@ mv instantclient_12_1 /usr/local</pre>
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
 <pre class="code">
-apt-get install g++ make libreadline-dev perl php5-dev python-dev ruby-dev \
+apt-get install g++ make perl php5-dev python-dev ruby-dev \
 tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
 libmysqlclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
 unixodbc-dev freetds-dev mdbtools-dev</pre>
@@ -250,7 +250,7 @@ mv instantclient_12_1 /usr/local</pre>
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
 <pre class="code">
-pkg install clang gmake readline perl php55 php55-pdo python ruby tcl86 \
+pkg install clang gmake perl php55 php55-pdo python ruby tcl86 \
 openjdk8 erlang node npm pkgconf mono mysql56-client postgresql92-client \
 firebird25-client sqlite3 unixODBC freetds mdbtools
 npm install node-gyp</pre>
@@ -285,7 +285,7 @@ npm install node-gyp</pre>
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
  
 <pre class="code">
-pkgin install g++ gmake readline perl php55 php55-pdo python27 ruby tcl \
+pkgin install g++ gmake perl php55 php55-pdo python27 ruby tcl \
 openjdk7 erlang nodejs pkg-config mono mysql-client postgresql92-client \
 sqlite3 unixodbc freetds mdbtools</pre>
 
@@ -323,7 +323,7 @@ installpath = ftp://ftp.usa.openbsd.org/pub/OpenBSD/5.8/packages/amd64/
 <p>... and execute the following command, as root:</p>
 
 <pre class="code">
-pkg_add -r g++ gmake readline perl php python ruby tcl erlang node mono \
+pkg_add -r g++ gmake perl php python ruby tcl erlang node mono \
 mariadb-client postgresql-client iodbc freetds mdbtools</pre>
 
 <p>The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.</p>
@@ -344,7 +344,7 @@ mariadb-client postgresql-client iodbc freetds mdbtools</pre>
 <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
 <pre class="code">
-pkgin install clang binutils gmake readline perl python27 tcl mysql \
+pkgin install clang binutils gmake perl python27 tcl mysql \
 postgresql84 iodbc freetds mdbtools</pre>
 
 <p>The clang, binutils, and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.</p>

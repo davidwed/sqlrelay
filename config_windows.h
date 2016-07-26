@@ -1,9 +1,6 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
-/* On some platforms */
-/* #undef ADD_NEWLINE_AFTER_READ_FROM_STDIN */
-
 /* On some platforms NewObjectArray requires a cast */
 /* #undef CAST_NEW_OBJECT_ARRAY */
 
@@ -147,9 +144,6 @@
 
 /* Some versions of postgresql have PQsetNoticeProcessor */
 #define HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR 1
-
-/* Do we have readline */
-/* #undef HAVE_READLINE */
 
 /* Do we have SIGABRT */
 #define HAVE_SIGABRT 1

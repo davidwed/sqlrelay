@@ -22,7 +22,7 @@ $(SQLR)-import$(EXE): sqlr-import.cpp sqlr-import.$(OBJ)
 	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-import.$(OBJ) $(CMDLINELIBS)
 
 $(SQLR)sh$(EXE): sqlrsh.cpp sqlrsh.$(OBJ) 
-	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlrsh.$(OBJ) $(CMDLINELIBS) $(READLINELIBS)
+	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlrsh.$(OBJ) $(CMDLINELIBS)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)

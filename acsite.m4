@@ -571,7 +571,6 @@ case $host_os in
 		then
 			prefix="/boot/common"
 		fi
-  		AC_DEFINE(ADD_NEWLINE_AFTER_READ_FROM_STDIN,1,On some platforms, you have to add a newline after reading from stdin)
 		AC_MSG_RESULT(yes)
 		;;
 	* )
