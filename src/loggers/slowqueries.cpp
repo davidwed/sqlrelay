@@ -19,7 +19,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info);
 	private:
 		char		*querylogname;
@@ -96,7 +96,7 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info) {
 
 	if (!enabled) {
@@ -109,8 +109,7 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 	}
 
 	// don't do anything unless we got INFO/QUERY
-	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
-		event!=SQLRLOGGER_EVENTTYPE_QUERY) {
+	if (level!=SQLRLOGGER_LOGLEVEL_INFO || event!=SQLREVENT_QUERY) {
 		return true;
 	}
 

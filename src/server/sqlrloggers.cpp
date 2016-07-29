@@ -140,7 +140,7 @@ void sqlrloggers::runLoggers(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();

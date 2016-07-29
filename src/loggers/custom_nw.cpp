@@ -22,7 +22,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_custom_nw : public sqlrlogger {
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info);
 	private:
 		int	strescape(const char *str, char *buf, int limit);
@@ -86,7 +86,7 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event,
+				sqlrevent_t event,
 				const char *info) {
 	debugFunction();
 
@@ -95,8 +95,7 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 	}
 
 	// don't do anything unless we got INFO/QUERY
-	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
-		event!=SQLRLOGGER_EVENTTYPE_QUERY) {
+	if (level!=SQLRLOGGER_LOGLEVEL_INFO || event!=SQLREVENT_QUERY) {
 		return true;
 	}
 

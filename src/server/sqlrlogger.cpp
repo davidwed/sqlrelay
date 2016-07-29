@@ -18,7 +18,7 @@ bool sqlrlogger::run(sqlrlistener *sqlrl,
 			sqlrserverconnection *sqlrcon,
 			sqlrservercursor *sqlrcur,
 			sqlrlogger_loglevel_t level,
-			sqlrlogger_eventtype_t event,
+			sqlrevent_t event,
 			const char *info) {
 	return true;
 }
@@ -44,6 +44,6 @@ static const char *eventtypes[]={
 	"DEBUG_MESSAGE"
 };
 
-const char *sqlrlogger::eventType(sqlrlogger_eventtype_t event) {
+const char *sqlrlogger::eventType(sqlrevent_t event) {
 	return eventtypes[(uint16_t)event];
 }

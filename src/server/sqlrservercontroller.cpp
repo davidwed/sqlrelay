@@ -5094,7 +5094,7 @@ void sqlrservercontroller::logDebugMessage(const char *info) {
 	}
 	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_DEBUG,
-			SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE,
+			SQLREVENT_DEBUG_MESSAGE,
 			info);
 }
 
@@ -5104,7 +5104,7 @@ void sqlrservercontroller::logClientConnected() {
 	}
 	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTED,
+			SQLREVENT_CLIENT_CONNECTED,
 			NULL);
 }
 
@@ -5114,7 +5114,7 @@ void sqlrservercontroller::logClientConnectionRefused(const char *info) {
 	}
 	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED,
+			SQLREVENT_CLIENT_CONNECTION_REFUSED,
 			info);
 }
 
@@ -5124,7 +5124,7 @@ void sqlrservercontroller::logClientDisconnected(const char *info) {
 	}
 	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_CLIENT_DISCONNECTED,
+			SQLREVENT_CLIENT_DISCONNECTED,
 			info);
 }
 
@@ -5152,7 +5152,7 @@ void sqlrservercontroller::logClientProtocolError(sqlrservercursor *cursor,
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR,
+			SQLREVENT_CLIENT_PROTOCOL_ERROR,
 			errorbuffer.getString());
 }
 
@@ -5162,7 +5162,7 @@ void sqlrservercontroller::logDbLogIn() {
 	}
 	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_DB_LOGIN,
+			SQLREVENT_DB_LOGIN,
 			NULL);
 }
 
@@ -5172,7 +5172,7 @@ void sqlrservercontroller::logDbLogOut() {
 	}
 	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_DB_LOGOUT,
+			SQLREVENT_DB_LOGOUT,
 			NULL);
 }
 
@@ -5183,7 +5183,7 @@ void sqlrservercontroller::logDbError(sqlrservercursor *cursor,
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLRLOGGER_EVENTTYPE_DB_ERROR,
+			SQLREVENT_DB_ERROR,
 			info);
 }
 
@@ -5194,7 +5194,7 @@ void sqlrservercontroller::logDbWarning(sqlrservercursor *cursor,
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLRLOGGER_EVENTTYPE_DB_WARNING,
+			SQLREVENT_DB_WARNING,
 			info);
 }
 
@@ -5204,7 +5204,7 @@ void sqlrservercontroller::logQuery(sqlrservercursor *cursor) {
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_QUERY,
+			SQLREVENT_QUERY,
 			NULL);
 }
 
@@ -5214,7 +5214,7 @@ void sqlrservercontroller::logFilterViolation(sqlrservercursor *cursor) {
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_FILTER_VIOLATION,
+			SQLREVENT_FILTER_VIOLATION,
 			NULL);
 }
 
@@ -5232,7 +5232,7 @@ void sqlrservercontroller::logInternalError(sqlrservercursor *cursor,
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
+			SQLREVENT_INTERNAL_ERROR,
 			errorbuffer.getString());
 }
 
@@ -5250,7 +5250,7 @@ void sqlrservercontroller::logInternalWarning(sqlrservercursor *cursor,
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING,
+			SQLREVENT_INTERNAL_WARNING,
 			warningbuffer.getString());
 }
 

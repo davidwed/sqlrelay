@@ -1127,27 +1127,27 @@ class SQLRSERVER_DLLSPEC sqlrpwdencs {
 };
 
 
+enum sqlrevent_t {
+	SQLREVENT_CLIENT_CONNECTED=0,
+	SQLREVENT_CLIENT_CONNECTION_REFUSED,
+	SQLREVENT_CLIENT_DISCONNECTED,
+	SQLREVENT_CLIENT_PROTOCOL_ERROR,
+	SQLREVENT_DB_LOGIN,
+	SQLREVENT_DB_LOGOUT,
+	SQLREVENT_DB_ERROR,
+	SQLREVENT_DB_WARNING,
+	SQLREVENT_QUERY,
+	SQLREVENT_FILTER_VIOLATION,
+	SQLREVENT_INTERNAL_ERROR,
+	SQLREVENT_INTERNAL_WARNING,
+	SQLREVENT_DEBUG_MESSAGE
+};
+
 enum sqlrlogger_loglevel_t {
 	SQLRLOGGER_LOGLEVEL_DEBUG=0,
 	SQLRLOGGER_LOGLEVEL_INFO,
 	SQLRLOGGER_LOGLEVEL_WARNING,
 	SQLRLOGGER_LOGLEVEL_ERROR
-};
-
-enum sqlrlogger_eventtype_t {
-	SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTED=0,
-	SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED,
-	SQLRLOGGER_EVENTTYPE_CLIENT_DISCONNECTED,
-	SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR,
-	SQLRLOGGER_EVENTTYPE_DB_LOGIN,
-	SQLRLOGGER_EVENTTYPE_DB_LOGOUT,
-	SQLRLOGGER_EVENTTYPE_DB_ERROR,
-	SQLRLOGGER_EVENTTYPE_DB_WARNING,
-	SQLRLOGGER_EVENTTYPE_QUERY,
-	SQLRLOGGER_EVENTTYPE_FILTER_VIOLATION,
-	SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
-	SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING,
-	SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE
 };
 
 class SQLRSERVER_DLLSPEC sqlrlogger {
@@ -1161,11 +1161,11 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info);
 	protected:
 		const char	*logLevel(sqlrlogger_loglevel_t level);
-		const char	*eventType(sqlrlogger_eventtype_t event);
+		const char	*eventType(sqlrevent_t event);
 		xmldomnode	*parameters;
 };
 
@@ -1188,7 +1188,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info);
 	private:
 		void		unloadLoggers();

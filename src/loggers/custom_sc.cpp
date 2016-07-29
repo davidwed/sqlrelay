@@ -21,7 +21,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info);
 	private:
 		file	querylog;
@@ -88,7 +88,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event,
+				sqlrevent_t event,
 				const char *info) {
 	debugFunction();
 
@@ -128,8 +128,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// append the event type and log level
 	// (except for db errors/warnings which are handled specially)
-	if (event!=SQLRLOGGER_EVENTTYPE_DB_ERROR &&
-		event!=SQLRLOGGER_EVENTTYPE_DB_WARNING) {
+	if (event!=SQLREVENT_DB_ERROR && event!=SQLREVENT_DB_WARNING) {
 		logbuffer.append(eventType(event))->append(' ');
 		logbuffer.append(logLevel(level))->append(": ");
 	}
@@ -142,38 +141,38 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// handle each event differently...
 	switch (event) {
-		case SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTED:
+		case SQLREVENT_CLIENT_CONNECTED:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
 			logbuffer.append(" connected");
 			break;
-		case SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED:
+		case SQLREVENT_CLIENT_CONNECTION_REFUSED:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
 			logbuffer.append(" connection refused");
 			break;
-		case SQLRLOGGER_EVENTTYPE_CLIENT_DISCONNECTED:
+		case SQLREVENT_CLIENT_DISCONNECTED:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
 			logbuffer.append(" disconnected");
 			break;
-		case SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR:
+		case SQLREVENT_CLIENT_PROTOCOL_ERROR:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
 			logbuffer.append(" protocol error");
 			break;
-		case SQLRLOGGER_EVENTTYPE_DB_LOGIN:
+		case SQLREVENT_DB_LOGIN:
 			logbuffer.append(SQLRELAY);
 			logbuffer.append(" logged in to DB ");
 			logbuffer.append(sqlrcon->cont->dbIpAddress());
 			break;
-		case SQLRLOGGER_EVENTTYPE_DB_LOGOUT:
+		case SQLREVENT_DB_LOGOUT:
 			logbuffer.append(SQLRELAY);
 			logbuffer.append(" logged out of DB ");
 			logbuffer.append(sqlrcon->cont->dbIpAddress());
 			break;
-		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
-		case SQLRLOGGER_EVENTTYPE_DB_WARNING:
+		case SQLREVENT_DB_ERROR:
+		case SQLREVENT_DB_WARNING:
 			{
 			const char	*colon=charstring::findFirst(info,':');
 			if (colon) {
@@ -187,11 +186,11 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 			}
 			}
 			break;
-		case SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR:
+		case SQLREVENT_INTERNAL_ERROR:
 			logbuffer.append(SQLRELAY);
 			logbuffer.append(" internal error");
 			break;
-		case SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING:
+		case SQLREVENT_INTERNAL_WARNING:
 			logbuffer.append(SQLRELAY);
 			logbuffer.append(" internal warning");
 			break;
@@ -203,8 +202,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 	// append info, if there was any
 	// (except for db errors/warnings which are handled specially)
 	if (charstring::length(info) &&
-		(event!=SQLRLOGGER_EVENTTYPE_DB_ERROR &&
-		event!=SQLRLOGGER_EVENTTYPE_DB_WARNING)) {
+		(event!=SQLREVENT_DB_ERROR && event!=SQLREVENT_DB_WARNING)) {
 		logbuffer.append(": ");
 		logbuffer.append(info);
 	}

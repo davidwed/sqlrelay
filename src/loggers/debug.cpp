@@ -18,7 +18,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_debug : public sqlrlogger {
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event,
+					sqlrevent_t event,
 					const char *info);
 	private:
 		bool	openDebugFile();
@@ -94,7 +94,7 @@ bool sqlrlogger_debug::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event,
+				sqlrevent_t event,
 				const char *info) {
 	if (!enabled) {
 		return true;

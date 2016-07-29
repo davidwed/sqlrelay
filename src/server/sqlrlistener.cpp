@@ -2195,7 +2195,7 @@ void sqlrlistener::logDebugMessage(const char *info) {
 	}
 	sqlrlg->runLoggers(this,NULL,NULL,
 			SQLRLOGGER_LOGLEVEL_DEBUG,
-			SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE,
+			SQLREVENT_DEBUG_MESSAGE,
 			info);
 }
 
@@ -2221,7 +2221,7 @@ void sqlrlistener::logClientProtocolError(const char *info, ssize_t result) {
 	}
 	sqlrlg->runLoggers(this,NULL,NULL,
 			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR,
+			SQLREVENT_CLIENT_PROTOCOL_ERROR,
 			errorbuffer.getString());
 }
 
@@ -2231,7 +2231,7 @@ void sqlrlistener::logClientConnectionRefused(const char *info) {
 	}
 	sqlrlg->runLoggers(this,NULL,NULL,
 			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED,
+			SQLREVENT_CLIENT_CONNECTION_REFUSED,
 			info);
 }
 
@@ -2248,7 +2248,7 @@ void sqlrlistener::logInternalError(const char *info) {
 	}
 	sqlrlg->runLoggers(this,NULL,NULL,
 			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
+			SQLREVENT_INTERNAL_ERROR,
 			errorbuffer.getString());
 }
 
