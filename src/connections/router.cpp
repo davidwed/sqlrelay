@@ -95,6 +95,8 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		regularexpression	beginendregex;
 
 		const char	*error;
+
+		sqlrrouters	*sqlrr;
 };
 
 class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
@@ -267,6 +269,8 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	beginregex.study();
 	beginendregex.compile("^\\s*begin\\s*.*\\s*end;\\s*$");
 	beginendregex.study();
+
+	sqlrr=NULL;
 }
 
 routerconnection::~routerconnection() {
@@ -275,6 +279,7 @@ routerconnection::~routerconnection() {
 	}
 	delete[] cons;
 	delete[] beginquery;
+	delete sqlrr;
 }
 
 bool routerconnection::supportsAuthOnDatabase() {
@@ -286,6 +291,13 @@ void routerconnection::handleConnectString() {
 	identity=cont->getConnectStringValue("identity");
 
 	cfg=cont->cfg;
+
+	xmldomnode	*routers=cfg->getRouters();
+	if (!routers->isNullNode()) {
+		sqlrr=new sqlrrouters(cont->pth);
+		sqlrr->loadRouters(routers);
+		sqlrr->initRouters(this);
+	}
 
 	linkedlist< routecontainer * >	*routelist=cont->cfg->getRouteList();
 	concount=routelist->getLength();

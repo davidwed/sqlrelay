@@ -566,6 +566,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// tls
 		tlscontext	*getTLSContext();
 
+		// paths
+		sqlrpaths	*getPaths();
+
 		// utilities
 		bool		skipComment(const char **ptr,
 						const char *endptr);
@@ -612,6 +615,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// configration
 		sqlrconfigs		*sqlrcfgs;
 		sqlrconfig		*cfg;
+		sqlrpaths		*pth;
 
 		// statistics
 		shmdata			*shm;
@@ -1290,10 +1294,10 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 };
 
 
-class SQLRSERVER_DLLSPEC sqlrroute {
+class SQLRSERVER_DLLSPEC sqlrrouter {
 	public:
-			sqlrroute(xmldomnode *parameters);
-		virtual	~sqlrroute();
+			sqlrrouter(xmldomnode *parameters);
+		virtual	~sqlrrouter();
 
 		virtual bool	init(sqlrserverconnection *sqlrcon);
 		virtual bool	route(sqlrserverconnection *sqlrcon);
@@ -1302,27 +1306,27 @@ class SQLRSERVER_DLLSPEC sqlrroute {
 };
 
 
-class SQLRSERVER_DLLSPEC sqlrrouteplugin {
+class SQLRSERVER_DLLSPEC sqlrrouterplugin {
 	public:
-		sqlrroute	*r;
+		sqlrrouter	*r;
 		dynamiclib	*dl;
 };
 
-class SQLRSERVER_DLLSPEC sqlrroutes {
+class SQLRSERVER_DLLSPEC sqlrrouters {
 	public:
-			sqlrroutes(sqlrpaths *sqlrpth);
-			~sqlrroutes();
+			sqlrrouters(sqlrpaths *sqlrpth);
+			~sqlrrouters();
 
-		bool	loadRoutes(xmldomnode *parameters);
-		void	initRoutes(sqlrserverconnection *sqlrcon);
+		bool	loadRouters(xmldomnode *parameters);
+		void	initRouters(sqlrserverconnection *sqlrcon);
 		bool	route(sqlrserverconnection *sqlrcon);
 	private:
-		void		unloadRoutes();
-		void		loadRoute(xmldomnode *route);
+		void		unloadRouters();
+		void		loadRouter(xmldomnode *route);
 
 		const char	*libexecdir;
 
-		singlylinkedlist< sqlrrouteplugin * >	llist;
+		singlylinkedlist< sqlrrouterplugin * >	llist;
 };
 
 

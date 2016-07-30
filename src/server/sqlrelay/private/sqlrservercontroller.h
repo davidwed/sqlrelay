@@ -166,8 +166,6 @@
 		bool		dbchanged;
 		char		*originaldb;
 
-		sqlrpaths	*sqlrpth;
-
 		connectstringcontainer	*constr;
 
 		char		*updown;

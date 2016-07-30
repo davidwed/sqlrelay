@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		r=new_sqlrrouter_@module@(router);
+	} else

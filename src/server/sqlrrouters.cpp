@@ -12,44 +12,44 @@
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
-		#include "sqlrroutedeclarations.cpp"
+		#include "sqlrrouterdeclarations.cpp"
 	}
 #endif
 
-sqlrroutes::sqlrroutes(sqlrpaths *sqlrpth) {
+sqlrrouters::sqlrrouters(sqlrpaths *sqlrpth) {
 	debugFunction();
 	libexecdir=sqlrpth->getLibExecDir();
 }
 
-sqlrroutes::~sqlrroutes() {
+sqlrrouters::~sqlrrouters() {
 	debugFunction();
-	unloadRoutes();
+	unloadRouters();
 }
 
-bool sqlrroutes::loadRoutes(xmldomnode *parameters) {
+bool sqlrrouters::loadRouters(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadRoutes();
+	unloadRouters();
 
-	// run through the route list
-	for (xmldomnode *route=parameters->getFirstTagChild();
-			!route->isNullNode();
-			route=route->getNextTagSibling()) {
+	// run through the router list
+	for (xmldomnode *router=parameters->getFirstTagChild();
+			!router->isNullNode();
+			router=router->getNextTagSibling()) {
 
-		debugPrintf("loading route ...\n");
+		debugPrintf("loading router ...\n");
 
-		// load route
-		loadRoute(route);
+		// load router
+		loadRouter(router);
 	}
 	return true;
 }
 
-void sqlrroutes::unloadRoutes() {
+void sqlrrouters::unloadRouters() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrrouteplugin * > *node=
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
 						llist.getFirst();
 						node; node=node->getNext()) {
-		sqlrrouteplugin	*sqlrsp=node->getValue();
+		sqlrrouterplugin	*sqlrsp=node->getValue();
 		delete sqlrsp->r;
 		delete sqlrsp->dl;
 		delete sqlrsp;
@@ -57,38 +57,38 @@ void sqlrroutes::unloadRoutes() {
 	llist.clear();
 }
 
-void sqlrroutes::loadRoute(xmldomnode *route) {
+void sqlrrouters::loadRouter(xmldomnode *router) {
 
 	debugFunction();
 
-	// ignore non-routes
-	if (charstring::compare(route->getName(),"route")) {
+	// ignore non-routers
+	if (charstring::compare(router->getName(),"router")) {
 		return;
 	}
 
-	// get the route name
-	const char	*module=route->getAttributeValue("module");
+	// get the router name
+	const char	*module=router->getAttributeValue("module");
 	if (!charstring::length(module)) {
 		// try "file", that's what it used to be called
-		module=route->getAttributeValue("file");
+		module=router->getAttributeValue("file");
 		if (!charstring::length(module)) {
 			return;
 		}
 	}
 
-	debugPrintf("loading route: %s\n",module);
+	debugPrintf("loading router: %s\n",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
-	// load the route module
+	// load the router module
 	stringbuffer	modulename;
 	modulename.append(libexecdir);
 	modulename.append(SQLR);
-	modulename.append("route_");
+	modulename.append("router_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf(
-			"failed to load route module: %s\n",module);
+			"failed to load router module: %s\n",module);
 		char	*error=dl->getError();
 		stdoutput.printf("%s\n",error);
 		delete[] error;
@@ -96,14 +96,14 @@ void sqlrroutes::loadRoute(xmldomnode *route) {
 		return;
 	}
 
-	// load the route itself
+	// load the router itself
 	stringbuffer	functionname;
-	functionname.append("new_sqlrroute_")->append(module);
-	sqlrroute *(*newRoute)(xmldomnode *)=
-			(sqlrroute *(*)(xmldomnode *))
+	functionname.append("new_sqlrrouter_")->append(module);
+	sqlrrouter *(*newRouter)(xmldomnode *)=
+			(sqlrrouter *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
-	if (!newRoute) {
-		stdoutput.printf("failed to create route: %s\n",module);
+	if (!newRouter) {
+		stdoutput.printf("failed to create router: %s\n",module);
 		char	*error=dl->getError();
 		stdoutput.printf("%s\n",error);
 		delete[] error;
@@ -111,37 +111,37 @@ void sqlrroutes::loadRoute(xmldomnode *route) {
 		delete dl;
 		return;
 	}
-	sqlrroute	*r=(*newRoute)(route);
+	sqlrrouter	*r=(*newRouter)(router);
 
 #else
 
 	dynamiclib	*dl=NULL;
-	sqlrroute	*s;
-	#include "sqlrrouteassignments.cpp"
+	sqlrrouter	*r;
+	#include "sqlrrouterassignments.cpp"
 	{
 		r=NULL;
 	}
 #endif
 
 	// add the plugin to the list
-	sqlrrouteplugin	*sqlrsp=new sqlrrouteplugin;
+	sqlrrouterplugin	*sqlrsp=new sqlrrouterplugin;
 	sqlrsp->r=r;
 	sqlrsp->dl=dl;
 	llist.append(sqlrsp);
 }
 
-void sqlrroutes::initRoutes(sqlrserverconnection *sqlrcon) {
+void sqlrrouters::initRouters(sqlrserverconnection *sqlrcon) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrrouteplugin * > *node=
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
 						llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->r->init(sqlrcon);
 	}
 }
 
-bool sqlrroutes::route(sqlrserverconnection *sqlrcon) {
+bool sqlrrouters::route(sqlrserverconnection *sqlrcon) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrrouteplugin * > *node=
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
 						llist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->r->route(sqlrcon)) {

@@ -72,7 +72,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	dbchanged=false;
 	originaldb=NULL;
 
-	sqlrpth=NULL;
+	pth=NULL;
 
 	unixsocket=NULL;
 	unixsocketptr=NULL;
@@ -183,7 +183,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete[] originaldb;
 
-	delete sqlrpth;
+	delete pth;
 
 	for (uint32_t i=0; i<usercount; i++) {
 		delete[] users[i];
@@ -244,7 +244,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	cmdl=new sqlrcmdline(argc,argv);
 
 	// initialize the paths
-	sqlrpth=new sqlrpaths(cmdl);
+	pth=new sqlrpaths(cmdl);
 
 	// default id warning
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
@@ -277,8 +277,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	silent=cmdl->found("-silent");
 
 	// load the configuration
-	sqlrcfgs=new sqlrconfigs(sqlrpth);
-	cfg=sqlrcfgs->load(sqlrpth->getConfigUrl(),cmdl->getId());
+	sqlrcfgs=new sqlrconfigs(pth);
+	cfg=sqlrcfgs->load(pth->getConfigUrl(),cmdl->getId());
 	if (!cfg) {
 		return false;
 	}
@@ -294,7 +294,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get password encryptions
 	xmldomnode	*pwdencs=cfg->getPasswordEncryptions();
 	if (!pwdencs->isNullNode()) {
-		sqlrpe=new sqlrpwdencs(sqlrpth);
+		sqlrpe=new sqlrpwdencs(pth);
 		sqlrpe->loadPasswordEncryptions(pwdencs);
 	}	
 
@@ -302,7 +302,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	debugsqlrauths=cfg->getDebugAuths();
 	xmldomnode	*auths=cfg->getAuths();
 	if (!auths->isNullNode()) {
-		sqlra=new sqlrauths(sqlrpth,debugsqlrauths);
+		sqlra=new sqlrauths(pth,debugsqlrauths);
 		sqlra->loadAuths(auths,sqlrpe);
 	}
 
@@ -315,7 +315,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get loggers
 	xmldomnode	*loggers=cfg->getLoggers();
 	if (!loggers->isNullNode()) {
-		sqlrlg=new sqlrloggers(sqlrpth);
+		sqlrlg=new sqlrloggers(pth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(NULL,conn);
 	}
@@ -323,7 +323,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get notifications
 	xmldomnode	*notifications=cfg->getNotifications();
 	if (!notifications->isNullNode()) {
-		sqlrn=new sqlrnotifications(sqlrpth);
+		sqlrn=new sqlrnotifications(pth);
 		sqlrn->loadNotifications(notifications);
 		sqlrn->initNotifications(NULL,conn);
 	}
@@ -331,7 +331,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get schedules
 	xmldomnode	*schedules=cfg->getSchedules();
 	if (!schedules->isNullNode()) {
-		sqlrs=new sqlrschedules(sqlrpth);
+		sqlrs=new sqlrschedules(pth);
 		sqlrs->loadSchedules(schedules);
 		sqlrs->initSchedules(conn);
 	}
@@ -390,7 +390,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*translations=cfg->getTranslations();
 	if (!translations->isNullNode()) {
 		sqlrp=newParser();
-		sqlrt=new sqlrtranslations(sqlrpth,debugsqlrtranslation);
+		sqlrt=new sqlrtranslations(pth,debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
 	}
 
@@ -401,7 +401,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		if (!sqlrp) {
 			sqlrp=newParser();
 		}
-		sqlrf=new sqlrfilters(sqlrpth,debugsqlrfilters);
+		sqlrf=new sqlrfilters(pth,debugsqlrfilters);
 		sqlrf->loadFilters(filters);
 	}
 
@@ -410,7 +410,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*resultsettranslations=
 				cfg->getResultSetTranslations();
 	if (!resultsettranslations->isNullNode()) {
-		sqlrrst=new sqlrresultsettranslations(sqlrpth,
+		sqlrrst=new sqlrresultsettranslations(pth,
 						debugsqlrresultsettranslation);
 		sqlrrst->loadResultSetTranslations(resultsettranslations);
 	}
@@ -423,7 +423,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		if (!sqlrp) {
 			sqlrp=newParser();
 		}
-		sqlrtr=new sqlrtriggers(sqlrpth,debugsqlrtriggers);
+		sqlrtr=new sqlrtriggers(pth,debugsqlrtriggers);
 		sqlrtr->loadTriggers(triggers);
 	}
 
@@ -449,13 +449,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// create connection pid file
 	pid_t	pid=process::getProcessId();
-	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+16+
+	size_t	pidfilelen=charstring::length(pth->getPidDir())+16+
 				charstring::length(cmdl->getId())+1+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
 				"%ssqlr-connection-%s.%ld",
-				sqlrpth->getPidDir(),cmdl->getId(),(long)pid);
+				pth->getPidDir(),cmdl->getId(),(long)pid);
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// increment connection counter
@@ -476,13 +476,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the custom query handlers
 	xmldomnode	*queries=cfg->getQueries();
 	if (!queries->isNullNode()) {
-		sqlrq=new sqlrqueries(sqlrpth);
+		sqlrq=new sqlrqueries(pth);
 		sqlrq->loadQueries(queries);
 	}
 
 	// init client protocols
 	debugsqlrprotocols=cfg->getDebugProtocols();
-	sqlrpr=new sqlrprotocols(this,sqlrpth,debugsqlrprotocols);
+	sqlrpr=new sqlrprotocols(this,pth,debugsqlrprotocols);
 	sqlrpr->loadProtocols(cfg->getListeners());
 
 	// set a handler for SIGALARMs, if necessary
@@ -533,7 +533,7 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the connection module
 	stringbuffer	modulename;
-	modulename.append(sqlrpth->getLibExecDir());
+	modulename.append(pth->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("connection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -582,11 +582,11 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 }
 
 void sqlrservercontroller::setUnixSocketDirectory() {
-	size_t	unixsocketlen=charstring::length(sqlrpth->getSocketsDir())+22;
+	size_t	unixsocketlen=charstring::length(pth->getSocketsDir())+22;
 	unixsocket=new char[unixsocketlen];
 	charstring::printf(unixsocket,unixsocketlen,"%s",
-					sqlrpth->getSocketsDir());
-	unixsocketptr=unixsocket+charstring::length(sqlrpth->getSocketsDir());
+					pth->getSocketsDir());
+	unixsocketptr=unixsocket+charstring::length(pth->getSocketsDir());
 	unixsocketptrlen=unixsocketlen-(unixsocketptr-unixsocket);
 }
 
@@ -597,12 +597,12 @@ bool sqlrservercontroller::handlePidFile() {
 	// writes it out after forking and it's possible that the connection
 	// might start up after the sqlr-listener has forked, but before it
 	// writes out the pid file)
-	size_t	listenerpidfilelen=charstring::length(sqlrpth->getPidDir())+14+
+	size_t	listenerpidfilelen=charstring::length(pth->getPidDir())+14+
 					charstring::length(cmdl->getId())+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
 					"%ssqlr-listener-%s",
-					sqlrpth->getPidDir(),cmdl->getId());
+					pth->getPidDir(),cmdl->getId());
 
 	// On most platforms, 1 second is plenty of time to wait for the
 	// listener to come up, but on windows, it can take a while longer.
@@ -652,12 +652,12 @@ bool sqlrservercontroller::handlePidFile() {
 void sqlrservercontroller::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
+	size_t	updownlen=charstring::length(pth->getIpcDir())+
 				charstring::length(cmdl->getId())+1+
 				charstring::length(connectionid)+1;
 	updown=new char[updownlen];
 	charstring::printf(updown,updownlen,"%s%s-%s",
-			sqlrpth->getIpcDir(),cmdl->getId(),connectionid);
+			pth->getIpcDir(),cmdl->getId(),connectionid);
 }
 
 bool sqlrservercontroller::getUnixSocket() {
@@ -689,7 +689,7 @@ bool sqlrservercontroller::getUnixSocket() {
 bool sqlrservercontroller::openSequenceFile(file *sockseq) {
 
 	// open the sequence file and get the current port number
-	const char	*sockseqfile=sqlrpth->getSockSeqFile();
+	const char	*sockseqfile=pth->getSockSeqFile();
 
 	debugstr.clear();
 	debugstr.append("opening ")->append(sockseqfile);
@@ -1442,12 +1442,12 @@ void sqlrservercontroller::registerForHandoff() {
 
 	// construct the name of the socket to connect to
 	size_t	handoffsocknamelen=
-			charstring::length(sqlrpth->getSocketsDir())+
+			charstring::length(pth->getSocketsDir())+
 			charstring::length(cmdl->getId())+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
 					"%s%s-handoff",
-					sqlrpth->getSocketsDir(),
+					pth->getSocketsDir(),
 					cmdl->getId());
 
 	debugstr.clear();
@@ -1488,13 +1488,13 @@ void sqlrservercontroller::deRegisterForHandoff() {
 
 	// construct the name of the socket to connect to
 	size_t	removehandoffsocknamelen=
-				charstring::length(sqlrpth->getSocketsDir())+
+				charstring::length(pth->getSocketsDir())+
 				charstring::length(cmdl->getId())+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
 				"%s%s-removehandoff",
-				sqlrpth->getSocketsDir(),cmdl->getId());
+				pth->getSocketsDir(),cmdl->getId());
 
 	debugstr.clear();
 	debugstr.append("removehandoffsockname: ");
@@ -4200,11 +4200,11 @@ void sqlrservercontroller::deleteCursor(sqlrservercursor *curs) {
 
 bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
-	size_t	idfilenamelen=charstring::length(sqlrpth->getIpcDir())+
+	size_t	idfilenamelen=charstring::length(pth->getIpcDir())+
 						charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,"%s%s",
-						sqlrpth->getIpcDir(),id);
+						pth->getIpcDir(),id);
 
 	debugstr.clear();
 	debugstr.append("attaching to shared memory and semaphores ");
@@ -4476,7 +4476,7 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the parser module
 	stringbuffer	modulename;
-	modulename.append(sqlrpth->getLibExecDir());
+	modulename.append(pth->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("parser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -5433,11 +5433,11 @@ const char *sqlrservercontroller::getId() {
 }
 
 const char *sqlrservercontroller::getLogDir() {
-	return sqlrpth->getLogDir();
+	return pth->getLogDir();
 }
 
 const char *sqlrservercontroller::getDebugDir() {
-	return sqlrpth->getDebugDir();
+	return pth->getDebugDir();
 }
 
 bool sqlrservercontroller::isCustomQuery(sqlrservercursor *cursor) {

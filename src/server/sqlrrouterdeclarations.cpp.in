@@ -1,0 +1,1 @@
+sqlrrouter	*new_sqlrrouter_@module@(xmldomnode *parameters);

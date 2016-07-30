@@ -222,6 +222,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual xmldomnode	*getLoggers()=0;
 		virtual xmldomnode	*getNotifications()=0;
 		virtual xmldomnode	*getSchedules()=0;
+		virtual xmldomnode	*getRouters()=0;
 		virtual xmldomnode	*getQueries()=0;
 		virtual xmldomnode	*getPasswordEncryptions()=0;
 		virtual xmldomnode	*getAuths()=0;

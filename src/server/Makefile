@@ -24,8 +24,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrnotification.cpp \
 	sqlrschedules.cpp \
 	sqlrschedule.cpp \
-	sqlrroutes.cpp \
-	sqlrroute.cpp \
+	sqlrrouters.cpp \
+	sqlrrouter.cpp \
 	sqlrqueries.cpp \
 	sqlrquery.cpp \
 	sqlrpwdencs.cpp \
@@ -57,8 +57,8 @@ LIBSQLRSERVERLOBJS = \
 	sqlrnotification.$(OBJ) \
 	sqlrschedules.$(OBJ) \
 	sqlrschedule.$(OBJ) \
-	sqlrroutes.$(OBJ) \
-	sqlrroute.$(OBJ) \
+	sqlrrouters.$(OBJ) \
+	sqlrrouter.$(OBJ) \
 	sqlrqueries.$(OBJ) \
 	sqlrquery.$(OBJ) \
 	sqlrpwdencs.$(OBJ) \
@@ -213,17 +213,17 @@ sqlrscheduleassignments.cpp: sqlrscheduleassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqlrroutedeclarations.cpp: sqlrroutedeclarations.cpp.in
+sqlrrouterdeclarations.cpp: sqlrrouterdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../routes/*.$(OBJ)`; \
+	for file in `ls ../routers/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqlrrouteassignments.cpp: sqlrrouteassignments.cpp.in
+sqlrrouterassignments.cpp: sqlrrouterassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../routes/*.$(OBJ)`; \
+	for file in `ls ../routers/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
