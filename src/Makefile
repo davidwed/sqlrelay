@@ -23,6 +23,9 @@ all-queries:
 all-loggers:
 	cd loggers $(AND) $(MAKE) all
 
+all-notifications:
+	cd notifications $(AND) $(MAKE) all
+
 all-protocols:
 	cd protocols $(AND) $(MAKE) all
 
@@ -54,6 +57,7 @@ clean:
 	cd parsers $(AND) $(MAKE) clean
 	cd queries $(AND) $(MAKE) clean
 	cd loggers $(AND) $(MAKE) clean
+	cd notifications $(AND) $(MAKE) clean
 	cd protocols $(AND) $(MAKE) clean
 	cd pwdencs $(AND) $(MAKE) clean
 	cd auths $(AND) $(MAKE) clean
@@ -87,6 +91,9 @@ install-queries:
 install-loggers:
 	cd loggers $(AND) $(MAKE) install
 
+install-notifications:
+	cd notifications $(AND) $(MAKE) install
+
 install-protocols:
 	cd protocols $(AND) $(MAKE) install
 
@@ -118,6 +125,7 @@ uninstall:
 	cd parsers $(AND) $(MAKE) uninstall
 	cd queries $(AND) $(MAKE) uninstall
 	cd loggers $(AND) $(MAKE) uninstall
+	cd notifications $(AND) $(MAKE) uninstall
 	cd protocols $(AND) $(MAKE) uninstall
 	cd pwdencs $(AND) $(MAKE) uninstall
 	cd auths $(AND) $(MAKE) uninstall

@@ -125,6 +125,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	sqlrrst=NULL;
 	sqlrtr=NULL;
 	sqlrlg=NULL;
+	sqlrn=NULL;
 	sqlrq=NULL;
 	sqlrpe=NULL;
 	sqlra=NULL;
@@ -212,6 +213,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete sqlrrst;
 	delete sqlrtr;
 	delete sqlrlg;
+	delete sqlrn;
 	delete sqlrq;
 	delete sqlrpe;
 	delete sqlra;
@@ -314,6 +316,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(NULL,conn);
+	}
+
+	// get notifications
+	xmldomnode	*notifications=cfg->getNotifications();
+	if (!notifications->isNullNode()) {
+		sqlrn=new sqlrnotifications(sqlrpth);
+		sqlrn->loadNotifications(notifications);
+		sqlrn->initNotifications(NULL,conn);
 	}
 
 	// handle the unix socket directory
@@ -5089,49 +5099,65 @@ bool sqlrservercontroller::logEnabled() {
 }
 
 void sqlrservercontroller::logDebugMessage(const char *info) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_DEBUG,
+				SQLREVENT_DEBUG_MESSAGE,
+				info);
 	}
-	sqlrlg->runLoggers(NULL,conn,NULL,
-			SQLRLOGGER_LOGLEVEL_DEBUG,
-			SQLREVENT_DEBUG_MESSAGE,
-			info);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,NULL,
+				SQLREVENT_DEBUG_MESSAGE,
+				info);
+	}
 }
 
 void sqlrservercontroller::logClientConnected() {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLREVENT_CLIENT_CONNECTED,
+				NULL);
 	}
-	sqlrlg->runLoggers(NULL,conn,NULL,
-			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLREVENT_CLIENT_CONNECTED,
-			NULL);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,NULL,
+				SQLREVENT_CLIENT_CONNECTED,
+				NULL);
+	}
 }
 
 void sqlrservercontroller::logClientConnectionRefused(const char *info) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_WARNING,
+				SQLREVENT_CLIENT_CONNECTION_REFUSED,
+				info);
 	}
-	sqlrlg->runLoggers(NULL,conn,NULL,
-			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLREVENT_CLIENT_CONNECTION_REFUSED,
-			info);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,NULL,
+				SQLREVENT_CLIENT_CONNECTION_REFUSED,
+				info);
+	}
 }
 
 void sqlrservercontroller::logClientDisconnected(const char *info) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLREVENT_CLIENT_DISCONNECTED,
+				info);
 	}
-	sqlrlg->runLoggers(NULL,conn,NULL,
-			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLREVENT_CLIENT_DISCONNECTED,
-			info);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,NULL,
+				SQLREVENT_CLIENT_DISCONNECTED,
+				info);
+	}
 }
 
 void sqlrservercontroller::logClientProtocolError(sqlrservercursor *cursor,
 							const char *info,
 							ssize_t result) {
-	if (!sqlrlg) {
+	if (!sqlrlg && !sqlrn) {
 		return;
 	}
 	stringbuffer	errorbuffer;
@@ -5150,77 +5176,108 @@ void sqlrservercontroller::logClientProtocolError(sqlrservercursor *cursor,
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	sqlrlg->runLoggers(NULL,conn,cursor,
-			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLREVENT_CLIENT_PROTOCOL_ERROR,
-			errorbuffer.getString());
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,cursor,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLREVENT_CLIENT_PROTOCOL_ERROR,
+				errorbuffer.getString());
+	}
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,cursor,
+				SQLREVENT_CLIENT_PROTOCOL_ERROR,
+				errorbuffer.getString());
+	}
 }
 
 void sqlrservercontroller::logDbLogIn() {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLREVENT_DB_LOGIN,
+				NULL);
 	}
-	sqlrlg->runLoggers(NULL,conn,NULL,
-			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLREVENT_DB_LOGIN,
-			NULL);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,NULL,
+				SQLREVENT_DB_LOGIN,
+				NULL);
+	}
 }
 
 void sqlrservercontroller::logDbLogOut() {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLREVENT_DB_LOGOUT,
+				NULL);
 	}
-	sqlrlg->runLoggers(NULL,conn,NULL,
-			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLREVENT_DB_LOGOUT,
-			NULL);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,NULL,
+				SQLREVENT_DB_LOGOUT,
+				NULL);
+	}
 }
 
 void sqlrservercontroller::logDbError(sqlrservercursor *cursor,
 						const char *info) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,cursor,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLREVENT_DB_ERROR,
+				info);
 	}
-	sqlrlg->runLoggers(NULL,conn,cursor,
-			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLREVENT_DB_ERROR,
-			info);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,cursor,
+				SQLREVENT_DB_ERROR,
+				info);
+	}
 }
 
 void sqlrservercontroller::logDbWarning(sqlrservercursor *cursor,
 						const char *info) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,cursor,
+				SQLRLOGGER_LOGLEVEL_WARNING,
+				SQLREVENT_DB_WARNING,
+				info);
 	}
-	sqlrlg->runLoggers(NULL,conn,cursor,
-			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLREVENT_DB_WARNING,
-			info);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,cursor,
+				SQLREVENT_DB_WARNING,
+				info);
+	}
 }
 
 void sqlrservercontroller::logQuery(sqlrservercursor *cursor) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,cursor,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLREVENT_QUERY,
+				NULL);
 	}
-	sqlrlg->runLoggers(NULL,conn,cursor,
-			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLREVENT_QUERY,
-			NULL);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,cursor,
+				SQLREVENT_QUERY,
+				NULL);
+	}
 }
 
 void sqlrservercontroller::logFilterViolation(sqlrservercursor *cursor) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,cursor,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLREVENT_FILTER_VIOLATION,
+				NULL);
 	}
-	sqlrlg->runLoggers(NULL,conn,cursor,
-			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLREVENT_FILTER_VIOLATION,
-			NULL);
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,cursor,
+				SQLREVENT_FILTER_VIOLATION,
+				NULL);
+	}
 }
 
 void sqlrservercontroller::logInternalError(sqlrservercursor *cursor,
 							const char *info) {
-	if (!sqlrlg) {
+	if (!sqlrlg && !sqlrn) {
 		return;
 	}
 	stringbuffer	errorbuffer;
@@ -5230,15 +5287,22 @@ void sqlrservercontroller::logInternalError(sqlrservercursor *cursor,
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	sqlrlg->runLoggers(NULL,conn,cursor,
-			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLREVENT_INTERNAL_ERROR,
-			errorbuffer.getString());
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,cursor,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLREVENT_INTERNAL_ERROR,
+				errorbuffer.getString());
+	}
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,cursor,
+				SQLREVENT_INTERNAL_ERROR,
+				errorbuffer.getString());
+	}
 }
 
 void sqlrservercontroller::logInternalWarning(sqlrservercursor *cursor,
 							const char *info) {
-	if (!sqlrlg) {
+	if (!sqlrlg && !sqlrn) {
 		return;
 	}
 	stringbuffer	warningbuffer;
@@ -5248,10 +5312,17 @@ void sqlrservercontroller::logInternalWarning(sqlrservercursor *cursor,
 		warningbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	sqlrlg->runLoggers(NULL,conn,cursor,
-			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLREVENT_INTERNAL_WARNING,
-			warningbuffer.getString());
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,cursor,
+				SQLRLOGGER_LOGLEVEL_WARNING,
+				SQLREVENT_INTERNAL_WARNING,
+				warningbuffer.getString());
+	}
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,cursor,
+				SQLREVENT_INTERNAL_WARNING,
+				warningbuffer.getString());
+	}
 }
 
 void sqlrservercontroller::alarmHandler(int32_t signum) {

@@ -29,6 +29,7 @@ const char *sqlrlogger::logLevel(sqlrlogger_loglevel_t level) {
 	return loglevels[(uint8_t)level];
 }
 
+// FIXME: push up and consolidate
 static const char *eventtypes[]={
 	"CLIENT_CONNECTED",
 	"CLIENT_CONNECTION_REFUSED",

@@ -16,6 +16,8 @@ class sqlrpwdenc;
 class sqlrpwdencs;
 class sqlrlogger;
 class sqlrloggers;
+class sqlrnotification;
+class sqlrnotifications;
 class sqlrparser;
 class sqlrtranslation;
 class sqlrtranslations;
@@ -1197,6 +1199,53 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 		const char	*libexecdir;
 
 		singlylinkedlist< sqlrloggerplugin * >	llist;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrnotification {
+	public:
+			sqlrnotification(xmldomnode *parameters);
+		virtual	~sqlrnotification();
+
+		virtual bool	init(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon);
+		virtual bool	run(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					sqlrevent_t event,
+					const char *info);
+	protected:
+		const char	*eventType(sqlrevent_t event);
+		xmldomnode	*parameters;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrnotificationplugin {
+	public:
+		sqlrnotification	*lg;
+		dynamiclib	*dl;
+};
+
+class SQLRSERVER_DLLSPEC sqlrnotifications {
+	public:
+			sqlrnotifications(sqlrpaths *sqlrpth);
+			~sqlrnotifications();
+
+		bool	loadNotifications(xmldomnode *parameters);
+		void	initNotifications(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon);
+		void	runNotifications(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					sqlrevent_t event,
+					const char *info);
+	private:
+		void		unloadNotifications();
+		void		loadNotification(xmldomnode *notification);
+
+		const char	*libexecdir;
+
+		singlylinkedlist< sqlrnotificationplugin * >	llist;
 };
 
 

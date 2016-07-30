@@ -149,6 +149,7 @@
 		sqlrresultsettranslations	*sqlrrst;
 		sqlrtriggers			*sqlrtr;
 		sqlrloggers			*sqlrlg;
+		sqlrnotifications		*sqlrn;
 		sqlrqueries			*sqlrq;
 		sqlrpwdencs			*sqlrpe;
 		sqlrauths			*sqlra;
