@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		s=new_sqlrschedule_@module@(schedule);
+	} else

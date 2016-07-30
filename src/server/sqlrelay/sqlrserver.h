@@ -1290,6 +1290,42 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 };
 
 
+class SQLRSERVER_DLLSPEC sqlrroute {
+	public:
+			sqlrroute(xmldomnode *parameters);
+		virtual	~sqlrroute();
+
+		virtual bool	init(sqlrserverconnection *sqlrcon);
+		virtual bool	route(sqlrserverconnection *sqlrcon);
+	protected:
+		xmldomnode	*parameters;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrrouteplugin {
+	public:
+		sqlrroute	*r;
+		dynamiclib	*dl;
+};
+
+class SQLRSERVER_DLLSPEC sqlrroutes {
+	public:
+			sqlrroutes(sqlrpaths *sqlrpth);
+			~sqlrroutes();
+
+		bool	loadRoutes(xmldomnode *parameters);
+		void	initRoutes(sqlrserverconnection *sqlrcon);
+		bool	route(sqlrserverconnection *sqlrcon);
+	private:
+		void		unloadRoutes();
+		void		loadRoute(xmldomnode *route);
+
+		const char	*libexecdir;
+
+		singlylinkedlist< sqlrrouteplugin * >	llist;
+};
+
+
 class SQLRSERVER_DLLSPEC sqlrparser {
 	public:
 			sqlrparser(xmldomnode *parameters, bool debug);
