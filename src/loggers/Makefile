@@ -5,10 +5,10 @@ include ../../config.mk
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(LOGGERCPPFLAGS) $(COMPILE) $< $(OUT)$@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $< $(OUT)$@
 
 .cpp.obj:
-	$(CXX) $(CXXFLAGS) $(WERROR) $(LOGGERCPPFLAGS) $(COMPILE) $<
+	$(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
 all: $(SQLR)logger_debug.$(LIBEXT) \
 	$(SQLR)logger_slowqueries.$(LIBEXT) \

@@ -126,6 +126,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	sqlrtr=NULL;
 	sqlrlg=NULL;
 	sqlrn=NULL;
+	sqlrs=NULL;
 	sqlrq=NULL;
 	sqlrpe=NULL;
 	sqlra=NULL;
@@ -214,6 +215,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete sqlrtr;
 	delete sqlrlg;
 	delete sqlrn;
+	delete sqlrs;
 	delete sqlrq;
 	delete sqlrpe;
 	delete sqlra;
@@ -324,6 +326,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		sqlrn=new sqlrnotifications(sqlrpth);
 		sqlrn->loadNotifications(notifications);
 		sqlrn->initNotifications(NULL,conn);
+	}
+
+	// get schedules
+	xmldomnode	*schedules=cfg->getSchedules();
+	if (!schedules->isNullNode()) {
+		sqlrs=new sqlrschedules(sqlrpth);
+		sqlrs->loadSchedules(schedules);
+		sqlrs->initSchedules(conn);
 	}
 
 	// handle the unix socket directory

@@ -352,8 +352,6 @@ CONFIGPLUGINLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIME
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) /I$(top_builddir)\src\api\c++
 SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib
 
-LOGGERCPPFLAGS = $(PLUGINCPPFLAGS)
-
 INSTALLSHAREDLIB =
 
 

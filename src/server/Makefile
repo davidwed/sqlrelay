@@ -22,6 +22,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrlogger.cpp \
 	sqlrnotifications.cpp \
 	sqlrnotification.cpp \
+	sqlrschedules.cpp \
+	sqlrschedule.cpp \
 	sqlrqueries.cpp \
 	sqlrquery.cpp \
 	sqlrpwdencs.cpp \
@@ -51,6 +53,8 @@ LIBSQLRSERVERLOBJS = \
 	sqlrlogger.$(OBJ) \
 	sqlrnotifications.$(OBJ) \
 	sqlrnotification.$(OBJ) \
+	sqlrschedules.$(OBJ) \
+	sqlrschedule.$(OBJ) \
 	sqlrqueries.$(OBJ) \
 	sqlrquery.$(OBJ) \
 	sqlrpwdencs.$(OBJ) \
@@ -184,6 +188,22 @@ sqlrnotificationdeclarations.cpp: sqlrnotificationdeclarations.cpp.in
 sqlrnotificationassignments.cpp: sqlrnotificationassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../notifications/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrscheduledeclarations.cpp: sqlrscheduledeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../schedules/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrscheduleassignments.cpp: sqlrscheduleassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../schedules/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \

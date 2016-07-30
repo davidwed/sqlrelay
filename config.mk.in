@@ -536,6 +536,7 @@ STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../parsers/*.$(OBJ)) \
 		$(shell ls ../loggers/*.$(OBJ)) \
 		$(shell ls ../notifications/*.$(OBJ)) \
+		$(shell ls ../schedules/*.$(OBJ)) \
 		$(shell ls ../pwdencs/*.$(OBJ)) \
 		$(shell ls ../auths/*.$(OBJ)) \
 		$(shell ls ../translations/*.$(OBJ)) \
@@ -623,9 +624,6 @@ CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(E
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++
 SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
-
-LOGGERCPPFLAGS = $(PLUGINCPPFLAGS)
-NOTIFICATIONCPPFLAGS = $(PLUGINCPPFLAGS)
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 INSTALLSHAREDLIB = installsharedlib
@@ -935,8 +933,8 @@ SRCALLSUBDIRS += all-util all-configs
 SRCINSTALLSUBDIRS += install-util install-configs
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections
-SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections
+SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections
+SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections
 endif
 else
 SRCALLSUBDIRS = all-api
@@ -946,8 +944,8 @@ SRCALLSUBDIRS += all-configs all-util
 SRCINSTALLSUBDIRS += install-configs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server
-SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server
+SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-filters all-connections all-server
+SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-filters install-connections install-server
 endif
 endif
 ifeq ($(ENABLE_CMDLINE),yes)

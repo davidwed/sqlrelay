@@ -150,6 +150,7 @@
 		sqlrtriggers			*sqlrtr;
 		sqlrloggers			*sqlrlg;
 		sqlrnotifications		*sqlrn;
+		sqlrschedules			*sqlrs;
 		sqlrqueries			*sqlrq;
 		sqlrpwdencs			*sqlrpe;
 		sqlrauths			*sqlra;

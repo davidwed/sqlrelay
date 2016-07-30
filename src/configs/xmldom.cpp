@@ -111,6 +111,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		xmldomnode	*getTriggers();
 		xmldomnode	*getLoggers();
 		xmldomnode	*getNotifications();
+		xmldomnode	*getSchedules();
 		xmldomnode	*getQueries();
 		xmldomnode	*getPasswordEncryptions();
 		xmldomnode	*getAuths();
@@ -220,6 +221,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		xmldomnode	*triggersxml;
 		xmldomnode	*loggersxml;
 		xmldomnode	*notificationsxml;
+		xmldomnode	*schedulesxml;
 		xmldomnode	*queriesxml;
 		xmldomnode	*pwdencsxml;
 		xmldomnode	*authsxml;
@@ -672,6 +674,10 @@ xmldomnode *sqlrconfig_xmldom::getLoggers() {
 
 xmldomnode *sqlrconfig_xmldom::getNotifications() {
 	return notificationsxml;
+}
+
+xmldomnode *sqlrconfig_xmldom::getSchedules() {
+	return schedulesxml;
 }
 
 xmldomnode *sqlrconfig_xmldom::getQueries() {
@@ -1584,6 +1590,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	triggersxml=instance->getFirstTagChild("triggers");
 	loggersxml=instance->getFirstTagChild("loggers");
 	notificationsxml=instance->getFirstTagChild("notifications");
+	schedulesxml=instance->getFirstTagChild("schedules");
 	queriesxml=instance->getFirstTagChild("queries");
 	pwdencsxml=instance->getFirstTagChild("passwordencryptions");
 	authsxml=instance->getFirstTagChild("auths");

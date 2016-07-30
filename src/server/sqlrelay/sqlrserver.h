@@ -18,6 +18,8 @@ class sqlrlogger;
 class sqlrloggers;
 class sqlrnotification;
 class sqlrnotifications;
+class sqlrschedule;
+class sqlrschedules;
 class sqlrparser;
 class sqlrtranslation;
 class sqlrtranslations;
@@ -1223,8 +1225,8 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 
 class SQLRSERVER_DLLSPEC sqlrnotificationplugin {
 	public:
-		sqlrnotification	*lg;
-		dynamiclib	*dl;
+		sqlrnotification	*n;
+		dynamiclib		*dl;
 };
 
 class SQLRSERVER_DLLSPEC sqlrnotifications {
@@ -1247,6 +1249,42 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 		const char	*libexecdir;
 
 		singlylinkedlist< sqlrnotificationplugin * >	llist;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrschedule {
+	public:
+			sqlrschedule(xmldomnode *parameters);
+		virtual	~sqlrschedule();
+
+		virtual bool	init(sqlrserverconnection *sqlrcon);
+		virtual bool	run(sqlrserverconnection *sqlrcon);
+	protected:
+		xmldomnode	*parameters;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrscheduleplugin {
+	public:
+		sqlrschedule	*s;
+		dynamiclib	*dl;
+};
+
+class SQLRSERVER_DLLSPEC sqlrschedules {
+	public:
+			sqlrschedules(sqlrpaths *sqlrpth);
+			~sqlrschedules();
+
+		bool	loadSchedules(xmldomnode *parameters);
+		void	initSchedules(sqlrserverconnection *sqlrcon);
+		void	runSchedules(sqlrserverconnection *sqlrcon);
+	private:
+		void		unloadSchedules();
+		void		loadSchedule(xmldomnode *schedule);
+
+		const char	*libexecdir;
+
+		singlylinkedlist< sqlrscheduleplugin * >	llist;
 };
 
 
