@@ -80,11 +80,11 @@
 		void		decrementBusyListeners();
 		int32_t		getBusyListeners();
 
-		void	logDebugMessage(const char *info);
-		void	logClientProtocolError(const char *info,
-						ssize_t result);
-		void	logClientConnectionRefused(const char *info);
-		void	logInternalError(const char *info);
+		void	raiseDebugMessageEvent(const char *info);
+		void	raiseClientProtocolErrorEvent(const char *info,
+							ssize_t result);
+		void	raiseClientConnectionRefusedEvent(const char *info);
+		void	raiseInternalErrorEvent(const char *info);
 
 		static void	alarmHandler(int32_t signum);
 

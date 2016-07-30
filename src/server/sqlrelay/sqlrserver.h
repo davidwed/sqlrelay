@@ -276,26 +276,27 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	incrementReLogInCount();
 
 
-		// logging api...
+		// event api...
 		bool	logEnabled();
-		void	logDebugMessage(const char *info);
-		void	logClientConnected();
-		void	logClientConnectionRefused(const char *info);
-		void	logClientDisconnected(const char *info);
-		void	logClientProtocolError(sqlrservercursor *cursor,
+		bool	notificationsEnabled();
+		void	raiseDebugMessageEvent(const char *info);
+		void	raiseClientConnectedEvent();
+		void	raiseClientConnectionRefusedEvent(const char *info);
+		void	raiseClientDisconnectedEvent(const char *info);
+		void	raiseClientProtocolErrorEvent(sqlrservercursor *cursor,
 							const char *info,
 							ssize_t result);
-		void	logDbLogIn();
-		void	logDbLogOut();
-		void	logDbError(sqlrservercursor *cursor,
+		void	raiseDbLogInEvent();
+		void	raiseDbLogOutEvent();
+		void	raiseDbErrorEvent(sqlrservercursor *cursor,
 							const char *info);
-		void	logDbWarning(sqlrservercursor *cursor,
+		void	raiseDbWarningEvent(sqlrservercursor *cursor,
 							const char *info);
-		void	logQuery(sqlrservercursor *cursor);
-		void	logFilterViolation(sqlrservercursor *cursor);
-		void	logInternalError(sqlrservercursor *cursor,
+		void	raiseQueryEvent(sqlrservercursor *cursor);
+		void	raiseFilterViolationEvent(sqlrservercursor *cursor);
+		void	raiseInternalErrorEvent(sqlrservercursor *cursor,
 							const char *info);
-		void	logInternalWarning(sqlrservercursor *cursor,
+		void	raiseInternalWarningEvent(sqlrservercursor *cursor,
 							const char *info);
 
 

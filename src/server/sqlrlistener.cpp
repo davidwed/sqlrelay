@@ -490,7 +490,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 		debugstr.append("creating shared memory "
 				"and semaphores: id filename: ");
 		debugstr.append(idfilename);
-		logDebugMessage(debugstr.getString());
+		raiseDebugMessageEvent(debugstr.getString());
 	}
 
 	// make sure that the file exists and is read/writeable
@@ -508,7 +508,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// create the shared memory segment
 	// FIXME: if it already exists, attempt to remove and re-create it
-	logDebugMessage("creating shared memory...");
+	raiseDebugMessageEvent("creating shared memory...");
 
 	shmem=new sharedmemory;
 	if (!shmem->create(key,sizeof(shmdata),
@@ -524,7 +524,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// create (or connect) to the semaphore set
 	// FIXME: if it already exists, attempt to remove and re-create it
-	logDebugMessage("creating semaphores...");
+	raiseDebugMessageEvent("creating semaphores...");
 
 	// semaphores are:
 	//
@@ -747,7 +747,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 				info.append("failed to listen "
 						"on client port: ");
 				info.append(port);
-				logInternalError(info.getString());
+				raiseInternalErrorEvent(info.getString());
 
 				char	*err=error::getErrorString();
 				stderror.printf(
@@ -783,7 +783,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 			stringbuffer	info;
 			info.append("failed to listen on client socket: ");
 			info.append(sock);
-			logInternalError(info.getString());
+			raiseInternalErrorEvent(info.getString());
 
 			stderror.printf("Could not listen on unix socket: ");
 			stderror.printf("%s\n",sock);
@@ -826,7 +826,7 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 		stringbuffer	info;
 		info.append("failed to listen on handoff socket: ");
 		info.append(handoffsockname);
-		logInternalError(info.getString());
+		raiseInternalErrorEvent(info.getString());
 
 		stderror.printf("Could not listen on unix socket: ");
 		stderror.printf("%s\n",handoffsockname);
@@ -859,7 +859,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 		stringbuffer	info;
 		info.append("failed to listen on deregistration socket: ");
 		info.append(removehandoffsockname);
-		logInternalError(info.getString());
+		raiseInternalErrorEvent(info.getString());
 
 		stderror.printf("Could not listen on unix socket: ");
 		stderror.printf("%s\n",removehandoffsockname);
@@ -891,7 +891,7 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 		stringbuffer	info;
 		info.append("failed to listen on fixup socket: ");
 		info.append(fixupsockname);
-		logInternalError(info.getString());
+		raiseInternalErrorEvent(info.getString());
 
 		stderror.printf("Could not listen on unix socket: ");
 		stderror.printf("%s\n",fixupsockname);
@@ -911,11 +911,11 @@ void sqlrlistener::listen() {
 
 		if (opendbconnections<
 			static_cast<int32_t>(cfg->getConnections())) {
-			logDebugMessage("waiting for server "
+			raiseDebugMessageEvent("waiting for server "
 					"connections (sleeping 1s)");
 			snooze::macrosnooze(1);
 		} else {
-			logDebugMessage("finished waiting for "
+			raiseDebugMessageEvent("finished waiting for "
 					"server connections");
 			break;
 		}
@@ -935,7 +935,7 @@ void sqlrlistener::listen() {
 
 filedescriptor *sqlrlistener::waitForTraffic() {
 
-	logDebugMessage("waiting for traffic...");
+	raiseDebugMessageEvent("waiting for traffic...");
 
 	// wait for data on one of the sockets...
 	// if something bad happened, return an invalid file descriptor
@@ -947,7 +947,7 @@ filedescriptor *sqlrlistener::waitForTraffic() {
 	// file descriptor on error
 	filedescriptor	*fd=lsnr.getReadReadyList()->getFirst()->getValue();
 
-	logDebugMessage("finished waiting for traffic");
+	raiseDebugMessageEvent("finished waiting for traffic");
 
 	return fd;
 }
@@ -1077,12 +1077,12 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 
 bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 
-	logDebugMessage("registering handoff...");
+	raiseDebugMessageEvent("registering handoff...");
 
 	// get the connection daemon's pid
 	uint32_t processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		logInternalError("failed to read process "
+		raiseInternalErrorEvent("failed to read process "
 					"id during registration");
 		delete sock;
 		return false;
@@ -1121,18 +1121,18 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 		handoffsocklist=newhandoffsocklist;
 	}
 
-	logDebugMessage("finished registering handoff...");
+	raiseDebugMessageEvent("finished registering handoff...");
 	return true;
 }
 
 bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 
-	logDebugMessage("de-registering handoff...");
+	raiseDebugMessageEvent("de-registering handoff...");
 
 	// get the connection daemon's pid
 	uint32_t	processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		logInternalError("failed to read process "
+		raiseInternalErrorEvent("failed to read process "
 				"id during deregistration");
 		delete sock;
 		return false;
@@ -1151,18 +1151,18 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	// clean up
 	delete sock;
 
-	logDebugMessage("finished de-registering handoff...");
+	raiseDebugMessageEvent("finished de-registering handoff...");
 	return true;
 }
 
 bool sqlrlistener::fixup(filedescriptor *sock) {
 
-	logDebugMessage("passing socket of newly spawned connection...");
+	raiseDebugMessageEvent("passing socket of newly spawned connection...");
 
 	// get the pid of the connection daemon the child listener needs
 	uint32_t	processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		logInternalError("failed to read process id during fixup");
+		raiseInternalErrorEvent("failed to read process id during fixup");
 		delete sock;
 		return false;
 	}
@@ -1173,11 +1173,11 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 		if (handoffsocklist[i].pid==processid) {
 			retval=sock->passSocket(handoffsocklist[i].
 						sock->getFileDescriptor());
-			logDebugMessage("found socket for requested pid ");
+			raiseDebugMessageEvent("found socket for requested pid ");
 			if (retval) {
-				logDebugMessage("passed it successfully");
+				raiseDebugMessageEvent("passed it successfully");
 			} else {
-				logDebugMessage("failed to pass it");
+				raiseDebugMessageEvent("failed to pass it");
 			}
 			break;
 		}
@@ -1186,14 +1186,14 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	// clean up
 	delete sock;
 
-	logDebugMessage("finished passing socket of newly spawned connection");
+	raiseDebugMessageEvent("finished passing socket of newly spawned connection");
 
 	return retval;
 }
 
 bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 
-	logDebugMessage("checking for valid ip...");
+	raiseDebugMessageEvent("checking for valid ip...");
 
 	char	*ip=clientsock->getPeerAddress();
 	if (ip && denied->match(ip) &&
@@ -1201,13 +1201,13 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 
 		stringbuffer	info;
 		info.append("rejected IP address: ")->append(ip);
-		logClientConnectionRefused(info.getString());
+		raiseClientConnectionRefusedEvent(info.getString());
 
 		delete[] ip;
 		return true;
 	}
 
-	logDebugMessage("valid ip");
+	raiseDebugMessageEvent("valid ip");
 
 	delete[] ip;
 	return false;
@@ -1285,7 +1285,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		errorClientSession(clientsock,
 			SQLR_ERROR_ERRORFORKINGLISTENER,
 			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
-		logInternalError(
+		raiseInternalErrorEvent(
 			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 		delete csa;
 		delete thr;
@@ -1331,7 +1331,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 			debugstr.clear();
 			debugstr.append("forked a child: ");
 			debugstr.append((int32_t)childpid);
-			logDebugMessage(debugstr.getString());
+			raiseDebugMessageEvent(debugstr.getString());
 		}
 
 		// the main process doesn't need to stay connected
@@ -1346,7 +1346,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		errorClientSession(clientsock,
 				SQLR_ERROR_ERRORFORKINGLISTENER,
 				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
-		logInternalError(SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+		raiseInternalErrorEvent(SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 	}
 }
 
@@ -1432,7 +1432,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 				// this could fail if a connection
 				// died because its ttl expired...
 
-				logInternalError("failed to pass "
+				raiseInternalErrorEvent("failed to pass "
 						"file descriptor");
 				continue;
 			}
@@ -1464,7 +1464,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 
 bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
 
-	logDebugMessage("acquiring exclusive shm access");
+	raiseDebugMessageEvent("acquiring exclusive shm access");
 
 	// Loop, waiting.  Bail if timeout occurred
 	bool	result=true;
@@ -1495,31 +1495,31 @@ bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
 
 	// handle alarm...
 	if (*timeout) {
-		logDebugMessage("timeout occured");
+		raiseDebugMessageEvent("timeout occured");
 		return false;
 	}
 
 	// handle general failure...
 	if (!result) {
-		logDebugMessage("failed to acquire exclusive shm access");
+		raiseDebugMessageEvent("failed to acquire exclusive shm access");
 		return false;
 	}
 
 	// success...
-	logDebugMessage("acquired exclusive shm access");
+	raiseDebugMessageEvent("acquired exclusive shm access");
 	return true;
 }
 
 bool sqlrlistener::releaseShmAccess() {
 
-	logDebugMessage("releasing exclusive shm access");
+	raiseDebugMessageEvent("releasing exclusive shm access");
 
 	if (!semset->signalWithUndo(1)) {
-		logDebugMessage("failed to release exclusive shm access");
+		raiseDebugMessageEvent("failed to release exclusive shm access");
 		return false;
 	}
 
-	logDebugMessage("finished releasing exclusive shm access");
+	raiseDebugMessageEvent("finished releasing exclusive shm access");
 	return true;
 }
 
@@ -1548,7 +1548,7 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 		}
 	}
 
-	logDebugMessage("waiting for an available connection");
+	raiseDebugMessageEvent("waiting for an available connection");
 
 	// Loop, waiting.  Bail if timeout occurred
 	// FIXME: Some of the listenertimeout might have already been consumed
@@ -1582,13 +1582,13 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 
 	// handle alarm...
 	if (*timeout) {
-		logDebugMessage("timeout occured");
+		raiseDebugMessageEvent("timeout occured");
 		return false;
 	}
 
 	// handle general failure...
 	if (!result) {
-		logInternalError("general failure waiting "
+		raiseInternalErrorEvent("general failure waiting "
 					"for available connection");
 		return false;
 	}
@@ -1603,27 +1603,27 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 	// because of the lock on semaphore 1.
 	semset->setValue(2,0);
 
-	logDebugMessage("succeeded in waiting for an available connection");
+	raiseDebugMessageEvent("succeeded in waiting for an available connection");
 	return true;
 }
 
 bool sqlrlistener::doneAcceptingAvailableConnection() {
 
-	logDebugMessage("signalling accepted connection");
+	raiseDebugMessageEvent("signalling accepted connection");
 
 	if (!semset->signal(3)) {
-		logDebugMessage("failed to signal accepted connection");
+		raiseDebugMessageEvent("failed to signal accepted connection");
 		return false;
 	}
 
-	logDebugMessage("succeeded signalling accepted connection");
+	raiseDebugMessageEvent("succeeded signalling accepted connection");
 	return true;
 }
 
 void sqlrlistener::waitForConnectionToBeReadyForHandoff() {
-	logDebugMessage("waiting for connection to be ready for handoff");
+	raiseDebugMessageEvent("waiting for connection to be ready for handoff");
 	semset->wait(12);
-	logDebugMessage("done waiting for connection to be ready for handoff");
+	raiseDebugMessageEvent("done waiting for connection to be ready for handoff");
 }
 
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
@@ -1635,7 +1635,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 	for (;;) {
 
-		logDebugMessage("getting a connection...");
+		raiseDebugMessageEvent("getting a connection...");
 
 		// set "all db's down" flag
 		bool	alldbsdown=false;
@@ -1682,19 +1682,19 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 							"a connection: ");
 					debugstr.append(
 						(int32_t)*connectionpid);
-					logDebugMessage(debugstr.getString());
+					raiseDebugMessageEvent(debugstr.getString());
 				}
 				return true;
 			}
 
 			// if the connection wasn't up, fork a child to jog it,
 			// spin back and get another connection
-			logDebugMessage("connection was down");
+			raiseDebugMessageEvent("connection was down");
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
 
 		if (timeout) {
-			logDebugMessage("failed to get "
+			raiseDebugMessageEvent("failed to get "
 					"a connection: timeout");
 			sock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
 			sock->write((uint64_t)SQLR_ERROR_HANDOFFFAILED);
@@ -1707,7 +1707,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// return an error if all db's were down
 		if (alldbsdown) {
-			logDebugMessage("failed to get "
+			raiseDebugMessageEvent("failed to get "
 					"a connection: all dbs were down");
 			sock->write((uint16_t)ERROR_OCCURRED);
 			sock->write((uint64_t)SQLR_ERROR_DBSDOWN);
@@ -1823,13 +1823,13 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 bool sqlrlistener::requestFixup(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
-	logDebugMessage("requesting socket of newly spawned connection...");
+	raiseDebugMessageEvent("requesting socket of newly spawned connection...");
 
 	// connect to the fixup socket of the parent listener
 	unixsocketclient	fixupclientsockun;
 	if (fixupclientsockun.connect(fixupsockname,-1,-1,0,1)
 						!=RESULT_SUCCESS) {
-		logInternalError("fixup failed to connect");
+		raiseInternalErrorEvent("fixup failed to connect");
 		return false;
 	}
 
@@ -1837,7 +1837,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 
 	// send the pid of the connection that we need
 	if (fixupclientsockun.write(connectionpid)!=sizeof(uint32_t)) {
-		logInternalError("fixup failed to write pid");
+		raiseInternalErrorEvent("fixup failed to write pid");
 		return false;
 	}
 	fixupclientsockun.flushWriteBuffer(-1,-1);
@@ -1845,7 +1845,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	// get the file descriptor of the socket
 	int32_t	fd;
 	if (!fixupclientsockun.receiveSocket(&fd)) {
-		logInternalError("fixup failed to receive socket");
+		raiseInternalErrorEvent("fixup failed to receive socket");
 		return false;
 	}
 	connectionsock->setFileDescriptor(fd);
@@ -1857,7 +1857,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	// process.  So, we force it to blocking mode here.
 	connectionsock->useBlockingMode();
 
-	logDebugMessage("received socket of newly spawned connection");
+	raiseDebugMessageEvent("received socket of newly spawned connection");
 	return true;
 }
 
@@ -1865,7 +1865,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				filedescriptor *serversock,
 				filedescriptor *clientsock) {
 
-	logDebugMessage("proxying client...");
+	raiseDebugMessageEvent("proxying client...");
 
 	// send the connection our PID
 	serversock->write((uint32_t)process::getProcessId());
@@ -1874,13 +1874,13 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	// wait up to 5 seconds for a response
 	unsigned char	ack=0;
 	if (serversock->read(&ack,5,0)!=sizeof(unsigned char)) {
-		logDebugMessage("proxying client failed: "
+		raiseDebugMessageEvent("proxying client failed: "
 				"failed to receive ack");
 		return false;
 	}
 	#define ACK	6
 	if (ack!=ACK) {
-		logDebugMessage("proxying client failed: "
+		raiseDebugMessageEvent("proxying client failed: "
 				"received bad ack");
 		return false;
 	}
@@ -1914,7 +1914,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// closed the socket, but it appears in that case, the wait does		// fall through with the side that closed the socket indicated
 		// as ready and then the read fails.
 		if (waitcount<1) {
-			logDebugMessage("wait exited with no data");
+			raiseDebugMessageEvent("wait exited with no data");
 			endsession=true;
 			break;
 		}
@@ -1934,7 +1934,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				char	*err=error::getErrorString();
 				debugstr.append(err);
 				delete[] err;
-				logDebugMessage(debugstr.getString());
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			endsession=(fd==clientsock);
 			break;
@@ -1947,7 +1947,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				debugstr.append("read ");
 				debugstr.append((uint32_t)readcount);
 				debugstr.append(" bytes from server");
-				logDebugMessage(debugstr.getString());
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			clientsock->write(readbuffer,readcount);
 			clientsock->flushWriteBuffer(-1,-1);
@@ -1957,7 +1957,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				debugstr.append("read ");
 				debugstr.append((uint32_t)readcount);
 				debugstr.append(" bytes from client");
-				logDebugMessage(debugstr.getString());
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			serversock->write(readbuffer,readcount);
 			serversock->flushWriteBuffer(-1,-1);
@@ -1971,7 +1971,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	// send an END_SESSION ourselves.  Worst case, the server will receive
 	// a second END_SESSION, but we'll kludge it to tolerate that.
 	if (endsession) {
-		logDebugMessage("ending the session");
+		raiseDebugMessageEvent("ending the session");
 		// translate byte order for this, as the client would
 		serversock->translateByteOrder();
 		serversock->write((uint16_t)END_SESSION);
@@ -1985,7 +1985,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	clientsock->dontAllowShortReads();
 	clientsock->useBlockingMode();
 
-	logDebugMessage("finished proxying client");
+	raiseDebugMessageEvent("finished proxying client");
 
 	return true;
 }
@@ -2074,7 +2074,7 @@ void sqlrlistener::incrementMaxListenersErrors() {
 
 void sqlrlistener::incrementConnectedClientCount() {
 
-	logDebugMessage("incrementing connected client count...");
+	raiseDebugMessageEvent("incrementing connected client count...");
 
 	if (!semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
@@ -2106,30 +2106,30 @@ void sqlrlistener::incrementConnectedClientCount() {
 
 		// signal the scaler to evaluate the connection count
 		// and start more connections if necessary
-		logDebugMessage("signalling the scaler...");
+		raiseDebugMessageEvent("signalling the scaler...");
 		if (!semset->signal(6)) {
 			// FIXME: bail somehow
 		}
-		logDebugMessage("finished signalling the scaler...");
+		raiseDebugMessageEvent("finished signalling the scaler...");
 
 		// wait for the scaler
-		logDebugMessage("waiting for the scaler...");
+		raiseDebugMessageEvent("waiting for the scaler...");
 		if (!semset->wait(7)) {
 			// FIXME: bail somehow
 		}
-		logDebugMessage("finished waiting for the scaler...");
+		raiseDebugMessageEvent("finished waiting for the scaler...");
 	}
 
 	if (!semset->signalWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
-	logDebugMessage("finished incrementing connected client count");
+	raiseDebugMessageEvent("finished incrementing connected client count");
 }
 
 void sqlrlistener::decrementConnectedClientCount() {
 
-	logDebugMessage("decrementing connected client count...");
+	raiseDebugMessageEvent("decrementing connected client count...");
  
 	if (!semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
@@ -2143,7 +2143,7 @@ void sqlrlistener::decrementConnectedClientCount() {
 		// FIXME: bail somehow
 	}
 
-	logDebugMessage("finished decrementing connected client count");
+	raiseDebugMessageEvent("finished decrementing connected client count");
 }
 
 uint32_t sqlrlistener::incrementForkedListeners() {
@@ -2167,7 +2167,7 @@ uint32_t sqlrlistener::decrementForkedListeners() {
 
 void sqlrlistener::incrementBusyListeners() {
 
-	logDebugMessage("incrementing busy listeners");
+	raiseDebugMessageEvent("incrementing busy listeners");
 
 	if (!semset->signal(10)) {
 		// FIXME: bail somehow
@@ -2188,22 +2188,22 @@ void sqlrlistener::incrementBusyListeners() {
 		shm->peak_listeners_1min_time=dt.getEpoch();
 	}
 
-	logDebugMessage("finished incrementing busy listeners");
+	raiseDebugMessageEvent("finished incrementing busy listeners");
 }
 
 void sqlrlistener::decrementBusyListeners() {
-	logDebugMessage("decrementing busy listeners");
+	raiseDebugMessageEvent("decrementing busy listeners");
 	if (!semset->wait(10)) {
 		// FIXME: bail somehow
 	}
-	logDebugMessage("finished decrementing busy listeners");
+	raiseDebugMessageEvent("finished decrementing busy listeners");
 }
 
 int32_t sqlrlistener::getBusyListeners() {
 	return semset->getValue(10);
 }
 
-void sqlrlistener::logDebugMessage(const char *info) {
+void sqlrlistener::raiseDebugMessageEvent(const char *info) {
 	if (sqlrlg) {
 		sqlrlg->runLoggers(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_DEBUG,
@@ -2217,7 +2217,8 @@ void sqlrlistener::logDebugMessage(const char *info) {
 	}
 }
 
-void sqlrlistener::logClientProtocolError(const char *info, ssize_t result) {
+void sqlrlistener::raiseClientProtocolErrorEvent(
+					const char *info, ssize_t result) {
 	if (!sqlrlg && !sqlrn) {
 		return;
 	}
@@ -2250,7 +2251,7 @@ void sqlrlistener::logClientProtocolError(const char *info, ssize_t result) {
 	}
 }
 
-void sqlrlistener::logClientConnectionRefused(const char *info) {
+void sqlrlistener::raiseClientConnectionRefusedEvent(const char *info) {
 	if (sqlrlg) {
 		sqlrlg->runLoggers(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_WARNING,
@@ -2264,7 +2265,7 @@ void sqlrlistener::logClientConnectionRefused(const char *info) {
 	}
 }
 
-void sqlrlistener::logInternalError(const char *info) {
+void sqlrlistener::raiseInternalErrorEvent(const char *info) {
 	if (!sqlrlg && !sqlrn) {
 		return;
 	}

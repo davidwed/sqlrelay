@@ -820,7 +820,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (cont->logEnabled()) {
+	if (cont->logEnabled() || cont->notificationsEnabled()) {
 		if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
 				(ub4)OCI_ATTR_STMTCACHESIZE,
@@ -828,7 +828,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 			stringbuffer	debugstr;
 			debugstr.append("cache size ");
 			debugstr.append(stmtcachesize);
-			cont->logDebugMessage(debugstr.getString());
+			cont->raiseDebugMessageEvent(debugstr.getString());
 		}
 	}
 #endif
@@ -2240,7 +2240,8 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 
 		// prepare the query...
 		bool	prepare=true;
-		if (oracleconn->cont->logEnabled()) {
+		if (oracleconn->cont->logEnabled() ||
+			oracleconn->cont->notificationsEnabled()) {
 			// check for a statment cache hit
 			// and report our findings
 			if (OCIStmtPrepare2(oracleconn->svc,&stmt,
@@ -2252,13 +2253,13 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 					OCI_SUCCESS) {
 				// we got a hit and don't
 				// need to do anything else
-				oracleconn->cont->logDebugMessage(
+				oracleconn->cont->raiseDebugMessageEvent(
 							"statement cache hit");
 				prepare=false;
 			} else {
 				// we didn't get a hit and
 				// need to prepare the query
-				oracleconn->cont->logDebugMessage(
+				oracleconn->cont->raiseDebugMessageEvent(
 							"statement cache miss");
 			}
 		}
