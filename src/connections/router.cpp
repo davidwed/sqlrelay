@@ -292,6 +292,7 @@ void routerconnection::handleConnectString() {
 
 	cfg=cont->cfg;
 
+	// FIXME: use router modules...
 	xmldomnode	*routers=cfg->getRouters();
 	if (!routers->isNullNode()) {
 		sqlrr=new sqlrrouters(cont->pth);
