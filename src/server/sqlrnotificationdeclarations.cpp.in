@@ -1,0 +1,1 @@
+sqlrnotification	*new_sqlrnotification_@module@(xmldomnode *parameters);
