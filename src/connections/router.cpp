@@ -292,7 +292,7 @@ void routerconnection::handleConnectString() {
 
 	cfg=cont->cfg;
 
-	// FIXME: use router modules...
+	// FIXME: use the router modules...
 	xmldomnode	*routers=cfg->getRouters();
 	if (!routers->isNullNode()) {
 		sqlrr=new sqlrrouters(cont->pth);
@@ -655,6 +655,8 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize the cursor bind count
 	cbcount=0;
+
+	// FIXME: use the router modules...
 
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
