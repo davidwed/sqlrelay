@@ -10,29 +10,29 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: $(SQLR)route_default.$(LIBEXT)
+all: $(SQLR)router_default.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-$(SQLR)route_default.$(LIBEXT): default.cpp default.$(OBJ)
+$(SQLR)router_default.$(LIBEXT): default.cpp default.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ default.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)route_default.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)router_default.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)route_default.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/$(SQLR)route_default.a
-	$(RM) $(libexecdir)/$(SQLR)route_default.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/$(SQLR)route_default.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)router_default.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)router_default.a
+	$(RM) $(libexecdir)/$(SQLR)router_default.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)router_default.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/$(SQLR)route_default.*
+	$(RM) $(libexecdir)/$(SQLR)router_default.*
