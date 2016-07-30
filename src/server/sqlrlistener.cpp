@@ -38,6 +38,7 @@ sqlrlistener::sqlrlistener() {
 	initialized=false;
 
 	sqlrlg=NULL;
+	sqlrn=NULL;
 
 	semset=NULL;
 	shmem=NULL;
@@ -187,6 +188,7 @@ void sqlrlistener::cleanUp() {
 	delete denied;
 	delete allowed;
 	delete sqlrlg;
+	delete sqlrn;
 }
 
 bool sqlrlistener::init(int argc, const char **argv) {
@@ -223,6 +225,13 @@ bool sqlrlistener::init(int argc, const char **argv) {
 		sqlrlg=new sqlrloggers(sqlrpth);
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(this,NULL);
+	}
+
+	xmldomnode	*notifications=cfg->getNotifications();
+	if (!notifications->isNullNode()) {
+		sqlrn=new sqlrnotifications(sqlrpth);
+		sqlrn->loadNotifications(notifications);
+		sqlrn->initNotifications(this,NULL);
 	}
 
 	idleclienttimeout=cfg->getIdleClientTimeout();
@@ -476,7 +485,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	charstring::printf(idfilename,idfilenamelen,
 				"%s%s",sqlrpth->getIpcDir(),id);
 
-	if (sqlrlg) {
+	if (sqlrlg || sqlrn) {
 		debugstr.clear();
 		debugstr.append("creating shared memory "
 				"and semaphores: id filename: ");
@@ -1302,6 +1311,11 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 			sqlrlg->initLoggers(this,NULL);
 		}
 
+		// re-init notifications
+		if (sqlrn) {
+			sqlrn->initNotifications(this,NULL);
+		}
+
 		clientSession(clientsock,protocolindex,NULL);
 
 		decrementBusyListeners();
@@ -1313,7 +1327,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 	} else if (childpid>0) {
 
 		// parent...
-		if (sqlrlg) {
+		if (sqlrlg || sqlrn) {
 			debugstr.clear();
 			debugstr.append("forked a child: ");
 			debugstr.append((int32_t)childpid);
@@ -1662,7 +1676,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(shm->connectionid)) {
-				if (sqlrlg) {
+				if (sqlrlg || sqlrn) {
 					debugstr.clear();
 					debugstr.append("finished getting "
 							"a connection: ");
@@ -1912,7 +1926,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// read whatever data was available
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
-			if (sqlrlg) {
+			if (sqlrlg || sqlrn) {
 				debugstr.clear();
 				debugstr.append("read failed: ");
 				debugstr.append((uint32_t)readcount);
@@ -1928,7 +1942,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 		// write the data to the other side
 		if (fd==serversock) {
-			if (sqlrlg) {
+			if (sqlrlg || sqlrn) {
 				debugstr.clear();
 				debugstr.append("read ");
 				debugstr.append((uint32_t)readcount);
@@ -1938,7 +1952,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 			clientsock->write(readbuffer,readcount);
 			clientsock->flushWriteBuffer(-1,-1);
 		} else if (fd==clientsock) {
-			if (sqlrlg) {
+			if (sqlrlg || sqlrn) {
 				debugstr.clear();
 				debugstr.append("read ");
 				debugstr.append((uint32_t)readcount);
@@ -2190,17 +2204,21 @@ int32_t sqlrlistener::getBusyListeners() {
 }
 
 void sqlrlistener::logDebugMessage(const char *info) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(this,NULL,NULL,
+				SQLRLOGGER_LOGLEVEL_DEBUG,
+				SQLREVENT_DEBUG_MESSAGE,
+				info);
 	}
-	sqlrlg->runLoggers(this,NULL,NULL,
-			SQLRLOGGER_LOGLEVEL_DEBUG,
-			SQLREVENT_DEBUG_MESSAGE,
-			info);
+	if (sqlrn) {
+		sqlrn->runNotifications(this,NULL,NULL,
+				SQLREVENT_DEBUG_MESSAGE,
+				info);
+	}
 }
 
 void sqlrlistener::logClientProtocolError(const char *info, ssize_t result) {
-	if (!sqlrlg) {
+	if (!sqlrlg && !sqlrn) {
 		return;
 	}
 	stringbuffer	errorbuffer;
@@ -2219,24 +2237,35 @@ void sqlrlistener::logClientProtocolError(const char *info, ssize_t result) {
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	sqlrlg->runLoggers(this,NULL,NULL,
-			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLREVENT_CLIENT_PROTOCOL_ERROR,
-			errorbuffer.getString());
+	if (sqlrlg) {
+		sqlrlg->runLoggers(this,NULL,NULL,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLREVENT_CLIENT_PROTOCOL_ERROR,
+				errorbuffer.getString());
+	}
+	if (sqlrn) {
+		sqlrn->runNotifications(this,NULL,NULL,
+				SQLREVENT_CLIENT_PROTOCOL_ERROR,
+				errorbuffer.getString());
+	}
 }
 
 void sqlrlistener::logClientConnectionRefused(const char *info) {
-	if (!sqlrlg) {
-		return;
+	if (sqlrlg) {
+		sqlrlg->runLoggers(this,NULL,NULL,
+				SQLRLOGGER_LOGLEVEL_WARNING,
+				SQLREVENT_CLIENT_CONNECTION_REFUSED,
+				info);
 	}
-	sqlrlg->runLoggers(this,NULL,NULL,
-			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLREVENT_CLIENT_CONNECTION_REFUSED,
-			info);
+	if (sqlrn) {
+		sqlrn->runNotifications(this,NULL,NULL,
+				SQLREVENT_CLIENT_CONNECTION_REFUSED,
+				info);
+	}
 }
 
 void sqlrlistener::logInternalError(const char *info) {
-	if (!sqlrlg) {
+	if (!sqlrlg && !sqlrn) {
 		return;
 	}
 	stringbuffer	errorbuffer;
@@ -2246,10 +2275,17 @@ void sqlrlistener::logInternalError(const char *info) {
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	sqlrlg->runLoggers(this,NULL,NULL,
-			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLREVENT_INTERNAL_ERROR,
-			errorbuffer.getString());
+	if (sqlrlg) {
+		sqlrlg->runLoggers(this,NULL,NULL,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLREVENT_INTERNAL_ERROR,
+				errorbuffer.getString());
+	}
+	if (sqlrn) {
+		sqlrn->runNotifications(this,NULL,NULL,
+				SQLREVENT_INTERNAL_ERROR,
+				errorbuffer.getString());
+	}
 }
 
 void sqlrlistener::alarmHandler(int32_t signum) {
