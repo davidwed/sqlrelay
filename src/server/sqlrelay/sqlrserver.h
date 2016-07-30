@@ -300,6 +300,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							const char *info);
 		void	raiseInternalWarningEvent(sqlrservercursor *cursor,
 							const char *info);
+		void	raiseScheduleViolationEvent(const char *info);
 
 
 		// cursor api...
@@ -1145,7 +1146,8 @@ enum sqlrevent_t {
 	SQLREVENT_FILTER_VIOLATION,
 	SQLREVENT_INTERNAL_ERROR,
 	SQLREVENT_INTERNAL_WARNING,
-	SQLREVENT_DEBUG_MESSAGE
+	SQLREVENT_DEBUG_MESSAGE,
+	SQLREVENT_SCHEDULE_VIOLATION
 };
 
 enum sqlrlogger_loglevel_t {
@@ -1258,7 +1260,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 		virtual	~sqlrschedule();
 
 		virtual bool	init(sqlrserverconnection *sqlrcon);
-		virtual bool	run(sqlrserverconnection *sqlrcon);
+		virtual bool	allowed(sqlrserverconnection *sqlrcon);
 	protected:
 		xmldomnode	*parameters;
 };
@@ -1277,7 +1279,7 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 
 		bool	loadSchedules(xmldomnode *parameters);
 		void	initSchedules(sqlrserverconnection *sqlrcon);
-		void	runSchedules(sqlrserverconnection *sqlrcon);
+		bool	allowed(sqlrserverconnection *sqlrcon);
 	private:
 		void		unloadSchedules();
 		void		loadSchedule(xmldomnode *schedule);

@@ -35,7 +35,8 @@ static const char *eventtypes[]={
 	"QUERY",
 	"INTERNAL_ERROR",
 	"INTERNAL_WARNING",
-	"DEBUG_MESSAGE"
+	"DEBUG_MESSAGE",
+	"SCHEDULE_VIOLATION"
 };
 
 const char *sqlrnotification::eventType(sqlrevent_t event) {

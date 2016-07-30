@@ -9,7 +9,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule_default : public sqlrschedule {
 			~sqlrschedule_default();
 
 		bool	init(sqlrserverconnection *sqlrcon);
-		bool	run(sqlrserverconnection *sqlrcon);
+		bool	allow(sqlrserverconnection *sqlrcon);
 	private:
 		bool	enabled;
 };
@@ -30,7 +30,7 @@ bool sqlrschedule_default::init(sqlrserverconnection *sqlrcon) {
 	return true;
 }
 
-bool sqlrschedule_default::run(sqlrserverconnection *sqlrcon) {
+bool sqlrschedule_default::allow(sqlrserverconnection *sqlrcon) {
 	if (!enabled) {
 		return true;
 	}

@@ -1836,6 +1836,13 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 
 	raiseDebugMessageEvent("auth...");
 
+	// consult connection schedules
+	if (sqlrs && !sqlrs->allowed(conn)) {
+		raiseDebugMessageEvent("connection schedule violation");
+		raiseScheduleViolationEvent(userbuffer);
+		return false;
+	}
+
 	// authenticate
 	bool	success=(sqlra && sqlra->auth(conn,userbuffer,passwordbuffer));
 	if (success) {
@@ -1854,6 +1861,13 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 				const char *extra) {
 
 	raiseDebugMessageEvent("auth...");
+
+	// consult connection schedules
+	if (sqlrs && !sqlrs->allowed(conn)) {
+		raiseDebugMessageEvent("connection schedule violation");
+		raiseScheduleViolationEvent(userbuffer);
+		return false;
+	}
 
 	// authenticate
 	bool	success=(sqlra && sqlra->auth(conn,userbuffer,
@@ -5337,6 +5351,20 @@ void sqlrservercontroller::raiseInternalWarningEvent(sqlrservercursor *cursor,
 		sqlrn->runNotifications(NULL,conn,cursor,
 				SQLREVENT_INTERNAL_WARNING,
 				warningbuffer.getString());
+	}
+}
+
+void sqlrservercontroller::raiseScheduleViolationEvent(const char *info) {
+	if (sqlrlg) {
+		sqlrlg->runLoggers(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_WARNING,
+				SQLREVENT_SCHEDULE_VIOLATION,
+				info);
+	}
+	if (sqlrn) {
+		sqlrn->runNotifications(NULL,conn,NULL,
+				SQLREVENT_SCHEDULE_VIOLATION,
+				info);
 	}
 }
 
