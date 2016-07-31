@@ -58,6 +58,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 			ns->sendNotification(
 					rnode->getAttributeValue("address"),
 					rnode->getAttributeValue("transportid"),
+					enode->getAttributeValue("subject"),
 					enode->getAttributeValue("template"),
 					event,info);
 		}

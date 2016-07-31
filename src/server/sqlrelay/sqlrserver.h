@@ -1255,6 +1255,7 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 
 		bool	sendNotification(const char *address,
 						const char *transportid,
+						const char *subject,
 						const char *templatefile,
 						sqlrevent_t event,
 						const char *info);

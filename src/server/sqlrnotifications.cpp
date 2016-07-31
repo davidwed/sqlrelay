@@ -191,6 +191,7 @@ sqlrevent_t sqlrnotifications::eventType(const char *event) {
 
 bool sqlrnotifications::sendNotification(const char *address,
 						const char *transportid,
+						const char *subject,
 						const char *templatefile,
 						sqlrevent_t event,
 						const char *info) {
@@ -204,20 +205,20 @@ bool sqlrnotifications::sendNotification(const char *address,
 			"event %s with info \"%s\" via %s\n",
 			address,templatefile,eventType(event),info,url);
 
-	// get the tempate file and perform substiutions
+	// get the subject and perform substitutions
+	const char	*subj=subject;
+	if (charstring::isNullOrEmpty(subj)) {
+		subj=SQL_RELAY" Notification";
+	}
 	// FIXME: perform substitutions
+
+	// get the tempate file and perform substiutions
 	file	tfile;
 	if (!tfile.open(templatefile,O_RDONLY)) {
 		return false;
 	}
 	char	*message=tfile.getContents();
-
-	// FIXME: get this from somewhere
 	// FIXME: perform substitutions
-	stringbuffer	subject;
-	subject.append(SQL_RELAY);
-	subject.append(" Notification - ");
-	subject.append(eventType(event));
 	
 	// handle different transports...
 	if (!charstring::compare(url,"mail")) {
@@ -246,7 +247,7 @@ bool sqlrnotifications::sendNotification(const char *address,
 		// build mail command
 		stringbuffer	mailcmd;
 		mailcmd.append("mail -s \"");
-		mailcmd.append(subject.getString());
+		mailcmd.append(subj);
 		mailcmd.append("\"");
 		mailcmd.append(" \"")->append(address)->append("\"");
 		mailcmd.append(" < ")->append(tempfile);

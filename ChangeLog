@@ -22,7 +22,7 @@
 	non-ascii character encodings work with the C# API now
 	rudiments prompt class is used instead of using readline directly now
 	renamed "logger-events" to just "events"
-	added notification framework
+	added notification framework and "events" module
 	added connection schedule framework
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
