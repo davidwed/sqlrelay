@@ -5,6 +5,7 @@
 
 #include <rudiments/xmldomnode.h>
 #include <rudiments/stdio.h>
+#include <rudiments/process.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
@@ -30,6 +31,8 @@ bool sqlrnotifications::load(xmldomnode *parameters) {
 	debugFunction();
 
 	unload();
+
+	transports=parameters->getFirstTagChild("transports");
 
 	// run through the notification list
 	for (xmldomnode *notification=parameters->getFirstTagChild();
@@ -99,8 +102,8 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 	// load the notification itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrnotification_")->append(module);
-	sqlrnotification *(*newNotification)(xmldomnode *)=
-			(sqlrnotification *(*)(xmldomnode *))
+	sqlrnotification *(*newNotification)(sqlrnotifications *, xmldomnode *)=
+		(sqlrnotification *(*)(sqlrnotifications *, xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newNotification) {
 		stdoutput.printf("failed to create notification: %s\n",module);
@@ -111,7 +114,7 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 		delete dl;
 		return;
 	}
-	sqlrnotification	*n=(*newNotification)(notification);
+	sqlrnotification	*n=(*newNotification)(this,notification);
 
 #else
 
@@ -153,12 +156,151 @@ void sqlrnotifications::run(sqlrlistener *sqlrl,
 	}
 }
 
-bool sqlrnotifications::sendNotification(const char *recipientid,
+// FIXME: push up and consolidate
+static const char *eventtypes[]={
+	"CLIENT_CONNECTED",
+	"CLIENT_CONNECTION_REFUSED",
+	"CLIENT_DISCONNECTED",
+	"CLIENT_PROTOCOL_ERROR",
+	"DB_LOGIN",
+	"DB_LOGOUT",
+	"DB_ERROR",
+	"DB_WARNING",
+	"QUERY",
+	"INTERNAL_ERROR",
+	"INTERNAL_WARNING",
+	"DEBUG_MESSAGE",
+	"SCHEDULE_VIOLATION",
+	NULL
+};
+
+const char *sqlrnotifications::eventType(sqlrevent_t event) {
+	return eventtypes[(uint16_t)event];
+}
+
+sqlrevent_t sqlrnotifications::eventType(const char *event) {
+	uint16_t	retval=SQLREVENT_CLIENT_CONNECTED;
+	for (const char * const *ev=eventtypes; *ev; ev++) {
+		if (!charstring::compareIgnoringCase(event,*ev)) {
+			break;
+		}
+		retval++;
+	}
+	return (sqlrevent_t)retval;
+}
+
+bool sqlrnotifications::sendNotification(const char *address,
+						const char *transportid,
 						const char *templatefile,
 						sqlrevent_t event,
 						const char *info) {
 	debugFunction();
-stdoutput.printf("notifying %s with %s\n",recipientid,templatefile);
-	// FIXME: implement this...
+
+	// get the recipient and transport info
+	xmldomnode	*transport=getTransport(transportid);
+	const char	*url=transport->getAttributeValue("url");
+
+	debugPrintf("notifying %s with %s about "
+			"event %s with info \"%s\" via %s\n",
+			address,templatefile,eventType(event),info,url);
+
+	// get the tempate file and perform substiutions
+	// FIXME: perform substitutions
+	file	tfile;
+	if (!tfile.open(templatefile,O_RDONLY)) {
+		return false;
+	}
+	char	*message=tfile.getContents();
+
+	// FIXME: get this from somewhere
+	// FIXME: perform substitutions
+	stringbuffer	subject;
+	subject.append(SQL_RELAY);
+	subject.append(" Notification - ");
+	subject.append(eventType(event));
+	
+	// handle different transports...
+	if (!charstring::compare(url,"mail")) {
+
+#ifndef _WIN32
+		// write the message to a temp file
+		// FIXME: make this location configurable or
+		// use SQL Relay's temp directory
+		char	tempfile[12]="/tmp/XXXXXX";
+		int32_t	tfd=file::createTemporaryFile(tempfile);
+		if (tfd==-1) {
+			delete[] message;
+			return false;
+		}
+
+		// write the message to the temp file
+		file	tf;
+		tf.setFileDescriptor(tfd);
+		if (tf.write(message,charstring::length(message))!=
+					(ssize_t)charstring::length(message)) {
+			delete[] message;
+			return false;
+		}
+		tf.close();
+
+		// build mail command
+		stringbuffer	mailcmd;
+		mailcmd.append("mail -s \"");
+		mailcmd.append(subject.getString());
+		mailcmd.append("\"");
+		mailcmd.append(" \"")->append(address)->append("\"");
+		mailcmd.append(" < ")->append(tempfile);
+		mailcmd.append(" 2> /dev/null");
+
+		debugPrintf("%s\n",mailcmd.getString());
+
+		// launch mail command
+		const char	*args[100];
+		uint32_t	a=0;
+		args[a++]="sh";
+		args[a++]="-c";
+		args[a++]=mailcmd.getString();
+		args[a++]=NULL;
+		pid_t	pid=process::spawn("/bin/sh",args,false);
+
+		debugPrintf("pid: %d\n",pid);
+
+		// wait for the command to finish
+		if (pid!=-1) {
+			process::getChildStateChange(pid,true,true,true,
+							NULL,NULL,NULL,NULL);
+		}
+
+		// clean up
+		file::remove(tempfile);
+
+#else
+		// FIXME: is there a local mail program we can run on Windows?
+		delete[] message;
+		return false;
+#endif
+
+	} else if (!charstring::compare(url,"smtp:",5) ||
+			!charstring::compare(url,"smtps:",6)) {
+
+		// FIXME: implement this...
+
+	}
+
+	// clean up
+	delete[] message;
+
 	return true;
+}
+
+xmldomnode *sqlrnotifications::getTransport(const char *transportid) {
+	for (xmldomnode *tnode=transports->getFirstTagChild("transport");
+				!tnode->isNullNode();
+				tnode=tnode->getNextTagSibling("transport")) {
+		if (!charstring::compare(transportid,
+					tnode->getAttributeValue("id"))) {
+			return tnode;
+		}
+	}
+	return transports->getNullNode();
 }

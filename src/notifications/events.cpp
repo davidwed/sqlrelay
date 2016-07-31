@@ -43,7 +43,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 			enode=enode->getNextTagSibling("event")) {
 
 		// do we care about this event?
-		if (event!=eventType(enode->getAttributeValue("event"))) {
+		if (event!=ns->eventType(enode->getAttributeValue("event"))) {
 			continue;
 		}
 
@@ -56,7 +56,8 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 			// send the notification
 			// FIXME: this can fail...
 			ns->sendNotification(
-					rnode->getAttributeValue("id"),
+					rnode->getAttributeValue("address"),
+					rnode->getAttributeValue("transportid"),
 					enode->getAttributeValue("template"),
 					event,info);
 		}

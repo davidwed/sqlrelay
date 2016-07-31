@@ -1223,11 +1223,10 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 					sqlrevent_t event,
 					const char *info);
 	protected:
-		const char	*eventType(sqlrevent_t event);
-		sqlrevent_t	eventType(const char *event);
-
 		sqlrnotifications	*ns;
 		xmldomnode		*parameters;
+		xmldomnode		*transports;
+		xmldomnode		*recipients;
 };
 
 
@@ -1251,15 +1250,23 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 					sqlrevent_t event,
 					const char *info);
 
-		bool	sendNotification(const char *recipientid,
+		const char	*eventType(sqlrevent_t event);
+		sqlrevent_t	eventType(const char *event);
+
+		bool	sendNotification(const char *address,
+						const char *transportid,
 						const char *templatefile,
 						sqlrevent_t event,
 						const char *info);
+
+		xmldomnode	*getTransport(const char *transportid);
 	private:
 		void		unload();
 		void		loadNotification(xmldomnode *notification);
 
 		const char	*libexecdir;
+
+		xmldomnode	*transports;
 
 		singlylinkedlist< sqlrnotificationplugin * >	llist;
 };
