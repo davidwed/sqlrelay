@@ -7,7 +7,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
 #include <rudiments/sys.h>
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
 #include <config.h>
@@ -326,13 +326,20 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 					const char *event,
 					const char *info) {
 	debugFunction();
+
 	debugPrintf("input string:\n%s\n\n",str);
 
-	stringbuffer	retval;
+	// output buffer
+	stringbuffer	outbuf;
 
+	// get various bits of data for substitutions
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	char		*hostname=NULL;
+	char	*hostname=NULL;
+	char	*pid=NULL;
+	sqlrconnstatistics	*connstats=(sqlrcon)?
+						sqlrcon->cont->connstats:
+						NULL;
 
 	const char *ch=str;
 	while (*ch) {
@@ -343,10 +350,10 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 			debugPrintf("event: ");
 			value=event;
 			ch+=7;
-		} else if (!charstring::compare(ch,"@info@",6)) {
-			debugPrintf("info: ");
+		} else if (!charstring::compare(ch,"@eventinfo@",11)) {
+			debugPrintf("eventinfo: ");
 			value=info;
-			ch+=6;
+			ch+=11;
 		} else if (!charstring::compare(ch,"@datetime@",10)) {
 			debugPrintf("datetime: ");
 			value=dt.getString();
@@ -362,34 +369,45 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 			debugPrintf("instance: ");
 			value=((sqlrcon)?sqlrcon->cont->getId():sqlrl->getId());
 			ch+=10;
+		} else if (!charstring::compare(ch,"@pid@",5)) {
+			debugPrintf("pid: ");
+			if (!pid) {
+				pid=charstring::parseNumber(
+						process::getProcessId());
+			}
+			value=pid;
+			ch+=5;
 		} else if (!charstring::compare(ch,"@clientaddr@",12)) {
 			debugPrintf("clientaddr: ");
-			value=(sqlrcon && sqlrcon->cont->connstats)?
-					sqlrcon->cont->connstats->clientaddr:"";
+			value=(connstats)?connstats->clientaddr:"";
+			ch+=12;
+		} else if (!charstring::compare(ch,"@clientinfo@",12)) {
+			debugPrintf("clientinfo: ");
+			value=(connstats)?connstats->clientinfo:"";
 			ch+=12;
 		} else if (!charstring::compare(ch,"@user@",6)) {
 			debugPrintf("user: ");
-			value=(sqlrcon && sqlrcon->cont->connstats)?
-					sqlrcon->cont->connstats->user:"";
+			value=(connstats)?connstats->user:"";
 			ch+=6;
 		} else if (!charstring::compare(ch,"@query@",7)) {
 			debugPrintf("query: ");
-			value=(sqlrcur)?sqlrcur->getQueryBuffer():"";
+			value=(connstats)?connstats->sqltext:"";
 			ch+=7;
 		}
 
 		if (value) {
 			debugPrintf(" %s\n",value);
-			retval.append(value);
+			outbuf.append(value);
 		} else {
-			retval.append(*ch);
+			outbuf.append(*ch);
  			ch++;
 		}
 	}
 
-	debugPrintf("\noutput string:\n%s\n\n",retval.getString());
+	debugPrintf("\noutput string:\n%s\n\n",outbuf.getString());
 
 	delete[] hostname;
+	delete[] pid;
 
-	return retval.detachString();
+	return outbuf.detachString();
 }
