@@ -223,15 +223,15 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	xmldomnode	*loggers=cfg->getLoggers();
 	if (!loggers->isNullNode()) {
 		sqlrlg=new sqlrloggers(sqlrpth);
-		sqlrlg->loadLoggers(loggers);
-		sqlrlg->initLoggers(this,NULL);
+		sqlrlg->load(loggers);
+		sqlrlg->init(this,NULL);
 	}
 
 	xmldomnode	*notifications=cfg->getNotifications();
 	if (!notifications->isNullNode()) {
 		sqlrn=new sqlrnotifications(sqlrpth);
-		sqlrn->loadNotifications(notifications);
-		sqlrn->initNotifications(this,NULL);
+		sqlrn->load(notifications);
+		sqlrn->init(this,NULL);
 	}
 
 	idleclienttimeout=cfg->getIdleClientTimeout();
@@ -1308,12 +1308,12 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 
 		// re-init loggers
 		if (sqlrlg) {
-			sqlrlg->initLoggers(this,NULL);
+			sqlrlg->init(this,NULL);
 		}
 
 		// re-init notifications
 		if (sqlrn) {
-			sqlrn->initNotifications(this,NULL);
+			sqlrn->init(this,NULL);
 		}
 
 		clientSession(clientsock,protocolindex,NULL);
@@ -2205,13 +2205,13 @@ int32_t sqlrlistener::getBusyListeners() {
 
 void sqlrlistener::raiseDebugMessageEvent(const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(this,NULL,NULL,
+		sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_DEBUG,
 				SQLREVENT_DEBUG_MESSAGE,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(this,NULL,NULL,
+		sqlrn->run(this,NULL,NULL,
 				SQLREVENT_DEBUG_MESSAGE,
 				info);
 	}
@@ -2239,13 +2239,13 @@ void sqlrlistener::raiseClientProtocolErrorEvent(
 		delete[] error;
 	}
 	if (sqlrlg) {
-		sqlrlg->runLoggers(this,NULL,NULL,
+		sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_ERROR,
 				SQLREVENT_CLIENT_PROTOCOL_ERROR,
 				errorbuffer.getString());
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(this,NULL,NULL,
+		sqlrn->run(this,NULL,NULL,
 				SQLREVENT_CLIENT_PROTOCOL_ERROR,
 				errorbuffer.getString());
 	}
@@ -2253,13 +2253,13 @@ void sqlrlistener::raiseClientProtocolErrorEvent(
 
 void sqlrlistener::raiseClientConnectionRefusedEvent(const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(this,NULL,NULL,
+		sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_WARNING,
 				SQLREVENT_CLIENT_CONNECTION_REFUSED,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(this,NULL,NULL,
+		sqlrn->run(this,NULL,NULL,
 				SQLREVENT_CLIENT_CONNECTION_REFUSED,
 				info);
 	}
@@ -2277,13 +2277,13 @@ void sqlrlistener::raiseInternalErrorEvent(const char *info) {
 		delete[] error;
 	}
 	if (sqlrlg) {
-		sqlrlg->runLoggers(this,NULL,NULL,
+		sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_ERROR,
 				SQLREVENT_INTERNAL_ERROR,
 				errorbuffer.getString());
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(this,NULL,NULL,
+		sqlrn->run(this,NULL,NULL,
 				SQLREVENT_INTERNAL_ERROR,
 				errorbuffer.getString());
 	}

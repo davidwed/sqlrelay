@@ -25,13 +25,13 @@ sqlrauths::sqlrauths(sqlrpaths *sqlrpth, bool debug) {
 
 sqlrauths::~sqlrauths() {
 	debugFunction();
-	unloadAuths();
+	unload();
 }
 
-bool sqlrauths::loadAuths(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
+bool sqlrauths::load(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
 	debugFunction();
 
-	unloadAuths();
+	unload();
 
 	// run through each set of auths
 	for (xmldomnode *auth=parameters->getFirstTagChild("auth");
@@ -46,7 +46,7 @@ bool sqlrauths::loadAuths(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
 	return true;
 }
 
-void sqlrauths::unloadAuths() {
+void sqlrauths::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {

@@ -295,7 +295,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*pwdencs=cfg->getPasswordEncryptions();
 	if (!pwdencs->isNullNode()) {
 		sqlrpe=new sqlrpwdencs(pth);
-		sqlrpe->loadPasswordEncryptions(pwdencs);
+		sqlrpe->load(pwdencs);
 	}	
 
 	// initialize auth
@@ -303,7 +303,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*auths=cfg->getAuths();
 	if (!auths->isNullNode()) {
 		sqlra=new sqlrauths(pth,debugsqlrauths);
-		sqlra->loadAuths(auths,sqlrpe);
+		sqlra->load(auths,sqlrpe);
 	}
 
 	// load database plugin
@@ -316,24 +316,24 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*loggers=cfg->getLoggers();
 	if (!loggers->isNullNode()) {
 		sqlrlg=new sqlrloggers(pth);
-		sqlrlg->loadLoggers(loggers);
-		sqlrlg->initLoggers(NULL,conn);
+		sqlrlg->load(loggers);
+		sqlrlg->init(NULL,conn);
 	}
 
 	// get notifications
 	xmldomnode	*notifications=cfg->getNotifications();
 	if (!notifications->isNullNode()) {
 		sqlrn=new sqlrnotifications(pth);
-		sqlrn->loadNotifications(notifications);
-		sqlrn->initNotifications(NULL,conn);
+		sqlrn->load(notifications);
+		sqlrn->init(NULL,conn);
 	}
 
 	// get schedules
 	xmldomnode	*schedules=cfg->getSchedules();
 	if (!schedules->isNullNode()) {
 		sqlrs=new sqlrschedules(pth);
-		sqlrs->loadSchedules(schedules);
-		sqlrs->initSchedules(conn);
+		sqlrs->load(schedules);
+		sqlrs->init(conn);
 	}
 
 	// handle the unix socket directory
@@ -391,7 +391,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (!translations->isNullNode()) {
 		sqlrp=newParser();
 		sqlrt=new sqlrtranslations(pth,debugsqlrtranslation);
-		sqlrt->loadTranslations(translations);
+		sqlrt->load(translations);
 	}
 
 	// get the query filters
@@ -412,7 +412,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (!resultsettranslations->isNullNode()) {
 		sqlrrst=new sqlrresultsettranslations(pth,
 						debugsqlrresultsettranslation);
-		sqlrrst->loadResultSetTranslations(resultsettranslations);
+		sqlrrst->load(resultsettranslations);
 	}
 
 	// get the triggers
@@ -424,7 +424,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 			sqlrp=newParser();
 		}
 		sqlrtr=new sqlrtriggers(pth,debugsqlrtriggers);
-		sqlrtr->loadTriggers(triggers);
+		sqlrtr->load(triggers);
 	}
 
 	// set autocommit behavior
@@ -477,13 +477,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*queries=cfg->getQueries();
 	if (!queries->isNullNode()) {
 		sqlrq=new sqlrqueries(pth);
-		sqlrq->loadQueries(queries);
+		sqlrq->load(queries);
 	}
 
 	// init client protocols
 	debugsqlrprotocols=cfg->getDebugProtocols();
 	sqlrpr=new sqlrprotocols(this,pth,debugsqlrprotocols);
-	sqlrpr->loadProtocols(cfg->getListeners());
+	sqlrpr->load(cfg->getListeners());
 
 	// set a handler for SIGALARMs, if necessary
 	#ifdef SIGALRM
@@ -2407,7 +2407,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	// apply translation rules
 	stringbuffer	translatedquery;
-	if (!sqlrt->runTranslations(conn,cursor,sqlrp,query,&translatedquery)) {
+	if (!sqlrt->run(conn,cursor,sqlrp,query,&translatedquery)) {
 		if (debugsqlrtranslation) {
 			stdoutput.printf("translation failed, "
 						"using original:\n\"%s\"\n\n",
@@ -3724,9 +3724,9 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	// run translations
 	if (sqlrrst) {
 		// FIXME: use mapColumn() here?
-		sqlrrst->runResultSetTranslations(conn,cursor,name,index,
-						*newfield,*newfieldlength,
-						newfield,newfieldlength);
+		sqlrrst->run(conn,cursor,name,index,
+					*newfield,*newfieldlength,
+					newfield,newfieldlength);
 	}
 
 	if (debugsqlrresultsettranslation) {
@@ -5128,13 +5128,13 @@ bool sqlrservercontroller::notificationsEnabled() {
 
 void sqlrservercontroller::raiseDebugMessageEvent(const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,NULL,
+		sqlrlg->run(NULL,conn,NULL,
 				SQLRLOGGER_LOGLEVEL_DEBUG,
 				SQLREVENT_DEBUG_MESSAGE,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,NULL,
+		sqlrn->run(NULL,conn,NULL,
 				SQLREVENT_DEBUG_MESSAGE,
 				info);
 	}
@@ -5142,13 +5142,13 @@ void sqlrservercontroller::raiseDebugMessageEvent(const char *info) {
 
 void sqlrservercontroller::raiseClientConnectedEvent() {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,NULL,
+		sqlrlg->run(NULL,conn,NULL,
 				SQLRLOGGER_LOGLEVEL_INFO,
 				SQLREVENT_CLIENT_CONNECTED,
 				NULL);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,NULL,
+		sqlrn->run(NULL,conn,NULL,
 				SQLREVENT_CLIENT_CONNECTED,
 				NULL);
 	}
@@ -5156,13 +5156,13 @@ void sqlrservercontroller::raiseClientConnectedEvent() {
 
 void sqlrservercontroller::raiseClientConnectionRefusedEvent(const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,NULL,
+		sqlrlg->run(NULL,conn,NULL,
 				SQLRLOGGER_LOGLEVEL_WARNING,
 				SQLREVENT_CLIENT_CONNECTION_REFUSED,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,NULL,
+		sqlrn->run(NULL,conn,NULL,
 				SQLREVENT_CLIENT_CONNECTION_REFUSED,
 				info);
 	}
@@ -5170,13 +5170,13 @@ void sqlrservercontroller::raiseClientConnectionRefusedEvent(const char *info) {
 
 void sqlrservercontroller::raiseClientDisconnectedEvent(const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,NULL,
+		sqlrlg->run(NULL,conn,NULL,
 				SQLRLOGGER_LOGLEVEL_INFO,
 				SQLREVENT_CLIENT_DISCONNECTED,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,NULL,
+		sqlrn->run(NULL,conn,NULL,
 				SQLREVENT_CLIENT_DISCONNECTED,
 				info);
 	}
@@ -5206,13 +5206,13 @@ void sqlrservercontroller::raiseClientProtocolErrorEvent(
 		delete[] error;
 	}
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,cursor,
+		sqlrlg->run(NULL,conn,cursor,
 				SQLRLOGGER_LOGLEVEL_ERROR,
 				SQLREVENT_CLIENT_PROTOCOL_ERROR,
 				errorbuffer.getString());
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,cursor,
+		sqlrn->run(NULL,conn,cursor,
 				SQLREVENT_CLIENT_PROTOCOL_ERROR,
 				errorbuffer.getString());
 	}
@@ -5220,13 +5220,13 @@ void sqlrservercontroller::raiseClientProtocolErrorEvent(
 
 void sqlrservercontroller::raiseDbLogInEvent() {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,NULL,
+		sqlrlg->run(NULL,conn,NULL,
 				SQLRLOGGER_LOGLEVEL_INFO,
 				SQLREVENT_DB_LOGIN,
 				NULL);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,NULL,
+		sqlrn->run(NULL,conn,NULL,
 				SQLREVENT_DB_LOGIN,
 				NULL);
 	}
@@ -5234,13 +5234,13 @@ void sqlrservercontroller::raiseDbLogInEvent() {
 
 void sqlrservercontroller::raiseDbLogOutEvent() {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,NULL,
+		sqlrlg->run(NULL,conn,NULL,
 				SQLRLOGGER_LOGLEVEL_INFO,
 				SQLREVENT_DB_LOGOUT,
 				NULL);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,NULL,
+		sqlrn->run(NULL,conn,NULL,
 				SQLREVENT_DB_LOGOUT,
 				NULL);
 	}
@@ -5249,13 +5249,13 @@ void sqlrservercontroller::raiseDbLogOutEvent() {
 void sqlrservercontroller::raiseDbErrorEvent(sqlrservercursor *cursor,
 							const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,cursor,
+		sqlrlg->run(NULL,conn,cursor,
 				SQLRLOGGER_LOGLEVEL_ERROR,
 				SQLREVENT_DB_ERROR,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,cursor,
+		sqlrn->run(NULL,conn,cursor,
 				SQLREVENT_DB_ERROR,
 				info);
 	}
@@ -5264,13 +5264,13 @@ void sqlrservercontroller::raiseDbErrorEvent(sqlrservercursor *cursor,
 void sqlrservercontroller::raiseDbWarningEvent(sqlrservercursor *cursor,
 							const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,cursor,
+		sqlrlg->run(NULL,conn,cursor,
 				SQLRLOGGER_LOGLEVEL_WARNING,
 				SQLREVENT_DB_WARNING,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,cursor,
+		sqlrn->run(NULL,conn,cursor,
 				SQLREVENT_DB_WARNING,
 				info);
 	}
@@ -5278,13 +5278,13 @@ void sqlrservercontroller::raiseDbWarningEvent(sqlrservercursor *cursor,
 
 void sqlrservercontroller::raiseQueryEvent(sqlrservercursor *cursor) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,cursor,
+		sqlrlg->run(NULL,conn,cursor,
 				SQLRLOGGER_LOGLEVEL_INFO,
 				SQLREVENT_QUERY,
 				NULL);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,cursor,
+		sqlrn->run(NULL,conn,cursor,
 				SQLREVENT_QUERY,
 				NULL);
 	}
@@ -5292,13 +5292,13 @@ void sqlrservercontroller::raiseQueryEvent(sqlrservercursor *cursor) {
 
 void sqlrservercontroller::raiseFilterViolationEvent(sqlrservercursor *cursor) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,cursor,
+		sqlrlg->run(NULL,conn,cursor,
 				SQLRLOGGER_LOGLEVEL_INFO,
 				SQLREVENT_FILTER_VIOLATION,
 				NULL);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,cursor,
+		sqlrn->run(NULL,conn,cursor,
 				SQLREVENT_FILTER_VIOLATION,
 				NULL);
 	}
@@ -5317,13 +5317,13 @@ void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 		delete[] error;
 	}
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,cursor,
+		sqlrlg->run(NULL,conn,cursor,
 				SQLRLOGGER_LOGLEVEL_ERROR,
 				SQLREVENT_INTERNAL_ERROR,
 				errorbuffer.getString());
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,cursor,
+		sqlrn->run(NULL,conn,cursor,
 				SQLREVENT_INTERNAL_ERROR,
 				errorbuffer.getString());
 	}
@@ -5342,13 +5342,13 @@ void sqlrservercontroller::raiseInternalWarningEvent(sqlrservercursor *cursor,
 		delete[] error;
 	}
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,cursor,
+		sqlrlg->run(NULL,conn,cursor,
 				SQLRLOGGER_LOGLEVEL_WARNING,
 				SQLREVENT_INTERNAL_WARNING,
 				warningbuffer.getString());
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,cursor,
+		sqlrn->run(NULL,conn,cursor,
 				SQLREVENT_INTERNAL_WARNING,
 				warningbuffer.getString());
 	}
@@ -5356,13 +5356,13 @@ void sqlrservercontroller::raiseInternalWarningEvent(sqlrservercursor *cursor,
 
 void sqlrservercontroller::raiseScheduleViolationEvent(const char *info) {
 	if (sqlrlg) {
-		sqlrlg->runLoggers(NULL,conn,NULL,
+		sqlrlg->run(NULL,conn,NULL,
 				SQLRLOGGER_LOGLEVEL_WARNING,
 				SQLREVENT_SCHEDULE_VIOLATION,
 				info);
 	}
 	if (sqlrn) {
-		sqlrn->runNotifications(NULL,conn,NULL,
+		sqlrn->run(NULL,conn,NULL,
 				SQLREVENT_SCHEDULE_VIOLATION,
 				info);
 	}

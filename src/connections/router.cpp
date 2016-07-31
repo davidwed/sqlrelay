@@ -296,8 +296,8 @@ void routerconnection::handleConnectString() {
 	xmldomnode	*routers=cfg->getRouters();
 	if (!routers->isNullNode()) {
 		sqlrr=new sqlrrouters(cont->pth);
-		sqlrr->loadRouters(routers);
-		sqlrr->initRouters(this);
+		sqlrr->load(routers);
+		sqlrr->init(this);
 	}
 
 	linkedlist< routecontainer * >	*routelist=cont->cfg->getRouteList();

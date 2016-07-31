@@ -23,13 +23,13 @@ sqlrqueries::sqlrqueries(sqlrpaths *sqlrpth) {
 
 sqlrqueries::~sqlrqueries() {
 	debugFunction();
-	unloadQueries();
+	unload();
 }
 
-bool sqlrqueries::loadQueries(xmldomnode *parameters) {
+bool sqlrqueries::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadQueries();
+	unload();
 
 	// run through the query list
 	for (xmldomnode *query=parameters->getFirstTagChild();
@@ -43,7 +43,7 @@ bool sqlrqueries::loadQueries(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrqueries::unloadQueries() {
+void sqlrqueries::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrqueryplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {

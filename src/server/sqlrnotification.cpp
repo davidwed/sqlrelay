@@ -3,14 +3,17 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-sqlrnotification::sqlrnotification(xmldomnode *parameters) {
+sqlrnotification::sqlrnotification(sqlrnotifications *ns,
+					xmldomnode *parameters) {
+	this->ns=ns;
 	this->parameters=parameters;
 }
 
 sqlrnotification::~sqlrnotification() {
 }
 
-bool sqlrnotification::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+bool sqlrnotification::init(sqlrlistener *sqlrl,
+				sqlrserverconnection *sqlrcon) {
 	return true;
 }
 
@@ -36,9 +39,21 @@ static const char *eventtypes[]={
 	"INTERNAL_ERROR",
 	"INTERNAL_WARNING",
 	"DEBUG_MESSAGE",
-	"SCHEDULE_VIOLATION"
+	"SCHEDULE_VIOLATION",
+	NULL
 };
 
 const char *sqlrnotification::eventType(sqlrevent_t event) {
 	return eventtypes[(uint16_t)event];
+}
+
+sqlrevent_t sqlrnotification::eventType(const char *event) {
+	uint16_t	retval=SQLREVENT_CLIENT_CONNECTED;
+	for (const char * const *ev=eventtypes; *ev; ev++) {
+		if (!charstring::compareIgnoringCase(event,*ev)) {
+			break;
+		}
+		retval++;
+	}
+	return (sqlrevent_t)retval;
 }

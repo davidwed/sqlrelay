@@ -23,13 +23,13 @@ sqlrnotifications::sqlrnotifications(sqlrpaths *sqlrpth) {
 
 sqlrnotifications::~sqlrnotifications() {
 	debugFunction();
-	unloadNotifications();
+	unload();
 }
 
-bool sqlrnotifications::loadNotifications(xmldomnode *parameters) {
+bool sqlrnotifications::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadNotifications();
+	unload();
 
 	// run through the notification list
 	for (xmldomnode *notification=parameters->getFirstTagChild();
@@ -44,7 +44,7 @@ bool sqlrnotifications::loadNotifications(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrnotifications::unloadNotifications() {
+void sqlrnotifications::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
 						llist.getFirst();
@@ -130,7 +130,7 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 	llist.append(sqlrnp);
 }
 
-void sqlrnotifications::initNotifications(sqlrlistener *sqlrl,
+void sqlrnotifications::init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
@@ -140,7 +140,7 @@ void sqlrnotifications::initNotifications(sqlrlistener *sqlrl,
 	}
 }
 
-void sqlrnotifications::runNotifications(sqlrlistener *sqlrl,
+void sqlrnotifications::run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
@@ -151,4 +151,14 @@ void sqlrnotifications::runNotifications(sqlrlistener *sqlrl,
 						node; node=node->getNext()) {
 		node->getValue()->n->run(sqlrl,sqlrcon,sqlrcur,event,info);
 	}
+}
+
+bool sqlrnotifications::sendNotification(const char *recipientid,
+						const char *templatefile,
+						sqlrevent_t event,
+						const char *info) {
+	debugFunction();
+stdoutput.printf("notifying %s with %s\n",recipientid,templatefile);
+	// FIXME: implement this...
+	return true;
 }

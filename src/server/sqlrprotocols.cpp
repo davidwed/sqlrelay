@@ -25,13 +25,13 @@ sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont,
 
 sqlrprotocols::~sqlrprotocols() {
 	debugFunction();
-	unloadProtocols();
+	unload();
 }
 
-bool sqlrprotocols::loadProtocols(xmldomnode *parameters) {
+bool sqlrprotocols::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadProtocols();
+	unload();
 
 	// run through the listeners
 	uint16_t	i=0;
@@ -49,7 +49,7 @@ bool sqlrprotocols::loadProtocols(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrprotocols::unloadProtocols() {
+void sqlrprotocols::unload() {
 	debugFunction();
 	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
 			*node=protos.getList()->getFirst();

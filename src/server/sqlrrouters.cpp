@@ -23,13 +23,13 @@ sqlrrouters::sqlrrouters(sqlrpaths *sqlrpth) {
 
 sqlrrouters::~sqlrrouters() {
 	debugFunction();
-	unloadRouters();
+	unload();
 }
 
-bool sqlrrouters::loadRouters(xmldomnode *parameters) {
+bool sqlrrouters::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadRouters();
+	unload();
 
 	// run through the router list
 	for (xmldomnode *router=parameters->getFirstTagChild();
@@ -44,7 +44,7 @@ bool sqlrrouters::loadRouters(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrrouters::unloadRouters() {
+void sqlrrouters::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
 						llist.getFirst();
@@ -130,7 +130,7 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	llist.append(sqlrsp);
 }
 
-void sqlrrouters::initRouters(sqlrserverconnection *sqlrcon) {
+void sqlrrouters::init(sqlrserverconnection *sqlrcon) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
 						llist.getFirst();

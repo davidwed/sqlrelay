@@ -18,13 +18,13 @@ sqlrtriggers::sqlrtriggers(sqlrpaths *sqlrpth, bool debug) {
 
 sqlrtriggers::~sqlrtriggers() {
 	debugFunction();
-	unloadTriggers();
+	unload();
 }
 
-bool sqlrtriggers::loadTriggers(xmldomnode *parameters) {
+bool sqlrtriggers::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadTriggers();
+	unload();
 
 	// run through the trigger list
 	for (xmldomnode *trigger=parameters->getFirstTagChild();
@@ -55,7 +55,7 @@ bool sqlrtriggers::loadTriggers(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrtriggers::unloadTriggers() {
+void sqlrtriggers::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrtriggerplugin * > *bnode=
 				beforetriggers.getFirst();
@@ -156,7 +156,7 @@ void sqlrtriggers::runBeforeTriggers(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
-	runTriggers(sqlrcon,sqlrcur,querytree,&beforetriggers,true,true);
+	run(sqlrcon,sqlrcur,querytree,&beforetriggers,true,true);
 }
 
 void sqlrtriggers::runAfterTriggers(sqlrserverconnection *sqlrcon,
@@ -164,10 +164,10 @@ void sqlrtriggers::runAfterTriggers(sqlrserverconnection *sqlrcon,
 						xmldom *querytree,
 						bool success) {
 	debugFunction();
-	runTriggers(sqlrcon,sqlrcur,querytree,&aftertriggers,false,success);
+	run(sqlrcon,sqlrcur,querytree,&aftertriggers,false,success);
 }
 
-void sqlrtriggers::runTriggers(sqlrserverconnection *sqlrcon,
+void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				xmldom *querytree,
 				singlylinkedlist< sqlrtriggerplugin * > *list,

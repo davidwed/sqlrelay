@@ -26,14 +26,13 @@ sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth,
 
 sqlrresultsettranslations::~sqlrresultsettranslations() {
 	debugFunction();
-	unloadResultSetTranslations();
+	unload();
 }
 
-bool sqlrresultsettranslations::loadResultSetTranslations(
-					xmldomnode *parameters) {
+bool sqlrresultsettranslations::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadResultSetTranslations();
+	unload();
 
 	// run through the result set translation list
 	for (xmldomnode *resultsettranslation=parameters->getFirstTagChild();
@@ -48,7 +47,7 @@ bool sqlrresultsettranslations::loadResultSetTranslations(
 	return true;
 }
 
-void sqlrresultsettranslations::unloadResultSetTranslations() {
+void sqlrresultsettranslations::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
 						tlist.getFirst();
@@ -146,8 +145,7 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 	tlist.append(sqlrrstp);
 }
 
-bool sqlrresultsettranslations::runResultSetTranslations(
-						sqlrserverconnection *sqlrcon,
+bool sqlrresultsettranslations::run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						const char *fieldname,
 						uint16_t fieldindex,

@@ -566,9 +566,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// tls
 		tlscontext	*getTLSContext();
 
-		// paths
-		sqlrpaths	*getPaths();
-
 		// utilities
 		bool		skipComment(const char **ptr,
 						const char *endptr);
@@ -612,7 +609,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// connection
 		sqlrserverconnection	*conn;
 
-		// configration
+		// configuration
 		sqlrconfigs		*sqlrcfgs;
 		sqlrconfig		*cfg;
 		sqlrpaths		*pth;
@@ -1036,10 +1033,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 						bool debug);
 			~sqlrprotocols();
 
-		bool		loadProtocols(xmldomnode *listeners);
+		bool		load(xmldomnode *listeners);
 		sqlrprotocol	*getProtocol(uint16_t port);
 	private:
-		void	unloadProtocols();
+		void	unload();
 		void	loadProtocol(uint16_t index, xmldomnode *listener);
 
 		sqlrservercontroller	*cont;
@@ -1084,14 +1081,14 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 			sqlrauths(sqlrpaths *sqlrpth, bool debug);
 			~sqlrauths();
 
-		bool	loadAuths(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
+		bool	load(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password,
 					const char *method, const char *extra);
 	private:
-		void	unloadAuths();
+		void	unload();
 		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);
 
 		const char	*libexecdir;
@@ -1125,10 +1122,10 @@ class SQLRSERVER_DLLSPEC sqlrpwdencs {
 			sqlrpwdencs(sqlrpaths *sqlrpth);
 			~sqlrpwdencs();
 
-		bool		loadPasswordEncryptions(xmldomnode *parameters);
+		bool		load(xmldomnode *parameters);
 		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
 	private:
-		void	unloadPasswordEncryptions();
+		void	unload();
 		void	loadPasswordEncryption(xmldomnode *pwdenc);
 
 		const char	*libexecdir;
@@ -1151,7 +1148,8 @@ enum sqlrevent_t {
 	SQLREVENT_INTERNAL_ERROR,
 	SQLREVENT_INTERNAL_WARNING,
 	SQLREVENT_DEBUG_MESSAGE,
-	SQLREVENT_SCHEDULE_VIOLATION
+	SQLREVENT_SCHEDULE_VIOLATION,
+	SQLREVENT_INVALID_EVENT
 };
 
 enum sqlrlogger_loglevel_t {
@@ -1192,17 +1190,17 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 			sqlrloggers(sqlrpaths *sqlrpth);
 			~sqlrloggers();
 
-		bool	loadLoggers(xmldomnode *parameters);
-		void	initLoggers(sqlrlistener *sqlrl,
-					sqlrserverconnection *sqlrcon);
-		void	runLoggers(sqlrlistener *sqlrl,
-					sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
-					sqlrevent_t event,
-					const char *info);
+		bool	load(xmldomnode *parameters);
+		void	init(sqlrlistener *sqlrl,
+				sqlrserverconnection *sqlrcon);
+		void	run(sqlrlistener *sqlrl,
+				sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
+				sqlrlogger_loglevel_t level,
+				sqlrevent_t event,
+				const char *info);
 	private:
-		void		unloadLoggers();
+		void		unload();
 		void		loadLogger(xmldomnode *logger);
 
 		const char	*libexecdir;
@@ -1213,7 +1211,8 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 
 class SQLRSERVER_DLLSPEC sqlrnotification {
 	public:
-			sqlrnotification(xmldomnode *parameters);
+			sqlrnotification(sqlrnotifications *ns,
+						xmldomnode *parameters);
 		virtual	~sqlrnotification();
 
 		virtual bool	init(sqlrlistener *sqlrl,
@@ -1225,7 +1224,10 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 					const char *info);
 	protected:
 		const char	*eventType(sqlrevent_t event);
-		xmldomnode	*parameters;
+		sqlrevent_t	eventType(const char *event);
+
+		sqlrnotifications	*ns;
+		xmldomnode		*parameters;
 };
 
 
@@ -1240,16 +1242,21 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 			sqlrnotifications(sqlrpaths *sqlrpth);
 			~sqlrnotifications();
 
-		bool	loadNotifications(xmldomnode *parameters);
-		void	initNotifications(sqlrlistener *sqlrl,
+		bool	load(xmldomnode *parameters);
+		void	init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon);
-		void	runNotifications(sqlrlistener *sqlrl,
+		void	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
 					const char *info);
+
+		bool	sendNotification(const char *recipientid,
+						const char *templatefile,
+						sqlrevent_t event,
+						const char *info);
 	private:
-		void		unloadNotifications();
+		void		unload();
 		void		loadNotification(xmldomnode *notification);
 
 		const char	*libexecdir;
@@ -1281,11 +1288,11 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 			sqlrschedules(sqlrpaths *sqlrpth);
 			~sqlrschedules();
 
-		bool	loadSchedules(xmldomnode *parameters);
-		void	initSchedules(sqlrserverconnection *sqlrcon);
+		bool	load(xmldomnode *parameters);
+		void	init(sqlrserverconnection *sqlrcon);
 		bool	allowed(sqlrserverconnection *sqlrcon);
 	private:
-		void		unloadSchedules();
+		void		unload();
 		void		loadSchedule(xmldomnode *schedule);
 
 		const char	*libexecdir;
@@ -1317,11 +1324,11 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 			sqlrrouters(sqlrpaths *sqlrpth);
 			~sqlrrouters();
 
-		bool	loadRouters(xmldomnode *parameters);
-		void	initRouters(sqlrserverconnection *sqlrcon);
+		bool	load(xmldomnode *parameters);
+		void	init(sqlrserverconnection *sqlrcon);
 		bool	route(sqlrserverconnection *sqlrcon);
 	private:
-		void		unloadRouters();
+		void		unload();
 		void		loadRouter(xmldomnode *route);
 
 		const char	*libexecdir;
@@ -1397,8 +1404,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 			sqlrtranslations(sqlrpaths *sqlrpth, bool debug);
 			~sqlrtranslations();
 
-		bool	loadTranslations(xmldomnode *parameters);
-		bool	runTranslations(sqlrserverconnection *sqlrcon,
+		bool	load(xmldomnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						sqlrparser *sqlrp,
 						const char *query,
@@ -1427,7 +1434,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 
 		void	endSession();
 	private:
-		void	unloadTranslations();
+		void	unload();
 		void	loadTranslation(xmldomnode *translation);
 
 		bool	getReplacementName(
@@ -1570,8 +1577,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 							bool debug);
 			~sqlrresultsettranslations();
 
-		bool	loadResultSetTranslations(xmldomnode *parameters);
-		bool	runResultSetTranslations(sqlrserverconnection *sqlrcon,
+		bool	load(xmldomnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						const char *fieldname,
 						uint16_t fieldindex,
@@ -1580,7 +1587,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 						const char **newfield,
 						uint32_t *newfieldlength);
 	private:
-		void	unloadResultSetTranslations();
+		void	unload();
 		void	loadResultSetTranslation(
 					xmldomnode *resultsettranslation);
 		
@@ -1618,7 +1625,7 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 			sqlrtriggers(sqlrpaths *sqlrpth, bool debug);
 			~sqlrtriggers();
 
-		bool	loadTriggers(xmldomnode *parameters);
+		bool	load(xmldomnode *parameters);
 		void	runBeforeTriggers(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						xmldom *querytree);
@@ -1627,11 +1634,11 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 						xmldom *querytree,
 						bool success);
 	private:
-		void		unloadTriggers();
+		void		unload();
 		void		loadTrigger(xmldomnode *trigger,
 					singlylinkedlist< sqlrtriggerplugin *>
 					*list);
-		void		runTriggers(sqlrserverconnection *sqlrcon,
+		void		run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					singlylinkedlist< sqlrtriggerplugin * >
@@ -1685,13 +1692,13 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 			sqlrqueries(sqlrpaths *sqlrpth);
 			~sqlrqueries();
 
-		bool		loadQueries(xmldomnode *parameters);
+		bool		load(xmldomnode *parameters);
 		sqlrquerycursor	*match(sqlrserverconnection *sqlrcon,
 						const char *querystring,
 						uint32_t querylength,
 						uint16_t id);
 	private:
-		void		unloadQueries();
+		void		unload();
 		void		loadQuery(xmldomnode *logger);
 
 		const char	*libexecdir;

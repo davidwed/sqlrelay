@@ -28,15 +28,15 @@ sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
 
 sqlrtranslations::~sqlrtranslations() {
 	debugFunction();
-	unloadTranslations();
+	unload();
 	delete temptablepool;
 	delete tempindexpool;
 }
 
-bool sqlrtranslations::loadTranslations(xmldomnode *parameters) {
+bool sqlrtranslations::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadTranslations();
+	unload();
 
 	// run through the translation list
 	for (xmldomnode *translation=parameters->getFirstTagChild();
@@ -50,7 +50,7 @@ bool sqlrtranslations::loadTranslations(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrtranslations::unloadTranslations() {
+void sqlrtranslations::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
 						tlist.getFirst();
@@ -141,7 +141,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	tlist.append(sqltp);
 }
 
-bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
+bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrparser *sqlrp,
 					const char *query,

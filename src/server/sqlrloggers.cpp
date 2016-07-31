@@ -23,13 +23,13 @@ sqlrloggers::sqlrloggers(sqlrpaths *sqlrpth) {
 
 sqlrloggers::~sqlrloggers() {
 	debugFunction();
-	unloadLoggers();
+	unload();
 }
 
-bool sqlrloggers::loadLoggers(xmldomnode *parameters) {
+bool sqlrloggers::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadLoggers();
+	unload();
 
 	// run through the logger list
 	for (xmldomnode *logger=parameters->getFirstTagChild();
@@ -43,7 +43,7 @@ bool sqlrloggers::loadLoggers(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrloggers::unloadLoggers() {
+void sqlrloggers::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
@@ -127,7 +127,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	llist.append(sqlrlp);
 }
 
-void sqlrloggers::initLoggers(sqlrlistener *sqlrl,
+void sqlrloggers::init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
@@ -136,12 +136,12 @@ void sqlrloggers::initLoggers(sqlrlistener *sqlrl,
 	}
 }
 
-void sqlrloggers::runLoggers(sqlrlistener *sqlrl,
-					sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
-					sqlrevent_t event,
-					const char *info) {
+void sqlrloggers::run(sqlrlistener *sqlrl,
+				sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
+				sqlrlogger_loglevel_t level,
+				sqlrevent_t event,
+				const char *info) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {

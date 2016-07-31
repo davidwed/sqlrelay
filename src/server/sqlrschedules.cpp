@@ -23,13 +23,13 @@ sqlrschedules::sqlrschedules(sqlrpaths *sqlrpth) {
 
 sqlrschedules::~sqlrschedules() {
 	debugFunction();
-	unloadSchedules();
+	unload();
 }
 
-bool sqlrschedules::loadSchedules(xmldomnode *parameters) {
+bool sqlrschedules::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadSchedules();
+	unload();
 
 	// run through the schedule list
 	for (xmldomnode *schedule=parameters->getFirstTagChild();
@@ -44,7 +44,7 @@ bool sqlrschedules::loadSchedules(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrschedules::unloadSchedules() {
+void sqlrschedules::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
 						llist.getFirst();
@@ -130,7 +130,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 	llist.append(sqlrsp);
 }
 
-void sqlrschedules::initSchedules(sqlrserverconnection *sqlrcon) {
+void sqlrschedules::init(sqlrserverconnection *sqlrcon) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
 						llist.getFirst();

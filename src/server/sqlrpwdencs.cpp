@@ -24,13 +24,13 @@ sqlrpwdencs::sqlrpwdencs(sqlrpaths *sqlrpth) {
 
 sqlrpwdencs::~sqlrpwdencs() {
 	debugFunction();
-	unloadPasswordEncryptions();
+	unload();
 }
 
-bool sqlrpwdencs::loadPasswordEncryptions(xmldomnode *parameters) {
+bool sqlrpwdencs::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadPasswordEncryptions();
+	unload();
 
 	// run through the password encryption list
 	for (xmldomnode *pwdenc=parameters->getFirstTagChild();
@@ -44,7 +44,7 @@ bool sqlrpwdencs::loadPasswordEncryptions(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrpwdencs::unloadPasswordEncryptions() {
+void sqlrpwdencs::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {

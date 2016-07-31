@@ -86,7 +86,7 @@ int main(int argc, const char **argv) {
 		process::exit(1);
 	}
 	sqlrpwdencs	sqlrpe(&sqlrpth);
-	sqlrpe.loadPasswordEncryptions(pwdencs);
+	sqlrpe.load(pwdencs);
 	sqlrpwdenc	*sqlrp=sqlrpe.getPasswordEncryptionById(pwdencid);
 	if (!sqlrp) {
 		stderror.printf("password encryption id %s not found\n",
