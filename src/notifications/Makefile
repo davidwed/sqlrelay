@@ -10,29 +10,29 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: $(SQLR)notification_default.$(LIBEXT)
+all: $(SQLR)notification_event.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-$(SQLR)notification_default.$(LIBEXT): default.cpp default.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ default.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+$(SQLR)notification_event.$(LIBEXT): event.cpp event.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ event.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)notification_default.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)notification_event.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)notification_default.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/$(SQLR)notification_default.a
-	$(RM) $(libexecdir)/$(SQLR)notification_default.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/$(SQLR)notification_default.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)notification_event.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)notification_event.a
+	$(RM) $(libexecdir)/$(SQLR)notification_event.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)notification_event.so so $(MODULESUFFIX)
 
 uninstall:
-	$(RM) $(libexecdir)/$(SQLR)notification_default.*
+	$(RM) $(libexecdir)/$(SQLR)notification_event.*

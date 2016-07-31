@@ -3,10 +3,10 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-class SQLRSERVER_DLLSPEC sqlrnotification_default : public sqlrnotification {
+class SQLRSERVER_DLLSPEC sqlrnotification_event : public sqlrnotification {
 	public:
-			sqlrnotification_default(xmldomnode *parameters);
-			~sqlrnotification_default();
+			sqlrnotification_event(xmldomnode *parameters);
+			~sqlrnotification_event();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
@@ -18,16 +18,19 @@ class SQLRSERVER_DLLSPEC sqlrnotification_default : public sqlrnotification {
 		bool	enabled;
 };
 
-sqlrnotification_default::sqlrnotification_default(xmldomnode *parameters) :
-					sqlrnotification(parameters) {
+sqlrnotification_event::sqlrnotification_event(xmldomnode *parameters) :
+						sqlrnotification(parameters) {
+
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
+
+
 }
 
-sqlrnotification_default::~sqlrnotification_default() {
+sqlrnotification_event::~sqlrnotification_event() {
 }
 
-bool sqlrnotification_default::init(sqlrlistener *sqlrl,
+bool sqlrnotification_event::init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon) {
 	if (!enabled) {
 		return true;
@@ -35,7 +38,7 @@ bool sqlrnotification_default::init(sqlrlistener *sqlrl,
 	return true;
 }
 
-bool sqlrnotification_default::run(sqlrlistener *sqlrl,
+bool sqlrnotification_event::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				sqlrevent_t event,
@@ -47,8 +50,8 @@ bool sqlrnotification_default::run(sqlrlistener *sqlrl,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrnotification *new_sqlrnotification_default(
+	SQLRSERVER_DLLSPEC sqlrnotification *new_sqlrnotification_event(
 						xmldomnode *parameters) {
-		return new sqlrnotification_default(parameters);
+		return new sqlrnotification_event(parameters);
 	}
 }
