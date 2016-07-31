@@ -6,7 +6,8 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
-//#define DEBUG_MESSAGES 1
+#include <rudiments/sys.h>
+#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
 #include <config.h>
@@ -189,7 +190,10 @@ sqlrevent_t sqlrnotifications::eventType(const char *event) {
 	return (sqlrevent_t)retval;
 }
 
-bool sqlrnotifications::sendNotification(const char *address,
+bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
+						sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						const char *address,
 						const char *transportid,
 						const char *subject,
 						const char *templatefile,
@@ -197,20 +201,23 @@ bool sqlrnotifications::sendNotification(const char *address,
 						const char *info) {
 	debugFunction();
 
+	// get the event string
+	const char	*eventstring=eventType(event);
+
 	// get the recipient and transport info
 	xmldomnode	*transport=getTransport(transportid);
 	const char	*url=transport->getAttributeValue("url");
 
 	debugPrintf("notifying %s with %s about "
 			"event %s with info \"%s\" via %s\n",
-			address,templatefile,eventType(event),info,url);
+			address,eventstring,info,url);
 
 	// get the subject and perform substitutions
-	const char	*subj=subject;
-	if (charstring::isNullOrEmpty(subj)) {
-		subj=SQL_RELAY" Notification";
+	if (charstring::isNullOrEmpty(subject)) {
+		subject=SQL_RELAY" Notification";
 	}
-	// FIXME: perform substitutions
+	char	*subj=substitutions(sqlrl,sqlrcon,sqlrcur,
+					subject,eventstring,info);
 
 	// get the tempate file and perform substiutions
 	file	tfile;
@@ -218,7 +225,9 @@ bool sqlrnotifications::sendNotification(const char *address,
 		return false;
 	}
 	char	*message=tfile.getContents();
-	// FIXME: perform substitutions
+	char	*msg=substitutions(sqlrl,sqlrcon,sqlrcur,
+					message,eventstring,info);
+	delete[] message;
 	
 	// handle different transports...
 	if (!charstring::compare(url,"mail")) {
@@ -230,16 +239,18 @@ bool sqlrnotifications::sendNotification(const char *address,
 		char	tempfile[12]="/tmp/XXXXXX";
 		int32_t	tfd=file::createTemporaryFile(tempfile);
 		if (tfd==-1) {
-			delete[] message;
+			delete[] subj;
+			delete[] msg;
 			return false;
 		}
 
 		// write the message to the temp file
 		file	tf;
 		tf.setFileDescriptor(tfd);
-		if (tf.write(message,charstring::length(message))!=
-					(ssize_t)charstring::length(message)) {
-			delete[] message;
+		if (tf.write(msg,charstring::length(msg))!=
+					(ssize_t)charstring::length(msg)) {
+			delete[] subj;
+			delete[] msg;
 			return false;
 		}
 		tf.close();
@@ -277,7 +288,8 @@ bool sqlrnotifications::sendNotification(const char *address,
 
 #else
 		// FIXME: is there a local mail program we can run on Windows?
-		delete[] message;
+		delete[] subj;
+		delete[] msg;
 		return false;
 #endif
 
@@ -289,7 +301,8 @@ bool sqlrnotifications::sendNotification(const char *address,
 	}
 
 	// clean up
-	delete[] message;
+	delete[] subj;
+	delete[] msg;
 
 	return true;
 }
@@ -304,4 +317,79 @@ xmldomnode *sqlrnotifications::getTransport(const char *transportid) {
 		}
 	}
 	return transports->getNullNode();
+}
+
+char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					const char *str,
+					const char *event,
+					const char *info) {
+	debugFunction();
+	debugPrintf("input string:\n%s\n\n",str);
+
+	stringbuffer	retval;
+
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	char		*hostname=NULL;
+
+	const char *ch=str;
+	while (*ch) {
+
+		// FIXME: implement more of these
+		const char	*value=NULL;
+		if (!charstring::compare(ch,"@event@",7)) {
+			debugPrintf("event: ");
+			value=event;
+			ch+=7;
+		} else if (!charstring::compare(ch,"@info@",6)) {
+			debugPrintf("info: ");
+			value=info;
+			ch+=6;
+		} else if (!charstring::compare(ch,"@datetime@",10)) {
+			debugPrintf("datetime: ");
+			value=dt.getString();
+			ch+=10;
+		} else if (!charstring::compare(ch,"@hostname@",10)) {
+			debugPrintf("hostname: ");
+			if (!hostname) {
+				hostname=sys::getHostName();
+			}
+			value=hostname;
+			ch+=10;
+		} else if (!charstring::compare(ch,"@instance@",10)) {
+			debugPrintf("instance: ");
+			value=((sqlrcon)?sqlrcon->cont->getId():sqlrl->getId());
+			ch+=10;
+		} else if (!charstring::compare(ch,"@clientaddr@",12)) {
+			debugPrintf("clientaddr: ");
+			value=(sqlrcon && sqlrcon->cont->connstats)?
+					sqlrcon->cont->connstats->clientaddr:"";
+			ch+=12;
+		} else if (!charstring::compare(ch,"@user@",6)) {
+			debugPrintf("user: ");
+			value=(sqlrcon && sqlrcon->cont->connstats)?
+					sqlrcon->cont->connstats->user:"";
+			ch+=6;
+		} else if (!charstring::compare(ch,"@query@",7)) {
+			debugPrintf("query: ");
+			value=(sqlrcur)?sqlrcur->getQueryBuffer():"";
+			ch+=7;
+		}
+
+		if (value) {
+			debugPrintf(" %s\n",value);
+			retval.append(value);
+		} else {
+			retval.append(*ch);
+ 			ch++;
+		}
+	}
+
+	debugPrintf("\noutput string:\n%s\n\n",retval.getString());
+
+	delete[] hostname;
+
+	return retval.detachString();
 }

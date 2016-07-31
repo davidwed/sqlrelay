@@ -1253,7 +1253,10 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 		const char	*eventType(sqlrevent_t event);
 		sqlrevent_t	eventType(const char *event);
 
-		bool	sendNotification(const char *address,
+		bool	sendNotification(sqlrlistener *sqlrl,
+						sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						const char *address,
 						const char *transportid,
 						const char *subject,
 						const char *templatefile,
@@ -1264,6 +1267,13 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 	private:
 		void		unload();
 		void		loadNotification(xmldomnode *notification);
+
+		char		*substitutions(sqlrlistener *sqlrl,
+						sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						const char *str,
+						const char *event,
+						const char *info);
 
 		const char	*libexecdir;
 

@@ -56,6 +56,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 			// send the notification
 			// FIXME: this can fail...
 			ns->sendNotification(
+					sqlrl,sqlrcon,sqlrcur,
 					rnode->getAttributeValue("address"),
 					rnode->getAttributeValue("transportid"),
 					enode->getAttributeValue("subject"),
