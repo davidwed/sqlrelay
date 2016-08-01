@@ -221,7 +221,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 
 	// get the subject and perform substitutions
 	if (charstring::isNullOrEmpty(subject)) {
-		subject=SQL_RELAY" Notification";
+		subject=SQL_RELAY" Notification: @event@";
 	}
 	char	*subj=substitutions(sqlrl,sqlrcon,sqlrcur,
 					subject,eventstring,info);
