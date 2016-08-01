@@ -1839,6 +1839,7 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 	// consult connection schedules
 	if (sqlrs && !sqlrs->allowed(conn,userbuffer)) {
 		raiseDebugMessageEvent("connection schedule violation");
+		// FIXME: handle GSS/TLS users
 		raiseScheduleViolationEvent(userbuffer);
 		return false;
 	}
@@ -1865,6 +1866,7 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 	// consult connection schedules
 	if (sqlrs && !sqlrs->allowed(conn,userbuffer)) {
 		raiseDebugMessageEvent("connection schedule violation");
+		// FIXME: handle GSS/TLS users
 		raiseScheduleViolationEvent(userbuffer);
 		return false;
 	}

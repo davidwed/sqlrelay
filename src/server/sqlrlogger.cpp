@@ -40,6 +40,7 @@ static const char *eventtypes[]={
 	"DB_ERROR",
 	"DB_WARNING",
 	"QUERY",
+	"FILTER_VIOLATION",
 	"INTERNAL_ERROR",
 	"INTERNAL_WARNING",
 	"DEBUG_MESSAGE",

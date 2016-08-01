@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
 class period {
@@ -353,9 +353,10 @@ sqlrschedule_cron::sqlrschedule_cron(xmldomnode *parameters) :
 			parameters->getAttributeValue("default"),"deny");
 
 	// parse the rules
-	for (xmldomnode *rn=parameters->getFirstTagChild();
-				!rn->isNullNode();
-				rn=rn->getNextTagSibling()) {
+	for (xmldomnode *rn=parameters->getFirstTagChild("rules")->
+							getFirstTagChild();
+					!rn->isNullNode();
+					rn=rn->getNextTagSibling()) {
 
 		if (!charstring::compare(rn->getName(),"allow") ||
 			!charstring::compare(rn->getName(),"deny")) {
@@ -382,8 +383,7 @@ bool sqlrschedule_cron::allowed(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
-	// FIXME: handle kerberos users...
-	// FIXME: handle TLS users...
+	// FIXME: handle GSS/TLS users...
 
 	// do we care about this user?
 	bool	found=false;
