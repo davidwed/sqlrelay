@@ -217,7 +217,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 
 	debugPrintf("notifying %s with %s about "
 			"event %s with info \"%s\" via %s\n",
-			address,eventstring,info,url);
+			address,eventstring,eventstring,info,url);
 
 	// get the subject and perform substitutions
 	if (charstring::isNullOrEmpty(subject)) {
@@ -249,6 +249,8 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 			return false;
 		}
 
+		debugPrintf("message file: %s\n",tmpfilename);
+
 		// write the message to the temp file
 		file	tf;
 		tf.setFileDescriptor(tfd);
@@ -260,20 +262,15 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		}
 		tf.close();
 
+#ifndef _WIN32
 		// build mail command
 		stringbuffer	mailcmd;
-#ifndef _WIN32
+
 		mailcmd.append("mail ");
 		mailcmd.append("-s \"")->append(subj)->append("\" ");
 		mailcmd.append("\"")->append(address)->append("\" ");
 		mailcmd.append("< ")->append(tmpfilename);
 		mailcmd.append(" 2> /dev/null");
-#else
-		mailcmd.append("blat ");
-		mailcmd.append("-subject \"")->append(subj)->append("\" ");
-		mailcmd.append("-to \"")->append(address)->append("\" ");
-		mailcmd.append("-body \"")->append(tmpfilename)->append("\"");
-#endif
 
 		debugPrintf("%s\n",mailcmd.getString());
 
@@ -285,18 +282,30 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		args[a++]=mailcmd.getString();
 		args[a++]=NULL;
 		pid_t	pid=process::spawn("/bin/sh",args,false);
+#else
+		// launch mail command
+		const char	*args[100];
+		uint32_t	a=0;
+		args[a++]="blat.exe";
+		args[a++]=tmpfilename;
+		args[a++]="-to";
+		args[a++]=address;
+		args[a++]="-subject";
+		args[a++]=subj;
+		args[a++]="-q";
+		args[a++]=NULL;
+		pid_t	pid=process::spawn("blat.exe",args,false);
+#endif
 
 		debugPrintf("pid: %d\n",pid);
 
 		// wait for the command to finish
 		if (pid!=-1) {
-			process::getChildStateChange(pid,true,true,true,
-							NULL,NULL,NULL,NULL);
+			process::waitForChildToExit(pid);
 		}
 
 		// clean up
 		file::remove(tmpfilename);
-
 	}
 	// FIXME: implement other transports
 
