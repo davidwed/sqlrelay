@@ -280,6 +280,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		tf.setFileDescriptor(tfd);
 		if (tf.write(msg,charstring::length(msg))!=
 					(ssize_t)charstring::length(msg)) {
+			tf.close();
 			file::remove(tmpfilename);
 			delete[] subj;
 			delete[] msg;
