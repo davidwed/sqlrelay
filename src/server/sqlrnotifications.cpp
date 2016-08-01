@@ -214,6 +214,14 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 	if (charstring::isNullOrEmpty(url)) {
 		url="mail";
 	}
+	const char	*agent=transport->getAttributeValue("agent");
+	if (charstring::isNullOrEmpty(agent)) {
+		#ifndef _WIN32
+			agent="mail";
+		#else
+			agent="blat.exe";
+		#endif
+	}
 
 	debugPrintf("notifying %s with %s about "
 			"event %s with info \"%s\" via %s\n",
@@ -226,15 +234,30 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 	char	*subj=substitutions(sqlrl,sqlrcon,sqlrcur,
 					subject,eventstring,info);
 
-	// get the tempate file and perform substiutions
+	// get the message template file and perform substiutions
+	char	*msg=NULL;
 	file	tfile;
-	if (!tfile.open(templatefile,O_RDONLY)) {
-		return false;
-	}
-	char	*message=tfile.getContents();
-	char	*msg=substitutions(sqlrl,sqlrcon,sqlrcur,
+	if (!charstring::isNullOrEmpty(templatefile) &&
+				tfile.open(templatefile,O_RDONLY)) {
+		char	*message=tfile.getContents();
+		msg=substitutions(sqlrl,sqlrcon,sqlrcur,
 					message,eventstring,info);
-	delete[] message;
+		delete[] message;
+	} else {
+		msg=substitutions(sqlrl,sqlrcon,sqlrcur,
+				SQL_RELAY" Notification\n\n"
+				"Event          : @event@\n"
+				"Event Info     : @eventinfo@\n"
+				"Date           : @datetime@\n"
+				"Host Name      : @hostname@\n"
+				"Instance       : @instance@\n"
+				"Process Id     : @pid@\n"
+				"Client Address : @clientaddr@\n"
+				"Client Info    : @clientinfo@\n"
+				"User           : @user@\n"
+				"Query          : \n@query@\n",
+				eventstring,info);
+	}
 	
 	// handle transports...
 	if (!charstring::compare(url,"mail")) {
@@ -266,7 +289,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		// build mail command
 		stringbuffer	mailcmd;
 
-		mailcmd.append("mail ");
+		mailcmd.append(agent)->append(" ");
 		mailcmd.append("-s \"")->append(subj)->append("\" ");
 		mailcmd.append("\"")->append(address)->append("\" ");
 		mailcmd.append("< ")->append(tmpfilename);
@@ -286,7 +309,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		// launch mail command
 		const char	*args[100];
 		uint32_t	a=0;
-		args[a++]="blat.exe";
+		args[a++]=agent;
 		args[a++]=tmpfilename;
 		args[a++]="-to";
 		args[a++]=address;
