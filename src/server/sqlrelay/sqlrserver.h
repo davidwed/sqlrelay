@@ -1276,6 +1276,8 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 						const char *info);
 
 		const char	*libexecdir;
+		const char	*tmpdir;
+		char		*tmpfilename;
 
 		xmldomnode	*transports;
 

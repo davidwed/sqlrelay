@@ -146,6 +146,10 @@ const char *sqlrpaths::getLocalStateDir() {
 	return localstatedir;
 }
 
+const char *sqlrpaths::getTmpDir() {
+	return tmpdir;
+}
+
 const char *sqlrpaths::getSockSeqFile() {
 	return sockseqfile;
 }

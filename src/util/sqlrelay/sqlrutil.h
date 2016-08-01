@@ -22,6 +22,7 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 				~sqlrpaths();
 		const char	*getBinDir();
 		const char	*getLocalStateDir();
+		const char	*getTmpDir();
 		const char	*getSockSeqFile();
 		const char	*getSocketsDir();
 		const char	*getIpcDir();

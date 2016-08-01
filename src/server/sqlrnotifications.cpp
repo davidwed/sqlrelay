@@ -7,6 +7,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
 #include <rudiments/sys.h>
+#include <rudiments/permissions.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
@@ -21,11 +22,14 @@
 sqlrnotifications::sqlrnotifications(sqlrpaths *sqlrpth) {
 	debugFunction();
 	libexecdir=sqlrpth->getLibExecDir();
+	tmpdir=sqlrpth->getTmpDir();
+	tmpfilename=new char[charstring::length(sqlrpth->getTmpDir())+6+1];
 }
 
 sqlrnotifications::~sqlrnotifications() {
 	debugFunction();
 	unload();
+	delete[] tmpfilename;
 }
 
 bool sqlrnotifications::load(xmldomnode *parameters) {
@@ -232,12 +236,10 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 	// handle different transports...
 	if (!charstring::compare(url,"mail")) {
 
-#ifndef _WIN32
-		// write the message to a temp file
-		// FIXME: make this location configurable or
-		// use SQL Relay's temp directory
-		char	tempfile[12]="/tmp/XXXXXX";
-		int32_t	tfd=file::createTemporaryFile(tempfile);
+		charstring::copy(tmpfilename,tmpdir);
+		charstring::append(tmpfilename,"XXXXXX");
+		int32_t	tfd=file::createTemporaryFile(tmpfilename,
+				permissions::evalPermString("rw-------"));
 		if (tfd==-1) {
 			delete[] subj;
 			delete[] msg;
@@ -257,12 +259,18 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 
 		// build mail command
 		stringbuffer	mailcmd;
-		mailcmd.append("mail -s \"");
-		mailcmd.append(subj);
-		mailcmd.append("\"");
-		mailcmd.append(" \"")->append(address)->append("\"");
-		mailcmd.append(" < ")->append(tempfile);
+#ifndef _WIN32
+		mailcmd.append("mail ");
+		mailcmd.append("-s \"")->append(subj)->append("\" ");
+		mailcmd.append("\"")->append(address)->append("\" ");
+		mailcmd.append("< ")->append(tmpfilename);
 		mailcmd.append(" 2> /dev/null");
+#else
+		mailcmd.append("blat ");
+		mailcmd.append("-subject \"")->append(subj)->append("\" ");
+		mailcmd.append("-to \"")->append(address)->append("\" ");
+		mailcmd.append("-body \"")->append(tmpfilename)->append("\"");
+#endif
 
 		debugPrintf("%s\n",mailcmd.getString());
 
@@ -284,14 +292,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		}
 
 		// clean up
-		file::remove(tempfile);
-
-#else
-		// FIXME: is there a local mail program we can run on Windows?
-		delete[] subj;
-		delete[] msg;
-		return false;
-#endif
+		file::remove(tmpfilename);
 
 	} else if (!charstring::compare(url,"smtp:",5) ||
 			!charstring::compare(url,"smtps:",6)) {
