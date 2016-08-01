@@ -139,12 +139,12 @@ void sqlrschedules::init(sqlrserverconnection *sqlrcon) {
 	}
 }
 
-bool sqlrschedules::allowed(sqlrserverconnection *sqlrcon) {
+bool sqlrschedules::allowed(sqlrserverconnection *sqlrcon, const char *user) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
 						llist.getFirst();
 						node; node=node->getNext()) {
-		if (!node->getValue()->s->allowed(sqlrcon)) {
+		if (!node->getValue()->s->allowed(sqlrcon,user)) {
 			return false;
 		}
 	}

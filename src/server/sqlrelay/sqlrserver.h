@@ -1291,7 +1291,8 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 		virtual	~sqlrschedule();
 
 		virtual bool	init(sqlrserverconnection *sqlrcon);
-		virtual bool	allowed(sqlrserverconnection *sqlrcon);
+		virtual bool	allowed(sqlrserverconnection *sqlrcon,
+							const char *user);
 	protected:
 		xmldomnode	*parameters;
 };
@@ -1310,7 +1311,8 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 
 		bool	load(xmldomnode *parameters);
 		void	init(sqlrserverconnection *sqlrcon);
-		bool	allowed(sqlrserverconnection *sqlrcon);
+		bool	allowed(sqlrserverconnection *sqlrcon,
+						const char *user);
 	private:
 		void		unload();
 		void		loadSchedule(xmldomnode *schedule);

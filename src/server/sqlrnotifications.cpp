@@ -317,7 +317,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		args[a++]=subj;
 		args[a++]="-q";
 		args[a++]=NULL;
-		pid_t	pid=process::spawn("blat.exe",args,false);
+		pid_t	pid=process::spawn(agent,args,false);
 #endif
 
 		debugPrintf("pid: %d\n",pid);

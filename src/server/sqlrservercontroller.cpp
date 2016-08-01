@@ -1837,7 +1837,7 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 	raiseDebugMessageEvent("auth...");
 
 	// consult connection schedules
-	if (sqlrs && !sqlrs->allowed(conn)) {
+	if (sqlrs && !sqlrs->allowed(conn,userbuffer)) {
 		raiseDebugMessageEvent("connection schedule violation");
 		raiseScheduleViolationEvent(userbuffer);
 		return false;
@@ -1863,7 +1863,7 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 	raiseDebugMessageEvent("auth...");
 
 	// consult connection schedules
-	if (sqlrs && !sqlrs->allowed(conn)) {
+	if (sqlrs && !sqlrs->allowed(conn,userbuffer)) {
 		raiseDebugMessageEvent("connection schedule violation");
 		raiseScheduleViolationEvent(userbuffer);
 		return false;

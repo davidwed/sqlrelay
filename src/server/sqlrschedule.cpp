@@ -14,6 +14,6 @@ bool sqlrschedule::init(sqlrserverconnection *sqlrcon) {
 	return true;
 }
 
-bool sqlrschedule::allowed(sqlrserverconnection *sqlrcon) {
+bool sqlrschedule::allowed(sqlrserverconnection *sqlrcon, const char *user) {
 	return true;
 }
