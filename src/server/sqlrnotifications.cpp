@@ -208,9 +208,12 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 	// get the event string
 	const char	*eventstring=eventType(event);
 
-	// get the recipient and transport info
+	// get the transport info, falling back to "mail"
 	xmldomnode	*transport=getTransport(transportid);
 	const char	*url=transport->getAttributeValue("url");
+	if (charstring::isNullOrEmpty(url)) {
+		url="mail";
+	}
 
 	debugPrintf("notifying %s with %s about "
 			"event %s with info \"%s\" via %s\n",
@@ -233,7 +236,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 					message,eventstring,info);
 	delete[] message;
 	
-	// handle different transports...
+	// handle transports...
 	if (!charstring::compare(url,"mail")) {
 
 		charstring::copy(tmpfilename,tmpdir);
@@ -294,12 +297,8 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		// clean up
 		file::remove(tmpfilename);
 
-	} else if (!charstring::compare(url,"smtp:",5) ||
-			!charstring::compare(url,"smtps:",6)) {
-
-		// FIXME: implement this...
-
 	}
+	// FIXME: implement other transports
 
 	// clean up
 	delete[] subj;
