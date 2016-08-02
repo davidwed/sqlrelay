@@ -18,6 +18,9 @@ class sqlrlogger;
 class sqlrloggers;
 class sqlrnotification;
 class sqlrnotifications;
+class sqlrscheduleperiod;
+class sqlrscheduledaypart;
+class sqlrschedulerule;
 class sqlrschedule;
 class sqlrschedules;
 class sqlrparser;
@@ -1285,6 +1288,58 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 };
 
 
+class SQLRSERVER_DLLSPEC sqlrscheduleperiod {
+	public:
+		uint16_t	start;
+		uint16_t	end;
+};
+
+class SQLRSERVER_DLLSPEC sqlrscheduledaypart {
+	public:
+		uint16_t	starthour;
+		uint16_t	startminute;
+		uint16_t	endhour;
+		uint16_t	endminute;
+};
+
+class SQLRSERVER_DLLSPEC sqlrschedulerule {
+	public:
+		sqlrschedulerule(bool allow, const char *when);
+		sqlrschedulerule(bool allow,
+			const char *years,
+			const char *months,
+			const char *daysofmonth,
+			const char *daysofweek,
+			const char *dayparts);
+		~sqlrschedulerule();
+
+		bool	allowed(datetime *dt, bool currentlyallowed);
+		
+	private:
+		void	init(bool allow,
+				const char *years,
+				const char *months,
+				const char *daysofmonth,
+				const char *daysofweek,
+				const char *dayparts);
+		void	splitTimePart(
+				linkedlist< sqlrscheduleperiod * > *periods,
+				const char *timepartlist);
+		void	splitDayParts(const char *daypartlist);
+		bool	inPeriods(
+				linkedlist< sqlrscheduleperiod * > *periods,
+				int32_t timepart);
+		bool	inDayParts(int32_t hour, int32_t minute);
+
+		bool			allow;
+		linkedlist< sqlrscheduleperiod * >	years;
+		linkedlist< sqlrscheduleperiod * >	months;
+		linkedlist< sqlrscheduleperiod * >	daysofmonth;
+		linkedlist< sqlrscheduleperiod * >	daysofweek;
+		linkedlist< sqlrscheduledaypart * >	dayparts;
+};
+
+
 class SQLRSERVER_DLLSPEC sqlrschedule {
 	public:
 			sqlrschedule(xmldomnode *parameters);
@@ -1293,8 +1348,22 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 		virtual bool	init(sqlrserverconnection *sqlrcon);
 		virtual bool	allowed(sqlrserverconnection *sqlrcon,
 							const char *user);
+
+		virtual	void	addRule(bool allow, const char *when);
+		virtual	void	addRule(bool allow,
+					const char *years,
+					const char *months,
+					const char *daysofmonth,
+					const char *daysofweek,
+					const char *dayparts);
+
+		virtual	bool	rulesAllow(datetime *dt, bool currentlyallowed);
+
 	protected:
 		xmldomnode	*parameters;
+
+	private:
+		linkedlist< sqlrschedulerule * >	rules;
 };
 
 
