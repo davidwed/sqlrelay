@@ -366,13 +366,19 @@ rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 %post
 /sbin/ldconfig
 if [ $1 = 1 ]; then
-	/sbin/chkconfig --add sqlrelay
+	#/sbin/chkconfig --add sqlrelay
+	/usr/bin/systemctl enable sqlrelay.service
+	/usr/bin/systemctl enable sqlrcachemanager.service
 fi
 
 %preun
 if [ $1 = 0 ]; then
-	/sbin/service sqlrelay stop> /dev/null 2>&1 || :
-	/sbin/chkconfig --del sqlrelay
+	#/sbin/service sqlrelay stop> /dev/null 2>&1 || :
+	#/sbin/chkconfig --del sqlrelay
+	/usr/bin/systemctl stop sqlrelay.service
+	/usr/bin/systemctl stop sqlrcachemanager.service
+	/usr/bin/systemctl disable sqlrelay.service
+	/usr/bin/systemctl disable sqlrcachemanager.service
 fi
 
 %postun
@@ -392,8 +398,10 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %{_sysconfdir}/sqlrelay.conf.d
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
-/etc/init.d/sqlrelay
-/etc/init.d/sqlrcachemanager
+#/etc/init.d/sqlrelay
+#/etc/init.d/sqlrcachemanager
+/lib/systemd/system/sqlrelay.service
+/lib/systemd/system/sqlrcachemanager.service
 %{_bindir}/sqlr-cachemanager*
 %{_bindir}/sqlr-listener*
 %{_bindir}/sqlr-connection*
