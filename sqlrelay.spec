@@ -366,15 +366,12 @@ rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 %post
 /sbin/ldconfig
 if [ $1 = 1 ]; then
-	#/sbin/chkconfig --add sqlrelay
 	/usr/bin/systemctl enable sqlrelay.service
 	/usr/bin/systemctl enable sqlrcachemanager.service
 fi
 
 %preun
 if [ $1 = 0 ]; then
-	#/sbin/service sqlrelay stop> /dev/null 2>&1 || :
-	#/sbin/chkconfig --del sqlrelay
 	/usr/bin/systemctl stop sqlrelay.service
 	/usr/bin/systemctl stop sqlrcachemanager.service
 	/usr/bin/systemctl disable sqlrelay.service
@@ -398,8 +395,6 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %{_sysconfdir}/sqlrelay.conf.d
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
-#/etc/init.d/sqlrelay
-#/etc/init.d/sqlrcachemanager
 /lib/systemd/system/sqlrelay.service
 /lib/systemd/system/sqlrcachemanager.service
 %{_bindir}/sqlr-cachemanager*
@@ -414,12 +409,15 @@ rm -rf %{buildroot}
 %{_libexecdir}/sqlrelay/sqlrauth_*
 %{_libexecdir}/sqlrelay/sqlrconfig_*
 %{_libexecdir}/sqlrelay/sqlrfilter_*
+%{_libexecdir}/sqlrelay/sqlrnotification_*
 %{_libexecdir}/sqlrelay/sqlrparser_*
 %{_libexecdir}/sqlrelay/sqlrprotocol_*
 %{_libexecdir}/sqlrelay/sqlrpwdenc_*
 %{_libexecdir}/sqlrelay/sqlrlogger_*
 %{_libexecdir}/sqlrelay/sqlrquery_*
 %{_libexecdir}/sqlrelay/sqlrresultsettranslation_*
+%{_libexecdir}/sqlrelay/sqlrrouter_*
+%{_libexecdir}/sqlrelay/sqlrschedule_*
 %{_libexecdir}/sqlrelay/sqlrtranslation_*
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
