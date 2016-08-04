@@ -460,8 +460,9 @@ rm -rf %{buildroot}
 %files client-devel-c++
 %defattr(-, root, root)
 %{_bindir}/sqlrclient-config
-%{_includedir}/sqlrelay
-%{_includedir}/sqlrelay/private
+# FIXME: remove these directories if they are empty
+#%{_includedir}/sqlrelay
+#%{_includedir}/sqlrelay/private
 %{_includedir}/sqlrelay/sqlrclient.h
 %{_includedir}/sqlrelay/private/sqlrclientincludes.h
 %{_includedir}/sqlrelay/private/sqlrconnection.h
