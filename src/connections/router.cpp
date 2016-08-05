@@ -295,7 +295,8 @@ void routerconnection::handleConnectString() {
 	// FIXME: use the router modules...
 	xmldomnode	*routers=cfg->getRouters();
 	if (!routers->isNullNode()) {
-		sqlrr=new sqlrrouters(cont->pth);
+		// FIXME: set debug correctly
+		sqlrr=new sqlrrouters(cont->pth,false);
 		sqlrr->load(routers);
 		sqlrr->init(this);
 	}

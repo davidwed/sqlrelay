@@ -16,9 +16,10 @@
 	}
 #endif
 
-sqlrrouters::sqlrrouters(sqlrpaths *sqlrpth) {
+sqlrrouters::sqlrrouters(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	libexecdir=sqlrpth->getLibExecDir();
+	this->debug=debug;
 }
 
 sqlrrouters::~sqlrrouters() {
@@ -99,8 +100,8 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	// load the router itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrrouter_")->append(module);
-	sqlrrouter *(*newRouter)(xmldomnode *)=
-			(sqlrrouter *(*)(xmldomnode *))
+	sqlrrouter *(*newRouter)(xmldomnode *,bool)=
+			(sqlrrouter *(*)(xmldomnode *,bool))
 				dl->getSymbol(functionname.getString());
 	if (!newRouter) {
 		stdoutput.printf("failed to create router: %s\n",module);
@@ -111,7 +112,7 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		delete dl;
 		return;
 	}
-	sqlrrouter	*r=(*newRouter)(router);
+	sqlrrouter	*r=(*newRouter)(router,debug);
 
 #else
 
@@ -139,14 +140,17 @@ void sqlrrouters::init(sqlrserverconnection *sqlrcon) {
 	}
 }
 
-bool sqlrrouters::route(sqlrserverconnection *sqlrcon) {
+const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
 						llist.getFirst();
 						node; node=node->getNext()) {
-		if (!node->getValue()->r->route(sqlrcon)) {
-			return false;
+		const char	*connectionid=
+				node->getValue()->r->route(sqlrcon,sqlrcur);
+		if (connectionid) {
+			return connectionid;
 		}
 	}
-	return true;
+	return NULL;
 }

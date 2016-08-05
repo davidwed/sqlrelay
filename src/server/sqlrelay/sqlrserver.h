@@ -1394,13 +1394,15 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 
 class SQLRSERVER_DLLSPEC sqlrrouter {
 	public:
-			sqlrrouter(xmldomnode *parameters);
+			sqlrrouter(xmldomnode *parameters, bool debug);
 		virtual	~sqlrrouter();
 
-		virtual bool	init(sqlrserverconnection *sqlrcon);
-		virtual bool	route(sqlrserverconnection *sqlrcon);
+		virtual	bool		init(sqlrserverconnection *sqlrcon);
+		virtual const char	*route(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur);
 	protected:
 		xmldomnode	*parameters;
+		bool		debug;
 };
 
 
@@ -1412,17 +1414,20 @@ class SQLRSERVER_DLLSPEC sqlrrouterplugin {
 
 class SQLRSERVER_DLLSPEC sqlrrouters {
 	public:
-			sqlrrouters(sqlrpaths *sqlrpth);
+			sqlrrouters(sqlrpaths *sqlrpth, bool debug);
 			~sqlrrouters();
 
 		bool	load(xmldomnode *parameters);
 		void	init(sqlrserverconnection *sqlrcon);
-		bool	route(sqlrserverconnection *sqlrcon);
+
+		const char	*route(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur);
 	private:
 		void		unload();
 		void		loadRouter(xmldomnode *route);
 
 		const char	*libexecdir;
+		bool		debug;
 
 		singlylinkedlist< sqlrrouterplugin * >	llist;
 };
