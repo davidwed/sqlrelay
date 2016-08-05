@@ -11,10 +11,6 @@ sqlrrouter::sqlrrouter(xmldomnode *parameters, bool debug) {
 sqlrrouter::~sqlrrouter() {
 }
 
-bool sqlrrouter::init(sqlrserverconnection *sqlrcon) {
-	return true;
-}
-
 const char *sqlrrouter::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur) {
 	return NULL;

@@ -1,1 +1,1 @@
-sqlrschedule	*new_sqlrschedule_@module@(xmldomnode *parameters);
+sqlrschedule	*new_sqlrschedule_@module@(xmldomnode *parameters, bool debug);

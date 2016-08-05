@@ -131,15 +131,6 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	llist.append(sqlrsp);
 }
 
-void sqlrrouters::init(sqlrserverconnection *sqlrcon) {
-	debugFunction();
-	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
-						llist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->r->init(sqlrcon);
-	}
-}
-
 const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur) {
 	debugFunction();

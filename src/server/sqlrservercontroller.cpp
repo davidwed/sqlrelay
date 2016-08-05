@@ -136,11 +136,8 @@ sqlrservercontroller::sqlrservercontroller() {
 	debugsqlrparser=false;
 	debugsqlrtranslation=false;
 	debugsqlrfilters=false;
-	debugsqlrtriggers=false;
 	debugbindtranslation=false;
 	debugsqlrresultsettranslation=false;
-	debugsqlrprotocols=false;
-	debugsqlrauths=false;
 
 	cur=NULL;
 
@@ -299,10 +296,9 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}	
 
 	// initialize auth
-	debugsqlrauths=cfg->getDebugAuths();
 	xmldomnode	*auths=cfg->getAuths();
 	if (!auths->isNullNode()) {
-		sqlra=new sqlrauths(pth,debugsqlrauths);
+		sqlra=new sqlrauths(pth,cfg->getDebugAuths());
 		sqlra->load(auths,sqlrpe);
 	}
 
@@ -323,17 +319,15 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get notifications
 	xmldomnode	*notifications=cfg->getNotifications();
 	if (!notifications->isNullNode()) {
-		sqlrn=new sqlrnotifications(pth);
+		sqlrn=new sqlrnotifications(pth,cfg->getDebugNotifications());
 		sqlrn->load(notifications);
-		sqlrn->init(NULL,conn);
 	}
 
 	// get schedules
 	xmldomnode	*schedules=cfg->getSchedules();
 	if (!schedules->isNullNode()) {
-		sqlrs=new sqlrschedules(pth);
+		sqlrs=new sqlrschedules(pth,cfg->getDebugSchedules());
 		sqlrs->load(schedules);
-		sqlrs->init(conn);
 	}
 
 	// handle the unix socket directory
@@ -416,14 +410,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get the triggers
-	debugsqlrtriggers=cfg->getDebugTriggers();
 	xmldomnode	*triggers=cfg->getTriggers();
 	if (!triggers->isNullNode()) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!sqlrp) {
 			sqlrp=newParser();
 		}
-		sqlrtr=new sqlrtriggers(pth,debugsqlrtriggers);
+		sqlrtr=new sqlrtriggers(pth,cfg->getDebugTriggers());
 		sqlrtr->load(triggers);
 	}
 
@@ -481,8 +474,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// init client protocols
-	debugsqlrprotocols=cfg->getDebugProtocols();
-	sqlrpr=new sqlrprotocols(this,pth,debugsqlrprotocols);
+	sqlrpr=new sqlrprotocols(this,pth,cfg->getDebugProtocols());
 	sqlrpr->load(cfg->getListeners());
 
 	// set a handler for SIGALARMs, if necessary

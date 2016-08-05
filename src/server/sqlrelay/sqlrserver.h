@@ -1215,11 +1215,10 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 class SQLRSERVER_DLLSPEC sqlrnotification {
 	public:
 			sqlrnotification(sqlrnotifications *ns,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		virtual	~sqlrnotification();
 
-		virtual bool	init(sqlrlistener *sqlrl,
-					sqlrserverconnection *sqlrcon);
 		virtual bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -1230,6 +1229,7 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 		xmldomnode		*parameters;
 		xmldomnode		*transports;
 		xmldomnode		*recipients;
+		bool			debug;
 };
 
 
@@ -1241,12 +1241,10 @@ class SQLRSERVER_DLLSPEC sqlrnotificationplugin {
 
 class SQLRSERVER_DLLSPEC sqlrnotifications {
 	public:
-			sqlrnotifications(sqlrpaths *sqlrpth);
+			sqlrnotifications(sqlrpaths *sqlrpth, bool debug);
 			~sqlrnotifications();
 
 		bool	load(xmldomnode *parameters);
-		void	init(sqlrlistener *sqlrl,
-					sqlrserverconnection *sqlrcon);
 		void	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -1281,6 +1279,7 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 		const char	*libexecdir;
 		const char	*tmpdir;
 		char		*tmpfilename;
+		bool		debug;
 
 		xmldomnode	*transports;
 
@@ -1342,10 +1341,9 @@ class SQLRSERVER_DLLSPEC sqlrschedulerule {
 
 class SQLRSERVER_DLLSPEC sqlrschedule {
 	public:
-			sqlrschedule(xmldomnode *parameters);
+			sqlrschedule(xmldomnode *parameters, bool debug);
 		virtual	~sqlrschedule();
 
-		virtual bool	init(sqlrserverconnection *sqlrcon);
 		virtual bool	allowed(sqlrserverconnection *sqlrcon,
 							const char *user);
 
@@ -1361,6 +1359,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 
 	protected:
 		xmldomnode	*parameters;
+		bool		debug;
 
 	private:
 		linkedlist< sqlrschedulerule * >	rules;
@@ -1375,11 +1374,10 @@ class SQLRSERVER_DLLSPEC sqlrscheduleplugin {
 
 class SQLRSERVER_DLLSPEC sqlrschedules {
 	public:
-			sqlrschedules(sqlrpaths *sqlrpth);
+			sqlrschedules(sqlrpaths *sqlrpth, bool debug);
 			~sqlrschedules();
 
 		bool	load(xmldomnode *parameters);
-		void	init(sqlrserverconnection *sqlrcon);
 		bool	allowed(sqlrserverconnection *sqlrcon,
 						const char *user);
 	private:
@@ -1387,6 +1385,7 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 		void		loadSchedule(xmldomnode *schedule);
 
 		const char	*libexecdir;
+		bool		debug;
 
 		singlylinkedlist< sqlrscheduleplugin * >	llist;
 };
@@ -1397,7 +1396,6 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 			sqlrrouter(xmldomnode *parameters, bool debug);
 		virtual	~sqlrrouter();
 
-		virtual	bool		init(sqlrserverconnection *sqlrcon);
 		virtual const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
 	protected:
@@ -1418,7 +1416,6 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 			~sqlrrouters();
 
 		bool	load(xmldomnode *parameters);
-		void	init(sqlrserverconnection *sqlrcon);
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);

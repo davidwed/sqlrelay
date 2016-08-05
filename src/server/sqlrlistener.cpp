@@ -35,6 +35,8 @@ sqlrlistener::sqlrlistener() {
 	sqlrcfgs=NULL;
 	cfg=NULL;
 
+	debugsqlrnotifications=false;
+
 	initialized=false;
 
 	sqlrlg=NULL;
@@ -227,11 +229,11 @@ bool sqlrlistener::init(int argc, const char **argv) {
 		sqlrlg->init(this,NULL);
 	}
 
+	debugsqlrnotifications=cfg->getDebugNotifications();
 	xmldomnode	*notifications=cfg->getNotifications();
 	if (!notifications->isNullNode()) {
-		sqlrn=new sqlrnotifications(sqlrpth);
+		sqlrn=new sqlrnotifications(sqlrpth,debugsqlrnotifications);
 		sqlrn->load(notifications);
-		sqlrn->init(this,NULL);
 	}
 
 	idleclienttimeout=cfg->getIdleClientTimeout();
@@ -1309,11 +1311,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		// re-init loggers
 		if (sqlrlg) {
 			sqlrlg->init(this,NULL);
-		}
-
-		// re-init notifications
-		if (sqlrn) {
-			sqlrn->init(this,NULL);
 		}
 
 		clientSession(clientsock,protocolindex,NULL);

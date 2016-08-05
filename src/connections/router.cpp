@@ -296,9 +296,8 @@ void routerconnection::handleConnectString() {
 	xmldomnode	*routers=cfg->getRouters();
 	if (!routers->isNullNode()) {
 		// FIXME: set debug correctly
-		sqlrr=new sqlrrouters(cont->pth,false);
+		sqlrr=new sqlrrouters(cont->pth,cfg->getDebugRouters());
 		sqlrr->load(routers);
-		sqlrr->init(this);
 	}
 
 	linkedlist< routecontainer * >	*routelist=cont->cfg->getRouteList();

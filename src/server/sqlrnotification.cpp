@@ -4,17 +4,14 @@
 #include <sqlrelay/sqlrserver.h>
 
 sqlrnotification::sqlrnotification(sqlrnotifications *ns,
-					xmldomnode *parameters) {
+					xmldomnode *parameters,
+					bool debug) {
 	this->ns=ns;
 	this->parameters=parameters;
+	this->debug=debug;
 }
 
 sqlrnotification::~sqlrnotification() {
-}
-
-bool sqlrnotification::init(sqlrlistener *sqlrl,
-				sqlrserverconnection *sqlrcon) {
-	return true;
 }
 
 bool sqlrnotification::run(sqlrlistener *sqlrl,

@@ -103,6 +103,8 @@
 		sqlrconfigs	*sqlrcfgs;
 		sqlrconfig	*cfg;
 
+		bool		debugsqlrnotifications;
+
 		sqlrloggers		*sqlrlg;
 		sqlrnotifications	*sqlrn;
 

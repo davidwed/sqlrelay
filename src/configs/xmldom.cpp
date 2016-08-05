@@ -82,6 +82,9 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugResultSetTranslations();
 		bool		getDebugProtocols();
 		bool		getDebugAuths();
+		bool		getDebugNotifications();
+		bool		getDebugSchedules();
+		bool		getDebugRouters();
 		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
@@ -193,6 +196,9 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugresultsettranslations;
 		bool		debugprotocols;
 		bool		debugauths;
+		bool		debugnotifications;
+		bool		debugschedules;
+		bool		debugrouters;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -316,6 +322,9 @@ void sqlrconfig_xmldom::init() {
 			charstring::contains(debug,"resultsettranslations");
 	debugprotocols=charstring::contains(debug,"protocols");
 	debugauths=charstring::contains(debug,"auths");
+	debugnotifications=charstring::contains(debug,"notifications");
+	debugschedules=charstring::contains(debug,"schedules");
+	debugrouters=charstring::contains(debug,"routers");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -568,6 +577,18 @@ bool sqlrconfig_xmldom::getDebugProtocols() {
 
 bool sqlrconfig_xmldom::getDebugAuths() {
 	return debugauths;
+}
+
+bool sqlrconfig_xmldom::getDebugNotifications() {
+	return debugnotifications;
+}
+
+bool sqlrconfig_xmldom::getDebugSchedules() {
+	return debugschedules;
+}
+
+bool sqlrconfig_xmldom::getDebugRouters() {
+	return debugrouters;
 }
 
 uint64_t sqlrconfig_xmldom::getMaxClientInfoLength() {
@@ -1512,6 +1533,9 @@ void sqlrconfig_xmldom::getTreeValues() {
 			charstring::contains(debug,"resultsettranslations");
 		debugprotocols=charstring::contains(debug,"protocols");
 		debugauths=charstring::contains(debug,"auths");
+		debugnotifications=charstring::contains(debug,"notifications");
+		debugschedules=charstring::contains(debug,"schedules");
+		debugrouters=charstring::contains(debug,"routers");
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {

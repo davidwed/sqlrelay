@@ -19,11 +19,12 @@
 	}
 #endif
 
-sqlrnotifications::sqlrnotifications(sqlrpaths *sqlrpth) {
+sqlrnotifications::sqlrnotifications(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	libexecdir=sqlrpth->getLibExecDir();
 	tmpdir=sqlrpth->getTmpDir();
 	tmpfilename=new char[charstring::length(sqlrpth->getTmpDir())+6+1];
+	this->debug=debug;
 }
 
 sqlrnotifications::~sqlrnotifications() {
@@ -107,8 +108,9 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 	// load the notification itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrnotification_")->append(module);
-	sqlrnotification *(*newNotification)(sqlrnotifications *, xmldomnode *)=
-		(sqlrnotification *(*)(sqlrnotifications *, xmldomnode *))
+	sqlrnotification *(*newNotification)(sqlrnotifications *,
+							xmldomnode *, bool)=
+		(sqlrnotification *(*)(sqlrnotifications *, xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newNotification) {
 		stdoutput.printf("failed to create notification: %s\n",module);
@@ -119,7 +121,7 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 		delete dl;
 		return;
 	}
-	sqlrnotification	*n=(*newNotification)(this,notification);
+	sqlrnotification	*n=(*newNotification)(this,notification,debug);
 
 #else
 
@@ -136,16 +138,6 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 	sqlrnp->n=n;
 	sqlrnp->dl=dl;
 	llist.append(sqlrnp);
-}
-
-void sqlrnotifications::init(sqlrlistener *sqlrl,
-				sqlrserverconnection *sqlrcon) {
-	debugFunction();
-	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
-						llist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->n->init(sqlrl,sqlrcon);
-	}
 }
 
 void sqlrnotifications::run(sqlrlistener *sqlrl,

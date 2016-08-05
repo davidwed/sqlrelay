@@ -16,9 +16,10 @@
 	}
 #endif
 
-sqlrschedules::sqlrschedules(sqlrpaths *sqlrpth) {
+sqlrschedules::sqlrschedules(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	libexecdir=sqlrpth->getLibExecDir();
+	this->debug=debug;
 }
 
 sqlrschedules::~sqlrschedules() {
@@ -99,8 +100,8 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 	// load the schedule itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrschedule_")->append(module);
-	sqlrschedule *(*newSchedule)(xmldomnode *)=
-			(sqlrschedule *(*)(xmldomnode *))
+	sqlrschedule *(*newSchedule)(xmldomnode *, bool)=
+			(sqlrschedule *(*)(xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newSchedule) {
 		stdoutput.printf("failed to create schedule: %s\n",module);
@@ -111,7 +112,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 		delete dl;
 		return;
 	}
-	sqlrschedule	*s=(*newSchedule)(schedule);
+	sqlrschedule	*s=(*newSchedule)(schedule,debug);
 
 #else
 
@@ -128,15 +129,6 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 	sqlrsp->s=s;
 	sqlrsp->dl=dl;
 	llist.append(sqlrsp);
-}
-
-void sqlrschedules::init(sqlrserverconnection *sqlrcon) {
-	debugFunction();
-	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
-						llist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->s->init(sqlrcon);
-	}
 }
 
 bool sqlrschedules::allowed(sqlrserverconnection *sqlrcon, const char *user) {

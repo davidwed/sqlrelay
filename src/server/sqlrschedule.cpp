@@ -289,8 +289,9 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 
 
 
-sqlrschedule::sqlrschedule(xmldomnode *parameters) {
+sqlrschedule::sqlrschedule(xmldomnode *parameters, bool debug) {
 	this->parameters=parameters;
+	this->debug=debug;
 }
 
 sqlrschedule::~sqlrschedule() {
@@ -298,10 +299,6 @@ sqlrschedule::~sqlrschedule() {
 							r; r=r->getNext()) {
 		delete r->getValue();
 	}
-}
-
-bool sqlrschedule::init(sqlrserverconnection *sqlrcon) {
-	return true;
 }
 
 bool sqlrschedule::allowed(sqlrserverconnection *sqlrcon, const char *user) {
