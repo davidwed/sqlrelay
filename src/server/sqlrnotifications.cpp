@@ -400,7 +400,7 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 			debugPrintf("pid: ");
 			if (!pid) {
 				pid=charstring::parseNumber(
-						process::getProcessId());
+					(int64_t)process::getProcessId());
 			}
 			value=pid;
 			ch+=5;
