@@ -3,11 +3,11 @@
 
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/process.h>
-#include <rudiments/inetsocketclient.h>
-#include <rudiments/unixsocketclient.h>
-#include <rudiments/directory.h>
-#include <rudiments/error.h>
-#include <rudiments/snooze.h>
+#ifndef _WIN32
+	#include <rudiments/inetsocketclient.h>
+	#include <rudiments/unixsocketclient.h>
+	#include <rudiments/snooze.h>
+#endif
 #include <rudiments/stdio.h>
 #include <config.h>
 #include <defaults.h>
