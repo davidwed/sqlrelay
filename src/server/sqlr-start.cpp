@@ -20,6 +20,8 @@
 #endif
 
 // for ceil()
+#undef LITTLE_ENDIAN
+#undef BIG_ENDIAN
 #include <math.h>
 
 bool	iswindows;
