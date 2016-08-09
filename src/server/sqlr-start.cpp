@@ -19,9 +19,12 @@
 	#include <io.h>
 #endif
 
-// for ceil()
+// On some older platforms (at least redhat 1.1) endian.h and asm/byteorder.h
+// battle it out.  This makes endian.h (which is included by math.h) win.
 #undef LITTLE_ENDIAN
 #undef BIG_ENDIAN
+
+// for ceil()
 #include <math.h>
 
 bool	iswindows;
