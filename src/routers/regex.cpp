@@ -25,9 +25,8 @@ sqlrrouter_regex::sqlrrouter_regex(xmldomnode *parameters, bool debug) :
 						sqlrrouter(parameters,debug) {
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
-
-	if (!enabled) {
-		return;
+	if (!enabled && debug) {
+		stdoutput.printf("	disabled\n");
 	}
 
 	connectionid=parameters->getAttributeValue("connectionid");
@@ -35,10 +34,19 @@ sqlrrouter_regex::sqlrrouter_regex(xmldomnode *parameters, bool debug) :
 	for (xmldomnode *pn=parameters->getFirstTagChild("pattern");
 				!pn->isNullNode();
 				pn=pn->getNextTagSibling("pattern")) {
+
+		const char	*pattern=pn->getAttributeValue("pattern");
+		if (debug) {
+			stdoutput.printf("	pattern: \"%s\"\n",pattern);
+		}
+
 		regularexpression	*re=new regularexpression;
-		re->compile(parameters->getAttributeValue("pattern"));
+		re->compile(pattern);
 		re->study();
 		relist.append(re);
+	}
+	if (debug && !relist.getLength()) {
+		stdoutput.printf("	WARNING! no patterns found\n");
 	}
 }
 
@@ -55,9 +63,15 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 		return NULL;
 	}
 
+	const char	*query=sqlrcur->getQueryBuffer();
 	for (linkedlistnode< regularexpression *> *rn=relist.getFirst();
 							rn; rn=rn->getNext()) {
-		if (rn->getValue()->match(sqlrcur->getQueryBuffer())) {
+		if (rn->getValue()->match(query)) {
+			if (debug) {
+				stdoutput.printf("\nrouting query:\n"
+							"	%s\nto: %s\n",
+							query,connectionid);
+			}
 			return connectionid;
 		}
 	}

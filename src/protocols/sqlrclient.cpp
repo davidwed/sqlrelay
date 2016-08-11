@@ -518,6 +518,12 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 			cont->raiseQueryEvent(cursor);
 		}
 
+		// free memory used by binds...
+		// (it's tempting to do this inside of processQueryOrBindCursor
+		// but a log/notification module activated by the
+		// raiseQueryEvent above might still need the bind values)
+		bindpool->deallocate();
+
 	} while (loop);
 
 	// end the session if necessary
@@ -1285,9 +1291,6 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 			// send a result set header
 			returnResultSetHeader(cursor);
 
-			// free memory used by binds
-			bindpool->deallocate();
-
 			// return the result set
 			return returnResultSetData(cursor,false);
 
@@ -1590,7 +1593,8 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			bv->value.dateval.buffer=
 				(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
-		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB || bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
+					bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
 				return false;
 			}

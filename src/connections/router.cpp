@@ -292,14 +292,13 @@ void routerconnection::handleConnectString() {
 
 	cfg=cont->cfg;
 
-	// FIXME: use the router modules...
 	xmldomnode	*routers=cfg->getRouters();
 	if (!routers->isNullNode()) {
-		// FIXME: set debug correctly
 		sqlrr=new sqlrrouters(cont->pth,cfg->getDebugRouters());
 		sqlrr->load(routers);
 	}
 
+#if 0
 	linkedlist< routecontainer * >	*routelist=cont->cfg->getRouteList();
 	concount=routelist->getLength();
 
@@ -342,6 +341,51 @@ void routerconnection::handleConnectString() {
 		index++;
 		rln=rln->getNext();
 	}
+#else
+	linkedlist< connectstringcontainer * >	*cslist=
+					cont->cfg->getConnectStringList();
+	concount=cslist->getLength();
+
+	cons=new sqlrconnection *[concount];
+	beginquery=new const char *[concount];
+	anymustbegin=false;
+	uint16_t index=0;
+	connectstringnode	*csln=cslist->getFirst();
+	while (index<concount) {
+
+		cons[index]=NULL;
+		beginquery[index]=NULL;
+
+		connectstringcontainer	*csc=csln->getValue();
+
+		cons[index]=new sqlrconnection(
+				csc->getConnectStringValue("server"),
+				charstring::toUnsignedInteger(
+					csc->getConnectStringValue("port")),
+				csc->getConnectStringValue("socket"),
+				csc->getConnectStringValue("user"),
+				csc->getConnectStringValue("password"),
+				0,1);
+
+		const char	*id=cons[index]->identify();
+		if (!charstring::compare(id,"sybase") ||
+				!charstring::compare(id,"freetds")) {
+			beginquery[index]="begin tran";
+		} else if (!charstring::compare(id,"sqlite")) {
+			beginquery[index]="begin transaction";
+		} else if (!charstring::compare(id,"postgresql") ||
+				!charstring::compare(id,"router")) {
+			beginquery[index]="begin";
+		}
+
+		if (beginquery[index]) {
+			anymustbegin=true;
+		}
+
+		index++;
+		csln=csln->getNext();
+	}
+#endif
 }
 
 bool routerconnection::logIn(const char **error, const char **warning) {
@@ -656,8 +700,10 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// initialize the cursor bind count
 	cbcount=0;
 
-	// FIXME: use the router modules...
+	// determine which connectionid to route to
+	const char	*connectionid=routerconn->sqlrr->route(conn,this);
 
+#if 0
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
 	uint16_t	conindex=0;
@@ -683,6 +729,24 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 			conindex++;
 		}
 	}
+#else
+	// get the corresponding connection and cursor
+	uint16_t		conindex=0;
+	connectstringnode	*csn=conn->cont->cfg->
+					getConnectStringList()->getFirst();
+	while (csn) {
+		if (!charstring::compare(connectionid,
+					csn->getValue()->getConnectionId())) {
+			con=routerconn->cons[conindex];
+			routerconn->cur=con;
+			cur=curs[conindex];
+			curindex=conindex;
+			break;
+		}
+		csn=csn->getNext();
+		conindex++;
+	}
+#endif
 
 	// free normalized query
 	if (nquery) {

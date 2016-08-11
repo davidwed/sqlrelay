@@ -24,6 +24,12 @@
 	renamed "logger-events" to just "events"
 	added notification framework and "events" module
 	added connection schedule framework and "cron" module
+	applied sec/usec patch from samchuck at neowiz to custom_nw logger to
+		fix subtle time calculation error
+	applied a patch from samchuck at neowiz to the sqlrclient protocol
+		module to deallocate storage for bind variables after logging
+		the query to resolve a reference-after-free bug
+	added router module framework and "regex" module
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

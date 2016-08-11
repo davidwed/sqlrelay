@@ -37,8 +37,6 @@ bool sqlrrouters::load(xmldomnode *parameters) {
 			!router->isNullNode();
 			router=router->getNextTagSibling()) {
 
-		debugPrintf("loading router ...\n");
-
 		// load router
 		loadRouter(router);
 	}
@@ -77,7 +75,9 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		}
 	}
 
-	debugPrintf("loading router: %s\n",module);
+	if (debug) {
+		stdoutput.printf("loading router: %s\n",module);
+	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the router module
