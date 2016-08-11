@@ -27,6 +27,7 @@ sqlrrouter_regex::sqlrrouter_regex(xmldomnode *parameters, bool debug) :
 			parameters->getAttributeValue("enabled"),"no");
 	if (!enabled && debug) {
 		stdoutput.printf("	disabled\n");
+		return;
 	}
 
 	connectionid=parameters->getAttributeValue("connectionid");
