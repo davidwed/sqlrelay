@@ -1,6 +1,14 @@
 /* Copyright (c) 2000  Adam Kropielnicki
    See the file COPYING for more information */
 
+// Some versions of PHP 7.0 need INT64_MIN/INT64_MAX to be defined but
+// these gyrations are necessary when using C++.
+#include <rudiments/private/config.h>
+#ifdef RUDIMENTS_HAVE_STDINT_H
+	#define __STDC_LIMIT_MACROS
+	#include <stdint.h>
+#endif
+
 #include <sqlrelay/sqlrclient.h>
 
 // The various define/undef games below play havoc with inttypes.h

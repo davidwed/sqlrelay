@@ -1,6 +1,14 @@
 // Copyright (c) 2013 David Muse
 // See the file COPYING for more information
 
+// Some versions of PHP 7.0 need INT64_MIN/INT64_MAX to be defined but
+// these gyrations are necessary when using C++.
+#include <rudiments/private/config.h>
+#ifdef RUDIMENTS_HAVE_STDINT_H
+	#define __STDC_LIMIT_MACROS
+	#include <stdint.h>
+#endif
+
 #include <config.h>
 #define NEED_IS_BIT_TYPE_CHAR
 #define NEED_IS_BOOL_TYPE_CHAR
