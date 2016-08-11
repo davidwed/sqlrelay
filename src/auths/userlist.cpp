@@ -9,6 +9,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 			sqlrauth_userlist(xmldomnode *parameters,
 						sqlrpwdencs *sqlrpe,
 						bool debug);
+			~sqlrauth_userlist();
+
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -57,12 +59,18 @@ sqlrauth_userlist::sqlrauth_userlist(xmldomnode *parameters,
 	}
 }
 
+sqlrauth_userlist::~sqlrauth_userlist() {
+	delete[] users;
+	delete[] passwords;
+	delete[] passwordencryptions;
+}
+
 bool sqlrauth_userlist::auth(sqlrserverconnection *sqlrcon,
 						const char *user,
 						const char *password) {
 
 	// run through the user/password arrays...
-	for (uint32_t i=0; i<usercount; i++) {
+	for (uint64_t i=0; i<usercount; i++) {
 
 		// if the user matches...
 		if (!charstring::compare(user,users[i])) {

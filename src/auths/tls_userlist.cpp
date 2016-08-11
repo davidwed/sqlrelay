@@ -10,6 +10,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_tls_userlist : public sqlrauth {
 			sqlrauth_tls_userlist(xmldomnode *parameters,
 						sqlrpwdencs *sqlrpe,
 						bool debug);
+			~sqlrauth_tls_userlist();
+
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -39,6 +41,10 @@ sqlrauth_tls_userlist::sqlrauth_tls_userlist(xmldomnode *parameters,
 	}
 }
 
+sqlrauth_tls_userlist::~sqlrauth_tls_userlist() {
+	delete[] users;
+}
+
 bool sqlrauth_tls_userlist::auth(sqlrserverconnection *sqlrcon,
 						const char *user,
 						const char *password) {
@@ -63,7 +69,7 @@ bool sqlrauth_tls_userlist::auth(sqlrserverconnection *sqlrcon,
 	}
 
 	// run through the user/password arrays...
-	for (uint32_t i=0; i<usercount; i++) {
+	for (uint64_t i=0; i<usercount; i++) {
 
 		if (sans->getLength()) {
 

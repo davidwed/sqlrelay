@@ -10,6 +10,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_krb_userlist : public sqlrauth {
 			sqlrauth_krb_userlist(xmldomnode *parameters,
 						sqlrpwdencs *sqlrpe,
 						bool debug);
+			~sqlrauth_krb_userlist();
+
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password);
 	private:
@@ -39,6 +41,10 @@ sqlrauth_krb_userlist::sqlrauth_krb_userlist(xmldomnode *parameters,
 	}
 }
 
+sqlrauth_krb_userlist::~sqlrauth_krb_userlist() {
+	delete[] users;
+}
+
 bool sqlrauth_krb_userlist::auth(sqlrserverconnection *sqlrcon,
 						const char *user,
 						const char *password) {
@@ -56,7 +62,7 @@ bool sqlrauth_krb_userlist::auth(sqlrserverconnection *sqlrcon,
 	}
 
 	// run through the user/password arrays...
-	for (uint32_t i=0; i<usercount; i++) {
+	for (uint64_t i=0; i<usercount; i++) {
 
 		// if the initiator matches...
 		if (!charstring::compare(initiator,users[i])) {
