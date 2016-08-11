@@ -298,50 +298,6 @@ void routerconnection::handleConnectString() {
 		sqlrr->load(routers);
 	}
 
-#if 0
-	linkedlist< routecontainer * >	*routelist=cont->cfg->getRouteList();
-	concount=routelist->getLength();
-
-	cons=new sqlrconnection *[concount];
-	beginquery=new const char *[concount];
-	anymustbegin=false;
-	uint16_t index=0;
-	linkedlistnode< routecontainer * >	*rln=routelist->getFirst();
-	while (index<concount) {
-
-		cons[index]=NULL;
-		beginquery[index]=NULL;
-
-		routecontainer	*rc=rln->getValue();
-
-		if (rc->getIsFilter()) {
-			index++;
-			continue;
-		}
-
-		cons[index]=new sqlrconnection(rc->getHost(),rc->getPort(),
-						rc->getSocket(),rc->getUser(),
-						rc->getPassword(),0,1);
-
-		const char	*id=cons[index]->identify();
-		if (!charstring::compare(id,"sybase") ||
-				!charstring::compare(id,"freetds")) {
-			beginquery[index]="begin tran";
-		} else if (!charstring::compare(id,"sqlite")) {
-			beginquery[index]="begin transaction";
-		} else if (!charstring::compare(id,"postgresql") ||
-				!charstring::compare(id,"router")) {
-			beginquery[index]="begin";
-		}
-
-		if (beginquery[index]) {
-			anymustbegin=true;
-		}
-
-		index++;
-		rln=rln->getNext();
-	}
-#else
 	linkedlist< connectstringcontainer * >	*cslist=
 					cont->cfg->getConnectStringList();
 	concount=cslist->getLength();
@@ -385,7 +341,6 @@ void routerconnection::handleConnectString() {
 		index++;
 		csln=csln->getNext();
 	}
-#endif
 }
 
 bool routerconnection::logIn(const char **error, const char **warning) {
@@ -703,33 +658,6 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// determine which connectionid to route to
 	const char	*connectionid=routerconn->sqlrr->route(conn,this);
 
-#if 0
-	// look through the regular expressions and figure out which
-	// connection this query needs to be run through
-	uint16_t	conindex=0;
-	routenode	*rcn=routerconn->cfg->getRouteList()->getFirst();
-	bool	found=false;
-	while (rcn && !found) {
-		linkedlistnode< regularexpression * >	*ren=
-				rcn->getValue()->getRegexList()->getFirst();
-
-		while (ren && !found) {
-			if (ren->getValue()->match(nquery)) {
-				con=routerconn->cons[conindex];
-				routerconn->cur=con;
-				cur=curs[conindex];
-				curindex=conindex;
-				found=true;
-			}
-			ren=ren->getNext();
-		}
-
-		if (!found) {
-			rcn=rcn->getNext();
-			conindex++;
-		}
-	}
-#else
 	// get the corresponding connection and cursor
 	uint16_t		conindex=0;
 	connectstringnode	*csn=conn->cont->cfg->
@@ -746,7 +674,6 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 		csn=csn->getNext();
 		conindex++;
 	}
-#endif
 
 	// free normalized query
 	if (nquery) {
