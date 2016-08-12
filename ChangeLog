@@ -34,6 +34,8 @@
 	when router detects a possible integrity violation now, it raises an
 		event which can be logged or trigger a notification and
 		disables the instance
+	router calls begin, commit, and rollback on all connections now, even
+		if they're executed as queries rather than using the api methods
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static
