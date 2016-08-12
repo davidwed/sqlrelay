@@ -44,7 +44,9 @@ static const char *eventtypes[]={
 	"INTERNAL_ERROR",
 	"INTERNAL_WARNING",
 	"DEBUG_MESSAGE",
-	"SCHEDULE_VIOLATION"
+	"SCHEDULE_VIOLATION",
+	"INTEGRITY_VIOLATION",
+	NULL
 };
 
 const char *sqlrlogger::eventType(sqlrevent_t event) {

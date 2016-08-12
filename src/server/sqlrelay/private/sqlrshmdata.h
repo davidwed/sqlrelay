@@ -146,6 +146,8 @@ struct shmdata {
 	uint32_t	qps_etc[STATQPSKEEP];
 
 	sqlrconnstatistics	connstats[MAXCONNECTIONS];
+
+	bool	disabled;
 };
 
 #endif

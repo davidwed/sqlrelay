@@ -348,6 +348,13 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 	uint16_t		command;
 	do {
 
+		// handle disabled instance
+		// FIXME: push up?
+		if (cont->disabledInstance()) {
+			endsession=true;
+			break;
+		}
+
 		// get a command from the client
 		if (!getCommand(&command)) {
 			break;
@@ -613,7 +620,7 @@ bool sqlrprotocol_sqlrclient::getCommand(uint16_t *command) {
 
 	cont->raiseDebugMessageEvent("getting command...");
 
-	cont->updateState(GET_COMMAND);
+	cont->setState(GET_COMMAND);
 
 	// get the command
 	ssize_t	result=clientsock->read(command,idleclienttimeout,0);
@@ -2611,7 +2618,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 	cont->raiseDebugMessageEvent("returning result set data...");
 
 	// FIXME: push up?
-	cont->updateState(RETURN_RESULT_SET);
+	cont->setState(RETURN_RESULT_SET);
 
 	// decide whether to use the cursor itself
 	// or an attached custom query cursor

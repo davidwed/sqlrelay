@@ -230,13 +230,19 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setLiveConnection(bool liveconnection);
 
 		// connection state
-		void	updateState(enum sqlrconnectionstate_t state);
+		void	setState(enum sqlrconnectionstate_t state);
+		enum sqlrconnectionstate_t	getState();
 		void	updateCurrentUser(const char *user,
 						uint32_t userlen);
 		void	updateCurrentQuery(const char *query,
 						uint32_t querylen);
 		void	updateClientInfo(const char *info,
 						uint32_t infolen);
+
+		// instance state
+		void	disableInstance();
+		void	enableInstance();
+		bool	disabledInstance();
 
 
 		// statistics api...
@@ -304,6 +310,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	raiseInternalWarningEvent(sqlrservercursor *cursor,
 							const char *info);
 		void	raiseScheduleViolationEvent(const char *info);
+		void	raiseIntegrityViolationEvent(const char *info);
 
 
 		// cursor api...
@@ -1152,6 +1159,7 @@ enum sqlrevent_t {
 	SQLREVENT_INTERNAL_WARNING,
 	SQLREVENT_DEBUG_MESSAGE,
 	SQLREVENT_SCHEDULE_VIOLATION,
+	SQLREVENT_INTEGRITY_VIOLATION,
 	SQLREVENT_INVALID_EVENT
 };
 

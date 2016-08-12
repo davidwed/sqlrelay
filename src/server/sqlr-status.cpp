@@ -108,6 +108,8 @@ int main(int argc, const char **argv) {
 
 	// print out stats
 	stdoutput.printf( 
+		"  Instance State:               %s\n"
+		"\n"
 		"  Open   Database Connections:  %d\n" 
 		"  Opened Database Connections:  %d\n" 
 		"\n"
@@ -129,6 +131,7 @@ int main(int argc, const char **argv) {
 		"  Connections:                  %d\n"
 		"  Connected Clients:            %d\n"
 		"\n",
+		(statistics.disabled)?"Disabled":"Enabled",
 		statistics.open_db_connections, 
 		statistics.opened_db_connections,
 		statistics.open_db_cursors,

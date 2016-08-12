@@ -75,9 +75,11 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		void	commitFailed(uint16_t index);
 		void	rollbackFailed(uint16_t index);
 		void	beginQueryFailed(uint16_t index);
-
+		void	raiseIntegrityViolationEvent(const char *command,
+								uint16_t index);
 		const char	*identity;
 
+		const char	**conids;
 		sqlrconnection	**cons;
 		sqlrconnection	*cur;
 		const char	**beginquery;
@@ -255,6 +257,7 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 	identity=NULL;
 
+	conids=NULL;
 	cons=NULL;
 	cur=NULL;
 	beginquery=NULL;
@@ -277,6 +280,7 @@ routerconnection::~routerconnection() {
 	for (uint16_t index=0; index<concount; index++) {
 		delete cons[index];
 	}
+	delete[] conids;
 	delete[] cons;
 	delete[] beginquery;
 	delete sqlrr;
@@ -302,17 +306,18 @@ void routerconnection::handleConnectString() {
 					cont->cfg->getConnectStringList();
 	concount=cslist->getLength();
 
+	conids=new const char *[concount];
 	cons=new sqlrconnection *[concount];
 	beginquery=new const char *[concount];
 	anymustbegin=false;
+
 	uint16_t index=0;
 	connectstringnode	*csln=cslist->getFirst();
 	while (index<concount) {
 
-		cons[index]=NULL;
-		beginquery[index]=NULL;
-
 		connectstringcontainer	*csc=csln->getValue();
+
+		conids[index]=csc->getConnectionId();
 
 		cons[index]=new sqlrconnection(
 				csc->getConnectStringValue("server"),
@@ -332,6 +337,8 @@ void routerconnection::handleConnectString() {
 		} else if (!charstring::compare(id,"postgresql") ||
 				!charstring::compare(id,"router")) {
 			beginquery[index]="begin";
+		} else {
+			beginquery[index]=NULL;
 		}
 
 		if (beginquery[index]) {
@@ -365,12 +372,10 @@ bool routerconnection::autoCommitOn() {
 	// turn autocommit on for all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		if (!cons[index]) {
-			continue;
-		}
 		bool	res=cons[index]->autoCommitOn();
 		if (!res) {
 			autoCommitOnFailed(index);
+			return false;
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
@@ -404,12 +409,10 @@ bool routerconnection::autoCommitOff() {
 	// turn autocommit on for all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		if (!cons[index]) {
-			continue;
-		}
 		bool	res=cons[index]->autoCommitOff();
 		if (!res) {
 			autoCommitOffFailed(index);
+			return false;
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
@@ -445,12 +448,10 @@ bool routerconnection::commit() {
 	// FIXME: use 2 stage commit...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		if (!cons[index]) {
-			continue;
-		}
 		bool	res=cons[index]->commit();
 		if (!res) {
 			commitFailed(index);
+			return false;
 		}
 		if (result) {
 			result=res;
@@ -465,12 +466,10 @@ bool routerconnection::rollback() {
 	// FIXME: use 2 stage rollback...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		if (!cons[index]) {
-			continue;
-		}
 		bool	res=cons[index]->rollback();
 		if (!res) {
 			rollbackFailed(index);
+			return false;
 		}
 		if (result) {
 			result=res;
@@ -484,10 +483,8 @@ void routerconnection::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+
 	for (uint16_t index=0; index<concount; index++) {
-		if (!cons[index]) {
-			continue;
-		}
 		const char	*errormessage=cons[index]->errorMessage();
 		if (!charstring::length(errormessage)) {
 			*errorlength=charstring::length(errormessage);
@@ -497,15 +494,12 @@ void routerconnection::errorMessage(char *errorbuffer,
 			break;
 		}
 	}
-	// FIXME: detect downed database or downed relay
 	*liveconnection=true;
 }
 
 void routerconnection::endSession() {
+
 	for (uint16_t index=0; index<concount; index++) {
-		if (!cons[index]) {
-			continue;
-		}
 		cons[index]->endSession();
 	}
 }
@@ -545,13 +539,9 @@ const char *routerconnection::dbIpAddress() {
 }
 
 bool routerconnection::ping() {
-
 	// ping all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		if (!cons[index]) {
-			continue;
-		}
 		bool	res=cons[index]->ping();
 		if (result) {
 			result=res;
@@ -561,7 +551,6 @@ bool routerconnection::ping() {
 }
 
 bool routerconnection::getLastInsertId(uint64_t *id) {
-
 	// run it against the previously used connection,
 	// unless there wasn't one
 	if (!cur) {
@@ -569,11 +558,7 @@ bool routerconnection::getLastInsertId(uint64_t *id) {
 		return true;
 	}
 	*id=cur->getLastInsertId();
-	if (*id==0) {
-		// FIXME: how can we report an error here?
-		return false;
-	}
-	return true;
+	return (*id!=0);
 }
 
 routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
@@ -1026,11 +1011,13 @@ bool routercursor::begin(const char *query, uint32_t length) {
 						length);
 			if (!res) {
 				routerconn->beginQueryFailed(index);
+				return false;
 			}
 		} else {
 			res=routerconn->cons[index]->autoCommitOff();
 			if (!res) {
 				routerconn->autoCommitOffFailed(index);
+				return false;
 			}
 		}
 		if (result) {
@@ -1063,7 +1050,6 @@ void routercursor::errorMessage(char *errorbuffer,
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errormessage,*errorlength);
 	*errorcode=(cur)?cur->errorNumber():0;
-	// FIXME: detect downed database or downed relay
 	*liveconnection=true;
 }
 
@@ -1175,20 +1161,35 @@ void routercursor::closeResultSet() {
 	cbcount=0;
 }
 
-// FIXME: "do something" when these failures occur
 void routerconnection::autoCommitOnFailed(uint16_t index) {
+	raiseIntegrityViolationEvent("autocommit-on",index);
 }
 
 void routerconnection::autoCommitOffFailed(uint16_t index) {
+	raiseIntegrityViolationEvent("autocommit-off",index);
 }
 
 void routerconnection::commitFailed(uint16_t index) {
+	raiseIntegrityViolationEvent("commit",index);
 }
 
 void routerconnection::rollbackFailed(uint16_t index) {
+	raiseIntegrityViolationEvent("rollback",index);
 }
 
 void routerconnection::beginQueryFailed(uint16_t index) {
+	raiseIntegrityViolationEvent("begin",index);
+}
+
+void routerconnection::raiseIntegrityViolationEvent(const char *command,
+							uint16_t index) {
+	stringbuffer	info;
+	info.append(command);
+	info.append(" failed on connectionid: ");
+	info.append(conids[index]);
+	cont->raiseIntegrityViolationEvent(info.getString());
+
+	cont->disableInstance();
 }
 
 extern "C" {

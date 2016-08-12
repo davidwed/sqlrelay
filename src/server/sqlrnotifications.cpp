@@ -169,6 +169,7 @@ static const char *eventtypes[]={
 	"INTERNAL_WARNING",
 	"DEBUG_MESSAGE",
 	"SCHEDULE_VIOLATION",
+	"INTEGRITY_VIOLATION",
 	NULL
 };
 

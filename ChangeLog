@@ -31,6 +31,9 @@
 		the query to resolve a reference-after-free bug
 	added router module framework with "regex", "userlist" and
 		"clientiplist" modules
+	when router detects a possible integrity violation now, it raises an
+		event which can be logged or trigger a notification and
+		disables the instance
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

@@ -1246,7 +1246,7 @@ void sqlrservercontroller::waitForAvailableDatabase() {
 
 	raiseDebugMessageEvent("waiting for available database...");
 
-	updateState(WAIT_FOR_AVAIL_DB);
+	setState(WAIT_FOR_AVAIL_DB);
 
 	if (!file::exists(updown)) {
 		raiseDebugMessageEvent("database is not available");
@@ -1366,7 +1366,7 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 		return false;
 	}
 
-	updateState(ANNOUNCE_AVAILABILITY);
+	setState(ANNOUNCE_AVAILABILITY);
 
 	// write the connectionid and pid into the segment
 	charstring::copy(shmemptr->connectionid,
@@ -1509,7 +1509,7 @@ int32_t sqlrservercontroller::waitForClient() {
 
 	raiseDebugMessageEvent("waiting for client...");
 
-	updateState(WAIT_CLIENT);
+	setState(WAIT_CLIENT);
 
 	// reset proxy mode flag
 	proxymode=false;
@@ -1691,7 +1691,7 @@ void sqlrservercontroller::clientSession() {
 	inclientsession=true;
 
 	// update various stats
-	updateState(SESSION_START);
+	setState(SESSION_START);
 	updateClientAddr();
 	updateClientSessionStartTime();
 	incrementOpenClientConnections();
@@ -3178,7 +3178,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enabletriggers) {
 
 	// set state
-	updateState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
+	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
 
 	// if we're re-executing
 	if (cursor->prepared) {
@@ -3812,7 +3812,7 @@ void sqlrservercontroller::endSession() {
 
 	raiseDebugMessageEvent("ending session...");
 
-	updateState(SESSION_END);
+	setState(SESSION_END);
 
 	raiseDebugMessageEvent("aborting all cursors...");
 	for (int32_t i=0; i<cursorcount; i++) {
@@ -4293,7 +4293,7 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 
 	raiseDebugMessageEvent("acquiring announce mutex");
 
-	updateState(WAIT_SEMAPHORE);
+	setState(WAIT_SEMAPHORE);
 
 	// Wait.  Bail if ttl is exceeded
 	bool	result=false;
@@ -4418,7 +4418,7 @@ void sqlrservercontroller::initConnStats() {
 
 			// initialize the connection stats
 			clearConnStats();
-			updateState(INIT);
+			setState(INIT);
 			connstats->index=i;
 			connstats->processid=process::getProcessId();
 			connstats->loggedinsec=loggedinsec;
@@ -4529,7 +4529,7 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 	return parser;
 }
 
-void sqlrservercontroller::updateState(enum sqlrconnectionstate_t state) {
+void sqlrservercontroller::setState(enum sqlrconnectionstate_t state) {
 	if (!connstats) {
 		return;
 	}
@@ -4538,6 +4538,13 @@ void sqlrservercontroller::updateState(enum sqlrconnectionstate_t state) {
 	dt.getSystemDateAndTime();
 	connstats->statestartsec=dt.getSeconds();
 	connstats->statestartusec=dt.getMicroseconds();
+}
+
+enum sqlrconnectionstate_t sqlrservercontroller::getState() {
+	if (!connstats) {
+		return NOT_AVAILABLE;
+	}
+	return connstats->state;
 }
 
 void sqlrservercontroller::updateClientSessionStartTime() {
@@ -4604,6 +4611,18 @@ void sqlrservercontroller::updateClientAddr() {
 	} else {
 		charstring::copy(connstats->clientaddr,"internal");
 	}
+}
+
+void sqlrservercontroller::disableInstance() {
+	getAnnounceBuffer()->disabled=true;
+}
+
+void sqlrservercontroller::enableInstance() {
+	getAnnounceBuffer()->disabled=false;
+}
+
+bool sqlrservercontroller::disabledInstance() {
+	return getAnnounceBuffer()->disabled;
 }
 
 void sqlrservercontroller::incrementOpenDatabaseConnections() {
@@ -5362,6 +5381,20 @@ void sqlrservercontroller::raiseScheduleViolationEvent(const char *info) {
 	}
 }
 
+void sqlrservercontroller::raiseIntegrityViolationEvent(const char *info) {
+	if (sqlrlg) {
+		sqlrlg->run(NULL,conn,NULL,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLREVENT_INTEGRITY_VIOLATION,
+				info);
+	}
+	if (sqlrn) {
+		sqlrn->run(NULL,conn,NULL,
+				SQLREVENT_INTEGRITY_VIOLATION,
+				info);
+	}
+}
+
 void sqlrservercontroller::alarmHandler(int32_t signum) {
 	alarmrang=1;
 }
@@ -5463,7 +5496,7 @@ void sqlrservercontroller::closeLobOutputBind(sqlrservercursor *cursor,
 bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 
 	// set state
-	updateState(PROCESS_SQL);
+	setState(PROCESS_SQL);
 
 	raiseDebugMessageEvent("fetching from bind cursor...");
 
