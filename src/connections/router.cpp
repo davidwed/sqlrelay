@@ -197,8 +197,6 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 						uint64_t *charsread);
 		bool		executeQuery(const char *query,
 						uint32_t length);
-		void		checkForTempTable(const char *query,
-							uint32_t length);
 		void		errorMessage(char *errorbuffer,
 						uint32_t errorbufferlength,
 						uint32_t *errorlength,
@@ -248,9 +246,6 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 
 		cursorbindvar	*cbv;
 		uint16_t	cbcount;
-
-		regularexpression	createoratemp;
-		regularexpression	preserverows;
 };
 
 routerconnection::routerconnection(sqlrservercontroller *cont) :
@@ -274,6 +269,10 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	beginendregex.study();
 
 	sqlrr=NULL;
+
+	// tell the controller to intercept begins, commits, and rollbacks sent
+	// as queries and call begin(), commit(), and rollback() methods instead
+	cont->setInterceptTransactionQueriesBehavior(true);
 }
 
 routerconnection::~routerconnection() {
@@ -492,7 +491,6 @@ void routerconnection::errorMessage(char *errorbuffer,
 }
 
 void routerconnection::endSession() {
-
 	for (uint16_t index=0; index<concount; index++) {
 		cons[index]->endSession();
 	}
@@ -579,9 +577,6 @@ routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
 
 	cbv=new cursorbindvar[conn->cont->cfg->getMaxBindCount()];
 	cbcount=0;
-
-	createoratemp.compile("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
-	preserverows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(preserve|PRESERVE)[ 	\\n\\r]+(rows|ROWS)");
 }
 
 routercursor::~routercursor() {
@@ -889,8 +884,6 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-	checkForTempTable(query,length);
-
 	nextrow=0;
 
 	// populate output bind values
@@ -944,49 +937,6 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void routercursor::checkForTempTable(const char *query, uint32_t length) {
-
-	// for non-oracle db's
-	if (charstring::compare(con->identify(),"oracle")) {
-		sqlrservercursor::checkForTempTable(query,length);
-		return;
-	}
-
-	// for oracle db's...
-
-	const char	*ptr=query;
-	const char	*endptr=query+length;
-
-	// skip any leading comments
-	if (!conn->cont->skipWhitespace(&ptr,endptr) ||
-		!conn->cont->skipComment(&ptr,endptr) ||
-		!conn->cont->skipWhitespace(&ptr,endptr)) {
-		return;
-	}
-
-	// look for "create global temporary table "
-	if (createoratemp.match(ptr)) {
-		ptr=createoratemp.getSubstringEnd(0);
-	} else {
-		return;
-	}
-
-	// get the table name
-	stringbuffer	tablename;
-	while (ptr && *ptr && *ptr!=' ' &&
-		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
-		tablename.append(*ptr);
-		ptr++;
-	}
-
-	// append to list of temp tables
-	// check for "on commit preserve rows" otherwise assume
-	// "on commit delete rows"
-	if (preserverows.match(ptr)) {
-		conn->cont->addSessionTempTableForTrunc(tablename.getString());
-	}
-}
-
 bool routercursor::begin(const char *query, uint32_t length) {
 
 	bool	result=true;
@@ -1022,13 +972,6 @@ bool routercursor::begin(const char *query, uint32_t length) {
 			}
 		}
 	}
-	// If we're here with no "cur", then all the begin's must have
-	// succeeded.  But we need a "cur" so everything else will work.
-	// Any of them will do, so use the first one.
-	/*if (!cur) {
-		cur=curs[0];
-		curindex=0;
-	}*/
 	return result;
 }
 

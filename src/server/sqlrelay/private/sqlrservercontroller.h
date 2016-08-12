@@ -182,7 +182,7 @@
 
 		bool		autocommitforthissession;
 
-		bool		translatebegins;
+		bool		intercepttxqueries;
 		bool		faketransactionblocks;
 		bool		faketransactionblocksautocommiton;
 		bool		intransactionblock;

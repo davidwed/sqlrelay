@@ -92,7 +92,7 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	autocommitforthissession=false;
 
-	translatebegins=true;
+	intercepttxqueries=false;
 	faketransactionblocks=false;
 	faketransactionblocksautocommiton=false;
 	intransactionblock=false;
@@ -2110,10 +2110,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 
 	*querywasintercepted=false;
 
-	// for now the only queries we're intercepting are related to
-	// faking transaction blocks, so we can ignore all of this if
-	// that's disabled
-	if (!faketransactionblocks) {
+	// we have to do this if we're faking transaction blocks,
+	// otherwise we'll only do it if it was manually enabled
+	if (!intercepttxqueries && !faketransactionblocks) {
 		return false;
 	}
 
@@ -2126,7 +2125,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (intransactionblock) {
+		if (faketransactionblocks && intransactionblock) {
 			cursor->setError(
 				"begin while in transaction block",
 							999999,true);
@@ -2141,7 +2140,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (!intransactionblock) {
+		if (faketransactionblocks && !intransactionblock) {
 			cursor->setError(
 				"commit while not in transaction block",
 								999998,true);
@@ -2156,7 +2155,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (!intransactionblock) {
+		if (faketransactionblocks && !intransactionblock) {
 			cursor->setError(
 				"rollback while not in transaction block",
 								999997,true);
@@ -5035,6 +5034,10 @@ const char *sqlrservercontroller::getPassword() {
 }
 void sqlrservercontroller::setAutoCommitBehavior(bool ac) {
 	conn->setAutoCommit(ac);
+}
+
+void sqlrservercontroller::setInterceptTransactionQueriesBehavior(bool itxqb) {
+	intercepttxqueries=itxqb;
 }
 
 void sqlrservercontroller::setFakeTransactionBlocksBehavior(bool ftb) {
