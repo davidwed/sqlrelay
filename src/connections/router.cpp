@@ -375,7 +375,6 @@ bool routerconnection::autoCommitOn() {
 		bool	res=cons[index]->autoCommitOn();
 		if (!res) {
 			autoCommitOnFailed(index);
-			return false;
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
@@ -412,7 +411,6 @@ bool routerconnection::autoCommitOff() {
 		bool	res=cons[index]->autoCommitOff();
 		if (!res) {
 			autoCommitOffFailed(index);
-			return false;
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
@@ -445,13 +443,11 @@ bool routerconnection::autoCommitOff() {
 bool routerconnection::commit() {
 
 	// commit all connections, if any fail, return failure
-	// FIXME: use 2 stage commit...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->commit();
 		if (!res) {
 			commitFailed(index);
-			return false;
 		}
 		if (result) {
 			result=res;
@@ -463,13 +459,11 @@ bool routerconnection::commit() {
 bool routerconnection::rollback() {
 
 	// rollback all connections, if any fail, return failure
-	// FIXME: use 2 stage rollback...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		bool	res=cons[index]->rollback();
 		if (!res) {
 			rollbackFailed(index);
-			return false;
 		}
 		if (result) {
 			result=res;
@@ -1011,13 +1005,11 @@ bool routercursor::begin(const char *query, uint32_t length) {
 						length);
 			if (!res) {
 				routerconn->beginQueryFailed(index);
-				return false;
 			}
 		} else {
 			res=routerconn->cons[index]->autoCommitOff();
 			if (!res) {
 				routerconn->autoCommitOffFailed(index);
-				return false;
 			}
 		}
 		if (result) {
