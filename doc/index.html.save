@@ -1,0 +1,184 @@
+<html>
+
+<head>
+<title>SQL Relay</title>
+<link rel="stylesheet" href="css/styles.css">
+</head> 
+
+<body>
+
+<span class="header">SQL Relay</span>
+
+<p class="indented">SQL Relay is a powerful database connection management solution.</p>
+
+<img class="indented" style="float: left; margin-right: 20px" src="images/sqlrelay.png">
+
+<br><br>
+
+<p>With SQL Relay, you can speed up and enhance the scalability of database-driven web-based applications, access databases from unsupported platforms, throttle database access, distribute load over clustered or replicated databases,<br>route queries and migrate applications from one database to another.</p>
+
+<br style="clear: both">
+
+<hr>
+
+<span class="header">Advantages</span><br>
+
+<p class="indented">
+<a href="features/connectionpooling.html">Persistent Database Connection Pooling</a> - makes database-driven web-based applications faster and more efficient<br>
+<a href="features/proxying.html">Proxying</a> - provides access to databases from unsupported platforms<br>
+<a href="features/throttling.html">Throttling</a> - prevents databases from becoming overloaded<br>
+<a href="features/ha.html">High Availability</a> - provides load balancing and failover with replicated or clustered databases<br>
+<a href="features/queryrouting.html">Query Routing</a> - conditionally sends queries to one database or another<br>
+<a href="features/queryfiltering.html">Query Filtering</a> - prevents queries that match certain patterns from being run at all<br>
+<br>
+<a href="features/databases.html">Database Support</a> - a wide variety of commercial and open-source databases are supported<br>
+<a href="features/dbabstractionlayers.html">Abstraction Layer Support</a> - drivers for most popular database abstraction layers are provided<br>
+<a href="features/dropinreplacementlibs.html">Drop-In Replacement Libraries</a> - allow many native MySQL or PostgreSQL applications to use SQL Relay without modification<br>
+<a href="features/languages.html">Native API</a> - the powerful native SQL Relay client API supports a wide variety of programming languages<br>
+<br>
+<a href="features/substitutionandbindvars.html">Substitution and Bind Variables</a> - make frequently run queries faster and more efficient<br>
+<a href="features/multirowfetches.html">Multi-Row Fetches</a> - reduce the number of network round-trips<br>
+<a href="features/resultsetcaching.html">Client-Side Result Set Caching</a> - makes paging faster and easier<br>
+<a href="features/suspendedtx.html">Suspended Transactions</a> - allow a single transaction to span multiple web pages<br>
+</p>
+
+<hr>
+
+<span class="header">Getting Started With Databases</span><br>
+
+<p>SQL Relay supports many different databases. However, just setting up a database before even trying to use SQL Relay with it can be a challenge. These documents include step-by-step instructions for setting up various databases on various platforms.</p>
+
+<p class="indented">
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-oracle.html">Getting Started With Oracle</a><br>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-mysql.html">Getting Started With MySQL</a><br>
+<a target="_blank" href="http://systems.firstworks.com/p/blog-page_51.html">Getting Started With PostgreSQL</a><br>
+<a target="_blank" href="http://systems.firstworks.com/p/getting.html">Getting Started With SAP/Sybase</a><br>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started With IBM DB2</a><br>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-firebird.html">Getting Started With Firebird</a><br>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-sqlite.html">Getting Started With SQLite</a><br>
+<a target="_blank" href=" http://systems.firstworks.com/p/blog-page_8.html">Getting Started With Microsoft Access (on a non-MS platform)</a><br>
+<a target="_blank" href="http://systems.firstworks.com/p/blog-page_65.html">Getting Started With ODBC (on a non-MS platform)</a><br>
+</p>
+
+<hr>
+
+<span class="header">Administering SQL Relay</span><br>
+
+<p class="indented">
+<a href="admin/installing.html">Installing SQL Relay</a><br>
+<a href="admin/configguide.html">SQL Relay Configuration Guide</a><br>
+<a href="admin/configreference.html">SQL Relay Configuration Reference</a><br>
+<a href="admin/running.html">Running SQL Relay</a><br>
+<a href="admin/router.html">Query Routing</a><br>
+<a href="admin/tuning.html">Tuning SQL Relay</a><br>
+</p>
+
+<hr>
+
+<span class="header">Connecting Applications to SQL Relay</span><br>
+
+<p>SQL Relay provides drivers for most popular database abstraction layers.</p>
+
+<blockquote>
+<div style="float: left;">
+<p class="indented">
+<b>Guides:</b><br>
+<a href="programming/ado.net.html">ADO.NET</a><br>
+<a href="programming/perldbi.html">Perl DBI</a><br>
+<a href="programming/pythondb.html">Python DB-API</a><br>
+<a href="programming/phppdo.html">PHP PDO</a><br>
+<a href="programming/odbc.html">ODBC</a><br>
+<a href="programming/jdbc.html">JDBC</a><br>
+</p>
+</div>
+
+<div style="float: left;">
+<p class="indented">
+<b>References</b>:<br>
+<a href="api/ado.net/html/annotated.html">ADO.NET</a><br>
+<a href="api/perl/SQLRelay.html">Perl DBI</a><br>
+<a href="api/python/PySQLRDB.py.html">Python DB-API</a><br>
+</p>
+</div>
+</blockquote>
+
+<div style="clear: both;"></div>
+
+<p>Drop-In Replacement Libraries allow many native MySQL or PostgreSQL applications to use SQL Relay without modification.</p>
+
+<blockquote>
+<p class="indented">
+<a href="dropin/mysql.html">MySQL</a><br>
+<a href="dropin/postgresql.html">PostgreSQL</a><br>
+</p>
+</blockquote>
+
+<p>If you are developing a new application, consider using the native SQL Relay client API as your database abstraction layer and take advantage of powerful features like suspended sessions, result set caching and tuning options.</p>
+
+<blockquote>
+<div style="float: left;">
+<p class="indented">
+<b>Guides:</b><br>
+<a href="programming/c++.html">C++</a><br>
+<a href="programming/c.html">C</a><br>
+<a href="programming/cs.html">C#</a><br>
+<a href="programming/perl.html">Perl</a><br>
+<a href="programming/php.html">PHP</a><br>
+<a href="programming/python.html">Python</a><br>
+<a href="programming/ruby.html">Ruby</a><br>
+<a href="programming/java.html">Java</a><br>
+<a href="programming/tcl.html">TCL</a><br>
+<a href="programming/erlang.html">Erlang</a><br>
+<a href="programming/nodejs.html">node.js</a><br>
+</p>
+</div>
+
+<div style="float: left;">
+<p class="indented">
+<b>References:</b><br>
+<a href="api/c++/html/annotated.html">C++</a><br>
+<a href="api/c/html/group__sqlrclientwrapper.html">C</a><br>
+<a href="api/cs/html/annotated.html">C#</a><br>
+<a href="api/perl/perl.html">Perl</a><br>
+<a href="api/php/index.html">PHP</a><br>
+<a href="api/python/PySQLRClient.py.html">Python</a><br>
+<a href="api/ruby/doc/index.html">Ruby</a><br>
+<a href="api/java/index.html">Java</a><br>
+<a href="api/tcl/index.html">TCL</a><br>
+<a href="api/nodejs/html/annotated.html">node.js</a><br>
+</p>
+</div>
+</blockquote>
+
+<div style="clear: both;"></div>
+
+<p>If you're developing or deploying SQL Relay client software in a Windows environment, you might want to check out <a target="_blank" href="http://sqlrelay.sourceforge.net/libfirstworks/index.html">libfirstworks</a> too.</p>
+
+<hr>
+
+<span class="header">SQL Relay Extension Modules</span><br>
+
+<p>SQL Relay can be extended via modules.  Use existing modules or develop your own.</p>
+
+<p class="indented">
+<a href="modules/pwdencs.html">Password Encryption Modules</a><br>
+<a href="modules/auths.html">Auth Modules</a><br>
+<a href="modules/translations.html">Query Translation Modules</a><br>
+<a href="modules/filters.html">Query Filter Modules</a><br>
+<a href="modules/resultsettranslations.html">Result Set Translation Modules</a><br>
+<a href="modules/loggers.html">Logger Modules</a><br>
+</p>
+
+<div style="clear: both;"></div>
+
+<hr>
+
+<span class="header">Frequently Asked Questions</span><br>
+
+<p class="indented">
+<a href="faq.html">FAQ</a><br>
+</p>
+
+</body>
+
+</html>

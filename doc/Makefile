@@ -2,7 +2,15 @@ top_builddir = ..
 
 include ../config.mk
 
-all:
+.SUFFIXES: .wt .html
+
+SRCS = index.wt
+OBJS = index.html
+
+.wt.html:
+	wt -c $< -o $@ -xhtml xhtml.conf
+
+all: $(OBJS)
 
 install:
 	$(MKINSTALLDIRS) $(docdir)
@@ -146,6 +154,7 @@ uninstall:
 	$(RMTREE) $(docdir)
 
 clean:
+	$(RM) $(OBJS)
 	cd admin $(AND) $(MAKE) cleanparts
 	cd features $(AND) $(MAKE) cleanparts
 	cd modules $(AND) $(MAKE) cleanparts

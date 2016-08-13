@@ -1,0 +1,134 @@
+= SQL Relay =
+
+ SQL Relay is a powerful database connection management solution.
+ 
+ [[Image(images/sqlrelay.png,nolink,float=left,margin-right=20px)]]
+ [[br]][[br]][[br]]
+ With SQL Relay, you can speed up and enhance the scalability of database-driven web-based applications, access databases from unsupported platforms, throttle database access, distribute load over clustered or replicated databases,[[br]]route queries and migrate applications from one database to another.
+ [[br]][[br]]
+
+----
+
+= Advantages =
+
+ [features/connectionpooling.html Persistent Database Connection Pooling] - makes database-driven web-based applications faster and more efficient[[br]]
+ [features/proxying.html Proxying] - provides access to databases from unsupported platforms[[br]]
+ [features/throttling.html Throttling] - prevents databases from becoming overloaded[[br]]
+ [features/ha.html High Availability] - provides load balancing and failover with replicated or clustered databases[[br]]
+ [features/queryrouting.html Query Routing] - conditionally sends queries to one database or another[[br]]
+ [features/queryfiltering.html Query Filtering] - prevents queries that match certain patterns from being run at all[[br]]
+
+ [features/databases.html Database Support] - a wide variety of commercial and open-source databases are supported[[br]]
+ [features/dbabstractionlayers.html Abstraction Layer Support] - drivers for most popular database abstraction layers are provided[[br]]
+ [features/dropinreplacementlibs.html Drop-In Replacement Libraries] - allow many native MySQL or PostgreSQL applications to use SQL Relay without modification[[br]]
+ [features/languages.html Native API] - the powerful native SQL Relay client API supports a wide variety of programming languages[[br]]
+
+ [features/substitutionandbindvars.html Substitution and Bind Variables] - make frequently run queries faster and more efficient[[br]]
+ [features/multirowfetches.html Multi-Row Fetches] - reduce the number of network round-trips[[br]]
+ [features/resultsetcaching.html Client-Side Result Set Caching] - makes paging faster and easier[[br]]
+ [features/suspendedtx.html Suspended Transactions] - allow a single transaction to span multiple web pages[[br]]
+
+----
+
+= Getting Started With Databases =
+
+SQL Relay supports many different databases. However, just setting up a database before even trying to use SQL Relay with it can be a challenge. These documents include step-by-step instructions for setting up various databases on various platforms.
+
+ [http://systems.firstworks.com/p/getting-started-with-oracle.html Getting Started With Oracle][[br]]
+ [http://systems.firstworks.com/p/getting-started-with-mysql.html Getting Started With MySQL][[br]]
+ [http://systems.firstworks.com/p/blog-page_51.html Getting Started With PostgreSQL][[br]]
+ [http://systems.firstworks.com/p/getting.html Getting Started With SAP/Sybase][[br]]
+ [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started With IBM DB2][[br]]
+ [http://systems.firstworks.com/p/getting-started-with-firebird.html Getting Started With Firebird][[br]]
+ [http://systems.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite][[br]]
+ [http://systems.firstworks.com/p/blog-page_8.html Getting Started With Microsoft Access (on a non-MS platform)][[br]]
+ [http://systems.firstworks.com/p/blog-page_65.html Getting Started With ODBC (on a non-MS platform)][[br]]
+
+----
+
+= Administering SQL Relay =
+
+ [admin/installing.html Installing SQL Relay][[br]]
+ [admin/configguide.html SQL Relay Configuration Guide][[br]]
+ [admin/configreference.html SQL Relay Configuration Reference][[br]]
+ [admin/running.html Running SQL Relay][[br]]
+ [admin/router.html Query Routing][[br]]
+ [admin/tuning.html Tuning SQL Relay][[br]]
+
+----
+
+= Connecting Applications to SQL Relay =
+
+SQL Relay provides drivers for most popular database abstraction layers.
+
+{{{#!td
+ '''Guides''':[[br]]
+ [programming/ado.net.html ADO.NET][[br]]
+ [programming/perldbi.html Perl DBI][[br]]
+ [programming/pythondb.html Python DB-API][[br]]
+ [programming/phppdo.html PHP PDO][[br]]
+ [programming/odbc.html ODBC][[br]]
+ [programming/jdbc.html JDBC][[br]]
+}}}
+{{{#!td
+ '''References''':[[br]]
+ [api/ado.net/html/annotated.html ADO.NET][[br]]
+ [api/perl/SQLRelay.html Perl DBI][[br]]
+ [api/python/PySQLRDB.py.html Python DB-API][[br]]
+}}}
+
+Drop-In Replacement Libraries allow many native MySQL or PostgreSQL applications to use SQL Relay without modification.
+
+ [dropin/mysql.html MySQL][[br]]
+ [dropin/postgresql.html PostgreSQL][[br]]
+
+If you are developing a new application, consider using the native SQL Relay client API as your database abstraction layer and take advantage of powerful features like suspended sessions, result set caching and tuning options.
+
+{{{#!td
+ '''Guides''':[[br]]
+ [programming/c++.html C++][[br]]
+ [programming/c.html C][[br]]
+ [programming/cs.html C#][[br]]
+ [programming/perl.html Perl][[br]]
+ [programming/php.html PHP][[br]]
+ [programming/python.html Python][[br]]
+ [programming/ruby.html Ruby][[br]]
+ [programming/java.html Java][[br]]
+ [programming/tcl.html TCL][[br]]
+ [programming/erlang.html Erlang][[br]]
+ [programming/nodejs.html node.js][[br]]
+}}}
+{{{#!td
+ '''References''':[[br]]
+ [api/c++/html/annotated.html C++][[br]]
+ [api/c/html/group__sqlrclientwrapper.html C][[br]]
+ [api/cs/html/annotated.html C#][[br]]
+ [api/perl/perl.html Perl][[br]]
+ [api/php/index.html PHP][[br]]
+ [api/python/PySQLRClient.py.html Python][[br]]
+ [api/ruby/doc/index.html Ruby][[br]]
+ [api/java/index.html Java][[br]]
+ [api/tcl/index.html TCL][[br]]
+ [api/nodejs/html/annotated.html node.js][[br]]
+}}}
+
+If you're developing or deploying SQL Relay client software in a Windows environment, you might want to check out [http://sqlrelay.sourceforge.net/libfirstworks/index.html libfirstworks] too.
+
+----
+
+= SQL Relay Extension Modules =
+
+SQL Relay can be extended via modules.  Use existing modules or develop your own.
+
+ [modules/pwdencs.html Password Encryption Modules][[br]]
+ [modules/auths.html Auth Modules][[br]]
+ [modules/translations.html Query Translation Modules][[br]]
+ [modules/filters.html Query Filter Modules][[br]]
+ [modules/resultsettranslations.html Result Set Translation Modules][[br]]
+ [modules/loggers.html Logger Modules][[br]]
+
+----
+
+= Frequently Asked Questions =
+
+ [faq.html FAQ]

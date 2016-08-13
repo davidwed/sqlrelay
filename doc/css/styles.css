@@ -11,6 +11,10 @@ li a {
 	font-size: 13px;
 }
 
+td {
+	vertical-align: top;
+}
+
 td a {
 	font-size: 13px;
 }
@@ -30,6 +34,11 @@ hr {
 }
 
 .header {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+h1 {
 	font-weight: bold;
 	font-size: 1.2em;
 }
@@ -120,6 +129,15 @@ p {
 	font-family: arial;
 	font-weight: medium;
 	font-size: 10pt;
+}
+
+blockquote {
+	background: white;
+	color: black;
+	font-family: arial;
+	font-weight: medium;
+	font-size: 10pt;
+	margin-left: 40px;
 }
 
 pre {
