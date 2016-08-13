@@ -4,8 +4,8 @@ include ../config.mk
 
 .SUFFIXES: .wt .html
 
-SRCS = index.wt
-OBJS = index.html
+SRCS = index.wt faq.wt
+OBJS = index.html faq.html
 
 .wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf

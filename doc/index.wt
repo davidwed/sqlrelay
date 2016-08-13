@@ -1,4 +1,4 @@
-= SQL Relay =
+==== SQL Relay ====
 
  SQL Relay is a powerful database connection management solution.
  
@@ -9,7 +9,7 @@
 
 ----
 
-= Advantages =
+==== Advantages ====
 
  [features/connectionpooling.html Persistent Database Connection Pooling] - makes database-driven web-based applications faster and more efficient[[br]]
  [features/proxying.html Proxying] - provides access to databases from unsupported platforms[[br]]
@@ -30,7 +30,7 @@
 
 ----
 
-= Getting Started With Databases =
+==== Getting Started With Databases ====
 
 SQL Relay supports many different databases. However, just setting up a database before even trying to use SQL Relay with it can be a challenge. These documents include step-by-step instructions for setting up various databases on various platforms.
 
@@ -46,7 +46,7 @@ SQL Relay supports many different databases. However, just setting up a database
 
 ----
 
-= Administering SQL Relay =
+==== Administering SQL Relay ====
 
  [admin/installing.html Installing SQL Relay][[br]]
  [admin/configguide.html SQL Relay Configuration Guide][[br]]
@@ -57,7 +57,7 @@ SQL Relay supports many different databases. However, just setting up a database
 
 ----
 
-= Connecting Applications to SQL Relay =
+==== Connecting Applications to SQL Relay ====
 
 SQL Relay provides drivers for most popular database abstraction layers.
 
@@ -116,7 +116,7 @@ If you're developing or deploying SQL Relay client software in a Windows environ
 
 ----
 
-= SQL Relay Extension Modules =
+==== SQL Relay Extension Modules ====
 
 SQL Relay can be extended via modules.  Use existing modules or develop your own.
 
@@ -129,6 +129,6 @@ SQL Relay can be extended via modules.  Use existing modules or develop your own
 
 ----
 
-= Frequently Asked Questions =
+==== Frequently Asked Questions ====
 
  [faq.html FAQ]

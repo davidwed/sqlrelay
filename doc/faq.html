@@ -1,139 +1,140 @@
 <html>
 <head>
-<title>firstworks   SQL Relay FAQ</title>
-<link href="css/styles.css" rel="stylesheet">
+	<title>SQL Relay FAQ</title>
+	<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+<h1>SQL Relay FAQ</h1>
 
-<span class="heading1">SQL Relay FAQ</span><br><br>
+<h2>General Questions</h2>
 
-<br><span class="heading2">General Questions</span><br>
 <ul>
-<li><a href="#whatis">What is SQL Relay?</a></li>
-<li><a href="#whatisnot">What doesn't SQL Relay do?</a></li>
-<li><a href="#connectionpooling">What is "persistent database connection pooling"?</a></li>
-<li><a href="#proxying">What is "proxying"?</a></li>
-<li><a href="#throttling">What is "throttling"?</a></li>
-<li><a href="#ha">What is "high availability"?</a></li>
-<li><a href="#loadbalancing">What is "load-balancing"?</a></li>
-<li><a href="#failover">What is "fail-over"?</a></li>
-<li><a href="#queryrouting">What is "query routing"?</a></li>
-<li><a href="#dropinlibs">What are "drop-in replacement libraries"?</a></li>
-<li><a href="#databases">What databases does SQL Relay support?</a></li>
-<li><a href="#platforms">What platforms does SQL Relay run on?</a></li>
-<li><a href="#languages">What languages does SQL Relay support?</a></li>
-<li><a href="#dbabstraction">What database abstraction layers does SQL Relay support?</a></li>
-<li><a href="#whatarebindvars">What are "bind variables"?</a></li>
-<li><a href="#multirow">What are "multi-row fetches"?</a></li>
-<li><a href="#resultsetcaching">What is "client-side result set caching"?</a></li>
-<li><a href="#suspendedtx">What are "suspended transactions"?</a></li>
-<li><a href="#howwork">How does SQL Relay work?</a></li>
-<li><a href="#efficiency">How can SQL Relay speed up or improve the efficiency of my website?</a></li>
-<li><a href="#unsupported">How does SQL Relay allow me to access a database from a platform not supported by the database vendor?</span>
-<li><a href="#migration">How can SQL Relay help migrating my application from one database to another?</a></li>
-<li><a href="#replicated">How can SQL Relay be used with replicated or clustered databases?</a></li>
-<li><a href="#databaseusers">Can SQL Relay proxy multiple database users instead of using the same user for every session?</a></li>
-<li><a href="#routing">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
-<li><a href="#mysqlrouting">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
-<li><a href="#filtering">Can SQL Relay be configured to filter out certain queries?</a></li>
+  <li><a href="#whatis">What is SQL Relay?</a></li>
+  <li><a href="#whatisnot">What doesn't SQL Relay do?</a></li>
+  <li><a href="#connectionpooling">What is "persistent database connection pooling"?</a></li>
+  <li><a href="#proxying">What is "proxying"?</a></li>
+  <li><a href="#throttling">What is "throttling"?</a></li>
+  <li><a href="#ha">What is "high availability"?</a></li>
+  <li><a href="#loadbalancing">What is "load-balancing"?</a></li>
+  <li><a href="#failover">What is "fail-over"?</a></li>
+  <li><a href="#queryrouting">What is "query routing"?</a></li>
+  <li><a href="#dropinlibs">What are "drop-in replacement libraries"?</a></li>
+  <li><a href="#databases">What databases does SQL Relay support?</a></li>
+  <li><a href="#platforms">What platforms does SQL Relay run on?</a></li>
+  <li><a href="#languages">What languages does SQL Relay support?</a></li>
+  <li><a href="#dbabstraction">What database abstraction layers does SQL Relay support?</a></li>
+  <li><a href="#whatarebindvars">What are "bind variables"?</a></li>
+  <li><a href="#multirow">What are "multi-row fetches"?</a></li>
+  <li><a href="#resultsetcaching">What is "client-side result set caching"?</a></li>
+  <li><a href="#suspendedtx">What are "suspended transactions"?</a></li>
+  <li><a href="#howwork">How does SQL Relay work?</a></li>
+  <li><a href="#efficiency">How can SQL Relay speed up or improve the efficiency of my website?</a></li>
+  <li><a href="#unsupported">How does SQL Relay allow me to access a database from a platform not supported by the database vendor?</a></li>
+  <li><a href="#migration">How can SQL Relay help migrating my application from one database to another?</a></li>
+  <li><a href="#replicated">How can SQL Relay be used with replicated or clustered databases?</a></li>
+  <li><a href="#databaseusers">Can SQL Relay proxy multiple database users instead of using the same user for every session?</a></li>
+  <li><a href="#routing">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
+  <li><a href="#mysqlrouting">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</a></li>
+  <li><a href="#filtering">Can SQL Relay be configured to filter out certain queries?</a></li>
 </ul>
 
-<br><span class="heading2">Build Questions</span><br>
+<h2>Build Questions</h2>
+
 <ul>
-<li><a href="#instantclient">Can I build SQL Relay against Oracle Instantclient?</a></li>
+  <li><a href="#instantclient">Can I build SQL Relay against Oracle Instantclient?</a></li>
 </ul>
 
-<br><span class="heading2">API Comparison Questions</span><br>
+<h2>API Comparison Questions</h2>
+
 <ul>
-<li><a href="#cgi">Why should I use SQL Relay with web-based applications instead of using a native database API?</a></li>
-<li><a href="#dbiproxy">How does SQL Relay compare to DBI::Proxy?</a></li>
-<li><a href="#apachedbi">How does SQL Relay compare to Apache::DBI or PHP's internal persistent database connections?</a></li>
+  <li><a href="#cgi">Why should I use SQL Relay with web-based applications instead of using a native database API?</a></li>
+  <li><a href="#dbiproxy">How does SQL Relay compare to DBI::Proxy?</a></li>
+  <li><a href="#apachedbi">How does SQL Relay compare to Apache::DBI or PHP's internal persistent database connections?</a></li>
 </ul>
 
-<br><span class="heading2">Database-Specific Questions</span><br>
-<ul>
-<li><a href="#canxxxdb">Can I use SQL Relay to connect to such-and-such database?</a></li>
-<li><a href="#oracle">Why can't I get SQL Relay to connect to Oracle?</a></li>
-<li><a href="#sqlserver">Why can't I get SQL Relay to connect to SAP/Sybase or Microsoft SQL Server?</a></li>
-<li><a href="#freetds">I know that SAP/Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</a></li>
-<li><a href="#pending">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</a>
+<h2>Database-Specific Questions</h2>
 
-<li><a href="#sybasefreetdsdiff">What's the difference between the SAP/Sybase and FreeTDS connections?</a></li>
-<li><a href="#postgresql">How do I get data type names instead of numbers when using PostgreSQL?</a>
-<li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
-<li><a href="#oracleosauth">How do I use Oracle's OS-Authentication (users identified externally)?</a></li>
-<li><a href="#mysqltrans">Why aren't commit's working in MySQL?</a></li>
-<li><a href="#mssqldates">What's the deal with date columns in MS SQL Server?</a></li>
+<ul>
+  <li><a href="#canxxxdb">Can I use SQL Relay to connect to such-and-such database?</a></li>
+  <li><a href="#oracle">Why can't I get SQL Relay to connect to Oracle?</a></li>
+  <li><a href="#sqlserver">Why can't I get SQL Relay to connect to SAP/Sybase or Microsoft SQL Server?</a></li>
+  <li><a href="#freetds">I know that SAP/Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</a></li>
+  <li><a href="#pending">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</a></li>
+  <li><a href="#sybasefreetdsdiff">What's the difference between the SAP/Sybase and FreeTDS connections?</a></li>
+  <li><a href="#postgresql">How do I get data type names instead of numbers when using PostgreSQL?</a></li>
+  <li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
+  <li><a href="#oracleosauth">How do I use Oracle's OS-Authentication (users identified externally)?</a></li>
+  <li><a href="#mysqltrans">Why aren't commit's working in MySQL?</a></li>
+  <li><a href="#mssqldates">What's the deal with date columns in MS SQL Server?</a></li>
 </ul>
 
-<br><span class="heading2">Programming Questions</span><br>
+<h2>Programming Questions</h2>
+
 <ul>
-<li><a href="#buffer">Why does SQL Relay buffer the entire result set?</a></li>
-<li><a href="#nobuffer">How do I keep SQL Relay from buffering the entire result set?</a></li>
-<li><a href="#bindvars">How do I use bind variables?</a></li>
-<li><a href="#vectorbinds">Why can't I do vector binds?</a></li>
-<li><a href="#storedprocs">How do I run stored procedures?</a></li>
-<li><a href="#storedprocresultset">How do I get the result set from a stored procedure that returns a result set?</a></li>
-<li><a href="#returning">How do I get data out of DML with RETURNING clauses?</a></li>
-<li><a href="#temptables">Do temporary tables work with SQL Relay?</a></li>
-<li><a href="#threadsafe">Is the SQL Relay API thread-safe?</a></li>
-<li><a href="#clientcache">How does client-side result-set caching work?</a></li>
-<li><a href="#servercache">What about server-side result-set caching?</a></li>
+  <li><a href="#buffer">Why does SQL Relay buffer the entire result set?</a></li>
+  <li><a href="#nobuffer">How do I keep SQL Relay from buffering the entire result set?</a></li>
+  <li><a href="#bindvars">How do I use bind variables?</a></li>
+  <li><a href="#vectorbinds">Why can't I do vector binds?</a></li>
+  <li><a href="#storedprocs">How do I run stored procedures?</a></li>
+  <li><a href="#storedprocresultset">How do I get the result set from a stored procedure that returns a result set?</a></li>
+  <li><a href="#returning">How do I get data out of DML with RETURNING clauses?</a></li>
+  <li><a href="#temptables">Do temporary tables work with SQL Relay?</a></li>
+  <li><a href="#threadsafe">Is the SQL Relay API thread-safe?</a></li>
+  <li><a href="#clientcache">How does client-side result-set caching work?</a></li>
+  <li><a href="#servercache">What about server-side result-set caching?</a></li>
 </ul>
 
-<br><span class="heading2">Administration Questions</span><br>
+<h2>Administration Questions</h2>
+
 <ul>
-<li><a href="#tweaks">What system parameters can I tweak to get better performance out of SQL Relay</a></li>
-<li><a href="#firewallhang">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
-<li><a href="#ttl">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</a></li>
-<li><a href="#nobody">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</a></li>
-<li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
-<li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
-<li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
-<li><a href="#cursorgrowth">In the configuration file, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
-<li><a href="#debug">What happened to the "debug" option?  How do I enable the debug logs?</a></li>
-<li><a href="#passwordencryption">I don't like storing plaintext passwords in my configuration file.  Can I encrypt them somehow?</a></li>
-<li><a href="#multipleconfig">Do I have to put define all of my instances in the same configuration file?</a></li>
+  <li><a href="#tweaks">What system parameters can I tweak to get better performance out of SQL Relay</a></li>
+  <li><a href="#firewallhang">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
+  <li><a href="#ttl">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</a></li>
+  <li><a href="#nobody">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</a></li>
+  <li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
+  <li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
+  <li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
+  <li><a href="#cursorgrowth">In the configuration file, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
+  <li><a href="#debug">What happened to the "debug" option?  How do I enable the debug logs?</a></li>
+  <li><a href="#passwordencryption">I don't like storing plaintext passwords in my configuration file.  Can I encrypt them somehow?</a></li>
+  <li><a href="#multipleconfig">Do I have to put define all of my instances in the same configuration file?</a></li>
 </ul>
 
-<hr>
+<br/><hr/>
 
-<br><br><span class="heading2">General Questions</span><br><br>
+<h2>General Questions</h2>
 
-<br><a name="whatis"></a>
-<span class="heading3">What is SQL Relay?</span><br>
+<br/><a name="whatis"/><h3>What is SQL Relay?</h3>
 
 <p>SQL Relay is a database connection management solution.</p>
 
-<img src="images/sqlrelay.png">
+<p><img src="images/sqlrelay.png"/></p>
 
 <p>SQL Relay sits between your app and the database and provides functionality not typically provided by the database directly.</p>
 
 <p>The main features of SQL Relay are:</p>
 
-<p><b>Persistent database connection pooling</b> - makes database driven web-based applications faster and more efficient<br>
+<p><b>Persistent database connection pooling</b> - makes database driven web-based applications faster and more efficient<br/>
 Solves - "I've analyzed my app's performance and it seems to be spending a lot of time just logging into the database."</p>
 
-<p><b>Proxing</b> - access databases from unsupported platforms<br>
+<p><b>Proxing</b> - access databases from unsupported platforms<br/>
 Solves - "I need to access MS SQL Server from Linux or Oracle from FreeBSD (or other unsupported platform)."</p>
 
-<p><b>Throttling</b> - prevents databases from becoming overloaded<br>
+<p><b>Throttling</b> - prevents databases from becoming overloaded<br/>
 Solves - "When I run enough web servers to handle the traffic, it slams the database, even though most of the database connections appear to be idle."</p>
 
-<p><b>High Availability</b> - provides load balancing and failover with replicated or clustered databases<br>
-Solves - "I wish there was a cheap and easy way to automatically distribute traffic to the nodes in my database cluster and manage outages."</li>
+<p><b>High Availability</b> - provides load balancing and failover with replicated or clustered databases<br/>
+Solves - "I wish there was a cheap and easy way to automatically distribute traffic to the nodes in my database cluster and manage outages."</p>
 
-<p><b>Query Routing</b> - conditionally sends queries to one database or another<br>
+<p><b>Query Routing</b> - conditionally sends queries to one database or another<br/>
 Solves - "My database is getting slammed.  I could replicate it but then I'd have to rewrite my app to send DML to the master and somehow distribute selects over the slaves."</p>
 
-<p><b>Drop-In Replacement Libraries</b> - aims an existing MySQL or PostgreSQL app at SQL Relay without modification<br>
+<p><b>Drop-In Replacement Libraries</b> - aims an existing MySQL or PostgreSQL app at SQL Relay without modification<br/>
 Solves - "I wrote my app using the native MySQL API but the company is migrating to Oracle.  I can tweak the queries to work with Oracle but I really don't want to have to modify the app to use OCI."</p>
 
 <p>SQL Relay has client API's for most modern programming languages and drivers for many popular database abstraction API's.</p>
 
-
-<br><a name="whatisnot"></a>
-<span class="heading3">What doesn't SQL Relay do?</span><br>
+<br/><a name="whatisnot"/><h3>What doesn't SQL Relay do?</h3>
 
 <p>SQL Relay is powerful but it does have some limits.</p>
 
@@ -149,91 +150,73 @@ Solves - "I wrote my app using the native MySQL API but the company is migrating
 
 <p>SQL Relay cannot currently translate queries from one syntax to another.  Though it can be used to aim an app originally written for MySQL at Oracle, for example, it cannot (yet) transparently convert queries in MySQL syntax to Oracle syntax.</p>
 
-
-<br><a name="connectionpooling"></a>
-<span class="heading3">What is "persistent database connection pooling"?</span><br>
+<br/><a name="connectionpooling"/><h3>What is "persistent database connection pooling"?</h3>
 
 <p>See <a href="features/connectionpooling.html">Persistent Database Connection Pooling</a>.</p>
 
-<br><a name="proxying"></a>
-<span class="heading3">What is "proxying"?</span><br>
+<br/><a name="proxying"/><h3>What is "proxying"?</h3>
 
 <p>See <a href="features/proxying.html">Proxying</a>.</p>
 
-<br><a name="throttling"></a>
-<span class="heading3">What is "throttling"?</span><br>
+<br/><a name="throttling"/><h3>What is "throttling"?</h3>
 
 <p>See <a href="features/throttling.html">Throttling</a>.</p>
 
-<br><a name="ha"></a>
-<span class="heading3">What is "high availability"?</span><br>
+<br/><a name="ha"/><h3>What is "high availability"?</h3>
 
 <p>See <a href="features/ha.html">High Availability</a>.</p>
 
-<br><a name="loadbalancing"></a>
-<span class="heading3">What is "load-balancing"?</span><br>
+<br/><a name="loadbalancing"/><h3>What is "load-balancing"?</h3>
 
 <p>See <a href="features/ha.html">High Availability</a>.</p>
 
-<br><a name="failover"></a>
-<span class="heading3">What is "fail-over"?</span><br>
+<br/><a name="failover"/><h3>What is "fail-over"?</h3>
 
 <p>See <a href="features/ha.html">High Availability</a>.</p>
 
-<br><a name="queryrouting"></a>
-<span class="heading3">What is "query routing"?</span><br>
+<br/><a name="queryrouting"/><h3>What is "query routing"?</h3>
 
 <p>See <a href="features/queryrouting.html">Query Routing</a>.</p>
 
-<br><a name="dropinlibs"></a>
-<span class="heading3">What are "drop-in replacement libraries"?</span><br>
+<br/><a name="dropinlibs"/><h3>What are "drop-in replacement libraries"?</h3>
 
 <p>See <a href="dropin/mysql.html">Using the SQL Relay drop-in replacement library for MySQL</a> and <a href="dropin/postgresql.html">Using the SQL Relay drop-in replacement library for PostgreSQL</a>.</p>
 
-<br><a name="databases"></a>
-<span class="heading3">What databases does SQL Relay support?</span>
+<br/><a name="databases"/><h3>What databases does SQL Relay support?</h3>
 
 <p>See <a href="features/databases.html">Supported Databases</a>.</p>
 
-<br><a name="platforms"></a>
-<span class="heading3">What platforms does SQL Relay run on?</span>
+<br/><a name="platforms"/><h3>What platforms does SQL Relay run on?</h3>
 
 <p>See the <a href="admin/installing.html#platforms">Supported Platforms</a> section of the installation document.</p>
 
-<br><a name="languages"></a>
-<span class="heading3">What languages does SQL Relay support?</span>
+<br/><a name="languages"/><h3>What languages does SQL Relay support?</h3>
 
 <p>See <a href="features/languages.html">Native API</a>.</p>
 
-<br><a name="dbabstraction"></a>
-<span class="heading3">What database abstraction layers does SQL Relay support?</span>
+<br/><a name="dbabstraction"/><h3>What database abstraction layers does SQL Relay support?</h3>
 
 <p>See <a href="features/dbabstractionlayers.html">Database Abstraction Layers</a>.</p>
 
 <p>The native SQL Relay Client API's are database abstraction layers as well, as the SQL Relay server can be connected to a variety of database and applications written using an SQL Relay Client API can talk to any SQL Relay server.</p>
 
-<br><a name="whatarebindvars"></a>
-<span class="heading3">What are "substitution and bind variables"?</span>
+<br/><a name="whatarebindvars"/><h3>What are "substitution and bind variables"?</h3>
 
 <p>See <a href="features/substitutionandbindvars.html">Substitution and Bind Variables</a>.</p>
 
-<br><a name="multirow"></a>
-<span class="heading3">What are "multi-row fetches"?</span>
+<br/><a name="multirow"/><h3>What are "multi-row fetches"?</h3>
 
 <p>See <a href="features/multirowfetches.html">Multi-Row Fetches</a>.</p>
 
-<br><a name="resultsetcaching"></a>
-<span class="heading3">What is "client-side result set caching"?</span>
+<br/><a name="resultsetcaching"/><h3>What is "client-side result set caching"?</h3>
 
 <p>See <a href="features/resultsetcaching.html">Client-Side Result Set Caching</a>.</p>
 
-<br><a name="suspendedtx"></a>
-<span class="heading3">What are "suspended transactions"?</span>
+<br/><a name="suspendedtx"/><h3>What are "suspended transactions"?</h3>
 
 <p>See <a href="features/suspendedtx.html">Suspended Transactions</a>.</p>
 
-<br><a name="howwork"></a>
-<span class="heading3">How does SQL Relay work?</span>
+<br/><a name="howwork"/><h3>How does SQL Relay work?</h3>
 
 <p>SQL Relay's connection daemons log in and maintain connections to
 databases.  These connection daemons advertise themselves with a listener 
@@ -244,8 +227,7 @@ is available, the client waits in a queue until one is.  Once a client
 is handed off to a connection daemon, the client communicates to the database 
 through the connection maintained by that daemon.</p>
 
-<br><a name="efficiency"></a>
-<span class="heading3">How can SQL Relay speed up or improve the efficiency of my website?</span>
+<br/><a name="efficiency"/><h3>How can SQL Relay speed up or improve the efficiency of my website?</h3>
 
 <p>There are many way that SQL Relay can speed up or improve the efficiency of your website, but here some common examples.</p>
 
@@ -257,17 +239,15 @@ through the connection maintained by that daemon.</p>
 
 <p>SQL Relay makes it easy to distribute load over replicated servers.  A common scaling solution when using MySQL or PostgreSQL in a read-only web environment is to run several web servers with a dedicated database server for each web server or group of web servers and update all the databases simultaneously at scheduled intervals.  This usually works pretty well, but sometimes database or web servers get runs of heavy load while others are idle.  In other cases, an uneven number of machines is required.  For example, your application may need 3 web servers but only 2 database servers or vice-versa and buying 3 of each would be wasteful.  Moreover, in most cases, the servers have to be equivalently powerful machines.  You can't usually just add another cheap machine that you have lying around into the pool.   SQL Relay can connect to multiple, replicated or clustered database servers, providing web-based applications access to whichever server isn't busy.  SQL Relay can also be configured to maintain more connections to more powerful machines and fewer connections to less powerful machines, enabling unevenly matched machines to be used in the same database pool.  Collectively, these features allow you to save money by using only the exact number of servers that you need and by enabling you to use spare hardware in your database pools.</p>
 
-<br><a name="unsupported"></a>
-<span class="heading3">How does SQL Relay allow me to access a database from a platform not supported by the database vendor?</span>
+<br/><a name="unsupported"/><h3>How does SQL Relay allow me to access a database from a platform not supported by the database vendor?</h3>
 
 <p>See <a href="features/proxying.html">Proxying</a>.</p>
 
-<br><a name="migration"></a>
-<span class="heading3">How can SQL Relay help migrating my application from one database to another?</span>
+<br/><a name="migration"/><h3>How can SQL Relay help migrating my application from one database to another?</h3>
 
 <p>SQL Relay is both a connection pool and database abstraction layer.  Lets say that your app currently connects directly to a database which has an insignificant connection delay but you want to migrate it to a database that has features that you want, but also has a significant connection delay.  If you first set up instances of SQL Relay to talk to both databases, and then put SQL Relay between your app and the database, you can switch between the databases by changing the connection parameters in your app to point to different instances of SQL Relay, as you would with any other database abstraction layer.  However, since SQL Relay is also a connection pool, you don't incur the connection delay associated with the new database.</p>
 
-<p>If your app was written using a database abstraction API supported by SQL Relay such as ODBC, ADO.NET, Perl DBI, etc. then this is straightforward.  You can just change the connect string to point to the appropriate intance of SQL Relay.</p>
+<p>If your app was written using a database abstraction API supported by SQL Relay such as ODBC, ADO.NET, Perl DBI, etc. then this is straightforward.  You can just change the connect string to point to the appropriate instance of SQL Relay.</p>
 
 <p>If your app was written using a database specific API then you might have to port your app to use the SQL Relay API, or a supported DB abstraction layer first.</p>
 
@@ -275,14 +255,11 @@ through the connection maintained by that daemon.</p>
 
 <p>SQL Relay doesn't currently do query translation though.  There might be queries in your app that are written using database-specific syntax that would need to be modified to use the new database.</p>
 
-<br><a name="replicated"></a>
-<span class="heading3">How can SQL Relay be used with replicated or clustered 
-databases?</span>
+<br/><a name="replicated"/><h3>How can SQL Relay be used with replicated or clustered databases?</h3>
 
 <p>See <a href="features/ha.html">High Availability</a>.</p>
 
-<br><a name="databaseusers"></a>
-<span class="heading3">Can SQL Relay proxy multiple database users instead of using the same user for every session?</span>
+<br/><a name="databaseusers"/><h3>Can SQL Relay proxy multiple database users instead of using the same user for every session?</h3>
 
 <p>Yes.  In the instance tag in the configuration file, set authtier="database".  See the <a href="admin/configreference.html">SQL Relay Configuration Reference</a> for more information.</p>
 
@@ -290,13 +267,11 @@ databases?</span>
 
 <p>Oracle and MySQL allow a process that is connected to the database to switch users without disconnecting from the database.  When used with other databases, SQL Relay logs out and logs back in to the database whenever it needs to switch users.</p>
 
-<br><a name="routing"></a>
-<span class="heading3">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
+<br/><a name="routing"/><h3>Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</h3>
 
 <p>Yes, see <a href="admin/router.html">Query Routing</a>.</p>
 
-<br><a name="mysqlrouting"></a>
-<span class="heading3">Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
+<br/><a name="mysqlrouting"/><h3>Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?</h3>
 
 <p>Probably.  You'll need to set up SQL Relay to route queries and use the Drop-in Replacement Library for MySQL to redirect your app to use SQL Relay.</p>
 
@@ -304,44 +279,38 @@ databases?</span>
 
 <p>See <a href="dropin/mysql.html">Using the SQL Relay drop-in replacement library for MySQL</a> for details about how to use the drop-in replacement library.</p>
 
-<br><a name="filtering"></a>
-<span class="heading3">Can SQL Relay be configured to filter out certain queries?</span>
+<br/><a name="filtering"/><h3>Can SQL Relay be configured to filter out certain queries?</h3>
 
 <p>Yes, see <a href="modules/filters.html">Query Filter Modules</a>.</p>
 
-<hr>
+<br/><hr/>
 
-<br><span class="heading2">Build Questions</span><br><br>
+<h2>Build Questions</h2>
 
-<br><a name="instantclient"></a>
-<span class="heading3">Can I build SQL Relay against Oracle Instantclient?</span><br>
+<br/><a name="instantclient"/><h3>Can I build SQL Relay against Oracle Instantclient?</h3>
 
-<p>Yes.  However, there are two potential issues.</p>
+<p>Yes.  However...</p>
 
 <p>The configure script looks hard for the instantclient installation but if you installed from a non-RPM distribution of instantclient, then you might have to use use the --with-oracle-instantclient-prefix option of the configure script.  For example, if you unzipped the instantclient distro in /opt/oracle and it created a directory called /opt/oracle/instantclient_11_2, then you should use:</p>
 
 <blockquote>
 ./configure --with-oracle-instantclient-prefix=/opt/oracle/instantclient_11_2
 </blockquote>
+<br/><hr/>
 
-<hr>
+<h2>API Comparison Questions</h2>
 
-<br><span class="heading2">API Comparison Questions</span><br><br>
-
-<br><a name="cgi"></a>
-<span class="heading3">Why should I use SQL Relay with web-based applications instead of using a native database API?</span>
+<br/><a name="cgi"/><h3>Why should I use SQL Relay with web-based applications instead of using a native database API?</h3>
 
 <p>Many web-based apps have to log into and out of the database each time they generate a page.  With native database API's, connecting directly to the database, logging in can take a long time.  SQL Relay maintains persistent database connections and is much faster to connect to.  Web-based applications generally run faster when using SQL Relay than when using a native API.</p>
 
 <p>Native database API libraries are often very large. The SQL Relay API's are lightweight. Web-based applications that use it generally use less memory than when using a native API.</p>
 
-<br><a name="dbiproxy"></a>
-<span class="heading3">How does SQL Relay compare to DBI::Proxy?</span>
+<br/><a name="dbiproxy"/><h3>How does SQL Relay compare to DBI::Proxy?</h3>
 
-<p>DBI::Proxy is Perl-specific or at least very challenging to use from other languages.  SQL Relay likely outperforms DBI::Proxy since DBI::Proxy is primarily targeted at providing access to databases from unsupported platforms, not at improving application performance, though I have never tested one against the other.  SQL Relay can provide access to databases from unsupported platforms as well, even platforms for which there is no unix support using the ODBC connection and an ODBC to ODBC bridge.</p>
+<p>The DBI::Proxy module is Perl-specific, or at least very challenging to use from other languages.  SQL Relay likely outperforms DBI::Proxy since DBI::Proxy is primarily targeted at providing access to databases from unsupported platforms, not at improving application performance, though I have never tested one against the other.  SQL Relay can provide access to databases from unsupported platforms as well, even platforms for which there is no unix support using the ODBC connection and an ODBC to ODBC bridge.</p>
 
-<br><a name="apachedbi"></a>
-<span class="heading3">How does SQL Relay compare to Apache::DBI or PHP's persistent database connections?</span>
+<br/><a name="apachedbi"/><h3>How does SQL Relay compare to Apache::DBI or PHP's persistent database connections?</h3>
 
 <p>SQL Relay is more lightweight and potentially faster than Apache::DBI and is competitive in speed with PHP's persistent connections.  SQL Relay can be used to provide a connection pool to multiple machines and has more backend features than Apache::DBI or PHP.  However, the DBI and PHP API's are generally considered to be simpler to implement.</p>
 
@@ -351,17 +320,15 @@ databases?</span>
 
 <p>SQL Relay makes more efficient use of resources by maintaining fewer persistent connections to the database and funnelling all database requests through those connections.  When the number of database session requests exceeds the number of persistent connections, the session requests are queued.  This ultimately causes delayed response to the client, but keeps the database running smoothly.  In most cases, the delay is negligable and the tradeoff is acceptable.</p>
 
-<hr>
+<br/><hr/>
 
-<br><span class="heading2">Database-Specific Questions</span><br><br>
+<h2>Database-Specific Questions</h2>
 
-<br><a name="canxxxdb"></a>
-<span class="heading3">Can I use SQL Relay to connect to such-and-such database?</span>
+<br/><a name="canxxxdb"/><h3>Can I use SQL Relay to connect to such-and-such database?</h3>
 
 <p>See <a href="features/databases.html">Supported Databases</a>.</p>
 
-<br><a name="oracle"></a>
-<span class="heading3">Why can't I get SQL Relay to connect to Oracle?</span>
+<br/><a name="oracle"/><h3>Why can't I get SQL Relay to connect to Oracle?</h3>
 
 <p>Here's the most common thing that causes this problem...</p>
 
@@ -374,13 +341,11 @@ databases?</span>
 <blockquote>
 chmod o+r tnsnames.ora
 </blockquote>
-
 <p>Another solution is to run SQL Relay as the oracle user and/or oinstall group, or to run it as a user that is in the oinstall group.</p>
 
 <p>A less common, but not terribly uncommon error is described below.</p>
 
-<br><a name="ocienvcreate"></a>
-<span class="heading3">SQL Relay fails to start against Oracle with error: OCIEnvCreate() failed.  How do I fix this?</span>
+<br/><a name="ocienvcreate"/><h3>SQL Relay fails to start against Oracle with error: OCIEnvCreate() failed.  How do I fix this?</h3>
 
 <p>This error means that the Oracle OCI library, which SQL Relay uses, couldn't find something that it needed to set up the environment.</p>
 
@@ -390,18 +355,15 @@ chmod o+r tnsnames.ora
 
 <p>The next most common cause is an invalid ORACLE_HOME environment variable, or invalid oracle_home setting in the configuration file.  The ORACLE_SID environment variable, or oracle_sid setting in the configuration file, can either refer to an entry in the tnsnames.ora file or it can just be an fully qualified entry itself.  In the case of the former, the ORACLE_HOME must be set to a valid directory, under which network/admin/tnsnames.ora can be found.  In the case of the latter, when using Oracle 8 and 8i or any version of Oracle Instant Client, ORACLE_HOME can be set to anything at all or left empty, but when using Oracle 9i and up, ORACLE_HOME must be set to a valid location.</p>
 
-<br><a name="sqlserver"></a>
-<span class="heading3">Why can't I get SQL Relay to connect to SAP/Sybase or Microsoft SQL Server?</span>
+<br/><a name="sqlserver"/><h3>Why can't I get SQL Relay to connect to SAP/Sybase or Microsoft SQL Server?</h3>
 
 <p>The server parameter in the string attribute of the connection tag does not refer to the DNS name of the server.  Rather it refers to an entry in the "interfaces" file.  The SAP/Sybase and FreeTDS libraries look for that file in default places, but if the file is installed somewhere else and the library can't find it, it will not be able to figure out what host/port the server is running on.  One way to tell SQL Relay where the file is located is to set the SYBASE environment variable to the directory containing the file before starting SQL Relay.  Alternatively, the string attribute of the connection tag takes a "sybase" parameter which sets the environment variable.</p>
 
-<br><a name="freetds"></a>
-<span class="heading3">I know that SAP/Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</span>
+<br/><a name="freetds"/><h3>I know that SAP/Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</h3>
 
 <p>You must have built SQL Relay against a really old version of FreeTDS.  Before FreeTDS version 0.53, calling the FreeTDS function to get the number of affected rows would cause a segmentation fault.  SQL Relay detects the FreeTDS at compile time and only enables affected rows if the version of FreeTDS is greater than 0.52.  If you compile against an earlier version of FreeTDS, a -1 is returned for affected rows as if the database didn't support the feature.</p>
 
-<br><a name="pending"></a>
-<span class="heading3">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</span>
+<br/><a name="pending"/><h3>How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</h3>
 
 <p>The short answer is... If you're doing nested selects, don't call setResultSetBufferSize() with a non-zero argument.</p>
 
@@ -413,8 +375,7 @@ chmod o+r tnsnames.ora
 
 <p>See the <a href="http://www.freetds.org/faq.html#pending">FreeTDS FAQ</a> for more info.</p>
 
-<br><a name="sybasefreetdsdiff"></a>
-<span class="heading3">What's the difference between the SAP/Sybase and FreeTDS connections?</span>
+<br/><a name="sybasefreetdsdiff"/><h3>What's the difference between the SAP/Sybase and FreeTDS connections?</h3>
 
 <p>The sqlrconnection_sybase module is compiled against SAP/Sybase ctlib; the libraries that come with SAP/Sybase Adaptive Server Enterprise.  They use a protocol called TDS (Tabular Data Stream) to talk to the database.</p>
 
@@ -422,8 +383,7 @@ chmod o+r tnsnames.ora
 
 <p>Very old versions of Microsoft SQL Server are compatible with SAP/Sybase ctlib, but modern versions are not.  FreeTDS is compatible with all versions of SAP/Sybase Adaptive Server Enterprise and Microsoft SQL Server.  So, if you want to access a modern version of Microsoft SQL Server, you must use the FreeTDS connection.  You can also access all versions of SAP/Sybase with the FreeTDS connection.</p>
 
-<br><a name="postgresql"></a>
-<span class="heading3">How do I get data type names instead of numbers when using PostgreSQL?</span>
+<br/><a name="postgresql"/><h3>How do I get data type names instead of numbers when using PostgreSQL?</h3>
 
 <p>The native PostgreSQL API returns data type ids (numbers), rather than data type names, so by default, SQL Relay does the same when run against PostgreSQL.  If you prefer getting type names, you can set the mangletypes connect string value to "yes" in your configuration file.</p>
 
@@ -432,17 +392,14 @@ chmod o+r tnsnames.ora
 <blockquote>
 user=myuser;password=mypass;db=testdb;mangletypes=yes
 </blockquote>
-
 <p>The following connectstring will instruct SQL Relay to return type numbers:</p>
 
 <blockquote>
 user=myuser;password=mypass;db=testdb;mangletypes=no
 </blockquote>
-
 <p>Leaving the mangletypes parameter out altogether is the same as setting it to "no".</p>
 
-<br><a name="nlslang"></a>
-<span class="heading3">Why am I getting question marks and other garbage back when I do a select?  It worked fine when I was using the native database command line tool.</span>
+<br/><a name="nlslang"/><h3>Why am I getting question marks and other garbage back when I do a select?  It worked fine when I was using the native database command line tool.</h3>
 
 <p>The most common cause of this has to do with character set translation.</p>
 
@@ -464,68 +421,51 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>In the case of DB2 or Informix, the <b>lang</b> connect string variable just sets the <b>LANG</b> environment variable.  When using versions of SQL Relay older than listed above, the <b>LANG</b> environment variable must be set prior to running SQL Relay to configure the character set.</p>
 
-<br><a name="oracleosauth"></a>
-<span class="heading3">How do I use Oracle's OS-Authentication (users identified externally)?</span>
+<br/><a name="oracleosauth"/><h3>How do I use Oracle's OS-Authentication (users identified externally)?</h3>
 
 <p>To set up Oracle to authenticate a user against the OS, first create a user in linux/unix, then log into oracle as the sys user and create a corresponding user as follows.  In this example, we'll assume that you created an OS-level user named <b>dmuse</b>:</p>
 
-<blockquote>
-<pre>
-<font color="#a52a2a"><b>CREATE</b></font> <font color="#6a5acd">USER</font> ops$dmuse <font color="#6a5acd">IDENTIFIED</font> EXTERNALLY
-<font color="#a52a2a"><b>GRANT</b></font> <font color="#6a5acd">CONNECT</font> <font color="#6a5acd">TO</font> ops$dmuse
+<pre>        CREATE USER ops$dmuse IDENTIFIED EXTERNALLY
+        GRANT CONNECT TO ops$dmuse
 </pre>
-</blockquote>
 
 <p>Now you can log in as <b>dmuse</b> and connect to the database using <b>sqlplus /</b> and you will not be prompted for a username and password.</p>
 
-<p>In the configuration file, set the runasuser attribute of the instance tag to the user that you want to connect as and leave out the user, password and oracle_sid parameters of the string attribute of the connection tag.</p> 
+<p>In the configuration file, set the runasuser attribute of the instance tag to the user that you want to connect as and leave out the user, password and oracle_sid parameters of the string attribute of the connection tag. </p>
 
 <p>For example, here's a normal (non-OS-authentication) configuration which connects to the ora1 instance of oracle using testuser/testpassword:</p>
 
-<blockquote>
-<pre>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>runasuser</b></font>=<font color="#ff00ff">&quot;oracle&quot;</font><font color="#008b8b"> ...&gt;</font>
-        ...
-        <font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=testuser;password=testpassword;oracle_sid=ora1&quot;</font><font color="#008b8b"> .../&gt;</font>
-        <font color="#008b8b">&lt;/connections&gt;</font>
-<font color="#008b8b">&lt;/instance&gt;</font>
+<pre>        &lt;instance ... runasuser="oracle" ...&gt;
+                ...
+                &lt;connections&gt;
+                        &lt;connection ... string="user=testuser;password=testpassword;oracle_sid=ora1" .../&gt;
+                &lt;/connections&gt;
+        &lt;/instance&gt;
 </pre>
-</blockquote>
 
 <p>Here's one that uses the oracle OS-user to connect.  This is analagous to logging in as oracle and running <b>sqlplus /</b>:</p>
 
-<blockquote>
-<pre>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>runasuser</b></font>=<font color="#ff00ff">&quot;oracle&quot;</font><font color="#008b8b"> ...&gt;</font>
-        ...
-        <font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font>
-                <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> .../&gt;</font>
-        <font color="#008b8b">&lt;/connections&gt;</font>
-<font color="#008b8b">&lt;/instance&gt;</font>
+<pre>        &lt;instance ... runasuser="oracle" ...&gt;
+                ...
+                &lt;connections&gt;
+                        &lt;connection ... string="" .../&gt;
+                &lt;/connections&gt;
+        &lt;/instance&gt;
 </pre>
-</blockquote>
 
-<p>It's possible to set up an externally authenticated user to have access to other SID's and use <b>sqlplus /@someotherschema</b> to connect to them.  To configure SQL Relay to connect to another schema, just add the oracle_sid parameter to the string attribute of the connection tag.  For example, use the following to connect to ora1.<p>
+<p>It's possible to set up an externally authenticated user to have access to other SID's and use <b>sqlplus /@someotherschema</b> to connect to them.  To configure SQL Relay to connect to another schema, just add the oracle_sid parameter to the string attribute of the connection tag.  For example, use the following to connect to ora1.</p>
 
-<blockquote>
-<pre>
-        <font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b"> ... </font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;oracle_sid=ora1&quot;</font><font color="#008b8b"> .../&gt;</font>
+<pre>        &lt;connection ... string="oracle_sid=ora1" .../&gt;
 </pre>
-</blockquote>
 
-<br><a name="mysqltrans"></a>
-<span class="heading3">Why aren't commit's working in MySQL?</span>
+<br/><a name="mysqltrans"/><h3>Why aren't commit's working in MySQL?</h3>
 
 <p>How old is your MySQL server?</p>
 
-<p>Ancient versions of MySQL didn't support transactions at all.  Old versions did, but only if you explicitly created tables using a table type that supports transactions like InnoDB:</p>
+<p>Ancient versions of MySQL didn't support transactions at all.  Old versions did, but only if you explicitly created tables using a table type that supports transactions like <a href="InnoDB">InnoDB</a>:</p>
 
-<blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">table</font> testtable (col1 int) <font color="#6a5acd">type</font>=innodb
+<pre>create table testtable (col1 int) type=innodb
 </pre>
-</blockquote>
 
 <p>Modern versions create transaction-capable tables by default.</p>
 
@@ -539,8 +479,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>As of SQL Relay 0.39, when using MySQL, whenever a client connects to the server, the MySQL connection daemon executes a commit before running the first query to sync things up.  This emulates the behavior that a client would expect if it was making a new connection directly to the database.</p>
 
-<br><a name="mssqldates"></a>
-<span class="heading3">What's the deal with date columns in MS SQL Server?</span>
+<br/><a name="mssqldates"/><h3>What's the deal with date columns in MS SQL Server?</h3>
 
 <p>SQL Relay uses FreeTDS to connect to MS SQL Server.  SQL Relay can also use FreeTDS to connect to SAP/Sybase.</p>
 
@@ -551,17 +490,15 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <p>So when using MS SQL Server, if you select a DATE and DATETIME column you might get results like:</p>
 
 <blockquote>
-<b>DATE:</b> 2013-08-05<br>
-<b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br>
+<b>DATE:</b> 2013-08-05<br/>
+<b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br/>
 </blockquote>
-
 <p>instead of what you'd get with SAP/Sybase:</p>
 
 <blockquote>
-<b>DATE:</b> Aug  5 2013 12:00:00:000AM<br>
-<b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br>
+<b>DATE:</b> Aug  5 2013 12:00:00:000AM<br/>
+<b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br/>
 </blockquote>
-
 <p>The <b>dateformat</b> parameter in the configuration file can be used to normalize these DATE fields but there is an interesting potential issue.</p>
 
 <p>The date/time conversion routines take any fields in the result set that appear to be a date, time or date/time combination and translate them to the format specified by the <b>dateformat</b>, <b>timeformat</b> and <b>datetimeformat</b> parameters.  However the routines must also use the <b>dateddmm</b> parameter to determine whether the month or day comes first.  For example, the date 03/04/2005 could be recognized as either March 4, 2005 or April 3, 2005.  If <b>dateddmm="yes"</b> is set then it will be recognized as the latter.</p>
@@ -574,94 +511,86 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>Of course, if you're not using MS SQL Server and date/time conversion and setting <b>dateddmm="yes"</b> then you don't have to worry about any of this.</p>
 
-<hr>
+<br/><hr/>
 
-<br><span class="heading2">Programming Questions</span><br><br>
+<h2>Programming Questions</h2>
 
-<br><a name="buffer"></a>
-<span class="heading3">Why does SQL Relay buffer the entire result set?</span>
+<br/><a name="buffer"/><h3>Why does SQL Relay buffer the entire result set?</h3>
 
 <p>SQL Relay is targeted for web-based applications.  For the most part, queries with relatively small result sets are used to build web pages.  For small result sets, it more efficient to buffer the entire result set than to step through it, building the page.  It's usually faster because it reduces network round-trips and allows one program to drop the connection to SQL Relay, freeing it up for more programs to use while the first program builds its page.</p>
 
-<br><a name="nobuffer"></a>
-<span class="heading3">How do I keep SQL Relay from buffering the entire result 
-set?</span>
+<br/><a name="nobuffer"/><h3>How do I keep SQL Relay from buffering the entire result set?</h3>
 
 <p>For large result sets it can be impractical to buffer the entire result set.  Use the setResultSetBufferSize() method or the sqlrcur_setResultSetBufferSize() function to specify how many rows of the result set to buffer at once.</p>
 
-<br><a name="bindvars"></a>
-<span class="heading3">How do I use bind variables?</span>
+<br/><a name="bindvars"/><h3>How do I use bind variables?</h3>
 
 <p>That depends on the database you're using.  Some databases support named bind variables while others only support binds by position.  Below are pseudocode examples of both.</p>
 
 <p>Oracle example:</p>
-<pre>
-sqlrconnection	*con=new sqlrconnection(...);
-sqlrcursor	*cur=new sqlrcursor(cur);
-cur-&gt;prepareQuery("select * from table where charcol=:charval and intcol=:intval and floatcol=:floatval");
-cur-&gt;inputBind("charval","hello");
-cur-&gt;inputBind("intval",10);
-cur-&gt;inputBind("floatval",5.5,1,1);
-cur-&gt;executeQuery();
-delete cur;
-delete con;
+
+<pre>        sqlrconnection	*con=new sqlrconnection(...);
+        sqlrcursor	*cur=new sqlrcursor(cur);
+        cur-&gt;prepareQuery("select * from table where charcol=:charval and intcol=:intval and floatcol=:floatval");
+        cur-&gt;inputBind("charval","hello");
+        cur-&gt;inputBind("intval",10);
+        cur-&gt;inputBind("floatval",5.5,1,1);
+        cur-&gt;executeQuery();
+        delete cur;
+        delete con;
 </pre>
 
 <p>SAP/Sybase/MS SQL Server example:</p>
-<pre>
-sqlrconnection	*con=new sqlrconnection(...);
-sqlrcursor	*cur=new sqlrcursor(cur);
-cur-&gt;prepareQuery("select * from table where charcol=@charval and intcol=@intval and floatcol=@floatval");
-cur-&gt;inputBind("charval","hello");
-cur-&gt;inputBind("intval",10);
-cur-&gt;inputBind("floatval",5.5,1,1);
-cur-&gt;executeQuery();
-delete cur;
-delete con;
+
+<pre>        sqlrconnection	*con=new sqlrconnection(...);
+        sqlrcursor	*cur=new sqlrcursor(cur);
+        cur-&gt;prepareQuery("select * from table where charcol=@charval and intcol=@intval and floatcol=@floatval");
+        cur-&gt;inputBind("charval","hello");
+        cur-&gt;inputBind("intval",10);
+        cur-&gt;inputBind("floatval",5.5,1,1);
+        cur-&gt;executeQuery();
+        delete cur;
+        delete con;
 </pre>
 
 <p>Other DB example:</p>
-<pre>
-sqlrconnection	*con=new sqlrconnection(...);
-sqlrcursor	*cur=new sqlrcursor(cur);
-cur-&gt;prepareQuery("select * from table where charcol=? and intcol=? and floatcol=?");
-cur-&gt;inputBind("0","hello");
-cur-&gt;inputBind("1",10);
-cur-&gt;inputBind("2",5.5,1,1);
-cur-&gt;executeQuery();
-delete cur;
-delete con;
+
+<pre>        sqlrconnection	*con=new sqlrconnection(...);
+        sqlrcursor	*cur=new sqlrcursor(cur);
+        cur-&gt;prepareQuery("select * from table where charcol=? and intcol=? and floatcol=?");
+        cur-&gt;inputBind("0","hello");
+        cur-&gt;inputBind("1",10);
+        cur-&gt;inputBind("2",5.5,1,1);
+        cur-&gt;executeQuery();
+        delete cur;
+        delete con;
 </pre>
 
 <p>Output bind variables work similarly.</p>
 
-<pre>
-sqlrconnection	*con=new sqlrconnection(...);
-sqlrcursor	*cur=new sqlrcursor(con);
-cur-&gt;prepareQuery("insert into table values ('hello') returning :charval");
-cur-&gt;defineOutputBindString("charval","hello",10);
-cur-&gt;executeQuery();
-cout &lt;&lt; "charval is: " &lt;&lt; cur-&gt;getOutputBind("charval") &lt;&lt; endl;
-delete con;
-delete cur;
+<pre>        sqlrconnection	*con=new sqlrconnection(...);
+        sqlrcursor	*cur=new sqlrcursor(con);
+        cur-&gt;prepareQuery("insert into table values ('hello') returning :charval");
+        cur-&gt;defineOutputBindString("charval","hello",10);
+        cur-&gt;executeQuery();
+        cout &lt;&lt; "charval is: " &lt;&lt; cur-&gt;getOutputBind("charval") &lt;&lt; endl;
+        delete con;
+        delete cur;
 </pre>
 
 <p>ODBC appears to only support binding by position, so when using ODBC to connect SQL Relay to a database, you must bind by position, even if the underlying database supports binding by name.</p>
 
 <p>A more complete explanation of bind variables is given in <a href="programming/binds.html">here</a> and the programming guides for each language explain how to use them with queries and stored procedures.</p>
 
-<br><a name="vectorbinds"></a>
-<span class="heading3">Why can't I do vector binds?</span>
+<br/><a name="vectorbinds"/><h3>Why can't I do vector binds?</h3>
 
 <p>Vector binds just aren't implemented yet.</p>
 
-<br><a name="storedprocs"></a>
-<span class="heading3">How do I run stored procedures?</span>
+<br/><a name="storedprocs"/><h3>How do I run stored procedures?</h3>
 
 <p>The syntax for creating and executing a stored procedure is different for each database.  Each of the "Programming with SQL Relay using the such-and-such API" documents explain how to use stored procedures in detail.</p>
 
-<br><a name="storedprocs"></a>
-<span class="heading3">How do I get the result set from a stored procedure that returns a result set?</span>
+<br/><a name="storedprocs"/><h3>How do I get the result set from a stored procedure that returns a result set?</h3>
 
 <p>This depends entirely on the database you're using.</p>
 
@@ -673,19 +602,16 @@ delete cur;
 
 <p>There is an exception to this is with Oracle.  Since Oracle exposes cursor variables directly, and each cursor variable can be bound to a client-side cursor, one result set can be fetched from each cursor variable exposed by a stored procedure.</p>
 
-<br><a name="returning"></a>
-<span class="heading3">How do I get data out of DML with RETURNING clauses?</span>
+<br/><a name="returning"/><h3>How do I get data out of DML with RETURNING clauses?</h3>
 
 <p>You can use output bind variables to get data out of DML with RETURNING clauses if the values returned are scalar.  For example:</p>
 
-<pre>
-insert into testtable values ("one",2) returning :first, :second
+<pre>        insert into testtable values ("one",2) returning :first, :second
 </pre>
 
 <p>Vector values are not supported.</p>
 
-<br><a name="temptables"></a>
-<span class="heading3">Do temporary tables work with SQL Relay?</span>
+<br/><a name="temptables"/><h3>Do temporary tables work with SQL Relay?</h3>
 
 <p>Yes.</p>
 
@@ -705,13 +631,11 @@ insert into testtable values ("one",2) returning :first, :second
 
 <p>To manage this, for databases that support global temporary tables (currently Oracle and Firebird), there's a <b>globaltemptables</b> parameter in the sqlrelay.conf file that can be set to either % or a comma-delimited list of tables.  If set to %, then SQL Relay queries the database for a list of global temporary tables at the end of each session, and truncates all of them.  If set to a comma-delimited list of tables, then only the tables in the list are truncated.  If omitted, then only the tables that were created during the session are truncated.  Using % rather than a list is more flexible, but using a list performs substantially better.  See the <a href="admin/configreference.html">SQL Relay Configuration Reference</a> for more information about this parameter.</p>
 
-<br><a name="threadsafe"></a>
-<span class="heading3">Is the SQL Relay API thread-safe?</span>
+<br/><a name="threadsafe"/><h3>Is the SQL Relay API thread-safe?</h3>
 
 <p>Yes.  However, you cannot share an instance of an sqlrconnection or sqlrcursor between threads without protecting the calls with mutexes.</p>
 
-<br><a name="clientcache"></a>
-<span class="heading3">How does client-side result-set caching work?</span>
+<br/><a name="clientcache"/><h3>How does client-side result-set caching work?</h3>
 
 <p>When the cacheToFile() and setCacheTtl() methods are called prior to running a query, the client caches the result set from the query in a file on the local file system and attaches a time-to-live tag to the file.  The full pathname of this file can be retrieved using the getCacheFileName() method.</p>
 
@@ -719,22 +643,19 @@ insert into testtable values ("one",2) returning :first, :second
 
 <p>Until the file is removed, other applications can open the file by name using the openCachedResultSet() methods.  At this point, the API acts as if it had run a query that generated that result set.</p>
 
-<br><a name="servercache"></a>
-<span class="heading3">What about server-side result-set caching?</span>
+<br/><a name="servercache"/><h3>What about server-side result-set caching?</h3>
 
 <p>Server-side result set caching has not been implemented yet.</p>
 
-<hr>
+<br/><hr/>
 
-<br><span class="heading2">Administration Questions</span><br>
+<h2>Administration Questions</h2>
 
-<br><a name="tweaks"></a>
-<span class="heading3">What system parameters can I tweak to get better performance out of SQL Relay?</span><br>
+<br/><a name="tweaks"/><h3>What system parameters can I tweak to get better performance out of SQL Relay?</h3>
 
-<p>See <a href="tuning.html">Tuning SQL Relay</a>.</p>
+<p>See <a href="admin/tuning.html">Tuning SQL Relay</a>.</p>
 
-<br><a name="firewallhang"></a>
-<span class="heading3">If I leave SQL Relay idle for a long time, then come back and try to use it, my program gets hung or I get a low level TCP error from the database.  What does that mean?</span><br>
+<br/><a name="firewallhang"/><h3>If I leave SQL Relay idle for a long time, then come back and try to use it, my program gets hung or I get a low level TCP error from the database.  What does that mean?</h3>
 
 <p>If you are running SQL Relay on one machine and the database on a seperate machine, and there is a firewall between the two machines, and no queries have been run in a while, the firewall may "close" the connection between SQL Relay and the database by discarding any packets that it receives from either.  However, the firewall does not send "close packets" to either SQL Relay or the database.  SQL Relay thinks it's still connected to the database and since the firewall silently discards all packets coming from SQL Relay, it never learns otherwise.</p>
 
@@ -750,16 +671,14 @@ insert into testtable values ("one",2) returning :first, :second
 
 <p>You could also just set up the timeout to be so long that it's really unlikely that it will ever occur.  The PIX firewall's default is 1 hour.  You can change it from the PIX's command line using a command such as the following:</p>
 
-<blockquote><b>
-timeout conn 12:00:00
-</b></blockquote>
-
+<blockquote>
+<b>timeout conn 12:00:00</b>
+</blockquote>
 <p>You can also set it using the graphical web interface as follows:</p>
 
-<p><img src="images/WPM_4877_1.PNG"></p>
+<p><img src="images/WPM_4877_1.PNG"/></p>
 
-<br><a name="ttl"></a>
-<span class="heading3">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</span><br>
+<br/><a name="ttl"/><h3>Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</h3>
 
 <p>When SQL Relay first starts up, since no connections are started, no connections are registered with the listener.  Clients connect, connections fire up to handle them, clients disconnect, the connections time out and die.  However, one of the connections will still remain registered with the listener as an "available connection".  This connection cannot die off.</p>
 
@@ -767,23 +686,20 @@ timeout conn 12:00:00
 
 <p>Basically, here's the code:</p>
 
-<blockquote>
-<pre>
-listener:
-	acquireExclusiveAccessToSharedMemoryAmongListenerProcesses();
-	waitForConnectionToSignalUsToRead();
-	readRegistration();
-	signalConnectionThatWeHaveRead();
-	releaseEclusiveAccessToSharedMemoryAmongListenerProcesses();
+<pre>    listener:
+	    acquireExclusiveAccessToSharedMemoryAmongListenerProcesses();
+	    waitForConnectionToSignalUsToRead();
+	    readRegistration();
+	    signalConnectionThatWeHaveRead();
+	    releaseEclusiveAccessToSharedMemoryAmongListenerProcesses();
 
-connection:
-	acquireExclusiveAccessToSharedMemoryAmongConnectionProcesses();
-	writeRegistration();
-	signalListenerToRead();
-	waitForListenerToSignalUsThatItHasRead();
-	releaseEclusiveAccessToSharedMemoryAmongConnectionProcesses();
+    connection:
+	    acquireExclusiveAccessToSharedMemoryAmongConnectionProcesses();
+	    writeRegistration();
+	    signalListenerToRead();
+	    waitForListenerToSignalUsThatItHasRead();
+	    releaseEclusiveAccessToSharedMemoryAmongConnectionProcesses();
 </pre>
-</blockquote>
 
 <p>If the connection dies between signalListenerToRead() and waitForListenerToSignalUsThatItHasRead() or while waiting then obscure problems occur.  Most notably, the next connection with a that starts up will not die off.  Also, it is certain that the currently registered connection will die at this point because that's where it sits and waits for the listener to hand it a client.</p>
 
@@ -791,10 +707,7 @@ connection:
 
 <p>Of course, it's always possible to kill the connection manually.  In that case though, you would cause the problem that I'm trying to avoid.</p>
 
-<p>
-
-<br><a name="nobody"></a>
-<span class="heading3">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's going on?</span><br>
+<br/><a name="nobody"/><h3>Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's going on?</h3>
 
 <p>The short answer is...  The config file isn't readably by "nobody" (or whoever else runasuser is set to).</p>
 
@@ -804,15 +717,13 @@ connection:
 
 <p>To remedy the situation, make sure that the configuration file is readable by each of the users and groups specified in the runasuser/runasgroup attributes inside the file.</p>
 
-<br><a name="socketonly"></a>
-<span class="heading3">How can I get SQL Relay to only listen on the unix socket and not the inet port?</span><br>
+<br/><a name="socketonly"/><h3>How can I get SQL Relay to only listen on the unix socket and not the inet port?</h3>
 
 <p>Supply a value for the socket attribute and either omit the port attribute or set it to port="".</p>
 
-<p>Note that if neither socket nor port are specified then SQL Relay listens on the default inet port (9000) and doesn't listen on the unix socket at all.</p> 
+<p>Note that if neither socket nor port are specified then SQL Relay listens on the default inet port (9000) and doesn't listen on the unix socket at all. </p>
 
-<br><a name="dynamicscaling"></a>
-<span class="heading3">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</span><br>
+<br/><a name="dynamicscaling"/><h3>If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</h3>
 
 <p>This can happen if a spike of client traffic comes in.  If configured to do so, SQL Relay will fork off more connection daemons to handle the traffic.  Later when the traffic dies down, the connections that were spawned will still end up handling clients.  Each connection daemon will experience longer idle periods than before the spike, but unless those idle periods are shorter than the <i>ttl</i> parameter, the connections will not die off.  Setting the <i>ttl</i> shorter should take care of this, but it may take some fine tuning to find the correct <i>ttl</i>.</p>
 
@@ -822,20 +733,17 @@ connection:
 
 <p>Using either of these parameters ensures that all spawned connections eventually die off.  Like the <i>ttl</i> though, they require some tuning, but setting either of them too low will result in poorer performance rather than additional resource consumption.</p>
 
-<br><a name="maxqueuelengthzero"></a>
-<span class="heading3">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</span><br>
+<br/><a name="maxqueuelengthzero"/><h3>If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</h3>
 
 <p>This can happen if all connection daemons are occupied, a client calls endSession, and then immediately runs another query.  The connection daemon that the client was using has to loop back and tell the listener that it's ready for another client.  The client will attempt to reconnect to SQL Relay to run the next query, but depending on the exact timing, if the connetion daemon hasn't finished looping back, to the scaler daemon, it will appear that all connections are busy, but there's a new client attempting to connect and it will fork off a new connection daemon to service it.</p>
 
 <p>There is no easy fix for this and the impact is low.  Anything that might be done to guarantee that a new connection daemon won't be spawned would have greater impact.  So, if you're using maxqueuelength=0, then expect for this to happen.  It should not happen if maxqueuelength is set to some value greater than 0.</p>
 
-<br><a name="cursorgrowth"></a>
-<span class="heading3">In the configuration file, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</span><br>
+<br/><a name="cursorgrowth"/><h3>In the configuration file, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</h3>
 
 <p>Some database API's provide functions for doing commits and rollbacks.  Others do not.  For those that do not, SQL Relay allocates a new cursor and uses it to execute the commit or rollback as a query.  Each time this happens, the Opened Server Cursors count increases.  Aside from being confusing, this shouldn't cause any problems.</p>
 
-<br><a name="debug"></a>
-<span class="heading3">What happened to the debug option?  How do I enable the debug logs?</span><br>
+<br/><a name="debug"/><h3>What happened to the debug option?  How do I enable the debug logs?</h3>
 
 <p>Prior to version 0.49, the instance tag of the configuration file had a debug attribute that made it possible to enable debug logs for the listeners and connections.</p>
 
@@ -843,31 +751,26 @@ connection:
 
 <p>The modern equivalent configuration to the classic <b>debug="listener and connection"</b> configuration is:</p>
 
-<blockquote>
-<font face="monospace">
-<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;...&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">loggers</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">logger</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;debug&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>listener</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connection</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/logger&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-<font color="#008b8b">&lt;/intstance&gt;</font><br>
-</font>
-</blockquote>
+<pre>        &lt;instance ...&gt;
+                ...
+                &lt;loggers&gt;
+                        &lt;logger module="debug" listener="yes" connection="yes"/&gt;
+                &lt;/logger&gt;
+                ...
+        &lt;/instance&gt;
+</pre>
 
 <p>You can disable logging of either listener or connection daemons by setting "no" to "yes".</p>
 
 <p>See <a href="modules/loggers.html">Logger Modules</a> for more information.</p>
 
-<br><a name="passwordencryption"></a>
-<span class="heading3">I don't like storing plaintext passwords in my configuration file.  Can I encrypt them somehow?</span><br>
+<br/><a name="passwordencryption"/><h3>I don't like storing plaintext passwords in my configuration file.  Can I encrypt them somehow?</h3>
 
 <p>Yes.  Both database passwords and passwords for accessing SQL Relay itself can be encrypted via extension modules.  You can use one of the provided modules or develop your own.</p>
 
 <p>See <a href="modules/passwordencryption.html">Password Encryption Modules</a> for more information.</p>
 
-<br><a name="multipleconfig"></a>
-<span class="heading3">Do I have to put define all of my instances in the same configuration file?</span><br>
+<br/><a name="multipleconfig"/><h3>Do I have to put define all of my instances in the same configuration file?</h3>
 
 <p>No.</p>
 
@@ -883,7 +786,8 @@ starting SQL Relay.</p>
 
 <p>And, if that wasn't enough, a config file can contain lists of other config files, each of which will be consulted during start-up as well.</p>
 
-<p>See the <a href="/admin/configguide.html#files">SQL Relay Configuration Guide</a> for more information.</p>
+<p>See the <a href="admin/configguide.html#files">SQL Relay Configuration Guide</a> for more information.
+</p>
 
 </body>
 </html>
