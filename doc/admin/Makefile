@@ -4,8 +4,8 @@ include ../../config.mk
 
 .SUFFIXES: .wt .html.in
 
-SRCS = configguide.wt
-OBJS = configguide.html.in
+SRCS = configguide.wt configreference.wt
+OBJS = configguide.html.in configreference.html.in
 
 .wt.html.in:
 	wt -c $< -o $@ -xhtml xhtml.conf

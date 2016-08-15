@@ -1,0 +1,335 @@
+= SQL Relay Configuration Reference =
+
+* [#example Example]
+* [#tags Tags]
+* [#attributes Attributes]
+* [#complex Complex Attributes]
+* [#modules Extension Modules]
+
+[[br]][=#example]
+== Example ==
+
+The SQL Relay configuration file is usually located at /usr/local/firstworks/etc/sqlrelay.conf
+
+Additional configuration files may be created under the configuration directory, usually /usr/local/firstworks/etc/sqlrelay.conf.d
+
+Files in the configuration directory may be given any name, but it is conventional to give them a .conf suffix.
+
+Each configuration file may define any number of SQL Relay instances.
+
+A comprehensive example follows.
+
+{{{#!blockquote
+@sqlrelay-comprehensive.conf.html@
+}}}
+
+[[br]][=#tags]
+== Tags ==
+
+The '''instances''' tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.
+
+Each '''instance''' tag defines an instance of SQL Relay.  You can define as many of these as you like in each configuration file.
+
+The '''users''' tag surrounds the list of users that may connect to the instance.
+
+Each '''user''' tag defines a user/password combination that may be used to connect to the instance.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+
+The '''session''' tag surrounds a set of queries to be run at the start and end of each session.  The entire '''session''' block is optional.
+
+The '''start''' tag surrounds a set of queries to be run at the the start of each session and the '''end''' tag surrounds a set of qeries to be run at the end of each session.  Both are optional.
+
+The '''runquery''' tag surrounds a query to be run at the beginning or end of a session.  Any number (including 0) of these may be specified.
+
+The '''connections''' tag surrounds the list of database connection configurations used by the instance.
+
+Each '''connection''' tag defines a database connection configuration.  In most cases, there will be only 1 of these tags.  In cases where clustered or replicated databases are used, there would likely be more than 1 line here.  See [loadbalfailover.html Load Balancing and Failover] for more information.
+
+The '''router''' tag sets up the instance to route queries to other SQL Relay instances.  If this tag is present, the instance should contain no '''connections''' tags.  See [router.html Query Routing] for detailed information about configuring SQL Relay to route queries. 
+
+The '''route''' tag designates an instance of SQL Relay to route queries to.  It should contain a set of '''query''' tags defining which queries to route to the designated instance.  This tag is only valid inside a '''router''' tag.
+
+The '''query''' tag defines a regular expression which the '''route''' tags use to match queries.
+
+[[br]][=#attributes]
+== Attributes ==
+
+Below is a description of the attributes for each tag.
+
+* '''instance'''
+ * '''id''' - The ID of this instance.
+ * '''enabled''' - Whether to auto-start this instance.  Defaults to "no".  If set to "yes", then this instance will be started when sqlr-start is run with no arguments (as it is in the init scripts which run at boot).
+ * '''addresses''' - A comma-delimited list of addresses that the instance should bind to.  If absent or set to 0.0.0.0, it will bind to all addresses.  Defaults to 0.0.0.0.
+ * '''port''' - The port to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.
+ * '''socket''' - The unix socket (filename) to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket
+ * Kerberos options - Use these options to configure Kerberos encryption and authentication.
+  * '''krb''' - Set to "yes" to enable Kerberos encryption and authentication.  Set to "no" to disable Kerberos encryption and authentication.  Defaults to "no".
+  * '''krbservice''' - Specifies the kerberos service to run this instance as.  Defaults to "sqlrelay".
+  * '''krbkeytab''' - Sets the Kerberos keytab file to acquire the service key from.  Defaults to the system keytab, usually /etc/krb.keytab.  Has no effect on Windows systems.
+  * '''krbmech''' - Sets the Kerberos mechanism to use.  On Linux and Unix systems this should ba an OID, like: "{ 1 2 840 113554 1 2 2 }".  On Windows systems this should be the string name of the mechanism, like: "Kerberos".  Defaults to the default mechanism of the Kerberos implementation.  Only set this if you know that you have a good reason to.
+  * '''krbflags''' - Sets the Kerberos flags to use.  Multiple flags may be specified, separated by commas.  Valid flags include: GSS_C_MUTUAL_FLAG, GSS_C_REPLAY_FLAG, GSS_C_SEQUENCE_FLAG, GSS_C_CONF_FLAG, and GSS_C_INTEG_FLAG.  For a full list of flags, consult the GSSAPI documentation, though note that only the previously listed flags are supported on Windows.  Only set this if you know that you have a good reason to.
+ * TLS/SSL options - Use these options to configure TLS/SSL encryption and authentication.
+  * '''tls''' - Set to "yes" to enable TLS/SSL encryption and authentication.  Set to "no" to disable TLS/SSL encryption and authentication.  Defaults to "no".
+  * '''tlsversion''' - Sets the TLS/SSL version to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If left blank or omitted, the highest supported version will be negotiated.
+  * '''tlscert''' - Specifies the file name of the TLS/SSL certificate to use.  On Windows systems this must be a .pfx file.  On non-Windows systems, a variety of file formats are supported.
+  * '''tlspassword''' - Specifies the password to use if the certificate contains a password-protected private key.
+  * '''tlsvalidate''' - Set to "yes" to instruct the server to request a certificate from the client and only allow a session to proceed if it can be validatated against known certificate authorities, including any supplied by the tlsca parameter.  Set to "no" not to request a certificate from the client.  Defaults to "no.
+  * '''tlsca''' - Specifies the location of a certificate authority file to use, in addition to the system's root certificates, when validating the client's certificate.  This is useful if the client's certificate is self-signed.  On Windows systems, this must be a file name.  On non-Windows systems, it can be either a file or directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.  On Windows systems this must be a .pfx file.  On non-Windows systems, a variety of file formats are supported.
+  * '''tlsciphers''' - Specifies a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If omitted or left empty then a default set of ciphers is used.  For a list of valid ciphers on Linux/Unix platforms, see: man ciphers.  For a list of valid ciphers on Windows platforms, see: [https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx this link].  On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes. For example: 3DES_112.  Only set this if you know that you have a good reason to.
+  * '''tlsdepth''' - Sets the maximum certificate chain validation depth.  The absolute maximum depth is 9.  Defaults to "9".
+ * '''dbase''' - The type of database the connection daemon should connect to.  Should be one of: "oracle", "mysql", "postgresql", "sqlite", "freetds", "sap", "odbc", "db2", "informix", "firebird" or "mdbtools".  Defaults to "oracle".  Note: for historical reasons, "oracle8" and "sybase" are also supported, and are synonymous with "oracle" and "sap"
+ * '''connections''' - The number of database connections to open at startup.  This may be set to any positive number or 0.  Defaults to 5.
+ * '''maxconnections''' - The maximum number of database connections to scale up to.  If this is set to a number lower than the value for the '''connections''' parameter then it will be automatically bumped up to the value set for '''connections'''.  Defaults to the same value as '''connections'''.
+ * '''maxqueuelength''' - The size the queue of waiting clients has to grow to before more connections will be spawned.  Defaults to 0.
+ * '''growby''' - The number of connections that will be started at a time when new connections are spawned.  Defaults to 1.
+ * '''ttl''' - The number of seconds that a dynamically spawned connection will sit idle, waiting for a client, before giving up and shutting down.  Setting this parameter to 0 causes each dynamically spawned connection to die immediately after handling one client session.  Defaults to 60 (one minute).
+ * '''softttl''' - The total number of seconds that a dynamically spawned connection intends to live.  When the connection notices that it has been alive for this number of seconds, it voluntarily shuts down, but it only checks after each client session.  Thus, the connection will ignore this parameter until it has handled at least one client session, and it could live longer than this time if a client session takes a long time, or if it sits idle for a long time between client sessions.  Setting this parameter to 0 disables it.  Defaults to 0 (disabled).
+ * '''maxsessioncount''' - The number of client sessions that a dynmically spawned connection will handle before voluntarily shutting down.  Setting this to 0 disables it.  Defaults to 0 (disabled).
+ * '''endofsession''' - The command to issue when a client ends its session or dies.  Should be either "commit" or "rollback".  Defaults to "commit".
+ * '''sessiontimeout''' - If a client leaves a session open for another client to pick up but no client picks it up, the session will time out after this number of seconds.  Defaults to 600 (10 minutes).
+ * '''runasuser''' - The user to run the instance as.  Note that a configuration file must be readable by this user and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this user.  If this parameter is set to a user other than the user who runs sqlr-start, then unless sqlr-start is run as root, it will not be possible to switch to this user and the following warning will be displayed: <i>Warning: could not change user to '''user'''.</i>  Defaults to "nobody".
+ * '''runasgroup''' - The group to run the instance as.  Note that a configuration file must be readable by this group and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this group.  If this parameter is set to a group other than a group that the user who runs sqlr-start belongs to, then unless sqlr-start is run as root, it will not be possible to switch to this group and the following warning will be displayed: <i>Warning: could not change group to '''group'''.</i>  Defaults to "nobody".
+ * '''cursors''' - The number of database cursors to open and maintain for each database connection.  More cursors may be opened if needed, but the pool of cursors will shrink back down to this size at the end of each client session.  This may be set to any positive number or 0.  Defaults to 1.
+ * '''maxcursors''' - The maximum number of database cursors that may be opened for a single client session.  If this is set to a number lower than the value for the '''cursors''' parameter then it will be automatically bumped up to the value set for '''cursors'''.  Defaults to the same value as '''cursors'''.
+ * '''cursors_growby''' - The number of new cursors that will be opened at a time when new cursors are required.  Defaults to 1.
+ * '''authtier''' - Where to authenticate, see [#complex Complex Attributes] below.  Can be set to "connection". or "database".  Defaults to connection.
+ * '''sessionhandler''' - Method used by the listener to handle a client session.  Options are either "thread" (the default as of version 0.58) or "process".  When a client connects to the listener, a child is forked to handle the connection.  The child can be either a process or a thread.  Threads should perform better but aren't supported on all platforms.  Defaults to "thread" (as of version 0.58).
+ * '''handoff''' - Method for handing off a client from listener to connection, can be one of: "pass" or "proxy", see [#complex Complex Attributes] below.  Defaults to "pass".
+ * '''deinedips''' - A [http://www.regular-expressions.info regular expression] indicating which IP addresses will be denied access (for example, to deny access to all clients: deniedips=".*")  By default, no IP addresses are denied.
+ * '''allowedips''' - A [http://www.regular-expressions.info regular expression] indicating which IP addresses will be allowed access, overriding deniedips (for example, to allow access to clients from the 192.168.2.0 and 64.45.22.0 networks: allowedips="(192\.168\.2\..*|64\.45\.22\..*)")  By default, all IP addresses are allowed.
+ * '''maxquerysize''' - Sets the maximum query length (in bytes) that the SQL Relay server will accept, if a client tries to send a longer query, the server will close the connection.  Defaults to 65536 (64k) bytes.
+ * '''maxbindvars''' - Sets the maximum number of input and output bind variables that the server will accept in a single query, if a client tries to send more input bind variables or more output bind variables than this number, in a single query, the server will close the connection.  Defaults to 256 bind variables.  Note that this parameter controls both input and output bind variables independently.  For example, setting it to 512 would allow both 512 input bind variables and 512 output bind variables.
+ * '''maxstringbindvaluelength''' - Sets the maximum length of a string bind value that the SQL Relay server will accept, if the client tries to send a longer string bind value, the server will close the connection.  Defaults to 32768 (32k) bytes.
+ * '''maxlobbindvaluelength''' - Sets the maximum length of a LOB/CLOB bind value that the SQL Relay server will accept, if the client tries to send a longer LOB/CLOB bind value, the server will close the connection.  Defaults to 71680 (70k) bytes.
+ * '''idleclienttimeout''' - Sets the number of seconds that a client can sit idle while logged into the SQL Relay server before it will be disconnected.  Defaults to -1, which means to wait forever.
+ * '''maxlisteners''' - When a client connects to the listener but no connections are available, a child listener is forked off to wait for an available connection.  Since these can pile up and consume system resources, this parameter allows you to limit the number of child listeners that can be running simultaneously before an error will be returned to the client.  Defaults to -1, which means to run without a limit.
+ * '''listenertimeout''' - Sets the number of seconds that a listener will wait for an avaialable connection before giving up.  Defaults to 0, which means to wait forever.
+ * '''reloginatstart''' - When SQL Relay starts up, it attempts to log into the database.  If this parameter is set to yes, then if the login fails, SQL Relay will fork off into the background and attempt to log in over and until it succeeds or until it is shut down.  If this parameter is set to no, then if the login fails, SQL Relay will print out an error and exit.  This parameter is useful in situations where it is difficult or impossible to guarantee that SQL Relay will start after the databases it needs to connect to are up.  Defaults to "no".
+ * '''fakeinputbindvariables''' - Instead of binding variables using the native database API, SQL Relay can fake input bind variables by rewriting the query and substituting values directly into it.  Setting this parameter to "yes" enables this functionality.  This is useful if you are using an old version of a database that doesn't support bind variables natively or if your are using a modern version but your app was originally written when the database didn't support bind variables natively or when SQL Relay didn't support native bind variables with that database.  If enabled, bind variables must be specified in the query as a colon, followed by a name or number (eg.  :var1 or :1) unless the translatebindvariables parameter is also set to "yes".  Defaults to "no".
+ * '''translatebindvariables''' - There is no standaradized format for bind variables across databases.  Some databases use question marks to identify bind variables, others use colon, dollar-sign or at-signs, followed by either names or numbers.  Setting this parameter to "yes" causes SQL Relay to remap the bind variables in a query to the native format for whatever database the query is being run against.  This is useful when migrating from one database to another or when using fake binds against a database that doesn't support colon-delimited bind variables.  Defaults to "no".
+ * '''isolationlevel''' - Sets the transaction isolation level to the specified value.  At the end of each client session, the isolation level will be reset to this value as well.  If this is left blank or omitted entirely then nothing will be done to set or reset the isolation level at the beginning or end of each session.
+ * '''ignoreselectdatabase''' - Instructs SQL Relay to ignore selectDatabase() calls from the client.  If you want to point an instance at a test database and a program at the instance but the program manually selects the database to use, effectively aiming itself back at production, this is useful in preventing it from doing so.  Defaults to "no".
+ * '''waitfordowndatabase''' - If this is set to "yes" then, if the database goes down while a client is connected, the server will not return an error but rather wait until the database comes back up and then resume the client session.  If this is set to "no" and a down database is detected during a client session, then SQL Relay will return the native database error and if a new client connection is made and all databases are down then SQL Relay will generate an error and return it.  Defaults to "yes".
+ * '''datetimeformat''' - Date/time formats vary widely between databases.  Some databases allow you to define what format to return the date/time in.  Others do not.  This can be be especially problematic when switching an app from using one database to using another.  If datetimeformat is set to some value, SQL Relay will attempt to detect a date/time field in the result set and reformat it into the supplied format.  SQL Relay can detect a wide variety of date formats but is admittedly imperfect.  Format strings can use any combination of the following format characters.  Non-format characters will be inserted as-is.
+  * '''DD''' - day of the month
+  * '''MM''' - numeric month
+  * '''MON''' - 3-character text abbreviation for the month
+  * '''Month''' - full text month
+  * '''YYYY''' - year including century
+  * '''YY''' - year excluding century
+  * '''HH24''' - hour (0-23)
+  * '''HH''' - hour (1-12)
+  * '''MI''' - minute
+  * '''SS''' - second
+  * '''FFF''' - fraction of a second
+  * '''AM''' - AM or PM
+ * '''dateformat''' - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
+ * '''timeformat''' - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
+ * '''dateddmm''' and '''dateyyyyddmm''' - When date/time translation is enabled (one or more of datetimeformat, dateformat or timeformat are set), the server attempts to interpret each field in the result set as a date/time to determine whether it needs to be translated or not.  It can parse the native formats of all the databases that SQL Relay currently supports, but it cannot tell by examination whether a date like 02-05-2011 is in MM-DD-YYYY format or DD-MM-YYYY format.  By default, it assumes MMDD, but if you want it to assume DDMM instead, set '''dateddmm''' to "yes".  Another parameter allows you to specify different behaviors for dates that start with years, such as 2011-02-05.  If '''dateyyyyddmm''' is set to "yes" then that date would be interpreted as being in the YYYY-DD-MM format.  If it is set to "no" then that date would be interpreted as being in the YYYY-MM-DD format.  If it is not set, then it defaults to whatever '''dateddmm''' is set to.  If neither are set then dates are universally interpreted to be in MM/DD format.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.  Note: date/time translation in general is especially problematic with MS SQL Server.  See [../faq/#mssqldates the FAQ] for more info.
+ * '''datedelimiters''' - When date/time translation is enabled (one or more of datetimeformat, dateformat or timeformat are set), the server attempts to interpret each field in the result set as a date/time to determine whether it needs to be translated or not.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.
+ * '''ignorenondatetime''' - When date/time translation is enabled (one or more of datetimeformat, dateformat or timeformat are set), the server attempts to interpret each field in the result set as a date/time to determine whether it needs to be translated or not.  If this parameter is set to "yes" then fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.
+
+
+* '''user'''
+ * '''user''' - The user name required to connect to SQL Relay.
+ * '''password''' - The password required to connect to SQL Relay.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+
+
+* '''connection'''
+ * '''connectionid''' - The ID of this connection.  This parameter defaults to <i>id</i>-<i>number</i> where "id" is the id of the instance snd "number" is the index of the connection tag.  It's not necessary to set this parameter if you use sqlr-start.  It's only necessary if you plan on starting the daemons individually and want friendlier connection ids.
+ * '''string''' - The database connect string the connection daemon should use.
+  * For '''oracle''' databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;stmtcachesize=0;rejectduplicatebinds=yes/no;disablekeylookup=yes/no;identity=ID"
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''oracle_sid''': Which Oracle SID to use.  Optional if the ORACLE_SID environment variable is set.  Overrides the ORACLE_SID environment variable.  This parameter can either be an SID name corresponding to an entry in the tnsnames.ora file such as:
+{{{#!blockquote
+//oracle_sid=ora1//
+}}}
+or a tnsnames-style expression such as:
+{{{#!blockquote
+//oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))//
+}}}
+   * '''oracle_home''': The base directory of the oracle installation to use.  Optional if the ORACLE_HOME environment variable is set.  The SID will be looked up in $ORACLE_HOME/network/admin/tnsnames.ora
+   * '''nls_lang''': The NLS_LANG to use.  Optional if the NLS_LANG environment variable is set.  Overrides the NLS_LANG environment variable.
+   * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
+   * '''fetchatonce''': The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''faketransactionblocks''': Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Oracle is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".
+   * '''droptemptables''': In most databases, temporary tables are dropped at the end of the client session.  In Oracle however, the rows may be deleted but the table itself remains.  Setting this parameter to "yes" causes any temporary tables that were created during an SQL Relay client session, to be dropped when the session is over, in effect emulating the behavior or other databases.  Note that temporary tables created outside of the session will not be dropped.
+   * '''globaltemptables''': Since SQL Relay doesn't log out of the database at the end of each client session, global temporary tables aren't automatically truncated by the database.  SQL Relay tracks the creation of global temporary tables and truncates any table created during the session, or drops them if droptemptables=yes is configured.  But, SQL Relay isn't aware of tables created outside of the current session, or outside of SQL Relay altogether.  To work around this issue, this parameter can be set to either a comma-separated list of global temporary tables that SQL Relay should truncate at the end of each session.  Alternatively, it can be set to % and SQL Relay will truncate all global temporary tables that it has access to at the end of each session.  If this parameter is omitted, only tables that were created during the session are truncated.  Providing a list of tables performs better but is less flexible than using %.
+   * '''lastinsertidfunction''': Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Oracle doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Oracle.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.
+   * '''stmtcachesize''': Set the size of the local statement cache.  Using a local statement cache can improve performance significantly.  This parameter defaults to 0, which disables using the cache.  This parameter also has no effect when SQL Relay is compiled against a version of Oracle prior to 9i.  There is one known issue with using the statement cache.  There is either a bug in OCI or a bug in the way SQL Relay uses it.  Running a query that uses a stored procedure that returns a result set in an output bind cursor while using the statement cache causes a segmentation fault in the OCIStmtExecute function.  To prevent this, SQL Relay prevents any attempt to run such a query if stmtcachesize is non-zero.  It is possible to run such queries when stmtcachesize is set to 0 or defaulted to 0 though.
+   * '''rejectduplicatebinds''': Setting this to yes causes SQL Relay to reject queries which contain more than one instance of the same bind variable.  If you're binding by position and using PL/SQL and your query contains duplicate bind variables, it may not work as expected and it might be convenient to just have SQL Relay reject all queries containing duplicate bind variables.  This parameter is defaulted to no.  By default, queries containing duplicate bind variables are not rejected.
+   * '''disablekeylookup''': It is possible to get the list of columns in a table by running "describe table" or "show columns of table like '...'" in sqlrsh, or calling getColumnList() in one of the native API's, or by other methods using non-native API's.  When doing this, whether each column is a primary, unique or foreign key is returned.  Looking up this key information takes a noticeably long time though.  This parameter makes it possible to disable key lookup by setting disablekeylookup=yes.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''mysql''' databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;fakebinds=FAKEBINDS;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;sslkey=keyfile;sslcert=certfile;sslca=cafile;sslcapath=cafilepath;sslcipher=cipherlist;foundrows=yes/no;ignorespace=yes/no;identity=ID"
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''db''': The database to log into.  Required.
+   * '''host''': The host to connect to.  Required.
+   * '''port''': The port to connect to on a remote host.  Optional, defaults to 3306.
+   * '''socket''': The unix socket to connect to.  Optional if host and/or port are specified.  Overrides host/port.  host and port are optional if socket is specified.
+   * '''fakebinds''': MySQL versions 4.1.2 and higher support bind variables natively.  Older versions did not and SQL Relay had to substitute the values of bind variables into the query itself (fake binds).  As such, in modern MySQL, bind variables are identified by ?'s in the query, while in old versions, bind variables are identified by :var1, :var2, :var3, etc.  Converting queries and code which was written to use the old syntax to use the modern syntax can be a lot of work, so this parameter is provided to make code which was written to run against old versions of MySQL work against modern MySQL  This parameter may be set to "yes" (meaning allow only old syntax and fake binds) or "no" (meaning only allow modern syntax and use native binds).
+   * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''charset''': The character set to translate data coming out of the database into.  Excluding this parameter causes the data to be translated to whatever character set the MySQL client library was configured to use at compile time, probably latin1.  Setting this to "binary" will cause the data not to be translated at all.  This parameter is only supported when SQL Relay is compiled against version 5.0.7 or newer of the MySQL client library.
+   * '''sslkey''': The full path name of the ssl key file (eg. /etc/certs/key.pem).  Only necessary when connecting to MySQL using SSL.
+   * '''sslcert''': The full path name of the ssl certificate file (eg. /etc/certs/cert.pem).  Only necessary when connecting to MySQL using SSL.
+   * '''sslca''': The full path name of the ssl certificate authority file (eg. /etc/certs/ca.pem).  Only necessary when connecting to MySQL using SSL.
+   * '''sslcapath''': The path name to a directory that contains trusted SSL CA certificates in PEM format.  I'm not sure when this is necessary.  Perhaps only when connecting to MySQL using SSL and the CA file provided by sslca must be validated against another CA file.
+   * '''sslcipher''': The list of permissable ciphers to use for SSL encryption.  Only necessary if you want to restrict which cipers to use when onnecting ot MySQL using SSL.
+   * '''foundrows''': Ordinarily, the MySQL client library returns the number of rows that were modified by an insert, update or delete command are returned as the "affected rows" of the query.  Setting foundrows to "yes" passes a flag to the MySQL client library, telling it to return the number of rows that matched the where clause of the query rather than the number that were modified.  This can be a different number with certain queries.  This parameter defaults to no.
+   * '''ignorespace''': Tells MySQL to allow spaces after function names.  Ie. "select count (*) from mytable" should be valid, with the space between count and (*).
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''postgresql''' databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;sslmode=SSLMODE;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;lastinsertidfunction=LASTINSERTDFUNCTION;identity=ID"
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''db''': The database to log into.  Required.
+   * '''host''': The host to connect to.  Required.  If host begins with a slash (/) then it is assumed to be the directory containing a unix socket starting with .s.PGSQL.
+   * '''port''': The port to connect to on a remote host.  Optional, defaults to 5432.  If host refers to a unix socket, then port is the extension on the socket name (eg. /tmp/.s.PGSQL.5432).
+   * '''sslmode''': The ssl mode of the connection.  Optional, defaults to disable (ie. not to use ssl).  Valid values include disable, allow, prefer, require, verify-ca and verify-full.  See [http://www.postgresql.org/docs/devel/static/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS SSL Mode Descriptions] for more information.  If a mode other than disable is used, certificate and key fules must be present in ~/.postgresql (in the home directory of the user that sqlrelay is running as).  See [http://www.postgresql.org/docs/devel/static/libpq-ssl.html#LIBPQ-SSL-FILE-USAGE SSL Client File Usage] for more information.
+   * '''options''': Command line options to be sent to the server.  Optional.
+   * '''typemangling''': If set to "yes" then column types are translated to standard types.  If set to "lookup" then the pg_type table is queried at startup and column type names are returned as they appear in that table.  By default (or if set to "no"), the type number is returned.
+   * '''fakebinds''': Postgresql 8 supports bind variables natively.  Versions prior to 8 did not, and SQL Relay had to substitute the values of bind variables into the query itself (fake binds).  In Postgresql 8, bind variables are identified by $1, $2, $3, etc. in the query, while in versions prior to 8, bind variables are identified by :var1, :var2, :var3, etc.  Converting queries and code which was written to use Postgresql 7 syntax to use Postgresql 8 syntax can be a lot of work, so this parameter is provided to make code which was written to run against Postgresql 7 work against Postgresql 8.  This parameter may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or "no" (meaning only allow Postgresql 8 syntax and use native binds).
+   * '''charset''': The character set to translate data coming out of the database into.  Optional.
+   * '''lastinsertidfunction''': Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Postgresql doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Postgresql.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''sqlite''' databases, the connect string syntax is "db=DB;identity=ID"
+   * '''db''': The filename of the database open.  Required.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''freetds''' databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"
+   * '''sybase''': The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''server''': The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.
+   * '''db''': The database to log into.  Required.
+   * '''charset''': The character set to use.  Optional.
+   * '''language''': The language to use.  Optional.
+   * '''hostname''': The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.
+   * '''packetsize''': The packetsize to use.  Optional.
+   * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''sap''' (or '''sybase''') databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"
+   * '''sybase''': The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''server''': The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.
+   * '''db''': The database to log into.  Required.
+   * '''charset''': The character set to translate data coming out of the database into.  Optional.
+   * '''language''': The language to use.  Optional.
+   * '''hostname''': The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.
+   * '''packetsize''': The packetsize to use.  Optional.
+   * '''fetchatonce''': The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;identity=ID"
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''dsn''': The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.
+   * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
+   * '''timeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
+   * '''odbcversion''': Tells the driver to exhibit behavior from the specified version of ODBC.  Valid values include: 2, 3, and 3.8.  Defaults to 3.  It may be necessary to set this to 2 for some drivers that only support ODBC 2.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''db2''' databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''db''': The server instance to connect to.
+   * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
+   * '''lang''': Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.
+   * '''faketransactionblocks''': Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  DB2 is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".
+   * '''timeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
+   * '''fetchatonce''': The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxoutlobbindsize''': The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''informix''' databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''informixdir''': Specifies the path to the informix instance that should be used.  This is used for locating the sqlhosts file and other dependencies.  If not specified, this defaults to the value of the INFORMIXDIR environment variable, if set.
+   * '''servername''': The server to connect to, as defined in sqlhosts.  If not specified, this defaults to the value of the INFORMIXSERVER environment variable, if set.
+   * '''db''': The database instance to connect to, on the specified server.
+   * '''informixdir''': The server instance to connect to.
+   * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
+   * '''lang''': Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.
+   * '''faketransactionblocks''': Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Informix is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".
+   * '''timeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
+   * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxoutlobbindsize''': The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''firebird''' databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;identity=ID"
+   * '''user''': The username SQL Relay should use to log into the database.  Required.
+   * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+   * '''db''': The filename of the database open.  Required.
+   * '''dialect''': The database dialect to use.  Optional, defaults to 3.
+   * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
+   * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
+   * '''charset''': The character set to translate data coming out of the database into.  Optional.
+   * '''faketransactionblocks''': Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Firebird is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".
+   * '''droptemptables''': In most databases, temporary tables are dropped at the end of the client session.  In Firebird however, the rows may be deleted but the table itself remains.  Setting this parameter to "yes" causes any temporary tables that were created during an SQL Relay client session, to be dropped when the session is over, in effect emulating the behavior or other databases.  Note that temporary tables created outside of the session will not be dropped.
+   * '''globaltemptables''': Since SQL Relay doesn't log out of the database at the end of each client session, global temporary tables aren't automatically truncated by the database.  SQL Relay tracks the creation of global temporary tables and truncates any table created during the session, or drops them if droptemptables=yes is configured.  But, SQL Relay isn't aware of tables created outside of the current session, or outside of SQL Relay altogether.  To work around this issue, this parameter can be set to either a comma-separated list of global temporary tables that SQL Relay should truncate at the end of each session.  Alternatively, it can be set to % and SQL Relay will truncate all global temporary tables that it has access to at the end of each session.  If this parameter is omitted, only tables that were created during the session are truncated.  Providing a list of tables performs SUBSTANTIALLY better but is less flexible than using %.
+   * '''lastinsertidfunction''': Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Firebird doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Firebird.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+  * For '''mdbtools''' databases, the connect string syntax is "db=DATABASE;identity=ID"
+   * '''db''': The filename of the database open.  Required.
+   * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+ * '''metric''' - A number that influences how many of this connection should be started.  See [#complex Complex Attributes] below.  Defaults to 1.
+ * '''behindloadbalancer''' - Can be set to "yes" or "no".  Indicates whether the database is really a pool of databases behind a load balancer or not.  If the database is not a pool of databases behind a load balancer, then when a connection daemon determines that the database has gone down, it will cause all connection daemons connected to that database to log out and re-login.  However, if the database is really a pool of databases behind a load balancer, and a connection daemon determines that the database has gone down, only that connection will log out and re-login as some or all of the remaining connections may not actually be connected to the same physical database machine, but rather to a clone which has not actually gone down.
+
+
+* '''route'''
+ * '''host''' - The host that the SQL Relay server that queries will be routed to is running on.
+ * '''port''' - The port that the SQL Relay server that queries will be routed to is listening on.
+ * '''socket''' - The socket that the SQL Relay server that queries will be routed to is listening on.  Only use this if the SQL Relay server that queries will be routed to is running on the same machine as the router.
+ * '''user''' - The user name to use to log into the SQL Relay server that queries will be routed to is running on.
+ * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [../modules/passwordencryption.html Password Encryption Modules]
+
+
+* '''query'''
+ * '''pattern''' - A regular expression.  Any query matching this regular expression will be routed to the SQL Relay server specified in the enclosing route tag.
+
+[[br]][=#complex]
+== Complex Attributes ==
+
+Most of the tag attributes are straightforward.  The most complex one are the '''metric''' attribute of the '''connection''' tag and the '''authtier''' and '''handoff''' attributes of the '''instance''' tag.
+
+[[br]]
+=== Metric ===
+
+The '''metric''' attribute doesn't define how many connections are started, the '''connections''' attribute of the '''instance''' tag defines that.  The '''metric''' attribute influences how many of the total connections will be of that connection type.  The higher the metric relative to the other metrics, the more of that connection type will be started.
+
+[[br]]
+=== Authtier ===
+
+The client will send a user and password when it connects to the SQL Relay server.
+
+If the '''authtier''' attribute is set to "connection", then SQL Relay will compare the user/password to the list of user/passwords in a configuration file and accept or reject the client connection.
+
+If the '''authtier''' attribute is set to "database", then SQL Relay will authenticate the user against the database itself rather than against the list of user/passwords in a configuration file.  This causes SQL Relay to switch which user it is logged into the database as.
+
+When SQL Relay is used with Oracle 8i or higher, it switches users without logging out.  The database connection must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to SQL Relay as one of the users that can be proxied.  See [oraclentier.html this document] for more information including instructions for configuring Oracle.
+
+When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is somewhat ineffecient and defeats the value of keeping persistent database connections but might be useful for particular applications.
+
+'''NOTE:''' Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router uses to use database authentication but not the router instance itself.  If database authentication is used for that instance, authentication will fail.
+
+[[br]]
+=== Handoff ===
+
+When an '''SQL Relay''' client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The file descriptor of the connected client can be passed from the listener to the connection daemon, or the listener can proxy the client, ferrying data back and forth between it and the connection daemon.  These two methods are referred to as "pass" and "proxy".  "proxy" works on every platform.  "pass" works on most platforms but not all.  "pass" is faster and lighter than "proxy" and should be used if possible.  Cygwin and Linux kernels prior to 2.2 don't support "pass" though, and on those platforms, even if you specify "pass", "proxy" will be used instead and a warning will be displayed.  Other platforms may not support "pass" as well but those are the only known ones and the only ones where "proxy" is forced.
+
+[[br]][=#modules]
+== Extension Modules ==
+
+SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to a configuration file and each module has its own tags and attributes.  The following types of modules are currently supported:
+
+* [../modules/pwdencs.html Password Encryption]
+* [../modules/auths.html Authentication]
+* [../modules/translations.html Query Translation]
+* [../modules/filters.html Query Filter]
+* [../modules/resultsettranslations.html Result Set Translations]
+* [../modules/loggers.html Logger]
