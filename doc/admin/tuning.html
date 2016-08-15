@@ -1,28 +1,25 @@
 <html>
 <head>
-<title>firstworks   Tuning SQL Relay</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Tuning SQL Relay</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Tuning SQL Relay</span><br><br>
+<h1>Tuning SQL Relay</h1>
 
 <ul>
-<li><a href="#localdbconnection">Connect To The Database Using a Local Connection</a></li>
-<li><a href="#unixsocket">Connect To SQL Relay Using a Unix Socket</a></li>
-<li><a href="#handoff">Use a Platform That Supports File Descriptor Passing</a></li>
-<li><a href="#threads">Use a Platform That Supports Threads</a></li>
-<li><a href="#systemparameters">Tweak Various System Parameters</a></li>
-<li><a href="#dontgetcolumninfo">Don't Get Unnecessary Column Info</a></li>
-<li><a href="#resultsetbuffersize">Use Result Set Buffer Size</a></li>
-<li><a href="#memoryusage">Memory Usage</a></li>
-<li><a href="#howmanyconnections">How Many Connections Should I Run?</a></li>
-<li><a href="#howmanycursors">How Many Cursors Should I Allocate?</a></li>
+  <li><a href="#localdbconnection">Connect To The Database Using a Local Connection</a></li>
+  <li><a href="#unixsocket">Connect To SQL Relay Using a Unix Socket</a></li>
+  <li><a href="#handoff">Use a Platform That Supports File Descriptor Passing</a></li>
+  <li><a href="#threads">Use a Platform That Supports Threads</a></li>
+  <li><a href="#systemparameters">Tweak Various System Parameters</a></li>
+  <li><a href="#dontgetcolumninfo">Don't Get Unnecessary Column Info</a></li>
+  <li><a href="#resultsetbuffersize">Use Result Set Buffer Size</a></li>
+  <li><a href="#memoryusage">Memory Usage</a></li>
+  <li><a href="#howmanyconnections">How Many Connections Should I Run?</a></li>
+  <li><a href="#howmanycursors">How Many Cursors Should I Allocate?</a></li>
 </ul>
 
-<br>
-<a name="localdbconnection"></a>
-<span class="heading2">Connect To The Database Using a Local Connection</span><br>
+<a name="localdbconnection""/><h2>Connect To The Database Using a Local Connection</h2>
 
 <p>One of the most common mistakes that people make when running SQL Relay on
 the same machine as the database is not using a "local connection" to the
@@ -36,19 +33,18 @@ connect to the database using a remote connection.  However, if you're running
 SQL Relay on the same machine as the database, then you should configure it to
 connect to the database using a local connection if possible.</p>
 
-<span class="heading3">MySQL</span>
+<h3>MySQL</h3>
 
 <p>MySQL supports local connections over a unix socket.</p>
 
 <p>By default, MySQL is usually configured to accept local connections.  To make
 sure MySQL is configuerd to accept local connections, edit the MySQL
 configuration file (usually /etc/my.cnf) and add a line like the following to
-the [mysqld] section if it's not already there:</p>
+the <tt>[mysqld]</tt> section if it's not already there:</p>
 
 <blockquote>
-<font color="#298a52"><b>socket=</b></font>/var/lib/mysql/mysql.sock
+socket=/var/lib/mysql/mysql.sock
 </blockquote>
-
 <p>Now restart MySQL.</p>
 
 <p>To configure SQL Relay to connect to MySQL using the local connection,
@@ -56,16 +52,14 @@ edit the configuration file and make sure that the connectstring for the
 MySQL instance uses the socket parameter, as follows:</p>
 
 <blockquote>
-<font color="#ff00ff">user=testuser;password=testpassword;db=testdb;socket=/var/lib/mysql/mysql.sock</font>
+user=testuser;password=testpassword;db=testdb;socket=/var/lib/mysql/mysql.sock
 </blockquote>
-
 <p>as opposed to:</p>
 
 <blockquote>
-<font color="#ff00ff">user=testuser;password=testpassword;db=testdb;host=localhost;port=5432</font>
+user=testuser;password=testpassword;db=testdb;host=localhost;port=5432
 </blockquote>
-
-<span class="heading3">PostgreSQL</span>
+<h3>PostgreSQL</h3>
 
 <p>PostgreSQL supports local connections over a unix socket.</p>
 
@@ -79,15 +73,14 @@ the parameters, remove the leading # and set the parameter.  By default, the
 parameters look like this:</p>
 
 <blockquote>
-<pre>
-<font color="#0000ff">#unix_socket_directory = ''</font>
-<font color="#0000ff">#unix_socket_group = ''</font>
-<font color="#0000ff">#unix_socket_permissions = 0777 # octal</font>
+  <pre>#unix_socket_directory = ''
+#unix_socket_group = ''
+#unix_socket_permissions = 0777 # octal
 
-<font color="#0000ff">#port = 5432</font>
+#port = 5432
 </pre>
-</blockquote>
 
+</blockquote>
 <p>The socket file that PostgreSQL will listen on will be found in /tmp by
 default, or in whatever directory is specified by unix_socket_directory.  The
 file always start with .s.PGSQL. and end with whatever port is specified with
@@ -108,15 +101,13 @@ edit the configuration file and make sure that the connectstring for the
 PostgreSQL instance uses the host and port parameters as follows:</p>
 
 <blockquote>
-<font color="#ff00ff">user=testuser;password=testpassword;host=/tmp;port=5432;</font>
+user=testuser;password=testpassword;host=/tmp;port=5432;
 </blockquote>
-
 <p>as opposed to:</p>
 
 <blockquote>
-<font color="#ff00ff">user=testuser;password=testpassword;host=localhost;port=5432;</font>
+user=testuser;password=testpassword;host=localhost;port=5432;
 </blockquote>
-
 <p>Ordinarily, the host parameter tells SQL Relay what host to connect to, but
 if it starts with a / then it indicates what directory to look for the socket
 file in.  Likewise, the port parameter ordinarily tells SQL Relay what port to
@@ -124,7 +115,7 @@ connect to, but if host starts with a / then it indicates that SQL Relay should
 look for a file in the directory specifid by the host parameter starting with
 .s.PGSQL. and ending in the port number.</p>
 
-<span class="heading3">Oracle</span>
+<h3>Oracle</h3>
 
 <p>Oracle supports local connections over IPC using shared memory.</p>
 
@@ -133,34 +124,32 @@ To set up Oracle to listen for IPC connections, edit
 $ORACLE_HOME/network/admin/listener.ora and look for a section like this:</p>
 
 <blockquote>
-<pre>
-LISTENER =
-  (<font color="#298a52"><b>DESCRIPTION_LIST</b></font> =
-    (<font color="#298a52"><b>DESCRIPTION</b></font> =
-      (<font color="#298a52"><b>ADDRESS_LIST</b></font> =
-        (<font color="#298a52"><b>ADDRESS</b></font> = (<font color="#a52829"><b>PROTOCOL</b></font> = <font color="#a52829"><b>TCP</b></font>)(<font color="#a52829"><b>HOST</b></font> = localhost.localdomain)(<font color="#a52829"><b>PORT</b></font> = 1521))
+  <pre>LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS_LIST =
+        (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521))
       )
     )
   )
 </pre>
-</blockquote>
 
+</blockquote>
 <p>Add an additional ADDRESS section as follows:</p>
 
 <blockquote>
-<pre>
-LISTENER =
-  (<font color="#298a52"><b>DESCRIPTION_LIST</b></font> =
-    (<font color="#298a52"><b>DESCRIPTION</b></font> =
-      (<font color="#298a52"><b>ADDRESS_LIST</b></font> =
-        (<font color="#298a52"><b>ADDRESS</b></font> = (<font color="#a52829"><b>PROTOCOL</b></font> = <font color="#008a8c">IPC</font>)(<font color="#a52829"><b>KEY</b></font> = EXTPROC))
-        (<font color="#298a52"><b>ADDRESS</b></font> = (<font color="#a52829"><b>PROTOCOL</b></font> = <font color="#a52829"><b>TCP</b></font>)(<font color="#a52829"><b>HOST</b></font> = localhost.localdomain)(<font color="#a52829"><b>PORT</b></font> = 1521))
+  <pre>LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS_LIST =
+        (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC))
+        (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521))
       )
     )
   )
 </pre>
-</blockquote>
 
+</blockquote>
 <p>Now Oracle's listener is configured to listen for both IPC and inet socket
 connections.  Restart Oracle</p>
 
@@ -172,48 +161,45 @@ IPC instead, edit $ORACLE_HOME/network/admin/tnsnames.ora and look for a
 section for the ORACLE_SID like this:</p>
 
 <blockquote>
-<pre>
-ORA1 =
-  (<font color="#298a52"><b>DESCRIPTION</b></font> =
-    (<font color="#298a52"><b>ADDRESS</b></font> = (<font color="#a52829"><b>PROTOCOL</b></font> = <font color="#a52829"><b>TCP</b></font>)(<font color="#a52829"><b>HOST</b></font> = localhost.localdomain)(<font color="#a52829"><b>PORT</b></font> = 1521))
-    (<font color="#298a52"><b>CONNECT_DATA</b></font> =
-      (<font color="#a52829"><b>SERVER</b></font> = <font color="#008a8c">DEDICATED</font>)
-      (<font color="#a52829"><b>SERVICE_NAME</b></font> = ora1)
+  <pre>ORA1 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = ora1)
     )
   )
 </pre>
-</blockquote>
 
+</blockquote>
 <p>Modify it as follows:</p>
 
 <blockquote>
-<pre>
-ORA1 =
-  (<font color="#298a52"><b>DESCRIPTION</b></font> =
-    (<font color="#298a52"><b>ADDRESS</b></font> = (<font color="#a52829"><b>PROTOCOL</b></font> = <font color="#008a8c">IPC</font>)(<font color="#a52829"><b>KEY</b></font> = EXTPROC))
-    (<font color="#298a52"><b>CONNECT_DATA</b></font> =
-      (<font color="#a52829"><b>SERVER</b></font> = <font color="#008a8c">DEDICATED</font>)
-      (<font color="#a52829"><b>SERVICE_NAME</b></font> = ora1)
+  <pre>ORA1 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = ora1)
     )
   )
 </pre>
-</blockquote>
 
+</blockquote>
 <p>SQL Relay requires no specific modifications to connect to the database using
 IPC instead of an inet socket.  Just configure the connect string to use an SID
 that uses IPC to connect to the database.  For example:</p>
 
 <blockquote>
-<font color="#ff00ff">user=testuser;password=testpassword;oracle_sid=ora1;</font>
+user=testuser;password=testpassword;oracle_sid=ora1;
 </blockquote>
-
-<span class="heading3">SQLite</span>
+<h3>SQLite</h3>
 
 <p>SQLite is different from other databases.  SQL Relay's sqlite connection
 uses the sqlite library to access the database file directly.  Effectively,
 the database connection is always local.</p>
 
-<span class="heading3">IBM DB2</span>
+<h3>IBM DB2</h3>
 
 <p>As far as I can tell, DB2 supports local connections over IPC using
 shared memory, semaphores and message queues (though I can't find any
@@ -227,10 +213,9 @@ which relays to the remote instance and connect to the local instance.</p>
 Just configure the connect string to use the local database.  For example:</p>
 
 <blockquote>
-<font color="#ff00ff">db=testdb</font>
+db=testdb
 </blockquote>
-
-<span class="heading3">Informix</span>
+<h3>Informix</h3>
 
 <p>Informix databases support connections over a wide range of protocols,
 including remote connections using TCP/IP sockets and local connections using
@@ -247,24 +232,21 @@ connection, use the onipcshm protocol.</p>
 For example:</p>
 
 <blockquote>
-<font color="#ff00ff">db=testdb</font>
+db=testdb
 </blockquote>
-
-<span class="heading3">SAP/Sybase</span>
+<h3>SAP/Sybase</h3>
 
 <p>As far as I can tell, SAP/Sybase only supports client connections over inet
 sockets.  If anyone knows differently, send mail to
 <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>.</p>
 
-<span class="heading3">Firebird</span>
+<h3>Firebird</h3>
 
 <p>As far as I can tell, Firebird only supports client connections
 over inet sockets.  If anyone knows differently, send mail to
 <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>.</p>
 
-<br>
-<a name="unixsocket"></a>
-<span class="heading2">Connect To SQL Relay Using a Unix Socket</span><br>
+<a name="unixsocket""/><h2>Connect To SQL Relay Using a Unix Socket</h2>
 
 <p>SQL Relay supports inet and unix sockets.  If you are runing the SQL Relay
 client (your program) and the SQL Relay server on the same machine, make sure
@@ -275,9 +257,8 @@ socket.  In the configuration file, the instance that is talking to mysql
 should have a socket attribute:</p>
 
 <blockquote>
-<instance id="mysqltest" port="8006" socket="/tmp/mysqltest.socket" ... >
+&lt;instance id="mysqltest" port="8006" socket="/tmp/mysqltest.socket" ... &gt;
 </blockquote>
-
 <p>In the above example, the SQL Relay server will listen on inet port 8006 and
 unix socket /tmp/mysqltest.socket.</p>
 
@@ -287,13 +268,11 @@ a new sqlrconnection, make sure you tell it to use the unix socket:</p>
 <blockquote>
 sqlrconnection	*con=new sqlrconnection("localhost",8006,"/tmp/mysqltest.socket","user","password",0,1);
 </blockquote>
-
 <p>as opposed to:</p>
 
 <blockquote>
-sqlrconnection  *con=<font color="#a52829"><b>new</b></font> sqlrconnection(<font color="#ff00ff">&quot;localhost&quot;</font>,<font color="#ff00ff">8006</font>,<font color="#ff00ff">NULL</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+sqlrconnection  *con=new sqlrconnection("localhost",8006,NULL,"user","password",0,1);
 </blockquote>
-
 <p>(for non-C++ api's the syntax is similar)</p>
 
 <p>The client will first try the unix socket, then if it can't connect, it will
@@ -305,10 +284,7 @@ performance even though they were using unix sockets.  They had just typed the
 unix socket file name wrong and it was trying it, failing, then falling back to
 host/port.</p>
 
-
-<br>
-<a name="handoff"></a>
-<span class="heading2">Use a Platform That Supports File Descriptor Passing</span><br>
+<a name="handoff""/><h2>Use a Platform That Supports File Descriptor Passing</h2>
 
 <p>When a client connects to the SQL Relay listener process, it waits for an available database connection, then either hands the client off to that process via file descriptor passing, or proxies the incoming client, ferrying data back and forth between it and the database connecton process.</p>
 
@@ -318,10 +294,7 @@ host/port.</p>
 
 <p>If you want the best performance, you must use a platform that supports file descriptor passing.</p>
 
-
-<br>
-<a name="threads"></a>
-<span class="heading2">Use a Platform That Supports Threads</span><br>
+<a name="threads""/><h2>Use a Platform That Supports Threads</h2>
 
 <p>When a client connects to the SQL Relay listener process, it forks off either a thread or child process and waits for an available database connection.  Support for forking a thread, rather than a process was added in version 0.54.</p>
 
@@ -333,14 +306,11 @@ host/port.</p>
 
 <p>If you want the best performance, you must use a platform that supports threads.</p>
 
-
-<br>
-<a name="systemparameters"></a>
-<span class="heading2">Tweak Various System Parameters</span><br>
+<a name="systemparameters""/><h2>Tweak Various System Parameters</h2>
 
 <p>Certain system parameters can be tuned to get better performance out of SQL Relay.</p>
 
-<span class="heading3">TIME_WAIT timeout</span>
+<h3>TIME_WAIT timeout</h3>
 
 <p>The first paramater that comes to mind is the TIME_WAIT timeout.  When a TCP 
 client disconnects from a server, the socket that the client was connected on
@@ -367,19 +337,25 @@ not tried all of them myself.</p>
 example, the timeout is set to 30 seconds.  You should put this command in a
 system startup file so it will be executed at boot time.</p>
 
-<p>echo 30 &gt; /proc/sys/net/ipv4/tcp_fin_timeout</p>
+<blockquote>
+  <pre>echo 30 > /proc/sys/net/ipv4/tcp_fin_timeout
+</pre>
 
+</blockquote>
 <p>You might also try enabling tcp_tw_recycle and tcp_tw_reuse as follows:</p>
 
-<p>echo 1 &gt; /proc/sys/net/ipv4/tcp_tw_reuse<br>
-echo 1 &gt; /proc/sys/net/ipv4/tcp_tw_recycle<br></p>
+<blockquote>
+  <pre>echo 1 > /proc/sys/net/ipv4/tcp_tw_reuse
+echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle
+</pre>
 
+</blockquote>
 <p>Those parameters enable fast recycling and reuse of sockets in the
 TIME_WAIT state.  I can't find any documentation about them other than the
 following though:</p>
 
-<blockquote><pre>
-tcp_tw_recycle - BOOLEAN
+<blockquote>
+  <pre>tcp_tw_recycle - BOOLEAN
  Enable fast recycling TIME-WAIT sockets. Default value is 0.
  It should not be changed without advice/request of technical
  experts.
@@ -389,39 +365,53 @@ tcp_tw_reuse - BOOLEAN
  safe from protocol viewpoint. Default value is 0.
  It should not be changed without advice/request of technical
  experts.
-</pre></blockquote>
+</pre>
 
+</blockquote>
 <p>For Solaris, the parameter can be modified while the system is running
 using the ndd command to set the number of milliseconds to wait.  These
 examples set the timeout to 30 seconds.  You should put these commands in a 
 system startup file so they'll be executed at boot time.</p>
 
-<p>For Solaris 7 and later:  ndd -set /dev/tcp tcp_time_wait_interval 30000</p>
+<p>For Solaris 7 and later:</p>
 
-<p>For Solaris 2.6 and earlier:  ndd -set /dev/tcp tcp_close_wait_interval 30000</p>
+<blockquote>
+  <pre>ndd -set /dev/tcp tcp_time_wait_interval 30000
+</pre>
 
-<span class="heading3">Port range</span>
+</blockquote>
+<p>For Solaris 2.6 and earlier:</p>
+
+<blockquote>
+  <pre>ndd -set /dev/tcp tcp_close_wait_interval 30000
+</pre>
+
+</blockquote>
+<h3>Port range</h3>
 
 <p>Another paramter that you may want to tweak is the range of available ports.
 On Linux, you can display the range by running:</p>
 
-<p>/sbin/sysctl net.ipv4.ip_local_port_range</p>
+<blockquote>
+  <pre>/sbin/sysctl net.ipv4.ip_local_port_range
+</pre>
 
+</blockquote>
 <p>You can increase this to range from 1024 to 65535 by running the following 
 command:</p>
 
-<p>/sbin/sysctl -w net.ipv4.ip_local_port_range="1024 65535"</p>
+<blockquote>
+  <pre>/sbin/sysctl -w net.ipv4.ip_local_port_range="1024 65535"
+</pre>
 
+</blockquote>
 <p>You should put this command in a system startup file so it'll be executed at
 boot time.</p>
 
 <p>I'm not sure what the default port range is or how to change it on other
 operating systems.</p>
 
-
-<br>
-<a name="dontgetcolumninfo"></a>
-<span class="heading2">Don't Get Unnecessary Column Info</span><br>
+<a name="dontgetcolumninfo""/><h2>Don't Get Unnecessary Column Info</h2>
 
 <p>If you run select queries but don't need to know the names/types/sizes of
 the columns, rather you can just refer to them by number, then you can call
@@ -429,10 +419,7 @@ dontGetColumnInfo() before running your query and much less data will be
 transmitted from the SQL Relay server to the client.  This is really useful for
 speeding up 1 column queries like "select count(*) from mytable".</p>
 
-
-<br>
-<a name="resultsetbuffersize"></a>
-<span class="heading2">Use Result Set Buffer Size</span><br>
+<a name="resultsetbuffersize""/><h2>Use Result Set Buffer Size</h2>
 
 <p>By default, SQL Relay fetches the entire result set of a query into memory.
 SQL Relay was originally written for use with web-based apps, and most web
@@ -446,35 +433,36 @@ fetch too many rows at once, memory has to be allocated which slows things down
 it causes too many round trips to the database.  Each query has a sweet spot,
 finding it may dramatically improve that query's performance.</p>
 
-<br>
-<a name="memoryusage"></a>
-<span class="heading2">Memory Usage</span><br>
+<a name="memoryusage""/><h2>Memory Usage</h2>
 
 <p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Informix, SAP/Sybase, FreeTDS, MySQL, Firebird and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
 
 <p>The size of the result set buffer is determined by 3 parameters:</p>
 
 <ul>
-<li>The maximum number of columns in the result set.</li>
-<ul>
-<li>Defaults to 256</li>
-<li>Setting to -1 causes buffers to be allocated dynamically</li>
-</ul>
-<li>The maximum size of an individual non-LOB field.</li>
-<ul>
-<li>Defaults to 32768, the maximum size of a varchar and varbinary types</li>
-</ul>
-<li>The number of rows of the result set to fetch at once.</li>
-<ul>
-<li>Defaults to 10</li>
-</ul>
+  <li>The maximum number of columns in the result set.</li>
+  <ul>
+    <li>Defaults to 256</li>
+    <li>Setting to -1 causes buffers to be allocated dynamically</li>
+  </ul>
+
+  <li>The maximum size of an individual non-LOB field.</li>
+  <ul>
+    <li>Defaults to 32768, the maximum size of a varchar and varbinary types</li>
+  </ul>
+
+  <li>The number of rows of the result set to fetch at once.</li>
+  <ul>
+    <li>Defaults to 10</li>
+  </ul>
+
 </ul>
 
 <p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
 
 <p>The default result set buffer size for Oracle, DB2, Informix, and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  Informix, FreeTDS, MySQL, Firebird, and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
 
-<p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.<p>
+<p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.</p>
 
 <p>For example, if you open 10 connections with 2 cursors each, then since each cursor will consume 80mb, each connection will consume about 160mb, and all 10 connections will consume about 1.6g.</p>
 
@@ -490,9 +478,7 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 
-<br>
-<a name="howmanyconnections"></a>
-<span class="heading2">How Many Connections Should I Run?</span><br>
+<a name="howmanyconnections""/><h2>How Many Connections Should I Run?</h2>
 
 <p>A good rule of thumb is to run as many connections as your database can
 handle.</p>
@@ -526,9 +512,7 @@ applications.</p>
 
 <p>If you are concerned about memory usage, consider allowing connections to scale up and down as necessary by using the connections, maxconnections, maxqueuelength and growby parameters in the configuration file.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for detailed information on these parameters.</p>
 
-<br>
-<a name="howmanycursors"></a>
-<span class="heading2">How Many Cursors Should I Allocate?</span><br>
+<a name="howmanycursors""/><h2>How Many Cursors Should I Allocate?</h2>
 
 <p>Usually not very many.  Most often, only one.  If your app requires lots of
 cursors, then it's as likely as not that it isn't closing or freeing them
@@ -537,7 +521,7 @@ properly.</p>
 <p>By default, unless setResultSetBufferSize() is called, SQL Relay clients
 use a server-side cursor to fetch the entire result set into memory and then
 release the cursor.  This way, only one server-side cursor is required,
-independent of how many client-side cursors are used.<p>
+independent of how many client-side cursors are used.</p>
 
 <p>However, if you configure the client to fetch say, 10 rows at a time, and
 run nested queries - eg. run a select, and then run an insert for each row of
@@ -553,7 +537,8 @@ the app was done with it, or each cursor was freed when the app was done with
 it.  This is a common problem and, unfortunately, sometimes architectural
 constraints make it unavoidable.</p>
 
-<p>SQL Relay has parameters that allow cursors to scale up and down as needed.  If you are concerned about memory usage, consider using the cursors, maxcursors and cursors_growby parameters in the configuration file.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for detailed information on these parameters.</p>
+<p>SQL Relay has parameters that allow cursors to scale up and down as needed.  If you are concerned about memory usage, consider using the cursors, maxcursors and cursors_growby parameters in the configuration file.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for detailed information on these parameters.
+</p>
 
 </body>
 </html>

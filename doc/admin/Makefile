@@ -9,14 +9,16 @@ SRCS = configguide.wt \
 	installing.wt \
 	oraclentier.wt \
 	prerequisites.wt \
-	running.wt
+	running.wt \
+	tuning.wt
 
 OBJS = configguide.html.in \
 	configreference.html.in \
 	installing.html.in \
 	oraclentier.html.in \
 	prerequisites.html.in \
-	running.html.in
+	running.html.in \
+	tuning.html.in
 
 .wt.html.in:
 	wt -c $< -o $@ -xhtml xhtml.conf
