@@ -1,36 +1,35 @@
 <html>
 <head>
-<title>firstworks   Building and Installing SQL Relay</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Building and Installing SQL Relay</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Building and Installing SQL Relay</span>
+<h1>Building and Installing SQL Relay</h1>
 
 <ul>
-<li><a href="#platforms">Supported Platforms</a></li>
-<li><a href="#prerequisites">Prerequisites</a></li>
-<li><a href="#unixlinux">Installation on Linux, Unix or Unix-like Platforms</a></li>
-<ul>
-<li><a href="#downloading">Downloading SQL Relay</a></li>
-<li><a href="#extracting">Extracting SQL Relay</a></li>
-<li><a href="#compiling">Building SQL Relay</a></li>
-<li><a href="#installing">Installing SQL Relay</a></li>
-</ul>
-<li><a href="#windows">Installation on Windows</a></li>
-<ul>
-<li><a href="#windownloading">Downloading SQL Relay</a></li>
-<li><a href="#winextracting">Extracting SQL Relay</a></li>
-<li><a href="#wincompiling">Building SQL Relay</a></li>
-<li><a href="#wininstalling">Installing SQL Relay</a></li>
-</ul>
+  <li><a href="#platforms">Supported Platforms</a></li>
+  <li><a href="#prerequisites">Prerequisites</a></li>
+  <li><a href="#unixlinux">Installation on Linux, Unix or Unix-like Platforms</a></li>
+  <ul>
+    <li><a href="#downloading">Downloading SQL Relay</a></li>
+    <li><a href="#extracting">Extracting SQL Relay</a></li>
+    <li><a href="#compiling">Building SQL Relay</a></li>
+    <li><a href="#installing">Installing SQL Relay</a></li>
+  </ul>
+
+  <li><a href="#windows">Installation on Windows</a></li>
+  <ul>
+    <li><a href="#windownloading">Downloading SQL Relay</a></li>
+    <li><a href="#winextracting">Extracting SQL Relay</a></li>
+    <li><a href="#wincompiling">Building SQL Relay</a></li>
+    <li><a href="#wininstalling">Installing SQL Relay</a></li>
+  </ul>
+
 </ul>
 
+<br/><a name="platforms"/><h2>Supported Platforms</h2>
 
-<a name="platforms"></a>
-<span class="heading2">Supported Platforms</span>
-
-<p>All SQL Relay components should build and run on relatively modern versions of Linux, Unix, or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Minix, SCO OpenServer, SCO UnixWare, GNU Hurd, Haiku and Syllable.  Other Unix or Unix-like systems may also be supported.</p>
+<p>All SQL Relay components should build and run on relatively modern versions of Linux, Unix, or Unix-like systems including Solaris, <a href="FreeBSD">FreeBSD</a>, <a href="NetBSD">NetBSD</a>, <a href="OpenBSD">OpenBSD</a>, Minix, SCO <a href="OpenServer">OpenServer</a>, SCO <a href="UnixWare">UnixWare</a>, GNU Hurd, Haiku and Syllable.  Other Unix or Unix-like systems may also be supported.</p>
 
 <p>x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC, and others.</p>
 
@@ -38,157 +37,127 @@
 
 <p>All SQL Relay components should build and run on relatively modern versions of x86 or x64 Windows as well.</p>
 
-<a name="prerequisites"></a>
-<span class="heading2">Prerequisites</span>
+<a name="prerequisites"/><h2>Prerequisites</h2>
 
 <p>Before you can compile SQL Relay, you must install some prerequisites.</p>
 
 <p>The first thing that you need is a compiler toolchain and make utility.</p>
 
-<p>GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO UnixWare is also supported.  Native compiler toolchains for other Unix platforms may work as well.  GNU make is also required on Linux/Unix platforms.</p>
+<p>GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO <a href="UnixWare">UnixWare</a> is also supported.  Native compiler toolchains for other Unix platforms may work as well.  GNU make is also required on Linux/Unix platforms.</p>
 
 <p>Microsoft Visual Studio and Microsoft Visual Studio Express toolchains are supported on Windows.  Versions 2005 and greater should work.  The nmake utility is also required, but it's provided by Visual Studio.</p>
 
-<p>You also need to install the Rudiments library.  The library is available at <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and instructions for building and installing it are available at <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
+<p>You also need to install the Rudiments library.  The library is available at <a href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and instructions for building and installing it are available at <a href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
 
 <p>To build the non-C/C++ API's, you need to install one or more of
-<a target="_blank" href="http://www.perl.org">Perl</a>, 
-<a target="_blank" href="http://www.php.org">PHP</a>,
-<a target="_blank" href="http://www.python.org">Python</a>,
-<a target="_blank" href="http://www.ruby-lang.org">Ruby</a>,
-<a target="_blank" href="http://tcl.sourceforge.net">TCL</a>,
-<a target="_blank" href="http://java.sun.com">Java</a>,
-<a target="_blank" href="http://www.erlang.org">Erlang</a>, or
-<a target="_blank" href="http://nodejs.org">node.js</a>.  To build the C# API on Linux/Unix, you need to install <a target="_blank" href="http://mono-project.com">Mono</a> as well.
-</p>
+<a href="http://www.perl.org">Perl</a>, 
+<a href="http://www.php.org">PHP</a>,
+<a href="http://www.python.org">Python</a>,
+<a href="http://www.ruby-lang.org">Ruby</a>,
+<a href="http://tcl.sourceforge.net">TCL</a>,
+<a href="http://java.sun.com">Java</a>,
+<a href="http://www.erlang.org">Erlang</a>, or
+<a href="http://nodejs.org">node.js</a>.  To build the C# API on Linux/Unix, you need to install <a href="http://mono-project.com">Mono</a> as well.</p>
 
 <p>(Note: the Erlang API is not currently supported on Windows)</p>
 
 <p>To build the database connection modules, you need to install one or more of
-<a target="_blank" href="http://www.oracle.com">Oracle</a>,
-<a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>.
-<a target="_blank" href="http://www.ibm.com/software/data/db2/">DB2</a>,
-<a target="_blank" href="http://www.ibm.com/software/data/informix/">Informix</a>,
-<a target="_blank" href="http://web.mysql.com">MySQL</a>, 
-<a target="_blank" href="http://www.postgresql.org">PostgreSQL</a>, 
-<a target="_blank" href="http://www.firebirdsql.com/">Firebird</a>, or
-<a target="_blank" href="http://www.sqlite.org">SQLite</a>,
-</p>
+<a href="http://www.oracle.com">Oracle</a>,
+<a href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>.
+<a href="http://www.ibm.com/software/data/db2/">DB2</a>,
+<a href="http://www.ibm.com/software/data/informix/">Informix</a>,
+<a href="http://web.mysql.com">MySQL</a>, 
+<a href="http://www.postgresql.org">PostgreSQL</a>, 
+<a href="http://www.firebirdsql.com/">Firebird</a>, or
+<a href="http://www.sqlite.org">SQLite</a>,</p>
 
 <p>(Note: the SQLite connection module is not currently supported on Windows)</p>
 
 <p>On Linux/Unix, you can also install 
-<a target="_blank" href="http://www.unixodbc.org">unixODBC</a> or
-<a target="_blank" href="http://www.iodbc.org">iODBC</a>
+<a href="http://www.unixodbc.org">unixODBC</a> or <a href="http://www.iodbc.org">iODBC</a>
 to access databases using ODBC,
-<a target="_blank" href="http://www.freetds.org">FreeTDS</a> to access
-<a target="_blank" href="http://www.microsof.com/sql/default.html">MS SQL Server</a> (or
-<a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>), and
-<a target="_blank" href="http://mdbtools.sourceforge.net">MDB Tools</a> to access MS Access Databases.
-</p>
+<a href="http://www.freetds.org">FreeTDS</a> to access
+<a href="http://www.microsof.com/sql/default.html">MS SQL Server</a> (or
+<a href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>), and
+<a href="http://mdbtools.sourceforge.net">MDB Tools</a> to access MS Access Databases.</p>
 
 <p>On Windows, no additional software needs to be installed to access ODBC databases, and MS SQL Server and MS Access are accessible via ODBC.</p>
 
 <p>See <a href="prerequisites.html">Installing SQL Relay Prerequisites</a> for detailed information on installing prerequisite software.</p>
 
+<br/><a name="unixlinux"/><h1>Installation on Linux, Unix or Unix-like Platforms</h1>
 
-<br>
-<a name="unixlinux"></a>
-<span class="heading1">Installation on Linux, Unix or Unix-like Platforms</span><br><br>
+<a name="downloading"/><h2>Downloading SQL Relay</h2>
 
-
-<a name="downloading"></a>
-<span class="heading2">Downloading SQL Relay</span>
-
-<p>You can download the most current source distribution of SQL Relay from <a target="_top" href="http://sqlrelay.sourceforge.net">sqlrelay.sourceforge.net</a>.</p>
+<p>You can download the most current source distribution of SQL Relay from <a href="http://sqlrelay.sourceforge.net">sqlrelay.sourceforge.net</a>.</p>
 
 <p>For Linux or Unix installations, download the tar.gz file.</p>
 
-
-<a name="extracting"></a>
-<span class="heading2">Extracting SQL Relay</span>
+<a name="extracting"/><h2>Extracting SQL Relay</h2>
 
 <p>To extract the source distribution, move the file to a location on your machine that you have read/write access and execute the following commands:</p>
 
-<blockquote><b>
-gunzip sqlrelay-X.XX.tar.gz<br>
-tar xf sqlrelay-X.XX.tar
-</b></blockquote>
-
+<blockquote>
+<b>gunzip sqlrelay-X.XX.tar.gz<br/>
+tar xf sqlrelay-X.XX.tar</b>
+</blockquote>
 <p>(Where X.XX is replaced with the version of SQL Relay that you downloaded.)</p>
 
 <p>This will create a sqlrelay-X.XX directory.</p>
 
-
-<a name="compiling"></a>
-<span class="heading2">Building SQL Relay</span>
+<a name="compiling"/><h2>Building SQL Relay</h2>
 
 <p>To build SQL Relay, navigate to the directory that was created by the extraction, make sure your ORACLE_HOME environment variable is set if you want to include support for Oracle, and run:</p>
 
-<blockquote><b>
-configure<br>
-make
-</b></blockquote>
-
+<blockquote>
+<b>configure<br/>
+make</b>
+</blockquote>
 <p>The configure script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.  It also takes the --prefix option in case you want to install it somewhere other than /usr/local/firstworks.  For example:</p>
 
-<blockquote><b>
-configure --prefix=/usr/local
-</b></blockquote>
-
+<blockquote>
+<b>configure --prefix=/usr/local</b>
+</blockquote>
 <p>This invocation would cause the libraries to be installed in /usr/local/lib, the header files in /usr/local/include, the binaries and scripts to be installed in /usr/local/bin, etc.</p>
 
 <p>There are also options for using cross-compilers and enabling debug and profiling.  To see the full list of available options, run:</p>
 
-<blockquote><b>
-configure --help
-</b></blockquote>
-
-<a name="installing"></a>
-<span class="heading2">Installing SQL Relay</span>
+<blockquote>
+<b>configure --help</b>
+</blockquote>
+<a name="installing"/><h2>Installing SQL Relay</h2>
 
 <p>By default, on Unix or Linux, everything is installed under /usr/local/firstworks by default.  You should either create that directory and give yourself full access permissions or install as root.</p>
 
 <p>To install SQL Relay run:</p>
 
-<blockquote><b>
-make install
-</b></blockquote>
-
+<blockquote>
+<b>make install</b>
+</blockquote>
 <p>Libraries are installed in /usr/local/firstworks/lib.  Include files are installed in /usr/local/firstworks/include.  Binaries and scripts are installed in /usr/local/firstworks/bin.  Java libraries are installed in /usr/local/firstworks/java.  Files for other programming languages are installed in the appropriate language-specific directories.</p>
-	
+
 <p>If you install SQL Relay as root, init scripts and files will be installed in the appropriate places under /etc for your system.  If you install SQL Relay as a non-root user, the init scripts and files will be installed in similar places under /usr/local/firstworks/etc.</p>
 
 <p>To uninstall SQL Relay run:</p>
 
-<blockquote><b>
-make uninstall
-</b></blockquote>
+<blockquote>
+<b>make uninstall</b>
+</blockquote>
+<br/><br/><a name="windows"/><h1>Installation on Windows</h1>
 
+<a name="windownloading"/><h2>Downloading SQL Relay</h2>
 
-<br>
-<a name="windows"></a>
-<span class="heading1">Installation on Windows</span><br><br>
-
-
-<a name="windownloading"></a>
-<span class="heading2">Downloading SQL Relay</span>
-
-<p>You can download the most current source distribution of SQL Relay from <a target="_top" href="http://sqlrelay.sourceforge.net">sqlrelay.sourceforge.net</a>.</p>
+<p>You can download the most current source distribution of SQL Relay from <a href="http://sqlrelay.sourceforge.net">sqlrelay.sourceforge.net</a>.</p>
 
 <p>For a Windows installation, download the .zip file.</p>
 
-
-<a name="winextracting"></a>
-<span class="heading2">Extracting SQL Relay</span>
+<a name="winextracting"/><h2>Extracting SQL Relay</h2>
 
 <p>To extract the source distribution, move the file to your desktop or a location on your machine that you have read/write access, right-click on the file and select "Extract All".</p>
 
 <p>This will create a sqlrelay-X.XX directory.</p>
 
-
-<a name="wincompiling"></a>
-<span class="heading2">Building SQL Relay</span>
+<a name="wincompiling"/><h2>Building SQL Relay</h2>
 
 <p>To build SQL Relay on Windows, open the Visual Studio Command Prompt.</p>
 
@@ -196,33 +165,30 @@ make uninstall
 
 <p>Navigate to the directory that was created when SQL Relay was extracted, and execute the following commands:</p>
 
-<blockquote><b>
-cscript /nologo configure.vbs<br>
-nmake
-</b></blockquote>
-
+<blockquote>
+<b>cscript /nologo configure.vbs
+nmake</b>
+</blockquote>
 <p>The configure.vbs script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.</p>
 
 <p>Though inconvenient, the <i>config.mk</i> file can also be modified manually prior to running <b>nmake</b> to alter paths or exclude support for certain languages or databases.</p>
 
-<a name="wininstalling"></a>
-<span class="heading2">Installing SQL Relay</span>
+<a name="wininstalling"/><h2>Installing SQL Relay</h2>
 
 <p>By default, on Windows, most components are installed under C:\Program Files\Firstworks.  You should either create the appropriate directory and give yourself full access permissions or install as Administrator.</p>
 
-<blockquote><b>
-nmake install
-</b></blockquote>
-
+<blockquote>
+<b>nmake install</b>
+</blockquote>
 <p>Libraries are installed in C:\Program Files\Firstworks\lib.  Include files are installed in C:\Program Files\Firstworks\include.  Binaries and scripts are installed in C:\Program Files\Firstworks\bin.  Java libraries are installed in C:\Program Files\Firstworks\java.  Files for other programming languages are installed in the appropriate language-specific directories.</p>
 
 <p>To uninstall SQL Relay run:</p>
 
-<blockquote><b>
-nmake uninstall
-</b></blockquote>
-
-<p>To run the programs and scripts that use SQL Relay, it is helpful to add C:\Program Files\Firstworks\bin to your PATH.</p>
+<blockquote>
+<b>nmake uninstall</b>
+</blockquote>
+<p>To run the programs and scripts that use SQL Relay, it is helpful to add C:\Program Files\Firstworks\bin to your PATH.
+</p>
 
 </body>
 </html>

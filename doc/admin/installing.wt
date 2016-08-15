@@ -1,0 +1,211 @@
+= Building and Installing SQL Relay =
+
+* [#platforms Supported Platforms]
+* [#prerequisites Prerequisites]
+* [#unixlinux Installation on Linux, Unix or Unix-like Platforms]
+ * [#downloading Downloading SQL Relay]
+ * [#extracting Extracting SQL Relay]
+ * [#compiling Building SQL Relay]
+ * [#installing Installing SQL Relay]
+* [#windows Installation on Windows]
+ * [#windownloading Downloading SQL Relay]
+ * [#winextracting Extracting SQL Relay]
+ * [#wincompiling Building SQL Relay]
+ * [#wininstalling Installing SQL Relay]
+
+
+[=#platforms]
+== Supported Platforms ==
+
+All SQL Relay components should build and run on relatively modern versions of Linux, Unix, or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Minix, SCO OpenServer, SCO UnixWare, GNU Hurd, Haiku and Syllable.  Other Unix or Unix-like systems may also be supported.
+
+x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC, and others.
+
+uClib/Linux-based systems are also supported.
+
+All SQL Relay components should build and run on relatively modern versions of x86 or x64 Windows as well.
+
+[=#prerequisites]
+== Prerequisites ==
+
+Before you can compile SQL Relay, you must install some prerequisites.
+
+The first thing that you need is a compiler toolchain and make utility.
+
+GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO UnixWare is also supported.  Native compiler toolchains for other Unix platforms may work as well.  GNU make is also required on Linux/Unix platforms.
+
+Microsoft Visual Studio and Microsoft Visual Studio Express toolchains are supported on Windows.  Versions 2005 and greater should work.  The nmake utility is also required, but it's provided by Visual Studio.
+
+You also need to install the Rudiments library.  The library is available at [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and instructions for building and installing it are available at [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To build the non-C/C++ API's, you need to install one or more of
+[http://www.perl.org Perl], 
+[http://www.php.org PHP],
+[http://www.python.org Python],
+[http://www.ruby-lang.org Ruby],
+[http://tcl.sourceforge.net TCL],
+[http://java.sun.com Java],
+[http://www.erlang.org Erlang], or
+[http://nodejs.org node.js].  To build the C# API on Linux/Unix, you need to install [http://mono-project.com Mono] as well.
+
+
+(Note: the Erlang API is not currently supported on Windows)
+
+To build the database connection modules, you need to install one or more of
+[http://www.oracle.com Oracle],
+[http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase].
+[http://www.ibm.com/software/data/db2/ DB2],
+[http://www.ibm.com/software/data/informix/ Informix],
+[http://web.mysql.com MySQL], 
+[http://www.postgresql.org PostgreSQL], 
+[http://www.firebirdsql.com/ Firebird], or
+[http://www.sqlite.org SQLite],
+
+
+(Note: the SQLite connection module is not currently supported on Windows)
+
+On Linux/Unix, you can also install 
+[http://www.unixodbc.org unixODBC] or [http://www.iodbc.org iODBC]
+to access databases using ODBC,
+[http://www.freetds.org FreeTDS] to access
+[http://www.microsof.com/sql/default.html MS SQL Server] (or
+[http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase]), and
+[http://mdbtools.sourceforge.net MDB Tools] to access MS Access Databases.
+
+
+On Windows, no additional software needs to be installed to access ODBC databases, and MS SQL Server and MS Access are accessible via ODBC.
+
+See [prerequisites.html Installing SQL Relay Prerequisites] for detailed information on installing prerequisite software.
+
+
+[[br]]
+[=#unixlinux]
+= Installation on Linux, Unix or Unix-like Platforms =
+
+
+[=#downloading]
+== Downloading SQL Relay ==
+
+You can download the most current source distribution of SQL Relay from [http://sqlrelay.sourceforge.net sqlrelay.sourceforge.net].
+
+For Linux or Unix installations, download the tar.gz file.
+
+
+[=#extracting]
+== Extracting SQL Relay ==
+
+To extract the source distribution, move the file to a location on your machine that you have read/write access and execute the following commands:
+
+{{{#!blockquote
+'''gunzip sqlrelay-X.XX.tar.gz[[br]]
+tar xf sqlrelay-X.XX.tar'''
+}}}
+
+(Where X.XX is replaced with the version of SQL Relay that you downloaded.)
+
+This will create a sqlrelay-X.XX directory.
+
+
+[=#compiling]
+== Building SQL Relay ==
+
+To build SQL Relay, navigate to the directory that was created by the extraction, make sure your ORACLE_HOME environment variable is set if you want to include support for Oracle, and run:
+
+{{{#!blockquote
+'''configure[[br]]
+make'''
+}}}
+
+The configure script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.  It also takes the --prefix option in case you want to install it somewhere other than /usr/local/firstworks.  For example:
+
+{{{#!blockquote
+'''configure --prefix=/usr/local'''
+}}}
+
+This invocation would cause the libraries to be installed in /usr/local/lib, the header files in /usr/local/include, the binaries and scripts to be installed in /usr/local/bin, etc.
+
+There are also options for using cross-compilers and enabling debug and profiling.  To see the full list of available options, run:
+
+{{{#!blockquote
+'''configure --help'''
+}}}
+
+[=#installing]
+== Installing SQL Relay ==
+
+By default, on Unix or Linux, everything is installed under /usr/local/firstworks by default.  You should either create that directory and give yourself full access permissions or install as root.
+
+To install SQL Relay run:
+
+{{{#!blockquote
+'''make install'''
+}}}
+
+Libraries are installed in /usr/local/firstworks/lib.  Include files are installed in /usr/local/firstworks/include.  Binaries and scripts are installed in /usr/local/firstworks/bin.  Java libraries are installed in /usr/local/firstworks/java.  Files for other programming languages are installed in the appropriate language-specific directories.
+
+If you install SQL Relay as root, init scripts and files will be installed in the appropriate places under /etc for your system.  If you install SQL Relay as a non-root user, the init scripts and files will be installed in similar places under /usr/local/firstworks/etc.
+
+To uninstall SQL Relay run:
+
+{{{#!blockquote
+'''make uninstall'''
+}}}
+
+
+[[br]]
+[=#windows]
+= Installation on Windows =
+
+
+[=#windownloading]
+== Downloading SQL Relay ==
+
+You can download the most current source distribution of SQL Relay from [http://sqlrelay.sourceforge.net sqlrelay.sourceforge.net].
+
+For a Windows installation, download the .zip file.
+
+
+[=#winextracting]
+== Extracting SQL Relay ==
+
+To extract the source distribution, move the file to your desktop or a location on your machine that you have read/write access, right-click on the file and select "Extract All".
+
+This will create a sqlrelay-X.XX directory.
+
+
+[=#wincompiling]
+== Building SQL Relay ==
+
+To build SQL Relay on Windows, open the Visual Studio Command Prompt.
+
+To build a 32-bit version of SQL Relay, open the Visual Studio Command Prompt for x86.  To build a 64-bit version of SQL Relay, open the Visual Studio Command Prompt for x64.
+
+Navigate to the directory that was created when SQL Relay was extracted, and execute the following commands:
+
+{{{#!blockquote
+'''cscript /nologo configure.vbs
+nmake'''
+}}}
+
+The configure.vbs script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.
+
+Though inconvenient, the <i>config.mk</i> file can also be modified manually prior to running <b>nmake</b> to alter paths or exclude support for certain languages or databases.
+
+[=#wininstalling]
+== Installing SQL Relay ==
+
+By default, on Windows, most components are installed under C:\Program Files\Firstworks.  You should either create the appropriate directory and give yourself full access permissions or install as Administrator.
+
+{{{#!blockquote
+'''nmake install'''
+}}}
+
+Libraries are installed in C:\Program Files\Firstworks\lib.  Include files are installed in C:\Program Files\Firstworks\include.  Binaries and scripts are installed in C:\Program Files\Firstworks\bin.  Java libraries are installed in C:\Program Files\Firstworks\java.  Files for other programming languages are installed in the appropriate language-specific directories.
+
+To uninstall SQL Relay run:
+
+{{{#!blockquote
+'''nmake uninstall'''
+}}}
+
+To run the programs and scripts that use SQL Relay, it is helpful to add C:\Program Files\Firstworks\bin to your PATH.
