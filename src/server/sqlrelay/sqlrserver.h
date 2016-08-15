@@ -152,12 +152,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setPassword(const char *password);
 		const char	*getUser();
 		const char	*getPassword();
-		bool		auth(const char *userbuffer,
-						const char *passwordbuffer);
-		bool		auth(const char *userbuffer,
-						const char *passwordbuffer,
-						const char *method,
-						const char *extra);
+		sqlrcredentials	*getCredentials(const char *user,
+						const char *password,
+						bool usegss,
+						bool usetls);
 		bool		auth(sqlrcredentials *cred);
 		bool		changeUser(const char *newuser,
 						const char *newpassword);

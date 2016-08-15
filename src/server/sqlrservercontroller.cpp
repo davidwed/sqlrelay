@@ -1823,6 +1823,56 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 	return cur[firstnewcursor];
 }
 
+sqlrcredentials *sqlrservercontroller::getCredentials(const char *user,
+							const char *password,
+							bool usegss,
+							bool usetls) {
+
+	// if a user was passed in at all, then we need to use it
+	if (charstring::isNullOrEmpty(user)) {
+
+		// otherwise...
+
+		if (usegss) {
+
+			// try to use gss credentials
+			gsscontext	*ctx=getGSSContext();
+			if (ctx) {
+				sqlrgsscredentials	*gsscred=
+						new sqlrgsscredentials();
+				gsscred->setInitiator(ctx->getInitiator());
+				return gsscred;
+			}
+			return NULL;
+
+		} else if (usetls) {
+
+			// try to use tls credentials
+			tlscontext	*ctx=getTLSContext();
+			if (ctx) {
+				tlscertificate	*cert=ctx->getPeerCertificate();
+				if (cert) {
+					sqlrtlscredentials	*tlscred=
+						new sqlrtlscredentials();
+					tlscred->setSubjectAlternateNames(
+					cert->getSubjectAlternateNames());
+					tlscred->setCommonName(
+						cert->getCommonName());
+					return tlscred;
+				}
+			}
+			return NULL;
+		}
+	}
+
+	// use user/password credentials
+	sqlruserpasswordcredentials	*upcred=
+					new sqlruserpasswordcredentials();
+	upcred->setUser(user);
+	upcred->setPassword(password);
+	return upcred;
+}
+
 bool sqlrservercontroller::auth(sqlrcredentials *cred) {
 
 	raiseDebugMessageEvent("auth...");
@@ -1846,34 +1896,6 @@ bool sqlrservercontroller::auth(sqlrcredentials *cred) {
 
 		return true;
 	}
-
-	raiseDebugMessageEvent("auth failed");
-	raiseClientConnectionRefusedEvent("auth failed");
-	return false;
-}
-
-bool sqlrservercontroller::auth(const char *userbuffer,
-				const char *passwordbuffer,
-				const char *method,
-				const char *extra) {
-
-	raiseDebugMessageEvent("auth...");
-
-	// authenticate
-	if (sqlra && sqlra->auth(conn,userbuffer,passwordbuffer,method,extra)) {
-
-		raiseDebugMessageEvent("auth success");
-		setCurrentUser(userbuffer,charstring::length(userbuffer));
-
-		// consult connection schedules
-		if (sqlrs && !sqlrs->allowed(conn,getCurrentUser())) {
-			raiseDebugMessageEvent("connection schedule violation");
-			raiseScheduleViolationEvent(getCurrentUser());
-			return false;
-		}
-
-		return true;
-	} 
 
 	raiseDebugMessageEvent("auth failed");
 	raiseClientConnectionRefusedEvent("auth failed");

@@ -16,12 +16,6 @@ sqlrauth::~sqlrauth() {
 void sqlrauth::setParameter(const char *name, const char *value) {
 }
 
-bool sqlrauth::auth(sqlrserverconnection *sqlrcon,
-			const char *user, const char *password,
-			const char *method, const char *salt) {
-	return NULL;
-}
-
 const char *sqlrauth::auth(sqlrserverconnection *sqlrcon,
 					sqlrcredentials *cred) {
 	return NULL;
