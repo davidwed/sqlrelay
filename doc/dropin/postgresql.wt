@@ -1,0 +1,354 @@
+= Using the SQL Relay drop-in replacement library for !PostgreSQL =
+
+* [#whatis What is a drop-in replacement library?]
+* [#commandline Using the drop-in replacement library with command-line programs]
+* [#daemons Using the drop-in replacement library with daemons]
+* [#inetd Using the drop-in replacement library with inetd/xinetd helper programs]
+* [#modules Using the drop-in replacement library with modules]
+* [#work Function support]
+
+[=#whatis]
+== What is a drop-in replacement library? ==
+
+The SQL Relay Drop-In Replacement Library for !PostgreSQL is a shared-object library that can be LD_PRELOAD'ed to take the place of the native !PostgreSQL client library.
+
+It allows many applications that are written to use !PostgreSQL directly to use SQL Relay without modification.  This allows an app to immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling.  It can also be used to aim an app that was written to use !PostgreSQL at a different database.
+
+[=#commandline]
+== Using the drop-in replacement library with command-line programs ==
+
+You can use the SQL Relay drop-in replacement library for !PostgreSQL clients
+by loading the drop-in library and running your program.
+
+The parameters that would ordinarily indicate which host, port, socket,
+username and password to use to connect to !PostgreSQL will be used as
+parameters to connect to SQL Relay.  The parameter that would ordinarily
+indicate which database to connect to will be ignored.  Instances of SQL Relay
+are configured to connect to a single database, and that database will be used
+by the client program.
+
+In the following example, we're running the "psql" program against an
+instance of SQL Relay running on the localhost, port 9000 against an Oracle
+database.  This instance of SQL Relay is configured with a username/password of
+oracleuser/oraclepass.
+
+For sh-based shells:
+
+{{{#!blockquote
+{{{
+LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+export LD_PRELOAD
+psql -h localhost -p 9000 -U oracleuser -W
+Password: oraclepass
+}}}
+}}}
+
+For csh-based shells:
+
+{{{#!blockquote
+{{{
+setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
+psql -h localhost -p 9000 -U oracleuser -W
+Password: oraclepass
+}}}
+}}}
+
+The LD_PRELOAD environment variable instructs the dynamic loader to load
+libpqsqlrelay.so before loading any other libraries for any programs.
+The psql client program will still load the native !PostgreSQL client library,
+but since it loaded the SQL Relay drop-in replacement library first, function
+calls that would normally be fulfilled by the native !PostgreSQL client library
+are fulfilled by the SQL Relay drop-in replacement library instead.
+
+Below is a sample session using the psql command line client against an
+Oracle database through SQL Relay.
+
+{{{#!blockquote
+{{{
+Welcome to psql 7.3.4-RH, the !PostgreSQL interactive terminal.
+
+Type:  \copyright for distribution terms
+       \h for help with SQL commands
+       \? for help on internal slash commands
+       \g or terminate with semicolon to execute query
+       \q to quit
+
+=> create table testtable (col1 varchar2(60), col2 number(5,2));
+
+=> insert into testtable values ('hello',123.45);
+
+=> select * from testtable;
+ COL1  |  COL2
+-------+--------
+ hello | 123.45
+(1 row)
+
+=> \q
+
+}}}
+}}}
+
+[=#daemons]
+== Using the drop-in replacement library with daemons ==
+
+Using the SQL Relay drop-in replacement library for !PostgreSQL with daemons
+is simlar to using it on the command line.  You just need to add the LD_PRELOAD
+command to the startup script for the daemon before the command that starts the
+daemon itself.
+
+This goes for using the drop-in replacement library with PHP too.  You just
+need to add the LD_PRELOAD command to the startup script for the http
+daemon.
+
+If your system uses systemd instead of init scripts, then you can modify the systemd configuration to make the LD_PRELOAD setting part of the environment.  For example, the Apache webserver is typically started by the systemd config file /lib/systemd/system/httpd.service.  To configure Apache, create a new file /etc/systemd/system/httpd.service with the following contents:
+
+{{{#!blockquote
+{{{
+.include /lib/systemd/system/httpd.service
+[Service]
+Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+}}}
+}}}
+
+[=#inetd]
+== Using the drop-in replacement library with inetd/xinetd helper programs ==
+
+Inetd and xinetd are daemons that listen on ports and run helper programs to
+service requests on those ports.  The helper programs die off after the request
+is serviced.
+
+The easist way to get an inetd helper program to use the SQL Relay drop-in
+replacement library for !PostgreSQL is to add the LD_PRELOAD command to the
+startup script for inetd/xinetd.  Any command that inetd/xinetd runs will also
+preload the library.
+
+However, if some of the helper programs need to actually run against
+!PostgreSQL and not against SQL Relay, then you will have to do something
+different.  The easiest thing to do is create a script for each helper program
+that needs to run against SQL Relay that runs the LD_PRELOAD command and then
+runs the actual helper program, passing it all the necessary command line
+arguments.
+
+For example, lets say you have a pop3 server called pop3d that uses
+!PostgreSQL for user identification and you wanted to use SQL Relay instead of
+!PostgreSQL.  The inetd.conf entry might look like this:
+
+{{{#!blockquote
+{{{
+pop3 stream tcp nowait root /usr/local/bin/pop3d
+}}}
+}}}
+
+An /etc/xinetd.d entry might look like this:
+
+{{{#!blockquote
+{{{
+service pop3
+{
+	socket_type	= stream
+	wait		= no
+	user		= root
+	server		= /usr/local/bin/pop3d
+}
+}}}
+}}}
+
+You could write the a script called /usr/local/bin/pop3d-sqlrelay as
+follows:
+
+{{{#!blockquote
+{{{
+#!/bin/sh
+LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+export LD_PRELOAD
+/usr/local/bin/pop3d $@
+}}}
+}}}
+
+And modify the entries to call the script instead of pop3d as follows:
+
+{{{#!blockquote
+{{{
+pop3 stream tcp nowait root /usr/local/bin/pop3d-sqlrelay
+}}}
+}}}
+
+Or for xinetd:
+
+{{{#!blockquote
+{{{
+service pop3
+{
+	socket_type	= stream
+	wait		= no
+	user		= root
+	server		= /usr/local/bin/pop3d-sqlrelay
+}
+}}}
+}}}
+
+[=#modules]
+== Using the drop-in replacement library with modules ==
+
+You may want to use the SQL Relay drop-in replacement library for !PostgreSQL
+clients with a program that isn't compiled against the native !PostgreSQL client
+library but rather loads it as a module such as a program that uses ODBC or
+Perl DBI, or an Apache/PHP application.
+
+Using the SQL Relay drop-in replacement library with programs that load
+the native !PostgreSQL client library as a module is simlar to using it on the
+command line.  You just need to make sure that the LD_PRELOAD command is run
+before the program starts.
+
+If the program is a command line program, then run the LD_PRELOAD command
+before running your program.  Even though the program ultimately loads the
+native !PostgreSQL client library, all of its functions will be overriden by the
+SQL Relay drop-in replacement library.
+
+If the program is a daemon then add the LD_PRELOAD command to the startup
+script or systemd configuration for the daemon.
+
+If the program runs in the address space of a daemon, such as a PHP
+application running under Apache's mod_php, then add the LD_PRELOAD command to
+the startup script or systemd configuration for the daemon.  The caveat here is
+that all applications running in the address space of the daemon will use the
+drop-in replacement library instead of the native !PostgreSQL library.  It is
+not possible, for example for a web server to run one PHP application directly
+against !PostgreSQL and another PHP application against SQL Relay using the
+drop-in replacement library; if the drop-in replacement library is loaded, both
+applications will end up using it.
+
+If the program is spawned by a daemon, such as a cgi spawned by a web-server
+or an inetd/xinetd helper program, then you can either add the LD_PRELOAD
+command to the daemon's startup script/systemd configuration or write a script
+to run the LD_PRELOAD command and pass along the command line arguments (see
+the section
+[#inetd Using the drop-in replacement library with inetd/xinetd helper
+programs above]).
+
+[=#work]
+== Function support ==
+
+The SQL Relay drop-in replacement library for !PostgreSQL implements most of
+the native !PostgreSQL client library's functions, but there are a few functions
+that aren't implemented because SQL Relay doesn't have a good way to support
+them.  These functions return safe values or a failure condition.
+
+Here is a list of functions that are implemented and functions that are not.
+If your application uses one of the functions that is not implemented, you may
+or may not be able to use it with the SQL Relay drop-in replacement library for
+!PostgreSQL.
+
+* '''PQsetdbLogin''' - yes, but ignores the options and tty parameters
+* '''PQsetdb''' - yes, but ignores the options and tty parameters
+* '''PQconnectdb''' - yes, but ignores the options and tty parameters
+* '''PQconnectdbParams''' - yes, but ignores the options and tty parameters
+* '''PQfinish''' - yes
+* '''PQreset''' - yes
+* '''PQdb''' - yes
+* '''PQuser''' - yes
+* '''PQpass''' - yes
+* '''PQhost''' - yes
+* '''PQport''' - yes
+* '''PQtty''' - yes
+* '''PQoptions''' - yes
+* '''PQstatus''' - yes
+* '''PQsetErrorVerbosity''' - has no effect
+* '''PQerrorMessage''' - yes
+* '''PQsocket''' - always returns -1
+* '''PQbackendPID''' - always returns -1
+* '''PQgetssl''' - always returns 0
+* '''PQclientEncoding''' - yes
+* '''PQsetClientEncoding''' - has no effect
+* '''PQsetNoticeProcessor''' - yes
+* '''PQparameterStatus''' - returns dummy values
+* '''PQserverVersion''' - returns dummy value of 80100
+* '''PQprotocolVersion''' - returns dummy value of 3
+* '''PQescapeString''' - yes
+* '''PQescapeBytea''' - yes
+* '''PQescapeByteConn''' - yes, but just calls PQescapeBytea
+* '''PQunescapeBytea''' - yes
+* '''PQclear''' - yes
+* '''PQprepare''' - yes
+* '''PQexecPrepared''' - yes
+* '''PQexecParams''' - yes
+* '''PQexec''' - yes
+* '''PQdescribePrepared''' - always returns NULL
+* '''PQdescribePortal''' - always returns NULL
+* '''PQresultStatus''' - yes
+* '''PQresStatus''' - yes
+* '''PQresultErrorMessage''' - yes, returns the SQL Relay error string
+* '''PQresultErrorField''' - yes, but just calls PQresultErrorMessage
+* '''PQntuples''' - yes
+* '''PQnfields''' - yes
+* '''PQbinaryTuples''' - yes
+* '''PQfname''' - yes
+* '''PQfnumber''' - yes
+* '''PQftable''' - always returns !InvalidOid
+* '''PQftablecol''' - always returns !InvalidOid
+* '''PQfformat''' - yes
+* '''PQftype''' - yes
+* '''PQfsize''' - yes
+* '''PQfmod''' - yes
+* '''PQcmdStatus''' - only returns "" or "SELECT"
+* '''PQoidStatus''' - always returns !InvalidOid
+* '''PQoidValue''' - always returns !InvalidOid
+* '''PQcmdTuples''' - yes
+* '''PQgetvalue''' - yes
+* '''PQgetlength''' - yes
+* '''PQgetisnull''' - yes
+* '''PQmakeEmptyPGresult''' - yes
+* '''PQnparams''' - always returns 0
+* '''PQnparamtype''' - always returns 0
+* '''PQprint''' - yes
+* '''PQdisplayTuples''' - yes
+* '''PQprintTuples''' - yes
+* '''PQconninfoParse''' - always returns NULL
+* '''PQconndefaults''' - always returns NULL
+* '''PQconninfoFree''' - yes
+* '''PQtrace''' - just calls sqlrconnection::debugOn()
+* '''PQuntrace''' - just calls sqlrconnection::debugOff()
+* '''PQgetline''' - NULL terminates string and returns EOF
+* '''PQputline''' - always returns EOF
+* '''PQgetlineAsync''' - NULL terminates buffer and returns EOF
+* '''PQputnbytes''' - always returns EOF
+* '''PQendcopy''' - always returns -1 for failure
+* '''PQmblen''' - always returns 1
+* '''PQenv2encoding''' - yes
+* '''PQfn''' - does nothing, always returns NULL
+* '''PQfreemem''' - yes
+* '''lo_open''' - does nothing, always returns -1
+* '''lo_close''' - does nothing, always returns -1
+* '''lo_read''' - does nothing, always returns -1
+* '''lo_write''' - does nothing, always returns -1
+* '''lo_lseek''' - does nothing, always returns -1
+* '''lo_creat''' - does nothing, always returns -1
+* '''lo_tell''' - does nothing, always returns -1
+* '''lo_unlink''' - does nothing, always returns -1
+* '''lo_import''' - does nothing, always returns -1
+* '''lo_export''' - does nothing, always returns -1
+* '''PQnotifies''' - does nothing, always returns NULL
+* '''PQfreeNotify''' - does nothing
+
+The following functions implement the !PostgreSQL asynchronous query API.
+SQL Relay doesn't have an asynchronous query API so they are implemented
+as calls to synchronous query functions.  They work, but in a synchronous
+manner.
+
+* '''PQconnectStart'''
+* '''PQconnectPoll'''
+* '''PQresetStart'''
+* '''PQresetPoll'''
+* '''PQgetCancel'''
+* '''PQfreeCancel'''
+* '''PQcancel'''
+* '''PQrequestCancel'''
+* '''PQsendQuery'''
+* '''PQgetResult'''
+* '''PQtransactionStatus'''
+* '''PQisBusy'''
+* '''PQconsumeInput'''
+* '''PQsetnonblocking'''
+* '''PQisnonblocking'''
+* '''PQflush'''
+* '''PQsendSome'''

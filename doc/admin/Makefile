@@ -27,8 +27,9 @@ all: $(OBJS)
 	$(MAKE) html
 	$(MAKE) cleanin
 
-cleanin:
-	$(RM) *.in
-
 clean:
 	$(RM) $(OBJS)
+	$(MAKE) cleanin
+
+cleanin:
+	$(RM) *.in

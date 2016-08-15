@@ -1,32 +1,27 @@
 <html>
 <head>
-<title>firstworks   Using the SQL Relay drop-in replacement library for PostgreSQL</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Using the SQL Relay drop-in replacement library for PostgreSQL</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Using the SQL Relay drop-in replacement library for PostgreSQL</span><br><br>
+<h1>Using the SQL Relay drop-in replacement library for PostgreSQL</h1>
 
 <ul>
-<li><a href="#whatis">What is a drop-in replacement library?</a></li>
-<li><a href="#commandline">Using the drop-in replacement library with command-line programs</a></li>
-<li><a href="#daemons">Using the drop-in replacement library with daemons</a></li>
-<li><a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper programs</a></li>
-<li><a href="#modules">Using the drop-in replacement library with modules</a></li>
-<li><a href="#work">Function support</a></li>
+  <li><a href="#whatis">What is a drop-in replacement library?</a></li>
+  <li><a href="#commandline">Using the drop-in replacement library with command-line programs</a></li>
+  <li><a href="#daemons">Using the drop-in replacement library with daemons</a></li>
+  <li><a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper programs</a></li>
+  <li><a href="#modules">Using the drop-in replacement library with modules</a></li>
+  <li><a href="#work">Function support</a></li>
 </ul>
 
-<br>
-<a name="whatis"></a>
-<span class="heading2">What is a drop-in replacement library?</span><br>
+<a name="whatis"/><h2>What is a drop-in replacement library?</h2>
 
 <p>The SQL Relay Drop-In Replacement Library for PostgreSQL is a shared-object library that can be LD_PRELOAD'ed to take the place of the native PostgreSQL client library.</p>
 
 <p>It allows many applications that are written to use PostgreSQL directly to use SQL Relay without modification.  This allows an app to immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling.  It can also be used to aim an app that was written to use PostgreSQL at a different database.</p>
 
-<br>
-<a name="commandline"></a>
-<span class="heading2">Using the drop-in replacement library with command-line programs</span><br>
+<a name="commandline"/><h2>Using the drop-in replacement library with command-line programs</h2>
 
 <p>You can use the SQL Relay drop-in replacement library for PostgreSQL clients
 by loading the drop-in library and running your program.</p>
@@ -45,21 +40,23 @@ oracleuser/oraclepass.</p>
 
 <p>For sh-based shells:</p>
 
-<blockquote><pre><b>
-LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+<blockquote>
+  <pre>LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
 export LD_PRELOAD
 psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
-</b></pre></blockquote>
+</pre>
 
+</blockquote>
 <p>For csh-based shells:</p>
 
-<blockquote><pre><b>
-setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
+<blockquote>
+  <pre>setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
 psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
-</b></pre></blockquote>
+</pre>
 
+</blockquote>
 <p>The LD_PRELOAD environment variable instructs the dynamic loader to load
 libpqsqlrelay.so before loading any other libraries for any programs.
 The psql client program will still load the native PostgreSQL client library,
@@ -71,50 +68,30 @@ are fulfilled by the SQL Relay drop-in replacement library instead.</p>
 Oracle database through SQL Relay.</p>
 
 <blockquote>
-<pre>
-ORA<font color="#ff00ff">-06550</font>: line <font color="#ff00ff">1</font>, <font color="#6b59ce">column</font> <font color="#ff00ff">6</font>:
-PLS<font color="#ff00ff">-00103</font>: Encountered the symbol <font color="#ff00ff">&quot;;&quot;</font> when expecting one <font color="#6b59ce">of</font> the following:
+  <pre>Welcome to psql 7.3.4-RH, the !PostgreSQL interactive terminal.
 
-   <font color="#6b59ce">begin</font> case declare exit <font color="#6b59ce">for</font> goto <font color="#6b59ce">if</font> <font color="#6b59ce">loop</font> mod <font color="#6b59ce">null</font> pragma
-   raise <font color="#6b59ce">return</font> <font color="#a52829"><b>select</b></font> <font color="#a52829"><b>update</b></font> while <font color="#6b59ce">with</font> &lt;an identifier&gt;
-   &lt;a double-quoted delimited-identifier&gt; &lt;a bind variable&gt; &lt;&lt;
-   close <font color="#6b59ce">current</font> <font color="#a52829"><b>delete</b></font> fetch <font color="#a52829"><b>lock</b></font> <font color="#a52829"><b>insert</b></font> open <font color="#a52829"><b>rollback</b></font>
-   <font color="#a52829"><b>savepoint</b></font> <font color="#a52829"><b>set</b></font> sql <font color="#a52829"><b>execute</b></font> <font color="#a52829"><b>commit</b></font> forall merge
-   &lt;a single-quoted SQL string&gt; pipe
-The symbol <font color="#ff00ff">&quot;exit&quot;</font> was substituted <font color="#6b59ce">for</font> <font color="#ff00ff">&quot;;&quot;</font> <font color="#6b59ce">to</font> continue.
-ORA<font color="#ff00ff">-06550</font>: line <font color="#ff00ff">1</font>, <font color="#6b59ce">column</font> <font color="#ff00ff">84</font>:
-PLS<font color="#ff00ff">-00103</font>: Encountered the symbol <font color="#ff00ff">&quot;end-of-file&quot;</font> when expecting one <font color="#6b59ce">of</font> the following:
+Type:  \copyright for distribution terms
+       \h for help with SQL commands
+       \? for help on internal slash commands
+       \g or terminate with semicolon to execute query
+       \q to quit
 
-   ; <font color="#a52829"><b>comment</b></font> work &lt;a SQL statement&gt;
+=> create table testtable (col1 varchar2(60), col2 number(5,2));
 
-Attempted Query:
-<font color="#6b59ce">BEGIN</font>; <font color="#a52829"><b>SELECT</b></font> usesuper <font color="#6b59ce">FROM</font> pg_catalog.pg_user <font color="#6b59ce">WHERE</font> usename = <font color="#ff00ff">'oracletest'</font>; <font color="#a52829"><b>COMMIT</b></font>
-Welcome <font color="#6b59ce">to</font> psql <font color="#ff00ff">7.3</font>.<font color="#ff00ff">4</font>-RH, the PostgreSQL interactive terminal.
+=> insert into testtable values ('hello',123.45);
 
-<font color="#6b59ce">Type</font>:  \copyright <font color="#6b59ce">for</font> distribution terms
-       \h <font color="#6b59ce">for</font> help <font color="#6b59ce">with</font> SQL commands
-       \? <font color="#6b59ce">for</font> help <font color="#6b59ce">on</font> internal slash commands
-       \g <font color="#a52829"><b>or</b></font> terminate <font color="#6b59ce">with</font> semicolon <font color="#6b59ce">to</font> <font color="#a52829"><b>execute</b></font> query
-       \q <font color="#6b59ce">to</font> quit
-
-=&gt; <font color="#a52829"><b>create</b></font> <font color="#6b59ce">table</font> testtable (col1 <font color="#298a52"><b>varchar2</b></font>(<font color="#ff00ff">60</font>), col2 <font color="#298a52"><b>number</b></font>(<font color="#ff00ff">5</font>,<font color="#ff00ff">2</font>));
-
-=&gt; <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> testtable <font color="#6b59ce">values</font> (<font color="#ff00ff">'hello'</font>,<font color="#ff00ff">123</font>.<font color="#ff00ff">45</font>);
-
-=&gt; <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> testtable;
+=> select * from testtable;
  COL1  |  COL2
-<font color="#0000ff">-------+--------</font>
- hello | <font color="#ff00ff">123</font>.<font color="#ff00ff">45</font>
-(<font color="#ff00ff">1</font> <font color="#6b59ce">row</font>)
+-------+--------
+ hello | 123.45
+(1 row)
 
-=&gt; \q
+=> \q
 
 </pre>
-</blockquote>
 
-<br>
-<a name="daemons"></a>
-<span class="heading2">Using the drop-in replacement library with daemons</span><br>
+</blockquote>
+<a name="daemons"/><h2>Using the drop-in replacement library with daemons</h2>
 
 <p>Using the SQL Relay drop-in replacement library for PostgreSQL with daemons
 is simlar to using it on the command line.  You just need to add the LD_PRELOAD
@@ -127,15 +104,14 @@ daemon.</p>
 
 <p>If your system uses systemd instead of init scripts, then you can modify the systemd configuration to make the LD_PRELOAD setting part of the environment.  For example, the Apache webserver is typically started by the systemd config file /lib/systemd/system/httpd.service.  To configure Apache, create a new file /etc/systemd/system/httpd.service with the following contents:</p>
 
-<blockquote><b>
-.include /lib/systemd/system/httpd.service<br>
-[Service]<br>
+<blockquote>
+  <pre>.include /lib/systemd/system/httpd.service
+[Service]
 Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
-</b></blockquote>
+</pre>
 
-<br>
-<a name="inetd"></a>
-<span class="heading2">Using the drop-in replacement library with inetd/xinetd helper programs</span><br>
+</blockquote>
+<a name="inetd"/><h2>Using the drop-in replacement library with inetd/xinetd helper programs</h2>
 
 <p>Inetd and xinetd are daemons that listen on ports and run helper programs to
 service requests on those ports.  The helper programs die off after the request
@@ -157,55 +133,56 @@ arguments.</p>
 PostgreSQL for user identification and you wanted to use SQL Relay instead of
 PostgreSQL.  The inetd.conf entry might look like this:</p>
 
-<blockquote><pre>
-pop3 stream tcp nowait root /usr/local/bin/pop3d
-</pre></blockquote>
+<blockquote>
+  <pre>pop3 stream tcp nowait root /usr/local/bin/pop3d
+</pre>
 
-<p>An /etc/xinetd.d entry might look like this:
+</blockquote>
+<p>An /etc/xinetd.d entry might look like this:</p>
 
-<blockquote><pre>
-service pop3
+<blockquote>
+  <pre>service pop3
 {
 	socket_type	= stream
 	wait		= no
 	user		= root
 	server		= /usr/local/bin/pop3d
 }
-</pre></blockquote>
+</pre>
 
+</blockquote>
 <p>You could write the a script called /usr/local/bin/pop3d-sqlrelay as
 follows:</p>
 
 <blockquote>
-<pre>
-<font color="#0000ff">#!/bin/sh</font>
-<font color="#008a8c">LD_PRELOAD</font>=/usr/local/firstworks/lib/libpqsqlrelay.so
-<font color="#a52829"><b>export </b></font><font color="#008a8c">LD_PRELOAD</font>
-/usr/local/bin/pop3d <font color="#a520f7">$@</font>
+  <pre>#!/bin/sh
+LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+export LD_PRELOAD
+/usr/local/bin/pop3d $@
 </pre>
-</blockquote>
 
+</blockquote>
 <p>And modify the entries to call the script instead of pop3d as follows:</p>
 
-<blockquote><pre>
-pop3 stream tcp nowait root /usr/local/bin/pop3d-sqlrelay
-</pre></blockquote>
+<blockquote>
+  <pre>pop3 stream tcp nowait root /usr/local/bin/pop3d-sqlrelay
+</pre>
 
+</blockquote>
 <p>Or for xinetd:</p>
 
-<blockquote><pre>
-service pop3
+<blockquote>
+  <pre>service pop3
 {
 	socket_type	= stream
 	wait		= no
 	user		= root
 	server		= /usr/local/bin/pop3d-sqlrelay
 }
-</pre></blockquote>
+</pre>
 
-<br>
-<a name="modules"></a>
-<span class="heading2">Using the drop-in replacement library with modules</span><br>
+</blockquote>
+<a name="modules"/><h2>Using the drop-in replacement library with modules</h2>
 
 <p>You may want to use the SQL Relay drop-in replacement library for PostgreSQL
 clients with a program that isn't compiled against the native PostgreSQL client
@@ -241,11 +218,9 @@ command to the daemon's startup script/systemd configuration or write a script
 to run the LD_PRELOAD command and pass along the command line arguments (see
 the section
 <a href="#inetd">Using the drop-in replacement library with inetd/xinetd helper
-programs above)</a>).</p>
+programs above</a>).</p>
 
-<br>
-<a name="work"></a>
-<span class="heading2">Function support</span><br>
+<a name="work"/><h2>Function support</h2>
 
 <p>The SQL Relay drop-in replacement library for PostgreSQL implements most of
 the native PostgreSQL client library's functions, but there are a few functions
@@ -257,137 +232,124 @@ If your application uses one of the functions that is not implemented, you may
 or may not be able to use it with the SQL Relay drop-in replacement library for
 PostgreSQL.</p>
 
-<table border="1">
+<ul>
+  <li><b>PQsetdbLogin</b> - yes, but ignores the options and tty parameters</li>
+  <li><b>PQsetdb</b> - yes, but ignores the options and tty parameters</li>
+  <li><b>PQconnectdb</b> - yes, but ignores the options and tty parameters</li>
+  <li><b>PQconnectdbParams</b> - yes, but ignores the options and tty parameters</li>
+  <li><b>PQfinish</b> - yes</li>
+  <li><b>PQreset</b> - yes</li>
+  <li><b>PQdb</b> - yes</li>
+  <li><b>PQuser</b> - yes</li>
+  <li><b>PQpass</b> - yes</li>
+  <li><b>PQhost</b> - yes</li>
+  <li><b>PQport</b> - yes</li>
+  <li><b>PQtty</b> - yes</li>
+  <li><b>PQoptions</b> - yes</li>
+  <li><b>PQstatus</b> - yes</li>
+  <li><b>PQsetErrorVerbosity</b> - has no effect</li>
+  <li><b>PQerrorMessage</b> - yes</li>
+  <li><b>PQsocket</b> - always returns -1</li>
+  <li><b>PQbackendPID</b> - always returns -1</li>
+  <li><b>PQgetssl</b> - always returns 0</li>
+  <li><b>PQclientEncoding</b> - yes</li>
+  <li><b>PQsetClientEncoding</b> - has no effect</li>
+  <li><b>PQsetNoticeProcessor</b> - yes</li>
+  <li><b>PQparameterStatus</b> - returns dummy values</li>
+  <li><b>PQserverVersion</b> - returns dummy value of 80100</li>
+  <li><b>PQprotocolVersion</b> - returns dummy value of 3</li>
+  <li><b>PQescapeString</b> - yes</li>
+  <li><b>PQescapeBytea</b> - yes</li>
+  <li><b>PQescapeByteConn</b> - yes, but just calls PQescapeBytea</li>
+  <li><b>PQunescapeBytea</b> - yes</li>
+  <li><b>PQclear</b> - yes</li>
+  <li><b>PQprepare</b> - yes</li>
+  <li><b>PQexecPrepared</b> - yes</li>
+  <li><b>PQexecParams</b> - yes</li>
+  <li><b>PQexec</b> - yes</li>
+  <li><b>PQdescribePrepared</b> - always returns NULL</li>
+  <li><b>PQdescribePortal</b> - always returns NULL</li>
+  <li><b>PQresultStatus</b> - yes</li>
+  <li><b>PQresStatus</b> - yes</li>
+  <li><b>PQresultErrorMessage</b> - yes, returns the SQL Relay error string</li>
+  <li><b>PQresultErrorField</b> - yes, but just calls PQresultErrorMessage</li>
+  <li><b>PQntuples</b> - yes</li>
+  <li><b>PQnfields</b> - yes</li>
+  <li><b>PQbinaryTuples</b> - yes</li>
+  <li><b>PQfname</b> - yes</li>
+  <li><b>PQfnumber</b> - yes</li>
+  <li><b>PQftable</b> - always returns InvalidOid</li>
+  <li><b>PQftablecol</b> - always returns InvalidOid</li>
+  <li><b>PQfformat</b> - yes</li>
+  <li><b>PQftype</b> - yes</li>
+  <li><b>PQfsize</b> - yes</li>
+  <li><b>PQfmod</b> - yes</li>
+  <li><b>PQcmdStatus</b> - only returns "" or "SELECT"</li>
+  <li><b>PQoidStatus</b> - always returns InvalidOid</li>
+  <li><b>PQoidValue</b> - always returns InvalidOid</li>
+  <li><b>PQcmdTuples</b> - yes</li>
+  <li><b>PQgetvalue</b> - yes</li>
+  <li><b>PQgetlength</b> - yes</li>
+  <li><b>PQgetisnull</b> - yes</li>
+  <li><b>PQmakeEmptyPGresult</b> - yes</li>
+  <li><b>PQnparams</b> - always returns 0</li>
+  <li><b>PQnparamtype</b> - always returns 0</li>
+  <li><b>PQprint</b> - yes</li>
+  <li><b>PQdisplayTuples</b> - yes</li>
+  <li><b>PQprintTuples</b> - yes</li>
+  <li><b>PQconninfoParse</b> - always returns NULL</li>
+  <li><b>PQconndefaults</b> - always returns NULL</li>
+  <li><b>PQconninfoFree</b> - yes</li>
+  <li><b>PQtrace</b> - just calls sqlrconnection::debugOn()</li>
+  <li><b>PQuntrace</b> - just calls sqlrconnection::debugOff()</li>
+  <li><b>PQgetline</b> - NULL terminates string and returns EOF</li>
+  <li><b>PQputline</b> - always returns EOF</li>
+  <li><b>PQgetlineAsync</b> - NULL terminates buffer and returns EOF</li>
+  <li><b>PQputnbytes</b> - always returns EOF</li>
+  <li><b>PQendcopy</b> - always returns -1 for failure</li>
+  <li><b>PQmblen</b> - always returns 1</li>
+  <li><b>PQenv2encoding</b> - yes</li>
+  <li><b>PQfn</b> - does nothing, always returns NULL</li>
+  <li><b>PQfreemem</b> - yes</li>
+  <li><b>lo_open</b> - does nothing, always returns -1</li>
+  <li><b>lo_close</b> - does nothing, always returns -1</li>
+  <li><b>lo_read</b> - does nothing, always returns -1</li>
+  <li><b>lo_write</b> - does nothing, always returns -1</li>
+  <li><b>lo_lseek</b> - does nothing, always returns -1</li>
+  <li><b>lo_creat</b> - does nothing, always returns -1</li>
+  <li><b>lo_tell</b> - does nothing, always returns -1</li>
+  <li><b>lo_unlink</b> - does nothing, always returns -1</li>
+  <li><b>lo_import</b> - does nothing, always returns -1</li>
+  <li><b>lo_export</b> - does nothing, always returns -1</li>
+  <li><b>PQnotifies</b> - does nothing, always returns NULL</li>
+  <li><b>PQfreeNotify</b> - does nothing</li>
+</ul>
 
-<tr><th>Function</th><th>Implemented?</th></tr>
-
-<tr><td>PQsetdbLogin</td><td>yes, but ignores the options and tty parameters</td></tr>
-<tr><td>PQsetdb</td><td>yes, but ignores the options and tty parameters</td></tr>
-<tr><td>PQconnectdb</td><td>yes, but ignores the options and tty parameters</td></tr>
-<tr><td>PQconnectdbParams</td><td>yes, but ignores the options and tty parameters</td></tr>
-<tr><td>PQfinish</td><td>yes</td></tr>
-<tr><td>PQreset</td><td>yes</td></tr>
-<tr><td>PQdb</td><td>yes</td></tr>
-<tr><td>PQuser</td><td>yes</td></tr>
-<tr><td>PQpass</td><td>yes</td></tr>
-<tr><td>PQhost</td><td>yes</td></tr>
-<tr><td>PQport</td><td>yes</td></tr>
-<tr><td>PQtty</td><td>yes</td></tr>
-<tr><td>PQoptions</td><td>yes</td></tr>
-<tr><td>PQstatus</td><td>yes</td></tr>
-<tr><td>PQsetErrorVerbosity</td><td>has no effect</td></tr>
-<tr><td>PQerrorMessage</td><td>yes</td></tr>
-<tr><td>PQsocket</td><td>always returns -1</td></tr>
-<tr><td>PQbackendPID</td><td>always returns -1</td></tr>
-<tr><td>PQgetssl</td><td>always returns 0</td></tr>
-<tr><td>PQclientEncoding</td><td>yes</td></tr>
-<tr><td>PQsetClientEncoding</td><td>has no effect</td></tr>
-<tr><td>PQsetNoticeProcessor</td><td>yes</td></tr>
-<tr><td>PQparameterStatus</td><td>returns dummy values</td></tr>
-<tr><td>PQserverVersion</td><td>returns dummy value of 80100</td></tr>
-<tr><td>PQprotocolVersion</td><td>returns dummy value of 3</td></tr>
-
-<tr><td>PQescapeString</td><td>yes</td></tr>
-<tr><td>PQescapeBytea</td><td>yes</td></tr>
-<tr><td>PQescapeByteConn</td><td>yes, but just calls PQescapeBytea</td></tr>
-<tr><td>PQunescapeBytea</td><td>yes</td></tr>
-
-<tr><td>PQclear</td><td>yes</td></tr>
-<tr><td>PQprepare</td><td>yes</td></tr>
-<tr><td>PQexecPrepared</td><td>yes</td></tr>
-<tr><td>PQexecParams</td><td>yes</td></tr>
-<tr><td>PQexec</td><td>yes</td></tr>
-<tr><td>PQdescribePrepared</td><td>always returns NULL</td></tr>
-<tr><td>PQdescribePortal</td><td>always returns NULL</td></tr>
-<tr><td>PQresultStatus</td><td>yes</td></tr>
-<tr><td>PQresStatus</td><td>yes</td></tr>
-<tr><td>PQresultErrorMessage</td><td>yes, returns the SQL Relay error string</td></tr>
-<tr><td>PQresultErrorField</td><td>yes, but just calls PQresultErrorMessage</td></tr>
-<tr><td>PQntuples</td><td>yes</td></tr>
-<tr><td>PQnfields</td><td>yes</td></tr>
-<tr><td>PQbinaryTuples</td><td>yes</td></tr>
-<tr><td>PQfname</td><td>yes</td></tr>
-<tr><td>PQfnumber</td><td>yes</td></tr>
-<tr><td>PQftable</td><td>always returns InvalidOid</td></tr>
-<tr><td>PQftablecol</td><td>always returns InvalidOid</td></tr>
-<tr><td>PQfformat</td><td>yes</td></tr>
-<tr><td>PQftype</td><td>yes</td></tr>
-<tr><td>PQfsize</td><td>yes</td></tr>
-<tr><td>PQfmod</td><td>yes</td></tr>
-<tr><td>PQcmdStatus</td><td>only returns "" or "SELECT"</td></tr>
-<tr><td>PQoidStatus</td><td>always returns "InvalidOid"</td></tr>
-<tr><td>PQoidValue</td><td>always returns InvalidOid</td></tr>
-<tr><td>PQcmdTuples</td><td>yes</td></tr>
-<tr><td>PQgetvalue</td><td>yes</td></tr>
-<tr><td>PQgetlength</td><td>yes</td></tr>
-<tr><td>PQgetisnull</td><td>yes</td></tr>
-<tr><td>PQmakeEmptyPGresult</td><td>yes</td></tr>
-<tr><td>PQnparams</td><td>always returns 0</td></tr>
-<tr><td>PQnparamtype</td><td>always returns 0</td></tr>
-
-<tr><td>PQprint</td><td>yes</td></tr>
-<tr><td>PQdisplayTuples</td><td>yes</td></tr>
-<tr><td>PQprintTuples</td><td>yes</td></tr>
-
-<tr><td>PQconninfoParse</td><td>always returns NULL</td></tr>
-<tr><td>PQconndefaults</td><td>always returns NULL</td></tr>
-<tr><td>PQconninfoFree</td><td>yes</td></tr>
-
-<tr><td>PQtrace</td><td>just calls sqlrconnection::debugOn()</td></tr>
-<tr><td>PQuntrace</td><td>just calls sqlrconnection::debugOff()</td></tr>
-
-<tr><td>PQgetline</td><td>NULL terminates string and returns EOF</td></tr>
-<tr><td>PQputline</td><td>always returns EOF</td></tr>
-<tr><td>PQgetlineAsync</td><td>NULL terminates buffer and returns EOF</td></tr>
-<tr><td>PQputnbytes</td><td>always returns EOF</td></tr>
-<tr><td>PQendcopy</td><td>always returns -1 for failure</td></tr>
-
-<tr><td>PQmblen</td><td>always returns 1</td></tr>
-<tr><td>PQenv2encoding</td><td>yes</td></tr>
-
-<tr><td>PQfn</td><td>does nothing, always returns NULL</td></tr>
-<tr><td>PQfreemem</td><td>yes</td></tr>
-
-<tr><td>lo_open</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_close</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_read</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_write</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_lseek</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_creat</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_tell</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_unlink</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_import</td><td>does nothing, always returns -1</td></tr>
-<tr><td>lo_export</td><td>does nothing, always returns -1</td></tr>
-
-<tr><td>PQnotifies</td><td>does nothing, always returns NULL</td></tr>
-<tr><td>PQfreeNotify</td><td>does nothing</td></tr>
-
-<tr><td colspan="2">
-The following functions implement the PostgreSQL asynchronous query API.
+<p>The following functions implement the PostgreSQL asynchronous query API.
 SQL Relay doesn't have an asynchronous query API so they are implemented
 as calls to synchronous query functions.  They work, but in a synchronous
-manner.
-</td></tr>
-<tr><td>PQconnectStart</td><td>yes</td></tr>
-<tr><td>PQconnectPoll</td><td>yes</td></tr>
-<tr><td>PQresetStart</td><td>yes</td></tr>
-<tr><td>PQresetPoll</td><td>yes</td></tr>
-<tr><td>PQgetCancel</td><td>yes</td></tr>
-<tr><td>PQfreeCancel</td><td>yes</td></tr>
-<tr><td>PQcancel</td><td>yes</td></tr>
-<tr><td>PQrequestCancel</td><td>yes</td></tr>
-<tr><td>PQsendQuery</td><td>yes</td></tr>
-<tr><td>PQgetResult</td><td>yes</td></tr>
-<tr><td>PQtransactionStatus</td><td>yes</td></tr>
-<tr><td>PQisBusy</td><td>yes</td></tr>
-<tr><td>PQconsumeInput</td><td>yes</td></tr>
-<tr><td>PQsetnonblocking</td><td>yes</td></tr>
-<tr><td>PQisnonblocking</td><td>yes</td></tr>
-<tr><td>PQflush</td><td>yes</td></tr>
-<tr><td>PQsendSome</td><td>yes</td></tr>
+manner.</p>
 
-</table>
-
+<ul>
+  <li><b>PQconnectStart</b></li>
+  <li><b>PQconnectPoll</b></li>
+  <li><b>PQresetStart</b></li>
+  <li><b>PQresetPoll</b></li>
+  <li><b>PQgetCancel</b></li>
+  <li><b>PQfreeCancel</b></li>
+  <li><b>PQcancel</b></li>
+  <li><b>PQrequestCancel</b></li>
+  <li><b>PQsendQuery</b></li>
+  <li><b>PQgetResult</b></li>
+  <li><b>PQtransactionStatus</b></li>
+  <li><b>PQisBusy</b></li>
+  <li><b>PQconsumeInput</b></li>
+  <li><b>PQsetnonblocking</b></li>
+  <li><b>PQisnonblocking</b></li>
+  <li><b>PQflush</b></li>
+  <li><b>PQsendSome</b>
+</li>
+</ul>
 
 </body>
 </html>

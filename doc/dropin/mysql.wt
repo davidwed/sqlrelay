@@ -1,0 +1,385 @@
+= Using the SQL Relay drop-in replacement library for !MySQL =
+
+* [#whatis What is a drop-in replacement library?]
+* [#commandline Using the drop-in replacement library with command-line programs]
+* [#daemons Using the drop-in replacement library with daemons]
+* [#inetd Using the drop-in replacement library with inetd/xinetd helper programs]
+* [#php Using the drop-in replacement library with PHP]
+* [#modules Using the drop-in replacement library with modules]
+* [#work Function support]
+* [#tweaks Tweaks]
+* [#mappingerrorcodes Mapping Error Codes]
+
+[=#whatis]
+== What is a drop-in replacement library? ==
+
+The SQL Relay Drop-In Replacement Library for !MySQL is a shared-object library that can be LD_PRELOAD'ed to take the place of the native !MySQL client library.
+
+It allows many applications that are written to use !MySQL directly to use SQL Relay without modification.  This allows an app to immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling.  It can also be used to aim an app that was written to use !MySQL at a different database.
+
+[=#commandline]
+== Using the drop-in replacement library with command-line programs ==
+
+To use the SQL Relay drop-in replacement library for !MySQL clients, you first
+need to determine what version of !MySQL your existing application was compiled
+against.  There are 4 different drop-in replacement libraries.  One each for
+!MySQL versions 3.xx, 4.0, 4.1, 5.0 and 5.1 or higher.  !MySQL's native data
+structures changed a bit between the different versions.  If you use the wrong
+library your program will most likely crash.
+
+You can find out which library is installed on your system  by running the following command.
+
+{{{#!blockquote
+{{{
+/usr/bin/mysql --version
+}}}
+}}}
+
+It should return something like the following:
+
+{{{#!blockquote
+{{{
+mysql  Ver 14.14 Distrib 5.1.60, for redhat-linux-gnu (i386) using readline 5.1
+}}}
+}}}
+
+The number after Distrib is the version.
+
+Below is a chart mapping version numbers and which library to use:
+
+* 3.X - libmysql3sqlrelay.so
+* 4.0 - libmysql40sqlrelay.so
+* 4.1 - libmysql41sqlrelay.so
+* 5.0 - libmysql50sqlrelay.so
+* 5.1 or higher - libmysql51sqlrelay.so
+
+Once you've figured out which version of !MySQL is installed on your system,
+you can load the appropriate drop in library and run your program.
+
+The parameters that would ordinarily indicate which host, port, socket,
+username and password to use to connect to !MySQL will be used as parameters to
+connect to SQL Relay.  The parameter that would ordinarily indicate which
+database to connect to will be ignored.  Instances of SQL Relay are configured
+to connect to a single database, and that database will be used by the client
+program.
+
+In the following example, we're running the "mysql" program against an
+instance of SQL Relay running on the localhost, port 9000 against an Oracle
+database.  This instance of SQL Relay is configured with a username/password
+of oracleuser/oraclepass.
+
+For sh-based shells:
+
+{{{#!blockquote
+{{{
+LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+export LD_PRELOAD
+mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
+}}}
+}}}
+
+For csh-based shells:
+
+{{{#!blockquote
+{{{
+setenv LD_PRELOAD /usr/local/firstworks/lib/libmysql51sqlrelay.so
+mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
+}}}
+}}}
+
+The LD_PRELOAD environment variable instructs the dynamic loader to load
+libmysql51sqlrelay.so before loading any other libraries for any programs.
+The mysql client program will still load the native !MySQL client library, but
+since it loaded the SQL Relay drop-in replacement library first, function calls
+that would normally be fulfilled by the native !MySQL client library are 
+fulfilled by the SQL Relay drop-in replacement library instead.
+
+If your application was compiled against a different version of !MySQL, you
+will need to replace libmysql51sqlrelay.so with the appropriate library.
+
+Below is a sample session using the mysql command line client against an
+Oracle database through SQL Relay.
+
+(NOTE: As of version 5.5, the mysql command line client appears to have been statically linked, at least in some distributions.  As a result, the LD_PRELOAD trick doesn't work with it, but should still work with any program that is dynamically linked against libmysqlclient.)
+
+{{{#!blockquote
+{{{
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 0 to server version: 3.23.58
+
+Type 'help;' or '\h' for help. Type '\c' to clear the buffer.
+
+mysql&gt; create table testtable (col1 varchar2(60), col2 number(5,2));
+Empty set (0.21 sec)
+
+
+mysql&gt; insert into testtable values ('hello',123.45);
+Empty set (0.00 sec)
+
+
+mysql&gt; select * from testtable;
++-------+--------+
+| COL1  | COL2   |
++-------+--------+
+| hello | 123.45 |
++-------+--------+
+1 row in set (0.09 sec)
+
+
+mysql&gt; drop table testtable;
+Empty set (0.21 sec)
+
+
+mysql&gt; quit;
+
+}}}
+}}}
+
+[=#daemons]
+== Using the drop-in replacement library with daemons ==
+
+Using the SQL Relay drop-in replacement library for !MySQL with daemons is
+simlar to using it on the command line.  You just need to add the LD_PRELOAD
+command to the startup script for the daemon before the command that starts the
+daemon itself.
+
+If your system uses systemd instead of init scripts, then you can modify the systemd configuration to make the LD_PRELOAD setting part of the environment.  For example, the Apache webserver is typically started by the systemd config file /lib/systemd/system/httpd.service.  To configure Apache, create a new file /etc/systemd/system/httpd.service with the following contents:
+
+{{{#!blockquote
+.include /lib/systemd/system/httpd.service
+[Service]
+Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+}}}
+
+Unfortunately this approach does not work with PHP.  See the section below
+for how to use the drop-in replacement library with PHP.
+
+[=#inetd]
+== Using the drop-in replacement library with inetd/xinetd helper programs ==
+
+Inetd and xinetd are daemons that listen on ports and run helper programs to
+service requests on those ports.  The helper programs die off after the request
+is serviced.
+
+The easist way to get an inetd helper program to use the SQL Relay drop-in
+replacement library for !MySQL is to add the LD_PRELOAD command to the startup
+script for inetd/xinetd.  Any command that inetd/xinetd runs will also preload
+the library.
+
+However, if some of the helper programs need to actually run against !MySQL
+and not against SQL Relay, then you will have to do something different.  The
+easiest thing to do is create a script for each helper program that needs to 
+run against SQL Relay that runs the LD_PRELOAD command and then runs the actual
+helper program, passing it all the necessary command line arguments.
+
+For example, lets say you have a pop3 server called pop3d that uses !MySQL
+for user identification and you wanted to use SQL Relay instead of !MySQL.  The
+inetd.conf entry might look like this:
+
+{{{#!blockquote
+{{{
+pop3 stream tcp nowait root /usr/local/bin/pop3d
+}}}
+}}}
+
+An /etc/xinetd.d entry might look like this:
+
+{{{#!blockquote
+{{{
+service pop3
+{
+	socket_type	= stream
+	wait		= no
+	user		= root
+	server		= /usr/local/bin/pop3d
+}
+}}}
+}}}
+
+You could write the a script called /usr/local/bin/pop3d-sqlrelay as
+follows:
+
+{{{#!blockquote
+{{{
+#!/bin/sh
+LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+export LD_PRELOAD
+/usr/local/bin/pop3d $@
+}}}
+}}}
+
+And modify the entries to call the script instead of pop3d as follows:
+
+{{{#!blockquote
+{{{
+pop3 stream tcp nowait root /usr/local/bin/pop3d-sqlrelay
+}}}
+}}}
+
+Or for xinetd:
+
+{{{#!blockquote
+{{{
+service pop3
+{
+	socket_type	= stream
+	wait		= no
+	user		= root
+	server		= /usr/local/bin/pop3d-sqlrelay
+}
+}}}
+}}}
+
+[=#php]
+== Using the drop-in replacement library with PHP ==
+
+Ideally, if you wanted to use the drop-in replacement library for !MySQL with
+PHP, you'd just add the LD_PRELOAD command to the startup script for the http
+daemon, but PHP is not typically linked against the !MySQL client library,
+rather the PHP source code includes it's own !MySQL client API which is compiled
+directly into the PHP module itself.
+
+So, to use the drop-in replacement library with PHP, you must rebuild PHP
+and tell it to link against the !MySQL client library.
+
+Follow the instructions at [http://www.php.net/manual/en/install.php PHP: Installation and Configuration] for downloading and extracting the
+PHP source code.  When running the //./configure,// script, in addition to
+whatever other options you use, make sure to use the following option:
+
+{{{#!blockquote
+'''--with-mysql=/usr'''
+}}}
+
+If your mysql_config program is located somewhere other than /usr/bin, then
+you will need to replace /usr with appropriate path.  For instance, if
+it's installed in /usr/local/bin, then you may use the following options:
+
+{{{#!blockquote
+'''--with-mysql=/usr/local'''
+}}}
+
+If your're using a 64-bit system, with lib64 directories, then you'll also
+have to specify the libdir, with this option:
+
+{{{#!blockquote
+'''--libdir=lib64'''
+}}}
+
+Then continue to build and install PHP according to the instructions.
+
+Afterward, you should edit the '''php.ini''' file and configure it to load
+the '''mysql.so''' module automatically.  When !MySQL was compiled into PHP, 
+the !MySQL API calls could be made without loading the module, but now that it
+is not compiled into PHP, the module must be loaded manually.  To automatically
+load the !MySQL module, add a line like the following to your '''php.ini'''.
+
+{{{#!blockquote
+'''extension=mysql.so'''
+}}}
+
+A common thing to forget when configuring '''php.ini''' is to set the
+'''extension_dir''' parameter.  By default it's usually set to "./" which is
+wrong.  If you installed PHP into /usr/local, then the extension directory will
+be something like /usr/local/lib/php/extensions/no-debug-non-zts-20060613.  On
+your platform, it may be something else, but similar.  Whatever the directory
+name, it should contain the file '''mysql.so'''.  Edit '''php.ini''',
+search for the '''extension_dir''' parameter and set it to your extension
+directory.  For example:
+
+{{{#!blockquote
+'''extension_dir=/usr/local/lib/php/extensions/no-debug-non-zts-20060613'''
+}}}
+
+After following these steps, your PHP apps which formerly used !MySQL directly
+will now use SQL Relay.  You will need to change the connection parameters, to
+point to SQL Relay , but otherwise it should work.
+
+[=#modules]
+== Using the drop-in replacement library with modules ==
+
+You may want to use the SQL Relay drop-in replacement library for !MySQL
+clients with a program that isn't compiled against the native !MySQL client
+library but rather loads it as a module such as a program that uses ODBC or
+Perl DBI, or an Apache/PHP application.
+
+Using the SQL Relay drop-in replacement library with programs that load
+the native !MySQL client library as a module is simlar to using it on the
+command line.  You just need to make sure that the LD_PRELOAD command is run
+before the program starts.
+
+If the program is a command line program, then run the LD_PRELOAD command
+before running your program.  Even though the program ultimately loads the
+native !MySQL client library, all of its functions will be overriden by the
+SQL Relay drop-in replacement library.
+
+If the program is a daemon then add the LD_PRELOAD command to the startup
+script or systemd configuration for the daemon.
+
+If the program runs in the address space of a daemon, such as a PHP
+application running under Apache's mod_php, then add the LD_PRELOAD command to
+the startup script or systemd configuration for the daemon.  The caveat here is
+that all applications running in the address space of the daemon will use the
+drop-in replacement library instead of the native !MySQL library.  It is not
+possible, for example for a web server to run one PHP application directly
+against !MySQL and another PHP application against SQL Relay using the drop-in
+replacement library; if the drop-in replacement library is loaded, both
+applications will end up using it.
+
+If the program is spawned by a daemon, such as a cgi spawned by a web-server
+or an inetd/xinetd helper program, then you can either add the LD_PRELOAD
+command to the daemon's startup script/systemd configuration or write a script
+to run the LD_PRELOAD command and pass along the command line arguments (see
+the section
+[#inetd Using the drop-in replacement library with inetd/xinetd helper
+programs above)]).
+
+[=#work]
+== Function support ==
+
+The SQL Relay drop-in replacement library for !MySQL implements most of the
+native !MySQL client library's functions, but there are a few functions that
+aren't implemented because SQL Relay doesn't d way to support them.  These
+functions return safe values or a failure condition.
+
+[=#tweaks]
+== Tweaks ==
+
+Oracle (and possibly other db's) have a date type that is actually a date/time type but whether you get time information back or not depends on how you fetch the column.  By default, Oracle dates are mapped to the MYSQL_TYPE_DATETIME type.  However, if you want the type to be returned as MYSQL_TYPE_DATE instead, then set the environment variable SQLR_MYSQL_MAP_DATETME_TO_DATE="yes".
+
+When fetching a date into a MYSQL_TIME struct, the drop-in library attempts to interpret whatever it got back from the database as a date.  It can parse the native formats of all the databases that SQL Relay currently supports, but it cannot tell by examination whether a date like 02-05-2011 is in MM-DD-YYYY format or DD-MM-YYYY format.  By default, it assumes MMDD, but if you want it to assume DDMM instead, set the environment variable SQLR_MYSQL_DATE_DDMM="yes".  Another environment variable allows you to specify different behaviors for dates that start with years, such as 2011-02-05.  If SQLR_MYSQL_DATE_YYYYDDMM="yes" then that date would be interpreted as being in the YYYY-DD-MM format.  If it is set to "no" then that date would be interpreted as being in the YYYY-MM-DD format.  If it is not set, then it defaults to whatever SQLR_MYSQL_DATE_DDMM is set to.  If neither are set then dates are universally interpreted to be in MM/DD format.  There are very specific cases where these two environment variables need to be set differently from one another.  You'll know if you need to.
+
+When using mysql_stmt_bind_result, it's possible to bind fewer buffers than there are columns in the result set.  For example you might run "select col1, col2, col3 from mytable" but only bind a single value, expecting col1 to be fetched and the others ignored.  The native !MySQL library doesn't support this but some apps do it anyway and it's just fortune that they don't crash.  Some apps try a little harder and "NULL-terminate" the bind array with a zeroed-out bind buffer.  This doesn't appear to have any effect with the native !MySQL library but with the drop-in replacement library if you set the environment variable SQLR_MYSQL_NULL_TERMINATED_RESULT_BINDS="yes" then mysql_stmt_fetch() and mysql_fetch() will stop populating bind buffers when they find one containing NULL's for the buffer, length and is_null pointers.
+
+[=#mappingerrorcodes]
+== Mapping Error Codes ==
+
+By default, mysql_stmt_errno and mysql_errno return the native error code from the database.  For example, if SQL Relay is pointed at Oracle and a query is missing a FROM clause, then the Oracle error code 923 will be returned - the error code corresponding to the Oracle error "FROM keyword not found where expected" rather than the !MySQL error code 1064 corresponding to the !MySQL error "ER_PARSE_ERROR".
+
+Since various databases have thousands of error codes, it's not feasible to map every one to the corresponding !MySQL error code.  It is rare for an app to react to specific error codes, but if your app does, and requires specific !MySQL error codes to be returned, then there it is possible to map native error codes to !MySQL error codes.
+
+To do this, you must set the environment variable SQLR_MYSQL_ERROR_MAP to the location of an error map file.  For example:
+
+{{{#!blockquote
+export SQLR_MYSQL_ERROR_MAP=/usr/local/firstworks/etc/oracle-mysql-errors.map
+}}}
+
+This must be set on the client side - on the machine and in the shell where the drop-in replacement library is being run.
+
+Example error map files for Oracle and Microsoft SQL Server are provided at /usr/local/firstworks/share/examples/sample-oracle-mysql-errors.map and /usr/local/firstworks/share/examples/sample-mssqlserver-mysql-errors.map.
+
+The format is described at the top of the file and examples follow:
+
+{{{#!blockquote
+{{{
+# sample oracle to mysql error mappings...
+# format: &lt;oracle error number&gt;:&lt;mysql error number&gt;
+
+# FROM keyword not found where expected... -&gt; ER_PARSER_ERROR
+# (oracle actually has lots of syntax errors and they all need to be mapped to
+# ER_PARSE_ERROR)
+923:1064
+
+# quoted string not properly terminated -&gt; ER_PARSE_ERROR
+1756:1064
+}}}
+}}}
