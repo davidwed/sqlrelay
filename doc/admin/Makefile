@@ -24,9 +24,11 @@ OBJS = configguide.html.in \
 	wt -c $< -o $@ -xhtml xhtml.conf
 
 all: $(OBJS)
+	$(MAKE) html
+	$(MAKE) cleanin
 
 cleanin:
-	#$(RM) *.in
+	$(RM) *.in
 
 clean:
 	$(RM) $(OBJS)
