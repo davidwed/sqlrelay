@@ -1,0 +1,822 @@
+= SQL Relay Configuration Guide =
+
+* [#location Configuration File Location]
+* [#minimal Minimal Configuration]
+* [#connections Database Connections]
+* [#cursors Database Cursors]
+* [#dynamicscaling Dynamic Scaling]
+* [#listener Listener Configuration]
+* [#database Database Configuration]
+* [#sessionqueries Session-Queries]
+* [#instances Multiple Instances]
+* [#directory Configuration Directory]
+* [#specifying Specifying Configuration Files]
+* [#remote Remote Configuration Files]
+* [#linkfiles Link Files]
+* [#autostart Starting Instances Automatically]
+* [#ha High Availability Environments]
+ * [#cluster Load-Balancing and Fail-Over With Replicated or Clustered Databases]
+ * [#rac Already-Load-Balanced Databases]
+ * [#router Master-Slave Query Routing]
+ * [#frontend Front-End Load-Balancing and Fail-Over]
+* [#krb Kerberos and Active Directory Encryption and Authentication]
+* [#tls TLS/SSL Encryption and Authentication]
+* [#advanced Advanced Configuration]
+
+[[br]][=#location]
+== Configuration File Location ==
+
+When SQL Relay is first installed, no configuration file exists.  You must create one in the appropriate location.
+
+This location depends on the platform and on how you installed SQL Relay.
+
+* Unix and Linux
+ * Built from source - '''/usr/local/firstworks/etc/sqlrelay.conf'''
+  * (however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)
+ * RPM package - '''/etc/sqlrelay.conf'''
+ * FreeBSD package - '''/usr/local/etc/sqlrelay.conf'''
+ * NetBSD package - '''/usr/pkg/etc/sqlrelay.conf'''
+ * OpenBSD package - '''/usr/local/etc/sqlrelay.conf'''
+* Windows
+ * Built from source - '''C:\Program Files\Firstworks\etc\sqlrelay.conf'''
+ * Windows Installer package - '''C:\Program Files\Firstworks\etc\sqlrelay.conf'''
+  * (however, if you specified a different folder during installation, then it might be in a different location)
+
+
+[[br]][=#minimal]
+== Minimal Configuration ==
+
+The most minimal SQL Relay configuration would be something like:
+
+{{{#!blockquote
+@sqlrelay-minimal.conf.html@
+}}}
+
+This configuration defines an instance of SQL Relay named //example//, secured by a user and password, that opens and maintains a pool of 5 persistent connections to the //orcl// instance of an Oracle database using //scott/////tiger// credentials.
+
+The instance can be started using:
+
+{{{#!blockquote
+{{{
+sqlr-start -id example
+}}}
+}}}
+
+By default, SQL Relay listens on all available network interfaces, on port 9000.  It can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed using:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
+}}}
+}}}
+
+SQL Relay's remote accessibility makes it useful as a database proxy.  See [../features/proxying.html Proxying] for more information.
+
+It can also be accessed from the local server using //localhost//.
+
+{{{#!blockquote
+{{{
+sqlrsh -host localhost -user sqlruser -password sqlrpassword
+}}}
+}}}
+
+( '''NOTE:''' For versions of SQL Relay prior to 0.56, additional parameters were required for a minimal configuration.  In particular, either the port or socket parameter was required in the instance tag, the dbtype parameter was required in the instance tag, and connectionid and metric parameters were required in the connection tag.  See below, or see the [configreference.html Configuration Reference] for information about these parameters.)
+
+
+[[br]][=#connections]
+== Database Connections ==
+
+By default, SQL Relay opens and maintains a pool of 5 persistent database connections, but the number of connections can be configured using the connections attribute.
+
+{{{#!blockquote
+@sqlrelay-connections.conf.html@
+}}}
+
+[../features/connectionpooling.html Connection pooling] reduces the amount of time it takes an app to connect to the database, which can dramatically improve performance for many applications.
+
+The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients will be queued and must wait for one of the first 10 to disconnect before being able to access the database.
+
+Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can, and that number is usually dictated by database, system and network resources.  However, if you intend to [../features/throttling.html throttle] (limit) database access to a particular application, then you may intentionally configure a small number of connections.
+
+
+[[br]][=#cursors]
+== Database Cursors ==
+
+Database cursors are used to execute queries and step through result sets.  Most applications only need to use one cursor at a time.  Some apps require more though, either because they run nested queries, or sometimes because they just don't properly free them.
+
+SQL Relay maintains persistent cursors as well as connections.  By default, each connection opens one cursor, but the number of cursors opened by each connection can be configured using the cursors attribute.
+
+{{{#!blockquote
+@sqlrelay-cursors.conf.html@
+}}}
+
+Any number of cursors can be opened.  A good rule of thumb is to open as few as possible but as many as you know that your application will need.
+
+
+[[br]][=#dynamicscaling]
+== Dynamic Scaling ==
+
+Both connections and cursors can be configured to scale dynamically - open on demand and then die off when no longer needed.  This feature is useful if you have spikes in traffic during certain times of day or if your application has a few modules that occasionally need more cursors than usual.
+
+The maxconnections and maxcursors attribute define the upper bounds.
+
+{{{#!blockquote
+@sqlrelay-dynamicscaling.conf.html@
+}}}
+
+In this example, 10 connections will be started initially but more will be be started as necessary, up to 20.  Each of the newly spawned connections will die off if they are inactive for longer than 1 minute.
+
+In this example, each connection will initially open 2 cursors but more will be opened as necessary, up to 10.  Each newly opened cursor will be closed as soon as it is no longer needed.
+
+Other attributes that control dynamic scaling behavior include:
+
+* maxqueuelength
+* growby
+* ttl
+* cursors_growby
+
+See the [configreference.html SQL Relay Configuration Reference] for more information on these attributes.
+
+
+[[br]][=#listener]
+== Listener Configuration ==
+
+By default, SQL Relay listens for client connections on port 9000, on all available network interfaces.
+
+It can be configured to listen on a different port though...
+
+{{{#!blockquote
+@sqlrelay-port.conf.html@
+}}}
+
+...and accessed using:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -port 9001 -user sqlruser -password sqlrpassword
+}}}
+}}}
+
+It can also be configured to listen on a unix socket...
+
+{{{#!blockquote
+@sqlrelay-socket.conf.html@
+}}}
+
+...and accessed from the local server using:
+
+{{{#!blockquote
+{{{
+sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
+}}}
+}}}
+
+If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.
+
+{{{#!blockquote
+@sqlrelay-addresses.conf.html@
+}}}
+
+When configured this way, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+
+If the socket option is specified but port and addresses options are not, then SQL Relay will only listen on the socket.  If addresses/port and socket options are both specified then it listens on both.
+
+
+[[br]][=#database]
+== Database Configuration ==
+
+By default, SQL Relay assumes that it's connecting to an Oracle database, but SQL Relay supports many other databases.  The dbase attribute can be used to specify the database type.
+
+In the following example, SQL Relay is configured to connect to a SAP/Sybase database.
+
+{{{#!blockquote
+@sqlrelay-sap.conf.html@
+}}}
+
+In this example, SQL Relay is configured to connect to an IBM DB2 database.
+
+{{{#!blockquote
+@sqlrelay-db2.conf.html@
+}}}
+
+When connecting to an Oracle database, the dbase attribute may be omitted or set to "oracle".
+
+SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the [configreference.html SQL Relay Configuration Reference] for valid dbase settings and information on connect string options for each database.
+
+[[br]][=#sessionqueries]
+== Session-Queries ==
+
+SQL Relay can be configured to run a set of queries at the beginning and end of each client session.
+
+By far the most common use for this feature is that some database parameter needs to be reconfigured but you don't have permission or bouncing the database is out of the question, or something like that.  For example, lets say you are using an Oracle database, but your app requires dates to be formatted like MM/DD/YYYY instead of DD-MON-YYYY.  Ideally you'd alter the nls_date_format in the instance but you can't, for some reason.
+
+You can use SQL Relay's session queries to work around the problem.
+
+In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.
+
+{{{#!blockquote
+@sqlrelay-sessionqueries.conf.html@
+}}}
+
+Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.
+
+
+[[br]][=#instances]
+== Multiple Instances ==
+
+Any number of SQL Relay instances can be defined in the configuration file.
+
+In following example, instances that connect to Oracle, SAP/Sybase and DB2 are defined in the same file.
+
+{{{#!blockquote
+@sqlrelay-multiple.conf.html@
+}}}
+
+These instances can be started using:
+
+{{{#!blockquote
+{{{
+sqlr-start -id oracleexample
+sqlr-start -id sapexample
+sqlr-start -id db2example
+}}}
+}}}
+
+...and accessed using:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -port 9000
+sqlrsh -host sqlrserver -port 9001
+sqlrsh -host sqlrserver -port 9002
+}}}
+}}}
+
+
+[[br]][=#directory]
+== Configuration Directory ==
+
+While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files.
+
+The default the SQL Relay configuration directory depends on the platform and on how you installed SQL Relay.
+
+* Unix and Linux
+ * Built from source - '''/usr/local/firstworks/etc/sqlrelay.conf.d'''
+  * (however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)
+ * RPM package - '''/etc/sqlrelay.conf.d'''
+ * FreeBSD package - '''/usr/local/etc/sqlrelay.conf.d'''
+ * NetBSD package - '''/usr/pkg/etc/sqlrelay.conf.d'''
+ * OpenBSD package - '''/usr/local/etc/sqlrelay.conf.d'''
+* Windows
+ * Built from source - '''C:\Program Files\Firstworks\etc\sqlrelay.conf.d'''
+ * Windows Installer package - '''C:\Program Files\Firstworks\etc\sqlrelay.conf.d'''
+  * (however, if you specified a different folder during installatoin, then it might be in a different location)
+
+Additional configuration files may be created under this directory.  These files must follow the same format as the main configuration file.
+
+For example, if you wanted to split up oracle, sap and db2 configurations into 3 separate files, you could create:
+
+'''sqlrelay.conf.d/oracle.conf'''
+
+{{{#!blockquote
+@sqlrelay-multipleoracle.conf.html@
+}}}
+
+'''sqlrelay.conf.d/sap.conf'''
+
+{{{#!blockquote
+@sqlrelay-multiplesap.conf.html@
+}}}
+
+'''sqlrelay.conf.d/db2.conf'''
+
+{{{#!blockquote
+@sqlrelay-multipledb2.conf.html@
+}}}
+
+
+[[br]][=#specifying]
+== Specifying Configuration Files ==
+
+In addition to the -id option, the sqlr-start program also takes a -config option.  The -config option can be used to specify a configuration file or directory other than the default.
+
+For example:
+
+{{{#!blockquote
+{{{
+sqlr-start -id oracleexample -config /home/myuser/mysqlrelay.conf
+sqlr-start -id oracleexample -config file:///home/myuser/mysqlrelay.conf
+sqlr-start -id oracleexample -config dir:///home/myuser/mysqlrelay.conf.d
+}}}
+}}}
+
+(the file:// prefix is optional when specifying a file, but the dir:// prefix must be included when specifying a directory)
+
+The -config option may also be used to specify a comma-separated list of files or directories.  For example:
+
+{{{#!blockquote
+{{{
+sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf
+sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf,dir:///home/myuser/mysqrelay.conf.d
+sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf,dir:///home/myuser/mysqrelay-1.conf.d,dir:///home/myuser/mysqrelay-2.conf.d
+}}}
+}}}
+
+Files and directories are processed in the order that they are specified.
+
+
+[[br]][=#remote]
+== Remote Configuration Files ==
+
+In addition to local configuration files, the -config option may also be used to specify configuration files located on a remote host, accessible via http.
+
+Actually, if the Rudiments library upon which SQL Relay depends was compiled with support for libcurl, then configuration files may also be remotely accessible over other protocols supported by libcurl, such as https, ftp, scp, sftp, smb, etc.
+
+For example:
+
+{{{#!blockquote
+{{{
+sqlr-start -id oracleexample -config http://configserver.mydomain.com/sqlrconfig/sqlrelay.conf
+sqlr-start -id oracleexample -config http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/sqlrelay.conf
+sqlr-start -id oracleexample -config http://[/usr/local/firstworks/etc/sqlruserpwd.txt]@configserver.mydomain.com/sqlrconfig/sqlrelay.conf
+
+sqlr-start -id oracleexample -config https://configserver.mydomain.com/sqlrconfig/sqlrelay.conf
+sqlr-start -id oracleexample -config https://myuser:mypassword@configserver.mydomain.com/sqlrconfig/sqlrelay.conf
+sqlr-start -id oracleexample -config https://[/usr/local/firstworks/etc/sqlruserpwd.txt]@configserver.mydomain.com/sqlrconfig/sqlrelay.conf
+
+sqlr-start -id oracleexample -config scp://myuser:mypassword@configserver.mydomain.com/usr/local/firstworks/etc/sqlrelay.conf
+sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpwd.txt]@configserver.mydomain.com/usr/local/firstworks/etc/sqlrelay.conf
+}}}
+}}}
+
+(Note: the https and scp examples would only work if Rudiments is compiled with support for libcurl.)
+
+In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.  For example:
+
+{{{#!blockquote
+{{{
+myuser:mypassword
+}}}
+}}}
+
+Password protection is recommended for remotely accessible configuration files as they may contain users and passwords for accessing the database and SQL Relay itself.
+
+Using user-password files is recommended over passing literal users and passwords.  The files can be protected with file permissions, they prevent the user and password from being stored in the script that starts SQL Relay, and they prevent the user and password from being displayed in a process listing.
+
+
+[[br]][=#linkfiles]
+== Link Files ==
+
+So far, the example configuration files have all been XML files, containing configurations for instances of SQL Relay.
+
+However, a configuration file can, alternatively, be a "link file", containing nothing but links to other configuration files.
+
+For example:
+
+{{{#!blockquote
+{{{
+# oracle configuration
+http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/oracle.conf
+
+# sap/sybase configuration
+http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/sap.conf
+
+# db2 configuration
+http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/db2.conf
+}}}
+}}}
+
+Lines starting with # are considered to be comments and blank lines are ignored, but every other line is interpreted as the location of a local configuration file, local configuration directory, or remote configuration file, as described in the previous sections.
+
+Each of these files or directories are processed in the order that they are specified.
+
+Link files can be used to centralize configuration.  For example, if you have several SQL Relay servers, rather than distributing configuration files across the servers, you could create an identical sqlrelay.conf file on each of them like:
+
+{{{#!blockquote
+{{{
+http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/sqlrelay.conf
+}}}
+}}}
+
+And then, on configserver.mydomain.com, host an sqlrelay.conf file like:
+
+{{{#!blockquote
+{{{
+http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/oracle.conf
+http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/sap.conf
+http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/db2.conf
+}}}
+}}}
+
+The files oracle.conf, sap.conf, and db2.conf could then be hosted by and maintained on that server as well.
+
+The links in these examples are all urls, but they could just as easily be links to local files and directories as well.  It is important to note though, that SQL Relay interprets all local file and directory locations relative to the local machine.  If a remotely hosted link file contains a reference to a local file or directory, then SQL Relay will look for that file on the local machine, not the remote machine.
+
+Similarly, urls are resolved using the DNS configuration of the local machine as well, not the DNS configuration of the remote machine.
+
+The urls in these examples all contain literal users and passwords.  User-password files can also be used as described in the section [#remote Remote Configuration Files].  However, the user-password file must exist at the specified location on the local machine.
+
+As link files can be protected by file permissions, and the urls stored in them aren't exposed anywhere else, such as in a process listing, user-password files are not generally necessary when using link files.
+
+There is no limit to the depth of links.  A link file can reference another link file which references another, which references another, etc.  Too great a depth could lead to slow startup times though, especially when using remote configration files. This is especially significant when using [#dynamicscaling Dynamic Scaling], as the configuration must be loaded each time a new connection is spawned.  Care should also be taken to avoid loops.
+
+
+[[br]][=#autostart]
+== Starting Instances Automatically ==
+
+In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all intances configured with the enabled attribute set to yes.
+
+For example, if the following instances are defined...
+
+{{{#!blockquote
+@sqlrelay-autostart.conf.html@
+}}}
+
+...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.
+
+When installed on most platforms, SQL Relay creates a systemd service file (usually in /usr/lib/systemd/system or /lib/systemd/system) or an init script in the appropriate place under /etc.  These call sqlr-start with no -id option.  If configured to run at boot, they will start all instances for which enabled="yes" is configured.
+
+How to enable the service file or init script depends on what platform you are using.
+
+On systemd-enabled Linux, this usually involves running:
+
+{{{#!blockquote
+systemctl enable sqlrelay.service
+}}}
+
+On non-systemd-enabled Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.  This can be done manually, but most platforms provide utilities to do it for you.
+
+Redhat-derived Linux distributions have a chkconfig command that can do this for you:
+
+{{{#!blockquote
+chkconfig --add sqlrelay
+}}}
+
+Debian-derived Linux distributions provide the update-rc.d command:
+
+{{{#!blockquote
+update-rc.d sqlrelay defaults
+}}}
+
+Solaris provides svcadm:
+
+{{{#!blockquote
+svcadm enable sqlrelay
+}}}
+
+On FreeBSD you must add a line to /etc/rc.conf like:
+
+{{{#!blockquote
+sqlrelay_enabled=YES
+}}}
+
+On NetBSD you must add a line to /etc/rc.conf like:
+
+{{{#!blockquote
+sqlrelay=YES
+}}}
+
+On OpenBSD you must add a line to /etc/rc.conf like:
+
+{{{#!blockquote
+sqlrelay_flags=""
+}}}
+
+
+[[br]][=#ha]
+== High Availabiltiy Environments ==
+
+In a high availability environment, SQL Relay can be deployed as a front-end to provide load-balancing and fail-over for a set of replicated database servers or database cluster.  Load-balancing and fail-over can also be implemented over multiple SQL Relay servers.
+
+
+[[br]][=#cluster]
+=== Load-Balancing and Fail-Over With Replicated or Clustered Databases ===
+
+In a database cluster or replication environment, SQL Relay can be configured to maintain a pool of connections to the various database nodes and distribute client sessions over the nodes.  If an individual node fails, SQL Relay will attempt to reestablish connections to that node, while continuing to distribute client sessions over the remaining nodes.
+
+{{{#!td
+[[Image(../images/cluster.png)]]
+}}}
+{{{#!td
+[[Image(../images/replicated.png,padding-left=40px)]]
+}}}
+
+In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - orcl1, orcl2, and orcl3
+
+{{{#!blockquote
+@sqlrelay-replicated.conf.html@
+}}}
+
+Any number of connection tags may be defined.
+
+SQL Relay also supports disproportionate distribution of load. If some nodes can handle more traffic than others, then SQL Relay can be configured to send more traffic to the more capable nodes.
+
+[[Image(../images/replicated-disproportionate.png)]]
+
+SQL Relay uses the connection tag's metric attribute to decide how many connections to open to each node.
+
+{{{#!blockquote
+@sqlrelay-replicated-disproportionate.conf.html@
+}}}
+
+The metric attribute doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be opened and maintained.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.
+
+In the example above, 15 is 3 times 5, so 3 times as many connections will be opened to orcl2 as to orcl1.  30 is 6 times 5, so 6 times as many connections will be opened to orcl3 as orcl1.  Since a total of 10 connections will be opened, 1 will be opened to orcl1, 3 to orcl2, and 6 to orcl2.
+
+
+[[br]][=#rac]
+=== Already-Load-Balanced Databases ===
+
+In a typical database cluster or replicated environment, the nodes are identifiable as separate hosts.  However, when the nodes are located behind a load-balancing appliance or running on an application cluster, such as Oracle RAC, SQL Relay cannot identity an individual node.
+
+In these environments, if a node goes down, SQL Relay will attempt to re-establish the connection, but rather than failing until the node comes back up, the new connection will more likely just succeed to a different node in the cluster.  Over time, this can lead to disproportionate load-balancing, with a bias toward nodes that have never gone down.
+
+SQL Relay manages this by "shuffling" the connections periodically.  Every so often, each database connection is re-established, giving that connection a chance to be re-established to a node that may have gone down but is now back up.
+
+To indicate to SQL Relay that the nodes are already-load-balanced, and need to be "shuffled" periodically, only one connection tag should be used, with the behindloadbalancer attribute set to "yes".
+
+{{{#!blockquote
+@sqlrelay-rac.conf.html@
+}}}
+
+
+[[br]][=#router]
+=== Master-Slave Query Routing ===
+
+The load-balancing scenarios described above all assume that master-master replication is being used.  SQL Relay supports master-slave replication as well.
+
+In a master-slave replication environment, SQL Relay can be configured to route DML and DDL queries to the master and distribute selects over the slaves.
+
+[[Image(../images/router.png)]]
+
+This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.
+
+{{{#!blockquote
+@sqlrelay-router.conf.html@
+}}}
+
+The first two instances use familiar configuration options, but the third uses a dbtype of "router" and rather than defining connections, uses router, route and query tags to define query routing rules.
+
+The router tag defines a set of routes.  The attributes of each route tag specify an instance of SQL Relay to connect to.  The pattern attribute of each query tag defines a regular expression used to match queries.  Queries that match the set of patterns defined in the route tag are sent to the instance of SQL Relay designated in the route tag.
+
+The three instances can be started using:
+
+{{{#!blockquote
+{{{
+sqlr-start -id master
+sqlr-start -id slave
+sqlr-start -id router
+}}}
+}}}
+
+Client applications should connect to the router instance rather than the master or slave instances.
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user routeruser -password routerpassword
+}}}
+}}}
+
+See the [router.html Query Routing] for more information on query routing.
+
+
+[[br]][=#frontend]
+=== Front-End Load-Balancing and Fail-Over ===
+
+If you are building out a high availability environment, or if your pool of application servers is just sufficiently large, you might want to set up a pool of SQL Relay servers between your application servers and the database.
+
+SQL Relay supports two front-end load-balancing and fail-over strategies.  In the first strategy, load-balancing and fail-over are provided by an appliance or application cluster.  In the second, SQL Relay provides its own load-balancing and fail-over, with some help from DNS.
+
+Multiple instances of SQL Relay can be placed behind a load-balancing appliance.
+
+[[Image(../images/loadbalancer.png)]]
+
+In this illustration, the load-balancing appliance is shown as a single machine, but in a true HA environment, there would be 2 or more appliances sharing a virtual IP.  Alternatively, rather than using an appliance, SQL Relay can be run on an application server cluster such as Linux Virtual Server.
+
+[http://en.wikipedia.org/wiki/Round-robin_DNS Round-robin DNS] can be also be used to provide load-balancing and fail-over over multiple SQL Relay servers.
+
+[[Image(../images/rrdns.png)]]
+
+In a round-robin DNS scenario, multiple IP addresses are assigned to the same host name.  The SQL Relay client is then configured to connect to that host.  When it requests the IP addresses for the host, the client receives all of the IP addresses assigned to it, rather than just a single address.
+
+Round-robin DNS is so-called because, traditionally, the order of the IP addresses returned on successive requests alternated reliably, in round-robin fashion.  This behavior persists in many environments, but it is no longer guaranteed, as many modern DNS resolvers sort the list and return the IP addresses in the same order, every time.  SQL Relay clients randomize the list though, and try to connect to each of the IP addresses, one-at-a-time, until they succeed.  Doing so provides both load-balancing and fail-over without requiring an appliance or application server cluster.
+
+
+[[br]][=#krb]
+== Kerberos and Active Directory Encryption and Authentication ==
+
+SQL Relay supports Kerberos encryption and authentication.
+
+When Kerberos encryption and authentication is used:
+
+* All communications between the SQL Relay client and SQL Relay server are encrypted.
+* A user who has authenticated against a Kerberos KDC or Active Directory Domain Controller can access SQL Relay without having to provide additional credentials.
+
+On Linux and Unix systems, both server and client environments must be "Kerberized".  On Windows systems, both server and client must join an Active Directory Domain.  Note that this is only available on Professional or Server versions of Windows.  Home versions cannot join Active Directory Domains.
+
+The following configuration configures an instance of SQL Relay to use Kerberos authentication and encryption:
+
+{{{#!blockquote
+@sqlrelay-krb.conf.html@
+}}}
+
+* The '''krb''' parameter enables (or disables) Kerberos authentication and encryption.
+* The '''krbservice''' parameter specifies which Kerberos service to use.  This parameter is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.
+* The '''krbkeytab''' parameter specifies the location of the keytab file containing the key for the specified Kerberos service.  This parameter is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab
+
+Note that no passwords are required in the user list.  Note also that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.
+
+To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the krbkeytab parameter.
+
+To start the instance on a Windows system, you must be logged in as a user that can proxy the service specified by the krbservice parameter (or it's default value of "sqlrelay" if omitted).
+
+If those criteria are met, starting the Kerberized instance of SQL Relay is the same as starting any other instance:
+
+{{{#!blockquote
+{{{
+sqlr-start -id example
+}}}
+}}}
+
+To access the instance, you must acquire a Kerberos ticket-granting ticket.  On a Linux or Unix system, this typically involves running //kinit//, though a fully Kerberized environment may acquire this during login.  On a Windows system, you must log in as an Active Directory domain user.
+
+After acquiring the ticket-granting ticket, the instance of SQL Relay may be accessed from a Linux or Unix system as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -krb
+}}}
+}}}
+
+From a Windows system, it may be necessary to specify the fully qualified Kerberos service name as well:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -krb -krbservice sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM
+}}}
+}}}
+
+Note the absence of user and password parameters.
+
+Kerberos authentication establishes trust between the user who acquired the ticket-granting ticket (the user running the client program) and the service (the SQL Relay server) as follows:
+
+* The client program uses the user's ticket-granting ticket to acquire a ticket for the sqlrelay service.
+* The client program then uses this service ticket to establish a security context with the SQL Relay server.
+* During this process the client program sends the SQL Relay server the user name that was used to acquire the original ticket-granting ticket.
+* If the security context can be successfully established, then the SQL Relay server can trust that the client program is being run by the user that it says it is.
+
+Once the SQL Relay server trusts that the client is being run by the user that it says it is, the user is authorized against the list of valid users.
+
+While Kerberos authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:
+
+* The client program may have to acquire a service ticket from another server (the Kerberos KDC or Active Directory Domain Controller) prior to connecting to the SQL Relay server.
+* When establishing the secure session, a significant amount of data must be sent back and forth between the client and server over multiple network round-trips.
+* Kerberos imposes a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.
+* Without dedicated encryption hardware and a Kerberos implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.
+
+Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.
+
+
+[[br]][=#tls]
+== TLS/SSL Encryption and Authentication ==
+
+SQL Relay supports TLS/SSL encryption and authentication.
+
+When TLS/SSL encryption and authentication is used:
+
+* All communications between the SQL Relay client and SQL Relay server are encrypted.
+* SQL Relay clients and servers may optionally validate each other's certificates and identities.
+
+When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.  Linux and Unix systems support a variety of certificate formats, including the popular .pem format.  On Windows systems, only the .pfx certificate format is currently supported.
+
+
+The following configuration enables TLS/SSL security for an instance of SQL relay:
+
+{{{#!blockquote
+@sqlrelay-tls.conf.html@
+}}}
+
+* The '''tls''' parameter enables (or disables) TLS/SSL encryption.
+* The '''tlscert''' parameter specifies a TLS/SSL certificate to use.  A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.
+
+To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:
+
+{{{#!blockquote
+{{{
+sqlr-start -id example
+}}}
+}}}
+
+The instance may be accessed as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate no
+}}}
+}}}
+
+This establishes a TLS/SSL-encrypted session but does not validate the server's certificate or identity.  The session will only continue if the server's certificate is is well-formed and hasn't expired, '''but the client is still vulnerable to various attacks'''.
+
+[[br]]
+
+For a more secure session, the client may validate that the server's certificate was signed by a trusted certificate authority, known to the system, as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca
+}}}
+}}}
+
+If the server's certificate is self-signed, then the certificate authority won't be known to the system, but it's certificate may be specified by the tlsca parameter as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/sqlrca.pem
+}}}
+}}}
+
+(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)
+
+This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, '''but the client is still vulnerable to various attacks'''.
+
+[[br]]
+
+For a more secure session, the client may validate that the host name provided by the server's certificate matches the host name that the client meant to connect to, as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx files must be used)
+
+Note that the fully qualified host name was provided.  Note also the use of the ca+host value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the host name will also be validated.  If the certificate contains Subject Alternative Names, then the host name will be compared to each of them.  If no Subject Alternative Names are provided then the host name will be compared to the certificate's Common Name.  The session will only continue if the sever's certificate and identity are both valid.
+
+[[br]]
+
+Unless self-signed, certificates can be expensive, so certificates are often shared by multiple servers across a domain.  To manage environments like this, the host name validation can be relaxed as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/sqlrca.pem
+}}}
+}}}
+
+(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)
+
+Note that the fully qualified host name was provided.  Note also the use of the ca+domain value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the domain name portion of the host name will also be validated.  If the certificate contains Subject Alternative Names, then the domain name portion of the host name will be compared to the domain name portion of each of them.  If no Subject Alternative Names are provided then the domain name portion of the host name will be compared to the domain name portion of the certificate's Common Name.  The session will only continue if the sever's certificate and domain identity are both valid.
+
+[[br]]
+
+For a more secure session, the server may request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
+
+The following configuration enables these checks for an instance of SQL relay:
+
+{{{#!blockquote
+@sqlrelay-tls-validate.conf.html@
+}}}
+
+* The '''tlsvalidate''' parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.
+* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+
+Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.
+
+To access the instance, the client must provide, at minimum, a certificate, as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -tls -tlsvalidate no -tlscert /usr/local/firstworks/etc/sqlrclient.pem
+}}}
+}}}
+
+(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)
+
+Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.
+
+In a more likely use case, cross-validation occurs - the client validates the server and the server validates the client, as follows:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/sqlrclient.pem -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx files must be used)
+
+In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
+
+While TLS/SSL authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:
+
+* When establishing the secure session, a significant amount of data must be sent back and forth between the client and server over multiple network round-trips.
+* Some TLS/SSL implementations impose a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.
+* Without dedicated encryption hardware and a TLS/SSL implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.
+
+Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.
+
+
+
+[[br]][=#advanced]
+== Advanced Configuration ==
+
+The configuration file supports many more attributes and features than the ones described in this guide including tuning options and extension modules.  See the [configreference.html SQL Relay Configuration Reference] and [tuning.html Tuning SQL Relay] for more information.
