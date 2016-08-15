@@ -5,15 +5,16 @@
 class SQLRSERVER_DLLSPEC hardcoded : public sqlrauth {
 	public:
 			hardcoded(xmldomnode *parameters,
-					sqlrpwdencs *sqlrpe);
-		bool	authenticate(sqlrserverconnection *conn,
-						const char *user,
-						const char *password);
+					sqlrpwdencs *sqlrpe,
+					bool debug);
+		const char	*authenticate(sqlrserverconnection *conn,
+							sqlrcredentials *cred);
 };
 
 hardcoded::hardcoded(xmldomnode *parameters,
-				sqlrpwdencs *sqlrpe) :
-				sqlrauth(parameters,sqlrpe) {
+				sqlrpwdencs *sqlrpe,
+				bool debug) :
+				sqlrauth(parameters,sqlrpe,debug) {
 }
 
 struct cred_t {
@@ -28,21 +29,34 @@ static cred_t credentials[]={
 	{NULL,NULL}
 };
 
-bool hardcoded::authenticate(sqlrserverconnection *sqlrcon,
-				const char *user, const char *password) {
+const char *hardcoded::authenticate(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred) {
+
+	// this module only supports user-password credentials
+	if (charstring::compare(cred->getType(),"userpassword")) {
+		return NULL;
+	}
+
+	// convert "cred" to user-password credentials
+	sqlruserpasswordcredentials	*upcred=(sqlruserpasswordcredentials *)cred;
+
+	// if the user matches one of the users in our list, then return the user
 	for (const cred_t *c=credentials; c->user; c++) {
-		if (!charstring::compare(user,c->user) &&
-			!charstring::compare(password,c->password)) {
-			return true;
+		if (!charstring::compare(upcred->getUser(),c->user) &&
+			!charstring::compare(upcred->getPassword(),c->password)) {
+			return upcred->getUser();
 		}
 	}
-	return false;
+
+	// otherwise return NULL
+	return NULL;
 }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_hardcoded(
 						xmldomnode *users,
-						sqlrpwdencs *sqlrpe) {
-		return new hardcoded(users,sqlrpe);
+						sqlrpwdencs *sqlrpe,
+						bool debug) {
+		return new hardcoded(users,sqlrpe,debug);
 	}
 }

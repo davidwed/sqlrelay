@@ -13,9 +13,6 @@ sqlrauth::sqlrauth(xmldomnode *parameters, sqlrpwdencs *sqlrpe, bool debug) {
 sqlrauth::~sqlrauth() {
 }
 
-void sqlrauth::setParameter(const char *name, const char *value) {
-}
-
 const char *sqlrauth::auth(sqlrserverconnection *sqlrcon,
 					sqlrcredentials *cred) {
 	return NULL;

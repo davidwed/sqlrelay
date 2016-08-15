@@ -102,8 +102,6 @@
 <li>database</li>
 <li>proxied</li>
 <li>sqlrelay</li>
-<li>krb_userlist</li>
-<li>tls_userlist</li>
 </ul>
 </b>
 
@@ -189,6 +187,82 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
+
+<p>The userlist module can also authorize Kerberos-authenticated or Active Directory-authenticated users, as well as users authenticated by a TLS/SSL certificate.  The module automatically detects which athentication method to use, based on the credentials supplied by the client.</p>
+
+<p>When configuring the module to authenticate a Kerberos/Active-Directory user, include the list of valid principals, and omit the password from each entry.</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;dmuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;kmuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;imuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;smuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\dmuse&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\kmuse&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\imuse&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\smuse&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about configuring Kerberos and Active Directory encryption and authentication.</p>
+
+<p>When configuring the module to authenticate a TLS/SSL user, include the list of valid client names, and omit the password from each entry.</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;userlist&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient1.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient2.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient3.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient4.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<p>If the client's certificate contains Subject Alternative Names then each SAN will be compared to each entry in the list.  If a match is found then the client is authorized.</p>
+
+<p>If the client's certificate does not contain Subject Alternative Names, then the Common Name is compared to each entry in the list.  If a match is found then the client is authorized.</p>
+
+<p>Note that this module only works if:</p>
+
+<ul>
+<li>TLS/SSL is enabled on the server-side.</li>
+<li>TLS Validation is enabled on the server-side.</li>
+<li>The client sends a certificate.</li>
+</ul>
+
+<p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about configuring TLS/SSL encryption and authentication.</p>
+
+<p>(Note, in previous versions of SQL Relay, there were separate krb_userlist and tls_userlist modules.  As of version 0.66.0, these have been merged with the userlist module.)</p>
 
 <p>Since the userlist auth module appears to provide the exact same functionality as the built-in <i>users</i> tag, why would you want to use it instead of just using the built-in <i>users</i> tag?</p>
 
@@ -335,84 +409,6 @@
 </font>
 </blockquote>
 
-<br><br>
-<span class="heading3">krb_userlist</span><br>
-
-<p>The krb_userlist module authorizes a Kerberos-authenticated or Active Directory-authenticated user against a static list of valid users.</p>
-
-<blockquote>
-
-
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;krb_userlist&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;dmuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;kmuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;imuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;smuse@AD.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\dmuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\kmuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\imuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\smuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
-</blockquote>
-
-<p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about configuring Kerberos and Active Directory encryption and authentication.</p>
-
-<br><br>
-<span class="heading3">tls_userlist</span><br>
-
-<p>The tls_userlist module authorizes the Subject Alternative Names or Common Name provided in the client-provided TLS/SSL certificate against a static list of valid names.</p>
-
-<blockquote>
-
-
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auths</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;tls_userlist&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient1.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient2.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient3.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient4.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">auth</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/auths&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
-</blockquote>
-
-<p>If the client's certificate contains Subject Alternative Names then each SAN is compared to each entry in the list.  If a match is found then the client is authorized.</p>
-
-<p>If the client's certificate does not contain Subject Alternative Names, then the Common Name is compared to each entry in the list.  If a match is found then the client is authorized.</p>
-
-<p>Note that this module only works if:</p>
-
-<ul>
-<li>TLS/SSL is enabled on the server-side.</li>
-<li>TLS Validation is enabled on the server-side.</li>
-<li>The client sends a certificate.</li>
-</ul>
-
-<p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about configuring TLS/SSL encryption and authentication.</p>
-
 <br><a name="custom"></a>
 <span class="heading2">Custom Modules</span><br>
 
@@ -420,32 +416,58 @@
 
 <p>SQL Relay provides a base class for auth modules, called sqlrauth, defined in the header file: sqlrserver.h</p>
 
+<p>It also provides a base class for credentials and a child class for user-password credentials.</p>
+
 <blockquote>
 
 
 <font face="monospace">
+<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRSERVER_DLLSPEC sqlrcredentials {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>public</b></font>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcredentials();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;~sqlrcredentials();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*getType()=<font color="#ff00ff">0</font>;<br>
+};<br>
+<br>
+<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRSERVER_DLLSPEC sqlruserpasswordcredentials :&nbsp;<font color="#a52a2a"><b>public</b></font>&nbsp;sqlrcredentials {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>public</b></font>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlruserpasswordcredentials();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;~sqlruserpasswordcredentials();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*getType();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;&nbsp;&nbsp;&nbsp;setUser(<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*user);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;&nbsp;&nbsp;&nbsp;setPassword(<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*password);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*getUser();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*getPassword();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>private</b></font>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*user;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*password;<br>
+};<br>
+<br>
 <font color="#2e8b57"><b>class</b></font>&nbsp;SQLRSERVER_DLLSPEC sqlrauth {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>public</b></font>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrauth(xmldomnode *parameters,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;debug);<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;~sqlrauth();<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;&nbsp;&nbsp;&nbsp;authenticate(sqlrserverconnection *sqlrcon,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*user,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*password);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>virtual</b></font>&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*auth(sqlrserverconnection *sqlrcon,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcredentials *cred);<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>protected</b></font>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xmldomnode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*parameters;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *sqlrpe;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;debug;<br>
 };<br>
 </font>
 </blockquote>
 
 <p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
 
-<p>The default implementaion of the constructor just sets the member variables <i>parameters</i> and <i>sqlrpe</i> to the corresponding passed-in values.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
+<p>The default implementaion of the constructor just sets the member variables <i>parameters</i>, <i>sqlrpe</i>, and <i>debug</i> to the corresponding passed-in values.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
 
 <p>By default, the destructor does nothing.</p>
 
-<p>auth() does nothing by default and returns false, indicating that authentication/authorization failed.</p>
+<p>auth() does nothing by default and returns NULL, indicating that authentication/authorization failed.</p>
 
 <p>A custom module module must contain a class that inherits from sqlrauth, implements the necessary methods, and implements a function to return an instance of the class.</p>
 
@@ -464,15 +486,16 @@
 <font color="#2e8b57"><b>class</b></font>&nbsp;SQLRSERVER_DLLSPEC hardcoded :&nbsp;<font color="#a52a2a"><b>public</b></font>&nbsp;sqlrauth {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>public</b></font>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hardcoded(xmldomnode *parameters,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;&nbsp;&nbsp;&nbsp;authenticate(sqlrserverconnection *conn,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*user,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*password);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;debug);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*authenticate(sqlrserverconnection *conn,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcredentials *cred);<br>
 };<br>
 <br>
 hardcoded::hardcoded(xmldomnode *parameters,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe) :<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrauth(parameters,sqlrpe) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;debug) :<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrauth(parameters,sqlrpe,debug) {<br>
 }<br>
 <br>
 <font color="#2e8b57"><b>struct</b></font>&nbsp;cred_t {<br>
@@ -487,30 +510,43 @@ hardcoded::hardcoded(xmldomnode *parameters,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<font color="#ff00ff">NULL</font>,<font color="#ff00ff">NULL</font>}<br>
 };<br>
 <br>
-<font color="#2e8b57"><b>bool</b></font>&nbsp;hardcoded::authenticate(sqlrserverconnection *sqlrcon,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*user,&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*password) {<br>
+<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;*hardcoded::authenticate(sqlrserverconnection *sqlrcon,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcredentials *cred) {<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// this module only supports user-password credentials</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>if</b></font>&nbsp;(charstring::compare(cred-&gt;getType(),<font color="#ff00ff">&quot;userpassword&quot;</font>)) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#ff00ff">NULL</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// convert &quot;cred&quot; to user-password credentials</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlruserpasswordcredentials&nbsp;&nbsp;&nbsp;&nbsp; *upcred=(sqlruserpasswordcredentials *)cred;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// if the user matches one of the users in our list, then return the user</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#2e8b57"><b>const</b></font>&nbsp;cred_t *c=credentials; c-&gt;user; c++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>if</b></font>&nbsp;(!charstring::compare(user,c-&gt;user) &amp;&amp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!charstring::compare(password,c-&gt;password)) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#ff00ff">true</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>if</b></font>&nbsp;(!charstring::compare(upcred-&gt;getUser(),c-&gt;user) &amp;&amp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!charstring::compare(upcred-&gt;getPassword(),c-&gt;password)) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;upcred-&gt;getUser();<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#ff00ff">false</font>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// otherwise return NULL</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#ff00ff">NULL</font>;<br>
 }<br>
 <br>
 <font color="#2e8b57"><b>extern</b></font>&nbsp;<font color="#ff00ff">&quot;C&quot;</font>&nbsp;{<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_hardcoded(<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xmldomnode *users,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;hardcoded(users,sqlrpe);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrpwdencs *sqlrpe,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;debug) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>return</b></font>&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;hardcoded(users,sqlrpe,debug);<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
 }<br>
 </font>
 </blockquote>
 
-<p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The auth() method compares the user and password to a hardcoded list and returns true if it matches or false if it doesn't.</p>
+<p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The auth() method verifies that an appropriate type of credentials has been passed in, casts the credentials to a set of user-password credentials, compares the user and password to a hardcoded list, and returns the user if it matches or NULL if it doesn't.  It may seem odd to return the user rather than true/false, but some authentication methods pass a set of credentials (such as TLS's Common Name and Subject Alternative Names), and the auth() method must return specific credential was authorized.</p>
 
-<p>Note the "new_sqlrauth_hardcoded()" function which just allocates an instance of hardcoded and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrauth_<i>modulename</i>" and take xmldomnode * and sqlrpwdencs * parameters.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+<p>Note the "new_sqlrauth_hardcoded()" function which just allocates an instance of hardcoded and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrauth_<i>modulename</i>" and take xmldomnode *, sqlrpwdencs *, and bool parameters.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
 
 <p>To build the module on a Linux or Unix system, run a command like:</p>
 

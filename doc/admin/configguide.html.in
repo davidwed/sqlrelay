@@ -652,8 +652,9 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <li>The <b>krb</b> parameter enables (or disables) Kerberos authentication and encryption.</li>
 <li>The <b>krbservice</b> parameter specifies which Kerberos service to use.  This parameter is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.</li>
 <li>The <b>krbkeytab</b> parameter specifies the location of the keytab file containing the key for the specified Kerberos service.  This parameter is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab</li>
-<li>The <b>krb_userlist</b> auth module authorizes a set of Kerberos-authenticated users.  Note that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.  See <a href="../modules/auths.html">Extension Modules - Auth</a> for more information about auth modules.</li>
 </ul>
+
+<p>Note that no passwords are required in the user list.  Note also that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.</p>
 
 <p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the krbkeytab parameter.</p>
 
@@ -696,7 +697,7 @@ sqlrsh -host <i>sqlrserver</i> -krb -krbservice sqlrelay/sqlrserver.firstworks.c
 <li>If the security context can be successfully established, then the SQL Relay server can trust that the client program is being run by the user that it says it is.</li>
 </ul>
 
-<p>Once the SQL Relay server trusts that the client is being run by the user that it says it is, the krb_userlist auth module authorizes that user against the list of valid users.</p>
+<p>Once the SQL Relay server trusts that the client is being run by the user that it says it is, the user is authorized against the list of valid users.</p>
 
 <p>While Kerberos authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:</p>
 
@@ -818,8 +819,9 @@ sqlrsh -host <i>sqlrserver.firstworks.com</i> -user sqlruser -password sqlrpassw
 <ul>
 <li>The <b>tlsvalidate</b> parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.</li>
 <li>The <b>tlsca</b> parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.</li>
-<li>The <b>tls_userlist</b> auth module authorizes the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) against a list of valid names.  See <a href="../modules/auths.html">Extension Modules - Auth</a> for more information about auth modules.</li>
 </ul>
+
+<p>Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.</p>
 
 <p>To access the instance, the client must provide, at minimum, a certificate, as follows:</p>
 
@@ -831,7 +833,7 @@ sqlrsh -host <i>sqlrserver</i> -tls -tlsvalidate no -tlscert /usr/local/firstwor
 
 <p>(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)</p>
 
-<p>Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the tls_userlist auth module authorizes the name provided by the certificate against the list of valid names.</p>
+<p>Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.</p>
 
 <p>In a more likely use case, cross-validation occurs - the client validates the server and the server validates the client, as follows:</p>
 

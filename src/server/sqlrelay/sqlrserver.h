@@ -1121,8 +1121,6 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 					sqlrpwdencs *sqlrpe,
 					bool debug);
 		virtual	~sqlrauth();
-		virtual void	setParameter(const char *name,
-							const char *value);
 		virtual	const char	*auth(sqlrserverconnection *sqlrcon,
 							sqlrcredentials *cred);
 	protected:
