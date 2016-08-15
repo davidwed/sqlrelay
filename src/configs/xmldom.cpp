@@ -1326,6 +1326,21 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
+	// krb_userlist/tls_userlist -> userlist
+	for (xmldomnode *auth=instance->getFirstTagChild("auths")->
+						getFirstTagChild("auth");
+				!auth->isNullNode();
+				auth=auth->getNextTagSibling("auth")) {
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"krb_userlist") ||
+			!charstring::compare(
+				auth->getAttributeValue("module"),
+				"tls_userlist")) {
+			auth->setAttributeValue("module","userlist");
+		}
+	}
+
 	// normalize connections
 	uint32_t	connectioncount=0;
 	xmldomnode	*conns=instance->getFirstTagChild("connections");
