@@ -1125,16 +1125,13 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 		virtual	~sqlrauth();
 		virtual void	setParameter(const char *name,
 							const char *value);
-		virtual	bool	auth(sqlrserverconnection *sqlrcon,
-							const char *user,
-							const char *password);
+		virtual	const char	*auth(sqlrserverconnection *sqlrcon,
+							sqlrcredentials *cred);
 		virtual	bool	auth(sqlrserverconnection *sqlrcon,
 							const char *user,
 							const char *password,
 							const char *method,
 							const char *extra);
-		virtual	const char	*auth(sqlrserverconnection *sqlrcon,
-							sqlrcredentials *cred);
 	protected:
 		xmldomnode		*parameters;
 		sqlrpwdencs		*sqlrpe;

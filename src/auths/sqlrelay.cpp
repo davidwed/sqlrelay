@@ -11,8 +11,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 						sqlrpwdencs *sqlrpe,
 						bool debug);
 			~sqlrauth_sqlrelay();
-		bool	auth(sqlrserverconnection *sqlrcon,
-					const char *user, const char *password);
+		const char	*auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred);
 	private:
 		const char	*host;
 		uint16_t	port;
@@ -98,17 +98,28 @@ sqlrauth_sqlrelay::~sqlrauth_sqlrelay() {
 	delete sqlrcon;
 }
 
-bool sqlrauth_sqlrelay::auth(sqlrserverconnection *sqlrcon,
-						const char *user,
-						const char *password) {
+const char *sqlrauth_sqlrelay::auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred) {
+
+	// this module only supports user/password credentials
+	if (charstring::compare(cred->getType(),"userpassword")) {
+		return NULL;
+	}
+
+
+	// get the user/password from the creds
+	const char	*user=
+			((sqlruserpasswordcredentials *)cred)->getUser();
+	const char	*password=
+			((sqlruserpasswordcredentials *)cred)->getPassword();
 
 	sqlrcur->inputBind("1",user);
 	sqlrcur->inputBind("2",password);
-	bool	retval=(sqlrcur->executeQuery() &&
-			sqlrcur->rowCount() &&
-			sqlrcur->getFieldAsInteger(0,(uint32_t)0));
+	bool	success=(sqlrcur->executeQuery() &&
+				sqlrcur->rowCount() &&
+				sqlrcur->getFieldAsInteger(0,(uint32_t)0));
 	sqlrcon->endSession();
-	return retval;
+	return (success)?user:NULL;
 }
 
 extern "C" {

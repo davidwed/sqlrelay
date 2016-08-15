@@ -10,8 +10,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_proxied : public sqlrauth {
 			sqlrauth_proxied(xmldomnode *parameters,
 						sqlrpwdencs *sqlrpe,
 						bool debug);
-		bool	auth(sqlrserverconnection *sqlrcon,
-					const char *user, const char *password);
+		const char	*auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred);
 	private:
 		stringbuffer	lastuser;
 		stringbuffer	lastpassword;
@@ -23,8 +23,19 @@ sqlrauth_proxied::sqlrauth_proxied(xmldomnode *parameters,
 					sqlrauth(parameters,sqlrpe,debug) {
 }
 
-bool sqlrauth_proxied::auth(sqlrserverconnection *sqlrcon,
-				const char *user, const char *password) {
+const char *sqlrauth_proxied::auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred) {
+
+	// this module only supports user/password credentials
+	if (charstring::compare(cred->getType(),"userpassword")) {
+		return NULL;
+	}
+
+	// get the user/password from the creds
+	const char	*user=
+			((sqlruserpasswordcredentials *)cred)->getUser();
+	const char	*password=
+			((sqlruserpasswordcredentials *)cred)->getPassword();
 
 	// if the user we want to change to is different from the user
 	// that's currently logged in, then try to change to that user
@@ -46,7 +57,7 @@ bool sqlrauth_proxied::auth(sqlrserverconnection *sqlrcon,
 			lastpassword.append(password);
 		}
 	}
-	return success;
+	return (success)?user:NULL;
 }
 
 extern "C" {

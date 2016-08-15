@@ -10,8 +10,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 			sqlrauth_database(xmldomnode *parameters,
 						sqlrpwdencs *sqlrpe,
 						bool debug);
-		bool	auth(sqlrserverconnection *sqlrcon,
-					const char *user, const char *password);
+		const char	*auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred);
 	private:
 		bool		first;
 		stringbuffer	lastuser;
@@ -25,8 +25,13 @@ sqlrauth_database::sqlrauth_database(xmldomnode *parameters,
 	first=true;
 }
 
-bool sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
-				const char *user, const char *password) {
+const char *sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred) {
+
+	// this module only supports user/password credentials
+	if (charstring::compare(cred->getType(),"userpassword")) {
+		return NULL;
+	}
 
 	// if this is the first time, initialize the lastuser/lastpassword
 	// from the user/password that was originally used to log in to the
@@ -36,6 +41,12 @@ bool sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
 		lastpassword.append(sqlrcon->cont->getPassword());
 		first=false;
 	}
+
+	// get the user/password from the creds
+	const char	*user=
+			((sqlruserpasswordcredentials *)cred)->getUser();
+	const char	*password=
+			((sqlruserpasswordcredentials *)cred)->getPassword();
 
 	// if the user we want to change to is different from the user
 	// that's currently logged in, then try to change to that user
@@ -57,7 +68,7 @@ bool sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
 			lastpassword.append(password);
 		}
 	}
-	return success;
+	return (success)?user:NULL;
 }
 
 extern "C" {

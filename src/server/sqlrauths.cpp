@@ -126,18 +126,6 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 }
 
 bool sqlrauths::auth(sqlrserverconnection *sqlrcon,
-				const char *user, const char *password) {
-	debugFunction();
-	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
-						node; node=node->getNext()) {
-		if (node->getValue()->au->auth(sqlrcon,user,password)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-bool sqlrauths::auth(sqlrserverconnection *sqlrcon,
 				const char *user, const char *password,
 				const char *method, const char *extra) {
 	debugFunction();

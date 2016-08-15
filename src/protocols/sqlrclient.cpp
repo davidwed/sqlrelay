@@ -756,9 +756,12 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 		return false;
 	}
 
-	// build credentials
+	// build credentials...
+	// use kerberos or tls if we are configured to
+	// but...
+	// override kerberos/tls if the client passed us a user
 	sqlrcredentials	*cred=NULL;
-	if (usekrb) {
+	if (!userbuffer[0] && usekrb) {
 		gsscontext		*ctx=cont->getGSSContext();
 		if (ctx) {
 			sqlrgsscredentials	*gsscred=
@@ -766,7 +769,7 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 			gsscred->setInitiator(ctx->getInitiator());
 			cred=gsscred;
 		}
-	} else if (usetls) {
+	} else if (!userbuffer[0] && usetls) {
 		tlscontext		*ctx=cont->getTLSContext();
 		if (ctx) {
 			tlscertificate	*cert=ctx->getPeerCertificate();
@@ -789,7 +792,9 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 	}
 
 	// auth
-	if (cont->auth(cred)) {
+	bool	success=cont->auth(cred);
+	delete cred;
+	if (success) {
 		return true;
 	}
 

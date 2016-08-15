@@ -1823,16 +1823,19 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 	return cur[firstnewcursor];
 }
 
-bool sqlrservercontroller::auth(const char *userbuffer,
-				const char *passwordbuffer) {
+bool sqlrservercontroller::auth(sqlrcredentials *cred) {
 
 	raiseDebugMessageEvent("auth...");
 
 	// authenticate
-	if (sqlra && sqlra->auth(conn,userbuffer,passwordbuffer)) {
+	const char	*autheduser=NULL;
+	if (sqlra && sqlra->auth(conn,cred)) {
+		autheduser=sqlra->auth(conn,cred);
+	}
+	if (autheduser) {
 
 		raiseDebugMessageEvent("auth success");
-		setCurrentUser(userbuffer,charstring::length(userbuffer));
+		setCurrentUser(autheduser,charstring::length(autheduser));
 
 		// consult connection schedules
 		if (sqlrs && !sqlrs->allowed(conn,getCurrentUser())) {
@@ -1871,35 +1874,6 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 
 		return true;
 	} 
-
-	raiseDebugMessageEvent("auth failed");
-	raiseClientConnectionRefusedEvent("auth failed");
-	return false;
-}
-
-bool sqlrservercontroller::auth(sqlrcredentials *cred) {
-
-	raiseDebugMessageEvent("auth...");
-
-	// authenticate
-	const char	*autheduser=NULL;
-	if (sqlra && sqlra->auth(conn,cred)) {
-		autheduser=sqlra->auth(conn,cred);
-	}
-	if (autheduser) {
-
-		raiseDebugMessageEvent("auth success");
-		setCurrentUser(autheduser,charstring::length(autheduser));
-
-		// consult connection schedules
-		if (sqlrs && !sqlrs->allowed(conn,getCurrentUser())) {
-			raiseDebugMessageEvent("connection schedule violation");
-			raiseScheduleViolationEvent(getCurrentUser());
-			return false;
-		}
-
-		return true;
-	}
 
 	raiseDebugMessageEvent("auth failed");
 	raiseClientConnectionRefusedEvent("auth failed");
