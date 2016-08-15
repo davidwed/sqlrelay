@@ -10,6 +10,7 @@ class sqlrserverconnection;
 class sqlrservercursor;
 class sqlrprotocol;
 class sqlrprotocols;
+class sqlrcredentials;
 class sqlrauth;
 class sqlrauths;
 class sqlrpwdenc;
@@ -157,6 +158,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *passwordbuffer,
 						const char *method,
 						const char *extra);
+		bool		auth(sqlrcredentials *cred);
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 
@@ -233,12 +235,15 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// connection state
 		void	setState(enum sqlrconnectionstate_t state);
 		enum sqlrconnectionstate_t	getState();
-		void	updateCurrentUser(const char *user,
-						uint32_t userlen);
-		void	updateCurrentQuery(const char *query,
-						uint32_t querylen);
-		void	updateClientInfo(const char *info,
-						uint32_t infolen);
+
+		// current client info
+		void	setCurrentUser(const char *user, uint32_t userlen);
+		void	setCurrentQuery(const char *query, uint32_t querylen);
+		void	setClientInfo(const char *info, uint32_t infolen);
+		const char	*getCurrentUser();
+		const char	*getCurrentQuery();
+		const char	*getClientInfo();
+		const char	*getClientAddr();
 
 		// instance state
 		void	disableInstance();
@@ -1058,6 +1063,60 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 };
 
 
+class SQLRSERVER_DLLSPEC sqlrcredentials {
+	public:
+			sqlrcredentials();
+		virtual	~sqlrcredentials();
+		virtual const char	*getType()=0;
+};
+
+class SQLRSERVER_DLLSPEC sqlruserpasswordcredentials : public sqlrcredentials {
+	public:
+			sqlruserpasswordcredentials();
+		virtual	~sqlruserpasswordcredentials();
+		const char	*getType();
+
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+
+		const char	*getUser();
+		const char	*getPassword();
+	private:
+		const char	*user;
+		const char	*password;
+};
+
+class SQLRSERVER_DLLSPEC sqlrgsscredentials : public sqlrcredentials {
+	public:
+			sqlrgsscredentials();
+		virtual	~sqlrgsscredentials();
+		const char	*getType();
+
+		void	setInitiator(const char *initiator);
+
+		const char	*getInitiator();
+	private:
+		const char	*initiator;
+};
+
+class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
+	public:
+			sqlrtlscredentials();
+		virtual	~sqlrtlscredentials();
+		const char	*getType();
+
+		void	setCommonName(const char *commonname);
+		void	setSubjectAlternateNames(
+				linkedlist < char * > *subjectalternatenames);
+
+		const char		*getCommonName();
+		linkedlist< char * >	*getSubjectAlternateNames();
+	private:
+		const char		*commonname;
+		linkedlist< char * >	*subjectalternatenames;
+};
+
+
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 			sqlrauth(xmldomnode *parameters,
@@ -1074,6 +1133,8 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 							const char *password,
 							const char *method,
 							const char *extra);
+		virtual	const char	*auth(sqlrserverconnection *sqlrcon,
+							sqlrcredentials *cred);
 	protected:
 		xmldomnode		*parameters;
 		sqlrpwdencs		*sqlrpe;
@@ -1098,6 +1159,8 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		bool	auth(sqlrserverconnection *sqlrcon,
 					const char *user, const char *password,
 					const char *method, const char *extra);
+		const char	*auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred);
 	private:
 		void	unload();
 		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);

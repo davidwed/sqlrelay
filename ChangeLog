@@ -36,6 +36,8 @@
 		disables the instance
 	router calls begin, commit, and rollback on all connections now, even
 		if they're executed as queries rather than using the api methods
+	removed tls_userlist/krb_userlist auth modules and updated the
+		userlist auth module to support tls and kerberos auth
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

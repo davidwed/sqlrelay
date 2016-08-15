@@ -365,9 +365,6 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 	dt.getSystemDateAndTime();
 	char	*hostname=NULL;
 	char	*pid=NULL;
-	sqlrconnstatistics	*connstats=(sqlrcon)?
-						sqlrcon->cont->connstats:
-						NULL;
 
 	const char *ch=str;
 	while (*ch) {
@@ -407,19 +404,19 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 			ch+=5;
 		} else if (!charstring::compare(ch,"@clientaddr@",12)) {
 			debugPrintf("clientaddr: ");
-			value=(connstats)?connstats->clientaddr:"";
+			value=(sqlrcon)?sqlrcon->cont->getClientAddr():"";
 			ch+=12;
 		} else if (!charstring::compare(ch,"@clientinfo@",12)) {
 			debugPrintf("clientinfo: ");
-			value=(connstats)?connstats->clientinfo:"";
+			value=(sqlrcon)?sqlrcon->cont->getClientInfo():"";
 			ch+=12;
 		} else if (!charstring::compare(ch,"@user@",6)) {
 			debugPrintf("user: ");
-			value=(connstats)?connstats->user:"";
+			value=(sqlrcon)?sqlrcon->cont->getCurrentUser():"";
 			ch+=6;
 		} else if (!charstring::compare(ch,"@query@",7)) {
 			debugPrintf("query: ");
-			value=(connstats)?connstats->sqltext:"";
+			value=(sqlrcon)?sqlrcon->cont->getCurrentQuery():"";
 			ch+=7;
 		}
 

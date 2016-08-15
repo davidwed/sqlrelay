@@ -150,3 +150,20 @@ bool sqlrauths::auth(sqlrserverconnection *sqlrcon,
 	}
 	return false;
 }
+
+const char *sqlrauths::auth(sqlrserverconnection *sqlrcon,
+					sqlrcredentials *cred) {
+	debugFunction();
+	if (!cred) {
+		return NULL;
+	}
+	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
+						node; node=node->getNext()) {
+		const char	*autheduser=
+				node->getValue()->au->auth(sqlrcon,cred);
+		if (autheduser) {
+			return autheduser;
+		}
+	}
+	return NULL;
+}

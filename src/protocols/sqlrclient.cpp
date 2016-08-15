@@ -751,10 +751,45 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 
 	cont->raiseDebugMessageEvent("auth");
 
-	// get the user/password from the client and auth
-	if (getUserFromClient() &&
-		getPasswordFromClient() &&
-		cont->auth(userbuffer,passwordbuffer)) {
+	// get the user/password from the client
+	if (!getUserFromClient() || !getPasswordFromClient()) {
+		return false;
+	}
+
+	// build credentials
+	sqlrcredentials	*cred=NULL;
+	if (usekrb) {
+		gsscontext		*ctx=cont->getGSSContext();
+		if (ctx) {
+			sqlrgsscredentials	*gsscred=
+						new sqlrgsscredentials();
+			gsscred->setInitiator(ctx->getInitiator());
+			cred=gsscred;
+		}
+	} else if (usetls) {
+		tlscontext		*ctx=cont->getTLSContext();
+		if (ctx) {
+			tlscertificate	*cert=ctx->getPeerCertificate();
+			if (cert) {
+				sqlrtlscredentials	*tlscred=
+						new sqlrtlscredentials();
+				tlscred->setSubjectAlternateNames(
+					cert->getSubjectAlternateNames());
+				tlscred->setCommonName(
+					cert->getCommonName());
+				cred=tlscred;
+			}
+		}
+	} else {
+		sqlruserpasswordcredentials	*upcred=
+					new sqlruserpasswordcredentials();
+		upcred->setUser(userbuffer);
+		upcred->setPassword(passwordbuffer);
+		cred=upcred;
+	}
+
+	// auth
+	if (cont->auth(cred)) {
 		return true;
 	}
 
@@ -1398,7 +1433,7 @@ bool sqlrprotocol_sqlrclient::getClientInfo(sqlrservercursor *cursor) {
 
 	// FIXME: push up?
 	// update the stats with the client info
-	cont->updateClientInfo(clientinfo,clientinfolen);
+	cont->setClientInfo(clientinfo,clientinfolen);
 
 	return true;
 }
@@ -1437,7 +1472,8 @@ bool sqlrprotocol_sqlrclient::getQuery(sqlrservercursor *cursor) {
 		debugstr.append("get query failed: "
 				"client sent bad query length: ");
 		debugstr.append(querylength);
-		cont->raiseClientProtocolErrorEvent(cursor,debugstr.getString(),1);
+		cont->raiseClientProtocolErrorEvent(cursor,
+						debugstr.getString(),1);
 
 		return false;
 	}
@@ -1470,7 +1506,7 @@ bool sqlrprotocol_sqlrclient::getQuery(sqlrservercursor *cursor) {
 
 	// FIXME: push up?
 	// update the stats with the current query
-	cont->updateCurrentQuery(querybuffer,querylength);
+	cont->setCurrentQuery(querybuffer,querylength);
 
 	return true;
 }

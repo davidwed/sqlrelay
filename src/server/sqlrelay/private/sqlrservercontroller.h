@@ -127,8 +127,8 @@
 		sqlrparser	*newParser(const char *module,
 						bool errorifnotfound);
 
-		void	updateClientSessionStartTime();
-		void	updateClientAddr();
+		void	setClientSessionStartTime();
+		void	setClientAddr();
 
 
 		void	sessionStartQueries();

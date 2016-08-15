@@ -26,3 +26,8 @@ bool sqlrauth::auth(sqlrserverconnection *sqlrcon,
 			const char *method, const char *salt) {
 	return auth(sqlrcon,user,password);
 }
+
+const char *sqlrauth::auth(sqlrserverconnection *sqlrcon,
+					sqlrcredentials *cred) {
+	return NULL;
+}

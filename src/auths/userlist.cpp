@@ -11,9 +11,12 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 						bool debug);
 			~sqlrauth_userlist();
 
-		bool	auth(sqlrserverconnection *sqlrcon,
-					const char *user, const char *password);
+		const char	*auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred);
 	private:
+		const char	*userPassword(const char *user,
+						const char *password,
+						uint64_t index);
 		const char	**users;
 		const char	**passwords;
 		const char	**passwordencryptions;
@@ -65,77 +68,127 @@ sqlrauth_userlist::~sqlrauth_userlist() {
 	delete[] passwordencryptions;
 }
 
-bool sqlrauth_userlist::auth(sqlrserverconnection *sqlrcon,
-						const char *user,
-						const char *password) {
+const char *sqlrauth_userlist::auth(sqlrserverconnection *sqlrcon,
+						sqlrcredentials *cred) {
+
+	// this module supports userpassword, gss, and tls credentials
+	bool		up=!charstring::compare(cred->getType(),"userpassword");
+	bool		gss=!charstring::compare(cred->getType(),"gss");
+	bool		tls=!charstring::compare(cred->getType(),"tls");
+	const char	*user=NULL;
+	const char	*password=NULL;
+	const char	*initiator=NULL;
+	linkedlist< char * >	*sans=NULL;
+	const char		*commonname=NULL;
+	if (up) {
+		user=((sqlruserpasswordcredentials *)cred)->getUser();
+		password=((sqlruserpasswordcredentials *)cred)->getPassword();
+	} else if (gss) {
+		initiator=((sqlrgsscredentials *)cred)->getInitiator();
+	} else if (tls) {
+		sans=((sqlrtlscredentials *)cred)->getSubjectAlternateNames();
+		commonname=((sqlrtlscredentials *)cred)->getCommonName();
+	} else {
+		return NULL;
+	}
 
 	// run through the user/password arrays...
 	for (uint64_t i=0; i<usercount; i++) {
+		if (up) {
+			const char	*result=userPassword(user,password,i);
+			if (result) {
+				return result;
+			}
+		} else if (gss) {
+			if (!charstring::compare(initiator,users[i])) {
+				return initiator;
+			}
+		} else if (tls) {
+			if (sans && sans->getLength()) {
 
-		// if the user matches...
-		if (!charstring::compare(user,users[i])) {
-
-			if (sqlrpe &&
-				charstring::length(passwordencryptions[i])) {
-
-				// if password encryption is being used...
-
-				// get the module
-				sqlrpwdenc	*pe=
-					sqlrpe->getPasswordEncryptionById(
-							passwordencryptions[i]);
-				if (!pe) {
-					return false;
+				// if subject alternate names were
+				// present then validate against those
+				for (linkedlistnode< char * > *
+						node=sans->getFirst();
+						node; node=node->getNext()) {
+					if (!charstring::compare(
+						node->getValue(),users[i])) {
+						return node->getValue();
+					}
 				}
-
-				// For one-way encryption, encrypt the password
-				// that was passed in and compare it to the
-				// encrypted password in the configuration.
-				// For two-way encryption, decrypt the password
-				// from the configuration and compare to to the
-				// password that was passed in...
-
-				bool	retval=false;
-				char	*pwd=NULL;
-				if (pe->oneWay()) {
-
-					// encrypt the password
-					// that was passed in
-					pwd=pe->encrypt(password);
-
-					// compare it to the encrypted
-					// password from the configuration
-					retval=!charstring::compare(
-							pwd,passwords[i]);
-
-				} else {
-
-					// decrypt the password
-					// from the configuration
-					pwd=pe->decrypt(passwords[i]);
-
-					// compare it to the password
-					// that was passed in
-					retval=!charstring::compare(
-							password,pwd);
-				}
-
-				// clean up
-				delete[] pwd;
-
-				// return true/false
-				return retval;
 
 			} else {
 
-				// if password encryption isn't being used,
-				// return true if the passwords match
-				return !charstring::compare(password,
-								passwords[i]);
+				// if no subject alternate names were present
+				// then validate against the common name
+				if (!charstring::compare(
+						commonname,users[i])) {
+					return commonname;
+				}
 			}
 		}
 	}
-	return false;
+	return NULL;
+}
+
+const char *sqlrauth_userlist::userPassword(const char *user,
+						const char *password,
+						uint64_t index) {
+
+	// bail if the user doesn't match
+	if (charstring::compare(user,users[index])) {
+		return NULL;
+	}
+
+	// if password encryption is being used...
+	if (sqlrpe && charstring::length(passwordencryptions[index])) {
+
+		// get the module
+		sqlrpwdenc	*pe=sqlrpe->getPasswordEncryptionById(
+						passwordencryptions[index]);
+		if (!pe) {
+			return NULL;
+		}
+
+		// For one-way encryption, encrypt the password that was passed
+		// in and compare it to the encrypted password in the
+		// configuration.  For two-way encryption, decrypt the password
+		// from the configuration and compare to to the password that
+		// was passed in...
+
+		bool	result=false;
+		char	*pwd=NULL;
+		if (pe->oneWay()) {
+
+			// encrypt the password
+			// that was passed in
+			pwd=pe->encrypt(password);
+
+			// compare it to the encrypted
+			// password from the configuration
+			result=!charstring::compare(pwd,passwords[index]);
+
+		} else {
+
+			// decrypt the password
+			// from the configuration
+			pwd=pe->decrypt(passwords[index]);
+
+			// compare it to the password
+			// that was passed in
+			result=!charstring::compare(password,pwd);
+		}
+
+		// clean up
+		delete[] pwd;
+
+		// return the result
+		return (result)?user:NULL;
+	}
+
+	// if password encryption isn't being used,
+	// then return the user if the passwords match
+	return (!charstring::compare(password,passwords[index]))?user:NULL;
 }
 
 extern "C" {

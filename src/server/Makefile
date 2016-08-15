@@ -30,6 +30,7 @@ LIBSQLRSERVERSRCS = \
 	sqlrquery.cpp \
 	sqlrpwdencs.cpp \
 	sqlrpwdenc.cpp \
+	sqlrcredentials.cpp \
 	sqlrauths.cpp \
 	sqlrauth.cpp \
 	sqlrscaler.cpp \
@@ -63,6 +64,7 @@ LIBSQLRSERVERLOBJS = \
 	sqlrquery.$(OBJ) \
 	sqlrpwdencs.$(OBJ) \
 	sqlrpwdenc.$(OBJ) \
+	sqlrcredentials.$(OBJ) \
 	sqlrauths.$(OBJ) \
 	sqlrauth.$(OBJ) \
 	sqlrscaler.$(OBJ)

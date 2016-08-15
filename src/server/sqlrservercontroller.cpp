@@ -1692,8 +1692,8 @@ void sqlrservercontroller::clientSession() {
 
 	// update various stats
 	setState(SESSION_START);
-	updateClientAddr();
-	updateClientSessionStartTime();
+	setClientAddr();
+	setClientSessionStartTime();
 	incrementOpenClientConnections();
 
 	raiseClientConnectedEvent();
@@ -1828,24 +1828,25 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 
 	raiseDebugMessageEvent("auth...");
 
-	// consult connection schedules
-	if (sqlrs && !sqlrs->allowed(conn,userbuffer)) {
-		raiseDebugMessageEvent("connection schedule violation");
-		// FIXME: handle GSS/TLS users
-		raiseScheduleViolationEvent(userbuffer);
-		return false;
+	// authenticate
+	if (sqlra && sqlra->auth(conn,userbuffer,passwordbuffer)) {
+
+		raiseDebugMessageEvent("auth success");
+		setCurrentUser(userbuffer,charstring::length(userbuffer));
+
+		// consult connection schedules
+		if (sqlrs && !sqlrs->allowed(conn,getCurrentUser())) {
+			raiseDebugMessageEvent("connection schedule violation");
+			raiseScheduleViolationEvent(getCurrentUser());
+			return false;
+		}
+
+		return true;
 	}
 
-	// authenticate
-	bool	success=(sqlra && sqlra->auth(conn,userbuffer,passwordbuffer));
-	if (success) {
-		raiseDebugMessageEvent("auth success");
-		updateCurrentUser(userbuffer,charstring::length(userbuffer));
-	} else {
-		raiseDebugMessageEvent("auth failed");
-		raiseClientConnectionRefusedEvent("auth failed");
-	}
-	return success;
+	raiseDebugMessageEvent("auth failed");
+	raiseClientConnectionRefusedEvent("auth failed");
+	return false;
 }
 
 bool sqlrservercontroller::auth(const char *userbuffer,
@@ -1855,26 +1856,54 @@ bool sqlrservercontroller::auth(const char *userbuffer,
 
 	raiseDebugMessageEvent("auth...");
 
-	// consult connection schedules
-	if (sqlrs && !sqlrs->allowed(conn,userbuffer)) {
-		raiseDebugMessageEvent("connection schedule violation");
-		// FIXME: handle GSS/TLS users
-		raiseScheduleViolationEvent(userbuffer);
-		return false;
-	}
+	// authenticate
+	if (sqlra && sqlra->auth(conn,userbuffer,passwordbuffer,method,extra)) {
+
+		raiseDebugMessageEvent("auth success");
+		setCurrentUser(userbuffer,charstring::length(userbuffer));
+
+		// consult connection schedules
+		if (sqlrs && !sqlrs->allowed(conn,getCurrentUser())) {
+			raiseDebugMessageEvent("connection schedule violation");
+			raiseScheduleViolationEvent(getCurrentUser());
+			return false;
+		}
+
+		return true;
+	} 
+
+	raiseDebugMessageEvent("auth failed");
+	raiseClientConnectionRefusedEvent("auth failed");
+	return false;
+}
+
+bool sqlrservercontroller::auth(sqlrcredentials *cred) {
+
+	raiseDebugMessageEvent("auth...");
 
 	// authenticate
-	bool	success=(sqlra && sqlra->auth(conn,userbuffer,
-						passwordbuffer,
-						method,extra));
-	if (success) {
-		raiseDebugMessageEvent("auth success");
-		updateCurrentUser(userbuffer,charstring::length(userbuffer));
-	} else {
-		raiseDebugMessageEvent("auth failed");
-		raiseClientConnectionRefusedEvent("auth failed");
+	const char	*autheduser=NULL;
+	if (sqlra && sqlra->auth(conn,cred)) {
+		autheduser=sqlra->auth(conn,cred);
 	}
-	return success;
+	if (autheduser) {
+
+		raiseDebugMessageEvent("auth success");
+		setCurrentUser(autheduser,charstring::length(autheduser));
+
+		// consult connection schedules
+		if (sqlrs && !sqlrs->allowed(conn,getCurrentUser())) {
+			raiseDebugMessageEvent("connection schedule violation");
+			raiseScheduleViolationEvent(getCurrentUser());
+			return false;
+		}
+
+		return true;
+	}
+
+	raiseDebugMessageEvent("auth failed");
+	raiseClientConnectionRefusedEvent("auth failed");
+	return false;
 }
 
 bool sqlrservercontroller::changeUser(const char *newuser,
@@ -4546,7 +4575,7 @@ enum sqlrconnectionstate_t sqlrservercontroller::getState() {
 	return connstats->state;
 }
 
-void sqlrservercontroller::updateClientSessionStartTime() {
+void sqlrservercontroller::setClientSessionStartTime() {
 	if (!connstats) {
 		return;
 	}
@@ -4556,7 +4585,7 @@ void sqlrservercontroller::updateClientSessionStartTime() {
 	connstats->clientsessionusec=dt.getMicroseconds();
 }
 
-void sqlrservercontroller::updateCurrentUser(const char *user,
+void sqlrservercontroller::setCurrentUser(const char *user,
 						uint32_t userlen) {
 	if (!connstats) {
 		return;
@@ -4569,7 +4598,7 @@ void sqlrservercontroller::updateCurrentUser(const char *user,
 	connstats->user[len]='\0';
 }
 
-void sqlrservercontroller::updateCurrentQuery(const char *query,
+void sqlrservercontroller::setCurrentQuery(const char *query,
 						uint32_t querylen) {
 	if (!connstats) {
 		return;
@@ -4582,7 +4611,7 @@ void sqlrservercontroller::updateCurrentQuery(const char *query,
 	connstats->sqltext[len]='\0';
 }
 
-void sqlrservercontroller::updateClientInfo(const char *info,
+void sqlrservercontroller::setClientInfo(const char *info,
 						uint32_t infolen) {
 	if (!connstats) {
 		return;
@@ -4595,7 +4624,7 @@ void sqlrservercontroller::updateClientInfo(const char *info,
 	connstats->clientinfo[len]='\0';
 }
 
-void sqlrservercontroller::updateClientAddr() {
+void sqlrservercontroller::setClientAddr() {
 	if (!connstats) {
 		return;
 	}
@@ -4610,6 +4639,22 @@ void sqlrservercontroller::updateClientAddr() {
 	} else {
 		charstring::copy(connstats->clientaddr,"internal");
 	}
+}
+
+const char *sqlrservercontroller::getCurrentUser() {
+	return (connstats)?connstats->user:NULL;
+}
+
+const char *sqlrservercontroller::getCurrentQuery() {
+	return (connstats)?connstats->sqltext:NULL;
+}
+
+const char *sqlrservercontroller::getClientInfo() {
+	return (connstats)?connstats->clientinfo:NULL;
+}
+
+const char *sqlrservercontroller::getClientAddr() {
+	return (connstats)?connstats->clientaddr:NULL;
 }
 
 void sqlrservercontroller::disableInstance() {
