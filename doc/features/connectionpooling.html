@@ -1,11 +1,10 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Persistent Database Connection Pooling</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Persistent Database Connection Pooling</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Persistent Database Connection Pooling</span>
+<h1>Persistent Database Connection Pooling</h1>
 
 <p>Solves - "I've analyzed my app's performance and it seems to be spending a lot of time just logging into the database."</p>
 
@@ -13,19 +12,20 @@
 
 <p>Logging into some databases can take a noticable amount of time...</p>
 
-<img src="../images/app-to-db.png"><br>
+<p><a href="../images/app-to-db.png""><img src="../images/app-to-db.png""/></a></p>
 
 <p>In fact, it may take longer for an application to log in than to run all of the queries it needs to run.  This can be especially problematic for transient apps such as web-based applications which start up, connect, query, and shut down, over and over.</p>
 
 <p>Logging into a connection pooling takes a very short amount of time and since the connection pooling system has been maintaining already-logged-in database connections, the database is immediately available.</p>
 
-<img src="../images/app-to-sqlr-to-db.png"><br>
+<p><a href="../images/app-to-sqlr-to-db.png"><img src="../images/app-to-sqlr-to-db.png"/></a></p>
 
 <p>A connection pooling system can significantly reduce the amount of time it takes an app to begin running queries.</p>
 
 <p>This is especially true when an application uses a cloud service database located across the internet, and even more significant when that database requires TLS/SSL authentication.</p>
 
-<p>Many connection pooling systems are built into application servers or run within a web-server but can only be used by applications running within that server and usually only by applications written in a particular language.  SQL Relay runs stand-alone and may be used by any application, including applications running on other machines across the network.  This is especially useful if you have a variety of apps, written in different languages, running on various platforms that all need to talk to the same database.</p>
+<p>Many connection pooling systems are built into application servers or run within a web-server but can only be used by applications running within that server and usually only by applications written in a particular language.  SQL Relay runs stand-alone and may be used by any application, including applications running on other machines across the network.  This is especially useful if you have a variety of apps, written in different languages, running on various platforms that all need to talk to the same database.
+</p>
 
 </body>
 </html>

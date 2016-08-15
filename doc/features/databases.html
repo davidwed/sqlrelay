@@ -1,54 +1,67 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Supported Databases</title>
-<link href="../css/styles.css" rel="stylesheet">
-<script language="Javascript" src="../js/rotate.js"></script>
+	<title>Supported Databases</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
-<body onload="rotate();">
+<body>
+<p><script language="Javascript" src="../js/rotate.js"></script></p>
 
-<span class="heading1">Supported Databases</span><br><br>
+<h1>Supported Databases</h1>
 
-<div class="slide">
-<br>
+<p><div class="slide"></p>
+
 <table>
-<tr>
-<td><img src="../images/oracle.png">
-<img style="margin-left: 10px" src="../images/sybase.png">
-<img style="margin-left: 10px" src="../images/ibm.png"></td>
-<td><img style="margin-left: 10px" src="../images/mssqlserver.png"></td>
-</tr>
+  <tr>
+    <td><a href="../images/oracle.png"><img src="../images/oracle.png"/></a>
+<a href="../images/sybase.png"><img style="margin-left: 10px; " src="../images/sybase.png"/></a>
+<a href="../images/ibm.png"><img style="margin-left: 10px; " src="../images/ibm.png"/></a>
+</td>
+    <td><a href="../images/mssqlserver.png"><img style="margin-left: 10px; " src="../images/mssqlserver.png"/></a>
+</td>
+  </tr>
 </table>
-</div>
 
-<div class="slide hidden">
-<img src="../images/mysql.png">
-<img style="margin-left: 10px" src="../images/postgresql.png">
-<img style="margin-left: 10px" src="../images/firebird.png">
-<img style="margin-left: 10px" src="../images/sqlite.png">
-</div>
+<p></div></p>
 
-<div class="slide hidden">
+<p><div class="slide hidden">
+<a href="../images/mysql.png"><img src="../images/mysql.png"/></a>
+<a href="../images/postgresql.png"><img style="margin-left: 10px; " src="../images/postgresql.png"/></a>
+<a href="../images/firebird.png"><img style="margin-left: 10px; " src="../images/firebird.png"/></a>
+<a href="../images/sqlite.png"><img style="margin-left: 10px; " src="../images/sqlite.png"/></a>
+</div></p>
+
+<p><div class="slide hidden"></p>
+
 <table>
-<tr>
-<td><img src="../images/unixodbc.png">
-<img style="margin-left: 10px" src="../images/iodbc.png"></td>
-<td><img style="margin-left: 10px" src="../images/freetds.png">
-<br><br><img style="margin-left: 10px" src="../images/mdbtools.png"></td>
-</tr>
+  <tr>
+    <td><a href="../images/unixodbc.png"><img src="../images/unixodbc.png"/></a>
+<a href="../images/iodbc.png"><img style="margin-left: 10px; " src="../images/iodbc.png"/></a>
+</td>
+    <td><a href="../images/freetds.png"><img style="margin-left: 10px; " src="../images/freetds.png"/></a>
+<br/><br/>
+<a href="../images/mdbtools.png"><img style="margin-left: 10px; " src="../images/mdbtools.png"/></a>
+</td>
+  </tr>
 </table>
-</div>
 
-<p>SQL Relay supports <a target="_blank" href="http://oracle.com">Oracle</a>, <a target="_blank" href="http://www.mysql.com">MySQL</a>, <a target="_blank" href="http://postgresql.org">PostgreSQL</a>, <a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>, <a target="_blank" href="http://www-01.ibm.com/software/data/db2/">IBM DB2</a>, <a target="_blank" href="http://www-01.ibm.com/software/data/informix/">Informix</a>, <a target="_blank" href="http://www.firebirdsql.org">Firebird</a> and <a target="_blank" href="http://sqlite.org">SQLite</a> databases directly, using the native client API's for those databases.</p>
+<p></div></p>
 
-<p>Support is provided for Microsoft SQL Server via the <a target="_blank" href="http://www.freetds.org">FreeTDS</a> API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the SAP/Sybase database API.  So, depending on what version of SAP/Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
+<p>SQL Relay supports <a href="http://oracle.com">Oracle</a>, <a href="http://www.mysql.com">MySQL</a>, <a href="http://postgresql.org">PostgreSQL</a>, <a href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>, <a href="http://www-01.ibm.com/software/data/db2/">IBM DB2</a>, <a href="http://www-01.ibm.com/software/data/informix/">Informix</a>, <a href="http://www.firebirdsql.org">Firebird</a> and <a href="http://sqlite.org">SQLite</a> databases directly, using the native client API's for those databases.</p>
 
-<p>FreeTDS supports SAP/Sybase as well.  So you can access both SQL Server and SAP/Sybase databases using FreeTDS.</p>
+<p>Support is provided for Microsoft SQL Server via the <a href="http://www.freetds.org">FreeTDS</a> API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the SAP/Sybase database API.  So, depending on what version of SAP/Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
 
-<p>Minimal support is provided for Microsoft Access databases via the <a target="_blank" href="http://mdbtools.sourceforge.net">MDB Tools</a> API.  Select queries are supported but DML and DDL is not.</p>
+<p><a href="FreeTDS">FreeTDS</a> supports SAP/Sybase as well.  So you can access both SQL Server and SAP/Sybase databases using <a href="FreeTDS">FreeTDS</a>.</p>
 
-<p>ODBC is supported via the <a target="_blank" href="http://www.unixodbc.org">UnixODBC</a> and <a target="_blank" href="http://www.iodbc.org">iODBC</a> libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are running SQL Relay on.</p>
+<p>Minimal support is provided for Microsoft Access databases via the <a href="http://mdbtools.sourceforge.net">MDB Tools</a> API.  Select queries are supported but DML and DDL is not.</p>
 
-<p>Microsoft released a SQL Server ODBC driver in 2012 that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
+<p>ODBC is supported via the <a href="http://www.unixodbc.org">UnixODBC</a> and <a href="http://www.iodbc.org">iODBC</a> libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are running SQL Relay on.</p>
+
+<p>Microsoft released a SQL Server ODBC driver in 2012 that is compatible with certain versions of <a href="UnixODBC">UnixODBC</a> on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
+
+<p><script language="Javascript">
+rotate();
+</script>
+</p>
 
 </body>
 </html>

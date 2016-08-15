@@ -1,0 +1,53 @@
+<script language="Javascript" src="../js/rotate.js"></script>
+
+= Supported Databases =
+
+<div class="slide">
+
+{{{#!td
+[[Image(../images/oracle.png)]]
+[[Image(../images/sybase.png,margin-left=10px)]]
+[[Image(../images/ibm.png,margin-left=10px)]]
+}}}
+{{{#!td
+[[Image(../images/mssqlserver.png,margin-left=10px)]]
+}}}
+
+</div>
+
+<div class="slide hidden">
+[[Image(../images/mysql.png)]]
+[[Image(../images/postgresql.png,margin-left=10px)]]
+[[Image(../images/firebird.png,margin-left=10px)]]
+[[Image(../images/sqlite.png,margin-left=10px)]]
+</div>
+
+<div class="slide hidden">
+
+{{{#!td
+[[Image(../images/unixodbc.png)]]
+[[Image(../images/iodbc.png,margin-left=10px)]]
+}}}
+{{{#!td
+[[Image(../images/freetds.png,margin-left=10px)]]
+[[br]][[br]]
+[[Image(../images/mdbtools.png,margin-left=10px)]]
+}}}
+
+</div>
+
+SQL Relay supports [http://oracle.com Oracle], [http://www.mysql.com MySQL], [http://postgresql.org PostgreSQL], [http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase], [http://www-01.ibm.com/software/data/db2/ IBM DB2], [http://www-01.ibm.com/software/data/informix/ Informix], [http://www.firebirdsql.org Firebird] and [http://sqlite.org SQLite] databases directly, using the native client API's for those databases.
+
+Support is provided for Microsoft SQL Server via the [http://www.freetds.org FreeTDS] API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the SAP/Sybase database API.  So, depending on what version of SAP/Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.
+
+FreeTDS supports SAP/Sybase as well.  So you can access both SQL Server and SAP/Sybase databases using FreeTDS.
+
+Minimal support is provided for Microsoft Access databases via the [http://mdbtools.sourceforge.net MDB Tools] API.  Select queries are supported but DML and DDL is not.
+
+ODBC is supported via the [http://www.unixodbc.org UnixODBC] and [http://www.iodbc.org iODBC] libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are running SQL Relay on.
+
+Microsoft released a SQL Server ODBC driver in 2012 that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.
+
+<script language="Javascript">
+rotate();
+</script>
