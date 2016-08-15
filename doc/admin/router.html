@@ -1,26 +1,23 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Query Routing</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Query Routing</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<br>
-<span class="heading1">Query Routing</span><br>
+<h1>Query Routing</h1>
 
 <p>SQL Relay's query routing feature allows you to send one set of queries to one database, another set of queries to another.</p>
 
 <p>How is this useful?  Here are some examples of what you can do:</p>
 
 <ul>
-<li>Send inserts, updates and deletes to a master database and distribute selects over a set of slaves.</li>
-<li>Provide a single point of access to multiple databases, even different types of databases.</li>
+  <li>Send inserts, updates and deletes to a master database and distribute selects over a set of slaves.</li>
+  <li>Provide a single point of access to multiple databases, even different types of databases.</li>
 </ul>
 
 <p>These are not the only things you can do.  Use your imagination.</p>
 
-<br>
-<span class="heading1">How it Works</span><br>
+<h2>How it Works</h2>
 
 <p>Normally, SQL Relay maintains a set of persistent connections to a database or database cluster and distributes queries over the connections.  The databases to connect to are defined in a configuration file.</p>
 
@@ -28,10 +25,10 @@
 
 <p>For instance, you can set up one instance of SQL Relay to maintain connections to a master database and another instance of SQL Relay to maintain connections to a pool of slaves, then set up a third instance of SQL Relay to route queries to the other 2 instances.</p>
 
-<blockquote><img src="../images/router.png"></blockquote>
-
-<br>
-<span class="heading1">General Configuration</span><br>
+<blockquote>
+<a href="../images/router.png"><img src="../images/router.png"/></a>
+</blockquote>
+<h2>General Configuration</h2>
 
 <p>Each instance of SQL Relay that will be used as a query router must omit the <b>connection</b> tag and include a single <b>router</b> tag.  The <b>router</b> tag must contain a set of <b>route</b> tags.  Each <b>route</b> tag defines an instance of SQL Relay to route queries to and contains a set of <b>query</b> tags defining which queries to route to it.</p>
 
@@ -43,8 +40,7 @@ do they necessarily cover all possible cases.  In some cases, better, or more
 regular expressions could be written.  In other cases, developers may need to
 structure their queries so that they are guaranteed to match.</p>
 
-<span class="heading1">Sending Inserts, Updates and Deletes to a Master
-Database and Distributing Selects Over a Set of Slaves</span>
+<h2>Sending Inserts, Updates and Deletes to a Master Database and Distributing Selects Over a Set of Slaves</h2>
 
 <p>Here's an example configuration for sending inserts, updates and delete's to
 a master database and distributing selects over a set of slaves.</p>
@@ -126,8 +122,7 @@ separate machines.</p>
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
-<span class="heading1">Provide a Single Point of Access to Multiple Databases</span>
+<h2>Provide a Single Point of Access to Multiple Databases</h2>
 
 <p>Here's an example configuration providing a single point of access to
 multiple databases.</p>
@@ -188,11 +183,9 @@ all queries containing "postgresqldb." to the PostgreSQL database.</p>
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
+<h2>Quirks and Limitations</h2>
 
-<span class="heading1">Quirks and Limitations</span>
-
-<br><br>
-<span class="heading2">Query Normalization</span>
+<h3>Query Normalization</h3>
 
 <p>To make pattern matching easier, SQL Relay "normalizes" the query before
 matching it against the pattern.  The original query is run against the database
@@ -203,16 +196,14 @@ query is converted to lower-case.</p>
 as "select", "insert", "and", "or", etc.  When matching table names, you must
 use a lower-cased version of the table-name.</p>
 
-<br><br>
-<span class="heading2">Examples are Limited</span>
+<h3>Examples are Limited</h3>
 
 <p>The examples above are good introductions, but don't cover every scenario.
 For example, they expect the query to begin at the beginning of a line with
 no preceeding comments or spaces.  You may have to write more complex patterns
 for your applications.</p>
 
-<br><br>
-<span class="heading2">Perl Compatible Regular Expressions</span>
+<h3>Perl Compatible Regular Expressions</h3>
 
 <p>SQL Relay is built upon the Rudiments library.  Rudiments can be built with
 or without support for libpcre which provides support for Perl Compatible
@@ -233,8 +224,7 @@ work on the antique machine either.</p>
 <p>The examples above ought to work with PCRE's and all versions of posix
 regular expressions.</p>
 
-<br><br>
-<span class="heading2">Selects Not Showing Changes</span>
+<h3>Selects Not Showing Changes</h3>
 
 <p>In the scenario above where DML/DDL is sent to the master database and
 selects are distributed over slaves, an unintuitive thing can happen.</p>
@@ -246,8 +236,7 @@ pushed out to the slaves until the changes have been committed.  Since your
 selects are being run against the slaves, you must first commit before your
 changes will be visible.</p>
 
-<br><br>
-<span class="heading2">Commits and Rollbacks</span>
+<h3>Commits and Rollbacks</h3>
 
 <p>Behind the scenes, the router maintains parallel transactions on each of the
 databases that it is routing queries to.  When the client issues a begin, commit
@@ -287,14 +276,14 @@ be run against Oracle.  Conversely, if your client application is using a router
 which only routes queries over a set of Oracle databases, then you do not have
 to use "begin" queries.</p>
 
-<br><br>
-<span class="heading2">Stored Procedures</span>
+<h3>Stored Procedures</h3>
 
 <p>It's possible to use stored procedures with SQL Relay's query routing
 feature.  However, since stored procedures are run on the database, SQL Relay
 can't route the individual queries run inside the stored procedure.  So, the
 stored procedure and all queries run inside of it will be run against whichever
-database it was routed to.</p>
+database it was routed to.
+</p>
 
 </body>
 </html>

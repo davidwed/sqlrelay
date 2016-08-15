@@ -1,29 +1,28 @@
 <html>
 <head>
-<title>firstworks   Running SQL Relay</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Running SQL Relay</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Running SQL Relay</span>
+<h1>Running SQL Relay</h1>
 
 <ul>
-<li><a href="#sqlrstart">Starting SQL Relay</a></li>
-<li><a href="#stopping">Stopping SQL Relay</a></li>
-<li><a href="#cmdline">Using The Command Line Interfaces</a></li>
-<li><a href="#status">Using The Status Monitor</a></li>
-<li><a href="#problems">Common Problems</a></li>
+  <li><a href="#sqlrstart">Starting SQL Relay</a></li>
+  <li><a href="#stopping"">Stopping SQL Relay</a></li>
+  <li><a href="#cmdline">Using The Command Line Interfaces</a></li>
+  <li><a href="#status">Using The Status Monitor</a></li>
+  <li><a href="#problems">Common Problems</a></li>
 </ul>
 
-<a name="sqlrstart"></a>
-<span class="heading2">Starting SQL Relay</span>
+<a name="sqlrstart"/><h2>Starting SQL Relay</h2>
 
 <p>Use the <b>sqlr-start</b> program to start the SQL Relay server processes.</p>
 
 <blockquote>
-sqlr-start [-id ID] [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
-</blockquote>
+  <pre>sqlr-start [-id ID] [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
+</pre>
 
+</blockquote>
 <p>When run with the -id option, <b>sqlr-start</b> starts one instance of <b>sqlr-listener</b>, one instance of <b>sqlr-scaler</b> and the number of <b>sqlr-connection</b> daemons specified in the config file for the given ID.</p>
 
 <p>When run without the -id option, <b>sqlr-start</b> starts <b>sqlr-listener</b>, <b>sqlr-scaler</b> and <b>sqlr-connection</b> daemons as appropriate for each instance in the config file(s) whose enabled parameter is set to "yes".</p>
@@ -32,38 +31,38 @@ sqlr-start [-id ID] [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 
 <p>If the optional -localstatedir LOCALSTATEDIR argument is used, it is passed to the programs started by <b>sqlr-start</b> as appropriate.</p>
 
-
-<a name="stopping"></a>
-<span class="heading2">Stopping SQL Relay</span>
+<a name="stopping"/><h2>Stopping SQL Relay</h2>
 
 <p>The <b>sqlr-stop</b> command is provided to kill running instances of SQL Relay.  It accepts an optional argument: the id of the instance to kill.</p>
 
-<blockquote><b>
-sqlr-stop [-id ID]
-</b></blockquote>
+<blockquote>
+  <pre>sqlr-stop [-id ID]
+</pre>
 
+</blockquote>
 <p>Running it with an ID kills SQL Relay processes that were started with the supplied ID.  Running it with no arguments will kill all SQL Relay processes.</p>
 
-<a name="cmdline"></a>
-<span class="heading2">Using the Command Line Interfaces</span>
+<a name="cmdline"/><h2>Using the Command Line Interfaces</h2>
 
 <p>Several command line utilities are provided for use with SQL Relay.  The syntax for each is as follows:</p>
 
 <blockquote>
-sqlrsh -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD [-script SCRIPT | -command COMMAND] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]<br>
-sqlr-export -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
-sqlr-import -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -file exportfile.xml<br>
-</blockquote>
+  <pre>sqlrsh -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD [-script SCRIPT | -command COMMAND] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]
+sqlr-export -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml
+sqlr-import -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -file exportfile.xml
+</pre>
 
+</blockquote>
 <p>or, if there's a configuration file that the client can read:</p>
 
 <blockquote>
-sqlrsh -id ID [-config CONFIGFILE] [-script SCRIPT | -command COMMAND] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]<br>
-sqlr-export -id ID [-config CONFIGFILE] (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
-sqlr-import -id ID [-config CONFIGFILE] -file exportfile.xml<br>
-</blockquote>
+  <pre>sqlrsh -id ID [-config CONFIGFILE] [-script SCRIPT | -command COMMAND] [-quiet] [-format plain|csv] [-resultsetbuffersize rows]
+sqlr-export -id ID [-config CONFIGFILE] (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml
+sqlr-import -id ID [-config CONFIGFILE] -file exportfile.xml
+</pre>
 
-<p>The -host, -port, -socket, -user, and -password arguments specify which listener to connect to and what authentication to use.<p>
+</blockquote>
+<p>The -host, -port, -socket, -user, and -password arguments specify which listener to connect to and what authentication to use.</p>
 
 <p>The -id argument refers to an entry in a configuration file from which host, port, socket, user and passwords can be read.</p>
 
@@ -73,55 +72,54 @@ sqlr-import -id ID [-config CONFIGFILE] -file exportfile.xml<br>
 
 <p>The <b>sqlr-export</b> command exports the specified table or sequence to a file from which <b>sqlr-import</b> can later re-import it.</p>
 
-<p>The <b>sqlr-import</b> command reads the specified file and imports the data contained in the file into the table or sequence specified in the file.  Note, that <b>sqlr-import</b> does not create tables or sequences, it just imports data into an already-existing table or sequence.<p>
+<p>The <b>sqlr-import</b> command reads the specified file and imports the data contained in the file into the table or sequence specified in the file.  Note, that <b>sqlr-import</b> does not create tables or sequences, it just imports data into an already-existing table or sequence.</p>
 
-<p><b>sqlr-export</b> and <b>sqlr-import</b> may be used to export data from one database and import it into another database, even if the databases are dissimilar (eg. one is PostgreSQL and the other is MySQL), if the structures of the tables in both databases are compatible.</p>
+<p><b>sqlr-export</b> and <b>sqlr-import</b> may be used to export data from one database and import it into another database, even if the databases are dissimilar (eg. one is <a href="PostgreSQL">PostgreSQL</a> and the other is <a href="MySQL">MySQL</a>), if the structures of the tables in both databases are compatible.</p>
 
 <p>On Windows the command-line clients can be run from the Windows Command Line.  Adding C:\Program Files\Firstworks\bin to the PATH environment variable makes this easier, though is is not essential.  You could just change directories to C:\Program Files\Firstworks\bin and run the programs from there.</p>
 
+<a name="status"/><h2>Using The Status Monitor</h2>
 
-<a name="status"></a>
-<span class="heading2">Using The Status Monitor</span>
-
-<p>The <b>sqlr-status</b> program displays statistics about a running SQL Relay instance.  You can run it as follows, replacing <i>instance</i> with the name of the SQL Relay instance that you would like to read statistics from:</p> 
+<p>The <b>sqlr-status</b> program displays statistics about a running SQL Relay instance.  You can run it as follows, replacing <i>instance</i> with the name of the SQL Relay instance that you would like to read statistics from: </p>
 
 <blockquote>
-sqlr-status -id <i>instance</i>
+<tt>sqlr-status -id</tt> <i>instance</i>
 </blockquote>
-
 <p>Currently it generates output like:</p>
 
-<blockquote><pre>
-  Open   Database Connections:  0
-  Opened Database Connections:  394
+<blockquote>
+  <pre>  Instance State             :  Enabled
 
-  Open   Database Cursors:      0
-  Opened Database Cursors:      2286
+  Open   Database Connections:  2
+  Opened Database Connections:  2
+
+  Open   Database Cursors:      2
+  Opened Database Cursors:      4
 
   Open   Client Connections:    0
-  Opened Client Connections:    394
+  Opened Client Connections:    0
 
-  Times  New Cursor Used:       267
-  Times  Cursor Reused:         2571
+  Times  New Cursor Used:       0
+  Times  Cursor Reused:         0
 
-  Total  Queries:               3542
-  Total  Errors:                1
+  Total  Queries:               0
+  Total  Errors:                0
 
   Forked Listeners:             0
 
 Scaler's view:
-  Connections:                  0
+  Connections:                  2
   Connected Clients:            0
 
 Mutexes:
-  Connection Announce               : acquired     (1)
+  Connection Announce               : not acquired (0)
   Shared Memory Access              : acquired     (1)
   Connection Count                  : acquired     (1)
   Session Count                     : acquired     (1)
   Open Connections/Forked Listeners : acquired     (1)
 
 Triggers:
-  Accept Available Connection (l-w, c-s)         : not triggered (0)
+  Accept Available Connection (l-w, c-s)         : triggered     (1)
   Done Accepting Available Connection (c-w, l-s) : not triggered (0)
   Evaluate Connection Count (s-w, l-s)           : not triggered (0)
   Done Evaluating Connection Count (l-w, s-s)    : not triggered (0)
@@ -131,69 +129,69 @@ Counts:
   Busy Listener Count : 0
 
 Raw Semaphores:
-  +---------------------------------------------+
-  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 |
-  +---+---+---+---+---+---+---+---+---+---+-----+
-  | 1 | 1 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 |   0 |
-  +---------------------------------------------+
-</pre></blockquote>
+  +-------------------------------------------------------+
+  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 | 11 | 12 |
+  +---+---+---+---+---+---+---+---+---+---+-----+----+----+
+  | 0 | 1 | 1 | 0 | 1 | 1 | 0 | 0 | 0 | 1 |   0 |  0 |  0 |
+  +-------------------------------------------------------+
+</pre>
 
+</blockquote>
 <p>Here are descriptions of the statistics:</p>
 
 <ul>
-<li>Open Database Connections: The number of database connections that are currently open.</li>
-<li>Opened Database Connections: The total number of database connections that have been opened since the instance was started.</li>
-<li>Open Database Cursors: The number of database cursors that are currently open.</li>
-<li>Opened Database Cursors: The total number of database cursors that have been opened since the instance was started.</li>
-<li>Open Client Connections: The number of SQL Relay clients that are currently connected to the SQL Relay server.</li>
-<li>Opened Server Connections: The total number of SQL Relay clients that have connected to this instance of the SQL Relay server since the instance was
-started.</li>
-<li>Times New Cursor Used: The number of times a cursor couldn't be reused.</li>
-<li>Times Cursor Reused: The number of times a cursor could be reused.</li>
-<li>Total Queries: The total number of queries that have been run through this
-instance.</li>
-<li>Total Errors: The total number of queries that generated errors.</li>
-<li>Forked Listeners: The total number of child listener processes that are running.  This roughly corresponds to the number of clients that are waiting to access the database.</li>
+  <li>Open Database Connections: The number of database connections that are currently open.</li>
+  <li>Opened Database Connections: The total number of database connections that have been opened since the instance was started.</li>
+  <li>Open Database Cursors: The number of database cursors that are currently open.</li>
+  <li>Opened Database Cursors: The total number of database cursors that have been opened since the instance was started.</li>
+  <li>Open Client Connections: The number of SQL Relay clients that are currently connected to the SQL Relay server.</li>
+  <li>Opened Server Connections: The total number of SQL Relay clients that have connected to this instance of the SQL Relay server since the instance was started.</li>
+  <li>Times New Cursor Used: The number of times a cursor couldn't be reused.</li>
+  <li>Times Cursor Reused: The number of times a cursor could be reused.</li>
+  <li>Total Queries: The total number of queries that have been run through this instance.</li>
+  <li>Total Errors: The total number of queries that generated errors.</li>
+  <li>Forked Listeners: The total number of child listener processes that are running.  This roughly corresponds to the number of clients that are waiting to access the database.</li>
 </ul>
 
 <p>The rest of the stats are useful when reporting suspected bugs but are much more value to SQL Relay developers than users.</p>
 
-<a name="problems"></a>
-<span class="heading2">Common Problems</span>
+<a name="problems"/><h2>Common Problems</h2>
 
-<ul>
-<li><p>General difficulty with FreeTDS or SAP/Sybase connections.</p></li>
-<ul>
-<li>Some Linux Distributions set the LANG environment variable to a value that is not supported by older versions of SAP/Sybase ASE.  For example, LANG=en_US.iso885915 on Redhat 7.3.  If SQL Relay fails to start, try setting LANG to something that is defined in locales/locales.dat under your SYBASE directory such as en_US for english.  The LC_ALL environment variable needs to be set to something that is defined in locales/locales.dat as well.  SQL Relay version 0.35 and higher have a connectstring parameter for SAP/Sybase connections called "lang" which does the same thing.</li>
-<li><p>SAP/Sybase and FreeTDS both provide the libct.so library and the ctpublic.h header file.  If FreeTDS is installed from an RPM or other package, it is possible for its libct.so to be installed in /usr/lib and its header file to be installed in /usr/include.  This can cause the SAP/Sybase connection to be compiled against ctpublic.h and linked against libct.so from FreeTDS rather than from SAP/Sybase.</p>
+<h3>General difficulty with FreeTDS or SAP/Sybase connections.</h3>
+
+<p>Some Linux Distributions set the LANG environment variable to a value that is not supported by older versions of SAP/Sybase ASE.  For example, LANG=en_US.iso885915 on Redhat 7.3.  If SQL Relay fails to start, try setting LANG to something that is defined in locales/locales.dat under your SYBASE directory such as en_US for english.  The LC_ALL environment variable needs to be set to something that is defined in locales/locales.dat as well.  SQL Relay version 0.35 and higher have a connectstring parameter for SAP/Sybase connections called "lang" which does the same thing.</p>
+
+<p>SAP/Sybase and FreeTDS both provide the libct.so library and the ctpublic.h header file.  If FreeTDS is installed from an RPM or other package, it is possible for its libct.so to be installed in /usr/lib and its header file to be installed in /usr/include.  This can cause the SAP/Sybase connection to be compiled against ctpublic.h and linked against libct.so from FreeTDS rather than from SAP/Sybase.</p>
+
 <p>Alternatively, if the SAP/Sybase header and library end up in those locations (ie. if they were manually copied there) then the FreeTDS connection could be compiled or linked against them.</p>
-<p>Generally, the solution is to install FreeTDS somewhere other than /usr and omit the FreeTDS and SAP/Sybase library paths from /etc/ld.so.conf, /etc/ld.so.conf.d and LD_LIBRARY_PATH.  By default, the build uses rpath's to cause the connections to look for libraries in the exact place that they were found at compile time, causing each connection to find the right library.  This option can be turned off though.  In that case, LD_LIBRARY_PATH should be set before running sqlr-start to assure that the connection dynamically links against the proper library.  To see which libraries the connection will link against, run "ldd /usr/local/firstworks/lib/libsqlrelay_sqlrconnection_freetds.so" or "ldd /usr/local/firstworks/lib/libsqlrelay_sqlrconnection_sap.so"</p>
-<p>The configure script displays a warning that should encourage people to exercise care when compiling FreeTDS and SAP/Sybase connections.  However, even if each connection is compiled against the proper header file, it's possible for either connection to dynamically link against the wrong library at run time.</p>
-<p>Hopefully, one day, FreeTDS will support everything that the native SAP/Sybase libraries support and there will simply be an option to link the SAP/Sybase connection against one or the other.</p>
-</li>
-</ul>
-</ul>
 
-<ul>
-<li><p>FreeTDS or SAP/Sybase connection fails with error: Connection refused.</p></li>
-<ul>
-<li></p>The FreeTDS and SAP/Sybase libraries try to connect to port 4000 (or 1433 if FreeTDS is compiled with version 7.0 (MS SQL Server) support) by default.  The environment variables TDSPORT and DBLIB_PORT must both be set to override the default port.  As of version 0.24, the FreeTDS and SAP/Sybase connections' connectstring now accept a port argument which instruct the connections to set those variables.</p>
+<p>Generally, the solution is to install FreeTDS somewhere other than /usr and omit the FreeTDS and SAP/Sybase library paths from /etc/ld.so.conf, /etc/ld.so.conf.d and LD_LIBRARY_PATH.  By default, the build uses rpath's to cause the connections to look for libraries in the exact place that they were found at compile time, causing each connection to find the right library.  This option can be turned off though.  In that case, LD_LIBRARY_PATH should be set before running sqlr-start to assure that the connection dynamically links against the proper library.  To see which libraries the connection will link against, run "ldd /usr/local/firstworks/lib/libsqlrelay_sqlrconnection_freetds.so" or "ldd /usr/local/firstworks/lib/libsqlrelay_sqlrconnection_sap.so"</p>
+
+<p>The configure script displays a warning that should encourage people to exercise care when compiling FreeTDS and SAP/Sybase connections.  However, even if each connection is compiled against the proper header file, it's possible for either connection to dynamically link against the wrong library at run time.
+Hopefully, one day, FreeTDS will support everything that the native SAP/Sybase libraries support and there will simply be an option to link the SAP/Sybase connection against one or the other.</p>
+
+<h3>FreeTDS or SAP/Sybase connection fails with error: Connection refused.</h3>
+
+<p>The FreeTDS and SAP/Sybase libraries try to connect to port 4000 (or 1433 if FreeTDS is compiled with version 7.0 (MS SQL Server) support) by default.  The environment variables TDSPORT and DBLIB_PORT must both be set to override the default port.  As of version 0.24, the FreeTDS and SAP/Sybase connections' connectstring now accept a port argument which instruct the connections to set those variables.</p>
+
 <p>SAP/Sybase ASE runs on port 4100 by default and MS SQL Server runs on port 1433 by default.  If you try to connect to an instance of one of them and get an error, you can either reconfigure the instance to run on port 4000 or set the port argument of the connectstring in CONFIGFILE to the port that the instance is actually running on.</p>
-</li>
-</ul>
-<li><p>bind failed</p></li>
-<ul>
-<li><p>The most common cause of this problem is configuring SQL Relay to listen on the same port that the database is listening on.  For example, if your database is listening on port 4100 and you run SQL Relay on the same machine, you can't configure SQL Relay to listen on port 4100 or it will issue "bind failed" when the listener tries to run.</p></li>
-<li><p>A slightly less common cause of this problem is configuring SQL Relay to listen on a port that some other service is already listening on.  For example, web and cache servers often listen on port 8080 and IRC servers often listen on port 7000.  You can see if some other service is listening on the port you want to SQL Relay to listen on by running <i>netstat -ap | grep PORT</i> where PORT is replaced with the port number that you'd like SQL Relay to listen on.  If you get anything back from that command, then there is another service already listening on that port.</p></li>
-<li><p>If you kill and restart the daemons and get the message: "bind failed." as the listener is starting, then there are 2 possibilities.  First, all the daemons may not have been killed.  In this case, kill them all and make sure they are dead by using <i>ps -efal | grep sqlr-</i> before restarting them.  The second possibility is that the port the listener was listening on didn't get closed.  Executing <i>netstat -a | grep PORTNUMBER</i> will reveal any connections still lingering on the port.  If all the daemons are dead but the connections are still lingering, wait 2 minutes or so before restarting the daemons.  The lingering connections should have timed out by then.</p></li>
-</ul>
-<li><p>Everything starts fine but clients can't execute queries.</p></li>
-<ul>
-<li><p>The most common cause of this problem is telling the client to connect to the port that the database is listening on rather than the port that SQL Relay is listening on.  For example, if the database is listening on port 4100 and you have an instance of SQL Relay connected to it and have configured SQL Relay to listen on port 9000, then a common mistake would be to try to connect an SQL Relay client to port 4100 instead of port 9000.</p></li>
-<li><p>SQL Relay daemons use semaphores and shared memory segments.  If a daemon crashes unexpectedly, even if you kill all the other daemons, a semaphore or shared memory segment may still be hanging around.  These can interfere with future attempts to start up daemons with the same ID.  You can use the <i>ipcs</i> command to inspect the shared memory segments and semaphores and the <i>ipcrm</i> command to remove any lingering ones.</p></li>  
-<li><p>The SQL Relay daemons also use temporary files, usually located in /usr/local/firstworks/var/sqlrelay/tmp.  That directory should have 777 permissions, but sometimes it doesn't.  The sockseq file in that directory should have 666 permissions, but sometimes it doesn't.  The files named ID and ID-CONNECTIONID owned by the user that started the connections in that directory should get removed by <b>sqlr-stop</b>, but sometimes they don't.  Sometimes <b>sqlr-stop</b> isn't even used to stop the daemons.</p></li>
-</ul>
-</ul>
+
+<h3>bind failed</h3>
+
+<p>The most common cause of this problem is configuring SQL Relay to listen on the same port that the database is listening on.  For example, if your database is listening on port 4100 and you run SQL Relay on the same machine, you can't configure SQL Relay to listen on port 4100 or it will issue "bind failed" when the listener tries to run.</p>
+
+<p>A slightly less common cause of this problem is configuring SQL Relay to listen on a port that some other service is already listening on.  For example, web and cache servers often listen on port 8080 and IRC servers often listen on port 7000.  You can see if some other service is listening on the port you want to SQL Relay to listen on by running <i>netstat -ap | grep PORT</i> where PORT is replaced with the port number that you'd like SQL Relay to listen on.  If you get anything back from that command, then there is another service already listening on that port.</p>
+
+<p>If you kill and restart the daemons and get the message: "bind failed." as the listener is starting, then there are 2 possibilities.  First, all the daemons may not have been killed.  In this case, kill them all and make sure they are dead by using <i>ps -efal | grep sqlr-</i> before restarting them.  The second possibility is that the port the listener was listening on didn't get closed.  Executing <i>netstat -a | grep PORTNUMBER</i> will reveal any connections still lingering on the port.  If all the daemons are dead but the connections are still lingering, wait 2 minutes or so before restarting the daemons.  The lingering connections should have timed out by then.</p>
+
+<h3>Everything starts fine but clients can't execute queries.</h3>
+
+<p>The most common cause of this problem is telling the client to connect to the port that the database is listening on rather than the port that SQL Relay is listening on.  For example, if the database is listening on port 4100 and you have an instance of SQL Relay connected to it and have configured SQL Relay to listen on port 9000, then a common mistake would be to try to connect an SQL Relay client to port 4100 instead of port 9000.</p>
+
+<p>SQL Relay daemons use semaphores and shared memory segments.  If a daemon crashes unexpectedly, even if you kill all the other daemons, a semaphore or shared memory segment may still be hanging around.  These can interfere with future attempts to start up daemons with the same ID.  You can use the <i>ipcs</i> command to inspect the shared memory segments and semaphores and the <i>ipcrm</i> command to remove any lingering ones.</p>
+
+<p>The SQL Relay daemons also use temporary files, usually located in /usr/local/firstworks/var/sqlrelay/tmp.  That directory should have 777 permissions, but sometimes it doesn't.  The sockseq file in that directory should have 666 permissions, but sometimes it doesn't.  The files named ID and ID-CONNECTIONID owned by the user that started the connections in that directory should get removed by <b>sqlr-stop</b>, but sometimes they don't.  Sometimes <b>sqlr-stop</b> isn't even used to stop the daemons.
+</p>
 
 </body>
 </html>

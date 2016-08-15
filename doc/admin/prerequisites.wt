@@ -1,0 +1,437 @@
+= Installing SQL Relay Prerequisites =
+
+* [#platforms Platforms]
+ * [#linux Linux]
+  * [#fedora Fedora]
+  * [#centos CentOS]
+  * [#opensuse OpenSuSE]
+  * [#ubuntu Ubuntu]
+  * [#debian Debian]
+ * [#unix Unix]
+  * [#freebsd FreeBSD]
+  * [#netbsd NetBSD]
+  * [#openbsd OpenBSD]
+  * [#openbsd Minix]
+ * [#windows Windows]
+
+
+[=#platforms]
+== Platforms ==
+
+SQL Relay is supported on a variety of Linux/Unix systems and Windows.  Building SQL Relay on these platforms requires the installation of a compiler toolchain and other bits of optional software.  Instructions follow for many supported platforms.
+
+
+[=#linux]
+=== Linux ===
+
+SQL Relay is supported on a variety of Linux platforms including Fedora, !CentOS, !OpenSuSE, Debian, and Ubuntu.
+
+
+[=#fedora]
+==== Fedora ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for ["http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+
+{{{#!blockquote
+{{{
+dnf -y install gcc-c++ make perl-devel php-devel php-pdo \
+python-devel ruby-devel ruby-libs ruby tcl-devel java-1.8.0-openjdk-devel \
+erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel \
+postgresql-devel firebird-devel firebird-libfbclient sqlite-devel \
+unixODBC-devel freetds-devel mdbtools-devel mdbtools-libs
+}}}
+}}}
+
+The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php-devel and php-pdo packages.
+
+Note that on older Fedora platforms:
+
+* The yum package manager is used instead of the dnf package manager.  The syntax for the two is the same though, just replace dnf with yum in the command above.
+* JDK 1.8.0 is not available, so java-1.8.0-openjdk-devel must be replaced with an older version.
+* !MariaDB is not available, so mariadb-devel must be replaced with mysql-devel.
+
+Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from dnf/yum repositories and must be installed separately.
+
+The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from [http://www.oracle.com Oracle] and install them using the following commands, as root:
+
+{{{#!blockquote
+{{{
+dnf install libaio
+rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*
+}}}
+}}}
+
+For SAP/Sybase, you have to download the ASE installer from [http://sap.com SAP] and install the client components.  See [http://systems.firstworks.com/p/getting.html Getting Started with SAP/Sybase] for more information.
+
+For DB2, you have to download the installer from [http://ibm.com IBM] and perform a full installation.  See [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started with IBM DB2] for more information.
+
+For Informix, you also have to download the installer from [http://ibm.com IBM] and perform a full installation, though it isn't necessary to create a local instance.
+
+}}}
+
+
+[=#centos]
+==== !CentOS ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+
+{{{#!blockquote
+{{{
+yum -y install gcc-c++ make perl-devel php-devel php-pdo \
+python-devel ruby-devel ruby-libs ruby tcl-devel java-1.7.0-openjdk-devel \
+mariadb-devel postgresql-devel sqlite-devel unixODBC-devel
+}}}
+}}}
+
+The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php-devel and php-pdo packages.
+
+Note that on older !CentOS platforms, !MariaDB is not available, so mariadb-devel must be replaced with mysql-devel.
+
+Packages are not available for Erlang, node.js, Mono, Firebird, !FreeTDS, or MDB Tools.  If support is required for these languages or databases, then they must be built and installed from source.
+
+Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from yum repositories and must be installed separately.
+
+The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from [http://www.oracle.com Oracle] and install them using the following commands, as root:
+
+{{{#!blockquote
+{{{
+yum install libaio
+rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*
+}}}
+}}}
+
+For SAP/Sybase, you have to download the ASE installer from [http://sap.com SAP] and install the client components.  See [http://systems.firstworks.com/p/getting.html Getting Started with SAP/Sybase] for more information.
+
+For DB2, you have to download the installer from [http://ibm.com IBM] and perform a full installation.  See [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started with IBM DB2] for more information.
+
+For Informix, you also have to download the installer from [http://ibm.com IBM] and perform a full installation, though it isn't necessary to create a local instance.
+
+}}}
+
+
+[=#opensuse]
+==== !OpenSuSE ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+
+{{{#!blockquote
+{{{
+zypper install gcc-c++ make perl php5-devel php5-pdo \
+python-devel ruby-devel ruby2.1 tcl-devel java-1.8.0-openjdk-devel erlang \
+nodejs-devel node-gyp mono-devel mono-data-oracle libmyqlclient-devel \
+postgresql93-devel firebird-devel libsqlite3-devel unixODBC-devel \
+freetds-devel mdbtools-devel
+}}}
+}}}
+
+The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-devel and php5-pdo packages.
+
+Note that on older !OpenSuSE platforms:
+
+* JDK 1.8.0 is not available, so java-1.8.0-openjdk-devel must be replaced with an older version.
+* Ruby 2.1 is not available, so ruby2.1 must be replaced with an older version.
+* PostgreSQL 93 is not available, so postgresql93-devel must be replaced with an older version.
+
+Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from zypper repositories and must be installed separately.
+
+The simplest way to install the Oracle client API is to download the Oracle Instant Client RPM's from [http://www.oracle.com Oracle] and install them using the following commands, as root:
+
+{{{#!blockquote
+{{{
+zypper install libaio1
+rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*
+}}}
+}}}
+
+For SAP/Sybase, you have to download the ASE installer from [http://sap.com SAP] but you only have to install the client components.  See [http://systems.firstworks.com/p/getting.html Getting Started with SAP/Sybase] for more information.
+
+For DB2, you have to download the installer from [http://ibm.com IBM] and perform a full installation.  See [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started with IBM DB2] for more information.
+
+For Informix, you also have to download the installer from [http://ibm.com IBM] and perform a full installation, though it isn't necessary to create a local instance.
+
+}}}
+
+
+[=#ubuntu]
+==== Ubuntu ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+
+{{{#!blockquote
+{{{
+apt-get install g++ make perl php5-dev python-dev ruby-dev \
+tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
+libmariadbclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
+unixodbc-dev freetds-dev mdbtools-dev
+}}}
+}}}
+
+The g++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-dev package.
+
+Note that on older Ubuntu platforms !MariaDB is not available, so libmariadbclient-dev must be replaced with libmysqlclient-devel.
+
+Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from apt repositories and must be installed separately.
+
+The simplest way to install the Oracle client API is to download the Oracle Instant Client zips from [http://www.oracle.com Oracle] and install them using the following commands, as root:
+
+{{{#!blockquote
+{{{
+apt-get install libaio1 unzip
+unzip instantclient-basic-linux.*.zip
+unzip instantclient-sdk-linux.*.zip
+mv instantclient_12_1 /usr/local
+}}}
+}}}
+
+For SAP/Sybase, you have to download the ASE installer from [http://sap.com SAP] but you only have to install the client components.  See [http://systems.firstworks.com/p/getting.html Getting Started with SAP/Sybase] for more information.
+
+For DB2, you have to download the installer from [http://ibm.com IBM] and perform a full installation.  See [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started with IBM DB2] for more information.
+
+For Informix, you also have to download the installer from [http://ibm.com IBM] and perform a full installation, though it isn't necessary to create a local instance.
+
+}}}
+
+
+[=#debian]
+==== Debian ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+
+{{{#!blockquote
+{{{
+apt-get install g++ make perl php5-dev python-dev ruby-dev \
+tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
+libmysqlclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
+unixodbc-dev freetds-dev mdbtools-dev
+}}}
+}}}
+
+The g++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-dev package.
+
+Packages for for Oracle, SAP/Sybase, DB2, and Informix client API's are not available from apt repositories and must be installed separately.
+
+The simplest way to install the Oracle client API is to download the Oracle Instant Client zips from [http://www.oracle.com Oracle] and install them using the following commands, as root:
+
+{{{#!blockquote
+{{{
+apt-get install libaio1 unzip
+unzip instantclient-basic-linux.*.zip
+unzip instantclient-sdk-linux.*.zip
+mv instantclient_12_1 /usr/local
+}}}
+}}}
+
+For SAP/Sybase, you have to download the ASE installer from [http://sap.com SAP] and install the client components.  See [http://systems.firstworks.com/p/getting.html Getting Started with SAP/Sybase] for more information.
+
+For DB2, you have to download the installer from [http://ibm.com IBM] and perform a full installation.  See [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started with IBM DB2] for more information.
+
+For Informix, you also have to download the installer from [http://ibm.com IBM] and perform a full installation, though it isn't necessary to create a local instance.
+
+}}}
+
+
+[=#unix]
+=== Unix ===
+
+SQL Relay is supported on a variety of Unix platforms including !FreeBSD, !NetBSD, !OpenBSD, and Minix.
+
+
+[=#freebsd]
+==== !FreeBSD ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+
+{{{#!blockquote
+{{{
+pkg install clang gmake perl php55 php55-pdo python ruby tcl86 \
+openjdk8 erlang node npm pkgconf mono mysql56-client postgresql92-client \
+firebird25-client sqlite3 unixODBC freetds mdbtools
+npm install node-gyp
+}}}
+}}}
+
+The clang and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php55 and php55-pdo packages.
+
+Note that on older !FreeBSD platforms:
+
+* The pkgtools package manager is used instead of the pkg package manager and the syntax for the two is the different.  Replace "pkg install" with "pkg_add -r " in the command above.
+* Clang is not available, so clang must be replaced with g++.
+* PHP 5.5 is not available, so php55 must be replaced with an older version.
+* TCL 8.6 is not available, so tcl86 must be replaced with an older version.
+* JDK 1.8.0 is not available, so openjdk8 must be replaced with an older version.
+* MySQL 5.6 is not available, so mysql56 must be replaced with an older version.
+* PostgreSQL 9.2 is not available, so postgresql92 must be replaced with an older version.
+* Firebird 2.5 is not available, so firebird25 must be replaced with an older version.
+
+Native Oracle, SAP/Sybase, DB2, and Informix client API's are not available for !FreeBSD in any form.
+
+}}}
+
+
+[=#netbsd]
+==== !NetBSD ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+ 
+{{{#!blockquote
+{{{
+pkgin install g++ gmake perl php55 php55-pdo python27 ruby tcl \
+openjdk7 erlang nodejs pkg-config mono mysql-client postgresql92-client \
+sqlite3 unixodbc freetds mdbtools
+}}}
+}}}
+
+The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php55 and php55-pdo packages.
+
+Note that on older !NetBSD platforms:
+
+* PHP 5.5 is not available, so php55 must be replaced with an older version.
+* PostgreSQL 9.2 is not available, so postgresql92 must be replaced with an older version.
+
+Packages are not available for Firebird or MDB Tools.  If support is required for these databases, then they must be built and installed from source.
+
+Native Oracle, SAP/Sybase, DB2, and Informix client API's are not available for !NetBSD in any form.
+
+}}}
+
+
+[=#openbsd]
+==== !OpenBSD ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, add a line to /etc/pkg.conf like:
+
+{{{#!blockquote
+{{{
+installpath = ftp://ftp.usa.openbsd.org/pub/OpenBSD/5.8/packages/amd64/
+}}}
+}}}
+
+(replacing 5.8 with the version of !OpenBSD that you are using and replacing amd64 with the architecture given by uname -m)
+
+... and execute the following command, as root:
+
+{{{#!blockquote
+{{{
+pkg_add -r g++ gmake perl php python ruby tcl erlang node mono \
+mariadb-client postgresql-client iodbc freetds mdbtools
+}}}
+}}}
+
+The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.
+
+Packages are not available for OpenJDK, Firebird or SQLite.  If support is required for these languages or databases, then they must be built and installed from source.
+
+Native Oracle, SAP/Sybase, DB2, and Informix client API's are not available for !OpenBSD in any form.
+
+}}}
+
+[=#minix]
+==== Minix ====
+
+{{{#!blockquote
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+To install the rest of the prerequisites at once, execute the following command, as root:
+
+{{{#!blockquote
+{{{
+pkgin install clang binutils gmake perl python27 tcl mysql \
+postgresql84 iodbc freetds mdbtools
+}}}
+}}}
+
+The clang, binutils, and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php packages.
+
+SQLite is installed as part of the base installation.
+
+Packages are not available for PHP, Ruby, OpenJDK, Erlang, node.js, Mono, Firebird or MDB Tools.  If support is required for these languages or databases, then they must be built and installed from source.
+
+Native Oracle, SAP/Sybase, DB2, and Informix client API's are not available for Minix in any form.
+
+}}}
+
+
+[=#windows]
+=== Windows ===
+
+{{{#!blockquote
+
+SQL Relay is supported on a variety of Windows platforms.  Building SQL Relay on these platforms requires the installation of a compiler toolchain and other bits of optional software.
+
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+
+SQL Relay can be built using the Microsoft Visual Studio and Visual Studio Express toolchains.  Visual Studio Express can be downloaded for free from [http://www.visualstudio.com Microsoft] and the installer is intuitive.
+
+Perl, Python, and TCL packages for Windows are available from [http://www.activestate.com ActiveState].  All three are available for free and come with intuitive installers.  The Python and TCL packages are complete.  Some Active Perl packages lack the .lib file required for building Perl modules though and it must be built manually.  See [http://systems.firstworks.com/2016/01/generating-missing-import-file-from-dll.html Generating a Missing Import File From a DLL ] for instructions.
+
+PHP packages for Windows are available from the [http://windows.php.net/download PHP] project.  The installer is intuitive but the packages lack headers necessary to build PHP modules and they must be generated manually.  See [http://systems.firstworks.com/2016/01/shoehorning-development-headers-into.html Shoehorning Development Headers Into PHP for Windows] for instructions.
+
+Ruby packages for Windows are available but lack so many of the components necessary to build Ruby modules, that it is simpler to just build it from source.  See [http://systems.firstworks.com/2016/01/building-ruby-220-with-microsoft-visual.html Building Ruby From Source With Microsoft Visual Studio] for instructions.
+
+Java packages for Windows are available from [http://www.oracle.com/technetwork/java/javase/downloads/index.html Oracle].  The installer is intuitive and the packages are is complete.
+
+node.js packages for Windows are available from the [http://nodejs.org node.js] project.  The installer is intuitive but the packages lack development files necessary to build node.js modules and they must be installed separately.  To do this, execute the following commands, post-install:
+
+{{{#!blockquote
+{{{
+npm install node-gyp
+node c:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp\bin\node-gyp.js install 0.12.5
+}}}
+}}}
+
+... replacing 0.12.5 with the version of node.js that you are using.
+
+Support for C# and other .NET languages is provided by Visual Studio.  No additional software needs to be installed to build SQL Relay's C# or ADO.NET modules.
+
+MySQL packages for Windows are available from the [http://dev.mysql.com/downloads/connector/c/ MySQL] project.  The Connector/C package is the only package that is necessary to install to build SQL Relay with support for MySQL.  The installer is intuitive and the packages are complete.
+
+PostgreSQL packages for Windows are available from the [http://www.postgresql.org/download/windows/ PostgreSQL] project.  The installer is intuitive and the packages are complete.
+
+Firebird packages for Windows are available from the [http://www.firebirdsql.org/en/downloads/ Firebird] project.  The installer is intuitive and the packages are complete.
+
+Oracle packages for Windows are available from [http://oracle.com Oracle].  The Instant Client package is the only package that is necessary to install to build SQL Relay with support for Oracle.  The installer is intuitive and the packages are complete.
+
+SAP/Sybase packages for Windows are available from [http://www.sap.com SAP].  The ASE installer is intuitive.  You only have to install the client components.
+
+DB2 packages for Windows are available from [http://www.ibm.com IBM].  The installer is intuitive and the packages are complete.  You will have to perform a full installation though.
+
+Informix packages for Windows are available from [http://www.informix.com IBM].  The installer is intuitive and the packages are complete.  You will have to perform a full installation, though it isn't necessary to create a local instance.
+
+Support for ODBC is provided by Visual Studio and Windows itself.  No additional software needs to be installed to build SQL Relay's ODBC modules.
+
+On Linux and Unix platforms, SQL Relay uses !FreeTDS is generally used to access Microsoft SQL Server but on Windows, ODBC is used instead.  The ODBC driver for SQL Server must be installed to connect to a SQL Server database, but no additional software needs to be installed to build SQL Relay.
+
+}}}
