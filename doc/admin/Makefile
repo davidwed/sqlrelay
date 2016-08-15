@@ -6,11 +6,13 @@ include ../../config.mk
 
 SRCS = configguide.wt \
 	configreference.wt \
-	installing.wt
+	installing.wt \
+	oraclentier.wt
 
 OBJS = configguide.html.in \
 	configreference.html.in \
-	installing.html.in
+	installing.html.in \
+	oraclentier.html.in
 
 .wt.html.in:
 	wt -c $< -o $@ -xhtml xhtml.conf

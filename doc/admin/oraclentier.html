@@ -1,13 +1,12 @@
 <html>
 <head>
-<title>firstworks   Using SQL Relay With Oracle n-Tiered Authentication</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Using SQL Relay With Oracle n-Tiered Authentication</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
+<h1>Using SQL Relay With Oracle n-Tiered Authentication</h1>
 
-<span class="heading1">Using SQL Relay With Oracle n-Tiered Authentication</span><br><br>
-
-<span class="heading2">Background</span>
+<h2>Background</h2>
 
 <p>Ordinarily, <b>SQL Relay</b> logs into the database as a particular user
 several times and hands those sessions off to <b>SQL Relay</b> clients, thus
@@ -21,18 +20,17 @@ database user to run all queries.</p>
 
 <p>If you set up a proxy role, a proxy user and a set of users that can be 
 proxied by that proxy user in Oracle and configure <b>SQL Relay</b> to use the
-"database" authentication tier, <b>SQL Relay</b> users will map to Oracle
+"proxied" authentication tier, <b>SQL Relay</b> users will map to Oracle
 users.</p>
 
-<span class="heading2">Setting Up Oracle</span>
+<h2>Setting Up Oracle</h2>
 
 <p>First, make sure your database's compatibility mode is set to a version
 equal to or higher than "8.1.0".  Log in as the sys user and run:</p>
 
 <blockquote>
-<b>select name,value from v$parameter where name='compatible'</b>
+<b>select name,value from v$parameter where name='compatible</b>'
 </blockquote>
-
 <p>(Note: In 8i, you can log in as sys using <i>sqlplus sys/syspass</i>
 where syspass is replaced with the sys user's password.  Since 8i, you
 must use <i>sqlplus sys/syspass as sysdba</i> to log in as the sys user.)</p>
@@ -49,7 +47,6 @@ the sys user and run:</p>
 <blockquote>
 <b>ALTER SYSTEM SET compatible='8.1.0' SCOPE=spfile</b>
 </blockquote>
-
 <p>(Note: In 8i, you can log in as sys using <i>sqlplus sys/syspass</i>
 where syspass is replaced with the sys user's password.  Since 8i, you
 must use <i>sqlplus sys/syspass as sysdba</i> to log in as the sys user.)</p>
@@ -58,58 +55,61 @@ must use <i>sqlplus sys/syspass as sysdba</i> to log in as the sys user.)</p>
 
 <p>Next, log into the database as system and create a set of users:</p>
 
-<blockquote><b>CREATE USER user1 IDENTIFIED BY user1;<br>
-GRANT CREATE SESSION TO user1;<br>
-CREATE USER user2 IDENTIFIED BY user2;<br>
-GRANT CREATE SESSION TO user2;<br>
-CREATE USER user3 IDENTIFIED BY user3;<br>
-GRANT CREATE SESSION TO user3;</b></blockquote>
-
+<blockquote>
+<b>CREATE USER user1 IDENTIFIED BY user1;<br/>
+GRANT CREATE SESSION TO user1;<br/>
+CREATE USER user2 IDENTIFIED BY user2;<br/>
+GRANT CREATE SESSION TO user2;<br/>
+CREATE USER user3 IDENTIFIED BY user3;<br/>
+GRANT CREATE SESSION TO user3;</b>
+</blockquote>
 <p>You may also need to run:</p>
 
-<blockquote><b>ALTER USER user1 QUOTA UNLIMITED ON <i>tablespace_name</i>;<br>
-ALTER USER user2 QUOTA UNLIMITED ON <i>tablespace_name</i>;<br>
-ALTER USER user3 QUOTA UNLIMITED ON <i>tablespace_name</i>;<br></b></blockquote>
-
+<blockquote>
+<b>ALTER USER user1 QUOTA UNLIMITED ON <i>tablespace_name</i>;<br/>
+ALTER USER user2 QUOTA UNLIMITED ON <i>tablespace_name</i>;<br/>
+ALTER USER user3 QUOTA UNLIMITED ON <i>tablespace_name</i>;<br/></b>
+</blockquote>
 <p>Where <i>tablespace_name</i> is replaced with the name of the tablespace that
 the user's schema was created in.  This appears to be necessary with
 Oracle 10g, but I don't remember it being necessary prior to 10g.</p>
 
 <p>Now, create a proxy role and give the users access to it:</p>
 
-<blockquote><b>CREATE ROLE proxyrole;<br>
-GRANT proxyrole TO user1;<br>
-GRANT proxyrole TO user2;<br>
-GRANT proxyrole TO user3;</b></blockquote>
-
+<blockquote>
+<b>CREATE ROLE proxyrole;<br/>
+GRANT proxyrole TO user1;<br/>
+GRANT proxyrole TO user2;<br/>
+GRANT proxyrole TO user3;</b>
+</blockquote>
 <p>At this point, you'll need to perform grants to the proxyrole to give it 
 whatever permissions that the users that may use it will need.  Grants to roles
 are the performed like grants to users.  For example if proxyrole needs random 
 access to "publictable" and read access to "readonlytable":</p>
 
-<blockquote><b>GRANT all ON publictable TO proxyrole;<br>
-GRANT select ON readonlytable TO proxyrole;<br>
-</b></blockquote>
-
+<blockquote>
+<b>GRANT all ON publictable TO proxyrole;<br/>
+GRANT select ON readonlytable TO proxyrole;<br/>
+</b>
+</blockquote>
 <p>Create a proxy user:</p>
- 
-<blockquote><b>CREATE USER proxyuser IDENTIFIED BY proxyuser;<br>
-GRANT CREATE SESSION TO proxyuser;</b></blockquote>
 
+<blockquote>
+<b>CREATE USER proxyuser IDENTIFIED BY proxyuser;<br/>
+GRANT CREATE SESSION TO proxyuser;</b>
+</blockquote>
 <p>Give the users access through the proxy user:</p>
 
 <blockquote>
-<b>ALTER USER user1 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;<br>
-ALTER USER user2 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;<br>
+<b>ALTER USER user1 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;<br/>
+ALTER USER user2 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;<br/>
 ALTER USER user3 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;</b>
 </blockquote>
-
 <p>Note that you cannot do this with the SYSTEM user.  Ie.  you cannot run:</p>
 
 <blockquote>
-<b>ALTER USER SYSTEM GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;</b><br>
+<b>ALTER USER SYSTEM GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;</b><br/>
 </blockquote>
-
 <p>If you need to access the database through SQL Relay as the SYSTEM user, you
 must set up an instance of SQL Relay which logs in as the SYSTEM user and use
 that instance for accessing the database.</p>
@@ -117,14 +117,15 @@ that instance for accessing the database.</p>
 <p>If auditing is enabled in your database, you can enable auditing of the
 queries that the users have run through the proxyrole as follows:</p>
 
-<blockquote><b>AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user1;<br>
-AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user2;<br>
-AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user3;</b></blockquote>
-
+<blockquote>
+<b>AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user1;<br/>
+AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user2;<br/>
+AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user3;</b>
+</blockquote>
 <p>Queries will show up in the audit table as having been run by user1, user2
 or user3, rather than as the proxyuser.</p>
 
-<span class="heading2">Setting Up SQL Relay</span>
+<h2>Setting Up SQL Relay</h2>
 
 <p><b>SQL Relay</b> should be set up to use the database authentication tier 
 and to log into Oracle as the proxy user.  Below is a configuration file
@@ -133,37 +134,38 @@ that there are no users defined as they are unnecessary for this kind of
 configuration.</p>
 
 <blockquote>
-<PRE>
-<FONT color=#0000f8>&lt;?</FONT><B><FONT color=#288850>xml</FONT></B><B><FONT color=#288850> </FONT></B><B><FONT color=#288850>version</FONT></B>=<FONT color=#f800f8>&quot;1.0&quot;</FONT><FONT color=#0000f8>?&gt;</FONT>
-<FONT color=#008888>&lt;instances&gt;</FONT>
 
-        <FONT color=#008888>&lt;instance </FONT><B><FONT color=#288850>id</FONT></B>=<FONT color=#f800f8>&quot;proxyuser&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>port</FONT></B>=<FONT color=#f800f8>&quot;9000&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>socket</FONT></B>=<FONT color=#f800f8>&quot;/tmp/proxyuser.socket&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>dbase</FONT></B>=<FONT color=#f800f8>&quot;oracle&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>connections</FONT></B>=<FONT color=#f800f8>&quot;1&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>maxconnections</FONT></B>=<FONT color=#f800f8>&quot;3&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>maxqueuelength</FONT></B>=<FONT color=#f800f8>&quot;0&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>growby</FONT></B>=<FONT color=#f800f8>&quot;1&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>ttl</FONT></B>=<FONT color=#f800f8>&quot;60&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>endofsession</FONT></B>=<FONT color=#f800f8>&quot;commit&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>sessiontimeout</FONT></B>=<FONT color=#f800f8>&quot;600&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>runasuser</FONT></B>=<FONT color=#f800f8>&quot;nobody&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>runasgroup</FONT></B>=<FONT color=#f800f8>&quot;nobody&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>cursors</FONT></B>=<FONT color=#f800f8>&quot;5&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>authtier</FONT></B>=<FONT color=#f800f8>&quot;database&quot;</FONT><FONT color=#008888>&gt;</FONT>
-                <FONT color=#008888>&lt;users&gt;</FONT>
-                <FONT color=#008888>&lt;/users&gt;</FONT>
-                <FONT color=#008888>&lt;connections&gt;</FONT>
-                        <FONT color=#008888>&lt;</FONT><FONT color=#008888>connection </FONT><B><FONT color=#288850>connectionid</FONT></B>=<FONT color=#f800f8>&quot;proxyuser&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>string</FONT></B>=<FONT color=#f800f8>&quot;user=proxyuser;password=proxyuser;oracle_sid=ora1;&quot;</FONT><FONT color=#008888> </FONT><B><FONT color=#288850>metric</FONT></B>=<FONT color=#f800f8>&quot;1&quot;</FONT><FONT color=#008888>/&gt;</FONT>
-                <FONT color=#008888>&lt;/connections&gt;</FONT>
-        <FONT color=#008888>&lt;/instance&gt;</FONT>
 
-<FONT color=#008888>&lt;/instances&gt;</FONT>
-</PRE>
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;proxiedexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>authtier</b></font>=<font color="#ff00ff">&quot;proxied&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=proxyuser;password=proxyuser;oracle_sid=ora1;&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
 </blockquote>
-
-<span class="heading2">Running SQL Relay</span>
+<h2>Running SQL Relay</h2>
 
 <p>Now that Oracle and <b>SQL Relay</b> are configured, you can run 
 <b>SQL Relay</b> as follows:</p>
 
-<blockquote>sqlr-start -id proxyuser</blockquote>
-
+<blockquote>
+sqlr-start -id proxyuser
+</blockquote>
 <p>You can use sqlrsh to access it as any of the database level users that
 you created earlier:</p>
 
-<blockquote>sqlrsh localhost 9000 "/tmp/proxyuser.socket" user1 user1<br>
-or<br>
-sqlrsh localhost 9000 "/tmp/proxyuser.socket" user2 user2<br>
-or<br>
-sqlrsh localhost 9000 "/tmp/proxyuser.socket" user3 user3</blockquote>
-
+<blockquote>
+sqlrsh -host localhost -port 9000 -user user1 -password user1<br/>
+or<br/>
+sqlrsh -host localhost -port 9000 -user user2 -password user2<br/>
+or<br/>
+sqlrsh -host localhost -port 9000 -user user3 -password user3
+</blockquote>
 </body>
 </html>

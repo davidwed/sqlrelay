@@ -1,0 +1,162 @@
+= Using SQL Relay With Oracle n-Tiered Authentication =
+
+== Background ==
+
+Ordinarily, '''SQL Relay''' logs into the database as a particular user
+several times and hands those sessions off to '''SQL Relay''' clients, thus
+avoiding the cost of connecting to and disconnecting from the database over and 
+over.  A sometimes undesirable side-effect of this approach is that it is
+impossible to distinguish which queries were run by which '''SQL Relay''' 
+users from within the database since '''SQL Relay''' uses the same
+database user to run all queries.
+
+Oracle n-tiered authentication provides a way around this side-effect.
+
+If you set up a proxy role, a proxy user and a set of users that can be 
+proxied by that proxy user in Oracle and configure '''SQL Relay''' to use the
+"proxied" authentication tier, '''SQL Relay''' users will map to Oracle
+users.
+
+== Setting Up Oracle ==
+
+First, make sure your database's compatibility mode is set to a version
+equal to or higher than "8.1.0".  Log in as the sys user and run:
+
+{{{#!blockquote
+'''select name,value from v$parameter where name='compatible''''
+}}}
+
+(Note: In 8i, you can log in as sys using //sqlplus sys/syspass//
+where syspass is replaced with the sys user's password.  Since 8i, you
+must use //sqlplus sys/syspass as sysdba// to log in as the sys user.)
+
+If the compatibility mode is not 8.1.0 or greater, then follow these
+steps:
+
+If you have an $ORACLE_HOME/dbs/init$ORACLE_SID.ora file, change the
+"compatible" parameter to a version equal to or higher than "8.1.0".
+
+If you have an $ORACLE_HOME/dbs/spfile$ORACLE_SID.ora then you can log in as
+the sys user and run:
+
+{{{#!blockquote
+'''ALTER SYSTEM SET compatible='8.1.0' SCOPE=spfile'''
+}}}
+
+(Note: In 8i, you can log in as sys using //sqlplus sys/syspass//
+where syspass is replaced with the sys user's password.  Since 8i, you
+must use //sqlplus sys/syspass as sysdba// to log in as the sys user.)
+
+After changing the compatibility mode, restart the database.
+
+Next, log into the database as system and create a set of users:
+
+{{{#!blockquote
+'''CREATE USER user1 IDENTIFIED BY user1;[[br]]
+GRANT CREATE SESSION TO user1;[[br]]
+CREATE USER user2 IDENTIFIED BY user2;[[br]]
+GRANT CREATE SESSION TO user2;[[br]]
+CREATE USER user3 IDENTIFIED BY user3;[[br]]
+GRANT CREATE SESSION TO user3;'''
+}}}
+
+You may also need to run:
+
+{{{#!blockquote
+'''ALTER USER user1 QUOTA UNLIMITED ON //tablespace_name//;[[br]]
+ALTER USER user2 QUOTA UNLIMITED ON //tablespace_name//;[[br]]
+ALTER USER user3 QUOTA UNLIMITED ON //tablespace_name//;[[br]]'''
+}}}
+
+Where //tablespace_name// is replaced with the name of the tablespace that
+the user's schema was created in.  This appears to be necessary with
+Oracle 10g, but I don't remember it being necessary prior to 10g.
+
+Now, create a proxy role and give the users access to it:
+
+{{{#!blockquote
+'''CREATE ROLE proxyrole;[[br]]
+GRANT proxyrole TO user1;[[br]]
+GRANT proxyrole TO user2;[[br]]
+GRANT proxyrole TO user3;'''
+}}}
+
+At this point, you'll need to perform grants to the proxyrole to give it 
+whatever permissions that the users that may use it will need.  Grants to roles
+are the performed like grants to users.  For example if proxyrole needs random 
+access to "publictable" and read access to "readonlytable":
+
+{{{#!blockquote
+'''GRANT all ON publictable TO proxyrole;[[br]]
+GRANT select ON readonlytable TO proxyrole;[[br]]
+'''
+}}}
+
+Create a proxy user:
+
+{{{#!blockquote
+'''CREATE USER proxyuser IDENTIFIED BY proxyuser;[[br]]
+GRANT CREATE SESSION TO proxyuser;'''
+}}}
+
+Give the users access through the proxy user:
+
+{{{#!blockquote
+'''ALTER USER user1 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;[[br]]
+ALTER USER user2 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;[[br]]
+ALTER USER user3 GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;'''
+}}}
+
+Note that you cannot do this with the SYSTEM user.  Ie.  you cannot run:
+
+{{{#!blockquote
+'''ALTER USER SYSTEM GRANT CONNECT THROUGH proxyuser WITH ROLES proxyrole;'''[[br]]
+}}}
+
+If you need to access the database through SQL Relay as the SYSTEM user, you
+must set up an instance of SQL Relay which logs in as the SYSTEM user and use
+that instance for accessing the database.
+
+If auditing is enabled in your database, you can enable auditing of the
+queries that the users have run through the proxyrole as follows:
+
+{{{#!blockquote
+'''AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user1;[[br]]
+AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user2;[[br]]
+AUDIT SELECT ANY TABLE BY proxyuser ON BEHALF OF user3;'''
+}}}
+
+Queries will show up in the audit table as having been run by user1, user2
+or user3, rather than as the proxyuser.
+
+== Setting Up SQL Relay ==
+
+'''SQL Relay''' should be set up to use the database authentication tier 
+and to log into Oracle as the proxy user.  Below is a configuration file
+that does this.  Note the authtier attribute of the instance tag.  Note also 
+that there are no users defined as they are unnecessary for this kind of 
+configuration.
+
+{{{#!blockquote
+@sqlrelay-proxied.conf.html@
+}}}
+
+== Running SQL Relay ==
+
+Now that Oracle and '''SQL Relay''' are configured, you can run 
+'''SQL Relay''' as follows:
+
+{{{#!blockquote
+sqlr-start -id proxyuser
+}}}
+
+You can use sqlrsh to access it as any of the database level users that
+you created earlier:
+
+{{{#!blockquote
+sqlrsh -host localhost -port 9000 -user user1 -password user1[[br]]
+or[[br]]
+sqlrsh -host localhost -port 9000 -user user2 -password user2[[br]]
+or[[br]]
+sqlrsh -host localhost -port 9000 -user user3 -password user3
+}}}
