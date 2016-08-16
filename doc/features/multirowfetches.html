@@ -1,41 +1,41 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Multi-Row Fetches</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Multi-Row Fetches</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Multi-Row Fetches</span><br><br>
+<h1>Multi-Row Fetches</h1>
 
 <p>Multi-row fetches improve performance by reducing round-trips to the database.</p>
 
 <p>To fetch a result set, most database API's provide a "fetch" function that fetches a single row.  The app can then do something with that row and then fetch another row.</p>
 
-<img src="../images/fetch-one.png"/>
+<p><img src="../images/fetch-one.png"/></p>
 
 <p>If instead, multiple rows were fetched at once and buffered, it would reduce the number of round-trips to the database and improve performance, at the cost of memory.</p>
 
 <p>Some database API's do exactly this and provide a "fetchatonce" parameter that can be used to control how many rows are fetched at once.</p>
 
-<img src="../images/fetch-many.png"/>
+<p><img src="../images/fetch-many.png"/></p>
 
 <p>When using a database that provides a "fetchatonce" parameter, SQL Relay exposes it in the configuration file and does multi-row fetches from the database.</p>
 
-<img src="../images/sqlr-fetch-many.png"/>
+<p><img src="../images/sqlr-fetch-many.png"/></p>
 
 <p>The SQL Relay client goes even further.  By default, it fetches the entire result set from the SQL Relay server in one round-trip.</p>
 
-<img src="../images/sqlr-fetch-many-return.png"/>
+<p><img src="../images/sqlr-fetch-many-return.png"/></p>
 
 <p>For small result sets, like the ones that would likely be used to build a web page, this is very fast and usually doesn't consume an inordinate amount of memory.  However for larger result sets, the necessary memory allocation can be inefficient and slow.  To remedy this, the SQL Relay API's provide methods for setting how many rows will be fetched from the SQL Relay server and buffered at once.</p>
 
-<img src="../images/sqlr-fetch-many-return-rsbuffersize.png"/>
+<p><img src="../images/sqlr-fetch-many-return-rsbuffersize.png"/></p>
 
-<p>See the FAQ items <a href="faq.html#buffer">Why does SQL Relay buffer the entire result set?</a> and <a href="faq.html#nobuffer">How do keep SQL Relay from buffering the entire result set?</a> for more information.  The programming guides for each language delve into this subject as well.</p>
+<p>See the FAQ items <a href="../faq.html#buffer">Why does SQL Relay buffer the entire result set?</a> and <a href="../faq.html#nobuffer">How do keep SQL Relay from buffering the entire result set?</a> for more information.  The programming guides for each language delve into this subject as well.</p>
 
 <p>Even if the database does not support multi-row fetches, the SQL Relay client can still do multi-row fetches from the SQL Relay server.  If the SQL Relay server is run on the same machine as the database and the client is run on a separate machine, using SQL Relay can generally improves performance over native database access because of the reduced number of round-trips across the network while fetching the result set.</p>
 
-<img src="../images/sqlr-fetch-one-return-rsbuffersize.png"/>
+<p><img src="../images/sqlr-fetch-one-return-rsbuffersize.png"/>
+</p>
 
 </body>
 </html>

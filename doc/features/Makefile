@@ -9,14 +9,18 @@ SRCS = connectionpooling.wt \
 	dbabstractionlayers.wt \
 	dropinreplacementlibs.wt \
 	ha.wt \
-	languages.wt
+	languages.wt \
+	multirowfetches.wt \
+	proxying.wt
 
 OBJS = connectionpooling.html \
 	databases.html \
 	dbabstractionlayers.html \
 	dropinreplacementlibs.html \
 	ha.html \
-	languages.html.in
+	languages.html.in \
+	multirowfetches.html \
+	proxying.html
 
 .wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf
