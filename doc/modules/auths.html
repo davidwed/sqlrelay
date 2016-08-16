@@ -1,34 +1,33 @@
 <html>
 <head>
-<title>SQL Relay - Extension Modules - Auth</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Auth Modules</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Auth Modules</span><br><br>
+<h1>Auth Modules</h1>
 
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#available">Available Modules</a></li>
-<li><a href="#custom">Custom Modules</a></li>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#available">Available Modules</a></li>
+  <li><a href="#custom">Custom Modules</a></li>
 </ul>
 
-<hr>
+<hr/>
 
-<br><a name="introduction"></a>
-<span class="heading2">Introduction</span><br>
+<a name="introduction"/><h2>Introduction</h2>
 
 <p>SQL Relay provides three built-in auth mechanisms, configurable by the <i>authtier</i> attribute of the instance tag.</p>
 
 <ul>
-<li>authtier="connection" - Users are authenticated/authorized against a static list.</li>
-<li>authtier="database" - Users are authenticated/authorized against the database itself.  Users must log into SQL Relay using a user/password combination that would be valid to log into the database directly.</li>
-<li>authtier="proxied" - Users are authenticated/authorized against the database itself using n-tier/proxy authentication.  SQL Relay is logged into the database as a user with permissions to proxy other users.  Users must log into SQL Relay using a user/password combination that the proxy user is configured to proxy.  This is currently only supported with Oracle databases.</li>
+  <li>authtier="connection" - Users are authenticated/authorized against a static list.</li>
+  <li>authtier="database" - Users are authenticated/authorized against the database itself.  Users must log into SQL Relay using a user/password combination that would be valid to log into the database directly.</li>
+  <li>authtier="proxied" - Users are authenticated/authorized against the database itself using n-tier/proxy authentication.  SQL Relay is logged into the database as a user with permissions to proxy other users.  Users must log into SQL Relay using a user/password combination that the proxy user is configured to proxy.  This is currently only supported with Oracle databases.</li>
 </ul>
 
-<p class="indented">(<b>NOTE:</b> Prior to version 0.65.0, authtier="database" defaulted to the behavior of authtier="proxied" fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force authtier="database" behavior.  As of 0.65.0 the funcationality is split into two separate options.)<p>
-
-<p>Auth modules allow the SQL Relay server programs to authenticate/authorize users in a manner other than the provided by the built-in mechanisms.<p>
+<blockquote>
+( <b>NOTE:</b> Prior to version 0.65.0, authtier="database" defaulted to the behavior of authtier="proxied" fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force authtier="database" behavior.  As of 0.65.0 the funcationality is split into two separate options.)
+</blockquote>
+<p>Auth modules allow the SQL Relay server programs to authenticate/authorize users in a manner other than the provided by the built-in mechanisms.</p>
 
 <p>The <i>auths</i> section of the sqlrelay.conf file indicates which auth modules to load and what parameters to use when executing them.</p>
 
@@ -54,7 +53,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>In this example, the <i>module</i> attribute specifies which module to load and the <i>user</i> tags specify the list of valid users and passwords.</p>
 
 <p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
@@ -88,25 +86,20 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>At startup, the SQL Relay server creates instances of the specified auth modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  If a module successfully authenticates/authorizes a user, then the client is allowed to continue its session.  If a module fails to authenticate/authorize a user, then the credentials are passed on to the next module.  If all modules fail to authenticate/authorize a user, then the client is not allowed to continue its session.</p>
 
-<br><a name="available"></a>
-<span class="heading2">Available Modules</span><br>
+<a name="available"/><h2>Available Modules</h2>
 
 <p>Currently, the following auth modules are available:</p>
 
-<b>
 <ul>
-<li>userlist</li>
-<li>database</li>
-<li>proxied</li>
-<li>sqlrelay</li>
+  <li><b>userlist</b></li>
+  <li><b>database</b></li>
+  <li><b>proxied</b></li>
+  <li><b>sqlrelay</b></li>
 </ul>
-</b>
 
-<br><br>
-<span class="heading3">userlist</span><br>
+<h3>userlist</h3>
 
 <p>The userlist module authenticates/authorizes a user against a static list of valid user/password combinations.  In fact, it has the same behavior as the default behavior of SQL Relay.  The only difference is that the syntax in the config file is a little different.</p>
 
@@ -132,7 +125,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>...you would list the users inside of the tag for the module:</p>
 
 <blockquote>
@@ -157,7 +149,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p><a href="pwdencs.html">Password encryption</a> modules may also be used.</p>
 
 <blockquote>
@@ -187,7 +178,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>The userlist module can also authorize Kerberos-authenticated or Active Directory-authenticated users, as well as users authenticated by a TLS/SSL certificate.  The module automatically detects which athentication method to use, based on the credentials supplied by the client.</p>
 
 <p>When configuring the module to authenticate a Kerberos/Active-Directory user, include the list of valid principals, and omit the password from each entry.</p>
@@ -219,7 +209,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about configuring Kerberos and Active Directory encryption and authentication.</p>
 
 <p>When configuring the module to authenticate a TLS/SSL user, include the list of valid client names, and omit the password from each entry.</p>
@@ -247,7 +236,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>If the client's certificate contains Subject Alternative Names then each SAN will be compared to each entry in the list.  If a match is found then the client is authorized.</p>
 
 <p>If the client's certificate does not contain Subject Alternative Names, then the Common Name is compared to each entry in the list.  If a match is found then the client is authorized.</p>
@@ -255,9 +243,9 @@
 <p>Note that this module only works if:</p>
 
 <ul>
-<li>TLS/SSL is enabled on the server-side.</li>
-<li>TLS Validation is enabled on the server-side.</li>
-<li>The client sends a certificate.</li>
+  <li>TLS/SSL is enabled on the server-side.</li>
+  <li>TLS Validation is enabled on the server-side.</li>
+  <li>The client sends a certificate.</li>
 </ul>
 
 <p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about configuring TLS/SSL encryption and authentication.</p>
@@ -268,15 +256,16 @@
 
 <p>The <i>users</i> tag is evaluated prior to evaluating any modules.  So, you must use the userlist module if you are stacking auth modules, and want to use a different auth module first, falling back to a static list of users if it fails.</p>
 
-<br><br>
-<span class="heading3">database</span><br>
+<h3>database</h3>
 
 <p>The database module authenticates/authorizes a user against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.</p>
 
-<p class="indented"><b>NOTE:</b> Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it but the router instance itself should not.  If database auth is used for that instance, then auth will fail.</p>
-
-<p class="indented"><b>NOTE:</b> Prior to version 0.65.0, the "database" auth module defaulted to the behavior of the "proxied" auth module and fell back to this behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.<p>
-
+<blockquote>
+<b>NOTE:</b> Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it but the router instance itself should not.  If database auth is used for that instance, then auth will fail.
+</blockquote>
+<blockquote>
+<b>NOTE:</b> Prior to version 0.65.0, the "database" auth module defaulted to the behavior of the "proxied" auth module and fell back to this behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.
+</blockquote>
 <p>Using the database module has the same behavior as setting authtier="database" in the config file.  The only difference is that the syntax in the config file is different.</p>
 
 <p>When using the database auth module, rather than using authtier="database"...</p>
@@ -295,7 +284,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>...you would use the module instead:</p>
 
 <blockquote>
@@ -316,24 +304,24 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>Since the userlist auth module appears to provide the exact same functionality as the built-in <i>authtier</i> attribute, why would you want to use it instead of just using the built-in <i>authtier</i> attribute?</p>
 
 <p>There is no specific advantage to using the module instead of the attribute, other than consistency.  If you're using other auth modules in other instances, then you might also want to use the database auth module in this instance.</p>
 
 <p>Note also, that the database auth module should not be used in a stacked configuration.  Or, at least, using it in a stacked configuration could lead to unexpected results.  When using database auth, each connection is left logged in as the most recently authenticated/authorized user.  If an SQL Relay user is authenticated/authorized by some other method, then there is no guarantee what user it will access the database as.</p>
 
-<br><br>
-<span class="heading3">proxied</span><br>
+<h3>proxied</h3>
 
 <p>The proxied module authenticates/authorizes a user against the database itself.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.</p>
 
 <p>This is currently only supported with Oracle 8i or higher and requires database configuration.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
 
-<p class="indented"><b>NOTE:</b> Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.</p>
-
-<p class="indented"><b>NOTE:</b> Prior to version 0.65.0, the "database" auth module defaulted to the behavior of the "proxied" auth module and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force the database auth module's behavior.  As of 0.65.0 the funcationality is split into two separate modules.<p>
-
+<blockquote>
+<b>NOTE:</b> Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.
+</blockquote>
+<blockquote>
+<b>NOTE:</b> Prior to version 0.65.0, the "database" auth module defaulted to the behavior of the "proxied" auth module and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force the database auth module's behavior.  As of 0.65.0 the funcationality is split into two separate modules.
+</blockquote>
 <p>Using the proxied module has the same behavior as setting authtier="proxied" in the config file.  The only difference is that the syntax in the config file is different.</p>
 
 <p>When using the proxied auth module, rather than using authtier="proxied"...</p>
@@ -352,7 +340,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>...you would use the module instead:</p>
 
 <blockquote>
@@ -373,15 +360,13 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>Since the userlist auth module appears to provide the exact same functionality as the built-in <i>authtier</i> attribute, why would you want to use it instead of just using the built-in <i>authtier</i> attribute?</p>
 
 <p>There is no specific advantage to using the module instead of the attribute, other than consistency.  If you're using other auth modules in other instances, then you might also want to use the proxied auth module in this instance.</p>
 
 <p>Note also, that the proxied auth module should not be used in a stacked configuration.  Or, at least, using it in a stacked configuration could lead to unexpected results.  When using proxied auth, each connection is left logged in as the most recently authenticated/authorized user.  If an SQL Relay user is authenticated/authorized by some other method, then there is no guarantee what user it will access the database as.</p>
-<br><br>
 
-<span class="heading3">sqlrelay</span><br>
+<h3>sqlrelay</h3>
 
 <p>The sqlrelay module authenticates/authorizes a user against a table in a database, using another instance of SQL Relay to access that database.</p>
 
@@ -408,9 +393,7 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
-<br><a name="custom"></a>
-<span class="heading2">Custom Modules</span><br>
+<a name="custom"/><h2>Custom Modules</h2>
 
 <p>You can create your own custom auth modules too.</p>
 
@@ -460,7 +443,6 @@
 };<br>
 </font>
 </blockquote>
-
 <p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
 
 <p>The default implementaion of the constructor just sets the member variables <i>parameters</i>, <i>sqlrpe</i>, and <i>debug</i> to the corresponding passed-in values.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
@@ -543,37 +525,39 @@ hardcoded::hardcoded(xmldomnode *parameters,<br>
 }<br>
 </font>
 </blockquote>
-
 <p>Here, the hardcoded class inherits from sqlrauth.  The constructor just calls the parent constructor.  The auth() method verifies that an appropriate type of credentials has been passed in, casts the credentials to a set of user-password credentials, compares the user and password to a hardcoded list, and returns the user if it matches or NULL if it doesn't.  It may seem odd to return the user rather than true/false, but some authentication methods pass a set of credentials (such as TLS's Common Name and Subject Alternative Names), and the auth() method must return specific credential was authorized.</p>
 
-<p>Note the "new_sqlrauth_hardcoded()" function which just allocates an instance of hardcoded and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrauth_<i>modulename</i>" and take xmldomnode *, sqlrpwdencs *, and bool parameters.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+<p>Note the "new_sqlrauth_hardcoded()" function which just allocates an instance of hardcoded and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrauth_modulename" and take xmldomnode *, sqlrpwdencs *, and bool parameters.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
 
 <p>To build the module on a Linux or Unix system, run a command like:</p>
 
-<blockquote><b>
-gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.so hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</b></blockquote>
+<blockquote>
+  <pre>gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.so hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</pre>
 
+</blockquote>
 <p>This will create the file sqlrauth_hardcoded.so</p>
 
 <p>On Mac OSX, run a command like:</p>
 
-<blockquote><b>
-gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.bundle hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</b></blockquote>
+<blockquote>
+  <pre>gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrauth_hardcoded.bundle hardcoded.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</pre>
 
+</blockquote>
 <p>This will create the sqlrauth_hardcoded.bundle</p>
 
 <p>On Windows, run commands like:</p>
 
-<blockquote><b>
-cl /I"C:\Program Files\Firstworks\include" /c hardcoded.cpp<br>
+<blockquote>
+  <pre>cl /I"C:\Program Files\Firstworks\include" /c hardcoded.cpp
 link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
-</b></blockquote>
+</pre>
 
+</blockquote>
 <p>This will create the sqlrauth_hardcoded.dll</p>
 
-<p>It is essential that the file be named "sqlrauth_<i>modulename</i>.<i>extension</i>".</p>
+<p>It is essential that the file be named: sqlrauth_modulename.extension</p>
 
 <p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
 
@@ -597,8 +581,7 @@ link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libs
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
-<p>The server will see the module="hardcoded" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrauth_hardcoded.<i>extension</i>, load it and and run the new_sqlrauth_hardcoded() method to get an instance of the hardcoded class and then run the various methods of that class.</p>
+<p>The server will see the module="hardcoded" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrauth_hardcoded.//extension//, load it and and run the new_sqlrauth_hardcoded() method to get an instance of the hardcoded class and then run the various methods of that class.</p>
 
 <p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
 
@@ -609,8 +592,8 @@ link -out:sqlrauth_hardcoded.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libs
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*count=parameters-&gt;getAttributeValue(<font color="#ff00ff">&quot;count&quot;</font>);<br>
 </font>
 </blockquote>
-
-<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.</p>
+<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.
+</p>
 
 </body>
 </html>
