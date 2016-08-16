@@ -1,0 +1,175 @@
+= Result Set Translation Modules =
+
+* [#introduction Introduction]
+* [#available Available Modules]
+* [#custom Custom Modules]
+
+----
+
+[=#introduction]
+== Introduction ==
+
+Result Set Translation modules allow the SQL Relay server programs to alter fields in the result set before returning the field to the client.
+
+The //resultsettranslations// section of the sqlrelay.conf file indicates which result set translation modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+@sqlrelay-resultsettranslations-reformatdatetime.conf.html@
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.
+
+Currently, all result set translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+Translation modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
+
+{{{#!blockquote
+@sqlrelay-resultsettranslations-stacked.conf.html@
+}}}
+
+At startup, the SQL Relay server creates instances of the specified result set translations modules and initializes them.  As each field of the result set is returned, the server passes the field to each module, in the order that they were specified in the config file.  If a module modifies a field, then that modified field is passed on to the next module.
+
+[=#available]
+== Available Modules ==
+
+Currently, the following result set translation module is available:
+
+* '''reformatdatetime'''
+
+=== reformatdatetime ===
+
+The reformatdatetime module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.
+
+The following parameters are currently supported:
+
+* '''datetimeformat''' - Specifies the format to convert date/time fields to.  May be any combination of the following format characters.  Non-format characters will be inserted as-is.
+ * '''DD''' - day of the month
+ * '''MM''' - numeric month
+ * '''MON''' - 3-character text abbreviation for the month
+ * '''Month''' - full text month
+ * '''YYYY''' - year including century
+ * '''YY''' - year excluding century
+ * '''HH24''' - hour (0-23)
+ * '''HH''' - hour (1-12)
+ * '''MI''' - minute
+ * '''SS''' - second
+ * '''FFF''' - fraction of a second
+ * '''AM''' - AM or PM
+* '''dateformat''' - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
+* '''timeformat''' - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
+* '''dateddmm''' - If set to "yes" then dates are assumed to be in the DD-MM-YYYY format (with days leading), as opposed to MM-DD-YYYY format (with months leading).  This is important for interpreting dates like 03-04-2000.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.
+* '''dateyyddmm''' - If set to "yes" then dates are assumed to be in the YYYY-DD-MM format (with days leading), as opposed to YYYY-MM-DD-YYYY (with months leading).  This is important for interpreting dates like 2000-03-04.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.
+* '''datedelimiters''' - Determining whether the field is a date/time or not can be tricky.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.
+* '''ignorenondatetime''' - If this parameter is set to "yes" then only fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.  By default, all fields are examined and heuristics are used to determine whether the field contains a date/time.
+
+For example, the following configuration:
+
+{{{#!blockquote
+@sqlrelay-resultsettranslations-reformatdatetime.conf.html@
+}}}
+
+Would translate the following date/time field:
+
+{{{#!blockquote
+Jul 10 2015 05:17:55:717PM
+}}}
+
+Into:
+
+{{{#!blockquote
+07/10/2015 17:18:55
+}}}
+
+Note that '''dateddmm''' and '''dateyyddmm''' should usually be set to the same thing.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.
+
+Note also that date/time translation in general is especially problematic with MS SQL Server.  See [../faq/#mssqldates the FAQ] for more info.
+
+You might notice that the //instance// tag takes the exact same set of parameters as this module, and provides the exact same functionality.  So, why would you want to use it instead of just using the built in parameters of the //instance// tag.
+
+The //instance// tag parameters are evaluated prior to evaluating any modules.  So, you must use the //reformatdatetime// module if you are stacking result set translation modules, and want to ensure that other translations are performed prior to reformatting dates and times.
+
+[=#custom]
+== Custom Modules ==
+
+You can create your own custom result set translation modules too.
+
+SQL Relay provides a base class for result set translation modules, called sqlrresultsettranslation, defined in the header file: sqlrserver.h
+
+{{{#!blockquote
+@sqlrresultsettranslation.h.html@
+}}}
+
+On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.
+
+The default implementaion of the constructor just sets the member variables //sqlrrsts// and //parameters// to the corresponding passed-in values.  //sqlrrsts// is a pointer to an instance of the sqlrresultsettranslations class, which provides various helper methods.  //parameters// is a representation of the XML tag in the sqlrelay.conf file that loaded the module.
+
+By default, the destructor does nothing.
+
+run() does nothing by default and returns true, indicating that no error occurred.
+
+A custom module module must contain a class that inherits from sqlrresultsettranslation, implements the necessary methods, and implements a function to return an instance of the class.
+
+Lets say we want to create a custom result set translation module that translates all fields to lower case.
+
+We can create the file lowercase.cpp:
+
+{{{#!blockquote
+@sqlrresultsettranslation-lowercase.cpp.html@
+}}}
+
+Here, the lowercase class inherits from sqlrresultsettranslation.  The constructor just calls the parent constructor.  The run() method translates the field to lowercase and returns true.
+
+Note the "new_sqlrresultsettranslation_lowercase()" function which just allocates an instance of lowercase and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrresultsettranslation_modulename" and take sqlrresultsettranslations *, xmldomnode * and bool.  It is also essential that it be wrapped with an //extern "C"// clause to prevent it from being name-mangled by the compiler.
+
+To build the module on a Linux or Unix system, run a command like:
+
+{{{#!blockquote
+{{{
+gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrresultsettranslation_lowercase.so lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+}}}
+}}}
+
+This will create the file sqlrresultsettranslation_lowercase.so
+
+On Mac OSX, run a command like:
+
+{{{#!blockquote
+{{{
+gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrresultsettranslation_lowercase.bundle lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+}}}
+}}}
+
+This will create the sqlrresultsettranslation_lowercase.bundle
+
+On Windows, run commands like:
+
+{{{#!blockquote
+{{{
+cl /I"C:\Program Files\Firstworks\include" /c lowercase.cpp
+link -out:sqlrresultsettranslation_lowercase.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
+}}}
+}}}
+
+This will create the sqlrresultsettranslation_lowercase.dll
+
+It is essential that the file be named: sqlrresultsettranslation_modulename.extension
+
+To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay
+
+To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "resultsettranslations" section:
+
+{{{#!blockquote
+@sqlrelay-resultsettranslations-lowercase.conf.html@
+}}}
+
+The server will see the module="lowercase" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrresultsettranslation_lowercase.//extension//, load it and and run the new_sqlrresultsettranslation_lowercase() method to get an instance of the lowercase class and then run the various methods of that class.
+
+This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:
+
+{{{#!blockquote
+@sqlrresultsettranslation-param.cpp.html@
+}}}
+
+Refer to the Rudiments documentation for more info on the [http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html xmldomnode class].

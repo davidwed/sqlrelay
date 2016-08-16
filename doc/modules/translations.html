@@ -1,22 +1,20 @@
 <html>
 <head>
-<title>SQL Relay - Extension Modules - Query Translation</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Query Translation Modules</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Query Translation Modules</span><br><br>
+<h1>Query Translation Modules</h1>
 
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#available">Available Modules</a></li>
-<li><a href="#custom">Custom Modules</a></li>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#available">Available Modules</a></li>
+  <li><a href="#custom">Custom Modules</a></li>
 </ul>
 
-<hr>
+<hr/>
 
-<br><a name="introduction"></a>
-<span class="heading2">Introduction</span><br>
+<a name="introduction"/><h2>Introduction</h2>
 
 <p>Query Translation modules allow the SQL Relay server programs to alter queries before passing them to the database.</p>
 
@@ -40,7 +38,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>The <i>module</i> attribute specifies which module to load.</p>
 
 <p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
@@ -70,38 +67,39 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.</p>
 
-<br><a name="available"></a>
-<span class="heading2">Available Modules</span><br>
+<a name="available"/><h2>Available Modules</h2>
 
 <p>Currently, the following translation module is available:</p>
 
-<b>
 <ul>
-<li>normalize</li>
+  <li><b>normalize</b></li>
 </ul>
-</b>
 
-<br><br>
-<span class="heading3">normalize</span><br>
+<h3>normalize</h3>
 
 <p>The normalize module performs the following operations on a query:</p>
 
 <ul>
-<li>Removes comments.</li>
-<li>Converts all white-space characters to spaces, outside of quoted strings.</li>
-<li>Converts multiple spaces into a single space, outside of quoted strings.</li>
-<li>Removes whitespace from around operators, except for parentheses and asterisks (for now).</li>
-<li>Converts everything to lower case, outside of quoted strings.</li>
-<li>Converts static concatenations to equivalent strings.  Eg. converts 'he' || 'll' || 'o' to 'hello'.</li>
-<li>...</li>
+  <li>Removes comments.</li>
+  <li>Converts all white-space characters to spaces, outside of quoted strings.</li>
+  <li>Converts multiple spaces into a single space, outside of quoted strings.</li>
+  <li>Removes whitespace from around operators.</li>
+  <li>Converts everything to lower case, outside of quoted strings.</li>
+  <li>Converts static concatenations to equivalent strings.  Eg. converts 'he' <tt>#!td
+ 'll' 
+</tt>
+</li>
 </ul>
 
-<p>For example, the following query:</p>
+<table>
+  <tr>
+    <td>    <p> 'o' to 'hello'.</p>
 
-<blockquote>
+    <p>For example, the following query:</p>
+
+    <blockquote>
 
 
 <font face="monospace">
@@ -113,28 +111,25 @@
 <font color="#6a5acd">where</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myTaBLe.CoLuMn1&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp; myTablE.ColuMN2&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">2</font><br>
 </font>
-</blockquote>
+    </blockquote>
+    <p>Would be translated to:</p>
 
-<p>Would be translated to:</p>
-
-<blockquote>
+    <blockquote>
 
 
 <font face="monospace">
 <font color="#a52a2a"><b>select</b></font>&nbsp;*,&nbsp;<font color="#ff00ff">'HeLlo'</font>&nbsp;<font color="#6a5acd">from</font>&nbsp;mytable&nbsp;<font color="#6a5acd">where</font>&nbsp;mytable.column1 = mytable.column2/<font color="#ff00ff">2</font><br>
 </font>
-</blockquote>
+    </blockquote>
+    <p>Normalizing a query is useful when also using <a href="filters.html">Query Filters</a> as it simplifies the patterns that have to be searched for.</p>
 
-<p>Normalizing a query is useful when also using <a href="filters.html">Query Filters</a> as it simplifies the patterns that have to be searched for.</p>
+<a name="custom"/>    <h2>Custom Modules</h2>
 
-<br><a name="custom"></a>
-<span class="heading2">Custom Modules</span><br>
+    <p>You can create your own custom query translation modules too.</p>
 
-<p>You can create your own custom query translation modules too.</p>
+    <p>SQL Relay provides a base class for query translation modules, called sqlrtranslation, defined in the header file: sqlrserver.h</p>
 
-<p>SQL Relay provides a base class for query translation modules, called sqlrtranslation, defined in the header file: sqlrserver.h</p>
-
-<blockquote>
+    <blockquote>
 
 
 <font face="monospace">
@@ -155,23 +150,22 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>bool</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;debug;<br>
 };<br>
 </font>
-</blockquote>
+    </blockquote>
+    <p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
 
-<p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
+    <p>The default implementaion of the constructor just sets the member variables <i>sqlts</i>, <i>parameters</i> and <i>debug</i> to the corresponding passed-in values.  <i>sqlts</i> is a pointer to an instance of the sqlrtranslations class, which provides various helper methods.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.  <i>debug</i> is just a flag, indicating whether debug is requested or not.  The module should consult this flat and print out some debug if it is true.</p>
 
-<p>The default implementaion of the constructor just sets the member variables <i>sqlts</i>, <i>parameters</i> and <i>debug</i> to the corresponding passed-in values.  <i>sqlts</i> is a pointer to an instance of the sqlrtranslations class, which provides various helper methods.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.  <i>debug</i> is just a flag, indicating whether debug is requested or not.  The module should consult this flat and print out some debug if it is true.</p>
+    <p>By default, the destructor does nothing.</p>
 
-<p>By default, the destructor does nothing.</p>
+    <p>run() does nothing by default and returns true, indicating that no error occurred.</p>
 
-<p>run() does nothing by default and returns true, indicating that no error occurred.</p>
+    <p>A custom module module must contain a class that inherits from sqlrtranslation, implements the necessary methods, and implements a function to return an instance of the class.</p>
 
-<p>A custom module module must contain a class that inherits from sqlrtranslation, implements the necessary methods, and implements a function to return an instance of the class.</p>
+    <p>Lets say we want to create a custom translation module that translates the entire query to lower case.</p>
 
-<p>Lets say we want to create a custom translation module that translates the entire query to lower case.</p>
+    <p>We can create the file lowercase.cpp:</p>
 
-<p>We can create the file lowercase.cpp:</p>
-
-<blockquote>
+    <blockquote>
 
 
 <font face="monospace">
@@ -215,44 +209,46 @@ lowercase::lowercase(sqlrtranslations *sqlts,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
 }<br>
 </font>
-</blockquote>
+    </blockquote>
+    <p>Here, the lowercase class inherits from sqlrtranslation.  The constructor just calls the parent constructor.  The run() method translates the query to lowercase and returns true.</p>
 
-<p>Here, the lowercase class inherits from sqlrtranslation.  The constructor just calls the parent constructor.  The run() method translates the query to lowercase and returns true.</p>
+    <p>Note the "new_sqlrtranslation_lowercase()" function which just allocates an instance of lowercase and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrtranslation_modulename" and take sqlrtranslations *, xmldomnode * and bool.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
 
-<p>Note the "new_sqlrtranslation_lowercase()" function which just allocates an instance of lowercase and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrtranslation_<i>modulename</i>" and take sqlrtranslations *, xmldomnode * and bool.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+    <p>To build the module on a Linux or Unix system, run a command like:</p>
 
-<p>To build the module on a Linux or Unix system, run a command like:</p>
+    <blockquote>
+      <pre>gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrtranslation_lowercase.so lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</pre>
 
-<blockquote><b>
-gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrtranslation_lowercase.so lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</b></blockquote>
+    </blockquote>
+    <p>This will create the file sqlrtranslation_lowercase.so</p>
 
-<p>This will create the file sqlrtranslation_lowercase.so</p>
+    <p>On Mac OSX, run a command like:</p>
 
-<p>On Mac OSX, run a command like:</p>
+    <blockquote>
+      <pre>gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrtranslation_lowercase.bundle lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</pre>
 
-<blockquote><b>
-gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrtranslation_lowercase.bundle lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</b></blockquote>
+    </blockquote>
+    <p>This will create the sqlrtranslation_lowercase.bundle</p>
 
-<p>This will create the sqlrtranslation_lowercase.bundle</p>
+    <p>On Windows, run commands like:</p>
 
-<p>On Windows, run commands like:</p>
-
-<blockquote><b>
-cl /I"C:\Program Files\Firstworks\include" /c lowercase.cpp<br>
+    <blockquote>
+      <pre>cl /I"C:\Program Files\Firstworks\include" /c lowercase.cpp
 link -out:sqlrtranslation_lowercase.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
-</b></blockquote>
+</pre>
 
-<p>This will create the sqlrtranslation_lowercase.dll</p>
+    </blockquote>
+    <p>This will create the sqlrtranslation_lowercase.dll</p>
 
-<p>It is essential that the file be named "sqlrtranslation_<i>modulename</i>.<i>extension</i>".</p>
+    <p>It is essential that the file be named: sqlrtranslation_modulename.extension</p>
 
-<p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
+    <p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
 
-<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "translations" section:</p>
+    <p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "translations" section:</p>
 
-<blockquote>
+    <blockquote>
 
 
 <font face="monospace">
@@ -269,21 +265,23 @@ link -out:sqlrtranslation_lowercase.dll /LIBPATH:"C:\Program Files\Firstworks\li
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
-</blockquote>
+    </blockquote>
+    <p>The server will see the module="lowercase" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrtranslation_lowercase.extension, load it and and run the new_sqlrtranslation_lowercase() method to get an instance of the lowercase class and then run the various methods of that class.</p>
 
-<p>The server will see the module="lowercase" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrtranslation_lowercase.<i>extension</i>, load it and and run the new_sqlrtranslation_lowercase() method to get an instance of the lowercase class and then run the various methods of that class.</p>
+    <p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
 
-<p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
-
-<blockquote>
+    <blockquote>
 
 
 <font face="monospace">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*count=parameters-&gt;getAttributeValue(<font color="#ff00ff">&quot;count&quot;</font>);<br>
 </font>
-</blockquote>
+    </blockquote>
+    <p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.</p>
 
-<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.</p>
+</td>
+  </tr>
+</table>
 
 </body>
 </html>

@@ -1,22 +1,20 @@
 <html>
 <head>
-<title>SQL Relay - Extension Modules - Result Set Translation</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Result Set Translation Modules</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Result Set Translation Modules</span><br><br>
+<h1>Result Set Translation Modules</h1>
 
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#available">Available Modules</a></li>
-<li><a href="#custom">Custom Modules</a></li>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#available">Available Modules</a></li>
+  <li><a href="#custom">Custom Modules</a></li>
 </ul>
 
-<hr>
+<hr/>
 
-<br><a name="introduction"></a>
-<span class="heading2">Introduction</span><br>
+<a name="introduction"/><h2>Introduction</h2>
 
 <p>Result Set Translation modules allow the SQL Relay server programs to alter fields in the result set before returning the field to the client.</p>
 
@@ -32,8 +30,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslations</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;reformatdatetime&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>datetimeformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY HH24:MI:SS&quot;</font><br>
-<font color="#2e8b57"><b>dateformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>timeformat</b></font>=<font color="#ff00ff">&quot;HH24:MI:SS&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dateddmm</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>ignorenondatetime</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;reformatdatetime&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>datetimeformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY HH24:MI:SS&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>dateformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>timeformat</b></font>=<font color="#ff00ff">&quot;HH24:MI:SS&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>dateddmm</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>ignorenondatetime</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/resultsettranslations&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
@@ -41,7 +44,6 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>The <i>module</i> attribute specifies which module to load.</p>
 
 <p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
@@ -60,8 +62,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslations</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;reformatdatetime&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>datetimeformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY HH24:MI:SS&quot;</font><br>
-<font color="#2e8b57"><b>dateformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>timeformat</b></font>=<font color="#ff00ff">&quot;HH24:MI:SS&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dateddmm</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>ignorenondatetime</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;reformatdatetime&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>datetimeformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY HH24:MI:SS&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>dateformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>timeformat</b></font>=<font color="#ff00ff">&quot;HH24:MI:SS&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>dateddmm</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>ignorenondatetime</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;anothermodule&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;andanothermodule&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;yetanothermodule&quot;</font><font color="#008b8b">/&gt;</font><br>
@@ -72,50 +79,45 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>At startup, the SQL Relay server creates instances of the specified result set translations modules and initializes them.  As each field of the result set is returned, the server passes the field to each module, in the order that they were specified in the config file.  If a module modifies a field, then that modified field is passed on to the next module.</p>
 
-<br><a name="available"></a>
-<span class="heading2">Available Modules</span><br>
+<a name="available"/><h2>Available Modules</h2>
 
 <p>Currently, the following result set translation module is available:</p>
 
-<b>
 <ul>
-<li>reformatdatetime</li>
+  <li><b>reformatdatetime</b></li>
 </ul>
-</b>
 
-<br><br>
-<span class="heading3">reformatdatetime</span><br>
+<h3>reformatdatetime</h3>
 
 <p>The reformatdatetime module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.</p>
 
 <p>The following parameters are currently supported:</p>
 
 <ul>
-<li><b>datetimeformat</b> - Specifies the format to convert date/time fields to.  May be any combination of the following format characters.  Non-format characters will be inserted as-is.
-<ul>
-<li><b>DD</b> - day of the month</li>
-<li><b>MM</b> - numeric month</li>
-<li><b>MON</b> - 3-character text abbreviation for the month</li>
-<li><b>Month</b> - full text month</li>
-<li><b>YYYY</b> - year including century</li>
-<li><b>YY</b> - year excluding century</li>
-<li><b>HH24</b> - hour (0-23)</li>
-<li><b>HH</b> - hour (1-12)</li>
-<li><b>MI</b> - minute</li>
-<li><b>SS</b> - second</li>
-<li><b>FFF</b> - fraction of a second</li>
-<li><b>AM</b> - AM or PM</li>
-</ul>
-</li>
-<li><b>dateformat</b> - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.</li>
-<li><b>timeformat</b> - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.</li>
-<li><b>dateddmm</b> - If set to "yes" then dates are assumed to be in the DD-MM-YYYY format (with days leading), as opposed to MM-DD-YYYY format (with months leading).  This is important for interpreting dates like 03-04-2000.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.</li>
-<li><b>dateyyddmm</b> - If set to "yes" then dates are assumed to be in the YYYY-DD-MM format (with days leading), as opposed to YYYY-MM-DD-YYYY (with months leading).  This is important for interpreting dates like 2000-03-04.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.</li>
-<li><b>datedelimiters</b> - Determining whether the field is a date/time or not can be tricky.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.</li>
-<li><b>ignorenondatetime</b> - If this parameter is set to "yes" then only fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.  By default, all fields are examined and heuristics are used to determine whether the field contains a date/time.</li>
+  <li><b>datetimeformat</b> - Specifies the format to convert date/time fields to.  May be any combination of the following format characters.  Non-format characters will be inserted as-is.</li>
+  <ul>
+    <li><b>DD</b> - day of the month</li>
+    <li><b>MM</b> - numeric month</li>
+    <li><b>MON</b> - 3-character text abbreviation for the month</li>
+    <li><b>Month</b> - full text month</li>
+    <li><b>YYYY</b> - year including century</li>
+    <li><b>YY</b> - year excluding century</li>
+    <li><b>HH24</b> - hour (0-23)</li>
+    <li><b>HH</b> - hour (1-12)</li>
+    <li><b>MI</b> - minute</li>
+    <li><b>SS</b> - second</li>
+    <li><b>FFF</b> - fraction of a second</li>
+    <li><b>AM</b> - AM or PM</li>
+  </ul>
+
+  <li><b>dateformat</b> - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.</li>
+  <li><b>timeformat</b> - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.</li>
+  <li><b>dateddmm</b> - If set to "yes" then dates are assumed to be in the DD-MM-YYYY format (with days leading), as opposed to MM-DD-YYYY format (with months leading).  This is important for interpreting dates like 03-04-2000.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.</li>
+  <li><b>dateyyddmm</b> - If set to "yes" then dates are assumed to be in the YYYY-DD-MM format (with days leading), as opposed to YYYY-MM-DD-YYYY (with months leading).  This is important for interpreting dates like 2000-03-04.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.</li>
+  <li><b>datedelimiters</b> - Determining whether the field is a date/time or not can be tricky.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.</li>
+  <li><b>ignorenondatetime</b> - If this parameter is set to "yes" then only fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.  By default, all fields are examined and heuristics are used to determine whether the field contains a date/time.</li>
 </ul>
 
 <p>For example, the following configuration:</p>
@@ -130,8 +132,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;... &gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslations</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;reformatdatetime&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>datetimeformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY HH24:MI:SS&quot;</font><br>
-<font color="#2e8b57"><b>dateformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>timeformat</b></font>=<font color="#ff00ff">&quot;HH24:MI:SS&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dateddmm</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>ignorenondatetime</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">resultsettranslation</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;reformatdatetime&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>datetimeformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY HH24:MI:SS&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>dateformat</b></font>=<font color="#ff00ff">&quot;MM/DD/YYYY&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>timeformat</b></font>=<font color="#ff00ff">&quot;HH24:MI:SS&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>dateddmm</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><br>
+<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>ignorenondatetime</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/resultsettranslations&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
@@ -139,29 +146,25 @@
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
 <p>Would translate the following date/time field:</p>
 
 <blockquote>
 Jul 10 2015 05:17:55:717PM
 </blockquote>
-
 <p>Into:</p>
 
 <blockquote>
 07/10/2015 17:18:55
 </blockquote>
-
 <p>Note that <b>dateddmm</b> and <b>dateyyddmm</b> should usually be set to the same thing.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.</p>
 
-<p>Note also that date/time translation in general is especially problematic with MS SQL Server.  See <a href="../faq/#mssqldates">the FAQ</a> for more info.</li>
+<p>Note also that date/time translation in general is especially problematic with MS SQL Server.  See <a href="../faq/#mssqldates">the FAQ</a> for more info.</p>
 
 <p>You might notice that the <i>instance</i> tag takes the exact same set of parameters as this module, and provides the exact same functionality.  So, why would you want to use it instead of just using the built in parameters of the <i>instance</i> tag.</p>
 
 <p>The <i>instance</i> tag parameters are evaluated prior to evaluating any modules.  So, you must use the <i>reformatdatetime</i> module if you are stacking result set translation modules, and want to ensure that other translations are performed prior to reformatting dates and times.</p>
 
-<br><a name="custom"></a>
-<span class="heading2">Custom Modules</span><br>
+<a name="custom"/><h2>Custom Modules</h2>
 
 <p>You can create your own custom result set translation modules too.</p>
 
@@ -192,7 +195,6 @@ Jul 10 2015 05:17:55:717PM
 };<br>
 </font>
 </blockquote>
-
 <p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
 
 <p>The default implementaion of the constructor just sets the member variables <i>sqlrrsts</i> and <i>parameters</i> to the corresponding passed-in values.  <i>sqlrrsts</i> is a pointer to an instance of the sqlrresultsettranslations class, which provides various helper methods.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.</p>
@@ -267,37 +269,39 @@ lowercase::lowercase(sqlrresultsettranslations *sqlrrsts,<br>
 }<br>
 </font>
 </blockquote>
-
 <p>Here, the lowercase class inherits from sqlrresultsettranslation.  The constructor just calls the parent constructor.  The run() method translates the field to lowercase and returns true.</p>
 
-<p>Note the "new_sqlrresultsettranslation_lowercase()" function which just allocates an instance of lowercase and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrresultsettranslation_<i>modulename</i>" and take sqlrresultsettranslations *, xmldomnode * and bool.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
+<p>Note the "new_sqlrresultsettranslation_lowercase()" function which just allocates an instance of lowercase and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrresultsettranslation_modulename" and take sqlrresultsettranslations *, xmldomnode * and bool.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
 
 <p>To build the module on a Linux or Unix system, run a command like:</p>
 
-<blockquote><b>
-gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrresultsettranslation_lowercase.so lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</b></blockquote>
+<blockquote>
+  <pre>gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrresultsettranslation_lowercase.so lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</pre>
 
+</blockquote>
 <p>This will create the file sqlrresultsettranslation_lowercase.so</p>
 
 <p>On Mac OSX, run a command like:</p>
 
-<blockquote><b>
-gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrresultsettranslation_lowercase.bundle lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</b></blockquote>
+<blockquote>
+  <pre>gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrresultsettranslation_lowercase.bundle lowercase.cpp `sqlrserver-config --libs` `rudiments-config --libs`
+</pre>
 
+</blockquote>
 <p>This will create the sqlrresultsettranslation_lowercase.bundle</p>
 
 <p>On Windows, run commands like:</p>
 
-<blockquote><b>
-cl /I"C:\Program Files\Firstworks\include" /c lowercase.cpp<br>
+<blockquote>
+  <pre>cl /I"C:\Program Files\Firstworks\include" /c lowercase.cpp
 link -out:sqlrresultsettranslation_lowercase.dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
-</b></blockquote>
+</pre>
 
+</blockquote>
 <p>This will create the sqlrresultsettranslation_lowercase.dll</p>
 
-<p>It is essential that the file be named "sqlrresultsettranslation_<i>modulename</i>.<i>extension</i>".</p>
+<p>It is essential that the file be named: sqlrresultsettranslation_modulename.extension</p>
 
 <p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
 
@@ -321,8 +325,7 @@ link -out:sqlrresultsettranslation_lowercase.dll /LIBPATH:"C:\Program Files\Firs
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
 </blockquote>
-
-<p>The server will see the module="lowercase" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrresultsettranslation_lowercase.<i>extension</i>, load it and and run the new_sqlrresultsettranslation_lowercase() method to get an instance of the lowercase class and then run the various methods of that class.</p>
+<p>The server will see the module="lowercase" attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrresultsettranslation_lowercase.//extension//, load it and and run the new_sqlrresultsettranslation_lowercase() method to get an instance of the lowercase class and then run the various methods of that class.</p>
 
 <p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
 
@@ -333,8 +336,8 @@ link -out:sqlrresultsettranslation_lowercase.dll /LIBPATH:"C:\Program Files\Firs
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>const</b></font>&nbsp;<font color="#2e8b57"><b>char</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*count=parameters-&gt;getAttributeValue(<font color="#ff00ff">&quot;count&quot;</font>);<br>
 </font>
 </blockquote>
-
-<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.</p>
+<p>Refer to the Rudiments documentation for more info on the <a href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.
+</p>
 
 </body>
 </html>
