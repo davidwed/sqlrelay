@@ -1,11 +1,10 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Substitution and Bind Variables</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Substitution and Bind Variables</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Substitution and Bind Variables</span><br><br>
+<h1>Substitution and Bind Variables</h1>
 
 <p>Bind variables are parameters that can be dynamically inserted into a query.</p>
 
@@ -13,11 +12,10 @@
 
 <p>Bind variables allow the query to be prepared only once, with placeholders for the some of the values, and then executed over and over, just plugging in values for each execution.  By eliminating the prepare-time before every execution, performance can be improved significantly.</p>
 
-
 <p>The basic process is:</p>
 
-<blockquote><pre>
-prepare("select * from  mytable where col1=:val1 and col2=:val2 and col3=:val3");
+<blockquote>
+  <pre>prepare("select * from  mytable where col1=:val1 and col2=:val2 and col3=:val3");
 inputBind("val1","hello");
 inputBind("val2",5);
 inputBind("val2",20);
@@ -31,13 +29,15 @@ inputBind("val2",9);
 inputBind("val2",23);
 execute();
 ... and so on ...
-</pre></blockquote>
+</pre>
 
+</blockquote>
 <p>In addition to running faster, the program is much cleaner.  The program doesn't need to be reconstruct the query each time it is run.</p>
 
 <p>Most modern databases support bind variables.  MDB Tools and older versions of MySQL, PostgreSQL and SQLite are exceptions.  For databases that don't support bind variables, SQL Relay fakes them by rewriting the query and inserting the values manually.  The cost of re-preparing the query is incurred, but there is no way to get around it with those databases anyway.</p>
 
-<p>See the FAQ item <a href="../faq.html#bindvars">How do I use bind variables?</a> for more information.  A more complete explanation is also given in <a href="../programming/binds.html">here</a>, and the programming guides for each language explain how to use them with queries and stored procedures.</p>
+<p>See the FAQ item <a href="../faq.html#bindvars">How do I use bind variables?</a> for more information.  A more complete explanation is also given in <a href="../programming/binds.html">here</a>, and the programming guides for each language explain how to use them with queries and stored procedures.
+</p>
 
 </body>
 </html>

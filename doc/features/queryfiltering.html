@@ -1,25 +1,25 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Query Filtering</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Query Filtering</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Query Filtering</span><br><br>
+<h1>Query Filtering</h1>
 
 <p>Query filtering prevents queries that match a certian pattern from being run at all.  There are often certain queries that will bring the entire database to its knees.  A common use for query filtering is to identify those queries and prevent them from being run.</p>
 
 <p>For example, <i>select * from hugetable where id=100</i> might be fine...</p>
 
-<img src="../images/query-allowed.png">
+<p><img src="../images/query-allowed.png"/></p>
 
 <p>...but <i>select * from hugetable</i> without a where clause might crush the database.</p>
 
-<img src="../images/query-rejected.png">
+<p><img src="../images/query-rejected.png"/></p>
 
 <p>SQL Relay can be configured to allow one and reject the other.</p>
 
-<p>A complete descripton of query filtering with example configuration files is given <a href="../modules/filters.html">here</a>.</p>
+<p>A complete descripton of query filtering with example configuration files is given <a href="../modules/filters.html">here</a>.
+</p>
 
 </body>
 </html>

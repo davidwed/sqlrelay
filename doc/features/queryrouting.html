@@ -1,19 +1,19 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Query Routing</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Query Routing</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Query Routing</span><br><br>
+<h1>Query Routing</h1>
 
 <p>Solves - "My database is getting slammed. I could replicate it but then I'd have to rewrite my app to send DML to the master and somehow distribute selects over the slaves."</p>
 
 <p>Query routing sends queries that match one pattern to one set of database servers and queries that match another pattern to another set of servers.  A comon use for query routing is to route DML and DDL queries to a master and distribute select queries over a pool of slaves.</p>
 
-<img src="../images/router.png">
+<p><img src="../images/router.png"/></p>
 
-<p>A complete descripton of query routing with example configuration files is given <a href="../admin/configguide.html#router">here</a>.</p>
+<p>A complete descripton of query routing with example configuration files is given <a href="../admin/configguide.html#router">here</a>.
+</p>
 
 </body>
 </html>

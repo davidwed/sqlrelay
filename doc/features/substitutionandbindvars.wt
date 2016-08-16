@@ -1,0 +1,35 @@
+= Substitution and Bind Variables =
+
+Bind variables are parameters that can be dynamically inserted into a query.
+
+Before executing a query, the datbase must parse it and comes up with an execution plan.  This process is called "preparing" the query and it takes time.  If you need to run a large set of similar queries, and each must be prepared separately, then this prepare-time can add up.
+
+Bind variables allow the query to be prepared only once, with placeholders for the some of the values, and then executed over and over, just plugging in values for each execution.  By eliminating the prepare-time before every execution, performance can be improved significantly.
+
+
+The basic process is:
+
+{{{#!blockquote
+{{{
+prepare("select * from  mytable where col1=:val1 and col2=:val2 and col3=:val3");
+inputBind("val1","hello");
+inputBind("val2",5);
+inputBind("val2",20);
+execute();
+inputBind("val1","goodbye");
+inputBind("val2",7);
+inputBind("val2",34);
+execute();
+inputBind("val1","hi");
+inputBind("val2",9);
+inputBind("val2",23);
+execute();
+... and so on ...
+}}}
+}}}
+
+In addition to running faster, the program is much cleaner.  The program doesn't need to be reconstruct the query each time it is run.
+
+Most modern databases support bind variables.  MDB Tools and older versions of !MySQL, !PostgreSQL and SQLite are exceptions.  For databases that don't support bind variables, SQL Relay fakes them by rewriting the query and inserting the values manually.  The cost of re-preparing the query is incurred, but there is no way to get around it with those databases anyway.
+
+See the FAQ item [../faq.html#bindvars How do I use bind variables?] for more information.  A more complete explanation is also given in [../programming/binds.html here], and the programming guides for each language explain how to use them with queries and stored procedures.
