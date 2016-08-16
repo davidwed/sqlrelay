@@ -755,9 +755,9 @@ sqlrelay_flags=""
 
 <table>
   <tr>
-    <td><a href="../images/cluster.png"><img src="../images/cluster.png"/></a>
+    <td><img src="../images/cluster.png"/>
 </td>
-    <td><a href="../images/replicated.png"><img style="padding-left: 40px; " src="../images/replicated.png"/></a>
+    <td><img style="padding-left: 40px; " src="../images/replicated.png"/>
 </td>
   </tr>
 </table>
@@ -789,7 +789,7 @@ sqlrelay_flags=""
 
 <p>SQL Relay also supports disproportionate distribution of load. If some nodes can handle more traffic than others, then SQL Relay can be configured to send more traffic to the more capable nodes.</p>
 
-<p><a href="../images/replicated-disproportionate.png"><img src="../images/replicated-disproportionate.png"/></a></p>
+<p><img src="../images/replicated-disproportionate.png"/></p>
 
 <p>SQL Relay uses the connection tag's metric attribute to decide how many connections to open to each node.</p>
 
@@ -853,7 +853,7 @@ sqlrelay_flags=""
 
 <p>In a master-slave replication environment, SQL Relay can be configured to route DML and DDL queries to the master and distribute selects over the slaves.</p>
 
-<p><a href="../images/router.png"><img src="../images/router.png"/></a></p>
+<p><img src="../images/router.png"/></p>
 
 <p>This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.</p>
 
@@ -956,13 +956,13 @@ sqlr-start -id router
 
 <p>Multiple instances of SQL Relay can be placed behind a load-balancing appliance.</p>
 
-<p><a href="../images/loadbalancer.png"><img src="../images/loadbalancer.png"/></a></p>
+<p><img src="../images/loadbalancer.png"/></p>
 
 <p>In this illustration, the load-balancing appliance is shown as a single machine, but in a true HA environment, there would be 2 or more appliances sharing a virtual IP.  Alternatively, rather than using an appliance, SQL Relay can be run on an application server cluster such as Linux Virtual Server.</p>
 
 <p><a href="http://en.wikipedia.org/wiki/Round-robin_DNS">Round-robin DNS</a> can be also be used to provide load-balancing and fail-over over multiple SQL Relay servers.</p>
 
-<p><a href="../images/rrdns.png"><img src="../images/rrdns.png"/></a></p>
+<p><img src="../images/rrdns.png"/></p>
 
 <p>In a round-robin DNS scenario, multiple IP addresses are assigned to the same host name.  The SQL Relay client is then configured to connect to that host.  When it requests the IP addresses for the host, the client receives all of the IP addresses assigned to it, rather than just a single address.</p>
 

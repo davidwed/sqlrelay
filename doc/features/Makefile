@@ -15,7 +15,9 @@ SRCS = connectionpooling.wt \
 	queryfiltering.wt \
 	queryrouting.wt \
 	resultsetcaching.wt \
-	substitutionandbindvars.wt
+	substitutionandbindvars.wt \
+	suspendedtx.wt \
+	throttling.wt
 
 OBJS = connectionpooling.html \
 	databases.html \
@@ -28,7 +30,9 @@ OBJS = connectionpooling.html \
 	queryfiltering.html \
 	queryrouting.html \
 	resultsetcaching.html \
-	substitutionandbindvars.html
+	substitutionandbindvars.html \
+	suspendedtx.html \
+	throttling.html
 
 .wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf

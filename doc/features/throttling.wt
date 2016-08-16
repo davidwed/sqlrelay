@@ -1,0 +1,33 @@
+= Throttling =
+
+Solves - "When I run enough web servers to handle the traffic, it slams the database, even though most of the database connections appear to be idle" and "I wish I could keep this one app from monopolizing the database."
+
+Throttling limits the number of connections to a given database and queues clients rather than denying them access outright.  This can maximize the value of a per-connection licensing scheme, prevent database overload, and prevent an app from monopolizing the database.
+
+== Per-Connection Licensing Schemes ==
+
+Throttling is especially helpful when migrating from an in-house database to a cloud-service database with a per-connection licensing scheme.  Your in-house database may have allowed any number of connections, but you may only be able to afford a certain number of connections to the cloud.
+
+SQL Relay can be configured to open the exact number of connections that you paid for and funnel all of your database traffic through them.  If you paid for 10 connections, but every now and then you get a burst of traffic and 15 clients need to connect, 5 of them will be queued rather than rejected.
+
+== Database Overload ==
+
+"Too many connections." is a common error seen by !MySQL users.
+
+[[Image(../images/toomanyconnections.png,nolink)]]
+
+All too often it isn't seen until the app has been in production for a long time and finally got enough traffic to overload the database.
+
+A burst of activity finally caused the app to try to open more connections than the database could handle.  Unfortunately the app wasn't written to manage that particular error, so it just failed and printed the error out on the web page.
+
+Perhaps the database could be tuned to allow more connections.  Most likely though, the app only gets busy under certain circumstances and it would be nice if it could just be throttled back.  It's also possible that the database has already been tuned up as far as it can go but still gets hammered from time-to-time.
+
+SQL Relay can be configured to maintain a certain number of database connections and open more, on-demand, up to a point.  If the app is so busy that it needs more connections than the maximum number configured, clients will be queued, rather than rejected.  The queued clients consume few system resources and may be configured to wait for a while before giving up, or wait indefinitely.
+
+== Database Monopolization ==
+
+Multiple applications often use the same database.  Under the right set of circumstances, a lower priority app can monopolize the database with a large number of client sessions or with long-running queries.
+
+In some cases, this can be managed by dedicating a database user to each application and placing quotas on the users.  But not all databases support user quotas, and applications must often share database users.
+
+SQL Relay can be used to manage this problem.  Multiple instances of SQL Relay can be created, each instance can be dedicated to a set of apps, and the instances dedicated to lower priority apps can be configured to maintain a limited number of database connections.  As a result, the number of simultaneous client sessions that the lower priority apps are able to maintain are also limited.

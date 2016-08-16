@@ -18,7 +18,7 @@ When used in query routing mode, SQL Relay is configured to distribute queries o
 For instance, you can set up one instance of SQL Relay to maintain connections to a master database and another instance of SQL Relay to maintain connections to a pool of slaves, then set up a third instance of SQL Relay to route queries to the other 2 instances.
 
 {{{#!blockquote
-[[Image(../images/router.png)]]
+[[Image(../images/router.png,nolink)]]
 }}}
 
 == General Configuration ==

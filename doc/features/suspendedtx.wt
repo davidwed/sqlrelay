@@ -1,0 +1,11 @@
+= Suspended Transactions =
+
+Suspended transactions allow a single transaction to span mulitple invocations of an app or set of apps.
+
+A challenge associated with transient apps - apps which start up, connect to the database, perform some operations, log out and die - is how to handle situations where a single transaction might need to span multiple invocations of the app or span invocations of a set of apps.  Since each invocation of an app connects and disconnects from the database, and transactions start with the connection and end with the disconnection, how can this be done?  There are many solutions, but they usually involve storing stateful data in a set of tables, in effect building an app-specific transaction model on top of the database rather than using the database's built-in transactional capabilities.
+
+With SQL Relay's suspended transaction feature, you can begin a transaction, perform some operations, then suspend the transaction and pass credentials to another app.  The next app can then pick up that same transactions, perform more operations, then either commit, rollback or suspend the transaction again.
+
+This could be useful when collecting pages of information about a user, in ecommerce checkout processes, or in paging through a large result set.
+
+The programming docs for each language give more detail on this subject.

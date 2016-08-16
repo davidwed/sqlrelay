@@ -495,10 +495,10 @@ In a high availability environment, SQL Relay can be deployed as a front-end to 
 In a database cluster or replication environment, SQL Relay can be configured to maintain a pool of connections to the various database nodes and distribute client sessions over the nodes.  If an individual node fails, SQL Relay will attempt to reestablish connections to that node, while continuing to distribute client sessions over the remaining nodes.
 
 {{{#!td
-[[Image(../images/cluster.png)]]
+[[Image(../images/cluster.png,nolink)]]
 }}}
 {{{#!td
-[[Image(../images/replicated.png,padding-left=40px)]]
+[[Image(../images/replicated.png,padding-left=40px,nolink)]]
 }}}
 
 In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - orcl1, orcl2, and orcl3
@@ -511,7 +511,7 @@ Any number of connection tags may be defined.
 
 SQL Relay also supports disproportionate distribution of load. If some nodes can handle more traffic than others, then SQL Relay can be configured to send more traffic to the more capable nodes.
 
-[[Image(../images/replicated-disproportionate.png)]]
+[[Image(../images/replicated-disproportionate.png,nolink)]]
 
 SQL Relay uses the connection tag's metric attribute to decide how many connections to open to each node.
 
@@ -547,7 +547,7 @@ The load-balancing scenarios described above all assume that master-master repli
 
 In a master-slave replication environment, SQL Relay can be configured to route DML and DDL queries to the master and distribute selects over the slaves.
 
-[[Image(../images/router.png)]]
+[[Image(../images/router.png,nolink)]]
 
 This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.
 
@@ -589,13 +589,13 @@ SQL Relay supports two front-end load-balancing and fail-over strategies.  In th
 
 Multiple instances of SQL Relay can be placed behind a load-balancing appliance.
 
-[[Image(../images/loadbalancer.png)]]
+[[Image(../images/loadbalancer.png,nolink)]]
 
 In this illustration, the load-balancing appliance is shown as a single machine, but in a true HA environment, there would be 2 or more appliances sharing a virtual IP.  Alternatively, rather than using an appliance, SQL Relay can be run on an application server cluster such as Linux Virtual Server.
 
 [http://en.wikipedia.org/wiki/Round-robin_DNS Round-robin DNS] can be also be used to provide load-balancing and fail-over over multiple SQL Relay servers.
 
-[[Image(../images/rrdns.png)]]
+[[Image(../images/rrdns.png,nolink)]]
 
 In a round-robin DNS scenario, multiple IP addresses are assigned to the same host name.  The SQL Relay client is then configured to connect to that host.  When it requests the IP addresses for the host, the client receives all of the IP addresses assigned to it, rather than just a single address.
 
