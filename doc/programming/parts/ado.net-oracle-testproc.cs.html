@@ -1,0 +1,10 @@
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;begin testproc(:in1,:in2,:in3); end;&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteNonQuery();<br>
+</font>

@@ -1,0 +1,9 @@
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(int,<font color="#2e8b57"><b>float</b></font>,<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns void&nbsp;<font color="#6a5acd">as</font>&nbsp;<font color="#ff00ff">'</font><br>
+<font color="#ff00ff">begin</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert into mytable values ($1,$2,$3);</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;</font><br>
+<font color="#ff00ff">end;'</font>&nbsp;language plpgsql<br>
+</font>

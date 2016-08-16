@@ -39,7 +39,11 @@
 use the SQLRClient namespace.<p>
 
 <blockquote>
-using SQLRClient;
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+</font>
 </blockquote>
 
 <p>You'll also need to include the SQLRelay.dll assembly.  This is usually found in C:\Program Files\Firstworks\bin on Windows or /usr/local/firstworks/lib on Unix/Linux.</p>
@@ -97,24 +101,26 @@ mono sqlrexample.exe
 <p>To use SQL Relay, you have to first open a connection.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
-		}
-	}
-}
-</PRE>
+
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <p>The following connect string variables control attributes of the connection:</p>
@@ -173,65 +179,67 @@ session.</p>
 <p>In any case, you must create an instance of SQLRelayCommand and set its CommandText.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
 
-			// DML queries...
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "insert into testtable values (1,'hello')";
-			try
-			{
-				sqlrcom.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				... handle exceptions ...
-			}
-
-
-			// Single values
-			sqlrcom.CommandText = "select 1 from dual";
-			try
-			{
-				Int64 value = sqlrcom.ExecuteScalar();
-
-				... do something with the value ...
-			}
-			catch (Exception ex)
-			{
-				... handle exceptions ...
-			}
-
-
-			// Multiple rows
-			sqlrcom.CommandText = "select * from testtable";
-			try
-			{
-				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-
-				... do something with the result set ...
-			}
-			catch (Exception ex)
-			{
-				... handle exceptions ...
-			}
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// DML queries...</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;insert into testtable values (1,'hello')&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... handle exceptions ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// Single values</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select 1 from dual&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int64&nbsp;<font color="#a52a2a"><b>value</b></font>&nbsp;= sqlrcom.ExecuteScalar();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with the&nbsp;<font color="#a52a2a"><b>value</b></font>&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... handle exceptions ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// Multiple rows</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testtable&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with the result set ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... handle exceptions ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <a name="commit"></a>
@@ -240,34 +248,36 @@ namespace SQLRExamples
 <p>If you need to execute a commit or rollback, you should create an instance of the SQLRelayTransaction class and use its commit() and rollback() methods rather than sending "commit" or "rollback" queries.  There are two reasons for this.  First, it's much more efficient to call the methods.  Second, if you're writing code that can run on transactional or non-transactional databases, some non-transactional databases will throw errors if they receive a "commit" or "rollback" query, but by calling the commit() and rollback() methods you instruct the database connection daemon to call the commit and rollback API methods for that database rather than issuing them as queries.  If the API's have no commit or rollback methods, the calls do nothing and the database throws no error.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
-			SQLRelayTransaction sqlrtran = sqlrcon.BeginTransaction();
-
-			... run some queries that we want to keep the results of ...
-
-			sqlrtran.Commit();
-
-			... run some queries that we don't want to keep the results of ...
-
-			sqlrtran.Rollback();
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayTransaction sqlrtran = sqlrcon.BeginTransaction();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... run some queries that we want to keep the results of ...<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrtran.Commit();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... run some queries that we don't want to keep the results of ...<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrtran.Rollback();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <a name="temptables"></a>
@@ -301,35 +311,37 @@ directly to the database.</p>
 <p>If your calls to ExecuteNonQuery, ExecuteScaler or ExecuteReader fail, you can catch the error an exception.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "insert into testtable values (1,'hello')";
-			try
-			{
-				sqlrcom.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;insert into testtable values (1,'hello')&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <a name="bindvars"></a>
@@ -345,85 +357,89 @@ for using bind variables (also known as parameters) in those queries.</p>
 <p>To use bind variables (parameters) with the ADO.NET API, you must add variable/value pairs to the parameter collection associated with each instance of SQLRelayCommand.  For numeric, string or date variables, this is straightforward, you can just use the Parameters.Add() method.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "insert into testtable values (:var1,:var2,:var3)";
-			sqlrcom.Parameters.Add("var1", 1);
-			sqlrcom.Parameters.Add("var2", "hello");
-			sqlrcom.Parameters.Add("var2", new DateTime(2001, 1, 1, 0, 0, 0));
-			try
-			{
-				sqlrcom.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;insert into testtable values (:var1,:var2,:var3)&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var1&quot;</font>,&nbsp;<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var2&quot;</font>,&nbsp;<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var2&quot;</font>,&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;DateTime(<font color="#ff00ff">2001</font>,&nbsp;<font color="#ff00ff">1</font>,&nbsp;<font color="#ff00ff">1</font>,&nbsp;<font color="#ff00ff">0</font>,&nbsp;<font color="#ff00ff">0</font>,&nbsp;<font color="#ff00ff">0</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <p>You can also bind CLOB's and BLOB's.  It is a little more complex but not terribly.</p>
 
 <blockquote>
-<pre>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "insert into testtable values (:clobvar,:blobvar)";
-
-			SQLRelayParameter clobvar = new SQLRelayParameter();
-			clobvar.ParameterName = "clobvar";
-			clobvar.Value = "testclob";
-			clobvar.SQLRelayType = SQLRelayType.Clob;
-			sqlrcom.Parameters.Add(clobvar);
-
-			SQLRelayParameter blobvar = new SQLRelayParameter();
-			blobvar.ParameterName = "blobvar";
-			blobvar.Value = System.Text.Encoding.Default.GetBytes("testblob");
-			blobvar.SQLRelayType = SQLRelayType.Blob;
-			sqlrcom.Parameters.Add(blobvar);
-
-			try
-			{
-				sqlrcom.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
-	}
-}
-</pre>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;insert into testtable values (:clobvar,:blobvar)&quot;</font>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayParameter clobvar =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clobvar.ParameterName =&nbsp;<font color="#ff00ff">&quot;clobvar&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clobvar.Value =&nbsp;<font color="#ff00ff">&quot;testclob&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clobvar.SQLRelayType = SQLRelayType.Clob;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(clobvar);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayParameter blobvar =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;blobvar.ParameterName =&nbsp;<font color="#ff00ff">&quot;blobvar&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;blobvar.Value = System.Text.Encoding.Default.GetBytes(<font color="#ff00ff">&quot;testblob&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;blobvar.SQLRelayType = SQLRelayType.Blob;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(blobvar);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Clob or Blob types.</p>
@@ -431,66 +447,68 @@ namespace SQLRExamples
 <p>Output bind variables can be used too.  The Direction and DbType attributes of the parameter must be specified though and for strings, the Size of the buffer to allocate for the return value must be specified as well.</p>
 
 <blockquote>
-<pre>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  :datevar:='03-FEB-2001'; end;";
-
-			SQLRelayParameter numvar = new SQLRelayParameter();
-			numvar.ParameterName = "numvar";
-			numvar.Direction = ParameterDirection.Output;
-			numvar.DbType = DbType.Int64;
-			sqlrcom.Parameters.Add(numvar);
-
-			SQLRelayParameter stringvar = new SQLRelayParameter();
-			stringvar.ParameterName = "stringvar";
-			stringvar.Direction = ParameterDirection.Output;
-			stringvar.DbType = DbType.String;
-			stringvar.Size = 20;
-			sqlrcom.Parameters.Add(stringvar);
-
-			SQLRelayParameter floatvar = new SQLRelayParameter();
-			floatvar.ParameterName = "floatvar";
-			floatvar.Direction = ParameterDirection.Output;
-			floatvar.DbType = DbType.Double;
-			sqlrcom.Parameters.Add(floatvar);
-
-			SQLRelayParameter datevar = new SQLRelayParameter();
-			datevar.ParameterName = "datevar";
-			datevar.Direction = ParameterDirection.Output;
-			datevar.DbType = DbType.DateTime;
-			sqlrcom.Parameters.Add(datevar);
-
-			try
-			{
-				sqlrcom.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-
-			... do something with numvar.Value ...
-			... do something with stringvar.Value ...
-			... do something with floatvar.Value ...
-			... do something with datevar.Value ...
-		}
-	}
-}
-</pre>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;begin&nbsp;&nbsp;:numvar:=1;&nbsp;&nbsp;:stringvar:='hello';&nbsp;&nbsp;:floatvar:=2.5;&nbsp;&nbsp;:datevar:='03-FEB-2001'; end;&quot;</font>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayParameter numvar =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numvar.ParameterName =&nbsp;<font color="#ff00ff">&quot;numvar&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numvar.Direction = ParameterDirection.Output;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numvar.DbType = DbType.Int64;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(numvar);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayParameter stringvar =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stringvar.ParameterName =&nbsp;<font color="#ff00ff">&quot;stringvar&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stringvar.Direction = ParameterDirection.Output;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stringvar.DbType = DbType.String;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stringvar.Size =&nbsp;<font color="#ff00ff">20</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(stringvar);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayParameter floatvar =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;floatvar.ParameterName =&nbsp;<font color="#ff00ff">&quot;floatvar&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;floatvar.Direction = ParameterDirection.Output;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;floatvar.DbType = DbType.Double;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(floatvar);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayParameter datevar =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;datevar.ParameterName =&nbsp;<font color="#ff00ff">&quot;datevar&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;datevar.Direction = ParameterDirection.Output;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;datevar.DbType = DbType.DateTime;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(datevar);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with numvar.Value ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with stringvar.Value ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with floatvar.Value ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with datevar.Value ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <p>FIXME: ... clob, blob and cursor output bind ...</p>
@@ -504,61 +522,63 @@ over and over without re-preparing it.  If your backend database natively
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
-
-			// Prepare the query...
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "insert into testtable values (:var1,:var2,:var3)";
-			sqlrcom.Prepare();
 
 
-			// Execute once...
-			sqlrcom.Parameters.Add("var1", 1);
-			sqlrcom.Parameters.Add("var2", "hello");
-			sqlrcom.Parameters.Add("var2", new DateTime(2001, 1, 1, 0, 0, 0));
-			try
-			{
-				sqlrcom.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-			sqlrcom.Parameters.Clear();
-
-
-			// Execute again with new values...
-			sqlrcom.Parameters.Add("var1", 2);
-			sqlrcom.Parameters.Add("var2", "bye");
-			sqlrcom.Parameters.Add("var2", new DateTime(2002, 2, 2, 0, 0, 0));
-			try
-			{
-				sqlrcom.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-
-
-			... re-bind and re-execute again and again ...
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// Prepare the query...</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;insert into testtable values (:var1,:var2,:var3)&quot;</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Prepare();<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// Execute once...</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var1&quot;</font>,&nbsp;<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var2&quot;</font>,&nbsp;<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var2&quot;</font>,&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;DateTime(<font color="#ff00ff">2001</font>,&nbsp;<font color="#ff00ff">1</font>,&nbsp;<font color="#ff00ff">1</font>,&nbsp;<font color="#ff00ff">0</font>,&nbsp;<font color="#ff00ff">0</font>,&nbsp;<font color="#ff00ff">0</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Clear();<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// Execute again with new values...</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var1&quot;</font>,&nbsp;<font color="#ff00ff">2</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var2&quot;</font>,&nbsp;<font color="#ff00ff">&quot;bye&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;var2&quot;</font>,&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;DateTime(<font color="#ff00ff">2002</font>,&nbsp;<font color="#ff00ff">2</font>,&nbsp;<font color="#ff00ff">2</font>,&nbsp;<font color="#ff00ff">0</font>,&nbsp;<font color="#ff00ff">0</font>,&nbsp;<font color="#ff00ff">0</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... re-bind and re-execute again and again ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <a name="fields"></a>
@@ -573,69 +593,71 @@ namespace SQLRExamples
 <p>Further, the raw data for each field can be coaxed into a native type using the GetBoolean(), GetByte(), GetBytes(), GetChar(), GetChars(), GetGuid(), GetInt16(), GetInt32(), GetInt64(), GetFloat(), GetDouble(), GetString(), GetDecimal() and GetDateTime() methods.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
-
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "select col1,col2 from testtable";
-
-			try
-			{
-				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-				
-				// read row...
-				datareader.Read();
-
-				// get the raw data of the first field in a variety of ways
-				Object o1 = datareader.GetValue(0);
-				o1 = datareader[0];
-				o1 = datareader.GetValue(datareader.GetOrdinal("col1"));
-				o1 = datareader["col1"];
-				Object[] os1 = datareader.GetValues();
-				o1 = os1[0];
-
-				// get the first field as a string
-				String s1 = datareader.GetString(0);
 
 
-				// get the raw data of the second field in a variety of ways
-				Object o2 = datareader.GetValue(1);
-				o2 = datareader[1];
-				o2 = datareader.GetValue(datareader.GetOrdinal("col2"));
-				o2 = datareader["col2"];
-				Object[] os2 = datareader.GetValues();
-				o2 = os2[1];
-
-				// get the second field as a string
-				String s2 = datareader.GetString(1);
-				
-				// read another row...
-				datareader.Read();
-
-				... do something with this row ...
-
-				... fetch more rows ...
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select col1,col2 from testtable&quot;</font>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// read row...</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;datareader.Read();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// get the raw data of the first field in a variety of ways</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object o1 = datareader.GetValue(<font color="#ff00ff">0</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o1 = datareader[<font color="#ff00ff">0</font>];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o1 = datareader.GetValue(datareader.GetOrdinal(<font color="#ff00ff">&quot;col1&quot;</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o1 = datareader[<font color="#ff00ff">&quot;col1&quot;</font>];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object[] os1 = datareader.GetValues();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o1 = os1[<font color="#ff00ff">0</font>];<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// get the first field as a string</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String s1 = datareader.GetString(<font color="#ff00ff">0</font>);<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// get the raw data of the second field in a variety of ways</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object o2 = datareader.GetValue(<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o2 = datareader[<font color="#ff00ff">1</font>];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o2 = datareader.GetValue(datareader.GetOrdinal(<font color="#ff00ff">&quot;col2&quot;</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o2 = datareader[<font color="#ff00ff">&quot;col2&quot;</font>];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Object[] os2 = datareader.GetValues();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o2 = os2[<font color="#ff00ff">1</font>];<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// get the second field as a string</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String s2 = datareader.GetString(<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">// read another row...</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;datareader.Read();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with&nbsp;<font color="#a52a2a"><b>this</b></font>&nbsp;row ...<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... fetch more rows ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 
@@ -660,56 +682,58 @@ iterate through its result set, inserting rows into another table, using only
 <p>For example:</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
-
-			SQLRelayCommand sqlrcom1 = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom1.CommandText = "select * from my_first_table";
 
 
-			SQLRelayCommand sqlrcom2 = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom2.CommandText = "insert into my_second_table values (:col1, :col2, :col3)";
-
-			try
-			{
-				System.Data.IDataReader datareader = sqlrcom1.ExecuteReader();
-				while (datareader.Read())
-				{
-					sqlrcom2.Parameters.Clear();
-					sqlrcom2.Parameters.Add("col1",datareader.GetString(0));
-					sqlrcom2.Parameters.Add("col2",datareader.GetString(1));
-					sqlrcom2.Parameters.Add("col3",datareader.GetString(2));
-					try
-					{
-						sqlrcom2.ExecuteNonQuery();
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-					}
-				}
-				
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom1 = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom1.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from my_first_table&quot;</font>;<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom2 = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom2.CommandText =&nbsp;<font color="#ff00ff">&quot;insert into my_second_table values (:col1, :col2, :col3)&quot;</font>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Data.IDataReader datareader = sqlrcom1.ExecuteReader();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>while</b></font>&nbsp;(datareader.Read())<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom2.Parameters.Clear();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom2.Parameters.Add(<font color="#ff00ff">&quot;col1&quot;</font>,datareader.GetString(<font color="#ff00ff">0</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom2.Parameters.Add(<font color="#ff00ff">&quot;col2&quot;</font>,datareader.GetString(<font color="#ff00ff">1</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom2.Parameters.Add(<font color="#ff00ff">&quot;col3&quot;</font>,datareader.GetString(<font color="#ff00ff">2</font>));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom2.ExecuteNonQuery();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <a name="columns"></a>
@@ -718,114 +742,118 @@ namespace SQLRExamples
 <p>After executing a query, the column count is stored in the FieldCount property of the SQLRelayDataReader class.  Column names are accessible via the GetName() method.  Column types are available from the GetDataTypeName().  The native .NET data type for the field is avialable from the GetFieldType() method.  They may be used as follows:</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "select * from my_first_table";
-
-			try
-			{
-				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-				for (UInt32 index = 0; index &lt; sqlrcom.FieldCount; index++)
-				{
-					String name = datareader.GetName(index);
-					String datatype = datareader.GetDataTypename(index);
-					String nativedatatype = datareader.GetFieldType(index).ToString();
-
-					... do someting with the column data ...
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from my_first_table&quot;</font>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(UInt32 index =&nbsp;<font color="#ff00ff">0</font>; index &amp;lt; sqlrcom.FieldCount; index++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String name = datareader.GetName(index);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String datatype = datareader.GetDataTypename(index);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String nativedatatype = datareader.GetFieldType(index).ToString();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;someting with the column data ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <p>Extended column information is available from the GetSchemaTable method.  Usage is best illustrated by example.</p>
 
 <blockquote>
-<PRE>
-using System;
-using SQLRClient;
-using System.Data;
-using System.IO;
 
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
-			sqlrcon.Open();
 
-			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "select * from my_first_table";
-
-			try
-			{
-				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-
-				DataTable schematable = datareader.GetSchemaTable();
-				for (UInt32 index = 0; index &lt; sqlrcom.FieldCount; index++)
-				{
-					String columnname = Convert.ToString(schematable.Rows[index]["ColumnName"]);
-					Int64 columnordinal = Convert.ToInt64(schematable.Rows[index]["ColumnOrdinal"]);
-            				Int64 columnsize = Convert.ToInt64(schematable.Rows[index]["ColumnSize"]);
-            				Int64 numericprecision = Convert.ToInt64(schematable.Rows[index]["NumericPrecision"]);
-            				Int64 numericscale = Convert.ToInt64(schematable.Rows[index]["NumericScale"]);
-            				Boolean isunique = Convert.ToBoolean(schematable.Rows[index]["IsUnique"]);
-            				Boolean iskey = Convert.ToBoolean(schematable.Rows[index]["IsKey"]);
-            				String baseservername = Convert.ToString(schematable.Rows[index]["BaseServerName"]);
-            				String basecatalogname = Convert.ToString(schematable.Rows[index]["BaseCatalogName"]);
-            				String basecolumnname = Convert.ToString(schematable.Rows[index]["BaseColumnName"]);
-            				String baseschemaname = Convert.ToString(schematable.Rows[index]["BaseSchemaName"]);
-            				String basetablename = Convert.ToString(schematable.Rows[index]["BaseTableName"]);
-            				String datatype = Convert.ToString(schematable.Rows[index]["DataType"]);
-            				Boolean allowdbnull = Convert.ToBoolean(schematable.Rows[index]["AllowDBNull"]);
-            				String providertype = Convert.ToString(schematable.Rows[index]["ProviderType"]);
-            				Boolean isaliased = Convert.ToBoolean(schematable.Rows[index]["IsAliased"]);
-            				Boolean isexpression = Convert.ToBoolean(schematable.Rows[index]["IsExpression"]);
-            				Boolean isidentity = Convert.ToBoolean(schematable.Rows[index]["IsIdentity"]);
-            				Boolean isautoincrement = Convert.ToBoolean(schematable.Rows[index]["IsAutoIncrement"]);
-            				Boolean isrowversion = Convert.ToBoolean(schematable.Rows[index]["IsRowVersion"]);
-            				Boolean ishidden = Convert.ToBoolean(schematable.Rows[index]["IsHidden"]);
-            				Boolean islong = Convert.ToBoolean(schematable.Rows[index]["IsLong"]);
-            				Boolean isreadonly = Convert.ToBoolean(schematable.Rows[index]["IsReadOnly"]);
-            				String providerspecificdatatype = Convert.ToString(schematable.Rows[index]["ProviderSpecificDataType"]);
-            				String datatypename = Convert.ToString(schematable.Rows[index]["DataTypeName"]);
-            				String xmlschemacollectiondatabase = Convert.ToString(schematable.Rows[index]["XmlSchemaCollectionDatabase"]);
-            				String xmlschemacollectionowningschema = Convert.ToString(schematable.Rows[index]["XmlSchemaCollectionOwningSchema"]);
-            				String xmlschemacollectionname = Convert.ToString(schematable.Rows[index]["XmlSchemaCollectionName"]);
-
-					... do something with all these bits of information ...
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
-	}
-}
-</PRE>
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.Data;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;SQLRExamples<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;SQLRExample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayConnection(<font color="#ff00ff">&quot;Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon.Open();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from my_first_table&quot;</font>;<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>try</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DataTable schematable = datareader.GetSchemaTable();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(UInt32 index =&nbsp;<font color="#ff00ff">0</font>; index &amp;lt; sqlrcom.FieldCount; index++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String columnname = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;ColumnName&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int64 columnordinal = Convert.ToInt64(schematable.Rows[index][<font color="#ff00ff">&quot;ColumnOrdinal&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int64 columnsize = Convert.ToInt64(schematable.Rows[index][<font color="#ff00ff">&quot;ColumnSize&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int64 numericprecision = Convert.ToInt64(schematable.Rows[index][<font color="#ff00ff">&quot;NumericPrecision&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int64 numericscale = Convert.ToInt64(schematable.Rows[index][<font color="#ff00ff">&quot;NumericScale&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean isunique = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsUnique&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean iskey = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsKey&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String baseservername = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;BaseServerName&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String basecatalogname = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;BaseCatalogName&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String basecolumnname = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;BaseColumnName&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String baseschemaname = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;BaseSchemaName&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String basetablename = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;BaseTableName&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String datatype = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;DataType&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean allowdbnull = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;AllowDBNull&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String providertype = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;ProviderType&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean isaliased = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsAliased&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean isexpression = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsExpression&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean isidentity = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsIdentity&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean isautoincrement = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsAutoIncrement&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean isrowversion = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsRowVersion&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean ishidden = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsHidden&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean islong = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsLong&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Boolean isreadonly = Convert.ToBoolean(schematable.Rows[index][<font color="#ff00ff">&quot;IsReadOnly&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String providerspecificdatatype = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;ProviderSpecificDataType&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String datatypename = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;DataTypeName&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String xmlschemacollectiondatabase = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;XmlSchemaCollectionDatabase&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String xmlschemacollectionowningschema = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;XmlSchemaCollectionOwningSchema&quot;</font>]);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String xmlschemacollectionname = Convert.ToString(schematable.Rows[index][<font color="#ff00ff">&quot;XmlSchemaCollectionName&quot;</font>]);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...&nbsp;<font color="#a52a2a"><b>do</b></font>&nbsp;something with all these bits of information ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>catch</b></font>&nbsp;(Exception ex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(ex.Message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </blockquote>
 
 <p>SQL Relay support most of the fields that might be returned in the schema table but not all.  Most databases don't support all of these fields either.  In the future, support may improve.</p>
@@ -864,34 +892,40 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(in1&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in2&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in3&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>varchar2</b></font>)&nbsp;<font color="#6a5acd">is</font><br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;mytable&nbsp;<font color="#6a5acd">values</font>&nbsp;(in1,in2,in3);<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "begin testproc(:in1,:in2,:in3); end;";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-sqlrcom.ExecuteNonQuery();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;begin testproc(:in1,:in2,:in3); end;&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteNonQuery();<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -900,32 +934,38 @@ sqlrcom.ExecuteNonQuery();
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>) <font color="#6b59ce">as</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (@in1,@in2,@in3)
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc @in1 int, @in2&nbsp;<font color="#2e8b57"><b>float</b></font>, @in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)&nbsp;<font color="#6a5acd">as</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;mytable&nbsp;<font color="#6a5acd">values</font>&nbsp;(@in1,@in2,@in3)<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "exec testproc";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-sqlrcom.ExecuteNonQuery();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;exec testproc&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteNonQuery();<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <span class="heading4">Firebird</span><br>
@@ -933,35 +973,41 @@ sqlrcom.ExecuteNonQuery();
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
-        suspend;
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(in1&nbsp;<font color="#2e8b57"><b>integer</b></font>, in2&nbsp;<font color="#2e8b57"><b>float</b></font>, in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))&nbsp;<font color="#6a5acd">as</font><br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;mytable&nbsp;<font color="#6a5acd">values</font>&nbsp;(in1,in2,in3);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;suspend;<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "execute procedure testproc ?, ?, ?";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-sqlrcom.ExecuteNonQuery();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;execute procedure testproc ?, ?, ?&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteNonQuery();<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <span class="heading4">DB2</span><br>
@@ -969,34 +1015,40 @@ sqlrcom.ExecuteNonQuery();
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(<font color="#a52a2a"><b>in</b></font>&nbsp;in1 int,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in2 double,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql<br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;mytable&nbsp;<font color="#6a5acd">values</font>&nbsp;(in1,in2,in3);<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "call testproc(?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-sqlrcom.ExecuteNonQuery();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteNonQuery();<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <span class="heading4">Postgresql</span><br>
@@ -1004,35 +1056,41 @@ sqlrcom.ExecuteNonQuery();
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns void <font color="#6b59ce">as</font> '
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> ($<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font>);
-        <font color="#6b59ce">return</font>;
-<font color="#6b59ce">end</font>;' language plpgsql
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(int,<font color="#2e8b57"><b>float</b></font>,<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns void&nbsp;<font color="#6a5acd">as</font>&nbsp;<font color="#ff00ff">'</font><br>
+<font color="#ff00ff">begin</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert into mytable values ($1,$2,$3);</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;</font><br>
+<font color="#ff00ff">end;'</font>&nbsp;language plpgsql<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "call testfunc($1,$2,$3)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-sqlrcom.ExecuteNonQuery();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testfunc($1,$2,$3)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteNonQuery();<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(int,<font color="#2e8b57"><b>float</b></font>,<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))<br>
+</font>
 </blockquote>
 
 <span class="heading4">MySQL</span><br>
@@ -1040,26 +1098,30 @@ sqlrcom.ExecuteNonQuery();
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
-<font color="#6a5acd">begin</font>
-        <font color="#a52a2a"><b>insert</b></font> <font color="#6a5acd">into</font> mytable <font color="#6a5acd">values</font> (in1,in2,in3);
-<font color="#6a5acd">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(<font color="#a52a2a"><b>in</b></font>&nbsp;in1 int,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in2&nbsp;<font color="#2e8b57"><b>float</b></font>,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))<br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;mytable&nbsp;<font color="#6a5acd">values</font>&nbsp;(in1,in2,in3);<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "call testproc(?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-sqlrcom.ExecuteNonQuery();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.<font color="#6a5acd">Add</font>(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.<font color="#6a5acd">Add</font>(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.<font color="#6a5acd">Add</font>(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteNonQuery();<br>
+</font>
 </blockquote>
 
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
@@ -1067,9 +1129,11 @@ sqlrcom.ExecuteNonQuery();
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
