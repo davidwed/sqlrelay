@@ -1,47 +1,39 @@
-<html>
-<head>
-<title>firstworks   SQL Relay - Native API</title>
-<link href="../css/styles.css" rel="stylesheet">
 <script language="Javascript" src="../js/rotate.js"></script>
-</head>
-<body onload="rotate();">
 
-<span class="heading1">Native API</span><br><br>
+= Native API =
 
-<p>The native SQL Relay client API currently supports C, C++, .NET languages, Java, Perl, Python, PHP, Ruby, TCL, Erlang, and node.js.</p>
+The native SQL Relay client API currently supports C, C++, .NET languages, Java, Perl, Python, PHP, Ruby, TCL, Erlang, and node.js.
 
-<p>The native API is intuitive, consistent across languages, and supports powerful features not available when using a database abstraction layer like suspended sessions, result set caching and tuning options.</p>
+The native API is intuitive, consistent across languages, and supports powerful features not available when using a database abstraction layer like suspended sessions, result set caching and tuning options.
 
-<p>Programming guides with sample code and API references are available for each language:</p>
+Programming guides with sample code and API references are available for each language:
 
-<blockquote>
-<b>Guides:</b>
-<a href="../programming/c++.html">C++</a>, 
-<a href="../programming/c.html">C</a>,
-<a href="../programming/cs.html">C#</a>,
-<a href="../programming/perl.html">Perl</a>,
-<a href="../programming/php.html">PHP</a>,
-<a href="../programming/python.html">Python</a>,
-<a href="../programming/ruby.html">Ruby</a>,
-<a href="../programming/java.html">Java</a>,
-<a href="../programming/tcl.html">TCL</a>,
-<a href="../programming/erlang.html">Erlang</a>,
-<a href="../programming/nodejs.html">node.js</a>
+{{{#!blockquote
+'''Guides:'''
+[../programming/c++.html C++], 
+[../programming/c.html C],
+[../programming/cs.html C#],
+[../programming/perl.html Perl],
+[../programming/php.html PHP],
+[../programming/python.html Python],
+[../programming/ruby.html Ruby],
+[../programming/java.html Java],
+[../programming/tcl.html TCL],
+[../programming/erlang.html Erlang],
+[../programming/nodejs.html node.js]
 
-<br>
-
-<b>References:</b>
-<a href="../api/c++/html/annotated.html">C++</a>,
-<a href="../api/c/html/group__sqlrclientwrapper.html">C</a>,
-<a href="../api/cs/html/annotated.html">C#</a>,
-<a href="../api/perl/perl.html">Perl</a>,
-<a href="../api/php/index.html">PHP</a>,
-<a href="../api/python/PySQLRClient.py.html">Python</a>,
-<a href="../api/ruby/doc/index.html">Ruby</a>,
-<a href="../api/java/index.html">Java</a>,
-<a href="../api/tcl/index.html">TCL</a>,
-<a href="../api/nodejs/html/annotated.html">node.js</a>,
-</blockquote>
+'''References:'''
+[../api/c++/html/annotated.html C++],
+[../api/c/html/group__sqlrclientwrapper.html C],
+[../api/cs/html/annotated.html C#],
+[../api/perl/perl.html Perl],
+[../api/php/index.html PHP],
+[../api/python/PySQLRClient.py.html Python],
+[../api/ruby/doc/index.html Ruby],
+[../api/java/index.html Java],
+[../api/tcl/index.html TCL],
+[../api/nodejs/html/annotated.html node.js],
+}}}
 
 <div class="slide">
 
@@ -50,6 +42,7 @@
 <p class="code" style="height: 300px;">
 @example.cpp.html@
 </p>
+
 </div>
 
 <div style="display: block; float: left;"/>
@@ -57,6 +50,7 @@
 <p class="code" style="height: 300px;">
 @example.c.html@
 </p>
+
 </div>
 
 </div>
@@ -69,6 +63,7 @@
 <p class="code" style="height: 350px;">
 @example.cs.html@
 </p>
+
 </div>
 
 <div style="display: block; float: left;"/>
@@ -76,6 +71,7 @@
 <p class="code" style="height: 350px;">
 @example.java.html@
 </p>
+
 </div>
 
 </div>
@@ -88,6 +84,7 @@
 <p class="code" style="height: 300px;">
 @example.pl.html@
 </p>
+
 </div>
 
 <div style="display: block; float: left;"/>
@@ -95,6 +92,7 @@
 <p class="code" style="height: 300px;">
 @example.py.html@
 </p>
+
 </div>
 
 </div>
@@ -107,6 +105,7 @@
 <p class="code" style="height: 300px;">
 @example.php.html@
 </p>
+
 </div>
 
 <div style="display: block; float: left;"/>
@@ -114,6 +113,7 @@
 <p class="code" style="height: 300px;">
 @example.rb.html@
 </p>
+
 </div>
 
 </div>
@@ -126,6 +126,7 @@
 <p class="code" style="height: 300px;">
 @example.tcl.html@
 </p>
+
 </div>
 
 <div style="display: block; float: left;"/>
@@ -133,9 +134,11 @@
 <p class="code" style="height: 300px;">
 @example.js.html@
 </p>
-</div>
 
 </div>
 
-</body>
-</html>
+</div>
+
+<script language="Javascript">
+rotate();
+</script>

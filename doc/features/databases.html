@@ -12,11 +12,11 @@
 
 <table>
   <tr>
-    <td><a href="../images/oracle.png"><img src="../images/oracle.png"/></a>
-<a href="../images/sybase.png"><img style="margin-left: 10px; " src="../images/sybase.png"/></a>
-<a href="../images/ibm.png"><img style="margin-left: 10px; " src="../images/ibm.png"/></a>
+    <td><img src="../images/oracle.png"/>
+<img style="margin-left: 10px; " src="../images/sybase.png"/>
+<img style="margin-left: 10px; " src="../images/ibm.png"/>
 </td>
-    <td><a href="../images/mssqlserver.png"><img style="margin-left: 10px; " src="../images/mssqlserver.png"/></a>
+    <td><img style="margin-left: 10px; " src="../images/mssqlserver.png"/>
 </td>
   </tr>
 </table>
@@ -24,22 +24,22 @@
 <p></div></p>
 
 <p><div class="slide hidden">
-<a href="../images/mysql.png"><img src="../images/mysql.png"/></a>
-<a href="../images/postgresql.png"><img style="margin-left: 10px; " src="../images/postgresql.png"/></a>
-<a href="../images/firebird.png"><img style="margin-left: 10px; " src="../images/firebird.png"/></a>
-<a href="../images/sqlite.png"><img style="margin-left: 10px; " src="../images/sqlite.png"/></a>
+<img src="../images/mysql.png"/>
+<img style="margin-left: 10px; " src="../images/postgresql.png"/>
+<img style="margin-left: 10px; " src="../images/firebird.png"/>
+<img style="margin-left: 10px; " src="../images/sqlite.png"/>
 </div></p>
 
 <p><div class="slide hidden"></p>
 
 <table>
   <tr>
-    <td><a href="../images/unixodbc.png"><img src="../images/unixodbc.png"/></a>
-<a href="../images/iodbc.png"><img style="margin-left: 10px; " src="../images/iodbc.png"/></a>
+    <td><img src="../images/unixodbc.png"/>
+<img style="margin-left: 10px; " src="../images/iodbc.png"/>
 </td>
-    <td><a href="../images/freetds.png"><img style="margin-left: 10px; " src="../images/freetds.png"/></a>
+    <td><img style="margin-left: 10px; " src="../images/freetds.png"/>
 <br/><br/>
-<a href="../images/mdbtools.png"><img style="margin-left: 10px; " src="../images/mdbtools.png"/></a>
+<img style="margin-left: 10px; " src="../images/mdbtools.png"/>
 </td>
   </tr>
 </table>
@@ -50,13 +50,13 @@
 
 <p>Support is provided for Microsoft SQL Server via the <a href="http://www.freetds.org">FreeTDS</a> API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the SAP/Sybase database API.  So, depending on what version of SAP/Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
 
-<p><a href="FreeTDS">FreeTDS</a> supports SAP/Sybase as well.  So you can access both SQL Server and SAP/Sybase databases using <a href="FreeTDS">FreeTDS</a>.</p>
+<p>FreeTDS supports SAP/Sybase as well.  So you can access both SQL Server and SAP/Sybase databases using FreeTDS.</p>
 
 <p>Minimal support is provided for Microsoft Access databases via the <a href="http://mdbtools.sourceforge.net">MDB Tools</a> API.  Select queries are supported but DML and DDL is not.</p>
 
 <p>ODBC is supported via the <a href="http://www.unixodbc.org">UnixODBC</a> and <a href="http://www.iodbc.org">iODBC</a> libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are running SQL Relay on.</p>
 
-<p>Microsoft released a SQL Server ODBC driver in 2012 that is compatible with certain versions of <a href="UnixODBC">UnixODBC</a> on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
+<p>Microsoft released a SQL Server ODBC driver in 2012 that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
 
 <p><script language="Javascript">
 rotate();

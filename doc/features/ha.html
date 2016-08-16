@@ -1,22 +1,24 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - High Availability</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>High Availability</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">High Availability</span><br><br>
+<h1>High Availability</h1>
 
 <p>Solves - "I wish there was a cheap and easy way to automatically distribute traffic to the nodes in my database cluster and manage outages."</p>
 
 <p>In a database cluster or replication environment, the SQL Relay server maintains a pool of connections to the various database nodes and distributes client sessions over the pool.  SQL Relay even supports disproportionate distribution of load.  If some nodes are more powerful than others, then SQL Relay can be configured to send more traffic to the more powerful nodes.</p>
 
 <table>
-<tr>
-<td><img src="../images/cluster.png"></td>
-<td><img style="margin-left: 20px;" src="../images/replicated.png"></td>
-<td><img style="margin-left: 20px;" src="../images/replicated-disproportionate.png"></td>
-</tr>
+  <tr>
+    <td><img src="../images/cluster.png"/>
+</td>
+    <td><img style="margin-left: 20px; " src="../images/replicated.png"/>
+</td>
+    <td><img style="margin-left: 20px; " src="../images/replicated-disproportionate.png"/>
+</td>
+  </tr>
 </table>
 
 <p>If a node fails, the SQL Relay server will attempt to reestablish connections to that node, while continuing to distribute client sessions over the remaining nodes.</p>
@@ -26,13 +28,16 @@
 <p>SQL Relay supports two front-end high availability strategies as well.  Multiple instances of SQL Relay can be placed behind a load-balancing appliance, or round-robin DNS can be used to provide load-balancing and fail-over over multiple instances of SQL Relay.</p>
 
 <table>
-<tr>
-<td><img src="../images/loadbalancer.png"></td>
-<td><img style="margin-left: 20px;" src="../images/rrdns.png"></td>
-</tr>
+  <tr>
+    <td><a href="../images/loadbalancer.png"><img src="../images/loadbalancer.png"/></a>
+</td>
+    <td><img style="margin-left: 20px; " src="../images/rrdns.png"/>
+</td>
+  </tr>
 </table>
 
-<p>Complete descriptions of high availability strategies, with example configuration files are given <a href="../admin/configguide.html#ha">here</a>.</p>
+<p>Complete descriptions of high availability strategies, with example configuration files are given <a href="../admin/configguide.html#ha">here</a>.
+</p>
 
 </body>
 </html>

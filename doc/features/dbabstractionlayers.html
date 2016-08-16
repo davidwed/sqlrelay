@@ -1,44 +1,41 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Database Abstraction Layers</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Database Abstraction Layers</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Database Abstraction Layers</span><br><br>
+<h1>Database Abstraction Layers</h1>
 
 <p>Rather than using a native database API, most applications are written using a database abstraction layer that loads a database-specific driver at runtime.</p>
 
 <p>For example, a PHP app might be written to use PDO and be configured to load a MySQL driver at runtime to talk to a MySQL database.</p>
 
-<img src="../images/app-pdo-mysql.png"/>
+<p><img src="../images/app-pdo-mysql.png"/></p>
 
 <p>SQL Relay currently provides drivers for ADO.NET, Perl DBI, Python DB-API, PHP PDO and ODBC.  JDBC is also supported via the JDBC-ODBC bridge.</p>
 
 <p>The same PHP app could be configured to load the SQL Relay driver to talk to MySQL via SQL Relay.</p>
 
-<img src="../images/app-pdo-sqlr-mysql.png"/>
+<p><img src="../images/app-pdo-sqlr-mysql.png"/></p>
 
 <p>Programming guides with sample code and API references are available for each database abstraction layer:</p>
 
 <blockquote>
-<b>Guides:</b>
-<a href="../programming/ado.net.html">ADO.NET</a>,
+  <p><b>Guides:</b>
+<a href="../programming/ado.net.html">ADO.NET</a>
 <a href="../programming/perldbi.html">Perl DBO</a>,
 <a href="../programming/pythondb.html">Python DB-API</a>,
 <a href="../programming/phppdo.html">PHP PDO</a>,
 <a href="../programming/odbc.html">ODBC</a>,
-<a href="../programming/jdbc.html">JDBC</a>
+<a href="../programming/jdbc.html">JDBC</a></p>
 
-<br>
-
-<b>References:</b>
+<br/><b>References:</b>
 <a href="../api/ado.net.html/annotated.html">ADO.NET</a>,
 <a href="../api/perl/SQLRelay.html">Perl DBI</a>,
-<a href="../api/python/PySQLRDB.py.html">Python DB-API</a>,
+<a href="../api/python/PySQLRDB.py.html">Python DB-API</a>
 </blockquote>
-
-<p>The native SQL Relay client API is actually a database abstraction layer as well.  A program written using the native SQL Relay client API can talk to any database supported by SQL Relay.</p>
+<p>The native SQL Relay client API is actually a database abstraction layer as well.  A program written using the native SQL Relay client API can talk to any database supported by SQL Relay.
+</p>
 
 </body>
 </html>

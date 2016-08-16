@@ -1,11 +1,10 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Drop-In Replacement Libraries</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Drop-In Replacement Libraries</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Drop-In Replacement Libraries</span><br><br>
+<h1>Drop-In Replacement Libraries</h1>
 
 <p>Solves - "I wrote my app using the native MySQL API but the company is migrating to Oracle. I can tweak the queries to work with Oracle but I really don't want to have to modify the app to use OCI."</p>
 
@@ -13,13 +12,14 @@
 
 <p>Many apps that were written to use MySQL or PostgreSQL dynamically load a client library to talk to the database.</p>
 
-<img src="../images/mysql-chain.png"> <img style="margin-left: 50px;" src="../images/postgresql-chain.png">
+<p><img src="../images/mysql-chain.png"/> <img style="margin-left: 50px; " src="../images/postgresql-chain.png"/></p>
 
 <p>The SQL Relay Drop-In Replacement Libraries intercept the native client library calls, map them to the SQL Relay equivalents and aim the client at an SQL Relay server.</p>
 
-<img src="../images/mysql-sqlr-chain.png"> <img style="margin-left: 50px;" src="../images/postgresql-sqlr-chain.png">
+<p><img src="../images/mysql-sqlr-chain.png"/> <img style="margin-left: 50px; " src="../images/postgresql-sqlr-chain.png"/></p>
 
-<p>This can be used to aim an app that was written to use MySQL or PostgreSQL at a different database or just allow an app to continue to use the MySQL or PostgreSQL database but take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling without modification.</p>
+<p>This can be used to aim an app that was written to use MySQL or PostgreSQL at a different database or just allow an app to continue to use the MySQL or PostgreSQL database but take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling without modification.
+</p>
 
 </body>
 </html>

@@ -1,0 +1,20 @@
+
+
+<font face="monospace">
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrelay=require(<font color="#ff00ff">&quot;sqlrelay&quot;</font>);<br>
+<br>
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrcon=<font color="#a52a2a"><b>new</b></font>&nbsp;sqlrelay.SQLRConnection(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplehost&quot;</font>,9000,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,0,1);<br>
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrcur=<font color="#a52a2a"><b>new</b></font>&nbsp;sqlrelay.SQLRCursor(sqlrcon);<br>
+<br>
+sqlrcur.sendQuery(<font color="#ff00ff">&quot;select * from exampletable&quot;</font>);<br>
+<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">var</font>&nbsp;row=0; row&lt;sqlrcur.rowCount(); row++)&nbsp;<font color="#008b8b">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">var</font>&nbsp;col=0; col&lt;sqlrcur.colCount(); col++)&nbsp;<font color="#008b8b">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process.stdout.write(sqlrcur.getField(row,col)+<font color="#ff00ff">&quot;,&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">}</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process.stdout.write(<font color="#ff00ff">&quot;</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>);<br>
+<font color="#008b8b">}</font><br>
+</font>
