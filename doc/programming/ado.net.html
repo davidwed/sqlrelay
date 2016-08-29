@@ -1156,34 +1156,40 @@ Oracle calls these functions.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) returns <font color="#298a52"><b>number</b></font> <font color="#6b59ce">is</font>
-<font color="#6b59ce">begin</font>
-        <font color="#6b59ce">return</font> in1;
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testproc(in1&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in2&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in3&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>varchar2</b></font>) returns&nbsp;<font color="#2e8b57"><b>number</b></font>&nbsp;<font color="#6a5acd">is</font><br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#6a5acd">return</font>&nbsp;in1;<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select testproc(:in1,:in2,:in3) from dual";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-Int64 result=sqlrcom.ExecuteScalar();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select testproc(:in1,:in2,:in3) from dual&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+Int64 result=sqlrcom.ExecuteScalar();<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <p>Here is an example where the value is returned through an output
@@ -1192,40 +1198,46 @@ parameter.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        out1:=in1;
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(in1&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in2&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in3&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>varchar2</b></font>, out1&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>)&nbsp;<font color="#6a5acd">as</font><br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out1:=in1;<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "begin testproc(:in1,:in2,:in3,:out1); end";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-SQLRelayParameter out1 = new SQLRelayParameter();
-out1.ParameterName = "out1";
-out1.Direction = ParameterDirection.Output;
-out1.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out1);
-sqlrcom.ExecuteNonQuery();
-Int64 result = Convert.ToInt64(out1.Value);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;begin testproc(:in1,:in2,:in3,:out1); end&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+SQLRelayParameter out1 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out1.ParameterName =&nbsp;<font color="#ff00ff">&quot;out1&quot;</font>;<br>
+out1.Direction = ParameterDirection.Output;<br>
+out1.DbType = DbType.Int64;<br>
+sqlrcom.Parameters.Add(out1);<br>
+sqlrcom.ExecuteNonQuery();<br>
+Int64 result = Convert.ToInt64(out1.Value);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1238,38 +1250,44 @@ itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output <font color="#6b59ce">as</font>
-        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1)
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc @in1 int, @in2&nbsp;<font color="#2e8b57"><b>float</b></font>, @in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output&nbsp;<font color="#6a5acd">as</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;@out1=<font color="#008b8b">convert</font>(<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1)<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "exec testproc";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-SQLRelayParameter out1 = new SQLRelayParameter();
-out1.ParameterName = "out1";
-out1.Direction = ParameterDirection.Output;
-out1.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out1);
-sqlrcom.ExecuteNonQuery();
-Int64 result = Convert.ToInt64(out1.Value);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;exec testproc&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+SQLRelayParameter out1 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out1.ParameterName =&nbsp;<font color="#ff00ff">&quot;out1&quot;</font>;<br>
+out1.Direction = ParameterDirection.Output;<br>
+out1.DbType = DbType.Int64;<br>
+sqlrcom.Parameters.Add(out1);<br>
+sqlrcom.ExecuteNonQuery();<br>
+Int64 result = Convert.ToInt64(out1.Value);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1278,27 +1296,31 @@ Int64 result = Convert.ToInt64(out1.Value);
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        out1=in1;
-        suspend;
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(in1&nbsp;<font color="#2e8b57"><b>integer</b></font>, in2&nbsp;<font color="#2e8b57"><b>float</b></font>, in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1&nbsp;<font color="#2e8b57"><b>integer</b></font>)&nbsp;<font color="#6a5acd">as</font><br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out1=in1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;suspend;<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select * from testproc(?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-Int64 result = sqlrcom.ExecuteScalar();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testproc(?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+Int64 result = sqlrcom.ExecuteScalar();<br>
+</font>
 </blockquote>
 
 <p>Alternatively, you can run a query like the following and receive the result
@@ -1308,28 +1330,16 @@ output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "execute procedure testproc ?, ?, ?";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-SQLRelayParameter out1 = new SQLRelayParameter();
-out1.ParameterName = "1";
-out1.Direction = ParameterDirection.Output;
-out1.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out1);
-sqlrcom.ExecuteNonQuery();
-Int64 result = Convert.ToInt64(out1.Value);
-</pre>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1341,40 +1351,46 @@ than as return values of the procedure itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int) language sql
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>set</b></font> out1 = in1;
-<font color="#6b59ce">end</font>
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(<font color="#a52a2a"><b>in</b></font>&nbsp;in1 int,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in2 double,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>),&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;out1 int) language sql<br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>set</b></font>&nbsp;out1 = in1;<br>
+<font color="#6a5acd">end</font><br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "call testproc(?,?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-SQLRelayParameter out4 = new SQLRelayParameter();
-out4.ParameterName = "4";
-out4.Direction = ParameterDirection.Output;
-out4.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out4);
-sqlrcom.ExecuteNonQuery();
-Int64 result = Convert.ToInt64(out4.Value);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(?,?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+SQLRelayParameter out4 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out4.ParameterName =&nbsp;<font color="#ff00ff">&quot;4&quot;</font>;<br>
+out4.Direction = ParameterDirection.Output;<br>
+out4.DbType = DbType.Int64;<br>
+sqlrcom.Parameters.Add(out4);<br>
+sqlrcom.ExecuteNonQuery();<br>
+Int64 result = Convert.ToInt64(out4.Value);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1383,40 +1399,46 @@ Int64 result = Convert.ToInt64(out4.Value);
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6b59ce">as</font> '
-declare
-        in1 int;
-        in2 <font color="#298a52"><b>float</b></font>;
-        in3 <font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>);
-<font color="#6b59ce">begin</font>
-        in1:=$<font color="#ff00ff">1</font>;
-        <font color="#6b59ce">return</font>;
-<font color="#6b59ce">end</font>;
-' language plpgsql
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(int,<font color="#2e8b57"><b>float</b></font>,<font color="#2e8b57"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns int&nbsp;<font color="#6a5acd">as</font>&nbsp;<font color="#ff00ff">'</font><br>
+<font color="#ff00ff">declare</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in1 int;</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in2 float;</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in3 char(20);</font><br>
+<font color="#ff00ff">begin</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in1:=$1;</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;</font><br>
+<font color="#ff00ff">end;</font><br>
+<font color="#ff00ff">'</font>&nbsp;language plpgsql<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select * from testfunc($1,$2,$3)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-Int64 result = sqlrcom.ExecuteScalar();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testfunc($1,$2,$3)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+Int64 result = sqlrcom.ExecuteScalar();<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(int,<font color="#2e8b57"><b>float</b></font>,<font color="#2e8b57"><b>char</b></font>(<font color="#ff00ff">20</font>))<br>
+</font>
 </blockquote>
 
 <span class="heading4">MySQL</span><br>
@@ -1426,23 +1448,27 @@ Int64 result = sqlrcom.ExecuteScalar();
 <p>To create the function, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">function</font> testfunc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6a5acd">return</font> in1;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(<font color="#a52a2a"><b>in</b></font>&nbsp;in1 int,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in2&nbsp;<font color="#2e8b57"><b>float</b></font>,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns int&nbsp;<font color="#6a5acd">return</font>&nbsp;in1;<br>
+</font>
 </blockquote>
 
 <p>To execute the function from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select * from testfunc(?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-Int64 result = sqlrcom.ExecuteScalar();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testfunc(?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+Int64 result = sqlrcom.ExecuteScalar();<br>
+</font>
 </blockquote>
 
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
@@ -1450,9 +1476,11 @@ Int64 result = sqlrcom.ExecuteScalar();
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">function</font> testfunc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <p>A single value can be returned in the result set of a MySQL procedure.</p>
@@ -1460,28 +1488,34 @@ Int64 result = sqlrcom.ExecuteScalar();
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>; <font color="#6a5acd">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc()&nbsp;<font color="#6a5acd">begin</font>&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;<font color="#ff00ff">1</font>;&nbsp;<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
-<p>To execeute the procedure from an SQL Relay program, use code like the
+<p>To execute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select testproc()";
-Int64 result = sqlrcom.ExecuteScalar();
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select testproc()&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteScalar();<br>
+</font>
 </blockquote>
 
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <p>A single value can be returned using the output variable of a MySQL
@@ -1490,35 +1524,41 @@ procedure.</p>
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font> <font color="#6a5acd">into</font> out1; <font color="#6a5acd">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(<font color="#a52a2a"><b>out</b></font>&nbsp;out1 int)&nbsp;<font color="#6a5acd">begin</font>&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;<font color="#ff00ff">1</font>&nbsp;<font color="#6a5acd">into</font>&nbsp;out1;&nbsp;<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
-<p>To execeute the procedure from an SQL Relay program, use code like the
+<p>To execute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
 
-sqlrcom.CommandText = "set @out1=0";
-Int64 result = sqlrcom.ExecuteNonQuery();
 
-sqlrcom.CommandText = "call testproc(@out1)";
-Int64 result = sqlrcom.ExecuteNonQuery();
-
-sqlrcom.CommandText = "select @out1";
-Int64 result = sqlrcom.ExecuteScalar();
-</pre>
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;set @out1=0&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteNonQuery();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(@out1)&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteNonQuery();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select @out1&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteScalar();<br>
+</font>
 </blockquote>
 
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1541,55 +1581,61 @@ itself, but the rest must be returned through output parameters.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out2 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out3 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
-<font color="#6b59ce">begin</font>
-        out1:=in1;
-        out2:=in2;
-        out3:=in3;
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(in1&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in2&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, in3&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#2e8b57"><b>varchar2</b></font>, out1&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, out2&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;<font color="#2e8b57"><b>number</b></font>, out3&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;<font color="#2e8b57"><b>varchar2</b></font>)&nbsp;<font color="#6a5acd">is</font><br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out1:=in1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out2:=in2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out3:=in3;<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-SQLRelayParameter out1 = new SQLRelayParameter();
-out1.ParameterName = "out1";
-out1.Direction = ParameterDirection.Output;
-out1.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out1);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out2.ParameterName = "out2";
-out2.Direction = ParameterDirection.Output;
-out2.DbType = DbType.Double;
-sqlrcom.Parameters.Add(out2);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out3.ParameterName = "out3";
-out3.Direction = ParameterDirection.Output;
-out3.DbType = DbType.String;
-out3.Size = 20;
-sqlrcom.Parameters.Add(out3);
-sqlrcom.ExecuteNonQuery();
-Int64 result1 = Convert.ToInt64(out1.Value);
-Double result2 = Convert.ToDouble(out2.Value);
-String result3 = Convert.ToString(out3.Value);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+SQLRelayParameter out1 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out1.ParameterName =&nbsp;<font color="#ff00ff">&quot;out1&quot;</font>;<br>
+out1.Direction = ParameterDirection.Output;<br>
+out1.DbType = DbType.Int64;<br>
+sqlrcom.Parameters.Add(out1);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out2.ParameterName =&nbsp;<font color="#ff00ff">&quot;out2&quot;</font>;<br>
+out2.Direction = ParameterDirection.Output;<br>
+out2.DbType = DbType.Double;<br>
+sqlrcom.Parameters.Add(out2);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out3.ParameterName =&nbsp;<font color="#ff00ff">&quot;out3&quot;</font>;<br>
+out3.Direction = ParameterDirection.Output;<br>
+out3.DbType = DbType.String;<br>
+out3.Size =&nbsp;<font color="#ff00ff">20</font>;<br>
+sqlrcom.Parameters.Add(out3);<br>
+sqlrcom.ExecuteNonQuery();<br>
+Int64 result1 = Convert.ToInt64(out1.Value);<br>
+Double result2 = Convert.ToDouble(out2.Value);<br>
+String result3 = Convert.ToString(out3.Value);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1598,53 +1644,59 @@ String result3 = Convert.ToString(out3.Value);
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output, @out2 int output, @out3 int output <font color="#6b59ce">as</font>
-        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1),
-                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2),
-                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2)
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc @in1 int, @in2&nbsp;<font color="#2e8b57"><b>float</b></font>, @in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output, @out2 int output, @out3 int output&nbsp;<font color="#6a5acd">as</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;@out1=<font color="#008b8b">convert</font>(<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@out2=<font color="#008b8b">convert</font>(<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@out2=<font color="#008b8b">convert</font>(<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2)<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "exec testproc";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-SQLRelayParameter out1 = new SQLRelayParameter();
-out1.ParameterName = "out1";
-out1.Direction = ParameterDirection.Output;
-out1.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out1);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out2.ParameterName = "out2";
-out2.Direction = ParameterDirection.Output;
-out2.DbType = DbType.Double;
-sqlrcom.Parameters.Add(out2);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out3.ParameterName = "out3";
-out3.Direction = ParameterDirection.Output;
-out3.DbType = DbType.String;
-out3.Size = 20;
-sqlrcom.Parameters.Add(out3);
-sqlrcom.ExecuteNonQuery();
-Int64 result1 = Convert.ToInt64(out1.Value);
-Double result2 = Convert.ToDouble(out2.Value);
-String result3 = Convert.ToString(out3.Value);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;exec testproc&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+SQLRelayParameter out1 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out1.ParameterName =&nbsp;<font color="#ff00ff">&quot;out1&quot;</font>;<br>
+out1.Direction = ParameterDirection.Output;<br>
+out1.DbType = DbType.Int64;<br>
+sqlrcom.Parameters.Add(out1);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out2.ParameterName =&nbsp;<font color="#ff00ff">&quot;out2&quot;</font>;<br>
+out2.Direction = ParameterDirection.Output;<br>
+out2.DbType = DbType.Double;<br>
+sqlrcom.Parameters.Add(out2);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out3.ParameterName =&nbsp;<font color="#ff00ff">&quot;out3&quot;</font>;<br>
+out3.Direction = ParameterDirection.Output;<br>
+out3.DbType = DbType.String;<br>
+out3.Size =&nbsp;<font color="#ff00ff">20</font>;<br>
+sqlrcom.Parameters.Add(out3);<br>
+sqlrcom.ExecuteNonQuery();<br>
+Int64 result1 = Convert.ToInt64(out1.Value);<br>
+Double result2 = Convert.ToDouble(out2.Value);<br>
+String result3 = Convert.ToString(out3.Value);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1653,34 +1705,38 @@ String result3 = Convert.ToString(out3.Value);
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>, out2 <font color="#298a52"><b>float</b></font>, out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        out1=in1;
-        out2=in2;
-        out3=in3;
-        suspend;
-<font color="#6b59ce">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(in1&nbsp;<font color="#2e8b57"><b>integer</b></font>, in2&nbsp;<font color="#2e8b57"><b>float</b></font>, in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1&nbsp;<font color="#2e8b57"><b>integer</b></font>, out2&nbsp;<font color="#2e8b57"><b>float</b></font>, out3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))&nbsp;<font color="#6a5acd">as</font><br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out1=in1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out2=in2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;out3=in3;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;suspend;<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select * from testproc(?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-sqlrcom.ExecuteReader();
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testproc(?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteReader();<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>Alternatively, you can run a query like the following and receive the result
@@ -1690,41 +1746,45 @@ first output bind variable is 1 rather than 4, even though there were 3 input
 bind variables.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "exec procedure testproc ?, ?, ?";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-SQLRelayParameter out1 = new SQLRelayParameter();
-out1.ParameterName = "1";
-out1.Direction = ParameterDirection.Output;
-out1.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out1);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out2.ParameterName = "2";
-out2.Direction = ParameterDirection.Output;
-out2.DbType = DbType.Double;
-sqlrcom.Parameters.Add(out2);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out3.ParameterName = "3";
-out3.Direction = ParameterDirection.Output;
-out3.DbType = DbType.String;
-out3.Size = 20;
-sqlrcom.Parameters.Add(out3);
-sqlrcom.ExecuteNonQuery();
-Int64 result1 = Convert.ToInt64(out1.Value);
-Double result2 = Convert.ToDouble(out2.Value);
-String result3 = Convert.ToString(out3.Value);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;exec procedure testproc ?, ?, ?&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+SQLRelayParameter out1 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out1.ParameterName =&nbsp;<font color="#ff00ff">&quot;1&quot;</font>;<br>
+out1.Direction = ParameterDirection.Output;<br>
+out1.DbType = DbType.Int64;<br>
+sqlrcom.Parameters.Add(out1);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out2.ParameterName =&nbsp;<font color="#ff00ff">&quot;2&quot;</font>;<br>
+out2.Direction = ParameterDirection.Output;<br>
+out2.DbType = DbType.Double;<br>
+sqlrcom.Parameters.Add(out2);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out3.ParameterName =&nbsp;<font color="#ff00ff">&quot;3&quot;</font>;<br>
+out3.Direction = ParameterDirection.Output;<br>
+out3.DbType = DbType.String;<br>
+out3.Size =&nbsp;<font color="#ff00ff">20</font>;<br>
+sqlrcom.Parameters.Add(out3);<br>
+sqlrcom.ExecuteNonQuery();<br>
+Int64 result1 = Convert.ToInt64(out1.Value);<br>
+Double result2 = Convert.ToDouble(out2.Value);<br>
+String result3 = Convert.ToString(out3.Value);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1733,55 +1793,61 @@ String result3 = Convert.ToString(out3.Value);
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int, <font color="#a52829"><b>out</b></font> out2 double, <font color="#a52829"><b>out</b></font> out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>set</b></font> out1 = in1;
-        <font color="#a52829"><b>set</b></font> out2 = in2;
-        <font color="#a52829"><b>set</b></font> out3 = in3;
-<font color="#6b59ce">end</font>
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(<font color="#a52a2a"><b>in</b></font>&nbsp;in1 int,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in2 double,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>),&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;out1 int,&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;out2 double,&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;out3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql<br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>set</b></font>&nbsp;out1 = in1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>set</b></font>&nbsp;out2 = in2;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>set</b></font>&nbsp;out3 = in3;<br>
+<font color="#6a5acd">end</font><br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "call testproc(?,?,?,?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-SQLRelayParameter out1 = new SQLRelayParameter();
-out1.ParameterName = "4";
-out1.Direction = ParameterDirection.Output;
-out1.DbType = DbType.Int64;
-sqlrcom.Parameters.Add(out1);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out2.ParameterName = "5";
-out2.Direction = ParameterDirection.Output;
-out2.DbType = DbType.Double;
-sqlrcom.Parameters.Add(out2);
-SQLRelayParameter out2 = new SQLRelayParameter();
-out3.ParameterName = "6";
-out3.Direction = ParameterDirection.Output;
-out3.DbType = DbType.String;
-out3.Size = 20;
-sqlrcom.Parameters.Add(out3);
-sqlrcom.ExecuteNonQuery();
-Int64 result1 = Convert.ToInt64(out1.Value);
-Double result2 = Convert.ToDouble(out2.Value);
-String result3 = Convert.ToString(out3.Value);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(?,?,?,?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+SQLRelayParameter out1 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out1.ParameterName =&nbsp;<font color="#ff00ff">&quot;4&quot;</font>;<br>
+out1.Direction = ParameterDirection.Output;<br>
+out1.DbType = DbType.Int64;<br>
+sqlrcom.Parameters.Add(out1);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out2.ParameterName =&nbsp;<font color="#ff00ff">&quot;5&quot;</font>;<br>
+out2.Direction = ParameterDirection.Output;<br>
+out2.DbType = DbType.Double;<br>
+sqlrcom.Parameters.Add(out2);<br>
+SQLRelayParameter out2 =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+out3.ParameterName =&nbsp;<font color="#ff00ff">&quot;6&quot;</font>;<br>
+out3.Direction = ParameterDirection.Output;<br>
+out3.DbType = DbType.String;<br>
+out3.Size =&nbsp;<font color="#ff00ff">20</font>;<br>
+sqlrcom.Parameters.Add(out3);<br>
+sqlrcom.ExecuteNonQuery();<br>
+Int64 result1 = Convert.ToInt64(out1.Value);<br>
+Double result2 = Convert.ToDouble(out2.Value);<br>
+String result3 = Convert.ToString(out3.Value);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1790,43 +1856,49 @@ String result3 = Convert.ToString(out3.Value);
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns record <font color="#6b59ce">as</font> '
-declare
-        output record;
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>select</b></font> $<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font> <font color="#6b59ce">into</font> output;
-        <font color="#6b59ce">return</font> output;
-<font color="#6b59ce">end</font>;
-' language plpgsql
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(int,<font color="#2e8b57"><b>float</b></font>,<font color="#2e8b57"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns record&nbsp;<font color="#6a5acd">as</font>&nbsp;<font color="#ff00ff">'</font><br>
+<font color="#ff00ff">declare</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;output record;</font><br>
+<font color="#ff00ff">begin</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;select $1,$2,$3 into output;</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return output;</font><br>
+<font color="#ff00ff">end;</font><br>
+<font color="#ff00ff">'</font>&nbsp;language plpgsql<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select * from testfunc(?,?,?) as (col1 int, col2 float, col3 char(20))";
-sqlrcom.Parameters.Add("in1",1);
-sqlrcom.Parameters.Add("in2",1.1);
-sqlrcom.Parameters.Add("in3","hello");
-sqlrcom.ExecuteReader();
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testfunc(?,?,?) as (col1 int, col2 float, col3 char(20))&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;in3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteReader();<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc(int,<font color="#2e8b57"><b>float</b></font>,<font color="#2e8b57"><b>char</b></font>(<font color="#ff00ff">20</font>))<br>
+</font>
 </blockquote>
 
 <span class="heading4">MySQL</span><br>
@@ -1837,28 +1909,32 @@ set of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> in1, in2, in3; <font color="#6a5acd">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(<font color="#a52a2a"><b>in</b></font>&nbsp;in1 int,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in2&nbsp;<font color="#2e8b57"><b>float</b></font>,&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;in3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))&nbsp;<font color="#6a5acd">begin</font>&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;in1, in2, in3;&nbsp;<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "call testproc(?,?,?)";
-sqlrcom.Parameters.Add("1",1);
-sqlrcom.Parameters.Add("2",1.1);
-sqlrcom.Parameters.Add("3","hello");
-sqlrcom.ExecuteReader();
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-</pre>
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+sqlrcom.ExecuteReader();<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
@@ -1866,9 +1942,11 @@ String out3 = datareader.GetString(2);
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <p>Here's how you can get multiple values from the output variables
@@ -1877,39 +1955,45 @@ of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int, <font color="#a52a2a"><b>out</b></font> out2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>out</b></font> out3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">'hello'</font> <font color="#6a5acd">into</font> out1, out2, out3; <font color="#6a5acd">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc(<font color="#a52a2a"><b>out</b></font>&nbsp;out1 int,&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;out2&nbsp;<font color="#2e8b57"><b>float</b></font>,&nbsp;<font color="#a52a2a"><b>out</b></font>&nbsp;out3&nbsp;<font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))&nbsp;<font color="#6a5acd">begin</font>&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;<font color="#ff00ff">1</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">'hello'</font>&nbsp;<font color="#6a5acd">into</font>&nbsp;out1, out2, out3;&nbsp;<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
 
-sqlrcom.CommandText = "set @out1=0, @out2=0.0, @out3=''";
-Int64 result = sqlrcom.ExecuteNonQuery();
 
-sqlrcom.CommandText = "call testproc(@out1,@out2,@out3)";
-Int64 result = sqlrcom.ExecuteNonQuery();
-
-sqlrcom.CommandText = "select @out1,@out2,@out3";
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-</pre>
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;set @out1=0, @out2=0.0, @out3=''&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteNonQuery();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(@out1,@out2,@out3)&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteNonQuery();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select @out1,@out2,@out3&quot;</font>;<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -1925,18 +2009,20 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#a52829"><b>or</b></font> replace package types <font color="#6b59ce">as</font>
-        <font color="#6b59ce">type</font> cursorType <font color="#6b59ce">is</font> ref <font color="#6b59ce">cursor</font>;
-<font color="#6b59ce">end</font>;
 
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testproc <font color="#6b59ce">return</font> types.cursortype <font color="#6b59ce">is</font>
-        l_cursor    types.cursorType;
-<font color="#6b59ce">begin</font>
-        open l_cursor <font color="#6b59ce">for</font> <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> mytable;
-        <font color="#6b59ce">return</font> l_cursor;
-<font color="#6b59ce">end</font>;
-</pre>
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#a52a2a"><b>or</b></font>&nbsp;<font color="#008b8b">replace</font>&nbsp;package types&nbsp;<font color="#6a5acd">as</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#6a5acd">type</font>&nbsp;cursorType&nbsp;<font color="#6a5acd">is</font>&nbsp;ref&nbsp;<font color="#6a5acd">cursor</font>;<br>
+<font color="#6a5acd">end</font>;<br>
+<br>
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testproc&nbsp;<font color="#6a5acd">return</font>&nbsp;types.cursortype&nbsp;<font color="#6a5acd">is</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;l_cursor&nbsp;&nbsp;&nbsp;&nbsp;types.cursorType;<br>
+<font color="#6a5acd">begin</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;open l_cursor&nbsp;<font color="#6a5acd">for</font>&nbsp;select *&nbsp;<font color="#6a5acd">from</font>&nbsp;mytable;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#6a5acd">return</font>&nbsp;l_cursor;<br>
+<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor.  That cursor may then be opened and fetched from.  In fact, a stored procedure may return multiple result sets and each may be bound to a cursor.</p>
@@ -1946,26 +2032,28 @@ each database that SQL Relay supports.</p>
 <p>For example:</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "begin :curs=testproc; end;";
 
-SQLRelayParameter curs = new SQLRelayParameter();
-curs.ParameterName = "curs";
-curs.Direction = ParameterDirection.Output;
-curs.SQLRelayType = SQLRelayType.Cursor;
-sqlrcom.Parameters.Add(curs);
 
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-
-// the main result set will be empty, skip to the result set of the cursor
-datareader.NextResult();
-
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-</pre>
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;begin :curs=testproc; end;&quot;</font>;<br>
+<br>
+SQLRelayParameter curs =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+curs.ParameterName =&nbsp;<font color="#ff00ff">&quot;curs&quot;</font>;<br>
+curs.Direction = ParameterDirection.Output;<br>
+curs.SQLRelayType = SQLRelayType.Cursor;<br>
+sqlrcom.Parameters.Add(curs);<br>
+<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+<br>
+<font color="#0000ff">// the main result set will be empty, skip to the result set of the cursor</font><br>
+datareader.NextResult();<br>
+<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Cursor types.</p>
@@ -1975,34 +2063,38 @@ String out3 = datareader.GetString(2);
 <p>For example:</p>
 
 <blockquote>
-<pre>
-SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "begin :curs=testproc; end;";
 
-SQLRelayParameter curs = new SQLRelayParameter();
-curs.ParameterName = "curs";
-curs.Direction = ParameterDirection.Output;
-curs.SQLRelayType = SQLRelayType.Cursor;
-sqlrcom.Parameters.Add(curs);
 
-sqlrcom.ExecuteNonQuery();
-
-SQLRelayDataReader datareader = (SQLRelayDataReader)curs.Value;
-
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-</pre>
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;begin :curs=testproc; end;&quot;</font>;<br>
+<br>
+SQLRelayParameter curs =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRelayParameter();<br>
+curs.ParameterName =&nbsp;<font color="#ff00ff">&quot;curs&quot;</font>;<br>
+curs.Direction = ParameterDirection.Output;<br>
+curs.SQLRelayType = SQLRelayType.Cursor;<br>
+sqlrcom.Parameters.Add(curs);<br>
+<br>
+sqlrcom.ExecuteNonQuery();<br>
+<br>
+SQLRelayDataReader datareader = (SQLRelayDataReader)curs.Value;<br>
+<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testproc
-<font color="#a52829"><b>drop</b></font> package types
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testproc<br>
+<font color="#a52a2a"><b>drop</b></font>&nbsp;package types<br>
+</font>
 </blockquote>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
@@ -2010,35 +2102,41 @@ String out3 = datareader.GetString(2);
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc <font color="#6a5acd">as</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> testtable
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc&nbsp;<font color="#6a5acd">as</font>&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;testtable<br>
+</font>
 </blockquote>
 
 <p>To exceute the stored procedure from an SQL Relay program, ue code like the
 following.</p>
 
 <blockquote>
-<pre>
-sqlrcom.CommandText = "exec testproc";
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-datareader.Read();
-out1 = datareader.GetInt64(0);
-out2 = datareader.GetDouble(1);
-out3 = datareader.GetString(2);
-</pre>
+
+
+<font face="monospace">
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;exec testproc&quot;</font>;<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+datareader.Read();<br>
+out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 
@@ -2060,43 +2158,49 @@ that return result sets.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc() returns setof record <font color="#6b59ce">as</font> '
-        declare output record;
-<font color="#6b59ce">begin</font>
-        <font color="#6b59ce">for</font> output <font color="#a52829"><b>in</b></font> <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> mytable <font color="#6b59ce">loop</font>
-                <font color="#6b59ce">return</font> next output;
-        <font color="#6b59ce">end</font> <font color="#6b59ce">loop</font>;
-        <font color="#6b59ce">return</font>;
-<font color="#6b59ce">end</font>;
-' language plpgsql
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc() returns setof record&nbsp;<font color="#6a5acd">as</font>&nbsp;<font color="#ff00ff">'</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;declare output record;</font><br>
+<font color="#ff00ff">begin</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for output in select * from mytable loop</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return next output;</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end loop;</font><br>
+<font color="#ff00ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;</font><br>
+<font color="#ff00ff">end;</font><br>
+<font color="#ff00ff">'</font>&nbsp;language plpgsql<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-sqlrcom.CommandText = "select * from testfunc() as (testint int, testfloat float, testchar char(40))";
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-datareader.Read();
-out1 = datareader.GetInt64(0);
-out2 = datareader.GetDouble(1);
-out3 = datareader.GetString(2);
-</pre>
+
+
+<font face="monospace">
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testfunc() as (testint int, testfloat float, testchar char(40))&quot;</font>;<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+datareader.Read();<br>
+out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">function</font>&nbsp;testfunc<br>
+</font>
 </blockquote>
 
 <span class="heading4">MySQL</span><br>
@@ -2110,35 +2214,41 @@ currently SQL Relay can only fetch the first result set.</p>
 the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> mytable; <font color="#6a5acd">end</font>;
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc()&nbsp;<font color="#6a5acd">begin</font>&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;mytable;&nbsp;<font color="#6a5acd">end</font>;<br>
+</font>
 </blockquote>
 
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-sqlrcom.CommandText = "call testproc()";
-System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
-datareader.Read();
-Int64 out1 = datareader.GetInt64(0);
-Double out2 = datareader.GetDouble(1);
-String out3 = datareader.GetString(2);
-datareader.Read();
-out1 = datareader.GetInt64(0);
-out2 = datareader.GetDouble(1);
-out3 = datareader.GetString(2);
-</pre>
+
+
+<font face="monospace">
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc()&quot;</font>;<br>
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();<br>
+datareader.Read();<br>
+Int64 out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+Double out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+String out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+datareader.Read();<br>
+out1 = datareader.GetInt64(<font color="#ff00ff">0</font>);<br>
+out2 = datareader.GetDouble(<font color="#ff00ff">1</font>);<br>
+out3 = datareader.GetString(<font color="#ff00ff">2</font>);<br>
+</font>
 </blockquote>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">procedure</font>&nbsp;testproc<br>
+</font>
 </blockquote>
 
 <a name="lastinsertid"></a>

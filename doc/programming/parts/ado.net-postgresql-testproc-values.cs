@@ -1,0 +1,11 @@
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select * from testfunc(?,?,?) as (col1 int, col2 float, col3 char(20))";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+sqlrcom.ExecuteReader();
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);

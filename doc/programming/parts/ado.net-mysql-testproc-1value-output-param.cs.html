@@ -1,0 +1,14 @@
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;set @out1=0&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteNonQuery();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;call testproc(@out1)&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteNonQuery();<br>
+<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select @out1&quot;</font>;<br>
+Int64 result = sqlrcom.ExecuteScalar();<br>
+</font>

@@ -1,0 +1,12 @@
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "call testproc(?,?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+SQLRelayParameter out4 = new SQLRelayParameter();
+out4.ParameterName = "4";
+out4.Direction = ParameterDirection.Output;
+out4.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out4);
+sqlrcom.ExecuteNonQuery();
+Int64 result = Convert.ToInt64(out4.Value);

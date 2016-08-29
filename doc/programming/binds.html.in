@@ -1,0 +1,169 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay - Substitution and Bind Variables</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Substitution and Bind Variables</span><br><br>
+
+<span class="heading2">What exactly are substitution and bind variables?</span><br><br>
+
+<p>Substitution and input bind variables are both methods for replacing a
+variable in a query or procedural code with a corresponding value from
+your program.  Some databases call bind variables parameters.</p>
+
+<PRE>
+        <B><FONT color=#a62828>select</FONT></B>
+                first_name,
+                middle_initial,
+                last_name
+        <FONT color=#6959cf>from</FONT>
+                $(schema).people
+        <FONT color=#6959cf>where</FONT>
+                person_id=:id
+                <B><FONT color=#a62828>and</FONT></B>
+                age&gt;=:youngage
+                <B><FONT color=#a62828>and</FONT></B>
+                age&lt;=:oldage
+</PRE>
+
+<p>In this query, $(schema) is a substitution variable and :id, :youngage and
+:oldage are input bind variables.</p>
+
+<p>Output bind variables allow values to be passed from procedural code
+into buffers in your program.</p>
+
+<PRE>
+        <FONT color=#6959cf>BEGIN</FONT>
+                :returnval:=<FONT color=#ff00ff>100</FONT>*<FONT color=#ff00ff>50</FONT>;
+        <FONT color=#6959cf>END</FONT>;
+</PRE>
+
+<p>In this code, :returnval is an output bind variable.</p>
+
+<p>Substitution variables are processed first, by the API.  Input bind 
+variables are processed second, by the underlying database or by the 
+<b>SQL Relay</b> connection daemon in the event that the database doesn't 
+support bind variables.  Output bind variables are processed by the database as
+the query or procedural code is executed.</p>
+
+<p>Input bind variables may appear as values in the WHERE clause of a SELECT, 
+UPDATE or DELETE, as values in the SET clause of an UPDATE, in the VALUES 
+clause of an INSERT or as values in a block of procedural code.</p>
+
+<p>Output bind variables may appear in the RETURNING clause of a SELECT or as 
+variables in a block of procedural code.</p>
+
+<p>Substitution variables may appear anywhere in the query.  They are 
+frequently used to ammend WHERE clauses with additional constraints and specify
+schemas or databases.  A substitution value may even contain bind variables.</p>
+
+<span class="heading2">Bind Variable Syntax</span><br><br>
+
+<p>Different databases have different syntax for bind variables.  Oracle bind
+variables are names preceeded by a colon.  In MySQL, DB2 and Firebird,
+bind variables are represented by question marks.  In Sybase and MS SQL Server,
+bind variables are names preceeded by an @ sign.  In PostgreSQL, bind variables
+are numbers preceeded by a $ sign.</p>
+
+<p>When using <b>SQL Relay</b> bind functions, to refer to an Oracle, Sybase
+or MS SQL Server bind variable, you should use its name without the preceeding
+colon.  To refer to bind variables when using other databases, you should use
+the bind variable's position number.</p>
+
+<p>For example...</p>
+
+<PRE>
+        <B><FONT color=#a62828>select</FONT></B>
+                first_name,
+                middle_initial,
+                last_name
+        <FONT color=#6959cf>from</FONT>
+                $(schema).people
+        <FONT color=#6959cf>where</FONT>
+                person_id=:id
+                <B><FONT color=#a62828>and</FONT></B>
+                age&gt;=:youngage
+                <B><FONT color=#a62828>and</FONT></B>
+                age&lt;=:oldage
+</PRE>
+
+<p>In this query, you should use "id", "youngage" and "oldage" as variable
+names in the inputBind functions.</p>
+
+<PRE>
+        <B><FONT color=#a62828>select</FONT></B>
+                first_name,
+                middle_initial,
+                last_name
+        <FONT color=#6959cf>from</FONT>
+                $(schema).people
+        <FONT color=#6959cf>where</FONT>
+                person_id=?
+                <B><FONT color=#a62828>and</FONT></B>
+                age&gt;=?
+                <B><FONT color=#a62828>and</FONT></B>
+                age&lt;=?
+</PRE>
+
+<p>In this query, you should use "1", "2" and "3" as variable names in the
+inputBind functions.</p>
+
+<span class="heading2">Why should I use input bind variables instead of just 
+using substitution variables for everything?</span><br><br>
+
+<p>Using input bind variables improves performance.  A query can be prepared
+once and executed multiple times, changing the bind variable values between
+each execution.</p>
+
+<p>Using bind variables improves the cache-hit rate for databases which cache 
+prepred queries as well.  Databases which support bind variables parse the 
+query then plug input bind variables into the already parsed code.  If the same
+query is run a bunch of times, even with different values for the input bind 
+variables, the databse will have the code cached and won't have to parse 
+the query again.  If you don't use input bind variables, the database will
+parse the query	each time because the where clause will be slightly 
+different each time and the code for all those slightly different 
+queries will clog the cache.</p>
+
+<p>As a rule of thumb, you should use input bind variables instead of
+substitutions in the WHERE clause of SELECT statements whenever you can.</p>
+
+<p>Output bind variables allow values to be passed directly from procedural 
+code into buffers in your program.  This is generally more convenient and
+efficient than construcing a query that calls procedural code or constructing 
+procedural code that manufactures a result set.</p>
+
+<span class="heading2">What if my database doesn't support bind variables?</span><br><br>
+
+<p>The <b>SQL Relay</b> connection daemon will fake input binds for database 
+API's which don't natively support binds.  Currently that is just the MDB Tools
+connection.  Postgresql 8, MySQL 4.1.2 and modern SQLite support bind variables
+but older versions do not.  <b>SQL Relay</b> fakes input binds for versions of
+Postgresql, MySQL and SQLite that don't support them.
+For versions that do, the "fakebinds" connect string parameter can be used to
+force <b>SQL Relay</b> to fake binds rather than using the database's built-in
+support.  You can use either Oracle style or DB2/Firebird style bind variables
+with those databases.  Output binds are not supported when using
+"fakebinds".</p>
+
+<p>When using a database for which <b>SQL Relay</b> fakes bind variables, you 
+should make sure not to pass the wrong type of data into a bind variable.  For 
+example, in the query:</p>
+
+<PRE>
+        <B><FONT color=#a02828>select</FONT></B>
+                *
+        <FONT color=#6858c8>from</FONT>
+                testtable
+        <FONT color=#6858c8>where</FONT>
+                stringcol&gt;:stringvar
+</PRE>
+
+<p>If stringcol is a string datatype such as char or varchar, bind a string to
+stringvar rather than a long or double.  Failure to do so will cause the
+query to fail.</p>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+
+
+<font face="monospace">
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();<br>
+sqlrcom.CommandText =&nbsp;<font color="#ff00ff">&quot;select * from testproc(?,?,?)&quot;</font>;<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;1&quot;</font>,<font color="#ff00ff">1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;2&quot;</font>,<font color="#ff00ff">1.1</font>);<br>
+sqlrcom.Parameters.Add(<font color="#ff00ff">&quot;3&quot;</font>,<font color="#ff00ff">&quot;hello&quot;</font>);<br>
+Int64 result = sqlrcom.ExecuteScalar();<br>
+</font>

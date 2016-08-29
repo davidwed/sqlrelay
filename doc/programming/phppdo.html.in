@@ -1,0 +1,1843 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the PHP PDO API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the PHP PDO API</span><br><br>
+
+<ul>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#config">Configuring PHP</a></li>
+<li><a href="#session">Establishing a Session</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#transactions">Transactions</a></li>
+<li><a href="#temptables">Temporary Tables</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
+<li><a href="#statements">Statements</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+<li><a href="#storedprocedures">Stored Procedures</a></li>
+<li><a href="#lastinsertid">Getting the Last Insert ID</a></li>
+<li><a href="#driverspecific">Driver-Specific Attributes</a></li>
+<li><a href="#drivermethods">Driver-Specific Methods</a></li>
+</ul>
+
+<a name="intro"></a>
+<span class="heading2">Introduction</span><br><br>
+
+<p>PDO is a popular database abstraction layer for PHP.</p>
+
+<p>A <a href="http://www.php.net/manual/en/book.pdo.php">good PDO guide and
+reference</a> can be found on the PHP site but a short discussion of it
+follows here as well.</p>
+
+<a name="config"></a>
+<span class="heading2">Configuring PHP</span><br><br>
+
+<p>To use the SQL Relay PDO driver, PHP must be configured to load the
+appropriate module - pdo_sqlrelay.so on Linux or Unix and php_pdo_sqlrelay.dll
+on Windows.</p>
+
+<p>If you are using SQL Relay version 0.58 or higher on reasonably modern Linux
+or Solaris with PHP installed from a package, then the installation process
+should have configured PHP correctly and you can probably ignore the rest of
+this section.</p>
+
+</p>But on other operating sytems, or if you built PHP from source, or if the
+installation process didn't go smoothly, then you may have to configure PHP
+manually.</p>
+
+<p>The PHP configuration file is usually named php.ini.  The name and location
+of the file may vary though.  Here are some common locations, by platform.</p>
+
+<ul>
+<li><b>Linux</b> - /etc/php.ini</li>
+<li><b>Solaris</b> - /etc/php/&lt;php version&gt;/php.ini</li>
+<li><b>FreeBSD</b> - /usr/local/etc/php.ini</li>
+<li><b>NetBSD</b> - /usr/pkg/etc/php.ini</li>
+<li><b>OpenBSD</b> - /etc/php-&lt;php version&gt;.ini</li>
+<li><b>Windows</b> - C:\Windows\php.ini</li>
+</ul>
+
+<p>To load the php module on Linux or Unix, you usually just need to add lines
+to the configuration file like:</p>
+
+<blockquote>
+<pre>
+extension=pdo.so
+extension=pdo_sqlrelay.so
+</pre>
+</blockquote>
+
+<p>To load the php module on Windows, you usually need to add lines like:</p>
+
+<blockquote>
+<pre>
+extension_dir=C:\PHP\ext
+extension=php_pdo.dll
+extension=php_pdo_sqlrelay.dll
+</pre>
+</blockquote>
+
+<p>(the <i>extension_dir</i> value might need to be changed, depending on where PHP is installed on your system)</p>
+
+<p>It is possible, even likely that the configuration file already contains a 
+line to load the pdo.so (or php_pdo.dll) module, so look through the file and
+verify whether it is or not before loading it again.</p>
+
+<p>Also, some Linux and Unix distributions have PDO compiled directly into the
+PHP module or binary and don't require pdo.so module to be loaded at all.  If
+you built PHP from source with the default options then this is likely.  You
+can verify this by running:</p>
+
+<blockquote>
+<pre>
+strings &lt;path-to-php-binary&gt;/php | grep "PDO drivers"
+</pre>
+</blockquote>
+
+<p>If PDO is built-in then it should return something like:</p>
+
+<blockquote>
+<pre>
+You MUST load PDO before loading any PDO drivers
+</pre>
+</blockquote>
+
+<p>And if that wasn't complex enough, some PHP distributions on Linux or Unix
+have configuration directories.  PHP parses the php.ini file first, then goes
+alphabetically through the files in the configuration directory.  The
+configuration directory is usually named conf.d and is found somewhere under the
+directory that the main configuration file is found in.  If there is a pdo.ini
+file in there, or if one of the files in that directory loads the pdo.so module,
+then you'll have to either add the lines above to the end of that same file or
+create a new pdo_sqlrelay.ini file that contains the lines to load
+pdo_sqlrelay.so or php_pdo_sqlrelay.dll</p>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to identify the connection that you intend to 
+use.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+</pre>
+</blockquote>
+
+<p>The following connect string variables control attributes of the connection:</p>
+
+<ul>
+<li><b>host</b> - The SQL Relay server to connect to.</li>
+<li><b>port</b> - The port that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+<li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+<li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
+<li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
+<li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
+<li><b>lazyconnect</b> - By default, the SQL Relay client does "lazy connects".  I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run.  This optimizes availability of the connection pool but is inconstent with most other database API's.  Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning 0, if the connection cannot be established.  Defaults to 1.</li>
+</ul>
+
+<p>In addition, the following connect string variables can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
+
+<p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about Kerberos and Active Directory configurations.  In particular, the user and password are usually left as empty strings or null when using Kerberos/AD.</p>
+
+<ul>
+<li><b>krb</b> - Set to <b>yes</b> to enable Kerberos/AD encryption/authentication or <b>no</b> to disable it.</li>
+<li><b>krbservice</b> - Specifies the Kerberos service name of the SQL Relay server.  If omitted or left empty then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</li>
+<li><b>krbmech</b> - Specifies the Kerberos mechanism to use.  On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as: { 1 2 840 113554 1 2 2 }.  On Windows platforms, this should be a string like: Kerberos.  If omitted or left empty then the default mechanism will be used.  Only set this if you know that you have a good reason to.</li>
+<li><b>krbflags</b> - Specifies what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used.  Only set this if you know that you have a good reason to.  Valid flags include: GSS_C_MUTUAL_FLAG, GSS_C_REPLAY_FLAG, GSS_C_SEQUENCE_FLAG, GSS_C_CONF_FLAG, and GSS_C_INTEG_FLAG.  For a full list of flags, consult the GSSAPI documentation, though note that only the previously listed flags are supported on Windows.</li>
+</ul>
+
+<p>The following connect string variables can be used to establish TLS/SSL encryption and authentication with the server:</p>
+
+<p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about TLS/SSL configurations.</p>
+
+<ul>
+<li><b>tls</b> - Set to <b>yes</b> to enable TLS/SSL encryption/authentication or <b>no</b> to disable it.</li>
+<li><b>tlsversion</b> - Specifies the TLS/SSL protocol version that the client will attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If omittted or left empty then the highest supported version will be negotiated.</li>
+<li><b>tlscert</b> - Specifies the file name of the certificate chain file to send to the SQL Relay server.  This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.</li>
+<li><b>tlspassword</b> - If tlscert contains a password-protected private key, then tlspassword may be supplied to access it.  If the private key is not password-protected, then this argument is ignored, and may be omitted or left empty.</li>
+<li><b>tlsciphers</b> - Specifies a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If omitted or left empty then a default set is used.  For a list of valid ciphers on Linux/Unix platforms, see: man ciphers. For a list of valid ciphers on Windows platforms, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx">this page</a>.  On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes.  For example: 3DES_112.  Only set this if you know that you have a good reason to.</p>
+<li><b>tlsvalidate</b> - Indicates whether to validate the SQL Relay server's certificate, and may be set to one of the following: <b>no</b> - Don't validate the server's certificate.  <b>ca</b> - Validate that the server's certificate was signed by a trusted certificate authority.  <b>ca+host</b> - Perform "ca" validation and also validate that one of the subject altenate names (or the common name if no SANs are present) in the certificate matches the host parameter.  (Falls back to "ca" validation when a unix socket is used.)  <b>ca+domain</b> - Perform "ca" validation and also validate that the domain name of one of the subject alternate names (or the common name if no SANs are present) in the certificate matches the domain name of the host parameter.  (Falls back to "ca" validation when a unix socket is used.)</li>
+<li><b>tlsca</b> - Specifies the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate.  This is useful if the SQL Relay server's certificate is self-signed.  On Windows, "ca" must be a file name.  On non-Windows systems, "ca" can be either a file or  directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.</li>
+</ul>
+
+<p>Note that the supported tlscert and tlsca file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.</p>
+
+<p>These additional connect string variables control the default statement attributes:</p>
+
+<ul>
+<li><b>resultsetbuffersize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
+<li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
+<li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.</li>
+</ul>
+
+<p>Setting one of the statement attribute connect string variables has the same effect as if the corresponding statement handle attribute were set immediately after creating each statement.  See <a href="#driverspecific">Driver-Specific Attributes</a> below.</p>
+
+<p>The other two parameters following the connect string are.</p>
+
+<ul>
+<li><b>user</b> - The username to use when logging into SQL Relay.</li>
+<li><b>password</b> - The password to use when logging into SQL Relay.</li>
+</ul>
+
+<p>After calling the constructor, a session is established when the first 
+query or other operation is run, unless lazyconnects=0 is used.</p>
+
+<p>For the duration of the session, the client occupies one of the database
+connections, so care should be taken to minimize the length of a
+session.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>Call exec() to run a query and return the number of rows affected.  This is
+best used with DML or DDL queries.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+if (!$dbh->exec("insert into testtable values (1,'hello')")) {
+	die("exec failed");
+}
+</pre>
+</blockquote>
+
+<p>Call query() to run a query and return a statement object which can be used
+to fetch the result set.  This is best used with selects or other queries that
+return result sets.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->query("select * from testtable"));
+</pre>
+</blockquote>
+
+<a name="transactions"></a>
+<span class="heading2">Transactions</span><br><br>
+
+<p>Run begin() to start a transaction.  To complete a transaction, run commit()
+or rollBack().  You should use the commit() and rollBack() functions rather than
+sending a "commit" or "rollback" query.  There are two reasons for this.  First,
+it's much more efficient to call the functions.  Second, if you're writing code
+that can run on transactional or non-transactional databases, some
+non-transactional databases will throw errors if they receive a "commit" or
+"rollback" query, but by calling the commit() and rollBack() functions you
+instruct the database connection daemon to call the commit and rollback API
+functions for that database rather than issuing them as queries.  If the API's
+have no commit or rollback functions, the calls do nothing and the database
+throws no error.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$dbh->beginTransaction();
+
+... run some queries that we want to keep the results of ...
+
+$dbh->commit();
+
+$dbh->beginTransaction();
+
+... run some queries that we don't want to keep the results of ...
+
+$dbh->rollBack();
+</pre>
+</blockquote>
+
+<p>You can also turn Autocommit on or off using the setAttribute() method.</p>
+
+<p>The following command turns Autocommit on.</p>
+
+<blockquote>
+<pre>
+$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,TRUE);
+</pre>
+</blockquote>
+
+<p>The following command turns Autocommit off.</p>
+
+<blockquote>
+<pre>
+$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE);
+</pre>
+</blockquote>
+
+<p>When Autocommit is on, the database performs a commit after each successful
+DML or DDL query.  When Autocommit is off, the database commits when the client
+instructs it to, or (by default) when a client disconnects.  For databases that
+don't support Autocommit, setting Autocommit on or off has no effect.</p>
+
+<a name="temptables"></a>
+<span class="heading2">Temporary Tables</span><br><br>
+
+<p>Some databases support temporary tables.  That is, tables which are
+automatically dropped or truncated when an application closes its connection
+to the database or when a transaction is committed or rolled back.</p>
+
+<p>For databases which drop or truncate tables when a transaction is committed
+or rolled back, temporary tables work naturally.</p>
+
+<p>However, for databases which drop or truncate tables when an application
+closes its connection to the database, there is an issue.  Since SQL Relay
+maintains persistent database connections, when an application disconnects from
+SQL Relay, the connection between SQL Relay and the database remains, so
+the database does not know to drop or truncate the table.  To remedy this
+situation, SQL Relay parses each query to see if it created a temporary table,
+keeps a list of temporary tables and drops (or truncates them) when the
+application disconnects from SQL Relay.  Since each database has slightly
+different syntax for creating a temporary table, SQL Relay parses each query
+according to the rules for that database.</p>
+
+<p>In effect, temporary tables should work when an application connects to
+SQL Relay in the same manner that they would work if the application connected
+directly to the database.</p>
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>Most PDO methods return a value indicating that they failed.  There are 3
+options for error handling too that can be set using setAttribute().</p>
+
+<ul>
+<li>PDO::ERRMODE_WARNING - raise an E_WARNING on error</li>
+<li>PDO::ERRMODE_EXCEPTION - throw an exception on error</li>
+<li>PDO::ERRMODE_SILENT - just set error codes</li>
+</ul>
+
+<p>After determining that an error has occurred you can find out why by
+calling errorCode() or errorInfo() on the database handle or statement
+objects.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+if (!$dbh->exec("insert into testtable values (1,1.1,'hello')")) {
+	die($dbh->errorCode().":".$dbh->errorInfo());
+}
+
+$stmt=$dbh->prepare("bad query");
+if ($stmt->execute()) {
+	die($stmt->errorCode().":".$stmt->errorInfo());
+}
+</pre>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  The PDO API provides means for
+using bind variables (also known as parameters) in those queries.</p>
+
+<p>For a detailed discussion of substitutions and binds, see
+<a href="binds.html">this document</a>.
+
+<p>PDO provides several means for using bind variables but in all cases, you
+must bind variable/value pairs to the statement.  Here is an example of using
+the bindValue() method.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
+$stmt->bindValue(":var",1,PDO::PARAM_INT);
+$stmt->bindValue(":var","1.1",PDO::PARAM_STR);
+$stmt->bindValue(":var","hello",PDO::PARAM_STR);
+$stmt->bindValue(":var","hello",PDO::PARAM_LOB);
+$stmt->execute();
+</pre>
+</blockquote>
+
+<p>(Note: these examples use colon-delimited variable names.  These are not supported by all databases.  See "A few words about the format of bind variables..." below for more information.)</p>
+
+<p>PDO supports binding integer, string and LOB values.  Oddly, it doesn't
+support binding floating point values.  You have to pass them as strings.
+Also, CLOB's have to be passed as LOB's.</p>
+
+<p>PDO also provides a bindParam() method and allows you to pass an associative
+array into the execute() method.  See the official PDO documentation for info
+on those methods.</p>
+
+<p>Output bind variables can be used too.  Just or the PDO::PARAM_INPUT_OUTPUT
+flag with the variable type.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; end;");
+$param1=0;
+$param2="";
+$stmt->bindParam(":numvar",$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$stmt->bindParam(":stringvar",$param2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$stmt->execute();
+echo($param1.",".$param2);
+</pre>
+</blockquote>
+
+<p>BLOB's output binds can be used as well.  PDO returns BLOB values as
+streams, so you have to use stream functions to access them.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select blob_col into :blobvar from testtable");
+$blobvar="";
+$stmt->bindParam(":blobvar",$blobvar,PDO::PARAM_LOB|PDO::PARAM_INPUT_OUTPUT);
+$stmt->execute();
+echo(stream_get_contents($blobvar));
+</pre>
+</blockquote>
+
+<p>PDO allows you to bind by name and by position.  So, you can pass either
+a variable name or a number as the first parameter of bindParam().  When
+binding by position, the first bind parameter is number 1, not 0.</p>
+
+<p>A few words about the format of bind variables...</p>
+
+<p>The official PDO documentation says to use ?'s in your queries when binding by position and colon-delimited names when binding by name.</p>
+
+<p>However, databases differ widely in their bind variable formats and only SQLite supports both ?'s when binding by position and colon-delimited names when binding by name.</p>
+
+<p>The most efficient thing to do is to ignore the PDO docs and just use whatever bind format is supported by the database you're using.</p>
+
+<p>With Oracle:</p>
+
+<blockquote>
+insert into testtable values (:var1,:var2,:var3,:var4)
+</blockquote>
+
+<p>or</p>
+
+<blockquote>
+insert into testtable values (:1,:2,:3,:4)
+</blockquote>
+
+<p>With Sybase and MS SQL Server:</p>
+
+<blockquote>
+insert into testtable values (@var1,@var2,@var3,@var4)
+</blockquote>
+
+<p>With DB2, MySQL and Firebird:</p>
+
+<blockquote>
+insert into testtable values (?,?,?,?)
+</blockquote>
+
+<p>With PostgreSQL:</p>
+
+<blockquote>
+insert into testtable values ($1,$2,$3,$4)
+</blockquote>
+
+<p>With SQLite:</p>
+
+<blockquote>
+insert into testtable values (:var1,:var2,:var3,:var4)
+</blockquote>
+
+<p>or</p>
+
+<blockquote>
+insert into testtable values (?,?,?,?)
+</blockquote>
+
+
+<p>However...</p>
+
+<p>Another solution is to configure SQL Relay to translate bind variables by setting translatebindvariables="yes" in the sqlrelay.conf file for the instance you're using.  Simply put, this parameter makes every database support every bind variable format.  See the <a href="../admin/configreference.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
+
+<p>A third solution is to configure PDO to emulate prepares by setting the PDO::ATTR_EMULATE_PREPARES attribute to true.  When the SQL Relay driver sees that this is set true, it rewrites the queries and translates the bind variables to substitution variables.  This solution also makes every database support every bind variable format, but the translation is done on the client-side.  Unfortunately it doesn't work with output bind variables.</p>
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>Another feature of the prepare/bind/execute paradigm is the ability to 
+prepare, bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("insert into testtable values (:var1,:var2,:var3)");
+$stmt->bindValue(":var",1,PDO::PARAM_INT);
+$stmt->bindValue(":var","1.1",PDO::PARAM_STR);
+$stmt->bindValue(":var","hello",PDO::PARAM_STR);
+$stmt->execute();
+
+$stmt->bindValue(":var",2,PDO::PARAM_INT);
+$stmt->bindValue(":var","2.2",PDO::PARAM_STR);
+$stmt->bindValue(":var","bye",PDO::PARAM_STR);
+$stmt->execute();
+
+... re-bind and re-execute again and again ...
+</pre>
+</blockquote>
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>To fetch a row from a statement that has been executed, call the fetch()
+method.  When called with no parameters, fetch() returns an array of fields
+with both numeric and associative entries.  When called with the PDO::FETCH_NUM
+flag, it returns an array with only numeric entries.  When called with the
+PDO::FETCH_ASSOC flag, it returns an array with only associative entries.</p>
+
+<p>LOB values are returned as streams, just like output bind parameters.</p>
+
+<p>Here is an example using fetch() to return both ordered and associative
+arrays (the default).</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->query("select int_col, float_col, string_col, blob_col from testtable");
+$result=$stmt->fetch();
+echo($result[0].",".$result[1].",".$result[2].",".stream_get_contents($result[3])."\n");
+echo($result["int_col"].",".$result["float_col"].",".$result["string_col"].",".stream_get_contents("blob_col")."\n");
+</pre>
+</blockquote>
+
+<p>The bindColumn() method and PDO::FETCH_BOUND flag can be used to fetch
+values into preallocated variables.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
+
+$col1=0;
+$col2="";
+$col3="";
+$col4="";
+$stmt->bindColumn(1,$col1);
+$stmt->bindColumn(2,$col2);
+$stmt->bindColumn(3,$col3);
+$stmt->bindColumn(4,$col4);
+
+$stmt->execute();
+
+$result=$stmt->fetch(PDO::FETCH_BOUND);
+echo($col1.",".$col2.",".$col3.",".stream_get_contents($col4)."\n");
+
+$result=$stmt->fetch(PDO::FETCH_BOUND);
+echo($col1.",".$col2.",".$col3.",".stream_get_contents($col4)."\n");
+</pre>
+</blockquote>
+
+<p>The PDO API also provides the fetchAll() convenience function for fetching
+an entire result set in one step.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
+$stmt->execute();
+
+$result=$stmt->fetchAll();
+
+echo($result[0][0].",".$result[0][1].",".$result[0][2].",".stream_get_contents($result[0][3])."\n");
+echo($result[1][0].",".$result[1][1].",".$result[1][2].",".stream_get_contents($result[1][3])."\n");
+echo($result[2][0].",".$result[2][1].",".$result[2][2].",".stream_get_contents($result[2][3])."\n");
+... and so on ...
+</pre>
+</blockquote>
+
+<p>The fetchColumn() method allows you to fetch a single column of the result
+set too.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
+$stmt->execute();
+
+$result=$stmt->fetchColumn(0);
+
+echo($result[0]."\n");
+echo($result[1]."\n");
+echo($result[2]."\n");
+... and so on ...
+</pre>
+</blockquote>
+
+<a name="largeresultsets"></a>
+<span class="heading2">Dealing With Large Result Sets</span><br><br>
+
+<p>SQL Relay normally buffers the entire result set.  This can speed things up 
+at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
+
+<p>Use the connect string variable "resultsetbuffersize" or the statement
+attribute PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE to set the number of rows
+to buffer at a time.  Calls to fetch() cause the chunk containing the requested
+field to be fetched.  Rows in that chunk are accessible but rows before it are
+not.</p>
+
+<p>For example, if you set the result set buffer size to 5 and execute a query
+that returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14,
+then 15-19.  When rows 5-9 are available, fetching row 0 will return false and
+fetching row 11 will cause rows 10-14 to be fetched and return the requested
+row.</p>
+
+<p>The following code sets the result set buffer size to 5.</p>
+
+<blockquote>
+<pre>
+$stmt->setAttribute(PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE,5);
+</pre>
+</blockquote>
+
+<p>The following code retrieves the result set buffer size.</p>
+
+<blockquote>
+<pre>
+$rsbs=$stmt->getAttribute(PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE);
+</pre>
+</blockquote>
+
+<a name="statements"></a>
+<span class="heading2">Statements</span><br><br>
+
+<p>It's possible to execute new queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through its result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt1=$dbh->prepare("select * from table1");
+$stmt2=$dbh->prepare("insert into table2 values (:col1, :col2, :col3)");
+
+$stmt1->execute();
+
+while ($result=$stmt1->fetch()) {
+
+	$stmt2->bindValue(":col1",$result[0],PDO::PARAM_INT);
+	$stmt2->bindValue(":col2",$result[1],PDO::PARAM_STR);
+	$stmt2->bindValue(":col3",$result[2],PDO::PARAM_STR);
+
+	$stmt2->execute();
+}
+</pre>
+</blockquote>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>After executing a query, the column count may be retrieved using
+columnCount().  An associative array of column data, including column name,
+type, length and various flags are available from getColumnMeta().</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->query("select * from testtable"));
+
+for ($i=0; $i<$stmt->columnCount(); $i++) {
+
+	$meta=$stmt->getColumnMeta($i);
+
+	... do something with $meta ...
+}
+</pre>
+</blockquote>
+
+<a name="storedprocedures"></a>
+<span class="heading2">Stored Procedures</span><br><br>
+
+<p>Many databases support stored procedures.  Stored procedures are sets of
+queries and procedural code that are executed inside of the database itself.
+For example, a stored procedure may select rows from one table, iterate through
+the result set and, based on the values in each row, insert, update or delete
+rows in other tables.  A client program could do this as well, but a stored
+procedure is generally more efficient because queries and result sets don't
+have to be sent back and forth between the client and database.  Also, stored
+procedures are generally stored in the database in a compiled state, while
+queries may have to be re-parsed and re-compiled each time they are sent.</p>
+
+<p>While many databases support stored procedures.  The syntax for creating
+and executing stored procedures varies greatly between databases.</p>
+
+<p>Stored procedures typically take input paramters from client programs through
+input bind variables and return values back to client programs either through
+bind variables or result sets.  Stored procedures can be broken down into
+several categories, based on the values that they return.  Some stored
+procedures don't return any values, some return a single value, some return
+multiple values and some return entire result sets.</p>
+
+<span class="heading3">No Values</span><br>
+
+<p>Some stored procedures don't return any values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("begin testproc(:in1,:in2,:in3); end;");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>) <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (@in1,@in2,@in3)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("exec testproc");
+$stmt->bindValue("@in1",1);
+$stmt->bindValue("@in2","1.1");
+$stmt->bindValue("@in3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
+        suspend;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("execute procedure testproc ?, ?, ?");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">DB2</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns void <font color="#6b59ce">as</font> '
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> ($<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font>);
+        <font color="#6b59ce">return</font>;
+<font color="#6b59ce">end</font>;' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testfunc($1,$2,$3)");
+$stmt->bindValue("$1",1);
+$stmt->bindValue("$2","1.1");
+$stmt->bindValue("$3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
+<font color="#6a5acd">begin</font>
+        <font color="#a52a2a"><b>insert</b></font> <font color="#6a5acd">into</font> mytable <font color="#6a5acd">values</font> (in1,in2,in3);
+<font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+
+
+<br><span class="heading3">Single Values</span><br>
+
+<p>Some stored procedures return single values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>In Oracle, stored procedures can return values through output parameters or
+as return values of the procedure itself.</p>
+
+<p>Here is an example where the procedure itself returns a value.  Note that
+Oracle calls these functions.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) returns <font color="#298a52"><b>number</b></font> <font color="#6b59ce">is</font>
+<font color="#6b59ce">begin</font>
+        <font color="#6b59ce">return</font> in1;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3) from dual");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testproc
+</pre>
+</blockquote>
+
+<p>Here is an example where the value is returned through an output
+parameter.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        out1:=in1;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3,:out1) from dual");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$out1=0;
+$stmt->bindParam(":out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>In Sybase and Microsoft SQL Server, stored procedures return values
+through output parameters rather than as return values of the procedure
+itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("exec testproc");
+$stmt->bindValue("@in1",1);
+$stmt->bindValue("@in2","1.1");
+$stmt->bindValue("@in3","hello");
+$out1=0;
+$stmt->bindParam("@out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        out1=in1;
+        suspend;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select * from testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>Alternatively, you can run a query like the following and receive the result
+using an output bind variable.  Note that in Firebird, input and
+output bind variable indices are distict from one another.  The index of the
+output bind variable is 1 rather than 4, even though there were 3 input bind
+variables.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("execute procedure testproc ?, ?, ?");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$out1=0;
+$stmt->bindParam("1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">DB2</span><br>
+
+<p>In DB2, stored procedures return values through output parameters rather
+than as return values of the procedure itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>set</b></font> out1 = in1;
+<font color="#6b59ce">end</font>
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc(?,?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$out1=0;
+$stmt->bindParam("4",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6b59ce">as</font> '
+declare
+        in1 int;
+        in2 <font color="#298a52"><b>float</b></font>;
+        in3 <font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>);
+<font color="#6b59ce">begin</font>
+        in1:=$<font color="#ff00ff">1</font>;
+        <font color="#6b59ce">return</font>;
+<font color="#6b59ce">end</font>;
+' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select * from testfunc($1,$2,$3)");
+$stmt->bindValue("$1",1);
+$stmt->bindValue("$2","1.1");
+$stmt->bindValue("$3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>A single value can be returned from a MySQL function.</p>
+
+<p>To create the function, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">function</font> testfunc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6a5acd">return</font> in1;
+</pre>
+</blockquote>
+
+<p>To execute the function from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select * from testfunc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
+
+<p>To drop the function, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">function</font> testfunc
+</pre>
+</blockquote>
+
+<p>A single value can be returned in the result set of a MySQL procedure.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execeute the procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select * from testproc()");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To create the procedure, run a query like the following.</p>
+
+<p>To drop the procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+<p>A single value can be returned using the output variable of a MySQL
+procedure.</p>
+
+<p>To create the procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font> <font color="#6a5acd">into</font> out1; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execeute the procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$dbh->query("set @out1=0");
+
+$dbh->query("call testproc(@out1)");
+
+$stmt=$dbh->prepare("select @out1");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+
+
+
+
+<br><span class="heading3">Multiple Values</span><br>
+
+<p>Some stored procedures return multiple values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>In Oracle, stored procedures can return values through output parameters or
+as return values of the procedure itself.  If a procedure needs to return
+multiple values, it can return one of them as the return value of the procedure
+itself, but the rest must be returned through output parameters.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out2 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out3 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
+<font color="#6b59ce">begin</font>
+        out1:=in1;
+        out2:=in2;
+        out3:=in3;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3,:out1,:out2,:out3) from dual");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$out1=0;
+$stmt->bindParam(":out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$out2="";
+$stmt->bindParam(":out2",$out2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$out3="";
+$stmt->bindParam(":out3",$out3,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output, @out2 int output, @out3 int output <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1),
+                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2),
+                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("exec testproc");
+$stmt->bindValue("@in1",1);
+$stmt->bindValue("@in2","1.1");
+$stmt->bindValue("@in3","hello");
+$out1=0;
+$stmt->bindParam("@out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$out2="";
+$stmt->bindParam("@out2",$out2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$out3="";
+$stmt->bindParam("@out3",$out3,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>, out2 <font color="#298a52"><b>float</b></font>, out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        out1=in1;
+        out2=in2;
+        out3=in3;
+        suspend;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select * from testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">DB2</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int, <font color="#a52829"><b>out</b></font> out2 double, <font color="#a52829"><b>out</b></font> out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>set</b></font> out1 = in1;
+        <font color="#a52829"><b>set</b></font> out2 = in2;
+        <font color="#a52829"><b>set</b></font> out3 = in3;
+<font color="#6b59ce">end</font>
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc(?,?,?,?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$out4=0;
+$stmt->bindParam("4",$out4,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$out5="";
+$stmt->bindParam("5",$out5,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$out6="";
+$stmt->bindParam("6",$out6,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns record <font color="#6b59ce">as</font> '
+declare
+        output record;
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>select</b></font> $<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font> <font color="#6b59ce">into</font> output;
+        <font color="#6b59ce">return</font> output;
+<font color="#6b59ce">end</font>;
+' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))");
+$stmt->bindValue("$1",1);
+$stmt->bindValue("$2","1.1");
+$stmt->bindValue("$3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>Here's how you can get multiple values from the result
+set of a MySQL procedure.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> in1, in2, in3; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+<p>Here's how you can get multiple values from the output variables
+of a MySQL procedure.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int, <font color="#a52a2a"><b>out</b></font> out2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>out</b></font> out3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">'hello'</font> <font color="#6a5acd">into</font> out1, out2, out3; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$dbh->query("set @out1=0, @out2=0.0, @out3=''");
+
+$dbh->query("call testproc(@out1,@out2,@out3)");
+
+$stmt=$dbh->prepare("select @out1,@out2,@out3");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+
+<br><span class="heading3">Result Sets</span><br>
+
+<p>Some stored procedures return entire result sets.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor.  PDO had a PDO::PARAM_STMT type that could theoretically be used to get one of these but it is currently unimplemented by any driver, including the SQL Relay driver.  Quirks in the implementation of PDO itself make it impossible (or at least very difficult) to implement.  Specifically, there's no obvious way of creating an instance of the PDO statement type to set the bound parameter to.  Hopefully this will be remedied in a future version of PDO.</p>
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc <font color="#6a5acd">as</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> testtable
+</pre>
+</blockquote>
+
+<p>To exceute the stored procedure from an SQL Relay program, ue code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("exec testproc");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">Firebird</span><br>
+
+<p>Stored procedures in Firebird can return a result set if a
+select query in the procedure selects values into the output parameters and
+then issues a suspend command, however SQL Relay doesn't currently support
+stored procedures that return result sets.</p>
+
+<span class="heading4">DB2</span><br>
+
+<p>Stored procedures in DB2 can return a result set if the procedure is declared
+to return one, however SQL Relay doesn't currently support stored procedures
+that return result sets.</p>
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc() returns setof record <font color="#6b59ce">as</font> '
+        declare output record;
+<font color="#6b59ce">begin</font>
+        <font color="#6b59ce">for</font> output <font color="#a52829"><b>in</b></font> <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> mytable <font color="#6b59ce">loop</font>
+                <font color="#6b59ce">return</font> next output;
+        <font color="#6b59ce">end</font> <font color="#6b59ce">loop</font>;
+        <font color="#6b59ce">return</font>;
+<font color="#6b59ce">end</font>;
+' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select * from testfunc() as (testint int, testfloat float, testchar char(40)");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>The result sets of all select statements called within MySQL stored
+procedures (that aren't selected into variables) are returned from the procedure
+call.  Though MySQL stored procedures can return multiple result sets,
+currently SQL Relay can only fetch the first result set.</p>
+
+<p>To create the stored procedure which returns a result set, run a query like
+the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> mytable; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc()");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+<a name="lastinsertid"></a>
+<span class="heading2">Getting the Last Insert ID</span><br><br>
+
+<p>Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.</p>
+
+<p>PDO provides the PDO::lastInsertId() method to get this value.</p>
+
+<p>When using the SQLite database, you can also get the last insert id by running the query:</p>
+
+<blockquote>
+<b>select last insert rowid</b>
+</blockquote>
+
+<a name="driverspecific"></a>
+<span class="heading2">Driver-Specific Attributes</span><br><br>
+
+<p>PHP PDO allows drivers to define their own attributes for database handles and statements.  These attributes can be used with the getAttribute and setAttribute methods to control various parameters unique to the driver.  SQL Relay implements several of these.</p>
+
+<p>Database handle attributes defined by the SQL Relay driver:</p>
+
+<ul>
+<li><b>PDO::SQLRELAY_ATTR_DB_TYPE</b> - get-only, returns database type</li>
+<li><b>PDO::SQLRELAY_ATTR_DB_VERSION</b> - get-only, returns database version string</li>
+<li><b>PDO::SQLRELAY_ATTR_DB_HOST_NAME</b> - get-only, returns the host name of the machine the database is running on</li>
+<li><b>PDO::SQLRELAY_ATTR_DB_IP_ADDRESS</b> - get-only, returns the ip address of the machine the database is running on</li>
+<li><b>PDO::SQLRELAY_ATTR_BIND_FORMAT</b> - get-only, returns a string representing the bind-format accepted by the database</li>
+<li><b>PDO::SQLRELAY_ATTR_CURRENT_DB</b> - get/set, returns or sets the current database/schema</li>
+</ul>
+
+<p>Statement handle attributes defined by the SQL Relay driver:</p>
+
+<ul>
+<li><b>PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE</b> - get/set, returns or sets the result set buffer size as described <a href="#largeresultsets">above</a>.</li>
+<li><b>PDO::SQLRELAY_ATTR_DONT_GET_COLUMN_INFO</b> - set-only (1 or 0), sets whether or not to fetch column info with the result set, default (0) is to return column info</li>
+<li><b>PDO::SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS</b> - set-only (1 or 0), sets whether to return NULL values as empty strings or nulls, default (1) is to return NULL values as empty strings</li>
+</ul>
+
+<p>Default values for the statement handle attributes can be set in the connect string.  Setting the corresponding connect string variable has the same effect as if the statement handle attribute were set immediately after creating the statement.  See <a href="#session">Establishing a Session</a> above.</p>
+
+<a name="drivermethods"></a>
+<span class="heading2">Driver-Specific Methods</span><br><br>
+
+<p>PHP PDO allows drivers to define their own custom methods to provide
+functionality unique to the driver.  SQL Relay implements several of these
+related to ending, suspending and resuming sessions.</p>
+
+<p>PDO provides a closeCursor method to close a cursor, but doesn't provide
+a similar method to close a database connection, aside from reusing the
+database handle or setting it to null.</p>
+
+<p>Since SQL Relay can automatically re-establish closed connections when the
+next query is sent, it would be nice if there was a way to release the
+connection and give other clients a chance to access the database without
+invalidating the database handle.  The endSession method makes this
+possible.</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$stmt=$dbh->query("select * from my_table");
+
+... do some stuff that takes a short time ...
+
+$stmt=$dbh->query("select * from another_table");
+$dbh->endSession();
+
+... do some stuff that takes a long time ...
+
+$stmt=$dbh->query("select * from yet_another_table");
+$dbh->endSession();
+
+... process the result set ...
+</pre>
+</blockquote>
+
+<p>Since the program does some stuff that takes a long time between the second and third queries, ending the session there allows another client an opportunity to use that database connection while this client is busy. The next call to query() establishes another session. Since the program does some stuff that takes a short time between the first two queries, it's OK to leave the session open between them.</p>
+
+<p>Sometimes web-based applications need a single database transaction to span
+multiple pages.  Since SQL Relay sessions can be suspended and resumed, this
+is possible.</p>
+
+<p>First page:</p>
+
+<blockquote>
+<pre>
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$stmt=$dbh->query("select * from testtable");
+$stmt->suspendResultSet();
+$dbh->suspendSession();
+$rs=$stmt->getResultSetId();
+$port=$dbh->getConnectionPort();
+
+... pass the rs, port and socket to the next page ...
+</pre>
+</blockquote>
+
+<p>Second page:</p>
+
+<blockquote>
+<pre>
+... get the rs, port and socket from previous page ...
+
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$stmt=$dbh->prepare(null);
+$dbh->resumeSession($port,$socket);
+$stmt->resumeResultSet($rs);
+
+... run more queries in the same transaction ...
+</pre>
+</blockquote>
+
+<p>Note the strange call of $stmt->prepare(null) above.  Resuming a result set
+requires an active statment to resume the result set into.  Ideally
+resumeResultSet() would be a method of the database handle and return a
+statement, but the PDO developer API doesn't currently provide a method for
+creating a statement programatically.  Until it does, this strangeness will be
+necessary.</p>
+
+<p>You can also distribute the processing of a result set across a series of
+pages using suspended sessions.  If you're buffering a result set in chunks
+instead of all at once and suspend a session, when you resume the session you 
+can continue to retrieve rows from the result set.</p>
+
+</body>
+</html>
