@@ -13,8 +13,8 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-#define DEBUG_MESSAGES 1
-#define DEBUG_TO_FILE 1
+//#define DEBUG_MESSAGES 1
+//#define DEBUG_TO_FILE 1
 //static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 static const char debugfile[]="C:\\Users\\dmuse\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
@@ -1864,6 +1864,8 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 		SQLR_BuildTableName(&table,NULL,0,
 					schemaname,namelength2,
 					tablename,namelength3);
+	} else {
+		SQLR_BuildTableName(&table,NULL,0,NULL,0,tablename,namelength3);
 	}
 
 	if (namelength4==SQL_NTS) {
@@ -1878,6 +1880,14 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 
 	debugPrintf("  table: %s\n",table.getString());
 	debugPrintf("  wild: %s\n",(wild)?wild:"");
+
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
+	SQLR_STMTClearError(stmt);
 
 	SQLRETURN	retval=
 		(stmt->cur->getColumnList(table.getString(),wild,
@@ -2954,9 +2964,6 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		// move on to the next row
 		stmt->currentgetdatarow++;
 	}
-
-	// reset the current SQLGetData row
-	stmt->currentgetdatarow=stmt->currentfetchrow;
 
 	// move on to the next rowset
 	stmt->currentstartrow=stmt->currentfetchrow;
@@ -6808,8 +6815,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 					SQLSMALLINT namelength4) {
 	debugFunction();
 
-	//debugPrintf("  for catalog=%s schema=%s table=%s tabletype=%s\n",
-stdoutput.printf("SQLTables for catalog=%s schema=%s table=%s tabletype=%s\n",
+	debugPrintf("  for catalog=%s schema=%s table=%s tabletype=%s\n",
 			(namelength1 && catalogname)?catalogname:(SQLCHAR *)"",
 			(namelength2 && schemaname)?schemaname:(SQLCHAR *)"",
 			(namelength3 && tablename)?tablename:(SQLCHAR *)"",
@@ -6868,6 +6874,14 @@ stdoutput.printf("SQLTables for catalog=%s schema=%s table=%s tabletype=%s\n",
 
 		debugPrintf("  getting database list...\n");
 
+		// reinit row indices
+		stmt->currentfetchrow=0;
+		stmt->currentstartrow=0;
+		stmt->currentgetdatarow=0;
+
+		// clear the error
+		SQLR_STMTClearError(stmt);
+
 		retval=
 		(stmt->cur->getDatabaseList(NULL,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
@@ -6898,6 +6912,14 @@ stdoutput.printf("SQLTables for catalog=%s schema=%s table=%s tabletype=%s\n",
 
 		// FIXME: this list should also be restricted to the
 		// specified catalog, schema, and table type
+
+		// reinit row indices
+		stmt->currentfetchrow=0;
+		stmt->currentstartrow=0;
+		stmt->currentgetdatarow=0;
+
+		// clear the error
+		SQLR_STMTClearError(stmt);
 
 		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
