@@ -13,9 +13,10 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-//#define DEBUG_MESSAGES 1
-//#define DEBUG_TO_FILE 1
+#define DEBUG_MESSAGES 1
+#define DEBUG_TO_FILE 1
 //static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
+static const char debugfile[]="C:\\Users\\dmuse\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -5019,7 +5020,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// aka SQL_CATALOG_NAME_SEPARATOR
 			debugPrintf("  infotype: "
 					"SQL_QUALIFIER_NAME_SEPARATOR/"
-					"SQL_CATALOG_NAME_SEPARATOR/");
+					"SQL_CATALOG_NAME_SEPARATOR\n");
 			// FIXME: is this true for all db's?
 			strval=".";
 			break;
@@ -6807,11 +6808,12 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 					SQLSMALLINT namelength4) {
 	debugFunction();
 
-	debugPrintf("  for %s.%s.%s (%s)\n",
-			(namelength1)?catalogname:(SQLCHAR *)"",
-			(namelength2)?schemaname:(SQLCHAR *)"",
-			(namelength3)?tablename:(SQLCHAR *)"",
-			(namelength4)?tabletype:(SQLCHAR *)"");
+	//debugPrintf("  for catalog=%s schema=%s table=%s tabletype=%s\n",
+stdoutput.printf("SQLTables for catalog=%s schema=%s table=%s tabletype=%s\n",
+			(namelength1 && catalogname)?catalogname:(SQLCHAR *)"",
+			(namelength2 && schemaname)?schemaname:(SQLCHAR *)"",
+			(namelength3 && tablename)?tablename:(SQLCHAR *)"",
+			(namelength4 && tabletype)?tabletype:(SQLCHAR *)"");
 
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -6819,6 +6821,24 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
+
+	// normalize the names
+	if (namelength1==SQL_NTS) {
+		namelength1=charstring::length(catalogname);
+	}
+	if (namelength2==SQL_NTS) {
+		namelength2=charstring::length(schemaname);
+	}
+	if (namelength3==SQL_NTS) {
+		namelength3=charstring::length(tablename);
+	}
+	if (namelength4==SQL_NTS) {
+		namelength4=charstring::length(tabletype);
+	}
+	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
+	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
+	char	*tblname=charstring::duplicate((char *)tablename,namelength3);
+	char	*tbltype=charstring::duplicate((char *)tabletype,namelength4);
 
 	// FIXME: this code treats xxxname as a search pattern in all cases
 	// xxxname should be a case-insensitive search pattern if:
@@ -6841,49 +6861,56 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	char		*wild=NULL;
 	SQLRETURN	retval=SQL_ERROR;
-	if (!charstring::isNullOrEmpty(catalogname)) {
-
-		if (namelength1==SQL_NTS) {
-			namelength1=charstring::length(catalogname);
-		}
-		wild=charstring::duplicate(
-				(const char *)catalogname,namelength1);
-		if (!charstring::compare(wild,SQL_ALL_CATALOGS)) {
-			delete[] wild;
-			wild=NULL;
-		}
+	if (!charstring::compare(catname,SQL_ALL_CATALOGS) &&
+				charstring::isNullOrEmpty(schname) &&
+				charstring::isNullOrEmpty(tblname) &&
+				charstring::isNullOrEmpty(tbltype)) {
 
 		debugPrintf("  getting database list...\n");
-		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 		retval=
-		(stmt->cur->getDatabaseList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
+		(stmt->cur->getDatabaseList(NULL,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
 
-	} else if (!charstring::isNullOrEmpty(schemaname)) {
+	} else if (!charstring::compare(schname,SQL_ALL_SCHEMAS) &&
+				charstring::isNullOrEmpty(catname) &&
+				charstring::isNullOrEmpty(tblname) &&
+				charstring::isNullOrEmpty(tbltype)) {
 
 		debugPrintf("  schema list not supported\n");
 
+	} else if (!charstring::compare(tbltype,SQL_ALL_TABLE_TYPES) &&
+				charstring::isNullOrEmpty(catname) &&
+				charstring::isNullOrEmpty(schname) &&
+				charstring::isNullOrEmpty(tblname)) {
+
+		debugPrintf("  table type list not supported\n");
+
 	} else {
-		if (namelength3==SQL_NTS) {
-			namelength3=charstring::length(tablename);
-		}
-		wild=charstring::duplicate(
-				(const char *)tablename,namelength3);
+
+		const char	*wild=tblname;
 		if (!charstring::compare(wild,"%")) {
-			delete[] wild;
 			wild=NULL;
 		}
 
 		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
+		// FIXME: this list should also be restricted to the
+		// specified catalog, schema, and table type
+
 		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
 	}
 
+	delete[] catname;
+	delete[] schname;
+	delete[] tblname;
+	delete[] tbltype;
+
 	delete[] wild;
+	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 	return retval;
 }
 
