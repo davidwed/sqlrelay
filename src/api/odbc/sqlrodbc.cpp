@@ -4467,6 +4467,9 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 			// clear any error that might have been set during
 			// the recursive call
 			SQLR_CONNClearError(conn);
+stdoutput.printf("BITS!!!!! ");
+stdoutput.printBits(supported[0]);
+stdoutput.printf("\n");
 			break;
 		#endif
 		#if (ODBCVER >= 0x0380)
@@ -4492,7 +4495,11 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 					SQLUSMALLINT functionid,
 					SQLUSMALLINT *supported) {
 	debugFunction();
-	return SQLR_SQLGetFunctions(connectionhandle,functionid,supported);
+	SQLRETURN ret=SQLR_SQLGetFunctions(connectionhandle,functionid,supported);
+stdoutput.printf("BITS!!!!! ");
+stdoutput.printBits(supported[0]);
+stdoutput.printf("\n");
+	return ret;
 }
 
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
@@ -4595,8 +4602,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_CURSOR_COMMIT_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
-			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=SQL_CB_CLOSE;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_DATA_SOURCE_READ_ONLY:
 			debugPrintf("  infotype: "
@@ -4971,8 +4978,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_CURSOR_ROLLBACK_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
-			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=SQL_CB_CLOSE;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_EXPRESSIONS_IN_ORDERBY:
 			debugPrintf("  infotype: "
