@@ -653,6 +653,7 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 		return (wild)?
 			"select "
 			"	name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	sysobjects "
@@ -667,6 +668,7 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 	
 			"select "
 			"	name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	sysobjects "
@@ -680,6 +682,7 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 		return (wild)?
 			"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	information_schema.tables "
@@ -690,6 +693,7 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 	
 			"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	information_schema.tables "

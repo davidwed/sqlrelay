@@ -41,6 +41,9 @@
 	converted most of the doc source to wikitext
 	fixed ODBC driver bug that could corrupt memory and trick the driver
 		manager into thinking that some basic functions are unavailable
+	ODBC SQLTables works more correctly now
+	fixed an ODBC bug that caused the first row to be fetched twice when
+		using SQLBindCol
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static

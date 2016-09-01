@@ -253,6 +253,7 @@ const char *sqliteconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
 		"	tbl_name, "
+		"	'TABLE', "
 		"	NULL "
 		"from "
 		"(select "
@@ -277,6 +278,7 @@ const char *sqliteconnection::getTableListQuery(bool wild) {
 
 		"select "
 		"	tbl_name, "
+		"	'TABLE', "
 		"	NULL "
 		"from "
 		"(select "

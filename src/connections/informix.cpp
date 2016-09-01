@@ -575,6 +575,7 @@ const char *informixconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select distinct "
 		"	tabname, "
+		"	'TABLE', "
 		"	'' as extra "
 		"from "
 		"	systables "
@@ -589,6 +590,7 @@ const char *informixconnection::getTableListQuery(bool wild) {
 
 		"select distinct "
 		"	tabname, "
+		"	'TABLE', "
 		"	'' as extra "
 		"from "
 		"	systables "

@@ -577,6 +577,7 @@ const char *sapconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
 		"	name, "
+		"	'TABLE', "
 		"	NULL "
 		"from "
 		"	sysobjects "
@@ -591,6 +592,7 @@ const char *sapconnection::getTableListQuery(bool wild) {
 
 		"select "
 		"	name, "
+		"	'TABLE', "
 		"	NULL "
 		"from "
 		"	sysobjects "

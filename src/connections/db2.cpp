@@ -451,6 +451,7 @@ void db2connection::dbVersionSpecificTasks() {
 		gettablelistquery=
 			"select distinct "
 			"	tabname, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	syscat.tables "
@@ -468,6 +469,7 @@ void db2connection::dbVersionSpecificTasks() {
 		gettablelistquerywild=
 			"select distinct "
 			"	tabname, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	syscat.tables "
@@ -490,6 +492,7 @@ void db2connection::dbVersionSpecificTasks() {
 		gettablelistquery=
 			"select distinct "
 			"	tabname, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	syscat.tables "
@@ -507,6 +510,7 @@ void db2connection::dbVersionSpecificTasks() {
 		gettablelistquerywild=
 			"select distinct "
 			"	tabname, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	syscat.tables "

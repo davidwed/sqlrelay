@@ -548,6 +548,7 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 const char *mysqlconnection::getTableListQuery(bool wild) {
 	return (wild)?"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	information_schema.tables "
@@ -558,6 +559,7 @@ const char *mysqlconnection::getTableListQuery(bool wild) {
 			:
 			"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	information_schema.tables "

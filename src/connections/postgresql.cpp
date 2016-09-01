@@ -501,6 +501,7 @@ const char *postgresqlconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
 		"	table_name, "
+		"	'TABLE', "
 		"	NULL "
 		"from "
 		"	information_schema.tables "
@@ -513,6 +514,7 @@ const char *postgresqlconnection::getTableListQuery(bool wild) {
 
 		"select "
 		"	table_name, "
+		"	'TABLE', "
 		"	NULL "
 		"from "
 		"	information_schema.tables "

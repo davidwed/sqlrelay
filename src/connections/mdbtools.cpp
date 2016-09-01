@@ -464,6 +464,8 @@ const char *mdbtoolscursor::getColumnName(uint32_t col) {
 	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
 		if (col==0) {
 			return "TABLE";
+		} else if (col==1) {
+			return "TYPE";
 		}
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
 		switch (col) {
@@ -609,6 +611,9 @@ void mdbtoolscursor::getField(uint32_t col,
 		if (col==0 && currenttable) {
 			*field=currenttable->object_name;
 			*fieldlength=charstring::length(*field);
+		} else if (col==1 && currenttable) {
+			*field="TABLE";
+			*fieldlength=5;
 		}
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
 		*field=NULL;

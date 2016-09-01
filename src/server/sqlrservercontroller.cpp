@@ -3661,15 +3661,15 @@ void sqlrservercontroller::buildColumnMaps() {
 	// ODBC getTableList:
 	//
 	// TABLE_CAT -> NULL
-	odbctablescolumnmap.setValue(0,1);
+	odbctablescolumnmap.setValue(0,2);
 	// TABLE_SCHEM -> NULL
-	odbctablescolumnmap.setValue(1,1);
+	odbctablescolumnmap.setValue(1,2);
 	// TABLE_NAME -> Tables_in_xxx
 	odbctablescolumnmap.setValue(2,0);
-	// TABLE_TYPE -> NULL
+	// TABLE_TYPE -> 'TABLE'
 	odbctablescolumnmap.setValue(3,1);
 	// REMARKS -> NULL
-	odbctablescolumnmap.setValue(4,1);
+	odbctablescolumnmap.setValue(4,2);
 
 	// ODBC getColumnList:
 	//

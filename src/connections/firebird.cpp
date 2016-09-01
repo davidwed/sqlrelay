@@ -576,7 +576,9 @@ const char *firebirdconnection::getDatabaseListQuery(bool wild) {
 const char *firebirdconnection::getTableListQuery(bool wild) {
 	return (wild)?
 		"select "
-		"	rdb$relation_name, NULL "
+		"	rdb$relation_name, "
+		"	'TABLE', "
+		"	NULL "
 		"from "
 		"	rdb$relations "
 		"where "
@@ -587,7 +589,9 @@ const char *firebirdconnection::getTableListQuery(bool wild) {
 		"	rdb$relation_name":
 
 		"select "
-		"	rdb$relation_name, NULL "
+		"	rdb$relation_name, "
+		"	'TABLE', "
+		"	NULL "
 		"from "
 		"	rdb$relations "
 		"where "

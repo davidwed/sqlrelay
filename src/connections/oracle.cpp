@@ -1199,6 +1199,7 @@ const char *oracleconnection::getTableListQuery(bool wild) {
 		return (wild)?
 			"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	all_tables "
@@ -1211,6 +1212,7 @@ const char *oracleconnection::getTableListQuery(bool wild) {
 
 			"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	all_tables "
@@ -1222,6 +1224,7 @@ const char *oracleconnection::getTableListQuery(bool wild) {
 		return (wild)?
 			"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	user_tables "
@@ -1232,6 +1235,7 @@ const char *oracleconnection::getTableListQuery(bool wild) {
 
 			"select "
 			"	table_name, "
+			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	user_tables "
