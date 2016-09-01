@@ -4467,9 +4467,6 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 			// clear any error that might have been set during
 			// the recursive call
 			SQLR_CONNClearError(conn);
-stdoutput.printf("BITS!!!!! ");
-stdoutput.printBits(supported[0]);
-stdoutput.printf("\n");
 			break;
 		#endif
 		#if (ODBCVER >= 0x0380)
@@ -4495,11 +4492,7 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 					SQLUSMALLINT functionid,
 					SQLUSMALLINT *supported) {
 	debugFunction();
-	SQLRETURN ret=SQLR_SQLGetFunctions(connectionhandle,functionid,supported);
-stdoutput.printf("BITS!!!!! ");
-stdoutput.printBits(supported[0]);
-stdoutput.printf("\n");
-	return ret;
+	return SQLR_SQLGetFunctions(connectionhandle,functionid,supported);
 }
 
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
