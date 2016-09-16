@@ -1828,41 +1828,37 @@ sqlrcredentials *sqlrservercontroller::getCredentials(const char *user,
 							bool usegss,
 							bool usetls) {
 
-	// if a user was passed in at all, then we need to use it
-	if (charstring::isNullOrEmpty(user)) {
+	// try to use gss credentials
+	if (usegss) {
 
-		// otherwise...
-
-		if (usegss) {
-
-			// try to use gss credentials
-			gsscontext	*ctx=getGSSContext();
-			if (ctx) {
-				sqlrgsscredentials	*gsscred=
-						new sqlrgsscredentials();
-				gsscred->setInitiator(ctx->getInitiator());
-				return gsscred;
-			}
-			return NULL;
-
-		} else if (usetls) {
-
-			// try to use tls credentials
-			tlscontext	*ctx=getTLSContext();
-			if (ctx) {
-				tlscertificate	*cert=ctx->getPeerCertificate();
-				if (cert) {
-					sqlrtlscredentials	*tlscred=
-						new sqlrtlscredentials();
-					tlscred->setSubjectAlternateNames(
-					cert->getSubjectAlternateNames());
-					tlscred->setCommonName(
-						cert->getCommonName());
-					return tlscred;
-				}
-			}
-			return NULL;
+		gsscontext	*ctx=getGSSContext();
+		if (ctx) {
+			sqlrgsscredentials	*gsscred=
+					new sqlrgsscredentials();
+			gsscred->setInitiator(ctx->getInitiator());
+			return gsscred;
 		}
+		return NULL;
+	}
+
+	// try to use tls credentials
+	// (unless a user was passed in)
+	if (usetls && charstring::isNullOrEmpty(user)) {
+
+		tlscontext	*ctx=getTLSContext();
+		if (ctx) {
+			tlscertificate	*cert=ctx->getPeerCertificate();
+			if (cert) {
+				sqlrtlscredentials	*tlscred=
+					new sqlrtlscredentials();
+				tlscred->setSubjectAlternateNames(
+				cert->getSubjectAlternateNames());
+				tlscred->setCommonName(
+					cert->getCommonName());
+				return tlscred;
+			}
+		}
+		return NULL;
 	}
 
 	// use user/password credentials
