@@ -44,6 +44,7 @@
 	ODBC SQLTables works more correctly now
 	fixed an ODBC bug that caused the first row to be fetched twice when
 		using SQLBindCol
+	added /DPERL_IMPLICIT_SYS macro for windows builds of Perl API
 
 0.65.0 - removed erroneous SQLR_SQLExecute export in ODBC driver
 	fixed call type of internal ODBC driver functions and made them static
