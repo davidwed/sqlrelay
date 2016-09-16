@@ -275,6 +275,9 @@ stdout=cmd.StdOut.ReadAll()
 stderr=cmd.StdErr.ReadLine()
 parts=split(stderr)
 arch=parts(ubound(parts))
+if arch="80x86" then
+	arch="x86"
+end if
 version=""
 for i=lbound(parts) to ubound(parts)
 	if parts(i)="Version" then
@@ -290,7 +293,7 @@ WScript.Echo("Visual C++ Architecture: " & arch)
 
 ' set some architecture-based flags
 USE_32BIT_TIME_T=""
-if arch="80x86" then
+if arch="x86" then
 	USE_32BIT_TIME_T="/D _USE_32BIT_TIME_T"
 end if
 
@@ -727,7 +730,7 @@ if RUBYPREFIX<>"" and RUBYVERSION="" then
 end if
 
 if RUBYPREFIX<>"" and RUBYVERSION<>"" then
-	if arch="80x86" or arch="x86" then
+	if arch="x86" then
 		RUBYTARGET="i386-mswin32"
 		findVersion RUBYPREFIX & "\lib","msvcr","-ruby" & RUBYLIBVERSION & ".lib",RUBYVCVERSION
 		RUBYLIBPREFIX="msvcr" & RUBYVCVERSION
