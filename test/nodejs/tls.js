@@ -712,7 +712,7 @@ console.log("COMMIT AND ROLLBACK: ");
 var secondcon=new sqlrelay.SQLRConnection("sqlrserver",
 				9000,
 				"/tmp/test.socket",
-				"test","test",0,1);
+				null,null,0,1);
 var secondcur=new sqlrelay.SQLRCursor(secondcon);
 secondcon.enableTls(null,cert,null,null,"ca",ca,0);
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
