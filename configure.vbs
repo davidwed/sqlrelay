@@ -727,7 +727,7 @@ if RUBYPREFIX<>"" and RUBYVERSION="" then
 end if
 
 if RUBYPREFIX<>"" and RUBYVERSION<>"" then
-	if arch="80x86" then
+	if arch="80x86" or arch="x86" then
 		RUBYTARGET="i386-mswin32"
 		findVersion RUBYPREFIX & "\lib","msvcr","-ruby" & RUBYLIBVERSION & ".lib",RUBYVCVERSION
 		RUBYLIBPREFIX="msvcr" & RUBYVCVERSION
