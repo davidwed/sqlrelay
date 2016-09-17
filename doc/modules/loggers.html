@@ -21,18 +21,6 @@
 <p>For example, to use the <i>debug</i> module, which logs detailed information for debugging purposes, you would include a section in the sqlrelay.conf file like:</p>
 
 <blockquote>
-
-
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;...&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">loggers</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">logger</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;debug&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>listener</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connection</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/loggers&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
-<font color="#008b8b">&lt;/intstance&gt;</font><br>
-</font>
 </blockquote>
 <p>The <i>module</i> attribute specifies which module to load.  The <i>listener</i> and <i>connection</i> attributes are parameters for the module.</p>
 
@@ -63,38 +51,6 @@
 <p>This module takes three parameters: <b>listener</b>, <b>connection</b> and <b>perms</b>.  The <b>listener</b> parameter may be set to "no" to disable logging of the sqlr-listener processes.  The <b>connection</b> parameter may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either parameter is omitted or set to any other value.  The <b>perms</b> parameter may be set to any ls -l style permissions string.  The default is "rw-------" which translates to read/write for owner only.</p>
 
 <p>The general log format is:</p>
-
-<p><tt>#!blockquote<code>
-mm/dd/yyyy hh:mm:ss TZ processname [pid] : info
-</code></tt></p>
-
-<p>Sample log for main listener process: <a href="sqlr-listener.1869.html">sqlr-listener.1869</a><br>
-Sample log for child listener process: <a href="sqlr-listener.1886.html">sqlr-listener.1886</a><br>
-Sample log for connecton process: <a href="sqlr-connection.1871.html">sqlr-connection.1871</a></p>
-
-<p><span class="heading3">slowqueries</span><br></p>
-
-<p>The <b>slowqueries</b> module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the sqlrelay.conf file and "pid" is replaced with the process id.</p>
-
-<p>This module takes two parameters: <b>sec</b> and <b>usec</b>.  Queries that take longer than <b>sec</b> seconds and <b>usec</b> microseconds will be logged.  Both parameters default to 0 and omitting them causes all queries to be logged.</p>
-
-<p>The general format is:</p>
-
-<blockquote>
-  <pre>Mon 2014 Apr  6 15:58:17 :
-select 1 from dual
-time: 0.000001
-</pre>
-
-</blockquote>
-<p>Sample log: <a href="sqlr-connection-oracletest-querylog.2899.html">sqlr-connection-oracletest-querylog.2899</a></p>
-
-<a name="custom"/><h2>Custom Modules</h2>
-
-<p>Custom modules that log very specific information in very specific formats are also available in the general SQL Relay distribution but they are not intended for general use.</p>
-
-<p>Custom modules may also be developed...
-</p>
 
 </body>
 </html>
