@@ -52,11 +52,13 @@ Currently, the following filter modules are available:
 
 The patterns module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.
 
-The list of patterns is given by a set of '''pattern''' child tags.  Each pattern tag may have contain the following attributes.
+The list of patterns is given by a set of '''pattern''' child tags.  Each pattern tag may contain the following attributes.
 
 * '''pattern''' - Required.  The pattern to match.
 * '''type''' - Optional.  Defaults to "string".  Valid values are "string", "cistring" (case insensitive string), and "regex" (regular expression).
 * '''scope''' - Optional.  Defaults to "query".  Valid values are "query" (attempt to match against the entire query), "outsidequotes" (only match parts of the query not surrounded by single-quotes), and "insidequotes" (only match parts of the query surrounded by single-quotes).
+* '''errornumber''' - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.
+* '''error''' - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.
 
 For example, with the following configuration...
 
@@ -80,6 +82,12 @@ But these queries would not be:
 
 The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.
 
+In addition to the module attribute, each filter tag may contain the following attributes.
+
+* '''pattern''' - Required.  The pattern to match.
+* '''errornumber''' - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.
+* '''error''' - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.
+
 For example, with the following configuration:
 
 {{{#!blockquote
@@ -102,7 +110,12 @@ But this query would not be:
 
 The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.
 
-The module's '''ignorecase''' parameter defaults to "no", but if set to "yes", causes the comparison to be case insensitive.
+In addition to the module attribute, each filter tag may contain the following attributes.
+
+* '''pattern''' - Required.  The pattern to match.
+* '''ignorecase''' - Optional.  Defaults to "no".  If set to "yes" then the comparison is case insensitive.
+* '''errornumber''' - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.
+* '''error''' - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.
 
 For example, with the following configuration:
 
