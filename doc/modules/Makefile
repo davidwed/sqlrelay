@@ -10,6 +10,8 @@ SRCS = auths.wt \
 	notifications.wt \
 	pwdencs.wt \
 	resultsettranslations.wt \
+	routers.wt \
+	schedules.wt \
 	translations.wt
 
 OBJS = auths.html.in \
@@ -18,6 +20,8 @@ OBJS = auths.html.in \
 	notifications.html.in \
 	pwdencs.html.in \
 	resultsettranslations.html.in \
+	routers.html.in \
+	schedules.html.in \
 	translations.html.in
 
 .wt.html.in:
