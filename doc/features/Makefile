@@ -5,7 +5,6 @@ include ../../config.mk
 .SUFFIXES: .wt .html .html.in
 
 SRCS = connectionpooling.wt \
-	connectionschedules.wt \
 	databases.wt \
 	dbabstractionlayers.wt \
 	dropinreplacementlibs.wt \
@@ -16,12 +15,12 @@ SRCS = connectionpooling.wt \
 	queryfiltering.wt \
 	queryrouting.wt \
 	resultsetcaching.wt \
+	schedules.wt \
 	substitutionandbindvars.wt \
 	suspendedtx.wt \
 	throttling.wt
 
 OBJS = connectionpooling.html \
-	connectionschedules.html \
 	databases.html \
 	dbabstractionlayers.html \
 	dropinreplacementlibs.html \
@@ -32,6 +31,7 @@ OBJS = connectionpooling.html \
 	queryfiltering.html \
 	queryrouting.html \
 	resultsetcaching.html \
+	schedules.html \
 	substitutionandbindvars.html \
 	suspendedtx.html \
 	throttling.html
