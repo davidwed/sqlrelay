@@ -45,6 +45,31 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">C++</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#800080">#include&nbsp;</font><font color="#ff00ff">&lt;sqlrelay/sqlrclient.h&gt;</font><br>
+<font color="#800080">#include&nbsp;</font><font color="#ff00ff">&lt;rudiments/stdio.h&gt;</font><br>
+<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;<font color="#2e8b57"><b>namespace</b></font>&nbsp;rudiments;<br>
+<br>
+<font color="#2e8b57"><b>int</b></font>&nbsp;main() {<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrconnection&nbsp;&nbsp;sqlrcon(<font color="#ff00ff">&quot;examplehost&quot;</font>,<font color="#ff00ff">9000</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcursor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur(&amp;sqlrcon);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur.sendQuery(<font color="#ff00ff">&quot;select * from exampletable&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#2e8b57"><b>uint64_t</b></font>&nbsp;row=<font color="#ff00ff">0</font>; row&lt;sqlrcur.rowCount(); row++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#2e8b57"><b>uint64_t</b></font>&nbsp;col=<font color="#ff00ff">0</font>; col&lt;sqlrcur.colCount(); col++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stdoutput.printf(<font color="#ff00ff">&quot;</font><font color="#6a5acd">%s</font><font color="#ff00ff">,&quot;</font>,sqlrcur.getField(row,col));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stdoutput.printf(<font color="#ff00ff">&quot;</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -52,6 +77,34 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">C</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#800080">#include&nbsp;</font><font color="#ff00ff">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font><br>
+<font color="#800080">#include&nbsp;</font><font color="#ff00ff">&lt;stdio.h&gt;</font><br>
+<br>
+<font color="#2e8b57"><b>int</b></font>&nbsp;main() {<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon sqlrconref=sqlrcon_alloc(<font color="#ff00ff">&quot;examplehost&quot;</font>,<font color="#ff00ff">9000</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur sqlrcurref=sqlrcur_alloc(sqlrconref);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur_sendQuery(sqlrcurref,<font color="#ff00ff">&quot;select * from exampletable&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>uint64_t</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;row;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>uint64_t</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;col;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(row=<font color="#ff00ff">0</font>; row&lt;sqlrcur_rowCount(sqlrcurref); row++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(col=<font color="#ff00ff">0</font>; col&lt;sqlrcur_colCount(sqlrcurref); col++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf(<font color="#ff00ff">&quot;</font><font color="#6a5acd">%s</font><font color="#ff00ff">,&quot;</font>,sqlrcur_getFieldByIndex(sqlrcurref,row,col));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf(<font color="#ff00ff">&quot;</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur_free(sqlrcurref);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon_free(sqlrconref);<br>
+}<br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -63,6 +116,38 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">C#</span>
 <p class="code" style="height: 350px;">
+
+
+<font face="monospace">
+<font color="#a52a2a"><b>using</b></font>&nbsp;System;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;SQLRClient;<br>
+<font color="#a52a2a"><b>using</b></font>&nbsp;System.IO;<br>
+<br>
+<font color="#2e8b57"><b>namespace</b></font>&nbsp;csexample<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>class</b></font>&nbsp;example<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;Main()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRConnection sqlrcon =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRConnection(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplehost&quot;</font>,&nbsp;<font color="#ff00ff">9000</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">0</font>,&nbsp;<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRCursor sqlrcur =&nbsp;<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRCursor(sqlrcon);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur.sendQuery(<font color="#ff00ff">&quot;select * from exampletable&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(UInt64 row=<font color="#ff00ff">0</font>; row&lt;sqlrcur.rowCount(); row++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(UInt64 col=<font color="#ff00ff">0</font>; col&lt;sqlrcur.colCount(); col++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(sqlrcur.getField(row,col)+<font color="#ff00ff">&quot;,&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -70,6 +155,33 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Java</span>
 <p class="code" style="height: 350px;">
+
+
+<font face="monospace">
+<font color="#800080">import</font>&nbsp;com.firstworks.sqlrelay.SQLRConnection;<br>
+<font color="#800080">import</font>&nbsp;com.firstworks.sqlrelay.SQLRCursor;<br>
+<br>
+<font color="#2e8b57"><b>class</b></font>&nbsp;example {<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#2e8b57"><b>public</b></font>&nbsp;<font color="#2e8b57"><b>static</b></font>&nbsp;<font color="#2e8b57"><b>void</b></font>&nbsp;main(String[]&nbsp;args)&nbsp;{<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRConnection&nbsp;&nbsp;sqlrcon=<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRConnection(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplehost&quot;</font>,(<font color="#2e8b57"><b>short</b></font>)<font color="#ff00ff">9000</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SQLRCursor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur=<font color="#a52a2a"><b>new</b></font>&nbsp;SQLRCursor(sqlrcon);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur.sendQuery(<font color="#ff00ff">&quot;select * from exampletable&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#2e8b57"><b>long</b></font>&nbsp;row=<font color="#ff00ff">0</font>; row&lt;sqlrcur.rowCount(); row++)&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#2e8b57"><b>long</b></font>&nbsp;col=<font color="#ff00ff">0</font>; col&lt;sqlrcur.colCount(); col++)&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(sqlrcur.getField(row,col)+<font color="#ff00ff">&quot;,&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+}<br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -81,6 +193,28 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Perl</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#800080">#!/usr/bin/perl</font><br>
+<br>
+<font color="#a52a2a"><b>use&nbsp;</b></font>SQLRelay::Connection;<br>
+<font color="#a52a2a"><b>use&nbsp;</b></font>SQLRelay::Cursor;<br>
+<br>
+<font color="#008b8b">$sqlrcon</font>=SQLRelay::Connection-&gt;new(<font color="#ff00ff">&quot;</font><font color="#ff00ff">examplehost</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;</font><font color="#ff00ff">/tmp/example.socket</font><font color="#ff00ff">&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;</font><font color="#ff00ff">exampleuser</font><font color="#ff00ff">&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;</font><font color="#ff00ff">examplepassword</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);<br>
+<font color="#008b8b">$sqlrcur</font>=SQLRelay::Cursor-&gt;new(<font color="#008b8b">$sqlrcon</font>);<br>
+<br>
+<font color="#008b8b">$sqlrcur</font><font color="#008b8b">-&gt;sendQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from exampletable</font><font color="#ff00ff">&quot;</font>);<br>
+<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">$row</font>=<font color="#ff00ff">0</font>;&nbsp;<font color="#008b8b">$row</font>&lt;<font color="#008b8b">$sqlrcur</font><font color="#008b8b">-&gt;rowCount</font>();&nbsp;<font color="#008b8b">$row</font>++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">$col</font>=<font color="#ff00ff">0</font>;&nbsp;<font color="#008b8b">$col</font>&lt;<font color="#008b8b">$sqlrcur</font><font color="#008b8b">-&gt;colCount</font>();&nbsp;<font color="#008b8b">$col</font>++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>print</b></font>(<font color="#008b8b">$sqlrcur</font><font color="#008b8b">-&gt;getField</font>(<font color="#008b8b">$row</font>,<font color="#008b8b">$col</font>).<font color="#ff00ff">&quot;</font><font color="#ff00ff">,</font><font color="#ff00ff">&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>print</b></font>(<font color="#ff00ff">&quot;</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>);<br>
+}<br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -88,6 +222,29 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Python</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#0000ff">#! /usr/bin/env python</font><br>
+<br>
+<font color="#800080">from</font>&nbsp;SQLRelay&nbsp;<font color="#800080">import</font>&nbsp;PySQLRClient<br>
+<br>
+<font color="#a52a2a"><b>def</b></font>&nbsp;<font color="#008b8b">main</font>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcon=PySQLRClient.sqlrconnection(<font color="#ff00ff">&quot;</font><font color="#ff00ff">examplehost</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,&nbsp;<font color="#6a5acd">\</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;</font><font color="#ff00ff">/tmp/example.socket</font><font color="#ff00ff">&quot;</font>,&nbsp;<font color="#6a5acd">\</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;</font><font color="#ff00ff">exampleuser</font><font color="#ff00ff">&quot;</font>,&nbsp;<font color="#6a5acd">\</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;</font><font color="#ff00ff">examplepassword</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur=PySQLRClient.sqlrcursor(sqlrcon)<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sqlrcur.sendQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from exampletable</font><font color="#ff00ff">&quot;</font>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;row&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#008b8b">range</font>(<font color="#ff00ff">0</font>,sqlrcur.rowCount()):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;col&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#008b8b">range</font>(<font color="#ff00ff">0</font>,sqlrcur.colCount()):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">print</font>&nbsp;sqlrcur.getField(row,col)+<font color="#ff00ff">&quot;</font><font color="#ff00ff">,</font><font color="#ff00ff">&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">print</font><br>
+<br>
+<font color="#a52a2a"><b>if</b></font>&nbsp;__name__ ==&nbsp;<font color="#ff00ff">&quot;</font><font color="#ff00ff">__main__</font><font color="#ff00ff">&quot;</font>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;main()<br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -99,6 +256,33 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">PHP</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#008b8b">&lt;</font><font color="#a52a2a"><b>html</b></font><font color="#008b8b">&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#a52a2a"><b>body</b></font><font color="#008b8b">&gt;</font><br>
+<font color="#6a5acd">&lt;?php</font><br>
+<br>
+<font color="#008b8b">dl</font><font color="#6a5acd">(</font><font color="#ff00ff">&quot;sql_relay.so&quot;</font><font color="#6a5acd">)</font>;<br>
+<br>
+<font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font><font color="#ff00ff">&quot;examplehost&quot;</font>,<font color="#ff00ff">9000</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;<br>
+<font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font><font color="#a52a2a"><b>=</b></font>sqlrcur_alloc<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#6a5acd">)</font>;<br>
+<br>
+sqlrcur_sendQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,<font color="#ff00ff">&quot;select * from exampletable&quot;</font><font color="#6a5acd">)</font>;<br>
+<font color="#a52a2a"><b>for</b></font>&nbsp;<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">row</font><font color="#a52a2a"><b>=</b></font><font color="#ff00ff">0</font>;&nbsp;<font color="#a52a2a"><b>$</b></font><font color="#008b8b">row</font><font color="#a52a2a"><b>&lt;</b></font>sqlrcur_rowCount<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font><font color="#6a5acd">)</font>;&nbsp;<font color="#a52a2a"><b>$</b></font><font color="#008b8b">row</font><font color="#a52a2a"><b>++</b></font><font color="#6a5acd">)</font>&nbsp;<font color="#6a5acd">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">col</font><font color="#a52a2a"><b>=</b></font><font color="#ff00ff">0</font>;&nbsp;<font color="#a52a2a"><b>$</b></font><font color="#008b8b">col</font><font color="#a52a2a"><b>&lt;</b></font>sqlrcur_colCount<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font><font color="#6a5acd">)</font>;&nbsp;<font color="#a52a2a"><b>$</b></font><font color="#008b8b">col</font><font color="#a52a2a"><b>++</b></font><font color="#6a5acd">)</font>&nbsp;<font color="#6a5acd">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#800080">echo</font><font color="#6a5acd">(</font>sqlrcur_getField<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,<font color="#a52a2a"><b>$</b></font><font color="#008b8b">row</font>,<font color="#a52a2a"><b>$</b></font><font color="#008b8b">col</font><font color="#6a5acd">)</font><font color="#a52a2a"><b>.</b></font><font color="#ff00ff">&quot;,&quot;</font><font color="#6a5acd">)</font>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#6a5acd">}</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#800080">echo</font><font color="#6a5acd">(</font><font color="#ff00ff">&quot;&lt;br&gt;</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font><font color="#6a5acd">)</font>;<br>
+<font color="#6a5acd">}</font><br>
+<br>
+<font color="#6a5acd">?&gt;</font><br>
+<font color="#008b8b">&lt;/</font><font color="#a52a2a"><b>body</b></font><font color="#008b8b">&gt;</font><br>
+<font color="#008b8b">&lt;/</font><font color="#a52a2a"><b>html</b></font><font color="#008b8b">&gt;</font><br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -106,6 +290,27 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Ruby</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#800080">#! /usr/bin/env ruby</font><br>
+<br>
+<font color="#800080">require</font>&nbsp;<font color="#6a5acd">'</font><font color="#ff00ff">sqlrelay</font><font color="#6a5acd">'</font><br>
+<br>
+sqlrcon=<font color="#2e8b57"><b>SQLRConnection</b></font>.new(<font color="#6a5acd">&quot;</font><font color="#ff00ff">examplehost</font><font color="#6a5acd">&quot;</font>,<font color="#ff00ff">9000</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#6a5acd">&quot;</font><font color="#ff00ff">/tmp/example.socket</font><font color="#6a5acd">&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#6a5acd">&quot;</font><font color="#ff00ff">exampleuser</font><font color="#6a5acd">&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#6a5acd">&quot;</font><font color="#ff00ff">examplepassword</font><font color="#6a5acd">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>)<br>
+sqlrcur=<font color="#2e8b57"><b>SQLRCursor</b></font>.new(sqlrcon)<br>
+<br>
+sqlrcur.sendQuery(<font color="#6a5acd">&quot;</font><font color="#ff00ff">select * from exampletable</font><font color="#6a5acd">&quot;</font>)<br>
+<font color="#a52a2a"><b>for</b></font>&nbsp;row&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#ff00ff">0</font>..sqlrcur.rowCount()-<font color="#ff00ff">1</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;col&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;<font color="#ff00ff">0</font>..sqlrcur.colCount()-<font color="#ff00ff">1</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print sqlrcur.getField(row,col),<font color="#6a5acd">&quot;</font><font color="#ff00ff">,</font><font color="#6a5acd">&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>end</b></font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;<font color="#6a5acd">&quot;</font><font color="#6a5acd">\n</font><font color="#6a5acd">&quot;</font><br>
+<font color="#a52a2a"><b>end</b></font><br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -117,6 +322,30 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">TCL</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#0000ff">#!/usr/bin/tclsh</font><br>
+<br>
+<font color="#a52a2a"><b>load</b></font>&nbsp;/usr/lib/sqlrelay/sqlrelay.so sqlrelay<br>
+<br>
+<font color="#a52a2a"><b>set</b></font>&nbsp;con [sqlrcon -server&nbsp;<font color="#ff00ff">&quot;examplehost&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-port&nbsp;<font color="#ff00ff">9000</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-<font color="#a52a2a"><b>socket</b></font>&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-user&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-password&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-retrytime&nbsp;<font color="#ff00ff">0</font>&nbsp;-tries&nbsp;<font color="#ff00ff">1</font>]<br>
+<font color="#a52a2a"><b>set</b></font>&nbsp;cur [<font color="#008b8b">$con</font>&nbsp;sqlrcur]<br>
+<br>
+<font color="#008b8b">$cur</font>&nbsp;sendQuery&nbsp;<font color="#ff00ff">&quot;select * from exampletable&quot;</font><br>
+<font color="#a52a2a"><b>for</b></font>&nbsp;{<font color="#a52a2a"><b>set</b></font>&nbsp;row&nbsp;<font color="#ff00ff">0</font>} {<font color="#008b8b">$row</font>&lt;[<font color="#008b8b">$cur</font>&nbsp;rowCount]} {<font color="#a52a2a"><b>incr</b></font>&nbsp;row} {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;{<font color="#a52a2a"><b>set</b></font>&nbsp;col&nbsp;<font color="#ff00ff">0</font>} {<font color="#008b8b">$col</font>&lt;[<font color="#008b8b">$cur</font>&nbsp;colCount]} {<font color="#a52a2a"><b>incr</b></font>&nbsp;col} {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>puts</b></font>&nbsp;-nonewline [<font color="#008b8b">$cur</font>&nbsp;getFieldByIndex&nbsp;<font color="#008b8b">$row</font>&nbsp;<font color="#008b8b">$col</font>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>puts</b></font>&nbsp;-nonewline&nbsp;<font color="#ff00ff">&quot;,&quot;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>puts</b></font>&nbsp;<font color="#ff00ff">&quot;&quot;</font><br>
+}<br>
+</font>
 </p></p>
 
 <p></div></p>
@@ -124,6 +353,26 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">node.js</span>
 <p class="code" style="height: 300px;">
+
+
+<font face="monospace">
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrelay=require(<font color="#ff00ff">&quot;sqlrelay&quot;</font>);<br>
+<br>
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrcon=<font color="#a52a2a"><b>new</b></font>&nbsp;sqlrelay.SQLRConnection(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplehost&quot;</font>,9000,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;exampleuser&quot;</font>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">&quot;examplepassword&quot;</font>,0,1);<br>
+<font color="#008b8b">var</font>&nbsp;&nbsp;&nbsp;&nbsp; sqlrcur=<font color="#a52a2a"><b>new</b></font>&nbsp;sqlrelay.SQLRCursor(sqlrcon);<br>
+<br>
+sqlrcur.sendQuery(<font color="#ff00ff">&quot;select * from exampletable&quot;</font>);<br>
+<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">var</font>&nbsp;row=0; row&lt;sqlrcur.rowCount(); row++)&nbsp;<font color="#008b8b">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>for</b></font>&nbsp;(<font color="#008b8b">var</font>&nbsp;col=0; col&lt;sqlrcur.colCount(); col++)&nbsp;<font color="#008b8b">{</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process.stdout.write(sqlrcur.getField(row,col)+<font color="#ff00ff">&quot;,&quot;</font>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">}</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process.stdout.write(<font color="#ff00ff">&quot;</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>);<br>
+<font color="#008b8b">}</font><br>
+</font>
 </p></p>
 
 <p></div></p>
