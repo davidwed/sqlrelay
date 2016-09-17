@@ -126,6 +126,7 @@ SQL Relay can be extended via modules.  Use existing modules or develop your own
  [modules/filters.html Query Filter Modules][[br]]
  [modules/resultsettranslations.html Result Set Translation Modules][[br]]
  [modules/loggers.html Logger Modules][[br]]
+ [modules/notifications.html Notification Modules][[br]]
 
 ----
 

@@ -1,0 +1,79 @@
+<html>
+<head>
+	<title>Notification Modules</title>
+	<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<h1>Notification Modules</h1>
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#available">Available Modules</a></li>
+  <li><a href="#custom">Custom Modules</a></li>
+</ul>
+
+<hr/>
+
+<a name="introduction"/><h2>Introduction</h2>
+
+<p>Notification modules allow the SQL Relay server programs to notify recipients when a specified set of events occur.  A section of the sqlrelay.conf file indicates which modules to load and what parameters to use.</p>
+
+<p>For example, to use the <i>events</i> module, you would include a section in the sqlrelay.conf file like:</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;...&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notifications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notification</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;events&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">events</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;db_login&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;db_logout&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;filter_violation&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/events&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipients</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipient</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>address</b></font>=<font color="#ff00ff">&quot;david.muse@firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/recipients&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notification&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notifications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/intstance&gt;</font><br>
+</font>
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.  The child tags and attributes indicate which events to listen for and which recipients to send notifications to.</p>
+
+<p>Different modules may have different parameters.</p>
+
+<p>Currently, all notification modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
+
+<p>Multiple notification modules may be loaded by specifying multiple notification tags.</p>
+
+<p>Internally, at startup the SQL Relay server processes create instances of the specified notification modules and initialize them.  Then, as they run, the call the notification modules' "run" method, passing in an event type, and information about the event.  The modules then react to the different events, in a module-specific manner.</p>
+
+<p><br><a name="available"></a>
+<span class="heading2">Available Modules</span><br></p>
+
+<p>Currently, the following standard notification modules are available:</p>
+
+<p><b>
+<ul>
+<li>events</li>
+</ul>
+</b></p>
+
+<p><span class="heading3">events</span><br></p>
+
+<p>The <b>events</b> module ...</p>
+
+<a name="custom"/><h2>Custom Modules</h2>
+
+<p>Custom modules that log very specific information in very specific formats are also available in the general SQL Relay distribution but they are not intended for general use.</p>
+
+<p>Custom modules may also be developed...
+</p>
+
+</body>
+</html>

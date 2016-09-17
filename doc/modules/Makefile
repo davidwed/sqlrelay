@@ -7,6 +7,7 @@ include ../../config.mk
 SRCS = auths.wt \
 	filters.wt \
 	loggers.wt \
+	notifications.wt \
 	pwdencs.wt \
 	resultsettranslations.wt \
 	translations.wt
@@ -14,6 +15,7 @@ SRCS = auths.wt \
 OBJS = auths.html.in \
 	filters.html.in \
 	loggers.html.in \
+	notifications.html.in \
 	pwdencs.html.in \
 	resultsettranslations.html.in \
 	translations.html.in

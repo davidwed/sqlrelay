@@ -1,0 +1,50 @@
+= Notification Modules =
+
+* [#introduction Introduction]
+* [#available Available Modules]
+* [#custom Custom Modules]
+
+----
+
+[=#introduction]
+== Introduction ==
+
+Notification modules allow the SQL Relay server programs to notify recipients when a specified set of events occur.  A section of the sqlrelay.conf file indicates which modules to load and what parameters to use.
+
+For example, to use the //events// module, you would include a section in the sqlrelay.conf file like:
+
+{{{#!blockquote
+@sqlrelay-notifications-events.conf.html@
+}}}
+
+The //module// attribute specifies which module to load.  The child tags and attributes indicate which events to listen for and which recipients to send notifications to.
+
+Different modules may have different parameters.
+
+Currently, all notification modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+Multiple notification modules may be loaded by specifying multiple notification tags.
+
+Internally, at startup the SQL Relay server processes create instances of the specified notification modules and initialize them.  Then, as they run, the call the notification modules' "run" method, passing in an event type, and information about the event.  The modules then react to the different events, in a module-specific manner.
+
+<br><a name="available"></a>
+<span class="heading2">Available Modules</span><br>
+
+Currently, the following standard notification modules are available:
+
+'''
+<ul>
+<li>events</li>
+</ul>
+'''
+
+<span class="heading3">events</span><br>
+
+The '''events''' module ...
+
+[=#custom]
+== Custom Modules ==
+
+Custom modules that log very specific information in very specific formats are also available in the general SQL Relay distribution but they are not intended for general use.
+
+Custom modules may also be developed...
