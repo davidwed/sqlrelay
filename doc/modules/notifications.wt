@@ -9,36 +9,36 @@
 [=#introduction]
 == Introduction ==
 
-Notification modules allow the SQL Relay server programs to notify recipients when a specified set of events occur.  A section of the sqlrelay.conf file indicates which modules to load and what parameters to use.
+Notification modules allow the SQL Relay server programs to notify recipients when a specified set of events occur. 
 
-For example, to use the //events// module, you would include a section in the sqlrelay.conf file like:
+The //notifications// section of the sqlrelay.conf file indicates which notification modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
 @sqlrelay-notifications-events.conf.html@
 }}}
 
-The //module// attribute specifies which module to load.  The child tags and attributes indicate which events to listen for and which recipients to send notifications to.
+The //module// attribute specifies which module to load.
 
-Different modules may have different parameters.
+Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.
 
 Currently, all notification modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
-Multiple notification modules may be loaded by specifying multiple notification tags.
+Notification modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
-Internally, at startup the SQL Relay server processes create instances of the specified notification modules and initialize them.  Then, as they run, the call the notification modules' "run" method, passing in an event type, and information about the event.  The modules then react to the different events, in a module-specific manner.
+{{{#!blockquote
+@sqlrelay-notifications-stacked.conf.html@
+}}}
 
-<br><a name="available"></a>
-<span class="heading2">Available Modules</span><br>
+Internally, at startup the SQL Relay server processes create instances of the specified notification modules and initialize them.
+
+[=#available]
+== Available Modules ==
 
 Currently, the following standard notification modules are available:
 
-'''
-<ul>
-<li>events</li>
-</ul>
-'''
+* '''events'''
 
-<span class="heading3">events</span><br>
+=== events ===
 
 The '''events''' module listens for a specified set of events and notifies recipients when a one occurs.
 

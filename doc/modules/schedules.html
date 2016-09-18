@@ -16,7 +16,7 @@
 
 <a name="introduction""/><h2>Introduction</h2>
 
-<p>Connection schedule modules allow the SQL Relay server ...</p>
+<p>Connection schedule modules allow the SQL Relay server to control when users are allowed to access the database.</p>
 
 <p>The <i>schedules</i> section of the sqlrelay.conf file indicates which schedules modules to load and what parameters to use when executing them.</p>
 
@@ -52,77 +52,7 @@
 
 <p>You can create your own custom query connection schedule modules too.</p>
 
-<p>SQL Relay provides a base class for connection schedule modules, called sqlrschedule, defined in the header file: sqlrserver.h</p>
-
-<blockquote>
-@sqlrschedule.h.html@
-</blockquote>
-<p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
-
-<p>The default implementaion of the constructor just sets the member variables <i>sqlrfs</i>, <i>parameters</i> and <i>debug</i> to the corresponding passed-in values.  <i>sqlrfs</i> is a pointer to an instance of the sqlrschedules class, which provides various helper methods.  <i>parameters</i> is a representation of the XML tag in the sqlrelay.conf file that loaded the module.  <i>debug</i> is just a flag, indicating whether debug is requested or not.  The module should consult this flat and print out some debug if it is true.</p>
-
-<p>By default, the destructor does nothing.</p>
-
-<p>run() does nothing by default and returns true, indicating that no error occurred.</p>
-
-<p>A custom module module must contain a class that inherits from sqlrschedule, implements the necessary methods, and implements a function to return an instance of the class.</p>
-
-<p>Lets say we want to create a custom schedule module that ...</p>
-
-<p>We can create the file ...</p>
-
-<blockquote>
-@sqlrschedule-....cpp.html@
-</blockquote>
-<p>Here, the ... class inherits from sqlrschedule.  The constructor just calls the parent constructor.  The run() method ...</p>
-
-<p>Note the "new_sqlrschedule_...()" function which just allocates an instance of .... and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrschedule_modulename" and take sqlrschedules *, xmldomnode * and bool.  It is also essential that it be wrapped with an <i>extern "C"</i> clause to prevent it from being name-mangled by the compiler.</p>
-
-<p>To build the module on a Linux or Unix system, run a command like:</p>
-
-<blockquote>
-  <pre>gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrschedule_....so ....cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</pre>
-
-</blockquote>
-<p>This will create the file sqlrschedule_....so</p>
-
-<p>On Mac OSX, run a command like:</p>
-
-<blockquote>
-  <pre>gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrschedule_....bundle ....cpp `sqlrserver-config --libs` `rudiments-config --libs`
-</pre>
-
-</blockquote>
-<p>This will create the sqlrschedule_....bundle</p>
-
-<p>On Windows, run commands like:</p>
-
-<blockquote>
-  <pre>cl /I"C:\Program Files\Firstworks\include" /c ....cpp
-link -out:sqlrschedule_....dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
-</pre>
-
-</blockquote>
-<p>This will create the sqlrschedule_....dll</p>
-
-<p>It is essential that the file be named: sqlrschedule_modulename.extension</p>
-
-<p>To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay</p>
-
-<p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "schedules" section:</p>
-
-<blockquote>
-@sqlrelay-schedules-....conf.html@
-</blockquote>
-<p>The server will see the module="..." attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrschedule_....extension, load it and and run the new_sqlrschedule_...() method to get an instance of the ... class and then run the various methods of that class.</p>
-
-<p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
-
-<blockquote>
-@sqlrschedule-param.cpp.html@
-</blockquote>
-<p>Refer to the Rudiments documentation for more info on the <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.
+<p>...
 </p>
 
 </body>
