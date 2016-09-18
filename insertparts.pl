@@ -11,11 +11,14 @@ foreach $guideline(<$guide>) {
 		my $partfilename=$guideline;
 		$partfilename=~s/@//g;
 		my $partfile=new FileHandle;
-		$partfile->open("parts/$partfilename");
-		foreach $partfileline(<$partfile>) {
-			print $partfileline;
+		if ($partfile->open("parts/$partfilename")) {
+			foreach $partfileline(<$partfile>) {
+				print $partfileline;
+			}
+			$partfile->close();
+		} else {
+			print $guideline;
 		}
-		$partfile->close();
 	} else {
 		print $guideline;
 	}

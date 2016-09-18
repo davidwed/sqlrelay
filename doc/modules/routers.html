@@ -21,6 +21,7 @@
 <p>The <i>routers</i> section of the sqlrelay.conf file indicates which router modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
+@sqlrelay-router-....conf.html@
 </blockquote>
 <p>The <i>module</i> attribute specifies which module to load.</p>
 
@@ -31,6 +32,7 @@
 <p>Router modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
+@sqlrelay-routers-stacked.conf.html@
 </blockquote>
 <p>At startup, the SQL Relay server creates instances of the specified router modules and initializes them...</p>
 
@@ -63,6 +65,7 @@
 <p>SQL Relay provides a base class for connection router modules, called sqlrrouter, defined in the header file: sqlrserver.h</p>
 
 <blockquote>
+@sqlrrouter.h.html@
 </blockquote>
 <p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
 
@@ -79,6 +82,7 @@
 <p>We can create the file ...</p>
 
 <blockquote>
+@sqlrrouter-....cpp.html@
 </blockquote>
 <p>Here, the ... class inherits from sqlrrouter.  The constructor just calls the parent constructor.  The run() method ...</p>
 
@@ -119,12 +123,14 @@ link -out:sqlrrouter_....dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrs
 <p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "routers" section:</p>
 
 <blockquote>
+@sqlrelay-routers-....conf.html@
 </blockquote>
 <p>The server will see the module="..." attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrrouter_....extension, load it and and run the new_sqlrrouter_...() method to get an instance of the ... class and then run the various methods of that class.</p>
 
 <p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
 
 <blockquote>
+@sqlrrouter-param.cpp.html@
 </blockquote>
 <p>Refer to the Rudiments documentation for more info on the <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.
 </p>

@@ -66,7 +66,129 @@
 
 <p><span class="heading3">events</span><br></p>
 
-<p>The <b>events</b> module ...</p>
+<p>The <b>events</b> module listens for a specified set of events and notifies recipients when a one occurs.</p>
+
+<p>An example configuration follows.</p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;...&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notifications</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notification</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;events&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">events</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;db_login&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;db_logout&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;filter_violation&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/events&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipients</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipient</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>address</b></font>=<font color="#ff00ff">&quot;david.muse@firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/recipients&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notification&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notifications&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/intstance&gt;</font><br>
+</font>
+</blockquote>
+<p>In this example, the module sends notifications to <b>david.muse@firstworks.com</b> when one of the <b>db_login</b>, <b>db_logout</b>, or <b>filter_violation</b> events occurs.</p>
+
+<p>The <b>events</b> tag defines the set of events to listen for.  Valid events are:</p>
+
+<ul>
+  <li><b>CLIENT_CONNECTED</b> - An SQL Relay client connected to the SQL Relay server.</li>
+  <li><b>CLIENT_CONNECTION_REFUSED</b> - An SQL Relay client attempted to connect to the SQL Relay server but the server refused the connection, usually because authentication failed.</li>
+  <li><b>CLIENT_DISCONNECTED</b> - An SQL Relay client disconnected from the SQL Relay server.</li>
+  <li><b>CLIENT_PROTOCOL_ERROR</b> - The SQL Relay server didn't understand something that the SQL Relay client sent to it.</li>
+  <li><b>DB_LOGIN</b> - The SQL Relay server opened a connection to the database.</li>
+  <li><b>DB_LOGOUT</b> - The SQL Relay server closed a connection to the database.</li>
+  <li><b>DB_ERROR</b> - A query generated an error.</li>
+  <li><b>DB_WARNING</b> - A query generated a warning.</li>
+  <li><b>QUERY</b> - A query was executed.</li>
+  <li><b>FILTER_VIOLATION</b> - A <a href="filters.html">filter module</a> prevented a query from being executed.</li>
+  <li><b>INTERNAL_ERROR</b> - An internal error occurred.</li>
+  <li><b>INTERNAL_WARNING</b> - An internal warning occurred.</li>
+  <li><b>DEBUG_MESSAGE</b> - A debug message was generated.</li>
+  <li><b>SCHEDULE_VIOLATION</b> - A <a href="schedules.html">schedule module</a> prevented a user from logging in to the SQL Relay server.</li>
+  <li><b>INTEGRITY_VIOLATION</b> - A <a href="routers.html">router module</a> is in use and a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeded on some of the backends but failed on others.</li>
+</ul>
+
+<p>Any number of events may be specified.  Each event must be specified in its own <b>event</b> tag.  The event tag supports the following attributes:</p>
+
+<ul>
+  <li><b>event</b> - Required.  The event to listen for.</li>
+</ul>
+
+<p>Any number of recipients may also be specified.  Each recipient must be specified in its own <b>recipient</b> tag.  The recipient tag supports the following attributes:</p>
+
+<ul>
+  <li><b>address</b> - Required.  The address to send the notification message to.</li>
+  <li><b>subject</b> - Optional.  The subject of the notification message.</li>
+  <li><b>template</b> - Optional.  The filename of the template to use for the notification message.</li>
+</ul>
+
+<p>Currently, notifications may only be sent via email.</p>
+
+<p>If the <b>subject</b> attribute is not provided, then SQL Relay uses a default subject of:</p>
+
+<blockquote>
+SQL Relay Notification: @event@
+</blockquote>
+<p>Where @event@ is replaced with the event that triggered the notification.</p>
+
+<p>If the <b>template</b> attribute is not provided, then SQL Relay uses a default template of:</p>
+
+<blockquote>
+  <pre>SQL Relay Notification:
+
+Event          : @event@
+Event Info     : @eventinfo@
+Date           : @datetime@
+Host Name      : @hostname@
+Instance       : @instance@
+Process Id     : @pid@
+Client Address : @clientaddr@
+Client Info    : @clientinfo@
+User           : @user@
+Query          :
+@query@
+</pre>
+
+</blockquote>
+<p>In both subject lines and template files, the following substitutions can be made:</p>
+
+<ul>
+  <li><b>@event@</b> - The event that triggered the notification.</li>
+  <li><b>@eventinfo@</b> - The text (if any) that accompanied the event.</li>
+  <li><b>@datetime@</b> - The date/time that the event occurred.</li>
+  <li><b>@hostname@</b> - The host name of the server hosting the SQL Relay instance that generated the event.</li>
+  <li><b>@instance@</b> - The instance name of the SQL Relay instance that generated the event.</li>
+  <li><b>@pid@</b> - The process id of the SQL Relay instance that generated the event.</li>
+  <li><b>@clientaddr@</b> - The client address (if any) of the SQL Relay client that was connected when the event occurred.</li>
+  <li><b>@clientinfo@</b> - The client info (if any) of the SQL Relay client that was connected when the event occurred.</li>
+  <li><b>@user@</b> - The SQL Relay user (if any) that was logged in to the SQL Relay instance that generated the event.</li>
+  <li><b>@query@</b> - The query (if any) that was running when the event occurred.</li>
+</ul>
+
+<p>On linux/unix systems, the <i>mail</i> program is used to send notifications.  Messages are sent using the following command:</p>
+
+<blockquote>
+mail -s <i>subject</i> <i>address</i> < <i>message</i>
+</blockquote>
+<p>Where <i>subject</i> is replaced with the subject, <i>address</i> is replaced with the recipient and <i>messagee</i> is replaced with the name of the temporary file that is used to store the message.</p>
+
+<p>SQL Relay assumes that the <i>mail</i> program is installed, in the PATH of the user that SQL Relay runs as, and that mail delivery is configured on the host system.</p>
+
+<p>On Windows systems the <i>blat</i> program is used to send notifications.  Messages are sent using the following command:</p>
+
+<blockquote>
+blat <i>message</i> -to <i>address</i> -subject <i>subject</i> -q
+</blockquote>
+<p>Where <i>subject</i> is replaced with the subject, <i>address</i> is replaced with the recipient and <i>message</i> is replaced with the name of the temporary file that is used to store the message.</p>
+
+<p>SQL Relay assumes that the <i>blat</i> program is installed, in the PATH of the user that SQL Relay runs as, and that blat has been configured.  See <a target="_blank" href="http://www.blat.net">http://www.blat.net</a> to download and configure blat.</p>
 
 <a name="custom"/><h2>Custom Modules</h2>
 

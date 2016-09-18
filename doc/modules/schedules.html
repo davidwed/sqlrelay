@@ -21,6 +21,7 @@
 <p>The <i>schedules</i> section of the sqlrelay.conf file indicates which schedules modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
+@sqlrelay-schedules-cron.conf.html@
 </blockquote>
 <p>The <i>module</i> attribute specifies which module to load.</p>
 
@@ -31,6 +32,7 @@
 <p>Connection schedule modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
+@sqlrelay-schedules-stacked.conf.html@
 </blockquote>
 <p>At startup, the SQL Relay server creates instances of the specified schedule modules and initializes them...</p>
 
@@ -53,6 +55,7 @@
 <p>SQL Relay provides a base class for connection schedule modules, called sqlrschedule, defined in the header file: sqlrserver.h</p>
 
 <blockquote>
+@sqlrschedule.h.html@
 </blockquote>
 <p>On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.</p>
 
@@ -69,6 +72,7 @@
 <p>We can create the file ...</p>
 
 <blockquote>
+@sqlrschedule-....cpp.html@
 </blockquote>
 <p>Here, the ... class inherits from sqlrschedule.  The constructor just calls the parent constructor.  The run() method ...</p>
 
@@ -109,12 +113,14 @@ link -out:sqlrschedule_....dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsql
 <p>To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "schedules" section:</p>
 
 <blockquote>
+@sqlrelay-schedules-....conf.html@
 </blockquote>
 <p>The server will see the module="..." attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrschedule_....extension, load it and and run the new_sqlrschedule_...() method to get an instance of the ... class and then run the various methods of that class.</p>
 
 <p>This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:</p>
 
 <blockquote>
+@sqlrschedule-param.cpp.html@
 </blockquote>
 <p>Refer to the Rudiments documentation for more info on the <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html">xmldomnode class</a>.
 </p>

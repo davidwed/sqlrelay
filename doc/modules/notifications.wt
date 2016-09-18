@@ -40,7 +40,106 @@ Currently, the following standard notification modules are available:
 
 <span class="heading3">events</span><br>
 
-The '''events''' module ...
+The '''events''' module listens for a specified set of events and notifies recipients when a one occurs.
+
+An example configuration follows.
+
+{{{#!blockquote
+@sqlrelay-notifications-events.conf.html@
+}}}
+
+In this example, the module sends notifications to '''david.muse@firstworks.com''' when one of the '''db_login''', '''db_logout''', or '''filter_violation''' events occurs.
+
+The '''events''' tag defines the set of events to listen for.  Valid events are:
+
+* '''CLIENT_CONNECTED''' - An SQL Relay client connected to the SQL Relay server.
+* '''CLIENT_CONNECTION_REFUSED''' - An SQL Relay client attempted to connect to the SQL Relay server but the server refused the connection, usually because authentication failed.
+* '''CLIENT_DISCONNECTED''' - An SQL Relay client disconnected from the SQL Relay server.
+* '''CLIENT_PROTOCOL_ERROR''' - The SQL Relay server didn't understand something that the SQL Relay client sent to it.
+* '''DB_LOGIN''' - The SQL Relay server opened a connection to the database.
+* '''DB_LOGOUT''' - The SQL Relay server closed a connection to the database.
+* '''DB_ERROR''' - A query generated an error.
+* '''DB_WARNING''' - A query generated a warning.
+* '''QUERY''' - A query was executed.
+* '''FILTER_VIOLATION''' - A [filters.html filter module] prevented a query from being executed.
+* '''INTERNAL_ERROR''' - An internal error occurred.
+* '''INTERNAL_WARNING''' - An internal warning occurred.
+* '''DEBUG_MESSAGE''' - A debug message was generated.
+* '''SCHEDULE_VIOLATION''' - A [schedules.html schedule module] prevented a user from logging in to the SQL Relay server.
+* '''INTEGRITY_VIOLATION''' - A [routers.html router module] is in use and a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeded on some of the backends but failed on others.
+
+Any number of events may be specified.  Each event must be specified in its own '''event''' tag.  The event tag supports the following attributes:
+
+* '''event''' - Required.  The event to listen for.
+
+Any number of recipients may also be specified.  Each recipient must be specified in its own '''recipient''' tag.  The recipient tag supports the following attributes:
+
+* '''address''' - Required.  The address to send the notification message to.
+* '''subject''' - Optional.  The subject of the notification message.
+* '''template''' - Optional.  The filename of the template to use for the notification message.
+
+Currently, notifications may only be sent via email.
+
+If the '''subject''' attribute is not provided, then SQL Relay uses a default subject of:
+
+{{{#!blockquote
+SQL Relay Notification: @event@
+}}}
+
+Where @event@ is replaced with the event that triggered the notification.
+
+If the '''template''' attribute is not provided, then SQL Relay uses a default template of:
+
+{{{#!blockquote
+{{{
+SQL Relay Notification:
+
+Event          : @event@
+Event Info     : @eventinfo@
+Date           : @datetime@
+Host Name      : @hostname@
+Instance       : @instance@
+Process Id     : @pid@
+Client Address : @clientaddr@
+Client Info    : @clientinfo@
+User           : @user@
+Query          :
+@query@
+}}}
+}}}
+
+In both subject lines and template files, the following substitutions can be made:
+
+* '''@event@''' - The event that triggered the notification.
+* '''@eventinfo@''' - The text (if any) that accompanied the event.
+* '''@datetime@''' - The date/time that the event occurred.
+* '''@hostname@''' - The host name of the server hosting the SQL Relay instance that generated the event.
+* '''@instance@''' - The instance name of the SQL Relay instance that generated the event.
+* '''@pid@''' - The process id of the SQL Relay instance that generated the event.
+* '''@clientaddr@''' - The client address (if any) of the SQL Relay client that was connected when the event occurred.
+* '''@clientinfo@''' - The client info (if any) of the SQL Relay client that was connected when the event occurred.
+* '''@user@''' - The SQL Relay user (if any) that was logged in to the SQL Relay instance that generated the event.
+* '''@query@''' - The query (if any) that was running when the event occurred.
+
+On linux/unix systems, the //mail// program is used to send notifications.  Messages are sent using the following command:
+
+{{{#!blockquote
+mail -s //subject// //address// < //message//
+}}}
+
+Where //subject// is replaced with the subject, //address// is replaced with the recipient and //messagee// is replaced with the name of the temporary file that is used to store the message.
+
+SQL Relay assumes that the //mail// program is installed, in the PATH of the user that SQL Relay runs as, and that mail delivery is configured on the host system.
+
+On Windows systems the //blat// program is used to send notifications.  Messages are sent using the following command:
+
+{{{#!blockquote
+blat //message// -to //address// -subject //subject// -q
+}}}
+
+Where //subject// is replaced with the subject, //address// is replaced with the recipient and //message// is replaced with the name of the temporary file that is used to store the message.
+
+SQL Relay assumes that the //blat// program is installed, in the PATH of the user that SQL Relay runs as, and that blat has been configured.  See [http://www.blat.net] to download and configure blat.
 
 [=#custom]
 == Custom Modules ==
