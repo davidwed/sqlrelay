@@ -327,9 +327,11 @@ When an '''SQL Relay''' client needs to talk to the database, it connects to a l
 
 SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to a configuration file and each module has its own tags and attributes.  The following types of modules are currently supported:
 
-* [../modules/pwdencs.html Password Encryption]
-* [../modules/auths.html Authentication]
-* [../modules/translations.html Query Translation]
-* [../modules/filters.html Query Filter]
-* [../modules/resultsettranslations.html Result Set Translations]
-* [../modules/loggers.html Logger]
+* [../modules/auths.html Auth Modules]
+* [../modules/pwdencs.html Password Encryption Modules]
+* [../modules/translations.html Query Translation Modules]
+* [../modules/filters.html Query Filter Modules]
+* [../modules/resultsettranslations.html Result Set Translation Modules]
+* [../modules/schedules.html Connection Schedule Modules]
+* [../modules/loggers.html Logger Modules]
+* [../modules/notifications.html Notification Modules]

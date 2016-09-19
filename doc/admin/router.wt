@@ -23,15 +23,11 @@ For instance, you can set up one instance of SQL Relay to maintain connections t
 
 == General Configuration ==
 
-Each instance of SQL Relay that will be used as a query router must omit the '''connection''' tag and include a single '''router''' tag.  The '''router''' tag must contain a set of '''route''' tags.  Each '''route''' tag defines an instance of SQL Relay to route queries to and contains a set of '''query''' tags defining which queries to route to it.
+Each instance of SQL Relay that will be used as a query router must define dbase="route" in the instance tag and include a single '''routers''' tag, which must contain a set of '''router''' tags.  Each '''router''' tag defines a router module to use and a connectionid to route queries to.  It must also contain a set of tags defining rules for identifying which queries to route to the specified connectionid.
 
-When deciding where to route a query, SQL Relay runs through the '''query''' tags, in the order that they appear in the configuration file, and compares the query to the regular expression defined in the tag.  If the query matches a regular expression defined in a '''query''' tag inside of a '''route''' tag, it will be routed to the instance of SQL Relay defined in the '''route''' tag.
+When deciding where to route a query, SQL Relay runs through the '''router''' tags in the order that they appear in the configuration file, and uses the specified module to identify where to route the query.  For example, if a '''router''' tag specifies the //regex// module, and a query matches a regular expression defined in a '''pattern''' tag, then the query will be routed to the connectionid defined in the '''router''' tag.
 
-See the examples below.  Note that the regular expressions in the
-examples below aren't perfect.  They are not case insensitive, for example, nor
-do they necessarily cover all possible cases.  In some cases, better, or more
-regular expressions could be written.  In other cases, developers may need to
-structure their queries so that they are guaranteed to match.
+See the examples below.  Note that the regular expressions in the examples below aren't perfect.  They are not case insensitive, for example, nor do they necessarily cover all possible cases.  In some cases, better, or more regular expressions could be written.  In other cases, developers may need to structure their queries so that they are guaranteed to match.
 
 == Sending Inserts, Updates and Deletes to a Master Database and Distributing Selects Over a Set of Slaves ==
 
@@ -64,6 +60,8 @@ all queries containing "postgresqldb." to the !PostgreSQL database.
 {{{#!blockquote
 @sqlrelay-router-multipledb.conf.html@
 }}}
+
+The examples above all use the //regex// router module to route queries based on regular expression pattern matching.  Router modules are available to route queries based on other things too though, such as the user that ran the query, or the IP address of the client.  See [../modules/routers.html Router Modules] for more information about router modules.
 
 == Quirks and Limitations ==
 

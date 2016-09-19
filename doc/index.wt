@@ -119,13 +119,14 @@ If you're developing or deploying SQL Relay client software in a Windows environ
 
 ==== SQL Relay Extension Modules ====
 
-SQL Relay can be extended via modules.  Use existing modules or develop your own.
+SQL Relay can be extended via modules.  Many standard modules are available and custom modules can be developed.
 
- [modules/pwdencs.html Password Encryption Modules][[br]]
  [modules/auths.html Auth Modules][[br]]
+ [modules/pwdencs.html Password Encryption Modules][[br]]
  [modules/translations.html Query Translation Modules][[br]]
  [modules/filters.html Query Filter Modules][[br]]
  [modules/resultsettranslations.html Result Set Translation Modules][[br]]
+ [modules/schedules.html Connection Schedule Modules][[br]]
  [modules/loggers.html Logger Modules][[br]]
  [modules/notifications.html Notification Modules][[br]]
 

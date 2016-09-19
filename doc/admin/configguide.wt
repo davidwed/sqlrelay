@@ -555,9 +555,9 @@ This actually requires 3 instances of SQL Relay.  One to connect to the master, 
 @sqlrelay-router.conf.html@
 }}}
 
-The first two instances use familiar configuration options, but the third uses a dbtype of "router" and rather than defining connections, uses router, route and query tags to define query routing rules.
+The first two instances use familiar configuration options, but the third uses a dbtype of "router" and uses instances of the router module to define query routing rules.
 
-The router tag defines a set of routes.  The attributes of each route tag specify an instance of SQL Relay to connect to.  The pattern attribute of each query tag defines a regular expression used to match queries.  Queries that match the set of patterns defined in the route tag are sent to the instance of SQL Relay designated in the route tag.
+Each router tag defines a connectionid to send the query to and a set of regular expression patterns to match.  Queries that match the set of patterns defined in the pattern tags are sent to the instance of SQL Relay designated by the connectionid in the router tag.
 
 The three instances can be started using:
 
@@ -577,7 +577,9 @@ sqlrsh -host sqlrserver -user routeruser -password routerpassword
 }}}
 }}}
 
-See the [router.html Query Routing] for more information on query routing.
+This example routes queries based on regular expression pattern matching.  Router modules are available to route queries based on other things too though, such as the user that ran the query, or the IP address of the client.  See [../modules/routers.html Router Modules] for more information about router modules.
+
+See [router.html Query Routing] for more information on query routing in general.
 
 
 [[br]][=#frontend]

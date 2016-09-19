@@ -64,9 +64,12 @@ bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 			!u->isNullNode();
 			u=u->getNextTagSibling("user")) {
 
-		debugPrintf("	%s=%s - ",user,u->getAttributeValue("user"));
+		const char	*userattr=u->getAttributeValue("user");
 
-		if (!charstring::compare(user,u->getAttributeValue("user"))) {
+		debugPrintf("	%s=%s - ",user,userattr);
+
+		if (!charstring::compare(user,userattr) ||
+			!charstring::compare(userattr,"*")) {
 			found=true;
 			debugPrintf("yes\n");
 			break;
