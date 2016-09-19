@@ -25,7 +25,7 @@ Currently, all log modules have an //enabled// parameter, allowing the module to
 
 Multiple log modules may be loaded by specifying multiple logger tags.
 
-Internally, at startup the SQL Relay server processes create instances of the specified logger modules and initialize them.  Then, as they run, the call the logger modules' "run" method, passing in an event type, log level and log message.  The modules then react to the different events, log levels and messages in a module-specific manner.  The "debug" logger module, for example, logs every event type at every log level, while the "slowqueries" logger module only logs queries and ignores all other event types.
+Internally, at startup the SQL Relay server processes create instances of the specified logger modules and initializes them.  Then, as they run, the call the logger modules' "run" method, passing in an event type, log level and log message.  The modules then react to the different events, log levels and messages in a module-specific manner.  The "debug" logger module, for example, logs every event type at every log level, while the "slowqueries" logger module only logs queries and ignores all other event types.
 
 <br><a name="available"></a>
 <span class="heading2">Available Modules</span><br>
@@ -76,6 +76,6 @@ Sample log: [sqlr-connection-oracletest-querylog.2899.html sqlr-connection-oracl
 [=#custom]
 == Custom Modules ==
 
-Custom modules that log very specific information in very specific formats are also available in the general SQL Relay distribution but they are not intended for general use.
+Custom modules may also be developed.
 
-Custom modules may also be developed...
+For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]

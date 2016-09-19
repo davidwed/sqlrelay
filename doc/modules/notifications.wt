@@ -29,7 +29,7 @@ Notification modules can be "stacked".  Multiple modules may be loaded and multi
 @sqlrelay-notifications-stacked.conf.html@
 }}}
 
-Internally, at startup the SQL Relay server processes create instances of the specified notification modules and initialize them.
+At startup, the SQL Relay server processes create instances of the specified notification modules and initializes them.  As events occur, the server passes the event and, optionally, a string of information about the event to each module, in the order that they were specified in the config file.  If a module is listening for that event, then it sends a notification to the specified recpients.
 
 [=#available]
 == Available Modules ==
@@ -48,7 +48,7 @@ An example configuration follows.
 @sqlrelay-notifications-events.conf.html@
 }}}
 
-In this example, the module sends notifications to '''david.muse@firstworks.com''' when one of the '''db_login''', '''db_logout''', or '''filter_violation''' events occurs.
+In this example, the module sends notifications to '''dev@firstworks.com''' when one of the '''db_error''', '''db_warning''', or '''filter_violation''' events occurs.
 
 The '''events''' tag defines the set of events to listen for.  Valid events are:
 
@@ -142,8 +142,8 @@ Where //subject// is replaced with the subject, //address// is replaced with the
 SQL Relay assumes that the //blat// program is installed, in the PATH of the user that SQL Relay runs as, and that blat has been configured.  See [http://www.blat.net] to download and configure blat.
 
 [=#custom]
-== Custom Modules ==
+== Custom ==
 
-You can create your own custom notification modules too.
+Custom modules may also be developed.
 
-...
+For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]

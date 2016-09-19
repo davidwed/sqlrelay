@@ -6,15 +6,15 @@
 
 ----
 
-[=#introduction"]
+[=#introduction]
 == Introduction ==
 
-Router modules allow the SQL Relay server ...
+When used in conjunction with the dbase="router" parameter, router modules allow the SQL Relay server to route queries to one database or another based on various conditions.
 
 The //routers// section of the sqlrelay.conf file indicates which router modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-router-....conf.html@
+@sqlrelay-routers-regex.conf.html@
 }}}
 
 The //module// attribute specifies which module to load.
@@ -25,16 +25,14 @@ Currently, all router modules have an //enabled// parameter, allowing the module
 
 Router modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
-{{{#!blockquote
-@sqlrelay-routers-stacked.conf.html@
-}}}
+In fact, the example above shows a stacked configuration.  The first instance of the router module sends DDL/DML queries to a "master" database and the second instance of the router module sends all other queries to a "slave" database.
 
-At startup, the SQL Relay server creates instances of the specified router modules and initializes them...
+At startup, the SQL Relay server creates instances of the specified router modules and initializes them.  When the client sends a query to the SQL Relay server, the server consults each router module, in the order that they were specified in the config file.  Each module applies its routing rules to determine which connection to run the query on.  If a module returns a connection then the remaining modules are ignored.  If the query makes it through all modules without being routed to a particular connection, then the query is ignored.
 
-[=#available"]
+[=#available]
 == Available Modules ==
 
-Currently, the following filter modules are available:
+Currently, the following router modules are available:
 
 * '''regex'''
 * '''userlist'''
@@ -42,96 +40,63 @@ Currently, the following filter modules are available:
 
 === regex ===
 
-...
+The '''regex''' module routes queries by matching them against regular expressions.
+
+An example configuration follows.
+
+{{{#!blockquote
+@sqlrelay-routers-regex.conf.html@
+}}}
+
+In this example DDL/DML queries are routed to the connectionid "master", and all other queries are routed to the connectionid "slave".
+
+The '''string''' parameter for the "master" connection refers to a separate instance of SQL Relay which maintains connections to the master database.  The '''string''' parameter for the "slave" connection refers to a separate instance of SQL Relay which maintains connections to the slave databases.
+
+This example is explained in greater detail in the SQL Relay Configuration Guide, in the section on [../admin/configguide.html#router Master-Slave Query Routing].
+
+See [../admin/router.html Query Routing] for more information about query routing in general.
 
 === userlist ===
 
-...
+The '''userlist''' module routes queries by matching the user that ran the query against a list of users.
+
+An example configuration follows.
+
+{{{#!blockquote
+@sqlrelay-routers-userlist.conf.html@
+}}}
+
+In this example queries run by user named "master" are routed to the connectionid "master", and queries run by any other user are routed to the connectionid "slave".
+
+The '''string''' parameter for the "master" connection refers to a separate instance of SQL Relay which maintains connections to the master database.  The '''string''' parameter for the "slave" connection refers to a separate instance of SQL Relay which maintains connections to the slave databases.
+
+A similar example is explained in greater detail in the SQL Relay Configuration Guide, in the section on [../admin/configguide.html#router Master-Slave Query Routing].
+
+See [../admin/router.html Query Routing] for more information about query routing in general.
 
 === clientiplist ===
 
-...
+The '''clientiplist''' module routes queries by matching the client that ran the query against a list of IP addresses.
 
-[=#custom"]
-=== Custom Modules ===
-
-You can create your own custom query connection router modules too.
-
-SQL Relay provides a base class for connection router modules, called sqlrrouter, defined in the header file: sqlrserver.h
+An example configuration follows.
 
 {{{#!blockquote
-@sqlrrouter.h.html@
+@sqlrelay-routers-clientiplist.conf.html@
 }}}
 
-On non-Windows platforms, it's most likely installed in /usr/local/firstworks/include/sqlrelay if you built from source or /usr/include/sqlrelay if you installed a package.  On Windows platforms, it's most likely installed in C:\Program Files\Firstworks\include\sqlrelay.
+In this example queries run by clients at IP addresses 192.0-168.*.213 are routed to the connectionid "master", and queries run by clients at any other IP address are routed to the connectionid "slave".
 
-The default implementaion of the constructor just sets the member variables //sqlrfs//, //parameters// and //debug// to the corresponding passed-in values.  //sqlrfs// is a pointer to an instance of the sqlrrouters class, which provides various helper methods.  //parameters// is a representation of the XML tag in the sqlrelay.conf file that loaded the module.  //debug// is just a flag, indicating whether debug is requested or not.  The module should consult this flat and print out some debug if it is true.
+Each octet of the '''ip''' parameter may be specfied as a number, a dash-separated range of numbers, or a * meaning "all possible values".
 
-By default, the destructor does nothing.
+The '''string''' parameter for the "master" connection refers to a separate instance of SQL Relay which maintains connections to the master database.  The '''string''' parameter for the "slave" connection refers to a separate instance of SQL Relay which maintains connections to the slave databases.
 
-run() does nothing by default and returns true, indicating that no error occurred.
+A similar example is explained in greater detail in the SQL Relay Configuration Guide, in the section on [../admin/configguide.html#router Master-Slave Query Routing].
 
-A custom module module must contain a class that inherits from sqlrrouter, implements the necessary methods, and implements a function to return an instance of the class.
+See [../admin/router.html Query Routing] for more information about query routing in general.
 
-Lets say we want to create a custom router module that ...
+[=#custom]
+== Custom Modules ==
 
-We can create the file ...
+Custom modules may also be developed.
 
-{{{#!blockquote
-@sqlrrouter-....cpp.html@
-}}}
-
-Here, the ... class inherits from sqlrrouter.  The constructor just calls the parent constructor.  The run() method ...
-
-Note the "new_sqlrrouter_...()" function which just allocates an instance of .... and returns it.  This function is essential to provide, and it is essential that it be named "new_sqlrrouter_modulename" and take sqlrrouters *, xmldomnode * and bool.  It is also essential that it be wrapped with an //extern "C"// clause to prevent it from being name-mangled by the compiler.
-
-To build the module on a Linux or Unix system, run a command like:
-
-{{{#!blockquote
-{{{
-gcc -shared `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrrouter_....so ....cpp `sqlrserver-config --libs` `rudiments-config --libs`
-}}}
-}}}
-
-This will create the file sqlrrouter_....so
-
-On Mac OSX, run a command like:
-
-{{{#!blockquote
-{{{
-gcc -bundle `sqlrserver-config --cflags` `rudiments-config --cflags` -o sqlrrouter_....bundle ....cpp `sqlrserver-config --libs` `rudiments-config --libs`
-}}}
-}}}
-
-This will create the sqlrrouter_....bundle
-
-On Windows, run commands like:
-
-{{{#!blockquote
-{{{
-cl /I"C:\Program Files\Firstworks\include" /c ....cpp
-link -out:sqlrrouter_....dll /LIBPATH:"C:\Program Files\Firstworks\lib" libsqlrserver.lib librudiments.lib
-}}}
-}}}
-
-This will create the sqlrrouter_....dll
-
-It is essential that the file be named: sqlrrouter_modulename.extension
-
-To install the new module, copy it to the SQL Relay "modules" directory.  On non-Windows platforms, that is most likely /usr/local/firstworks/libexec/sqlrelay if you built from source, or /usr/libexec/sqlrelay if you installed a package.  On Windows platforms, that is most likely C:\Program Files\Firstworks\libexec\sqlrelay
-
-To configure an instance of SQL Relay to use your module, you will need to update the sqlrelay.conf file to include a "routers" section:
-
-{{{#!blockquote
-@sqlrelay-routers-....conf.html@
-}}}
-
-The server will see the module="..." attribute in the sqlrelay.conf file, look in the "modules" directory for sqlrrouter_....extension, load it and and run the new_sqlrrouter_...() method to get an instance of the ... class and then run the various methods of that class.
-
-This example module doesn't have any parameters, but if you create a module that does then you can access them via the the protected "parameters" member variable.  For example:
-
-{{{#!blockquote
-@sqlrrouter-param.cpp.html@
-}}}
-
-Refer to the Rudiments documentation for more info on the [http://rudiments.sourceforge.net/rudiments/classes/html/classxmldomnode.html xmldomnode class].
+For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
