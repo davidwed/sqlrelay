@@ -129,6 +129,7 @@ SQL Relay can be extended via modules.  Many standard modules are available and 
  [modules/schedules.html Connection Schedule Modules][[br]]
  [modules/loggers.html Logger Modules][[br]]
  [modules/notifications.html Notification Modules][[br]]
+ [modules/routers.html Router Modules][[br]]
 
 ----
 
