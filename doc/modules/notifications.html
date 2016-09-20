@@ -138,21 +138,21 @@
 <p>The <b>events</b> tag defines the set of events to listen for.  Valid events are:</p>
 
 <ul>
-  <li><b>CLIENT_CONNECTED</b> - An SQL Relay client connected to the SQL Relay server.</li>
-  <li><b>CLIENT_CONNECTION_REFUSED</b> - An SQL Relay client attempted to connect to the SQL Relay server but the server refused the connection, usually because authentication failed.</li>
-  <li><b>CLIENT_DISCONNECTED</b> - An SQL Relay client disconnected from the SQL Relay server.</li>
-  <li><b>CLIENT_PROTOCOL_ERROR</b> - The SQL Relay server didn't understand something that the SQL Relay client sent to it.</li>
-  <li><b>DB_LOGIN</b> - The SQL Relay server opened a connection to the database.</li>
-  <li><b>DB_LOGOUT</b> - The SQL Relay server closed a connection to the database.</li>
-  <li><b>DB_ERROR</b> - A query generated an error.</li>
-  <li><b>DB_WARNING</b> - A query generated a warning.</li>
-  <li><b>QUERY</b> - A query was executed.</li>
-  <li><b>FILTER_VIOLATION</b> - A <a href="filters.html">filter module</a> prevented a query from being executed.</li>
-  <li><b>INTERNAL_ERROR</b> - An internal error occurred.</li>
-  <li><b>INTERNAL_WARNING</b> - An internal warning occurred.</li>
-  <li><b>DEBUG_MESSAGE</b> - A debug message was generated.</li>
-  <li><b>SCHEDULE_VIOLATION</b> - A <a href="schedules.html">schedule module</a> prevented a user from logging in to the SQL Relay server.</li>
-  <li><b>INTEGRITY_VIOLATION</b> - A <a href="routers.html">router module</a> is in use and a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeded on some of the backends but failed on others.</li>
+  <li><b>client_connected</b> - An SQL Relay client connected to the SQL Relay server.</li>
+  <li><b>client_connection_refused</b> - An SQL Relay client attempted to connect to the SQL Relay server but the server refused the connection, usually because authentication failed.</li>
+  <li><b>client_disconnected</b> - An SQL Relay client disconnected from the SQL Relay server.</li>
+  <li><b>client_protocol_error</b> - The SQL Relay server didn't understand something that the SQL Relay client sent to it.</li>
+  <li><b>db_login</b> - The SQL Relay server opened a connection to the database.</li>
+  <li><b>db_logout</b> - The SQL Relay server closed a connection to the database.</li>
+  <li><b>db_error</b> - A query generated an error.</li>
+  <li><b>db_warning</b> - A query generated a warning.</li>
+  <li><b>query</b> - A query was executed.</li>
+  <li><b>filter_violation</b> - A <a href="filters.html">filter module</a> prevented a query from being executed.</li>
+  <li><b>internal_error</b> - An internal error occurred.</li>
+  <li><b>internal_warning</b> - An internal warning occurred.</li>
+  <li><b>debug_message</b> - A debug message was generated.</li>
+  <li><b>schedule_violation</b> - A <a href="schedules.html">schedule module</a> prevented a user from logging in to the SQL Relay server.</li>
+  <li><b>integrity_violation</b> - A <a href="routers.html">router module</a> is in use and a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeded on some of the backends but failed on others.</li>
 </ul>
 
 <p>Any number of events may be specified.  Each event must be specified in its own <b>event</b> tag.  The event tag supports the following attributes:</p>

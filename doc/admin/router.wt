@@ -46,6 +46,8 @@ separate machines.
 @sqlrelay-router.conf.html@
 }}}
 
+Note the use of a notification module to notify //dba@firstworks.com// if an //integrity_violation// event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See [notifications.html notifications] for information about notification modules.
+
 == Provide a Single Point of Access to Multiple Databases ==
 
 Here's an example configuration providing a single point of access to
@@ -60,6 +62,8 @@ all queries containing "postgresqldb." to the !PostgreSQL database.
 {{{#!blockquote
 @sqlrelay-router-multipledb.conf.html@
 }}}
+
+Note the use of a notification module to notify //dba@firstworks.com// if an //integrity_violation// event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See [notifications.html notifications] for information about notification modules.
 
 The examples above all use the //regex// router module to route queries based on regular expression pattern matching.  Router modules are available to route queries based on other things too though, such as the user that ran the query, or the IP address of the client.  See [../modules/routers.html Router Modules] for more information about router modules.
 

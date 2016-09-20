@@ -52,21 +52,21 @@ In this example, the module sends notifications to '''dev@firstworks.com''' when
 
 The '''events''' tag defines the set of events to listen for.  Valid events are:
 
-* '''CLIENT_CONNECTED''' - An SQL Relay client connected to the SQL Relay server.
-* '''CLIENT_CONNECTION_REFUSED''' - An SQL Relay client attempted to connect to the SQL Relay server but the server refused the connection, usually because authentication failed.
-* '''CLIENT_DISCONNECTED''' - An SQL Relay client disconnected from the SQL Relay server.
-* '''CLIENT_PROTOCOL_ERROR''' - The SQL Relay server didn't understand something that the SQL Relay client sent to it.
-* '''DB_LOGIN''' - The SQL Relay server opened a connection to the database.
-* '''DB_LOGOUT''' - The SQL Relay server closed a connection to the database.
-* '''DB_ERROR''' - A query generated an error.
-* '''DB_WARNING''' - A query generated a warning.
-* '''QUERY''' - A query was executed.
-* '''FILTER_VIOLATION''' - A [filters.html filter module] prevented a query from being executed.
-* '''INTERNAL_ERROR''' - An internal error occurred.
-* '''INTERNAL_WARNING''' - An internal warning occurred.
-* '''DEBUG_MESSAGE''' - A debug message was generated.
-* '''SCHEDULE_VIOLATION''' - A [schedules.html schedule module] prevented a user from logging in to the SQL Relay server.
-* '''INTEGRITY_VIOLATION''' - A [routers.html router module] is in use and a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeded on some of the backends but failed on others.
+* '''client_connected''' - An SQL Relay client connected to the SQL Relay server.
+* '''client_connection_refused''' - An SQL Relay client attempted to connect to the SQL Relay server but the server refused the connection, usually because authentication failed.
+* '''client_disconnected''' - An SQL Relay client disconnected from the SQL Relay server.
+* '''client_protocol_error''' - The SQL Relay server didn't understand something that the SQL Relay client sent to it.
+* '''db_login''' - The SQL Relay server opened a connection to the database.
+* '''db_logout''' - The SQL Relay server closed a connection to the database.
+* '''db_error''' - A query generated an error.
+* '''db_warning''' - A query generated a warning.
+* '''query''' - A query was executed.
+* '''filter_violation''' - A [filters.html filter module] prevented a query from being executed.
+* '''internal_error''' - An internal error occurred.
+* '''internal_warning''' - An internal warning occurred.
+* '''debug_message''' - A debug message was generated.
+* '''schedule_violation''' - A [schedules.html schedule module] prevented a user from logging in to the SQL Relay server.
+* '''integrity_violation''' - A [routers.html router module] is in use and a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeded on some of the backends but failed on others.
 
 Any number of events may be specified.  Each event must be specified in its own '''event''' tag.  The event tag supports the following attributes:
 
