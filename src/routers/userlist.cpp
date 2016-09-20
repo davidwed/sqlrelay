@@ -49,19 +49,20 @@ sqlrrouter_userlist::~sqlrrouter_userlist() {
 }
 
 const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur) {
+						sqlrservercursor *sqlrcur) {
 	if (!enabled) {
 		return NULL;
 	}
 
 	// get the user
-	const char	*user=sqlrcon->cont->connstats->user;
+	const char	*user=sqlrcon->cont->getCurrentUser();
 
 	// run through the user array...
 	for (uint64_t i=0; i<usercount; i++) {
 
 		// if the user matches...
-		if (!charstring::compare(user,users[i])) {
+		if (!charstring::compare(user,users[i]) ||
+			!charstring::compare(users[i],"*")) {
 			if (debug) {
 				stdoutput.printf("\nrouting user %s to %s\n",
 							user,connectionid);
