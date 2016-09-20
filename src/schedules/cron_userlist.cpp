@@ -52,8 +52,6 @@ bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
-	// FIXME: handle GSS/TLS users...
-
 	// do we care about this user?
 	debugPrintf("user...\n");
 
