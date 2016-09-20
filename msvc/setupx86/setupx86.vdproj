@@ -381,6 +381,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_168F592149DF4093B300D9DE08073391"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_17233AFC79474DC8B1A63D987843003D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2361,6 +2367,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_87027912547145BDA4ED9CA2661664F5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_87940E1015344B68BC2286079AA5B9DE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3093,6 +3105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B2D94D9BC1594A958CABAC042A2E182E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B2F7B2EFD5A14578AB8B87F6C58F2510"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3615,7 +3633,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D3F9099261214A7C91C152153FFD97FF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_D47B10BFB70A48889484ECE2BBD0CE5B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D4EAC4A97CDA42C39609C00FDD7732C8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3826,6 +3856,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E0A77675AC374E93B6A56CD7F59FB5D9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E0A8BEBD641346F4A09413A81D793988"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -5654,6 +5690,26 @@
             "TargetName" = "8:navigation.js"
             "Tag" = "8:"
             "Folder" = "8:_DE8FB9B7420546D3AF7EBFD2935998C5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_168F592149DF4093B300D9DE08073391"
+            {
+            "SourcePath" = "8:..\\..\\doc\\modules\\schedules.html"
+            "TargetName" = "8:schedules.html"
+            "Tag" = "8:"
+            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -12239,6 +12295,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_87027912547145BDA4ED9CA2661664F5"
+            {
+            "SourcePath" = "8:..\\..\\doc\\modules\\notifications.html"
+            "TargetName" = "8:notifications.html"
+            "Tag" = "8:"
+            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_87940E1015344B68BC2286079AA5B9DE"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c\\libsqlrclientwrapper.lib"
@@ -14679,6 +14755,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2D94D9BC1594A958CABAC042A2E182E"
+            {
+            "SourcePath" = "8:..\\..\\doc\\modules\\routers.html"
+            "TargetName" = "8:routers.html"
+            "Tag" = "8:"
+            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2F7B2EFD5A14578AB8B87F6C58F2510"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c++\\html\\dir_0912e6c65b091fa41da70873249342a4.html"
@@ -16399,12 +16495,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D3F9099261214A7C91C152153FFD97FF"
+            {
+            "SourcePath" = "8:..\\..\\doc\\images\\dayshift.png"
+            "TargetName" = "8:dayshift.png"
+            "Tag" = "8:"
+            "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D47B10BFB70A48889484ECE2BBD0CE5B"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ado.net\\html\\ftv2mlastnode.png"
             "TargetName" = "8:ftv2mlastnode.png"
             "Tag" = "8:"
             "Folder" = "8:_1D210F24103844498F8966485E987D0B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D4EAC4A97CDA42C39609C00FDD7732C8"
+            {
+            "SourcePath" = "8:..\\..\\doc\\images\\nightshift.png"
+            "TargetName" = "8:nightshift.png"
+            "Tag" = "8:"
+            "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -17105,6 +17241,26 @@
             "TargetName" = "8:doxygen.png"
             "Tag" = "8:"
             "Folder" = "8:_5BFCE3D2C583443DB10577904D6DBA74"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E0A8BEBD641346F4A09413A81D793988"
+            {
+            "SourcePath" = "8:..\\..\\doc\\features\\schedules.html"
+            "TargetName" = "8:schedules.html"
+            "Tag" = "8:"
+            "Folder" = "8:_CB4C1A4C40744B33B6C776AC6843B95E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
