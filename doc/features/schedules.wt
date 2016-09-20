@@ -15,3 +15,5 @@ While only Joe and Mary may be allowed to access the database during the night s
 [[Image(../images/nightshift.png)]]
 
 Database access can be constrained to any combination of years, months, days of the month, days of the week, and times of day.
+
+A complete description of connection schedules with example configuration files is given [../modules/schedules.html here].
