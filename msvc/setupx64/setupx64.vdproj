@@ -579,6 +579,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1F5775B93F51439FAAD46013ED23642A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_204DBDBE22EF4D7F8463D422263E774D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1258,6 +1264,12 @@
         "Entry"
         {
         "MsmKey" = "8:_458AFE136B694401862B996659265BE7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_458B80ECC10D4CE08AD7CDA884EF271F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2367,6 +2379,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_83B13B2C44B54645B5170EA5BCE53A6C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_83E3B3C2C49041A888F977E7B31E815F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3046,6 +3064,12 @@
         "Entry"
         {
         "MsmKey" = "8:_B2D2D3D7BB6542E8975F80F04A5EBF4B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B2F55B2BF3394144ACB84E0F3285ED4E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3891,6 +3915,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E6E6682DA9F740D2BCAA578E87818933"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E74C189ECAE34C7EBD2BA88DFB1F8561"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3916,6 +3946,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E7E6EBBEDE164A98AD98DD9921A7E728"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E7FE4BA816A0480B8A7AF7E62EFA3BBE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -6334,6 +6370,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1F5775B93F51439FAAD46013ED23642A"
+            {
+            "SourcePath" = "8:..\\..\\doc\\modules\\routers.html"
+            "TargetName" = "8:routers.html"
+            "Tag" = "8:"
+            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_204DBDBE22EF4D7F8463D422263E774D"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRConnection.src\\M000105.html"
@@ -8591,6 +8647,26 @@
             "TargetName" = "8:class_s_q_l_r_client_1_1_s_q_l_relay_exception.html"
             "Tag" = "8:"
             "Folder" = "8:_1D210F24103844498F8966485E987D0B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_458B80ECC10D4CE08AD7CDA884EF271F"
+            {
+            "SourcePath" = "8:..\\..\\doc\\modules\\schedules.html"
+            "TargetName" = "8:schedules.html"
+            "Tag" = "8:"
+            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -12285,6 +12361,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_83B13B2C44B54645B5170EA5BCE53A6C"
+            {
+            "SourcePath" = "8:..\\..\\doc\\images\\nightshift.png"
+            "TargetName" = "8:nightshift.png"
+            "Tag" = "8:"
+            "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_83E3B3C2C49041A888F977E7B31E815F"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c++\\html\\ftv2vertline.png"
@@ -14549,6 +14645,26 @@
             {
             "SourcePath" = "8:..\\..\\doc\\images\\i386-linux-uclibc.png"
             "TargetName" = "8:i386-linux-uclibc.png"
+            "Tag" = "8:"
+            "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2F55B2BF3394144ACB84E0F3285ED4E"
+            {
+            "SourcePath" = "8:..\\..\\doc\\images\\dayshift.png"
+            "TargetName" = "8:dayshift.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
             "Condition" = "8:"
@@ -17345,6 +17461,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E6E6682DA9F740D2BCAA578E87818933"
+            {
+            "SourcePath" = "8:..\\..\\doc\\modules\\notifications.html"
+            "TargetName" = "8:notifications.html"
+            "Tag" = "8:"
+            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E74C189ECAE34C7EBD2BA88DFB1F8561"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRCursor.src\\M000053.html"
@@ -17431,6 +17567,26 @@
             "TargetName" = "8:index.html"
             "Tag" = "8:"
             "Folder" = "8:_9764D1FF5DA445B9B9632E6D525B2B84"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E7FE4BA816A0480B8A7AF7E62EFA3BBE"
+            {
+            "SourcePath" = "8:..\\..\\doc\\features\\schedules.html"
+            "TargetName" = "8:schedules.html"
+            "Tag" = "8:"
+            "Folder" = "8:_CB4C1A4C40744B33B6C776AC6843B95E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -19841,7 +19997,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Firstworks SQL Relay (64-bit)"
         "ProductCode" = "8:{C0EC8D59-D301-4F83-83D9-1CCD6E8001A5}"
-        "PackageCode" = "8:{8EDE44AE-37B4-428A-9D66-EAF45942FD35}"
+        "PackageCode" = "8:{0E09493E-22D6-48C8-B2B0-635C06EA0446}"
         "UpgradeCode" = "8:{97679A6A-B07C-4278-9494-57F8C96615C6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
