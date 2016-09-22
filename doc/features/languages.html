@@ -45,7 +45,36 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">C++</span>
 <p class="code" style="height: 300px;">
-@example.cpp.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclient.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;rudiments/stdio.h&gt;</font>
+
+<b><font color="#0000FF">using</font></b> <b><font color="#0000FF">namespace</font></b> rudiments<font color="#990000">;</font>
+
+<font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+	<font color="#008080">sqlrconnection</font>	<b><font color="#000000">sqlrcon</font></b><font color="#990000">(</font><font color="#FF0000">"examplehost"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font>
+				<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+				<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+				<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+	<font color="#008080">sqlrcursor</font>	<b><font color="#000000">sqlrcur</font></b><font color="#990000">(&amp;</font>sqlrcon<font color="#990000">);</font>
+
+	sqlrcur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
+	<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">uint64_t</font> row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> row<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">rowCount</font></b><font color="#990000">();</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+		<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">uint64_t</font> col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">colCount</font></b><font color="#990000">();</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+			stdoutput<font color="#990000">.</font><b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s,"</font><font color="#990000">,</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font>row<font color="#990000">,</font>col<font color="#990000">));</font>
+		<font color="#FF0000">}</font>
+		stdoutput<font color="#990000">.</font><b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+	<font color="#FF0000">}</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -53,7 +82,39 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">C</span>
 <p class="code" style="height: 300px;">
-@example.c.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+	<font color="#008080">sqlrcon</font>	sqlrconref<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"examplehost"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font>
+						<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+						<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+						<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+	<font color="#008080">sqlrcur</font>	sqlrcurref<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>sqlrconref<font color="#990000">);</font>
+
+	<b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>sqlrcurref<font color="#990000">,</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
+	<font color="#008080">uint64_t</font>	row<font color="#990000">;</font>
+	<font color="#008080">uint64_t</font>	col<font color="#990000">;</font>
+	<b><font color="#0000FF">for</font></b> <font color="#990000">(</font>row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> row<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_rowCount</font></b><font color="#990000">(</font>sqlrcurref<font color="#990000">);</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+		<b><font color="#0000FF">for</font></b> <font color="#990000">(</font>col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>sqlrcurref<font color="#990000">);</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+			<b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s,"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>sqlrcurref<font color="#990000">,</font>row<font color="#990000">,</font>col<font color="#990000">));</font>
+		<font color="#FF0000">}</font>
+		<b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+	<font color="#FF0000">}</font>
+
+	<b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>sqlrcurref<font color="#990000">);</font>
+	<b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>sqlrconref<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -65,7 +126,43 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">C#</span>
 <p class="code" style="height: 350px;">
-@example.cs.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
+<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
+<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
+
+<b><font color="#0000FF">namespace</font></b> csexample
+<font color="#FF0000">{</font>
+	<b><font color="#0000FF">class</font></b> <font color="#008080">example</font>
+	<font color="#FF0000">{</font>
+		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
+		<font color="#FF0000">{</font>
+			<font color="#008080">SQLRConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font>
+							<font color="#FF0000">"examplehost"</font><font color="#990000">,</font> <font color="#993399">9000</font><font color="#990000">,</font>
+							<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+							<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+							<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font>
+							<font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
+			<font color="#008080">SQLRCursor</font> sqlrcur <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>sqlrcon<font color="#990000">);</font>
+
+			sqlrcur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
+			<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">UInt64</font> row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> row<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">rowCount</font></b><font color="#990000">();</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+				<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">UInt64</font> col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">colCount</font></b><font color="#990000">();</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+					Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font>row<font color="#990000">,</font>col<font color="#990000">)+</font><font color="#FF0000">","</font><font color="#990000">);</font>
+				<font color="#FF0000">}</font>
+				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">();</font>
+			<font color="#FF0000">}</font>
+		<font color="#FF0000">}</font>
+	<font color="#FF0000">}</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -73,7 +170,38 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Java</span>
 <p class="code" style="height: 350px;">
-@example.java.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#008080">import</font> com<font color="#990000">.</font>firstworks<font color="#990000">.</font>sqlrelay<font color="#990000">.</font>SQLRConnection<font color="#990000">;</font>
+<font color="#008080">import</font> com<font color="#990000">.</font>firstworks<font color="#990000">.</font>sqlrelay<font color="#990000">.</font>SQLRCursor<font color="#990000">;</font>
+
+<b><font color="#0000FF">class</font></b> <font color="#008080">example</font> <font color="#FF0000">{</font>
+
+	<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">main</font></b><font color="#990000">(</font>String<font color="#990000">[]</font> args<font color="#990000">)</font> <font color="#FF0000">{</font>
+
+		<font color="#008080">SQLRConnection</font>	sqlrcon<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font>
+						<font color="#FF0000">"examplehost"</font><font color="#990000">,(</font><font color="#009900">short</font><font color="#990000">)</font><font color="#993399">9000</font><font color="#990000">,</font>
+						<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+						<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+						<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+		<font color="#008080">SQLRCursor</font>	sqlrcur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>sqlrcon<font color="#990000">);</font>
+
+		sqlrcur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
+		<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#009900">long</font> row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> row<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">rowCount</font></b><font color="#990000">();</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+			<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#009900">long</font> col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">colCount</font></b><font color="#990000">();</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+				System<font color="#990000">.</font>out<font color="#990000">.</font><b><font color="#000000">println</font></b><font color="#990000">(</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font>row<font color="#990000">,</font>col<font color="#990000">)+</font><font color="#FF0000">","</font><font color="#990000">);</font>
+			<font color="#FF0000">}</font>
+			System<font color="#990000">.</font>out<font color="#990000">.</font><b><font color="#000000">println</font></b><font color="#990000">();</font>
+		<font color="#FF0000">}</font>
+	<font color="#FF0000">}</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -85,7 +213,33 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Perl</span>
 <p class="code" style="height: 300px;">
-@example.pl.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><i><font color="#9A1900">#!/usr/bin/perl</font></i>
+
+<b><font color="#0000FF">use</font></b> SQLRelay<font color="#990000">::</font>Connection<font color="#990000">;</font>
+<b><font color="#0000FF">use</font></b> SQLRelay<font color="#990000">::</font>Cursor<font color="#990000">;</font>
+
+<font color="#009900">$sqlrcon</font><font color="#990000">=</font>SQLRelay<font color="#990000">::</font>Connection<font color="#990000">-&gt;</font><b><font color="#000000">new</font></b><font color="#990000">(</font><font color="#FF0000">"examplehost"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font>
+					<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+					<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+					<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">$sqlrcur</font><font color="#990000">=</font>SQLRelay<font color="#990000">::</font>Cursor<font color="#990000">-&gt;</font><b><font color="#000000">new</font></b><font color="#990000">(</font><font color="#009900">$sqlrcon</font><font color="#990000">);</font>
+
+<font color="#009900">$sqlrcur</font><font color="#990000">-&gt;</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
+<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#009900">$row</font><font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> <font color="#009900">$row</font><font color="#FF0000">&lt;$sqlrcur-&gt;</font><b><font color="#000000">rowCount</font></b><font color="#990000">();</font> <font color="#009900">$row</font><font color="#990000">++)</font> <font color="#FF0000">{</font>
+	<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#009900">$col</font><font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> <font color="#009900">$col</font><font color="#FF0000">&lt;$sqlrcur-&gt;</font><b><font color="#000000">colCount</font></b><font color="#990000">();</font> <font color="#009900">$col</font><font color="#990000">++)</font> <font color="#FF0000">{</font>
+		<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#009900">$sqlrcur</font><font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#009900">$row</font><font color="#990000">,</font><font color="#009900">$col</font><font color="#990000">).</font><font color="#FF0000">","</font><font color="#990000">);</font>
+	<font color="#FF0000">}</font>
+	<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">"\n"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -93,7 +247,34 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Python</span>
 <p class="code" style="height: 300px;">
-@example.py.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><i><font color="#9A1900">#! /usr/bin/env python</font></i>
+
+<b><font color="#000080">from</font></b> SQLRelay <b><font color="#000080">import</font></b> PySQLRClient
+
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+	sqlrcon<font color="#990000">=</font>PySQLRClient<font color="#990000">.</font><b><font color="#000000">sqlrconnection</font></b><font color="#990000">(</font><font color="#FF0000">"examplehost"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font> <font color="#990000">\</font>
+						<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font> <font color="#990000">\</font>
+						<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font> <font color="#990000">\</font>
+						<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">)</font>
+	sqlrcur<font color="#990000">=</font>PySQLRClient<font color="#990000">.</font><b><font color="#000000">sqlrcursor</font></b><font color="#990000">(</font>sqlrcon<font color="#990000">)</font>
+
+	sqlrcur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">)</font>
+	<b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">rowCount</font></b><font color="#990000">()):</font>
+		<b><font color="#0000FF">for</font></b> col <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">colCount</font></b><font color="#990000">()):</font>
+			<b><font color="#0000FF">print</font></b> sqlrcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font>row<font color="#990000">,</font>col<font color="#990000">)+</font><font color="#FF0000">","</font><font color="#990000">,</font>
+		<b><font color="#0000FF">print</font></b>
+
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">"__main__"</font><font color="#990000">:</font>
+	<b><font color="#000000">main</font></b><font color="#990000">()</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -105,7 +286,38 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">PHP</span>
 <p class="code" style="height: 300px;">
-@example.php.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">&lt;</font>html<font color="#990000">&gt;</font>
+<font color="#990000">&lt;</font>body<font color="#990000">&gt;</font>
+<font color="#990000">&lt;?</font>php
+
+<b><font color="#000000">dl</font></b><font color="#990000">(</font><font color="#FF0000">"sql_relay.so"</font><font color="#990000">);</font>
+
+$con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"examplehost"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font>
+			<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+			<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+			<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+
+<b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
+<b><font color="#0000FF">for</font></b> <font color="#990000">(</font>$row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> $row<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_rowCount</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font> $row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+	<b><font color="#0000FF">for</font></b> <font color="#990000">(</font>$col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> $col<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font> $col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+		<b><font color="#000000">echo</font></b><font color="#990000">(</font><b><font color="#000000">sqlrcur_getField</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font>$row<font color="#990000">,</font>$col<font color="#990000">).</font><font color="#FF0000">","</font><font color="#990000">);</font>
+	<font color="#FF0000">}</font>
+	<b><font color="#000000">echo</font></b><font color="#990000">(</font><font color="#FF0000">"&lt;br&gt;</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
+
+<font color="#990000">?&gt;</font>
+<font color="#990000">&lt;/</font>body<font color="#990000">&gt;</font>
+<font color="#990000">&lt;/</font>html<font color="#990000">&gt;</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -113,7 +325,32 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">Ruby</span>
 <p class="code" style="height: 300px;">
-@example.rb.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><i><font color="#9A1900">#! /usr/bin/env ruby</font></i>
+
+<b><font color="#000080">require</font></b> <font color="#FF0000">'sqlrelay'</font>
+
+sqlrcon<font color="#990000">=</font>SQLRConnection<font color="#990000">.</font>new<font color="#990000">(</font><font color="#FF0000">"examplehost"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font>
+				<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+				<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+				<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">)</font>
+sqlrcur<font color="#990000">=</font>SQLRCursor<font color="#990000">.</font>new<font color="#990000">(</font>sqlrcon<font color="#990000">)</font>
+
+sqlrcur<font color="#990000">.</font>sendQuery<font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">)</font>
+<b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> <font color="#993399">0</font><font color="#990000">..</font>sqlrcur<font color="#990000">.</font>rowCount<font color="#990000">()-</font><font color="#993399">1</font>
+	<b><font color="#0000FF">for</font></b> col <b><font color="#0000FF">in</font></b> <font color="#993399">0</font><font color="#990000">..</font>sqlrcur<font color="#990000">.</font>colCount<font color="#990000">()-</font><font color="#993399">1</font>
+		print sqlrcur<font color="#990000">.</font>getField<font color="#990000">(</font>row<font color="#990000">,</font>col<font color="#990000">),</font><font color="#FF0000">","</font>
+	<b><font color="#0000FF">end</font></b>
+	print <font color="#FF0000">"\n"</font>
+<b><font color="#0000FF">end</font></b>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -125,7 +362,35 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">TCL</span>
 <p class="code" style="height: 300px;">
-@example.tcl.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#</font></b><font color="#990000">!/</font>usr<font color="#990000">/</font>bin<font color="#990000">/</font>tclsh
+
+load <font color="#990000">/</font>usr<font color="#990000">/</font>lib<font color="#990000">/</font>sqlrelay<font color="#990000">/</font>sqlrelay<font color="#990000">.</font>so sqlrelay
+
+<font color="#008080">set</font> con <font color="#990000">[</font>sqlrcon <font color="#990000">-</font>server <font color="#FF0000">"examplehost"</font>
+			<font color="#990000">-</font>port <font color="#993399">9000</font>
+			<font color="#990000">-</font>socket <font color="#FF0000">"/tmp/example.socket"</font>
+			<font color="#990000">-</font>user <font color="#FF0000">"exampleuser"</font>
+			<font color="#990000">-</font>password <font color="#FF0000">"examplepassword"</font>
+			<font color="#990000">-</font>retrytime <font color="#993399">0</font> <font color="#990000">-</font>tries <font color="#993399">1</font><font color="#990000">]</font>
+<font color="#008080">set</font> cur <font color="#990000">[</font>$<font color="#008080">con</font> sqlrcur<font color="#990000">]</font>
+
+$<font color="#008080">cur</font> sendQuery <font color="#FF0000">"select * from exampletable"</font>
+<b><font color="#0000FF">for</font></b> <font color="#FF0000">{</font>set row <font color="#993399">0</font><font color="#FF0000">}</font> <font color="#FF0000">{</font>$row<font color="#990000">&lt;[</font>$<font color="#008080">cur</font> rowCount<font color="#990000">]</font><font color="#FF0000">}</font> <font color="#FF0000">{</font><font color="#008080">incr</font> row<font color="#FF0000">}</font> <font color="#FF0000">{</font>
+	<b><font color="#0000FF">for</font></b> <font color="#FF0000">{</font>set col <font color="#993399">0</font><font color="#FF0000">}</font> <font color="#FF0000">{</font>$col<font color="#990000">&lt;[</font>$<font color="#008080">cur</font> colCount<font color="#990000">]</font><font color="#FF0000">}</font> <font color="#FF0000">{</font><font color="#008080">incr</font> col<font color="#FF0000">}</font> <font color="#FF0000">{</font>
+		puts <font color="#990000">-</font>nonewline <font color="#990000">[</font>$<font color="#008080">cur</font> getFieldByIndex $row $col<font color="#990000">]</font>
+		puts <font color="#990000">-</font>nonewline <font color="#FF0000">","</font>
+	<font color="#FF0000">}</font>
+	puts <font color="#FF0000">""</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>
@@ -133,7 +398,31 @@
 <p><div style="display: block; float: left;"/>
 <span class="heading2">node.js</span>
 <p class="code" style="height: 300px;">
-@example.js.html@
+<pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
+
+<font color="#008080">var</font>	sqlrcon<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font>
+				<font color="#FF0000">"examplehost"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font>
+				<font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font>
+				<font color="#FF0000">"exampleuser"</font><font color="#990000">,</font>
+				<font color="#FF0000">"examplepassword"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	sqlrcur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>sqlrcon<font color="#990000">);</font>
+
+sqlrcur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
+<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">var</font> row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> row<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">rowCount</font></b><font color="#990000">();</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+	<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">var</font> col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">colCount</font></b><font color="#990000">();</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+		process<font color="#990000">.</font>stdout<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>sqlrcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font>row<font color="#990000">,</font>col<font color="#990000">)+</font><font color="#FF0000">","</font><font color="#990000">);</font>
+	<font color="#FF0000">}</font>
+	process<font color="#990000">.</font>stdout<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</pre>
+
+
 </p></p>
 
 <p></div></p>

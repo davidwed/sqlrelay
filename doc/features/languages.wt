@@ -40,7 +40,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">C++</span>
 <p class="code" style="height: 300px;">
-@example.cpp.html@
+{{{#!code
+@parts/example.cpp@
+}}}
 </p>
 
 </div>
@@ -48,7 +50,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">C</span>
 <p class="code" style="height: 300px;">
-@example.c.html@
+{{{#!code
+@parts/example.c@
+}}}
 </p>
 
 </div>
@@ -61,7 +65,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">C#</span>
 <p class="code" style="height: 350px;">
-@example.cs.html@
+{{{#!code
+@parts/example.cs@
+}}}
 </p>
 
 </div>
@@ -69,7 +75,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">Java</span>
 <p class="code" style="height: 350px;">
-@example.java.html@
+{{{#!code
+@parts/example.java@
+}}}
 </p>
 
 </div>
@@ -82,7 +90,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">Perl</span>
 <p class="code" style="height: 300px;">
-@example.pl.html@
+{{{#!code
+@parts/example.pl@
+}}}
 </p>
 
 </div>
@@ -90,7 +100,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">Python</span>
 <p class="code" style="height: 300px;">
-@example.py.html@
+{{{#!code
+@parts/example.py@
+}}}
 </p>
 
 </div>
@@ -103,7 +115,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">PHP</span>
 <p class="code" style="height: 300px;">
-@example.php.html@
+{{{#!code
+@parts/example.php@
+}}}
 </p>
 
 </div>
@@ -111,7 +125,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">Ruby</span>
 <p class="code" style="height: 300px;">
-@example.rb.html@
+{{{#!code
+@parts/example.rb@
+}}}
 </p>
 
 </div>
@@ -124,7 +140,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">TCL</span>
 <p class="code" style="height: 300px;">
-@example.tcl.html@
+{{{#!code
+@parts/example.tcl@
+}}}
 </p>
 
 </div>
@@ -132,7 +150,9 @@ Programming guides with sample code and API references are available for each la
 <div style="display: block; float: left;"/>
 <span class="heading2">node.js</span>
 <p class="code" style="height: 300px;">
-@example.js.html@
+{{{#!code
+@parts/example.js@
+}}}
 </p>
 
 </div>

@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.SUFFIXES: .wt .html .html.in
+.SUFFIXES: .wt .html
 
 SRCS = connectionpooling.wt \
 	databases.wt \
@@ -25,7 +25,7 @@ OBJS = connectionpooling.html \
 	dbabstractionlayers.html \
 	dropinreplacementlibs.html \
 	ha.html \
-	languages.html.in \
+	languages.html \
 	multirowfetches.html \
 	proxying.html \
 	queryfiltering.html \
@@ -39,15 +39,7 @@ OBJS = connectionpooling.html \
 .wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf
 
-.wt.html.in:
-	wt -c $< -o $@ -xhtml xhtml.conf
-
 all: $(OBJS)
-	$(MAKE) html
-	$(MAKE) cleanin
 
 clean:
 	$(RM) $(OBJS)
-
-cleanin:
-	$(RM) *.in
