@@ -14,7 +14,9 @@ Query Filter modules allow the SQL Relay server programs to filter out queries, 
 The //filters// section of the sqlrelay.conf file indicates which filter modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-filters-regex.conf.html@
+{{{#!code
+@parts/sqlrelay-filters-regex.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.
@@ -26,7 +28,9 @@ Currently, all filter modules have an //enabled// parameter, allowing the module
 Filter modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
-@sqlrelay-filters-stacked.conf.html@
+{{{#!code
+@parts/sqlrelay-filters-stacked.conf@
+}}}
 }}}
 
 At startup, the SQL Relay server creates instances of the specified filter modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module filters out the query, then it isn't passed along to the next module, nor is it sent to the database, and the client program is told that the query failed.
@@ -34,7 +38,9 @@ At startup, the SQL Relay server creates instances of the specified filter modul
 When using query filters, it is helpful to use the //normalize// query translation too:
 
 {{{#!blockquote
-@sqlrelay-filter-regex-normalize.conf.html@
+{{{#!code
+@parts/sqlrelay-filter-regex-normalize.conf@
+}}}
 }}}
 
 See [translations.html Query Translations] for more information.
@@ -63,19 +69,25 @@ The list of patterns is given by a set of '''pattern''' child tags.  Each patter
 For example, with the following configuration...
 
 {{{#!blockquote
-@sqlrelay-filters-patterns.conf.html@
+{{{#!code
+@parts/sqlrelay-filters-patterns.conf@
+}}}
 }}}
 
 These queries would be filtered out:
 
 {{{#!blockquote
-@patterns-filtered.sql.html@
+{{{#!code
+@parts/patterns-filtered.sql@
+}}}
 }}}
 
 But these queries would not be:
 
 {{{#!blockquote
-@patterns-notfiltered.sql.html@
+{{{#!code
+@parts/patterns-notfiltered.sql@
+}}}
 }}}
 
 === regex ===
@@ -91,19 +103,25 @@ In addition to the module attribute, each filter tag may contain the following a
 For example, with the following configuration:
 
 {{{#!blockquote
-@sqlrelay-filters-regex.conf.html@
+{{{#!code
+@parts/sqlrelay-filters-regex.conf@
+}}}
 }}}
 
 This query would be filtered out:
 
 {{{#!blockquote
-@regex-filtered.sql.html@
+{{{#!code
+@parts/regex-filtered.sql@
+}}}
 }}}
 
 But this query would not be:
 
 {{{#!blockquote
-@regex-notfiltered.sql.html@
+{{{#!code
+@parts/regex-notfiltered.sql@
+}}}
 }}}
 
 === string ===
@@ -120,19 +138,25 @@ In addition to the module attribute, each filter tag may contain the following a
 For example, with the following configuration:
 
 {{{#!blockquote
-@sqlrelay-filters-string.conf.html@
+{{{#!code
+@parts/sqlrelay-filters-string.conf@
+}}}
 }}}
 
 This query would be filtered out:
 
 {{{#!blockquote
-@string-filtered.sql.html@
+{{{#!code
+@parts/string-filtered.sql@
+}}}
 }}}
 
 But this query would not be:
 
 {{{#!blockquote
-@string-notfiltered.sql.html@
+{{{#!code
+@parts/string-notfiltered.sql@
+}}}
 }}}
 
 [=#custom]

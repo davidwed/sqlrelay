@@ -14,7 +14,9 @@ Query Translation modules allow the SQL Relay server programs to alter queries b
 The //translations// section of the sqlrelay.conf file indicates which translation modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-translations-normalize.conf.html@
+{{{#!code
+@parts/sqlrelay-translations-normalize.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.
@@ -26,7 +28,9 @@ Currently, all translation modules have an //enabled// parameter, allowing the m
 Translation modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
-@sqlrelay-translations-stacked.conf.html@
+{{{#!code
+@parts/sqlrelay-translations-stacked.conf@
+}}}
 }}}
 
 At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
@@ -52,13 +56,17 @@ The normalize module performs the following operations on a query:
 For example, the following query:
 
 {{{#!blockquote
-@normalize-before.sql.html@
+{{{#!code
+@parts/normalize-before.sql@
+}}}
 }}}
 
 Would be translated to:
 
 {{{#!blockquote
-@normalize-after.sql.html@
+{{{#!code
+@parts/normalize-after.sql@
+}}}
 }}}
 
 Normalizing a query is useful when also using [filters.html Query Filters] as it simplifies the patterns that have to be searched for.

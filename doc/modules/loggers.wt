@@ -14,7 +14,9 @@ Logger modules allow the SQL Relay server programs to log various bits of inform
 For example, to use the //debug// module, which logs detailed information for debugging purposes, you would include a section in the sqlrelay.conf file like:
 
 {{{#!blockquote
-@sqlrelay-debug.conf.html@
+{{{#!code
+@parts/sqlrelay-debug.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.  The //listener// and //connection// attributes are parameters for the module.

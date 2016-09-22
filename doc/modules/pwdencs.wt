@@ -18,7 +18,9 @@ The //passwordencryptions// section of the sqlrelay.conf file indicates which mo
 For example, the //rot// (rotate) module encrypts by performing a simple character rotation.  To use this module you would include a section in the sqlrelay.conf file like:
 
 {{{#!blockquote
-@sqlrelay-pwdencs-rot13.conf.html@
+{{{#!code
+@parts/sqlrelay-pwdencs-rot13.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.  The //id// and //count// attributes are parameters for the module.  "13" tells the module to rotate by 13 characters.  The //id// attribute is defined by you and just assigns this particular configuration an id that may be referred to later.
@@ -28,7 +30,9 @@ Module configurations may have attributes and/or nested tags.  How these element
 To use this module with with an SQL Relay password, you would specify:
 
 {{{#!blockquote
-@sqlrelay-pwdencs-user-rot13.conf.html@
+{{{#!code
+@parts/sqlrelay-pwdencs-user-rot13.conf@
+}}}
 }}}
 
 Note that the password is encrypted.  Unencrypted, it would just be "test".  A command line program (described later) is provided to encrypt passwords.
@@ -38,7 +42,9 @@ Note also that the passwordencryptionid attribute refers to the id of the module
 To use password encryption with a database password, you would specify:
 
 {{{#!blockquote
-@sqlrelay-pwdencs-connection-rot13.conf.html@
+{{{#!code
+@parts/sqlrelay-pwdencs-connection-rot13.conf@
+}}}
 }}}
 
 Again, the password is encrypted.  Unencrypted, it would just be "testpassword".
@@ -46,7 +52,9 @@ Again, the password is encrypted.  Unencrypted, it would just be "testpassword".
 It is possible to load multiple modules and use each one with a different password.  For example, you might want to use the //rot// module with a count of 13 for the SQL Relay password and a count of 10 for the database password.
 
 {{{#!blockquote
-@sqlrelay-pwdencs-multiple.conf.html@
+{{{#!code
+@parts/sqlrelay-pwdencs-multiple.conf@
+}}}
 }}}
 
 Encryption modules may be either two-way or one-way.  Two-way encryption modules can both encrypt and decrypt a password.  One-way encryption modules can only encrypt a password.

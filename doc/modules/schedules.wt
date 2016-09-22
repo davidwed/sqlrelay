@@ -14,7 +14,9 @@ Connection schedule modules allow the SQL Relay server to control when users are
 The //schedules// section of the sqlrelay.conf file indicates which schedules modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-schedules-cron-deny.conf.html@
+{{{#!code
+@parts/sqlrelay-schedules-cron-deny.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.
@@ -26,7 +28,9 @@ Currently, all schedule modules have an //enabled// parameter, allowing the modu
 Connection schedule modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
-@sqlrelay-schedules-stacked.conf.html@
+{{{#!code
+@parts/sqlrelay-schedules-stacked.conf@
+}}}
 }}}
 
 At startup, the SQL Relay server creates instances of the specified schedule modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  Each module applies its rules to the specified user.  If a module denies access to a user then the remaining modules are ignored.  If the user makes it through all modules without being denies access, then the user is allowed access.
@@ -47,7 +51,9 @@ The '''cron_userlist''' module allows you to define a connection schedule for a 
 An example configuration follows.
 
 {{{#!blockquote
-@sqlrelay-schedules-cron-deny.conf.html@
+{{{#!code
+@parts/sqlrelay-schedules-cron-deny.conf@
+}}}
 }}}
 
 In this example, the module denies access to all users by default, but then allows access to the dmuse, kmuse, imuse, and smuse users during business hours.  In this case, business hours are defined as:
@@ -61,7 +67,9 @@ In this example, the module denies access to all users by default, but then allo
 Another example configuration follows.
 
 {{{#!blockquote
-@sqlrelay-schedules-cron-allow.conf.html@
+{{{#!code
+@parts/sqlrelay-schedules-cron-allow.conf@
+}}}
 }}}
 
 In this example, the module allows access to all users by default, but then denies access to the dmuse, kmuse, imuse, and smuse users during non-business hours.  In this case, non-business hours are defined as:

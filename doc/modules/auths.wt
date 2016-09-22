@@ -24,7 +24,9 @@ Auth modules allow the SQL Relay server programs to authenticate/authorize users
 The //auths// section of the sqlrelay.conf file indicates which auth modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-auths-userlist.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-userlist.conf@
+}}}
 }}}
 
 In this example, the //module// attribute specifies which module to load and the //user// tags specify the list of valid users and passwords.
@@ -34,7 +36,9 @@ Module configurations may have attributes and/or nested tags.  How these element
 Auth modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
-@sqlrelay-auths-stacked.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-stacked.conf@
+}}}
 }}}
 
 At startup, the SQL Relay server creates instances of the specified auth modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  If a module successfully authenticates/authorizes a user, then the client is allowed to continue its session.  If a module fails to authenticate/authorize a user, then the credentials are passed on to the next module.  If all modules fail to authenticate/authorize a user, then the client is not allowed to continue its session.
@@ -56,19 +60,25 @@ The userlist module authenticates/authorizes a user against a static list of val
 When using the userlist auth module, rather than using the //users// tag to specify valid users...
 
 {{{#!blockquote
-@sqlrelay-auths-users.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-users.conf@
+}}}
 }}}
 
 ...you would list the users inside of the tag for the module:
 
 {{{#!blockquote
-@sqlrelay-auths-userlist.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-userlist.conf@
+}}}
 }}}
 
 [pwdencs.html Password encryption] modules may also be used.
 
 {{{#!blockquote
-@sqlrelay-auths-userlist-pwdenc.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-userlist-pwdenc.conf@
+}}}
 }}}
 
 The userlist module can also authorize Kerberos-authenticated or Active Directory-authenticated users, as well as users authenticated by a TLS/SSL certificate.  The module automatically detects which athentication method to use, based on the credentials supplied by the client.
@@ -76,7 +86,9 @@ The userlist module can also authorize Kerberos-authenticated or Active Director
 When configuring the module to authenticate a Kerberos/Active-Directory user, include the list of valid principals, and omit the password from each entry.
 
 {{{#!blockquote
-@sqlrelay-auths-krb_userlist.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-krb_userlist.conf@
+}}}
 }}}
 
 See the [../admin/configguide.html#krb SQL Relay Configuration Guide] for more information about configuring Kerberos and Active Directory encryption and authentication.
@@ -84,7 +96,9 @@ See the [../admin/configguide.html#krb SQL Relay Configuration Guide] for more i
 When configuring the module to authenticate a TLS/SSL user, include the list of valid client names, and omit the password from each entry.
 
 {{{#!blockquote
-@sqlrelay-auths-tls_userlist.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-tls_userlist.conf@
+}}}
 }}}
 
 If the client's certificate contains Subject Alternative Names then each SAN will be compared to each entry in the list.  If a match is found then the client is authorized.
@@ -122,13 +136,17 @@ Using the database module has the same behavior as setting authtier="database" i
 When using the database auth module, rather than using authtier="database"...
 
 {{{#!blockquote
-@sqlrelay-auths-authtier-database.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-authtier-database.conf@
+}}}
 }}}
 
 ...you would use the module instead:
 
 {{{#!blockquote
-@sqlrelay-auths-database.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-database.conf@
+}}}
 }}}
 
 Since the userlist auth module appears to provide the exact same functionality as the built-in //authtier// attribute, why would you want to use it instead of just using the built-in //authtier// attribute?
@@ -156,13 +174,17 @@ Using the proxied module has the same behavior as setting authtier="proxied" in 
 When using the proxied auth module, rather than using authtier="proxied"...
 
 {{{#!blockquote
-@sqlrelay-auths-authtier-proxied.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-authtier-proxied.conf@
+}}}
 }}}
 
 ...you would use the module instead:
 
 {{{#!blockquote
-@sqlrelay-auths-proxied.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-proxied.conf@
+}}}
 }}}
 
 Since the userlist auth module appears to provide the exact same functionality as the built-in //authtier// attribute, why would you want to use it instead of just using the built-in //authtier// attribute?
@@ -178,7 +200,9 @@ The sqlrelay module authenticates/authorizes a user against a table in a databas
 The module's '''host''', '''port''', '''socket''', '''user''' and '''password''' paramters define which instance of SQL Relay to talk to.  The '''table''', '''usercolumn''' and '''passwordcolumn''' parameters define which table and which columns within the table to authenticate/authorize against.  If passwords aren't stored in plain text, then an optional '''passwordfunction''' parameter may specify the stored procedure used to encrypt the password.
 
 {{{#!blockquote
-@sqlrelay-auths-sqlrelay.conf.html@
+{{{#!code
+@parts/sqlrelay-auths-sqlrelay.conf@
+}}}
 }}}
 
 [=#custom]

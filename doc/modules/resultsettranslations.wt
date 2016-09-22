@@ -14,7 +14,9 @@ Result Set Translation modules allow the SQL Relay server programs to alter fiel
 The //resultsettranslations// section of the sqlrelay.conf file indicates which result set translation modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-resultsettranslations-reformatdatetime.conf.html@
+{{{#!code
+@parts/sqlrelay-resultsettranslations-reformatdatetime.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.
@@ -26,7 +28,9 @@ Currently, all result set translation modules have an //enabled// parameter, all
 Translation modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
-@sqlrelay-resultsettranslations-stacked.conf.html@
+{{{#!code
+@parts/sqlrelay-resultsettranslations-stacked.conf@
+}}}
 }}}
 
 At startup, the SQL Relay server creates instances of the specified result set translations modules and initializes them.  As each field of the result set is returned, the server passes the field to each module, in the order that they were specified in the config file.  If a module modifies a field, then that modified field is passed on to the next module.
@@ -67,7 +71,9 @@ The following parameters are currently supported:
 For example, the following configuration:
 
 {{{#!blockquote
-@sqlrelay-resultsettranslations-reformatdatetime.conf.html@
+{{{#!code
+@parts/sqlrelay-resultsettranslations-reformatdatetime.conf@
+}}}
 }}}
 
 Would translate the following date/time field:

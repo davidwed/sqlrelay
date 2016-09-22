@@ -14,7 +14,9 @@ When used in conjunction with the dbase="router" parameter, router modules allow
 The //routers// section of the sqlrelay.conf file indicates which router modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-routers-regex.conf.html@
+{{{#!code
+@parts/sqlrelay-routers-regex.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.
@@ -45,7 +47,9 @@ The '''regex''' module routes queries by matching them against regular expressio
 An example configuration follows.
 
 {{{#!blockquote
-@sqlrelay-routers-regex.conf.html@
+{{{#!code
+@parts/sqlrelay-routers-regex.conf@
+}}}
 }}}
 
 In this example DDL/DML queries are routed to the connectionid "master", and all other queries are routed to the connectionid "slave".
@@ -63,7 +67,9 @@ The '''userlist''' module routes queries by matching the user that ran the query
 An example configuration follows.
 
 {{{#!blockquote
-@sqlrelay-routers-userlist.conf.html@
+{{{#!code
+@parts/sqlrelay-routers-userlist.conf@
+}}}
 }}}
 
 In this example queries run by user named "master" are routed to the connectionid "master", and queries run by any other user are routed to the connectionid "slave".
@@ -81,7 +87,9 @@ The '''clientiplist''' module routes queries by matching the client that ran the
 An example configuration follows.
 
 {{{#!blockquote
-@sqlrelay-routers-clientiplist.conf.html@
+{{{#!code
+@parts/sqlrelay-routers-clientiplist.conf@
+}}}
 }}}
 
 In this example queries run by clients at IP addresses 192.0-168.*.213 are routed to the connectionid "master", and queries run by clients at any other IP address are routed to the connectionid "slave".

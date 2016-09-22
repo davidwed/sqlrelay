@@ -14,7 +14,9 @@ Notification modules allow the SQL Relay server programs to notify recipients wh
 The //notifications// section of the sqlrelay.conf file indicates which notification modules to load and what parameters to use when executing them.
 
 {{{#!blockquote
-@sqlrelay-notifications-events.conf.html@
+{{{#!code
+@parts/sqlrelay-notifications-events.conf@
+}}}
 }}}
 
 The //module// attribute specifies which module to load.
@@ -26,7 +28,9 @@ Currently, all notification modules have an //enabled// parameter, allowing the 
 Notification modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
-@sqlrelay-notifications-stacked.conf.html@
+{{{#!code
+@parts/sqlrelay-notifications-stacked.conf@
+}}}
 }}}
 
 At startup, the SQL Relay server processes create instances of the specified notification modules and initializes them.  As events occur, the server passes the event and, optionally, a string of information about the event to each module, in the order that they were specified in the config file.  If a module is listening for that event, then it sends a notification to the specified recpients.
@@ -45,7 +49,9 @@ The '''events''' module listens for a specified set of events and notifies recip
 An example configuration follows.
 
 {{{#!blockquote
-@sqlrelay-notifications-events.conf.html@
+{{{#!code
+@parts/sqlrelay-notifications-events.conf@
+}}}
 }}}
 
 In this example, the module sends notifications to '''dev@firstworks.com''' when one of the '''db_error''', '''db_warning''', or '''filter_violation''' events occurs.

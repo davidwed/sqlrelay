@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.SUFFIXES: .wt .html.in
+.SUFFIXES: .wt .html
 
 SRCS = auths.wt \
 	filters.wt \
@@ -14,26 +14,20 @@ SRCS = auths.wt \
 	schedules.wt \
 	translations.wt
 
-OBJS = auths.html.in \
-	filters.html.in \
-	loggers.html.in \
-	notifications.html.in \
-	pwdencs.html.in \
-	resultsettranslations.html.in \
-	routers.html.in \
-	schedules.html.in \
-	translations.html.in
+OBJS = auths.html \
+	filters.html \
+	loggers.html \
+	notifications.html \
+	pwdencs.html \
+	resultsettranslations.html \
+	routers.html \
+	schedules.html \
+	translations.html
 
-.wt.html.in:
+.wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf
 
 all: $(OBJS)
-	$(MAKE) html
-	$(MAKE) cleanin
 
 clean:
 	$(RM) $(OBJS)
-	$(MAKE) cleanin
-
-cleanin:
-	$(RM) *.in
