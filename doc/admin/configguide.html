@@ -71,23 +71,27 @@
 <p>The most minimal SQL Relay configuration would be something like:</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>This configuration defines an instance of SQL Relay named <i>example</i>, secured by a user and password, that opens and maintains a pool of 5 persistent connections to the <i>orcl</i> instance of an Oracle database using <i>scott</i><i>/tiger</i> credentials.</p>
 
@@ -121,23 +125,27 @@
 <p>By default, SQL Relay opens and maintains a pool of 5 persistent database connections, but the number of connections can be configured using the connections attribute.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p><a href="../features/connectionpooling.html">Connection pooling</a> reduces the amount of time it takes an app to connect to the database, which can dramatically improve performance for many applications.</p>
 
@@ -152,23 +160,27 @@
 <p>SQL Relay maintains persistent cursors as well as connections.  By default, each connection opens one cursor, but the number of cursors opened by each connection can be configured using the cursors attribute.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font> <font color="#009900">cursors</font><font color="#990000">=</font><font color="#FF0000">"2"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>cursors</b></font>=<font color="#ff00ff">&quot;2&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>Any number of cursors can be opened.  A good rule of thumb is to open as few as possible but as many as you know that your application will need.</p>
 
@@ -179,23 +191,27 @@
 <p>The maxconnections and maxcursors attribute define the upper bounds.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font> <font color="#009900">maxconnections</font><font color="#990000">=</font><font color="#FF0000">"20"</font> <font color="#009900">cursors</font><font color="#990000">=</font><font color="#FF0000">"2"</font> <font color="#009900">maxcursors</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>maxconnections</b></font>=<font color="#ff00ff">&quot;20&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>cursors</b></font>=<font color="#ff00ff">&quot;2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>maxcursors</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>In this example, 10 connections will be started initially but more will be be started as necessary, up to 20.  Each of the newly spawned connections will die off if they are inactive for longer than 1 minute.</p>
 
@@ -219,23 +235,27 @@
 <p>It can be configured to listen on a different port though...</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>...and accessed using:</p>
 
@@ -247,23 +267,27 @@
 <p>It can also be configured to listen on a unix socket...</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/example.socket"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/example.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>...and accessed from the local server using:</p>
 
@@ -275,23 +299,27 @@
 <p>If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">addresses</font><font color="#990000">=</font><font color="#FF0000">"192.168.1.50,192.168.123.51"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>addresses</b></font>=<font color="#ff00ff">&quot;192.168.1.50,192.168.123.51&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>When configured this way, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
 
@@ -304,44 +332,52 @@
 <p>In the following example, SQL Relay is configured to connect to a SAP/Sybase database.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>In this example, SQL Relay is configured to connect to an IBM DB2 database.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;db2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>When connecting to an Oracle database, the dbase attribute may be omitted or set to "oracle".</p>
 
@@ -358,31 +394,35 @@
 <p>In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;session&gt;</font></b>
+			<b><font color="#0000FF">&lt;start&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='MM/DD/YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/start&gt;</font></b>
+			<b><font color="#0000FF">&lt;end&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='DD-MON-YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/end&gt;</font></b>
+		<b><font color="#0000FF">&lt;/session&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">session</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">start</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">runquery</font><font color="#008b8b">&gt;</font>alter session set nls_date_format='MM/DD/YYYY'<font color="#008b8b">&lt;/runquery&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/start&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">end</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">runquery</font><font color="#008b8b">&gt;</font>alter session set nls_date_format='DD-MON-YYYY'<font color="#008b8b">&lt;/runquery&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/end&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/session&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.</p>
 
@@ -393,41 +433,45 @@
 <p>In following example, instances that connect to Oracle, SAP/Sybase and DB2 are defined in the same file.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;oracleexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9000&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sapexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;db2example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;db2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9002&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>These instances can be started using:</p>
 
@@ -486,65 +530,77 @@ sqlrsh -host sqlrserver -port 9002
 <p><b>sqlrelay.conf.d/oracle.conf</b></p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;oracleexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9000&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p><b>sqlrelay.conf.d/sap.conf</b></p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sapexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p><b>sqlrelay.conf.d/db2.conf</b></p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;db2example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;db2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9002&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <br/><br/><a name="specifying"/><h2>Specifying Configuration Files</h2>
 
@@ -666,41 +722,45 @@ http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/db2.conf
 <p>For example, if the following instances are defined...</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;oracleexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>enabled</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9000&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sapexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>enabled</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sap&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;db2example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;db2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9002&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
 
@@ -765,25 +825,29 @@ sqlrelay_flags=""
 <p>In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - orcl1, orcl2, and orcl3</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl1"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl2"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl3"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl1&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl2&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl3&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>Any number of connection tags may be defined.</p>
 
@@ -794,25 +858,29 @@ sqlrelay_flags=""
 <p>SQL Relay uses the connection tag's metric attribute to decide how many connections to open to each node.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl1"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"5"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl2"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"15"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl3"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"30"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl1&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;5&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;15&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl3&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>metric</b></font>=<font color="#ff00ff">&quot;30&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>The metric attribute doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be opened and maintained.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
 
@@ -829,23 +897,27 @@ sqlrelay_flags=""
 <p>To indicate to SQL Relay that the nodes are already-load-balanced, and need to be "shuffled" periodically, only one connection tag should be used, with the behindloadbalancer attribute set to "yes".</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orclrac"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orclrac&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>behindloadbalancer</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <br/><br/><a name="router"/><h3>Master-Slave Query Routing</h3>
 
@@ -858,85 +930,89 @@ sqlrelay_flags=""
 <p>This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to the "master" MySQL database</font></i>
+<i><font color="#9A1900">                on the masterdb machine.  This instance only listens on the</font></i>
+<i><font color="#9A1900">                unix socket /tmp/master.socket and thus cannot be connected to</font></i>
+<i><font color="#9A1900">                by clients from another machine. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/master.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"masteruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=masteruser;password=masterpassword;host=masterdb;db=master;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to the &quot;master&quot; MySQL database</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on the masterdb machine.&nbsp;&nbsp;This instance only listens on the</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unix socket /tmp/master.socket and thus cannot be connected to</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by clients from another machine. --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;master&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/master.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;mysql&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;masteruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;masterpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=masteruser;password=masterpassword;host=masterdb;db=master;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to 4 &quot;slave&quot; MySQL databases</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on 4 slave machines.&nbsp;&nbsp;This instance only listens on the unix</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;socket /tmp/slave.socket and thus cannot be connected to by</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clients from another machine. --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;slave&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/slave.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;mysql&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;slaveuser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;slavepassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb1;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb2;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb3;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb3;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance sends DML (insert,update,delete) and</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DDL (create/delete) queries to the &quot;master&quot; SQL Relay instance</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;which, in turn, sends them to the &quot;master&quot; database.</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This instance sends any other queries to the &quot;slave&quot; SQL Relay</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instance which, in turn, distributes them over the &quot;slave&quot;</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;databases. --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;routeruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;routerpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">routers</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all DML/DDL queries to &quot;master&quot;&nbsp;&nbsp;--</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;master&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^drop &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^create &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^insert &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^update &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^delete &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/router&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all other queries to &quot;slave&quot; --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;slave&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;.*&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/router&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/routers&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;master&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;socket=/tmp/master.socket;user=masteruser;password=masterpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;slave&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;socket=/tmp/slave.socket;user=slaveuser;password=slavepassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notifications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notification</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;events&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">events</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;integrity_violation&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/events&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipients</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipient</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>address</b></font>=<font color="#ff00ff">&quot;dba@firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/recipients&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notification&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notifications&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to 4 "slave" MySQL databases</font></i>
+<i><font color="#9A1900">                on 4 slave machines.  This instance only listens on the unix</font></i>
+<i><font color="#9A1900">                socket /tmp/slave.socket and thus cannot be connected to by</font></i>
+<i><font color="#9A1900">                clients from another machine. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/slave.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"slaveuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb1;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb2;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb3;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb3;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance sends DML (insert,update,delete) and</font></i>
+<i><font color="#9A1900">                DDL (create/delete) queries to the "master" SQL Relay instance</font></i>
+<i><font color="#9A1900">                which, in turn, sends them to the "master" database.</font></i>
+<i><font color="#9A1900">                This instance sends any other queries to the "slave" SQL Relay</font></i>
+<i><font color="#9A1900">                instance which, in turn, distributes them over the "slave"</font></i>
+<i><font color="#9A1900">                databases. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+                        <i><font color="#9A1900">&lt;!-- send all DML/DDL queries to "master"  --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^drop "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^create "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^insert "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^update "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^delete "</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+                        <i><font color="#9A1900">&lt;!-- send all other queries to "slave" --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/master.socket;user=masteruser;password=masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/slave.socket;user=slaveuser;password=slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
+			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;events&gt;</font></b>
+					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/events&gt;</font></b>
+				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
+					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
+			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
+		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>The first two instances use familiar configuration options, but the third uses a dbtype of "router" and uses instances of the router module to define query routing rules.</p>
 
@@ -998,30 +1074,34 @@ sqlr-start -id router
 <p>The following configuration configures an instance of SQL Relay to use Kerberos authentication and encryption:</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">krb</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">krbservice</font><font color="#990000">=</font><font color="#FF0000">"sqlrelay"</font> <font color="#009900">krbkeytab</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrelay.keytab"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"dmuse@KRB.FIRSTWORKS.COM"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"kmuse@KRB.FIRSTWORKS.COM"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"imuse@KRB.FIRSTWORKS.COM"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"smuse@KRB.FIRSTWORKS.COM"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"FIRSTWORKS.COM\dmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"FIRSTWORKS.COM\kmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"FIRSTWORKS.COM\imuse"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"FIRSTWORKS.COM\smuse"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>krb</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>krbservice</b></font>=<font color="#ff00ff">&quot;sqlrelay&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>krbkeytab</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrelay.keytab&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;dmuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;kmuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;imuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;smuse@KRB.FIRSTWORKS.COM&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\dmuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\kmuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\imuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;FIRSTWORKS.COM\smuse&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <ul>
   <li>The <b>krb</b> parameter enables (or disables) Kerberos authentication and encryption.</li>
@@ -1098,23 +1178,27 @@ sqlr-start -id router
 <p>The following configuration enables TLS/SSL security for an instance of SQL relay:</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">tls</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">tlscert</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrserver.pem"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>tls</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>tlscert</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrserver.pem&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <ul>
   <li>The <b>tls</b> parameter enables (or disables) TLS/SSL encryption.</li>
@@ -1182,30 +1266,34 @@ sqlr-start -id router
 <p>The following configuration enables these checks for an instance of SQL relay:</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font>
+		<font color="#009900">tls</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
+		<font color="#009900">tlscert</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrserver.pem"</font>
+		<font color="#009900">tlsvalidate</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
+		<font color="#009900">tlsca</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrca.pem"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient1.firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient2.firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient3.firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient4.firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><br>
-<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tls</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><br>
-<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tlscert</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrserver.pem&quot;</font><br>
-<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tlsvalidate</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><br>
-<font color="#008b8b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2e8b57"><b>tlsca</b></font>=<font color="#ff00ff">&quot;/usr/local/firstworks/etc/sqlrca.pem&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient1.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient2.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient3.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlrclient4.firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <ul>
   <li>The <b>tlsvalidate</b> parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.</li>

@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.SUFFIXES: .wt .html.in
+.SUFFIXES: .wt .html
 
 SRCS = configguide.wt \
 	configreference.wt \
@@ -13,25 +13,19 @@ SRCS = configguide.wt \
 	running.wt \
 	tuning.wt
 
-OBJS = configguide.html.in \
-	configreference.html.in \
-	installing.html.in \
-	oraclentier.html.in \
-	prerequisites.html.in \
-	router.html.in \
-	running.html.in \
-	tuning.html.in
+OBJS = configguide.html \
+	configreference.html \
+	installing.html \
+	oraclentier.html \
+	prerequisites.html \
+	router.html \
+	running.html \
+	tuning.html
 
-.wt.html.in:
+.wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf
 
 all: $(OBJS)
-	$(MAKE) html
-	$(MAKE) cleanin
 
 clean:
 	$(RM) $(OBJS)
-	$(MAKE) cleanin
-
-cleanin:
-	$(RM) *.in

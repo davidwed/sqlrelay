@@ -50,85 +50,89 @@ of SQL Relay run on the same machine, but in reality, all 3 could run on
 separate machines.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to the "master" MySQL database</font></i>
+<i><font color="#9A1900">                on the masterdb machine.  This instance only listens on the</font></i>
+<i><font color="#9A1900">                unix socket /tmp/master.socket and thus cannot be connected to</font></i>
+<i><font color="#9A1900">                by clients from another machine. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/master.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"masteruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=masteruser;password=masterpassword;host=masterdb;db=master;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to the &quot;master&quot; MySQL database</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on the masterdb machine.&nbsp;&nbsp;This instance only listens on the</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unix socket /tmp/master.socket and thus cannot be connected to</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by clients from another machine. --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;master&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/master.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;mysql&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;masteruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;masterpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=masteruser;password=masterpassword;host=masterdb;db=master;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to 4 &quot;slave&quot; MySQL databases</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on 4 slave machines.&nbsp;&nbsp;This instance only listens on the unix</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;socket /tmp/slave.socket and thus cannot be connected to by</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clients from another machine. --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;slave&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/slave.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;mysql&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;slaveuser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;slavepassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb1;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb2;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb3;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=slaveuser;password=slavepassword;host=slavedb3;db=slave;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance sends DML (insert,update,delete) and</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DDL (create/delete) queries to the &quot;master&quot; SQL Relay instance</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;which, in turn, sends them to the &quot;master&quot; database.</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This instance sends any other queries to the &quot;slave&quot; SQL Relay</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instance which, in turn, distributes them over the &quot;slave&quot;</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;databases. --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;routeruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;routerpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">routers</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all DML/DDL queries to &quot;master&quot;&nbsp;&nbsp;--</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;master&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^drop &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^create &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^insert &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^update &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^delete &quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/router&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all other queries to &quot;slave&quot; --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;slave&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;.*&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/router&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/routers&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;master&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;socket=/tmp/master.socket;user=masteruser;password=masterpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;slave&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;socket=/tmp/slave.socket;user=slaveuser;password=slavepassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notifications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notification</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;events&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">events</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;integrity_violation&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/events&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipients</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipient</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>address</b></font>=<font color="#ff00ff">&quot;dba@firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/recipients&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notification&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notifications&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to 4 "slave" MySQL databases</font></i>
+<i><font color="#9A1900">                on 4 slave machines.  This instance only listens on the unix</font></i>
+<i><font color="#9A1900">                socket /tmp/slave.socket and thus cannot be connected to by</font></i>
+<i><font color="#9A1900">                clients from another machine. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/slave.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"slaveuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb1;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb2;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb3;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb3;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance sends DML (insert,update,delete) and</font></i>
+<i><font color="#9A1900">                DDL (create/delete) queries to the "master" SQL Relay instance</font></i>
+<i><font color="#9A1900">                which, in turn, sends them to the "master" database.</font></i>
+<i><font color="#9A1900">                This instance sends any other queries to the "slave" SQL Relay</font></i>
+<i><font color="#9A1900">                instance which, in turn, distributes them over the "slave"</font></i>
+<i><font color="#9A1900">                databases. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+                        <i><font color="#9A1900">&lt;!-- send all DML/DDL queries to "master"  --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^drop "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^create "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^insert "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^update "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^delete "</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+                        <i><font color="#9A1900">&lt;!-- send all other queries to "slave" --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/master.socket;user=masteruser;password=masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/slave.socket;user=slaveuser;password=slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
+			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;events&gt;</font></b>
+					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/events&gt;</font></b>
+				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
+					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
+			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
+		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="notifications.html">notifications</a> for information about notification modules.</p>
 
@@ -144,68 +148,72 @@ tables and send all queries containing "mysqldb." to the MySQL database and
 all queries containing "postgresqldb." to the PostgreSQL database.</p>
 
 <blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a MySQL database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/mysqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"mysqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqldbuser;password=mysqldbpassword;host=mysqldb;db=mysqldb;"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
 
-<font face="monospace">
-<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
-<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to a MySQL database --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;mysqldb&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;mysql&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=mysqldbuser;password=mysqldbpassword;host=mysqldb;db=mysqldb;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance maintains connections to a PostgreSQL database --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;postgresqldb&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/postgresqldb.socket&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;postgresql&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;postgresqldbuser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;postgresqldbpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=postgresqldbuser;password=postgresqldbpassword;host=postgresqldb;db=postgresqldb;&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- This instance sends queries containing &quot;mysqldb.&quot; to the mysql</font><br>
-<font color="#0000ff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;database and &quot;postgresqldb.&quot; to the postgresql database --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;router&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;routeruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;routerpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">routers</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all mysqldb queries to &quot;mysqldb&quot; --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;mysqldb&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;mysqldb\.&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/router&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all postgresqldb queries to &quot;postgresqldb&quot; --</font><font color="#0000ff">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;regex&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;postgresqldb&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">pattern</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;postgresqldb\.&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/router&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/routers&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;mysqldb&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;socket=/tmp/mysqldb.socket;user=mysqldbuser;password=mysqldbpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connectionid</b></font>=<font color="#ff00ff">&quot;postgresqldb&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;socket=/tmp/postgresqldb.socket;user=postgresqldbuser;password=postgresqldbpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notifications</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">notification</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;events&quot;</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">events</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">event</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>event</b></font>=<font color="#ff00ff">&quot;integrity_violation&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/events&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipients</font><font color="#008b8b">&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">recipient</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>address</b></font>=<font color="#ff00ff">&quot;dba@firstworks.com&quot;</font><font color="#008b8b">/&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/recipients&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notification&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/notifications&gt;</font><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
-<br>
-<font color="#008b8b">&lt;/instances&gt;</font><br>
-</font>
+	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a PostgreSQL database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/postgresqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqldbuser;password=postgresqldbpassword;host=postgresqldb;db=postgresqldb;"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+	<i><font color="#9A1900">&lt;!-- This instance sends queries containing "mysqldb." to the mysql</font></i>
+<i><font color="#9A1900">		database and "postgresqldb." to the postgresql database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- send all mysqldb queries to "mysqldb" --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"mysqldb\."</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- send all postgresqldb queries to "postgresqldb" --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb\."</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/mysqldb.socket;user=mysqldbuser;password=mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/postgresqldb.socket;user=postgresqldbuser;password=postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
+			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;events&gt;</font></b>
+					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/events&gt;</font></b>
+				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
+					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
+			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
+		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
 </blockquote>
 <p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="notifications.html">notifications</a> for information about notification modules.</p>
 

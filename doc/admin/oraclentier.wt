@@ -138,7 +138,9 @@ that there are no users defined as they are unnecessary for this kind of
 configuration.
 
 {{{#!blockquote
-@sqlrelay-proxied.conf.html@
+{{{#!code
+@parts/sqlrelay-proxied.conf.html@
+}}}
 }}}
 
 == Running SQL Relay ==

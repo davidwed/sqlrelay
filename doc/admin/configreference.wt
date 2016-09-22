@@ -20,7 +20,9 @@ Each configuration file may define any number of SQL Relay instances.
 A comprehensive example follows.
 
 {{{#!blockquote
-@sqlrelay-comprehensive.conf.html@
+{{{#!code
+@parts/sqlrelay-comprehensive.conf@
+}}}
 }}}
 
 [[br]][=#tags]

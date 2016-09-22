@@ -49,7 +49,9 @@ This location depends on the platform and on how you installed SQL Relay.
 The most minimal SQL Relay configuration would be something like:
 
 {{{#!blockquote
-@sqlrelay-minimal.conf.html@
+{{{#!code
+@parts/sqlrelay-minimal.conf@
+}}}
 }}}
 
 This configuration defines an instance of SQL Relay named //example//, secured by a user and password, that opens and maintains a pool of 5 persistent connections to the //orcl// instance of an Oracle database using //scott/////tiger// credentials.
@@ -89,7 +91,9 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 By default, SQL Relay opens and maintains a pool of 5 persistent database connections, but the number of connections can be configured using the connections attribute.
 
 {{{#!blockquote
-@sqlrelay-connections.conf.html@
+{{{#!code
+@parts/sqlrelay-connections.conf@
+}}}
 }}}
 
 [../features/connectionpooling.html Connection pooling] reduces the amount of time it takes an app to connect to the database, which can dramatically improve performance for many applications.
@@ -107,7 +111,9 @@ Database cursors are used to execute queries and step through result sets.  Most
 SQL Relay maintains persistent cursors as well as connections.  By default, each connection opens one cursor, but the number of cursors opened by each connection can be configured using the cursors attribute.
 
 {{{#!blockquote
-@sqlrelay-cursors.conf.html@
+{{{#!code
+@parts/sqlrelay-cursors.conf@
+}}}
 }}}
 
 Any number of cursors can be opened.  A good rule of thumb is to open as few as possible but as many as you know that your application will need.
@@ -121,7 +127,9 @@ Both connections and cursors can be configured to scale dynamically - open on de
 The maxconnections and maxcursors attribute define the upper bounds.
 
 {{{#!blockquote
-@sqlrelay-dynamicscaling.conf.html@
+{{{#!code
+@parts/sqlrelay-dynamicscaling.conf@
+}}}
 }}}
 
 In this example, 10 connections will be started initially but more will be be started as necessary, up to 20.  Each of the newly spawned connections will die off if they are inactive for longer than 1 minute.
@@ -146,7 +154,9 @@ By default, SQL Relay listens for client connections on port 9000, on all availa
 It can be configured to listen on a different port though...
 
 {{{#!blockquote
-@sqlrelay-port.conf.html@
+{{{#!code
+@parts/sqlrelay-port.conf@
+}}}
 }}}
 
 ...and accessed using:
@@ -160,7 +170,9 @@ sqlrsh -host sqlrserver -port 9001 -user sqlruser -password sqlrpassword
 It can also be configured to listen on a unix socket...
 
 {{{#!blockquote
-@sqlrelay-socket.conf.html@
+{{{#!code
+@parts/sqlrelay-socket.conf@
+}}}
 }}}
 
 ...and accessed from the local server using:
@@ -174,7 +186,9 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.
 
 {{{#!blockquote
-@sqlrelay-addresses.conf.html@
+{{{#!code
+@parts/sqlrelay-addresses.conf@
+}}}
 }}}
 
 When configured this way, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
@@ -190,13 +204,17 @@ By default, SQL Relay assumes that it's connecting to an Oracle database, but SQ
 In the following example, SQL Relay is configured to connect to a SAP/Sybase database.
 
 {{{#!blockquote
-@sqlrelay-sap.conf.html@
+{{{#!code
+@parts/sqlrelay-sap.conf@
+}}}
 }}}
 
 In this example, SQL Relay is configured to connect to an IBM DB2 database.
 
 {{{#!blockquote
-@sqlrelay-db2.conf.html@
+{{{#!code
+@parts/sqlrelay-db2.conf@
+}}}
 }}}
 
 When connecting to an Oracle database, the dbase attribute may be omitted or set to "oracle".
@@ -215,7 +233,9 @@ You can use SQL Relay's session queries to work around the problem.
 In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.
 
 {{{#!blockquote
-@sqlrelay-sessionqueries.conf.html@
+{{{#!code
+@parts/sqlrelay-sessionqueries.conf@
+}}}
 }}}
 
 Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.
@@ -229,7 +249,9 @@ Any number of SQL Relay instances can be defined in the configuration file.
 In following example, instances that connect to Oracle, SAP/Sybase and DB2 are defined in the same file.
 
 {{{#!blockquote
-@sqlrelay-multiple.conf.html@
+{{{#!code
+@parts/sqlrelay-multiple.conf@
+}}}
 }}}
 
 These instances can be started using:
@@ -279,19 +301,25 @@ For example, if you wanted to split up oracle, sap and db2 configurations into 3
 '''sqlrelay.conf.d/oracle.conf'''
 
 {{{#!blockquote
-@sqlrelay-multipleoracle.conf.html@
+{{{#!code
+@parts/sqlrelay-multipleoracle.conf@
+}}}
 }}}
 
 '''sqlrelay.conf.d/sap.conf'''
 
 {{{#!blockquote
-@sqlrelay-multiplesap.conf.html@
+{{{#!code
+@parts/sqlrelay-multiplesap.conf@
+}}}
 }}}
 
 '''sqlrelay.conf.d/db2.conf'''
 
 {{{#!blockquote
-@sqlrelay-multipledb2.conf.html@
+{{{#!code
+@parts/sqlrelay-multipledb2.conf@
+}}}
 }}}
 
 
@@ -429,7 +457,9 @@ In all previous examples sqlr-start has been called with the -id option, specify
 For example, if the following instances are defined...
 
 {{{#!blockquote
-@sqlrelay-autostart.conf.html@
+{{{#!code
+@parts/sqlrelay-autostart.conf@
+}}}
 }}}
 
 ...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.
@@ -504,7 +534,9 @@ In a database cluster or replication environment, SQL Relay can be configured to
 In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - orcl1, orcl2, and orcl3
 
 {{{#!blockquote
-@sqlrelay-replicated.conf.html@
+{{{#!code
+@parts/sqlrelay-replicated.conf@
+}}}
 }}}
 
 Any number of connection tags may be defined.
@@ -516,7 +548,9 @@ SQL Relay also supports disproportionate distribution of load. If some nodes can
 SQL Relay uses the connection tag's metric attribute to decide how many connections to open to each node.
 
 {{{#!blockquote
-@sqlrelay-replicated-disproportionate.conf.html@
+{{{#!code
+@parts/sqlrelay-replicated-disproportionate.conf@
+}}}
 }}}
 
 The metric attribute doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be opened and maintained.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.
@@ -536,7 +570,9 @@ SQL Relay manages this by "shuffling" the connections periodically.  Every so of
 To indicate to SQL Relay that the nodes are already-load-balanced, and need to be "shuffled" periodically, only one connection tag should be used, with the behindloadbalancer attribute set to "yes".
 
 {{{#!blockquote
-@sqlrelay-rac.conf.html@
+{{{#!code
+@parts/sqlrelay-rac.conf@
+}}}
 }}}
 
 
@@ -552,7 +588,9 @@ In a master-slave replication environment, SQL Relay can be configured to route 
 This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.
 
 {{{#!blockquote
-@sqlrelay-router.conf.html@
+{{{#!code
+@parts/sqlrelay-router.conf@
+}}}
 }}}
 
 The first two instances use familiar configuration options, but the third uses a dbtype of "router" and uses instances of the router module to define query routing rules.
@@ -619,7 +657,9 @@ On Linux and Unix systems, both server and client environments must be "Kerberiz
 The following configuration configures an instance of SQL Relay to use Kerberos authentication and encryption:
 
 {{{#!blockquote
-@sqlrelay-krb.conf.html@
+{{{#!code
+@parts/sqlrelay-krb.conf@
+}}}
 }}}
 
 * The '''krb''' parameter enables (or disables) Kerberos authentication and encryption.
@@ -695,7 +735,9 @@ When using TLS/SSL encryption and authentication, at minimum, a certificate must
 The following configuration enables TLS/SSL security for an instance of SQL relay:
 
 {{{#!blockquote
-@sqlrelay-tls.conf.html@
+{{{#!code
+@parts/sqlrelay-tls.conf@
+}}}
 }}}
 
 * The '''tls''' parameter enables (or disables) TLS/SSL encryption.
@@ -776,7 +818,9 @@ For a more secure session, the server may request a certificate from the client,
 The following configuration enables these checks for an instance of SQL relay:
 
 {{{#!blockquote
-@sqlrelay-tls-validate.conf.html@
+{{{#!code
+@parts/sqlrelay-tls-validate.conf@
+}}}
 }}}
 
 * The '''tlsvalidate''' parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.

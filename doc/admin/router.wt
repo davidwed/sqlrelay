@@ -43,7 +43,9 @@ of SQL Relay run on the same machine, but in reality, all 3 could run on
 separate machines.
 
 {{{#!blockquote
-@sqlrelay-router.conf.html@
+{{{#!code
+@parts/sqlrelay-router.conf@
+}}}
 }}}
 
 Note the use of a notification module to notify //dba@firstworks.com// if an //integrity_violation// event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See [notifications.html notifications] for information about notification modules.
@@ -60,7 +62,9 @@ tables and send all queries containing "mysqldb." to the !MySQL database and
 all queries containing "postgresqldb." to the !PostgreSQL database.
 
 {{{#!blockquote
-@sqlrelay-router-multipledb.conf.html@
+{{{#!code
+@parts/sqlrelay-router-multipledb.conf@
+}}}
 }}}
 
 Note the use of a notification module to notify //dba@firstworks.com// if an //integrity_violation// event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See [notifications.html notifications] for information about notification modules.
