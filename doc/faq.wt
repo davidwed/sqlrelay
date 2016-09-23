@@ -288,7 +288,7 @@ See [dropin/mysql.html Using the SQL Relay drop-in replacement library for MySQL
 [[br]][=#filtering]
 === Can SQL Relay be configured to filter out certain queries? ===
 
-Yes, see [modules/filters.html Query Filter Modules].
+Yes, see [admin/configguide.html#filtering.html Query Filtering].
 
 [[br]]
 ----
@@ -819,14 +819,14 @@ The modern equivalent configuration to the classic '''debug="listener and connec
 
 You can disable logging of either listener or connection daemons by setting "no" to "yes".
 
-See [modules/loggers.html Logger Modules] for more information.
+See [admin/configguide.html#logging Logging] for more information.
 
 [[br]][=#passwordencryption]
 === I don't like storing plaintext passwords in my configuration file.  Can I encrypt them somehow? ===
 
 Yes.  Both database passwords and passwords for accessing SQL Relay itself can be encrypted via extension modules.  You can use one of the provided modules or develop your own.
 
-See [modules/passwordencryption.html Password Encryption Modules] for more information.
+See [admin/configguide.html#pwdenc Password Encryption] for more information.
 
 [[br]][=#multipleconfig]
 === Do I have to put define all of my instances in the same configuration file? ===

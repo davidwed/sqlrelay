@@ -11,7 +11,6 @@
   <li><a href="#tags">Tags</a></li>
   <li><a href="#attributes">Attributes</a></li>
   <li><a href="#complex">Complex Attributes</a></li>
-  <li><a href="#modules">Extension Modules</a></li>
 </ul>
 
 <br/><a name="example"/><h2>Example</h2>
@@ -122,7 +121,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>The <b>users</b> tag surrounds the list of users that may connect to the instance.</p>
 
-<p>Each <b>user</b> tag defines a user/password combination that may be used to connect to the instance.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></p>
+<p>Each <b>user</b> tag defines a user/password combination that may be used to connect to the instance.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></p>
 
 <p>The <b>session</b> tag surrounds a set of queries to be run at the start and end of each session.  The entire <b>session</b> block is optional.</p>
 
@@ -235,7 +234,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>user</b></li>
   <ul>
     <li><b>user</b> - The user name required to connect to SQL Relay.</li>
-    <li><b>password</b> - The password required to connect to SQL Relay.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+    <li><b>password</b> - The password required to connect to SQL Relay.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
   </ul>
 
 </ul>
@@ -249,7 +248,7 @@ http://www.gnu.org/software/src-highlite -->
       <li>For <b>oracle</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;stmtcachesize=0;rejectduplicatebinds=yes/no;disablekeylookup=yes/no;identity=ID"</li>
       <ul>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>oracle_sid</b>: Which Oracle SID to use.  Optional if the ORACLE_SID environment variable is set.  Overrides the ORACLE_SID environment variable.  This parameter can either be an SID name corresponding to an entry in the tnsnames.ora file such as:
         <blockquote>
 <i>oracle_sid=ora1</i>
@@ -279,7 +278,7 @@ or a tnsnames-style expression such as:
       <li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;fakebinds=FAKEBINDS;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;sslkey=keyfile;sslcert=certfile;sslca=cafile;sslcapath=cafilepath;sslcipher=cipherlist;foundrows=yes/no;ignorespace=yes/no;identity=ID"</li>
       <ul>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>db</b>: The database to log into.  Required.</li>
         <li><b>host</b>: The host to connect to.  Required.</li>
         <li><b>port</b>: The port to connect to on a remote host.  Optional, defaults to 3306.</li>
@@ -301,7 +300,7 @@ or a tnsnames-style expression such as:
       <li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;sslmode=SSLMODE;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;lastinsertidfunction=LASTINSERTDFUNCTION;identity=ID"</li>
       <ul>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>db</b>: The database to log into.  Required.</li>
         <li><b>host</b>: The host to connect to.  Required.  If host begins with a slash (/) then it is assumed to be the directory containing a unix socket starting with .s.PGSQL.</li>
         <li><b>port</b>: The port to connect to on a remote host.  Optional, defaults to 5432.  If host refers to a unix socket, then port is the extension on the socket name (eg. /tmp/.s.PGSQL.5432).</li>
@@ -324,7 +323,7 @@ or a tnsnames-style expression such as:
       <ul>
         <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.</li>
         <li><b>db</b>: The database to log into.  Required.</li>
         <li><b>charset</b>: The character set to use.  Optional.</li>
@@ -340,7 +339,7 @@ or a tnsnames-style expression such as:
       <ul>
         <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.</li>
         <li><b>db</b>: The database to log into.  Required.</li>
         <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
@@ -356,7 +355,7 @@ or a tnsnames-style expression such as:
       <li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;identity=ID"</li>
       <ul>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>dsn</b>: The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.</li>
         <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
         <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
@@ -367,7 +366,7 @@ or a tnsnames-style expression such as:
       <li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</li>
       <ul>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>db</b>: The server instance to connect to.</li>
         <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
         <li><b>lang</b>: Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.</li>
@@ -383,7 +382,7 @@ or a tnsnames-style expression such as:
       <li>For <b>informix</b> databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</li>
       <ul>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>informixdir</b>: Specifies the path to the informix instance that should be used.  This is used for locating the sqlhosts file and other dependencies.  If not specified, this defaults to the value of the INFORMIXDIR environment variable, if set.</li>
         <li><b>servername</b>: The server to connect to, as defined in sqlhosts.  If not specified, this defaults to the value of the INFORMIXSERVER environment variable, if set.</li>
         <li><b>db</b>: The database instance to connect to, on the specified server.</li>
@@ -401,7 +400,7 @@ or a tnsnames-style expression such as:
       <li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;charset=CHARSET;faketransactionblocks=YESORNO;droptemptables=YESORNO;globaltemptables=TABLELIST;lastinsertidfunction=LASTINSERTIDFUNCTION;identity=ID"</li>
       <ul>
         <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
-        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+        <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
         <li><b>db</b>: The filename of the database open.  Required.</li>
         <li><b>dialect</b>: The database dialect to use.  Optional, defaults to 3.</li>
         <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
@@ -436,7 +435,7 @@ or a tnsnames-style expression such as:
     <li><b>port</b> - The port that the SQL Relay server that queries will be routed to is listening on.</li>
     <li><b>socket</b> - The socket that the SQL Relay server that queries will be routed to is listening on.  Only use this if the SQL Relay server that queries will be routed to is running on the same machine as the router.</li>
     <li><b>user</b> - The user name to use to log into the SQL Relay server that queries will be routed to is running on.</li>
-    <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
+    <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
   </ul>
 
 </ul>
@@ -473,23 +472,8 @@ or a tnsnames-style expression such as:
 
 <br/><h3>Handoff</h3>
 
-<p>When an <b>SQL Relay</b> client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The file descriptor of the connected client can be passed from the listener to the connection daemon, or the listener can proxy the client, ferrying data back and forth between it and the connection daemon.  These two methods are referred to as "pass" and "proxy".  "proxy" works on every platform.  "pass" works on most platforms but not all.  "pass" is faster and lighter than "proxy" and should be used if possible.  Cygwin and Linux kernels prior to 2.2 don't support "pass" though, and on those platforms, even if you specify "pass", "proxy" will be used instead and a warning will be displayed.  Other platforms may not support "pass" as well but those are the only known ones and the only ones where "proxy" is forced.</p>
-
-<br/><a name="modules"/><h2>Extension Modules</h2>
-
-<p>SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to a configuration file and each module has its own tags and attributes.  The following types of modules are currently supported:</p>
-
-<ul>
-  <li><a href="../modules/auths.html">Auth Modules</a></li>
-  <li><a href="../modules/pwdencs.html">Password Encryption Modules</a></li>
-  <li><a href="../modules/translations.html">Query Translation Modules</a></li>
-  <li><a href="../modules/filters.html">Query Filter Modules</a></li>
-  <li><a href="../modules/resultsettranslations.html">Result Set Translation Modules</a></li>
-  <li><a href="../modules/schedules.html">Connection Schedule Modules</a></li>
-  <li><a href="../modules/loggers.html">Logger Modules</a></li>
-  <li><a href="../modules/notifications.html">Notification Modules</a>
-</li>
-</ul>
+<p>When an <b>SQL Relay</b> client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The file descriptor of the connected client can be passed from the listener to the connection daemon, or the listener can proxy the client, ferrying data back and forth between it and the connection daemon.  These two methods are referred to as "pass" and "proxy".  "proxy" works on every platform.  "pass" works on most platforms but not all.  "pass" is faster and lighter than "proxy" and should be used if possible.  Cygwin and Linux kernels prior to 2.2 don't support "pass" though, and on those platforms, even if you specify "pass", "proxy" will be used instead and a warning will be displayed.  Other platforms may not support "pass" as well but those are the only known ones and the only ones where "proxy" is forced.
+</p>
 
 </body>
 </html>

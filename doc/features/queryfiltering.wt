@@ -12,4 +12,4 @@ For example, //select * from hugetable where id=100// might be fine...
 
 SQL Relay can be configured to allow one and reject the other.
 
-A complete descripton of query filtering with example configuration files is given [../modules/filters.html here].
+A complete descripton of query filtering with example configuration files is given [../admin/configguide.html#filtering here].
