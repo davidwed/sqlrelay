@@ -152,6 +152,4 @@ uninstall:
 
 clean:
 	$(RM) $(OBJS)
-	cd admin $(AND) $(MAKE) cleanparts
-	cd features $(AND) $(MAKE) cleanparts
 	cd programming $(AND) $(MAKE) cleanparts

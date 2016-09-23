@@ -1,3 +1,5 @@
+0.67.0 - consolidated lots of documentation into configuration guide
+
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every
 		session even if only selects were run, to make sure metadata
