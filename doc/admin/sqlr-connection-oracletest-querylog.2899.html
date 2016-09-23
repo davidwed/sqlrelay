@@ -1,0 +1,358 @@
+<html>
+<body>
+<pre>
+Mon 2015 Apr  6  15:58:10 :
+drop table testtable
+execution time: 1.045129
+Mon 2015 Apr  6  15:58:11 :
+create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)
+execution time: 1.18446744073709410958
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())
+execution time: 0.077606
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+execution time: 0.023698
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+execution time: 0.000385
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+execution time: 0.000938
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+execution time: 0.000352
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+execution time: 0.014303
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+execution time: 0.000333
+Mon 2015 Apr  6  15:58:11 :
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+execution time: 0.000300
+Mon 2015 Apr  6  15:58:11 :
+begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='03-FEB-2001'; end;
+execution time: 0.016637
+Mon 2015 Apr  6  15:58:11 :
+begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='03-FEB-2001'; end;
+execution time: 0.000262
+Mon 2015 Apr  6  15:58:11 :
+begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='03-FEB-2001'; end;
+execution time: 0.000251
+Mon 2015 Apr  6  15:58:11 :
+select * from testtable order by testnumber
+execution time: 0.002317
+Mon 2015 Apr  6  15:58:11 :
+select 1,'hello',10.5556 from dual
+execution time: 0.001050
+Mon 2015 Apr  6  15:58:11 :
+begin :var1:='hello'; end;
+execution time: 0.001089
+Mon 2015 Apr  6  15:58:11 :
+select 1,2,3 from dual
+execution time: 0.000768
+Mon 2015 Apr  6  15:58:11 :
+select 'hi','hello','bye' from dual
+execution time: 0.000714
+Mon 2015 Apr  6  15:58:11 :
+select 10.55,10.556,10.5556 from dual
+execution time: 0.000696
+Mon 2015 Apr  6  15:58:11 :
+select NULL,1,NULL from dual
+execution time: 0.000705
+Mon 2015 Apr  6  15:58:11 :
+select NULL,1,NULL from dual
+execution time: 0.000320
+Mon 2015 Apr  6  15:58:11 :
+select * from testtable order by testnumber
+execution time: 0.000379
+Mon 2015 Apr  6  15:58:11 :
+select * from testtable order by testnumber
+execution time: 0.000276
+Mon 2015 Apr  6  15:58:11 :
+select * from testtable order by testnumber
+execution time: 0.000258
+Mon 2015 Apr  6  15:58:11 :
+select * from testtable order by testnumber
+execution time: 0.000241
+Mon 2015 Apr  6  15:58:11 :
+select * from testtable order by testnumber
+execution time: 0.000257
+Mon 2015 Apr  6  15:58:12 :
+select * from testtable order by testnumber
+execution time: 0.000297
+Mon 2015 Apr  6  15:58:12 :
+select * from testtable order by testnumber
+execution time: 0.000264
+Mon 2015 Apr  6  15:58:12 :
+select * from testtable order by testnumber
+execution time: 0.000268
+Mon 2015 Apr  6  15:58:12 :
+select * from testtable order by testnumber
+execution time: 0.000278
+Mon 2015 Apr  6  15:58:12 :
+select * from testtable order by testnumber
+execution time: 0.000301
+Mon 2015 Apr  6  15:58:12 :
+insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',NULL)
+execution time: 0.001764
+Mon 2015 Apr  6  15:58:12 :
+select * from testtable order by testnumber
+execution time: 0.000309
+Mon 2015 Apr  6  15:58:12 :
+drop table testtable1
+execution time: 0.004593
+Mon 2015 Apr  6  15:58:12 :
+create table testtable1 (testclob clob, testblob blob)
+execution time: 0.111908
+Mon 2015 Apr  6  15:58:12 :
+insert into testtable1 values ('hello',:var1)
+execution time: 0.033265
+Mon 2015 Apr  6  15:58:12 :
+begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;
+execution time: 0.003861
+Mon 2015 Apr  6  15:58:13 :
+drop table testtable1
+execution time: 1.18446744073709360634
+Mon 2015 Apr  6  15:58:13 :
+create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)
+execution time: 0.070494
+Mon 2015 Apr  6  15:58:13 :
+insert into testtable1 values (:var1,:var2,:var3,:var4)
+execution time: 0.089332
+Mon 2015 Apr  6  15:58:13 :
+select * from testtable1
+execution time: 0.002132
+Mon 2015 Apr  6  15:58:13 :
+drop table testtable1
+execution time: 0.155630
+Mon 2015 Apr  6  15:58:14 :
+create or replace package types is type cursorType is ref cursor; end;
+execution time: 1.18446744073709185555
+Mon 2015 Apr  6  15:58:14 :
+create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable where testnumber>value; return l_cursor; end;
+execution time: 0.287923
+Mon 2015 Apr  6  15:58:14 :
+begin  :curs1:=sp_testtable(5);  :curs2:=sp_testtable(0); end;
+execution time: 0.026420
+Mon 2015 Apr  6  15:58:14 :
+
+execution time: 0.000000
+Mon 2015 Apr  6  15:58:14 :
+
+execution time: 0.000000
+Mon 2015 Apr  6  15:58:14 :
+drop package types
+execution time: 0.084781
+Mon 2015 Apr  6  15:58:14 :
+drop table testtable2
+execution time: 0.002949
+Mon 2015 Apr  6  15:58:14 :
+create table testtable2 (testclob clob)
+execution time: 0.007531
+Mon 2015 Apr  6  15:58:16 :
+insert into testtable2 values (:clobval)
+execution time: 2.18446744073709331084
+Mon 2015 Apr  6  15:58:16 :
+select testclob from testtable2
+execution time: 0.001894
+Mon 2015 Apr  6  15:58:16 :
+begin select testclob into :clobbindval from testtable2; end;
+execution time: 0.002198
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable2
+execution time: 0.083185
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable2
+execution time: 0.003182
+Mon 2015 Apr  6  15:58:16 :
+create table testtable2 (testval varchar2(4000))
+execution time: 0.004713
+Mon 2015 Apr  6  15:58:16 :
+insert into testtable2 values (:testval)
+execution time: 0.003887
+Mon 2015 Apr  6  15:58:16 :
+select testval from testtable2
+execution time: 0.002113
+Mon 2015 Apr  6  15:58:16 :
+begin :bindval:='CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'; end;
+execution time: 0.001454
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable2
+execution time: 0.108073
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable2
+execution time: 0.002917
+Mon 2015 Apr  6  15:58:16 :
+create table testtable2 (testval number)
+execution time: 0.004782
+Mon 2015 Apr  6  15:58:16 :
+insert into testtable2 values (:testval)
+execution time: 0.003501
+Mon 2015 Apr  6  15:58:16 :
+select testval from testtable2
+execution time: 0.001682
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable2
+execution time: 0.021588
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable1
+execution time: 0.003701
+Mon 2015 Apr  6  15:58:16 :
+create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))
+execution time: 0.005074
+Mon 2015 Apr  6  15:58:16 :
+insert into testtable1 values (:var1,:var2,:var3)
+execution time: 0.003341
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable1
+execution time: 0.013028
+Mon 2015 Apr  6  15:58:16 :
+drop table testtable
+execution time: 0.015300
+Mon 2015 Apr  6  15:58:16 :
+drop table temptabledelete
+
+execution time: 0.002764
+Mon 2015 Apr  6  15:58:16 :
+create global temporary table temptabledelete (col1 number) on commit delete rows
+execution time: 0.005482
+Mon 2015 Apr  6  15:58:16 :
+insert into temptabledelete values (1)
+execution time: 0.001142
+Mon 2015 Apr  6  15:58:16 :
+select count(*) from temptabledelete
+execution time: 0.002769
+Mon 2015 Apr  6  15:58:16 :
+select count(*) from temptabledelete
+execution time: 0.000373
+Mon 2015 Apr  6  15:58:16 :
+drop table temptabledelete
+
+execution time: 0.011276
+Mon 2015 Apr  6  15:58:16 :
+drop table temptablepreserve
+
+execution time: 0.002976
+Mon 2015 Apr  6  15:58:16 :
+create global temporary table temptablepreserve (col1 number) on commit preserve rows
+execution time: 0.005375
+Mon 2015 Apr  6  15:58:16 :
+insert into temptablepreserve values (1)
+execution time: 0.001172
+Mon 2015 Apr  6  15:58:16 :
+select count(*) from temptablepreserve
+execution time: 0.001591
+Mon 2015 Apr  6  15:58:16 :
+select count(*) from temptablepreserve
+execution time: 0.000359
+Mon 2015 Apr  6  15:58:16 :
+select count(*) from temptablepreserve
+execution time: 0.000351
+Mon 2015 Apr  6  15:58:16 :
+drop table temptablepreserve
+
+execution time: 0.015553
+Mon 2015 Apr  6  15:58:16 :
+drop function testproc
+execution time: 0.021661
+Mon 2015 Apr  6  15:58:16 :
+drop procedure testproc
+execution time: 0.001330
+Mon 2015 Apr  6  15:58:16 :
+create or replace procedure testproc(in1 in number, in2 in number, in3 in varchar2) is begin return; end;
+execution time: 0.119204
+Mon 2015 Apr  6  15:58:16 :
+begin testproc(:in1,:in2,:in3); end;
+execution time: 0.001624
+Mon 2015 Apr  6  15:58:16 :
+drop function testproc
+execution time: 0.001407
+Mon 2015 Apr  6  15:58:16 :
+drop procedure testproc
+execution time: 0.008292
+Mon 2015 Apr  6  15:58:16 :
+create or replace function testproc(in1 in number, in2 in number, in3 in varchar2) return number is begin return in1; end;
+execution time: 0.021444
+Mon 2015 Apr  6  15:58:16 :
+select testproc(:in1,:in2,:in3) from dual
+execution time: 0.007825
+Mon 2015 Apr  6  15:58:16 :
+begin  :out1:=testproc(:in1,:in2,:in3); end;
+execution time: 0.001354
+Mon 2015 Apr  6  15:58:17 :
+drop function testproc
+execution time: 1.18446744073708559392
+Mon 2015 Apr  6  15:58:17 :
+drop procedure testproc
+execution time: 0.001455
+Mon 2015 Apr  6  15:58:17 :
+create or replace procedure testproc(in1 in number, in2 in number, in3 in varchar2, out1 out number, out2 out number, out3 out varchar2) is begin out1:=in1; out2:=in2; out3:=in3; end;
+execution time: 0.008205
+Mon 2015 Apr  6  15:58:17 :
+begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;
+execution time: 0.001861
+Mon 2015 Apr  6  15:58:17 :
+drop function testproc
+execution time: 0.001511
+Mon 2015 Apr  6  15:58:17 :
+drop procedure testproc
+execution time: 0.008178
+Mon 2015 Apr  6  15:58:17 :
+drop procedure testproc
+execution time: 0.001546
+Mon 2015 Apr  6  15:58:17 :
+create or replace procedure testproc(in1 in number, out1 out number) is begin out1:=in1; return; end;
+execution time: 0.006771
+Mon 2015 Apr  6  15:58:17 :
+begin testproc(:in,:out); end;
+execution time: 0.001523
+Mon 2015 Apr  6  15:58:17 :
+begin testproc(:in,:out); end;
+execution time: 0.000254
+Mon 2015 Apr  6  15:58:17 :
+begin testproc(:in,:out); end;
+execution time: 0.000234
+Mon 2015 Apr  6  15:58:17 :
+drop procedure testproc
+execution time: 0.007425
+Mon 2015 Apr  6  15:58:17 :
+select * from testtable order by testnumber
+execution time: 0.001030
+Mon 2015 Apr  6  15:58:17 :
+select * from testtable order by testnumber
+execution time: 0.000616
+Mon 2015 Apr  6  15:58:17 :
+select * from testtable order by testnumber
+execution time: 0.000481
+Mon 2015 Apr  6  15:58:17 :
+select * from testtable order by testnumber
+execution time: 0.000530
+Mon 2015 Apr  6  15:58:17 :
+insert into testtable values (1,2,3,4)
+execution time: 0.000588
+Mon 2015 Apr  6  15:58:17 :
+insert into testtable values (1,2,3,4)
+execution time: 0.000502
+Mon 2015 Apr  6  15:58:17 :
+insert into testtable values (1,2,3,4)
+execution time: 0.000450
+Mon 2015 Apr  6  15:58:17 :
+insert into testtable values (1,2,3,4)
+execution time: 0.000470
+Mon 2015 Apr  6  15:58:17 :
+create table testtable
+execution time: 0.000403
+Mon 2015 Apr  6  15:58:17 :
+create table testtable
+execution time: 0.000429
+Mon 2015 Apr  6  15:58:17 :
+create table testtable
+execution time: 0.000382
+Mon 2015 Apr  6  15:58:17 :
+create table testtable
+execution time: 0.000385
+</pre>
+</body>
+</html>
