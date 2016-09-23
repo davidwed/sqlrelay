@@ -7,68 +7,86 @@
 <h1>SQL Relay Configuration Guide</h1>
 
 <ul>
-  <li><a href="#location">Configuration File Location</a></li>
-  <li><a href="#minimal">Minimal Configuration</a></li>
-  <li><a href="#connections">Database Connections</a></li>
-  <li><a href="#cursors">Database Cursors</a></li>
-  <li><a href="#dynamicscaling">Dynamic Scaling</a></li>
-  <li><a href="#listener">Listener Configuration</a></li>
-  <li><a href="#database">Database Configuration</a></li>
-  <li><a href="#sessionqueries">Session-Queries</a></li>
-  <li><a href="#instances">Multiple Instances</a></li>
-  <li><a href="#directory">Configuration Directory</a></li>
-  <li><a href="#specifying">Specifying Configuration Files</a></li>
-  <li><a href="#remote">Remote Configuration Files</a></li>
-  <li><a href="#linkfiles">Link Files</a></li>
-  <li><a href="#autostart">Starting Instances Automatically</a></li>
-  <li><a href="#ha">High Availability Environments</a></li>
+  <li><a href="#quick">Quick Start</a></li>
+  <li><a href="#basic">Basic Configuration</a></li>
   <ul>
-    <li><a href="#cluster">Load-Balancing and Fail-Over With Replicated or Clustered Databases</a></li>
+    <li><a href="#dbconnections">Database Connections</a></li>
+    <li><a href="#dbcursors">Database Cursors</a></li>
+    <li><a href="#dynamicscaling">Dynamic Scaling</a></li>
+    <li><a href="#listener">Listener Configuration</a></li>
+    <li><a href="#database">Database Configuration</a></li>
+    <li><a href="#instances">Multiple Instances</a></li>
+    <li><a href="#autostart">Starting Instances Automatically</a></li>
+  </ul>
+
+  <li><a href="#altconfigfile">Alternate Configuration File Options</a></li>
+  <ul>
+    <li><a href="#directory">Configuration Directory</a></li>
+    <li><a href="#specifying">Specifying Configuration Files</a></li>
+    <li><a href="#remote">Remote Configuration Files</a></li>
+    <li><a href="#linkfiles">Link Files</a></li>
+  </ul>
+
+  <li><a href="#ha">High Availability</a></li>
+  <ul>
+    <li><a href="#cluster">Load-Balancing and Fail-Over With Replicated Databases or Database Clusters</a></li>
     <li><a href="#rac">Already-Load-Balanced Databases</a></li>
     <li><a href="#router">Master-Slave Query Routing</a></li>
     <li><a href="#frontend">Front-End Load-Balancing and Fail-Over</a></li>
   </ul>
 
-  <li><a href="#krb">Kerberos and Active Directory Encryption and Authentication</a></li>
-  <li><a href="#tls">TLS/SSL Encryption and Authentication</a></li>
+  <li><a href="#authoptions">Authentication/Authorization Options</a></li>
+  <ul>
+    <li><a href="#userlistauth">User List Auth</a></li>
+    <li><a href="#dbauth">Database Auth</a></li>
+    <li><a href="#proxiedauth">Proxied Auth</a></li>
+    <li><a href="#krb">Kerberos and Active Directory Encryption and Authentication</a></li>
+    <li><a href="#tls">TLS/SSL Encryption and Authentication</a></li>
+  </ul>
+
+  <li><a href="#se">Security Enhancement</a></li>
+  <ul>
+    <li><a href="#pwdenc">Password Encryption</a></li>
+    <li><a href="#schedules">Connection Schedules</a></li>
+    <li><a href="#filtering">Query Filtering</a></li>
+  </ul>
+
+  <li><a href="#translation">Translation</a></li>
+  <ul>
+    <li><a href="#querytranslation">Query Translation</a></li>
+    <li><a href="#resultsettranslation">Result Set Translation</a></li>
+  </ul>
+
+  <li><a href="#queryrouting">Query Routing</a></li>
+  <li><a href="#logging">Logging</a></li>
+  <li><a href="#notifications">Notifications</a></li>
+  <li><a href="#sessionqueries">Session-Queries</a></li>
   <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
-<br/><a name="location"/><h2>Configuration File Location</h2>
+<br/><br/><a name="quick"/><h2>Quick Start</h2>
 
-<p>When SQL Relay is first installed, no configuration file exists.  You must create one in the appropriate location.</p>
-
-<p>This location depends on the platform and on how you installed SQL Relay.</p>
+<p>When SQL Relay is first installed, no configuration file exists.  You must create one in the appropriate location.  This location depends on the platform and on how you installed SQL Relay.</p>
 
 <ul>
   <li>Unix and Linux</li>
   <ul>
-    <li>Built from source - <b>/usr/local/firstworks/etc/sqlrelay.conf</b></li>
-    <ul>
-      <li>(however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)</li>
-    </ul>
-
+    <li>Built from source - <b>/usr/local/firstworks/etc/sqlrelay.conf</b> (unless you specified a non-standard --prefix or --sysconfdir during the build)</li>
     <li>RPM package - <b>/etc/sqlrelay.conf</b></li>
-    <li><a href="FreeBSD">FreeBSD</a> package - <b>/usr/local/etc/sqlrelay.conf</b></li>
-    <li><a href="NetBSD">NetBSD</a> package - <b>/usr/pkg/etc/sqlrelay.conf</b></li>
-    <li><a href="OpenBSD">OpenBSD</a> package - <b>/usr/local/etc/sqlrelay.conf</b></li>
+    <li>FreeBSD package - <b>/usr/local/etc/sqlrelay.conf</b></li>
+    <li>NetBSD package - <b>/usr/pkg/etc/sqlrelay.conf</b></li>
+    <li>OpenBSD package - <b>/usr/local/etc/sqlrelay.conf</b></li>
   </ul>
 
   <li>Windows</li>
   <ul>
     <li>Built from source - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf</b></li>
-    <li>Windows Installer package - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf</b></li>
-    <ul>
-      <li>(however, if you specified a different folder during installation, then it might be in a different location)</li>
-    </ul>
-
+    <li>Windows Installer package - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf</b> (unless you specified a non-standard installation folder)</li>
   </ul>
 
 </ul>
 
-<br/><br/><a name="minimal"/><h2>Minimal Configuration</h2>
-
-<p>The most minimal SQL Relay configuration would be something like:</p>
+<p>The most minimal sqlrelay.conf would be something like:</p>
 
 <blockquote>
   <pre><!-- Generator: GNU source-highlight 3.1.8
@@ -102,27 +120,27 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>By default, SQL Relay listens on all available network interfaces, on port 9000.  It can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed using:</p>
-
-<blockquote>
-  <pre>sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
-</pre>
-
-</blockquote>
-<p>SQL Relay's remote accessibility makes it useful as a database proxy.  See <a href="../features/proxying.html">Proxying</a> for more information.</p>
-
-<p>It can also be accessed from the local server using <i>localhost</i>.</p>
+<p>It can be accessed locally using:</p>
 
 <blockquote>
   <pre>sqlrsh -host localhost -user sqlruser -password sqlrpassword
 </pre>
 
 </blockquote>
-<p>( <b>NOTE:</b> For versions of SQL Relay prior to 0.56, additional parameters were required for a minimal configuration.  In particular, either the port or socket parameter was required in the instance tag, the dbtype parameter was required in the instance tag, and connectionid and metric parameters were required in the connection tag.  See below, or see the <a href="configreference.html">Configuration Reference</a> for information about these parameters.)</p>
+<p>By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
-<br/><a name="connections"/><h2>Database Connections</h2>
+<blockquote>
+  <pre>sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
+</pre>
 
-<p>By default, SQL Relay opens and maintains a pool of 5 persistent database connections, but the number of connections can be configured using the connections attribute.</p>
+</blockquote>
+<br/><br/><a name="basic"/><h2>Basic Configuration</h2>
+
+<p>The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are you'll want to configure it further.</p>
+
+<a name="dbconnections"/><h3>Database Connections</h3>
+
+<p>By default, SQL Relay opens and maintains a pool of 5 <a href="../features/connectionpooling.html">persistent database connections</a>, but the number of connections can be configured using the connections attribute.</p>
 
 <blockquote>
   <pre><!-- Generator: GNU source-highlight 3.1.8
@@ -147,13 +165,11 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p><a href="../features/connectionpooling.html">Connection pooling</a> reduces the amount of time it takes an app to connect to the database, which can dramatically improve performance for many applications.</p>
+<p>The number of connections determines how many client applications can access the database simultaneously.  In this example, up to 10, assuming each client only needs one connection.  Additional clients would be queued and would have to wait for one of the first 10 to disconnect before being able to access the database.</p>
 
-<p>The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients will be queued and must wait for one of the first 10 to disconnect before being able to access the database.</p>
+<p>Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can.  That number is usually environment-specific, and dictated by database, system and network resources.  However, if you intend to <a href="../features/throttling.html">throttle</a> database access to a particular application, then you may intentionally configure a small number of connections.</p>
 
-<p>Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can, and that number is usually dictated by database, system and network resources.  However, if you intend to <a href="../features/throttling.html">throttle</a> (limit) database access to a particular application, then you may intentionally configure a small number of connections.</p>
-
-<br/><a name="cursors"/><h2>Database Cursors</h2>
+<br/><a name="dbcursors"/><h3>Database Cursors</h3>
 
 <p>Database cursors are used to execute queries and step through result sets.  Most applications only need to use one cursor at a time.  Some apps require more though, either because they run nested queries, or sometimes because they just don't properly free them.</p>
 
@@ -182,9 +198,9 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>Any number of cursors can be opened.  A good rule of thumb is to open as few as possible but as many as you know that your application will need.</p>
+<p>Any number of cursors can be opened.  A good rule of thumb is to open as few as possible, but as many as you know that your application will need.</p>
 
-<br/><a name="dynamicscaling"/><h2>Dynamic Scaling</h2>
+<br/><a name="dynamicscaling"/><h3>Dynamic Scaling</h3>
 
 <p>Both connections and cursors can be configured to scale dynamically - open on demand and then die off when no longer needed.  This feature is useful if you have spikes in traffic during certain times of day or if your application has a few modules that occasionally need more cursors than usual.</p>
 
@@ -228,7 +244,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on these attributes.</p>
 
-<br/><a name="listener"/><h2>Listener Configuration</h2>
+<br/><a name="listener"/><h3>Listener Configuration</h3>
 
 <p>By default, SQL Relay listens for client connections on port 9000, on all available network interfaces.</p>
 
@@ -325,9 +341,9 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>If the socket option is specified but port and addresses options are not, then SQL Relay will only listen on the socket.  If addresses/port and socket options are both specified then it listens on both.</p>
 
-<br/><a name="database"/><h2>Database Configuration</h2>
+<br/><a name="database"/><h3>Database Configuration</h3>
 
-<p>By default, SQL Relay assumes that it's connecting to an Oracle database, but SQL Relay supports many other databases.  The dbase attribute can be used to specify the database type.</p>
+<p>By default, SQL Relay assumes that it's connecting to an Oracle database, but many other databases are supported.  The dbase attribute can be used to specify the database type.</p>
 
 <p>In the following example, SQL Relay is configured to connect to a SAP/Sybase database.</p>
 
@@ -383,50 +399,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for valid dbase settings and information on connect string options for each database.</p>
 
-<br/><a name="sessionqueries"/><h2>Session-Queries</h2>
-
-<p>SQL Relay can be configured to run a set of queries at the beginning and end of each client session.</p>
-
-<p>By far the most common use for this feature is that some database parameter needs to be reconfigured but you don't have permission or bouncing the database is out of the question, or something like that.  For example, lets say you are using an Oracle database, but your app requires dates to be formatted like MM/DD/YYYY instead of DD-MON-YYYY.  Ideally you'd alter the nls_date_format in the instance but you can't, for some reason.</p>
-
-<p>You can use SQL Relay's session queries to work around the problem.</p>
-
-<p>In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.</p>
-
-<blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
-<b><font color="#0000FF">&lt;instances&gt;</font></b>
-
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
-		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/users&gt;</font></b>
-		<b><font color="#0000FF">&lt;session&gt;</font></b>
-			<b><font color="#0000FF">&lt;start&gt;</font></b>
-				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='MM/DD/YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
-			<b><font color="#0000FF">&lt;/start&gt;</font></b>
-			<b><font color="#0000FF">&lt;end&gt;</font></b>
-				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='DD-MON-YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
-			<b><font color="#0000FF">&lt;/end&gt;</font></b>
-		<b><font color="#0000FF">&lt;/session&gt;</font></b>
-		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
-
-<b><font color="#0000FF">&lt;/instances&gt;</font></b>
-
-</tt></pre>
-</pre>
-
-</blockquote>
-<p>Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.</p>
-
-<br/><a name="instances"/><h2>Multiple Instances</h2>
+<br/><a name="instances"/><h3>Multiple Instances</h3>
 
 <p>Any number of SQL Relay instances can be defined in the configuration file.</p>
 
@@ -491,34 +464,118 @@ sqlrsh -host sqlrserver -port 9002
 </pre>
 
 </blockquote>
-<br/><br/><a name="directory"/><h2>Configuration Directory</h2>
+<br/><a name="autostart"/><h3>Starting Instances Automatically</h3>
 
-<p>While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files.</p>
+<p>In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all intances configured with the enabled attribute set to yes.</p>
 
-<p>The default the SQL Relay configuration directory depends on the platform and on how you installed SQL Relay.</p>
+<p>For example, if the following instances are defined...</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
+
+<p>When installed on most platforms, SQL Relay creates a systemd service file (usually in /usr/lib/systemd/system or /lib/systemd/system) or an init script in the appropriate place under /etc.  These call sqlr-start with no -id option.  If configured to run at boot, they will start all instances for which enabled="yes" is configured.</p>
+
+<p>How to enable the service file or init script depends on what platform you are using.</p>
+
+<p>On systemd-enabled Linux, this usually involves running:</p>
+
+<blockquote>
+systemctl enable sqlrelay.service
+</blockquote>
+<p>On non-systemd-enabled Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.  This can be done manually, but most platforms provide utilities to do it for you.</p>
+
+<p>Redhat-derived Linux distributions have a chkconfig command that can do this for you:</p>
+
+<blockquote>
+chkconfig --add sqlrelay
+</blockquote>
+<p>Debian-derived Linux distributions provide the update-rc.d command:</p>
+
+<blockquote>
+update-rc.d sqlrelay defaults
+</blockquote>
+<p>Solaris provides svcadm:</p>
+
+<blockquote>
+svcadm enable sqlrelay
+</blockquote>
+<p>On FreeBSD you must add a line to /etc/rc.conf like:</p>
+
+<blockquote>
+sqlrelay_enabled=YES
+</blockquote>
+<p>On NetBSD you must add a line to /etc/rc.conf like:</p>
+
+<blockquote>
+sqlrelay=YES
+</blockquote>
+<p>On OpenBSD you must add a line to /etc/rc.conf like:</p>
+
+<blockquote>
+sqlrelay_flags=""
+</blockquote>
+<br/><a name="altconfigfile"/><h2>Alternate Configuration File Options</h2>
+
+<a name="directory"/><h3>Configuration Directory</h3>
+
+<p>While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files located in a configuration directory.</p>
+
+<p>The default SQL Relay configuration directory depends on the platform and on how you installed SQL Relay.</p>
 
 <ul>
   <li>Unix and Linux</li>
   <ul>
-    <li>Built from source - <b>/usr/local/firstworks/etc/sqlrelay.conf.d</b></li>
-    <ul>
-      <li>(however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)</li>
-    </ul>
-
+    <li>Built from source - <b>/usr/local/firstworks/etc/sqlrelay.conf.d</b> (unless you specified a non-standard --prefix or --sysconfdir during the build)</li>
     <li>RPM package - <b>/etc/sqlrelay.conf.d</b></li>
-    <li><a href="FreeBSD">FreeBSD</a> package - <b>/usr/local/etc/sqlrelay.conf.d</b></li>
-    <li><a href="NetBSD">NetBSD</a> package - <b>/usr/pkg/etc/sqlrelay.conf.d</b></li>
-    <li><a href="OpenBSD">OpenBSD</a> package - <b>/usr/local/etc/sqlrelay.conf.d</b></li>
+    <li>FreeBSD package - <b>/usr/local/etc/sqlrelay.conf.d</b></li>
+    <li>NetBSD package - <b>/usr/pkg/etc/sqlrelay.conf.d</b></li>
+    <li>OpenBSD package - <b>/usr/local/etc/sqlrelay.conf.d</b></li>
   </ul>
 
   <li>Windows</li>
   <ul>
     <li>Built from source - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf.d</b></li>
-    <li>Windows Installer package - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf.d</b></li>
-    <ul>
-      <li>(however, if you specified a different folder during installatoin, then it might be in a different location)</li>
-    </ul>
-
+    <li>Windows Installer package - <b>C:\Program Files\Firstworks\etc\sqlrelay.conf.d</b> (unless you specified a non-standard installation folder)</li>
   </ul>
 
 </ul>
@@ -602,9 +659,9 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<br/><br/><a name="specifying"/><h2>Specifying Configuration Files</h2>
+<br/><br/><a name="specifying"/><h3>Specifying Configuration Files</h3>
 
-<p>In addition to the -id option, the sqlr-start program also takes a -config option.  The -config option can be used to specify a configuration file or directory other than the default.</p>
+<p>It is also possible to specify a particular configuration file or directory by passing the sqlr-start program a -config option.</p>
 
 <p>For example:</p>
 
@@ -617,7 +674,9 @@ sqlr-start -id oracleexample -config dir:///home/myuser/mysqlrelay.conf.d
 </blockquote>
 <p>(the file:// prefix is optional when specifying a file, but the dir:// prefix must be included when specifying a directory)</p>
 
-<p>The -config option may also be used to specify a comma-separated list of files or directories.  For example:</p>
+<p>The -config option may also be used to specify a comma-separated list of files or directories.</p>
+
+<p>For example:</p>
 
 <blockquote>
   <pre>sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf
@@ -628,7 +687,7 @@ sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser
 </blockquote>
 <p>Files and directories are processed in the order that they are specified.</p>
 
-<br/><a name="remote"/><h2>Remote Configuration Files</h2>
+<br/><a name="remote"/><h3>Remote Configuration Files</h3>
 
 <p>In addition to local configuration files, the -config option may also be used to specify configuration files located on a remote host, accessible via http.</p>
 
@@ -652,7 +711,9 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 </blockquote>
 <p>(Note: the https and scp examples would only work if Rudiments is compiled with support for libcurl.)</p>
 
-<p>In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.  For example:</p>
+<p>In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.</p>
+
+<p>For example:</p>
 
 <blockquote>
   <pre>myuser:mypassword
@@ -663,7 +724,7 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 
 <p>Using user-password files is recommended over passing literal users and passwords.  The files can be protected with file permissions, they prevent the user and password from being stored in the script that starts SQL Relay, and they prevent the user and password from being displayed in a process listing.</p>
 
-<br/><a name="linkfiles"/><h2>Link Files</h2>
+<br/><a name="linkfiles"/><h3>Link Files</h3>
 
 <p>So far, the example configuration files have all been XML files, containing configurations for instances of SQL Relay.</p>
 
@@ -715,101 +776,11 @@ http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/db2.conf
 
 <p>There is no limit to the depth of links.  A link file can reference another link file which references another, which references another, etc.  Too great a depth could lead to slow startup times though, especially when using remote configration files. This is especially significant when using <a href="#dynamicscaling">Dynamic Scaling</a>, as the configuration must be loaded each time a new connection is spawned.  Care should also be taken to avoid loops.</p>
 
-<br/><a name="autostart"/><h2>Starting Instances Automatically</h2>
-
-<p>In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all intances configured with the enabled attribute set to yes.</p>
-
-<p>For example, if the following instances are defined...</p>
-
-<blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
-<b><font color="#0000FF">&lt;instances&gt;</font></b>
-
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
-		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/users&gt;</font></b>
-		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
-
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
-		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/users&gt;</font></b>
-		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
-
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
-		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/users&gt;</font></b>
-		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
-
-<b><font color="#0000FF">&lt;/instances&gt;</font></b>
-
-</tt></pre>
-</pre>
-
-</blockquote>
-<p>...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
-
-<p>When installed on most platforms, SQL Relay creates a systemd service file (usually in /usr/lib/systemd/system or /lib/systemd/system) or an init script in the appropriate place under /etc.  These call sqlr-start with no -id option.  If configured to run at boot, they will start all instances for which enabled="yes" is configured.</p>
-
-<p>How to enable the service file or init script depends on what platform you are using.</p>
-
-<p>On systemd-enabled Linux, this usually involves running:</p>
-
-<blockquote>
-systemctl enable sqlrelay.service
-</blockquote>
-<p>On non-systemd-enabled Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.  This can be done manually, but most platforms provide utilities to do it for you.</p>
-
-<p>Redhat-derived Linux distributions have a chkconfig command that can do this for you:</p>
-
-<blockquote>
-chkconfig --add sqlrelay
-</blockquote>
-<p>Debian-derived Linux distributions provide the update-rc.d command:</p>
-
-<blockquote>
-update-rc.d sqlrelay defaults
-</blockquote>
-<p>Solaris provides svcadm:</p>
-
-<blockquote>
-svcadm enable sqlrelay
-</blockquote>
-<p>On <a href="FreeBSD">FreeBSD</a> you must add a line to /etc/rc.conf like:</p>
-
-<blockquote>
-sqlrelay_enabled=YES
-</blockquote>
-<p>On <a href="NetBSD">NetBSD</a> you must add a line to /etc/rc.conf like:</p>
-
-<blockquote>
-sqlrelay=YES
-</blockquote>
-<p>On <a href="OpenBSD">OpenBSD</a> you must add a line to /etc/rc.conf like:</p>
-
-<blockquote>
-sqlrelay_flags=""
-</blockquote>
-<br/><br/><a name="ha"/><h2>High Availabiltiy Environments</h2>
+<br/><a name="ha"/><h2>High Availabiltiy</h2>
 
 <p>In a high availability environment, SQL Relay can be deployed as a front-end to provide load-balancing and fail-over for a set of replicated database servers or database cluster.  Load-balancing and fail-over can also be implemented over multiple SQL Relay servers.</p>
 
-<br/><a name="cluster"/><h3>Load-Balancing and Fail-Over With Replicated or Clustered Databases</h3>
+<br/><a name="cluster"/><h3>Load-Balancing and Fail-Over With Replicated Databases or Database Clusters</h3>
 
 <p>In a database cluster or replication environment, SQL Relay can be configured to maintain a pool of connections to the various database nodes and distribute client sessions over the nodes.  If an individual node fails, SQL Relay will attempt to reestablish connections to that node, while continuing to distribute client sessions over the remaining nodes.</p>
 
@@ -1014,7 +985,11 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>The first two instances use familiar configuration options, but the third uses a dbtype of "router" and uses instances of the router module to define query routing rules.</p>
+<p>The first two instances use familiar configuration options, but the third uses a dbtype of "router" and uses router tags to define query routing rules.</p>
+
+<p>(Note the <i>module</i> attribute of the router tag.  SQL Relay is highly modular, and many advanced features, including query routing, are provided by loadable modules.)</p>
+
+<p>(Note also the use of a notifications tag.  See <a href="#notifications">Notifications</a> below for more information.)</p>
 
 <p>Each router tag defines a connectionid to send the query to and a set of regular expression patterns to match.  Queries that match the set of patterns defined in the pattern tags are sent to the instance of SQL Relay designated by the connectionid in the router tag.</p>
 
@@ -1034,11 +1009,7 @@ sqlr-start -id router
 </pre>
 
 </blockquote>
-<p>This example routes queries based on regular expression pattern matching.  Router modules are available to route queries based on other things too though, such as the user that ran the query, or the IP address of the client.  See <a href="../modules/routers.html">Router Modules</a> for more information about router modules.</p>
-
-<p>See <a href="router.html">Query Routing</a> for more information on query routing in general.</p>
-
-<br/><a name="frontend"/><h3>Front-End Load-Balancing and Fail-Over</h3>
+<br/><br/><a name="frontend"/><h3>Front-End Load-Balancing and Fail-Over</h3>
 
 <p>If you are building out a high availability environment, or if your pool of application servers is just sufficiently large, you might want to set up a pool of SQL Relay servers between your application servers and the database.</p>
 
@@ -1058,7 +1029,106 @@ sqlr-start -id router
 
 <p>Round-robin DNS is so-called because, traditionally, the order of the IP addresses returned on successive requests alternated reliably, in round-robin fashion.  This behavior persists in many environments, but it is no longer guaranteed, as many modern DNS resolvers sort the list and return the IP addresses in the same order, every time.  SQL Relay clients randomize the list though, and try to connect to each of the IP addresses, one-at-a-time, until they succeed.  Doing so provides both load-balancing and fail-over without requiring an appliance or application server cluster.</p>
 
-<br/><a name="krb"/><h2>Kerberos and Active Directory Encryption and Authentication</h2>
+<br/><a name="authoptions"/><h2>Authentication/Authorization Options</h2>
+
+<p>There are several options for controlling which users are allowed to access an instance of SQL Relay.</p>
+
+<a name="userlistauth"/><h3>User List Auth</h3>
+
+<p>The standard authentication/authorization option is <i>user list</i> auth.</p>
+
+<p>When user list auth is used, a user is authenticated/authorized against a static list of valid user/password combinations.  This is the method used in all of the examples above.</p>
+
+<p>To enable user list auth, you must provide a list of valid user/password combinations, as follows:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password1"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password2"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password2"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<br/><a name="dbauth"/><h3>Database Auth</h3>
+
+<p>Another authentication/authorization option is <i>database</i> auth.</p>
+
+<p>When database auth is used, a user is authenticated/authorized against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.</p>
+
+<p>To enable database auth, omit the list of user/passwords and configure authtier="database" as follows.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <font color="#009900">authtier</font><font color="#990000">=</font><font color="#FF0000">"database"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<blockquote>
+<b>NOTE:</b> Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.
+</blockquote>
+<blockquote>
+<b>NOTE:</b> Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.
+</blockquote>
+<br/><a name="proxiedauth"/><h3>Proxied Auth</h3>
+
+<p>Another authentication/authorization option is <i>proxied</i> auth.</p>
+
+<p>When proxied auth is used, a user is authenticated/authorized against the database itself, though in a different manner than datbase auth described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.</p>
+
+<p>This is currently only supported with Oracle (version 8i or higher) and requires database configuration.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
+
+<p>To enable proxied auth, omit the list of user/passwords and configure authtier="proxied" as follows.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <font color="#009900">authtier</font><font color="#990000">=</font><font color="#FF0000">"proxied"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<blockquote>
+<b>NOTE:</b> Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.
+</blockquote>
+<br/><a name="krb"/><h3>Kerberos and Active Directory Encryption and Authentication</h3>
 
 <p>SQL Relay supports Kerberos encryption and authentication.</p>
 
@@ -1107,6 +1177,7 @@ http://www.gnu.org/software/src-highlite -->
   <li>The <b>krb</b> parameter enables (or disables) Kerberos authentication and encryption.</li>
   <li>The <b>krbservice</b> parameter specifies which Kerberos service to use.  This parameter is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.</li>
   <li>The <b>krbkeytab</b> parameter specifies the location of the keytab file containing the key for the specified Kerberos service.  This parameter is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab</li>
+  <li>User list auth is also used.  Database and proxied auth are not currently supported with Kerberos.</li>
 </ul>
 
 <p>Note that no passwords are required in the user list.  Note also that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.</p>
@@ -1162,7 +1233,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.</p>
 
-<br/><a name="tls"/><h2>TLS/SSL Encryption and Authentication</h2>
+<br/><a name="tls"/><h3>TLS/SSL Encryption and Authentication</h3>
 
 <p>SQL Relay supports TLS/SSL encryption and authentication.</p>
 
@@ -1203,6 +1274,7 @@ http://www.gnu.org/software/src-highlite -->
 <ul>
   <li>The <b>tls</b> parameter enables (or disables) TLS/SSL encryption.</li>
   <li>The <b>tlscert</b> parameter specifies a TLS/SSL certificate to use.  A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.</li>
+  <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
 </ul>
 
 <p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:</p>
@@ -1261,7 +1333,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Note that the fully qualified host name was provided.  Note also the use of the ca+domain value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the domain name portion of the host name will also be validated.  If the certificate contains Subject Alternative Names, then the domain name portion of the host name will be compared to the domain name portion of each of them.  If no Subject Alternative Names are provided then the domain name portion of the host name will be compared to the domain name portion of the certificate's Common Name.  The session will only continue if the sever's certificate and domain identity are both valid.</p>
 
-<br/><p>For a more secure session, the server may request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.</p>
+<br/><p>For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.</p>
 
 <p>The following configuration enables these checks for an instance of SQL relay:</p>
 
@@ -1298,6 +1370,7 @@ http://www.gnu.org/software/src-highlite -->
 <ul>
   <li>The <b>tlsvalidate</b> parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.</li>
   <li>The <b>tlsca</b> parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.</li>
+  <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
 </ul>
 
 <p>Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.</p>
@@ -1333,6 +1406,827 @@ http://www.gnu.org/software/src-highlite -->
 </ul>
 
 <p>Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.</p>
+
+<br/><a name="se"/><h2>Security Enhancement</h2>
+
+<p>SQL Relay offers several security enhancement features.</p>
+
+<br/><a name="pwdenc"/><h3>Password Encryption</h3>
+
+<p>Password encryption allows you to store encrypted passwords in the configuration file so that they are not directly readable.  Passwords for SQL Relay users and database passwords may both be encrypted.</p>
+
+<p>Encryption and decryption are achieved via loadable modules.  The <i>passwordencryptions</i> section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.</p>
+
+<p>For example, to use the <i>rot</i> module, which encrypts by performing a simple character rotation, with passwords in the user list:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;passwordencryptions&gt;</font></b>
+			<b><font color="#0000FF">&lt;passwordencryption</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"rot"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"13"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/passwordencryptions&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"test"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"grfg"</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=grfgcnffjbeq;..."</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
+
+<p>In this example, the <i>id</i> and <i>count</i> attributes are parameters for the <i>rot</i> module.  "13" tells the module to rotate by 13 characters.  The <i>id</i> attribute is defined by you and just assigns this particular configuration an id that may be referred to later.  All password encryption modules must have an <i>id</i> attribute.</p>
+
+<p>Note that the password in the user tag is encrypted (unencrypted, it would just be "test") and that the password in the string attribute of the connection tag is encrypted (nencrypted, it would just be "testpassword").  A command line program (described later) is provided to encrypt passwords.</p>
+
+<p>Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the <i>id</i> parameter in the passwordencryption tag ( <i>rot13</i> ), not the module name ( <i>rot</i> ).</p>
+
+<p>Password encryption modules may be "stacked".  It is possible to load multiple modules and use each one with a different password.  For example, you might want to use the <i>rot</i> module with a count of 13 for the SQL Relay password and a count of 10 for the database password.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;passwordencryptions&gt;</font></b>
+			<b><font color="#0000FF">&lt;passwordencryption</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"rot"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"13"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;passwordencryption</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"rot"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"rot10"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/passwordencryptions&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"test"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"grfg"</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=docdzkccgybn;..."</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot10"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>Encryption modules may be either two-way or one-way.  Two-way encryption modules can both encrypt and decrypt a password.  One-way encryption modules can only encrypt a password.</p>
+
+<p>Symmetric and asymmetric key encryption techniques are two-way.  The rot encryption is an example of symmetric key encryption.  Asymmetric key encryptions generally use a public/private key pair, where the publicly available key is be used to encrypt the data but a privately held key is required to decrypt it.  SQL Relay can use two-way encryption modules with passwords for SQL Relay users and database passwords.</p>
+
+<p>One-way encryption techniques include DES, MD5 and SHA1 hashes.  When using those techniques, the password can be encrypted but cannot effectively be decrypted.  SQL Relay can use one-way encryption moudles with passwords for SQL Relay users but can not use one-way encryption modules to encrypt database passwords.</p>
+
+<p>The command line tool <b>sqlr-pwdenc</b> is provided to help encrypt passwords for inclusion in the configuration file.  Given an encryption module and password, it will print out the encrypted password.</p>
+
+<blockquote>
+  <pre>sqlr-pwdenc [-config configfile] -id id -pwdencid passwordencryptionid -password password
+</pre>
+
+</blockquote>
+<ul>
+  <li><b>configfile</b> - optional and refers to the configuration file</li>
+  <li><b>id</b> - the instance within the configuration file to look for the specified password encryption module definition</li>
+  <li><b>passwordencryptionid</b> - the id of the password encryption module to use</li>
+  <li><b>password</b> - the password to encrypt</li>
+</ul>
+
+<p>For example:</p>
+
+<blockquote>
+  <pre>$ sqlr-pwdenc -id example -pwdencid rot13 -password testpassword
+grfgcnffjbeq
+</pre>
+
+</blockquote>
+<p>The resulting string "grfgcnffjbeq" can now be put in the configuration file as the password.</p>
+
+<p>There is one final thing to note.  Command line client programs like sqlrsh and sqlr-import take a -id option.  The -id option causes the program to open the configuration file and extract the host, port, socket, user and password from the specified instance.  If the password is encrypted, then the encrypted password will be extracted and passed to the server.  This will fail.  So, when using the -id option with an encrypted password, you must also use the -user and -password option, to override the user/password that are extracted from the configuration file.</p>
+
+<p>For example, rather than just using:</p>
+
+<blockquote>
+  <pre>sqlrsh -id example
+</pre>
+
+</blockquote>
+<p>You should use:</p>
+
+<blockquote>
+  <pre>sqlrsh -id example -user test -password test
+</pre>
+
+</blockquote>
+<p>Currently, the following password encryption modules are available in the standard SQL Relay distribution:</p>
+
+<ul>
+  <li>rot</li>
+  <li>md5</li>
+  <li>crypt</li>
+</ul>
+
+<p>The <b>rot</b> module is a two-way encryption module that performs a character rotation, similar to the popular <a target="_blank" href="http://en.wikipedia.org/wiki/ROT13">ROT13</a> algorithm, though it can rotate by any amount specified in the <i>count</i> attribute, not just 13 and rotates digits as well as upper and lower-case characters.</p>
+
+<p>The <b>md5</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/MD5">MD5</a> algorithm.</p>
+
+<p>The <b>crypt</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> attribute.  The salt is required and must be a 2 digit alphanumeric code.</p>
+
+<p>Custom modules may also be developed.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<br/><a name="schedules"/><h3>Connection Schedules</h3>
+
+<p>Connection schedules allow the SQL Relay server to control when users are allowed to access the database.</p>
+
+<p>Connection schedules are defined and enforced by loadable modules.  The <i>schedules</i> section of the sqlrelay.conf file indicates which modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;schedules&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- allow these users during business hours --&gt;</font></i>
+			<b><font color="#0000FF">&lt;schedule</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"cron_userlist"</font> <font color="#009900">default</font><font color="#990000">=</font><font color="#FF0000">"deny"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;users&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"dmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"kmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"imuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"smuse"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/users&gt;</font></b>
+				<b><font color="#0000FF">&lt;rules&gt;</font></b>
+					<b><font color="#0000FF">&lt;allow</font></b> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"* * * 2-5 8:00-11:59,13:00-16:59"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/rule&gt;</font></b>
+			<b><font color="#0000FF">&lt;/schedule&gt;</font></b>
+		<b><font color="#0000FF">&lt;/schedules&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
+
+<p>All schedule modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
+
+<p>Connection schedule modules can be "stacked".  Multiple different modules may be loaded, and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;schedules&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- allow these users during business hours --&gt;</font></i>
+			<b><font color="#0000FF">&lt;schedule</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"cron_userlist"</font> <font color="#009900">default</font><font color="#990000">=</font><font color="#FF0000">"deny"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;users&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"imuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"smuse"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/users&gt;</font></b>
+				<b><font color="#0000FF">&lt;rules&gt;</font></b>
+					<b><font color="#0000FF">&lt;allow</font></b> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"* * * 2-5 8:00-11:59,13:00-16:59"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/rule&gt;</font></b>
+			<b><font color="#0000FF">&lt;/schedule&gt;</font></b>
+
+			<i><font color="#9A1900">&lt;!-- allow these users at any time --&gt;</font></i>
+			<b><font color="#0000FF">&lt;schedule</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"cron_userlist"</font> <font color="#009900">default</font><font color="#990000">=</font><font color="#FF0000">"deny"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;users&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"dmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"kmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/users&gt;</font></b>
+				<b><font color="#0000FF">&lt;rules&gt;</font></b>
+					<b><font color="#0000FF">&lt;allow</font></b> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"* * * * *"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/rule&gt;</font></b>
+			<b><font color="#0000FF">&lt;/schedule&gt;</font></b>
+		<b><font color="#0000FF">&lt;/schedules&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>At startup, the SQL Relay server creates instances of the specified schedule modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  Each module applies its rules to the specified user.  If a module denies access to a user then the remaining modules are ignored.  If the user makes it through all modules without being denies access, then the user is allowed access.</p>
+
+<p>Currently, only the ''cron_userlist'' connection schedule module is available in the standard SQL Relay distribution.  Custom modules may be developed though.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<p>The <b>cron_userlist</b> module allows you to define a connection schedule for a list of users, using a cron-like syntax.</p>
+
+<p><b>Note though, that the time-and-date fields have different meanings from traditional cron.</b></p>
+
+<p>An example configuration follows.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;schedules&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- allow these users during business hours --&gt;</font></i>
+			<b><font color="#0000FF">&lt;schedule</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"cron_userlist"</font> <font color="#009900">default</font><font color="#990000">=</font><font color="#FF0000">"deny"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;users&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"dmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"kmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"imuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"smuse"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/users&gt;</font></b>
+				<b><font color="#0000FF">&lt;rules&gt;</font></b>
+					<b><font color="#0000FF">&lt;allow</font></b> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"* * * 2-5 8:00-11:59,13:00-16:59"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/rule&gt;</font></b>
+			<b><font color="#0000FF">&lt;/schedule&gt;</font></b>
+		<b><font color="#0000FF">&lt;/schedules&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>In this example, the module denies access to all users by default, but then allows access to the dmuse, kmuse, imuse, and smuse users during business hours.  In this case, business hours are defined as:</p>
+
+<ul>
+  <li>every year</li>
+  <li>every month</li>
+  <li>every day of the month</li>
+  <li>between days 2-5 (Monday-Friday) of the week</li>
+  <li>between 8:00AM and 11:59AM and 1:00PM and 4:59PM</li>
+</ul>
+
+<p>Another example configuration follows.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;schedules&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- deny these users during non-business hours --&gt;</font></i>
+			<b><font color="#0000FF">&lt;schedule</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"cron_userlist"</font> <font color="#009900">default</font><font color="#990000">=</font><font color="#FF0000">"allow"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;users&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"dmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"kmuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"imuse"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"smuse"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/users&gt;</font></b>
+				<b><font color="#0000FF">&lt;rules&gt;</font></b>
+					<b><font color="#0000FF">&lt;deny</font></b> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"* * * 2-5 00:00-7:59,12:00-12:59,17:00-23:59"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;deny</font></b> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"* * * 1,7 *"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/rules&gt;</font></b>
+			<b><font color="#0000FF">&lt;/schedule&gt;</font></b>
+		<b><font color="#0000FF">&lt;/schedules&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>In this example, the module allows access to all users by default, but then denies access to the dmuse, kmuse, imuse, and smuse users during non-business hours.  In this case, non-business hours are defined as:</p>
+
+<ul>
+  <li>every year</li>
+  <li>every month</li>
+  <li>every day of the month</li>
+  <li>between days 2-5 (Monday-Friday) of the week</li>
+  <ul>
+    <li>between 12:00AM and 7:59AM</li>
+    <li>between 12:00PM and 12:59PM</li>
+    <li>between 5:00PM and 11:59PM</li>
+  </ul>
+
+  <li>on days 1 and 7 (Saturday and Sunday) of the week, at all hours</li>
+</ul>
+
+<p>The <b>users</b> tag defines a list of users to apply the schedule to.  It may contain any number of <b>user</b> tags.</p>
+
+<p>The <b>user</b> tags support the following attributes:</p>
+
+<ul>
+  <li><b>user</b> - the name of a user or * meaning "all users"</li>
+</ul>
+
+<p>If a user does not appear in this list then it is granted access at any time.  If a user appears in the list then the schedule will be applied to that user.</p>
+
+<p>The <b>default</b> attribute of the <b>schedule</b> tag defines the default rule.</p>
+
+<ul>
+  <li><b>allow</b> - allow access to the list of users unless they are denied access by the set of rules</li>
+  <li><b>deny</b> - deny access to the list of users unless they are allowed access by the set of rules</li>
+</ul>
+
+<p>The <b>rules</b> tag defines the list of rules that modify the default behavior.  It may contain <b>allow</b> or <b>deny</b> tags.</p>
+
+<p>The <b>allow</b> and <b>deny</b> tags support the following attributes:</p>
+
+<ul>
+  <li><b>when</b> - the years, months, days of month, days of week, and times of day that the rule applies to</li>
+</ul>
+
+<p>The format of the <b>when</b> attribute is cron-like.  There are 5 fields, separated by spaces.</p>
+
+<p><b>Note again though, that the time-and-date fields have different meanings from traditional cron.</b></p>
+
+<p>The fields represent, in order:</p>
+
+<ul>
+  <li>years</li>
+  <li>months (where 1=January)</li>
+  <li>days of the month</li>
+  <li>days of the week (where 1=Sunday)</li>
+  <li>times of day, in 24-hour format</li>
+</ul>
+
+<p>In each field, ranges may be specified with a dash, and sets may be separated by commas.  A * means "all possible values".</p>
+
+<p>For example:</p>
+
+<p>All day, every day, at any time of day:</p>
+
+<blockquote>
+  <pre>* * * * *
+</pre>
+
+</blockquote>
+<p>All day, every month, on the 1st, 3rd through 5th, 8th, and 10th through 12th of the month:</p>
+
+<blockquote>
+  <pre>* * 1,3-5,8,10-12 * *
+</pre>
+
+</blockquote>
+<p>Every day from 8:00AM through 11:59AM and 1:00PM through 4:59PM:</p>
+
+<blockquote>
+  <pre>* * * * 8:00-11:59,13:00-16:59
+</pre>
+
+</blockquote>
+<p>Every day from 1:00PM to 4:00PM:</p>
+
+<blockquote>
+  <pre>* * * * 13:00-16:00
+</pre>
+
+</blockquote>
+<p>All day, every Saturday:</p>
+
+<blockquote>
+  <pre>* * * 6 *
+</pre>
+
+</blockquote>
+<p>All day, every day, in February and March:</p>
+
+<blockquote>
+  <pre>* 2,3 * * *
+</pre>
+
+</blockquote>
+<p>Every day in February and March, from noon to 3PM:</p>
+
+<blockquote>
+  <pre>* 2,3 * * 12:00-15:00
+</pre>
+
+</blockquote>
+<p>...and so on.</p>
+
+<p>In general, the module works as follows:</p>
+
+<ul>
+  <li>When a user connects, the module looks for the user in the list of users.</li>
+  <ul>
+    <li>If the user is not found then access is granted.</li>
+    <li>If the user is found, then the default rule is applied.</li>
+    <ul>
+      <li>Each rule in the rules list is evaluated.</li>
+      <ul>
+        <li>If the rule doesn't apply to the current time, then it is ignored.</li>
+        <li>If the rule does apply to the current time, then it is applied.</li>
+        <ul>
+          <li>Each rule may reverse the outcome the previous rules.</li>
+        </ul>
+
+      </ul>
+
+      <li>When all rules have been applied, the user will have been allowed or denied access.</li>
+    </ul>
+
+  </ul>
+
+</ul>
+
+<br/><br/><a name="filtering"/><h3>Query Filtering</h3>
+
+<p>Query Filter modules allow the SQL Relay server programs to filter out queries, and not pass them along to the database.</p>
+
+<p>Query filters are defined and enforced by loadable modules.  The <i>filters</i> section of the sqlrelay.conf file indicates which filter modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">" [0-9]*=[0-9]*"</font> <font color="#009900">errornumbrer</font><font color="#990000">=</font><font color="#FF0000">"100"</font> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"regex filter violation"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
+
+<p>Currently, all filter modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
+
+<p>Filter modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">" [0-9]*=[0-9]*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(create)"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(drop)"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"hugetable"</font> <font color="#009900">ignorecase</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"badschema"</font> <font color="#009900">ignorecase</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>At startup, the SQL Relay server creates instances of the specified filter modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module filters out the query, then it isn't passed along to the next module, nor is it sent to the database, and the client program is told that the query failed.</p>
+
+<p>When using query filters, it is helpful to use the <i>normalize</i> query translation too:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">" [0-9]*=[0-9]*"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>See <a href="#querytranslations">Query Translations</a> below for more information.</p>
+
+<p>Currently, the following filter modules are available:</p>
+
+<ul>
+  <li><b>patterns</b></li>
+  <li><b>regex</b></li>
+  <li><b>string</b></li>
+</ul>
+
+<p>Custom modules may also be developed.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<h4>patterns</h4>
+
+<p>The patterns module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.</p>
+
+<p>The list of patterns is given by a set of <b>pattern</b> child tags.  Each pattern tag may contain the following attributes.</p>
+
+<ul>
+  <li><b>pattern</b> - Required.  The pattern to match.</li>
+  <li><b>type</b> - Optional.  Defaults to "string".  Valid values are "string", "cistring" (case insensitive string), and "regex" (regular expression).</li>
+  <li><b>scope</b> - Optional.  Defaults to "query".  Valid values are "query" (attempt to match against the entire query), "outsidequotes" (only match parts of the query not surrounded by single-quotes), and "insidequotes" (only match parts of the query surrounded by single-quotes).</li>
+  <li><b>errornumber</b> - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.</li>
+  <li><b>error</b> - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.</li>
+</ul>
+
+<p>For example, with the following configuration...</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"patterns"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(drop|create)"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"hugetable"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"cistring"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"outsidequotes"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"badstring"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font> <font color="#009900">errornumbrer</font><font color="#990000">=</font><font color="#FF0000">"100"</font> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"pattern filter violation"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/filter&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>These queries would be filtered out:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop table mytable
+create <font color="#008080">table</font> <b><font color="#000000">mytable</font></b> <font color="#990000">(</font><font color="#008080">col1</font> <font color="#009900">int</font><font color="#990000">)</font>
+select <font color="#990000">*</font> from HugeTable
+select <font color="#990000">*</font> from badstringtable <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#FF0000">'badstring'</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>But these queries would not be:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font>
+select <font color="#990000">*</font> from goodtable
+select <font color="#990000">*</font> from badstringtable <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#FF0000">'goodstring'</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>regex</h4>
+
+<p>The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.</p>
+
+<p>In addition to the module attribute, each filter tag may contain the following attributes.</p>
+
+<ul>
+  <li><b>pattern</b> - Required.  The pattern to match.</li>
+  <li><b>errornumber</b> - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.</li>
+  <li><b>error</b> - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.</li>
+</ul>
+
+<p>For example, with the following configuration:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">" [0-9]*=[0-9]*"</font> <font color="#009900">errornumbrer</font><font color="#990000">=</font><font color="#FF0000">"100"</font> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"regex filter violation"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>This query would be filtered out:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>select <font color="#990000">*</font> from mytable <font color="#008080">where</font> column1<font color="#990000">=</font><font color="#993399">1</font> and <font color="#993399">1</font><font color="#990000">=</font><font color="#993399">1</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>But this query would not be:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>select <font color="#990000">*</font> from mytable <font color="#008080">where</font> column1<font color="#990000">=</font><font color="#993399">1</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>string</h4>
+
+<p>The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.</p>
+
+<p>In addition to the module attribute, each filter tag may contain the following attributes.</p>
+
+<ul>
+  <li><b>pattern</b> - Required.  The pattern to match.</li>
+  <li><b>ignorecase</b> - Optional.  Defaults to "no".  If set to "yes" then the comparison is case insensitive.</li>
+  <li><b>errornumber</b> - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.</li>
+  <li><b>error</b> - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.</li>
+</ul>
+
+<p>For example, with the following configuration:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"hugetable"</font> <font color="#009900">ignorecase</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">errornumbrer</font><font color="#990000">=</font><font color="#FF0000">"100"</font> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"string filter violation"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>This query would be filtered out:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>select <font color="#990000">*</font> from hugetable
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>But this query would not be:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>select <font color="#990000">*</font> from goodtable <font color="#008080">where</font> column1<font color="#990000">=</font><font color="#993399">1</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<br/><br/><a name="translation"/><h2>Translation</h2>
+
+<p>...</p>
+
+<br/><a name="querytranslation"/><h3>Query Translation</h3>
+
+<p>...</p>
+
+<br/><a name="resultsettranslation"/><h3>Result Set Translation</h3>
+
+<p>...</p>
+
+<br/><a name="queryrouting"/><h2>Query Routing</h2>
+
+<p>...</p>
+
+<br/><a name="logging"/><h2>Logging</h2>
+
+<p>...</p>
+
+<br/><a name="notifications"/><h2>Notifications</h2>
+
+<p>...</p>
+
+<br/><a name="sessionqueries"/><h2>Session-Queries</h2>
+
+<p>SQL Relay can be configured to run a set of queries at the beginning and end of each client session.</p>
+
+<p>By far the most common use for this feature is that some database parameter needs to be reconfigured but you don't have permission or bouncing the database is out of the question, or something like that.  For example, lets say you are using an Oracle database, but your app requires dates to be formatted like MM/DD/YYYY instead of DD-MON-YYYY.  Ideally you'd alter the nls_date_format in the instance but you can't, for some reason.</p>
+
+<p>You can use SQL Relay's session queries to work around the problem.</p>
+
+<p>In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;session&gt;</font></b>
+			<b><font color="#0000FF">&lt;start&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='MM/DD/YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/start&gt;</font></b>
+			<b><font color="#0000FF">&lt;end&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='DD-MON-YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/end&gt;</font></b>
+		<b><font color="#0000FF">&lt;/session&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.</p>
 
 <br/><a name="advanced"/><h2>Advanced Configuration</h2>
 

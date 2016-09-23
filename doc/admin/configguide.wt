@@ -1,52 +1,60 @@
 = SQL Relay Configuration Guide =
 
-* [#location Configuration File Location]
-* [#minimal Minimal Configuration]
-* [#connections Database Connections]
-* [#cursors Database Cursors]
-* [#dynamicscaling Dynamic Scaling]
-* [#listener Listener Configuration]
-* [#database Database Configuration]
-* [#sessionqueries Session-Queries]
-* [#instances Multiple Instances]
-* [#directory Configuration Directory]
-* [#specifying Specifying Configuration Files]
-* [#remote Remote Configuration Files]
-* [#linkfiles Link Files]
-* [#autostart Starting Instances Automatically]
-* [#ha High Availability Environments]
- * [#cluster Load-Balancing and Fail-Over With Replicated or Clustered Databases]
+* [#quick Quick Start]
+* [#basic Basic Configuration]
+ * [#dbconnections Database Connections]
+ * [#dbcursors Database Cursors]
+ * [#dynamicscaling Dynamic Scaling]
+ * [#listener Listener Configuration]
+ * [#database Database Configuration]
+ * [#instances Multiple Instances]
+ * [#autostart Starting Instances Automatically]
+* [#altconfigfile Alternate Configuration File Options]
+ * [#directory Configuration Directory]
+ * [#specifying Specifying Configuration Files]
+ * [#remote Remote Configuration Files]
+ * [#linkfiles Link Files]
+* [#ha High Availability]
+ * [#cluster Load-Balancing and Fail-Over With Replicated Databases or Database Clusters]
  * [#rac Already-Load-Balanced Databases]
  * [#router Master-Slave Query Routing]
  * [#frontend Front-End Load-Balancing and Fail-Over]
-* [#krb Kerberos and Active Directory Encryption and Authentication]
-* [#tls TLS/SSL Encryption and Authentication]
+* [#authoptions Authentication/Authorization Options]
+ * [#userlistauth User List Auth]
+ * [#dbauth Database Auth]
+ * [#proxiedauth Proxied Auth]
+ * [#krb Kerberos and Active Directory Encryption and Authentication]
+ * [#tls TLS/SSL Encryption and Authentication]
+* [#se Security Enhancement]
+ * [#pwdenc Password Encryption]
+ * [#schedules Connection Schedules]
+ * [#filtering Query Filtering]
+* [#translation Translation]
+ * [#querytranslation Query Translation]
+ * [#resultsettranslation Result Set Translation]
+* [#queryrouting Query Routing]
+* [#logging Logging]
+* [#notifications Notifications]
+* [#sessionqueries Session-Queries]
 * [#advanced Advanced Configuration]
 
-[[br]][=#location]
-== Configuration File Location ==
 
-When SQL Relay is first installed, no configuration file exists.  You must create one in the appropriate location.
+[[br]][=#quick]
+== Quick Start ==
 
-This location depends on the platform and on how you installed SQL Relay.
+When SQL Relay is first installed, no configuration file exists.  You must create one in the appropriate location.  This location depends on the platform and on how you installed SQL Relay.
 
 * Unix and Linux
- * Built from source - '''/usr/local/firstworks/etc/sqlrelay.conf'''
-  * (however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)
+ * Built from source - '''/usr/local/firstworks/etc/sqlrelay.conf''' (unless you specified a non-standard --prefix or --sysconfdir during the build)
  * RPM package - '''/etc/sqlrelay.conf'''
- * FreeBSD package - '''/usr/local/etc/sqlrelay.conf'''
- * NetBSD package - '''/usr/pkg/etc/sqlrelay.conf'''
- * OpenBSD package - '''/usr/local/etc/sqlrelay.conf'''
+ * !FreeBSD package - '''/usr/local/etc/sqlrelay.conf'''
+ * !NetBSD package - '''/usr/pkg/etc/sqlrelay.conf'''
+ * !OpenBSD package - '''/usr/local/etc/sqlrelay.conf'''
 * Windows
  * Built from source - '''C:\Program Files\Firstworks\etc\sqlrelay.conf'''
- * Windows Installer package - '''C:\Program Files\Firstworks\etc\sqlrelay.conf'''
-  * (however, if you specified a different folder during installation, then it might be in a different location)
+ * Windows Installer package - '''C:\Program Files\Firstworks\etc\sqlrelay.conf''' (unless you specified a non-standard installation folder)
 
-
-[[br]][=#minimal]
-== Minimal Configuration ==
-
-The most minimal SQL Relay configuration would be something like:
+The most minimal sqlrelay.conf would be something like:
 
 {{{#!blockquote
 {{{#!code
@@ -64,17 +72,7 @@ sqlr-start -id example
 }}}
 }}}
 
-By default, SQL Relay listens on all available network interfaces, on port 9000.  It can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed using:
-
-{{{#!blockquote
-{{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
-}}}
-}}}
-
-SQL Relay's remote accessibility makes it useful as a database proxy.  See [../features/proxying.html Proxying] for more information.
-
-It can also be accessed from the local server using //localhost//.
+It can be accessed locally using:
 
 {{{#!blockquote
 {{{
@@ -82,13 +80,24 @@ sqlrsh -host localhost -user sqlruser -password sqlrpassword
 }}}
 }}}
 
-( '''NOTE:''' For versions of SQL Relay prior to 0.56, additional parameters were required for a minimal configuration.  In particular, either the port or socket parameter was required in the instance tag, the dbtype parameter was required in the instance tag, and connectionid and metric parameters were required in the connection tag.  See below, or see the [configreference.html Configuration Reference] for information about these parameters.)
+By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
+}}}
+}}}
 
 
-[[br]][=#connections]
-== Database Connections ==
+[[br]][=#basic]
+== Basic Configuration ==
 
-By default, SQL Relay opens and maintains a pool of 5 persistent database connections, but the number of connections can be configured using the connections attribute.
+The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are you'll want to configure it further.
+
+[=#dbconnections]
+=== Database Connections ===
+
+By default, SQL Relay opens and maintains a pool of 5 [../features/connectionpooling.html persistent database connections], but the number of connections can be configured using the connections attribute.
 
 {{{#!blockquote
 {{{#!code
@@ -96,15 +105,12 @@ By default, SQL Relay opens and maintains a pool of 5 persistent database connec
 }}}
 }}}
 
-[../features/connectionpooling.html Connection pooling] reduces the amount of time it takes an app to connect to the database, which can dramatically improve performance for many applications.
+The number of connections determines how many client applications can access the database simultaneously.  In this example, up to 10, assuming each client only needs one connection.  Additional clients would be queued and would have to wait for one of the first 10 to disconnect before being able to access the database.
 
-The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients will be queued and must wait for one of the first 10 to disconnect before being able to access the database.
+Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can.  That number is usually environment-specific, and dictated by database, system and network resources.  However, if you intend to [../features/throttling.html throttle] database access to a particular application, then you may intentionally configure a small number of connections.
 
-Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can, and that number is usually dictated by database, system and network resources.  However, if you intend to [../features/throttling.html throttle] (limit) database access to a particular application, then you may intentionally configure a small number of connections.
-
-
-[[br]][=#cursors]
-== Database Cursors ==
+[[br]][=#dbcursors]
+=== Database Cursors ===
 
 Database cursors are used to execute queries and step through result sets.  Most applications only need to use one cursor at a time.  Some apps require more though, either because they run nested queries, or sometimes because they just don't properly free them.
 
@@ -116,11 +122,11 @@ SQL Relay maintains persistent cursors as well as connections.  By default, each
 }}}
 }}}
 
-Any number of cursors can be opened.  A good rule of thumb is to open as few as possible but as many as you know that your application will need.
+Any number of cursors can be opened.  A good rule of thumb is to open as few as possible, but as many as you know that your application will need.
 
 
 [[br]][=#dynamicscaling]
-== Dynamic Scaling ==
+=== Dynamic Scaling ===
 
 Both connections and cursors can be configured to scale dynamically - open on demand and then die off when no longer needed.  This feature is useful if you have spikes in traffic during certain times of day or if your application has a few modules that occasionally need more cursors than usual.
 
@@ -147,7 +153,7 @@ See the [configreference.html SQL Relay Configuration Reference] for more inform
 
 
 [[br]][=#listener]
-== Listener Configuration ==
+=== Listener Configuration ===
 
 By default, SQL Relay listens for client connections on port 9000, on all available network interfaces.
 
@@ -197,9 +203,9 @@ If the socket option is specified but port and addresses options are not, then S
 
 
 [[br]][=#database]
-== Database Configuration ==
+=== Database Configuration ===
 
-By default, SQL Relay assumes that it's connecting to an Oracle database, but SQL Relay supports many other databases.  The dbase attribute can be used to specify the database type.
+By default, SQL Relay assumes that it's connecting to an Oracle database, but many other databases are supported.  The dbase attribute can be used to specify the database type.
 
 In the following example, SQL Relay is configured to connect to a SAP/Sybase database.
 
@@ -221,28 +227,9 @@ When connecting to an Oracle database, the dbase attribute may be omitted or set
 
 SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the [configreference.html SQL Relay Configuration Reference] for valid dbase settings and information on connect string options for each database.
 
-[[br]][=#sessionqueries]
-== Session-Queries ==
-
-SQL Relay can be configured to run a set of queries at the beginning and end of each client session.
-
-By far the most common use for this feature is that some database parameter needs to be reconfigured but you don't have permission or bouncing the database is out of the question, or something like that.  For example, lets say you are using an Oracle database, but your app requires dates to be formatted like MM/DD/YYYY instead of DD-MON-YYYY.  Ideally you'd alter the nls_date_format in the instance but you can't, for some reason.
-
-You can use SQL Relay's session queries to work around the problem.
-
-In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-sessionqueries.conf@
-}}}
-}}}
-
-Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.
-
 
 [[br]][=#instances]
-== Multiple Instances ==
+=== Multiple Instances ===
 
 Any number of SQL Relay instances can be defined in the configuration file.
 
@@ -274,25 +261,88 @@ sqlrsh -host sqlrserver -port 9002
 }}}
 }}}
 
+[[br]][=#autostart]
+=== Starting Instances Automatically ===
 
-[[br]][=#directory]
-== Configuration Directory ==
+In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all intances configured with the enabled attribute set to yes.
 
-While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files.
+For example, if the following instances are defined...
 
-The default the SQL Relay configuration directory depends on the platform and on how you installed SQL Relay.
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-autostart.conf@
+}}}
+}}}
+
+...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.
+
+When installed on most platforms, SQL Relay creates a systemd service file (usually in /usr/lib/systemd/system or /lib/systemd/system) or an init script in the appropriate place under /etc.  These call sqlr-start with no -id option.  If configured to run at boot, they will start all instances for which enabled="yes" is configured.
+
+How to enable the service file or init script depends on what platform you are using.
+
+On systemd-enabled Linux, this usually involves running:
+
+{{{#!blockquote
+systemctl enable sqlrelay.service
+}}}
+
+On non-systemd-enabled Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.  This can be done manually, but most platforms provide utilities to do it for you.
+
+Redhat-derived Linux distributions have a chkconfig command that can do this for you:
+
+{{{#!blockquote
+chkconfig --add sqlrelay
+}}}
+
+Debian-derived Linux distributions provide the update-rc.d command:
+
+{{{#!blockquote
+update-rc.d sqlrelay defaults
+}}}
+
+Solaris provides svcadm:
+
+{{{#!blockquote
+svcadm enable sqlrelay
+}}}
+
+On !FreeBSD you must add a line to /etc/rc.conf like:
+
+{{{#!blockquote
+sqlrelay_enabled=YES
+}}}
+
+On !NetBSD you must add a line to /etc/rc.conf like:
+
+{{{#!blockquote
+sqlrelay=YES
+}}}
+
+On !OpenBSD you must add a line to /etc/rc.conf like:
+
+{{{#!blockquote
+sqlrelay_flags=""
+}}}
+
+[[br]][=#altconfigfile]
+== Alternate Configuration File Options ==
+
+[=#directory]
+=== Configuration Directory ===
+
+While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files located in a configuration directory.
+
+The default SQL Relay configuration directory depends on the platform and on how you installed SQL Relay.
 
 * Unix and Linux
- * Built from source - '''/usr/local/firstworks/etc/sqlrelay.conf.d'''
-  * (however, if you specified a --prefix or --sysconfdir during the build, then it might be in a different location)
+ * Built from source - '''/usr/local/firstworks/etc/sqlrelay.conf.d''' (unless you specified a non-standard --prefix or --sysconfdir during the build)
  * RPM package - '''/etc/sqlrelay.conf.d'''
- * FreeBSD package - '''/usr/local/etc/sqlrelay.conf.d'''
- * NetBSD package - '''/usr/pkg/etc/sqlrelay.conf.d'''
- * OpenBSD package - '''/usr/local/etc/sqlrelay.conf.d'''
+ * !FreeBSD package - '''/usr/local/etc/sqlrelay.conf.d'''
+ * !NetBSD package - '''/usr/pkg/etc/sqlrelay.conf.d'''
+ * !OpenBSD package - '''/usr/local/etc/sqlrelay.conf.d'''
 * Windows
  * Built from source - '''C:\Program Files\Firstworks\etc\sqlrelay.conf.d'''
- * Windows Installer package - '''C:\Program Files\Firstworks\etc\sqlrelay.conf.d'''
-  * (however, if you specified a different folder during installatoin, then it might be in a different location)
+ * Windows Installer package - '''C:\Program Files\Firstworks\etc\sqlrelay.conf.d''' (unless you specified a non-standard installation folder)
 
 Additional configuration files may be created under this directory.  These files must follow the same format as the main configuration file.
 
@@ -324,9 +374,9 @@ For example, if you wanted to split up oracle, sap and db2 configurations into 3
 
 
 [[br]][=#specifying]
-== Specifying Configuration Files ==
+=== Specifying Configuration Files ===
 
-In addition to the -id option, the sqlr-start program also takes a -config option.  The -config option can be used to specify a configuration file or directory other than the default.
+It is also possible to specify a particular configuration file or directory by passing the sqlr-start program a -config option.
 
 For example:
 
@@ -340,7 +390,9 @@ sqlr-start -id oracleexample -config dir:///home/myuser/mysqlrelay.conf.d
 
 (the file:// prefix is optional when specifying a file, but the dir:// prefix must be included when specifying a directory)
 
-The -config option may also be used to specify a comma-separated list of files or directories.  For example:
+The -config option may also be used to specify a comma-separated list of files or directories.
+
+For example:
 
 {{{#!blockquote
 {{{
@@ -354,7 +406,7 @@ Files and directories are processed in the order that they are specified.
 
 
 [[br]][=#remote]
-== Remote Configuration Files ==
+=== Remote Configuration Files ===
 
 In addition to local configuration files, the -config option may also be used to specify configuration files located on a remote host, accessible via http.
 
@@ -379,7 +431,9 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 
 (Note: the https and scp examples would only work if Rudiments is compiled with support for libcurl.)
 
-In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.  For example:
+In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.
+
+For example:
 
 {{{#!blockquote
 {{{
@@ -393,7 +447,7 @@ Using user-password files is recommended over passing literal users and password
 
 
 [[br]][=#linkfiles]
-== Link Files ==
+=== Link Files ===
 
 So far, the example configuration files have all been XML files, containing configurations for instances of SQL Relay.
 
@@ -449,78 +503,14 @@ As link files can be protected by file permissions, and the urls stored in them 
 There is no limit to the depth of links.  A link file can reference another link file which references another, which references another, etc.  Too great a depth could lead to slow startup times though, especially when using remote configration files. This is especially significant when using [#dynamicscaling Dynamic Scaling], as the configuration must be loaded each time a new connection is spawned.  Care should also be taken to avoid loops.
 
 
-[[br]][=#autostart]
-== Starting Instances Automatically ==
-
-In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all intances configured with the enabled attribute set to yes.
-
-For example, if the following instances are defined...
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-autostart.conf@
-}}}
-}}}
-
-...then calling sqlr-start without the -id parameter will start oracleexample and sapexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.
-
-When installed on most platforms, SQL Relay creates a systemd service file (usually in /usr/lib/systemd/system or /lib/systemd/system) or an init script in the appropriate place under /etc.  These call sqlr-start with no -id option.  If configured to run at boot, they will start all instances for which enabled="yes" is configured.
-
-How to enable the service file or init script depends on what platform you are using.
-
-On systemd-enabled Linux, this usually involves running:
-
-{{{#!blockquote
-systemctl enable sqlrelay.service
-}}}
-
-On non-systemd-enabled Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.  This can be done manually, but most platforms provide utilities to do it for you.
-
-Redhat-derived Linux distributions have a chkconfig command that can do this for you:
-
-{{{#!blockquote
-chkconfig --add sqlrelay
-}}}
-
-Debian-derived Linux distributions provide the update-rc.d command:
-
-{{{#!blockquote
-update-rc.d sqlrelay defaults
-}}}
-
-Solaris provides svcadm:
-
-{{{#!blockquote
-svcadm enable sqlrelay
-}}}
-
-On FreeBSD you must add a line to /etc/rc.conf like:
-
-{{{#!blockquote
-sqlrelay_enabled=YES
-}}}
-
-On NetBSD you must add a line to /etc/rc.conf like:
-
-{{{#!blockquote
-sqlrelay=YES
-}}}
-
-On OpenBSD you must add a line to /etc/rc.conf like:
-
-{{{#!blockquote
-sqlrelay_flags=""
-}}}
-
-
 [[br]][=#ha]
-== High Availabiltiy Environments ==
+== High Availabiltiy ==
 
 In a high availability environment, SQL Relay can be deployed as a front-end to provide load-balancing and fail-over for a set of replicated database servers or database cluster.  Load-balancing and fail-over can also be implemented over multiple SQL Relay servers.
 
 
 [[br]][=#cluster]
-=== Load-Balancing and Fail-Over With Replicated or Clustered Databases ===
+=== Load-Balancing and Fail-Over With Replicated Databases or Database Clusters ===
 
 In a database cluster or replication environment, SQL Relay can be configured to maintain a pool of connections to the various database nodes and distribute client sessions over the nodes.  If an individual node fails, SQL Relay will attempt to reestablish connections to that node, while continuing to distribute client sessions over the remaining nodes.
 
@@ -593,7 +583,11 @@ This actually requires 3 instances of SQL Relay.  One to connect to the master, 
 }}}
 }}}
 
-The first two instances use familiar configuration options, but the third uses a dbtype of "router" and uses instances of the router module to define query routing rules.
+The first two instances use familiar configuration options, but the third uses a dbtype of "router" and uses router tags to define query routing rules.
+
+(Note the //module// attribute of the router tag.  SQL Relay is highly modular, and many advanced features, including query routing, are provided by loadable modules.)
+
+(Note also the use of a notifications tag.  See [#notifications Notifications] below for more information.)
 
 Each router tag defines a connectionid to send the query to and a set of regular expression patterns to match.  Queries that match the set of patterns defined in the pattern tags are sent to the instance of SQL Relay designated by the connectionid in the router tag.
 
@@ -614,10 +608,6 @@ Client applications should connect to the router instance rather than the master
 sqlrsh -host sqlrserver -user routeruser -password routerpassword
 }}}
 }}}
-
-This example routes queries based on regular expression pattern matching.  Router modules are available to route queries based on other things too though, such as the user that ran the query, or the IP address of the client.  See [../modules/routers.html Router Modules] for more information about router modules.
-
-See [router.html Query Routing] for more information on query routing in general.
 
 
 [[br]][=#frontend]
@@ -641,9 +631,72 @@ In a round-robin DNS scenario, multiple IP addresses are assigned to the same ho
 
 Round-robin DNS is so-called because, traditionally, the order of the IP addresses returned on successive requests alternated reliably, in round-robin fashion.  This behavior persists in many environments, but it is no longer guaranteed, as many modern DNS resolvers sort the list and return the IP addresses in the same order, every time.  SQL Relay clients randomize the list though, and try to connect to each of the IP addresses, one-at-a-time, until they succeed.  Doing so provides both load-balancing and fail-over without requiring an appliance or application server cluster.
 
+[[br]][=#authoptions]
+== Authentication/Authorization Options ==
+
+There are several options for controlling which users are allowed to access an instance of SQL Relay.
+
+[=#userlistauth]
+=== User List Auth ===
+
+The standard authentication/authorization option is //user list// auth.
+
+When user list auth is used, a user is authenticated/authorized against a static list of valid user/password combinations.  This is the method used in all of the examples above.
+
+To enable user list auth, you must provide a list of valid user/password combinations, as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-auths-users.conf@
+}}}
+}}}
+
+[[br]][=#dbauth]
+=== Database Auth ===
+
+Another authentication/authorization option is //database// auth.
+
+When database auth is used, a user is authenticated/authorized against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.
+
+To enable database auth, omit the list of user/passwords and configure authtier="database" as follows.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-auths-authtier-database.conf@
+}}}
+}}}
+
+{{{#!blockquote
+'''NOTE:''' Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.
+}}}
+
+{{{#!blockquote
+'''NOTE:''' Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.
+}}}
+
+[[br]][=#proxiedauth]
+=== Proxied Auth ===
+
+Another authentication/authorization option is //proxied// auth.
+
+When proxied auth is used, a user is authenticated/authorized against the database itself, though in a different manner than datbase auth described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.
+
+This is currently only supported with Oracle (version 8i or higher) and requires database configuration.  See [oraclentier.html this document] for more information including instructions for configuring Oracle.
+
+To enable proxied auth, omit the list of user/passwords and configure authtier="proxied" as follows.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-auths-authtier-proxied.conf@
+}}}
+}}}
+
+{{{#!blockquote
+'''NOTE:''' Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.
+}}}
 
 [[br]][=#krb]
-== Kerberos and Active Directory Encryption and Authentication ==
+=== Kerberos and Active Directory Encryption and Authentication ===
 
 SQL Relay supports Kerberos encryption and authentication.
 
@@ -665,6 +718,7 @@ The following configuration configures an instance of SQL Relay to use Kerberos 
 * The '''krb''' parameter enables (or disables) Kerberos authentication and encryption.
 * The '''krbservice''' parameter specifies which Kerberos service to use.  This parameter is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.
 * The '''krbkeytab''' parameter specifies the location of the keytab file containing the key for the specified Kerberos service.  This parameter is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab
+* User list auth is also used.  Database and proxied auth are not currently supported with Kerberos.
 
 Note that no passwords are required in the user list.  Note also that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.
 
@@ -720,7 +774,7 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 
 
 [[br]][=#tls]
-== TLS/SSL Encryption and Authentication ==
+=== TLS/SSL Encryption and Authentication ===
 
 SQL Relay supports TLS/SSL encryption and authentication.
 
@@ -742,6 +796,7 @@ The following configuration enables TLS/SSL security for an instance of SQL rela
 
 * The '''tls''' parameter enables (or disables) TLS/SSL encryption.
 * The '''tlscert''' parameter specifies a TLS/SSL certificate to use.  A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.
+* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
 
 To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:
 
@@ -813,7 +868,7 @@ Note that the fully qualified host name was provided.  Note also the use of the 
 
 [[br]]
 
-For a more secure session, the server may request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
+For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
 
 The following configuration enables these checks for an instance of SQL relay:
 
@@ -825,6 +880,7 @@ The following configuration enables these checks for an instance of SQL relay:
 
 * The '''tlsvalidate''' parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.
 * The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
 
 Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.
 
@@ -860,6 +916,490 @@ While TLS/SSL authenticated and encrypted sessions are substantially more secure
 
 Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.
 
+
+[[br]][=#se]
+== Security Enhancement ==
+
+SQL Relay offers several security enhancement features.
+
+
+[[br]][=#pwdenc]
+=== Password Encryption ===
+
+Password encryption allows you to store encrypted passwords in the configuration file so that they are not directly readable.  Passwords for SQL Relay users and database passwords may both be encrypted.
+
+Encryption and decryption are achieved via loadable modules.  The //passwordencryptions// section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.
+
+For example, to use the //rot// module, which encrypts by performing a simple character rotation, with passwords in the user list:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-rot13.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+In this example, the //id// and //count// attributes are parameters for the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute is defined by you and just assigns this particular configuration an id that may be referred to later.  All password encryption modules must have an //id// attribute.
+
+Note that the password in the user tag is encrypted (unencrypted, it would just be "test") and that the password in the string attribute of the connection tag is encrypted (nencrypted, it would just be "testpassword").  A command line program (described later) is provided to encrypt passwords.
+
+Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// parameter in the passwordencryption tag ( //rot13// ), not the module name ( //rot// ).
+
+Password encryption modules may be "stacked".  It is possible to load multiple modules and use each one with a different password.  For example, you might want to use the //rot// module with a count of 13 for the SQL Relay password and a count of 10 for the database password.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-stacked.conf@
+}}}
+}}}
+
+Encryption modules may be either two-way or one-way.  Two-way encryption modules can both encrypt and decrypt a password.  One-way encryption modules can only encrypt a password.
+
+Symmetric and asymmetric key encryption techniques are two-way.  The rot encryption is an example of symmetric key encryption.  Asymmetric key encryptions generally use a public/private key pair, where the publicly available key is be used to encrypt the data but a privately held key is required to decrypt it.  SQL Relay can use two-way encryption modules with passwords for SQL Relay users and database passwords.
+
+One-way encryption techniques include DES, MD5 and SHA1 hashes.  When using those techniques, the password can be encrypted but cannot effectively be decrypted.  SQL Relay can use one-way encryption moudles with passwords for SQL Relay users but can not use one-way encryption modules to encrypt database passwords.
+
+The command line tool '''sqlr-pwdenc''' is provided to help encrypt passwords for inclusion in the configuration file.  Given an encryption module and password, it will print out the encrypted password.
+
+{{{#!blockquote
+{{{
+sqlr-pwdenc [-config configfile] -id id -pwdencid passwordencryptionid -password password
+}}}
+}}}
+
+* '''configfile''' - optional and refers to the configuration file
+* '''id''' - the instance within the configuration file to look for the specified password encryption module definition
+* '''passwordencryptionid''' - the id of the password encryption module to use
+* '''password''' - the password to encrypt
+
+For example:
+
+{{{#!blockquote
+{{{
+$ sqlr-pwdenc -id example -pwdencid rot13 -password testpassword
+grfgcnffjbeq
+}}}
+}}}
+
+The resulting string "grfgcnffjbeq" can now be put in the configuration file as the password.
+
+There is one final thing to note.  Command line client programs like sqlrsh and sqlr-import take a -id option.  The -id option causes the program to open the configuration file and extract the host, port, socket, user and password from the specified instance.  If the password is encrypted, then the encrypted password will be extracted and passed to the server.  This will fail.  So, when using the -id option with an encrypted password, you must also use the -user and -password option, to override the user/password that are extracted from the configuration file.
+
+For example, rather than just using:
+
+{{{#!blockquote
+{{{
+sqlrsh -id example
+}}}
+}}}
+
+You should use:
+
+{{{#!blockquote
+{{{
+sqlrsh -id example -user test -password test
+}}}
+}}}
+
+Currently, the following password encryption modules are available in the standard SQL Relay distribution:
+
+* rot
+* md5
+* crypt
+
+The '''rot''' module is a two-way encryption module that performs a character rotation, similar to the popular [http://en.wikipedia.org/wiki/ROT13 ROT13] algorithm, though it can rotate by any amount specified in the //count// attribute, not just 13 and rotates digits as well as upper and lower-case characters.
+
+The '''md5''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/MD5 MD5] algorithm.
+
+The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
+
+Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#schedules]
+=== Connection Schedules ===
+
+Connection schedules allow the SQL Relay server to control when users are allowed to access the database.
+
+Connection schedules are defined and enforced by loadable modules.  The //schedules// section of the sqlrelay.conf file indicates which modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-schedules-cron-deny.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+All schedule modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+Connection schedule modules can be "stacked".  Multiple different modules may be loaded, and multiple instances of the same type of module, with different configurations, may also be loaded.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-schedules-stacked.conf@
+}}}
+}}}
+
+At startup, the SQL Relay server creates instances of the specified schedule modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  Each module applies its rules to the specified user.  If a module denies access to a user then the remaining modules are ignored.  If the user makes it through all modules without being denies access, then the user is allowed access.
+
+Currently, only the ''cron_userlist'' connection schedule module is available in the standard SQL Relay distribution.  Custom modules may be developed though.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+The '''cron_userlist''' module allows you to define a connection schedule for a list of users, using a cron-like syntax.
+
+'''Note though, that the time-and-date fields have different meanings from traditional cron.'''
+
+An example configuration follows.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-schedules-cron-deny.conf@
+}}}
+}}}
+
+In this example, the module denies access to all users by default, but then allows access to the dmuse, kmuse, imuse, and smuse users during business hours.  In this case, business hours are defined as:
+
+* every year
+* every month
+* every day of the month
+* between days 2-5 (Monday-Friday) of the week
+* between 8:00AM and 11:59AM and 1:00PM and 4:59PM
+
+Another example configuration follows.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-schedules-cron-allow.conf@
+}}}
+}}}
+
+In this example, the module allows access to all users by default, but then denies access to the dmuse, kmuse, imuse, and smuse users during non-business hours.  In this case, non-business hours are defined as:
+
+* every year
+* every month
+* every day of the month
+* between days 2-5 (Monday-Friday) of the week
+ * between 12:00AM and 7:59AM
+ * between 12:00PM and 12:59PM
+ * between 5:00PM and 11:59PM
+* on days 1 and 7 (Saturday and Sunday) of the week, at all hours
+
+The '''users''' tag defines a list of users to apply the schedule to.  It may contain any number of '''user''' tags.
+
+The '''user''' tags support the following attributes:
+
+* '''user''' - the name of a user or * meaning "all users"
+
+If a user does not appear in this list then it is granted access at any time.  If a user appears in the list then the schedule will be applied to that user.
+
+The '''default''' attribute of the '''schedule''' tag defines the default rule.
+
+* '''allow''' - allow access to the list of users unless they are denied access by the set of rules
+* '''deny''' - deny access to the list of users unless they are allowed access by the set of rules
+
+The '''rules''' tag defines the list of rules that modify the default behavior.  It may contain '''allow''' or '''deny''' tags.
+
+The '''allow''' and '''deny''' tags support the following attributes:
+
+* '''when''' - the years, months, days of month, days of week, and times of day that the rule applies to
+
+The format of the '''when''' attribute is cron-like.  There are 5 fields, separated by spaces.
+
+'''Note again though, that the time-and-date fields have different meanings from traditional cron.'''
+
+The fields represent, in order:
+
+* years
+* months (where 1=January)
+* days of the month
+* days of the week (where 1=Sunday)
+* times of day, in 24-hour format
+
+In each field, ranges may be specified with a dash, and sets may be separated by commas.  A * means "all possible values".
+
+For example:
+
+All day, every day, at any time of day:
+
+{{{#!blockquote
+{{{
+* * * * *
+}}}
+}}}
+
+All day, every month, on the 1st, 3rd through 5th, 8th, and 10th through 12th of the month:
+
+{{{#!blockquote
+{{{
+* * 1,3-5,8,10-12 * *
+}}}
+}}}
+
+Every day from 8:00AM through 11:59AM and 1:00PM through 4:59PM:
+
+{{{#!blockquote
+{{{
+* * * * 8:00-11:59,13:00-16:59
+}}}
+}}}
+
+Every day from 1:00PM to 4:00PM:
+
+{{{#!blockquote
+{{{
+* * * * 13:00-16:00
+}}}
+}}}
+
+All day, every Saturday:
+
+{{{#!blockquote
+{{{
+* * * 6 *
+}}}
+}}}
+
+All day, every day, in February and March:
+
+{{{#!blockquote
+{{{
+* 2,3 * * *
+}}}
+}}}
+
+Every day in February and March, from noon to 3PM:
+
+{{{#!blockquote
+{{{
+* 2,3 * * 12:00-15:00
+}}}
+}}}
+
+...and so on.
+
+In general, the module works as follows:
+
+* When a user connects, the module looks for the user in the list of users.
+ * If the user is not found then access is granted.
+ * If the user is found, then the default rule is applied.
+  * Each rule in the rules list is evaluated.
+   * If the rule doesn't apply to the current time, then it is ignored.
+   * If the rule does apply to the current time, then it is applied.
+    * Each rule may reverse the outcome the previous rules.
+  * When all rules have been applied, the user will have been allowed or denied access.
+
+
+[[br]][=#filtering]
+=== Query Filtering ===
+
+Query Filter modules allow the SQL Relay server programs to filter out queries, and not pass them along to the database.
+
+Query filters are defined and enforced by loadable modules.  The //filters// section of the sqlrelay.conf file indicates which filter modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-filters-regex.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+Currently, all filter modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+Filter modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-filters-stacked.conf@
+}}}
+}}}
+
+At startup, the SQL Relay server creates instances of the specified filter modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module filters out the query, then it isn't passed along to the next module, nor is it sent to the database, and the client program is told that the query failed.
+
+When using query filters, it is helpful to use the //normalize// query translation too:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-filters-regex-normalize.conf@
+}}}
+}}}
+
+See [#querytranslations Query Translations] below for more information.
+
+Currently, the following filter modules are available:
+
+* '''patterns'''
+* '''regex'''
+* '''string'''
+
+Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+==== patterns ====
+
+The patterns module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.
+
+The list of patterns is given by a set of '''pattern''' child tags.  Each pattern tag may contain the following attributes.
+
+* '''pattern''' - Required.  The pattern to match.
+* '''type''' - Optional.  Defaults to "string".  Valid values are "string", "cistring" (case insensitive string), and "regex" (regular expression).
+* '''scope''' - Optional.  Defaults to "query".  Valid values are "query" (attempt to match against the entire query), "outsidequotes" (only match parts of the query not surrounded by single-quotes), and "insidequotes" (only match parts of the query surrounded by single-quotes).
+* '''errornumber''' - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.
+* '''error''' - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.
+
+For example, with the following configuration...
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-filters-patterns.conf@
+}}}
+}}}
+
+These queries would be filtered out:
+
+{{{#!blockquote
+{{{#!code
+@parts/patterns-filtered.sql@
+}}}
+}}}
+
+But these queries would not be:
+
+{{{#!blockquote
+{{{#!code
+@parts/patterns-notfiltered.sql@
+}}}
+}}}
+
+==== regex ====
+
+The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.
+
+In addition to the module attribute, each filter tag may contain the following attributes.
+
+* '''pattern''' - Required.  The pattern to match.
+* '''errornumber''' - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.
+* '''error''' - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.
+
+For example, with the following configuration:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-filters-regex.conf@
+}}}
+}}}
+
+This query would be filtered out:
+
+{{{#!blockquote
+{{{#!code
+@parts/regex-filtered.sql@
+}}}
+}}}
+
+But this query would not be:
+
+{{{#!blockquote
+{{{#!code
+@parts/regex-notfiltered.sql@
+}}}
+}}}
+
+==== string ====
+
+The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.
+
+In addition to the module attribute, each filter tag may contain the following attributes.
+
+* '''pattern''' - Required.  The pattern to match.
+* '''ignorecase''' - Optional.  Defaults to "no".  If set to "yes" then the comparison is case insensitive.
+* '''errornumber''' - Optional.  Defaults to 0.  The error number to return to the client if the query matches this filter.
+* '''error''' - Optional.  Defaults to an empty string.  The error string to return to the client if the query matches this filter.
+
+For example, with the following configuration:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-filters-string.conf@
+}}}
+}}}
+
+This query would be filtered out:
+
+{{{#!blockquote
+{{{#!code
+@parts/string-filtered.sql@
+}}}
+}}}
+
+But this query would not be:
+
+{{{#!blockquote
+{{{#!code
+@parts/string-notfiltered.sql@
+}}}
+}}}
+
+
+[[br]][=#translation]
+== Translation ==
+
+...
+
+
+[[br]][=#querytranslation]
+=== Query Translation ===
+
+...
+
+
+[[br]][=#resultsettranslation]
+=== Result Set Translation ===
+
+...
+
+
+[[br]][=#queryrouting]
+== Query Routing ==
+
+...
+
+
+[[br]][=#logging]
+== Logging ==
+
+...
+
+
+[[br]][=#notifications]
+== Notifications ==
+
+...
+
+[[br]][=#sessionqueries]
+== Session-Queries ==
+
+SQL Relay can be configured to run a set of queries at the beginning and end of each client session.
+
+By far the most common use for this feature is that some database parameter needs to be reconfigured but you don't have permission or bouncing the database is out of the question, or something like that.  For example, lets say you are using an Oracle database, but your app requires dates to be formatted like MM/DD/YYYY instead of DD-MON-YYYY.  Ideally you'd alter the nls_date_format in the instance but you can't, for some reason.
+
+You can use SQL Relay's session queries to work around the problem.
+
+In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-sessionqueries.conf@
+}}}
+}}}
+
+Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.
 
 
 [[br]][=#advanced]
