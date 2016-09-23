@@ -64,7 +64,9 @@
   <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
-<br/><br/><a name="quick"/><h2>Quick Start</h2>
+<hr/>
+
+<br/><a name="quick"/><h2>Quick Start</h2>
 
 <p>When SQL Relay is first installed, no configuration file exists.  You must create one in the appropriate location.  This location depends on the platform and on how you installed SQL Relay.</p>
 
@@ -134,7 +136,9 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<br/><br/><a name="basic"/><h2>Basic Configuration</h2>
+<hr/>
+
+<br/><a name="basic"/><h2>Basic Configuration</h2>
 
 <p>The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are you'll want to configure it further.</p>
 
@@ -554,6 +558,8 @@ sqlrelay=YES
 <blockquote>
 sqlrelay_flags=""
 </blockquote>
+<hr/>
+
 <br/><a name="altconfigfile"/><h2>Alternate Configuration File Options</h2>
 
 <a name="directory"/><h3>Configuration Directory</h3>
@@ -775,6 +781,8 @@ http://myuser:mypassword@configserver.mydomain.com/sqlrconfig/db2.conf
 <p>As link files can be protected by file permissions, and the urls stored in them aren't exposed anywhere else, such as in a process listing, user-password files are not generally necessary when using link files.</p>
 
 <p>There is no limit to the depth of links.  A link file can reference another link file which references another, which references another, etc.  Too great a depth could lead to slow startup times though, especially when using remote configration files. This is especially significant when using <a href="#dynamicscaling">Dynamic Scaling</a>, as the configuration must be loaded each time a new connection is spawned.  Care should also be taken to avoid loops.</p>
+
+<hr/>
 
 <br/><a name="ha"/><h2>High Availabiltiy</h2>
 
@@ -1028,6 +1036,8 @@ sqlr-start -id router
 <p>In a round-robin DNS scenario, multiple IP addresses are assigned to the same host name.  The SQL Relay client is then configured to connect to that host.  When it requests the IP addresses for the host, the client receives all of the IP addresses assigned to it, rather than just a single address.</p>
 
 <p>Round-robin DNS is so-called because, traditionally, the order of the IP addresses returned on successive requests alternated reliably, in round-robin fashion.  This behavior persists in many environments, but it is no longer guaranteed, as many modern DNS resolvers sort the list and return the IP addresses in the same order, every time.  SQL Relay clients randomize the list though, and try to connect to each of the IP addresses, one-at-a-time, until they succeed.  Doing so provides both load-balancing and fail-over without requiring an appliance or application server cluster.</p>
+
+<hr/>
 
 <br/><a name="authoptions"/><h2>Authentication/Authorization Options</h2>
 
@@ -1407,6 +1417,8 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.</p>
 
+<hr/>
+
 <br/><a name="se"/><h2>Security Enhancement</h2>
 
 <p>SQL Relay offers several security enhancement features.</p>
@@ -1417,7 +1429,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Encryption and decryption are achieved via loadable modules.  The <i>passwordencryptions</i> section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.</p>
 
-<p>For example, to use the <i>rot</i> module, which encrypts by performing a simple character rotation, with passwords in the user list:</p>
+<p>For example, to use the <i>rot</i> module, which encrypts by performing a simple character rotation:</p>
 
 <blockquote>
   <pre><!-- Generator: GNU source-highlight 3.1.8
@@ -1449,9 +1461,9 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
 
-<p>In this example, the <i>id</i> and <i>count</i> attributes are parameters for the <i>rot</i> module.  "13" tells the module to rotate by 13 characters.  The <i>id</i> attribute is defined by you and just assigns this particular configuration an id that may be referred to later.  All password encryption modules must have an <i>id</i> attribute.</p>
+<p>In this example, the <i>id</i> and <i>count</i> attributes are parameters for the <i>rot</i> module.  "13" tells the module to rotate by 13 characters.  The <i>id</i> attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The <i>id</i> attribute is mandatory.</p>
 
-<p>Note that the password in the user tag is encrypted (unencrypted, it would just be "test") and that the password in the string attribute of the connection tag is encrypted (nencrypted, it would just be "testpassword").  A command line program (described later) is provided to encrypt passwords.</p>
+<p>Note that the password in the user tag is encrypted (unencrypted, it would just be "test") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "testpassword").  A command line program (described later) is provided to encrypt passwords.</p>
 
 <p>Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the <i>id</i> parameter in the passwordencryption tag ( <i>rot13</i> ), not the module name ( <i>rot</i> ).</p>
 
@@ -2161,7 +2173,9 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<br/><br/><a name="translation"/><h2>Translation</h2>
+<hr/>
+
+<br/><a name="translation"/><h2>Translation</h2>
 
 <p>SQL Relay offers features for translating queries and result sets.</p>
 
@@ -2376,6 +2390,8 @@ Jul 10 2015 05:17:55:717PM
 <p>Note that <b>dateddmm</b> and <b>dateyyddmm</b> should usually be set to the same thing.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.</p>
 
 <p>Note also that date/time translation in general is especially problematic with MS SQL Server.  See <a href="../faq/#mssqldates">the FAQ</a> for more info.</p>
+
+<hr/>
 
 <br/><a name="queryrouting"/><h2>Query Routing</h2>
 
@@ -2938,6 +2954,8 @@ can't route the individual queries run inside the stored procedure.  So, the
 stored procedure and all queries run inside of it will be run against whichever
 database it was routed to.</p>
 
+<hr/>
+
 <br/><a name="logging"/><h2>Logging</h2>
 
 <p>Logging allows the SQL Relay server programs to log various bits of information as they run.</p>
@@ -3020,6 +3038,8 @@ time: 0.000001
 
 </blockquote>
 <p>Sample log: <a href="sqlr-connection-oracletest-querylog.2899.html">sqlr-connection-oracletest-querylog.2899</a></p>
+
+<hr/>
 
 <br/><a name="notifications"/><h2>Notifications</h2>
 
@@ -3247,6 +3267,8 @@ blat <i>message</i> -to <i>address</i> -subject <i>subject</i> -q
 
 <p>SQL Relay assumes that the <i>blat</i> program is installed, in the PATH of the user that SQL Relay runs as, and that blat has been configured.  See <a target="_blank" href="http://www.blat.net">http://www.blat.net</a> to download and configure blat.</p>
 
+<hr/>
+
 <br/><a name="sessionqueries"/><h2>Session-Queries</h2>
 
 <p>SQL Relay can be configured to run a set of queries at the beginning and end of each client session.</p>
@@ -3290,9 +3312,11 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.</p>
 
+<hr/>
+
 <br/><a name="advanced"/><h2>Advanced Configuration</h2>
 
-<p>The configuration file supports many more attributes and features than the ones described in this guide including tuning options and extension modules.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> and <a href="tuning.html">Tuning SQL Relay</a> for more information.
+<p>The configuration file supports many more attributes and features than the ones described in this guide including tuning options.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> and <a href="tuning.html">Tuning SQL Relay</a> for more information.
 </p>
 
 </body>
