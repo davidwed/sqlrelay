@@ -1243,7 +1243,7 @@ Custom modules may also be developed.  For more information, please contact Davi
 
 ==== patterns ====
 
-The patterns module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.
+The '''patterns''' module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.
 
 The list of patterns is given by a set of '''pattern''' child tags.  Each pattern tag may contain the following attributes.
 
@@ -1279,7 +1279,7 @@ But these queries would not be:
 
 ==== regex ====
 
-The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.
+The '''regex''' module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.
 
 In addition to the module attribute, each filter tag may contain the following attributes.
 
@@ -1313,7 +1313,7 @@ But this query would not be:
 
 ==== string ====
 
-The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.
+The '''string''' module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.
 
 In addition to the module attribute, each filter tag may contain the following attributes.
 
@@ -1350,19 +1350,138 @@ But this query would not be:
 [[br]][=#translation]
 == Translation ==
 
-...
+SQL Relay offers features for translating queries and result sets.
 
 
 [[br]][=#querytranslation]
 === Query Translation ===
 
-...
+Query translation allows the SQL Relay server to alter queries before passing them to the database.
+
+Query translation is implemented by loadable modules.  The //translations// section of the sqlrelay.conf file indicates which translation modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-translations-normalize.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+All translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
+
+Currently, the following translation module is available:
+
+* '''normalize'''
+
+Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+The '''normalize''' module performs the following operations on a query:
+
+* Removes comments.
+* Converts all white-space characters to spaces, outside of quoted strings.
+* Converts multiple spaces into a single space, outside of quoted strings.
+* Removes whitespace from around operators.
+* Converts everything to lower case, outside of quoted strings.
+* Converts static concatenations to equivalent strings.  Eg. converts 'he' ``|``| 'll' ``|``| 'o' to 'hello'.
+
+For example, the following query:
+
+{{{#!blockquote
+{{{#!code
+@parts/normalize-before.sql@
+}}}
+}}}
+
+Would be translated to:
+
+{{{#!blockquote
+{{{#!code
+@parts/normalize-after.sql@
+}}}
+}}}
+
+Normalizing a query is useful when also using [#filtering query filtering] as it simplifies the patterns that have to be searched for.
 
 
 [[br]][=#resultsettranslation]
 === Result Set Translation ===
 
-...
+Result set translation allows the SQL Relay server to alter fields in the result set before returning the field to the client.
+
+Result set translation is implemented by loadable modules.  The //resultsettranslations// section of the sqlrelay.conf file indicates which result set translation modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-resultsettranslations-reformatdatetime.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+All result set translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+At startup, the SQL Relay server creates instances of the specified result set translation modules and initializes them.  As each field of the result set is returned, the server passes the field to each module, in the order that they were specified in the config file.  If a module modifies a field, then that modified field is passed on to the next module.
+
+Currently, the following result set translation module is available:
+
+* '''reformatdatetime'''
+
+Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+The '''reformatdatetime''' module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.
+
+The following parameters are currently supported:
+
+* '''datetimeformat''' - Specifies the format to convert date/time fields to.  May be any combination of the following format characters.  Non-format characters will be inserted as-is.
+ * '''DD''' - day of the month
+ * '''MM''' - numeric month
+ * '''MON''' - 3-character text abbreviation for the month
+ * '''Month''' - full text month
+ * '''YYYY''' - year including century
+ * '''YY''' - year excluding century
+ * '''HH24''' - hour (0-23)
+ * '''HH''' - hour (1-12)
+ * '''MI''' - minute
+ * '''SS''' - second
+ * '''FFF''' - fraction of a second
+ * '''AM''' - AM or PM
+* '''dateformat''' - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
+* '''timeformat''' - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
+* '''dateddmm''' - If set to "yes" then dates are assumed to be in the DD-MM-YYYY format (with days leading), as opposed to MM-DD-YYYY format (with months leading).  This is important for interpreting dates like 03-04-2000.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.
+* '''dateyyddmm''' - If set to "yes" then dates are assumed to be in the YYYY-DD-MM format (with days leading), as opposed to YYYY-MM-DD-YYYY (with months leading).  This is important for interpreting dates like 2000-03-04.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.
+* '''datedelimiters''' - Determining whether the field is a date/time or not can be tricky.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.
+* '''ignorenondatetime''' - If this parameter is set to "yes" then only fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.  By default, all fields are examined and heuristics are used to determine whether the field contains a date/time.
+
+For example, the following configuration:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-resultsettranslations-reformatdatetime.conf@
+}}}
+}}}
+
+Would translate the following date/time field:
+
+{{{#!blockquote
+Jul 10 2015 05:17:55:717PM
+}}}
+
+Into:
+
+{{{#!blockquote
+07/10/2015 17:18:55
+}}}
+
+Note that '''dateddmm''' and '''dateyyddmm''' should usually be set to the same thing.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.
+
+Note also that date/time translation in general is especially problematic with MS SQL Server.  See [../faq/#mssqldates the FAQ] for more info.
 
 
 [[br]][=#queryrouting]
@@ -1455,11 +1574,11 @@ Notifications are implemented by loadable modules.  The //notifications// sectio
 
 The //module// attribute specifies which module to load.
 
-Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
 All notification modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
-Notification modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
+Notification modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
 {{{#!code
@@ -1469,13 +1588,11 @@ Notification modules can be "stacked".  Multiple modules may be loaded and multi
 
 At startup, the SQL Relay server processes create instances of the specified notification modules and initializes them.  As events occur, the server passes the event and, optionally, a string of information about the event to each module, in the order that they were specified in the config file.  If a module is listening for that event, then it sends a notification to the specified recpients.
 
-Currently, the following standard notification modules are available:
+Currently, the following standard notification module is available:
 
 * '''events'''
 
 Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
-
-==== events ====
 
 The '''events''' module listens for a specified set of events and notifies recipients when a one occurs.
 

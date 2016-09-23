@@ -1965,7 +1965,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <h4>patterns</h4>
 
-<p>The patterns module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.</p>
+<p>The <b>patterns</b> module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.</p>
 
 <p>The list of patterns is given by a set of <b>pattern</b> child tags.  Each pattern tag may contain the following attributes.</p>
 
@@ -2038,7 +2038,7 @@ select <font color="#990000">*</font> from badstringtable <font color="#008080">
 </blockquote>
 <h4>regex</h4>
 
-<p>The regex module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.</p>
+<p>The <b>regex</b> module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.</p>
 
 <p>In addition to the module attribute, each filter tag may contain the following attributes.</p>
 
@@ -2100,7 +2100,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <h4>string</h4>
 
-<p>The string module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.</p>
+<p>The <b>string</b> module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.</p>
 
 <p>In addition to the module attribute, each filter tag may contain the following attributes.</p>
 
@@ -2163,15 +2163,219 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <br/><br/><a name="translation"/><h2>Translation</h2>
 
-<p>...</p>
+<p>SQL Relay offers features for translating queries and result sets.</p>
 
 <br/><a name="querytranslation"/><h3>Query Translation</h3>
 
-<p>...</p>
+<p>Query translation allows the SQL Relay server to alter queries before passing them to the database.</p>
+
+<p>Query translation is implemented by loadable modules.  The <i>translations</i> section of the sqlrelay.conf file indicates which translation modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
+
+<p>All translation modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
+
+<p>At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.</p>
+
+<p>Currently, the following translation module is available:</p>
+
+<ul>
+  <li><b>normalize</b></li>
+</ul>
+
+<p>Custom modules may also be developed.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<p>The <b>normalize</b> module performs the following operations on a query:</p>
+
+<ul>
+  <li>Removes comments.</li>
+  <li>Converts all white-space characters to spaces, outside of quoted strings.</li>
+  <li>Converts multiple spaces into a single space, outside of quoted strings.</li>
+  <li>Removes whitespace from around operators.</li>
+  <li>Converts everything to lower case, outside of quoted strings.</li>
+  <li>Converts static concatenations to equivalent strings.  Eg. converts 'he' || 'll' || 'o' to 'hello'.</li>
+</ul>
+
+<p>For example, the following query:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sElEcT
+	<font color="#990000">*,</font>
+	<font color="#FF0000">'He'</font> <font color="#990000">||</font> <font color="#FF0000">'Ll'</font> <font color="#990000">||</font> <font color="#FF0000">'o'</font>
+from
+	myTABLE
+where
+	myTaBLe<font color="#990000">.</font>CoLuMn1    <font color="#990000">=</font>     myTablE<font color="#990000">.</font>ColuMN2  <font color="#990000">/</font>    <font color="#993399">2</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>Would be translated to:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>select <font color="#990000">*,</font> <font color="#FF0000">'HeLlo'</font> from mytable <font color="#008080">where</font> mytable<font color="#990000">.</font>column1 <font color="#990000">=</font> mytable<font color="#990000">.</font>column2<font color="#990000">/</font><font color="#993399">2</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>Normalizing a query is useful when also using <a href="#filtering">query filtering</a> as it simplifies the patterns that have to be searched for.</p>
 
 <br/><a name="resultsettranslation"/><h3>Result Set Translation</h3>
 
-<p>...</p>
+<p>Result set translation allows the SQL Relay server to alter fields in the result set before returning the field to the client.</p>
+
+<p>Result set translation is implemented by loadable modules.  The <i>resultsettranslations</i> section of the sqlrelay.conf file indicates which result set translation modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;resultsettranslations&gt;</font></b>
+			<b><font color="#0000FF">&lt;resultsettranslation</font></b>
+				<font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"reformatdatetime"</font>
+				<font color="#009900">datetimeformat</font><font color="#990000">=</font><font color="#FF0000">"MM/DD/YYYY HH24:MI:SS"</font>
+				<font color="#009900">dateformat</font><font color="#990000">=</font><font color="#FF0000">"MM/DD/YYYY"</font>
+				<font color="#009900">timeformat</font><font color="#990000">=</font><font color="#FF0000">"HH24:MI:SS"</font>
+				<font color="#009900">dateddmm</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
+				<font color="#009900">ignorenondatetime</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/resultsettranslations&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
+
+<p>All result set translation modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
+
+<p>At startup, the SQL Relay server creates instances of the specified result set translation modules and initializes them.  As each field of the result set is returned, the server passes the field to each module, in the order that they were specified in the config file.  If a module modifies a field, then that modified field is passed on to the next module.</p>
+
+<p>Currently, the following result set translation module is available:</p>
+
+<ul>
+  <li><b>reformatdatetime</b></li>
+</ul>
+
+<p>Custom modules may also be developed.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<p>The <b>reformatdatetime</b> module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.</p>
+
+<p>The following parameters are currently supported:</p>
+
+<ul>
+  <li><b>datetimeformat</b> - Specifies the format to convert date/time fields to.  May be any combination of the following format characters.  Non-format characters will be inserted as-is.</li>
+  <ul>
+    <li><b>DD</b> - day of the month</li>
+    <li><b>MM</b> - numeric month</li>
+    <li><b>MON</b> - 3-character text abbreviation for the month</li>
+    <li><b>Month</b> - full text month</li>
+    <li><b>YYYY</b> - year including century</li>
+    <li><b>YY</b> - year excluding century</li>
+    <li><b>HH24</b> - hour (0-23)</li>
+    <li><b>HH</b> - hour (1-12)</li>
+    <li><b>MI</b> - minute</li>
+    <li><b>SS</b> - second</li>
+    <li><b>FFF</b> - fraction of a second</li>
+    <li><b>AM</b> - AM or PM</li>
+  </ul>
+
+  <li><b>dateformat</b> - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.</li>
+  <li><b>timeformat</b> - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.</li>
+  <li><b>dateddmm</b> - If set to "yes" then dates are assumed to be in the DD-MM-YYYY format (with days leading), as opposed to MM-DD-YYYY format (with months leading).  This is important for interpreting dates like 03-04-2000.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.</li>
+  <li><b>dateyyddmm</b> - If set to "yes" then dates are assumed to be in the YYYY-DD-MM format (with days leading), as opposed to YYYY-MM-DD-YYYY (with months leading).  This is important for interpreting dates like 2000-03-04.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.</li>
+  <li><b>datedelimiters</b> - Determining whether the field is a date/time or not can be tricky.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.</li>
+  <li><b>ignorenondatetime</b> - If this parameter is set to "yes" then only fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.  By default, all fields are examined and heuristics are used to determine whether the field contains a date/time.</li>
+</ul>
+
+<p>For example, the following configuration:</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;resultsettranslations&gt;</font></b>
+			<b><font color="#0000FF">&lt;resultsettranslation</font></b>
+				<font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"reformatdatetime"</font>
+				<font color="#009900">datetimeformat</font><font color="#990000">=</font><font color="#FF0000">"MM/DD/YYYY HH24:MI:SS"</font>
+				<font color="#009900">dateformat</font><font color="#990000">=</font><font color="#FF0000">"MM/DD/YYYY"</font>
+				<font color="#009900">timeformat</font><font color="#990000">=</font><font color="#FF0000">"HH24:MI:SS"</font>
+				<font color="#009900">dateddmm</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
+				<font color="#009900">ignorenondatetime</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/resultsettranslations&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>Would translate the following date/time field:</p>
+
+<blockquote>
+Jul 10 2015 05:17:55:717PM
+</blockquote>
+<p>Into:</p>
+
+<blockquote>
+07/10/2015 17:18:55
+</blockquote>
+<p>Note that <b>dateddmm</b> and <b>dateyyddmm</b> should usually be set to the same thing.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.</p>
+
+<p>Note also that date/time translation in general is especially problematic with MS SQL Server.  See <a href="../faq/#mssqldates">the FAQ</a> for more info.</p>
 
 <br/><a name="queryrouting"/><h2>Query Routing</h2>
 
@@ -2299,11 +2503,11 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The <i>module</i> attribute specifies which module to load.</p>
 
-<p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
 
 <p>All notification modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
 
-<p>Notification modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
+<p>Notification modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
   <pre><!-- Generator: GNU source-highlight 3.1.8
@@ -2346,15 +2550,13 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>At startup, the SQL Relay server processes create instances of the specified notification modules and initializes them.  As events occur, the server passes the event and, optionally, a string of information about the event to each module, in the order that they were specified in the config file.  If a module is listening for that event, then it sends a notification to the specified recpients.</p>
 
-<p>Currently, the following standard notification modules are available:</p>
+<p>Currently, the following standard notification module is available:</p>
 
 <ul>
   <li><b>events</b></li>
 </ul>
 
 <p>Custom modules may also be developed.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
-
-<h4>events</h4>
 
 <p>The <b>events</b> module listens for a specified set of events and notifies recipients when a one occurs.</p>
 
