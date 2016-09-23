@@ -31,7 +31,7 @@
   <ul>
     <li><a href="#cluster">Load-Balancing and Fail-Over With Replicated Databases or Database Clusters</a></li>
     <li><a href="#rac">Already-Load-Balanced Databases</a></li>
-    <li><a href="#router">Master-Slave Query Routing</a></li>
+    <li><a href="#masterslave">Master-Slave Query Routing</a></li>
     <li><a href="#frontend">Front-End Load-Balancing and Fail-Over</a></li>
   </ul>
 
@@ -890,7 +890,7 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<br/><br/><a name="router"/><h3>Master-Slave Query Routing</h3>
+<br/><br/><a name="masterslave"/><h3>Master-Slave Query Routing</h3>
 
 <p>The load-balancing scenarios described above all assume that master-master replication is being used.  SQL Relay supports master-slave replication as well.</p>
 
@@ -2169,7 +2169,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Query translation allows the SQL Relay server to alter queries before passing them to the database.</p>
 
-<p>Query translation is implemented by loadable modules.  The <i>translations</i> section of the sqlrelay.conf file indicates which translation modules to load and what parameters to use when executing them.</p>
+<p>Query translation is implemented by loadable modules.  The <i>translations</i> section of the configuration file indicates which translation modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
   <pre><!-- Generator: GNU source-highlight 3.1.8
@@ -2258,7 +2258,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Result set translation allows the SQL Relay server to alter fields in the result set before returning the field to the client.</p>
 
-<p>Result set translation is implemented by loadable modules.  The <i>resultsettranslations</i> section of the sqlrelay.conf file indicates which result set translation modules to load and what parameters to use when executing them.</p>
+<p>Result set translation is implemented by loadable modules.  The <i>resultsettranslations</i> section of the configuration file indicates which result set translation modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
   <pre><!-- Generator: GNU source-highlight 3.1.8
@@ -2379,7 +2379,564 @@ Jul 10 2015 05:17:55:717PM
 
 <br/><a name="queryrouting"/><h2>Query Routing</h2>
 
-<p>...</p>
+<p>Query routing allows the SQL Relay server to send one set of queries to one database, another set of queries to another, another set of queries to another, and so on.</p>
+
+<p>To route queries, one instance of SQL Relay must be configured as a router to route queries to other instances of SQL Relay which are configured normally.</p>
+
+<p>A typical use case is to configure one instance of SQL Relay to maintain connections to a master database and another instance of SQL Relay to maintain connections to a pool of slaves, then set up a third instance of SQL Relay to route queries to the other 2 instances.</p>
+
+<blockquote>
+<img src="../images/router.png"/>
+</blockquote>
+<p>This is such a common case, that it is also described above in it's own section: <a href="#masterslave">Master-Slave Query Routing</a>.</p>
+
+<p>There are other possiblities as well though.</p>
+
+<p>The actual query routing itself is implemented by loadable modules.  The <i>routers</i> section of the configuration file indicates which router modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+        <b><font color="#0000FF">&lt;instance</font></b> ... <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^drop "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^create "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^insert "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^update "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^delete "</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"..."</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"..."</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		...
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.</p>
+
+<p>All router modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
+
+<p>Router modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
+
+<p>In fact, the example above shows a stacked configuration.  The first instance of the router module sends DDL/DML queries to a "master" database and the second instance of the router module sends all other queries to a "slave" database.</p>
+
+<p>At startup, the SQL Relay server creates instances of the specified router modules and initializes them.  When the client sends a query to the SQL Relay server, the server consults each router module, in the order that they were specified in the config file.  Each module applies its routing rules to determine which connection to run the query on.  If a module returns a connection then the remaining modules are ignored.  If the query makes it through all modules without being routed to a particular connection, then the query is ignored.</p>
+
+<p>Currently, the following router modules are available:</p>
+
+<ul>
+  <li><b>regex</b></li>
+  <li><b>userlist</b></li>
+  <li><b>clientiplist</b></li>
+</ul>
+
+<p>Custom modules may also be developed.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<h4>regex</h4>
+
+<p>The <b>regex</b> module routes queries by matching them against regular expressions.</p>
+
+<p>A classic <a href="#masterslave">Master-Slave Query Routing</a> configuration follows.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to the "master" MySQL database</font></i>
+<i><font color="#9A1900">                on the masterdb machine.  This instance only listens on the</font></i>
+<i><font color="#9A1900">                unix socket /tmp/master.socket and thus cannot be connected to</font></i>
+<i><font color="#9A1900">                by clients from another machine. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/master.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"masteruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=masteruser;password=masterpassword;host=masterdb;db=master;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to 4 "slave" MySQL databases</font></i>
+<i><font color="#9A1900">                on 4 slave machines.  This instance only listens on the unix</font></i>
+<i><font color="#9A1900">                socket /tmp/slave.socket and thus cannot be connected to by</font></i>
+<i><font color="#9A1900">                clients from another machine. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/slave.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"slaveuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb1;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb2;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb3;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=slaveuser;password=slavepassword;host=slavedb3;db=slave;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance sends DML (insert,update,delete) and</font></i>
+<i><font color="#9A1900">                DDL (create/delete) queries to the "master" SQL Relay instance</font></i>
+<i><font color="#9A1900">                which, in turn, sends them to the "master" database.</font></i>
+<i><font color="#9A1900">                This instance sends any other queries to the "slave" SQL Relay</font></i>
+<i><font color="#9A1900">                instance which, in turn, distributes them over the "slave"</font></i>
+<i><font color="#9A1900">                databases. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+                        <i><font color="#9A1900">&lt;!-- send all DML/DDL queries to "master"  --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^drop "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^create "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^insert "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^update "</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^delete "</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+                        <i><font color="#9A1900">&lt;!-- send all other queries to "slave" --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/master.socket;user=masteruser;password=masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/slave.socket;user=slaveuser;password=slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
+			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;events&gt;</font></b>
+					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/events&gt;</font></b>
+				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
+					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
+			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
+		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>In this example, 3 SQL Relay instances are defined:</p>
+
+<ul>
+  <li>one to maintain connections to the master database</li>
+  <li>one to maintain connections to a pool of slave databases</li>
+  <li>one to route queries to the other two instances</li>
+</ul>
+
+<p>In this configuration, DDL/DML queries are routed to the connectionid "master", and all other queries are routed to the connectionid "slave".</p>
+
+<p>The <b>string</b> parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:</p>
+
+<ul>
+  <li><b>host</b> - the host name or IP address of the SQL Relay instance</li>
+  <li><b>port</b> - the port of the SQL Relay instance</li>
+  <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
+  <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
+  <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+</ul>
+
+<p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="#notifications">Notifications</a> for information about notification modules.</p>
+
+<br/><p>Master-slave routing isn't all that the <b>regex</b> module can do though.</p>
+
+<p>In the example below, we provide a single point of access to MySQL and PostgreSQL databases.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a MySQL database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/mysqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"mysqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqldbuser;password=mysqldbpassword;host=mysqldb;db=mysqldb;"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a PostgreSQL database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/postgresqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqldbuser;password=postgresqldbpassword;host=postgresqldb;db=postgresqldb;"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+	<i><font color="#9A1900">&lt;!-- This instance sends queries containing "mysqldb." to the mysql</font></i>
+<i><font color="#9A1900">		database and "postgresqldb." to the postgresql database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- send all mysqldb queries to "mysqldb" --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"mysqldb\."</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+			<i><font color="#9A1900">&lt;!-- send all postgresqldb queries to "postgresqldb" --&gt;</font></i>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb\."</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/mysqldb.socket;user=mysqldbuser;password=mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/postgresqldb.socket;user=postgresqldbuser;password=postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
+			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;events&gt;</font></b>
+					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/events&gt;</font></b>
+				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
+					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
+			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
+		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>In this configuration, all queries containing "mysqldb." are sent to the connectionid "mysqldb" and all queries containing "postgresqldb." are sent to the connectionid "postgresqldb".</p>
+
+<p>As above, the <b>string</b> parameter in each connection tag provides the parameters necessary to connect to the other instances.</p>
+
+<p>Note the use of a notification module, as above.</p>
+
+<h4>userlist</h4>
+
+<p>The <b>userlist</b> module routes queries by matching the user that ran the query against a list of users.</p>
+
+<p>An example configuration follows.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to an Oracle database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/oracle.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to an SAP database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/sap.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance sends one set of users to the Oracle database and</font></i>
+<i><font color="#9A1900">                all other users to the sap database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser4"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser4"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"userlist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser1"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser2"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser3"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser4"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"userlist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"sap"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/oracle.socket;user=oracleuser;password=oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/sap.socket;user=sapuser;password=sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
+			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;events&gt;</font></b>
+					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/events&gt;</font></b>
+				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
+					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
+			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
+		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>In this example, 3 SQL Relay instances are defined:</p>
+
+<ul>
+  <li>one to maintain connections to an Oracle database</li>
+  <li>one to maintain connections to a SAP database</li>
+  <li>one to route queries to the other two instances</li>
+</ul>
+
+<p>In this configuration, queries made by "oracle users" are routed to the connectionid "oracle", and all other queries are routed to the connectionid "sap".</p>
+
+<p>The <b>string</b> parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:</p>
+
+<ul>
+  <li><b>host</b> - the host name or IP address of the SQL Relay instance</li>
+  <li><b>port</b> - the port of the SQL Relay instance</li>
+  <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
+  <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
+  <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+</ul>
+
+<p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="#notifications">Notifications</a> for information about notification modules.</p>
+
+<h4>clientiplist</h4>
+
+<p>The <b>clientiplist</b> module routes queries by matching the client that ran the query against a list of IP addresses.</p>
+
+<p>An example configuration follows.</p>
+
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to an Oracle database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/oracle.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to an SAP database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/sap.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance sends one set of users to the Oracle database and</font></i>
+<i><font color="#9A1900">                all other users to the sap database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientiplist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">"192.168.*.0-50"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientiplist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">"*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/oracle.socket;user=oracleuser;password=oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/sap.socket;user=sapuser;password=sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
+			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;events&gt;</font></b>
+					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/events&gt;</font></b>
+				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
+					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
+			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
+		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+
+</tt></pre>
+</pre>
+
+</blockquote>
+<p>In this example, 3 SQL Relay instances are defined:</p>
+
+<ul>
+  <li>one to maintain connections to an Oracle database</li>
+  <li>one to maintain connections to a SAP database</li>
+  <li>one to route queries to the other two instances</li>
+</ul>
+
+<p>In this configuration, queries made by users originating at IP addresses 192.168.*.0-50 are routed to the connectionid "oracle", and queries made by users originating at all other IP addresses are routed to the connectionid "sap".</p>
+
+<p>Each octet of the <b>ip</b> parameter may be specfied as a number, a dash-separated range of numbers, or a * meaning "all possible values".</p>
+
+<p>The <b>string</b> parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:</p>
+
+<ul>
+  <li><b>host</b> - the host name or IP address of the SQL Relay instance</li>
+  <li><b>port</b> - the port of the SQL Relay instance</li>
+  <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
+  <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
+  <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+</ul>
+
+<p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="#notifications">Notifications</a> for information about notification modules.</p>
+
+<h3>Quirks and Limitations</h3>
+
+<h4>Query Normalization</h4>
+
+<p>To make pattern matching easier, SQL Relay "normalizes" the query before
+matching it against the pattern.  The original query is run against the database
+but when matched against the pattern, whitespace is compresssed and the entire
+query (except for quoted strings) is converted to lower-case.</p>
+
+<p>When matching query operators, you must use lower-cased versions of them such
+as "select", "insert", "and", "or", etc.  When matching table names, you must
+use a lower-cased version of the table-name.</p>
+
+<h4>Perl Compatible Regular Expressions</h4>
+
+<p>SQL Relay is built upon the Rudiments library.  Rudiments can be built with
+or without support for libpcre which provides support for Perl Compatible
+Regular Expressions.  PCRE's are more powerful than standard posix regular
+expressions and have many more operators.</p>
+
+<p>As such, if you copy a configuration file from a machine where Rudiments was
+compiled with PCRE support to a machine where Rudiments wasn't compiled with
+PCRE support, then it's possible that your patterns may not work on the new
+machine.</p>
+
+<p>To make matters worse, sufficiently old versions of the posix regular
+expression functions had fewer operators than modern versions.  So, even if
+Rudiments isn't using PCRE's, it's not impossible that after copying a
+configuration file from a fairly modern OS to an antique, the patterns won't
+work on the antique machine either.</p>
+
+<p>The examples above ought to work with PCRE's and all versions of posix
+regular expressions.</p>
+
+<h4>Selects Not Showing Changes</h4>
+
+<p>In the scenario above where DML/DDL is sent to the master database and
+selects are distributed over slaves, an unintuitive thing can happen.</p>
+
+<p>If you begin a transaction and do several inserts, updates and deletes,
+you'll find that if you do a select, you will not see your changes.  This is
+because in a master-slave configuration, changes to the database are not
+pushed out to the slaves until the changes have been committed.  Since your
+selects are being run against the slaves, you must first commit before your
+changes will be visible.</p>
+
+<h4>Integrity Violations</h4>
+
+<p>Behind the scenes, the router maintains parallel transactions on each of the
+databases that it is routing queries to.  When the client issues a begin, commit
+or rollback, the router issues a begin, commit or rollback to each of the
+databases.  Similarly, if the client turns auto-commit on or off, the router
+turns auto-commit on or off on each of the databases.</p>
+
+<p>There are scenarios where a commit, rollback or auto-commit on/off command
+could succeed on some of the databases and fail on others.  Some databases
+have a 2-phase commit feature to handle these scenarios.  With 2-phase commit,
+you can roll back a commit until you do second commit.  Many databases don't
+support 2-phase commit though.  At present, SQL Relay doesn't currently support
+2-phase commit for any database.  So, currently, to handle this situation,
+SQL Relay returns an error, disables the instance doing the query routing, and
+raises an integrity_violation event.  If a notification is configured to notify
+a DBA when an integrity_violation is raised, then the DBA will receive an
+email about the problem.  Unfortunately, there is no standard way to solve
+the problem.  The DBA must determine the cause, resolve it manually, and restart
+SQL Relay.</p>
+
+<h4>Commits and Rollbacks</h4>
+
+<p>Since queries may be routed to different kinds of databases, the router has
+to employ some tricks to maintain parallel transactions.  Some databases run
+in auto-commit mode by default and must be issued a "begin" query to start a
+transaction.  Other databases implicitly start a new transaction when a client
+logs in and after each commit or rollback.  If any of the databases being
+routed to require a "begin" query to start a transaction, then the ones that
+don't are put in auto-commit mode when the client logs in and after each commit
+or rollback and are taken out of auto-commit mode when the client sends a begin
+query.  If none of the databases being routed to require a "begin" query to
+start a transaction, then the databases are not put in auto-commit mode when
+the client logs in or after each commit or rollback.  Rather, transactions are
+implicitly started by the database.  For example, if your client application
+is using a router which routes queries over both PostgreSQL and Oracle databases,
+then since PostgreSQL requires "begin" queries, you must use a "begin" query to
+start a transaction, even if your app only intends to send queries which would
+be run against Oracle.  Conversely, if your client application is using a router
+which only routes queries over a set of Oracle databases, then you do not have
+to use "begin" queries.</p>
+
+<h4>Stored Procedures</h4>
+
+<p>It's possible to use stored procedures with SQL Relay's query routing
+feature.  However, since stored procedures are run on the database, SQL Relay
+can't route the individual queries run inside the stored procedure.  So, the
+stored procedure and all queries run inside of it will be run against whichever
+database it was routed to.</p>
 
 <br/><a name="logging"/><h2>Logging</h2>
 
@@ -2468,7 +3025,7 @@ time: 0.000001
 
 <p>Notifications allow the SQL Relay server programs to notify recipients when a specified set of events occur. </p>
 
-<p>Notifications are implemented by loadable modules.  The <i>notifications</i> section of the sqlrelay.conf file indicates which notification modules to load and what parameters to use when executing them.</p>
+<p>Notifications are implemented by loadable modules.  The <i>notifications</i> section of the configuration file indicates which notification modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
   <pre><!-- Generator: GNU source-highlight 3.1.8

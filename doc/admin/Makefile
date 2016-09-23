@@ -9,7 +9,6 @@ SRCS = configguide.wt \
 	installing.wt \
 	oraclentier.wt \
 	prerequisites.wt \
-	router.wt \
 	running.wt \
 	tuning.wt
 
@@ -18,7 +17,6 @@ OBJS = configguide.html \
 	installing.html \
 	oraclentier.html \
 	prerequisites.html \
-	router.html \
 	running.html \
 	tuning.html
 

@@ -37,7 +37,6 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/images
 	$(MKINSTALLDIRS) $(docdir)/js
 	$(MKINSTALLDIRS) $(docdir)/css
-	$(MKINSTALLDIRS) $(docdir)/modules
 	$(MKINSTALLDIRS) $(docdir)/programming
 	$(CP) *.html $(docdir)
 	$(CHMOD) 644 $(docdir)/*.html
@@ -145,8 +144,6 @@ install:
 	$(CHMOD) 644 $(docdir)/images/*.PNG
 	$(CP) js/*.js $(docdir)/js
 	$(CHMOD) 644 $(docdir)/js/*.js
-	$(CP) modules/*.html $(docdir)/modules
-	$(CHMOD) 644 $(docdir)/modules/*.html
 	$(CP) programming/*.html $(docdir)/programming
 	$(CHMOD) 644 $(docdir)/programming/*.html
 
@@ -157,5 +154,4 @@ clean:
 	$(RM) $(OBJS)
 	cd admin $(AND) $(MAKE) cleanparts
 	cd features $(AND) $(MAKE) cleanparts
-	cd modules $(AND) $(MAKE) cleanparts
 	cd programming $(AND) $(MAKE) cleanparts
