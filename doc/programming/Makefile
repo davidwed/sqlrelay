@@ -5,7 +5,18 @@ include ../../config.mk
 # documentation
 .PHONY: doc parts html cleanparts
 
-all:
+.SUFFIXES: .wt .html
+
+SRCS = ado.net.wt
+OBJS = ado.net.html
+
+.wt.html:
+	wt -c $< -o $@ -xhtml xhtml.conf
+
+all: $(OBJS)
+
+clean:
+	$(RM) $(OBJS)
 
 doc: parts html cleanparts
 
