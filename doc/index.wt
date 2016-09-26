@@ -53,7 +53,6 @@ SQL Relay supports many different databases. However, just setting up a database
  [admin/configguide.html SQL Relay Configuration Guide][[br]]
  [admin/configreference.html SQL Relay Configuration Reference][[br]]
  [admin/running.html Running SQL Relay][[br]]
- [admin/router.html Query Routing][[br]]
  [admin/tuning.html Tuning SQL Relay][[br]]
 
 ----
