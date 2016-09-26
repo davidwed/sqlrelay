@@ -87,6 +87,8 @@
 <h2>Administration Questions</h2>
 
 <ul>
+  <li><a href="#bindfailed">Why do I get "bind failed" when I run sqlr-start?</a></li>
+  <li><a href="#queriesfail">The SQL Relay server processes appear to be running, but sqlrsh can't execute queries.  What's going on?</a></li>
   <li><a href="#tweaks">What system parameters can I tweak to get better performance out of SQL Relay</a></li>
   <li><a href="#firewallhang">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
   <li><a href="#ttl">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</a></li>
@@ -357,7 +359,24 @@ chmod o+r tnsnames.ora
 
 <br/><a name="sqlserver"/><h3>Why can't I get SQL Relay to connect to SAP/Sybase or Microsoft SQL Server?</h3>
 
-<p>The server parameter in the string attribute of the connection tag does not refer to the DNS name of the server.  Rather it refers to an entry in the "interfaces" file.  The SAP/Sybase and FreeTDS libraries look for that file in default places, but if the file is installed somewhere else and the library can't find it, it will not be able to figure out what host/port the server is running on.  One way to tell SQL Relay where the file is located is to set the SYBASE environment variable to the directory containing the file before starting SQL Relay.  Alternatively, the string attribute of the connection tag takes a "sybase" parameter which sets the environment variable.</p>
+<p>There are a few common causes of this problem...</p>
+
+<p>The server parameter in the string attribute of the connection tag does not refer to the DNS name of the server.  Rather it refers to an entry in the "interfaces" or "freetds.conf" files.  The SAP/Sybase and FreeTDS libraries look for that file in default places (usually /opt/sap/interfaces or /etc/freetds.conf), but if the file is installed somewhere else and the library can't find it, it will not be able to figure out what host/port the server is running on.  One way to tell SQL Relay where the file is located is to set the SYBASE environment variable to the directory containing the file before starting SQL Relay.  Alternatively, the string attribute of the connection tag takes a "sybase" parameter which sets the environment variable.</p>
+
+<p>Another possibility...</p>
+
+<p>Some Linux Distributions set the LANG environment variable to a value that is not supported by older versions of SAP/Sybase ASE.  For example, LANG=en_US.iso885915.  If SQL Relay fails to start, try setting LANG to something that is defined in locales/locales.dat under your SYBASE directory such as en_US for english.  The LC_ALL environment variable needs to be set to something that is defined in locales/locales.dat as well.  SQL Relay version 0.35 and higher have a connectstring parameter for SAP/Sybase connections called "lang" which does the same thing.</p>
+
+<p>Another possibility...</p>
+
+<p>SAP/Sybase and FreeTDS both provide the libct.so library and the ctpublic.h header file.  If FreeTDS is installed from an RPM or other package, it is possible for its libct.so to be installed in /usr/lib and its header file to be installed in /usr/include.  This can cause the SAP/Sybase connection to be compiled against ctpublic.h and linked against libct.so from FreeTDS rather than from SAP/Sybase.</p>
+
+<p>Alternatively, if the SAP/Sybase header and library end up in those locations (ie. if they were manually copied there) then the FreeTDS connection could be compiled or linked against them.</p>
+
+<p>Generally, the solution is to install FreeTDS somewhere other than /usr and omit the FreeTDS and SAP/Sybase library paths from /etc/ld.so.conf, /etc/ld.so.conf.d and LD_LIBRARY_PATH.  By default, the build uses rpath's to cause the connections to look for libraries in the exact place that they were found at compile time, causing each connection to find the right library.  This option can be turned off though.  In that case, LD_LIBRARY_PATH should be set before running sqlr-start to assure that the connection dynamically links against the proper library.  To see which libraries the connection will link against, run "ldd /usr/local/firstworks/libexec/sqlrelay/sqlrconnection_freetds.so" or "ldd /usr/local/firstworks/libexec/sqlrelay/sqlrconnection_sap.so"</p>
+
+<p>The configure script displays a warning that should encourage people to exercise care when compiling FreeTDS and SAP/Sybase connections.  However, even if each connection is compiled against the proper header file, it's possible for either connection to dynamically link against the wrong library at run time.
+Hopefully, one day, FreeTDS will support everything that the native SAP/Sybase libraries support and there will simply be an option to link the SAP/Sybase connection against one or the other.</p>
 
 <br/><a name="freetds"/><h3>I know that SAP/Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</h3>
 
@@ -650,6 +669,22 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <br/><hr/>
 
 <h2>Administration Questions</h2>
+
+<br/><a name="bindfailed"/><h3>Why do I get "bind failed" when I run sqlr-start?</h3>
+
+<p>The most common cause of this problem is configuring SQL Relay to listen on the same port that the database is listening on.  For example, if your database is listening on port 3600 and you run SQL Relay on the same machine, you can't configure SQL Relay to listen on port 3600 or it will issue "bind failed" when the listener tries to run.</p>
+
+<p>A slightly less common cause of this problem is configuring SQL Relay to listen on a port that some other service is already listening on.  For example, web and cache servers often listen on port 8080 and IRC servers often listen on port 7000.  You can see if some other service is listening on the port you want to SQL Relay to listen on by running <i>netstat -ap | grep PORT</i> where PORT is replaced with the port number that you'd like SQL Relay to listen on.  If you get anything back from that command, then there is another service already listening on that port.</p>
+
+<p>If you stop and restart SQL Relay and get the message: "bind failed." as the listener is starting, then there are 2 possibilities.  First, the old processes may not have been killed successfully.  In this case, kill them all and make sure they are dead by using <i>ps -efal | grep sqlr-</i> before restarting them.  The second possibility is that the port the listener was listening on didn't get closed.  Executing <i>netstat -a | grep PORTNUMBER</i> will reveal any connections still lingering on the port.  If all the daemons are dead but the connections are still lingering, wait 2 minutes or so before restarting the daemons.  The lingering connections should have timed out by then.</p>
+
+<br/><a name="queriesfail"/><h3>The SQL Relay server processes appear to be running, but sqlrsh can't execute queries.  What's going on?</h3>
+
+<p>The most common cause of this problem is telling the client to connect to the port that the database is listening on rather than the port that SQL Relay is listening on.  For example, if the database is listening on port 3600 and you have an instance of SQL Relay connected to it and have configured SQL Relay to listen on port 9000, then a common mistake would be to try to connect an SQL Relay client to port 3600 instead of port 9000.</p>
+
+<p>Another fairly common cause is that the SQL Relay daemons use semaphores and shared memory segments, and if a daemon crashes unexpectedly, even if you kill all the other daemons, a semaphore or shared memory segment may still be hanging around.  These can interfere with future attempts to start up daemons with the same ID.  You can use the <i>ipcs</i> command to inspect the shared memory segments and semaphores and the <i>ipcrm</i> command to remove any lingering ones.</p>
+
+<p>Another less common, though still fairly common cause is that the SQL Relay daemons also use temporary files, usually located in /usr/local/firstworks/var/sqlrelay/tmp.  That directory should have 777 permissions, but sometimes it doesn't.  The sockseq file in that directory should have 666 permissions, but sometimes it doesn't.  The files named ID and ID-CONNECTIONID owned by the user that started the connections in that directory should get removed by <b>sqlr-stop</b>, but sometimes they don't.  Stop the SQL Relay server processes, verify these permissions, and verify that the files have been removed, before restarting them.</p>
 
 <br/><a name="tweaks"/><h3>What system parameters can I tweak to get better performance out of SQL Relay?</h3>
 

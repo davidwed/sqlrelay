@@ -89,6 +89,24 @@ sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
 }}}
 }}}
 
+The instance can be stopped using:
+
+{{{#!blockquote
+{{{
+sqlr-stop -id example
+}}}
+}}}
+
+All running instances of SQL Relay can be stopped using:
+
+{{{#!blockquote
+{{{
+sqlr-stop
+}}}
+}}}
+
+(without the -id argument)
+
 ----
 
 [[br]][=#basic]
