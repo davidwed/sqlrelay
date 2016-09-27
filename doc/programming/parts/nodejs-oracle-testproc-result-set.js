@@ -1,0 +1,11 @@
+cur.prepareQuery("begin  :curs:=testproc; end;");
+cur.defineOutputBindCursor("curs");
+cur.executeQuery();
+var     bindcur=cur.getOutputBindCursor("curs");
+bindcur.fetchFromBindCursor();
+var     field00=bindcur.getField(0,0);
+var     field01=bindcur.getField(0,1);
+var     field02=bindcur.getField(0,2);
+var     field10=bindcur.getField(1,0);
+var     field11=bindcur.getField(1,1);
+var     field12=bindcur.getField(1,2);

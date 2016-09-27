@@ -14,6 +14,7 @@ SRCS = ado.net.wt \
 	erlang.wt \
 	java.wt \
 	jdbc.wt \
+	nodejs.wt \
 	odbc.wt \
 	precisionscale.wt
 
@@ -24,6 +25,7 @@ OBJS = ado.net.html \
 	erlang.html \
 	java.html \
 	jdbc.html \
+	nodejs.html \
 	odbc.html \
 	precisionscale.html
 
