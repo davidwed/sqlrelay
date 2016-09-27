@@ -7,8 +7,13 @@ include ../../config.mk
 
 .SUFFIXES: .wt .html
 
-SRCS = ado.net.wt
-OBJS = ado.net.html
+SRCS = ado.net.wt \
+	binds.wt \
+	precisionscale.wt
+
+OBJS = ado.net.html \
+	binds.html \
+	precisionscale.html
 
 .wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf

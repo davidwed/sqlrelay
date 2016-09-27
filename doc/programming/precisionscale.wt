@@ -1,87 +1,43 @@
-<html>
-<head>
-	<title>Precision and Scale</title>
-	<link rel="stylesheet" href="../css/styles.css">
-</head>
-<body>
-<h1>Precision and Scale</h1>
+= Precision and Scale =
 
-<h1>Definitions</h1>
+= Definitions =
 
-<p>Precision and scale are important concepts to understand if you need to deal
-with decimal numbers</p>
+Precision and scale are important concepts to understand if you need to deal
+with decimal numbers
 
-<dl>
-  <dt><b>precision</b></dt>
-  <dd>The total number of digits in a decimal number, both before and after the decimal point.</dd>
-  <dt><b>scale</b></dt>
-  <dd>The total number of digits after the decimal point in a number.</dd>
-</dl>
+'''precision''':: The total number of digits in a decimal number, both before and after the decimal point.
 
-<p>Here are some examples:</p>
+'''scale''':: The total number of digits after the decimal point in a number.
 
-<table>
-  <tr>
-    <th> Number 
-</th>
-    <th> Precision 
-</th>
-    <th> Scale 
-</th>
-  </tr>
-  <tr>
-    <td> 5.333 
-</td>
-    <td> 4 
-</td>
-    <td> 3 
-</td>
-  </tr>
-  <tr>
-    <td> 15.333 
-</td>
-    <td> 5 
-</td>
-    <td> 3 
-</td>
-  </tr>
-  <tr>
-    <td> 115.333 
-</td>
-    <td> 6 
-</td>
-    <td> 3 
-</td>
-  </tr>
-  <tr>
-    <td> 115.33 
-</td>
-    <td> 5 
-</td>
-    <td> 2 
-</td>
-  </tr>
-</table>
+Here are some examples:
 
-<br/><h1>Columns With Precision And Scale</h1>
+||= Number =||= Precision =||= Scale =||
+|| 5.333 || 4 || 3 ||
+|| 15.333 || 5 || 3 ||
+|| 115.333 || 6 || 3 ||
+|| 115.33 || 5 || 2 ||
 
-<p>Many databases support numeric datatypes with precision and scale attribute.
+= Columns With Precision And Scale =
+
+Many databases support numeric datatypes with precision and scale attribute.
 For example, Oracle supports a "number" type.  This query creates a table with
 a column that can store numbers with precision of 5 and scale of 2.  That is,
 it can store numbers with up to 5 total digits, 3 of which are reserved for the
 whole number component of the number and 2 of which are reserved for decimal
-places.</p>
+places.
 
-<blockquote>
-  <pre>create table testtable (col1 number(5,2))
-</pre>
+{{{#!blockquote
+{{{
+create table testtable (col1 number(5,2))
+}}}
+}}}
 
-</blockquote>
-<p>Any number with 3 or fewer whole number digits and 2 or fewer decimal digits
-may be inserted into this column.</p>
+Any number with 3 or fewer whole number digits and 2 or fewer decimal digits
+may be inserted into this column.
 
-<blockquote>
-  <pre>0> insert into testtable values (5.2);
+{{{#!blockquote
+{{{
+0> insert into testtable values (5.2);
 0> insert into testtable values (5.22);
 0> insert into testtable values (55.2);
 0> insert into testtable values (55.22);
@@ -96,14 +52,15 @@ COL1
 55.22
 555.2
 555.22
-</pre>
+}}}
+}}}
 
-</blockquote>
-<p>Numbers with more than 2 decimal digits may be inserted into this column,
-but they will be rounded up or down as appropriate.</p>
+Numbers with more than 2 decimal digits may be inserted into this column,
+but they will be rounded up or down as appropriate.
 
-<blockquote>
-  <pre>0> insert into testtable values (5.221);
+{{{#!blockquote
+{{{
+0> insert into testtable values (5.221);
 0> insert into testtable values (5.225);
 0> insert into testtable values (5.229);
 0> select * from testtable;
@@ -112,37 +69,39 @@ COL1
 5.22
 5.23
 5.23
-</pre>
+}}}
+}}}
 
-</blockquote>
-<p>Since 2 digits are reserved for decimal digits.  Numbers with more than 3
+Since 2 digits are reserved for decimal digits.  Numbers with more than 3
 whole number digits may not be inserted into this column, even if the total
-number of digits is less than 5.  Attempts to do so will generate errors.</p>
+number of digits is less than 5.  Attempts to do so will generate errors.
 
-<blockquote>
-  <pre>0> insert into testtable values (5555.22);
+{{{#!blockquote
+{{{
+0> insert into testtable values (5555.22);
 ORA-01438: value larger than specified precision allows for this column
 0> insert into testtable values (5555.2);
 ORA-01438: value larger than specified precision allows for this column
 0> insert into testtable values (5555);
 ORA-01438: value larger than specified precision allows for this column
-</pre>
+}}}
+}}}
 
-</blockquote>
-<h1>Arithmetic Involving Numbers With Different Precision And Scale</h1>
+= Arithmetic Involving Numbers With Different Precision And Scale =
 
-<p>When 2 columns with different precision and/or scale are involved in 
+When 2 columns with different precision and/or scale are involved in 
 arithmentic, the precision and scale of the result are not limited by the
 precision and scale of the factors.  The result will have whatever precision
-and scale are necessary to represent the number.</p>
+and scale are necessary to represent the number.
 
-<p>For example, 9.2 has a precision of 2 and scale of 1 and 9.22 has a
+For example, 9.2 has a precision of 2 and scale of 1 and 9.22 has a
 precision of 3 and scale of 2.  When added, the sum, 18.42, has a precision
 of 4 and scale of 2.  When multiplied, the product, 84.824, has a precision of
-5 and scale of 3.</p>
+5 and scale of 3.
 
-<blockquote>
-  <pre>0> select 9.2+9.22 from dual
+{{{#!blockquote
+{{{
+0> select 9.2+9.22 from dual
 9.2+9.22
 =========
 18.42
@@ -150,36 +109,37 @@ of 4 and scale of 2.  When multiplied, the product, 84.824, has a precision of
 9.2*9.22
 =========
 84.824
-</pre>
+}}}
+}}}
 
-</blockquote>
-<h1>Rounding Errors</h1>
+= Rounding Errors =
 
-<p>As shown in the previous example, multiplication can result in numbers with
+As shown in the previous example, multiplication can result in numbers with
 larger scale than either of the two numbers that were multiplied.  If the
 result is stored back into a column with smaller scale than is necessary to
-represent the product, rounding will occur.</p>
+represent the product, rounding will occur.
 
-<p>This can be a frustrating occurrance when dealing with money.  It is common
+This can be a frustrating occurrance when dealing with money.  It is common
 to use columns with scale of 2 for money but such a column cannot be used
 to keep track of fractions of cents.  Only 2 decimal places are required when
 monetary values which are added together or multiplied by whole numbers, but if
 a monetary value is multiplied by a decimal number then it could require more
 than 2 decimal places to store the result.  Using only 2 decimal places will
-introduce rounding errors quickly.</p>
+introduce rounding errors quickly.
 
-<p>Since numbers cannot have infinite scale, it is always possible to introduce
+Since numbers cannot have infinite scale, it is always possible to introduce
 rounding errors.  You have to decide how much of a rounding error is acceptable
-when designing your tables.</p>
+when designing your tables.
 
-<h1>Truncation</h1>
+= Truncation =
 
-<p>If a value is inserted back and forth between columns with different scales,
+If a value is inserted back and forth between columns with different scales,
 the original scale of the value will be lost and the value will be rounded and
-truncated. For instance:</p>
+truncated. For instance:
 
-<blockquote>
-  <pre>0> create table testtable1 (col1 number(3,2));
+{{{#!blockquote
+{{{
+0> create table testtable1 (col1 number(3,2));
 0> create table testtable2 (col1 number(2,1));
 0> insert into testtable1 values (1.29);
 0> insert into testtable2 select * from testtable1;
@@ -189,31 +149,31 @@ COL1
 ====
 1.29
 1.3
-</pre>
+}}}
+}}}
 
-</blockquote>
-<p>When 1.29 was inserted into col1 of testtable2, which can only accommodate a
+When 1.29 was inserted into col1 of testtable2, which can only accommodate a
 single decimal digit, it was rounded up to 1.3 and the second decimal digit
 was truncated.  Now, col1 of testtable2 contains 1.3 rather than 1.29 and 1.3
 is what gets selected from col1 of testtable2 and inserted back into testtable1
-rather than 1.29.</p>
+rather than 1.29.
 
-<h1>Bind and Substitution Variables</h1>
+= Bind and Substitution Variables =
 
-<p>Computer hardware stores decimal numbers using as many decimal places as it
+Computer hardware stores decimal numbers using as many decimal places as it
 can (floating point format).  But databases store decimal numbers using a
 precise number of decimal places (fixed point format).  So, when supplying a
 floating point number as the value of a bind or substitution variable, you must
 constrain the number of decimal places by supplying a precision and scale for
-that number.</p>
+that number.
 
-<p>You should set the scale equal to the number of decimal places that you
+You should set the scale equal to the number of decimal places that you
 believe your variable is accurate to, and the precision equal to the scale
 plus the maximum number of whole number digits your variable could contain.
 For instance, if you plan on storing values between 0 and 255, accurate to
-3 decimal places, then you should use scale 3 and precision 6.</p>
+3 decimal places, then you should use scale 3 and precision 6.
 
-<p>Note, however, that the scale of a bind variable will not always be
+Note, however, that the scale of a bind variable will not always be
 preserved.  If you use a bind variable to insert a floating point number into a
 column with smaller scale than you specified for your number, your number will
 be rounded down upon insertion.  For instance, if you pass in 1.2999 with scale
@@ -222,7 +182,3 @@ insert will succeed but your number will be rounded up to 1.3.  Similarly, if
 you use a bind variable to pass a floating point number into a comparison, it
 will be converted to have the same scale as the value it is being compared to,
 which could cause rounding to occur.
-</p>
-
-</body>
-</html>
