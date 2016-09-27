@@ -1,0 +1,12 @@
+select
+	first_name,
+	middle_initial,
+	last_name
+from
+	$(schema).people
+where
+	person_id=?
+	and
+	age>=?
+	and
+	age<=?
