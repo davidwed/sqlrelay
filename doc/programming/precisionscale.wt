@@ -1,6 +1,6 @@
 = Precision and Scale =
 
-= Definitions =
+== Definitions ==
 
 Precision and scale are important concepts to understand if you need to deal
 with decimal numbers
@@ -17,7 +17,7 @@ Here are some examples:
 || 115.333 || 6 || 3 ||
 || 115.33 || 5 || 2 ||
 
-= Columns With Precision And Scale =
+== Columns With Precision And Scale ==
 
 Many databases support numeric datatypes with precision and scale attribute.
 For example, Oracle supports a "number" type.  This query creates a table with
@@ -87,7 +87,7 @@ ORA-01438: value larger than specified precision allows for this column
 }}}
 }}}
 
-= Arithmetic Involving Numbers With Different Precision And Scale =
+== Arithmetic Involving Numbers With Different Precision And Scale ==
 
 When 2 columns with different precision and/or scale are involved in 
 arithmentic, the precision and scale of the result are not limited by the
@@ -112,7 +112,7 @@ of 4 and scale of 2.  When multiplied, the product, 84.824, has a precision of
 }}}
 }}}
 
-= Rounding Errors =
+== Rounding Errors ==
 
 As shown in the previous example, multiplication can result in numbers with
 larger scale than either of the two numbers that were multiplied.  If the
@@ -131,7 +131,7 @@ Since numbers cannot have infinite scale, it is always possible to introduce
 rounding errors.  You have to decide how much of a rounding error is acceptable
 when designing your tables.
 
-= Truncation =
+== Truncation ==
 
 If a value is inserted back and forth between columns with different scales,
 the original scale of the value will be lost and the value will be rounded and
@@ -158,7 +158,7 @@ was truncated.  Now, col1 of testtable2 contains 1.3 rather than 1.29 and 1.3
 is what gets selected from col1 of testtable2 and inserted back into testtable1
 rather than 1.29.
 
-= Bind and Substitution Variables =
+== Bind and Substitution Variables ==
 
 Computer hardware stores decimal numbers using as many decimal places as it
 can (floating point format).  But databases store decimal numbers using a
