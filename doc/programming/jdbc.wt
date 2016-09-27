@@ -1,0 +1,92 @@
+= Programming with SQL Relay using JDBC =
+
+The SQL Relay distribution does not provide a native JBCD driver, but by using the JDBC-ODBC bridge provided by most Java distributions, applications which use JDBC on Unix or Linux may access databases through SQL Relay via the ODBC driver.
+
+Note that the JDBC-ODBC bridge is not available in !OpenJDK and was removed from Oracle Java in version 8.  To use the JDBC-ODBC bridge, you must use Oracle Java 7 or earlier.
+
+See [odbc.html Programming with SQL Relay using ODBC] for instructions detailing how to access SQL Relay through ODBC.  Once that is working, you can access databases through SQL Relay via JDBC as well.
+
+A good program to test this with is [http://henplus.sourceforge.net/ HenPlus], a JDBC command line client.  After downloading and installing !HenPlus, you can run it as follows:
+
+{{{#!blockquote
+'''henplus jdbc:odbc:sqlrtest'''
+}}}
+
+When you run it, you might get an error like:
+
+{{{#!blockquote
+/usr/java/jdk1.7.0_10/bin/java: symbol lookup error: /usr/java/jdk1.7.0_10/jre/lib/i386/libJdbcOdbc.so: undefined symbol: SQLAllocEnv
+}}}
+
+If so, this is because the JDBC-ODBC library wasn't linked properly, a common problem.  It can be fixed by preloading the ODBC driver manager library as follows:
+
+{{{#!blockquote
+export LD_PRELOAD=/usr/lib/libodbc.so
+}}}
+
+(Replacing /usr/lib with the path to libodbc.so on your system)
+
+Here is a sample henplus session:
+
+{{{#!blockquote
+{{{#!code
+[dmuse@fedora bin]$ ./henplus jdbc:odbc:sqlrtest
+no readline found (no JavaReadline in java.library.path). Using simple stdin.
+using GNU readline (Brian Fox, Chet Ramey), Java wrapper by Bernhard Bablok
+henplus config at /home/dmuse/.henplus
+----------------------------------------------------------------------------
+ HenPlus II 0.9.8 "Yay Labor Day"
+ Copyright(C) 1997..2009 Henner Zeller <H.Zeller@acm.org>
+ HenPlus is provided AS IS and comes with ABSOLUTELY NO WARRANTY
+ This is free software, and you are welcome to redistribute it under the
+ conditions of the GNU Public License <http://www.gnu.org/licenses/gpl2.txt>
+----------------------------------------------------------------------------
+HenPlus II connecting 
+ url 'jdbc:odbc:sqlrtest'
+ driver version 2.1
+ oracle - Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+@odbc> create table testtable (col1 int, col2 varchar2(20));
+affected 0 rows (301 msec)
+@odbc> insert into testtable values (1,'hello');
+affected 1 rows (71 msec)
+@odbc> insert into testtable values (2,'goodbye');
+affected 1 rows (1 msec)
+@odbc> select * from testtable;
+------+---------+
+ COL1 |  COL2   |
+------+---------+
+    1 | hello   |
+    2 | goodbye |
+------+---------+
+2 rows in result (first row: 56 msec; total: 57 msec)
+@odbc> update testtable set col2='bye' where col1=2;
+affected 1 rows (2 msec)
+@odbc> select * from testtable;
+------+-------+
+ COL1 | COL2  |
+------+-------+
+    1 | hello |
+    2 | bye   |
+------+-------+
+2 rows in result (first row: 1 msec; total: 2 msec)
+@odbc> delete from testtable where col1=1;
+affected 1 rows (2 msec)
+@odbc> select * from testtable;
+------+------+
+ COL1 | COL2 |
+------+------+
+    2 | bye  |
+------+------+
+1 row in result (first row: 1 msec; total: 1 msec)
+@odbc> drop table testtable;
+affected 0 rows (3.637 sec)
+@odbc> quit
+storing settings..
+[dmuse@fedora bin]$
+}}}
+}}}
+
+Similarly, any program that uses JDBC can be configured to use SQL Relay via JDBC by setting its database url to jdbc:odbc:DSN where //DSN// is replaced with the ODBC DSN defined in /etc/odbc.ini.
+
+Developing applications which use JDBC is beyond the scope if this document but many examples and tutorials may be found on the web.

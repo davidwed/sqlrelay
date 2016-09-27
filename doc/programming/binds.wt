@@ -1,0 +1,79 @@
+= Substitution and Bind Variables =
+
+== What exactly are substitution and bind variables? ==
+
+Substitution and input bind variables are both methods for replacing a variable in a query or procedural code with a corresponding value from your program.  Some databases call bind variables "parameters".
+
+{{{#!blockquote
+{{{#!code
+@parts/binds-inputbind.sql@
+}}}
+}}}
+
+In this query, $(schema) is a substitution variable and :id, :youngage and :oldage are input bind variables.
+
+Output bind variables allow values to be passed from procedural code into buffers in your program.
+
+{{{#!blockquote
+{{{#!code
+@parts/binds-outputbind.sql@
+}}}
+}}}
+
+In this code, :returnval is an output bind variable.
+
+Substitution variables are processed first, by the API.  Input bind variables are processed second, by the underlying database or by the SQL Relay server in the event that the database doesn't support bind variables.  Output bind variables are processed by the database as the query or procedural code is executed.
+
+Input bind variables may appear as values in the WHERE clause of a SELECT, UPDATE or DELETE, as values in the SET clause of an UPDATE, in the VALUES clause of an INSERT or as values in a block of procedural code.
+
+Output bind variables may appear in the RETURNING clause of a SELECT or as variables in a block of procedural code.
+
+Substitution variables may appear anywhere in the query.  They are frequently used to ammend WHERE clauses with additional constraints and specify schemas or databases.  A substitution value may even contain bind variables.
+
+== Bind Variable Syntax ==
+
+Different databases have different syntax for bind variables.  Oracle bind variables are names preceeded by a colon.  In MySQL, DB2 and Firebird, bind variables are represented by question marks.  In Sybase and MS SQL Server, bind variables are names preceeded by an @ sign.  In PostgreSQL, bind variables are numbers preceeded by a $ sign.
+
+When using SQL Relay bind functions, to refer to an Oracle, Sybase or MS SQL Server bind variable, you should use its name without the preceeding colon.  To refer to bind variables when using other databases, you should use the bind variable's position number.
+
+For example...
+
+{{{#!blockquote
+{{{#!code
+@parts/binds-inputbind.sql@
+}}}
+}}}
+
+In this query, you should use "id", "youngage" and "oldage" as variable names in the inputBind functions.
+
+{{{#!blockquote
+{{{#!code
+@parts/binds-inputbind-numeric.sql@
+}}}
+}}}
+
+In this query, you should use "1", "2" and "3" as variable names in the inputBind functions.
+
+== Why should I use input bind variables instead of just using substitution variables for everything? ==
+
+Using input bind variables improves performance.  A query can be prepared once and executed multiple times, changing the bind variable values between each execution.
+
+Using bind variables improves the cache-hit rate for databases which cache prepred queries as well.  Databases which support bind variables parse the query then plug input bind variables into the already parsed code.  If the same query is run a bunch of times, even with different values for the input bind variables, the databse will have the code cached and won't have to parse the query again.  If you don't use input bind variables, the database will parse the query	each time because the where clause will be slightly different each time and the code for all those slightly different queries will clog the cache.
+
+As a rule of thumb, you should use input bind variables instead of substitutions in the WHERE clause of SELECT statements whenever you can.
+
+Output bind variables allow values to be passed directly from procedural code into buffers in your program.  This is generally more convenient and efficient than construcing a query that calls procedural code or constructing procedural code that manufactures a result set.
+
+== What if my database doesn't support bind variables? ==
+
+SQL Relay will fake input binds for database API's which don't natively support binds.  Currently that is just the MDB Tools connection.  Postgresql 8, MySQL 4.1.2 and modern SQLite support bind variables but older versions do not.  SQL Relay fakes input binds for versions of Postgresql, MySQL and SQLite that don't support them.  For versions that do, the "fakebinds" connect string parameter can be used to force SQL Relay to fake binds rather than using the database's built-in support.  You can use either Oracle style or DB2/Firebird style bind variables with those databases.  Output binds are not supported when using "fakebinds".
+
+When using a database for which SQL Relay fakes bind variables, you should make sure not to pass the wrong type of data into a bind variable.  For example, in the query:
+
+{{{#!blockquote
+{{{#!code
+@parts/binds-fakebinds.sql@
+}}}
+}}}
+
+If stringcol is a string datatype such as char or varchar, bind a string to stringvar rather than a long or double.  Failure to do so will cause the query to fail.
