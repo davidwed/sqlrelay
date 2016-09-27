@@ -9,11 +9,13 @@ include ../../config.mk
 
 SRCS = ado.net.wt \
 	binds.wt \
+	odbc.wt \
 	jdbc.wt \
 	precisionscale.wt
 
 OBJS = ado.net.html \
 	binds.html \
+	odbc.html \
 	jdbc.html \
 	precisionscale.html
 
