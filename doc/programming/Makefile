@@ -12,8 +12,9 @@ SRCS = ado.net.wt \
 	c++.wt \
 	binds.wt \
 	erlang.wt \
-	odbc.wt \
+	java.wt \
 	jdbc.wt \
+	odbc.wt \
 	precisionscale.wt
 
 OBJS = ado.net.html \
@@ -21,8 +22,9 @@ OBJS = ado.net.html \
 	c++.html \
 	binds.html \
 	erlang.html \
-	odbc.html \
+	java.html \
 	jdbc.html \
+	odbc.html \
 	precisionscale.html
 
 .wt.html:
