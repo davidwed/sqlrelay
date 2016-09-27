@@ -1,0 +1,11 @@
+cur->prepareQuery("begin  :curs:=testproc; end;");
+cur->defineOutputBindCursor("curs");
+cur->executeQuery();
+sqlrcursor      *bindcur=cur->getOutputBindCursor("curs");
+bindcur->fetchFromBindCursor();
+char    *field00=bindcur->getField(0,0);
+char    *field01=bindcur->getField(0,1);
+char    *field02=bindcur->getField(0,2);
+char    *field10=bindcur->getField(1,0);
+char    *field11=bindcur->getField(1,1);
+char    *field12=bindcur->getField(1,2);

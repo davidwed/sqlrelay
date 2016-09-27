@@ -8,6 +8,7 @@ include ../../config.mk
 .SUFFIXES: .wt .html
 
 SRCS = ado.net.wt \
+	c++.wt \
 	binds.wt \
 	erlang.wt \
 	odbc.wt \
@@ -15,6 +16,7 @@ SRCS = ado.net.wt \
 	precisionscale.wt
 
 OBJS = ado.net.html \
+	c++.html \
 	binds.html \
 	erlang.html \
 	odbc.html \
