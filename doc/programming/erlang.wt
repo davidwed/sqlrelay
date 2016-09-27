@@ -1,0 +1,3 @@
+= Programming with SQL Relay using the Erlang API =
+
+No documentation has been written for the Erlang API yet.  The functions match the C API functions without the sqlrcon_ and sqlrcur_ prefixes.

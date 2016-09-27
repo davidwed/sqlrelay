@@ -1,0 +1,162 @@
+= Programming with SQL Relay using ODBC =
+
+The SQL Relay distribution provides an ODBC driver, enabling applications which use ODBC to access SQL Relay.
+
+On Windows, just use the ODBC control panel to create a DSN.
+
+On Unix or Linux platforms, using unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)
+
+{{{#!blockquote
+{{{#!code
+[SQLRelay]
+Description=ODBC for SQL Relay
+Driver=/usr/local/firstworks/lib/libsqlrodbc.so
+FileUsage=1
+}}}
+}}}
+
+Note that the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.  Note also that on Mac OS X you'll need to replace the '''.so''' suffix with '''.dylib'''
+
+Once the instance is defined you can add a DSN for SQL Relay by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)
+
+{{{#!blockquote
+{{{#!code
+[sqlrtest]
+Description=Connection to SQL Relay
+Driver=SQLRelay
+Server=sqlrserver
+Port=9000
+Socket=/tmp/test.socket
+User=testuser
+Password=testpass
+}}}
+}}}
+
+Here the Driver attribute refers to the instance in odbcinst.ini.
+
+Alternatively, you could create a combined instance/DSN by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)
+
+{{{#!blockquote
+{{{#!code
+[sqlrtest]
+Description=Connection to SQL Relay
+Driver=/usr/local/firstworks/lib/libsqlrodbc.so
+FileUsage=1
+Server=sqlrserver
+Port=9000
+Socket=/tmp/test.socket
+User=testuser
+Password=testpass
+}}}
+}}}
+
+In addition to the attributes described above, the following attributes can be used to establish Kerberos or Active Directory encryption and authentication with the server:
+
+See the [../admin/configguide.html#krb SQL Relay Configuration Guide] for more information about Kerberos and Active Directory configurations.  In particular, User and Password are not typically used when using Kerberos/AD.
+
+* '''Krb''' - Set to '''yes''' to enable Kerberos/AD encryption/authentication or '''no''' to disable it.
+* '''Krbservice''' - Specifies the Kerberos service name of the SQL Relay server.  If omitted or left empty then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".
+* '''Krbmech''' - Specifies the Kerberos mechanism to use.  On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as: { 1 2 840 113554 1 2 2 }.  On Windows platforms, this should be a string like: Kerberos.  If omitted or left empty then the default mechanism will be used.  Only set this if you know that you have a good reason to.
+* '''Krbflags''' - Specifies what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used.  Only set this if you know that you have a good reason to.  Valid flags include: GSS_C_MUTUAL_FLAG, GSS_C_REPLAY_FLAG, GSS_C_SEQUENCE_FLAG, GSS_C_CONF_FLAG, and GSS_C_INTEG_FLAG.  For a full list of flags, consult the GSSAPI documentation, though note that only the previously listed flags are supported on Windows.
+
+The following attributes can be used to establish TLS/SSL encryption and authentication with the server:
+
+See the [../admin/configguide.html#tls SQL Relay Configuration Guide] for more information about TLS/SSL configurations.
+
+* '''Tls''' - Set to '''yes''' to enable TLS/SSL encryption/authentication or '''no''' to disable it.
+* '''Tlsversion''' - Specifies the TLS/SSL protocol version that the client will attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If omittted or left empty then the highest supported version will be negotiated.
+* '''Tlscert''' - Specifies the file name of the certificate chain file to send to the SQL Relay server.  This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.
+* '''Tlspassword''' - If Tlscert contains a password-protected private key, then Tlspassword may be supplied to access it.  If the private key is not password-protected, then this argument is ignored, and may be omitted or left empty.
+* '''Tlsciphers''' - Specifies a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If omitted or left empty then a default set is used.  For a list of valid ciphers on Linux/Unix platforms, see: man ciphers. For a list of valid ciphers on Windows platforms, see [https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx this page].  On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes.  For example: 3DES_112.  Only set this if you know that you have a good reason to.
+* '''Tlsvalidate''' - Indicates whether to validate the SQL Relay server's certificate, and may be set to one of the following: '''no''' - Don't validate the server's certificate.  '''ca''' - Validate that the server's certificate was signed by a trusted certificate authority.  '''ca+host''' - Perform "ca" validation and also validate that one of the subject altenate names (or the common name if no SANs are present) in the certificate matches the host parameter.  (Falls back to "ca" validation when a unix socket is used.)  '''ca+domain''' - Perform "ca" validation and also validate that the domain name of one of the subject alternate names (or the common name if no SANs are present) in the certificate matches the domain name of the host parameter.  (Falls back to "ca" validation when a unix socket is used.)
+* '''Tlsca''' - Specifies the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate.  This is useful if the SQL Relay server's certificate is self-signed.  On Windows, "ca" must be a file name.  On non-Windows systems, "ca" can be either a file or  directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.
+
+Note that the supported Tlscert and Tlsca file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.
+
+[[br]]
+
+Now you can use the //isql// command line utility that comes with iODBC
+or unixODBC to access the database through SQL Relay as follows:
+
+{{{#!blockquote
+'''isql sqlrtest'''
+}}}
+
+Here is a sample session:
+
+{{{#!blockquote
+{{{#!code
+[dmuse@fedora ~]$ isql sqlrodbc
++---------------------------------------+
+| Connected!                            |
+|                                       |
+| sql-statement                         |
+| help [tablename]                      |
+| quit                                  |
+|                                       |
++---------------------------------------+
+SQL> create table test (col1 int, col2 varchar2(20))
+SQLRowCount returns 0
+SQL> insert into test values (1,'hello')
+SQLRowCount returns 1
+SQL> insert into test values (2,'goodbye')
+SQLRowCount returns 1
+SQL> select * from test
++-----+--------+
+| COL1| COL2   |
++-----+--------+
+| 1   | hello  |
+| 2   | goodbye|
++-----+--------+
+SQLRowCount returns 0
+2 rows fetched
+SQL> update test set col2='bye' where col1=2
+SQLRowCount returns 1
+SQL> select * from test
++-----+------+
+| COL1| COL2 |
++-----+------+
+| 1   | hello|
+| 2   | bye  |
++-----+------+
+SQLRowCount returns 0
+2 rows fetched
+SQL> delete from test
+SQLRowCount returns 2
+SQL> select * from test
++-----+-----+
+| COL1| COL2|
++-----+-----+
++-----+-----+
+SQLRowCount returns 0
+SQL> drop table test
+SQLRowCount returns 0
+SQL> quit
+[dmuse@fedora ~]$ 
+}}}
+}}}
+
+If you get an error like '''ISQL ERROR: Could not SQLConnect''' when you run isql then it's possible that it can't find your ODBC INI file.  Some versions of unixODBC, when compiled and installed with non-standard prefixes, still look for odbc.ini in /etc rather than under their prefix.  For example, I discovered that on Mac OS X, unixODBC 2.2.12 installed under /sw should look for /sw/etc/odbc.ini but instead it looks for /etc/odbc.ini, even though //odbcinst -j// looks under /sw.
+
+You can work around this by setting environment variables to override whatever default search path unixODBC uses.  For example, to force it to look under /sw/etc, use:
+
+{{{#!blockquote
+{{{#!code
+export ODBCINST=/sw/etc/odbcinst.ini
+export ODBCINI=/sw/etc/odbc.ini
+}}}
+}}}
+
+Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN that you defined. 
+
+You can also use SQL Relay with any language that supports ODBC directly or has a database abstraction layer that supports ODBC.  For example, lets say you have an existing PHP app that uses MDB2 to connect to Oracle and you want to use SQL Relay with it.  There is no PHP MDB2 driver for SQL Relay, but since MDB2 suppots ODBC, you could use:
+
+{{{#!blockquote
+{{{#!code
+PHP -&gt; MDB2 -&gt; ODBC -&gt; SQL Relay -&gt; Oracle
+}}}
+}}}
+
+Similarly, you could use SQL Relay via ODBC with PHP/PDO, PHP/ADODB, Java/JDBC ([jdbc.html using the JDBC-ODBC bridge]), with the ODBC Adapter for Ruby on Rails, and so on.
+
+Developing applications which use ODBC is beyond the scope if this document but many examples and tutorials can be found on the web.
