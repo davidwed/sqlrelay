@@ -1,0 +1,11 @@
+sqlrcur_prepareQuery(cur,"begin  :curs:=testproc; end;");
+sqlrcur_defineOutputBindCursor(cur,"curs");
+sqlrcur_executeQuery(cur);
+sqlrcur bindcur=sqlrcur_getOutputBindCursor(cur,"curs");
+sqlrcur_fetchFromBindCursor(bindcur);
+char    *field00=sqlrcur_getFieldByIndex(bindcur,0,0);
+char    *field01=sqlrcur_getFieldByIndex(bindcur,0,1);
+char    *field02=sqlrcur_getFieldByIndex(bindcur,0,2);
+char    *field10=sqlrcur_getFieldByIndex(bindcur,1,0);
+char    *field11=sqlrcur_getFieldByIndex(bindcur,1,1);
+char    *field12=sqlrcur_getFieldByIndex(bindcur,1,2);

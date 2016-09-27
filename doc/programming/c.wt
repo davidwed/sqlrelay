@@ -1,4 +1,4 @@
-= Programming with SQL Relay using the C++ API =
+= Programming with SQL Relay using the C API =
 
 * [#compiling Compiling an SQL Relay Client Program]
 * [#session Establishing a Session]
@@ -9,7 +9,7 @@
 * [#bindvars Substitution and Bind Variables]
 * [#rebinding Re-Binding and Re-Executing]
 * [#fields Accessing Fields in the Result Set]
-* [#largeresultsets Dealing With Large Result Sets]
+* [#largeresultsets Dealing With Large Result Set]
 * [#cursors Cursors]
 * [#columns Getting Column Information]
 * [#storedprocedures Stored Procedures]
@@ -17,42 +17,62 @@
 * [#suspending Suspending and Resuming Sessions]
 * [#lastinsertid Getting the Last Insert ID]
 
+
 [=#compiling]
 == Compiling an SQL Relay Client Program ==
 
-When writing an SQL Relay client program using the C++ API, you need to
-include the sqlrclient.h file.
+When writing an SQL Relay client program using the C API, you need to
+include the sqlrclientwrapper.h file.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-include.cpp@
+@parts/c-include.c@
 }}}
 }}}
 
-You'll also need to link against the sqlrclient and rudiments libraries.
+You'll also need to link against the sqlrclientwrapper, sqlrclient and 
+rudiments libraries.
 
-On Linux and Unix, the header files are usually found under /usr/local/firstworks/include and the libraries are usually found in /usr/local/firstworks/lib.
+On Linux and Unix, the header files are usually found under
+/usr/local/firstworks/include and the libraries are usually found in 
+/usr/local/firstworks/lib.
 
 On Windows, the header files are usually found under C:\Program Files\Firstworks\include, the .lib files are usually found under C:\Program Files\Firstworks\lib and the .dll files are usually found under C:\Program Files\Firstworks\bin.
 
-The command to compile your .cpp file to object code will look something like
-this (assuming you're using GNU C++ on Linux or Unix):
+The command to compile your .c file to object code will look something like
+this (assuming you're using the GNU C compiler on Linux or Unix):
 
 {{{#!blockquote
-{{{
-g++ -I/usr/local/firstworks/include -c myprogram.cpp
+{{{#!code
+gcc -I/usr/local/firstworks/include -c myprogram.c
 }}}
 }}}
 
 The command to compile your .o file to an executable will look something like
-this (assuming you're using GNU C++ on Linux or Unix):
+this (assuming you're using the GNU C++ compiler on Linux or Unix):
 
 {{{#!blockquote
-{{{
-g++ -o myprogram myprogram.o -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
+{{{#!code
+g++ -o myprogram myprogram.o -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments
 }}}
 }}}
 
+Note that g++ was used to link, not gcc.  You could alternatively link using
+gcc like this:
+
+{{{#!blockquote
+{{{#!code
+gcc -o myprogram myprogram.o -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments -lstdc++
+}}}
+}}}
+
+When using the C API, it is important to compile the .c files to object code
+using the C compiler before linking them using the C++ compiler.  
+Compiling/Linking in one step using the C++ compiler the will most likely fail
+as it will generate C++ style symbols for function calls which will not be 
+resolved in the sqlrclientwrapper library since it contains C style function 
+symbols.  Compiling to object code using the C compiler as a seperate step
+ensures that C style symbols will be generated for function calls.
 
 [=#session]
 == Establishing a Session ==
@@ -62,7 +82,7 @@ use.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-session.cpp@
+@parts/c-session.c@
 }}}
 }}}
 
@@ -73,52 +93,49 @@ For the duration of the session, the client occupies one of the database
 connections, so care should be taken to minimize the length of a
 session.
 
-Sessions can also be encrypted and authenticated using Kerberos/Active Directory or TLS/SSL.  The enableKerberos() method is provided to enable Kerberos/Active Directory encryption and authentication and the enableTls() method is provided to enable TLS/SSL encryption and authentication.  The disableEncryption() method is provided to disable any previously enabled encryption.
+Sessions can also be encrypted and authenticated using Kerberos/Active Directory or TLS/SSL.  The sqlrcon_enableKerberos() function is provided to enable Kerberos/Active Directory encryption and authentication and the sqlrcon_enableTls() function is provided to enable TLS/SSL encryption and authentication.  The sqlrcon_disableEncryption() function is provided to disable any previously enabled encryption.
 
-See the [../api/c++/html/classsqlrconnection.html sqlrconnection class reference] for information about these methods and the SQL Relay Configuration Guide for more information about [../admin/configguide.html#krb Kerberos/Active Directory] and [../admin/configguide.html#tls TLS/SSL] configurations.  In particular, note that user and password are not typically used when using Kerberos/AD.
-
+See the [../api/c/html/group_sqlrclientwrapper.html C API reference] for information about these functions and the SQL Relay Configuration Guide for more information about [../admin/configguide.html#krb Kerberos/Active Directory] and [../admin/configguide.html#tls TLS/SSL] configurations.  In particular, note that user and password are not typically used when using Kerberos/AD.
 
 [=#query]
 == Executing Queries ==
 
-Allocate a cursor, then call sendQuery() or sendFileQuery() to run a 
-query.  The same cursor may be used over and over.
+Call sqlrcur_sendQuery() or sqlrcur_sendFileQuery() to run a query.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-execute.cpp@
+@parts/c-execute.c@
 }}}
 }}}
 
-Note the call to endSession() after the call to sendFileQuery().  Since the
-program does some stuff that takes a long time between that query and the next,
-ending the session there allows another client an opportunity to use that
-database connection while your client is busy.  The next call to sendQuery() 
-establishes another session.  Since the program does some stuff that takes a 
-short time between the first two queries, it's OK to leave the session open 
-between them.
+Note the call to sqlrcon_endSession() after the call to sqlrcur_sendFileQuery().
+Since the program does some stuff that takes a long time between that query and
+the next, ending the session there allows another client an opportunity to use 
+that database connection while your client is busy.  The next call to 
+sqlrcur_sendQuery() establishes another session.  Since the program does some 
+stuff that takes a short time between the first two queries, it's OK to leave 
+the session open between them.
 
 [=#commit]
 == Commits and Rollbacks ==
 
-If you need to execute a commit or rollback, you should use the commit()
-and rollback() methods of the sqlrconnection class rather than sending a 
-"commit" or "rollback" query.  There are two reasons for this.  First, it's 
-much more efficient to call the methods.  Second, if you're writing code that 
-can run on transactional or non-transactional databases, some non-transactional 
-databases will throw errors if they receive a "commit" or "rollback" query, but
-by calling the commit() and rollback() methods you instruct the database 
-connection daemon to call the commit and rollback API methods for that database 
+If you need to execute a commit or rollback, you should use the 
+sqlrcon_commit() and sqlrcon_rollback() functions rather than sending a "commit"
+or "rollback" query.  There are two reasons for this.  First, it's much more 
+efficient to call the functions.  Second, if you're writing code that can run on 
+transactional or non-transactional databases, some non-transactional databases 
+will throw errors if they receive a "commit" or "rollback" query, but by calling
+the sqlrcon_commit() and sqlrcon_rollback() functions you instruct the database
+connection daemon to call the commit and rollback API functions for that database
 rather than issuing them as queries.  If the API's have no commit or rollback 
-methods, the calls do nothing and the database throws no error.
+functions, the calls do nothing and the database throws no error.
 
-You can also turn Autocommit on or off with the autoCommitOn() and
-autoCommitOff() methods of the sqlrconnection class.  When Autocommit is on,
-the database performs a commit after each successful DML or DDL query.  When 
-Autocommit is off, the database commits when the client instructs it to, or 
-(by default) when a client disconnects.  For databases that don't support 
-Autocommit, autoCommitOn() and autoCommitOff() have no effect.
-
+You can also turn Autocommit on or off with the sqlrcon_autoCommitOn() and 
+sqlrcon_autoCommitOff() functions.  When Autocommit is on, the database 
+performs a commit after each successful DML or DDL query.  When Autocommit is 
+off, the database commits when the client instructs it to, or (by default) when
+a client disconnects.  For databases that don't support Autocommit, 
+sqlrcon_autoCommitOn() and sqlrcon_autoCommitOff() have no effect.
 
 [=#temptables]
 == Temporary Tables ==
@@ -148,20 +165,21 @@ directly to the database.
 [=#errors]
 == Catching Errors ==
 
-If your call to sendQuery() or sendFileQuery() returns a 0, the query failed.
-You can find out why by calling errorMessage().
+If your call to sqlrcur_sendQuery() or sqlrcur_sendFileQuery() returns a 0, the 
+query failed.  You can find out why by calling sqlrcur_errorMessage().
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-errors.cpp@
+@parts/c-errors.c@
 }}}
 }}}
+
 
 [=#bindvars]
 == Substitution and Bind Variables ==
 
 Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  The SQL Relay API provides methods for
+of the query is dynamically generated.  The SQL Relay API provides functions for
 making substitutions and binds in those queries.
 
 For a detailed discussion of substitutions and binds, see
@@ -178,7 +196,7 @@ scale.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-bind.cpp@
+@parts/c-bind.c@
 }}}
 }}}
 
@@ -187,25 +205,24 @@ you can call countBindVariables() after preparing the query.
 
 If you're using a database with an embedded procedural language, you may
 want to retrieve data from function calls.  To facilitate this, SQL Relay
-provides methods for defining and retrieving output bind variables.
+provides functions for defining and retrieving output bind variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-bind-out.cpp@
+@parts/c-bind-out.c@
 }}}
 }}}
 
-The getOutputBindString() method returns a NULL value as an empty string.  
+The getOutputBindString() function returns a NULL value as an empty string.  
 If you would it to come back as a NULL instead, you can call the 
-getNullsAsNulls() method.  To revert to the default behavior, you can
+getNullsAsNulls() function.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().
 
-You can insert data into BLOB and CLOB columns using the inputBindBlob(),
-inputBindClob() methods.
+You can insert data into BLOB and CLOB columns using the inputBindBlob(), inputBindClob() functions.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-bind-lob.cpp@
+@parts/c-bind-lob.c@
 }}}
 }}}
 
@@ -215,11 +232,11 @@ defineOutputBindClob()/getOutputBindClob().
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-bind-lob-out.cpp@
+@parts/c-bind-lob-out.c@
 }}}
 }}}
 
-Sometimes its convenient to bind a bunch of variables that may or may not 
+Sometimes it's convenient to bind a bunch of variables that may or may not 
 actually be in the query.  For example, if you are building a web based
 application, it may be easy to just bind all the form variables/values from the
 previous page, even though some of them don't appear in the query.  Databases
@@ -239,46 +256,49 @@ supports this paradigm, you can reap a substantial performance improvement.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-reexecute.cpp@
+@parts/c-reexecute.c@
 }}}
 }}}
+
 
 [=#fields]
 == Accessing Fields in the Result Set ==
 
-The rowCount(), colCount() and getField() methods are useful for processing
-result sets.
+The sqlrcur_rowCount(), sqlrcur_colCount(), sqlrcur_getFieldByName() and
+sqlrcur_getFieldByIndex() functions are useful for processing result sets.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-fields.cpp@
+@parts/c-fields.c@
 }}}
 }}}
 
-The getField() method returns a string.  If you would like to get a field as
-a long or double, you can use getFieldAsLong() and getFieldAsDouble().
+The sqlrcur_getFieldByName() and sqlrcur_getFieldByIndex() functions return
+strings.  If you would like to get a field as a long or double, you can use
+sqlrcur_getFieldAsLongByName()/sqlrcur_getFieldAsLongByIndex() and
+sqlrcur_getFieldAsDoubleByName()/sqlrcur_getFieldAsDoubleByIndex().
 
-You can also use getRow() which returns a NULL-terminated array of the
-fields in the row.
+You can also use sqlrcur_getRow() which returns a NULL-terminated array of
+the fields in the row.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-fields-as.cpp@
+@parts/c-fields-as.c@
 }}}
 }}}
 
-The getField() and getRow() methods return NULL fields as empty strings.
-If you would like them to come back as NULL's instead, you can call the
-getNullsAsNulls() method.  To revert to the default behavior, you can call
-getNullsAsEmptyStrings().
+The sqlrcur_getFieldByIndex(), sqlrcur_getFieldByName() and sqlrcur_getRow() 
+functions return NULL fields as empty strings.  If you would like them to come 
+back as NULL's instead, you can call the sqlrcur_getNullsAsNulls() function.  To 
+revert to the default behavior, you can call sqlrcur_getNullsAsEmptyStrings().
 
 If you want to access the result set, but don't care about the
 column information (column names, types or sizes) and don't mind getting
 fields by their numeric index instead of by name,  you can call the
-dontGetColumnInfo() method prior to executing your query.  This can result
-in a performance improvement, especially when many queries with small
-result sets are executed in rapid succession.  You can call getColumnInfo()
-again later to turn off this feature.
+sqlrcur_dontGetColumnInfo() function prior to executing your query.  This can 
+result in a performance improvement, especially when many queries with small
+result sets are executed in rapid succession.  You can call 
+sqlrcur_getColumnInfo() again later to turn off this feature.
 
 [=#largeresultsets]
 == Dealing With Large Result Sets ==
@@ -286,30 +306,30 @@ again later to turn off this feature.
 SQL Relay normally buffers the entire result set.  This can speed things up 
 at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.
 
-Use setResultSetBufferSize() to set the number of rows to buffer at a time.
-Calls to getRow() and getField() cause the chunk containing the requested field
-to be fetched.  Rows in that chunk are accessible but rows before it are 
-not.
+Use sqlrcur_setResultSetBufferSize() to set the number of rows to buffer at a 
+time.  Calls to sqlrcur_getRow(), sqlrcur_getFieldByIndex() and 
+sqlrcur_getFieldByName() cause the chunk containing the requested field to be 
+fetched.  Rows in that chunk are accessible but rows before it are not.
 
 For example, if you setResultSetBufferSize(5) and execute a query that 
 returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14, 
-then 15-19.  When rows 5-9 are available, getField(0,0) will return NULL and 
-getField(11,0) will cause rows 10-14 to be fetched and return the requested
-value.
+then 15-19.  When rows 5-9 are available, getFieldByIndex(0,0) will return NULL
+and getFieldByIndex(11,0) will cause rows 10-14 to be fetched and return the 
+requested value.
 
 When buffering the result set in chunks, don't end the session until after
 you're done with the result set.
 
-If you call setResultSetBufferSize() and forget what you set it to, you
-can always call getResultSetBufferSize().
+If you call sqlrcur_setResultSetBufferSize() and forget what you set it to, 
+you can always call sqlrcur_getResultSetBufferSize().
 
-When buffering a result set in chunks, the rowCount() method returns
-the number of rows returned so far.  The firstRowIndex() method returns the
-index of the first row of the currently buffered chunk.
+When buffering a result set in chunks, the sqlrcur_rowCount() function returns
+the number of rows returned so far.  The sqlrcur_firstRowIndex() function returns 
+the index of the first row of the currently buffered chunk.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-rsbuffersize.cpp@
+@parts/c-rsbuffersize.c@
 }}}
 }}}
 
@@ -325,7 +345,7 @@ For example:
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-cursors.cpp@
+@parts/c-cursors.c@
 }}}
 }}}
 
@@ -335,19 +355,9 @@ then retrieve that cursor.  Your program can retrieve the result set from the
 cursor.  All of this can be accomplished using defineOutputBindCursor(),
 getOutputBindCursor() and fetchFromOutputBindCursor().
 
-PL/SQL Procedure:
 {{{#!blockquote
 {{{#!code
-@parts/oracle-create-spmytable.sql@
-}}}
-}}}
-
-[[br]]
-
-Program code:
-{{{#!blockquote
-{{{#!code
-@parts/c++-bind-cursor.cpp@
+@parts/c-bind-cursor.c@
 }}}
 }}}
 
@@ -369,7 +379,7 @@ always returned as false.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-columninfo.cpp@
+@parts/c-columninfo.c@
 }}}
 }}}
 
@@ -383,9 +393,10 @@ database.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-columncase.cpp@
+@parts/c-columncase.c@
 }}}
 }}}
+
 
 [=#storedprocedures]
 == Stored Procedures ==
@@ -431,7 +442,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc.cpp@
+@parts/c-oracle-testproc.c@
 }}}
 }}}
 
@@ -459,7 +470,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc.cpp@
+@parts/c-sybase-testproc.c@
 }}}
 }}}
 
@@ -486,7 +497,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc.cpp@
+@parts/c-firebird-testproc.c@
 }}}
 }}}
 
@@ -513,7 +524,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-db2-testproc.cpp@
+@parts/c-db2-testproc.c@
 }}}
 }}}
 
@@ -540,7 +551,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc.cpp@
+@parts/c-postgresql-testproc.c@
 }}}
 }}}
 
@@ -567,7 +578,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc.cpp@
+@parts/c-mysql-testproc.c@
 }}}
 }}}
 
@@ -610,7 +621,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-1value.cpp@
+@parts/c-oracle-testproc-1value.c@
 }}}
 }}}
 
@@ -638,7 +649,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-1value-output-param.cpp@
+@parts/c-oracle-testproc-1value-output-param.c@
 }}}
 }}}
 
@@ -670,7 +681,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc-1value.cpp@
+@parts/c-sybase-testproc-1value.c@
 }}}
 }}}
 
@@ -698,7 +709,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-1value.cpp@
+@parts/c-firebird-testproc-1value.c@
 }}}
 }}}
 
@@ -710,7 +721,7 @@ variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-1value-output-param.cpp@
+@parts/c-firebird-testproc-1value-output-param.c@
 }}}
 }}}
 
@@ -741,7 +752,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-db2-testproc-1value.cpp@
+@parts/c-db2-testproc-1value.c@
 }}}
 }}}
 
@@ -769,7 +780,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc-1value.cpp@
+@parts/c-postgresql-testproc-1value.c@
 }}}
 }}}
 
@@ -798,7 +809,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-1value.cpp@
+@parts/c-mysql-testproc-1value.c@
 }}}
 }}}
 
@@ -827,7 +838,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-1value-result-set.cpp@
+@parts/c-mysql-testproc-1value-result-set.c@
 }}}
 }}}
 
@@ -855,7 +866,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-1value-output-param.cpp@
+@parts/c-mysql-testproc-1value-output-param.c@
 }}}
 }}}
 
@@ -895,7 +906,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-values.cpp@
+@parts/c-oracle-testproc-values.c@
 }}}
 }}}
 
@@ -923,7 +934,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc-values.cpp@
+@parts/c-sybase-testproc-values.c@
 }}}
 }}}
 
@@ -951,7 +962,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-values.cpp@
+@parts/c-firebird-testproc-values.c@
 }}}
 }}}
 
@@ -963,7 +974,7 @@ bind variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-values-output-params.cpp@
+@parts/c-firebird-testproc-values-output-params.c@
 }}}
 }}}
 
@@ -991,7 +1002,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-db2-testproc-values.cpp@
+@parts/c-db2-testproc-values.c@
 }}}
 }}}
 
@@ -1019,7 +1030,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc-values.cpp@
+@parts/c-postgresql-testproc-values.c@
 }}}
 }}}
 
@@ -1049,7 +1060,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-values.cpp@
+@parts/c-mysql-testproc-values.c@
 }}}
 }}}
 
@@ -1079,7 +1090,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-values-output-params.cpp@
+@parts/c-mysql-testproc-values-output-params.c@
 }}}
 }}}
 
@@ -1114,7 +1125,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-result-set.cpp@
+@parts/c-oracle-testproc-result-set.c@
 }}}
 }}}
 
@@ -1142,7 +1153,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc-result-set.cpp@
+@parts/c-sybase-testproc-result-set.c@
 }}}
 }}}
 
@@ -1183,7 +1194,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc-result-set.cpp@
+@parts/c-postgresql-testproc-result-set.c@
 }}}
 }}}
 
@@ -1216,7 +1227,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-result-set.cpp@
+@parts/c-mysql-testproc-result-set.c@
 }}}
 }}}
 
@@ -1227,8 +1238,6 @@ To drop the stored procedure, run a query like the following.
 @parts/mysql-drop-testproc.sql@
 }}}
 }}}
-
-
 
 
 [=#caching]
@@ -1244,7 +1253,7 @@ First page:
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-caching-firstpage.cpp@
+@parts/c-caching-firstpage.c@
 }}}
 }}}
 
@@ -1252,7 +1261,7 @@ Second page:
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-caching-secondpage.cpp@
+@parts/c-caching-secondpage.c@
 }}}
 }}}
 
@@ -1268,7 +1277,7 @@ First page:
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-suspend.cpp@
+@parts/c-suspend.c@
 }}}
 }}}
 
@@ -1276,7 +1285,7 @@ Second page:
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-resume.cpp@
+@parts/c-resume.c@
 }}}
 }}}
 
@@ -1287,15 +1296,15 @@ can continue to retrieve rows from the result set.
 
 Similarly, if you're buffering a result set in chunks, caching that
 result set and suspend your session.  When you resume the session, you can
-continue caching the result set.  You must use resumeCachedResultSet()
-instead of resumeResultSet() however.
+continue caching the result set.  You must use sqlrcur_resumeCachedResultSet()
+instead of sqlrcur_resumeResultSet() however.
 
 [=#lastinsertid]
 == Getting the Last Insert ID ==
 
 Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.
 
-SQL Relay provides the sqlrconnection::getLastInsertId() method to get this value.
+SQL Relay provides the sqlrcon_getLastInsertId() function to get this value.
 
 When using the SQLite database, you can also get the last insert id by running the query:
 

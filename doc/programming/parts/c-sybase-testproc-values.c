@@ -1,0 +1,11 @@
+sqlrcur_prepareQuery(cur,"exec testproc");
+sqlrcur_inputBindLong(cur,"in1",1);
+sqlrcur_inputBindDouble(cur,"in2",1.1,2,1);
+sqlrcur_inputBindString(cur,"in3","hello");
+sqlrcur_defineOutputBindInteger(cur,"out1");
+sqlrcur_defineOutputBindDouble(cur,"out2");
+sqlrcur_defineOutputBindString(cur,"out3",20);
+sqlrcur_executeQuery(cur);
+int64_t out1=sqlrcur_getOutputBindInteger(cur,"out1");
+double  out2=sqlrcur_getOutputBindDouble(cur,"out2");
+char    *out3=sqlrcur_getOutputBindString(cur,"out3");
