@@ -17,6 +17,7 @@ SRCS = ado.net.wt \
 	nodejs.wt \
 	odbc.wt \
 	perldbi.wt \
+	perl.wt \
 	precisionscale.wt
 
 OBJS = ado.net.html \
@@ -29,6 +30,7 @@ OBJS = ado.net.html \
 	nodejs.html \
 	odbc.html \
 	perldbi.html \
+	perl.html \
 	precisionscale.html
 
 .wt.html:
