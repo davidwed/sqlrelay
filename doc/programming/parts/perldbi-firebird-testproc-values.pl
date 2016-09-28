@@ -1,0 +1,10 @@
+my $sth=$dth->prepare("select * from testproc(?,?,?)");
+$sth->bind_param("1",1);
+$sth->bind_param("2",1.1,2,1);
+$sth->bind_param("3","hello");
+$sth->execute();
+my $out1;
+my $out2;
+my $out3;
+$sth->bind_columns(undef,\$out1,\$out1,\$out3);
+$sth->fetch();

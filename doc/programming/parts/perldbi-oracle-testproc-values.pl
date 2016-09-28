@@ -1,0 +1,10 @@
+my $sth=$dbh->prepare("begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;");
+$sth->bind_param("in1",1);
+$sth->bind_param("in2",1.1,2,1);
+$sth->bind_param("in3","hello");
+my $out1;
+my $out2;
+my $out3;
+$sth->bind_input_param("out1",\$out1,20);
+$sth->bind_input_param("out2",\$out2,20);
+$sth->bind_input_param("out3",\$out3,20);

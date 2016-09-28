@@ -1,0 +1,11 @@
+my $sth=$dbh->prepare("set \@out1=0, \@out2=0.0, \@out3='')");
+$sth->execute();
+$sth=$dbh->prepare("call testproc(\@out1,\@out2,\@out3)");
+$sth->execute();
+$sth=$dbh->prepare("select \@out1,\@out2,\@out3");
+$sth->execute();
+my $out1;
+my $out2;
+my $out3;
+$sth->bind_columns(undef,\$out1,\$out2,\$out3);
+$sth->fetch();

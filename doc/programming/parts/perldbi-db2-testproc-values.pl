@@ -1,0 +1,11 @@
+my $sth=$dbh->prepare("call testproc(?,?,?,?,?,?)");
+$sth->bind_param("1",1);
+$sth->bind_param("2",1.1,2,1);
+$sth->bind_param("3","hello");
+my $out1;
+my $out2;
+my $out3;
+$sth->bind_inout_param("4",\$out1,25);
+$sth->bind_inout_param("5",\$out2,25);
+$sth->bind_inout_param("6",\$out3,25);
+$sth->execute();
