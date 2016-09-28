@@ -283,7 +283,7 @@ the fields in the row.
 
 {{{#!blockquote
 {{{#!code
-@parts/c-fields-as.c@
+@parts/c-fields-row.c@
 }}}
 }}}
 

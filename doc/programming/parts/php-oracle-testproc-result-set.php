@@ -1,0 +1,11 @@
+sqlrcur_prepareQuery($cur,"begin  :curs:=testproc; end;");
+sqlrcur_defineOutputBindCursor($cur,"curs");
+sqlrcur_executeQuery($cur);
+$bindcur=sqlrcur_getOutputBindCursor($cur,"curs");
+sqlrcur_fetchFromBindCursor($bindcur);
+$field00=sqlrcur_getField($bindcur,0,0);
+$field01=sqlrcur_getField($bindcur,0,1);
+$field02=sqlrcur_getField($bindcur,0,2);
+$field10=sqlrcur_getField($bindcur,1,0);
+$field11=sqlrcur_getField($bindcur,1,1);
+$field12=sqlrcur_getField($bindcur,1,2);

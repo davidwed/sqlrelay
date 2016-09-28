@@ -263,7 +263,7 @@ fields in the row.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-fields-as.cpp@
+@parts/c++-fields-row.cpp@
 }}}
 }}}
 

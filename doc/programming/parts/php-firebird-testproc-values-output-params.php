@@ -1,0 +1,11 @@
+sqlrcur_prepareQuery($cur,"execute procedure testproc ?, ?, ?");
+sqlrcur_inputBind($cur,"1",1);
+sqlrcur_inputBind($cur,"2",1.1,2,1);
+sqlrcur_inputBind($cur,"3","hello");
+sqlrcur_defineOutputBind($cur,"1",20);
+sqlrcur_defineOutputBind($cur,"2",20);
+sqlrcur_defineOutputBind($cur,"3",20);
+sqlrcur_executeQuery($cur);
+$out1=sqlrcur_getOutputBind($cur,"1");
+$out2=sqlrcur_getOutputBind($cur,"2");
+$out3=sqlrcur_getOutputBind($cur,"3");

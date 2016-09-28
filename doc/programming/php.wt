@@ -1,6 +1,6 @@
-= Programming with SQL Relay using the Java API =
+= Programming with SQL Relay using the PHP API =
 
-* [#compiling Compiling an SQL Relay Client Program]
+* [#config Configuring PHP]
 * [#session Establishing a Session]
 * [#query Executing Queries]
 * [#commit Commits and Rollbacks]
@@ -17,43 +17,62 @@
 * [#suspending Suspending and Resuming Sessions]
 * [#lastinsertid Getting the Last Insert ID]
 
+[=#config]
+== Configuring PHP ==
 
-[=#compiling]
-= Compiling an SQL Relay Client Program =
+To use SQL Relay, PHP must be configured to load the appropriate module - sql_relay.so on Linux or Unix and php_sql_relay.dll on Windows.
 
-When writing an SQL Relay client program using the Java API, you need to
-include /usr/local/firstworks/java in your CLASSPATH.
+If you are using SQL Relay version 0.58 or higher on reasonably modern Linux
+or Solaris with PHP installed from a package, then the installation process
+should have configured PHP correctly and you can probably ignore the rest of
+this section.
+
+On other operating sytems, or if you built PHP from source, or if the
+installation process didn't go smoothly, then you may have to configure PHP
+manually.
+
+The PHP configuration file is usually named php.ini.  The name and location
+of the file may vary though.  Here are some common names and locations, by
+platform.
+
+* '''Linux''' - /etc/php.ini
+* '''Solaris''' - /etc/php/&lt;php version&gt;/php.ini
+* '''!FreeBSD''' - /usr/local/etc/php.ini
+* '''!NetBSD''' - /usr/pkg/etc/php.ini
+* '''!OpenBSD''' - /etc/php-&lt;php version&gt;.ini
+* '''Windows''' - C:\Windows\php.ini
+
+To load the php module on Linux or Unix, you usually just need to add a line
+to the configuration file like:
 
 {{{#!blockquote
-{{{
-CLASSPATH=$CLASSPATH:/usr/local/firstworks/java
-export CLASSPATH
-javac MyProgram.java
+{{{#!code
+extension=sql_relay.so
 }}}
 }}}
 
-To run your program, you need to include /usr/local/firstworks/java in your 
-LD_LIBRARY_PATH.  If your system supports ld.so, you can alternatively add 
-/usr/local/firstworks/java to your /etc/ld.so.conf or /etc/ld.so.conf.d
-(if your system supports ld.so.conf.d) and run ldconfig.
+To load the php module on Windows, you usually need to add lines like:
 
 {{{#!blockquote
-{{{
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/firstworks/java
-export LD_LIBRARY_PATH
-java MyProgram
+{{{#!code
+extension_dir=C:\PHP\ext
+extension=php_sql_relay.dll
 }}}
 }}}
+
+(the <i>extension_dir</i> value might need to be changed, depending on where PHP is installed on your system)
 
 [=#session]
-= Establishing a Session =
+== Establishing a Session ==
 
 To use SQL Relay, you have to identify the connection that you intend to 
 use.
 
+If PHP is run as a web server module, then you will have to restart the web server for the changes to take effect.
+
 {{{#!blockquote
 {{{#!code
-@parts/java-session.java@
+@parts/php-session.php@
 }}}
 }}}
 
@@ -64,54 +83,53 @@ For the duration of the session, the client occupies one of the database
 connections, so care should be taken to minimize the length of a
 session.
 
+Sessions can also be encrypted and authenticated using Kerberos/Active Directory or TLS/SSL.  The enableKerberos() function is provided to enable Kerberos/Active Directory encryption and authentication and the enableTls() function is provided to enable TLS/SSL encryption and authentication.  The disableEncryption() function is provided to disable any previously enabled encryption.
 
-Sessions can also be encrypted and authenticated using Kerberos/Active Directory or TLS/SSL.  The enableKerberos() method is provided to enable Kerberos/Active Directory encryption and authentication and the enableTls() method is provided to enable TLS/SSL encryption and authentication.  The disableEncryption() method is provided to disable any previously enabled encryption.
-
-See the [../api/java/com/firstworks/sqlrelay/SQLRConnection.html SQLRConnection class reference] for information about these methods and the SQL Relay Configuration Guide for more information about [../admin/configguide.html#krb Kerberos/Active Directory] and [../admin/configguide.html#tls TLS/SSL] configurations.  In particular, note that user and password are not typically used when using Kerberos/AD.
+See the [../api/php/index.html PHP API reference] for information about these functions and the SQL Relay Configuration Guide for more information about [../admin/configguide.html#krb Kerberos/Active Directory] and [../admin/configguide.html#tls TLS/SSL] configurations.  In particular, note that user and password are not typically used when using Kerberos/AD.
 
 [=#query]
-= Executing Queries =
+== Executing Queries ==
 
-Allocate a cursor, then call sendQuery() or sendFileQuery() to run a 
-query.  The same cursor may be used over and over.
+Call sqlrcur_sendQuery() or sqlrcur_sendFileQuery() to run a query.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-execute.java@
+@parts/php-execute.php@
 }}}
 }}}
 
-Note the call to endSession() after the call to sendFileQuery().  Since the
-program does some stuff that takes a long time between that query and the next,
-ending the session there allows another client an opportunity to use that
-database connection while your client is busy.  The next call to sendQuery() 
-establishes another session.  Since the program does some stuff that takes a 
-short time between the first two queries, it's OK to leave the session open 
-between them.
+Note the call to sqlrcur_endSession() after the call to sqlrcur_sendFileQuery().
+Since the program does some stuff that takes a long time between that query and
+the next, ending the session there allows another client an opportunity to use 
+that database connection while your client is busy.  The next call to 
+sqlrcur_sendQuery() establishes another session.  Since the program does some 
+stuff that takes a short time between the first two queries, it's OK to leave 
+the session open between them.
 
 [=#commit]
-= Commits and Rollbacks =
+== Commits and Rollbacks ==
 
-If you need to execute a commit or rollback, you should use the commit()
-and rollback() methods of the SQLRConnection class rather than sending a 
+If you need to execute a commit or rollback, you should use the 
+sqlrcon_commit() and sqlrcon_rollback() functions rather than sending a 
 "commit" or "rollback" query.  There are two reasons for this.  First, it's 
-much more efficient to call the methods.  Second, if you're writing code that 
-can run on transactional or non-transactional databases, some non-transactional 
-databases will throw errors if they receive a "commit" or "rollback" query, but
-by calling the commit() and rollback() methods you instruct the database 
-connection daemon to call the commit and rollback API methods for that database
-rather than issuing them as queries.  If the API's have no commit or rollback 
-methods, the calls do nothing and the database throws no error.
+much more efficient to call the functions.  Second, if you're writing code that 
+can run on transactional or non-transactional databases, some non-transactional
+databases will throw errors if they receive a "commit" or "rollback" query, 
+but by calling the sqlrcon_commit() and sqlrcon_rollback() functions you 
+instruct the database connection daemon to call the commit and rollback API 
+functions for that database rather than issuing them as queries.  If the API's 
+have no commit or rollback functions, the calls do nothing and the database 
+throws no error.
 
-You can also turn Autocommit on or off with the autoCommitOn() and
-autoCommitOff() methods of the SQLRConnection class.  When Autocommit is on, 
-the database performs a commit after each successful DML or DDL query.  When 
-Autocommit is off, the database commits when the client instructs it to, or 
-(by default) when a client disconnects.  For databases that don't support 
-Autocommit, autoCommitOn() and autoCommitOff() have no effect.
+You can also turn Autocommit on or off with the sqlrcon_autoCommitOn() and
+sqlrcon_autoCommitOff() functions.  When Autocommit is on, the database
+performs a commit after each successful DML or DDL query.  When Autocommit is
+off, the database commits when the client instructs it to, or (by default)
+when a client disconnects.  For databases that don't support Autocommit, 
+sqlrcon_autoCommitOn() and sqlrcon_autoCommitOff() have no effect.
 
 [=#temptables]
-= Temporary Tables =
+== Temporary Tables ==
 
 Some databases support temporary tables.  That is, tables which are
 automatically dropped or truncated when an application closes its connection
@@ -136,23 +154,23 @@ SQL Relay in the same manner that they would work if the application connected
 directly to the database.
 
 [=#errors]
-= Catching Errors =
+== Catching Errors ==
 
-If your call to sendQuery() or sendFileQuery() returns a 0, the query failed.
-You can find out why by calling errorMessage().
+If your call to sqlrcur_sendQuery() or sqlrcur_sendFileQuery() returns a 0, the 
+query failed.  You can find out why by calling sqlrcur_errorMessage().
 
 {{{#!blockquote
 {{{#!code
-@parts/java-errors.java@
+@parts/php-errors.php@
 }}}
 }}}
 
 
 [=#bindvars]
-= Substitution and Bind Variables =
+== Substitution and Bind Variables ==
 
 Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  The SQL Relay API provides methods for
+of the query is dynamically generated.  The SQL Relay API provides functions for
 making substitutions and binds in those queries.
 
 For a detailed discussion of substitutions and binds, see
@@ -169,7 +187,7 @@ scale.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-bind.java@
+@parts/php-bind.php@
 }}}
 }}}
 
@@ -178,25 +196,25 @@ you can call countBindVariables() after preparing the query.
 
 If you're using a database with an embedded procedural language, you may
 want to retrieve data from function calls.  To facilitate this, SQL Relay
-provides methods for defining and retrieving output bind variables.
+provides functions for defining and retrieving output bind variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-bind-out.java@
+@parts/php-bind-out.php@
 }}}
 }}}
 
-The getOutputBindString() method returns a NULL value as an empty string.  
+The getOutputBindString() function returns a NULL value as an empty string.  
 If you would it to come back as a NULL instead, you can call the 
-getNullsAsNulls() method.  To revert to the default behavior, you can
+getNullsAsNulls() function.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().
 
 You can insert data into BLOB and CLOB columns using the inputBindBlob(),
-inputBindClob() methods.
+inputBindClob() functions.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-bind-lob.java@
+@parts/php-bind-lob.php@
 }}}
 }}}
 
@@ -206,7 +224,7 @@ defineOutputBindClob()/getOutputBindClob().
 
 {{{#!blockquote
 {{{#!code
-@parts/java-bind-lob-out.java@
+@parts/php-bind-lob-out.php@
 }}}
 }}}
 
@@ -221,7 +239,7 @@ call validBind() to see if a specific variable is valid.  However there is
 a performance cost associated with calling validateBinds() and validBind().
 
 [=#rebinding]
-= Re-Binding and Re-Execution =
+== Re-Binding and Re-Execution ==
 
 Another feature of the prepare/bind/execute paradigm is the ability to 
 prepare, bind and execute a query once, then re-bind and re-execute the query 
@@ -230,59 +248,58 @@ supports this paradigm, you can reap a substantial performance improvement.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-reexecute.java@
+@parts/php-reexecute.php@
 }}}
 }}}
 
 [=#fields]
-= Accessing Fields in the Result Set =
+== Accessing Fields in the Result Set ==
 
-The rowCount(), colCount() and getField() methods are useful for processing
-result sets.
-
-{{{#!blockquote
-{{{#!code
-@parts/java-fields.java@
-}}}
-}}}
-
-The getField() method returns a string.  If you would like to get a field as
-a long or double, you can use getFieldAsLong() and getFieldAsDouble().  If 
-you would like to get a field as an array of bytes, you can use
-getFieldAsByteArray().
-
-You can also use getRow() which returns a null-terminated array of the
-fields in the row.
+The sqlrcur_rowCount(), sqlrcur_colCount() and sqlrcur_getField() functions
+are useful for processing result sets.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-fields-row.java@
+@parts/php-fields.php@
 }}}
 }}}
 
-The getField() and getRow() methods return NULL fields as empty strings.
-If you would like them to come back as null's instead, you can call the
-getNullsAsNulls() method.  To revert to the default behavior, you can call
-getNullsAsEmptyStrings().
+The sqlrcur_getField() function returns a string.  If you would like to get
+a field as a long or double, you can use sqlrcur_getFieldAsLong() and
+sqlrcur_getFieldAsDouble().
+
+You can also use sqlrcur_getRow() or sqlrcur_getRowAssoc() to get the entire 
+row.
+
+{{{#!blockquote
+{{{#!code
+@parts/php-fields-row.php@
+}}}
+}}}
+
+The sqlrcur_getField(), sqlrcur_getRow() and sqlrcur_getRowAssoc() functions
+return NULL fields as empty strings.  If you would like them to come back as 
+NULL's instead, you can call the sqlrcur_getNullsAsNulls() function.  To revert 
+to the default behavior, you can call sqlrcur_getNullsAsEmptyStrings().
 
 If you want to access the result set, but don't care about the
 column information (column names, types or sizes) and don't mind getting
 fields by their numeric index instead of by name,  you can call the
-dontGetColumnInfo() method prior to executing your query.  This can result
-in a performance improvement, especially when many queries with small
-result sets are executed in rapid succession.  You can call getColumnInfo()
-again later to turn off this feature.
+sqlrcur_dontGetColumnInfo() function prior to executing your query.  This can 
+result in a performance improvement, especially when many queries with small
+result sets are executed in rapid succession.  You can call 
+sqlrcur_getColumnInfo() again later to turn off this feature.
 
 [=#largeresultsets]
-= Dealing With Large Result Sets =
+== Dealing With Large Result Sets ==
 
 SQL Relay normally buffers the entire result set.  This can speed things up 
 at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.
 
-Use setResultSetBufferSize() to set the number of rows to buffer at a time.
-Calls to getRow() and getField() cause the chunk containing the requested field
-to be fetched.  Rows in that chunk are accessible but rows before it are 
-not.
+Use sqlrcur_setResultSetBufferSize() to set the number of rows to buffer at a 
+time.  Calls to sqlrcur_getRow(), sqlrcur_getRowAssoc() and sqlrcur_getField() cause 
+the chunk containing the requested field to be fetched.  Rows in that chunk are
+accessible but rows before it are not.
 
 For example, if you setResultSetBufferSize(5) and execute a query that 
 returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14, 
@@ -293,21 +310,21 @@ value.
 When buffering the result set in chunks, don't end the session until after
 you're done with the result set.
 
-If you call setResultSetBufferSize() and forget what you set it to, you
-can always call getResultSetBufferSize().
+If you call sqlrcur_setResultSetBufferSize() and forget what you set it to, 
+you can always call sqlrcur_getResultSetBufferSize().
 
-When buffering a result set in chunks, the rowCount() method returns
-the number of rows returned so far.  The firstRowIndex() method returns the
-index of the first row of the currently buffered chunk.
+When buffering a result set in chunks, the sqlrcur_rowCount() function
+returns the number of rows returned so far.  The sqlrcur_firstRowIndex()
+function returns the index of the first row of the currently buffered chunk.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-rsbuffersize.java@
+@parts/php-rsbuffersize.php@
 }}}
 }}}
 
 [=#cursors]
-= Cursors =
+== Cursors ==
 
 Cursors make it possible to execute queries while processing the result
 set of another query.  You can select rows from a table in one query, then 
@@ -318,7 +335,7 @@ For example:
 
 {{{#!blockquote
 {{{#!code
-@parts/java-cursors.java@
+@parts/php-cursors.php@
 }}}
 }}}
 
@@ -330,7 +347,7 @@ getOutputBindCursor() and fetchFromOutputBindCursor().
 
 {{{#!blockquote
 {{{#!code
-@parts/java-bind-cursor.java@
+@parts/php-bind-cursor.php@
 }}}
 }}}
 
@@ -338,7 +355,7 @@ The number of cursors simultaneously available per-connection is set at
 compile time and defaults to 5.
 
 [=#columns]
-= Getting Column Information =
+== Getting Column Information ==
 
 For each column, the API supports getting the name, type and length of each
 field.  All databases support these attributes.  The API also supports
@@ -352,7 +369,7 @@ always returned as false.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-columninfo.java@
+@parts/php-columninfo.php@
 }}}
 }}}
 
@@ -366,7 +383,7 @@ database.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-columncase.java@
+@parts/php-columncase.php@
 }}}
 }}}
 
@@ -415,7 +432,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-oracle-testproc.java@
+@parts/php-oracle-testproc.php@
 }}}
 }}}
 
@@ -443,7 +460,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-sybase-testproc.java@
+@parts/php-sybase-testproc.php@
 }}}
 }}}
 
@@ -470,7 +487,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-firebird-testproc.java@
+@parts/php-firebird-testproc.php@
 }}}
 }}}
 
@@ -497,7 +514,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-db2-testproc.java@
+@parts/php-db2-testproc.php@
 }}}
 }}}
 
@@ -524,7 +541,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-postgresql-testproc.java@
+@parts/php-postgresql-testproc.php@
 }}}
 }}}
 
@@ -551,7 +568,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-mysql-testproc.java@
+@parts/php-mysql-testproc.php@
 }}}
 }}}
 
@@ -594,7 +611,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-oracle-testproc-1value.java@
+@parts/php-oracle-testproc-1value.php@
 }}}
 }}}
 
@@ -622,7 +639,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-oracle-testproc-1value-output-param.java@
+@parts/php-oracle-testproc-1value-output-param.php@
 }}}
 }}}
 
@@ -654,7 +671,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-sybase-testproc-1value.java@
+@parts/php-sybase-testproc-1value.php@
 }}}
 }}}
 
@@ -682,7 +699,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-firebird-testproc-1value.java@
+@parts/php-firebird-testproc-1value.php@
 }}}
 }}}
 
@@ -694,7 +711,7 @@ variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-firebird-testproc-1value-output-param.java@
+@parts/php-firebird-testproc-1value-output-param.php@
 }}}
 }}}
 
@@ -725,7 +742,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-db2-testproc-1value.java@
+@parts/php-db2-testproc-1value.php@
 }}}
 }}}
 
@@ -753,7 +770,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-postgresql-testproc-1value.java@
+@parts/php-postgresql-testproc-1value.php@
 }}}
 }}}
 
@@ -782,7 +799,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-mysql-testproc-1value.java@
+@parts/php-mysql-testproc-1value.php@
 }}}
 }}}
 
@@ -811,7 +828,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-mysql-testproc-1value-result-set.java@
+@parts/php-mysql-testproc-1value-result-set.php@
 }}}
 }}}
 
@@ -839,7 +856,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-mysql-testproc-1value-output-param.java@
+@parts/php-mysql-testproc-1value-output-param.php@
 }}}
 }}}
 
@@ -879,7 +896,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-oracle-testproc-values.java@
+@parts/php-oracle-testproc-values.php@
 }}}
 }}}
 
@@ -907,7 +924,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-sybase-testproc-values.java@
+@parts/php-sybase-testproc-values.php@
 }}}
 }}}
 
@@ -935,7 +952,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-firebird-testproc-values.java@
+@parts/php-firebird-testproc-values.php@
 }}}
 }}}
 
@@ -947,7 +964,7 @@ bind variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-firebird-testproc-values-output-params.java@
+@parts/php-firebird-testproc-values-output-params.php@
 }}}
 }}}
 
@@ -975,7 +992,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-db2-testproc-values.java@
+@parts/php-db2-testproc-values.php@
 }}}
 }}}
 
@@ -1003,7 +1020,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-postgresql-testproc-values.java@
+@parts/php-postgresql-testproc-values.php@
 }}}
 }}}
 
@@ -1033,7 +1050,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-mysql-testproc-values.java@
+@parts/php-mysql-testproc-values.php@
 }}}
 }}}
 
@@ -1063,7 +1080,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-mysql-testproc-values-output-params.java@
+@parts/php-mysql-testproc-values-output-params.php@
 }}}
 }}}
 
@@ -1098,7 +1115,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-oracle-testproc-result-set.java@
+@parts/php-oracle-testproc-result-set.php@
 }}}
 }}}
 
@@ -1126,7 +1143,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-sybase-testproc-result-set.java@
+@parts/php-sybase-testproc-result-set.php@
 }}}
 }}}
 
@@ -1167,7 +1184,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-postgresql-testproc-result-set.java@
+@parts/php-postgresql-testproc-result-set.php@
 }}}
 }}}
 
@@ -1200,7 +1217,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/java-mysql-testproc-result-set.java@
+@parts/php-mysql-testproc-result-set.php@
 }}}
 }}}
 
@@ -1213,8 +1230,12 @@ To drop the stored procedure, run a query like the following.
 }}}
 
 
+
+
+
+
 [=#caching]
-= Caching The Result Set =
+== Caching The Result Set ==
 
 Say you're writing a web-based report where a query with a huge result set
 is executed and 20 rows are displayed per page.  Rather than rerunning the 
@@ -1225,22 +1246,61 @@ just open the file for each page of the report.
 First page:
 
 {{{#!blockquote
-{{{#!code
-@parts/java-caching-firstpage.java@
-}}}
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> generate a unique file name <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_cacheToFile<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>,</FONT><FONT color=#008b8b>filename</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_setCacheTtl<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<FONT color=#ff00ff>600</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_cacheOff<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> pass the filename to the next page <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
 }}}
 
 Second page:
 
 {{{#!blockquote
-{{{#!code
-@parts/java-caching-secondpage.java@
-}}}
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+
+     <B><FONT color=#a52a2a>...</FONT></B> get the filename from the previous page <B><FONT color=#a52a2a>...</FONT></B>
+
+     <B><FONT color=#a52a2a>...</FONT></B> get the page to display from the previous page <B><FONT color=#a52a2a>...</FONT></B>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_openCachedResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,filename<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>=$</FONT></B><FONT color=#008b8b>pagetodisplay</FONT><B><FONT color=#a52a2a>*</FONT></B><FONT color=#ff00ff>20</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>&lt;</FONT></B><FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>pagetodisplay</FONT><B><FONT color=#a52a2a>+</FONT></B><FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT><B><FONT color=#a52a2a>*</FONT></B><FONT color=#ff00ff>20</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+             <B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_colCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
+                     <FONT color=#008b8b>echo</FONT> sqlrcur_getField<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><FONT color=#6a5acd>)</FONT>;
+                     <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>,</FONT>&quot;;
+             <FONT color=#6a5acd>}</FONT>
+             <FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
+     <FONT color=#6a5acd>}</FONT>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
 }}}
 
 
 [=#suspending]
-= Suspending and Resuming Sessions =
+== Suspending and Resuming Sessions ==
 
 Sometimes web-based applications need a single database transaction to span
 multiple pages.  Since SQL Relay sessions can be suspended and resumed, this
@@ -1249,17 +1309,47 @@ is possible.
 First page:
 
 {{{#!blockquote
-{{{#!code
-@parts/java-suspend.java@
-}}}
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcur_suspendResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_suspendSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rs</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_getResultSetId<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_getConnectionPort<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_getConnectionSocket<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     <B><FONT color=#a52a2a>...</FONT></B> pass the rs, port <B><FONT color=#a52a2a>and</FONT></B> socket to the <FONT color=#008b8b>next</FONT> page <B><FONT color=#a52a2a>...</FONT></B>
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
 }}}
 
 Second page:
 
 {{{#!blockquote
-{{{#!code
-@parts/java-resume.java@
-}}}
+<PRE>
+<FONT color=#6a5acd>&lt;?</FONT>
+
+     <B><FONT color=#a52a2a>...</FONT></B> get rs, port <B><FONT color=#a52a2a>and</FONT></B> socket from previous page <B><FONT color=#a52a2a>...</FONT></B>
+
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcon_resumeSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_resumeResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rs</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>commit</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
+     sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+
+     sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
+     sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
+<FONT color=#6a5acd>?&gt;</FONT>
+</PRE>
 }}}
 
 You can also distribute the processing of a result set across a series of
@@ -1269,15 +1359,15 @@ can continue to retrieve rows from the result set.
 
 Similarly, if you're buffering a result set in chunks, caching that
 result set and suspend your session.  When you resume the session, you can
-continue caching the result set.  You must use resumeCachedResultSet()
-instead of resumeResultSet() however.
+continue caching the result set.  You must use sqlrcur_resumeCachedResultSet()
+instead of sqlrcur_resumeResultSet() however.
 
 [=#lastinsertid]
-= Getting the Last Insert ID =
+== Getting the Last Insert ID ==
 
 Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.
 
-SQL Relay provides the SQLRConnection.getLastInsertId() method to get this value.
+SQL Relay provides the sqlrcon_getLastInsertId() function to get this value.
 
 When using the SQLite database, you can also get the last insert id by running the query:
 

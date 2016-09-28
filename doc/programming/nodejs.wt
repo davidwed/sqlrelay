@@ -224,7 +224,7 @@ fields in the row.
 
 {{{#!blockquote
 {{{#!code
-@parts/nodejs-fields-as.js@
+@parts/nodejs-fields-row.js@
 }}}
 }}}
 
