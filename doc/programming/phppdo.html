@@ -1,43 +1,38 @@
 <html>
 <head>
-<title>firstworks   Programming with SQL Relay using the PHP PDO API</title>
-<link href="../css/styles.css" rel="stylesheet">
+	<title>Programming with SQL Relay using the PHP PDO API</title>
+	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-
-<span class="heading1">Programming with SQL Relay using the PHP PDO API</span><br><br>
+<h1>Programming with SQL Relay using the PHP PDO API</h1>
 
 <ul>
-<li><a href="#intro">Introduction</a></li>
-<li><a href="#config">Configuring PHP</a></li>
-<li><a href="#session">Establishing a Session</a></li>
-<li><a href="#query">Executing Queries</a></li>
-<li><a href="#transactions">Transactions</a></li>
-<li><a href="#temptables">Temporary Tables</a></li>
-<li><a href="#errors">Catching Errors</a></li>
-<li><a href="#bindvars">Bind Variables</a></li>
-<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
-<li><a href="#fields">Accessing Fields in the Result Set</a></li>
-<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
-<li><a href="#statements">Statements</a></li>
-<li><a href="#columns">Getting Column Information</a></li>
-<li><a href="#storedprocedures">Stored Procedures</a></li>
-<li><a href="#lastinsertid">Getting the Last Insert ID</a></li>
-<li><a href="#driverspecific">Driver-Specific Attributes</a></li>
-<li><a href="#drivermethods">Driver-Specific Methods</a></li>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#config">Configuring PHP</a></li>
+  <li><a href="#session">Establishing a Session</a></li>
+  <li><a href="#query">Executing Queries</a></li>
+  <li><a href="#transactions">Transactions</a></li>
+  <li><a href="#temptables">Temporary Tables</a></li>
+  <li><a href="#errors">Catching Errors</a></li>
+  <li><a href="#bindvars">Bind Variables</a></li>
+  <li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+  <li><a href="#fields">Accessing Fields in the Result Set</a></li>
+  <li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
+  <li><a href="#statements">Statements</a></li>
+  <li><a href="#columns">Getting Column Information</a></li>
+  <li><a href="#storedprocedures">Stored Procedures</a></li>
+  <li><a href="#lastinsertid">Getting the Last Insert ID</a></li>
+  <li><a href="#driverspecific">Driver-Specific Attributes</a></li>
+  <li><a href="#drivermethods">Driver-Specific Methods</a></li>
 </ul>
 
-<a name="intro"></a>
-<span class="heading2">Introduction</span><br><br>
+<a name="intro"/><h2>Introduction</h2>
 
 <p>PDO is a popular database abstraction layer for PHP.</p>
 
-<p>A <a href="http://www.php.net/manual/en/book.pdo.php">good PDO guide and
-reference</a> can be found on the PHP site but a short discussion of it
-follows here as well.</p>
+<p>A <a target="_blank" href="http://www.php.net/manual/en/book.pdo.php">good PDO guide and reference</a> can be found on the PHP site but a short discussion of it follows here as well.</p>
 
-<a name="config"></a>
-<span class="heading2">Configuring PHP</span><br><br>
+<a name="config"/><h2>Configuring PHP</h2>
 
 <p>To use the SQL Relay PDO driver, PHP must be configured to load the
 appropriate module - pdo_sqlrelay.so on Linux or Unix and php_pdo_sqlrelay.dll
@@ -48,7 +43,7 @@ or Solaris with PHP installed from a package, then the installation process
 should have configured PHP correctly and you can probably ignore the rest of
 this section.</p>
 
-</p>But on other operating sytems, or if you built PHP from source, or if the
+<p>But on other operating sytems, or if you built PHP from source, or if the
 installation process didn't go smoothly, then you may have to configure PHP
 manually.</p>
 
@@ -56,59 +51,65 @@ manually.</p>
 of the file may vary though.  Here are some common locations, by platform.</p>
 
 <ul>
-<li><b>Linux</b> - /etc/php.ini</li>
-<li><b>Solaris</b> - /etc/php/&lt;php version&gt;/php.ini</li>
-<li><b>FreeBSD</b> - /usr/local/etc/php.ini</li>
-<li><b>NetBSD</b> - /usr/pkg/etc/php.ini</li>
-<li><b>OpenBSD</b> - /etc/php-&lt;php version&gt;.ini</li>
-<li><b>Windows</b> - C:\Windows\php.ini</li>
+  <li><b>Linux</b> - /etc/php.ini</li>
+  <li><b>Solaris</b> - /etc/php/&lt;php version&gt;/php.ini</li>
+  <li><b><a href="FreeBSD">FreeBSD</a></b> - /usr/local/etc/php.ini</li>
+  <li><b><a href="NetBSD">NetBSD</a></b> - /usr/pkg/etc/php.ini</li>
+  <li><b><a href="OpenBSD">OpenBSD</a></b> - /etc/php-&lt;php version&gt;.ini</li>
+  <li><b>Windows</b> - C:\Windows\php.ini</li>
 </ul>
 
 <p>To load the php module on Linux or Unix, you usually just need to add lines
 to the configuration file like:</p>
 
 <blockquote>
-<pre>
-extension=pdo.so
-extension=pdo_sqlrelay.so
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>extension<font color="#990000">=</font>pdo<font color="#990000">.</font>so
+extension<font color="#990000">=</font>pdo_sqlrelay<font color="#990000">.</font>so
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>To load the php module on Windows, you usually need to add lines like:</p>
 
 <blockquote>
-<pre>
-extension_dir=C:\PHP\ext
-extension=php_pdo.dll
-extension=php_pdo_sqlrelay.dll
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>extension_dir<font color="#990000">=</font>C<font color="#990000">:\</font>PHP<font color="#990000">\</font>ext
+extension<font color="#990000">=</font>php_pdo<font color="#990000">.</font>dll
+extension<font color="#990000">=</font>php_pdo_sqlrelay<font color="#990000">.</font>dll
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>(the <i>extension_dir</i> value might need to be changed, depending on where PHP is installed on your system)</p>
 
-<p>It is possible, even likely that the configuration file already contains a 
-line to load the pdo.so (or php_pdo.dll) module, so look through the file and
-verify whether it is or not before loading it again.</p>
+<p>It is possible, even likely that the configuration file already contains a line to load the pdo.so (or php_pdo.dll) module, so look through the file and verify whether it is or not before loading it again.</p>
 
-<p>Also, some Linux and Unix distributions have PDO compiled directly into the
-PHP module or binary and don't require pdo.so module to be loaded at all.  If
-you built PHP from source with the default options then this is likely.  You
-can verify this by running:</p>
+<p>Also, some Linux and Unix distributions have PDO compiled directly into the PHP module or binary and don't require pdo.so module to be loaded at all.  If you built PHP from source with the default options then this is likely.  You can verify this by running:</p>
 
 <blockquote>
-<pre>
-strings &lt;path-to-php-binary&gt;/php | grep "PDO drivers"
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>strings <font color="#990000">&lt;</font>path<font color="#990000">-</font>to<font color="#990000">-</font>php<font color="#990000">-</font>binary<font color="#990000">&gt;/</font>php <font color="#990000">|</font> grep <font color="#FF0000">"PDO drivers"</font>
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>If PDO is built-in then it should return something like:</p>
 
 <blockquote>
-<pre>
-You MUST load PDO before loading any PDO drivers
+  <pre>You MUST load PDO before loading any PDO drivers
 </pre>
-</blockquote>
 
+</blockquote>
 <p>And if that wasn't complex enough, some PHP distributions on Linux or Unix
 have configuration directories.  PHP parses the php.ini file first, then goes
 alphabetically through the files in the configuration directory.  The
@@ -119,31 +120,35 @@ then you'll have to either add the lines above to the end of that same file or
 create a new pdo_sqlrelay.ini file that contains the lines to load
 pdo_sqlrelay.so or php_pdo_sqlrelay.dll</p>
 
-<a name="session"></a>
-<span class="heading2">Establishing a Session</span><br><br>
+<a name="session"/><h2>Establishing a Session</h2>
 
 <p>To use SQL Relay, you have to identify the connection that you intend to 
 use.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>The following connect string variables control attributes of the connection:</p>
 
 <ul>
-<li><b>host</b> - The SQL Relay server to connect to.</li>
-<li><b>port</b> - The port that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
-<li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
-<li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
-<li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
-<li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
-<li><b>lazyconnect</b> - By default, the SQL Relay client does "lazy connects".  I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run.  This optimizes availability of the connection pool but is inconstent with most other database API's.  Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning 0, if the connection cannot be established.  Defaults to 1.</li>
+  <li><b>host</b> - The SQL Relay server to connect to.</li>
+  <li><b>port</b> - The port that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+  <li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+  <li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
+  <li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
+  <li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
+  <li><b>lazyconnect</b> - By default, the SQL Relay client does "lazy connects".  I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run.  This optimizes availability of the connection pool but is inconstent with most other database API's.  Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning 0, if the connection cannot be established.  Defaults to 1.</li>
 </ul>
 
 <p>In addition, the following connect string variables can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
@@ -151,10 +156,10 @@ if (!$dbh) {
 <p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about Kerberos and Active Directory configurations.  In particular, the user and password are usually left as empty strings or null when using Kerberos/AD.</p>
 
 <ul>
-<li><b>krb</b> - Set to <b>yes</b> to enable Kerberos/AD encryption/authentication or <b>no</b> to disable it.</li>
-<li><b>krbservice</b> - Specifies the Kerberos service name of the SQL Relay server.  If omitted or left empty then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</li>
-<li><b>krbmech</b> - Specifies the Kerberos mechanism to use.  On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as: { 1 2 840 113554 1 2 2 }.  On Windows platforms, this should be a string like: Kerberos.  If omitted or left empty then the default mechanism will be used.  Only set this if you know that you have a good reason to.</li>
-<li><b>krbflags</b> - Specifies what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used.  Only set this if you know that you have a good reason to.  Valid flags include: GSS_C_MUTUAL_FLAG, GSS_C_REPLAY_FLAG, GSS_C_SEQUENCE_FLAG, GSS_C_CONF_FLAG, and GSS_C_INTEG_FLAG.  For a full list of flags, consult the GSSAPI documentation, though note that only the previously listed flags are supported on Windows.</li>
+  <li><b>krb</b> - Set to <b>yes</b> to enable Kerberos/AD encryption/authentication or <b>no</b> to disable it.</li>
+  <li><b>krbservice</b> - Specifies the Kerberos service name of the SQL Relay server.  If omitted or left empty then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</li>
+  <li><b>krbmech</b> - Specifies the Kerberos mechanism to use.  On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as: { 1 2 840 113554 1 2 2 }.  On Windows platforms, this should be a string like: Kerberos.  If omitted or left empty then the default mechanism will be used.  Only set this if you know that you have a good reason to.</li>
+  <li><b>krbflags</b> - Specifies what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used.  Only set this if you know that you have a good reason to.  Valid flags include: GSS_C_MUTUAL_FLAG, GSS_C_REPLAY_FLAG, GSS_C_SEQUENCE_FLAG, GSS_C_CONF_FLAG, and GSS_C_INTEG_FLAG.  For a full list of flags, consult the GSSAPI documentation, though note that only the previously listed flags are supported on Windows.</li>
 </ul>
 
 <p>The following connect string variables can be used to establish TLS/SSL encryption and authentication with the server:</p>
@@ -162,13 +167,13 @@ if (!$dbh) {
 <p>See the <a href="../admin/configguide.html#tls">SQL Relay Configuration Guide</a> for more information about TLS/SSL configurations.</p>
 
 <ul>
-<li><b>tls</b> - Set to <b>yes</b> to enable TLS/SSL encryption/authentication or <b>no</b> to disable it.</li>
-<li><b>tlsversion</b> - Specifies the TLS/SSL protocol version that the client will attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If omittted or left empty then the highest supported version will be negotiated.</li>
-<li><b>tlscert</b> - Specifies the file name of the certificate chain file to send to the SQL Relay server.  This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.</li>
-<li><b>tlspassword</b> - If tlscert contains a password-protected private key, then tlspassword may be supplied to access it.  If the private key is not password-protected, then this argument is ignored, and may be omitted or left empty.</li>
-<li><b>tlsciphers</b> - Specifies a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If omitted or left empty then a default set is used.  For a list of valid ciphers on Linux/Unix platforms, see: man ciphers. For a list of valid ciphers on Windows platforms, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx">this page</a>.  On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes.  For example: 3DES_112.  Only set this if you know that you have a good reason to.</p>
-<li><b>tlsvalidate</b> - Indicates whether to validate the SQL Relay server's certificate, and may be set to one of the following: <b>no</b> - Don't validate the server's certificate.  <b>ca</b> - Validate that the server's certificate was signed by a trusted certificate authority.  <b>ca+host</b> - Perform "ca" validation and also validate that one of the subject altenate names (or the common name if no SANs are present) in the certificate matches the host parameter.  (Falls back to "ca" validation when a unix socket is used.)  <b>ca+domain</b> - Perform "ca" validation and also validate that the domain name of one of the subject alternate names (or the common name if no SANs are present) in the certificate matches the domain name of the host parameter.  (Falls back to "ca" validation when a unix socket is used.)</li>
-<li><b>tlsca</b> - Specifies the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate.  This is useful if the SQL Relay server's certificate is self-signed.  On Windows, "ca" must be a file name.  On non-Windows systems, "ca" can be either a file or  directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.</li>
+  <li><b>tls</b> - Set to <b>yes</b> to enable TLS/SSL encryption/authentication or <b>no</b> to disable it.</li>
+  <li><b>tlsversion</b> - Specifies the TLS/SSL protocol version that the client will attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If omittted or left empty then the highest supported version will be negotiated.</li>
+  <li><b>tlscert</b> - Specifies the file name of the certificate chain file to send to the SQL Relay server.  This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.</li>
+  <li><b>tlspassword</b> - If tlscert contains a password-protected private key, then tlspassword may be supplied to access it.  If the private key is not password-protected, then this argument is ignored, and may be omitted or left empty.</li>
+  <li><b>tlsciphers</b> - Specifies a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If omitted or left empty then a default set is used.  For a list of valid ciphers on Linux/Unix platforms, see: man ciphers. For a list of valid ciphers on Windows platforms, see <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx">this page</a>.  On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes.  For example: 3DES_112.  Only set this if you know that you have a good reason to.</li>
+  <li><b>tlsvalidate</b> - Indicates whether to validate the SQL Relay server's certificate, and may be set to one of the following: <b>no</b> - Don't validate the server's certificate.  <b>ca</b> - Validate that the server's certificate was signed by a trusted certificate authority.  <b>ca+host</b> - Perform "ca" validation and also validate that one of the subject altenate names (or the common name if no SANs are present) in the certificate matches the host parameter.  (Falls back to "ca" validation when a unix socket is used.)  <b>ca+domain</b> - Perform "ca" validation and also validate that the domain name of one of the subject alternate names (or the common name if no SANs are present) in the certificate matches the domain name of the host parameter.  (Falls back to "ca" validation when a unix socket is used.)</li>
+  <li><b>tlsca</b> - Specifies the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate.  This is useful if the SQL Relay server's certificate is self-signed.  On Windows, "ca" must be a file name.  On non-Windows systems, "ca" can be either a file or  directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.</li>
 </ul>
 
 <p>Note that the supported tlscert and tlsca file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.</p>
@@ -176,9 +181,9 @@ if (!$dbh) {
 <p>These additional connect string variables control the default statement attributes:</p>
 
 <ul>
-<li><b>resultsetbuffersize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
-<li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
-<li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.</li>
+  <li><b>resultsetbuffersize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
+  <li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
+  <li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.</li>
 </ul>
 
 <p>Setting one of the statement attribute connect string variables has the same effect as if the corresponding statement handle attribute were set immediately after creating each statement.  See <a href="#driverspecific">Driver-Specific Attributes</a> below.</p>
@@ -186,8 +191,8 @@ if (!$dbh) {
 <p>The other two parameters following the connect string are.</p>
 
 <ul>
-<li><b>user</b> - The username to use when logging into SQL Relay.</li>
-<li><b>password</b> - The password to use when logging into SQL Relay.</li>
+  <li><b>user</b> - The username to use when logging into SQL Relay.</li>
+  <li><b>password</b> - The password to use when logging into SQL Relay.</li>
 </ul>
 
 <p>After calling the constructor, a session is established when the first 
@@ -197,42 +202,50 @@ query or other operation is run, unless lazyconnects=0 is used.</p>
 connections, so care should be taken to minimize the length of a
 session.</p>
 
-<a name="query"></a>
-<span class="heading2">Executing Queries</span><br><br>
+<a name="query"/><h2>Executing Queries</h2>
 
 <p>Call exec() to run a query and return the number of rows affected.  This is
 best used with DML or DDL queries.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-if (!$dbh->exec("insert into testtable values (1,'hello')")) {
-	die("exec failed");
-}
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">exec</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (1,'hello')"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"exec failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>Call query() to run a query and return a statement object which can be used
 to fetch the result set.  This is best used with selects or other queries that
 return result sets.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->query("select * from testtable"));
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testtable"</font><font color="#990000">));</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
-<a name="transactions"></a>
-<span class="heading2">Transactions</span><br><br>
+</blockquote>
+<a name="transactions"/><h2>Transactions</h2>
 
 <p>Run begin() to start a transaction.  To complete a transaction, run commit()
 or rollBack().  You should use the commit() and rollBack() functions rather than
@@ -247,51 +260,65 @@ have no commit or rollback functions, the calls do nothing and the database
 throws no error.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$dbh->beginTransaction();
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">beginTransaction</font></b><font color="#990000">();</font>
 
-... run some queries that we want to keep the results of ...
+<font color="#990000">...</font> run some queries that we want to keep the <font color="#008080">results</font> of <font color="#990000">...</font>
 
-$dbh->commit();
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">commit</font></b><font color="#990000">();</font>
 
-$dbh->beginTransaction();
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">beginTransaction</font></b><font color="#990000">();</font>
 
-... run some queries that we don't want to keep the results of ...
+<font color="#990000">...</font> run some queries that <font color="#008080">we</font> don<font color="#FF0000">'t want to keep the results of ...</font>
 
-$dbh->rollBack();
+<font color="#FF0000">$dbh-&gt;rollBack();</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>You can also turn Autocommit on or off using the setAttribute() method.</p>
 
 <p>The following command turns Autocommit on.</p>
 
 <blockquote>
-<pre>
-$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,TRUE);
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">setAttribute</font></b><font color="#990000">(</font>PDO<font color="#990000">::</font>ATTR_AUTOCOMMIT<font color="#990000">,</font>TRUE<font color="#990000">);</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>The following command turns Autocommit off.</p>
 
 <blockquote>
-<pre>
-$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE);
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">setAttribute</font></b><font color="#990000">(</font>PDO<font color="#990000">::</font>ATTR_AUTOCOMMIT<font color="#990000">,</font>FALSE<font color="#990000">);</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>When Autocommit is on, the database performs a commit after each successful
 DML or DDL query.  When Autocommit is off, the database commits when the client
 instructs it to, or (by default) when a client disconnects.  For databases that
 don't support Autocommit, setting Autocommit on or off has no effect.</p>
 
-<a name="temptables"></a>
-<span class="heading2">Temporary Tables</span><br><br>
+<a name="temptables"/><h2>Temporary Tables</h2>
 
 <p>Some databases support temporary tables.  That is, tables which are
 automatically dropped or truncated when an application closes its connection
@@ -315,16 +342,15 @@ according to the rules for that database.</p>
 SQL Relay in the same manner that they would work if the application connected
 directly to the database.</p>
 
-<a name="errors"></a>
-<span class="heading2">Catching Errors</span><br><br>
+<a name="errors"/><h2>Catching Errors</h2>
 
 <p>Most PDO methods return a value indicating that they failed.  There are 3
 options for error handling too that can be set using setAttribute().</p>
 
 <ul>
-<li>PDO::ERRMODE_WARNING - raise an E_WARNING on error</li>
-<li>PDO::ERRMODE_EXCEPTION - throw an exception on error</li>
-<li>PDO::ERRMODE_SILENT - just set error codes</li>
+  <li>PDO::ERRMODE_WARNING - raise an E_WARNING on error</li>
+  <li>PDO::ERRMODE_EXCEPTION - throw an exception on error</li>
+  <li>PDO::ERRMODE_SILENT - just set error codes</li>
 </ul>
 
 <p>After determining that an error has occurred you can find out why by
@@ -332,53 +358,62 @@ calling errorCode() or errorInfo() on the database handle or statement
 objects.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-if (!$dbh->exec("insert into testtable values (1,1.1,'hello')")) {
-	die($dbh->errorCode().":".$dbh->errorInfo());
-}
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">exec</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (1,1.1,'hello')"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">errorCode</font></b><font color="#990000">().</font><font color="#FF0000">":"</font><font color="#990000">.</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">errorInfo</font></b><font color="#990000">());</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("bad query");
-if ($stmt->execute()) {
-	die($stmt->errorCode().":".$stmt->errorInfo());
-}
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"bad query"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">errorCode</font></b><font color="#990000">().</font><font color="#FF0000">":"</font><font color="#990000">.</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">errorInfo</font></b><font color="#990000">());</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
-<a name="bindvars"></a>
-<span class="heading2">Bind Variables</span><br><br>
+</blockquote>
+<a name="bindvars"/><h2>Bind Variables</h2>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
 of the query is dynamically generated.  The PDO API provides means for
 using bind variables (also known as parameters) in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
-<a href="binds.html">this document</a>.
+<a href="binds.html">this document</a>.</p>
 
 <p>PDO provides several means for using bind variables but in all cases, you
 must bind variable/value pairs to the statement.  Here is an example of using
 the bindValue() method.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
-$stmt->bindValue(":var",1,PDO::PARAM_INT);
-$stmt->bindValue(":var","1.1",PDO::PARAM_STR);
-$stmt->bindValue(":var","hello",PDO::PARAM_STR);
-$stmt->bindValue(":var","hello",PDO::PARAM_LOB);
-$stmt->execute();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (:var1,:var2,:var3,:var4)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_LOB<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>(Note: these examples use colon-delimited variable names.  These are not supported by all databases.  See "A few words about the format of bind variables..." below for more information.)</p>
 
 <p>PDO supports binding integer, string and LOB values.  Oddly, it doesn't
@@ -389,44 +424,57 @@ Also, CLOB's have to be passed as LOB's.</p>
 array into the execute() method.  See the official PDO documentation for info
 on those methods.</p>
 
-<p>Output bind variables can be used too.  Just or the PDO::PARAM_INPUT_OUTPUT
-flag with the variable type.</p>
+<dl>
+  <dt>Output bind variables can be used too.  Just or the PDO</dt>
+  <dd>PARAM_INPUT_OUTPUT
+flag with the variable type.</dd>
+</dl>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; end;");
-$param1=0;
-$param2="";
-$stmt->bindParam(":numvar",$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$stmt->bindParam(":stringvar",$param2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
-$stmt->execute();
-echo($param1.",".$param2);
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"begin  :numvar:=1; :stringvar:='hello'; end;"</font><font color="#990000">);</font>
+$param1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$param2<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":numvar"</font><font color="#990000">,</font>$param1<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":stringvar"</font><font color="#990000">,</font>$param2<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$param1<font color="#990000">.</font><font color="#FF0000">","</font><font color="#990000">.</font>$param2<font color="#990000">);</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>BLOB's output binds can be used as well.  PDO returns BLOB values as
 streams, so you have to use stream functions to access them.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("select blob_col into :blobvar from testtable");
-$blobvar="";
-$stmt->bindParam(":blobvar",$blobvar,PDO::PARAM_LOB|PDO::PARAM_INPUT_OUTPUT);
-$stmt->execute();
-echo(stream_get_contents($blobvar));
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select blob_col into :blobvar from testtable"</font><font color="#990000">);</font>
+$blobvar<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":blobvar"</font><font color="#990000">,</font>$blobvar<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_LOB<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$blobvar<font color="#990000">));</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>PDO allows you to bind by name and by position.  So, you can pass either
 a variable name or a number as the first parameter of bindParam().  When
 binding by position, the first bind parameter is number 1, not 0.</p>
@@ -442,54 +490,97 @@ binding by position, the first bind parameter is number 1, not 0.</p>
 <p>With Oracle:</p>
 
 <blockquote>
-insert into testtable values (:var1,:var2,:var3,:var4)
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font>var1<font color="#990000">,:</font>var2<font color="#990000">,:</font>var3<font color="#990000">,:</font>var4<font color="#990000">)</font>
+</tt></pre>
+</pre>
 
+</blockquote>
 <p>or</p>
 
 <blockquote>
-insert into testtable values (:1,:2,:3,:4)
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font><font color="#993399">1</font><font color="#990000">,:</font><font color="#993399">2</font><font color="#990000">,:</font><font color="#993399">3</font><font color="#990000">,:</font><font color="#993399">4</font><font color="#990000">)</font>
+</tt></pre>
+</pre>
 
+</blockquote>
 <p>With Sybase and MS SQL Server:</p>
 
 <blockquote>
-insert into testtable values (@var1,@var2,@var3,@var4)
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@var1<font color="#990000">,</font>@var2<font color="#990000">,</font>@var3<font color="#990000">,</font>@var4<font color="#990000">)</font>
+</tt></pre>
+</pre>
 
-<p>With DB2, MySQL and Firebird:</p>
+</blockquote>
+<p>With DB2, <a href="MySQL">MySQL</a> and Firebird:</p>
 
 <blockquote>
-insert into testtable values (?,?,?,?)
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(?,?,?,?)</font>
+</tt></pre>
+</pre>
 
-<p>With PostgreSQL:</p>
+</blockquote>
+<p>With <a href="PostgreSQL">PostgreSQL</a>:</p>
 
 <blockquote>
-insert into testtable values ($1,$2,$3,$4)
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>$<font color="#993399">1</font><font color="#990000">,</font>$<font color="#993399">2</font><font color="#990000">,</font>$<font color="#993399">3</font><font color="#990000">,</font>$<font color="#993399">4</font><font color="#990000">)</font>
+</tt></pre>
+</pre>
 
+</blockquote>
 <p>With SQLite:</p>
 
 <blockquote>
-insert into testtable values (:var1,:var2,:var3,:var4)
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font>var1<font color="#990000">,:</font>var2<font color="#990000">,:</font>var3<font color="#990000">,:</font>var4<font color="#990000">)</font>
+</tt></pre>
+</pre>
 
+</blockquote>
 <p>or</p>
 
 <blockquote>
-insert into testtable values (?,?,?,?)
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(?,?,?,?)</font>
+</tt></pre>
+</pre>
+
 </blockquote>
-
-
-<p>However...</p>
+<br/><p>However...</p>
 
 <p>Another solution is to configure SQL Relay to translate bind variables by setting translatebindvariables="yes" in the sqlrelay.conf file for the instance you're using.  Simply put, this parameter makes every database support every bind variable format.  See the <a href="../admin/configreference.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
 
-<p>A third solution is to configure PDO to emulate prepares by setting the PDO::ATTR_EMULATE_PREPARES attribute to true.  When the SQL Relay driver sees that this is set true, it rewrites the queries and translates the bind variables to substitution variables.  This solution also makes every database support every bind variable format, but the translation is done on the client-side.  Unfortunately it doesn't work with output bind variables.</p>
+<dl>
+  <dt>A third solution is to configure PDO to emulate prepares by setting the PDO</dt>
+  <dd>ATTR_EMULATE_PREPARES attribute to true.  When the SQL Relay driver sees that this is set true, it rewrites the queries and translates the bind variables to substitution variables.  This solution also makes every database support every bind variable format, but the translation is done on the client-side.  Unfortunately it doesn't work with output bind variables.</dd>
+</dl>
 
-<a name="rebinding"></a>
-<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+<a name="rebinding"/><h2>Re-Binding and Re-Execution</h2>
 
 <p>Another feature of the prepare/bind/execute paradigm is the ability to 
 prepare, bind and execute a query once, then re-bind and re-execute the query 
@@ -497,35 +588,42 @@ over and over without re-preparing it.  If your backend database natively
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("insert into testtable values (:var1,:var2,:var3)");
-$stmt->bindValue(":var",1,PDO::PARAM_INT);
-$stmt->bindValue(":var","1.1",PDO::PARAM_STR);
-$stmt->bindValue(":var","hello",PDO::PARAM_STR);
-$stmt->execute();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (:var1,:var2,:var3)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
-$stmt->bindValue(":var",2,PDO::PARAM_INT);
-$stmt->bindValue(":var","2.2",PDO::PARAM_STR);
-$stmt->bindValue(":var","bye",PDO::PARAM_STR);
-$stmt->execute();
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"2.2"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"bye"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
-... re-bind and re-execute again and again ...
+<font color="#990000">...</font> re<font color="#990000">-</font>bind <font color="#008080">and</font> re<font color="#990000">-</font>execute again <font color="#008080">and</font> again <font color="#990000">...</font>
+
+</tt></pre>
 </pre>
+
 </blockquote>
+<a name="fields"/><h2>Accessing Fields in the Result Set</h2>
 
-<a name="fields"></a>
-<span class="heading2">Accessing Fields in the Result Set</span><br><br>
-
-<p>To fetch a row from a statement that has been executed, call the fetch()
+<dl>
+  <dt>To fetch a row from a statement that has been executed, call the fetch()
 method.  When called with no parameters, fetch() returns an array of fields
-with both numeric and associative entries.  When called with the PDO::FETCH_NUM
+with both numeric and associative entries.  When called with the PDO</dt>
+  <dd>FETCH_NUM
 flag, it returns an array with only numeric entries.  When called with the
-PDO::FETCH_ASSOC flag, it returns an array with only associative entries.</p>
+PDO::FETCH_ASSOC flag, it returns an array with only associative entries.</dd>
+</dl>
 
 <p>LOB values are returned as streams, just like output bind parameters.</p>
 
@@ -533,105 +631,130 @@ PDO::FETCH_ASSOC flag, it returns an array with only associative entries.</p>
 arrays (the default).</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->query("select int_col, float_col, string_col, blob_col from testtable");
-$result=$stmt->fetch();
-echo($result[0].",".$result[1].",".$result[2].",".stream_get_contents($result[3])."\n");
-echo($result["int_col"].",".$result["float_col"].",".$result["string_col"].",".stream_get_contents("blob_col")."\n");
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">]).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#FF0000">"int_col"</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#FF0000">"float_col"</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#FF0000">"string_col"</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font><font color="#FF0000">"blob_col"</font><font color="#990000">).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
-<p>The bindColumn() method and PDO::FETCH_BOUND flag can be used to fetch
-values into preallocated variables.</p>
+</blockquote>
+<dl>
+  <dt>The bindColumn() method and PDO</dt>
+  <dd>FETCH_BOUND flag can be used to fetch
+values into preallocated variables.</dd>
+</dl>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
 
-$col1=0;
-$col2="";
-$col3="";
-$col4="";
-$stmt->bindColumn(1,$col1);
-$stmt->bindColumn(2,$col2);
-$stmt->bindColumn(3,$col3);
-$stmt->bindColumn(4,$col4);
+$col1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$col2<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$col3<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$col4<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindColumn</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font>$col1<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindColumn</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font>$col2<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindColumn</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font>$col3<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindColumn</font></b><font color="#990000">(</font><font color="#993399">4</font><font color="#990000">,</font>$col4<font color="#990000">);</font>
 
-$stmt->execute();
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
-$result=$stmt->fetch(PDO::FETCH_BOUND);
-echo($col1.",".$col2.",".$col3.",".stream_get_contents($col4)."\n");
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">(</font>PDO<font color="#990000">::</font>FETCH_BOUND<font color="#990000">);</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$col1<font color="#990000">.</font><font color="#FF0000">","</font><font color="#990000">.</font>$col2<font color="#990000">.</font><font color="#FF0000">","</font><font color="#990000">.</font>$col3<font color="#990000">.</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$col4<font color="#990000">).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
 
-$result=$stmt->fetch(PDO::FETCH_BOUND);
-echo($col1.",".$col2.",".$col3.",".stream_get_contents($col4)."\n");
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">(</font>PDO<font color="#990000">::</font>FETCH_BOUND<font color="#990000">);</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$col1<font color="#990000">.</font><font color="#FF0000">","</font><font color="#990000">.</font>$col2<font color="#990000">.</font><font color="#FF0000">","</font><font color="#990000">.</font>$col3<font color="#990000">.</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$col4<font color="#990000">).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>The PDO API also provides the fetchAll() convenience function for fetching
 an entire result set in one step.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
-$stmt->execute();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
-$result=$stmt->fetchAll();
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetchAll</font></b><font color="#990000">();</font>
 
-echo($result[0][0].",".$result[0][1].",".$result[0][2].",".stream_get_contents($result[0][3])."\n");
-echo($result[1][0].",".$result[1][1].",".$result[1][2].",".stream_get_contents($result[1][3])."\n");
-echo($result[2][0].",".$result[2][1].",".$result[2][2].",".stream_get_contents($result[2][3])."\n");
-... and so on ...
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#993399">0</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#993399">1</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#993399">2</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#993399">3</font><font color="#990000">]).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">][</font><font color="#993399">0</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">][</font><font color="#993399">1</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">][</font><font color="#993399">2</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">][</font><font color="#993399">3</font><font color="#990000">]).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">][</font><font color="#993399">0</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">][</font><font color="#993399">1</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">][</font><font color="#993399">2</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">][</font><font color="#993399">3</font><font color="#990000">]).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<font color="#990000">...</font> and <font color="#008080">so</font> on <font color="#990000">...</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>The fetchColumn() method allows you to fetch a single column of the result
 set too.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
-$stmt->execute();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
-$result=$stmt->fetchColumn(0);
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetchColumn</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
 
-echo($result[0]."\n");
-echo($result[1]."\n");
-echo($result[2]."\n");
-... and so on ...
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">].</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">].</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">].</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+<font color="#990000">...</font> and <font color="#008080">so</font> on <font color="#990000">...</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
-<a name="largeresultsets"></a>
-<span class="heading2">Dealing With Large Result Sets</span><br><br>
+</blockquote>
+<a name="largeresultsets"/><h2>Dealing With Large Result Sets</h2>
 
 <p>SQL Relay normally buffers the entire result set.  This can speed things up 
 at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
 
-<p>Use the connect string variable "resultsetbuffersize" or the statement
-attribute PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE to set the number of rows
+<dl>
+  <dt>Use the connect string variable "resultsetbuffersize" or the statement
+attribute PDO</dt>
+  <dd>SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE to set the number of rows
 to buffer at a time.  Calls to fetch() cause the chunk containing the requested
 field to be fetched.  Rows in that chunk are accessible but rows before it are
-not.</p>
+not.</dd>
+</dl>
 
 <p>For example, if you set the result set buffer size to 5 and execute a query
 that returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14,
@@ -642,21 +765,30 @@ row.</p>
 <p>The following code sets the result set buffer size to 5.</p>
 
 <blockquote>
-<pre>
-$stmt->setAttribute(PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE,5);
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">setAttribute</font></b><font color="#990000">(</font>PDO<font color="#990000">::</font>SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE<font color="#990000">,</font><font color="#993399">5</font><font color="#990000">);</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>The following code retrieves the result set buffer size.</p>
 
 <blockquote>
-<pre>
-$rsbs=$stmt->getAttribute(PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE);
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$rsbs<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">getAttribute</font></b><font color="#990000">(</font>PDO<font color="#990000">::</font>SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE<font color="#990000">);</font>
 
-<a name="statements"></a>
-<span class="heading2">Statements</span><br><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<a name="statements"/><h2>Statements</h2>
 
 <p>It's possible to execute new queries while processing the result
 set of another query.  You can select rows from a table in one query, then 
@@ -666,55 +798,63 @@ iterate through its result set, inserting rows into another table, using only
 <p>For example:</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt1=$dbh->prepare("select * from table1");
-$stmt2=$dbh->prepare("insert into table2 values (:col1, :col2, :col3)");
+$stmt1<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from table1"</font><font color="#990000">);</font>
+$stmt2<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"insert into table2 values (:col1, :col2, :col3)"</font><font color="#990000">);</font>
 
-$stmt1->execute();
+$stmt1<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
-while ($result=$stmt1->fetch()) {
+<b><font color="#0000FF">while</font></b> <font color="#990000">(</font>$result<font color="#990000">=</font>$stmt1<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
 
-	$stmt2->bindValue(":col1",$result[0],PDO::PARAM_INT);
-	$stmt2->bindValue(":col2",$result[1],PDO::PARAM_STR);
-	$stmt2->bindValue(":col3",$result[2],PDO::PARAM_STR);
+	$stmt2<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":col1"</font><font color="#990000">,</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">);</font>
+	$stmt2<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":col2"</font><font color="#990000">,</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
+	$stmt2<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":col3"</font><font color="#990000">,</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">],</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
 
-	$stmt2->execute();
-}
+	$stmt2<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
-<a name="columns"></a>
-<span class="heading2">Getting Column Information</span><br><br>
+</blockquote>
+<a name="columns"/><h2>Getting Column Information</h2>
 
 <p>After executing a query, the column count may be retrieved using
 columnCount().  An associative array of column data, including column name,
 type, length and various flags are available from getColumnMeta().</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-if (!$dbh) {
-	die("connection failed");
-}
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
+	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
+<font color="#FF0000">}</font>
 
-$stmt=$dbh->query("select * from testtable"));
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testtable"</font><font color="#990000">));</font>
 
-for ($i=0; $i<$stmt->columnCount(); $i++) {
+<b><font color="#0000FF">for</font></b> <font color="#990000">(</font>$i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> $i<font color="#990000">&lt;</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">columnCount</font></b><font color="#990000">();</font> $i<font color="#990000">++)</font> <font color="#FF0000">{</font>
 
-	$meta=$stmt->getColumnMeta($i);
+	$meta<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">getColumnMeta</font></b><font color="#990000">(</font>$i<font color="#990000">);</font>
 
-	... do something with $meta ...
-}
+	<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> <font color="#008080">something</font> with $meta <font color="#990000">...</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
-<a name="storedprocedures"></a>
-<span class="heading2">Stored Procedures</span><br><br>
+</blockquote>
+<br/><a name="storedprocedures"/><h2>Stored Procedures</h2>
 
 <p>Many databases support stored procedures.  Stored procedures are sets of
 queries and procedural code that are executed inside of the database itself.
@@ -736,230 +876,315 @@ several categories, based on the values that they return.  Some stored
 procedures don't return any values, some return a single value, some return
 multiple values and some return entire result sets.</p>
 
-<span class="heading3">No Values</span><br>
+<h3>No Values</h3>
 
 <p>Some stored procedures don't return any values.  Below are examples,
 illustrating how to create, execute and drop this kind of stored procedure for
 each database that SQL Relay supports.</p>
 
-<span class="heading4">Oracle</span><br>
+<h4>Oracle</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("begin testproc(:in1,:in2,:in3); end;");
-$stmt->bindValue(":in1",1);
-$stmt->bindValue(":in2","1.1");
-$stmt->bindValue(":in3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3); end;"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+<br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>) <font color="#6b59ce">as</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (@in1,@in2,@in3)
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("exec testproc");
-$stmt->bindValue("@in1",1);
-$stmt->bindValue("@in2","1.1");
-$stmt->bindValue("@in3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
-<span class="heading4">Firebird</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
-        suspend;
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+        suspend<font color="#990000">;</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("execute procedure testproc ?, ?, ?");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$result=$stmt->execute();
-</pre>
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
-<span class="heading4">DB2</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("call testproc(?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
-<span class="heading4">Postgresql</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns void <font color="#6b59ce">as</font> '
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> ($<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font>);
-        <font color="#6b59ce">return</font>;
-<font color="#6b59ce">end</font>;' language plpgsql
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">void</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        insert into mytable values ($1,$2,$3);</font>
+<font color="#FF0000">        return;</font>
+<font color="#FF0000">end;'</font> language plpgsql
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("call testfunc($1,$2,$3)");
-$stmt->bindValue("$1",1);
-$stmt->bindValue("$2","1.1");
-$stmt->bindValue("$3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testfunc($1,$2,$3)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 
-<span class="heading4">MySQL</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>MySQL</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
-<font color="#6a5acd">begin</font>
-        <font color="#a52a2a"><b>insert</b></font> <font color="#6a5acd">into</font> mytable <font color="#6a5acd">values</font> (in1,in2,in3);
-<font color="#6a5acd">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("call testproc(?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-
-
-<br><span class="heading3">Single Values</span><br>
+<br/><h3>Single Values</h3>
 
 <p>Some stored procedures return single values.  Below are examples,
 illustrating how to create, execute and drop this kind of stored procedure for
 each database that SQL Relay supports.</p>
 
-<span class="heading4">Oracle</span><br>
+<h4>Oracle</h4>
 
 <p>In Oracle, stored procedures can return values through output parameters or
 as return values of the procedure itself.</p>
@@ -970,73 +1195,103 @@ Oracle calls these functions.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) returns <font color="#298a52"><b>number</b></font> <font color="#6b59ce">is</font>
-<font color="#6b59ce">begin</font>
-        <font color="#6b59ce">return</font> in1;
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
+begin
+        <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3) from dual");
-$stmt->bindValue(":in1",1);
-$stmt->bindValue(":in2","1.1");
-$stmt->bindValue(":in3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc(:in1,:in2,:in3) from dual"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>Here is an example where the value is returned through an output
 parameter.</p>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        out1:=in1;
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
+begin
+        out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3,:out1) from dual");
-$stmt->bindValue(":in1",1);
-$stmt->bindValue(":in2","1.1");
-$stmt->bindValue(":in3","hello");
-$out1=0;
-$stmt->bindParam(":out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc(:in1,:in2,:in3,:out1) from dual"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$out1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":out1"</font><font color="#990000">,</font>$out1<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
-<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>In Sybase and Microsoft SQL Server, stored procedures return values
 through output parameters rather than as return values of the procedure
@@ -1045,63 +1300,83 @@ itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output <font color="#6b59ce">as</font>
-        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1)
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
+        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("exec testproc");
-$stmt->bindValue("@in1",1);
-$stmt->bindValue("@in2","1.1");
-$stmt->bindValue("@in3","hello");
-$out1=0;
-$stmt->bindParam("@out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$out1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"@out1"</font><font color="#990000">,</font>$out1<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-<span class="heading4">Firebird</span><br>
+<br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        out1=in1;
-        suspend;
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select * from testproc(?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using an output bind variable.  Note that in Firebird, input and
 output bind variable indices are distict from one another.  The index of the
@@ -1109,28 +1384,36 @@ output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("execute procedure testproc ?, ?, ?");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$out1=0;
-$stmt->bindParam("1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$result=$stmt->execute();
-</pre>
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$out1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font>$out1<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-<span class="heading4">DB2</span><br>
+<br/><h4>DB2</h4>
 
 <p>In DB2, stored procedures return values through output parameters rather
 than as return values of the procedure itself.</p>
@@ -1138,185 +1421,255 @@ than as return values of the procedure itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int) language sql
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>set</b></font> out1 = in1;
-<font color="#6b59ce">end</font>
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
+begin
+        <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
+end
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("call testproc(?,?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$out1=0;
-$stmt->bindParam("4",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$out1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,</font>$out1<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
-<span class="heading4">Postgresql</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6b59ce">as</font> '
-declare
-        in1 int;
-        in2 <font color="#298a52"><b>float</b></font>;
-        in3 <font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>);
-<font color="#6b59ce">begin</font>
-        in1:=$<font color="#ff00ff">1</font>;
-        <font color="#6b59ce">return</font>;
-<font color="#6b59ce">end</font>;
-' language plpgsql
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">int</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">declare</font>
+<font color="#FF0000">        in1 int;</font>
+<font color="#FF0000">        in2 float;</font>
+<font color="#FF0000">        in3 char(20);</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        in1:=$1;</font>
+<font color="#FF0000">        return;</font>
+<font color="#FF0000">end;</font>
+<font color="#FF0000">'</font> language plpgsql
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select * from testfunc($1,$2,$3)");
-$stmt->bindValue("$1",1);
-$stmt->bindValue("$2","1.1");
-$stmt->bindValue("$3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc($1,$2,$3)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 
-<span class="heading4">MySQL</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>MySQL</h4>
 
 <p>A single value can be returned from a MySQL function.</p>
 
 <p>To create the function, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">function</font> testfunc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6a5acd">return</font> in1;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the function from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select * from testfunc(?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc(?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">function</font> testfunc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>A single value can be returned in the result set of a MySQL procedure.</p>
 
-<blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>; <font color="#6a5acd">end</font>;
-</pre>
-</blockquote>
+<p>To create the procedure, run a query like the following.</p>
 
+<blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
+
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select * from testproc()");
-$result=$stmt->execute();
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc()"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-<p>To create the procedure, run a query like the following.</p>
-
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>A single value can be returned using the output variable of a MySQL
 procedure.</p>
 
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font> <font color="#6a5acd">into</font> out1; <font color="#6a5acd">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$dbh->query("set @out1=0");
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0"</font><font color="#990000">);</font>
 
-$dbh->query("call testproc(@out1)");
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(@out1)"</font><font color="#990000">);</font>
 
-$stmt=$dbh->prepare("select @out1");
-$result=$stmt->execute();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-
-
-
-
-<br><span class="heading3">Multiple Values</span><br>
+<br/><h3>Multiple Values</h3>
 
 <p>Some stored procedures return multiple values.  Below are examples,
 illustrating how to create, execute and drop this kind of stored procedure for
 each database that SQL Relay supports.</p>
 
-<span class="heading4">Oracle</span><br>
+<h4>Oracle</h4>
 
 <p>In Oracle, stored procedures can return values through output parameters or
 as return values of the procedure itself.  If a procedure needs to return
@@ -1326,205 +1679,276 @@ itself, but the rest must be returned through output parameters.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out2 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out3 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
-<font color="#6b59ce">begin</font>
-        out1:=in1;
-        out2:=in2;
-        out3:=in3;
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">,</font> out2 <font color="#008080">out</font> number<font color="#990000">,</font> out3 <font color="#008080">out</font> varchar2<font color="#990000">)</font> is
+begin
+        out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
+        out2<font color="#990000">:=</font>in2<font color="#990000">;</font>
+        out3<font color="#990000">:=</font>in3<font color="#990000">;</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3,:out1,:out2,:out3) from dual");
-$stmt->bindValue(":in1",1);
-$stmt->bindValue(":in2","1.1");
-$stmt->bindValue(":in3","hello");
-$out1=0;
-$stmt->bindParam(":out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$out2="";
-$stmt->bindParam(":out2",$out2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
-$out3="";
-$stmt->bindParam(":out3",$out3,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc(:in1,:in2,:in3,:out1,:out2,:out3) from dual"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$out1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":out1"</font><font color="#990000">,</font>$out1<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$out2<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":out2"</font><font color="#990000">,</font>$out2<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$out3<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":out3"</font><font color="#990000">,</font>$out3<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+<br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output, @out2 int output, @out3 int output <font color="#6b59ce">as</font>
-        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1),
-                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2),
-                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2)
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
+        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">),</font>
+                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">),</font>
+                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("exec testproc");
-$stmt->bindValue("@in1",1);
-$stmt->bindValue("@in2","1.1");
-$stmt->bindValue("@in3","hello");
-$out1=0;
-$stmt->bindParam("@out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$out2="";
-$stmt->bindParam("@out2",$out2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
-$out3="";
-$stmt->bindParam("@out3",$out3,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$out1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"@out1"</font><font color="#990000">,</font>$out1<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$out2<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"@out2"</font><font color="#990000">,</font>$out2<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$out3<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"@out3"</font><font color="#990000">,</font>$out3<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-<span class="heading4">Firebird</span><br>
+<br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>, out2 <font color="#298a52"><b>float</b></font>, out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
-<font color="#6b59ce">begin</font>
-        out1=in1;
-        out2=in2;
-        out3=in3;
-        suspend;
-<font color="#6b59ce">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">,</font> <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+begin
+        out1<font color="#990000">=</font>in1<font color="#990000">;</font>
+        out2<font color="#990000">=</font>in2<font color="#990000">;</font>
+        out3<font color="#990000">=</font>in3<font color="#990000">;</font>
+        suspend<font color="#990000">;</font>
+end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select * from testproc(?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-<span class="heading4">DB2</span><br>
+<br/><h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int, <font color="#a52829"><b>out</b></font> out2 double, <font color="#a52829"><b>out</b></font> out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>set</b></font> out1 = in1;
-        <font color="#a52829"><b>set</b></font> out2 = in2;
-        <font color="#a52829"><b>set</b></font> out3 = in3;
-<font color="#6b59ce">end</font>
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">double</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+begin
+        <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
+        <font color="#008080">set</font> out2 <font color="#990000">=</font> in2<font color="#990000">;</font>
+        <font color="#008080">set</font> out3 <font color="#990000">=</font> in3<font color="#990000">;</font>
+end
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("call testproc(?,?,?,?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$out4=0;
-$stmt->bindParam("4",$out4,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
-$out5="";
-$stmt->bindParam("5",$out5,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
-$out6="";
-$stmt->bindParam("6",$out6,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?,?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$out4<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,</font>$out4<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$out5<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"5"</font><font color="#990000">,</font>$out5<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$out6<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">,</font>$out6<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-<span class="heading4">Postgresql</span><br>
+<br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns record <font color="#6b59ce">as</font> '
-declare
-        output record;
-<font color="#6b59ce">begin</font>
-        <font color="#a52829"><b>select</b></font> $<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font> <font color="#6b59ce">into</font> output;
-        <font color="#6b59ce">return</font> output;
-<font color="#6b59ce">end</font>;
-' language plpgsql
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">declare</font>
+<font color="#FF0000">        output record;</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        select $1,$2,$3 into output;</font>
+<font color="#FF0000">        return output;</font>
+<font color="#FF0000">end;</font>
+<font color="#FF0000">'</font> language plpgsql
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))");
-$stmt->bindValue("$1",1);
-$stmt->bindValue("$2","1.1");
-$stmt->bindValue("$3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 
-<span class="heading4">MySQL</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>MySQL</h4>
 
 <p>Here's how you can get multiple values from the result
 set of a MySQL procedure.</p>
@@ -1532,157 +1956,218 @@ set of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> in1, in2, in3; <font color="#6a5acd">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("call testproc(?,?,?)");
-$stmt->bindValue("1",1);
-$stmt->bindValue("2","1.1");
-$stmt->bindValue("3","hello");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>Here's how you can get multiple values from the output variables
 of a MySQL procedure.</p>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int, <font color="#a52a2a"><b>out</b></font> out2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>out</b></font> out3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">'hello'</font> <font color="#6a5acd">into</font> out1, out2, out3; <font color="#6a5acd">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$dbh->query("set @out1=0, @out2=0.0, @out3=''");
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0, @out2=0.0, @out3=''"</font><font color="#990000">);</font>
 
-$dbh->query("call testproc(@out1,@out2,@out3)");
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(@out1,@out2,@out3)"</font><font color="#990000">);</font>
 
-$stmt=$dbh->prepare("select @out1,@out2,@out3");
-$result=$stmt->execute();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1,@out2,@out3"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+
+</tt></pre>
 </pre>
+
 </blockquote>
-
-
-
-<br><span class="heading3">Result Sets</span><br>
+<br/><h3>Result Sets</h3>
 
 <p>Some stored procedures return entire result sets.  Below are examples,
 illustrating how to create, execute and drop this kind of stored procedure for
 each database that SQL Relay supports.</p>
 
-<span class="heading4">Oracle</span><br>
+<h4>Oracle</h4>
 
-<p>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor.  PDO had a PDO::PARAM_STMT type that could theoretically be used to get one of these but it is currently unimplemented by any driver, including the SQL Relay driver.  Quirks in the implementation of PDO itself make it impossible (or at least very difficult) to implement.  Specifically, there's no obvious way of creating an instance of the PDO statement type to set the bound parameter to.  Hopefully this will be remedied in a future version of PDO.</p>
+<dl>
+  <dt>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor. PDO had a PDO</dt>
+  <dd>PARAM_STMT type that could theoretically be used to get one of these but it is currently unimplemented by any driver, including the SQL Relay driver. Quirks in the implementation of PDO itself make it impossible (or at least very difficult) to implement. Specifically, there's no obvious way of creating an instance of the PDO statement type to set the bound parameter to. Hopefully this will be remedied in a future version of PDO.</dd>
+</dl>
 
-<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+<h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc <font color="#6a5acd">as</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> testtable
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create procedure testproc <font color="#008080">as</font> select <font color="#990000">*</font> from testtable
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To exceute the stored procedure from an SQL Relay program, ue code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("exec testproc");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
-<span class="heading4">Firebird</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<br/><h4>Firebird</h4>
 
 <p>Stored procedures in Firebird can return a result set if a
 select query in the procedure selects values into the output parameters and
 then issues a suspend command, however SQL Relay doesn't currently support
 stored procedures that return result sets.</p>
 
-<span class="heading4">DB2</span><br>
+<h4>DB2</h4>
 
 <p>Stored procedures in DB2 can return a result set if the procedure is declared
 to return one, however SQL Relay doesn't currently support stored procedures
 that return result sets.</p>
 
-<span class="heading4">Postgresql</span><br>
+<h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc() returns setof record <font color="#6b59ce">as</font> '
-        declare output record;
-<font color="#6b59ce">begin</font>
-        <font color="#6b59ce">for</font> output <font color="#a52829"><b>in</b></font> <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> mytable <font color="#6b59ce">loop</font>
-                <font color="#6b59ce">return</font> next output;
-        <font color="#6b59ce">end</font> <font color="#6b59ce">loop</font>;
-        <font color="#6b59ce">return</font>;
-<font color="#6b59ce">end</font>;
-' language plpgsql
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">()</font> returns setof <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">        declare output record;</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        for output in select * from mytable loop</font>
+<font color="#FF0000">                return next output;</font>
+<font color="#FF0000">        end loop;</font>
+<font color="#FF0000">        return;</font>
+<font color="#FF0000">end;</font>
+<font color="#FF0000">'</font> language plpgsql
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("select * from testfunc() as (testint int, testfloat float, testchar char(40)");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc() as (testint int, testfloat float, testchar char(40)"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop function testfunc
 
-<span class="heading4">MySQL</span><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<h4>MySQL</h4>
 
 <p>The result sets of all select statements called within MySQL stored
 procedures (that aren't selected into variables) are returned from the procedure
@@ -1693,70 +2178,84 @@ currently SQL Relay can only fetch the first result set.</p>
 the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> mytable; <font color="#6a5acd">end</font>;
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<pre>
-$stmt=$dbh->prepare("call testproc()");
-$result=$stmt->execute();
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc()"</font><font color="#990000">);</font>
+$result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
+</tt></pre>
+</pre>
+
+</blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<pre>
-<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
-</pre>
-</blockquote>
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
 
-<a name="lastinsertid"></a>
-<span class="heading2">Getting the Last Insert ID</span><br><br>
+</tt></pre>
+</pre>
+
+</blockquote>
+<br/><a name="lastinsertid"/><h2>Getting the Last Insert ID</h2>
 
 <p>Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.</p>
 
-<p>PDO provides the PDO::lastInsertId() method to get this value.</p>
+<dl>
+  <dt>PDO provides the PDO</dt>
+  <dd>lastInsertId() method to get this value.</dd>
+</dl>
 
 <p>When using the SQLite database, you can also get the last insert id by running the query:</p>
 
 <blockquote>
 <b>select last insert rowid</b>
 </blockquote>
-
-<a name="driverspecific"></a>
-<span class="heading2">Driver-Specific Attributes</span><br><br>
+<a name="driverspecific"/><h2>Driver-Specific Attributes</h2>
 
 <p>PHP PDO allows drivers to define their own attributes for database handles and statements.  These attributes can be used with the getAttribute and setAttribute methods to control various parameters unique to the driver.  SQL Relay implements several of these.</p>
 
 <p>Database handle attributes defined by the SQL Relay driver:</p>
 
 <ul>
-<li><b>PDO::SQLRELAY_ATTR_DB_TYPE</b> - get-only, returns database type</li>
-<li><b>PDO::SQLRELAY_ATTR_DB_VERSION</b> - get-only, returns database version string</li>
-<li><b>PDO::SQLRELAY_ATTR_DB_HOST_NAME</b> - get-only, returns the host name of the machine the database is running on</li>
-<li><b>PDO::SQLRELAY_ATTR_DB_IP_ADDRESS</b> - get-only, returns the ip address of the machine the database is running on</li>
-<li><b>PDO::SQLRELAY_ATTR_BIND_FORMAT</b> - get-only, returns a string representing the bind-format accepted by the database</li>
-<li><b>PDO::SQLRELAY_ATTR_CURRENT_DB</b> - get/set, returns or sets the current database/schema</li>
+  <li><b>PDO::SQLRELAY_ATTR_DB_TYPE</b> - get-only, returns database type</li>
+  <li><b>PDO::SQLRELAY_ATTR_DB_VERSION</b> - get-only, returns database version string</li>
+  <li><b>PDO::SQLRELAY_ATTR_DB_HOST_NAME</b> - get-only, returns the host name of the machine the database is running on</li>
+  <li><b>PDO::SQLRELAY_ATTR_DB_IP_ADDRESS</b> - get-only, returns the ip address of the machine the database is running on</li>
+  <li><b>PDO::SQLRELAY_ATTR_BIND_FORMAT</b> - get-only, returns a string representing the bind-format accepted by the database</li>
+  <li><b>PDO::SQLRELAY_ATTR_CURRENT_DB</b> - get/set, returns or sets the current database/schema</li>
 </ul>
 
 <p>Statement handle attributes defined by the SQL Relay driver:</p>
 
 <ul>
-<li><b>PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE</b> - get/set, returns or sets the result set buffer size as described <a href="#largeresultsets">above</a>.</li>
-<li><b>PDO::SQLRELAY_ATTR_DONT_GET_COLUMN_INFO</b> - set-only (1 or 0), sets whether or not to fetch column info with the result set, default (0) is to return column info</li>
-<li><b>PDO::SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS</b> - set-only (1 or 0), sets whether to return NULL values as empty strings or nulls, default (1) is to return NULL values as empty strings</li>
+  <li><b>PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE</b> - get/set, returns or sets the result set buffer size as described <a href="#largeresultsets">above</a>.</li>
+  <li><b>PDO::SQLRELAY_ATTR_DONT_GET_COLUMN_INFO</b> - set-only (1 or 0), sets whether or not to fetch column info with the result set, default (0) is to return column info</li>
+  <li><b>PDO::SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS</b> - set-only (1 or 0), sets whether to return NULL values as empty strings or nulls, default (1) is to return NULL values as empty strings</li>
 </ul>
 
 <p>Default values for the statement handle attributes can be set in the connect string.  Setting the corresponding connect string variable has the same effect as if the statement handle attribute were set immediately after creating the statement.  See <a href="#session">Establishing a Session</a> above.</p>
 
-<a name="drivermethods"></a>
-<span class="heading2">Driver-Specific Methods</span><br><br>
+<a name="drivermethods"/><h2>Driver-Specific Methods</h2>
 
 <p>PHP PDO allows drivers to define their own custom methods to provide
 functionality unique to the driver.  SQL Relay implements several of these
@@ -1773,24 +2272,29 @@ invalidating the database handle.  The endSession method makes this
 possible.</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-$stmt=$dbh->query("select * from my_table");
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
 
-... do some stuff that takes a short time ...
+<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> some stuff that takes a <font color="#008080">short</font> time <font color="#990000">...</font>
 
-$stmt=$dbh->query("select * from another_table");
-$dbh->endSession();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from another_table"</font><font color="#990000">);</font>
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">endSession</font></b><font color="#990000">();</font>
 
-... do some stuff that takes a long time ...
+<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> some stuff that takes a <font color="#008080">long</font> time <font color="#990000">...</font>
 
-$stmt=$dbh->query("select * from yet_another_table");
-$dbh->endSession();
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from yet_another_table"</font><font color="#990000">);</font>
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">endSession</font></b><font color="#990000">();</font>
 
-... process the result set ...
+<font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>Since the program does some stuff that takes a long time between the second and third queries, ending the session there allows another client an opportunity to use that database connection while this client is busy. The next call to query() establishes another session. Since the program does some stuff that takes a short time between the first two queries, it's OK to leave the session open between them.</p>
 
 <p>Sometimes web-based applications need a single database transaction to span
@@ -1800,33 +2304,43 @@ is possible.</p>
 <p>First page:</p>
 
 <blockquote>
-<pre>
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-$stmt=$dbh->query("select * from testtable");
-$stmt->suspendResultSet();
-$dbh->suspendSession();
-$rs=$stmt->getResultSetId();
-$port=$dbh->getConnectionPort();
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">suspendResultSet</font></b><font color="#990000">();</font>
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">suspendSession</font></b><font color="#990000">();</font>
+$rs<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">getResultSetId</font></b><font color="#990000">();</font>
+$port<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">getConnectionPort</font></b><font color="#990000">();</font>
 
-... pass the rs, port and socket to the next page ...
+<font color="#990000">...</font> pass <font color="#008080">the</font> rs<font color="#990000">,</font> port and socket to the <font color="#008080">next</font> page <font color="#990000">...</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>Second page:</p>
 
 <blockquote>
-<pre>
-... get the rs, port and socket from previous page ...
+  <pre><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">...</font> get <font color="#008080">the</font> rs<font color="#990000">,</font> port and socket from <font color="#008080">previous</font> page <font color="#990000">...</font>
 
-$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
-$stmt=$dbh->prepare(null);
-$dbh->resumeSession($port,$socket);
-$stmt->resumeResultSet($rs);
+$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font>null<font color="#990000">);</font>
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">resumeSession</font></b><font color="#990000">(</font>$port<font color="#990000">,</font>$socket<font color="#990000">);</font>
+$stmt<font color="#990000">-&gt;</font><b><font color="#000000">resumeResultSet</font></b><font color="#990000">(</font>$rs<font color="#990000">);</font>
 
-... run more queries in the same transaction ...
+<font color="#990000">...</font> run more queries in the <font color="#008080">same</font> transaction <font color="#990000">...</font>
+
+</tt></pre>
 </pre>
-</blockquote>
 
+</blockquote>
 <p>Note the strange call of $stmt->prepare(null) above.  Resuming a result set
 requires an active statment to resume the result set into.  Ideally
 resumeResultSet() would be a method of the database handle and return a
@@ -1837,7 +2351,8 @@ necessary.</p>
 <p>You can also distribute the processing of a result set across a series of
 pages using suspended sessions.  If you're buffering a result set in chunks
 instead of all at once and suspend a session, when you resume the session you 
-can continue to retrieve rows from the result set.</p>
+can continue to retrieve rows from the result set.
+</p>
 
 </body>
 </html>
