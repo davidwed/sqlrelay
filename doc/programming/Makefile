@@ -22,7 +22,8 @@ SRCS = ado.net.wt \
 	phppdo.wt \
 	precisionscale.wt \
 	pythondb.wt \
-	python.wt
+	python.wt \
+	ruby.wt
 
 OBJS = ado.net.html \
 	c.html \
@@ -39,7 +40,8 @@ OBJS = ado.net.html \
 	phppdo.html \
 	precisionscale.html \
 	pythondb.html \
-	python.html
+	python.html \
+	ruby.html
 
 .wt.html:
 	wt -c $< -o $@ -xhtml xhtml.conf
