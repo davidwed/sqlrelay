@@ -1,0 +1,5 @@
+cur.prepareQuery("set @out1=0")
+cur.prepareQuery("call testproc()")
+cur.prepareQuery("select @out1")
+cur.executeQuery()
+result=cur.getField(0,0)

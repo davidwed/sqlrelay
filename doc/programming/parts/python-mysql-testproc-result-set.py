@@ -1,0 +1,7 @@
+cur.sendQuery("call testproc()")
+field00=cur.getField(0,0)
+field01=cur.getField(0,1)
+field02=cur.getField(0,2)
+field10=cur.getField(1,0)
+field11=cur.getField(1,1)
+field12=cur.getField(1,2)
