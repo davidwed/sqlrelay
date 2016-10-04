@@ -26,6 +26,8 @@
  * [#krb Kerberos and Active Directory Encryption and Authentication]
  * [#tls TLS/SSL Encryption and Authentication]
 * [#se Security Enhancement]
+ * [#runas Run-As User and Group]
+ * [#deniedallowedips Denied/Allowed IP Addresses]
  * [#pwdenc Password Encryption]
  * [#schedules Connection Schedules]
  * [#filtering Query Filtering]
@@ -948,11 +950,42 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 
 SQL Relay offers several security enhancement features.
 
+[[br]][=#runas]
+=== Run-As User and Group ===
+
+By default, the SQL Relay server runs as whatever user runs sqlr-start.  On unix and linux systems, the root user generally runs all init scripts.  As such, when started at boot, by default, the SQL Relay server also runs as root.
+
+However, when run as root, the runasuser and runasgroup attributes can be used to control what user and group the SQL Relay server runs as.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-runas.conf@
+}}}
+}}}
+
+Be sure that whatever user/group SQL Relay is configured to run as has permissions to read all configuration files, including any database configuration files such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file.  Otherwise various thins will fail, including dynamic scaling.
+
+
+[[br]][=#deniedallowedips]
+=== Allowed/Denied IP Addresses ===
+
+By default, clients from any IP address are allowed to connect to the SQL Relay srever.  However, the deinedips and allowedips attributes can be used to restrict the set of IP addresses that clients can connect from.
+
+The deniedips attribute can be configured with a [http://www.regular-expressions.info regular expression] indicating which IP address will be denied access.  The allowedips attribute can also be configured with a [http://www.regular-expressions.info regular expression] to override the deniedips attribute.
+
+For example, to deny all clients except clients connecting from the 192.168.2.0 and 64.45.22.0 networks:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-deniedallowedips.conf@
+}}}
+}}}
+
 
 [[br]][=#pwdenc]
 === Password Encryption ===
 
-Password encryption allows you to store encrypted passwords in the configuration file so that they are not directly readable.  Passwords for SQL Relay users and database passwords may both be encrypted.
+Password encryption allows you to store passwords in the configuration file in a manner that makes them not directly readable.  Passwords for SQL Relay users and database passwords may both be encrypted.
 
 Encryption and decryption are achieved via loadable modules.  The //passwordencryptions// section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.
 

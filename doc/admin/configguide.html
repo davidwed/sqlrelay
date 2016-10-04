@@ -46,6 +46,8 @@
 
   <li><a href="#se">Security Enhancement</a></li>
   <ul>
+    <li><a href="#runas">Run-As User and Group</a></li>
+    <li><a href="#deniedallowedips">Denied/Allowed IP Addresses</a></li>
     <li><a href="#pwdenc">Password Encryption</a></li>
     <li><a href="#schedules">Connection Schedules</a></li>
     <li><a href="#filtering">Query Filtering</a></li>
@@ -1391,9 +1393,57 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>SQL Relay offers several security enhancement features.</p>
 
-<br/><a name="pwdenc"/><h3>Password Encryption</h3>
+<br/><a name="runas"/><h3>Run-As User and Group</h3>
 
-<p>Password encryption allows you to store encrypted passwords in the configuration file so that they are not directly readable.  Passwords for SQL Relay users and database passwords may both be encrypted.</p>
+<p>By default, the SQL Relay server runs as whatever user runs sqlr-start.  On unix and linux systems, the root user generally runs all init scripts.  As such, when started at boot, by default, the SQL Relay server also runs as root.</p>
+
+<p>However, when run as root, the runasuser and runasgroup attributes can be used to control what user and group the SQL Relay server runs as.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <font color="#009900">runasuser</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">runasgroup</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>Be sure that whatever user/group SQL Relay is configured to run as has permissions to read all configuration files, including any database configuration files such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file.  Otherwise various thins will fail, including dynamic scaling.</p>
+
+<br/><a name="deniedallowedips"/><h3>Allowed/Denied IP Addresses</h3>
+
+<p>By default, clients from any IP address are allowed to connect to the SQL Relay srever.  However, the deinedips and allowedips attributes can be used to restrict the set of IP addresses that clients can connect from.</p>
+
+<p>The deniedips attribute can be configured with a <a target="_blank" href="http://www.regular-expressions.info">regular expression</a> indicating which IP address will be denied access.  The allowedips attribute can also be configured with a <a target="_blank" href="http://www.regular-expressions.info">regular expression</a> to override the deniedips attribute.</p>
+
+<p>For example, to deny all clients except clients connecting from the 192.168.2.0 and 64.45.22.0 networks:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <font color="#009900">deniedips</font><font color="#990000">=</font><font color="#FF0000">".*"</font> <font color="#009900">allowedips</font><font color="#990000">=</font><font color="#FF0000">"(192\.168\.2\..*|64\.45\.22\..*)"</font> ...<b><font color="#0000FF">/&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<br/><br/><a name="pwdenc"/><h3>Password Encryption</h3>
+
+<p>Password encryption allows you to store passwords in the configuration file in a manner that makes them not directly readable.  Passwords for SQL Relay users and database passwords may both be encrypted.</p>
 
 <p>Encryption and decryption are achieved via loadable modules.  The <i>passwordencryptions</i> section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.</p>
 
