@@ -20,8 +20,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#990000">[</font>SQLRelay<font color="#990000">]</font>
 Description<font color="#990000">=</font>ODBC <b><font color="#0000FF">for</font></b> SQL Relay
 Driver<font color="#990000">=/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib<font color="#990000">/</font>libsqlrodbc<font color="#990000">.</font>so
-FileUsage<font color="#990000">=</font><font color="#993399">1</font>
-</tt></pre>
+FileUsage<font color="#990000">=</font><font color="#993399">1</font></tt></pre>
+
 </blockquote>
 <p>Note that the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.  Note also that on Mac OS X you'll need to replace the <b>.so</b> suffix with <b>.dylib</b></p>
 
@@ -39,8 +39,8 @@ Server<font color="#990000">=</font>sqlrserver
 Port<font color="#990000">=</font><font color="#993399">9000</font>
 Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>test<font color="#990000">.</font>socket
 User<font color="#990000">=</font>testuser
-Password<font color="#990000">=</font>testpass
-</tt></pre>
+Password<font color="#990000">=</font>testpass</tt></pre>
+
 </blockquote>
 <p>Here the Driver attribute refers to the instance in odbcinst.ini.</p>
 
@@ -59,8 +59,8 @@ Server<font color="#990000">=</font>sqlrserver
 Port<font color="#990000">=</font><font color="#993399">9000</font>
 Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>test<font color="#990000">.</font>socket
 User<font color="#990000">=</font>testuser
-Password<font color="#990000">=</font>testpass
-</tt></pre>
+Password<font color="#990000">=</font>testpass</tt></pre>
+
 </blockquote>
 <p>In addition to the attributes described above, the following attributes can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
 
@@ -148,8 +148,8 @@ SQLRowCount returns <font color="#993399">0</font>
 SQL<font color="#990000">&gt;</font> drop table test
 SQLRowCount returns <font color="#993399">0</font>
 SQL<font color="#990000">&gt;</font> quit
-<font color="#990000">[</font>dmuse@fedora <font color="#990000">~]</font>$ 
-</tt></pre>
+<font color="#990000">[</font>dmuse@fedora <font color="#990000">~]</font>$ </tt></pre>
+
 </blockquote>
 <p>If you get an error like <b>ISQL ERROR: Could not SQLConnect</b> when you run isql then it's possible that it can't find your ODBC INI file.  Some versions of unixODBC, when compiled and installed with non-standard prefixes, still look for odbc.ini in /etc rather than under their prefix.  For example, I discovered that on Mac OS X, unixODBC 2.2.12 installed under /sw should look for /sw/etc/odbc.ini but instead it looks for /etc/odbc.ini, even though <i>odbcinst -j</i> looks under /sw.</p>
 
@@ -161,8 +161,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">export</font> ODBCINST<font color="#990000">=/</font>sw<font color="#990000">/</font>etc<font color="#990000">/</font>odbcinst<font color="#990000">.</font>ini
-<font color="#008080">export</font> ODBCINI<font color="#990000">=/</font>sw<font color="#990000">/</font>etc<font color="#990000">/</font>odbc<font color="#990000">.</font>ini
-</tt></pre>
+<font color="#008080">export</font> ODBCINI<font color="#990000">=/</font>sw<font color="#990000">/</font>etc<font color="#990000">/</font>odbc<font color="#990000">.</font>ini</tt></pre>
+
 </blockquote>
 <p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN that you defined. </p>
 
@@ -173,8 +173,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>PHP <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> MDB2 <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> ODBC <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> <font color="#008080">SQL</font> Relay <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> Oracle
-</tt></pre>
+<pre><tt>PHP <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> MDB2 <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> ODBC <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> <font color="#008080">SQL</font> Relay <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> Oracle</tt></pre>
+
 </blockquote>
 <p>Similarly, you could use SQL Relay via ODBC with PHP/PDO, PHP/ADODB, Java/JDBC (<a href="jdbc.html">using the JDBC-ODBC bridge</a>), with the ODBC Adapter for Ruby on Rails, and so on.</p>
 

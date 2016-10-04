@@ -42,8 +42,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> execute some queries <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The following connect string variables control attributes of the connection:</p>
 
@@ -92,8 +92,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>my $dbh<font color="#990000">=</font>DBI<font color="#990000">-&gt;</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">"DBI:SQLRelay(AutoCommit=&gt;0,PrintError=&gt;0):host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font> 
-
 </tt></pre>
+
 </blockquote>
 <p>In addition to the standard database handle attributes (such as <a href="AutoCommit">AutoCommit</a>, <a href="PrintError">PrintError</a>, etc.), these additional connect string variables control some default statement attributes:</p>
 
@@ -141,8 +141,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process the result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <a name="commit"/><h2>Commits and Rollbacks</h2>
 
@@ -168,8 +168,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$dbh<font color="#990000">-&gt;</font><font color="#FF0000">{</font>AutoCommit<font color="#FF0000">}</font> <font color="#990000">=</font> <font color="#993399">1</font><font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The following command turns Autocommit off.</p>
 
@@ -179,8 +179,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$dbh<font color="#990000">-&gt;</font><font color="#FF0000">{</font>AutoCommit<font color="#FF0000">}</font> <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>When Autocommit is on, the database performs a commit after each successful 
 DML or DDL query.  When Autocommit is off, the database commits when the client 
@@ -237,8 +237,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process the result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <a name="bindvars"/><h2>Bind Variables</h2>
 
@@ -275,8 +275,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process the result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The precision and scale parameters can be used to specify a precision
 and scale for floating point numbers.</p>
@@ -301,8 +301,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process the result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <dl>
   <dt>You can also bind CLOB's and BLOB's using the DBD</dt>
@@ -332,8 +332,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process the result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>bind_param() is used for input binds.  bind_inout_param() is used for output
 binds.  Here is an example using the bind_inout_param() function to retrieve a
@@ -367,8 +367,8 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">"$hello $integer $float\n"</font><font color="#990000">);</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>Here is an example using the execute() function directly.  The additional
 parameters correspond to bind variable positions.  Note that the first
@@ -392,8 +392,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process the result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <a name="rebinding"/><h2>Re-Binding and Re-Execution</h2>
 
@@ -428,8 +428,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <a name="fields"/><h2>Accessing Fields in the Result Set</h2>
 
@@ -464,8 +464,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>Here's an example using bind_columns() and fetch().  Note that the first
 bind_columns() parameter must be "undef".</p>
@@ -491,8 +491,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <br/><a name="largeresultsets"/><h2>Dealing With Large Result Sets</h2>
 
@@ -536,8 +536,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>my $dbh<font color="#990000">=</font>DBI<font color="#990000">-&gt;</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">"DBI:SQLRelay(RowCacheSize=&gt;5):host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The following code sets the result set buffer size using <a href="RowCacheSize">RowCacheSize</a> to 5.</p>
 
@@ -547,8 +547,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$dbh<font color="#990000">-&gt;</font><font color="#FF0000">{</font>RowCacheSize<font color="#FF0000">}</font><font color="#990000">=</font><font color="#993399">5</font><font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The following code retrieves the result set buffer size using
 <a href="RowCacheSize">RowCacheSize</a>.</p>
@@ -559,8 +559,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$rsbs<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><font color="#FF0000">{</font>RowCacheSize<font color="#FF0000">}</font><font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The following code sets the result set buffer size using <a href="ResultSetBufferSize">ResultSetBufferSize</a></p>
 
@@ -572,8 +572,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>my $dbh<font color="#990000">=</font>DBI<font color="#990000">-&gt;</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">"DBI:SQLRelay(DBD::SQLRelay::ResultSetBufferSize=&gt;5):host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The following code sets the result set buffer size using <a href="ResultSetBufferSize">ResultSetBufferSize</a>
 to 5.</p>
@@ -584,8 +584,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$sth<font color="#990000">-&gt;</font><font color="#FF0000">{</font>DBD<font color="#990000">::</font>SQLRelay<font color="#990000">::</font>ResultSetBufferSize<font color="#FF0000">}</font><font color="#990000">=</font><font color="#993399">5</font><font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>The following code retrieves the result set buffer size using
 <a href="ResultSetBufferSize">ResultSetBufferSize</a>.</p>
@@ -596,8 +596,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$rsbs<font color="#990000">=</font>$sth<font color="#990000">-&gt;</font><font color="#FF0000">{</font>DBD<font color="#990000">::</font>SQLRelay<font color="#990000">::</font>ResultSetBufferSize<font color="#FF0000">}</font><font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <a name="statements"/><h2>Statements</h2>
 
@@ -634,8 +634,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">...</font> process result set <font color="#990000">...</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <a name="columns"/><h2>Getting Column Information</h2>
 
@@ -663,8 +663,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 <font color="#009900">$dbh</font><font color="#990000">-&gt;</font>disconnect<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <a name="storedprocedures"/><h2>Stored Procedures</h2>
 
@@ -707,8 +707,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -723,8 +723,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -734,8 +734,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
@@ -748,8 +748,8 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -764,8 +764,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -775,8 +775,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <h4>Firebird</h4>
 
@@ -792,8 +792,8 @@ begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
         suspend<font color="#990000">;</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -808,8 +808,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -819,8 +819,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <h4>DB2</h4>
 
@@ -835,8 +835,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -851,8 +851,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -862,8 +862,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <h4>Postgresql</h4>
 
@@ -879,8 +879,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">        insert into mytable values ($1,$2,$3);</font>
 <font color="#FF0000">        return;</font>
 <font color="#FF0000">end;'</font> language plpgsql
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -895,8 +895,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -906,8 +906,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-
 </tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
@@ -922,8 +922,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -938,8 +938,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
@@ -951,8 +951,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h3>Single Values</h3>
 
@@ -979,8 +979,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -998,8 +998,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b
 my $result<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$result<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1009,8 +1009,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <p>Here is an example where the value is returned through an output
 parameter.</p>
@@ -1026,8 +1026,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1044,8 +1044,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $result<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1055,8 +1055,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
@@ -1073,8 +1073,8 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
         select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1091,8 +1091,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $result<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1102,8 +1102,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Firebird</h4>
 
@@ -1115,8 +1115,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1134,8 +1134,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b
 my $result<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$result<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using an output bind variable.  Note that in Firebird, input and
@@ -1155,8 +1155,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $result<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1166,8 +1166,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>DB2</h4>
 
@@ -1185,8 +1185,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
 end
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1203,8 +1203,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $result<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1214,8 +1214,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Postgresql</h4>
 
@@ -1236,8 +1236,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">        return;</font>
 <font color="#FF0000">end;</font>
 <font color="#FF0000">'</font> language plpgsql
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1255,8 +1255,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b
 my $result<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$result<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1266,8 +1266,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-
 </tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
@@ -1281,8 +1281,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the function from an SQL Relay program, use code like the
 following.</p>
@@ -1300,8 +1300,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b
 my $out1<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$out1<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
@@ -1313,8 +1313,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <p>A single value can be returned in the result set of a MySQL procedure.</p>
 
@@ -1326,8 +1326,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1341,8 +1341,8 @@ http://www.gnu.org/software/src-highlite -->
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$out1<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
@@ -1352,8 +1352,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <p>A single value can be returned using the output variable of a MySQL
 procedure.</p>
@@ -1366,8 +1366,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1385,8 +1385,8 @@ my $sth<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><f
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$out1<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
@@ -1396,8 +1396,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h3>Multiple Values</h3>
 
@@ -1425,8 +1425,8 @@ begin
         out2<font color="#990000">:=</font>in2<font color="#990000">;</font>
         out3<font color="#990000">:=</font>in3<font color="#990000">;</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1446,8 +1446,8 @@ my $out3<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_input_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_input_param</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_input_param</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1457,8 +1457,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
@@ -1473,8 +1473,8 @@ http://www.gnu.org/software/src-highlite -->
         select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">),</font>
                 @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">),</font>
                 @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1495,8 +1495,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param<
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1506,8 +1506,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Firebird</h4>
 
@@ -1525,8 +1525,8 @@ begin
         out3<font color="#990000">=</font>in3<font color="#990000">;</font>
         suspend<font color="#990000">;</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1546,8 +1546,8 @@ my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$out1<font color="#990000">,\</font>$out1<font color="#990000">,\</font>$out3<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using a output bind variables.  Note that in Firebird, input and
@@ -1571,8 +1571,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param<
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1582,8 +1582,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>DB2</h4>
 
@@ -1600,8 +1600,8 @@ begin
         <font color="#008080">set</font> out2 <font color="#990000">=</font> in2<font color="#990000">;</font>
         <font color="#008080">set</font> out3 <font color="#990000">=</font> in3<font color="#990000">;</font>
 end
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1622,8 +1622,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param<
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"5"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1633,8 +1633,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Postgresql</h4>
 
@@ -1653,8 +1653,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">        return output;</font>
 <font color="#FF0000">end;</font>
 <font color="#FF0000">'</font> language plpgsql
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1674,8 +1674,8 @@ my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$out1<font color="#990000">,\</font>$out2<font color="#990000">,\</font>$out3<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1685,8 +1685,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-
 </tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
@@ -1701,8 +1701,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1722,8 +1722,8 @@ my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$out1<font color="#990000">,\</font>$out2<font color="#990000">,\</font>$out3<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
@@ -1735,8 +1735,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <p>Here's how you can get multiple values from the output variables
 of a MySQL procedure.</p>
@@ -1749,8 +1749,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1771,8 +1771,8 @@ my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</font></b><font color="#990000">(</font>undef<font color="#990000">,\</font>$out1<font color="#990000">,\</font>$out2<font color="#990000">,\</font>$out3<font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1782,8 +1782,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h3>Result Sets</h3>
 
@@ -1810,8 +1810,8 @@ begin
         <font color="#008080">open</font> l_cursor <font color="#008080">for</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font>
         <b><font color="#0000FF">return</font></b> l_cursor<font color="#990000">;</font>
 end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1821,8 +1821,8 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>perldbi<font color="#990000">-</font>oracle<font color="#990000">-</font>testproc<font color="#990000">-</font>result<font color="#990000">-</font>set<font color="#990000">.</font>pl@
-</tt></pre>
+<pre><tt>@parts<font color="#990000">/</font>perldbi<font color="#990000">-</font>oracle<font color="#990000">-</font>testproc<font color="#990000">-</font>result<font color="#990000">-</font>set<font color="#990000">.</font>pl@</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1833,8 +1833,8 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop function testproc
 drop package types
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
@@ -1846,8 +1846,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create procedure testproc <font color="#008080">as</font> select <font color="#990000">*</font> from testtable
-
 </tt></pre>
+
 </blockquote>
 <p>To exceute the stored procedure from an SQL Relay program, ue code like the
 following.</p>
@@ -1866,8 +1866,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</fon
 <b><font color="#0000FF">while</font></b> <font color="#990000">(</font>$sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
         print <font color="#FF0000">"$out1, $out2, $out3</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">;</font>
 <font color="#FF0000">}</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1877,8 +1877,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><h4>Firebird</h4>
 
@@ -1911,8 +1911,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">        return;</font>
 <font color="#FF0000">end;</font>
 <font color="#FF0000">'</font> language plpgsql
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1931,8 +1931,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</fon
 <b><font color="#0000FF">while</font></b> <font color="#990000">(</font>$sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
         print <font color="#FF0000">"$col1, $col2, $col3</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">;</font>
 <font color="#FF0000">}</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1942,8 +1942,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop function testfunc
-
 </tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
@@ -1961,8 +1961,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
@@ -1984,8 +1984,8 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_columns</fon
 <b><font color="#0000FF">while</font></b> <font color="#990000">(</font>$sth<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
         print <font color="#FF0000">"$out1, $out2, $out3</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">;</font>
 <font color="#FF0000">}</font>
-
 </tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1995,8 +1995,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
-
 </tt></pre>
+
 </blockquote>
 <br/><br/><a name="lastinsertid"/><h2>Getting the Last Insert ID</h2>
 

@@ -27,8 +27,8 @@ where
 	age<font color="#990000">&gt;=:</font>youngage
 	and
 	age<font color="#990000">&lt;=:</font>oldage
-
 </tt></pre>
+
 </blockquote>
 <p>In this query, $(schema) is a substitution variable and :id, :youngage and :oldage are input bind variables.</p>
 
@@ -42,8 +42,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>BEGIN
 	<font color="#990000">:</font>returnval<font color="#990000">:=</font><font color="#993399">100</font><font color="#990000">*</font><font color="#993399">50</font><font color="#990000">;</font>
 END<font color="#990000">;</font>
-
 </tt></pre>
+
 </blockquote>
 <p>In this code, :returnval is an output bind variable.</p>
 
@@ -80,8 +80,8 @@ where
 	age<font color="#990000">&gt;=:</font>youngage
 	and
 	age<font color="#990000">&lt;=:</font>oldage
-
 </tt></pre>
+
 </blockquote>
 <p>In this query, you should use "id", "youngage" and "oldage" as variable names in the inputBind functions.</p>
 
@@ -90,8 +90,8 @@ where
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>binds<font color="#990000">-</font>inputbind<font color="#990000">-</font>numeric<font color="#990000">.</font>sql@
-</tt></pre>
+<pre><tt>@parts<font color="#990000">/</font>binds<font color="#990000">-</font>inputbind<font color="#990000">-</font>numeric<font color="#990000">.</font>sql@</tt></pre>
+
 </blockquote>
 <p>In this query, you should use "1", "2" and "3" as variable names in the inputBind functions.</p>
 
@@ -122,8 +122,8 @@ from
 	testtable
 where
 	stringcol<font color="#990000">&gt;:</font>stringvar
-
 </tt></pre>
+
 </blockquote>
 <p>If stringcol is a string datatype such as char or varchar, bind a string to stringvar rather than a long or double.  Failure to do so will cause the query to fail.
 </p>
