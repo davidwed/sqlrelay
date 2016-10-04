@@ -2,6 +2,7 @@
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
+#include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <config.h>
 
@@ -40,42 +41,60 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 
+	const char	*host;
+	const char	*port;
+	const char	*socket;
+	const char	*user;
+	const char	*password;
+	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
+		host="sqlrserver";
+		port="9000";
+		socket="/tmp/test.socket";
+		user="test";
+		password="test";
+	} else {
+		if (argc==2) {
+			host=argv[1];
+		} else {
+			host="sqlrserver";
+		}
+		port="3306";
+		socket="/var/lib/mysql/mysql.sock";
+		user="testuser";
+		password="testpassword";
+	}
+
+	stdoutput.printf("\n============ Traditional API ============\n\n");
+
 	MYSQL	mysql;
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	stdoutput.printf("mysql_init\n");
 	checkSuccess((long)mysql_init(&mysql),(long)&mysql);
 	stdoutput.printf("\n");
-#endif
-
-	const char	*host="sqlrserver";
-	const char	*port="9000";
-	const char	*socket="/tmp/test.socket";
-	const char	*user="test";
-	const char	*password="test";
-
-#ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	stdoutput.printf("mysql_real_connect\n");
-#if MYSQL_VERSION_ID>=32200
-	checkSuccess((long)mysql_real_connect(&mysql,host,user,password,"",
+	#if MYSQL_VERSION_ID>=32200
+		checkSuccess((long)mysql_real_connect(
+					&mysql,host,user,password,"",
 					charstring::toInteger(port),
 					socket,0),(long)&mysql);
-#else
-	checkSuccess((long)mysql_real_connect(&mysql,host,user,password,
+	#else
+		checkSuccess((long)mysql_real_connect(
+					&mysql,host,user,password,
 					charstring::toInteger(port),
 					socket,0),(long)&mysql);
-	// mysql_select_db...
-#endif
+		// FIXME: mysql_select_db...
+	#endif
 #else
 	checkSuccess((long)mysql_connect(&mysql,host,user,password),
 					(long)mysql);
 #endif
 	stdoutput.printf("\n");
+
 #ifdef HAVE_MYSQL_PING
 	stdoutput.printf("mysql_ping\n");
 	checkSuccess(mysql_ping(&mysql),0);
 	stdoutput.printf("\n");
 #endif
-
 
 	stdoutput.printf("mysql_character_set_name:\n");
 	checkSuccess((char *)mysql_character_set_name(&mysql),"latin1");
@@ -99,12 +118,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
 	checkSuccess(mysql_affected_rows(&mysql),1);
 	stdoutput.printf("\n");
-
-
-	// mysql_insert_id...
-	// mysql_info...
-
-
 
 	stdoutput.printf("mysql_real_query: select\n");
 	query="select * from testdb.testtable";
@@ -244,7 +257,6 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 
-#if 0
 	stdoutput.printf("mysql_fetch_fields:\n");
 	field=mysql_fetch_fields(result);
 	checkSuccess(field[0].name,"testtinyint");
@@ -267,7 +279,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(field[17].name,"testlongtext");
 	checkSuccess(field[18].name,"testtimestamp");
 	stdoutput.printf("\n");
-#endif
 
 
 	stdoutput.printf("mysql_fetch_row:\n");
@@ -457,38 +468,68 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("proto: %d\n",mysql_get_proto_info(&mysql));
 	stdoutput.printf("\n");
 	
+	// FIXME: mysql_insert_id
+	// FIXME: mysql_info
 
-	// mysql_error
-	// mysql_errno
-	// mysql_thread_id
-	// mysql_change_user
+	// FIXME: mysql_error
+	// FIXME: mysql_errno
+	// FIXME: mysql_thread_id
+	// FIXME: mysql_change_user
 
-	// mysql_send_query
-	// mysql_read_query_result
+	// FIXME: mysql_send_query
+	// FIXME: mysql_read_query_result
 
-	// mysql_create_db
-	// mysql_drop_db
+	// FIXME: mysql_create_db
+	// FIXME: mysql_drop_db
 
-	// mysql_shutdown
-	// mysql_refresh
-	// mysql_reload
+	// FIXME: mysql_shutdown
+	// FIXME: mysql_refresh
+	// FIXME: mysql_reload
 
-	// mysql_debug
-	// mysql_dump_debug_info
+	// FIXME: mysql_debug
+	// FIXME: mysql_dump_debug_info
 
-	// mysql_kill
-	// mysql_stat
+	// FIXME: mysql_kill
+	// FIXME: mysql_stat
 
-	// mysql_list_dbs
-	// mysql_list_tables
-	// mysql_list_fields
+	// FIXME: mysql_list_dbs
+	// FIXME: mysql_list_tables
+	// FIXME: mysql_list_fields
 
-	// mysql_list_processes
+	// FIXME: mysql_list_processes
 
-	// mysql_options
+	// FIXME: mysql_options
 		
-	// mysql_odbc_escape_string
+	// FIXME: mysql_odbc_escape_string
 	// myodbc_remove_escape
+
+	mysql_close(&mysql);
+
+	stdoutput.printf("============ Statement API ============\n\n");
+
+	// statement api...
+#ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
+	stdoutput.printf("mysql_init\n");
+	checkSuccess((long)mysql_init(&mysql),(long)&mysql);
+	stdoutput.printf("\n");
+	stdoutput.printf("mysql_real_connect\n");
+	#if MYSQL_VERSION_ID>=32200
+		checkSuccess((long)mysql_real_connect(
+					&mysql,host,user,password,"",
+					charstring::toInteger(port),
+					socket,0),(long)&mysql);
+	#else
+		checkSuccess((long)mysql_real_connect(
+					&mysql,host,user,password,
+					charstring::toInteger(port),
+					socket,0),(long)&mysql);
+		// FIXME: mysql_select_db...
+	#endif
+#else
+	checkSuccess((long)mysql_connect(&mysql,host,user,password),
+					(long)mysql);
+#endif
+	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_stmt_init:\n");
 	MYSQL_STMT	*stmt=mysql_stmt_init(&mysql);
