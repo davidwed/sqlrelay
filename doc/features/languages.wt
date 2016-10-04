@@ -34,129 +34,105 @@ Programming guides with sample code and API references are available for each la
 [../api/tcl/index.html TCL],
 [../api/nodejs/html/annotated.html node.js],
 }}}
-
 <div class="slide">
-
 <div style="display: block; float: left;"/>
 <span class="heading2">C++</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.cpp@
 }}}
-</p>
-
 </div>
-
+</div>
+</div>
+<div class="slide hidden">
 <div style="display: block; float: left;"/>
 <span class="heading2">C</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.c@
 }}}
-</p>
-
 </div>
-
 </div>
-
-
+</div>
 <div class="slide hidden">
-
 <div style="display: block; float: left;"/>
 <span class="heading2">C#</span>
-<p class="code" style="height: 350px;">
+<div class="code">
 {{{#!code
 @parts/example.cs@
 }}}
-</p>
-
 </div>
-
+</div>
+</div>
+<div class="slide hidden">
 <div style="display: block; float: left;"/>
 <span class="heading2">Java</span>
-<p class="code" style="height: 350px;">
+<div class="code">
 {{{#!code
 @parts/example.java@
 }}}
-</p>
-
 </div>
-
 </div>
-
-
+</div>
 <div class="slide hidden">
-
 <div style="display: block; float: left;"/>
 <span class="heading2">Perl</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.pl@
 }}}
-</p>
-
 </div>
-
+</div>
+</div>
+<div class="slide hidden">
 <div style="display: block; float: left;"/>
 <span class="heading2">Python</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.py@
 }}}
-</p>
-
 </div>
-
 </div>
-
-
+</div>
 <div class="slide hidden">
-
 <div style="display: block; float: left;"/>
 <span class="heading2">PHP</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.php@
 }}}
-</p>
-
 </div>
-
+</div>
+</div>
+<div class="slide hidden">
 <div style="display: block; float: left;"/>
 <span class="heading2">Ruby</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.rb@
 }}}
-</p>
-
 </div>
-
 </div>
-
-
+</div>
 <div class="slide hidden">
-
 <div style="display: block; float: left;"/>
 <span class="heading2">TCL</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.tcl@
 }}}
-</p>
-
 </div>
-
+</div>
+</div>
+<div class="slide hidden">
 <div style="display: block; float: left;"/>
 <span class="heading2">node.js</span>
-<p class="code" style="height: 300px;">
+<div class="code">
 {{{#!code
 @parts/example.js@
 }}}
-</p>
-
 </div>
-
+</div>
 </div>
 
 <script language="Javascript">
