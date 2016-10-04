@@ -3,9 +3,8 @@
 * [#example Example]
 * [#tags Tags]
 * [#attributes Attributes]
-* [#complex Complex Attributes]
 
-[[br]][=#example]
+[=#example]
 == Example ==
 
 The SQL Relay configuration file is usually located at /usr/local/firstworks/etc/sqlrelay.conf
@@ -16,7 +15,7 @@ Files in the configuration directory may be given any name, but it is convention
 
 Each configuration file may define any number of SQL Relay instances.
 
-A comprehensive example follows.
+A fairly comprehensive example follows.
 
 {{{#!blockquote
 {{{#!code
@@ -24,34 +23,20 @@ A comprehensive example follows.
 }}}
 }}}
 
-[[br]][=#tags]
+[=#tags]
 == Tags ==
 
-The '''instances''' tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.
+* The '''instances''' tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.
+ * Each '''instance''' tag defines an instance of SQL Relay.  You can define as many of these as you like in each configuration file.
+ * The '''users''' tag surrounds the list of users that may connect to the instance.
+  * Each '''user''' tag defines a user/password combination that may be used to connect to the instance.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
+ * The '''session''' tag surrounds a set of queries to be run at the start and end of each session.  The entire '''session''' block is optional.
+  * The '''start''' tag surrounds a set of queries to be run at the the start of each session and the '''end''' tag surrounds a set of qeries to be run at the end of each session.  Both are optional.
+   * The '''runquery''' tag surrounds a query to be run at the beginning or end of a session.  Any number (including 0) of these may be specified.
+ * The '''connections''' tag surrounds the list of database connection configurations used by the instance.
+  * Each '''connection''' tag defines a database connection configuration.  In most cases, there will be only 1 of these tags.  In cases where clustered or replicated databases are used, there would likely be more than 1 line here.  See [loadbalfailover.html Load Balancing and Failover] for more information.
 
-Each '''instance''' tag defines an instance of SQL Relay.  You can define as many of these as you like in each configuration file.
-
-The '''users''' tag surrounds the list of users that may connect to the instance.
-
-Each '''user''' tag defines a user/password combination that may be used to connect to the instance.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
-
-The '''session''' tag surrounds a set of queries to be run at the start and end of each session.  The entire '''session''' block is optional.
-
-The '''start''' tag surrounds a set of queries to be run at the the start of each session and the '''end''' tag surrounds a set of qeries to be run at the end of each session.  Both are optional.
-
-The '''runquery''' tag surrounds a query to be run at the beginning or end of a session.  Any number (including 0) of these may be specified.
-
-The '''connections''' tag surrounds the list of database connection configurations used by the instance.
-
-Each '''connection''' tag defines a database connection configuration.  In most cases, there will be only 1 of these tags.  In cases where clustered or replicated databases are used, there would likely be more than 1 line here.  See [loadbalfailover.html Load Balancing and Failover] for more information.
-
-The '''router''' tag sets up the instance to route queries to other SQL Relay instances.  If this tag is present, the instance should contain no '''connections''' tags.  See [router.html Query Routing] for detailed information about configuring SQL Relay to route queries. 
-
-The '''route''' tag designates an instance of SQL Relay to route queries to.  It should contain a set of '''query''' tags defining which queries to route to the designated instance.  This tag is only valid inside a '''router''' tag.
-
-The '''query''' tag defines a regular expression which the '''route''' tags use to match queries.
-
-[[br]][=#attributes]
+[=#attributes]
 == Attributes ==
 
 Below is a description of the attributes for each tag.
@@ -92,9 +77,9 @@ Below is a description of the attributes for each tag.
  * '''cursors''' - The number of database cursors to open and maintain for each database connection.  More cursors may be opened if needed, but the pool of cursors will shrink back down to this size at the end of each client session.  This may be set to any positive number or 0.  Defaults to 1.
  * '''maxcursors''' - The maximum number of database cursors that may be opened for a single client session.  If this is set to a number lower than the value for the '''cursors''' parameter then it will be automatically bumped up to the value set for '''cursors'''.  Defaults to the same value as '''cursors'''.
  * '''cursors_growby''' - The number of new cursors that will be opened at a time when new cursors are required.  Defaults to 1.
- * '''authtier''' - Where to authenticate, see [#complex Complex Attributes] below.  Can be set to "connection". or "database".  Defaults to connection.
+ * '''authtier''' - Where to authenticate.  Can be set to "connection", "database", or "proxied".  Defaults to connection, which implements [configguide.html# User List Auth].  See [configguide.html@userlistauth User List Auth], [configguide.html#dbauth Database Auth] and [configguide.html#proxiedauth Proxied Auth] in the configuration guide for more information.
  * '''sessionhandler''' - Method used by the listener to handle a client session.  Options are either "thread" (the default as of version 0.58) or "process".  When a client connects to the listener, a child is forked to handle the connection.  The child can be either a process or a thread.  Threads should perform better but aren't supported on all platforms.  Defaults to "thread" (as of version 0.58).
- * '''handoff''' - Method for handing off a client from listener to connection, can be one of: "pass" or "proxy", see [#complex Complex Attributes] below.  Defaults to "pass".
+ * '''handoff''' - Method for handing off a client from listener to connection, can be one of: "pass" or "proxy".  When an '''SQL Relay''' client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The file descriptor of the connected client can be passed from the listener to the connection daemon, or the listener can proxy the client, ferrying data back and forth between it and the connection daemon.  These two methods are referred to as "pass" and "proxy".  "proxy" works on every platform.  "pass" works on most platforms but not all.  "pass" is faster and lighter than "proxy" and should be used if possible.  Cygwin and Linux kernels prior to 2.2 don't support "pass" though, and on those platforms, even if you specify "pass", "proxy" will be used instead and a warning will be displayed.  Other platforms may not support "pass" as well but those are the only known ones and the only ones where "proxy" is forced.
  * '''deinedips''' - A [http://www.regular-expressions.info regular expression] indicating which IP addresses will be denied access (for example, to deny access to all clients: deniedips=".*")  By default, no IP addresses are denied.
  * '''allowedips''' - A [http://www.regular-expressions.info regular expression] indicating which IP addresses will be allowed access, overriding deniedips (for example, to allow access to clients from the 192.168.2.0 and 64.45.22.0 networks: allowedips="(192\.168\.2\..*|64\.45\.22\..*)")  By default, all IP addresses are allowed.
  * '''maxquerysize''' - Sets the maximum query length (in bytes) that the SQL Relay server will accept, if a client tries to send a longer query, the server will close the connection.  Defaults to 65536 (64k) bytes.
@@ -278,47 +263,5 @@ or a tnsnames-style expression such as:
   * For '''mdbtools''' databases, the connect string syntax is "db=DATABASE;identity=ID"
    * '''db''': The filename of the database open.  Required.
    * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
- * '''metric''' - A number that influences how many of this connection should be started.  See [#complex Complex Attributes] below.  Defaults to 1.
+ * '''metric''' - A number that influences how many of this connection should be started.  The '''metric''' attribute doesn't actually define how many connections are started, the '''connections''' attribute of the '''instance''' tag defines that.  The '''metric''' attribute influences how many of the total connections will be of that connection type.  The higher the metric relative to the other metrics, the more of that connection type will be started.
  * '''behindloadbalancer''' - Can be set to "yes" or "no".  Indicates whether the database is really a pool of databases behind a load balancer or not.  If the database is not a pool of databases behind a load balancer, then when a connection daemon determines that the database has gone down, it will cause all connection daemons connected to that database to log out and re-login.  However, if the database is really a pool of databases behind a load balancer, and a connection daemon determines that the database has gone down, only that connection will log out and re-login as some or all of the remaining connections may not actually be connected to the same physical database machine, but rather to a clone which has not actually gone down.
-
-
-* '''route'''
- * '''host''' - The host that the SQL Relay server that queries will be routed to is running on.
- * '''port''' - The port that the SQL Relay server that queries will be routed to is listening on.
- * '''socket''' - The socket that the SQL Relay server that queries will be routed to is listening on.  Only use this if the SQL Relay server that queries will be routed to is running on the same machine as the router.
- * '''user''' - The user name to use to log into the SQL Relay server that queries will be routed to is running on.
- * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
-
-
-* '''query'''
- * '''pattern''' - A regular expression.  Any query matching this regular expression will be routed to the SQL Relay server specified in the enclosing route tag.
-
-[[br]][=#complex]
-== Complex Attributes ==
-
-Most of the tag attributes are straightforward.  The most complex one are the '''metric''' attribute of the '''connection''' tag and the '''authtier''' and '''handoff''' attributes of the '''instance''' tag.
-
-[[br]]
-=== Metric ===
-
-The '''metric''' attribute doesn't define how many connections are started, the '''connections''' attribute of the '''instance''' tag defines that.  The '''metric''' attribute influences how many of the total connections will be of that connection type.  The higher the metric relative to the other metrics, the more of that connection type will be started.
-
-[[br]]
-=== Authtier ===
-
-The client will send a user and password when it connects to the SQL Relay server.
-
-If the '''authtier''' attribute is set to "connection", then SQL Relay will compare the user/password to the list of user/passwords in a configuration file and accept or reject the client connection.
-
-If the '''authtier''' attribute is set to "database", then SQL Relay will authenticate the user against the database itself rather than against the list of user/passwords in a configuration file.  This causes SQL Relay to switch which user it is logged into the database as.
-
-When SQL Relay is used with Oracle 8i or higher, it switches users without logging out.  The database connection must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to SQL Relay as one of the users that can be proxied.  See [oraclentier.html this document] for more information including instructions for configuring Oracle.
-
-When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is somewhat ineffecient and defeats the value of keeping persistent database connections but might be useful for particular applications.
-
-'''NOTE:''' Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router uses to use database authentication but not the router instance itself.  If database authentication is used for that instance, authentication will fail.
-
-[[br]]
-=== Handoff ===
-
-When an '''SQL Relay''' client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The file descriptor of the connected client can be passed from the listener to the connection daemon, or the listener can proxy the client, ferrying data back and forth between it and the connection daemon.  These two methods are referred to as "pass" and "proxy".  "proxy" works on every platform.  "pass" works on most platforms but not all.  "pass" is faster and lighter than "proxy" and should be used if possible.  Cygwin and Linux kernels prior to 2.2 don't support "pass" though, and on those platforms, even if you specify "pass", "proxy" will be used instead and a warning will be displayed.  Other platforms may not support "pass" as well but those are the only known ones and the only ones where "proxy" is forced.
