@@ -2,6 +2,8 @@ top_builddir = ..
 
 include ../config.mk
 
+all:
+
 install:
 	$(MKINSTALLDIRS) $(mandir)
 	$(MKINSTALLDIRS) $(mandir)/man1

@@ -851,7 +851,7 @@ dnl    (and set MINOR and PATCH to 0)
 dnl 2. MINOR when you add backwards-compatible features
 dnl    (and set PATCH to 0)
 dnl 3. PATCH when you make backwards-compatible fixes
-SQLR_VERSION="0.66.0"
+SQLR_VERSION="0.67.0"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 

@@ -1,4 +1,5 @@
 0.67.0 - general documenation clean-up
+	added missing all: target to man/Makefile
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every
