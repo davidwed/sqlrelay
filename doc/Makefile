@@ -8,9 +8,14 @@ SRCS = index.wt faq.wt
 OBJS = index.html faq.html
 
 .wt.html:
-	wt -c $< -o $@ -xhtml xhtml.conf
+	wt -i $< -o $@ -xhtml xhtml.conf
 
 all: $(OBJS)
+	cd programming $(AND) $(MAKE)
+	cd admin $(AND) $(MAKE)
+	cd dropin $(AND) $(MAKE)
+	cd features $(AND) $(MAKE)
+	cd programming $(AND) $(MAKE)
 
 install:
 	$(MKINSTALLDIRS) $(docdir)
@@ -152,4 +157,7 @@ uninstall:
 
 clean:
 	$(RM) $(OBJS)
-	cd programming $(AND) $(MAKE) cleanparts
+	cd admin $(AND) $(MAKE) clean
+	cd dropin $(AND) $(MAKE) clean
+	cd features $(AND) $(MAKE) clean
+	cd programming $(AND) $(MAKE) clean

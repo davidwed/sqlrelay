@@ -36,15 +36,13 @@
 use the SQLRClient namespace.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>You'll also need to include the SQLRelay.dll assembly.  This is usually found in C:\Program Files\Firstworks\bin on Windows or /usr/local/firstworks/lib on Unix/Linux.</p>
 
@@ -98,7 +96,7 @@ mcs -pkg:dotnet /out:sqlrexample.exe sqlrexample.cs /reference:SQLRClient.dll
 <p>To use SQL Relay, you have to first open a connection.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -120,8 +118,6 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>The following connect string variables control attributes of the connection:</p>
 
@@ -178,7 +174,7 @@ session.</p>
 <p>In any case, you must create an instance of SQLRelayCommand and set its CommandText.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -241,15 +237,13 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <a name="commit"/><h2>Commits and Rollbacks</h2>
 
 <p>If you need to execute a commit or rollback, you should create an instance of the SQLRelayTransaction class and use its commit() and rollback() methods rather than sending "commit" or "rollback" queries.  There are two reasons for this.  First, it's much more efficient to call the methods.  Second, if you're writing code that can run on transactional or non-transactional databases, some non-transactional databases will throw errors if they receive a "commit" or "rollback" query, but by calling the commit() and rollback() methods you instruct the database connection daemon to call the commit and rollback API methods for that database rather than issuing them as queries.  If the API's have no commit or rollback methods, the calls do nothing and the database throws no error.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -281,8 +275,6 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <a name="temptables"/><h2>Temporary Tables</h2>
 
@@ -313,7 +305,7 @@ directly to the database.</p>
 <p>If your calls to ExecuteNonQuery, ExecuteScalar or ExecuteReader fail, you can catch the error an exception.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -346,8 +338,6 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <a name="bindvars"/><h2>Bind Variables</h2>
 
@@ -361,7 +351,7 @@ for using bind variables (also known as parameters) in those queries.</p>
 <p>To use bind variables (parameters) with the ADO.NET API, you must add variable/value pairs to the parameter collection associated with each instance of SQLRelayCommand.  For numeric, string or date variables, this is straightforward, you can just use the Parameters.Add() method.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -397,13 +387,11 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>You can also bind CLOB's and BLOB's.  It is a little more complex but not terribly.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -449,15 +437,13 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Clob or Blob types.</p>
 
 <p>Output bind variables can be used too.  The Direction and DbType attributes of the parameter must be specified though and for strings, the Size of the buffer to allocate for the return value must be specified as well.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -521,8 +507,6 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>FIXME: ... clob, blob and cursor output bind ...</p>
 
@@ -534,7 +518,7 @@ over and over without re-preparing it.  If your backend database natively
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -593,8 +577,6 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <a name="fields"/><h2>Accessing Fields in the Result Set</h2>
 
@@ -607,7 +589,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Further, the raw data for each field can be coaxed into a native type using the GetBoolean(), GetByte(), GetBytes(), GetChar(), GetChars(), GetGuid(), GetInt16(), GetInt32(), GetInt64(), GetFloat(), GetDouble(), GetString(), GetDecimal() and GetDateTime() methods.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -674,8 +656,6 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><a name="largeresultsets"/><h2>Dealing With Large Result Sets</h2>
 
@@ -696,7 +676,7 @@ iterate through its result set, inserting rows into another table, using only
 <p>For example:</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -750,15 +730,13 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <a name="columns"/><h2>Getting Column Information</h2>
 
 <p>After executing a query, the column count is stored in the FieldCount property of the SQLRelayDataReader class.  Column names are accessible via the GetName() method.  Column types are available from the GetDataTypeName().  The native .NET data type for the field is avialable from the GetFieldType() method.  They may be used as follows:</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -800,13 +778,11 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Extended column information is available from the GetSchemaTable method.  Usage is best illustrated by example.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -875,8 +851,6 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">}</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>SQL Relay support most of the fields that might be returned in the schema table but not all.  Most databases don't support all of these fields either.  In the future, support may improve.</p>
 
@@ -913,7 +887,7 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -923,14 +897,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -942,28 +914,24 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -971,14 +939,12 @@ http://www.gnu.org/software/src-highlite -->
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -990,28 +956,24 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1022,14 +984,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1041,28 +1001,24 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1072,14 +1028,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1091,28 +1045,24 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1123,14 +1073,12 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">end;'</font> language plpgsql
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1142,28 +1090,24 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1173,14 +1117,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1192,23 +1134,19 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h3>Single Values</h3>
 
@@ -1227,7 +1165,7 @@ Oracle calls these functions.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1237,14 +1175,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1256,21 +1192,17 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 <font color="#008080">Int64</font> result<font color="#990000">=</font>sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Here is an example where the value is returned through an output
 parameter.</p>
@@ -1278,7 +1210,7 @@ parameter.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1288,14 +1220,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1313,21 +1243,17 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
@@ -1338,7 +1264,7 @@ itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1346,14 +1272,12 @@ http://www.gnu.org/software/src-highlite -->
         select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1371,28 +1295,24 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1403,14 +1323,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1422,8 +1340,6 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 <font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using an output bind variable.  Note that in Firebird, input and
@@ -1432,7 +1348,7 @@ output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1450,21 +1366,17 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>DB2</h4>
 
@@ -1474,7 +1386,7 @@ than as return values of the procedure itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1484,14 +1396,12 @@ begin
 end
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1509,28 +1419,24 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out4<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1546,14 +1452,12 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">'</font> language plpgsql
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1565,21 +1469,17 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 <font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
@@ -1588,21 +1488,19 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the function, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the function from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1614,44 +1512,38 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 <font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>A single value can be returned in the result set of a MySQL procedure.</p>
 
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1660,21 +1552,17 @@ sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> 
 <font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>A single value can be returned using the output variable of a MySQL
 procedure.</p>
@@ -1682,21 +1570,19 @@ procedure.</p>
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1712,21 +1598,17 @@ sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> 
 <font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><br/><h3>Multiple Values</h3>
 
@@ -1744,7 +1626,7 @@ itself, but the rest must be returned through output parameters.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1756,14 +1638,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1794,28 +1674,24 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1825,14 +1701,12 @@ http://www.gnu.org/software/src-highlite -->
                 @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1863,28 +1737,24 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1897,14 +1767,12 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1921,8 +1789,6 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using a output bind variables.  Note that in Firebird, input and
@@ -1931,7 +1797,7 @@ first output bind variable is 1 rather than 4, even though there were 3 input
 bind variables.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1962,28 +1828,24 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1995,14 +1857,12 @@ begin
 end
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2033,28 +1893,24 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2068,14 +1924,12 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">'</font> language plpgsql
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2092,21 +1946,17 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
@@ -2116,21 +1966,19 @@ set of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2147,23 +1995,19 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Here's how you can get multiple values from the output variables
 of a MySQL procedure.</p>
@@ -2171,21 +2015,19 @@ of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2205,21 +2047,17 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h3>Result Sets</h3>
 
@@ -2232,7 +2070,7 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2248,8 +2086,6 @@ begin
 end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor.  That cursor may then be opened and fetched from.  In fact, a stored procedure may return multiple result sets and each may be bound to a cursor.</p>
 
@@ -2258,7 +2094,7 @@ end<font color="#990000">;</font>
 <p>For example:</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2282,8 +2118,6 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Cursor types.</p>
 
@@ -2292,7 +2126,7 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <p>For example:</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2315,13 +2149,11 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2329,29 +2161,25 @@ http://www.gnu.org/software/src-highlite -->
 drop package types
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create procedure testproc <font color="#008080">as</font> select <font color="#990000">*</font> from testtable
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To exceute the stored procedure from an SQL Relay program, ue code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2367,21 +2195,17 @@ out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><
 out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <br/><h4>Firebird</h4>
 
@@ -2401,7 +2225,7 @@ that return result sets.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2416,14 +2240,12 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">'</font> language plpgsql
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2439,21 +2261,17 @@ out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><
 out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop function testfunc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
@@ -2466,21 +2284,19 @@ currently SQL Relay can only fetch the first result set.</p>
 the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2496,21 +2312,17 @@ out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><
 out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop procedure testproc
 
 </tt></pre>
-</pre>
-
 </blockquote>
 <a name="lastinsertid"/><h2>Getting the Last Insert ID</h2>
 

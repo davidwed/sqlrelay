@@ -237,7 +237,10 @@ through the connection maintained by that daemon.</p>
 
 <p>Let's say you're using Apache, mod_php and Oracle and you determine by doing all sorts of analysis that you need to keep 30 Apache processes running to provide adequate response.  Since most of your site isn't database-driven, on average, no more than 5 PHP's actually access the database simultaneously.  Currently, you're using persistent connections to defeat the time-cost of logging into Oracle, but you have to maintain 30 connections (1 per web server process) which takes up a lot of memory on both the web server and database server and you really only need 5 connections. By using SQL Relay you can reduce the number of Oracle connections to the 5 that you need, continue to run 30 Apache processes and reclaim the wasted memory on both machines.</p>
 
-<p>Many websites run applications written in a combination of languages, some of which have their own database pooling systems.  Perl modules, for example, can use Apache::DBI and PHP has a persistent database connection system, but a PHP cannot use an Apache::DBI connection and a Perl module cannot use a PHP persistent connection.  Thus in order to make sure that there are enough database connections for each platform, many more web-server processes have to be run, perhaps twice as many.  If the PHP's and Perl modules used SQL Relay instead, they could share databse connections and reduce the number of web-server processes and database connections.</p>
+<dl>
+  <dt>Many websites run applications written in a combination of languages, some of which have their own database pooling systems.  Perl modules, for example, can use Apache</dt>
+  <dd>DBI and PHP has a persistent database connection system, but a PHP cannot use an Apache::DBI connection and a Perl module cannot use a PHP persistent connection.  Thus in order to make sure that there are enough database connections for each platform, many more web-server processes have to be run, perhaps twice as many.  If the PHP's and Perl modules used SQL Relay instead, they could share databse connections and reduce the number of web-server processes and database connections.</dd>
+</dl>
 
 <p>SQL Relay makes it easy to distribute load over replicated servers.  A common scaling solution when using MySQL or PostgreSQL in a read-only web environment is to run several web servers with a dedicated database server for each web server or group of web servers and update all the databases simultaneously at scheduled intervals.  This usually works pretty well, but sometimes database or web servers get runs of heavy load while others are idle.  In other cases, an uneven number of machines is required.  For example, your application may need 3 web servers but only 2 database servers or vice-versa and buying 3 of each would be wasteful.  Moreover, in most cases, the servers have to be equivalently powerful machines.  You can't usually just add another cheap machine that you have lying around into the pool.   SQL Relay can connect to multiple, replicated or clustered database servers, providing web-based applications access to whichever server isn't busy.  SQL Relay can also be configured to maintain more connections to more powerful machines and fewer connections to less powerful machines, enabling unevenly matched machines to be used in the same database pool.  Collectively, these features allow you to save money by using only the exact number of servers that you need and by enabling you to use spare hardware in your database pools.</p>
 
@@ -310,13 +313,19 @@ through the connection maintained by that daemon.</p>
 
 <br/><a name="dbiproxy"/><h3>How does SQL Relay compare to DBI::Proxy?</h3>
 
-<p>The DBI::Proxy module is Perl-specific, or at least very challenging to use from other languages.  SQL Relay likely outperforms DBI::Proxy since DBI::Proxy is primarily targeted at providing access to databases from unsupported platforms, not at improving application performance, though I have never tested one against the other.  SQL Relay can provide access to databases from unsupported platforms as well, even platforms for which there is no unix support using the ODBC connection and an ODBC to ODBC bridge.</p>
+<dl>
+  <dt>The DBI</dt>
+  <dd>Proxy module is Perl-specific, or at least very challenging to use from other languages.  SQL Relay likely outperforms DBI::Proxy since DBI::Proxy is primarily targeted at providing access to databases from unsupported platforms, not at improving application performance, though I have never tested one against the other.  SQL Relay can provide access to databases from unsupported platforms as well, even platforms for which there is no unix support using the ODBC connection and an ODBC to ODBC bridge.</dd>
+</dl>
 
 <br/><a name="apachedbi"/><h3>How does SQL Relay compare to Apache::DBI or PHP's persistent database connections?</h3>
 
-<p>SQL Relay is more lightweight and potentially faster than Apache::DBI and is competitive in speed with PHP's persistent connections.  SQL Relay can be used to provide a connection pool to multiple machines and has more backend features than Apache::DBI or PHP.  However, the DBI and PHP API's are generally considered to be simpler to implement.</p>
-
-<p>When using Apache::DBI or PHP's persistent connections, a connection is opened to the database for every web server process.  Frequently, web sites need to run large numbers of processes to provide adequate response.  As the number of database connections grows, resources get strained and a lot of database connections go unused most of the time.</p>
+<dl>
+  <dt>SQL Relay is more lightweight and potentially faster than Apache</dt>
+  <dd>DBI and is competitive in speed with PHP's persistent connections.  SQL Relay can be used to provide a connection pool to multiple machines and has more backend features than Apache::DBI or PHP.  However, the DBI and PHP API's are generally considered to be simpler to implement.</dd>
+  <dt>When using Apache</dt>
+  <dd>DBI or PHP's persistent connections, a connection is opened to the database for every web server process.  Frequently, web sites need to run large numbers of processes to provide adequate response.  As the number of database connections grows, resources get strained and a lot of database connections go unused most of the time.</dd>
+</dl>
 
 <p>If a website runs a mixture of Perl modules and PHP scripts, the issue can be doubled.</p>
 

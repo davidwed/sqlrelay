@@ -13,7 +13,7 @@
 <p>On Unix or Linux platforms, using unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -22,15 +22,13 @@ Description<font color="#990000">=</font>ODBC <b><font color="#0000FF">for</font
 Driver<font color="#990000">=/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib<font color="#990000">/</font>libsqlrodbc<font color="#990000">.</font>so
 FileUsage<font color="#990000">=</font><font color="#993399">1</font>
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Note that the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.  Note also that on Mac OS X you'll need to replace the <b>.so</b> suffix with <b>.dylib</b></p>
 
 <p>Once the instance is defined you can add a DSN for SQL Relay by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -43,15 +41,13 @@ Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>test<font 
 User<font color="#990000">=</font>testuser
 Password<font color="#990000">=</font>testpass
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Here the Driver attribute refers to the instance in odbcinst.ini.</p>
 
 <p>Alternatively, you could create a combined instance/DSN by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -65,8 +61,6 @@ Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>test<font 
 User<font color="#990000">=</font>testuser
 Password<font color="#990000">=</font>testpass
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>In addition to the attributes described above, the following attributes can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
 
@@ -104,7 +98,7 @@ or unixODBC to access the database through SQL Relay as follows:</p>
 <p>Here is a sample session:</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -156,37 +150,31 @@ SQLRowCount returns <font color="#993399">0</font>
 SQL<font color="#990000">&gt;</font> quit
 <font color="#990000">[</font>dmuse@fedora <font color="#990000">~]</font>$ 
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>If you get an error like <b>ISQL ERROR: Could not SQLConnect</b> when you run isql then it's possible that it can't find your ODBC INI file.  Some versions of unixODBC, when compiled and installed with non-standard prefixes, still look for odbc.ini in /etc rather than under their prefix.  For example, I discovered that on Mac OS X, unixODBC 2.2.12 installed under /sw should look for /sw/etc/odbc.ini but instead it looks for /etc/odbc.ini, even though <i>odbcinst -j</i> looks under /sw.</p>
 
 <p>You can work around this by setting environment variables to override whatever default search path unixODBC uses.  For example, to force it to look under /sw/etc, use:</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">export</font> ODBCINST<font color="#990000">=/</font>sw<font color="#990000">/</font>etc<font color="#990000">/</font>odbcinst<font color="#990000">.</font>ini
 <font color="#008080">export</font> ODBCINI<font color="#990000">=/</font>sw<font color="#990000">/</font>etc<font color="#990000">/</font>odbc<font color="#990000">.</font>ini
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN that you defined. </p>
 
 <p>You can also use SQL Relay with any language that supports ODBC directly or has a database abstraction layer that supports ODBC.  For example, lets say you have an existing PHP app that uses MDB2 to connect to Oracle and you want to use SQL Relay with it.  There is no PHP MDB2 driver for SQL Relay, but since MDB2 suppots ODBC, you could use:</p>
 
 <blockquote>
-  <pre><!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>PHP <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> MDB2 <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> ODBC <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> <font color="#008080">SQL</font> Relay <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> Oracle
 </tt></pre>
-</pre>
-
 </blockquote>
 <p>Similarly, you could use SQL Relay via ODBC with PHP/PDO, PHP/ADODB, Java/JDBC (<a href="jdbc.html">using the JDBC-ODBC bridge</a>), with the ODBC Adapter for Ruby on Rails, and so on.</p>
 

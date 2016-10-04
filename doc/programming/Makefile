@@ -2,9 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-# documentation
-.PHONY: doc parts html cleanparts
-
 .SUFFIXES: .wt .html
 
 SRCS = ado.net.wt \
@@ -46,7 +43,7 @@ OBJS = ado.net.html \
 	tcl.html
 
 .wt.html:
-	wt -c $< -o $@ -xhtml xhtml.conf
+	wt -i $< -o $@ -xhtml xhtml.conf
 
 all: $(OBJS)
 

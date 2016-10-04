@@ -37,7 +37,7 @@ OBJS = connectionpooling.html \
 	throttling.html
 
 .wt.html:
-	wt -c $< -o $@ -xhtml xhtml.conf
+	wt -i $< -o $@ -xhtml xhtml.conf
 
 all: $(OBJS)
 

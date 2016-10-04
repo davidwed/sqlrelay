@@ -11,7 +11,7 @@ OBJS = mysql.html \
 	postgresql.html
 
 .wt.html:
-	wt -c $< -o $@ -xhtml xhtml.conf
+	wt -i $< -o $@ -xhtml xhtml.conf
 
 all: $(OBJS)
 
