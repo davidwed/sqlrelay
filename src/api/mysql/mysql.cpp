@@ -254,6 +254,8 @@ struct MYSQL {
 	char		*error;
 	int		errorno;
 	dictionary< int64_t, unsigned int >	*errormap;
+	bool		backendchecked;
+	bool		backendismysql;
 };
 
 
@@ -504,6 +506,8 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 	if (charstring::length(errormap)) {
 		loadErrorMap(mysql,errormap);
 	}
+	mysql->backendchecked=false;
+	mysql->backendismysql=false;
 	mysql->currentstmt=NULL;
 	mysql_select_db(mysql,db);
 	return mysql;
@@ -1033,7 +1037,7 @@ int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) {
 
 const char *mysql_info(MYSQL *mysql) {
 	debugFunction();
-	return "";
+	return NULL;
 }
 
 my_ulonglong mysql_insert_id(MYSQL *mysql) {
@@ -2481,6 +2485,16 @@ unsigned int mapErrorNumber(MYSQL *mysql, int64_t errorno) {
 	unsigned int	retval=CR_UNKNOWN_ERROR;
 	if (mysql->errormap) {
 		mysql->errormap->getValue(errorno,&retval);
+	} else {
+		if (!mysql->backendchecked) {
+			mysql->backendismysql=
+				!charstring::compare(
+					mysql->sqlrcon->identify(),"mysql");
+			mysql->backendchecked=true;
+		}
+		if (mysql->backendismysql) {
+			retval=errorno;
+		}
 	}
 	return retval;
 }
