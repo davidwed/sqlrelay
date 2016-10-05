@@ -615,13 +615,11 @@ int	main(int argc, char **argv) {
 
 	// FIXME: mysql_change_user
 
-	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-
-		stdoutput.printf("mysql_shutdown\n");
-		checkSuccess(mysql_shutdown(&mysql,SHUTDOWN_DEFAULT),2000);
-		stdoutput.printf("\n");
-
-	}
+	stdoutput.printf("mysql_shutdown\n");
+	// should fail for lack of permissions
+	// deprecated in real mysql, and always returns 1 on error
+	checkSuccess(mysql_shutdown(&mysql,SHUTDOWN_DEFAULT),1);
+	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_refresh\n");
 	// these should all fail for lack of permissions
@@ -646,7 +644,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_reload(&mysql),1);
 	stdoutput.printf("\n");
 
-	// protocol module currently hangs
 	stdoutput.printf("mysql_stat\n");
 	const char	*stat=mysql_stat(&mysql);
 	checkSuccess(charstring::contains(stat,"Uptime: "),1);
@@ -659,7 +656,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(charstring::contains(stat,"Queries per second avg: "),1);
 	stdoutput.printf("\n");
 
-	// FIXME: mysql_kill
+	stdoutput.printf("mysql_kill\n");
+	// should fail for lack of permissions
+	// deprecated in real mysql, and always returns 1 on error
+	checkSuccess(mysql_kill(&mysql,0),1);
+	stdoutput.printf("\n");
 
 	// FIXME: mysql_options
 	// (not supported by drop-in lib)

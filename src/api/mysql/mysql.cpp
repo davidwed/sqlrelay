@@ -549,7 +549,8 @@ const char *mysql_stat(MYSQL *mysql) {
 
 int mysql_shutdown(MYSQL *mysql) {
 	debugFunction();
-	return unknownError(mysql);
+	// this is deprecated in modern versions and always returns 1 on failure
+	return 1;
 }
 
 int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
@@ -605,7 +606,8 @@ MYSQL_RES *mysql_list_processes(MYSQL *mysql) {
 
 int mysql_kill(MYSQL *mysql, unsigned long pid) {
 	debugFunction();
-	return unknownError(mysql);
+	// this is deprecated in modern versions and always returns 1 on failure
+	return 1;
 }
 
 
