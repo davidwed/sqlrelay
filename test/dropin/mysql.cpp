@@ -845,7 +845,7 @@ int	main(int argc, char **argv) {
 		stdoutput.printf("mysql_real_connect\n");
 		#if MYSQL_VERSION_ID>=32200
 			checkSuccess((long)mysql_real_connect(
-						&mysql,host,user,password,"",
+						&mysql,host,user,password,db,
 						charstring::toInteger(port),
 						socket,0),(long)&mysql);
 		#else
@@ -853,7 +853,9 @@ int	main(int argc, char **argv) {
 						&mysql,host,user,password,
 						charstring::toInteger(port),
 						socket,0),(long)&mysql);
-			// FIXME: mysql_select_db...
+			if (!charstring::isNullOrEmpty(db)) {
+				checkSuccess(mysql_select_db(&mysql,db),0);
+			}
 		#endif
 	#else
 		checkSuccess((long)mysql_connect(&mysql,host,
