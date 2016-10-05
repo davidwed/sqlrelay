@@ -112,8 +112,17 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_list_dbs\n");
 	result=mysql_list_dbs(&mysql,NULL);
-	// FIXME: check field names
-	// FIXME: check field count
+	// FIXME: crashes with drop-in lib
+	//checkSuccess(mysql_field_count(&mysql),1);
+	checkSuccess(mysql_num_fields(result),1);
+	field=mysql_fetch_field_direct(result,0);
+	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
+		checkSuccess(field->name,"Database");
+	} else {
+		// sqlrelay calls this column schema_name rather
+		// than Database so the drop-in lib does too
+		checkSuccess(field->name,"schema_name");
+	}
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"information_schema");
 	row=mysql_fetch_row(result);
@@ -135,9 +144,19 @@ int	main(int argc, char **argv) {
 	// deprecated in real mysql, and crashes
 	if (argc!=2) {
 		stdoutput.printf("mysql_list_tables\n");
-		// FIXME: check field names
-		// FIXME: check field count
 		result=mysql_list_tables(&mysql,NULL);
+		// FIXME: crashes with drop-in lib
+		//checkSuccess(mysql_field_count(&mysql),1);
+		checkSuccess(mysql_num_fields(result),1);
+		field=mysql_fetch_field_direct(result,0);
+		if (charstring::isNullOrEmpty(
+				environment::getValue("LD_PRELOAD"))) {
+			checkSuccess(field->name,"Tables_in_testdb");
+		} else {
+			// sqlrelay calls this column schema_name rather
+			// than Database so the drop-in lib does too
+			checkSuccess(field->name,"table_name");
+		}
 		row=mysql_fetch_row(result);
 		checkSuccess(row[0],"testtable");
 		row=mysql_fetch_row(result);
@@ -147,8 +166,9 @@ int	main(int argc, char **argv) {
 
 		stdoutput.printf("mysql_list_fields\n");
 		result=mysql_list_fields(&mysql,"testtable",NULL);
-		unsigned int	fieldcount=mysql_num_fields(result);
-		checkSuccess(fieldcount,19);
+		// FIXME: crashes with drop-in lib
+		//checkSuccess(mysql_field_count(&mysql),19);
+		checkSuccess(mysql_num_fields(result),19);
 		field=mysql_fetch_field_direct(result,0);
 		checkSuccess(field->name,"testtinyint");
 		// FIXME: field->...
