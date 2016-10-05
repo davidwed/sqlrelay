@@ -518,7 +518,9 @@ static bool isBlobTypeChar(const char *type) {
 #ifdef NEED_IS_UNSIGNED_TYPE_CHAR
 static bool isUnsignedTypeChar(const char *type) { 
 	return (!charstring::compareIgnoringCase(type,"USHORT") ||
-		!charstring::compareIgnoringCase(type,"UINT"));
+		!charstring::compareIgnoringCase(type,"UINT")||
+		!charstring::compareIgnoringCase(type,"YEAR") ||
+		!charstring::compareIgnoringCase(type,"TIMESTAMP"));
 }
 #endif
 
@@ -540,7 +542,12 @@ static bool isBinaryTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"OID") ||
 		!charstring::compareIgnoringCase(type,"_OID") ||
 		!charstring::compareIgnoringCase(type,"OIDVECTOR") ||
-		!charstring::compareIgnoringCase(type,"_BYTEA"));
+		!charstring::compareIgnoringCase(type,"_BYTEA") ||
+		!charstring::compareIgnoringCase(type,"TIMESTAMP") ||
+		!charstring::compareIgnoringCase(type,"DATE") ||
+		!charstring::compareIgnoringCase(type,"TIME") ||
+		!charstring::compareIgnoringCase(type,"DATETIME") ||
+		!charstring::compareIgnoringCase(type,"NEWDATE"));
 }
 #endif
 

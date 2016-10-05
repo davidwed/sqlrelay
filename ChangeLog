@@ -7,6 +7,8 @@
 	mysql_refresh in the drop-in library works with options other than
 		REFRESH_GRANT now
 	mysql_shutdown/kill return 1 on failure now rather than 2000
+	date/time and timestamp types are recognized as binary types now
+	year/timestamp types are recognized as unsigned types now
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every

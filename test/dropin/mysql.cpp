@@ -53,19 +53,23 @@ int	main(int argc, char **argv) {
 	const char	*socket;
 	const char	*user;
 	const char	*password;
+	const char	*db;
 	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
 		host="sqlrserver";
 		port="9000";
 		socket="/tmp/test.socket";
 		user="test";
 		password="test";
+		db="";
 	} else {
 		// to run against a real mysql instance, provide a host name
 		// eg: ./mysql db64
 		if (argc==2) {
 			host=argv[1];
+			db="testdb";
 		} else {
 			host="sqlrserver";
+			db="";
 		}
 		port="3306";
 		socket="/var/lib/mysql/mysql.sock";
@@ -83,7 +87,7 @@ int	main(int argc, char **argv) {
 		stdoutput.printf("mysql_real_connect\n");
 		#if MYSQL_VERSION_ID>=32200
 			checkSuccess((long)mysql_real_connect(
-						&mysql,host,user,password,"",
+						&mysql,host,user,password,db,
 						charstring::toInteger(port),
 						socket,0),(long)&mysql);
 		#else
@@ -91,7 +95,9 @@ int	main(int argc, char **argv) {
 						&mysql,host,user,password,
 						charstring::toInteger(port),
 						socket,0),(long)&mysql);
-			// FIXME: mysql_select_db...
+			if (!charstring::isNullOrEmpty(db)) {
+				checkSuccess(mysql_select_db(&mysql,db),0);
+			}
 		#endif
 	#else
 		checkSuccess((long)mysql_connect(&mysql,host,
@@ -141,76 +147,218 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_info(&mysql),NULL);
 	stdoutput.printf("\n");
 
-	// deprecated in real mysql, and crashes
-	if (argc!=2) {
-		stdoutput.printf("mysql_list_tables\n");
-		result=mysql_list_tables(&mysql,NULL);
-		// FIXME: crashes with drop-in lib
-		//checkSuccess(mysql_field_count(&mysql),1);
-		checkSuccess(mysql_num_fields(result),1);
-		field=mysql_fetch_field_direct(result,0);
-		if (charstring::isNullOrEmpty(
-				environment::getValue("LD_PRELOAD"))) {
-			checkSuccess(field->name,"Tables_in_testdb");
-		} else {
-			// sqlrelay calls this column schema_name rather
-			// than Database so the drop-in lib does too
-			checkSuccess(field->name,"table_name");
-		}
-		row=mysql_fetch_row(result);
-		checkSuccess(row[0],"testtable");
-		row=mysql_fetch_row(result);
-		checkSuccess((row==NULL),1);
-		mysql_free_result(result);
-		stdoutput.printf("\n");
-
-		stdoutput.printf("mysql_list_fields\n");
-		result=mysql_list_fields(&mysql,"testtable",NULL);
-		// FIXME: crashes with drop-in lib
-		//checkSuccess(mysql_field_count(&mysql),19);
-		checkSuccess(mysql_num_fields(result),19);
-		field=mysql_fetch_field_direct(result,0);
-		checkSuccess(field->name,"testtinyint");
-		// FIXME: field->...
-		field=mysql_fetch_field_direct(result,1);
-		checkSuccess(field->name,"testsmallint");
-		field=mysql_fetch_field_direct(result,2);
-		checkSuccess(field->name,"testmediumint");
-		field=mysql_fetch_field_direct(result,3);
-		checkSuccess(field->name,"testint");
-		field=mysql_fetch_field_direct(result,4);
-		checkSuccess(field->name,"testbigint");
-		field=mysql_fetch_field_direct(result,5);
-		checkSuccess(field->name,"testfloat");
-		field=mysql_fetch_field_direct(result,6);
-		checkSuccess(field->name,"testreal");
-		field=mysql_fetch_field_direct(result,7);
-		checkSuccess(field->name,"testdecimal");
-		field=mysql_fetch_field_direct(result,8);
-		checkSuccess(field->name,"testdate");
-		field=mysql_fetch_field_direct(result,9);
-		checkSuccess(field->name,"testtime");
-		field=mysql_fetch_field_direct(result,10);
-		checkSuccess(field->name,"testdatetime");
-		field=mysql_fetch_field_direct(result,11);
-		checkSuccess(field->name,"testyear");
-		field=mysql_fetch_field_direct(result,12);
-		checkSuccess(field->name,"testchar");
-		field=mysql_fetch_field_direct(result,13);
-		checkSuccess(field->name,"testtext");
-		field=mysql_fetch_field_direct(result,14);
-		checkSuccess(field->name,"testvarchar");
-		field=mysql_fetch_field_direct(result,15);
-		checkSuccess(field->name,"testtinytext");
-		field=mysql_fetch_field_direct(result,16);
-		checkSuccess(field->name,"testmediumtext");
-		field=mysql_fetch_field_direct(result,17);
-		checkSuccess(field->name,"testlongtext");
-		field=mysql_fetch_field_direct(result,18);
-		checkSuccess(field->name,"testtimestamp");
-		mysql_free_result(result);
-		stdoutput.printf("\n");
+	stdoutput.printf("mysql_list_tables\n");
+	result=mysql_list_tables(&mysql,NULL);
+	// FIXME: crashes with drop-in lib
+	//checkSuccess(mysql_field_count(&mysql),1);
+	checkSuccess(mysql_num_fields(result),1);
+	field=mysql_fetch_field_direct(result,0);
+	if (charstring::isNullOrEmpty(
+			environment::getValue("LD_PRELOAD"))) {
+		checkSuccess(field->name,"Tables_in_testdb");
+	} else {
+		// sqlrelay calls this column schema_name rather
+		// than Database so the drop-in lib does too
+		checkSuccess(field->name,"table_name");
 	}
+	row=mysql_fetch_row(result);
+	checkSuccess(row[0],"testtable");
+	row=mysql_fetch_row(result);
+	checkSuccess((row==NULL),1);
+	mysql_free_result(result);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_list_fields\n");
+	result=mysql_list_fields(&mysql,"testtable",NULL);
+	// FIXME: crashes with drop-in lib
+	//checkSuccess(mysql_field_count(&mysql),19);
+	checkSuccess(mysql_num_fields(result),19);
+	stdoutput.printf("\n");
+
+	field=mysql_fetch_field_direct(result,0);
+
+	stdoutput.printf("tinyint\n");
+	checkSuccess(field->name,"testtinyint");
+	checkSuccess(field->org_name,"testtinyint");
+	if (argc==2) {
+		checkSuccess(field->table,"testtable");
+		checkSuccess(field->org_table,"testtable");
+		checkSuccess(field->db,"testdb");
+	}
+	checkSuccess(field->catalog,"def");
+	checkSuccess(field->def,NULL);
+	checkSuccess(field->length,4);
+	checkSuccess(field->max_length,0);
+	checkSuccess(field->name_length,11);
+	checkSuccess(field->org_name_length,11);
+	if (argc==2) {
+		checkSuccess(field->db_length,6);
+	}
+	checkSuccess(field->catalog_length,3);
+	checkSuccess(field->def_length,0);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->decimals,0);
+	if (argc==2) {
+		checkSuccess(field->charsetnr,63);
+	}
+	checkSuccess(field->type,MYSQL_TYPE_TINY);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("smallint\n");
+	field=mysql_fetch_field_direct(result,1);
+	checkSuccess(field->name,"testsmallint");
+	checkSuccess(field->length,6);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_SHORT);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mediumint\n");
+	field=mysql_fetch_field_direct(result,2);
+	checkSuccess(field->name,"testmediumint");
+	checkSuccess(field->length,9);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_INT24);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("int\n");
+	field=mysql_fetch_field_direct(result,3);
+	checkSuccess(field->name,"testint");
+	checkSuccess(field->length,11);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_LONG);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("bigint\n");
+	field=mysql_fetch_field_direct(result,4);
+	checkSuccess(field->name,"testbigint");
+	checkSuccess(field->length,20);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_LONGLONG);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("float\n");
+	field=mysql_fetch_field_direct(result,5);
+	checkSuccess(field->name,"testfloat");
+	checkSuccess(field->length,12);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_FLOAT);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("real\n");
+	field=mysql_fetch_field_direct(result,6);
+	checkSuccess(field->name,"testreal");
+	checkSuccess(field->length,22);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_DOUBLE);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("decimal\n");
+	field=mysql_fetch_field_direct(result,7);
+	checkSuccess(field->name,"testdecimal");
+	checkSuccess(field->length,4);
+	checkSuccess(field->flags,NUM_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_NEWDECIMAL);
+	checkSuccess(field->decimals,1);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("date\n");
+	field=mysql_fetch_field_direct(result,8);
+	checkSuccess(field->name,"testdate");
+	checkSuccess(field->length,10);
+	checkSuccess(field->flags,BINARY_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_DATE);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("time\n");
+	field=mysql_fetch_field_direct(result,9);
+	checkSuccess(field->name,"testtime");
+	checkSuccess(field->length,10);
+	checkSuccess(field->flags,BINARY_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_TIME);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("datetime\n");
+	field=mysql_fetch_field_direct(result,10);
+	checkSuccess(field->name,"testdatetime");
+	checkSuccess(field->length,19);
+	checkSuccess(field->flags,BINARY_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_DATETIME);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("year\n");
+	field=mysql_fetch_field_direct(result,11);
+	checkSuccess(field->name,"testyear");
+	checkSuccess(field->length,4);
+	checkSuccess(field->flags,NUM_FLAG|UNSIGNED_FLAG|ZEROFILL_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_YEAR);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("char\n");
+	field=mysql_fetch_field_direct(result,12);
+	checkSuccess(field->name,"testchar");
+	checkSuccess(field->length,40);
+	checkSuccess(field->flags,0);
+	checkSuccess(field->type,MYSQL_TYPE_STRING);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("text\n");
+	field=mysql_fetch_field_direct(result,13);
+	checkSuccess(field->name,"testtext");
+	checkSuccess(field->length,65535);
+	checkSuccess(field->flags,BLOB_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_BLOB);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("varchar\n");
+	field=mysql_fetch_field_direct(result,14);
+	checkSuccess(field->name,"testvarchar");
+	checkSuccess(field->length,40);
+	checkSuccess(field->flags,0);
+	checkSuccess(field->type,MYSQL_TYPE_VAR_STRING);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("tinytext\n");
+	field=mysql_fetch_field_direct(result,15);
+	checkSuccess(field->name,"testtinytext");
+	checkSuccess(field->length,255);
+	// FIXME: broken in non-real db
+	if (argc==2) {
+		checkSuccess(field->flags,BLOB_FLAG);
+		checkSuccess(field->type,MYSQL_TYPE_BLOB);
+	}
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mediumtext\n");
+	field=mysql_fetch_field_direct(result,16);
+	checkSuccess(field->name,"testmediumtext");
+	checkSuccess(field->length,16777215);
+	// FIXME: broken in non-real db
+	if (argc==2) {
+		checkSuccess(field->flags,BLOB_FLAG);
+		checkSuccess(field->type,MYSQL_TYPE_BLOB);
+	}
+	stdoutput.printf("\n");
+
+	stdoutput.printf("longtext\n");
+	field=mysql_fetch_field_direct(result,17);
+	checkSuccess(field->name,"testlongtext");
+	checkSuccess(field->length,-1);
+	// FIXME: broken in non-real db
+	if (argc==2) {
+		checkSuccess(field->flags,BLOB_FLAG);
+		checkSuccess(field->type,MYSQL_TYPE_BLOB);
+	}
+	stdoutput.printf("\n");
+
+	stdoutput.printf("timestamp\n");
+	field=mysql_fetch_field_direct(result,18);
+	checkSuccess(field->name,"testtimestamp");
+	checkSuccess(field->length,19);
+	checkSuccess(field->flags,TIMESTAMP_FLAG|ON_UPDATE_NOW_FLAG|
+				BINARY_FLAG|UNSIGNED_FLAG|NOT_NULL_FLAG);
+	checkSuccess(field->type,MYSQL_TYPE_TIMESTAMP);
+	mysql_free_result(result);
+	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_real_query: insert\n");
 	query="insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)";
