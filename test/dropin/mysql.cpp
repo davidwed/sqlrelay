@@ -588,7 +588,7 @@ int	main(int argc, char **argv) {
 		stdoutput.printf("\n");
 
 
-		// protocol module currently hangs
+		// currently hangs
 		if (argc==2) {
 			stdoutput.printf("mysql_list_processes\n");
 			result=mysql_list_processes(&mysql);
@@ -630,11 +630,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_refresh(&mysql,REFRESH_STATUS),1);
 	checkSuccess(mysql_refresh(&mysql,REFRESH_SLAVE),1);
 	checkSuccess(mysql_refresh(&mysql,REFRESH_MASTER),1);
-	// this one is a no-op for the drop-in library
-	// and protocol module and it succeeds
 	if (argc==2) {
 		checkSuccess(mysql_refresh(&mysql,REFRESH_THREADS),1);
 	} else {
+		// no-op in this case
 		checkSuccess(mysql_refresh(&mysql,REFRESH_THREADS),0);
 	}
 	stdoutput.printf("\n");
@@ -657,13 +656,13 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_kill\n");
-	// should fail for lack of permissions
+	// should fail for lack of permissions (or invalid thread id)
 	// deprecated in real mysql, and always returns 1 on error
 	checkSuccess(mysql_kill(&mysql,0),1);
 	stdoutput.printf("\n");
 
 	// FIXME: mysql_options
-	// (not supported by drop-in lib)
+	// (no options are currently supported, except against a real database)
 
 	mysql_close(&mysql);
 
