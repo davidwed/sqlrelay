@@ -542,7 +542,9 @@ int mysql_ping(MYSQL *mysql) {
 
 const char *mysql_stat(MYSQL *mysql) {
 	debugFunction();
-	return "Uptime: 0  Threads: 0  Questions: 0  Slow queries: 0  Opens: 0  Flush tables: 0  Open tables: 0 Queries per second avg: 0.0";
+	return "Uptime: 0  Threads: 0  Questions: 0  "
+		"Slow queries: 0  Opens: 0  Flush tables: 0  "
+		"Open tables: 0 Queries per second avg: 0.0";
 }
 
 int mysql_shutdown(MYSQL *mysql) {
@@ -581,7 +583,6 @@ int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
 				break;
 		}
 		sqlrcursor	sqlrcur(mysql->sqlrcon);
-stdoutput.printf("query: %s\n",query);
 		return !sqlrcur.sendQuery(query);
 	}
 	return 0;

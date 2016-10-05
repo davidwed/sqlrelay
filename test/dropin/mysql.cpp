@@ -588,7 +588,7 @@ int	main(int argc, char **argv) {
 		stdoutput.printf("\n");
 
 
-		// protocol module currently fails 
+		// protocol module currently hangs
 		if (argc==2) {
 			stdoutput.printf("mysql_list_processes\n");
 			result=mysql_list_processes(&mysql);
@@ -596,6 +596,7 @@ int	main(int argc, char **argv) {
 			unsigned int	fieldcount=mysql_num_fields(result);
 			checkSuccess(fieldcount,9);
 			row=mysql_fetch_row(result);
+			// FIXME: check values
 			for (unsigned int i=0; i<fieldcount; i++) {
 				stdoutput.printf("%s,",row[i]);
 			}
@@ -620,27 +621,45 @@ int	main(int argc, char **argv) {
 		checkSuccess(mysql_shutdown(&mysql,SHUTDOWN_DEFAULT),2000);
 		stdoutput.printf("\n");
 
-		stdoutput.printf("mysql_refresh\n");
-		// these should all fail for lack of permissions
-		checkSuccess(mysql_refresh(&mysql,REFRESH_GRANT),1);
-		checkSuccess(mysql_refresh(&mysql,REFRESH_LOG),1);
-		checkSuccess(mysql_refresh(&mysql,REFRESH_TABLES),1);
-		checkSuccess(mysql_refresh(&mysql,REFRESH_HOSTS),1);
-		checkSuccess(mysql_refresh(&mysql,REFRESH_STATUS),1);
-		// this one is a noop so it succeeds
-		checkSuccess(mysql_refresh(&mysql,REFRESH_THREADS),0);
-		checkSuccess(mysql_refresh(&mysql,REFRESH_SLAVE),1);
-		checkSuccess(mysql_refresh(&mysql,REFRESH_MASTER),1);
-		stdoutput.printf("\n");
-
-		stdoutput.printf("mysql_reload\n");
-		// should all fail for lack of permissions
-		checkSuccess(mysql_reload(&mysql),1);
-		stdoutput.printf("\n");
-
-		// FIXME: mysql_kill
-		// FIXME: mysql_stat
 	}
+
+	stdoutput.printf("mysql_refresh\n");
+	// these should all fail for lack of permissions
+	checkSuccess(mysql_refresh(&mysql,REFRESH_GRANT),1);
+	checkSuccess(mysql_refresh(&mysql,REFRESH_LOG),1);
+	checkSuccess(mysql_refresh(&mysql,REFRESH_TABLES),1);
+	checkSuccess(mysql_refresh(&mysql,REFRESH_HOSTS),1);
+	checkSuccess(mysql_refresh(&mysql,REFRESH_STATUS),1);
+	checkSuccess(mysql_refresh(&mysql,REFRESH_SLAVE),1);
+	checkSuccess(mysql_refresh(&mysql,REFRESH_MASTER),1);
+	// this one is a no-op for the drop-in library
+	// and protocol module and it succeeds
+	if (argc==2) {
+		checkSuccess(mysql_refresh(&mysql,REFRESH_THREADS),1);
+	} else {
+		checkSuccess(mysql_refresh(&mysql,REFRESH_THREADS),0);
+	}
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_reload\n");
+	// should fail for lack of permissions
+	checkSuccess(mysql_reload(&mysql),1);
+	stdoutput.printf("\n");
+
+	// protocol module currently hangs
+	stdoutput.printf("mysql_stat\n");
+	const char	*stat=mysql_stat(&mysql);
+	checkSuccess(charstring::contains(stat,"Uptime: "),1);
+	checkSuccess(charstring::contains(stat,"Threads: "),1);
+	checkSuccess(charstring::contains(stat,"Questions: "),1);
+	checkSuccess(charstring::contains(stat,"Slow queries: "),1);
+	checkSuccess(charstring::contains(stat,"Opens: "),1);
+	checkSuccess(charstring::contains(stat,"Flush tables: "),1);
+	checkSuccess(charstring::contains(stat,"Open tables: "),1);
+	checkSuccess(charstring::contains(stat,"Queries per second avg: "),1);
+	stdoutput.printf("\n");
+
+	// FIXME: mysql_kill
 
 	// FIXME: mysql_options
 	// (not supported by drop-in lib)
