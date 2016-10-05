@@ -26,6 +26,13 @@ extern "C" {
 #define CR_UNKNOWN_ERROR	2000
 #define MYSQL_NO_DATA		100
 #define REFRESH_GRANT		1
+#define REFRESH_LOG		2
+#define REFRESH_TABLES		4
+#define REFRESH_HOSTS		8
+#define REFRESH_STATUS		16
+#define REFRESH_THREADS		32
+#define REFRESH_SLAVE		64
+#define REFRESH_MASTER		128
 
 typedef unsigned long long	my_ulonglong;
 typedef bool			my_bool;
@@ -545,16 +552,44 @@ int mysql_shutdown(MYSQL *mysql) {
 
 int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
 	debugFunction();
-	return (refresh_options==REFRESH_GRANT)?mysql_reload(mysql):0;
+	if (!charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
+		const char	*query=NULL;
+		switch (refresh_options) {
+			case REFRESH_GRANT:
+				query="FLUSH PRIVILEGES";
+				break;
+			case REFRESH_LOG:
+				query="FLUSH LOGS";
+				break;
+			case REFRESH_TABLES:
+				query="FLUSH TABLES";
+				break;
+			case REFRESH_HOSTS:
+				query="FLUSH HOSTS";
+				break;
+			case REFRESH_STATUS:
+				query="FLUSH STATUS";
+				break;
+			case REFRESH_THREADS:
+				// FIXME: do something?
+				return 0;
+			case REFRESH_SLAVE:
+				query="RESET SLAVE";
+				break;
+			case REFRESH_MASTER:
+				query="RESET MASTER";
+				break;
+		}
+		sqlrcursor	sqlrcur(mysql->sqlrcon);
+stdoutput.printf("query: %s\n",query);
+		return !sqlrcur.sendQuery(query);
+	}
+	return 0;
 }
 
 int mysql_reload(MYSQL *mysql) {
 	debugFunction();
-	if (!charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
-		sqlrcursor	sqlrcur(mysql->sqlrcon);
-		return !sqlrcur.sendQuery("FLUSH PRIVILEGES");
-	}
-	return 0;
+	return mysql_refresh(mysql,REFRESH_GRANT);
 }
 
 unsigned long mysql_thread_id(MYSQL *mysql) {

@@ -1,9 +1,11 @@
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile
 	mysql_info in drop-in library for mysql returns NULL instead of "" now
-	mysql_errno now returns the error number from the DB, instead of
-		CR_UNKNOWN_ERROR, if no error map is provided, and the backend
-		database is known to be mysql
+	mysql_errno in the drop-in library now returns the error number from the
+		DB, instead of CR_UNKNOWN_ERROR, if no error map is provided,
+		and the backend database is known to be mysql
+	mysql_refresh in the drop-in library works with options other than
+		REFRESH_GRANT now
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every

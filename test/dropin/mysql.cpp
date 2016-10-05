@@ -6,7 +6,10 @@
 #include <rudiments/stdio.h>
 #include <config.h>
 
-MYSQL	mysql;
+MYSQL		mysql;
+MYSQL_RES	*result;
+MYSQL_FIELD	*field;
+MYSQL_ROW	row;
 
 void checkSuccess(const char *value, const char *success) {
 
@@ -57,6 +60,8 @@ int	main(int argc, char **argv) {
 		user="test";
 		password="test";
 	} else {
+		// to run against a real mysql instance, provide a host name
+		// eg: ./mysql db64
 		if (argc==2) {
 			host=argv[1];
 		} else {
@@ -105,6 +110,18 @@ int	main(int argc, char **argv) {
 	checkSuccess((char *)mysql_character_set_name(&mysql),"latin1");
 	stdoutput.printf("\n");
 
+	stdoutput.printf("mysql_list_dbs\n");
+	result=mysql_list_dbs(&mysql,NULL);
+	// FIXME: check field names
+	// FIXME: check field count
+	row=mysql_fetch_row(result);
+	checkSuccess(row[0],"information_schema");
+	row=mysql_fetch_row(result);
+	checkSuccess(row[0],"testdb");
+	row=mysql_fetch_row(result);
+	checkSuccess((row==NULL),1);
+	mysql_free_result(result);
+	stdoutput.printf("\n");
 
 	const char	*query="drop table testdb.testtable";
 	mysql_real_query(&mysql,query,charstring::length(query));
@@ -115,6 +132,65 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_info(&mysql),NULL);
 	stdoutput.printf("\n");
 
+	// deprecated in real mysql, and crashes
+	if (argc!=2) {
+		stdoutput.printf("mysql_list_tables\n");
+		// FIXME: check field names
+		// FIXME: check field count
+		result=mysql_list_tables(&mysql,NULL);
+		row=mysql_fetch_row(result);
+		checkSuccess(row[0],"testtable");
+		row=mysql_fetch_row(result);
+		checkSuccess((row==NULL),1);
+		mysql_free_result(result);
+		stdoutput.printf("\n");
+
+		stdoutput.printf("mysql_list_fields\n");
+		result=mysql_list_fields(&mysql,"testtable",NULL);
+		unsigned int	fieldcount=mysql_num_fields(result);
+		checkSuccess(fieldcount,19);
+		field=mysql_fetch_field_direct(result,0);
+		checkSuccess(field->name,"testtinyint");
+		// FIXME: field->...
+		field=mysql_fetch_field_direct(result,1);
+		checkSuccess(field->name,"testsmallint");
+		field=mysql_fetch_field_direct(result,2);
+		checkSuccess(field->name,"testmediumint");
+		field=mysql_fetch_field_direct(result,3);
+		checkSuccess(field->name,"testint");
+		field=mysql_fetch_field_direct(result,4);
+		checkSuccess(field->name,"testbigint");
+		field=mysql_fetch_field_direct(result,5);
+		checkSuccess(field->name,"testfloat");
+		field=mysql_fetch_field_direct(result,6);
+		checkSuccess(field->name,"testreal");
+		field=mysql_fetch_field_direct(result,7);
+		checkSuccess(field->name,"testdecimal");
+		field=mysql_fetch_field_direct(result,8);
+		checkSuccess(field->name,"testdate");
+		field=mysql_fetch_field_direct(result,9);
+		checkSuccess(field->name,"testtime");
+		field=mysql_fetch_field_direct(result,10);
+		checkSuccess(field->name,"testdatetime");
+		field=mysql_fetch_field_direct(result,11);
+		checkSuccess(field->name,"testyear");
+		field=mysql_fetch_field_direct(result,12);
+		checkSuccess(field->name,"testchar");
+		field=mysql_fetch_field_direct(result,13);
+		checkSuccess(field->name,"testtext");
+		field=mysql_fetch_field_direct(result,14);
+		checkSuccess(field->name,"testvarchar");
+		field=mysql_fetch_field_direct(result,15);
+		checkSuccess(field->name,"testtinytext");
+		field=mysql_fetch_field_direct(result,16);
+		checkSuccess(field->name,"testmediumtext");
+		field=mysql_fetch_field_direct(result,17);
+		checkSuccess(field->name,"testlongtext");
+		field=mysql_fetch_field_direct(result,18);
+		checkSuccess(field->name,"testtimestamp");
+		mysql_free_result(result);
+		stdoutput.printf("\n");
+	}
 
 	stdoutput.printf("mysql_real_query: insert\n");
 	query="insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)";
@@ -144,7 +220,7 @@ int	main(int argc, char **argv) {
 
 
 	stdoutput.printf("mysql_store_result:\n");
-	MYSQL_RES	*result=mysql_store_result(&mysql);
+	result=mysql_store_result(&mysql);
 
 	stdoutput.printf("mysql_num_fields:\n");
 	checkSuccess(mysql_num_fields(result),19);
@@ -162,10 +238,10 @@ int	main(int argc, char **argv) {
 
 
 	stdoutput.printf("mysql_fetch_field/mysql_field_tell:\n");
-	MYSQL_FIELD	*field;
 	field=mysql_fetch_field(result);
 	checkSuccess(mysql_field_tell(result),1);
 	checkSuccess(field->name,"testtinyint");
+	// FIXME: field->...
 	field=mysql_fetch_field(result);
 	checkSuccess(mysql_field_tell(result),2);
 	checkSuccess(field->name,"testsmallint");
@@ -231,6 +307,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("mysql_fetch_field_direct:\n");
 	field=mysql_fetch_field_direct(result,0);
 	checkSuccess(field->name,"testtinyint");
+	// FIXME: field->...
 	field=mysql_fetch_field_direct(result,1);
 	checkSuccess(field->name,"testsmallint");
 	field=mysql_fetch_field_direct(result,2);
@@ -295,7 +372,6 @@ int	main(int argc, char **argv) {
 
 
 	stdoutput.printf("mysql_fetch_row:\n");
-	MYSQL_ROW	row;
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"1");
 	checkSuccess(row[1],"1");
@@ -502,6 +578,33 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_errno(&mysql),1064);
 	stdoutput.printf("\n");
 
+
+	// drop-in api can't do these
+	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
+
+
+		stdoutput.printf("mysql_thread_id\n");
+		checkSuccess((mysql_thread_id(&mysql)!=0),1);
+		stdoutput.printf("\n");
+
+
+		// protocol module currently fails 
+		if (argc==2) {
+			stdoutput.printf("mysql_list_processes\n");
+			result=mysql_list_processes(&mysql);
+			// FIXME: check field names
+			unsigned int	fieldcount=mysql_num_fields(result);
+			checkSuccess(fieldcount,9);
+			row=mysql_fetch_row(result);
+			for (unsigned int i=0; i<fieldcount; i++) {
+				stdoutput.printf("%s,",row[i]);
+			}
+			stdoutput.printf("\n");
+			mysql_free_result(result);
+			stdoutput.printf("\n");
+		}
+	}
+
 	// FIXME: mysql_info for:
 	// insert into ... select ...
 	// insert into ... values (...),(...),(...)...
@@ -509,36 +612,38 @@ int	main(int argc, char **argv) {
 	// alter table
 	// update
 
-	// FIXME: mysql_thread_id
-
 	// FIXME: mysql_change_user
 
-	// FIXME: mysql_send_query
-	// FIXME: mysql_read_query_result
+	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
 
-	// FIXME: mysql_create_db
-	// FIXME: mysql_drop_db
+		stdoutput.printf("mysql_shutdown\n");
+		checkSuccess(mysql_shutdown(&mysql,SHUTDOWN_DEFAULT),2000);
+		stdoutput.printf("\n");
 
-	// FIXME: mysql_shutdown
-	// FIXME: mysql_refresh
-	// FIXME: mysql_reload
+		stdoutput.printf("mysql_refresh\n");
+		// these should all fail for lack of permissions
+		checkSuccess(mysql_refresh(&mysql,REFRESH_GRANT),1);
+		checkSuccess(mysql_refresh(&mysql,REFRESH_LOG),1);
+		checkSuccess(mysql_refresh(&mysql,REFRESH_TABLES),1);
+		checkSuccess(mysql_refresh(&mysql,REFRESH_HOSTS),1);
+		checkSuccess(mysql_refresh(&mysql,REFRESH_STATUS),1);
+		// this one is a noop so it succeeds
+		checkSuccess(mysql_refresh(&mysql,REFRESH_THREADS),0);
+		checkSuccess(mysql_refresh(&mysql,REFRESH_SLAVE),1);
+		checkSuccess(mysql_refresh(&mysql,REFRESH_MASTER),1);
+		stdoutput.printf("\n");
 
-	// FIXME: mysql_debug
-	// FIXME: mysql_dump_debug_info
+		stdoutput.printf("mysql_reload\n");
+		// should all fail for lack of permissions
+		checkSuccess(mysql_reload(&mysql),1);
+		stdoutput.printf("\n");
 
-	// FIXME: mysql_kill
-	// FIXME: mysql_stat
-
-	// FIXME: mysql_list_dbs
-	// FIXME: mysql_list_tables
-	// FIXME: mysql_list_fields
-
-	// FIXME: mysql_list_processes
+		// FIXME: mysql_kill
+		// FIXME: mysql_stat
+	}
 
 	// FIXME: mysql_options
-		
-	// FIXME: mysql_odbc_escape_string
-	// FIXME: myodbc_remove_escape
+	// (not supported by drop-in lib)
 
 	mysql_close(&mysql);
 
