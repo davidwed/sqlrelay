@@ -570,44 +570,41 @@ const char *mysql_stat(MYSQL *mysql) {
 
 int mysql_shutdown(MYSQL *mysql) {
 	debugFunction();
-	// this is deprecated in modern versions and always returns 1 on failure
-	return 1;
+	sqlrcursor	sqlrcur(mysql->sqlrcon);
+	return !sqlrcur.sendQuery("SHUTDOWN");
 }
 
 int mysql_refresh(MYSQL *mysql, unsigned int refresh_options) {
 	debugFunction();
-	if (!charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
-		const char	*query=NULL;
-		switch (refresh_options) {
-			case REFRESH_GRANT:
-				query="FLUSH PRIVILEGES";
-				break;
-			case REFRESH_LOG:
-				query="FLUSH LOGS";
-				break;
-			case REFRESH_TABLES:
-				query="FLUSH TABLES";
-				break;
-			case REFRESH_HOSTS:
-				query="FLUSH HOSTS";
-				break;
-			case REFRESH_STATUS:
-				query="FLUSH STATUS";
-				break;
-			case REFRESH_THREADS:
-				// FIXME: do something?
-				return 0;
-			case REFRESH_SLAVE:
-				query="RESET SLAVE";
-				break;
-			case REFRESH_MASTER:
-				query="RESET MASTER";
-				break;
-		}
-		sqlrcursor	sqlrcur(mysql->sqlrcon);
-		return !sqlrcur.sendQuery(query);
+	const char	*query=NULL;
+	switch (refresh_options) {
+		case REFRESH_GRANT:
+			query="FLUSH PRIVILEGES";
+			break;
+		case REFRESH_LOG:
+			query="FLUSH LOGS";
+			break;
+		case REFRESH_TABLES:
+			query="FLUSH TABLES";
+			break;
+		case REFRESH_HOSTS:
+			query="FLUSH HOSTS";
+			break;
+		case REFRESH_STATUS:
+			query="FLUSH STATUS";
+			break;
+		case REFRESH_THREADS:
+			// FIXME: do something?
+			return 0;
+		case REFRESH_SLAVE:
+			query="RESET SLAVE";
+			break;
+		case REFRESH_MASTER:
+			query="RESET MASTER";
+			break;
 	}
-	return 0;
+	sqlrcursor	sqlrcur(mysql->sqlrcon);
+	return !sqlrcur.sendQuery(query);
 }
 
 int mysql_reload(MYSQL *mysql) {
@@ -627,8 +624,10 @@ MYSQL_RES *mysql_list_processes(MYSQL *mysql) {
 
 int mysql_kill(MYSQL *mysql, unsigned long pid) {
 	debugFunction();
-	// this is deprecated in modern versions and always returns 1 on failure
-	return 1;
+	sqlrcursor	sqlrcur(mysql->sqlrcon);
+	stringbuffer	query;
+	query.append("KILL ")->append(pid);
+	return !sqlrcur.sendQuery(query.getString());
 }
 
 
