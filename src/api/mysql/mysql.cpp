@@ -1781,7 +1781,6 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 				retval==MYSQL_TYPE_NEWDECIMAL) && !scale) {
 				retval=MYSQL_TYPE_LONG;
 			}
-stdoutput.printf("%s==%s(%d)(%d)\n",columntype,datatypestring[index],index,retval);
 			return retval;
 		}
 	}
