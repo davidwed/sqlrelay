@@ -14,6 +14,7 @@
 	mapping date/time to MYSQL_TYPE_DATE/TIME, rather than
 		MYSQL_TYPE_DATETIME is the default in the drop-in library now
 		and SQLR_MAP_DATETIME_TO_DATE has been removed
+	mysql drop-in library sets column flags correctly now
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every

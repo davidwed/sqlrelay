@@ -271,6 +271,21 @@ struct MYSQL {
 	bool		backendismysql;
 };
 
+#define NOT_NULL_FLAG		1
+#define PRI_KEY_FLAG		2
+#define UNIQUE_KEY_FLAG		4
+#define MULTIPLE_KEY_FLAG	8
+#define BLOB_FLAG		16
+#define UNSIGNED_FLAG		32
+#define ZEROFILL_FLAG		64
+#define BINARY_FLAG		128
+#define ENUM_FLAG		256
+#define AUTO_INCREMENT_FLAG	512
+#define TIMESTAMP_FLAG		1024
+#define ON_UPDATE_NOW_FLAG	8192
+#define SET_FLAG		2048
+#define NUM_FLAG		32768
+
 
 unsigned int mysql_thread_safe();
 MYSQL *mysql_init(MYSQL *mysql);
@@ -924,20 +939,25 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			// figure out the column type
 			const char	*columntypestring=
 						sqlrcur->getField(i,1);
+			const char	*lengthstring=
+						sqlrcur->getField(i,2);
+			int64_t	prec=sqlrcur->getFieldAsInteger(i,3);
 			int64_t	scale=sqlrcur->getFieldAsInteger(i,4);
+			const char	*nullable=sqlrcur->getField(i,5);
+			const char	*key=sqlrcur->getField(i,6);
+			const char	*extra=sqlrcur->getField(i,8);
 			enum enum_field_types	columntype=
 					map_col_type(columntypestring,scale);
 			fields[i].type=columntype;
 
 			// determine the length...
 			unsigned int	len=0;
-			if (sqlrcur->getFieldLength(i,(uint32_t)2)) {
-				len=sqlrcur->getFieldAsInteger(i,(uint32_t)2);
+			if (!charstring::isNullOrEmpty(lengthstring)) {
+				len=charstring::toInteger(lengthstring);
 			} else {
 				switch (columntype) {
 					case MYSQL_TYPE_DECIMAL:
-						len=sqlrcur->getFieldAsInteger(
-							i,(uint32_t)3)+2;
+						len=prec+2;
 						break;
 					case MYSQL_TYPE_TINY:
 						len=4;
@@ -1014,16 +1034,55 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 
 			// figure out the flags
 			unsigned int	flags=0;
-			if (!isTrue(sqlrcur->getField(i,5))) {
-				#define NOT_NULL_FLAG	1
+			if (!isTrue(nullable)) {
 				flags|=NOT_NULL_FLAG;
 			}
-			if (isTrue(sqlrcur->getField(i,6))) {
-				#define PRI_KEY_FLAG	2
+			if (!charstring::compareIgnoringCase(key,"pri")) {
 				flags|=PRI_KEY_FLAG;
 			}
-			// FIXME: the Extra field might have other flags in it
-
+			if (!charstring::compareIgnoringCase(key,"uni")) {
+				flags|=UNIQUE_KEY_FLAG;
+			}
+			if (!charstring::isNullOrEmpty(key)) {
+				flags|=MULTIPLE_KEY_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_TINY_BLOB ||
+				columntype==MYSQL_TYPE_MEDIUM_BLOB ||
+				columntype==MYSQL_TYPE_LONG_BLOB ||
+				columntype==MYSQL_TYPE_BLOB) {
+				flags|=BLOB_FLAG;
+			}
+			// FIXME: the "unsigned" test won't work with most db's
+			if (charstring::contains(columntypestring,"unsigned") ||
+				isUnsignedTypeChar(columntypestring)) {
+				flags|=UNSIGNED_FLAG;
+			}
+			// FIXME: there are probably other
+			// types that are zero-filled
+			if (columntype==MYSQL_TYPE_YEAR) {
+				flags|=ZEROFILL_FLAG;
+			}
+			if (isBinaryTypeChar(columntypestring)) {
+				flags|=BINARY_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_ENUM) {
+				flags|=ENUM_FLAG;
+			}
+			if (charstring::contains(extra,"auto_increment")) {
+				flags|=AUTO_INCREMENT_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_TIMESTAMP ||
+				columntype==MYSQL_TYPE_TIMESTAMP2) {
+				flags|=TIMESTAMP_FLAG|ON_UPDATE_NOW_FLAG;
+			}
+			if (columntype==MYSQL_TYPE_SET) {
+				flags|=SET_FLAG;
+			}
+			if (isNumberTypeChar(columntypestring)) {
+				flags|=NUM_FLAG;
+			}
+			fields[i].flags=flags;
+		
 			// set the number of decimal places (scale)
 			fields[i].decimals=scale;
 		}
@@ -2116,69 +2175,52 @@ static void processFields(MYSQL_STMT *stmt) {
 			// figure out the flags
 			unsigned int	flags=0;
 			if (sqlrcur->getColumnIsNullable(i)) {
-				#define NOT_NULL_FLAG	1
 				flags|=NOT_NULL_FLAG;
 			}
 			if (sqlrcur->getColumnIsPrimaryKey(i)) {
-				#define PRI_KEY_FLAG	2
 				flags|=PRI_KEY_FLAG;
 			}
 			if (sqlrcur->getColumnIsUnique(i)) {
-				#define UNIQUE_KEY_FLAG 4
 				flags|=UNIQUE_KEY_FLAG;
 			}
 			if (sqlrcur->getColumnIsPartOfKey(i)) {
-				#define MULTIPLE_KEY_FLAG 8
 				flags|=MULTIPLE_KEY_FLAG;
 			}
 			if (columntype==MYSQL_TYPE_TINY_BLOB ||
 				columntype==MYSQL_TYPE_MEDIUM_BLOB ||
 				columntype==MYSQL_TYPE_LONG_BLOB ||
 				columntype==MYSQL_TYPE_BLOB) {
-				#define BLOB_FLAG	16
 				flags|=BLOB_FLAG;
 			}
-			if (sqlrcur->getColumnIsUnsigned(i) ||
+			// FIXME: the "unsigned" test won't work with most db's
+			if (charstring::contains(columntypestring,"unsigned") ||
+				sqlrcur->getColumnIsUnsigned(i) ||
 				isUnsignedTypeChar(columntypestring)) {
-				#define UNSIGNED_FLAG	32
 				flags|=UNSIGNED_FLAG;
 			}
 			if (sqlrcur->getColumnIsZeroFilled(i)) {
-				#define ZEROFILL_FLAG	64
 				flags|=ZEROFILL_FLAG;
 			}
 			if (sqlrcur->getColumnIsBinary(i) ||
 				isBinaryTypeChar(columntypestring)) {
-				#define BINARY_FLAG	128
 				flags|=BINARY_FLAG;
 			}
 			if (columntype==MYSQL_TYPE_ENUM) {
-				#define ENUM_FLAG	256
 				flags|=ENUM_FLAG;
 			}
 			if (sqlrcur->getColumnIsAutoIncrement(i)) {
-				#define AUTO_INCREMENT_FLAG 512
 				flags|=AUTO_INCREMENT_FLAG;
 			}
-			if (columntype==MYSQL_TYPE_TIMESTAMP) {
-				#define TIMESTAMP_FLAG	1024
-				flags|=TIMESTAMP_FLAG;
+			if (columntype==MYSQL_TYPE_TIMESTAMP ||
+				columntype==MYSQL_TYPE_TIMESTAMP2) {
+				flags|=TIMESTAMP_FLAG|ON_UPDATE_NOW_FLAG;
 			}
 			if (columntype==MYSQL_TYPE_SET) {
-				#define SET_FLAG	2048
 				flags|=SET_FLAG;
 			}
 			if (isNumberTypeChar(columntypestring)) {
-				#define NUM_FLAG	32768
 				flags|=NUM_FLAG;
 			}
-			// Presumably these don't matter...
-			// Intern; Part of some key
-			//#define PART_KEY_FLAG	16384
-			// Intern: Group field
-			//#define GROUP_FLAG	32768
-			// Intern: Used by sql_yacc
-			//#define UNIQUE_FLAG	65536
 			fields[i].flags=flags;
 
 			fields[i].decimals=scale;
