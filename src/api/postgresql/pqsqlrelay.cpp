@@ -1283,7 +1283,13 @@ static Oid postgresqltypemap[]={
 	// "BYTE"
 	26,
 	// "BOOLEAN"
-	16
+	16,
+	// "TINY_TEXT"
+	26,
+	// "MEDIUM_TEXT"
+	26,
+	// "LONG_TEXT"
+	26
 };
 
 Oid PQftype(const PGresult *res, int field_num) {

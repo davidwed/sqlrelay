@@ -202,7 +202,11 @@ typedef	enum {
 	// added by informix
 	SMALLFLOAT_DATATYPE,
 	BYTE_DATATYPE,
-	BOOLEAN_DATATYPE
+	BOOLEAN_DATATYPE,
+	// also added by mysql
+	TINYTEXT,
+	MEDIUMTEXT,
+	LONGTEXT
 } datatype;
 
 #ifdef NEED_DATATYPESTRING
@@ -399,6 +403,10 @@ static const char	*datatypestring[] = {
 	"SMALLFLOAT",
 	"BYTE",
 	"BOOLEAN",
+	// also added by mysql
+	"TINYTEXT",
+	"MEDIUMTEXT",
+	"LONGTEXT",
 	NULL
 };
 #endif
@@ -511,7 +519,10 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"LONG_RAW") ||
 		!charstring::compareIgnoringCase(type,"CLOB") ||
 		!charstring::compareIgnoringCase(type,"BFILE") ||
-		!charstring::compareIgnoringCase(type,"DBCLOB"));
+		!charstring::compareIgnoringCase(type,"DBCLOB") ||
+		!charstring::compareIgnoringCase(type,"TINYTEXT") ||
+		!charstring::compareIgnoringCase(type,"MEDIUMTEXT") ||
+		!charstring::compareIgnoringCase(type,"LONGTEXT"));
 }
 #endif
 

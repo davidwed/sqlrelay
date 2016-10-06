@@ -6,9 +6,14 @@
 		and the backend database is known to be mysql
 	mysql_refresh in the drop-in library works with options other than
 		REFRESH_GRANT now
-	mysql_shutdown/kill return 1 on failure now rather than 2000
+	mysql_shutdown/kill in the drop-in library return 1 on failure now
+		rather than 2000
 	date/time and timestamp types are recognized as binary types now
 	year/timestamp types are recognized as unsigned types now
+	TINY/MEDIUM/LONG_TEXT types are recognized as blobs now
+	mapping date/time to MYSQL_TYPE_DATE/TIME, rather than
+		MYSQL_TYPE_DATETIME is the default in the drop-in library now
+		and SQLR_MAP_DATETIME_TO_DATE has been removed
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every

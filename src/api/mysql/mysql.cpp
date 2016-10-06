@@ -47,7 +47,7 @@ enum mysql_option {
 	MYSQL_OPTION_UNKNOWN_OPTION
 };
 
-// Taken directly from mysql_com.h version 5.1.22
+// Taken directly from mysql_com.h version 5.something
 // Back-compatible with all previous versions.
 enum enum_field_types {
 	MYSQL_TYPE_DECIMAL,
@@ -58,12 +58,18 @@ enum enum_field_types {
 	MYSQL_TYPE_DOUBLE,
 	MYSQL_TYPE_NULL,
 	MYSQL_TYPE_TIMESTAMP,
-	MYSQL_TYPE_LONGLONG,MYSQL_TYPE_INT24,
+	MYSQL_TYPE_LONGLONG,
+	MYSQL_TYPE_INT24,
 	MYSQL_TYPE_DATE,
 	MYSQL_TYPE_TIME,
 	MYSQL_TYPE_DATETIME,
 	MYSQL_TYPE_YEAR,
 	MYSQL_TYPE_NEWDATE,
+	MYSQL_TYPE_VARCHAR,
+	MYSQL_TYPE_BIT,
+	MYSQL_TYPE_TIMESTAMP2,
+	MYSQL_TYPE_DATETIME2,
+	MYSQL_TYPE_TIME2,
 	MYSQL_TYPE_NEWDECIMAL=246,
 	MYSQL_TYPE_ENUM=247,
 	MYSQL_TYPE_SET=248,
@@ -881,8 +887,9 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			fields[i].name=const_cast<char *>(
 					sqlrcur->getField(i,(uint32_t)0));
 			fields[i].table=const_cast<char *>(table);
-			fields[i].def=const_cast<char *>(
-					sqlrcur->getField(i,(uint32_t)7));
+			const char	*def=sqlrcur->getField(i,(uint32_t)7);
+			fields[i].def=(charstring::isNullOrEmpty(def))?
+							NULL:(char *)def;
 
 			#if defined(COMPAT_MYSQL_4_0) || \
 				defined(COMPAT_MYSQL_4_1) || \
@@ -893,7 +900,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			#if defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].catalog=(char *)"";
+  			fields[i].catalog=(char *)"def";
   			fields[i].org_name=fields[i].name;
 			fields[i].name_length=
 				charstring::length(fields[i].name);
@@ -923,33 +930,91 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			fields[i].type=columntype;
 
 			// determine the length...
-			// for decimals, attempt to use the precision (column 3)
-			// and add 2 (one for negative, one for decimal)
-			// for non-decimals, or if column 3 is empty, fall back
-			// to the "length" (column 2) otherwise fall back to 50
-			bool		gotlen=false;
 			unsigned int	len=0;
-			if ((columntype==MYSQL_TYPE_DECIMAL ||
-				columntype==MYSQL_TYPE_NEWDECIMAL) &&
-				sqlrcur->getFieldLength(i,(uint32_t)3)) {
-				len=sqlrcur->getFieldAsInteger(i,(uint32_t)3)+2;
-				gotlen=true;
-			}
-			if (!gotlen && sqlrcur->getFieldLength(i,(uint32_t)2)) {
+			if (sqlrcur->getFieldLength(i,(uint32_t)2)) {
 				len=sqlrcur->getFieldAsInteger(i,(uint32_t)2);
-				gotlen=true;
-			}
-			if (!gotlen) {
-				len=50;
+			} else {
+				switch (columntype) {
+					case MYSQL_TYPE_DECIMAL:
+						len=sqlrcur->getFieldAsInteger(
+							i,(uint32_t)3)+2;
+						break;
+					case MYSQL_TYPE_TINY:
+						len=4;
+						break;
+					case MYSQL_TYPE_SHORT:
+						len=6;
+						break;
+					case MYSQL_TYPE_LONG:
+						len=11;
+						break;
+					case MYSQL_TYPE_FLOAT:
+						len=12;
+						break;
+					case MYSQL_TYPE_DOUBLE:
+						len=22;
+						break;
+					case MYSQL_TYPE_TIMESTAMP:
+						len=19;
+						break;
+					case MYSQL_TYPE_LONGLONG:
+						len=20;
+						break;
+					case MYSQL_TYPE_INT24:
+						len=9;
+						break;
+					case MYSQL_TYPE_DATE:
+						len=10;
+						break;
+					case MYSQL_TYPE_TIME:
+						len=10;
+						break;
+					case MYSQL_TYPE_DATETIME:
+						len=19;
+						break;
+					case MYSQL_TYPE_YEAR:
+						len=4;
+						break;
+					case MYSQL_TYPE_NEWDATE:
+						len=10;
+						break;
+					case MYSQL_TYPE_BIT:
+						len=1;
+						break;
+					case MYSQL_TYPE_TIMESTAMP2:
+						len=19;
+						break;
+					case MYSQL_TYPE_DATETIME2:
+						len=19;
+						break;
+					case MYSQL_TYPE_TIME2:
+						len=10;
+						break;
+					case MYSQL_TYPE_NEWDECIMAL:
+						len=sqlrcur->getFieldAsInteger(
+							i,(uint32_t)3)+2;
+						break;
+					case MYSQL_TYPE_ENUM:
+					case MYSQL_TYPE_SET:
+					case MYSQL_TYPE_GEOMETRY:
+						// FIXME: not really sure
+						// about these
+						len=8;
+						break;
+					default:
+						// fall back to 50
+						len=50;
+						break;
+				}
 			}
 			fields[i].length=len;
 
-			// no good way to set this
-			fields[i].max_length=fields[i].length;
+			// it looks like this is always 0
+			fields[i].max_length=0;
 
 			// figure out the flags
 			unsigned int	flags=0;
-			if (isTrue(sqlrcur->getField(i,5))) {
+			if (!isTrue(sqlrcur->getField(i,5))) {
 				#define NOT_NULL_FLAG	1
 				flags|=NOT_NULL_FLAG;
 			}
@@ -1337,7 +1402,7 @@ static enum enum_field_types	mysqltypemap[]={
 	// "FLOAT"
 	MYSQL_TYPE_FLOAT,
 	// "TEXT"
-	MYSQL_TYPE_STRING,
+	MYSQL_TYPE_BLOB,
 	// "VARCHAR"
 	MYSQL_TYPE_VAR_STRING,
 	// "VARBINARY"
@@ -1364,9 +1429,9 @@ static enum enum_field_types	mysqltypemap[]={
 	// "DOUBLE"
 	MYSQL_TYPE_DOUBLE,
 	// "DATE"
-	MYSQL_TYPE_DATETIME,
+	MYSQL_TYPE_DATE,
 	// "TIME"
-	MYSQL_TYPE_DATETIME,
+	MYSQL_TYPE_TIME,
 	// "TIMESTAMP"
 	MYSQL_TYPE_TIMESTAMP,
 	// added by msql
@@ -1456,6 +1521,10 @@ static enum enum_field_types	mysqltypemap[]={
 	// "DOUBLE PRECISION"
 	MYSQL_TYPE_DOUBLE,
 	// added by postgresql
+	// "BOOL"
+	MYSQL_TYPE_TINY,
+	// "BYTEA"
+	MYSQL_TYPE_BLOB,
 	// "NAME"
 	MYSQL_TYPE_STRING,
 	// "INT8"
@@ -1671,6 +1740,12 @@ static enum enum_field_types	mysqltypemap[]={
 	MYSQL_TYPE_BLOB,
 	// "BOOLEAN"
 	MYSQL_TYPE_TINY,
+	// "TINYTEXT"
+	MYSQL_TYPE_BLOB,
+	// "MEDIUMTEXT"
+	MYSQL_TYPE_BLOB,
+	// "LONGTEXT"
+	MYSQL_TYPE_BLOB
 };
 
 enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
@@ -1697,7 +1772,7 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 			enum_field_types	retval=mysqltypemap[index];
 
 			// Some DB's, like oracle, don't distinguish between
-			// float and integer types, they just have a numeric
+			// decimal and integer types, they just have a numeric
 			// field which may or may not have decimal points.
 			// Those fields types get translated to "decimal"
 			// but if there are 0 decimal points, then we need to
@@ -1706,19 +1781,7 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 				retval==MYSQL_TYPE_NEWDECIMAL) && !scale) {
 				retval=MYSQL_TYPE_LONG;
 			}
-
-			// Some DB's, like oracle, only have a date type, not
-			// date, time and datetime types.  Sometimes the app
-			// might just want the column to be treated as a date,
-			// rather than datetime.  Use an environment variable
-			// to handle this.
-			if (retval==MYSQL_TYPE_DATETIME &&
-				!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_MYSQL_MAP_DATETIME_TO_DATE"),
-					"yes")) {
-				retval=MYSQL_TYPE_DATE;
-			}
+stdoutput.printf("%s==%s(%d)(%d)\n",columntype,datatypestring[index],index,retval);
 			return retval;
 		}
 	}
@@ -2009,7 +2072,7 @@ static void processFields(MYSQL_STMT *stmt) {
 			#if defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].catalog=(char *)"";
+  			fields[i].catalog=(char *)"def";
   			fields[i].org_name=const_cast<char *>(
 						sqlrcur->getColumnName(i));
 			fields[i].name_length=
