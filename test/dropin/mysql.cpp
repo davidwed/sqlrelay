@@ -21,7 +21,7 @@ void checkSuccess(const char *value, const char *success) {
 			stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 			stdoutput.printf("failure ");
 stdoutput.printf("\n%s\n",mysql_error(&mysql));
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -30,7 +30,7 @@ stdoutput.printf("\n%s\n",mysql_error(&mysql));
 	} else {
 		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 		stdoutput.printf("failure ");
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -42,7 +42,7 @@ void checkSuccess(int value, int success) {
 		stdoutput.printf("\"%d\"!=\"%d\"\n",value,success);
 		stdoutput.printf("failure ");
 stdoutput.printf("\n%s\n",mysql_error(&mysql));
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -1161,6 +1161,8 @@ int	main(int argc, char **argv) {
 	bind[10].length=&bindlength[10];
 	isnull[10]=0;
 	bind[10].is_null=&isnull[10];
+
+	// FIXME: date/time binds
 
 	checkSuccess(mysql_stmt_bind_param(stmt,bind),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
