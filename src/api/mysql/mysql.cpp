@@ -915,7 +915,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
   			fields[i].catalog=(char *)"def";
-  			fields[i].org_name=fields[i].name;
+  			fields[i].org_name=(char *)"";
 			fields[i].name_length=
 				charstring::length(fields[i].name);
 			fields[i].org_name_length=
@@ -2130,8 +2130,7 @@ static void processFields(MYSQL_STMT *stmt) {
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
   			fields[i].catalog=(char *)"def";
-  			fields[i].org_name=const_cast<char *>(
-						sqlrcur->getColumnName(i));
+  			fields[i].org_name=(char *)"";
 			fields[i].name_length=
 				charstring::length(fields[i].name);
 			fields[i].org_name_length=
@@ -2591,7 +2590,6 @@ int mysql_server_init(int argc, char **argv, char **groups) {
 void mysql_library_init(int argc, char **argv, char **groups) {
 	debugFunction();
 	my_init();
-	// FIXME: do something?
 }
 
 void mysql_server_end() {
@@ -2601,7 +2599,6 @@ void mysql_server_end() {
 
 void mysql_library_end() {
 	debugFunction();
-	// FIXME: do something?
 }
 
 my_bool mysql_embedded() {

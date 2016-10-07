@@ -179,8 +179,8 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("tinyint\n");
 	checkSuccess(field->name,"testtinyint");
-	checkSuccess(field->org_name,"testtinyint");
 	if (argc==2) {
+		checkSuccess(field->org_name,"testtinyint");
 		checkSuccess(field->table,"testtable");
 		checkSuccess(field->org_table,"testtable");
 		checkSuccess(field->db,"testdb");
@@ -190,8 +190,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(field->length,4);
 	checkSuccess(field->max_length,0);
 	checkSuccess(field->name_length,11);
-	checkSuccess(field->org_name_length,11);
 	if (argc==2) {
+		checkSuccess(field->org_name_length,11);
 		checkSuccess(field->db_length,6);
 	}
 	checkSuccess(field->catalog_length,3);
