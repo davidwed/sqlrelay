@@ -642,7 +642,7 @@ int mysql_kill(MYSQL *mysql, unsigned long pid) {
 	debugFunction();
 	sqlrcursor	sqlrcur(mysql->sqlrcon);
 	stringbuffer	query;
-	query.append("KILL ")->append(pid);
+	query.append("KILL ")->append((uint64_t)pid);
 	return !sqlrcur.sendQuery(query.getString());
 }
 
