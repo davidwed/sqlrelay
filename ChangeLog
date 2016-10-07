@@ -16,6 +16,8 @@
 		and SQLR_MAP_DATETIME_TO_DATE has been removed
 	mysql drop-in library sets column flags correctly now
 	mysql drop-in library runs appropriate kill/shutdown queries now
+	mysql connection uses non-stmt api for "show *" queries now
+	mysql drop-in library runs "show processlist" for mysql_list_processes
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every

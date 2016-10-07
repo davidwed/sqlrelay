@@ -619,7 +619,23 @@ unsigned long mysql_thread_id(MYSQL *mysql) {
 
 MYSQL_RES *mysql_list_processes(MYSQL *mysql) {
 	debugFunction();
-	return NULL;
+	mysql_stmt_close(mysql->currentstmt);
+
+	mysql->currentstmt=new MYSQL_STMT;
+	mysql->currentstmt->bindvarnames=new memorypool(0,128,100);
+	mysql->currentstmt->result=new MYSQL_RES;
+	mysql->currentstmt->result->stmtbackptr=NULL;
+	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
+	mysql->currentstmt->result->errorno=0;
+	mysql->currentstmt->result->fields=NULL;
+	mysql->currentstmt->result->lengths=NULL;
+	mysql->currentstmt->result->sqlrcur->sendQuery("SHOW PROCESSLIST");
+	processFields(mysql->currentstmt);
+	mysql->currentstmt->result->currentfield=0;
+
+	MYSQL_RES	*retval=mysql->currentstmt->result;
+	mysql->currentstmt->result=NULL;
+	return retval;
 }
 
 int mysql_kill(MYSQL *mysql, unsigned long pid) {

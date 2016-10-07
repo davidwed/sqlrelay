@@ -153,8 +153,7 @@ int	main(int argc, char **argv) {
 	//checkSuccess(mysql_field_count(&mysql),1);
 	checkSuccess(mysql_num_fields(result),1);
 	field=mysql_fetch_field_direct(result,0);
-	if (charstring::isNullOrEmpty(
-			environment::getValue("LD_PRELOAD"))) {
+	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
 		checkSuccess(field->name,"Tables_in_testdb");
 	} else {
 		// sqlrelay calls this column schema_name rather
@@ -739,32 +738,38 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 
-	// drop-in api can't do these
 	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-
-
 		stdoutput.printf("mysql_thread_id\n");
 		checkSuccess((mysql_thread_id(&mysql)!=0),1);
 		stdoutput.printf("\n");
-
-
-		// currently hangs
-		if (argc==2) {
-			stdoutput.printf("mysql_list_processes\n");
-			result=mysql_list_processes(&mysql);
-			// FIXME: check field names
-			unsigned int	fieldcount=mysql_num_fields(result);
-			checkSuccess(fieldcount,9);
-			row=mysql_fetch_row(result);
-			// FIXME: check values
-			for (unsigned int i=0; i<fieldcount; i++) {
-				stdoutput.printf("%s,",row[i]);
-			}
-			stdoutput.printf("\n");
-			mysql_free_result(result);
-			stdoutput.printf("\n");
-		}
 	}
+
+
+	stdoutput.printf("mysql_list_processes\n");
+	result=mysql_list_processes(&mysql);
+	checkSuccess(mysql_num_fields(result),9);
+	field=mysql_fetch_field_direct(result,0);
+	checkSuccess(field->name,"Id");
+	field=mysql_fetch_field_direct(result,1);
+	checkSuccess(field->name,"User");
+	field=mysql_fetch_field_direct(result,2);
+	checkSuccess(field->name,"Host");
+	field=mysql_fetch_field_direct(result,3);
+	checkSuccess(field->name,"db");
+	field=mysql_fetch_field_direct(result,4);
+	checkSuccess(field->name,"Command");
+	field=mysql_fetch_field_direct(result,5);
+	checkSuccess(field->name,"Time");
+	field=mysql_fetch_field_direct(result,6);
+	checkSuccess(field->name,"State");
+	field=mysql_fetch_field_direct(result,7);
+	checkSuccess(field->name,"Info");
+	field=mysql_fetch_field_direct(result,8);
+	checkSuccess(field->name,"Progress");
+	row=mysql_fetch_row(result);
+	stdoutput.printf("\n");
+	mysql_free_result(result);
+	stdoutput.printf("\n");
 
 	// FIXME: mysql_info for:
 	// insert into ... select ...
