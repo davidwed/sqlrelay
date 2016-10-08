@@ -989,8 +989,7 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[2].buffer,"1");
 	checkSuccess((const char *)fieldbind[3].buffer,"1");
 	checkSuccess((const char *)fieldbind[4].buffer,"1");
-	// FIXME: fails when server is sparc
-	//checkSuccess((const char *)fieldbind[5].buffer,"1.1");
+	checkSuccess((const char *)fieldbind[5].buffer,"1.1");
 	checkSuccess((const char *)fieldbind[6].buffer,"1.1");
 	checkSuccess((const char *)fieldbind[7].buffer,"1.1");
 	checkSuccess((const char *)fieldbind[8].buffer,"2001-01-01");
@@ -1010,8 +1009,7 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[2].buffer,"2");
 	checkSuccess((const char *)fieldbind[3].buffer,"2");
 	checkSuccess((const char *)fieldbind[4].buffer,"2");
-	// FIXME: fails when server is sparc
-	//checkSuccess((const char *)fieldbind[5].buffer,"2.1");
+	checkSuccess((const char *)fieldbind[5].buffer,"2.1");
 	checkSuccess((const char *)fieldbind[6].buffer,"2.1");
 	checkSuccess((const char *)fieldbind[7].buffer,"2.1");
 	checkSuccess((const char *)fieldbind[8].buffer,"2002-01-01");
