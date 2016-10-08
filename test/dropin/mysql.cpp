@@ -1065,10 +1065,10 @@ int	main(int argc, char **argv) {
 
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with binds\n");
-	query="select ?,?,?,?,?,?,?,?,?,?,?";
+	query="select ?,?,?,?,?,?,?,?,?,?,?,?,?,?";
 	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
-	MYSQL_BIND	bind[19];
-	unsigned long	bindlength[19];
+	MYSQL_BIND	bind[14];
+	unsigned long	bindlength[14];
 	bytestring::zero(&bind,sizeof(bind));
 	bytestring::zero(&bindlength,sizeof(bindlength));
 	bytestring::zero(&isnull,sizeof(isnull));
@@ -1167,7 +1167,47 @@ int	main(int argc, char **argv) {
 	isnull[10]=0;
 	bind[10].is_null=&isnull[10];
 
-	// FIXME: date/time binds
+	bind[11].buffer_type=MYSQL_TYPE_DATE;
+	MYSQL_TIME	datetm;
+	bytestring::zero(&datetm,sizeof(datetm));
+	datetm.year=2001;
+	datetm.month=1;
+	datetm.day=2;
+	bind[11].buffer=(void *)&datetm;
+	bind[11].buffer_length=sizeof(datetm);
+	bindlength[11]=sizeof(datetm);
+	bind[11].length=&bindlength[11];
+	isnull[11]=0;
+	bind[11].is_null=&isnull[11];
+
+	bind[12].buffer_type=MYSQL_TYPE_TIME;
+	MYSQL_TIME	timetm;
+	bytestring::zero(&timetm,sizeof(timetm));
+	timetm.hour=12;
+	timetm.minute=10;
+	timetm.second=11;
+	bind[12].buffer=(void *)&timetm;
+	bind[12].buffer_length=sizeof(timetm);
+	bindlength[12]=sizeof(timetm);
+	bind[12].length=&bindlength[12];
+	isnull[12]=0;
+	bind[12].is_null=&isnull[12];
+
+	bind[13].buffer_type=MYSQL_TYPE_DATETIME;
+	MYSQL_TIME	datetimetm;
+	bytestring::zero(&datetimetm,sizeof(datetimetm));
+	datetimetm.year=2001;
+	datetimetm.month=1;
+	datetimetm.day=2;
+	datetimetm.hour=12;
+	datetimetm.minute=10;
+	datetimetm.second=11;
+	bind[13].buffer=(void *)&datetimetm;
+	bind[13].buffer_length=sizeof(datetimetm);
+	bindlength[13]=sizeof(datetimetm);
+	bind[13].length=&bindlength[13];
+	isnull[13]=0;
+	bind[13].is_null=&isnull[13];
 
 	checkSuccess(mysql_stmt_bind_param(stmt,bind),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
@@ -1184,6 +1224,15 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[8].buffer,"tinyblob1");
 	checkSuccess((const char *)fieldbind[9].buffer,"mediumblob1");
 	checkSuccess((const char *)fieldbind[10].buffer,"longblob1");
+	// FIXME: doesn't work with non-real mysql
+	if (argc==2) {
+		checkSuccess((const char *)fieldbind[11].buffer,
+							"2001-01-02");
+		checkSuccess((const char *)fieldbind[12].buffer,
+							"12:10:11");
+		checkSuccess((const char *)fieldbind[13].buffer,
+							"2001-01-02 12:10:11");
+	}
 	stdoutput.printf("\n");
 
 
