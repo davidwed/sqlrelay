@@ -1040,24 +1040,42 @@ bool mysqlcursor::inputBind(const char *variable,
 
 	bindvaluesize[pos]=sizeof(MYSQL_TIME);
 
-	if (*isnull) {
+	bool	validdate=(year>=0 && month>=0 && day>=0);
+	bool	validtime=(hour>=0 && minute>=0 && second>=0 && microsecond>=0);
+
+	if (*isnull || (!validdate && !validtime)) {
+
 		bind[pos].buffer_type=MYSQL_TYPE_NULL;
 		bind[pos].buffer=(void *)NULL;
 		bind[pos].buffer_length=0;
 		bind[pos].length=0;
-	} else {
-		MYSQL_TIME	*t=(MYSQL_TIME *)buffer;
-		t->year=year;
-		t->month=month;
-		t->day=day;
-		t->hour=hour;
-		t->minute=minute;
-		t->second=second;
-		t->second_part=microsecond;
-		t->neg=FALSE;
-		t->time_type=MYSQL_TIMESTAMP_DATETIME;
 
-		bind[pos].buffer_type=MYSQL_TYPE_DATETIME;
+	} else {
+
+		MYSQL_TIME	*t=(MYSQL_TIME *)buffer;
+
+		// MySQL supports date, time and datetime types.
+		// Decide which to use.
+		if (validdate && validtime) {
+			t->time_type=MYSQL_TIMESTAMP_DATETIME;
+			bind[pos].buffer_type=MYSQL_TYPE_DATETIME;
+		} else if (validdate) {
+			t->time_type=MYSQL_TIMESTAMP_DATE;
+			bind[pos].buffer_type=MYSQL_TYPE_DATE;
+		} else if (validtime) {
+			t->time_type=MYSQL_TIMESTAMP_TIME;
+			bind[pos].buffer_type=MYSQL_TYPE_TIME;
+		}
+
+		t->year=(year>=0)?year:0;
+		t->month=(month>=0)?month:0;
+		t->day=(day>=0)?day:0;
+		t->hour=(hour>=0)?hour:0;
+		t->minute=(minute>=0)?minute:0;
+		t->second=(second>=0)?second:0;
+		t->second_part=(microsecond>=0)?microsecond:0;
+		t->neg=FALSE;
+
 		bind[pos].buffer=(void *)buffer;
 		bind[pos].buffer_length=sizeof(MYSQL_TIME);
 		bind[pos].length=&bindvaluesize[pos];

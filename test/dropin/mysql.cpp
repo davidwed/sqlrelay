@@ -1224,15 +1224,9 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[8].buffer,"tinyblob1");
 	checkSuccess((const char *)fieldbind[9].buffer,"mediumblob1");
 	checkSuccess((const char *)fieldbind[10].buffer,"longblob1");
-	// FIXME: doesn't work with non-real mysql
-	if (argc==2) {
-		checkSuccess((const char *)fieldbind[11].buffer,
-							"2001-01-02");
-		checkSuccess((const char *)fieldbind[12].buffer,
-							"12:10:11");
-		checkSuccess((const char *)fieldbind[13].buffer,
-							"2001-01-02 12:10:11");
-	}
+	checkSuccess((const char *)fieldbind[11].buffer,"2001-01-02");
+	checkSuccess((const char *)fieldbind[12].buffer,"12:10:11");
+	checkSuccess((const char *)fieldbind[13].buffer,"2001-01-02 12:10:11");
 	stdoutput.printf("\n");
 
 
