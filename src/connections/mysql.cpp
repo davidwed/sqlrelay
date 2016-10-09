@@ -1069,12 +1069,22 @@ bool mysqlcursor::inputBind(const char *variable,
 
 		t->year=(year>=0)?year:0;
 		t->month=(month>=0)?month:0;
-		t->day=(day>=0)?day:0;
+		if (validdate) {
+			t->day=(day>=0)?day:0;
+			t->neg=FALSE;
+		} else {
+			if (day>=0) {
+				t->day=day;
+				t->neg=FALSE;
+			} else {
+				t->day=-1*day;
+				t->neg=TRUE;
+			}
+		}
 		t->hour=(hour>=0)?hour:0;
 		t->minute=(minute>=0)?minute:0;
 		t->second=(second>=0)?second:0;
 		t->second_part=(microsecond>=0)?microsecond:0;
-		t->neg=FALSE;
 
 		bind[pos].buffer=(void *)buffer;
 		bind[pos].buffer_length=sizeof(MYSQL_TIME);

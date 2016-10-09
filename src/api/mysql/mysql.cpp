@@ -2490,26 +2490,26 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
 				cursor->inputBind(variable,
-							tm->year,
-							tm->month,
-							tm->day,
-							-1,
-							-1,
-							-1,
-							-1,NULL);
+						tm->year,
+						tm->month,
+						tm->day,
+						-1,
+						-1,
+						-1,
+						-1,NULL);
 				break;
 			}
 			case MYSQL_TYPE_TIME: {
 				MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
 				cursor->inputBind(variable,
-							-1,
-							-1,
-							-1,
-							tm->hour,
-							tm->minute,
-							tm->second,
-							0,NULL);
+						-1,
+						-1,
+						((tm->neg)?-1:1)*tm->day,
+						tm->hour,
+						tm->minute,
+						tm->second,
+						0,NULL);
 				break;
 			}
 			case MYSQL_TYPE_TIMESTAMP:
@@ -2518,13 +2518,13 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
 				cursor->inputBind(variable,
-							tm->year,
-							tm->month,
-							tm->day,
-							tm->hour,
-							tm->minute,
-							tm->second,
-							0,NULL);
+						tm->year,
+						tm->month,
+						tm->day,
+						tm->hour,
+						tm->minute,
+						tm->second,
+						0,NULL);
 				break;
 			}
 			case MYSQL_TYPE_NEWDECIMAL:

@@ -1183,6 +1183,8 @@ int	main(int argc, char **argv) {
 	bind[12].buffer_type=MYSQL_TYPE_TIME;
 	MYSQL_TIME	timetm;
 	bytestring::zero(&timetm,sizeof(timetm));
+	timetm.neg=1;
+	timetm.day=1;
 	timetm.hour=12;
 	timetm.minute=10;
 	timetm.second=11;
@@ -1225,7 +1227,7 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[9].buffer,"mediumblob1");
 	checkSuccess((const char *)fieldbind[10].buffer,"longblob1");
 	checkSuccess((const char *)fieldbind[11].buffer,"2001-01-02");
-	checkSuccess((const char *)fieldbind[12].buffer,"12:10:11");
+	checkSuccess((const char *)fieldbind[12].buffer,"-36:10:11");
 	checkSuccess((const char *)fieldbind[13].buffer,"2001-01-02 12:10:11");
 	stdoutput.printf("\n");
 
