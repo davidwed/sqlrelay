@@ -42,7 +42,7 @@ class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 					bool *blob, bool *null);
 	private:
 		uint64_t	currentrow;
-		char		*fieldbuffer;
+		char		*fieldbuffer[9];
 
 		sqlrconnstatistics	*cs;
 
@@ -70,12 +70,16 @@ sqlrquery_sqlrcmdcstatcursor::sqlrquery_sqlrcmdcstatcursor(
 					xmldomnode *parameters, uint16_t id) :
 					sqlrquerycursor(sqlrcon,parameters,id) {
 	currentrow=0;
-	fieldbuffer=NULL;
+	for (uint16_t i=0; i<9; i++) {
+		fieldbuffer[i]=NULL;
+	}
 	cs=NULL;
 }
 
 sqlrquery_sqlrcmdcstatcursor::~sqlrquery_sqlrcmdcstatcursor() {
-	delete[] fieldbuffer;
+	for (uint16_t i=0; i<9; i++) {
+		delete[] fieldbuffer[i];
+	}
 }
 
 bool sqlrquery_sqlrcmdcstatcursor::executeQuery(const char *query,
@@ -172,14 +176,14 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 	*blob=false;
 	*null=false;
 
-	delete[] fieldbuffer;
-	fieldbuffer=NULL;
+	delete[] fieldbuffer[col];
+	fieldbuffer[col]=NULL;
 
 	switch (col) {
 		case 0:
 			// index -
 			// index in shmdata.connstats array
-			fieldbuffer=charstring::parseNumber(currentrow-1);
+			fieldbuffer[col]=charstring::parseNumber(currentrow-1);
 			break;
 		case 1:
 			// mine -
@@ -194,12 +198,12 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 		case 2:
 			// processid -
 			// pid of the connection
-			fieldbuffer=charstring::parseNumber(cs->processid);
+			fieldbuffer[col]=charstring::parseNumber(cs->processid);
 			break;
 		case 3:
 			// connect -
 			// number of client connections
-			fieldbuffer=charstring::parseNumber(cs->nconnect);
+			fieldbuffer[col]=charstring::parseNumber(cs->nconnect);
 			break;
 		case 4:
 			// state -
@@ -222,7 +226,7 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 					cs->statestartsec))+
 				((double)(dt.getMicroseconds()-
 					cs->statestartusec))/1000000.0;
-			fieldbuffer=charstring::parseNumber(statetime,
+			fieldbuffer[col]=charstring::parseNumber(statetime,
 					colinfo[5].precision,colinfo[5].scale);
 			}
 			break;
@@ -249,8 +253,8 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 			return;
 	}
 
-	*field=fieldbuffer;
-	*fieldlength=charstring::length(fieldbuffer);
+	*field=fieldbuffer[col];
+	*fieldlength=charstring::length(fieldbuffer[col]);
 }
 
 extern "C" {
