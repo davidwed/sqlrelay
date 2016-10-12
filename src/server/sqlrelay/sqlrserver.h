@@ -532,6 +532,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						uint32_t fieldlength,
 						const char **newfield,
 						uint32_t *newfieldlength);
+		void	reformatRow(sqlrservercursor *cursor,
+						uint32_t colcount,
+						const char * const *names,
+						const char * const *fields,
+						uint32_t *fieldlengths,
+						const char ***newfields,
+						uint32_t **newfieldlengths);
 		void	reformatDateTimes(sqlrservercursor *cursor,
 						uint16_t index,
 						const char *field,
@@ -1695,7 +1702,7 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
 			sqlrresultsettranslation(
-					sqlrresultsettranslations *sqlrrrsts,
+					sqlrresultsettranslations *sqlrrsts,
 					xmldomnode *parameters,
 					bool debug);
 		virtual	~sqlrresultsettranslation();
@@ -1709,7 +1716,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					const char **newfield,
 					uint32_t *newfieldlength);
 	protected:
-		sqlrresultsettranslations	*sqlrrrsts;
+		sqlrresultsettranslations	*sqlrrsts;
 		xmldomnode			*parameters;
 		bool				debug;
 };
@@ -1762,7 +1769,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					const char * const *fieldnames,
 					const char * const *fields,
 					uint32_t *fieldlengths,
-					const char * const **newfields,
+					const char ***newfields,
 					uint32_t **newfieldlengths);
 	protected:
 		sqlrresultsetrowtranslations	*sqlrrrsts;
@@ -1790,7 +1797,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 						const char * const *fieldnames,
 						const char * const *fields,
 						uint32_t *fieldlengths,
-						const char * const **newfields,
+						const char ***newfields,
 						uint32_t **newfieldlengths);
 	private:
 		void	unload();

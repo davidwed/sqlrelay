@@ -147,6 +147,7 @@
 		sqlrtranslations		*sqlrt;
 		sqlrfilters			*sqlrf;
 		sqlrresultsettranslations	*sqlrrst;
+		sqlrresultsetrowtranslations	*sqlrrrst;
 		sqlrtriggers			*sqlrtr;
 		sqlrloggers			*sqlrlg;
 		sqlrnotifications		*sqlrn;
@@ -212,6 +213,7 @@
 		bool		debugsqlrfilters;
 		bool		debugbindtranslation;
 		bool		debugsqlrresultsettranslation;
+		bool		debugsqlrresultsetrowtranslation;
 
 		dynamiclib	conndl;
 		dynamiclib	sqlrpdl;

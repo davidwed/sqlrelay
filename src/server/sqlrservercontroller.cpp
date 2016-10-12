@@ -123,6 +123,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	sqlrt=NULL;
 	sqlrf=NULL;
 	sqlrrst=NULL;
+	sqlrrrst=NULL;
 	sqlrtr=NULL;
 	sqlrlg=NULL;
 	sqlrn=NULL;
@@ -138,6 +139,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	debugsqlrfilters=false;
 	debugbindtranslation=false;
 	debugsqlrresultsettranslation=false;
+	debugsqlrresultsetrowtranslation=false;
 
 	cur=NULL;
 
@@ -209,6 +211,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete sqlrt;
 	delete sqlrf;
 	delete sqlrrst;
+	delete sqlrrrst;
 	delete sqlrtr;
 	delete sqlrlg;
 	delete sqlrn;
@@ -379,7 +382,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 	initConnStats();
 
-	// get the query translators
+	// get the query translations
 	debugsqlrtranslation=cfg->getDebugTranslations();
 	xmldomnode	*translations=cfg->getTranslations();
 	if (!translations->isNullNode()) {
@@ -399,14 +402,26 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		sqlrf->loadFilters(filters);
 	}
 
-	// get the result set translators
-	debugsqlrresultsettranslation=cfg->getDebugResultSetTranslations();
+	// get the result set translations
+	debugsqlrresultsettranslation=
+				cfg->getDebugResultSetTranslations();
 	xmldomnode	*resultsettranslations=
 				cfg->getResultSetTranslations();
 	if (!resultsettranslations->isNullNode()) {
 		sqlrrst=new sqlrresultsettranslations(pth,
 						debugsqlrresultsettranslation);
 		sqlrrst->load(resultsettranslations);
+	}
+
+	// get the result set row translations
+	debugsqlrresultsetrowtranslation=
+				cfg->getDebugResultSetRowTranslations();
+	xmldomnode	*resultsetrowtranslations=
+				cfg->getResultSetRowTranslations();
+	if (!resultsetrowtranslations->isNullNode()) {
+		sqlrrrst=new sqlrresultsetrowtranslations(pth,
+					debugsqlrresultsetrowtranslation);
+		sqlrrrst->load(resultsetrowtranslations);
 	}
 
 	// get the triggers
@@ -3745,6 +3760,45 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 
 	if (debugsqlrresultsettranslation) {
 		stdoutput.printf("translated:\n%s\n\n",*newfield);
+	}
+}
+
+void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
+						uint32_t colcount,
+						const char * const *names,
+						const char * const *fields,
+						uint32_t *fieldlengths,
+						const char ***newfields,
+						uint32_t **newfieldlengths) {
+
+	if (debugsqlrresultsetrowtranslation) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
+		stdoutput.printf("translating result set row\n");
+		for (uint32_t i=0; i<colcount; i++) {
+			stdoutput.printf("field %hd (%s)...\n",i,names[i]);
+			stdoutput.printf("original:\n%s\n",fields[i]);
+		}
+	}
+
+	// initialize return values
+	for (uint32_t i=0; i<colcount; i++) {
+		(*newfields)[i]=fields[i];
+		(*newfieldlengths)[i]=fieldlengths[i];
+	}
+
+	// run translations
+	if (sqlrrrst) {
+		// FIXME: use mapColumn() here?
+		sqlrrrst->run(conn,cursor,colcount,names,
+					*newfields,*newfieldlengths,
+					newfields,newfieldlengths);
+	}
+
+	if (debugsqlrresultsetrowtranslation) {
+		for (uint32_t i=0; i<colcount; i++) {
+			stdoutput.printf("translated:\n%s\n\n",*newfields[i]);
+		}
 	}
 }
 

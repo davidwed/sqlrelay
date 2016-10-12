@@ -47,6 +47,9 @@ all-translations:
 all-resultsettranslations:
 	cd resultsettranslations $(AND) $(MAKE) all
 
+all-resultsetrowtranslations:
+	cd resultsetrowtranslations $(AND) $(MAKE) all
+
 all-filters:
 	cd filters $(AND) $(MAKE) all
 
@@ -71,6 +74,7 @@ clean:
 	cd auths $(AND) $(MAKE) clean
 	cd translations $(AND) $(MAKE) clean
 	cd resultsettranslations $(AND) $(MAKE) clean
+	cd resultsetrowtranslations $(AND) $(MAKE) clean
 	cd filters $(AND) $(MAKE) clean
 	cd connections $(AND) $(MAKE) clean
 	cd server $(AND) $(MAKE) clean
@@ -123,6 +127,9 @@ install-translations:
 install-resultsettranslations:
 	cd resultsettranslations $(AND) $(MAKE) install
 
+install-resultsetrowtranslations:
+	cd resultsetrowtranslations $(AND) $(MAKE) install
+
 install-filters:
 	cd filters $(AND) $(MAKE) install
 
@@ -147,6 +154,7 @@ uninstall:
 	cd auths $(AND) $(MAKE) uninstall
 	cd translations $(AND) $(MAKE) uninstall
 	cd resultsettranslations $(AND) $(MAKE) uninstall
+	cd resultsetrowtranslations $(AND) $(MAKE) uninstall
 	cd filters $(AND) $(MAKE) uninstall
 	cd connections $(AND) $(MAKE) uninstall
 	cd server $(AND) $(MAKE) uninstall

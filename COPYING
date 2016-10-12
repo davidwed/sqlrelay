@@ -1,9 +1,11 @@
 SQLRelay consists of several components:
 
 *) Source code, scripts and binaries found under the src/server, src/auths,
-	src/connections, src/filters, src/loggers, src/parsers, src/protocols,
-	src/pwdencs, src/queries, src/resultsettranslations, src/translations,
-	src/util, bin and init directories of the SQL Relay source distribution.
+	src/connections, src/filters, src/loggers, src/notificatoins,
+	src/parsers, src/protocols, src/pwdencs, src/queries,
+	src/resultsettranslations, src/resultsetrowtranslations, src/routers,
+	src/schedules, src/translations, src/util, bin and init directories of
+	the SQL Relay source distribution.
 	This component is hereafter referred to as The SQLRelay Server.
 
 *) Source code, scripts and binaries found under the src/cmdline directory of

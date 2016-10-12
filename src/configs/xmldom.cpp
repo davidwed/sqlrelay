@@ -80,6 +80,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugTriggers();
 		bool		getDebugBindTranslations();
 		bool		getDebugResultSetTranslations();
+		bool		getDebugResultSetRowTranslations();
 		bool		getDebugProtocols();
 		bool		getDebugAuths();
 		bool		getDebugNotifications();
@@ -111,6 +112,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		xmldomnode	*getTranslations();
 		xmldomnode	*getFilters();
 		xmldomnode	*getResultSetTranslations();
+		xmldomnode	*getResultSetRowTranslations();
 		xmldomnode	*getTriggers();
 		xmldomnode	*getLoggers();
 		xmldomnode	*getNotifications();
@@ -194,6 +196,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugtriggers;
 		bool		debugbindtranslations;
 		bool		debugresultsettranslations;
+		bool		debugresultsetrowtranslations;
 		bool		debugprotocols;
 		bool		debugauths;
 		bool		debugnotifications;
@@ -225,6 +228,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		xmldomnode	*translationsxml;
 		xmldomnode	*filtersxml;
 		xmldomnode	*resultsettranslationsxml;
+		xmldomnode	*resultsetrowtranslationsxml;
 		xmldomnode	*triggersxml;
 		xmldomnode	*loggersxml;
 		xmldomnode	*notificationsxml;
@@ -320,6 +324,8 @@ void sqlrconfig_xmldom::init() {
 	debugbindtranslations=charstring::contains(debug,"bindtranslations");
 	debugresultsettranslations=
 			charstring::contains(debug,"resultsettranslations");
+	debugresultsetrowtranslations=
+			charstring::contains(debug,"resultsetrowtranslations");
 	debugprotocols=charstring::contains(debug,"protocols");
 	debugauths=charstring::contains(debug,"auths");
 	debugnotifications=charstring::contains(debug,"notifications");
@@ -571,6 +577,10 @@ bool sqlrconfig_xmldom::getDebugResultSetTranslations() {
 	return debugresultsettranslations;
 }
 
+bool sqlrconfig_xmldom::getDebugResultSetRowTranslations() {
+	return debugresultsetrowtranslations;
+}
+
 bool sqlrconfig_xmldom::getDebugProtocols() {
 	return debugprotocols;
 }
@@ -685,6 +695,10 @@ xmldomnode *sqlrconfig_xmldom::getFilters() {
 
 xmldomnode *sqlrconfig_xmldom::getResultSetTranslations() {
 	return resultsettranslationsxml;
+}
+
+xmldomnode *sqlrconfig_xmldom::getResultSetRowTranslations() {
+	return resultsetrowtranslationsxml;
 }
 
 xmldomnode *sqlrconfig_xmldom::getTriggers() {
@@ -1640,6 +1654,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 			charstring::contains(debug,"bindtranslations");
 		debugresultsettranslations=
 			charstring::contains(debug,"resultsettranslations");
+		debugresultsetrowtranslations=
+			charstring::contains(debug,"resultsetrowtranslations");
 		debugprotocols=charstring::contains(debug,"protocols");
 		debugauths=charstring::contains(debug,"auths");
 		debugnotifications=charstring::contains(debug,"notifications");
@@ -1726,6 +1742,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 	filtersxml=instance->getFirstTagChild("filters");
 	resultsettranslationsxml=instance->getFirstTagChild(
 						"resultsettranslations");
+	resultsetrowtranslationsxml=instance->getFirstTagChild(
+						"resultsetrowtranslations");
 	triggersxml=instance->getFirstTagChild("triggers");
 	loggersxml=instance->getFirstTagChild("loggers");
 	notificationsxml=instance->getFirstTagChild("notifications");
