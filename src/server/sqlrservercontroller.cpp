@@ -3732,17 +3732,17 @@ uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
 
 void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						const char *name,
-						uint16_t index,
+						uint32_t index,
 						const char *field,
-						uint32_t fieldlength,
+						uint64_t fieldlength,
 						const char **newfield,
-						uint32_t *newfieldlength) {
+						uint64_t *newfieldlength) {
 
 	if (debugsqlrresultsettranslation) {
 		stdoutput.printf("========================================"
 				"========================================\n\n");
 		stdoutput.printf("translating result set "
-				"field %hd (%s)...\n",index,name);
+				"field %d (%s)...\n",index,name);
 		stdoutput.printf("original:\n%s\n",field);
 	}
 
@@ -3767,16 +3767,16 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 						uint32_t colcount,
 						const char * const *names,
 						const char * const *fields,
-						uint32_t *fieldlengths,
+						uint64_t *fieldlengths,
 						const char ***newfields,
-						uint32_t **newfieldlengths) {
+						uint64_t **newfieldlengths) {
 
 	if (debugsqlrresultsetrowtranslation) {
 		stdoutput.printf("========================================"
 				"========================================\n\n");
 		stdoutput.printf("translating result set row\n");
 		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("field %hd (%s)...\n",i,names[i]);
+			stdoutput.printf("field %d (%s)...\n",i,names[i]);
 			stdoutput.printf("original:\n%s\n",fields[i]);
 		}
 	}
@@ -3803,11 +3803,11 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 }
 
 void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
-						uint16_t index,
+						uint32_t index,
 						const char *field,
-						uint32_t fieldlength,
+						uint64_t fieldlength,
 						const char **newfield,
-						uint32_t *newfieldlength,
+						uint64_t *newfieldlength,
 						bool ddmm, bool yyyyddmm,
 						bool ignorenondatetime,
 						const char *datedelimiters,

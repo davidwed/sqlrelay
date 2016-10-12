@@ -527,24 +527,24 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						uint32_t col);
 		void	reformatField(sqlrservercursor *cursor,
 						const char *name,
-						uint16_t index,
+						uint32_t index,
 						const char *field,
-						uint32_t fieldlength,
+						uint64_t fieldlength,
 						const char **newfield,
-						uint32_t *newfieldlength);
+						uint64_t *newfieldlength);
 		void	reformatRow(sqlrservercursor *cursor,
 						uint32_t colcount,
 						const char * const *names,
 						const char * const *fields,
-						uint32_t *fieldlengths,
+						uint64_t *fieldlengths,
 						const char ***newfields,
-						uint32_t **newfieldlengths);
+						uint64_t **newfieldlengths);
 		void	reformatDateTimes(sqlrservercursor *cursor,
-						uint16_t index,
+						uint32_t index,
 						const char *field,
-						uint32_t fieldlength,
+						uint64_t fieldlength,
 						const char **newfield,
-						uint32_t *newfieldlength,
+						uint64_t *newfieldlength,
 						bool ddmm, bool yyyyddmm,
 						bool ignorenondatetime,
 						const char *datedelimiters,
@@ -1710,11 +1710,11 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
-					uint16_t fieldindex,
+					uint32_t fieldindex,
 					const char *field,
-					uint32_t fieldlength,
+					uint64_t fieldlength,
 					const char **newfield,
-					uint32_t *newfieldlength);
+					uint64_t *newfieldlength);
 	protected:
 		sqlrresultsettranslations	*sqlrrsts;
 		xmldomnode			*parameters;
@@ -1738,11 +1738,11 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						const char *fieldname,
-						uint16_t fieldindex,
+						uint32_t fieldindex,
 						const char *field,
-						uint32_t fieldlength,
+						uint64_t fieldlength,
 						const char **newfield,
-						uint32_t *newfieldlength);
+						uint64_t *newfieldlength);
 	private:
 		void	unload();
 		void	loadResultSetTranslation(
@@ -1768,9 +1768,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					uint32_t colcount,
 					const char * const *fieldnames,
 					const char * const *fields,
-					uint32_t *fieldlengths,
+					uint64_t *fieldlengths,
 					const char ***newfields,
-					uint32_t **newfieldlengths);
+					uint64_t **newfieldlengths);
 	protected:
 		sqlrresultsetrowtranslations	*sqlrrrsts;
 		xmldomnode			*parameters;
@@ -1796,9 +1796,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 						uint32_t colcount,
 						const char * const *fieldnames,
 						const char * const *fields,
-						uint32_t *fieldlengths,
+						uint64_t *fieldlengths,
 						const char ***newfields,
-						uint32_t **newfieldlengths);
+						uint64_t **newfieldlengths);
 	private:
 		void	unload();
 		void	loadResultSetRowTranslation(

@@ -2708,35 +2708,63 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	debugFunction();
 
+	uint32_t	colcount=cont->colCount(cursor);
+
 	// run through the columns...
-	for (uint32_t i=0; i<cont->colCount(cursor); i++) {
+	const char	**fieldnames=new const char *[colcount];
+	const char	**fields=new const char *[colcount];
+	bool		*blob=new bool[colcount];
+	bool		*null=new bool[colcount];
+	uint64_t	*fieldlengths=new uint64_t[colcount];
+	const char	**newfields=new const char *[colcount];
+	uint64_t	*newfieldlengths=new uint64_t[colcount];
+	for (uint32_t i=0; i<colcount; i++) {
 
 		// init variables
-		const char	*field=NULL;
-		uint64_t	fieldlength=0;
-		bool		blob=false;
-		bool		null=false;
+		fieldnames[i]=NULL;
+		fields[i]=NULL;
+		fieldlengths[i]=0;
+		blob[i]=false;
+		null[i]=false;
+
+		// get the field name
+		fieldnames[i]=cont->getColumnName(cursor,i),
 
 		// get the field
-		cont->getField(cursor,i,&field,&fieldlength,&blob,&null);
+		cont->getField(cursor,i,
+				&fields[i],&fieldlengths[i],
+				&blob[i],&null[i]);
+	}
+
+	// reformat row
+	cont->reformatRow(cursor,
+			colcount,fieldnames,
+			fields,fieldlengths,
+			&newfields,&newfieldlengths);
+
+	// reformat/send fields
+	for (uint32_t i=0; i<colcount; i++) {
 
 		// send data to the client
-		if (null) {
+		if (null[i]) {
 			sendNullField();
-		} else if (blob) {
+		} else if (blob[i]) {
 			sendLobField(cursor,i);
 			// FIXME: move closeLob() into sendLobField()?
 			cont->closeLobField(cursor,i);
 		} else {
-			const char	*newfield=NULL;
-			uint32_t	newfieldlength=0;
 			cont->reformatField(cursor,
-						cont->getColumnName(cursor,i),
-						i,field,fieldlength,
-						&newfield,&newfieldlength);
-			sendField(newfield,newfieldlength);
+					fieldnames[i],i,
+					newfields[i],newfieldlengths[i],
+					&newfields[i],&newfieldlengths[i]);
+			sendField(newfields[i],newfieldlengths[i]);
 		}
 	}
+
+	// clean up
+	delete[] fieldnames;
+	delete[] fields;
+	delete[] fieldlengths;
 }
 
 void sqlrprotocol_sqlrclient::sendField(const char *data, uint32_t size) {

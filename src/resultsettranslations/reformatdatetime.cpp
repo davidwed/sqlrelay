@@ -16,14 +16,14 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
-					uint16_t fieldindex,
+					uint32_t fieldindex,
 					const char *field,
-					uint32_t fieldlength,
+					uint64_t fieldlength,
 					const char **newfield,
-					uint32_t *newfieldlength);
+					uint64_t *newfieldlength);
 	private:
 		char		*reformattedfield;
-		uint32_t	reformattedfieldlength;
+		uint64_t	reformattedfieldlength;
 
 		bool		ddmm;
 		bool		yyyyddmm;
@@ -88,11 +88,11 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
-					uint16_t fieldindex,
+					uint32_t fieldindex,
 					const char *field,
-					uint32_t fieldlength,
+					uint64_t fieldlength,
 					const char **newfield,
-					uint32_t *newfieldlength) {
+					uint64_t *newfieldlength) {
 	debugFunction();
 
 	if (!enabled) {
