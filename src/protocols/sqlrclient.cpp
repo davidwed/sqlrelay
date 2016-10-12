@@ -194,6 +194,12 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		uint64_t	fetch;
 
 		char		lobbuffer[32768];
+
+		const char	**fieldnames;
+		const char	**fields;
+		uint64_t	*fieldlengths;
+		bool		*blob;
+		bool		*null;
 };
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
@@ -2627,7 +2633,7 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 }
 
 bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
-						bool getskipandfetch) {
+							bool getskipandfetch) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("returning result set data...");
@@ -2678,6 +2684,14 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 		cont->raiseDebugMessageEvent(debugstr.getString());
 	}
 
+	// FIXME: preallocated these 
+	uint32_t	colcount=cont->colCount(cursor);
+	fieldnames=new const char *[colcount];
+	fields=new const char *[colcount];
+	fieldlengths=new uint64_t[colcount];
+	blob=new bool[colcount];
+	null=new bool[colcount];
+
 	// send the specified number of rows back
 	for (uint64_t i=0; (!fetch || i<fetch); i++) {
 
@@ -2701,6 +2715,11 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 	}
 	clientsock->flushWriteBuffer(-1,-1);
 
+	// clean up
+	delete[] fieldnames;
+	delete[] fields;
+	delete[] fieldlengths;
+
 	cont->raiseDebugMessageEvent("done returning result set data");
 	return true;
 }
@@ -2708,37 +2727,32 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	debugFunction();
 
+	// get the column count
 	uint32_t	colcount=cont->colCount(cursor);
 
 	// run through the columns...
-	const char	**fieldnames=new const char *[colcount];
-	const char	**fields=new const char *[colcount];
-	uint64_t	*fieldlengths=new uint64_t[colcount];
-	bool		*blob=new bool[colcount];
-	bool		*null=new bool[colcount];
 	for (uint32_t i=0; i<colcount; i++) {
 
 		// get the field name
 		fieldnames[i]=cont->getColumnName(cursor,i),
 
-		// init variables
+		// get the field
 		fields[i]=NULL;
 		fieldlengths[i]=0;
 		blob[i]=false;
 		null[i]=false;
-
-		// get the field
 		cont->getField(cursor,i,
 				&(fields[i]),&(fieldlengths[i]),
 				&(blob[i]),&(null[i]));
 	}
 
 	// reformat row
+	// FIXME: push this up
 	cont->reformatRow(cursor,
 			colcount,fieldnames,
 			&fields,&fieldlengths);
 
-	// reformat/send fields
+	// send fields
 	for (uint32_t i=0; i<colcount; i++) {
 
 		// send data to the client
@@ -2749,17 +2763,14 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 			// FIXME: move closeLob() into sendLobField()?
 			cont->closeLobField(cursor,i);
 		} else {
+			// reformat fields individually
+			// FIXME: push this up
 			cont->reformatField(cursor,
 					fieldnames[i],i,
 					&(fields[i]),&(fieldlengths[i]));
 			sendField(fields[i],fieldlengths[i]);
 		}
 	}
-
-	// clean up
-	delete[] fieldnames;
-	delete[] fields;
-	delete[] fieldlengths;
 }
 
 void sqlrprotocol_sqlrclient::sendField(const char *data, uint32_t size) {
