@@ -2736,7 +2736,6 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	// reformat row
 	cont->reformatRow(cursor,
 			colcount,fieldnames,
-			fields,fieldlengths,
 			&fields,&fieldlengths);
 
 	// reformat/send fields
@@ -2752,7 +2751,6 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 		} else {
 			cont->reformatField(cursor,
 					fieldnames[i],i,
-					fields[i],fieldlengths[i],
 					&(fields[i]),&(fieldlengths[i]));
 			sendField(fields[i],fieldlengths[i]);
 		}
