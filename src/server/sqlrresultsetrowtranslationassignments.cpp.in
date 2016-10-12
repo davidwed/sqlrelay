@@ -1,0 +1,5 @@
+	if (!charstring::compare(module,"@module@")) {
+		rstr=new_sqlrresultsetrowtranslation_@module@(this,
+							resultsetrowtranslation,
+							debug);
+	} else

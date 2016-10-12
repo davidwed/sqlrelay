@@ -31,6 +31,8 @@ class sqlrfilter;
 class sqlrfilters;
 class sqlrresultsettranslation;
 class sqlrresultsettranslations;
+class sqlrresultsetrowtranslation;
+class sqlrresultsetrowtranslations;
 class sqlrtrigger;
 class sqlrtriggers;
 class sqlrquery;
@@ -1693,7 +1695,7 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
 			sqlrresultsettranslation(
-					sqlrresultsettranslations *sqlrrsts,
+					sqlrresultsettranslations *sqlrrrsts,
 					xmldomnode *parameters,
 					bool debug);
 		virtual	~sqlrresultsettranslation();
@@ -1707,7 +1709,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					const char **newfield,
 					uint32_t *newfieldlength);
 	protected:
-		sqlrresultsettranslations	*sqlrrsts;
+		sqlrresultsettranslations	*sqlrrrsts;
 		xmldomnode			*parameters;
 		bool				debug;
 };
@@ -1743,6 +1745,62 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 		bool		debug;
 
 		singlylinkedlist< sqlrresultsettranslationplugin * >	tlist;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
+	public:
+			sqlrresultsetrowtranslation(
+					sqlrresultsetrowtranslations *sqlrrrsts,
+					xmldomnode *parameters,
+					bool debug);
+		virtual	~sqlrresultsetrowtranslation();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames,
+					const char * const *fields,
+					uint32_t *fieldlengths,
+					const char * const **newfields,
+					uint32_t **newfieldlengths);
+	protected:
+		sqlrresultsetrowtranslations	*sqlrrrsts;
+		xmldomnode			*parameters;
+		bool				debug;
+};
+
+
+class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslationplugin {
+	public:
+		sqlrresultsetrowtranslation	*rstr;
+		dynamiclib			*dl;
+};
+
+class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
+	public:
+			sqlrresultsetrowtranslations(sqlrpaths *sqlrpth,
+								bool debug);
+			~sqlrresultsetrowtranslations();
+
+		bool	load(xmldomnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						uint32_t colcount,
+						const char * const *fieldnames,
+						const char * const *fields,
+						uint32_t *fieldlengths,
+						const char * const **newfields,
+						uint32_t **newfieldlengths);
+	private:
+		void	unload();
+		void	loadResultSetRowTranslation(
+					xmldomnode *resultsetrowtranslation);
+		
+		const char	*libexecdir;
+		bool		debug;
+
+		singlylinkedlist< sqlrresultsetrowtranslationplugin * >	tlist;
 };
 
 

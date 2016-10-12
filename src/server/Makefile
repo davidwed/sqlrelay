@@ -16,6 +16,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrfilter.cpp \
 	sqlrresultsettranslations.cpp \
 	sqlrresultsettranslation.cpp \
+	sqlrresultsetrowtranslations.cpp \
+	sqlrresultsetrowtranslation.cpp \
 	sqlrtriggers.cpp \
 	sqlrtrigger.cpp \
 	sqlrloggers.cpp \
@@ -50,6 +52,8 @@ LIBSQLRSERVERLOBJS = \
 	sqlrfilter.$(OBJ) \
 	sqlrresultsettranslations.$(OBJ) \
 	sqlrresultsettranslation.$(OBJ) \
+	sqlrresultsetrowtranslations.$(OBJ) \
+	sqlrresultsetrowtranslation.$(OBJ) \
 	sqlrtriggers.$(OBJ) \
 	sqlrtrigger.$(OBJ) \
 	sqlrloggers.$(OBJ) \
@@ -290,6 +294,22 @@ sqlrresultsettranslationdeclarations.cpp: sqlrresultsettranslationdeclarations.c
 sqlrresultsettranslationassignments.cpp: sqlrresultsettranslationassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../resultsettranslations/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsetrowtranslationdeclarations.cpp: sqlrresultsetrowtranslationdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../resultsetrowtranslations/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsetrowtranslationassignments.cpp: sqlrresultsetrowtranslationassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../resultsetrowtranslations/*.$(OBJ)`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
