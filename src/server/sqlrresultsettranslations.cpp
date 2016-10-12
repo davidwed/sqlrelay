@@ -148,15 +148,10 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 bool sqlrresultsettranslations::run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						const char *fieldname,
-						uint16_t fieldindex,
-						const char *field,
-						uint32_t fieldlength,
-						const char **newfield,
-						uint32_t *newfieldlength) {
+						uint32_t fieldindex,
+						const char **field,
+						uint64_t *fieldlength) {
 	debugFunction();
-
-	*newfield=field;
-	*newfieldlength=fieldlength;
 
 	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
 						tlist.getFirst();
@@ -168,8 +163,7 @@ bool sqlrresultsettranslations::run(sqlrserverconnection *sqlrcon,
 
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
 						fieldname,fieldindex,
-						*newfield,*newfieldlength,
-						newfield,newfieldlength)) {
+						field,fieldlength)) {
 			return false;
 		}
 	}

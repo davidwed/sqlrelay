@@ -3733,43 +3733,33 @@ uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
 void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						const char *name,
 						uint32_t index,
-						const char *field,
-						uint64_t fieldlength,
-						const char **newfield,
-						uint64_t *newfieldlength) {
+						const char **field,
+						uint64_t *fieldlength) {
 
 	if (debugsqlrresultsettranslation) {
 		stdoutput.printf("========================================"
 				"========================================\n\n");
 		stdoutput.printf("translating result set "
 				"field %d (%s)...\n",index,name);
-		stdoutput.printf("original:\n%s\n",field);
+		stdoutput.printf("original:\n%s\n",*field);
 	}
-
-	// initialize return values
-	*newfield=field;
-	*newfieldlength=fieldlength;
 
 	// run translations
 	if (sqlrrst) {
 		// FIXME: use mapColumn() here?
-		sqlrrst->run(conn,cursor,name,index,
-					*newfield,*newfieldlength,
-					newfield,newfieldlength);
+		sqlrrst->run(conn,cursor,name,index,field,fieldlength);
 	}
 
 	if (debugsqlrresultsettranslation) {
-		stdoutput.printf("translated:\n%s\n\n",*newfield);
+		stdoutput.printf("translated:\n%s\n\n",*field);
 	}
 }
 
 void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 						uint32_t colcount,
 						const char * const *names,
-						const char * const *fields,
-						uint64_t *fieldlengths,
-						const char ***newfields,
-						uint64_t **newfieldlengths) {
+						const char ***fields,
+						uint64_t **fieldlengths) {
 
 	if (debugsqlrresultsetrowtranslation) {
 		stdoutput.printf("========================================"
@@ -3777,27 +3767,19 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 		stdoutput.printf("translating result set row\n");
 		for (uint32_t i=0; i<colcount; i++) {
 			stdoutput.printf("field %d (%s)...\n",i,names[i]);
-			stdoutput.printf("original:\n%s\n",fields[i]);
+			stdoutput.printf("original:\n%s\n",(*fields)[i]);
 		}
-	}
-
-	// initialize return values
-	for (uint32_t i=0; i<colcount; i++) {
-		(*newfields)[i]=fields[i];
-		(*newfieldlengths)[i]=fieldlengths[i];
 	}
 
 	// run translations
 	if (sqlrrrst) {
 		// FIXME: use mapColumn() here?
-		sqlrrrst->run(conn,cursor,colcount,names,
-					*newfields,*newfieldlengths,
-					newfields,newfieldlengths);
+		sqlrrrst->run(conn,cursor,colcount,names,fields,fieldlengths);
 	}
 
 	if (debugsqlrresultsetrowtranslation) {
 		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("translated:\n%s\n\n",*newfields[i]);
+			stdoutput.printf("translated:\n%s\n\n",(*fields)[i]);
 		}
 	}
 }

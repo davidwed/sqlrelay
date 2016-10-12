@@ -17,10 +17,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
 					uint32_t fieldindex,
-					const char *field,
-					uint64_t fieldlength,
-					const char **newfield,
-					uint64_t *newfieldlength);
+					const char **field,
+					uint64_t *fieldlength);
 	private:
 		char		*reformattedfield;
 		uint64_t	reformattedfieldlength;
@@ -89,21 +87,23 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
 					uint32_t fieldindex,
-					const char *field,
-					uint64_t fieldlength,
-					const char **newfield,
-					uint64_t *newfieldlength) {
+					const char **field,
+					uint64_t *fieldlength) {
 	debugFunction();
 
 	if (!enabled) {
 		return true;
 	}
 
+	if (debug) {
+		stdoutput.printf("converted date \"%s\" ",*field);
+	}
+
 	// For now, call the sqlrservercontroller method.
 	// Eventually that code should be moved here.
 	sqlrcon->cont->reformatDateTimes(sqlrcur,fieldindex,
+					*field,*fieldlength,
 					field,fieldlength,
-					newfield,newfieldlength,
 					ddmm,yyyyddmm,
 					ignorenondatetime,
 					datedelimiters,
@@ -112,9 +112,8 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 					timeformat);
 
 	if (debug) {
-		stdoutput.printf("converted date "
-			"\"%s\" to \"%s\"\nusing ddmm=%d and yyyyddmm=%d\n",
-			field,*newfield,ddmm,yyyyddmm);
+		stdoutput.printf("\"%s\"\nusing ddmm=%d and yyyyddmm=%d\n",
+						*field,ddmm,yyyyddmm);
 	}
 
 	return true;

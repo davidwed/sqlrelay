@@ -2713,34 +2713,31 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	// run through the columns...
 	const char	**fieldnames=new const char *[colcount];
 	const char	**fields=new const char *[colcount];
+	uint64_t	*fieldlengths=new uint64_t[colcount];
 	bool		*blob=new bool[colcount];
 	bool		*null=new bool[colcount];
-	uint64_t	*fieldlengths=new uint64_t[colcount];
-	const char	**newfields=new const char *[colcount];
-	uint64_t	*newfieldlengths=new uint64_t[colcount];
 	for (uint32_t i=0; i<colcount; i++) {
 
+		// get the field name
+		fieldnames[i]=cont->getColumnName(cursor,i),
+
 		// init variables
-		fieldnames[i]=NULL;
 		fields[i]=NULL;
 		fieldlengths[i]=0;
 		blob[i]=false;
 		null[i]=false;
 
-		// get the field name
-		fieldnames[i]=cont->getColumnName(cursor,i),
-
 		// get the field
 		cont->getField(cursor,i,
-				&fields[i],&fieldlengths[i],
-				&blob[i],&null[i]);
+				&(fields[i]),&(fieldlengths[i]),
+				&(blob[i]),&(null[i]));
 	}
 
 	// reformat row
 	cont->reformatRow(cursor,
 			colcount,fieldnames,
 			fields,fieldlengths,
-			&newfields,&newfieldlengths);
+			&fields,&fieldlengths);
 
 	// reformat/send fields
 	for (uint32_t i=0; i<colcount; i++) {
@@ -2755,9 +2752,9 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 		} else {
 			cont->reformatField(cursor,
 					fieldnames[i],i,
-					newfields[i],newfieldlengths[i],
-					&newfields[i],&newfieldlengths[i]);
-			sendField(newfields[i],newfieldlengths[i]);
+					fields[i],fieldlengths[i],
+					&(fields[i]),&(fieldlengths[i]));
+			sendField(fields[i],fieldlengths[i]);
 		}
 	}
 

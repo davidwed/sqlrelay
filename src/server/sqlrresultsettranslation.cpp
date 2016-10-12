@@ -18,10 +18,8 @@ sqlrresultsettranslation::~sqlrresultsettranslation() {
 bool sqlrresultsettranslation::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
-					uint16_t fieldindex,
-					const char *field,
-					uint32_t fieldlength,
-					const char **newfield,
-					uint32_t *newfieldlength) {
+					uint32_t fieldindex,
+					const char **field,
+					uint64_t *fieldlength) {
 	return true;
 }

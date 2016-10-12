@@ -19,9 +19,7 @@ bool sqlrresultsetrowtranslation::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
 					const char * const *fieldnames,
-					const char * const *fields,
-					uint32_t *fieldlengths,
-					const char ***newfield,
-					uint32_t **newfieldlength) {
+					const char ***field,
+					uint64_t **fieldlength) {
 	return true;
 }

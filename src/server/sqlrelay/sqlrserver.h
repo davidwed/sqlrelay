@@ -528,17 +528,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	reformatField(sqlrservercursor *cursor,
 						const char *name,
 						uint32_t index,
-						const char *field,
-						uint64_t fieldlength,
-						const char **newfield,
-						uint64_t *newfieldlength);
+						const char **field,
+						uint64_t *fieldlength);
 		void	reformatRow(sqlrservercursor *cursor,
 						uint32_t colcount,
 						const char * const *names,
-						const char * const *fields,
-						uint64_t *fieldlengths,
-						const char ***newfields,
-						uint64_t **newfieldlengths);
+						const char ***fields,
+						uint64_t **fieldlengths);
 		void	reformatDateTimes(sqlrservercursor *cursor,
 						uint32_t index,
 						const char *field,
@@ -1711,10 +1707,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
 					uint32_t fieldindex,
-					const char *field,
-					uint64_t fieldlength,
-					const char **newfield,
-					uint64_t *newfieldlength);
+					const char **field,
+					uint64_t *fieldlength);
 	protected:
 		sqlrresultsettranslations	*sqlrrsts;
 		xmldomnode			*parameters;
@@ -1739,10 +1733,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 						sqlrservercursor *sqlrcur,
 						const char *fieldname,
 						uint32_t fieldindex,
-						const char *field,
-						uint64_t fieldlength,
-						const char **newfield,
-						uint64_t *newfieldlength);
+						const char **field,
+						uint64_t *fieldlength);
 	private:
 		void	unload();
 		void	loadResultSetTranslation(
@@ -1767,10 +1759,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
 					const char * const *fieldnames,
-					const char * const *fields,
-					uint64_t *fieldlengths,
-					const char ***newfields,
-					uint64_t **newfieldlengths);
+					const char ***fields,
+					uint64_t **fieldlengths);
 	protected:
 		sqlrresultsetrowtranslations	*sqlrrrsts;
 		xmldomnode			*parameters;
@@ -1795,10 +1785,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 						sqlrservercursor *sqlrcur,
 						uint32_t colcount,
 						const char * const *fieldnames,
-						const char * const *fields,
-						uint64_t *fieldlengths,
-						const char ***newfields,
-						uint64_t **newfieldlengths);
+						const char ***fields,
+						uint64_t **fieldlengths);
 	private:
 		void	unload();
 		void	loadResultSetRowTranslation(

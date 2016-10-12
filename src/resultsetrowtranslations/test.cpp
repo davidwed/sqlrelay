@@ -17,10 +17,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation_test :
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
 					const char * const *fieldnames,
-					const char * const *fields,
-					uint64_t *fieldlengths,
-					const char ***newfields,
-					uint64_t **newfieldlengths);
+					const char ***fields,
+					uint64_t **fieldlengths);
 };
 
 sqlrresultsetrowtranslation_test::
@@ -39,10 +37,8 @@ bool sqlrresultsetrowtranslation_test::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
 					const char * const *fieldnames,
-					const char * const *fields,
-					uint64_t *fieldlengths,
-					const char ***newfields,
-					uint64_t **newfieldlengths) {
+					const char ***fields,
+					uint64_t **fieldlengths) {
 	return true;
 }
 
