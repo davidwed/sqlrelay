@@ -2730,7 +2730,7 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	// get the column count
 	uint32_t	colcount=cont->colCount(cursor);
 
-	// run through the columns...
+	// get the fields
 	for (uint32_t i=0; i<colcount; i++) {
 
 		// get the field name
