@@ -933,16 +933,45 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
-	ts->year=year;
-	ts->month=month;
-	ts->day=day;
-	ts->hour=hour;
-	ts->minute=minute;
-	ts->second=second;
-	ts->fraction=microsecond*1000;
+	bool	validdate=(year>=0 && month>=0 && day>=0);
+	bool	validtime=(hour>=0 && minute>=0 && second>=0 && microsecond>=0);
 
-	erg=SQLBindParameter(stmt,
+	if (validdate && !validtime) {
+
+		SQL_DATE_STRUCT	*ts=(SQL_DATE_STRUCT *)buffer;
+		ts->year=year;
+		ts->month=month;
+		ts->day=day;
+
+		erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_INPUT,
+				SQL_C_DATE,
+				SQL_DATE,
+				0,
+				0,
+				buffer,
+				0,
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)NULL
+				#elif defined(SQLBINDPARAMETER_SQLLEN)
+				(unsigned long *)NULL
+				#else
+				(SQLINTEGER *)NULL
+				#endif
+				);
+	} else {
+
+		SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+		ts->year=year;
+		ts->month=month;
+		ts->day=day;
+		ts->hour=hour;
+		ts->minute=minute;
+		ts->second=second;
+		ts->fraction=microsecond*1000;
+
+		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_TIMESTAMP,
@@ -959,6 +988,8 @@ bool odbccursor::inputBind(const char *variable,
 				(SQLINTEGER *)NULL
 				#endif
 				);
+	}
+
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}

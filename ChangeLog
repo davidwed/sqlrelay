@@ -18,8 +18,10 @@
 	mysql drop-in library runs appropriate kill/shutdown queries now
 	mysql connection uses non-stmt api for "show *" queries now
 	mysql drop-in library runs "show processlist" for mysql_list_processes
-	mysql drop-in library supports date/time/datetime binds now instead of
-		just treating them all as datetimes
+	mysql drop-in library supports date/time/datetime input binds now
+		instead of just treating them all as datetimes
+	connection modules differentiate between date/time/datetime binds now
+		instead of just treating them all as datetimes
 	mysql drop-in library supports negative times now
 	added result set row translation module framework
 	updated firebird connection module to  the fieldstruct.textbuffer

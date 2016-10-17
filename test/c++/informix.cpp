@@ -123,8 +123,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("12","testvarchar2");
 	cur->inputBind("13","testvarnchar2");
 	cur->inputBind("14","testvarlchar2");
-	cur->inputBind("15","01/01/2002");
-	cur->inputBind("16","2002-01-01 02:00:00");
+	cur->inputBind("15",2002,1,1,-1,-1,-1,-1,NULL);
+	cur->inputBind("16",2002,1,1,2,0,0,0,NULL);
 	cur->inputBindClob("17","testtext1",9);
 	cur->inputBindBlob("18","testbyte1",9);
 	checkSuccess(cur->executeQuery(),1);
@@ -143,8 +143,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("12","testvarchar3");
 	cur->inputBind("13","testvarnchar3");
 	cur->inputBind("14","testvarlchar3");
-	cur->inputBind("15","01/01/2003");
-	cur->inputBind("16","2003-01-01 03:00:00");
+	cur->inputBind("15",2003,1,1,-1,-1,-1,-1,NULL);
+	cur->inputBind("16",2003,1,1,3,0,0,0,NULL);
 	cur->inputBindClob("17","testtext3",9);
 	cur->inputBindBlob("18","testbyte3",9);
 	checkSuccess(cur->executeQuery(),1);
