@@ -616,9 +616,27 @@ void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref,
 					uint32_t scale);
 
 /** @ingroup sqlrclientwraper
- *  Defines a date input bind variable.  "day" should be
- *  1-31 and "month" should be 1-12.  "tz" may be left NULL.
- *  Most databases ignore "tz".  */
+ *  Defines a date input bind variable.  "day" and "month"
+ *  are 1-based.
+ *
+ *  Some databases distinguish between date, time, and
+ *  datetime types.  For those databases...
+ *
+ *  * The input bind variable will be interpreted as a time type
+ *  if year and/or month are negative.
+ *
+ *  * The input bind variable will be interpreted as a date type
+ *  if hour, minute, second, and/or microsecond are negative.
+ *
+ *  * The input bind variable will be interpreted as a datetime
+ *  type if all parts are positive.
+ *
+ *  "tz" is the timezone abbreviation, and may be left NULL.
+ *  Most databases ignore "tz".
+ *
+ *  Set "isnegative" may be set to true to represent a negative
+ *  time interval.  However, few databases support negative
+ *  time intervals and ignore "isnegative". */
 SQLRCLIENT_DLLSPEC
 void	sqlrcur_inputBindDate(sqlrcur sqlrcurref,
 				const char *variable,
