@@ -1023,8 +1023,6 @@ bool mysqlcursor::inputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	// FIXME: isnegative?
-
 	if (!usestmtprepare) {
 		return true;
 	}
@@ -1077,13 +1075,8 @@ bool mysqlcursor::inputBind(const char *variable,
 			t->day=(day>=0)?day:0;
 			t->neg=FALSE;
 		} else {
-			if (day>=0) {
-				t->day=day;
-				t->neg=FALSE;
-			} else {
-				t->day=-1*day;
-				t->neg=TRUE;
-			}
+			t->day=day;
+			t->neg=(isnegative)?TRUE:FALSE;
 		}
 		t->hour=(hour>=0)?hour:0;
 		t->minute=(minute>=0)?minute:0;
