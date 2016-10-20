@@ -2039,8 +2039,16 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 
 	bv->isnull=cont->nonNullBindValue();
 
-	// FIXME: get the is-negative flag
-	bv->value.dateval.isnegative=false;
+	// get the is-negative flag
+	bool	tempbool;
+	result=clientsock->read(&tempbool,idleclienttimeout,0);
+	if (result!=sizeof(bool)) {
+		cont->raiseClientProtocolErrorEvent(NULL,
+				"get binds failed: "
+				"failed to get is-negative flag",result);
+		return false;
+	}
+	bv->value.dateval.isnegative=tempbool;
 
 	debugstr.clear();
 	debugstr.append(bv->value.dateval.year)->append('-');
@@ -2419,7 +2427,7 @@ void sqlrprotocol_sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 							bv->value.dateval.tz);
 			clientsock->write(length);
 			clientsock->write(bv->value.dateval.tz,length);
-			// FIXME: return the is-negative flag
+			clientsock->write((bool)bv->value.dateval.isnegative);
 
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_CURSOR) {
 

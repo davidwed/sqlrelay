@@ -1731,8 +1731,8 @@ bool sqlrcursor::getOutputBindDate(const char *variable,
 						value.dateval.microsecond;
 				*tz=(*pvt->_outbindvars)[i].
 						value.dateval.tz;
-				// FIXME: isnegative?
-				*isnegative=false;
+				*isnegative=(*pvt->_outbindvars)[i].
+						value.dateval.isnegative;
 				return true;
 			}
 		}
@@ -2393,7 +2393,9 @@ void sqlrcursor::sendInputBinds() {
 			pvt->_sqlrc->cs()->write(
 					(*pvt->_inbindvars)[i].
 						value.dateval.tz);
-			// FIXME: isnegative?
+			pvt->_sqlrc->cs()->write(
+					(*pvt->_inbindvars)[i].
+						value.dateval.isnegative);
 
 			if (pvt->_sqlrc->debug()) {
 				pvt->_sqlrc->debugPrint(":DATE)=");
@@ -3533,6 +3535,16 @@ bool sqlrcursor::parseOutputBinds() {
 			(*pvt->_outbindvars)[count].
 					value.dateval.tz[length]='\0';
 
+			// get the isnegative flag
+			bool	tempbool;
+			if (getBool(&tempbool)!=sizeof(bool)) {
+				setError("Failed to get bool value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_outbindvars)[count].value.
+					dateval.isnegative=tempbool;
+
 			if (pvt->_sqlrc->debug()) {
 				pvt->_sqlrc->debugPreStart();
 				pvt->_sqlrc->debugPrint("		");
@@ -4169,6 +4181,17 @@ bool sqlrcursor::fetchRowIntoBuffer(bool getallrows, uint64_t row,
 		return true;
 	}
 	return false;
+}
+
+int32_t sqlrcursor::getBool(bool *boolean) {
+
+	// if the result set is coming from a cache file, read from
+	// the file, if not, read from the server
+	if (pvt->_cachesource && pvt->_cachesourceind) {
+		return pvt->_cachesource->read(boolean);
+	} else {
+		return pvt->_sqlrc->cs()->read(boolean);
+	}
 }
 
 int32_t sqlrcursor::getShort(uint16_t *integer,
