@@ -199,7 +199,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindLong(cur,"1",2);
 	sqlrcur_inputBindString(cur,"2","testchar2");
 	sqlrcur_inputBindString(cur,"3","testvarchar2");
-	sqlrcur_inputBindDate(cur,"4",2002,1,1,-1,-1,-1,0,NULL);
+	sqlrcur_inputBindDate(cur,"4",2002,1,1,-1,-1,-1,0,NULL,0);
 	sqlrcur_inputBindString(cur,"5","testlong2");
 	sqlrcur_inputBindClob(cur,"6","testclob2",9);
 	sqlrcur_inputBindBlob(cur,"7","testblob2",9);
@@ -208,7 +208,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindLong(cur,"1",3);
 	sqlrcur_inputBindString(cur,"2","testchar3");
 	sqlrcur_inputBindString(cur,"3","testvarchar3");
-	sqlrcur_inputBindDate(cur,"4",2003,1,1,-1,-1,-1,0,NULL);
+	sqlrcur_inputBindDate(cur,"4",2003,1,1,-1,-1,-1,0,NULL,0);
 	sqlrcur_inputBindString(cur,"5","testlong3");
 	sqlrcur_inputBindClob(cur,"6","testclob3",9);
 	sqlrcur_inputBindBlob(cur,"7","testblob3",9);
@@ -228,7 +228,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindLong(cur,"var1",5);
 	sqlrcur_inputBindString(cur,"var2","testchar5");
 	sqlrcur_inputBindString(cur,"var3","testvarchar5");
-	sqlrcur_inputBindDate(cur,"var4",2005,1,1,-1,-1,-1,0,NULL);
+	sqlrcur_inputBindDate(cur,"var4",2005,1,1,-1,-1,-1,0,NULL,0);
 	sqlrcur_inputBindString(cur,"var5","testlong5");
 	sqlrcur_inputBindClob(cur,"var6","testclob5",9);
 	sqlrcur_inputBindBlob(cur,"var7","testblob5",9);
@@ -237,7 +237,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindLong(cur,"var1",6);
 	sqlrcur_inputBindString(cur,"var2","testchar6");
 	sqlrcur_inputBindString(cur,"var3","testvarchar6");
-	sqlrcur_inputBindDate(cur,"var4",2006,1,1,-1,-1,-1,0,NULL);
+	sqlrcur_inputBindDate(cur,"var4",2006,1,1,-1,-1,-1,0,NULL,0);
 	sqlrcur_inputBindString(cur,"var5","testlong6");
 	sqlrcur_inputBindClob(cur,"var6","testclob6",9);
 	sqlrcur_inputBindBlob(cur,"var7","testblob6",9);
@@ -257,7 +257,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindLong(cur,"var1",8);
 	sqlrcur_inputBindString(cur,"var2","testchar8");
 	sqlrcur_inputBindString(cur,"var3","testvarchar8");
-	sqlrcur_inputBindDate(cur,"var4",2008,1,1,-1,-1,-1,0,NULL);
+	sqlrcur_inputBindDate(cur,"var4",2008,1,1,-1,-1,-1,0,NULL,0);
 	sqlrcur_inputBindString(cur,"var5","testlong8");
 	sqlrcur_inputBindClob(cur,"var6","testclob8",9);
 	sqlrcur_inputBindBlob(cur,"var7","testblob8",9);

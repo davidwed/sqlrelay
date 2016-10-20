@@ -29,6 +29,7 @@ struct outputbindvar {
 			int16_t		*second;
 			int32_t		*microsecond;
 			const char	**tz;
+			bool		*isnegative;
 		} datevalue;
 	} value;
 	uint16_t		valuesize;
@@ -135,6 +136,7 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz,
+						bool isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -173,6 +175,7 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 						int16_t *second,
 						int32_t *microsecond,
 						const char **tz,
+						bool *isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -707,11 +710,12 @@ bool routercursor::inputBind(const char *variable,
 				int16_t second,
 				int32_t microsecond,
 				const char *tz,
+				bool isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
 	cur->inputBind(variable+1,year,month,day,
-			hour,minute,second,microsecond,tz);
+			hour,minute,second,microsecond,tz,isnegative);
 	return true;
 }
 
@@ -786,6 +790,7 @@ bool routercursor::outputBind(const char *variable,
 				int16_t *second,
 				int32_t *microsecond,
 				const char **tz,
+				bool *isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
@@ -801,6 +806,7 @@ bool routercursor::outputBind(const char *variable,
 	obv[obcount].value.datevalue.microsecond=microsecond;
 	obv[obcount].value.datevalue.tz=tz;
 	obv[obcount].isnull=isnull;
+	obv[obcount].value.datevalue.isnegative=isnegative;
 	obcount++;
 	return true;
 }
@@ -915,7 +921,8 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 					obv[outi].value.datevalue.minute,
 					obv[outi].value.datevalue.second,
 					obv[outi].value.datevalue.microsecond,
-					obv[outi].value.datevalue.tz);
+					obv[outi].value.datevalue.tz,
+					obv[outi].value.datevalue.isnegative);
 		}
 	}
 

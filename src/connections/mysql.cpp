@@ -86,6 +86,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz,
+						bool isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -1017,9 +1018,12 @@ bool mysqlcursor::inputBind(const char *variable,
 				int16_t second,
 				int32_t microsecond,
 				const char *tz,
+				bool isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
+
+	// FIXME: isnegative?
 
 	if (!usestmtprepare) {
 		return true;

@@ -624,7 +624,8 @@ void	sqlrcur_inputBindDate(sqlrcur sqlrcurref,
 				const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int32_t microsecond, const char *tz);
+				int32_t microsecond, const char *tz,
+				int isnegative);
 
 /** @ingroup sqlrclientwrapper
  *  Defines a binary lob input bind variable. */
@@ -777,7 +778,8 @@ int	sqlrcur_getOutputBindDate(sqlrcur sqlrcurref,
 				const char *variable,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int32_t *microsecond, const char **tz);
+				int32_t *microsecond, const char **tz,
+				int *isnegative);
 
 /** @ingroup sqlrclientwrapper
  *  Get the value stored in a previously defined

@@ -40,6 +40,7 @@ class sqlrshbindvalue {
 				int16_t		second;
 				int32_t		microsecond;
 				const char	*tz;
+				bool		isnegative;
 			} dateval;
 		};
 		sqlrclientbindvartype_t	type;
@@ -882,7 +883,8 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.minute,
 						bv->dateval.second,
 						bv->dateval.microsecond,
-						bv->dateval.tz);
+						bv->dateval.tz,
+						bv->dateval.isnegative);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB) {
 				sqlrcur->inputBindBlob(name,bv->stringval,
 					charstring::length(bv->stringval));
@@ -943,7 +945,8 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						&(bv->dateval.minute),
 						&(bv->dateval.second),
 						&(bv->dateval.microsecond),
-						&(bv->dateval.tz));
+						&(bv->dateval.tz),
+						&(bv->dateval.isnegative));
 			}
 		}
 	}
@@ -1344,6 +1347,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 			charstring::contains(value,":")) {
 
 		datetime	dt;
+		// FIXME: isnegative?
 		dt.initialize(value);
 		bv->type=SQLRCLIENTBINDVARTYPE_DATE;
 		bv->dateval.year=dt.getYear();
@@ -1354,6 +1358,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		bv->dateval.second=dt.getSeconds();
 		bv->dateval.microsecond=charstring::toInteger(
 					charstring::findLast(value,":")+1);
+		bv->dateval.isnegative=false;
 		char	*tz=(char *)env->inbindpool->allocate(
 				charstring::length(dt.getTimeZoneString())+1);
 		charstring::copy(tz,dt.getTimeZoneString());
@@ -1510,6 +1515,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 			bv->dateval.second=0;
 			bv->dateval.microsecond=0;
 			bv->dateval.tz="";
+			bv->dateval.isnegative=false;
 		} else {
 			sane=false;
 		}
@@ -1561,10 +1567,11 @@ void sqlrsh::printbinds(const char *type,
 						bv->doubleval.value);
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
 			stdoutput.printf("(DATE) = %02d/%02d/%04d "
-						"%02d:%02d:%02d:%03d %s\n",
+						"%s%02d:%02d:%02d:%03d %s\n",
 						bv->dateval.month,
 						bv->dateval.day,
 						bv->dateval.year,
+						(bv->dateval.isnegative)?"-":"",
 						bv->dateval.hour,
 						bv->dateval.minute,
 						bv->dateval.second,

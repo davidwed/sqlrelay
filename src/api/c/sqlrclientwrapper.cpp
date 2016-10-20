@@ -337,9 +337,11 @@ void sqlrcur_inputBindDouble(sqlrcur sqlrcurref, const char *variable,
 void sqlrcur_inputBindDate(sqlrcur sqlrcurref, const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int32_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz,
+				int isnegative) {
 	sqlrcurref->inputBind(variable,year,month,day,
-				hour,minute,second,microsecond,tz);
+				hour,minute,second,microsecond,tz,
+				isnegative);
 }
 
 void sqlrcur_inputBindBlob(sqlrcur sqlrcurref, const char *variable,
@@ -464,9 +466,14 @@ double sqlrcur_getOutputBindDouble(sqlrcur sqlrcurref,
 int sqlrcur_getOutputBindDate(sqlrcur sqlrcurref, const char *variable,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int32_t *microsecond, const char **tz) {
-	return sqlrcurref->getOutputBindDate(variable,year,month,day,
-					hour,minute,second,microsecond,tz);
+				int32_t *microsecond, const char **tz,
+				int *isnegative) {
+	bool	isneg;
+	int	retval=sqlrcurref->getOutputBindDate(variable,year,month,day,
+					hour,minute,second,microsecond,tz,
+					&isneg);
+	*isnegative=isneg;
+	return retval;
 }
 
 uint32_t sqlrcur_getOutputBindLength(sqlrcur sqlrcurref, const char *variable) {

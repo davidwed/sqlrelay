@@ -143,6 +143,7 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz,
+						bool isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -171,6 +172,7 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 						int16_t *second,
 						int32_t *microsecond,
 						const char **tz,
+						bool *isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -1040,11 +1042,14 @@ bool sapcursor::inputBind(const char *variable,
 				int16_t second,
 				int32_t microsecond,
 				const char *tz,
+				bool isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
 	checkRePrepare();
+
+	// FIXME: isnegative?
 
 	// Sybase requires this format: "Jan 2 2012 4:5:3:000PM"
 	if (month<1) {
@@ -1190,6 +1195,7 @@ bool sapcursor::outputBind(const char *variable,
 				int16_t *second,
 				int32_t *microsecond,
 				const char **tz,
+				bool *isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
@@ -1205,6 +1211,9 @@ bool sapcursor::outputBind(const char *variable,
 	outbinddates[outbindindex].microsecond=microsecond;
 	outbinddates[outbindindex].tz=tz;
 	outbindindex++;
+
+	// FIXME: isnegative?
+	*isnegative=false;
 
 	bytestring::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {

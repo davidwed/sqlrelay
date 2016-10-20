@@ -115,8 +115,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("4",2.2,2,1);
 	cur->inputBind("5",2.2,2,1);
 	cur->inputBind("6",2.2,2,1);
-	cur->inputBind("7",2002,1,1,-1,-1,-1,-1,NULL);
-	cur->inputBind("8",-1,-1,-1,2,0,0,0,NULL);
+	cur->inputBind("7",2002,1,1,-1,-1,-1,-1,NULL,false);
+	cur->inputBind("8",-1,-1,-1,2,0,0,0,NULL,false);
 	cur->inputBind("9","testchar2");
 	cur->inputBind("10","testvarchar2");
 	cur->inputBind("11",(char *)NULL);
@@ -129,8 +129,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("4",3.3,2,1);
 	cur->inputBind("5",3.3,2,1);
 	cur->inputBind("6",3.3,2,1);
-	cur->inputBind("7",2003,1,1,-1,-1,-1,-1,NULL);
-	cur->inputBind("8",-1,-1,-1,3,0,0,0,NULL);
+	cur->inputBind("7",2003,1,1,-1,-1,-1,-1,NULL,false);
+	cur->inputBind("8",-1,-1,-1,3,0,0,0,NULL,false);
 	cur->inputBind("9","testchar3");
 	cur->inputBind("10","testvarchar3");
 	cur->inputBind("11",(char *)NULL);

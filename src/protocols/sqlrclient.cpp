@@ -2039,16 +2039,22 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 
 	bv->isnull=cont->nonNullBindValue();
 
-	stringbuffer	str;
-	str.append(bv->value.dateval.year)->append("-");
-	str.append(bv->value.dateval.month)->append("-");
-	str.append(bv->value.dateval.day)->append(" ");
-	str.append(bv->value.dateval.hour)->append(":");
-	str.append(bv->value.dateval.minute)->append(":");
-	str.append(bv->value.dateval.second)->append(":");
-	str.append(bv->value.dateval.microsecond)->append(" ");
-	str.append(bv->value.dateval.tz);
-	cont->raiseDebugMessageEvent(str.getString());
+	// FIXME: get the is-negative flag
+	bv->value.dateval.isnegative=false;
+
+	debugstr.clear();
+	debugstr.append(bv->value.dateval.year)->append('-');
+	debugstr.append(bv->value.dateval.month)->append('-');
+	debugstr.append(bv->value.dateval.day)->append(' ');
+	if (bv->value.dateval.isnegative) {
+		debugstr.append('-');
+	}
+	debugstr.append(bv->value.dateval.hour)->append(':');
+	debugstr.append(bv->value.dateval.minute)->append(':');
+	debugstr.append(bv->value.dateval.second)->append(':');
+	debugstr.append(bv->value.dateval.microsecond)->append(' ');
+	debugstr.append(bv->value.dateval.tz);
+	cont->raiseDebugMessageEvent(debugstr.getString());
 
 	return true;
 }
@@ -2386,6 +2392,9 @@ void sqlrprotocol_sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 				debugstr.append("-");
 				debugstr.append(bv->value.dateval.day);
 				debugstr.append(" ");
+				if (bv->value.dateval.isnegative) {
+					debugstr.append('-');
+				}
 				debugstr.append(bv->value.dateval.hour);
 				debugstr.append(":");
 				debugstr.append(bv->value.dateval.minute);
@@ -2410,6 +2419,7 @@ void sqlrprotocol_sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 							bv->value.dateval.tz);
 			clientsock->write(length);
 			clientsock->write(bv->value.dateval.tz,length);
+			// FIXME: return the is-negative flag
 
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_CURSOR) {
 

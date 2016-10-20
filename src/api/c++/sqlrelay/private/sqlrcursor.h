@@ -54,7 +54,8 @@
 						int16_t minute,
 						int16_t second,
 						int32_t microsecond,
-						const char *tz);
+						const char *tz,
+						bool isnegative);
 		void	lobVar(sqlrclientbindvar *var,
 						const char *variable,
 						const char *value,

@@ -1295,7 +1295,8 @@ RET SQLRCursor::inputBind(const ARGS &args) {
 						args[5]->Int32Value(),
 						args[6]->Int32Value(),
 						args[7]->Int32Value(),
-						toString(args[8]));
+						toString(args[8]),
+						args[9]->Int32Value());
 
 	} else {
 		throwWrongNumberOfArguments();

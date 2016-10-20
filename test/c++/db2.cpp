@@ -119,8 +119,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("6",2.2,4,2);
 	cur->inputBind("7","testchar2");
 	cur->inputBind("8","testvarchar2");
-	cur->inputBind("9",2002,1,1,-1,-1,-1,-1,NULL);
-	cur->inputBind("10",-1,-1,-1,2,0,0,0,NULL);
+	cur->inputBind("9",2002,1,1,-1,-1,-1,-1,NULL,false);
+	cur->inputBind("10",-1,-1,-1,2,0,0,0,NULL,false);
 	cur->inputBindClob("11","testclob2",9);
 	cur->inputBindBlob("12","testblob2",9);
 	checkSuccess(cur->executeQuery(),1);
@@ -133,8 +133,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("6",3.3,4,2);
 	cur->inputBind("7","testchar3");
 	cur->inputBind("8","testvarchar3");
-	cur->inputBind("9",2003,1,1,-1,-1,-1,-1,NULL);
-	cur->inputBind("10",-1,-1,-1,3,0,0,0,NULL);
+	cur->inputBind("9",2003,1,1,-1,-1,-1,-1,NULL,false);
+	cur->inputBind("10",-1,-1,-1,3,0,0,0,NULL,false);
 	cur->inputBindClob("11","testclob3",9);
 	cur->inputBindBlob("12","testblob3",9);
 	checkSuccess(cur->executeQuery(),1);

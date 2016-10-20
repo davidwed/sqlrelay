@@ -2570,15 +2570,18 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				int16_t	second;
 				int32_t	microsecond;
 				const char	*tz;
+				bool	isnegative;
 				stmt->cur->getOutputBindDate(parametername,
 							&year,&month,&day,
 							&hour,&minute,&second,
-							&microsecond,&tz);
+							&microsecond,&tz,
+							&isnegative);
 				DATE_STRUCT	*ds=
 					(DATE_STRUCT *)ob->parametervalue;
 				ds->year=year;
 				ds->month=month;
 				ds->day=day;
+				// FIXME: isnegative?
 				}
 				break;
 			case SQL_C_TIME:
@@ -2594,15 +2597,18 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				int16_t	second;
 				int32_t	microsecond;
 				const char	*tz;
+				bool	isnegative;
 				stmt->cur->getOutputBindDate(parametername,
 							&year,&month,&day,
 							&hour,&minute,&second,
-							&microsecond,&tz);
+							&microsecond,&tz,
+							&isnegative);
 				TIME_STRUCT	*ts=
 					(TIME_STRUCT *)ob->parametervalue;
 				ts->hour=hour;
 				ts->minute=minute;
 				ts->second=second;
+				// FIXME: isnegative?
 				}
 				break;
 			case SQL_C_TIMESTAMP:
@@ -2619,10 +2625,12 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				int16_t	second;
 				int32_t	microsecond;
 				const char	*tz;
+				bool	isnegative;
 				stmt->cur->getOutputBindDate(parametername,
 							&year,&month,&day,
 							&hour,&minute,&second,
-							&microsecond,&tz);
+							&microsecond,&tz,
+							&isnegative);
 				TIMESTAMP_STRUCT	*ts=
 					(TIMESTAMP_STRUCT *)ob->parametervalue;
 				ts->year=year;
@@ -2632,6 +2640,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				ts->minute=minute;
 				ts->second=second;
 				ts->fraction=microsecond*10;
+				// FIXME: isnegative?
 				}
 				break;
 			case SQL_C_INTERVAL_YEAR:
@@ -3224,6 +3233,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	int16_t	minute=-1;
 	int16_t	second=-1;
 	int16_t	fraction=-1;
+	bool	isnegative=false;
 
 	// get day/month format
 	bool	ddmm=!charstring::compareIgnoringCase(
@@ -3239,12 +3249,13 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
-					&hour,&minute,&second,&fraction);
+				&hour,&minute,&second,&fraction,&isnegative);
 
 	// copy data out
 	ds->year=(year!=-1)?year:0;
 	ds->month=(month!=-1)?month:0;
 	ds->day=(day!=-1)?day:0;
+	// FIXME: isnegative?
 }
 
 static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
@@ -3257,6 +3268,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	int16_t	minute=-1;
 	int16_t	second=-1;
 	int16_t	fraction=-1;
+	bool	isnegative=false;
 
 	// get day/month format
 	bool	ddmm=!charstring::compareIgnoringCase(
@@ -3272,12 +3284,13 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
-					&hour,&minute,&second,&fraction);
+				&hour,&minute,&second,&fraction,&isnegative);
 
 	// copy data out
 	ts->hour=(hour!=-1)?hour:0;
 	ts->minute=(minute!=-1)?minute:0;
 	ts->second=(second!=-1)?second:0;
+	// FIXME: isnegative?
 }
 
 static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
@@ -3290,6 +3303,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	int16_t	minute=-1;
 	int16_t	second=-1;
 	int16_t	fraction=-1;
+	bool	isnegative=false;
 
 	// get day/month format
 	bool	ddmm=!charstring::compareIgnoringCase(
@@ -3305,7 +3319,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
-					&hour,&minute,&second,&fraction);
+				&hour,&minute,&second,&fraction,&isnegative);
 
 	// copy data out
 	tss->year=(year!=-1)?year:0;
@@ -3315,6 +3329,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	tss->minute=(minute!=-1)?minute:0;
 	tss->second=(second!=-1)?second:0;
 	tss->fraction=(fraction!=-1)?fraction:0;
+	// FIXME: isnegative?
 }
 
 static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
@@ -7622,9 +7637,10 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			{
 			debugPrintf("  valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
 			DATE_STRUCT	*ds=(DATE_STRUCT *)parametervalue;
+			// FIXME: isnegative?
 			stmt->cur->inputBind(parametername,
 						ds->year,ds->month,ds->day,
-						0,0,0,0,NULL);
+						0,0,0,0,NULL,false);
 			}
 			break;
 		case SQL_C_TIME:
@@ -7632,10 +7648,11 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			{
 			debugPrintf("  valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
 			TIME_STRUCT	*ts=(TIME_STRUCT *)parametervalue;
+			// FIXME: isnegative?
 			stmt->cur->inputBind(parametername,
 						0,0,0,
 						ts->hour,ts->minute,ts->second,
-						0,NULL);
+						0,NULL,false);
 			break;
 			}
 		case SQL_C_TIMESTAMP:
@@ -7645,10 +7662,11 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
 			TIMESTAMP_STRUCT	*tss=
 					(TIMESTAMP_STRUCT *)parametervalue;
+			// FIXME: isnegative?
 			stmt->cur->inputBind(parametername,
 					tss->year,tss->month,tss->day,
 					tss->hour,tss->minute,tss->second,
-					tss->fraction/10,NULL);
+					tss->fraction/10,NULL,false);
 			break;
 			}
 		case SQL_C_INTERVAL_YEAR:

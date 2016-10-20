@@ -210,6 +210,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz,
+						bool isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -238,6 +239,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 						int16_t *second,
 						int32_t *microsecond,
 						const char **tz,
+						bool *isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -340,7 +342,8 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 						int16_t minute,
 						int16_t second,
 						int32_t microsecond,
-						const char *tz);
+						const char *tz,
+						bool isnegative);
 
 		void		encodeBlob(stringbuffer *buffer,
 						const char *data,
@@ -2320,7 +2323,8 @@ void oraclecursor::checkRePrepare() {
 void oraclecursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int32_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz,
+				bool isnegative) {
 
 	const char	*format=
 			conn->cont->cfg->getFakeInputBindVariablesDateFormat();
@@ -2330,11 +2334,14 @@ void oraclecursor::dateToString(char *buffer, uint16_t buffersize,
 		char	*newdate=conn->cont->convertDateTime(format,
 							year,month,day,
 							hour,minute,second,
-							microsecond);
+							microsecond,
+							isnegative);
 		charstring::safeCopy(buffer,buffersize,newdate);
 		delete[] newdate;
 		return;
 	}
+
+	// FIXME: isnegative?
 
 	// typically oracle just wants DD-MON-YYYY but if hour,
 	// minute and second are non-zero then use them too
@@ -2499,10 +2506,13 @@ bool oraclecursor::inputBind(const char *variable,
 				int16_t second,
 				int32_t microsecond,
 				const char *tz,
+				bool isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
 	checkRePrepare();
+
+	// FIXME: isnegative
 
 	indatebind[orainbindcount]=new OCIDate;
 	OCIDateSetDate(indatebind[orainbindcount],year,month,day);
@@ -2687,6 +2697,7 @@ bool oraclecursor::outputBind(const char *variable,
 				int16_t *second,
 				int32_t *microsecond,
 				const char **tz,
+				bool *isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
@@ -2703,6 +2714,9 @@ bool oraclecursor::outputBind(const char *variable,
 	db->tz=tz;
 	db->ocidate=new OCIDate;
 	outdatebind[oraoutbindcount]=db;
+
+	// FIXME: isnegative?
+	*isnegative=false;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);

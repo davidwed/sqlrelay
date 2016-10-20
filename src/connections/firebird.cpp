@@ -91,6 +91,7 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
                                         	int16_t second,
                                         	int32_t microsecond,
                                         	const char *tz,
+						bool isnegative,
                                         	char *buffer,
                                         	uint16_t buffersize,
                                         	int16_t *isnull);
@@ -129,6 +130,7 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 						int16_t *second,
 						int32_t *microsecond,
 						const char **tz,
+						bool *isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -944,9 +946,12 @@ bool firebirdcursor::inputBind(const char *variable,
 					int16_t second,
 					int32_t microsecond,
 					const char *tz,
+					bool isnegative,
 					char *buffer,
 					uint16_t buffersize,
 					int16_t *isnull) {
+
+	// FIXME: isnegative?
 
 	// build an ISC_TIMESTAMP
 	tm	t;
@@ -1156,6 +1161,7 @@ bool firebirdcursor::outputBind(const char *variable,
 				int16_t *second,
 				int32_t *microsecond,
 				const char **tz,
+				bool *isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
@@ -1168,6 +1174,9 @@ bool firebirdcursor::outputBind(const char *variable,
 	outdatebind[outbindcount].minute=minute;
 	outdatebind[outbindcount].second=second;
 	outdatebind[outbindcount].tz=tz;
+
+	// FIXME: isnegative?
+	*isnegative=false;
 
 	outbindcount++;
 

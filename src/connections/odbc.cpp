@@ -96,6 +96,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz,
+						bool isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -124,6 +125,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						int16_t *second,
 						int32_t *microsecond,
 						const char **tz,
+						bool *isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -929,9 +931,12 @@ bool odbccursor::inputBind(const char *variable,
 				int16_t second,
 				int32_t microsecond,
 				const char *tz,
+				bool isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
+
+	// FIXME: isnegative?
 
 	bool	validdate=(year>=0 && month>=0 && day>=0);
 	bool	validtime=(hour>=0 && minute>=0 && second>=0 && microsecond>=0);
@@ -1103,6 +1108,7 @@ bool odbccursor::outputBind(const char *variable,
 				int16_t *second,
 				int32_t *microsecond,
 				const char **tz,
+				bool *isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
@@ -1118,6 +1124,9 @@ bool odbccursor::outputBind(const char *variable,
 	db->tz=tz;
 	db->buffer=buffer;
 	outdatebind[outbindcount]=db;
+
+	// FIXME: isnegative?
+	*isnegative=false;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),

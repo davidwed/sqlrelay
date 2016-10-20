@@ -2281,17 +2281,19 @@ bool sqlrservercontroller::parseDateTime(
 				const char *datedelimiters,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int16_t *fraction) {
+				int16_t *fraction, bool *isnegative) {
 	return ::parseDateTime(datetime,ddmm,yyyyddmm,datedelimiters,
-				year,month,day,hour,minute,second,fraction);
+				year,month,day,hour,minute,second,fraction,
+				isnegative);
 }
 
 char *sqlrservercontroller::convertDateTime(const char *format,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t fraction) {
+				int16_t fraction, bool isnegative) {
 	return ::convertDateTime(format,year,month,day,
-				hour,minute,second,fraction);
+				hour,minute,second,fraction,
+				isnegative);
 }
 
 static const char *asciitohex[]={
@@ -3034,6 +3036,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					bind->value.dateval.second,
 					bind->value.dateval.microsecond,
 					bind->value.dateval.tz,
+					bind->value.dateval.isnegative,
 					bind->value.dateval.buffer,
 					bind->value.dateval.buffersize,
 					&bind->isnull)) {
@@ -3104,6 +3107,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->value.dateval.second,
 					&bind->value.dateval.microsecond,
 					(const char **)&bind->value.dateval.tz,
+					&bind->value.dateval.isnegative,
 					bind->value.dateval.buffer,
 					bind->value.dateval.buffersize,
 					&bind->isnull)) {
@@ -3818,11 +3822,12 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	int16_t	minute=-1;
 	int16_t	second=-1;
 	int16_t	fraction=-1;
+	bool	isnegative=false;
 	if (!parseDateTime(field,ddmm,yyyyddmm,
 				datedelimiters,
 				&year,&month,&day,
 				&hour,&minute,&second,
-				&fraction)) {
+				&fraction,&isnegative)) {
 		return;
 	}
 
@@ -3840,7 +3845,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	reformattedfield=convertDateTime(format,
 					year,month,day,
 					hour,minute,second,
-					fraction);
+					fraction,isnegative);
 	reformattedfieldlength=charstring::length(reformattedfield);
 
 	if (debugsqlrresultsettranslation) {

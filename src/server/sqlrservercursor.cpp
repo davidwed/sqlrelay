@@ -158,7 +158,8 @@ bool sqlrservercursor::inputBind(const char *variable,
 void sqlrservercursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int32_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz,
+				bool isnegative) {
 
 	const char	*format=
 			conn->cont->cfg->getFakeInputBindVariablesDateFormat();
@@ -171,7 +172,7 @@ void sqlrservercursor::dateToString(char *buffer, uint16_t buffersize,
 	char	*newdate=conn->cont->convertDateTime(format,
 						year,month,day,
 						hour,minute,second,
-						microsecond);
+						microsecond,isnegative);
 	charstring::safeCopy(buffer,buffersize,newdate);
 	delete[] newdate;
 }
@@ -186,11 +187,12 @@ bool sqlrservercursor::inputBind(const char *variable,
 					int16_t second,
 					int32_t microsecond,
 					const char *tz,
+					bool isnegative,
 					char *buffer,
 					uint16_t buffersize,
 					int16_t *isnull) {
 	dateToString(buffer,buffersize,year,month,day,
-			hour,minute,second,microsecond,tz);
+			hour,minute,second,microsecond,tz,isnegative);
 	if (buffer[0]=='\0') {
 		*isnull=conn->nullBindValue();
 	}
@@ -252,6 +254,7 @@ bool sqlrservercursor::outputBind(const char *variable,
 					int16_t *second,
 					int32_t *microsecond,
 					const char **tz,
+					bool *isnegative,
 					char *buffer,
 					uint16_t buffersize,
 					int16_t *isnull) {
@@ -697,7 +700,8 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 				inbindvars[index].value.dateval.minute,
 				inbindvars[index].value.dateval.second,
 				inbindvars[index].value.dateval.microsecond,
-				inbindvars[index].value.dateval.tz);
+				inbindvars[index].value.dateval.tz,
+				inbindvars[index].value.dateval.isnegative);
 		buffer->append("'")->append(buf)->append("'");
 	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_NULL) {
 		buffer->append("NULL");

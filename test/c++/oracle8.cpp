@@ -149,14 +149,14 @@ int	main(int argc, char **argv) {
 	cur->inputBind("1",2);
 	cur->inputBind("2","testchar2");
 	cur->inputBind("3","testvarchar2");
-	cur->inputBind("4",2002,1,1,0,0,0,0,NULL);
+	cur->inputBind("4",2002,1,1,0,0,0,0,NULL,false);
 	cur->inputBind("5","testlong2");
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",3);
 	cur->inputBind("2","testchar3");
 	cur->inputBind("3","testvarchar3");
-	cur->inputBind("4",2003,1,1,0,0,0,0,NULL);
+	cur->inputBind("4",2003,1,1,0,0,0,0,NULL,false);
 	cur->inputBind("5","testlong3");
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
@@ -172,14 +172,14 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var1",5);
 	cur->inputBind("var2","testchar5");
 	cur->inputBind("var3","testvarchar5");
-	cur->inputBind("var4",2005,1,1,0,0,0,0,NULL);
+	cur->inputBind("var4",2005,1,1,0,0,0,0,NULL,false);
 	cur->inputBind("var5","testlong5");
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("var1",6);
 	cur->inputBind("var2","testchar6");
 	cur->inputBind("var3","testvarchar6");
-	cur->inputBind("var4",2006,1,1,0,0,0,0,NULL);
+	cur->inputBind("var4",2006,1,1,0,0,0,0,NULL,false);
 	cur->inputBind("var5","testlong6");
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
@@ -195,7 +195,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var1",8);
 	cur->inputBind("var2","testchar8");
 	cur->inputBind("var3","testvarchar8");
-	cur->inputBind("var4",2008,1,1,0,0,0,0,NULL);
+	cur->inputBind("var4",2008,1,1,0,0,0,0,NULL,false);
 	cur->inputBind("var5","testlong8");
 	cur->inputBind("var9","junkvalue");
 	cur->validateBinds();
@@ -220,8 +220,10 @@ int	main(int argc, char **argv) {
 	int16_t	second=0;
 	int32_t	microsecond=0;
 	const char	*tz=NULL;
+	bool	isnegative=false;
 	cur->getOutputBindDate("datevar",&year,&month,&day,
-					&hour,&minute,&second,&microsecond,&tz);
+					&hour,&minute,&second,&microsecond,&tz,
+					&isnegative);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
@@ -246,7 +248,8 @@ int	main(int argc, char **argv) {
 	stringvar=cur->getOutputBindString("2");
 	floatvar=cur->getOutputBindDouble("3");
 	cur->getOutputBindDate("4",&year,&month,&day,
-					&hour,&minute,&second,&microsecond,&tz);
+					&hour,&minute,&second,&microsecond,&tz,
+					&isnegative);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
@@ -273,7 +276,8 @@ int	main(int argc, char **argv) {
 	stringvar=cur->getOutputBindString("stringvar");
 	floatvar=cur->getOutputBindDouble("floatvar");
 	cur->getOutputBindDate("datevar",&year,&month,&day,
-					&hour,&minute,&second,&microsecond,&tz);
+					&hour,&minute,&second,&microsecond,&tz,
+					&isnegative);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);

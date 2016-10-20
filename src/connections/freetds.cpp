@@ -126,6 +126,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz,
+						bool isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -154,6 +155,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 						int16_t *second,
 						int32_t *microsecond,
 						const char **tz,
+						bool *isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -1302,9 +1304,12 @@ bool freetdscursor::inputBind(const char *variable,
 				int16_t second,
 				int32_t microsecond,
 				const char *tz,
+				bool isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
+
+	// FIXME: isnegative?
 
 	checkRePrepare();
 
@@ -1455,9 +1460,14 @@ bool freetdscursor::outputBind(const char *variable,
 				int16_t *second,
 				int32_t *microsecond,
 				const char **tz,
+				bool *isnegative,
 				char *buffer,
 				uint16_t buffersize,
 				int16_t *isnull) {
+
+	// FIXME: isnegative?
+	*isnegative=false;
+
 	checkRePrepare();
 
 	outbindtype[outbindindex]=CS_DATETIME_TYPE;

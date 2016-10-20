@@ -169,6 +169,7 @@ class sqlrclientbindvar {
 				int16_t	second;
 				int32_t	microsecond;
 				char	*tz;
+				bool	isnegative;
 			} dateval;
 			char		*lobval;
 			uint16_t	cursorid;
@@ -1354,7 +1355,8 @@ void sqlrcursor::inputBind(const char *variable, double value,
 void sqlrcursor::inputBind(const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int32_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz,
+				bool isnegative) {
 	if (charstring::isNullOrEmpty(variable)) {
 		return;
 	}
@@ -1365,7 +1367,8 @@ void sqlrcursor::inputBind(const char *variable,
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
-	dateVar(bv,variable,year,month,day,hour,minute,second,microsecond,tz);
+	dateVar(bv,variable,year,month,day,hour,
+		minute,second,microsecond,tz,isnegative);
 	bv->send=true;
 	pvt->_dirtybinds=true;
 }
@@ -1463,7 +1466,8 @@ void sqlrcursor::dateVar(sqlrclientbindvar *var,
 					int16_t minute,
 					int16_t second,
 					int32_t microsecond,
-					const char *tz) {
+					const char *tz,
+					bool isnegative) {
 	var->type=SQLRCLIENTBINDVARTYPE_DATE;
 	var->value.dateval.year=year;
 	var->value.dateval.month=month;
@@ -1472,6 +1476,7 @@ void sqlrcursor::dateVar(sqlrclientbindvar *var,
 	var->value.dateval.minute=minute;
 	var->value.dateval.second=second;
 	var->value.dateval.microsecond=microsecond;
+	var->value.dateval.isnegative=isnegative;
 	if (pvt->_copyrefs) {
 		var->value.dateval.tz=charstring::duplicate(tz);
 	} else {
@@ -1701,7 +1706,8 @@ double sqlrcursor::getOutputBindDouble(const char *variable) {
 bool sqlrcursor::getOutputBindDate(const char *variable,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second,
-			int32_t *microsecond, const char **tz) {
+			int32_t *microsecond, const char **tz,
+			bool *isnegative) {
 
 	if (variable) {
 		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
@@ -1725,6 +1731,8 @@ bool sqlrcursor::getOutputBindDate(const char *variable,
 						value.dateval.microsecond;
 				*tz=(*pvt->_outbindvars)[i].
 						value.dateval.tz;
+				// FIXME: isnegative?
+				*isnegative=false;
 				return true;
 			}
 		}
@@ -2385,6 +2393,7 @@ void sqlrcursor::sendInputBinds() {
 			pvt->_sqlrc->cs()->write(
 					(*pvt->_inbindvars)[i].
 						value.dateval.tz);
+			// FIXME: isnegative?
 
 			if (pvt->_sqlrc->debug()) {
 				pvt->_sqlrc->debugPrint(":DATE)=");
@@ -2400,6 +2409,10 @@ void sqlrcursor::sendInputBinds() {
 					(*pvt->_inbindvars)[i].
 						value.dateval.day);
 				pvt->_sqlrc->debugPrint(" ");
+				if ((*pvt->_inbindvars)[i].
+						value.dateval.isnegative) {
+					pvt->_sqlrc->debugPrint("-");
+				}
 				pvt->_sqlrc->debugPrint((int64_t)
 					(*pvt->_inbindvars)[i].
 						value.dateval.hour);

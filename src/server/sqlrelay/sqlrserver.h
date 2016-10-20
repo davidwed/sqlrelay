@@ -116,6 +116,7 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 				int16_t		second;
 				int32_t		microsecond;
 				char		*tz;
+				bool		isnegative;
 				char		*buffer;
 				uint16_t	buffersize;
 			} dateval;
@@ -597,12 +598,12 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 				const char *datedelimiters,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int16_t *fraction);
+				int16_t *fraction, bool *isnegative);
 
 		char	*convertDateTime(const char *format,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t fraction);
+				int16_t fraction, bool isnegative);
 
 		const char	*asciiToHex(unsigned char ch);
 		const char	*asciiToOctal(unsigned char ch);
@@ -797,7 +798,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						int16_t minute,
 						int16_t second,
 						int32_t microsecond,
-						const char *tz);
+						const char *tz,
+						bool isnegative);
 		virtual bool	inputBind(const char *variable,
 						uint16_t variablesize,
 						int64_t year,
@@ -808,6 +810,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz,
+						bool isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
@@ -846,6 +849,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						int16_t *second,
 						int32_t *microsecond,
 						const char **tz,
+						bool *isnegative,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);

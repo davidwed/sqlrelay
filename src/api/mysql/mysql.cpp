@@ -1878,6 +1878,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	int16_t	minute=-1;
 	int16_t	second=-1;
 	int16_t	fraction=-1;
+	bool	isnegative=false;
 
 	// copy into a buffer (to make sure it's null-terminated)
 	char	*buffer=new char[length+1];
@@ -1898,7 +1899,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	parseDateTime(buffer,ddmm,yyyyddmm,
 				"/-:",&year,&month,&day,
 				&hour,&minute,&second,
-				&fraction);
+				&fraction,&isnegative);
 
 	// copy back data
 	tm->year=(year!=-1)?year:0;
@@ -1907,6 +1908,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	tm->hour=(hour!=-1)?hour:0;
 	tm->minute=(minute!=-1)?minute:0;
 	tm->second=(second!=-1)?second:0;
+	tm->neg=isnegative;
 
 	// clean up
 	delete[] buffer;
@@ -2496,7 +2498,9 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 						-1,
 						-1,
 						-1,
-						-1,NULL);
+						-1,
+						NULL,
+						tm->neg);
 				break;
 			}
 			case MYSQL_TYPE_TIME: {
@@ -2509,7 +2513,9 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 						tm->hour,
 						tm->minute,
 						tm->second,
-						0,NULL);
+						0,
+						NULL,
+						tm->neg);
 				break;
 			}
 			case MYSQL_TYPE_TIMESTAMP:
@@ -2524,7 +2530,9 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 						tm->hour,
 						tm->minute,
 						tm->second,
-						0,NULL);
+						0,
+						NULL,
+						tm->neg);
 				break;
 			}
 			case MYSQL_TYPE_NEWDECIMAL:
