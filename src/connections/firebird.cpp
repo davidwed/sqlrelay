@@ -53,6 +53,7 @@ struct datebind {
         int16_t         *minute;
         int16_t         *second;
         const char      **tz;
+	bool		*isnegative;
 };
 
 class firebirdconnection;
@@ -951,8 +952,6 @@ bool firebirdcursor::inputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	// FIXME: isnegative?
-
 	// build an ISC_TIMESTAMP
 	tm	t;
 	t.tm_sec=second;
@@ -1174,9 +1173,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outdatebind[outbindcount].minute=minute;
 	outdatebind[outbindcount].second=second;
 	outdatebind[outbindcount].tz=tz;
-
-	// FIXME: isnegative?
-	*isnegative=false;
+	outdatebind[outbindcount].isnegative=isnegative;
 
 	outbindcount++;
 
@@ -1413,6 +1410,7 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 				*(outdatebind[i].minute)=t.tm_min;
 				*(outdatebind[i].second)=t.tm_sec;
 				*(outdatebind[i].tz)=NULL;
+				*(outdatebind[i].isnegative)=false;
 			}
 		}
 		return retval;

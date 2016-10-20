@@ -975,8 +975,6 @@ bool db2cursor::inputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	// FIXME: isnegative?
-
 	bool	validdate=(year>=0 && month>=0 && day>=0);
 	bool	validtime=(hour>=0 && minute>=0 && second>=0 && microsecond>=0);
 
@@ -1178,11 +1176,9 @@ bool db2cursor::outputBind(const char *variable,
 	db->second=second;
 	db->microsecond=microsecond;
 	db->tz=tz;
+	*isnegative=false;
 	db->buffer=buffer;
 	outdatebind[outbindcount]=db;
-
-	// FIXME: isnegative?
-	*isnegative=false;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),

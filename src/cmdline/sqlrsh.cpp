@@ -19,6 +19,7 @@
 #include <config.h>
 #include <defaults.h>
 #include <defines.h>
+#include <parsedatetime.h>
 #include <version.h>
 
 class sqlrshbindvalue {
@@ -1345,26 +1346,29 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 
 	} else if (charstring::contains(value,"/") && 
 			charstring::contains(value,":")) {
-
-		datetime	dt;
-		// FIXME: isnegative?
-		dt.initialize(value);
+		int16_t	year;
+		int16_t	month;
+		int16_t	day;
+		int16_t	hour;
+		int16_t	minute;
+		int16_t	second;
+		int16_t	fraction;
+		bool	isnegative;
+		parseDateTime(value,false,false,"/",
+					&year,&month,&day,
+					&hour,&minute,&second,
+					&fraction,&isnegative);
 		bv->type=SQLRCLIENTBINDVARTYPE_DATE;
-		bv->dateval.year=dt.getYear();
-		bv->dateval.month=dt.getMonth();
-		bv->dateval.day=dt.getDayOfMonth();
-		bv->dateval.hour=dt.getHour();
-		bv->dateval.minute=dt.getMinutes();
-		bv->dateval.second=dt.getSeconds();
-		bv->dateval.microsecond=charstring::toInteger(
-					charstring::findLast(value,":")+1);
-		bv->dateval.isnegative=false;
-		char	*tz=(char *)env->inbindpool->allocate(
-				charstring::length(dt.getTimeZoneString())+1);
-		charstring::copy(tz,dt.getTimeZoneString());
-		bv->dateval.tz=tz;
+		bv->dateval.year=year;
+		bv->dateval.month=month;
+		bv->dateval.day=day;
+		bv->dateval.hour=hour;
+		bv->dateval.minute=minute;
+		bv->dateval.second=second;
+		bv->dateval.microsecond=fraction;
+		bv->dateval.tz="";
+		bv->dateval.isnegative=isnegative;
 		delete[] value;
-
 	} else if (charstring::isInteger(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_INTEGER;
 		bv->integerval=charstring::toInteger(value);

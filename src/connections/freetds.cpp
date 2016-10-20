@@ -80,6 +80,7 @@ struct datebind {
         int16_t         *second;
         int32_t         *microsecond;
         const char      **tz;
+	bool		*isnegative;
 };
 
 class freetdsconnection;
@@ -1309,8 +1310,6 @@ bool freetdscursor::inputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	// FIXME: isnegative?
-
 	checkRePrepare();
 
 	// Sybase requires this format: "Jan 2 2012 4:5:3:000PM"
@@ -1465,9 +1464,6 @@ bool freetdscursor::outputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	// FIXME: isnegative?
-	*isnegative=false;
-
 	checkRePrepare();
 
 	outbindtype[outbindindex]=CS_DATETIME_TYPE;
@@ -1479,6 +1475,7 @@ bool freetdscursor::outputBind(const char *variable,
 	outbinddates[outbindindex].second=second;
 	outbinddates[outbindindex].microsecond=microsecond;
 	outbinddates[outbindindex].tz=tz;
+	outbinddates[outbindindex].isnegative=isnegative;
 	outbindindex++;
 
 	bytestring::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
@@ -1775,6 +1772,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 				*(db->second)=dr.datesecond;
 				*(db->microsecond)=dr.datemsecond;
 				*(db->tz)=NULL;
+				*(db->isnegative)=false;
 			}
 		}
 

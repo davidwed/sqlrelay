@@ -102,6 +102,7 @@ struct datebind {
         int16_t         *second;
         int32_t         *microsecond;
         const char      **tz;
+	bool		*isnegative;
 };
 
 class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
@@ -1049,8 +1050,6 @@ bool sapcursor::inputBind(const char *variable,
 
 	checkRePrepare();
 
-	// FIXME: isnegative?
-
 	// Sybase requires this format: "Jan 2 2012 4:5:3:000PM"
 	if (month<1) {
 		month=1;
@@ -1210,10 +1209,8 @@ bool sapcursor::outputBind(const char *variable,
 	outbinddates[outbindindex].second=second;
 	outbinddates[outbindindex].microsecond=microsecond;
 	outbinddates[outbindindex].tz=tz;
+	outbinddates[outbindindex].isnegative=isnegative;
 	outbindindex++;
-
-	// FIXME: isnegative?
-	*isnegative=false;
 
 	bytestring::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -1454,6 +1451,7 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 				*(db->second)=dr.datesecond;
 				*(db->microsecond)=dr.datesecfrac;
 				*(db->tz)=NULL;
+				*(db->isnegative)=false;
 			}
 		}
 

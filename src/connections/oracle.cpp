@@ -78,6 +78,7 @@ struct datebind {
 	int16_t		*minute;
 	int16_t		*second;
 	const char	**tz;
+	bool		*isnegative;
 	OCIDate		*ocidate;
 };
 
@@ -2335,13 +2336,11 @@ void oraclecursor::dateToString(char *buffer, uint16_t buffersize,
 							year,month,day,
 							hour,minute,second,
 							microsecond,
-							isnegative);
+							false);
 		charstring::safeCopy(buffer,buffersize,newdate);
 		delete[] newdate;
 		return;
 	}
-
-	// FIXME: isnegative?
 
 	// typically oracle just wants DD-MON-YYYY but if hour,
 	// minute and second are non-zero then use them too
@@ -2511,8 +2510,6 @@ bool oraclecursor::inputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 	checkRePrepare();
-
-	// FIXME: isnegative
 
 	indatebind[orainbindcount]=new OCIDate;
 	OCIDateSetDate(indatebind[orainbindcount],year,month,day);
@@ -2712,11 +2709,9 @@ bool oraclecursor::outputBind(const char *variable,
 	db->minute=minute;
 	db->second=second;
 	db->tz=tz;
+	db->isnegative=isnegative;
 	db->ocidate=new OCIDate;
 	outdatebind[oraoutbindcount]=db;
-
-	// FIXME: isnegative?
-	*isnegative=false;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
@@ -3351,6 +3346,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 			*db->minute=minute;
 			*db->second=second;
 			*db->tz=NULL;
+			*db->isnegative=false;
 		}
 	}
 
