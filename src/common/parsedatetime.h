@@ -69,6 +69,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 	*minute=-1;
 	*second=-1;
 	*fraction=-1;
+	*isnegative=false;
 
 	// different db's format dates very differently
 
@@ -169,7 +170,14 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				!*(charstring::findFirst(timeparts[1],"PM")+2)))
 				) {
 
-				*hour=charstring::toInteger(timeparts[0]);
+				if (timeparts[0][0]=='-') {
+					*isnegative=true;
+					*hour=charstring::toInteger(
+							timeparts[0]+1);
+				} else {
+					*hour=charstring::toInteger(
+							timeparts[0]);
+				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=0;
 				*fraction=0;
@@ -214,8 +222,14 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 					*year=charstring::toInteger(
 								timeparts[2]);
 				} else {
-					*hour=charstring::toInteger(
+					if (timeparts[0][0]=='-') {
+						*isnegative=true;
+						*hour=charstring::toInteger(
+								timeparts[0]+1);
+					} else {
+						*hour=charstring::toInteger(
 								timeparts[0]);
+					}
 					*minute=charstring::toInteger(
 								timeparts[1]);
 					*second=charstring::toInteger(
@@ -234,7 +248,14 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				!*(charstring::findFirst(timeparts[2],"PM")+2)))
 				) {
 
-				*hour=charstring::toInteger(timeparts[0]);
+				if (timeparts[0][0]=='-') {
+					*isnegative=true;
+					*hour=charstring::toInteger(
+							timeparts[0]+1);
+				} else {
+					*hour=charstring::toInteger(
+							timeparts[0]);
+				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
 				const char	*dot=
@@ -252,7 +273,14 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				!*(charstring::findFirst(timeparts[2],"PM")+2)))
 				) {
 
-				*hour=charstring::toInteger(timeparts[0]);
+				if (timeparts[0][0]=='-') {
+					*isnegative=true;
+					*hour=charstring::toInteger(
+							timeparts[0]+1);
+				} else {
+					*hour=charstring::toInteger(
+							timeparts[0]);
+				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
 				*fraction=0;
@@ -263,7 +291,14 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				charstring::isNumber(timeparts[1]) &&
 				charstring::contains(timeparts[2],'.')) {
 
-				*hour=charstring::toInteger(timeparts[0]);
+				if (timeparts[0][0]=='-') {
+					*isnegative=true;
+					*hour=charstring::toInteger(
+							timeparts[0]+1);
+				} else {
+					*hour=charstring::toInteger(
+							timeparts[0]);
+				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
 				const char	*dot=
@@ -281,7 +316,14 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				!*(charstring::findFirst(timeparts[3],"PM")+2)))
 				) {
 
-				*hour=charstring::toInteger(timeparts[0]);
+				if (timeparts[0][0]=='-') {
+					*isnegative=true;
+					*hour=charstring::toInteger(
+							timeparts[0]+1);
+				} else {
+					*hour=charstring::toInteger(
+							timeparts[0]);
+				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
 				*fraction=charstring::toInteger(timeparts[3]);
@@ -293,7 +335,14 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				charstring::isNumber(timeparts[2]) &&
 				charstring::isNumber(timeparts[3])) {
 
-				*hour=charstring::toInteger(timeparts[0]);
+				if (timeparts[0][0]=='-') {
+					*isnegative=true;
+					*hour=charstring::toInteger(
+							timeparts[0]+1);
+				} else {
+					*hour=charstring::toInteger(
+							timeparts[0]);
+				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
 				*fraction=charstring::toInteger(timeparts[3]);
@@ -369,95 +418,6 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 			}
 			delete[] dateparts;
 
-		} else if (supportdashdelimiteddate &&
-				charstring::contains(parts[i],'-')) {
-
-			// the section with -'s is the date...
-
-			// split on -
-			char		**dateparts;
-			uint64_t	datepartcount;
-			charstring::split(parts[i],"-",1,true,
-						&dateparts,&datepartcount);
-
-			// there must be three parts, 0 and 2 must be numbers
-			if (datepartcount==3 &&
-				charstring::isNumber(dateparts[0]) &&
-				charstring::isNumber(dateparts[2])) {
-
-				// some dates have a non-numeric month in part 2
-				if (!charstring::isNumber(dateparts[1])) {
-
-					*day=charstring::toInteger(
-								dateparts[0]);
-					for (int j=0; shortmonths[j]; j++) {
-						if (!charstring::
-							compareIgnoringCase(
-								dateparts[1],
-								shortmonths[j]) 
-							||
-							!charstring::
-							compareIgnoringCase(
-								dateparts[1],
-								longmonths[j]))
-						{
-							*month=j+1;
-						}
-					}
-					*year=charstring::toInteger(
-								dateparts[2]);
-				} else {
-
-					// it could be yyyy-xx-xx or xx-xx-yyyy
-					if (charstring::length(
-							dateparts[0])==4) {
-						*year=charstring::toInteger(
-								dateparts[0]);
-						if (yyyyddmm) {
-							*day=
-							charstring::toInteger(
-								dateparts[1]);
-							*month=
-							charstring::toInteger(
-								dateparts[2]);
-						} else {
-							*month=
-							charstring::toInteger(
-								dateparts[1]);
-							*day=
-							charstring::toInteger(
-								dateparts[2]);
-						}
-					} else {
-						if (ddmm) {
-							*day=
-							charstring::toInteger(
-								dateparts[0]);
-							*month=
-							charstring::toInteger(
-								dateparts[1]);
-						} else {
-							*month=
-							charstring::toInteger(
-								dateparts[0]);
-							*day=
-							charstring::toInteger(
-								dateparts[1]);
-						}
-						*year=charstring::toInteger(
-								dateparts[2]);
-					}
-				}
-			} else {
-				retval=false;
-			}
-
-			// clean up
-			for (uint64_t j=0; j<datepartcount; j++) {
-				delete[] dateparts[j];
-			}
-			delete[] dateparts;
-
 		} else if (supportdotdelimiteddate &&
 				charstring::contains(parts[i],'.')) {
 
@@ -503,6 +463,98 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 						*year=charstring::toInteger(
 								dateparts[0]);
 						if (ddmm) {
+							*day=
+							charstring::toInteger(
+								dateparts[1]);
+							*month=
+							charstring::toInteger(
+								dateparts[2]);
+						} else {
+							*month=
+							charstring::toInteger(
+								dateparts[1]);
+							*day=
+							charstring::toInteger(
+								dateparts[2]);
+						}
+					} else {
+						if (ddmm) {
+							*day=
+							charstring::toInteger(
+								dateparts[0]);
+							*month=
+							charstring::toInteger(
+								dateparts[1]);
+						} else {
+							*month=
+							charstring::toInteger(
+								dateparts[0]);
+							*day=
+							charstring::toInteger(
+								dateparts[1]);
+						}
+						*year=charstring::toInteger(
+								dateparts[2]);
+					}
+				}
+			} else {
+				retval=false;
+			}
+
+			// clean up
+			for (uint64_t j=0; j<datepartcount; j++) {
+				delete[] dateparts[j];
+			}
+			delete[] dateparts;
+
+		} else if (supportdashdelimiteddate &&
+				charstring::contains(parts[i],'-')) {
+
+			// the section with -'s is the date...
+			// (a time can also start with a - (indicating that
+			// it's a negative interval) but that should should
+			// have been caught above because it also contain :'s)
+
+			// split on -
+			char		**dateparts;
+			uint64_t	datepartcount;
+			charstring::split(parts[i],"-",1,true,
+						&dateparts,&datepartcount);
+
+			// there must be three parts, 0 and 2 must be numbers
+			if (datepartcount==3 &&
+				charstring::isNumber(dateparts[0]) &&
+				charstring::isNumber(dateparts[2])) {
+
+				// some dates have a non-numeric month in part 2
+				if (!charstring::isNumber(dateparts[1])) {
+
+					*day=charstring::toInteger(
+								dateparts[0]);
+					for (int j=0; shortmonths[j]; j++) {
+						if (!charstring::
+							compareIgnoringCase(
+								dateparts[1],
+								shortmonths[j]) 
+							||
+							!charstring::
+							compareIgnoringCase(
+								dateparts[1],
+								longmonths[j]))
+						{
+							*month=j+1;
+						}
+					}
+					*year=charstring::toInteger(
+								dateparts[2]);
+				} else {
+
+					// it could be yyyy-xx-xx or xx-xx-yyyy
+					if (charstring::length(
+							dateparts[0])==4) {
+						*year=charstring::toInteger(
+								dateparts[0]);
+						if (yyyyddmm) {
 							*day=
 							charstring::toInteger(
 								dateparts[1]);
@@ -641,7 +693,8 @@ static char *convertDateTime(const char *format,
 			output.append(buf);
 			ptr=ptr+4;
 		} else if (!charstring::compare(ptr,"HH",2)) {
-			charstring::printf(buf,5,"%02d",
+			charstring::printf(buf,5,"%s%02d",
+						(isnegative)?"-":"",
 						(hour<13)?hour:hour-12);
 			output.append(buf);
 			ptr=ptr+2;
