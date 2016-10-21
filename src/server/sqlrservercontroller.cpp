@@ -1890,7 +1890,7 @@ bool sqlrservercontroller::auth(sqlrcredentials *cred) {
 
 	// authenticate
 	const char	*autheduser=NULL;
-	if (sqlra && sqlra->auth(conn,cred)) {
+	if (sqlra) {
 		autheduser=sqlra->auth(conn,cred);
 	}
 	if (autheduser) {
