@@ -275,6 +275,10 @@ class sqlrcursorprivate {
 		// cursor id
 		uint16_t	_cursorid;
 		bool		_havecursorid;
+
+		// query translation
+		char		*_querytree;
+		char		*_translatedquery;
 };
 
 // This method is a member of sqlrcursorprivate, rather than sqlrcuror, because
@@ -379,6 +383,10 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	pvt->_cursorid=0;
 	pvt->_havecursorid=false;
 
+	// query translation
+	pvt->_querytree=NULL;
+	pvt->_translatedquery=NULL;
+
 	// initialize all bind/substitution-related variables
 	pvt->_subvars=new dynamicarray<sqlrclientbindvar>(
 					OPTIMISTIC_BIND_COUNT,16);
@@ -454,6 +462,10 @@ sqlrcursor::~sqlrcursor() {
 		delete[] pvt->_cachedestname;
 	}
 	delete[] pvt->_cachedestindname;
+
+	// query translation
+	delete[] pvt->_querytree;
+	delete[] pvt->_translatedquery;
 
 	delete pvt;
 }
@@ -5090,7 +5102,10 @@ void sqlrcursor::clearColumns() {
 	pvt->_columnnamearray=NULL;
 }
 
-char *sqlrcursor::getQueryTree() {
+const char *sqlrcursor::getQueryTree() {
+
+	delete[] pvt->_querytree;
+	pvt->_querytree=NULL;
 
 	pvt->_reexecute=false;
 	pvt->_validatebinds=false;
@@ -5109,7 +5124,7 @@ char *sqlrcursor::getQueryTree() {
 	pvt->_cached=false;
 	pvt->_endofresultset=false;
 
-	// tell the server we want to get a db list
+	// tell the server we want to get a query tree
 	pvt->_sqlrc->cs()->write((uint16_t)GET_QUERY_TREE);
 
 	// tell the server whether we'll need a cursor or not
@@ -5131,21 +5146,82 @@ char *sqlrcursor::getQueryTree() {
 	}
 
 	// get the size of the tree
-	uint64_t	querytreelen;
-	if (pvt->_sqlrc->cs()->read(&querytreelen)!=sizeof(uint64_t)) {
+	uint64_t	len;
+	if (pvt->_sqlrc->cs()->read(&len)!=sizeof(uint64_t)) {
 		return NULL;
 	}
 
 	// get the tree itself
-	char	*querytree=new char[querytreelen+1];
-	if ((uint64_t)pvt->_sqlrc->cs()->read(
-				querytree,querytreelen)!=querytreelen) {
-		delete[] querytree;
+	pvt->_querytree=new char[len+1];
+	if ((uint64_t)pvt->_sqlrc->cs()->read(pvt->_querytree,len)!=len) {
+		delete[] pvt->_querytree;
+		pvt->_querytree=NULL;
 		return NULL;
 	}
-	querytree[querytreelen]='\0';
+	pvt->_querytree[len]='\0';
 
-	return querytree;
+	return pvt->_querytree;
+}
+
+const char *sqlrcursor::getTranslatedQuery() {
+
+	delete[] pvt->_translatedquery;
+	pvt->_translatedquery=NULL;
+
+	pvt->_reexecute=false;
+	pvt->_validatebinds=false;
+	pvt->_resumed=false;
+	clearVariables();
+
+	if (!pvt->_endofresultset) {
+		closeResultSet(false);
+	}
+	clearResultSet();
+
+	if (!pvt->_sqlrc->openSession()) {
+		return NULL;
+	}
+
+	pvt->_cached=false;
+	pvt->_endofresultset=false;
+
+	// tell the server we want to get a translated query
+	pvt->_sqlrc->cs()->write((uint16_t)GET_TRANSLATED_QUERY);
+
+	// tell the server whether we'll need a cursor or not
+	sendCursorStatus();
+
+	pvt->_sqlrc->flushWriteBuffer();
+
+	uint16_t	err=getErrorStatus();
+	if (err!=NO_ERROR_OCCURRED) {
+		if (err==TIMEOUT_GETTING_ERROR_STATUS) {
+			pvt->_sqlrc->endSession();
+			return NULL;
+		}
+		getErrorFromServer();
+		if (err==ERROR_OCCURRED_DISCONNECT) {
+			pvt->_sqlrc->endSession();
+		}
+		return NULL;
+	}
+
+	// get the size of the query
+	uint64_t	len;
+	if (pvt->_sqlrc->cs()->read(&len)!=sizeof(uint64_t)) {
+		return NULL;
+	}
+
+	// get the query itself
+	pvt->_translatedquery=new char[len+1];
+	if ((uint64_t)pvt->_sqlrc->cs()->read(pvt->_translatedquery,len)!=len) {
+		delete[] pvt->_translatedquery;
+		pvt->_translatedquery=NULL;
+		return NULL;
+	}
+	pvt->_translatedquery[len]='\0';
+
+	return pvt->_translatedquery;
 }
 
 bool sqlrcursor::endofresultset() {

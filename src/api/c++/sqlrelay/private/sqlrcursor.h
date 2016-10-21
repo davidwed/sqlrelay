@@ -138,7 +138,8 @@
 								bool copyrefs);
 		uint16_t	getOutputBindCursorId(const char *variable);
 		void		attachToBindCursor(uint16_t bindcursorid);
-		char		*getQueryTree();
+		const char	*getQueryTree();
+		const char	*getTranslatedQuery();
 		bool		getDatabaseList(const char *wild,
 					sqlrclientlistformat_t listformat);
 		bool		getTableList(const char *wild,

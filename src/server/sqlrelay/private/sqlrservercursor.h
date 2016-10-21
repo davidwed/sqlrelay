@@ -11,6 +11,7 @@
 		sqlrquerystatus_t	querystatus;
 
 		xmldom		*querytree;
+		stringbuffer	translatedquery;
 
 		uint16_t		inbindcount;
 		sqlrserverbindvar	*inbindvars;

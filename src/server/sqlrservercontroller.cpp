@@ -2437,8 +2437,9 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	cursor->clearQueryTree();
 
 	// apply translation rules
-	stringbuffer	translatedquery;
-	if (!sqlrt->run(conn,cursor,sqlrp,query,&translatedquery)) {
+	stringbuffer	*translatedquery=cursor->getTranslatedQueryBuffer();
+	translatedquery->clear();
+	if (!sqlrt->run(conn,cursor,sqlrp,query,translatedquery)) {
 		if (debugsqlrtranslation) {
 			stdoutput.printf("translation failed, "
 						"using original:\n\"%s\"\n\n",
@@ -2454,11 +2455,11 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	if (debugsqlrtranslation) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
-					translatedquery.getString());
+					translatedquery->getString());
 	}
 
 	// bail if the translated query is too large
-	if (translatedquery.getStringLength()>maxquerysize) {
+	if (translatedquery->getStringLength()>maxquerysize) {
 		if (debugsqlrtranslation) {
 			stdoutput.printf("translated query too large\n");
 		}
@@ -2468,10 +2469,10 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	// write the translated query to the cursor's query buffer
 	// so it'll be there if we decide to re-execute it later
 	charstring::copy(cursor->getQueryBuffer(),
-			translatedquery.getString(),
-			translatedquery.getStringLength());
+			translatedquery->getString(),
+			translatedquery->getStringLength());
 	cursor->setQueryLength(
-			translatedquery.getStringLength());
+			translatedquery->getStringLength());
 	cursor->getQueryBuffer()[cursor->getQueryLength()]='\0';
 	return true;
 }
@@ -3941,6 +3942,11 @@ void sqlrservercontroller::endSession() {
 	// reset sql translation
 	if (sqlrt) {
 		sqlrt->endSession();
+	}
+	for (int32_t i=0; i<cursorcount; i++) {
+		if (cur[i]) {
+			cur[i]->getTranslatedQueryBuffer()->clear();
+		}
 	}
 
 	// shrink the cursor array, if necessary
@@ -5866,6 +5872,11 @@ sqlrquerystatus_t sqlrservercontroller::getQueryStatus(
 
 xmldom *sqlrservercontroller::getQueryTree(sqlrservercursor *cursor) {
 	return cursor->getQueryTree();
+}
+
+const char *sqlrservercontroller::getTranslatedQuery(
+					sqlrservercursor *cursor) {
+	return cursor->getTranslatedQueryBuffer()->getString();
 }
 
 void sqlrservercontroller::setCommandStart(sqlrservercursor *cursor,

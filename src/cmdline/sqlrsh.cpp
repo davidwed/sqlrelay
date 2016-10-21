@@ -466,6 +466,7 @@ int sqlrsh::commandType(const char *command) {
 					"getresultsetbuffersize") ||
 		!charstring::compareIgnoringCase(ptr,"endsession") ||
 		!charstring::compareIgnoringCase(ptr,"querytree") ||
+		!charstring::compareIgnoringCase(ptr,"translatedquery") ||
 		!charstring::compareIgnoringCase(ptr,"response timeout",16) ||
 		!charstring::compareIgnoringCase(ptr,"cache ",6) ||
 		!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
@@ -627,6 +628,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		if (xmld.parseString(sqlrcur->getQueryTree())) {
 			xmld.getRootNode()->print(&stdoutput);
 		}
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"translatedquery")) {	
+		stdoutput.printf("%s\n",sqlrcur->getTranslatedQuery());
 		return;
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"response timeout",16)) {

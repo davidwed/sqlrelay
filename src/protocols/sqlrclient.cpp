@@ -164,6 +164,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	escapeParameter(stringbuffer *buffer,
 						const char *parameter);
 		bool	getQueryTreeCommand(sqlrservercursor *cursor);
+		bool	getTranslatedQueryCommand(sqlrservercursor *cursor);
 
 		stringbuffer	debugstr;
 
@@ -514,6 +515,9 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
 		} else if (command==GET_QUERY_TREE) {
 			cont->incrementGetQueryTreeCount();
 			loop=getQueryTreeCommand(cursor);
+		} else if (command==GET_TRANSLATED_QUERY) {
+			//cont->incrementGetTranslatedQueryCount();
+			loop=getTranslatedQueryCommand(cursor);
 		} else {
 			loop=false;
 		}
@@ -664,7 +668,8 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 		command==GETTABLELIST ||
 		command==GETCOLUMNLIST ||
 		command==ABORT_RESULT_SET ||
-		command==GET_QUERY_TREE) {
+		command==GET_QUERY_TREE ||
+		command==GET_TRANSLATED_QUERY) {
 		ssize_t	result=clientsock->read(&neednewcursor,
 						idleclienttimeout,0);
 		if (result!=sizeof(uint16_t)) {
@@ -3389,6 +3394,25 @@ bool sqlrprotocol_sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 
 	// clean up
 	delete xml;
+
+	return true;
+}
+
+bool sqlrprotocol_sqlrclient::getTranslatedQueryCommand(
+					sqlrservercursor *cursor) {
+	debugFunction();
+
+	cont->raiseDebugMessageEvent("getting translated query");
+
+	// get the query
+	const char	*query=cont->getTranslatedQuery(cursor);
+	uint64_t	querylen=charstring::length(query);
+
+	// send the tree
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	clientsock->write(querylen);
+	clientsock->write(query,querylen);
+	clientsock->flushWriteBuffer(-1,-1);
 
 	return true;
 }

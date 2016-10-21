@@ -363,8 +363,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		sqlrquerystatus_t	getQueryStatus(
 						sqlrservercursor *cursor);
 
-		// query tree
+		// query translations
 		xmldom		*getQueryTree(sqlrservercursor *cursor);
+		const char	*getTranslatedQuery(sqlrservercursor *cursor);
 
 		// running queries
 		bool	prepareQuery(sqlrservercursor *cursor,
@@ -961,6 +962,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		void		setQueryTree(xmldom *tree);
 		xmldom		*getQueryTree();
 		void		clearQueryTree();
+
+		stringbuffer	*getTranslatedQueryBuffer();
 
 		void		setCommandStart(uint64_t sec, uint64_t usec);
 		uint64_t	getCommandStartSec();

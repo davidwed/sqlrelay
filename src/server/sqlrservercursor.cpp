@@ -790,6 +790,10 @@ void sqlrservercursor::clearQueryTree() {
 	querytree=NULL;
 }
 
+stringbuffer *sqlrservercursor::getTranslatedQueryBuffer() {
+	return &translatedquery;
+}
+
 void sqlrservercursor::setCommandStart(uint64_t sec, uint64_t usec) {
 	commandstartsec=sec;
 	commandstartusec=usec;
