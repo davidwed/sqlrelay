@@ -204,9 +204,10 @@ typedef	enum {
 	BYTE_DATATYPE,
 	BOOLEAN_DATATYPE,
 	// also added by mysql
-	TINYTEXT,
-	MEDIUMTEXT,
-	LONGTEXT
+	TINYTEXT_DATATYPE,
+	MEDIUMTEXT_DATATYPE,
+	LONGTEXT_DATATYPE,
+	JSON_DATATYPE
 } datatype;
 
 #ifdef NEED_DATATYPESTRING
@@ -283,8 +284,8 @@ static const char	*datatypestring[] = {
 	"DBCLOB",
 	"DATALINK",
 	"USER_DEFINED_TYPE",
-	"SHORT_DATATYPE",
-	"TINY_DATATYPE",
+	"SHORT",
+	"TINY",
 	// added by firebird
 	"D_FLOAT",	// 67
 	"ARRAY",
@@ -407,6 +408,7 @@ static const char	*datatypestring[] = {
 	"TINYTEXT",
 	"MEDIUMTEXT",
 	"LONGTEXT",
+	"JSON",
 	NULL
 };
 #endif
@@ -522,7 +524,8 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"DBCLOB") ||
 		!charstring::compareIgnoringCase(type,"TINYTEXT") ||
 		!charstring::compareIgnoringCase(type,"MEDIUMTEXT") ||
-		!charstring::compareIgnoringCase(type,"LONGTEXT"));
+		!charstring::compareIgnoringCase(type,"LONGTEXT") ||
+		!charstring::compareIgnoringCase(type,"JSON"));
 }
 #endif
 
