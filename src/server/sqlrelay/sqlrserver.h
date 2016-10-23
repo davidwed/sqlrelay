@@ -128,6 +128,8 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 		int16_t			isnull;
 };
 
+class sqlrservercontrollerprivate;
+
 class SQLRSERVER_DLLSPEC sqlrservercontroller {
 	public:
 			sqlrservercontroller();
