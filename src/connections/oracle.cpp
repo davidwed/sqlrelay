@@ -636,8 +636,8 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 			stderror.printf(
 				"Warning: %s is not readable by %s:%s\n",
 				tnsnamesora,
-				cont->cfg->getRunAsUser(),
-				cont->cfg->getRunAsGroup());
+				cont->getConfig()->getRunAsUser(),
+				cont->getConfig()->getRunAsGroup());
 		}
 	}
 
@@ -1994,7 +1994,7 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 					oracleconn->maxselectlistsize,
 					oracleconn->maxitembuffersize);
 
-	maxbindcount=conn->cont->cfg->getMaxBindCount();
+	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	inbindpp=new OCIBind *[maxbindcount];
 	outbindpp=new OCIBind *[maxbindcount];
 	curbindpp=new OCIBind *[maxbindcount];
@@ -2328,7 +2328,7 @@ void oraclecursor::dateToString(char *buffer, uint16_t buffersize,
 				bool isnegative) {
 
 	const char	*format=
-			conn->cont->cfg->getFakeInputBindVariablesDateFormat();
+		conn->cont->getConfig()->getFakeInputBindVariablesDateFormat();
 	if (!charstring::isNullOrEmpty(format)) {
 		// FIXME: it'd be nice if we could pass buffer/buffersize
 		// into convertDateTime

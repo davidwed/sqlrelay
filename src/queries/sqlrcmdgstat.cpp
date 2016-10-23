@@ -88,11 +88,11 @@ sqlrquery_sqlrcmdgstatcursor::sqlrquery_sqlrcmdgstatcursor(
 bool sqlrquery_sqlrcmdgstatcursor::executeQuery(const char *query,
 							uint32_t length) {
 
-	shmdata	*gs=conn->cont->shm;
+	sqlrshm	*gs=conn->cont->getShm();
 
 	time_t	now=time(NULL);	
 
-	uint32_t	connectedclients=conn->cont->shm->connectedclients;
+	uint32_t	connectedclients=gs->connectedclients;
 	if (now/60>gs->peak_connectedclients_1min_time/60) {
 		gs->peak_connectedclients_1min_time=now;
 		gs->peak_connectedclients_1min=connectedclients;
@@ -187,7 +187,7 @@ bool sqlrquery_sqlrcmdgstatcursor::executeQuery(const char *query,
 	setGSResult("max_listener_error",gs->max_listeners_errors,rowcount++);
 	setGSResult("busy_listener",gs->forked_listeners,rowcount++);
 	setGSResult("peak_listener",gs->peak_listeners,rowcount++);
-	setGSResult("connection",conn->cont->shm->totalconnections,rowcount++);
+	setGSResult("connection",gs->totalconnections,rowcount++);
 	setGSResult("session",connectedclients,rowcount++);
 	setGSResult("peak_session",gs->peak_connectedclients,rowcount++);
 	setGSResult("peak_session_1min",

@@ -782,7 +782,7 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	informixconn=(informixconnection *)conn;
 	stmt=0;
-	maxbindcount=conn->cont->cfg->getMaxBindCount();
+	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	lobbindsize=new SQLLEN[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];

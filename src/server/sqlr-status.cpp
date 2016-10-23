@@ -8,7 +8,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
-#include <sqlrelay/private/sqlrshmdata.h>
+#include <sqlrelay/private/sqlrshm.h>
 #include <sqlrelay/sqlrutil.h>
 #include <datatypes.h>
 #include <defines.h>
@@ -73,16 +73,16 @@ int main(int argc, const char **argv) {
 
 	// attach to the shared memory segment for the specified instance
 	sharedmemory	idmemory;
-	if (!idmemory.attach(key,sizeof(shmdata))) {
+	if (!idmemory.attach(key,sizeof(sqlrshm))) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to shared memory segment: ");
 		stderror.printf("%s\n",err);
 		delete[] err;
 		process::exit(0);
 	}
-	shmdata	*shm=(shmdata *)idmemory.getPointer();
+	sqlrshm	*shm=(sqlrshm *)idmemory.getPointer();
 	if (!shm) {
-		stderror.printf("failed to get pointer to shmdata\n");
+		stderror.printf("failed to get pointer to shm\n");
 		process::exit(0);
 	}
 
@@ -98,7 +98,7 @@ int main(int argc, const char **argv) {
 
 	// take a snapshot of the stats
 	semset.waitWithUndo(9);
-	shmdata		statistics=*shm;
+	sqlrshm		statistics=*shm;
 	semset.signalWithUndo(9);
 	#define SEM_COUNT	13
 	int32_t	sem[SEM_COUNT];

@@ -707,8 +707,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
 	stmtfreeresult=false;
-	bind=new MYSQL_BIND[conn->cont->cfg->getMaxBindCount()];
-	bindvaluesize=new unsigned long[conn->cont->cfg->getMaxBindCount()];
+	bind=new MYSQL_BIND[conn->cont->getConfig()->getMaxBindCount()];
+	bindvaluesize=
+		new unsigned long[conn->cont->getConfig()->getMaxBindCount()];
 	usestmtprepare=true;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
@@ -842,7 +843,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	boundvariables=false;
 
 	// re-init bind buffers
-	for (uint16_t i=0; i<conn->cont->cfg->getMaxBindCount(); i++) {
+	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
 		bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
 	}
 
@@ -1652,7 +1653,7 @@ void mysqlcursor::closeResultSet() {
 	if (usestmtprepare) {
 		boundvariables=0;
 		for (uint16_t i=0;
-			i<conn->cont->cfg->getMaxBindCount();
+			i<conn->cont->getConfig()->getMaxBindCount();
 			i++) {
 			bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
 		}

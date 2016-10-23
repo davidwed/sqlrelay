@@ -720,8 +720,8 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
-	outdatebind=new datebind *[conn->cont->cfg->getMaxBindCount()];
-	for (uint16_t i=0; i<conn->cont->cfg->getMaxBindCount(); i++) {
+	outdatebind=new datebind *[conn->cont->getConfig()->getMaxBindCount()];
+	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
 		outdatebind[i]=NULL;
 	}
 }
@@ -1194,7 +1194,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<conn->cont->cfg->getMaxBindCount(); i++) {
+	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -1711,7 +1711,7 @@ void odbccursor::nextRow() {
 void odbccursor::closeResultSet() {
 	SQLCloseCursor(stmt);
 
-	for (uint16_t i=0; i<conn->cont->cfg->getMaxBindCount(); i++) {
+	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
 	}

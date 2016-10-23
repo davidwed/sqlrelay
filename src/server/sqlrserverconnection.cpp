@@ -11,8 +11,8 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 
 	this->cont=cont;
 
-	maxquerysize=cont->cfg->getMaxQuerySize();
-	maxerrorlength=cont->cfg->getMaxErrorLength();
+	maxquerysize=cont->getConfig()->getMaxQuerySize();
+	maxerrorlength=cont->getConfig()->getMaxErrorLength();
 
 	error=new char[maxerrorlength+1];
 	errorlength=0;

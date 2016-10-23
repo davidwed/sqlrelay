@@ -210,16 +210,17 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					sqlrprotocol(cont,parameters,debug) {
 	debugFunction();
 
-	idleclienttimeout=cont->cfg->getIdleClientTimeout();
-	maxclientinfolength=cont->cfg->getMaxClientInfoLength();
-	maxquerysize=cont->cfg->getMaxQuerySize();
-	maxbindcount=cont->cfg->getMaxBindCount();
-	maxbindnamelength=cont->cfg->getMaxBindNameLength();
-	maxstringbindvaluelength=cont->cfg->getMaxStringBindValueLength();
-	maxlobbindvaluelength=cont->cfg->getMaxLobBindValueLength();
+	idleclienttimeout=cont->getConfig()->getIdleClientTimeout();
+	maxclientinfolength=cont->getConfig()->getMaxClientInfoLength();
+	maxquerysize=cont->getConfig()->getMaxQuerySize();
+	maxbindcount=cont->getConfig()->getMaxBindCount();
+	maxbindnamelength=cont->getConfig()->getMaxBindNameLength();
+	maxstringbindvaluelength=
+			cont->getConfig()->getMaxStringBindValueLength();
+	maxlobbindvaluelength=cont->getConfig()->getMaxLobBindValueLength();
 	bindpool=new memorypool(512,128,100);
-	maxerrorlength=cont->cfg->getMaxErrorLength();
-	waitfordowndb=cont->cfg->getWaitForDownDatabase();
+	maxerrorlength=cont->getConfig()->getMaxErrorLength();
+	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
 	ctx=NULL;
 	usekrb=!charstring::compare(parameters->getAttributeValue("krb"),"yes");

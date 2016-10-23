@@ -36,7 +36,7 @@
 	#endif
 #endif
 
-#include <sqlrelay/private/sqlrshmdata.h>
+#include <sqlrelay/private/sqlrshm.h>
 
 class SQLRSERVER_DLLSPEC handoffsocketnode {
 	friend class sqlrlistener;

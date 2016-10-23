@@ -14,18 +14,20 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	this->conn=conn;
 
-	maxerrorlength=conn->cont->cfg->getMaxErrorLength();
+	maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
 
 	setInputBindCount(0);
-	inbindvars=new sqlrserverbindvar[conn->cont->cfg->getMaxBindCount()];
+	inbindvars=new sqlrserverbindvar[
+				conn->cont->getConfig()->getMaxBindCount()];
 	setOutputBindCount(0);
-	outbindvars=new sqlrserverbindvar[conn->cont->cfg->getMaxBindCount()];
+	outbindvars=new sqlrserverbindvar[
+				conn->cont->getConfig()->getMaxBindCount()];
 	
 	setState(SQLRCURSORSTATE_AVAILABLE);
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ 	\\r\\n]+((global|GLOBAL|local|LOCAL)?[ 	\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+");
 
-	querybuffer=new char[conn->cont->cfg->getMaxQuerySize()+1];
+	querybuffer=new char[conn->cont->getConfig()->getMaxQuerySize()+1];
 	setQueryLength(0);
 
 	setQueryStatus(SQLRQUERYSTATUS_ERROR);
@@ -161,8 +163,8 @@ void sqlrservercursor::dateToString(char *buffer, uint16_t buffersize,
 				int32_t microsecond, const char *tz,
 				bool isnegative) {
 
-	const char	*format=
-			conn->cont->cfg->getFakeInputBindVariablesDateFormat();
+	const char	*format=conn->cont->getConfig()->
+					getFakeInputBindVariablesDateFormat();
 	if (charstring::isNullOrEmpty(format)) {
 		format="YYYY-MM-DD HH:MI:SS";
 	}

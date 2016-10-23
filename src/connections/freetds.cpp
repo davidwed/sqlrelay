@@ -934,7 +934,7 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	cursornamelength=charstring::integerLength(id);
 	cursorname=charstring::parseNumber(id);
 
-	uint16_t	maxbindcount=conn->cont->cfg->getMaxBindCount();
+	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	parameter=new CS_DATAFMT[maxbindcount];
 	outbindtype=new CS_INT[maxbindcount];
 	outbindstrings=new char *[maxbindcount];

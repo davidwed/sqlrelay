@@ -112,7 +112,7 @@
 
 		semaphoreset	*semset;
 		sharedmemory	*shmem;
-		shmdata		*shm;
+		sqlrshm		*shm;
 		char		*idfilename;
 
 		bool	initialized;

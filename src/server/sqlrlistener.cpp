@@ -513,14 +513,14 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	raiseDebugMessageEvent("creating shared memory...");
 
 	shmem=new sharedmemory;
-	if (!shmem->create(key,sizeof(shmdata),
+	if (!shmem->create(key,sizeof(sqlrshm),
 				permissions::evalPermString("rw-r-----"))) {
 		shmError(id,shmem->getId());
-		shmem->attach(key,sizeof(shmdata));
+		shmem->attach(key,sizeof(sqlrshm));
 		return false;
 	}
-	shm=(shmdata *)shmem->getPointer();
-	bytestring::zero(shm,sizeof(shmdata));
+	shm=(sqlrshm *)shmem->getPointer();
+	bytestring::zero(shm,sizeof(sqlrshm));
 
 	setStartTime();
 

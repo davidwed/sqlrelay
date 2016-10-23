@@ -126,7 +126,7 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 
 	// escape the client info
 	static char	infobuf[1024+1];
-	strescape(sqlrcon->cont->connstats->clientinfo,infobuf,1024);
+	strescape(sqlrcon->cont->getClientInfo(),infobuf,1024);
 
 	// escape the input bind variables
 	char	bindbuf[1000+1];
@@ -151,14 +151,14 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 		dt.getHour(),
 		dt.getMinutes(),
 		dt.getSeconds(),
-		sqlrcon->cont->connstats->index,
+		sqlrcon->cont->getStatisticsIndex(),
 		((double)(sec*1000000+usec))/1000000.0,
 		errorcodebuf,
 		(long long)sqlrcur->getTotalRowsFetched(),
 		infobuf,
 		sqlbuf,
 		((double)(sec*1000000+usec))/1000000.0,
-		sqlrcon->cont->connstats->clientaddr,
+		sqlrcon->cont->getClientAddr(),
 		bindbuf
 		);
 

@@ -47,6 +47,22 @@
 
 class sqlrservercontrollerprivate {
 	friend class sqlrservercontroller;
+
+	// listener
+	listener		_lsnr;
+
+	// connection
+	//sqlrserverconnection	*conn;
+
+	// configuration
+	sqlrconfigs		*_sqlrcfgs;
+	sqlrconfig		*_cfg;
+	sqlrpaths		*_pth;
+
+	// statistics
+	sqlrshm			*_shm;
+	sqlrconnstatistics	*_connstats;
+
 	sqlrcmdline	*_cmdl;
 
 	semaphoreset	*_semset;
@@ -193,10 +209,10 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt=new sqlrservercontrollerprivate;
 
 	conn=NULL;
-	sqlrcfgs=NULL;
-	cfg=NULL;
-	pth=NULL;
-	connstats=NULL;
+	pvt->_sqlrcfgs=NULL;
+	pvt->_cfg=NULL;
+	pvt->_pth=NULL;
+	pvt->_connstats=NULL;
 
 	pvt->_cmdl=NULL;
 	pvt->_semset=NULL;
@@ -307,18 +323,18 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	shutDown();
 
-	if (connstats) {
-		bytestring::zero(connstats,sizeof(sqlrconnstatistics));
+	if (pvt->_connstats) {
+		bytestring::zero(pvt->_connstats,sizeof(sqlrconnstatistics));
 	}
 
 	delete pvt->_cmdl;
-	delete sqlrcfgs;
+	delete pvt->_sqlrcfgs;
 
 	delete[] pvt->_updown;
 
 	delete[] pvt->_originaldb;
 
-	delete pth;
+	delete pvt->_pth;
 
 	delete pvt->_shmem;
 
@@ -373,7 +389,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_cmdl=new sqlrcmdline(argc,argv);
 
 	// initialize the paths
-	pth=new sqlrpaths(pvt->_cmdl);
+	pvt->_pth=new sqlrpaths(pvt->_cmdl);
 
 	// default id warning
 	if (!charstring::compare(pvt->_cmdl->getId(),DEFAULT_ID)) {
@@ -407,65 +423,68 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_silent=pvt->_cmdl->found("-silent");
 
 	// load the configuration
-	sqlrcfgs=new sqlrconfigs(pth);
-	cfg=sqlrcfgs->load(pth->getConfigUrl(),pvt->_cmdl->getId());
-	if (!cfg) {
+	pvt->_sqlrcfgs=new sqlrconfigs(pvt->_pth);
+	pvt->_cfg=pvt->_sqlrcfgs->load(pvt->_pth->getConfigUrl(),
+						pvt->_cmdl->getId());
+	if (!pvt->_cfg) {
 		return false;
 	}
 
 	setUserAndGroup();
 
 	// update various configurable parameters
-	pvt->_maxquerysize=cfg->getMaxQuerySize();
-	pvt->_maxbindcount=cfg->getMaxBindCount();
-	pvt->_maxerrorlength=cfg->getMaxErrorLength();
-	pvt->_idleclienttimeout=cfg->getIdleClientTimeout();
+	pvt->_maxquerysize=pvt->_cfg->getMaxQuerySize();
+	pvt->_maxbindcount=pvt->_cfg->getMaxBindCount();
+	pvt->_maxerrorlength=pvt->_cfg->getMaxErrorLength();
+	pvt->_idleclienttimeout=pvt->_cfg->getIdleClientTimeout();
 
 	// get password encryptions
-	xmldomnode	*pwdencs=cfg->getPasswordEncryptions();
+	xmldomnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();
 	if (!pwdencs->isNullNode()) {
-		pvt->_sqlrpe=new sqlrpwdencs(pth);
+		pvt->_sqlrpe=new sqlrpwdencs(pvt->_pth);
 		pvt->_sqlrpe->load(pwdencs);
 	}	
 
 	// initialize auth
-	xmldomnode	*auths=cfg->getAuths();
+	xmldomnode	*auths=pvt->_cfg->getAuths();
 	if (!auths->isNullNode()) {
-		pvt->_sqlra=new sqlrauths(pth,cfg->getDebugAuths());
+		pvt->_sqlra=new sqlrauths(
+				pvt->_pth,pvt->_cfg->getDebugAuths());
 		pvt->_sqlra->load(auths,pvt->_sqlrpe);
 	}
 
 	// load database plugin
-	conn=initConnection(cfg->getDbase());
+	conn=initConnection(pvt->_cfg->getDbase());
 	if (!conn) {
 		return false;
 	}
 
 	// get loggers
-	xmldomnode	*loggers=cfg->getLoggers();
+	xmldomnode	*loggers=pvt->_cfg->getLoggers();
 	if (!loggers->isNullNode()) {
-		pvt->_sqlrlg=new sqlrloggers(pth);
+		pvt->_sqlrlg=new sqlrloggers(pvt->_pth);
 		pvt->_sqlrlg->load(loggers);
 		pvt->_sqlrlg->init(NULL,conn);
 	}
 
 	// get notifications
-	xmldomnode	*notifications=cfg->getNotifications();
+	xmldomnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
 		pvt->_sqlrn=new sqlrnotifications(
-				pth,cfg->getDebugNotifications());
+				pvt->_pth,pvt->_cfg->getDebugNotifications());
 		pvt->_sqlrn->load(notifications);
 	}
 
 	// get schedules
-	xmldomnode	*schedules=cfg->getSchedules();
+	xmldomnode	*schedules=pvt->_cfg->getSchedules();
 	if (!schedules->isNullNode()) {
-		pvt->_sqlrs=new sqlrschedules(pth,cfg->getDebugSchedules());
+		pvt->_sqlrs=new sqlrschedules(
+				pvt->_pth,pvt->_cfg->getDebugSchedules());
 		pvt->_sqlrs->load(schedules);
 	}
 
 	// handle the unix socket directory
-	if (cfg->getListenOnUnix()) {
+	if (pvt->_cfg->getListenOnUnix()) {
 		setUnixSocketDirectory();
 	}
 
@@ -475,7 +494,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// handle the connect string
-	pvt->_constr=cfg->getConnectString(pvt->_connectionid);
+	pvt->_constr=pvt->_cfg->getConnectString(pvt->_connectionid);
 	if (!pvt->_constr) {
 		stderror.printf("Error: invalid connectionid \"%s\".\n",
 							pvt->_connectionid);
@@ -485,7 +504,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	initDatabaseAvailableFileName();
 
-	if (cfg->getListenOnUnix() && !getUnixSocket()) {
+	if (pvt->_cfg->getListenOnUnix() && !getUnixSocket()) {
 		return false;
 	}
 
@@ -497,7 +516,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (conn->mustDetachBeforeLogIn() && !pvt->_cmdl->found("-nodetach")) {
 		process::detach();
 	}
-	bool	reloginatstart=cfg->getReLoginAtStart();
+	bool	reloginatstart=pvt->_cfg->getReLoginAtStart();
 	if (!reloginatstart) {
 		if (!attemptLogIn(!pvt->_silent)) {
 			return false;
@@ -514,58 +533,58 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	initConnStats();
 
 	// get the query translations
-	pvt->_debugsqlrtranslation=cfg->getDebugTranslations();
-	xmldomnode	*translations=cfg->getTranslations();
+	pvt->_debugsqlrtranslation=pvt->_cfg->getDebugTranslations();
+	xmldomnode	*translations=pvt->_cfg->getTranslations();
 	if (!translations->isNullNode()) {
 		pvt->_sqlrp=newParser();
 		pvt->_sqlrt=new sqlrtranslations(
-				pth,pvt->_debugsqlrtranslation);
+				pvt->_pth,pvt->_debugsqlrtranslation);
 		pvt->_sqlrt->load(translations);
 	}
 
 	// get the query filters
-	pvt->_debugsqlrfilters=cfg->getDebugFilters();
-	xmldomnode	*filters=cfg->getFilters();
+	pvt->_debugsqlrfilters=pvt->_cfg->getDebugFilters();
+	xmldomnode	*filters=pvt->_cfg->getFilters();
 	if (!filters->isNullNode()) {
 		if (!pvt->_sqlrp) {
 			pvt->_sqlrp=newParser();
 		}
 		pvt->_sqlrf=new sqlrfilters(
-				pth,pvt->_debugsqlrfilters);
+				pvt->_pth,pvt->_debugsqlrfilters);
 		pvt->_sqlrf->loadFilters(filters);
 	}
 
 	// get the result set translations
 	pvt->_debugsqlrresultsettranslation=
-				cfg->getDebugResultSetTranslations();
+				pvt->_cfg->getDebugResultSetTranslations();
 	xmldomnode	*resultsettranslations=
-				cfg->getResultSetTranslations();
+				pvt->_cfg->getResultSetTranslations();
 	if (!resultsettranslations->isNullNode()) {
 		pvt->_sqlrrst=new sqlrresultsettranslations(
-				pth,pvt->_debugsqlrresultsettranslation);
+				pvt->_pth,pvt->_debugsqlrresultsettranslation);
 		pvt->_sqlrrst->load(resultsettranslations);
 	}
 
 	// get the result set row translations
 	pvt->_debugsqlrresultsetrowtranslation=
-				cfg->getDebugResultSetRowTranslations();
+				pvt->_cfg->getDebugResultSetRowTranslations();
 	xmldomnode	*resultsetrowtranslations=
-				cfg->getResultSetRowTranslations();
+				pvt->_cfg->getResultSetRowTranslations();
 	if (!resultsetrowtranslations->isNullNode()) {
 		pvt->_sqlrrrst=new sqlrresultsetrowtranslations(
-				pth,pvt->_debugsqlrresultsetrowtranslation);
+			pvt->_pth,pvt->_debugsqlrresultsetrowtranslation);
 		pvt->_sqlrrrst->load(resultsetrowtranslations);
 	}
 
 	// get the triggers
-	xmldomnode	*triggers=cfg->getTriggers();
+	xmldomnode	*triggers=pvt->_cfg->getTriggers();
 	if (!triggers->isNullNode()) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!pvt->_sqlrp) {
 			pvt->_sqlrp=newParser();
 		}
 		pvt->_sqlrtr=new sqlrtriggers(
-				pth,cfg->getDebugTriggers());
+				pvt->_pth,pvt->_cfg->getDebugTriggers());
 		pvt->_sqlrtr->load(triggers);
 	}
 
@@ -574,16 +593,16 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get fake input bind variable behavior
 	// (this may have already been set true by the connect string)
-	pvt->_fakeinputbinds=
-		(pvt->_fakeinputbinds || cfg->getFakeInputBindVariables());
+	pvt->_fakeinputbinds=(pvt->_fakeinputbinds ||
+				pvt->_cfg->getFakeInputBindVariables());
 
 	// get translate bind variable behavior
-	pvt->_translatebinds=cfg->getTranslateBindVariables();
-	pvt->_debugbindtranslation=cfg->getDebugBindTranslations();
+	pvt->_translatebinds=pvt->_cfg->getTranslateBindVariables();
+	pvt->_debugbindtranslation=pvt->_cfg->getDebugBindTranslations();
 
 	// initialize cursors
-	pvt->_mincursorcount=cfg->getCursors();
-	pvt->_maxcursorcount=cfg->getMaxCursors();
+	pvt->_mincursorcount=pvt->_cfg->getCursors();
+	pvt->_maxcursorcount=pvt->_cfg->getMaxCursors();
 	if (!initCursors(pvt->_mincursorcount)) {
 		closeCursors(false);
 		logOut();
@@ -592,22 +611,25 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// create connection pid file
 	pid_t	pid=process::getProcessId();
-	size_t	pidfilelen=charstring::length(pth->getPidDir())+16+
+	size_t	pidfilelen=charstring::length(
+				pvt->_pth->getPidDir())+16+
 				charstring::length(pvt->_cmdl->getId())+1+
 				charstring::integerLength((uint64_t)pid)+1;
 	pvt->_pidfile=new char[pidfilelen];
 	charstring::printf(pvt->_pidfile,pidfilelen,
 				"%ssqlr-connection-%s.%ld",
-				pth->getPidDir(),pvt->_cmdl->getId(),(long)pid);
+				pvt->_pth->getPidDir(),
+				pvt->_cmdl->getId(),
+				(long)pid);
 	process::createPidFile(pvt->_pidfile,permissions::ownerReadWrite());
 
 	// increment connection counter
-	if (cfg->getDynamicScaling()) {
+	if (pvt->_cfg->getDynamicScaling()) {
 		incrementConnectionCount();
 	}
 
 	// set the transaction isolation level
-	pvt->_isolationlevel=cfg->getIsolationLevel();
+	pvt->_isolationlevel=pvt->_cfg->getIsolationLevel();
 	conn->setIsolationLevel(pvt->_isolationlevel);
 
 	// get the database/schema we're using so
@@ -617,15 +639,16 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	markDatabaseAvailable();
 
 	// get the custom query handlers
-	xmldomnode	*queries=cfg->getQueries();
+	xmldomnode	*queries=pvt->_cfg->getQueries();
 	if (!queries->isNullNode()) {
-		pvt->_sqlrq=new sqlrqueries(pth);
+		pvt->_sqlrq=new sqlrqueries(pvt->_pth);
 		pvt->_sqlrq->load(queries);
 	}
 
 	// init client protocols
-	pvt->_sqlrpr=new sqlrprotocols(this,pth,cfg->getDebugProtocols());
-	pvt->_sqlrpr->load(cfg->getListeners());
+	pvt->_sqlrpr=new sqlrprotocols(
+			this,pvt->_pth,pvt->_cfg->getDebugProtocols());
+	pvt->_sqlrpr->load(pvt->_cfg->getListeners());
 
 	// set a handler for SIGALARMs, if necessary
 	#ifdef SIGALRM
@@ -652,18 +675,18 @@ void sqlrservercontroller::setUserAndGroup() {
 
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
-	if (charstring::compare(currentgroup,cfg->getRunAsGroup()) &&
-				!process::setGroup(cfg->getRunAsGroup())) {
+	if (charstring::compare(currentgroup,pvt->_cfg->getRunAsGroup()) &&
+			!process::setGroup(pvt->_cfg->getRunAsGroup())) {
 		stderror.printf("Warning: could not change group to %s\n",
-						cfg->getRunAsGroup());
+						pvt->_cfg->getRunAsGroup());
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
-	if (charstring::compare(currentuser,cfg->getRunAsUser()) &&
-				!process::setUser(cfg->getRunAsUser())) {
+	if (charstring::compare(currentuser,pvt->_cfg->getRunAsUser()) &&
+			!process::setUser(pvt->_cfg->getRunAsUser())) {
 		stderror.printf("Warning: could not change user to %s\n",
-						cfg->getRunAsUser());
+						pvt->_cfg->getRunAsUser());
 	}
 
 	// clean up
@@ -676,7 +699,7 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the connection module
 	stringbuffer	modulename;
-	modulename.append(pth->getLibExecDir());
+	modulename.append(pvt->_pth->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("connection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -725,12 +748,12 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 }
 
 void sqlrservercontroller::setUnixSocketDirectory() {
-	size_t	unixsocketlen=charstring::length(pth->getSocketsDir())+22;
+	size_t	unixsocketlen=charstring::length(pvt->_pth->getSocketsDir())+22;
 	pvt->_unixsocket=new char[unixsocketlen];
 	charstring::printf(pvt->_unixsocket,unixsocketlen,"%s",
-					pth->getSocketsDir());
+					pvt->_pth->getSocketsDir());
 	pvt->_unixsocketptr=
-		pvt->_unixsocket+charstring::length(pth->getSocketsDir());
+		pvt->_unixsocket+charstring::length(pvt->_pth->getSocketsDir());
 	pvt->_unixsocketptrlen=
 		unixsocketlen-(pvt->_unixsocketptr-pvt->_unixsocket);
 }
@@ -743,12 +766,13 @@ bool sqlrservercontroller::handlePidFile() {
 	// might start up after the sqlr-listener has forked, but before it
 	// writes out the pid file)
 	size_t	listenerpidfilelen=
-			charstring::length(pth->getPidDir())+14+
+			charstring::length(pvt->_pth->getPidDir())+14+
 			charstring::length(pvt->_cmdl->getId())+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
-					"%ssqlr-listener-%s",
-					pth->getPidDir(),pvt->_cmdl->getId());
+						"%ssqlr-listener-%s",
+						pvt->_pth->getPidDir(),
+						pvt->_cmdl->getId());
 
 	// On most platforms, 1 second is plenty of time to wait for the
 	// listener to come up, but on windows, it can take a while longer.
@@ -798,12 +822,13 @@ bool sqlrservercontroller::handlePidFile() {
 void sqlrservercontroller::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	size_t	updownlen=charstring::length(pth->getIpcDir())+
+	size_t	updownlen=charstring::length(
+				pvt->_pth->getIpcDir())+
 				charstring::length(pvt->_cmdl->getId())+1+
 				charstring::length(pvt->_connectionid)+1;
 	pvt->_updown=new char[updownlen];
 	charstring::printf(pvt->_updown,updownlen,"%s%s-%s",
-						pth->getIpcDir(),
+						pvt->_pth->getIpcDir(),
 						pvt->_cmdl->getId(),
 						pvt->_connectionid);
 }
@@ -837,7 +862,7 @@ bool sqlrservercontroller::getUnixSocket() {
 bool sqlrservercontroller::openSequenceFile(file *sockseq) {
 
 	// open the sequence file and get the current port number
-	const char	*sockseqfile=pth->getSockSeqFile();
+	const char	*sockseqfile=pvt->_pth->getSockSeqFile();
 
 	pvt->_debugstr.clear();
 	pvt->_debugstr.append("opening ")->append(sockseqfile);
@@ -1132,7 +1157,7 @@ void sqlrservercontroller::incrementConnectionCount() {
 		acquireConnectionCountMutex();
 
 		// increment the counter
-		shm->totalconnections++;
+		pvt->_shm->totalconnections++;
 		pvt->_decrementonclose=true;
 
 		releaseConnectionCountMutex();
@@ -1153,8 +1178,8 @@ void sqlrservercontroller::decrementConnectionCount() {
 
 		acquireConnectionCountMutex();
 
-		if (shm->totalconnections) {
-			shm->totalconnections--;
+		if (pvt->_shm->totalconnections) {
+			pvt->_shm->totalconnections--;
 		}
 		pvt->_decrementonclose=false;
 
@@ -1196,7 +1221,7 @@ bool sqlrservercontroller::openSockets() {
 	raiseDebugMessageEvent("listening on sockets...");
 
 	// get the next available unix socket and open it
-	if (cfg->getListenOnUnix() &&
+	if (pvt->_cfg->getListenOnUnix() &&
 		!charstring::isNullOrEmpty(pvt->_unixsocketptr) &&
 		!pvt->_serversockun) {
 
@@ -1208,7 +1233,7 @@ bool sqlrservercontroller::openSockets() {
 			pvt->_debugstr.append(pvt->_unixsocket);
 			raiseDebugMessageEvent(pvt->_debugstr.getString());
 
-			lsnr.addReadFileDescriptor(pvt->_serversockun);
+			pvt->_lsnr.addReadFileDescriptor(pvt->_serversockun);
 
 		} else {
 			pvt->_debugstr.clear();
@@ -1230,9 +1255,9 @@ bool sqlrservercontroller::openSockets() {
 	bool	retval=true;
 
 	// open the next available inet socket
-	if (cfg->getListenOnInet() && !pvt->_serversockin) {
+	if (pvt->_cfg->getListenOnInet() && !pvt->_serversockin) {
 
-		const char	*addresses=cfg->getDefaultAddresses();
+		const char	*addresses=pvt->_cfg->getDefaultAddresses();
 
 		char		**addr=NULL;
 		uint64_t	addrcount=0;
@@ -1262,8 +1287,8 @@ bool sqlrservercontroller::openSockets() {
 					pvt->_inetport);
 				raiseDebugMessageEvent(string);
 
-				lsnr.addReadFileDescriptor(
-					pvt->_serversockin[index]);
+				pvt->_lsnr.addReadFileDescriptor(
+						pvt->_serversockin[index]);
 
 			} else {
 				pvt->_debugstr.clear();
@@ -1305,7 +1330,7 @@ bool sqlrservercontroller::listen() {
 
 	uint16_t	sessioncount=0;
 
-	int32_t		softttl=cfg->getSoftTtl();
+	int32_t		softttl=pvt->_cfg->getSoftTtl();
 	datetime	startdt;
 	startdt.getSystemDateAndTime();
 
@@ -1373,7 +1398,7 @@ bool sqlrservercontroller::listen() {
 			}
 		}
 
-		if (!loopback && cfg->getDynamicScaling()) {
+		if (!loopback && pvt->_cfg->getDynamicScaling()) {
 
 			decrementConnectedClientCount();
 
@@ -1394,10 +1419,11 @@ bool sqlrservercontroller::listen() {
 
 				// if we've already handled some number of
 				// client sessions...
-				if (pvt->_ttl>0 && cfg->getMaxSessionCount()) {
+				if (pvt->_ttl>0 &&
+					pvt->_cfg->getMaxSessionCount()) {
 					sessioncount++;
 					if (sessioncount==
-						cfg->getMaxSessionCount()) {
+					pvt->_cfg->getMaxSessionCount()) {
 						return true;
 					}
 				}
@@ -1528,9 +1554,6 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 		before=dt.getEpoch();
 	}
 
-	// get a pointer to the shared memory segment
-	shmdata	*shmemptr=getAnnounceBuffer();
-
 	// This will fall through if the ttl was reached while waiting.
 	// In that case, since we failed to acquire the announce mutex,
 	// we don't need to release it.  We also don't need to reset the
@@ -1543,9 +1566,9 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 	setState(ANNOUNCE_AVAILABILITY);
 
 	// write the connectionid and pid into the segment
-	charstring::copy(shmemptr->connectionid,
+	charstring::copy(pvt->_shm->connectionid,
 				connectionid,MAXCONNECTIONIDLEN);
-	shmemptr->connectioninfo.connectionpid=process::getProcessId();
+	pvt->_shm->connectioninfo.connectionpid=process::getProcessId();
 
 	signalListenerToRead();
 
@@ -1608,13 +1631,13 @@ void sqlrservercontroller::registerForHandoff() {
 
 	// construct the name of the socket to connect to
 	size_t	handoffsocknamelen=
-			charstring::length(pth->getSocketsDir())+
+			charstring::length(pvt->_pth->getSocketsDir())+
 			charstring::length(pvt->_cmdl->getId())+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
-					"%s%s-handoff",
-					pth->getSocketsDir(),
-					pvt->_cmdl->getId());
+						"%s%s-handoff",
+						pvt->_pth->getSocketsDir(),
+						pvt->_cmdl->getId());
 
 	pvt->_debugstr.clear();
 	pvt->_debugstr.append("handoffsockname: ")->append(handoffsockname);
@@ -1655,13 +1678,14 @@ void sqlrservercontroller::deRegisterForHandoff() {
 
 	// construct the name of the socket to connect to
 	size_t	removehandoffsocknamelen=
-				charstring::length(pth->getSocketsDir())+
+				charstring::length(pvt->_pth->getSocketsDir())+
 				charstring::length(pvt->_cmdl->getId())+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
 				"%s%s-removehandoff",
-				pth->getSocketsDir(),pvt->_cmdl->getId());
+				pvt->_pth->getSocketsDir(),
+				pvt->_cmdl->getId());
 
 	pvt->_debugstr.clear();
 	pvt->_debugstr.append("removehandoffsockname: ");
@@ -1812,13 +1836,13 @@ int32_t sqlrservercontroller::waitForClient() {
 		// If we're in the middle of a suspended session, wait for
 		// a client to reconnect...
 
-		if (lsnr.listen(pvt->_accepttimeout,0)<1) {
+		if (pvt->_lsnr.listen(pvt->_accepttimeout,0)<1) {
 			raiseInternalErrorEvent(NULL,"wait for client connect failed");
 			return 0;
 		}
 
 		// get the first socket that had data available...
-		filedescriptor	*fd=lsnr.getReadReadyList()->
+		filedescriptor	*fd=pvt->_lsnr.getReadReadyList()->
 						getFirst()->getValue();
 
 		inetsocketserver	*iss=NULL;
@@ -1977,7 +2001,8 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 	}
 
 	// create new cursors
-	uint16_t	expandto=pvt->_cursorcount+cfg->getCursorsGrowBy();
+	uint16_t	expandto=pvt->_cursorcount+
+					pvt->_cfg->getCursorsGrowBy();
 	if (expandto>=pvt->_maxcursorcount) {
 		expandto=pvt->_maxcursorcount;
 	}
@@ -2100,7 +2125,7 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 	pvt->_suspendedsession=true;
 
 	// we can't wait forever for the client to resume, set a timeout
-	pvt->_accepttimeout=cfg->getSessionTimeout();
+	pvt->_accepttimeout=pvt->_cfg->getSessionTimeout();
 
 	// abort all cursors that aren't suspended...
 	raiseDebugMessageEvent("aborting busy cursors...");
@@ -2187,7 +2212,8 @@ bool sqlrservercontroller::rollback() {
 }
 
 bool sqlrservercontroller::selectDatabase(const char *db) {
-	return (cfg->getIgnoreSelectDatabase())?true:conn->selectDatabase(db);
+	return (pvt->_cfg->getIgnoreSelectDatabase())?
+				true:conn->selectDatabase(db);
 }
 
 void sqlrservercontroller::dbHasChanged() {
@@ -2257,7 +2283,7 @@ void sqlrservercontroller::errorMessage(char *errorbuffer,
 		charstring::safeCopy(errorbuffer,
 					errorbuffersize,
 					conn->getErrorBuffer(),
-					cfg->getMaxErrorLength());
+					pvt->_cfg->getMaxErrorLength());
 		*errorcode=conn->getErrorNumber();
 		*liveconnection=conn->getLiveConnection();
 		conn->setErrorSetManually(false);
@@ -4080,7 +4106,7 @@ void sqlrservercontroller::endSession() {
 	} else if (conn->isTransactional() && pvt->_needcommitorrollback) {
 
 		// otherwise, commit or rollback as necessary
-		if (cfg->getEndOfSessionCommit()) {
+		if (pvt->_cfg->getEndOfSessionCommit()) {
 			raiseDebugMessageEvent("committing...");
 			commit();
 			raiseDebugMessageEvent("done committing...");
@@ -4336,7 +4362,7 @@ void sqlrservercontroller::closeSuspendedSessionSockets() {
 				"a previously suspended session...");
 	}
 	if (pvt->_serversockun) {
-		lsnr.removeFileDescriptor(pvt->_serversockun);
+		pvt->_lsnr.removeFileDescriptor(pvt->_serversockun);
 		delete pvt->_serversockun;
 		pvt->_serversockun=NULL;
 	}
@@ -4344,7 +4370,8 @@ void sqlrservercontroller::closeSuspendedSessionSockets() {
 		for (uint64_t index=0;
 				index<pvt->_serversockincount;
 				index++) {
-			lsnr.removeFileDescriptor(pvt->_serversockin[index]);
+			pvt->_lsnr.removeFileDescriptor(
+					pvt->_serversockin[index]);
 			delete pvt->_serversockin[index];
 			pvt->_serversockin[index]=NULL;
 		}
@@ -4369,8 +4396,10 @@ void sqlrservercontroller::shutDown() {
 	}
 
 	// decrement the connection counter or signal the scaler to
-	if (pvt->_decrementonclose && cfg->getDynamicScaling() &&
-					pvt->_semset && pvt->_shmem) {
+	if (pvt->_decrementonclose && 
+			pvt->_cfg->getDynamicScaling() &&
+			pvt->_semset &&
+			pvt->_shmem) {
 		decrementConnectionCount();
 	}
 
@@ -4386,7 +4415,7 @@ void sqlrservercontroller::shutDown() {
 	logOut();
 
 	// clear the pool
-	lsnr.removeAllFileDescriptors();
+	pvt->_lsnr.removeAllFileDescriptors();
 
 	// close, clean up all sockets
 	delete pvt->_serversockun;
@@ -4401,8 +4430,8 @@ void sqlrservercontroller::shutDown() {
 	// handle that with SIGCHLD/waitpid().  On other platforms we can
 	// do it with a semaphore.
 	if (!pvt->_decrementonclose &&
-			cfg &&
-			cfg->getDynamicScaling() &&
+			pvt->_cfg &&
+			pvt->_cfg->getDynamicScaling() &&
 			pvt->_semset &&
 			pvt->_shmem &&
 			!process::supportsGetChildStateChange()) {
@@ -4446,11 +4475,12 @@ void sqlrservercontroller::deleteCursor(sqlrservercursor *curs) {
 
 bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
-	size_t	idfilenamelen=charstring::length(pth->getIpcDir())+
-						charstring::length(id)+1;
+	size_t	idfilenamelen=charstring::length(
+					pvt->_pth->getIpcDir())+
+					charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,"%s%s",
-						pth->getIpcDir(),id);
+					pvt->_pth->getIpcDir(),id);
 
 	pvt->_debugstr.clear();
 	pvt->_debugstr.append("attaching to shared memory and semaphores ");
@@ -4461,7 +4491,7 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	raiseDebugMessageEvent("attaching to shared memory...");
 	pvt->_shmem=new sharedmemory();
 	if (!pvt->_shmem->attach(file::generateKey(idfilename,1),
-						sizeof(shmdata))) {
+						sizeof(sqlrshm))) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to shared memory segment: ");
 		stderror.printf("%s\n",err);
@@ -4471,9 +4501,9 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 		delete[] idfilename;
 		return false;
 	}
-	shm=(shmdata *)pvt->_shmem->getPointer();
-	if (!shm) {
-		stderror.printf("failed to get pointer to shmdata\n");
+	pvt->_shm=(sqlrshm *)pvt->_shmem->getPointer();
+	if (!pvt->_shm) {
+		stderror.printf("failed to get pointer to shm\n");
 		delete pvt->_shmem;
 		pvt->_shmem=NULL;
 		delete[] idfilename;
@@ -4503,10 +4533,6 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	return true;
 }
 
-shmdata *sqlrservercontroller::getAnnounceBuffer() {
-	return (shmdata *)pvt->_shmem->getPointer();
-}
-
 void sqlrservercontroller::decrementConnectedClientCount() {
 
 	raiseDebugMessageEvent("decrementing session count...");
@@ -4516,22 +4542,27 @@ void sqlrservercontroller::decrementConnectedClientCount() {
 	}
 
 	// increment the connections-in-use count
-	if (shm->connectedclients) {
-		shm->connectedclients--;
+	if (pvt->_shm->connectedclients) {
+		pvt->_shm->connectedclients--;
 	}
 
 	// update the peak connections-in-use count
-	if (shm->connectedclients>shm->peak_connectedclients) {
-		shm->peak_connectedclients=shm->connectedclients;
+	if (pvt->_shm->connectedclients>pvt->_shm->peak_connectedclients) {
+		pvt->_shm->peak_connectedclients=pvt->_shm->connectedclients;
 	}
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (shm->connectedclients>shm->peak_connectedclients_1min ||
-		dt.getEpoch()/60>shm->peak_connectedclients_1min_time/60) {
-		shm->peak_connectedclients_1min=shm->connectedclients;
-		shm->peak_connectedclients_1min_time=dt.getEpoch();
+	if (pvt->_shm->connectedclients>
+			pvt->_shm->peak_connectedclients_1min ||
+		dt.getEpoch()/60>
+			pvt->_shm->peak_connectedclients_1min_time/60) {
+
+		pvt->_shm->peak_connectedclients_1min=
+				pvt->_shm->connectedclients;
+		pvt->_shm->peak_connectedclients_1min_time=
+				dt.getEpoch();
 	}
 
 	if (!pvt->_semset->signalWithUndo(5)) {
@@ -4663,18 +4694,18 @@ void sqlrservercontroller::initConnStats() {
 	// more than MAXCONNECTIONS, so unless someone started one manually,
 	// it should always be possible to find an open one.
 	for (uint32_t i=0; i<MAXCONNECTIONS; i++) {
-		connstats=&shm->connstats[i];
-		if (!connstats->processid) {
+		pvt->_connstats=&(pvt->_shm->connstats[i]);
+		if (!pvt->_connstats->processid) {
 
 			pvt->_semset->signalWithUndo(9);
 
 			// initialize the connection stats
 			clearConnStats();
 			setState(INIT);
-			connstats->index=i;
-			connstats->processid=process::getProcessId();
-			connstats->loggedinsec=pvt->_loggedinsec;
-			connstats->loggedinusec=pvt->_loggedinusec;
+			pvt->_connstats->index=i;
+			pvt->_connstats->processid=process::getProcessId();
+			pvt->_connstats->loggedinsec=pvt->_loggedinsec;
+			pvt->_connstats->loggedinusec=pvt->_loggedinusec;
 			return;
 		}
 	}
@@ -4683,22 +4714,22 @@ void sqlrservercontroller::initConnStats() {
 
 	// in case someone started a connection manually and
 	// exceeded MAXCONNECTIONS, set this NULL here
-	connstats=NULL;
+	pvt->_connstats=NULL;
 }
 
 void sqlrservercontroller::clearConnStats() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	bytestring::zero(connstats,sizeof(struct sqlrconnstatistics));
+	bytestring::zero(pvt->_connstats,sizeof(struct sqlrconnstatistics));
 }
 
 sqlrparser *sqlrservercontroller::newParser() {
 
-	pvt->_sqlrpnode=cfg->getParser();
+	pvt->_sqlrpnode=pvt->_cfg->getParser();
 	const char	*module=pvt->_sqlrpnode->getAttributeValue("module");
 
-	pvt->_debugsqlrparser=cfg->getDebugParser();
+	pvt->_debugsqlrparser=pvt->_cfg->getDebugParser();
 
 	sqlrparser	*p=NULL;
 	if (!charstring::isNullOrEmpty(module)) {
@@ -4722,7 +4753,7 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the parser module
 	stringbuffer	modulename;
-	modulename.append(pth->getLibExecDir());
+	modulename.append(pvt->_pth->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("parser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -4783,175 +4814,177 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 }
 
 void sqlrservercontroller::setState(enum sqlrconnectionstate_t state) {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->state=state;
+	pvt->_connstats->state=state;
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	connstats->statestartsec=dt.getSeconds();
-	connstats->statestartusec=dt.getMicroseconds();
+	pvt->_connstats->statestartsec=dt.getSeconds();
+	pvt->_connstats->statestartusec=dt.getMicroseconds();
 }
 
 enum sqlrconnectionstate_t sqlrservercontroller::getState() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return NOT_AVAILABLE;
 	}
-	return connstats->state;
+	return pvt->_connstats->state;
 }
 
 void sqlrservercontroller::setClientSessionStartTime() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	connstats->clientsessionsec=dt.getSeconds();
-	connstats->clientsessionusec=dt.getMicroseconds();
+	pvt->_connstats->clientsessionsec=dt.getSeconds();
+	pvt->_connstats->clientsessionusec=dt.getMicroseconds();
 }
 
 void sqlrservercontroller::setCurrentUser(const char *user,
 						uint32_t userlen) {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
 	uint32_t	len=userlen;
 	if (len>USERSIZE-1) {
 		len=USERSIZE-1;
 	}
-	charstring::copy(connstats->user,user,len);
-	connstats->user[len]='\0';
+	charstring::copy(pvt->_connstats->user,user,len);
+	pvt->_connstats->user[len]='\0';
 }
 
 void sqlrservercontroller::setCurrentQuery(const char *query,
 						uint32_t querylen) {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
 	uint32_t	len=querylen;
 	if (len>STATSQLTEXTLEN-1) {
 		len=STATSQLTEXTLEN-1;
 	}
-	charstring::copy(connstats->sqltext,query,len);
-	connstats->sqltext[len]='\0';
+	charstring::copy(pvt->_connstats->sqltext,query,len);
+	pvt->_connstats->sqltext[len]='\0';
 }
 
 void sqlrservercontroller::setClientInfo(const char *info,
 						uint32_t infolen) {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
 	uint64_t	len=infolen;
 	if (len>STATCLIENTINFOLEN-1) {
 		len=STATCLIENTINFOLEN-1;
 	}
-	charstring::copy(connstats->clientinfo,info,len);
-	connstats->clientinfo[len]='\0';
+	charstring::copy(pvt->_connstats->clientinfo,info,len);
+	pvt->_connstats->clientinfo[len]='\0';
 }
 
 void sqlrservercontroller::setClientAddr() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
 	if (pvt->_clientsock) {
 		char	*clientaddrbuf=pvt->_clientsock->getPeerAddress();
 		if (clientaddrbuf) {
-			charstring::copy(connstats->clientaddr,clientaddrbuf);
+			charstring::copy(
+				pvt->_connstats->clientaddr,clientaddrbuf);
 			delete[] clientaddrbuf;
 		} else {
-			charstring::copy(connstats->clientaddr,"UNIX");
+			charstring::copy(
+				pvt->_connstats->clientaddr,"UNIX");
 		}
 	} else {
-		charstring::copy(connstats->clientaddr,"internal");
+		charstring::copy(pvt->_connstats->clientaddr,"internal");
 	}
 }
 
 const char *sqlrservercontroller::getCurrentUser() {
-	return (connstats)?connstats->user:NULL;
+	return (pvt->_connstats)?pvt->_connstats->user:NULL;
 }
 
 const char *sqlrservercontroller::getCurrentQuery() {
-	return (connstats)?connstats->sqltext:NULL;
+	return (pvt->_connstats)?pvt->_connstats->sqltext:NULL;
 }
 
 const char *sqlrservercontroller::getClientInfo() {
-	return (connstats)?connstats->clientinfo:NULL;
+	return (pvt->_connstats)?pvt->_connstats->clientinfo:NULL;
 }
 
 const char *sqlrservercontroller::getClientAddr() {
-	return (connstats)?connstats->clientaddr:NULL;
+	return (pvt->_connstats)?pvt->_connstats->clientaddr:NULL;
 }
 
 void sqlrservercontroller::disableInstance() {
-	getAnnounceBuffer()->disabled=true;
+	pvt->_shm->disabled=true;
 }
 
 void sqlrservercontroller::enableInstance() {
-	getAnnounceBuffer()->disabled=false;
+	pvt->_shm->disabled=false;
 }
 
 bool sqlrservercontroller::disabledInstance() {
-	return getAnnounceBuffer()->disabled;
+	return pvt->_shm->disabled;
 }
 
 void sqlrservercontroller::incrementOpenDatabaseConnections() {
 	pvt->_semset->waitWithUndo(9);
-	shm->open_db_connections++;
-	shm->opened_db_connections++;
+	pvt->_shm->open_db_connections++;
+	pvt->_shm->opened_db_connections++;
 	pvt->_semset->signalWithUndo(9);
 }
 
 void sqlrservercontroller::decrementOpenDatabaseConnections() {
 	pvt->_semset->waitWithUndo(9);
-	if (shm->open_db_connections) {
-		shm->open_db_connections--;
+	if (pvt->_shm->open_db_connections) {
+		pvt->_shm->open_db_connections--;
 	}
 	pvt->_semset->signalWithUndo(9);
 }
 
 void sqlrservercontroller::incrementOpenClientConnections() {
 	pvt->_semset->waitWithUndo(9);
-	shm->open_cli_connections++;
-	shm->opened_cli_connections++;
+	pvt->_shm->open_cli_connections++;
+	pvt->_shm->opened_cli_connections++;
 	pvt->_semset->signalWithUndo(9);
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nconnect++;
+	pvt->_connstats->nconnect++;
 }
 
 void sqlrservercontroller::decrementOpenClientConnections() {
 	pvt->_semset->waitWithUndo(9);
-	if (shm->open_cli_connections) {
-		shm->open_cli_connections--;
+	if (pvt->_shm->open_cli_connections) {
+		pvt->_shm->open_cli_connections--;
 	}
 	pvt->_semset->signalWithUndo(9);
 }
 
 void sqlrservercontroller::incrementOpenDatabaseCursors() {
 	pvt->_semset->waitWithUndo(9);
-	shm->open_db_cursors++;
-	shm->opened_db_cursors++;
+	pvt->_shm->open_db_cursors++;
+	pvt->_shm->opened_db_cursors++;
 	pvt->_semset->signalWithUndo(9);
 }
 
 void sqlrservercontroller::decrementOpenDatabaseCursors() {
 	pvt->_semset->waitWithUndo(9);
-	if (shm->open_db_cursors) {
-		shm->open_db_cursors--;
+	if (pvt->_shm->open_db_cursors) {
+		pvt->_shm->open_db_cursors--;
 	}
 	pvt->_semset->signalWithUndo(9);
 }
 
 void sqlrservercontroller::incrementTimesNewCursorUsed() {
 	pvt->_semset->waitWithUndo(9);
-	shm->times_new_cursor_used++;
+	pvt->_shm->times_new_cursor_used++;
 	pvt->_semset->signalWithUndo(9);
 }
 
 void sqlrservercontroller::incrementTimesCursorReused() {
 	pvt->_semset->waitWithUndo(9);
-	shm->times_cursor_reused++;
+	pvt->_shm->times_cursor_reused++;
 	pvt->_semset->signalWithUndo(9);
 }
 
@@ -4960,7 +4993,7 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 	pvt->_semset->waitWithUndo(9);
 
 	// update total queries
-	shm->total_queries++;
+	pvt->_shm->total_queries++;
 
 	// update queries-per-second stats...
 
@@ -4969,277 +5002,284 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 	dt.getSystemDateAndTime();
 	time_t	now=dt.getEpoch();
 	int	index=now%STATQPSKEEP;
-	if (shm->timestamp[index]!=now) {
-		shm->timestamp[index]=now;
-		shm->qps_select[index]=0;
-		shm->qps_update[index]=0;
-		shm->qps_insert[index]=0;
-		shm->qps_delete[index]=0;
-		shm->qps_create[index]=0;
-		shm->qps_drop[index]=0;
-		shm->qps_alter[index]=0;
-		shm->qps_custom[index]=0;
-		shm->qps_etc[index]=0;
+	if (pvt->_shm->timestamp[index]!=now) {
+		pvt->_shm->timestamp[index]=now;
+		pvt->_shm->qps_select[index]=0;
+		pvt->_shm->qps_update[index]=0;
+		pvt->_shm->qps_insert[index]=0;
+		pvt->_shm->qps_delete[index]=0;
+		pvt->_shm->qps_create[index]=0;
+		pvt->_shm->qps_drop[index]=0;
+		pvt->_shm->qps_alter[index]=0;
+		pvt->_shm->qps_custom[index]=0;
+		pvt->_shm->qps_etc[index]=0;
 	}
 
 	// increment per-query-type stats
 	switch (querytype) {
 		case SQLRQUERYTYPE_SELECT:
-			shm->qps_select[index]++;
+			pvt->_shm->qps_select[index]++;
 			break;
 		case SQLRQUERYTYPE_INSERT:
-			shm->qps_insert[index]++;
+			pvt->_shm->qps_insert[index]++;
 			break;
 		case SQLRQUERYTYPE_UPDATE:
-			shm->qps_update[index]++;
+			pvt->_shm->qps_update[index]++;
 			break;
 		case SQLRQUERYTYPE_DELETE:
-			shm->qps_delete[index]++;
+			pvt->_shm->qps_delete[index]++;
 			break;
 		case SQLRQUERYTYPE_CREATE:
-			shm->qps_create[index]++;
+			pvt->_shm->qps_create[index]++;
 			break;
 		case SQLRQUERYTYPE_DROP:
-			shm->qps_drop[index]++;
+			pvt->_shm->qps_drop[index]++;
 			break;
 		case SQLRQUERYTYPE_ALTER:
-			shm->qps_alter[index]++;
+			pvt->_shm->qps_alter[index]++;
 			break;
 		case SQLRQUERYTYPE_CUSTOM:
-			shm->qps_custom[index]++;
+			pvt->_shm->qps_custom[index]++;
 			break;
 		case SQLRQUERYTYPE_ETC:
 		default:
-			shm->qps_etc[index]++;
+			pvt->_shm->qps_etc[index]++;
 			break;
 	}
 
 	pvt->_semset->signalWithUndo(9);
 
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
 	if (querytype==SQLRQUERYTYPE_CUSTOM) {
-		connstats->ncustomsql++;
+		pvt->_connstats->ncustomsql++;
 	} else {
-		connstats->nsql++;
+		pvt->_connstats->nsql++;
 	}
 }
 
 void sqlrservercontroller::incrementTotalErrors() {
 	pvt->_semset->waitWithUndo(9);
-	shm->total_errors++;
+	pvt->_shm->total_errors++;
 	pvt->_semset->signalWithUndo(9);
 }
 
 void sqlrservercontroller::incrementAuthCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nauth++;
+	pvt->_connstats->nauth++;
 }
 
 void sqlrservercontroller::incrementSuspendSessionCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nsuspend_session++;
+	pvt->_connstats->nsuspend_session++;
 }
 
 void sqlrservercontroller::incrementEndSessionCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nend_session++;
+	pvt->_connstats->nend_session++;
 }
 
 void sqlrservercontroller::incrementPingCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nping++;
+	pvt->_connstats->nping++;
 }
 
 void sqlrservercontroller::incrementIdentifyCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nidentify++;
+	pvt->_connstats->nidentify++;
 }
 
 void sqlrservercontroller::incrementAutocommitCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nautocommit++;
+	pvt->_connstats->nautocommit++;
 }
 
 void sqlrservercontroller::incrementBeginCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nbegin++;
+	pvt->_connstats->nbegin++;
 }
 
 void sqlrservercontroller::incrementCommitCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ncommit++;
+	pvt->_connstats->ncommit++;
 }
 
 void sqlrservercontroller::incrementRollbackCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nrollback++;
+	pvt->_connstats->nrollback++;
 }
 
 void sqlrservercontroller::incrementDbVersionCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ndbversion++;
+	pvt->_connstats->ndbversion++;
 }
 
 void sqlrservercontroller::incrementBindFormatCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nbindformat++;
+	pvt->_connstats->nbindformat++;
 }
 
 void sqlrservercontroller::incrementServerVersionCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nserverversion++;
+	pvt->_connstats->nserverversion++;
 }
 
 void sqlrservercontroller::incrementSelectDatabaseCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nselectdatabase++;
+	pvt->_connstats->nselectdatabase++;
 }
 
 void sqlrservercontroller::incrementGetCurrentDatabaseCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ngetcurrentdatabase++;
+	pvt->_connstats->ngetcurrentdatabase++;
 }
 
 void sqlrservercontroller::incrementGetLastInsertIdCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ngetlastinsertid++;
+	pvt->_connstats->ngetlastinsertid++;
 }
 
 void sqlrservercontroller::incrementDbHostNameCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ndbhostname++;
+	pvt->_connstats->ndbhostname++;
 }
 
 void sqlrservercontroller::incrementDbIpAddressCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ndbipaddress++;
+	pvt->_connstats->ndbipaddress++;
 }
 
 void sqlrservercontroller::incrementNewQueryCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nnewquery++;
+	pvt->_connstats->nnewquery++;
 }
 
 void sqlrservercontroller::incrementReexecuteQueryCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nreexecutequery++;
+	pvt->_connstats->nreexecutequery++;
 }
 
 void sqlrservercontroller::incrementFetchFromBindCursorCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nfetchfrombindcursor++;
+	pvt->_connstats->nfetchfrombindcursor++;
 }
 
 void sqlrservercontroller::incrementFetchResultSetCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nfetchresultset++;
+	pvt->_connstats->nfetchresultset++;
 }
 
 void sqlrservercontroller::incrementAbortResultSetCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nabortresultset++;
+	pvt->_connstats->nabortresultset++;
 }
 
 void sqlrservercontroller::incrementSuspendResultSetCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nsuspendresultset++;
+	pvt->_connstats->nsuspendresultset++;
 }
 
 void sqlrservercontroller::incrementResumeResultSetCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nresumeresultset++;
+	pvt->_connstats->nresumeresultset++;
 }
 
 void sqlrservercontroller::incrementGetDbListCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ngetdblist++;
+	pvt->_connstats->ngetdblist++;
 }
 
 void sqlrservercontroller::incrementGetTableListCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ngettablelist++;
+	pvt->_connstats->ngettablelist++;
 }
 
 void sqlrservercontroller::incrementGetColumnListCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ngetcolumnlist++;
+	pvt->_connstats->ngetcolumnlist++;
 }
 
 void sqlrservercontroller::incrementGetQueryTreeCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->ngetquerytree++;
+	pvt->_connstats->ngetquerytree++;
 }
 
 void sqlrservercontroller::incrementReLogInCount() {
-	if (!connstats) {
+	if (!pvt->_connstats) {
 		return;
 	}
-	connstats->nrelogin++;
+	pvt->_connstats->nrelogin++;
+}
+
+uint32_t sqlrservercontroller::getStatisticsIndex() {
+	if (!pvt->_connstats) {
+		return 0;
+	}
+	return pvt->_connstats->index;
 }
 
 void sqlrservercontroller::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
 	for (linkedlistnode< char * > *node=
-		cfg->getSessionStartQueries()->getFirst();
-					node; node=node->getNext()) {
+			pvt->_cfg->getSessionStartQueries()->getFirst();
+			node; node=node->getNext()) {
 		sessionQuery(node->getValue());
 	}
 }
@@ -5247,8 +5287,8 @@ void sqlrservercontroller::sessionStartQueries() {
 void sqlrservercontroller::sessionEndQueries() {
 	// run a configurable set of queries at the end of each session
 	for (linkedlistnode< char * > *node=
-		cfg->getSessionEndQueries()->getFirst();
-					node; node=node->getNext()) {
+			pvt->_cfg->getSessionEndQueries()->getFirst();
+			node; node=node->getNext()) {
 		sessionQuery(node->getValue());
 	}
 }
@@ -5737,11 +5777,11 @@ const char *sqlrservercontroller::getId() {
 }
 
 const char *sqlrservercontroller::getLogDir() {
-	return pth->getLogDir();
+	return pvt->_pth->getLogDir();
 }
 
 const char *sqlrservercontroller::getDebugDir() {
-	return pth->getDebugDir();
+	return pvt->_pth->getDebugDir();
 }
 
 bool sqlrservercontroller::isCustomQuery(sqlrservercursor *cursor) {
@@ -5819,7 +5859,7 @@ void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 		charstring::safeCopy(errorbuffer,
 					errorbuffersize,
 					cursor->getErrorBuffer(),
-					cfg->getMaxErrorLength());
+					pvt->_cfg->getMaxErrorLength());
 		*errorcode=cursor->getErrorNumber();
 		*liveconnection=cursor->getLiveConnection();
 		cursor->setErrorSetManually(false);
@@ -6186,4 +6226,16 @@ gsscontext *sqlrservercontroller::getGSSContext() {
 tlscontext *sqlrservercontroller::getTLSContext() {
 	return (pvt->_currentprotocol)?
 			pvt->_currentprotocol->getTLSContext():NULL;
+}
+
+sqlrconfig *sqlrservercontroller::getConfig() {
+	return pvt->_cfg;
+}
+
+sqlrpaths *sqlrservercontroller::getPaths() {
+	return pvt->_pth;
+}
+
+sqlrshm *sqlrservercontroller::getShm() {
+	return pvt->_shm;
 }

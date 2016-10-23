@@ -103,7 +103,6 @@
 		void	closeCursors(bool destroy);
 
 		bool	createSharedMemoryAndSemaphores(const char *id);
-		shmdata	*getAnnounceBuffer();
 
 		void	decrementConnectedClientCount();
 

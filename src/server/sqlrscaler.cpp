@@ -262,7 +262,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// connect to the shared memory segment
 	shmem=new sharedmemory;
-	if (!shmem->attach(key,sizeof(shmdata))) {
+	if (!shmem->attach(key,sizeof(sqlrshm))) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to shared memory segment: ");
 		stderror.printf("%s\n",err);
@@ -271,9 +271,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 		shmem=NULL;
 		return false;
 	}
-	shm=(shmdata *)shmem->getPointer();
+	shm=(sqlrshm *)shmem->getPointer();
 	if (!shm) {
-		stderror.printf("failed to get pointer to shmdata\n");
+		stderror.printf("failed to get pointer to shm\n");
 		delete shmem;
 		shmem=NULL;
 		return false;

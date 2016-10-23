@@ -57,7 +57,7 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 	}
 
 	// get the clientip
-	const char	*clientip=sqlrcon->cont->connstats->clientaddr;
+	const char	*clientip=sqlrcon->cont->getClientAddr();
 
 	// run through the clientip array...
 	for (uint64_t i=0; i<clientipcount; i++) {

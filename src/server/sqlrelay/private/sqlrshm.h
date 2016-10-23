@@ -82,7 +82,7 @@ struct sqlrconnstatistics {
 // This structure is used to pass data in shared memory between the listener
 // and connection daemons.  A struct is used instead of just stepping a pointer
 // through the shared memory segment to avoid alignment issues.
-struct shmdata {
+struct sqlrshm {
 
 	uint32_t	totalconnections;
 	char		connectionid[MAXCONNECTIONIDLEN];

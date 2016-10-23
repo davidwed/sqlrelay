@@ -741,7 +741,7 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 	db2conn=(db2connection *)conn;
 	stmt=0;
 	lobstmt=0;
-	maxbindcount=conn->cont->cfg->getMaxBindCount();
+	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	blobbindsize=new SQLINTEGER[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];

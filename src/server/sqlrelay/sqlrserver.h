@@ -294,6 +294,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	incrementGetColumnListCount();
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
+		uint32_t	getStatisticsIndex();
 
 
 		// event api...
@@ -589,6 +590,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// tls
 		tlscontext	*getTLSContext();
 
+		// configuration
+		sqlrconfig	*getConfig();
+		sqlrpaths	*getPaths();
+
+		// shared memory
+		sqlrshm		*getShm();
+
 		// utilities
 		bool		skipComment(const char **ptr,
 						const char *endptr);
@@ -626,20 +634,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		const char * const	*dataTypeStrings();
 
-		// listener
-		listener		lsnr;
-
 		// connection
 		sqlrserverconnection	*conn;
-
-		// configuration
-		sqlrconfigs		*sqlrcfgs;
-		sqlrconfig		*cfg;
-		sqlrpaths		*pth;
-
-		// statistics
-		shmdata			*shm;
-		sqlrconnstatistics	*connstats;
 
 	#include <sqlrelay/private/sqlrservercontroller.h>
 };

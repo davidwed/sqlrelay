@@ -6843,8 +6843,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2B01E5167BDA424D8067F4D6E2838A4E"
             {
-            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrshmdata.h"
-            "TargetName" = "8:sqlrshmdata.h"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrshm.h"
+            "TargetName" = "8:sqlrshm.h"
             "Tag" = "8:"
             "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"

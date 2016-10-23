@@ -135,8 +135,8 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// get the client IP, it's needed for some events
 	const char	*clientaddr="unknown";
-	if (sqlrcon && sqlrcon->cont->connstats->clientaddr) {
-		clientaddr=sqlrcon->cont->connstats->clientaddr;
+	if (sqlrcon && sqlrcon->cont->getClientAddr()) {
+		clientaddr=sqlrcon->cont->getClientAddr();
 	}
 
 	// handle each event differently...

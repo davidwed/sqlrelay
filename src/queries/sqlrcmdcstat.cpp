@@ -142,7 +142,7 @@ bool sqlrquery_sqlrcmdcstatcursor::noRowsToReturn() {
 
 bool sqlrquery_sqlrcmdcstatcursor::fetchRow() {
 	while (currentrow<MAXCONNECTIONS) {
-		cs=&(conn->cont->shm->connstats[currentrow]);
+		cs=&(conn->cont->getShm()->connstats[currentrow]);
 		currentrow++;
 		if (cs->processid) {
 			return true;
@@ -182,7 +182,7 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 	switch (col) {
 		case 0:
 			// index -
-			// index in shmdata.connstats array
+			// index in sqlrshm.connstats array
 			fieldbuffer[col]=charstring::parseNumber(currentrow-1);
 			break;
 		case 1:

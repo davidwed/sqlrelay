@@ -87,8 +87,6 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		bool		anymustbegin;
 		uint16_t	concount;
 
-		sqlrconfig	*cfg;
-
 		bool		justloggedin;
 
 		int16_t		nullbindvalue;
@@ -261,7 +259,6 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	beginquery=NULL;
 	anymustbegin=false;
 	concount=0;
-	cfg=NULL;
 	justloggedin=false;
 	nullbindvalue=nullBindValue();
 	nonnullbindvalue=nonNullBindValue();
@@ -296,16 +293,15 @@ void routerconnection::handleConnectString() {
 
 	identity=cont->getConnectStringValue("identity");
 
-	cfg=cont->cfg;
-
-	xmldomnode	*routers=cfg->getRouters();
+	xmldomnode	*routers=cont->getConfig()->getRouters();
 	if (!routers->isNullNode()) {
-		sqlrr=new sqlrrouters(cont->pth,cfg->getDebugRouters());
+		sqlrr=new sqlrrouters(cont->getPaths(),
+					cont->getConfig()->getDebugRouters());
 		sqlrr->load(routers);
 	}
 
 	linkedlist< connectstringcontainer * >	*cslist=
-					cont->cfg->getConnectStringList();
+				cont->getConfig()->getConnectStringList();
 	concount=cslist->getLength();
 
 	conids=new const char *[concount];
@@ -575,10 +571,10 @@ routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
 	}
 	beginquery=false;
 
-	obv=new outputbindvar[conn->cont->cfg->getMaxBindCount()];
+	obv=new outputbindvar[conn->cont->getConfig()->getMaxBindCount()];
 	obcount=0;
 
-	cbv=new cursorbindvar[conn->cont->cfg->getMaxBindCount()];
+	cbv=new cursorbindvar[conn->cont->getConfig()->getMaxBindCount()];
 	cbcount=0;
 }
 
@@ -637,7 +633,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
 	// get the corresponding connection and cursor
 	uint16_t		conindex=0;
-	connectstringnode	*csn=conn->cont->cfg->
+	connectstringnode	*csn=conn->cont->getConfig()->
 					getConnectStringList()->getFirst();
 	while (csn) {
 		if (!charstring::compare(connectionid,

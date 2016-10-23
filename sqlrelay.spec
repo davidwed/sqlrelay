@@ -436,7 +436,7 @@ rm -rf %{buildroot}
 %{_includedir}/sqlrelay/private/sqlrservercontroller.h
 %{_includedir}/sqlrelay/private/sqlrservercursor.h
 %{_includedir}/sqlrelay/private/sqlrserverincludes.h
-%{_includedir}/sqlrelay/private/sqlrshmdata.h
+%{_includedir}/sqlrelay/private/sqlrshm.h
 %{_includedir}/sqlrelay/sqlrutil.h
 %{_includedir}/sqlrelay/private/sqlrutilincludes.h
 %{_libdir}/libsqlrserver.a
