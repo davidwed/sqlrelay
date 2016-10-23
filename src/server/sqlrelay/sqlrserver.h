@@ -634,9 +634,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		const char * const	*dataTypeStrings();
 
-		// connection
-		sqlrserverconnection	*conn;
-
 	#include <sqlrelay/private/sqlrservercontroller.h>
 };
 

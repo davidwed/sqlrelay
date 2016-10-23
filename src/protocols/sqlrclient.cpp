@@ -791,8 +791,6 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 				SQLR_ERROR_AUTHENTICATIONERROR_STRING));
 	clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 	clientsock->flushWriteBuffer(-1,-1);
-	// FIXME: use cont->endSession()?
-	cont->conn->endSession();
 	return false;
 }
 
