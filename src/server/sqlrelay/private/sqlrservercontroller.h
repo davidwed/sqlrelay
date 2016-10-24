@@ -53,8 +53,7 @@
 
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();
-		bool	interceptQuery(sqlrservercursor *cursor,
-						bool *querywasintercepted);
+		bool	interceptQuery(sqlrservercursor *cursor);
 		bool	isBeginTransactionQuery(sqlrservercursor *cursor);
 		bool	isCommitQuery(sqlrservercursor *cursor);
 		bool	isRollbackQuery(sqlrservercursor *cursor);

@@ -51,6 +51,12 @@ class sqlrservercursorprivate {
 		sqlrcursorstate_t	_state;
 
 		sqlrquerycursor		*_customquerycursor;
+
+		// flags that are only useful to the sqlrservercontroller
+		bool	_prepared;
+		bool	_querywasintercepted;
+		bool	_bindswerefaked;
+		bool	_fakeinputbindsforthisquery;
 };
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
@@ -97,11 +103,10 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_id=id;
 
-	// sqlrservercontroller flags
-	prepared=false;
-	querywasintercepted=false;
-	bindswerefaked=false;
-	fakeinputbindsforthisquery=false;
+	pvt->_prepared=false;
+	pvt->_querywasintercepted=false;
+	pvt->_bindswerefaked=false;
+	pvt->_fakeinputbindsforthisquery=false;
 }
 
 sqlrservercursor::~sqlrservercursor() {
@@ -1001,4 +1006,37 @@ const char *sqlrservercursor::skipCreateTempTableClause(const char *query) {
 		return pvt->_createtemp.getSubstringEnd(0);
 	}
 	return NULL;
+}
+
+void sqlrservercursor::setPreparedFlag(bool prepared) {
+	pvt->_prepared=prepared;
+}
+
+bool sqlrservercursor::getPreparedFlag() {
+	return pvt->_prepared;
+}
+
+void sqlrservercursor::setQueryWasInterceptedFlag(bool querywasintercepted) {
+	pvt->_querywasintercepted=querywasintercepted;
+}
+
+bool sqlrservercursor::getQueryWasInterceptedFlag() {
+	return pvt->_querywasintercepted;
+}
+
+void sqlrservercursor::setBindsWereFakedFlag(bool bindswerefaked) {
+	pvt->_bindswerefaked=bindswerefaked;
+}
+
+bool sqlrservercursor::getBindsWereFakedFlag() {
+	return pvt->_bindswerefaked;
+}
+
+void sqlrservercursor::setFakeInputBindsForThisQueryFlag(
+					bool fakeinputbindsforthisquery) {
+	pvt->_fakeinputbindsforthisquery=fakeinputbindsforthisquery;
+}
+
+bool sqlrservercursor::getFakeInputBindsForThisQueryFlag() {
+	return pvt->_fakeinputbindsforthisquery;
 }
