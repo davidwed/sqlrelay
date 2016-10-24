@@ -929,6 +929,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual	void	closeResultSet();
 		virtual bool	getColumnNameList(stringbuffer *output);
 
+		virtual void	encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize);
 
 		uint16_t	getId();
 
@@ -944,8 +946,6 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
-		virtual void	encodeBlob(stringbuffer *buffer,
-					const char *data, uint32_t datasize);
 		void	abort();
 
 		char		*getQueryBuffer();
@@ -1005,6 +1005,21 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						const char *createtemp);
 		const char	*skipCreateTempTableClause(
 						const char *query);
+
+		void	setQueryHasBeenPrepared(bool queryhasbeenprepared);
+		bool	getQueryHasBeenPrepared();
+
+		void	setQueryWasIntercepted(bool querywasintercepted);
+		bool	getQueryWasIntercepted();
+
+		void	setBindsWereFaked(bool bindswerefaked);
+		bool	getBindsWereFaked();
+
+		void	setFakeInputBindsForThisQuery(
+					bool fakeinputbindsforthisquery);
+		bool	getFakeInputBindsForThisQuery();
+
+		stringbuffer	*getQueryWithFakeInputBindsBuffer();
 
 	#include <sqlrelay/private/sqlrservercursor.h>
 };

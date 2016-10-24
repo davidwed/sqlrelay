@@ -2339,7 +2339,7 @@ void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 
 bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 
-	cursor->setQueryWasInterceptedFlag(false);
+	cursor->setQueryWasIntercepted(false);
 
 	// we have to do this if we're faking transaction blocks,
 	// otherwise we'll only do it if it was manually enabled
@@ -2352,7 +2352,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	// the query will be sent directly to the db and endFakeBeginTransaction
 	// won't get called.
 	if (isBeginTransactionQuery(cursor)) {
-		cursor->setQueryWasInterceptedFlag(true);
+		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
@@ -2367,7 +2367,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		// a begin command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
 	} else if (isCommitQuery(cursor)) {
-		cursor->setQueryWasInterceptedFlag(true);
+		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
@@ -2382,7 +2382,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		// a commit command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
 	} else if (isRollbackQuery(cursor)) {
-		cursor->setQueryWasInterceptedFlag(true);
+		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
@@ -3384,10 +3384,10 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	clearError(cursor);
 
 	// reset flags
-	cursor->setPreparedFlag(false);
-	cursor->setQueryWasInterceptedFlag(false);
-	cursor->setBindsWereFakedFlag(false);
-	cursor->setFakeInputBindsForThisQueryFlag(false);
+	cursor->setQueryHasBeenPrepared(false);
+	cursor->setQueryWasIntercepted(false);
+	cursor->setBindsWereFaked(false);
+	cursor->setFakeInputBindsForThisQuery(false);
 	cursor->setQueryStatus(SQLRQUERYSTATUS_ERROR);
 
 	// reset column mapping
@@ -3422,7 +3422,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
 
 	// if we're re-executing
-	if (cursor->getPreparedFlag()) {
+	if (cursor->getQueryHasBeenPrepared()) {
 
 		// clean up the previous result set
 		closeResultSet(cursor);
@@ -3432,8 +3432,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// if we're faking binds then the original
 		// query must be re-prepared
-		if (cursor->getFakeInputBindsForThisQueryFlag()) {
-			cursor->setPreparedFlag(false);
+		if (cursor->getFakeInputBindsForThisQuery()) {
+			cursor->setQueryHasBeenPrepared(false);
 		}
 	}
 
@@ -3441,7 +3441,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	bool	success=false;
 
 	// if the query hasn't been prepared then do various translations
-	if (!cursor->getPreparedFlag()) {
+	if (!cursor->getQueryHasBeenPrepared()) {
 
 		// do this here instead of inside translateBindVariables
 		// because translateQuery might use it
@@ -3481,26 +3481,27 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			!cursor->supportsNativeBinds(
 					cursor->getQueryBuffer(),
 					cursor->getQueryLength()) ||
-			cursor->getFakeInputBindsForThisQueryFlag()) {
+			cursor->getFakeInputBindsForThisQuery()) {
 
 			raiseDebugMessageEvent("faking binds...");
 
-			cursor->setFakeInputBindsForThisQueryFlag(true);
+			cursor->setFakeInputBindsForThisQuery(true);
 
 			if (cursor->fakeInputBinds()) {
 				if (pvt->_debugsqlrtranslation) {
 					stdoutput.printf(
 					"after faking input binds:\n%s\n\n",
-					cursor->querywithfakeinputbinds.
+					cursor->
+					getQueryWithFakeInputBindsBuffer()->
 								getString());
 				}
-				cursor->setBindsWereFakedFlag(true);
+				cursor->setBindsWereFaked(true);
 			}
 		}
 
 		// intercept some queries for special handling
 		success=interceptQuery(cursor);
-		if (cursor->getQueryWasInterceptedFlag()) {
+		if (cursor->getQueryWasIntercepted()) {
 			if (success) {
 				cursor->setQueryStatus(SQLRQUERYSTATUS_SUCCESS);
 			}
@@ -3511,13 +3512,15 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// get the query
 	const char	*query=cursor->getQueryBuffer();
 	uint32_t	querylen=cursor->getQueryLength();
-	if (cursor->getBindsWereFakedFlag()) {
-		query=cursor->querywithfakeinputbinds.getString();
-		querylen=cursor->querywithfakeinputbinds.getStringLength();
+	if (cursor->getBindsWereFaked()) {
+		query=cursor->getQueryWithFakeInputBindsBuffer()->
+							getString();
+		querylen=cursor->getQueryWithFakeInputBindsBuffer()->
+							getStringLength();
 	}
 
 	// now actually prepare the query, if necessary
-	if (!cursor->getPreparedFlag()) {
+	if (!cursor->getQueryHasBeenPrepared()) {
 
 		raiseDebugMessageEvent("preparing query...");
 
@@ -3559,7 +3562,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 
 		// set flag indicating that the query has been prepared
-		cursor->setPreparedFlag(true);
+		cursor->setQueryHasBeenPrepared(true);
 	}
 
 	raiseDebugMessageEvent("executing query...");
@@ -3568,7 +3571,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	translateBindVariablesFromMappings(cursor);
 
 	// handle binds (unless they were faked during the prepare)
-	if (!cursor->getBindsWereFakedFlag()) {
+	if (!cursor->getBindsWereFaked()) {
 		if (!handleBinds(cursor)) {
 
 			// update query and error counts

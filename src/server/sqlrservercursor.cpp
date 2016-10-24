@@ -20,6 +20,7 @@ class sqlrservercursorprivate {
 		char			*_querybuffer;
 		uint32_t		_querylength;
 		sqlrquerystatus_t	_querystatus;
+		stringbuffer		_querywithfakeinputbinds;
 
 		xmldom		*_querytree;
 		stringbuffer	_translatedquery;
@@ -52,8 +53,7 @@ class sqlrservercursorprivate {
 
 		sqlrquerycursor		*_customquerycursor;
 
-		// flags that are only useful to the sqlrservercontroller
-		bool	_prepared;
+		bool	_queryhasbeenprepared;
 		bool	_querywasintercepted;
 		bool	_bindswerefaked;
 		bool	_fakeinputbindsforthisquery;
@@ -103,7 +103,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_id=id;
 
-	pvt->_prepared=false;
+	pvt->_queryhasbeenprepared=false;
 	pvt->_querywasintercepted=false;
 	pvt->_bindswerefaked=false;
 	pvt->_fakeinputbindsforthisquery=false;
@@ -588,7 +588,7 @@ bool sqlrservercursor::fakeInputBinds() {
 	}
 
 	// re-init the buffer
-	querywithfakeinputbinds.clear();
+	pvt->_querywithfakeinputbinds.clear();
 
 	// loop through the query, performing substitutions
 	char	prefix=pvt->_inbindvars[0].variable[0];
@@ -659,7 +659,7 @@ bool sqlrservercursor::fakeInputBinds() {
 					)) {
 
 					performSubstitution(
-						&querywithfakeinputbinds,i);
+					&(pvt->_querywithfakeinputbinds),i);
 					if (*ptr=='?') {
 						ptr++;
 					} else {
@@ -674,7 +674,7 @@ bool sqlrservercursor::fakeInputBinds() {
 
 		// write the input query to the output query
 		if (*ptr) {
-			querywithfakeinputbinds.append(*ptr);
+			pvt->_querywithfakeinputbinds.append(*ptr);
 			ptr++;
 		}
 	}
@@ -1008,35 +1008,39 @@ const char *sqlrservercursor::skipCreateTempTableClause(const char *query) {
 	return NULL;
 }
 
-void sqlrservercursor::setPreparedFlag(bool prepared) {
-	pvt->_prepared=prepared;
+void sqlrservercursor::setQueryHasBeenPrepared(bool queryhasbeenprepared) {
+	pvt->_queryhasbeenprepared=queryhasbeenprepared;
 }
 
-bool sqlrservercursor::getPreparedFlag() {
-	return pvt->_prepared;
+bool sqlrservercursor::getQueryHasBeenPrepared() {
+	return pvt->_queryhasbeenprepared;
 }
 
-void sqlrservercursor::setQueryWasInterceptedFlag(bool querywasintercepted) {
+void sqlrservercursor::setQueryWasIntercepted(bool querywasintercepted) {
 	pvt->_querywasintercepted=querywasintercepted;
 }
 
-bool sqlrservercursor::getQueryWasInterceptedFlag() {
+bool sqlrservercursor::getQueryWasIntercepted() {
 	return pvt->_querywasintercepted;
 }
 
-void sqlrservercursor::setBindsWereFakedFlag(bool bindswerefaked) {
+void sqlrservercursor::setBindsWereFaked(bool bindswerefaked) {
 	pvt->_bindswerefaked=bindswerefaked;
 }
 
-bool sqlrservercursor::getBindsWereFakedFlag() {
+bool sqlrservercursor::getBindsWereFaked() {
 	return pvt->_bindswerefaked;
 }
 
-void sqlrservercursor::setFakeInputBindsForThisQueryFlag(
+void sqlrservercursor::setFakeInputBindsForThisQuery(
 					bool fakeinputbindsforthisquery) {
 	pvt->_fakeinputbindsforthisquery=fakeinputbindsforthisquery;
 }
 
-bool sqlrservercursor::getFakeInputBindsForThisQueryFlag() {
+bool sqlrservercursor::getFakeInputBindsForThisQuery() {
 	return pvt->_fakeinputbindsforthisquery;
+}
+
+stringbuffer *sqlrservercursor::getQueryWithFakeInputBindsBuffer() {
+	return &(pvt->_querywithfakeinputbinds);
 }
