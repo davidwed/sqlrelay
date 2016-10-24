@@ -945,8 +945,7 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
-	createtemp.compile("(create|CREATE)[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+#");
-	createtemp.study();
+	setCreateTempTablePattern("(create|CREATE)[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+#");
 
 	cursorquery.compile("^(select|SELECT)[ 	\\r\\n]+");
 	cursorquery.study();

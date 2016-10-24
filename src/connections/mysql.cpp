@@ -837,7 +837,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// the client tries to bind more variables than were defined when the
 	// query was prepared, it would cause the inputBind methods to attempt
 	// to address beyond the end of the various arrays
-	bindcount=inbindcount;
+	bindcount=getInputBindCount();
 
 	// reset bound variables flag
 	boundvariables=false;

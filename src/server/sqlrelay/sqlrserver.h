@@ -637,6 +637,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 	#include <sqlrelay/private/sqlrservercontroller.h>
 };
 
+class sqlrserverconnectionprivate;
 
 class SQLRSERVER_DLLSPEC sqlrserverconnection {
 	public:
@@ -750,11 +751,11 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		bool		getErrorSetManually();
 		void		setErrorSetManually(bool errorsetmanually);
 
-		sqlrservercontroller	*cont;
-
 	#include <sqlrelay/private/sqlrserverconnection.h>
 };
 
+
+class sqlrservercursorprivate;
 
 class SQLRSERVER_DLLSPEC sqlrservercursor {
 	public:
@@ -1000,7 +1001,10 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		getErrorSetManually();
 		void		setErrorSetManually(bool errorsetmanually);
 
-		sqlrserverconnection	*conn;
+		void		setCreateTempTablePattern(
+						const char *createtemp);
+		const char	*skipCreateTempTableClause(
+						const char *query);
 
 	#include <sqlrelay/private/sqlrservercursor.h>
 };

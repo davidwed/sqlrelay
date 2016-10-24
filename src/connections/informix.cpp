@@ -1034,7 +1034,7 @@ bool informixcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	lobbindsize[inbindcount]=valuesize;
+	lobbindsize[getInputBindCount()]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
@@ -1044,7 +1044,7 @@ bool informixcursor::inputBindBlob(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(lobbindsize[inbindcount]));
+				&(lobbindsize[getInputBindCount()]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1057,7 +1057,7 @@ bool informixcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	lobbindsize[inbindcount]=valuesize;
+	lobbindsize[getInputBindCount()]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
@@ -1071,7 +1071,7 @@ bool informixcursor::inputBindClob(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(lobbindsize[inbindcount]));
+				&(lobbindsize[getInputBindCount()]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1084,7 +1084,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint16_t valuesize, 
 					int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -1107,7 +1107,7 @@ bool informixcursor::outputBind(const char *variable,
 					int64_t *value,
 					int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	*value=0;
 
@@ -1134,7 +1134,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint32_t *scale,
 					int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	*value=0.0;
 
@@ -1180,7 +1180,7 @@ bool informixcursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
-	outdatebind[outbindcount]=db;
+	outdatebind[getOutputBindCount()]=db;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),

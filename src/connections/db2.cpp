@@ -1031,7 +1031,7 @@ bool db2cursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	blobbindsize[inbindcount]=valuesize;
+	blobbindsize[getInputBindCount()]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
@@ -1041,7 +1041,7 @@ bool db2cursor::inputBindBlob(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(blobbindsize[inbindcount]));
+				&(blobbindsize[getInputBindCount()]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1082,7 +1082,7 @@ bool db2cursor::outputBind(const char *variable,
 					uint16_t valuesize, 
 					int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -1105,7 +1105,7 @@ bool db2cursor::outputBind(const char *variable,
 					int64_t *value,
 					int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	*value=0;
 
@@ -1132,7 +1132,7 @@ bool db2cursor::outputBind(const char *variable,
 					uint32_t *scale,
 					int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	*value=0.0;
 
@@ -1178,7 +1178,7 @@ bool db2cursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
-	outdatebind[outbindcount]=db;
+	outdatebind[getOutputBindCount()]=db;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),

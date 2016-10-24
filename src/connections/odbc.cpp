@@ -1005,7 +1005,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint16_t valuesize, 
 				short *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -1035,7 +1035,7 @@ bool odbccursor::outputBind(const char *variable,
 				int64_t *value,
 				int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	*value=0;
 
@@ -1069,7 +1069,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint32_t *scale,
 				int16_t *isnull) {
 
-	outdatebind[outbindcount]=NULL;
+	outdatebind[getOutputBindCount()]=NULL;
 
 	*value=0.0;
 
@@ -1122,7 +1122,7 @@ bool odbccursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
-	outdatebind[outbindcount]=db;
+	outdatebind[getOutputBindCount()]=db;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),

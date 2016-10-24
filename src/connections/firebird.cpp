@@ -739,8 +739,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	queryisexecsp=false;
 	bindformaterror=false;
 
-	createtemp.compile("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
-	createtemp.study();
+	setCreateTempTablePattern("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
 	preserverows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(preserve|PRESERVE)[ 	\\n\\r]+(rows|ROWS)");
 	preserverows.study();
 	executeprocedure.compile("(execute|EXECUTE)[ 	\\n\\r]+(procedure|PROCEDURE)");
@@ -1599,24 +1598,16 @@ void firebirdcursor::errorMessage(char *errorbuffer,
 
 void firebirdcursor::checkForTempTable(const char *query, uint32_t length) {
 
-	const char	*ptr=query;
-	const char	*endptr=query+length;
-
-	// skip any leading whitespace and comments
-	ptr=conn->cont->skipWhitespaceAndComments(query);
-	if (!(*ptr)) {
-		return;
-	}
-
-	// look for "create global temporary table "
-	if (createtemp.match(ptr)) {
-		ptr=createtemp.getSubstringEnd(0);
-	} else {
+	// see if the query matches the pattern for a temporary query that
+	// creates a temporary table
+	const char	*ptr=skipCreateTempTableClause(query);
+	if (!ptr) {
 		return;
 	}
 
 	// get the table name
 	stringbuffer	tablename;
+	const char	*endptr=query+length;
 	while (ptr && *ptr && *ptr!=' ' &&
 		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
 		tablename.append(*ptr);

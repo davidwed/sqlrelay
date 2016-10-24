@@ -10,35 +10,81 @@
 #include <datatypes.h>
 #include <defines.h>
 
+class sqlrservercursorprivate {
+	 friend class sqlrservercursor;
+
+		regularexpression	_createtemp;
+
+		uint16_t	_id;
+
+		char			*_querybuffer;
+		uint32_t		_querylength;
+		sqlrquerystatus_t	_querystatus;
+
+		xmldom		*_querytree;
+		stringbuffer	_translatedquery;
+
+		uint16_t		_inbindcount;
+		sqlrserverbindvar	*_inbindvars;
+		uint16_t		_outbindcount;
+		sqlrserverbindvar	*_outbindvars;
+
+		uint64_t	_totalrowsfetched;
+
+		uint64_t	_commandstartsec;
+		uint64_t	_commandstartusec;
+		uint64_t	_commandendsec;
+		uint64_t	_commandendusec;
+		uint64_t	_querystartsec;
+		uint64_t	_querystartusec;
+		uint64_t	_queryendsec;
+		uint64_t	_queryendusec;
+
+		uint32_t	_maxerrorlength;
+
+		char		*_error;
+		uint32_t	_errorlength;
+		int64_t		_errnum;
+		bool		_liveconnection;
+		bool		_errorsetmanually;
+
+		sqlrcursorstate_t	_state;
+
+		sqlrquerycursor		*_customquerycursor;
+};
+
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
+
+	pvt=new sqlrservercursorprivate;
 
 	this->conn=conn;
 
-	maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
+	pvt->_maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
 
 	setInputBindCount(0);
-	inbindvars=new sqlrserverbindvar[
+	pvt->_inbindvars=new sqlrserverbindvar[
 				conn->cont->getConfig()->getMaxBindCount()];
 	setOutputBindCount(0);
-	outbindvars=new sqlrserverbindvar[
+	pvt->_outbindvars=new sqlrserverbindvar[
 				conn->cont->getConfig()->getMaxBindCount()];
 	
 	setState(SQLRCURSORSTATE_AVAILABLE);
 
-	createtemp.compile("(create|CREATE|declare|DECLARE)[ 	\\r\\n]+((global|GLOBAL|local|LOCAL)?[ 	\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+");
+	setCreateTempTablePattern("(create|CREATE|declare|DECLARE)[ 	\\r\\n]+((global|GLOBAL|local|LOCAL)?[ 	\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+");
 
-	querybuffer=new char[conn->cont->getConfig()->getMaxQuerySize()+1];
+	pvt->_querybuffer=
+		new char[conn->cont->getConfig()->getMaxQuerySize()+1];
 	setQueryLength(0);
 
 	setQueryStatus(SQLRQUERYSTATUS_ERROR);
 
 	setQueryTree(NULL);
 
-	error=new char[maxerrorlength+1];
-	errorlength=0;
-	errnum=0;
-	liveconnection=true;
-	errorsetmanually=false;
+	pvt->_error=new char[pvt->_maxerrorlength+1];
+	pvt->_errorlength=0;
+	pvt->_errnum=0;
+	pvt->_liveconnection=true;
+	pvt->_errorsetmanually=false;
 
 	setCommandStart(0,0);
 	setCommandEnd(0,0);
@@ -49,7 +95,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	clearTotalRowsFetched();
 
-	this->id=id;
+	pvt->_id=id;
 
 	// sqlrservercontroller flags
 	prepared=false;
@@ -59,12 +105,13 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 }
 
 sqlrservercursor::~sqlrservercursor() {
-	delete[] querybuffer;
-	delete querytree;
-	delete[] inbindvars;
-	delete[] outbindvars;
-	delete customquerycursor;
-	delete[] error;
+	delete[] pvt->_querybuffer;
+	delete pvt->_querytree;
+	delete[] pvt->_inbindvars;
+	delete[] pvt->_outbindvars;
+	delete pvt->_customquerycursor;
+	delete[] pvt->_error;
+	delete pvt;
 }
 
 bool sqlrservercursor::open() {
@@ -306,26 +353,16 @@ void sqlrservercursor::closeLobOutputBind(uint16_t index) {
 
 void sqlrservercursor::checkForTempTable(const char *query, uint32_t length) {
 
-	const char	*ptr=query;
-	const char	*endptr=query+length;
-
-	// skip any leading comments
-	if (!conn->cont->skipWhitespace(&ptr,endptr) ||
-		!conn->cont->skipComment(&ptr,endptr) ||
-		!conn->cont->skipWhitespace(&ptr,endptr)) {
-		return;
-	}
-
 	// see if the query matches the pattern for a temporary query that
 	// creates a temporary table
-	if (createtemp.match(ptr)) {
-		ptr=createtemp.getSubstringEnd(0);
-	} else {
+	const char	*ptr=skipCreateTempTableClause(query);
+	if (!ptr) {
 		return;
 	}
 
 	// get the table name
 	stringbuffer	tablename;
+	const char	*endptr=query+length;
 	while (ptr && *ptr && *ptr!=' ' &&
 		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
 		tablename.append(*ptr);
@@ -353,7 +390,8 @@ bool sqlrservercursor::fetchFromBindCursor() {
 bool sqlrservercursor::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.
-	const char	*ptr=conn->cont->skipWhitespaceAndComments(querybuffer);
+	const char	*ptr=
+		conn->cont->skipWhitespaceAndComments(pvt->_querybuffer);
 
 	// if the query is a select but not a select into then return false,
 	// otherwise return true
@@ -367,7 +405,8 @@ bool sqlrservercursor::queryIsNotSelect() {
 bool sqlrservercursor::queryIsCommitOrRollback() {
 
 	// scan the query, bypassing whitespace and comments.
-	const char	*ptr=conn->cont->skipWhitespaceAndComments(querybuffer);
+	const char	*ptr=
+		conn->cont->skipWhitespaceAndComments(pvt->_querybuffer);
 
 	// if the query is a commit or rollback, return true
 	// otherwise return false
@@ -533,13 +572,13 @@ bool sqlrservercursor::getColumnNameList(stringbuffer *output) {
 }
 
 uint16_t sqlrservercursor::getId() {
-	return id;
+	return pvt->_id;
 }
 
 bool sqlrservercursor::fakeInputBinds() {
 
 	// return false if there aren't any input binds
-	if (!inbindcount) {
+	if (!pvt->_inbindcount) {
 		return false;
 	}
 
@@ -547,8 +586,8 @@ bool sqlrservercursor::fakeInputBinds() {
 	querywithfakeinputbinds.clear();
 
 	// loop through the query, performing substitutions
-	char	prefix=inbindvars[0].variable[0];
-	char	*ptr=querybuffer;
+	char	prefix=pvt->_inbindvars[0].variable[0];
+	char	*ptr=pvt->_querybuffer;
 	int	index=1;
 	bool	inquotes=false;
 	while (*ptr) {
@@ -566,7 +605,7 @@ bool sqlrservercursor::fakeInputBinds() {
 		if (!inquotes && (*ptr==prefix || *ptr=='?')) {
 
 			// look through the list of vars
-			for (int16_t i=0; i<inbindcount; i++) {
+			for (int16_t i=0; i<pvt->_inbindcount; i++) {
 
 				// if we find a match, perform the substitution
 				// and skip past the variable...
@@ -589,27 +628,29 @@ bool sqlrservercursor::fakeInputBinds() {
 				if (
 					(*ptr=='?' && 
 					charstring::toInteger(
-						inbindvars[i].variable+1)==
-									index) 
+						pvt->_inbindvars[i].
+							variable+1)==index) 
 
 					||
 
 					(!charstring::compare(ptr,
-						inbindvars[i].variable,
-						inbindvars[i].variablesize) 
+						pvt->_inbindvars[i].
+							variable,
+						pvt->_inbindvars[i].
+							variablesize) 
 					 		&&
-					(*(ptr+inbindvars[i].variablesize)==
-					 		' ' ||
-					*(ptr+inbindvars[i].variablesize)==
-							'	' ||
-					*(ptr+inbindvars[i].variablesize)==
-							'\n' ||
-					*(ptr+inbindvars[i].variablesize)==
-							')' ||
-					*(ptr+inbindvars[i].variablesize)==
-							',' ||
-					*(ptr+inbindvars[i].variablesize)==
-							'\0')
+					(*(ptr+pvt->_inbindvars[i].
+						variablesize)==' ' ||
+					*(ptr+pvt->_inbindvars[i].
+						variablesize)=='	' ||
+					*(ptr+pvt->_inbindvars[i].
+						variablesize)=='\n' ||
+					*(ptr+pvt->_inbindvars[i].
+						variablesize)==')' ||
+					*(ptr+pvt->_inbindvars[i].
+						variablesize)==',' ||
+					*(ptr+pvt->_inbindvars[i].
+						variablesize)=='\0')
 					)) {
 
 					performSubstitution(
@@ -617,7 +658,7 @@ bool sqlrservercursor::fakeInputBinds() {
 					if (*ptr=='?') {
 						ptr++;
 					} else {
-						ptr=ptr+inbindvars[i].
+						ptr=ptr+pvt->_inbindvars[i].
 								variablesize;
 					}
 					index++;
@@ -638,16 +679,16 @@ bool sqlrservercursor::fakeInputBinds() {
 void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 							int16_t index) {
 
-	if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_STRING ||
-		inbindvars[index].type==SQLRSERVERBINDVARTYPE_CLOB) {
+	if (pvt->_inbindvars[index].type==SQLRSERVERBINDVARTYPE_STRING ||
+		pvt->_inbindvars[index].type==SQLRSERVERBINDVARTYPE_CLOB) {
 
 		buffer->append("'");
 
-		size_t	length=inbindvars[index].valuesize;
+		size_t	length=pvt->_inbindvars[index].valuesize;
 
 		for (size_t ind=0; ind<length; ind++) {
 
-			char	ch=inbindvars[index].value.stringval[ind];
+			char	ch=pvt->_inbindvars[index].value.stringval[ind];
 
 			// escape quotes and NULL's
 			if (ch=='\'') {
@@ -663,22 +704,32 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 
 		buffer->append("'");
 
-	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_BLOB) {
-		encodeBlob(buffer,inbindvars[index].value.stringval,
-						inbindvars[index].valuesize);
-	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_INTEGER) {
-		buffer->append(inbindvars[index].value.integerval);
-	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+	} else if (pvt->_inbindvars[index].type==
+				SQLRSERVERBINDVARTYPE_BLOB) {
+		encodeBlob(buffer,pvt->_inbindvars[index].value.stringval,
+					pvt->_inbindvars[index].valuesize);
+	} else if (pvt->_inbindvars[index].type==
+				SQLRSERVERBINDVARTYPE_INTEGER) {
+		buffer->append(pvt->_inbindvars[index].
+					value.integerval);
+	} else if (pvt->_inbindvars[index].type==
+				SQLRSERVERBINDVARTYPE_DOUBLE) {
 		char	*dbuf=NULL;
-		if (!inbindvars[index].value.doubleval.precision &&
-				!inbindvars[index].value.doubleval.scale) {
+		if (!pvt->_inbindvars[index].
+				value.doubleval.precision &&
+			!pvt->_inbindvars[index].
+				value.doubleval.scale) {
 			dbuf=charstring::parseNumber(
-				inbindvars[index].value.doubleval.value);
+				pvt->_inbindvars[index].
+					value.doubleval.value);
 		} else {
 			dbuf=charstring::parseNumber(
-				inbindvars[index].value.doubleval.value,
-				inbindvars[index].value.doubleval.precision,
-				inbindvars[index].value.doubleval.scale);
+				pvt->_inbindvars[index].
+					value.doubleval.value,
+				pvt->_inbindvars[index].
+					value.doubleval.precision,
+				pvt->_inbindvars[index].
+					value.doubleval.scale);
 		}
 		// In some regions a comma is used rather than a period for
 		// the decimal and the i8n settings will cause the vsnprintf 
@@ -692,20 +743,22 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 		}
 		buffer->append(dbuf);
 		delete[] dbuf;
-	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_DATE) {
+	} else if (pvt->_inbindvars[index].type==
+				SQLRSERVERBINDVARTYPE_DATE) {
 		char	buf[64];
 		dateToString(buf,sizeof(buf),
-				inbindvars[index].value.dateval.year,
-				inbindvars[index].value.dateval.month,
-				inbindvars[index].value.dateval.day,
-				inbindvars[index].value.dateval.hour,
-				inbindvars[index].value.dateval.minute,
-				inbindvars[index].value.dateval.second,
-				inbindvars[index].value.dateval.microsecond,
-				inbindvars[index].value.dateval.tz,
-				inbindvars[index].value.dateval.isnegative);
+			pvt->_inbindvars[index].value.dateval.year,
+			pvt->_inbindvars[index].value.dateval.month,
+			pvt->_inbindvars[index].value.dateval.day,
+			pvt->_inbindvars[index].value.dateval.hour,
+			pvt->_inbindvars[index].value.dateval.minute,
+			pvt->_inbindvars[index].value.dateval.second,
+			pvt->_inbindvars[index].value.dateval.microsecond,
+			pvt->_inbindvars[index].value.dateval.tz,
+			pvt->_inbindvars[index].value.dateval.isnegative);
 		buffer->append("'")->append(buf)->append("'");
-	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_NULL) {
+	} else if (pvt->_inbindvars[index].type==
+				SQLRSERVERBINDVARTYPE_NULL) {
 		buffer->append("NULL");
 	}
 }
@@ -726,27 +779,27 @@ void sqlrservercursor::encodeBlob(stringbuffer *buffer,
 }
 
 void sqlrservercursor::setInputBindCount(uint16_t inbindcount) {
-	this->inbindcount=inbindcount;
+	pvt->_inbindcount=inbindcount;
 }
 
 uint16_t sqlrservercursor::getInputBindCount() {
-	return inbindcount;
+	return pvt->_inbindcount;
 }
 
 sqlrserverbindvar *sqlrservercursor::getInputBinds() {
-	return inbindvars;
+	return pvt->_inbindvars;
 }
 
 void sqlrservercursor::setOutputBindCount(uint16_t outbindcount) {
-	this->outbindcount=outbindcount;
+	pvt->_outbindcount=outbindcount;
 }
 
 uint16_t sqlrservercursor::getOutputBindCount() {
-	return outbindcount;
+	return pvt->_outbindcount;
 }
 
 sqlrserverbindvar *sqlrservercursor::getOutputBinds() {
-	return outbindvars;
+	return pvt->_outbindvars;
 }
 
 void sqlrservercursor::abort() {
@@ -760,179 +813,192 @@ void sqlrservercursor::abort() {
 }
 
 char *sqlrservercursor::getQueryBuffer() {
-	return querybuffer;
+	return pvt->_querybuffer;
 }
 
 uint32_t sqlrservercursor::getQueryLength() {
-	return querylength;
+	return pvt->_querylength;
 }
 
 void sqlrservercursor::setQueryLength(uint32_t querylength) {
-	this->querylength=querylength;
+	pvt->_querylength=querylength;
 }
 
 void sqlrservercursor::setQueryStatus(sqlrquerystatus_t status) {
-	querystatus=status;
+	pvt->_querystatus=status;
 }
 
 sqlrquerystatus_t sqlrservercursor::getQueryStatus() {
-	return querystatus;
+	return pvt->_querystatus;
 }
 
 void sqlrservercursor::setQueryTree(xmldom *tree) {
-	querytree=tree;
+	pvt->_querytree=tree;
 }
 
 xmldom *sqlrservercursor::getQueryTree() {
-	return querytree;
+	return pvt->_querytree;
 }
 
 void sqlrservercursor::clearQueryTree() {
-	delete querytree;
-	querytree=NULL;
+	delete pvt->_querytree;
+	pvt->_querytree=NULL;
 }
 
 stringbuffer *sqlrservercursor::getTranslatedQueryBuffer() {
-	return &translatedquery;
+	return &(pvt->_translatedquery);
 }
 
 void sqlrservercursor::setCommandStart(uint64_t sec, uint64_t usec) {
-	commandstartsec=sec;
-	commandstartusec=usec;
+	pvt->_commandstartsec=sec;
+	pvt->_commandstartusec=usec;
 }
 
 uint64_t sqlrservercursor::getCommandStartSec() {
-	return commandstartsec;
+	return pvt->_commandstartsec;
 }
 
 uint64_t sqlrservercursor::getCommandStartUSec() {
-	return commandstartusec;
+	return pvt->_commandstartusec;
 }
 
 
 void sqlrservercursor::setCommandEnd(uint64_t sec, uint64_t usec) {
-	commandendsec=sec;
-	commandendusec=usec;
+	pvt->_commandendsec=sec;
+	pvt->_commandendusec=usec;
 }
 
 uint64_t sqlrservercursor::getCommandEndSec() {
-	return commandendsec;
+	return pvt->_commandendsec;
 }
 
 uint64_t sqlrservercursor::getCommandEndUSec() {
-	return commandendusec;
+	return pvt->_commandendusec;
 }
 
 
 void sqlrservercursor::setQueryStart(uint64_t sec, uint64_t usec) {
-	querystartsec=sec;
-	querystartusec=usec;
+	pvt->_querystartsec=sec;
+	pvt->_querystartusec=usec;
 }
 
 uint64_t sqlrservercursor::getQueryStartSec() {
-	return querystartsec;
+	return pvt->_querystartsec;
 }
 
 uint64_t sqlrservercursor::getQueryStartUSec() {
-	return querystartusec;
+	return pvt->_querystartusec;
 }
 
 
 void sqlrservercursor::setQueryEnd(uint64_t sec, uint64_t usec) {
-	queryendsec=sec;
-	queryendusec=usec;
+	pvt->_queryendsec=sec;
+	pvt->_queryendusec=usec;
 }
 
 uint64_t sqlrservercursor::getQueryEndSec() {
-	return queryendsec;
+	return pvt->_queryendsec;
 }
 
 uint64_t sqlrservercursor::getQueryEndUSec() {
-	return queryendusec;
+	return pvt->_queryendusec;
 }
 
 void sqlrservercursor::setState(sqlrcursorstate_t state) {
-	this->state=state;
+	pvt->_state=state;
 }
 
 sqlrcursorstate_t sqlrservercursor::getState() {
-	return state;
+	return pvt->_state;
 }
 
 void sqlrservercursor::setCustomQueryCursor(sqlrquerycursor *cur) {
-	customquerycursor=cur;
+	pvt->_customquerycursor=cur;
 }
 
 sqlrquerycursor *sqlrservercursor::getCustomQueryCursor() {
-	return customquerycursor;
+	return pvt->_customquerycursor;
 }
 
 void sqlrservercursor::clearCustomQueryCursor() {
-	delete customquerycursor;
-	customquerycursor=NULL;
+	delete pvt->_customquerycursor;
+	pvt->_customquerycursor=NULL;
 }
 
 void sqlrservercursor::clearTotalRowsFetched() {
-	totalrowsfetched=0;
+	pvt->_totalrowsfetched=0;
 }
 
 uint64_t sqlrservercursor::getTotalRowsFetched() {
-	return totalrowsfetched;
+	return pvt->_totalrowsfetched;
 }
 
 void sqlrservercursor::incrementTotalRowsFetched() {
-	totalrowsfetched++;
+	pvt->_totalrowsfetched++;
 }
 
 void sqlrservercursor::clearError() {
 	setError(NULL,0,true);
-	errorsetmanually=false;
+	pvt->_errorsetmanually=false;
 }
 
 void sqlrservercursor::setError(const char *err, int64_t errn, bool liveconn) {
-	errorlength=charstring::length(err);
-	if (errorlength>maxerrorlength) {
-		errorlength=maxerrorlength;
+	pvt->_errorlength=charstring::length(err);
+	if (pvt->_errorlength>pvt->_maxerrorlength) {
+		pvt->_errorlength=pvt->_maxerrorlength;
 	}
-	charstring::copy(error,err,errorlength);
-	error[errorlength]='\0';
-	errnum=errn;
-	liveconnection=liveconn;
-	errorsetmanually=true;
+	charstring::copy(pvt->_error,err,pvt->_errorlength);
+	pvt->_error[pvt->_errorlength]='\0';
+	pvt->_errnum=errn;
+	pvt->_liveconnection=liveconn;
+	pvt->_errorsetmanually=true;
 }
 
 char *sqlrservercursor::getErrorBuffer() {
-	return error;
+	return pvt->_error;
 }
 
 uint32_t sqlrservercursor::getErrorLength() {
-	return errorlength;
+	return pvt->_errorlength;
 }
 
 void sqlrservercursor::setErrorLength(uint32_t errorlength) {
-	this->errorlength=errorlength;
+	pvt->_errorlength=errorlength;
 }
 
 uint32_t sqlrservercursor::getErrorNumber() {
-	return errnum;
+	return pvt->_errnum;
 }
 
 void sqlrservercursor::setErrorNumber(uint32_t errnum) {
-	this->errnum=errnum;
+	pvt->_errnum=errnum;
 }
 
 bool sqlrservercursor::getLiveConnection() {
-	return liveconnection;
+	return pvt->_liveconnection;
 }
 
 void sqlrservercursor::setLiveConnection(bool liveconnection) {
-	this->liveconnection=liveconnection;
+	pvt->_liveconnection=liveconnection;
 }
 
 bool sqlrservercursor::getErrorSetManually() {
-	return errorsetmanually;
+	return pvt->_errorsetmanually;
 }
 
 void sqlrservercursor::setErrorSetManually(bool errorsetmanually) {
-	this->errorsetmanually=errorsetmanually;
+	pvt->_errorsetmanually=errorsetmanually;
+}
+
+void sqlrservercursor::setCreateTempTablePattern(const char *createtemp) {
+	pvt->_createtemp.compile(createtemp);
+	pvt->_createtemp.study();
+}
+
+const char *sqlrservercursor::skipCreateTempTableClause(const char *query) {
+	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
+	if (ptr && *ptr && pvt->_createtemp.match(ptr)) {
+		return pvt->_createtemp.getSubstringEnd(0);
+	}
+	return NULL;
 }

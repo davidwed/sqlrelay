@@ -7,31 +7,54 @@
 
 #include <defines.h>
 
+class sqlrserverconnectionprivate {
+	friend class sqlrserverconnection;
+
+		bool		_autocommit;
+		bool		_fakeautocommit;
+
+		uint32_t	_maxquerysize;
+		uint32_t	_maxerrorlength;
+
+		char		*_error;
+		uint32_t	_errorlength;
+		int64_t		_errnum;
+		bool		_liveconnection;
+		bool		_errorsetmanually;
+
+		char		*_dbhostname;
+		char		*_dbipaddress;
+		uint32_t	_dbhostiploop;
+};
+
 sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
+
+	pvt=new sqlrserverconnectionprivate;
 
 	this->cont=cont;
 
-	maxquerysize=cont->getConfig()->getMaxQuerySize();
-	maxerrorlength=cont->getConfig()->getMaxErrorLength();
+	pvt->_maxquerysize=cont->getConfig()->getMaxQuerySize();
+	pvt->_maxerrorlength=cont->getConfig()->getMaxErrorLength();
 
-	error=new char[maxerrorlength+1];
-	errorlength=0;
-	errnum=0;
-	liveconnection=false;
-	errorsetmanually=false;
+	pvt->_error=new char[pvt->_maxerrorlength+1];
+	pvt->_errorlength=0;
+	pvt->_errnum=0;
+	pvt->_liveconnection=false;
+	pvt->_errorsetmanually=false;
 
-	autocommit=false;
-	fakeautocommit=false;
+	pvt->_autocommit=false;
+	pvt->_fakeautocommit=false;
 
-	dbhostname=NULL;
-	dbipaddress=NULL;
-	dbhostiploop=0;
+	pvt->_dbhostname=NULL;
+	pvt->_dbipaddress=NULL;
+	pvt->_dbhostiploop=0;
 }
 
 sqlrserverconnection::~sqlrserverconnection() {
-	delete[] error;
-	delete[] dbhostname;
-	delete[] dbipaddress;
+	delete[] pvt->_error;
+	delete[] pvt->_dbhostname;
+	delete[] pvt->_dbipaddress;
+	delete pvt;
 }
 
 bool sqlrserverconnection::mustDetachBeforeLogIn() {
@@ -53,14 +76,14 @@ bool sqlrserverconnection::changeProxiedUser(const char *newuser,
 }
 
 bool sqlrserverconnection::autoCommitOn() {
-	fakeautocommit=true;
-	autocommit=true;
+	pvt->_fakeautocommit=true;
+	pvt->_autocommit=true;
 	return true;
 }
 
 bool sqlrserverconnection::autoCommitOff() {
-	fakeautocommit=true;
-	autocommit=false;
+	pvt->_fakeautocommit=true;
+	pvt->_autocommit=false;
 	return true;
 }
 
@@ -100,8 +123,11 @@ bool sqlrserverconnection::begin() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		begincur->errorMessage(error,maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
+		begincur->errorMessage(pvt->_error,
+					pvt->_maxerrorlength,
+					&(pvt->_errorlength),
+					&(pvt->_errnum),
+					&(pvt->_liveconnection));
 	}
 
 	// clean up
@@ -141,8 +167,11 @@ bool sqlrserverconnection::commit() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		commitcur->errorMessage(error,maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
+		commitcur->errorMessage(pvt->_error,
+					pvt->_maxerrorlength,
+					&(pvt->_errorlength),
+					&(pvt->_errnum),
+					&(pvt->_liveconnection));
 	}
 
 	// clean up
@@ -178,8 +207,11 @@ bool sqlrserverconnection::rollback() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		rbcur->errorMessage(error,maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
+		rbcur->errorMessage(pvt->_error,
+					pvt->_maxerrorlength,
+					&(pvt->_errorlength),
+					&(pvt->_errnum),
+					&(pvt->_liveconnection));
 	}
 
 	// clean up
@@ -217,7 +249,7 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	// bounds checking
 	size_t		sdquerylen=charstring::length(sdquerybase)+
 					charstring::length(database)+1;
-	if (sdquerylen>maxquerysize) {
+	if (sdquerylen>pvt->_maxquerysize) {
 		return false;
 	}
 
@@ -241,8 +273,11 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		sdcur->errorMessage(error,maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
+		sdcur->errorMessage(pvt->_error,
+					pvt->_maxerrorlength,
+					&(pvt->_errorlength),
+					&(pvt->_errnum),
+					&(pvt->_liveconnection));
 	}
 	delete[] sdquery;
 	sdcur->close();
@@ -341,8 +376,11 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		liicur->errorMessage(error,maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
+		liicur->errorMessage(pvt->_error,
+					pvt->_maxerrorlength,
+					&(pvt->_errorlength),
+					&(pvt->_errnum),
+					&(pvt->_liveconnection));
 	}
 
 	liicur->closeResultSet();
@@ -374,7 +412,7 @@ bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 	// bounds checking
 	size_t		silquerylen=charstring::length(silquerybase)+
 					charstring::length(isolevel)+1;
-	if (silquerylen>maxquerysize) {
+	if (silquerylen>pvt->_maxquerysize) {
 		return false;
 	}
 
@@ -395,8 +433,11 @@ bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 	// FIXME: we don't really need to do this now but we will
 	// later if we ever add an API call to set the isolation level
 	/* else {
-		silcur->errorMessage(error,maxerrorlength,
-					&errorlength,&errnum,&liveconnection));
+		silcur->errorMessage(pvt->_error,
+					pvt->_maxerrorlength,
+					&(pvt->_errorlength),
+					&(pvt->_errnum),
+					&(pvt->_liveconnection));
 	} */
 
 	delete[] silquery;
@@ -441,16 +482,16 @@ const char *sqlrserverconnection::dbIpAddressQuery() {
 
 const char *sqlrserverconnection::dbHostName() {
 
-	if (dbhostname) {
-		return dbhostname;
+	if (pvt->_dbhostname) {
+		return pvt->_dbhostname;
 	}
 
 	// don't get looped up...
-	if (dbhostiploop==2) {
-		dbhostiploop=0;
+	if (pvt->_dbhostiploop==2) {
+		pvt->_dbhostiploop=0;
 		return NULL;
 	}
-	dbhostiploop++;
+	pvt->_dbhostiploop++;
 
 	// if we have a host name query then use it, otherwise get the
 	// ip address and convert it to a host name...
@@ -471,7 +512,7 @@ const char *sqlrserverconnection::dbHostName() {
 				bool		null=false;
 				dbhncur->getField(0,&field,&fieldlength,
 								&blob,&null);
-				dbhostname=charstring::duplicate(field);
+				pvt->_dbhostname=charstring::duplicate(field);
 			} 
 		
 			dbhncur->closeResultSet();
@@ -490,24 +531,24 @@ const char *sqlrserverconnection::dbHostName() {
 				ipaddr++;
 			}
 		}
-		dbhostname=hostentry::getName(ip,4,AF_INET);
+		pvt->_dbhostname=hostentry::getName(ip,4,AF_INET);
 	}
-	dbhostiploop=0;
-	return dbhostname;
+	pvt->_dbhostiploop=0;
+	return pvt->_dbhostname;
 }
 
 const char *sqlrserverconnection::dbIpAddress() {
 
-	if (dbipaddress) {
-		return dbipaddress;
+	if (pvt->_dbipaddress) {
+		return pvt->_dbipaddress;
 	}
 
 	// don't get looped up...
-	if (dbhostiploop==2) {
-		dbhostiploop=0;
+	if (pvt->_dbhostiploop==2) {
+		pvt->_dbhostiploop=0;
 		return NULL;
 	}
-	dbhostiploop++;
+	pvt->_dbhostiploop++;
 
 	// if we have an ip address query then use it, otherwise get the
 	// host name and convert it to an ip address...
@@ -528,7 +569,7 @@ const char *sqlrserverconnection::dbIpAddress() {
 				bool		null=false;
 				dbiacur->getField(0,&field,&fieldlength,
 								&blob,&null);
-				dbipaddress=charstring::duplicate(field);
+				pvt->_dbipaddress=charstring::duplicate(field);
 			} 
 		
 			dbiacur->closeResultSet();
@@ -537,10 +578,10 @@ const char *sqlrserverconnection::dbIpAddress() {
 		cont->deleteCursor(dbiacur);
 
 	} else {
-		dbipaddress=hostentry::getAddressString(dbHostName());
+		pvt->_dbipaddress=hostentry::getAddressString(dbHostName());
 	}
-	dbhostiploop=0;
-	return dbipaddress;
+	pvt->_dbhostiploop=0;
+	return pvt->_dbipaddress;
 }
 
 bool sqlrserverconnection::getListsByApiCalls() {
@@ -645,68 +686,68 @@ void sqlrserverconnection::endSession() {
 }
 
 bool sqlrserverconnection::getAutoCommit() {
-	return autocommit;
+	return pvt->_autocommit;
 }
 
 void sqlrserverconnection::setAutoCommit(bool autocommit) {
-	this->autocommit=autocommit;
+	pvt->_autocommit=autocommit;
 }
 
 bool sqlrserverconnection::getFakeAutoCommit() {
-	return fakeautocommit;
+	return pvt->_fakeautocommit;
 }
 
 void sqlrserverconnection::clearError() {
 	setError(NULL,0,true);
-	errorsetmanually=false;
+	pvt->_errorsetmanually=false;
 }
 
 void sqlrserverconnection::setError(const char *err,
 					int64_t errn,
 					bool liveconn) {
-	errorlength=charstring::length(err);
-	if (errorlength>maxerrorlength-1) {
-		errorlength=maxerrorlength-1;
+	pvt->_errorlength=charstring::length(err);
+	if (pvt->_errorlength>pvt->_maxerrorlength-1) {
+		pvt->_errorlength=pvt->_maxerrorlength-1;
 	}
-	charstring::copy(error,err,errorlength);
-	error[errorlength]='\0';
-	errnum=errn;
-	liveconnection=liveconn;
-	errorsetmanually=true;
+	charstring::copy(pvt->_error,err,pvt->_errorlength);
+	pvt->_error[pvt->_errorlength]='\0';
+	pvt->_errnum=errn;
+	pvt->_liveconnection=liveconn;
+	pvt->_errorsetmanually=true;
 }
 
 char *sqlrserverconnection::getErrorBuffer() {
-	return error;
+	return pvt->_error;
 }
 
 uint32_t sqlrserverconnection::getErrorLength() {
-	return errorlength;
+	return pvt->_errorlength;
 }
 
 void sqlrserverconnection::setErrorLength(uint32_t errorlength) {
-	this->errorlength=errorlength;
+	pvt->_errorlength=errorlength;
 }
 
 uint32_t sqlrserverconnection::getErrorNumber() {
-	return errnum;
+	return pvt->_errnum;
 }
 
 void sqlrserverconnection::setErrorNumber(uint32_t errnum) {
-	this->errnum=errnum;
+	pvt->_errnum=errnum;
 }
 
 bool sqlrserverconnection::getLiveConnection() {
-	return liveconnection;
+	return pvt->_liveconnection;
 }
 
 void sqlrserverconnection::setLiveConnection(bool liveconnection) {
-	this->liveconnection=liveconnection;
+	pvt->_liveconnection=liveconnection;
 }
 
 bool sqlrserverconnection::getErrorSetManually() {
-	return errorsetmanually;
+	return pvt->_errorsetmanually;
 }
 
 void sqlrserverconnection::setErrorSetManually(bool errorsetmanually) {
-	this->errorsetmanually=errorsetmanually;
+	pvt->_errorsetmanually=errorsetmanually;
 }
