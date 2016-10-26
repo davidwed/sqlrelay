@@ -1819,6 +1819,10 @@ static enum enum_field_types	mysqltypemap[]={
 	// "MEDIUMTEXT"
 	MYSQL_TYPE_BLOB,
 	// "LONGTEXT"
+	MYSQL_TYPE_BLOB,
+	// "JSON"
+	MYSQL_TYPE_BLOB,
+	// "GEOMETRY"
 	MYSQL_TYPE_BLOB
 };
 
