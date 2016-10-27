@@ -208,7 +208,9 @@ typedef	enum {
 	MEDIUMTEXT_DATATYPE,
 	LONGTEXT_DATATYPE,
 	JSON_DATATYPE,
-	GEOMETRY_DATATYPE
+	GEOMETRY_DATATYPE,
+	// also added by oracle
+	SDO_GEOMETRY_DATATYPE
 } datatype;
 
 #ifdef NEED_DATATYPESTRING
@@ -411,6 +413,8 @@ static const char	*datatypestring[] = {
 	"LONGTEXT",
 	"JSON",
 	"GEOMETRY",
+	// also added by oracle
+	"SDO_GEOMETRY",
 	NULL
 };
 #endif
@@ -528,7 +532,8 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"MEDIUMTEXT") ||
 		!charstring::compareIgnoringCase(type,"LONGTEXT") ||
 		!charstring::compareIgnoringCase(type,"JSON") ||
-		!charstring::compareIgnoringCase(type,"GEOMETRY"));
+		!charstring::compareIgnoringCase(type,"GEOMETRY") ||
+		!charstring::compareIgnoringCase(type,"SDO_GEOMETRY"));
 }
 #endif
 

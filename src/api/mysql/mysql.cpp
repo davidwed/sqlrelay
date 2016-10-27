@@ -1823,6 +1823,8 @@ static enum enum_field_types	mysqltypemap[]={
 	// "JSON"
 	MYSQL_TYPE_BLOB,
 	// "GEOMETRY"
+	MYSQL_TYPE_BLOB,
+	// "SDO_GEOMETRY"
 	MYSQL_TYPE_BLOB
 };
 
