@@ -11,7 +11,6 @@ OBJS = index.html faq.html
 	wt -i $< -o $@ -xhtml xhtml.conf
 
 all: enterprise.html $(OBJS)
-	cd programming $(AND) $(MAKE)
 	cd admin $(AND) $(MAKE)
 	cd dropin $(AND) $(MAKE)
 	cd features $(AND) $(MAKE)
