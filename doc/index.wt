@@ -17,7 +17,7 @@
  [features/ha.html High Availability] - provides load balancing and failover with replicated or clustered databases[[br]]
  [features/queryrouting.html Query Routing] - conditionally sends queries to one database or another[[br]]
  [features/queryfiltering.html Query Filtering] - prevents queries that match certain patterns from being run at all[[br]]
- [features/schedules.html Connection Schedules] - constrains database access to specified times[[br]]
+ [features/schedules.html Connection Schedules] - constrain database access to specified times[[br]]
 
  [features/databases.html Database Support] - a wide variety of commercial and open-source databases are supported[[br]]
  [features/dbabstractionlayers.html Abstraction Layer Support] - drivers for most popular database abstraction layers are provided[[br]]
@@ -31,33 +31,50 @@
 
 ----
 
-==== Getting Started With Databases ====
+@enterprise.html@
 
-SQL Relay supports many different databases. However, just setting up a database before even trying to use SQL Relay with it can be a challenge. These documents include step-by-step instructions for setting up various databases on various platforms.
-
- [http://systems.firstworks.com/p/getting-started-with-oracle.html Getting Started With Oracle][[br]]
- [http://systems.firstworks.com/p/getting-started-with-mysql.html Getting Started With MySQL][[br]]
- [http://systems.firstworks.com/p/blog-page_51.html Getting Started With PostgreSQL][[br]]
- [http://systems.firstworks.com/p/getting.html Getting Started With SAP/Sybase][[br]]
- [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started With IBM DB2][[br]]
- [http://systems.firstworks.com/p/getting-started-with-firebird.html Getting Started With Firebird][[br]]
- [http://systems.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite][[br]]
- [http://systems.firstworks.com/p/blog-page_8.html Getting Started With Microsoft Access (on a non-MS platform)][[br]]
- [http://systems.firstworks.com/p/blog-page_65.html Getting Started With ODBC (on a non-MS platform)][[br]]
-
-----
-
+[[br]]
+{{{#!td
 ==== Administering SQL Relay ====
 
+Guides and references for SQL Relay administration.
+
+{{{#!td
  [admin/installing.html Building and Installing SQL Relay From Source][[br]]
  [admin/configguide.html SQL Relay Configuration Guide][[br]]
  [admin/configreference.html SQL Relay Configuration Reference][[br]]
  [admin/running.html SQL Relay Command Line Programs][[br]]
  [admin/tuning.html Tuning SQL Relay][[br]]
+}}}
+}}}
+{{{#!td
+<div style="margin-left: 56px;"/>
+}}}
+{{{#!td
+==== Database How-To's ====
+
+Getting-started guides for various databases supported by SQL Relay.
+
+{{{#!td
+ [http://systems.firstworks.com/p/getting-started-with-oracle.html Oracle][[br]]
+ [http://systems.firstworks.com/p/getting.html SAP/Sybase][[br]]
+ [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html IBM DB2][[br]]
+ [http://systems.firstworks.com/p/getting-started-with-mysql.html MySQL][[br]]
+ [http://systems.firstworks.com/p/blog-page_51.html PostgreSQL][[br]]
+}}}
+{{{#!td
+ [http://systems.firstworks.com/p/getting-started-with-firebird.html Firebird][[br]]
+ [http://systems.firstworks.com/p/getting-started-with-sqlite.html SQLite][[br]]
+ [http://systems.firstworks.com/p/blog-page_8.html MS Access (on non-MS platforms)][[br]]
+ [http://systems.firstworks.com/p/blog-page_65.html ODBC (non-MS platforms)][[br]]
+}}}
+}}}
 
 ----
 
-==== Connecting Applications to SQL Relay ====
+[[br]]
+{{{#!td
+==== Connectors ====
 
 SQL Relay provides drivers for most popular database abstraction layers.
 
@@ -76,13 +93,14 @@ SQL Relay provides drivers for most popular database abstraction layers.
  [api/perl/SQLRelay.html Perl DBI][[br]]
  [api/python/PySQLRDB.py.html Python DB-API][[br]]
 }}}
+}}}
+{{{#!td
+<div style="margin-left: 60px;"/>
+}}}
+{{{#!td
+==== Native APIs ====
 
-Drop-In Replacement Libraries allow many native !MySQL or !PostgreSQL applications to use SQL Relay without modification.
-
- [dropin/mysql.html MySQL][[br]]
- [dropin/postgresql.html PostgreSQL][[br]]
-
-If you are developing a new application, consider using the native SQL Relay client API as your database abstraction layer and take advantage of powerful features like suspended sessions, result set caching and tuning options.
+The native SQL Relay client APIs provide advanced features like suspended sessions, result set caching and tuning options.
 
 {{{#!td
  '''Guides''':[[br]]
@@ -111,8 +129,16 @@ If you are developing a new application, consider using the native SQL Relay cli
  [api/tcl/index.html TCL][[br]]
  [api/nodejs/html/annotated.html node.js][[br]]
 }}}
+}}}
 
-If you're developing or deploying SQL Relay client software in a Windows environment, you might want to check out [http://sqlrelay.sourceforge.net/libfirstworks/index.html libfirstworks] too.
+----
+
+==== Drop-In Replacement Libraries ====
+
+Drop-In Replacement Libraries allow many native !MySQL or !PostgreSQL applications to use SQL Relay without modification.
+
+ [dropin/mysql.html MySQL][[br]]
+ [dropin/postgresql.html PostgreSQL][[br]]
 
 ----
 

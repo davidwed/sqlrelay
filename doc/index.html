@@ -25,7 +25,7 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
 <a href="features/ha.html">High Availability</a> - provides load balancing and failover with replicated or clustered databases<br/>
 <a href="features/queryrouting.html">Query Routing</a> - conditionally sends queries to one database or another<br/>
 <a href="features/queryfiltering.html">Query Filtering</a> - prevents queries that match certain patterns from being run at all<br/>
-<a href="features/schedules.html">Connection Schedules</a> - constrains database access to specified times<br/>
+<a href="features/schedules.html">Connection Schedules</a> - constrain database access to specified times<br/>
 </blockquote>
 <blockquote>
 <a href="features/databases.html">Database Support</a> - a wide variety of commercial and open-source databases are supported<br/>
@@ -41,41 +41,76 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
 </blockquote>
 <hr/>
 
-<h4>Getting Started With Databases</h4>
+<h4>Enterprise Modules</h4>
 
-<p>SQL Relay supports many different databases. However, just setting up a database before even trying to use SQL Relay with it can be a challenge. These documents include step-by-step instructions for setting up various databases on various platforms.</p>
+<p>SQL Relay Enterprise Modules provide advanced features not available in the community version.</p>
 
 <blockquote>
-<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-oracle.html">Getting Started With Oracle</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-mysql.html">Getting Started With MySQL</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/blog-page_51.html">Getting Started With PostgreSQL</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/getting.html">Getting Started With SAP/Sybase</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started With IBM DB2</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-firebird.html">Getting Started With Firebird</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-sqlite.html">Getting Started With SQLite</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/blog-page_8.html">Getting Started With Microsoft Access (on a non-MS platform)</a><br/>
-<a target="_blank" href="http://systems.firstworks.com/p/blog-page_65.html">Getting Started With ODBC (on a non-MS platform)</a><br/>
+<a href="features/nativeprotocol.html">MySQL Protocol Support</a> - allows MySQL applications to use SQL Relay without modification and without a drop-in replacement library<br/>
 </blockquote>
 <hr/>
 
-<h4>Administering SQL Relay</h4>
+<br/><table>
+  <tr>
+    <td>    <h4>Administering SQL Relay</h4>
 
-<blockquote>
+    <p>Guides and references for SQL Relay administration.</p>
+
+    <table>
+      <tr>
+        <td>        <blockquote>
 <a href="admin/installing.html">Building and Installing SQL Relay From Source</a><br/>
 <a href="admin/configguide.html">SQL Relay Configuration Guide</a><br/>
 <a href="admin/configreference.html">SQL Relay Configuration Reference</a><br/>
 <a href="admin/running.html">SQL Relay Command Line Programs</a><br/>
 <a href="admin/tuning.html">Tuning SQL Relay</a><br/>
-</blockquote>
+        </blockquote>
+</td>
+      </tr>
+    </table>
+
+</td>
+    <td><div style="margin-left: 56px;"/>
+</td>
+    <td>    <h4>Database How-To's</h4>
+
+    <p>Getting-started guides for various databases supported by SQL Relay.</p>
+
+    <table>
+      <tr>
+        <td>        <blockquote>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-oracle.html">Oracle</a><br/>
+<a target="_blank" href="http://systems.firstworks.com/p/getting.html">SAP/Sybase</a><br/>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">IBM DB2</a><br/>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-mysql.html">MySQL</a><br/>
+<a target="_blank" href="http://systems.firstworks.com/p/blog-page_51.html">PostgreSQL</a><br/>
+        </blockquote>
+</td>
+        <td>        <blockquote>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-firebird.html">Firebird</a><br/>
+<a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-sqlite.html">SQLite</a><br/>
+<a target="_blank" href="http://systems.firstworks.com/p/blog-page_8.html">MS Access (on non-MS platforms)</a><br/>
+<a target="_blank" href="http://systems.firstworks.com/p/blog-page_65.html">ODBC (non-MS platforms)</a><br/>
+        </blockquote>
+</td>
+      </tr>
+    </table>
+
+</td>
+  </tr>
+</table>
+
 <hr/>
 
-<h4>Connecting Applications to SQL Relay</h4>
-
-<p>SQL Relay provides drivers for most popular database abstraction layers.</p>
-
-<table>
+<br/><table>
   <tr>
-    <td>    <blockquote>
+    <td>    <h4>Connectors</h4>
+
+    <p>SQL Relay provides drivers for most popular database abstraction layers.</p>
+
+    <table>
+      <tr>
+        <td>        <blockquote>
 <b>Guides</b>:<br/>
 <a href="programming/ado.net.html">ADO.NET</a><br/>
 <a href="programming/perldbi.html">Perl DBI</a><br/>
@@ -83,29 +118,28 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
 <a href="programming/phppdo.html">PHP PDO</a><br/>
 <a href="programming/odbc.html">ODBC</a><br/>
 <a href="programming/jdbc.html">JDBC</a><br/>
-    </blockquote>
+        </blockquote>
 </td>
-    <td>    <blockquote>
+        <td>        <blockquote>
 <b>References</b>:<br/>
 <a href="api/ado.net/html/annotated.html">ADO.NET</a><br/>
 <a href="api/perl/SQLRelay.html">Perl DBI</a><br/>
 <a href="api/python/PySQLRDB.py.html">Python DB-API</a><br/>
-    </blockquote>
+        </blockquote>
 </td>
-  </tr>
-</table>
+      </tr>
+    </table>
 
-<p>Drop-In Replacement Libraries allow many native MySQL or PostgreSQL applications to use SQL Relay without modification.</p>
+</td>
+    <td><div style="margin-left: 60px;"/>
+</td>
+    <td>    <h4>Native APIs</h4>
 
-<blockquote>
-<a href="dropin/mysql.html">MySQL</a><br/>
-<a href="dropin/postgresql.html">PostgreSQL</a><br/>
-</blockquote>
-<p>If you are developing a new application, consider using the native SQL Relay client API as your database abstraction layer and take advantage of powerful features like suspended sessions, result set caching and tuning options.</p>
+    <p>The native SQL Relay client APIs provide advanced features like suspended sessions, result set caching and tuning options.</p>
 
-<table>
-  <tr>
-    <td>    <blockquote>
+    <table>
+      <tr>
+        <td>        <blockquote>
 <b>Guides</b>:<br/>
 <a href="programming/c++.html">C++</a><br/>
 <a href="programming/c.html">C</a><br/>
@@ -118,9 +152,9 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
 <a href="programming/tcl.html">TCL</a><br/>
 <a href="programming/erlang.html">Erlang</a><br/>
 <a href="programming/nodejs.html">node.js</a><br/>
-    </blockquote>
+        </blockquote>
 </td>
-    <td>    <blockquote>
+        <td>        <blockquote>
 <b>References</b>:<br/>
 <a href="api/c++/html/annotated.html">C++</a><br/>
 <a href="api/c/html/group__sqlrclientwrapper.html">C</a><br/>
@@ -132,13 +166,25 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
 <a href="api/java/index.html">Java</a><br/>
 <a href="api/tcl/index.html">TCL</a><br/>
 <a href="api/nodejs/html/annotated.html">node.js</a><br/>
-    </blockquote>
+        </blockquote>
+</td>
+      </tr>
+    </table>
+
 </td>
   </tr>
 </table>
 
-<p>If you're developing or deploying SQL Relay client software in a Windows environment, you might want to check out <a target="_blank" href="http://sqlrelay.sourceforge.net/libfirstworks/index.html">libfirstworks</a> too.</p>
+<hr/>
 
+<h4>Drop-In Replacement Libraries</h4>
+
+<p>Drop-In Replacement Libraries allow many native MySQL or PostgreSQL applications to use SQL Relay without modification.</p>
+
+<blockquote>
+<a href="dropin/mysql.html">MySQL</a><br/>
+<a href="dropin/postgresql.html">PostgreSQL</a><br/>
+</blockquote>
 <hr/>
 
 <h4>Frequently Asked Questions</h4>
