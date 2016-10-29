@@ -3,7 +3,7 @@
 SQL Relay Enterprise Modules provide advanced features not available in the community version.
 
 {{{#!blockquote
-[../sqlrenterprise/features/nativeprotocol.html MySQL Native Protocol] - allows !MySQL applications to use SQL Relay without modification and without a drop-in replacement library[[br]]
+[../sqlrenterprise/features/nativeprotocol.html MySQL Protocol Modules] - allow !MySQL applications to use SQL Relay without modification and without a drop-in replacement library[[br]]
 }}}
 
 ----
