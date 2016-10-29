@@ -10,20 +10,20 @@ OBJS = index.html faq.html
 .wt.html:
 	wt -i $< -o $@ -xhtml xhtml.conf
 
-all: enterprise.html $(OBJS)
+all: enterprise.wt $(OBJS)
 	cd admin $(AND) $(MAKE)
 	cd dropin $(AND) $(MAKE)
 	cd features $(AND) $(MAKE)
 	cd programming $(AND) $(MAKE)
 
-index.html: enterprise.html
+index.html: enterprise.wt
 
-enterprise.html:
-	$(CP) empty.html.in enterprise.html
+enterprise.wt:
+	$(CP) empty.wt.in enterprise.wt
 
 enterprise:
-	$(RM) enterprise.html
-	$(CP) enterprise.html.in enterprise.html
+	$(RM) enterprise.wt
+	$(CP) enterprise.wt.in enterprise.wt
 	$(MAKE) all
 
 install:
@@ -165,7 +165,7 @@ uninstall:
 	$(RMTREE) $(docdir)
 
 clean:
-	$(RM) $(OBJS) enterprise.html
+	$(RM) $(OBJS) enterprise.wt
 	cd admin $(AND) $(MAKE) clean
 	cd dropin $(AND) $(MAKE) clean
 	cd features $(AND) $(MAKE) clean
