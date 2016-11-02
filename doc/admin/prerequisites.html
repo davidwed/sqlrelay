@@ -13,7 +13,7 @@
     <ul>
       <li><a href="#fedora">Fedora</a></li>
       <li><a href="#centos">CentOS</a></li>
-      <li><a href="#opensuse">OpenSuSE</a></li>
+      <li><a href="#opensuse">openSUSE</a></li>
       <li><a href="#ubuntu">Ubuntu</a></li>
       <li><a href="#debian">Debian</a></li>
     </ul>
@@ -37,12 +37,12 @@
 
 <a name="linux"/><h3>Linux</h3>
 
-<p>SQL Relay is supported on a variety of Linux platforms including Fedora, CentOS, OpenSuSE, Debian, and Ubuntu.</p>
+<p>SQL Relay is supported on a variety of Linux platforms including Fedora, CentOS, openSUSE, Debian, and Ubuntu.</p>
 
 <a name="fedora"/><h4>Fedora</h4>
 
 <blockquote>
-  <p>If you haven't already, you must first install the Rudiments library.  Download the library from <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and follow the instructions for <a target="_blank" href=""http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
+  <p>If you haven't already, you must first install the Rudiments library.  Download the library from <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and follow the instructions for <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
 
   <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
@@ -119,7 +119,7 @@ rpm -i oracle-instantclient12.1-basic-* oracle-instantclient12.1-devel-*
   <p>For Informix, you also have to download the installer from <a target="_blank" href="http://ibm.com">IBM</a> and perform a full installation, though it isn't necessary to create a local instance.</p>
 
 </blockquote>
-<br/><a name="opensuse"/><h4>OpenSuSE</h4>
+<br/><a name="opensuse"/><h4>openSUSE</h4>
 
 <blockquote>
   <p>If you haven't already, you must first install the Rudiments library.  Download the library from <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and follow the instructions for <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
@@ -137,7 +137,7 @@ freetds-devel mdbtools-devel
   </blockquote>
   <p>The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-devel and php5-pdo packages.</p>
 
-  <p>Note that on older OpenSuSE platforms:</p>
+  <p>Note that on older openSUSE platforms:</p>
 
   <ul>
     <li>JDK 1.8.0 is not available, so java-1.8.0-openjdk-devel must be replaced with an older version.</li>
@@ -278,9 +278,7 @@ npm install node-gyp
 <blockquote>
   <p>If you haven't already, you must first install the Rudiments library.  Download the library from <a target="_blank" href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and follow the instructions for <a target="_blank" href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
 
-  <p>To install the rest of the prerequisites at once, execute the following command, as root:
-  <blockquote
-  />
+  <p>To install the rest of the prerequisites at once, execute the following command, as root:</p>
 
   <blockquote>
     <pre>pkgin install g++ gmake perl php55 php55-pdo python27 ruby tcl \
@@ -289,8 +287,6 @@ sqlite3 unixodbc freetds mdbtools
 </pre>
 
   </blockquote>
-</p>
-
   <p>The g++ and gmake packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php55 and php55-pdo packages.</p>
 
   <p>Note that on older NetBSD platforms:</p>

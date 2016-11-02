@@ -4,7 +4,7 @@
  * [#linux Linux]
   * [#fedora Fedora]
   * [#centos CentOS]
-  * [#opensuse OpenSuSE]
+  * [#opensuse openSUSE]
   * [#ubuntu Ubuntu]
   * [#debian Debian]
  * [#unix Unix]
@@ -24,7 +24,7 @@ SQL Relay is supported on a variety of Linux/Unix systems and Windows.  Building
 [=#linux]
 === Linux ===
 
-SQL Relay is supported on a variety of Linux platforms including Fedora, !CentOS, !OpenSuSE, Debian, and Ubuntu.
+SQL Relay is supported on a variety of Linux platforms including Fedora, !CentOS, openSUSE, Debian, and Ubuntu.
 
 
 [=#fedora]
@@ -32,7 +32,7 @@ SQL Relay is supported on a variety of Linux platforms including Fedora, !CentOS
 
 {{{#!blockquote
 
-If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for ["http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
 
 To install the rest of the prerequisites at once, execute the following command, as root:
 
@@ -118,7 +118,7 @@ For Informix, you also have to download the installer from [http://ibm.com IBM] 
 
 
 [=#opensuse]
-==== !OpenSuSE ====
+==== openSUSE ====
 
 {{{#!blockquote
 
@@ -138,7 +138,7 @@ freetds-devel mdbtools-devel
 
 The gcc-c++ and make packages are required, but the rest are optional and may be omitted as appropriate.  For example, if you don't need PHP support, then you can omit the php5-devel and php5-pdo packages.
 
-Note that on older !OpenSuSE platforms:
+Note that on older openSUSE platforms:
 
 * JDK 1.8.0 is not available, so java-1.8.0-openjdk-devel must be replaced with an older version.
 * Ruby 2.1 is not available, so ruby2.1 must be replaced with an older version.
@@ -300,7 +300,7 @@ Native Oracle, SAP/Sybase, DB2, and Informix client API's are not available for 
 If you haven't already, you must first install the Rudiments library.  Download the library from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and follow the instructions for [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
 
 To install the rest of the prerequisites at once, execute the following command, as root:
- 
+
 {{{#!blockquote
 {{{
 pkgin install g++ gmake perl php55 php55-pdo python27 ruby tcl \
