@@ -395,7 +395,6 @@ rm -rf %{buildroot}
 
 
 %files
-%defattr(-, root, root)
 %{_sysconfdir}/sqlrelay.conf.d
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
 /lib/systemd/system/sqlrelay.service
@@ -428,7 +427,6 @@ rm -rf %{buildroot}
 %{_localstatedir}/sqlrelay/cache
 
 %files server-devel
-%defattr(-, root, root)
 %{_bindir}/sqlrserver-config
 %{_includedir}/sqlrelay/sqlrserver.h
 %{_includedir}/sqlrelay/private/sqlrlistener.h
@@ -447,22 +445,18 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrutil.so
 
 %files clients
-%defattr(-, root, root)
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
 %{_bindir}/sqlr-status*
 
 %files client-runtime-c++
-%defattr(-, root, root)
 %{_libdir}/libsqlrclient.so.*
 
 %files client-runtime-c
-%defattr(-, root, root)
 %{_libdir}/libsqlrclientwrapper.so.*
 
 %files client-devel-c++
-%defattr(-, root, root)
 %{_bindir}/sqlrclient-config
 %{_includedir}/sqlrelay/sqlrclient.h
 %{_includedir}/sqlrelay/private/sqlrclientincludes.h
@@ -474,7 +468,6 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/sqlrelay-c++.pc
 
 %files client-devel-c
-%defattr(-, root, root)
 %{_bindir}/sqlrclientwrapper-config
 %{_includedir}/sqlrelay/sqlrclientwrapper.h
 %{_includedir}/sqlrelay/private/sqlrclientwrapper.h
@@ -485,74 +478,57 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/sqlrelay-c.pc
 
 %files client-postgresql
-%defattr(-, root, root)
 %{_libdir}/libpqsqlrelay.so.*
 %{_libdir}/libpqsqlrelay.so
 
 %files client-mysql
-%defattr(-, root, root)
 %{_libdir}/libmysql*sqlrelay.so.*
 %{_libdir}/libmysql*sqlrelay.so
 
 %{!?_without_odbc:%files client-odbc}
-%{!?_without_odbc:%defattr(-, root, root)}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc.so.*}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc.so}
 
 %{!?_without_db2:%files db2}
-%{!?_without_db2:%defattr(-, root, root)}
 %{!?_without_db2:%{_libexecdir}/sqlrelay/sqlrconnection_db2*}
 
 %{!?_without_freetds:%files freetds}
-%{!?_without_freetds:%defattr(-, root, root)}
 %{!?_without_freetds:%{_libexecdir}/sqlrelay/sqlrconnection_freetds*}
 
 %{!?_without_firebird:%files firebird}
-%{!?_without_firebird:%defattr(-, root, root)}
 %{!?_without_firebird:%{_libexecdir}/sqlrelay/sqlrconnection_firebird*}
 
 %{!?_without_mdbtools:%files mdbtools}
-%{!?_without_mdbtools:%defattr(-, root, root)}
 %{!?_without_mdbtools:%{_libexecdir}/sqlrelay/sqlrconnection_mdbtools*}
 
 %{!?_without_mysql:%files mysql}
-%{!?_without_mysql:%defattr(-, root, root)}
 %{!?_without_mysql:%{_libexecdir}/sqlrelay/sqlrconnection_mysql*}
 
 %{!?_without_odbc:%files odbc}
-%{!?_without_odbc:%defattr(-, root, root)}
 %{!?_without_odbc:%{_libexecdir}/sqlrelay/sqlrconnection_odbc*}
 
 %{!?_without_oracle:%files oracle}
-%{!?_without_oracle:%defattr(-, root, root)}
 %{!?_without_oracle:%{_libexecdir}/sqlrelay/sqlrconnection_oracle*}
 
 %{!?_without_postgresql:%files postgresql}
-%{!?_without_postgresql:%defattr(-, root, root)}
 %{!?_without_postgresql:%{_libexecdir}/sqlrelay/sqlrconnection_postgresql*}
 
 %{!?_without_sqlite:%files sqlite}
-%{!?_without_sqlite:%defattr(-, root, root)}
 %{!?_without_sqlite:%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*}
 
 %{!?_without_sap:%files sap}
-%{!?_without_sap:%defattr(-, root, root)}
 %{!?_without_sap:%{_libexecdir}/sqlrelay/sqlrconnection_sap*}
 
 %{!?_without_informix:%files informix}
-%{!?_without_informix:%defattr(-, root, root)}
 %{!?_without_informix:%{_libexecdir}/sqlrelay/sqlrconnection_informix*}
 
 %{!?_without_router:%files router}
-%{!?_without_router:%defattr(-, root, root)}
 %{!?_without_router:%{_libexecdir}/sqlrelay/sqlrconnection_router*}
 
 %{!?_without_java:%files java}
-%{!?_without_java:%defattr(-, root, root)}
 %{!?_without_java:%{_prefix}/java/*}
 
 %{!?_without_perl:%files perl}
-%{!?_without_perl:%defattr(-, root, root)}
 %{!?_without_perl:%{perl_sitelib}/DBD/SQLRelay.pm}
 %{!?_without_perl:%{perl_sitearch}/auto/DBD/SQLRelay}
 %{!?_without_perl:%{perl_sitearch}/SQLRelay/Connection.pm}
@@ -562,35 +538,28 @@ rm -rf %{buildroot}
 %{!?_without_perl:%{perl_installman3dir}/*.%{perl_man3ext}*}
 
 %{!?_without_php:%files php}
-%{!?_without_php:%defattr(-, root, root)}
 %{!?_without_php:%{phpextdir}/sql_relay.so}
 %{!?_without_php:%{phpextdir}/pdo_sqlrelay.so}
 %{!?_without_php:%{phpconfdir}/sql_relay.ini}
 %{!?_without_php:%{phpconfdir}/pdo_sqlrelay.ini}
 
 %{!?_without_python:%files python}
-%{!?_without_python:%defattr(-, root, root)}
 %{!?_without_python:%{pythondir}/site-packages/SQLRelay}
 
 %{!?_without_ruby:%files ruby}
-%{!?_without_ruby:%defattr(-, root, root)}
 %{!?_without_ruby:%{ruby_sitearchdir}/sqlrelay.so}
 
 %{!?_without_tcl:%files tcl}
-%{!?_without_tcl:%defattr(-, root, root)}
 %{!?_without_tcl:%{tcldir}/sqlrelay/*}
 
 %{!?_without_erlang:%files erlang}
-%{!?_without_erlang:%defattr(-, root, root)}
 %{!?_without_erlang:%{erlangdir}/sqlrelay-%{version}}
 
 %{!?_without_mono:%files mono}
-%{!?_without_mono:%defattr(-, root, root)}
 %{!?_without_mono:%{_libdir}/SQLRClient.dll}
 %{!?_without_mono:%{_libdir}/SQLRClient.dll.config}
 
 %{!?_without_nodejs:%files nodejs}
-%{!?_without_nodejs:%defattr(-, root, root)}
 %{!?_without_nodejs:%{nodejsdir}/sqlrelay}
 
 %files doc
