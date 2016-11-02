@@ -3,7 +3,15 @@
 SQL Relay Enterprise Modules provide advanced features not available in the community version.
 
 {{{#!blockquote
-[../sqlrenterprise/features/nativeprotocol.html MySQL Protocol Modules] - allow !MySQL applications to use SQL Relay without modification and without a drop-in replacement library[[br]]
+[../sqlrenterprise/features/nativeprotocol.html MySQL Front-End Modules] - allow !MySQL applications to use SQL Relay without modification and without a drop-in replacement library
+}}}
+
+==== Administering Enterprise Modules ====
+
+{{{#!blockquote
+[../sqlrenterprise/modules/install_modules.html Installing the SQL Relay Enterprise Modules][[br]]
+[../sqlrenterprise/modules/license_mysql_frontend.html Licensing the MySQL Front-End Modules][[br]]
+[../sqlrenterprise/modules/configure_mysql_frontend.html Configuring the MySQL Front-End Modules][[br]]
 }}}
 
 ----

@@ -31,8 +31,6 @@
 
 ----
 
-@enterprise.wt@
-
 [[br]]
 {{{#!td
 ==== Administering SQL Relay ====
@@ -71,6 +69,8 @@ Getting-started guides for various databases supported by SQL Relay.
 }}}
 
 ----
+
+@enterprise.wt@
 
 [[br]]
 {{{#!td
