@@ -11,10 +11,29 @@
   <li><a href="#basic">Basic Configuration</a></li>
   <ul>
     <li><a href="#dbconnections">Database Connections</a></li>
+    <ul>
+      <li><a href="#dbconnections-performance">For Performance</a></li>
+      <li><a href="#dbconnections-throttling">Throttling</a></li>
+    </ul>
+
     <li><a href="#dbcursors">Database Cursors</a></li>
     <li><a href="#dynamicscaling">Dynamic Scaling</a></li>
     <li><a href="#listener">Listener Configuration</a></li>
     <li><a href="#database">Database Configuration</a></li>
+    <ul>
+      <li><a href="#db-oracle">Oracle</a></li>
+      <li><a href="#db-mssql">Microsoft SQL Server (using FreeTDS)</a></li>
+      <li><a href="#db-sap">SAP/Sybase</a></li>
+      <li><a href="#db-db2">IBM DB2</a></li>
+      <li><a href="#db-informix">Informix</a></li>
+      <li><a href="#db-mysql">MySQL</a></li>
+      <li><a href="#db-postgresql">PostgreSQL</a></li>
+      <li><a href="#db-firebird">Firebird</a></li>
+      <li><a href="#db-sqlite">SQLite</a></li>
+      <li><a href="#db-odbc">ODBC</a></li>
+      <li><a href="#db-msaccess">Microsoft Access (using MDBTools)</a></li>
+    </ul>
+
     <li><a href="#instances">Multiple Instances</a></li>
     <li><a href="#autostart">Starting Instances Automatically</a></li>
   </ul>
@@ -185,7 +204,13 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The number of connections determines how many client applications can access the database simultaneously.  In this example, up to 10, assuming each client only needs one connection.  Additional clients would be queued and would have to wait for one of the first 10 to disconnect before being able to access the database.</p>
 
-<p>Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can.  That number is usually environment-specific, and dictated by database, system and network resources.  However, if you intend to <a href="../features/throttling.html">throttle</a> database access to a particular application, then you may intentionally configure a small number of connections.</p>
+<a name="dbconnections-performance"/><h3>For Performance</h3>
+
+<p>Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can.  That number is usually environment-specific, and dictated by database, system and network resources.</p>
+
+<a name="dbconnections-throttling"/><h3>Throttling</h3>
+
+<p>If you intend to <a href="../features/throttling.html">throttle</a> database access to a particular application, then you may intentionally configure a small number of connections.</p>
 
 <br/><a name="dbcursors"/><h3>Database Cursors</h3>
 
@@ -272,7 +297,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -302,7 +327,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/example.socket"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/example.socket"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -332,7 +357,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">addresses</font><font color="#990000">=</font><font color="#FF0000">"192.168.1.50,192.168.1.51"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">addresses</font><font color="#990000">=</font><font color="#FF0000">"192.168.1.50,192.168.1.51"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -351,9 +376,13 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><a name="database"/><h3>Database Configuration</h3>
 
-<p>By default, SQL Relay assumes that it's connecting to an Oracle database, but many other databases are supported.  The dbase attribute can be used to specify the database type.</p>
+<p>By default, SQL Relay assumes that it's connecting to an Oracle database, but many other databases are supported.  The dbase attribute of the instance tag specifies the database type and the connect string options (options in the string attribute of the connection tag) specify the parameters used to connect to the database.  The connect string options are different for each database.</p>
 
-<p>In the following example, SQL Relay is configured to connect to a SAP/Sybase database.</p>
+<p>Examples follow.</p>
+
+<br/><a name="db-oracle"/><h4>Oracle</h4>
+
+<p>In this example, SQL Relay is configured to connect to an Oracle database.  The dbase parameter defaults to "oracle", so the dbase attribute may be omitted when connecting to an Oracle database.  It is just set here for illustrative purposes.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -363,7 +392,135 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_home=/u01/app/oracle/product/12.1.0;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The oracle_home option refers to the base directory of an Oracle instance.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>C<font color="#990000">:\\</font>Oracle<font color="#990000">\\</font>ora12<font color="#990000">.</font><font color="#993399">1</font></tt></pre>
+
+</blockquote>
+<p>The oracle_home option is often unnecessary though, as the $ORACLE_HOME environment variable is usually set system-wide.</p>
+
+<p>The oracle_sid option refers to an entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora) similar to:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>ORCL <font color="#990000">=</font>
+  <font color="#990000">(</font>DESCRIPTION <font color="#990000">=</font>
+    <font color="#990000">(</font>ADDRESS <font color="#990000">=</font> <font color="#990000">(</font>PROTOCOL <font color="#990000">=</font> TCP<font color="#990000">)(</font>HOST <font color="#990000">=</font> testhost<font color="#990000">)(</font>PORT <font color="#990000">=</font> <font color="#993399">1521</font><font color="#990000">))</font>
+    <font color="#990000">(</font>CONNECT_DATA <font color="#990000">=</font>
+      <font color="#990000">(</font>SERVER <font color="#990000">=</font> DEDICATED<font color="#990000">)</font>
+      <font color="#990000">(</font>SERVICE_NAME <font color="#990000">=</font> orcl<font color="#990000">)</font>
+    <font color="#990000">)</font>
+  <font color="#990000">)</font></tt></pre>
+
+</blockquote>
+<p>(Note that the tnsnames.ora file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>If you are using Oracle Instant Client, then it's likely that you don't have an $ORACLE_HOME or a tnsnames.ora file.  In that case, the oracle_sid can be set directly to a tnsnames-style expression and the oracle_home option can be omitted.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = testhost)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)))"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>See the <a href="configreference.html#oracle">SQL Relay Configuration Reference</a> for other valid Oracle connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-oracle.html">Getting Started With Oracle</a> for general assistance installing and configuring an Oracle database.</p>
+
+<br/><a name="db-mssql-freetds"/><h4>Microsoft SQL Server (using FreeTDS)</h4>
+
+<p>On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a <a target="_blank" href="https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx">Microsoft-provided ODBC driver</a> for some versions of Linux.</p>
+
+<p>However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available using <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"freetds"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> testhost
+	port <font color="#990000">=</font> <font color="#993399">1433</font>
+	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.0</font>
+	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font></tt></pre>
+
+</blockquote>
+<p>(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#freetds">SQL Relay Configuration Reference</a> for other valid FreeTDS connect string options.</p>
+
+<br/><a name="db-sap"/><h4>SAP/Sybase (using the native SAP/Sybase library)</h4>
+
+<p>In this example, SQL Relay is configured to connect to a SAP/Sybase database using the native SAP/Sybase library.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -376,6 +533,86 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
+<p>The sybase option refers to the base directory of the SAP/Sybase software installation.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>C<font color="#990000">:\\</font>SAP</tt></pre>
+
+</blockquote>
+<p>The sybase option is often unnecessary though, as the $SYBASE environment variable is usually set system-wide.</p>
+
+<p>On Linux/Unix platforms, the server option refers to an entry in the interfaces (usually $SYBASE/interfaces) file which identifies the database server, similar to:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>TESTDB
+	master tcp ether testhost <font color="#993399">5000</font>
+	query tcp ether testhost <font color="#993399">5000</font></tt></pre>
+
+</blockquote>
+<p>(Note that the interfaces file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>On Windows platforms, the server option refers to a similar entry created in an opaque location with the Open Client Directory Services Editor (dsedit).</p>
+
+<p>The lang option sets the language to a value that is known to be supported by Sybase.  This may not be necessary on all platforms.  See <a href="../faq.html#sqlserver">the FAQ</a> for more info.</p>
+
+<p>See the <a href="configreference.html#sap">SQL Relay Configuration Reference</a> for other valid SAP/Sybase connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/getting.html">Getting Started With SAP/Sybase</a> for general assistance installing and configuring an SAP/Sybase database.</p>
+
+<br/><a name="db-sapfreetds"/><h4>SAP/Sybase (using FreeTDS)</h4>
+
+<p>While the SAP/Sybase native library can be used to access a SAP/Sybase database on all platforms, on Linux and Unix platforms, access to SAP/Sybase databases is also available using <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"freetds"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> testhost
+	port <font color="#990000">=</font> <font color="#993399">5000</font>
+	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">5.0</font></tt></pre>
+
+</blockquote>
+<p>(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#freetds">SQL Relay Configuration Reference</a> for other valid FreeTDS connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/getting.html">Getting Started With SAP/Sybase</a> for general assistance installing and configuring an SAP/Sybase database.</p>
+
+<br/><a name="db-db2"/><h4>IBM DB2</h4>
+
 <p>In this example, SQL Relay is configured to connect to an IBM DB2 database.</p>
 
 <blockquote>
@@ -386,12 +623,12 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -399,9 +636,343 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>When connecting to an Oracle database, the dbase attribute may be omitted or set to "oracle".</p>
+<p>The db option refers to an entry in the local DB2 instance's database catalog.  See <a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html#accessingremote">Getting Started With IBM DB2 - Accessing Remote Instances</a> for more information.</p>
 
-<p>SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for valid dbase settings and information on connect string options for each database.</p>
+<p>The timeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.</p>
+
+<p>See the <a href="configreference.html#db2">SQL Relay Configuration Reference</a> for other valid IBM DB2 connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-ibm-db2.html">Getting Started With IBM DB2</a> for general assistance installing and configuring an IBM DB2 database.</p>
+
+<br/><a name="db-informix"/><h4>Informix</h4>
+
+<p>In this example, SQL Relay is configured to connect to an Informix database.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"informix"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"informixdir=/opt/informix;servername=ol_informix1210;db=testdb;user=testuser;password=testpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The informixdir option refers to the base directory of the Informix software installation.  On Windows platforms, it should be specified as a Windows-style pathwith doubled backslashes.  For example:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>C<font color="#990000">:\\</font><font color="#008080">Program</font> Files<font color="#990000">\\</font>IBM Informix Software Bundle</tt></pre>
+
+</blockquote>
+<p>The informixdir option is often unnecessary, as the $INFORMIXDIR environment variable is usually set system-wide.</p>
+
+<p>On Linux and Unix platforms, the servername option refers to an entry in the sqlhosts file (usually $INFORMIXDIR/etc/sqlhosts) which identifies the database server, similar to:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>ol_informix1210 onsoctcp <font color="#993399">192.168</font><font color="#990000">.</font><font color="#993399">123.59</font> ol_informix1210</tt></pre>
+
+</blockquote>
+<p>The second ol_informix1210 in the sqlhosts file refers to an entry in /etc/services which identifies the port that the server is listening on, similar to:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>ol_informix1210 <font color="#993399">29756</font><font color="#990000">/</font>tcp</tt></pre>
+
+</blockquote>
+<p>(Note that the sqlhosts and /etc/services files must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>On Windows platforms, the servername option refers to a similar entry created in an opaque location with the Setnet32 program.</p>
+
+<p>See the <a href="configreference.html#informix">SQL Relay Configuration Reference</a> for other valid Informix connect string options.</p>
+
+<br/><a name="db-mysql"/><h4>MySQL</h4>
+
+<p>In this example, SQL Relay is configured to connect to a MySQL database.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.</p>
+
+<p>See the <a href="configreference.html#mysql">SQL Relay Configuration Reference</a> for other valid MySQL connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-mysql.html">Getting Started With MySQL</a> for general assistance installing and configuring a MySQL database.</p>
+
+<br/><a name="db-postgresql"/><h4>PostgreSQL</h4>
+
+<p>In this example, SQL Relay is configured to connect to a PostgreSQL database.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.</p>
+
+<p>See the <a href="configreference.html#postgresql">SQL Relay Configuration Reference</a> for other valid PostgreSQL connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/blog-page_51.html">Getting Started With PostgreSQL</a> for general assistance installing and configuring a PostgreSQL database.</p>
+
+<br/><a name="db-firebird"/><h4>Firebird</h4>
+
+<p>In this example, SQL Relay is configured to connect to a Firebird database.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"firebird"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;db=testhost:/opt/firebird/testdb.gdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The db option indicates that SQL Relay should connect to the database located at /opt/firebird/testdb.gdb on the host testhost.</p>
+
+<p>Note that if the database is located on a Windows host, then the path segment of the db option should be specified as a Windows-style path with doubled backslashes.  For example:
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>testhost<font color="#990000">:</font>C<font color="#990000">:\\</font><font color="#008080">Program</font> Files<font color="#990000">\\</font>Firebird<font color="#990000">\\</font>Firebird_3_0<font color="#990000">\\</font>testdb<font color="#990000">.</font>gdb</tt></pre>
+
+</blockquote>
+</p>
+
+<p>See the <a href="configreference.html#firebird">SQL Relay Configuration Reference</a> for other valid Firebird connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-firebird.html">Getting Started With Firebird</a> for general assistance installing and configuring a Firebird database.</p>
+
+<br/><a name="db-sqlite"/><h4>SQLite</h4>
+
+<p>In this example, SQL Relay is configured to connect to a SQLite database.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sqlite"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/sqlite/testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The db option indicates that SQL Relay should connect to the database /var/sqlite/testdb.</p>
+
+<p>Note that the database file (testdb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.</p>
+
+<p>SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.</p>
+
+<p>As each running instance of sqlr-connection will have its own separate in-memory database, you almost certainly want to limit the number of connections to 1.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sqlite"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=:memory:"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>Note that the entire in-memory database will be lost when SQL Relay is stopped.  There is no way to preserve it.  Such is the nature of pure in-memory databases.</p>
+
+<p>See the <a href="configreference.html#sqlite">SQL Relay Configuration Reference</a> for other valid SQLite connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/getting-started-with-sqlite.html">Getting Started With SQLite</a> for general assistance installing and configuring a SQLite database.</p>
+
+<br/><a name="db-odbc"/><h4>ODBC</h4>
+
+<p>ODBC can be used to access databases for which SQL Relay has no native support.  On Windows platforms, ODBC is commonly used to access Microsoft SQL Server and Microsoft Access databases.  On Linux platforms, the <a target="_blank" href="https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx">Microsoft-provided ODBC driver</a> is also commonly used to access Microsoft SQL Server databases, as an alternative to <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
+
+<p>In this example, SQL Relay is configured to connect to a ODBC database.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"odbc"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=testdsn"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The dsn option refers to an ODBC DSN (Data Source Name).</p>
+
+<p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini) which identifies the database server, similar to:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>testdsn<font color="#990000">]</font>
+Description<font color="#990000">=</font>SQL Server
+Driver<font color="#990000">=</font>ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> SQL Server
+Server<font color="#990000">=</font>testhost
+Port<font color="#990000">=</font><font color="#993399">1433</font>
+Database<font color="#990000">=</font>
+User<font color="#990000">=</font>testuser
+Password<font color="#990000">=</font>testpassword</tt></pre>
+
+</blockquote>
+<p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> <font color="#008080">SQL</font> Server<font color="#990000">]</font> 
+Description<font color="#990000">=</font>Microsoft ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> SQL Server
+Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>microsoft<font color="#990000">/</font>msodbcsql<font color="#990000">/</font>lib64<font color="#990000">/</font>libmsodbcsql<font color="#990000">-</font><font color="#993399">11.0</font><font color="#990000">.</font>so<font color="#990000">.</font><font color="#993399">2270.0</font> 
+Threading<font color="#990000">=</font><font color="#993399">1</font> 
+UsageCount<font color="#990000">=</font><font color="#993399">1</font> </tt></pre>
+
+</blockquote>
+<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (odbcad32.exe).</p>
+
+<p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/blog-page_65.html">Getting Started With ODBC (on a non-MS platform)</a> for general assistance installing and configuring ODBC on a non-MS platform.</p>
+
+<br/><a name="db-msaccess"/><h4>Microsoft Access (using MDBTools)</h4>
+
+<p>On Windows platforms, ODBC can be used to access a Microsoft Access database.</p>
+
+<p>On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available using <a target="_blank" href="http://mdbtools.sourceforge.net">MDBTools</a>.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mdbtools"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/mdbtools/testdb.mdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The db option indicates that SQL Relay should connect to the database /var/mdbtools/testdb.mdb.</p>
+
+<p>(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#mdbtools">SQL Relay Configuration Reference</a> for other valid MDBTools connect string options.</p>
+
+<p>See <a target="_blank" href="http://systems.firstworks.com/p/blog-page_8.html">Getting Started With MS Access (on a non-MS platform)</a> for general assistance with MS Access databases on non-MS platforms.</p>
 
 <br/><a name="instances"/><h3>Multiple Instances</h3>
 
@@ -417,7 +988,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -426,7 +997,7 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -435,7 +1006,7 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -468,7 +1039,7 @@ sqlrsh -host sqlrserver -port 9002
 </blockquote>
 <br/><a name="autostart"/><h3>Starting Instances Automatically</h3>
 
-<p>In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all intances configured with the enabled attribute set to yes.</p>
+<p>In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all instances configured with the enabled attribute set to yes.</p>
 
 <p>For example, if the following instances are defined...</p>
 
@@ -480,7 +1051,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -489,7 +1060,7 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -498,7 +1069,7 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -596,7 +1167,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracleexample"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -619,7 +1190,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sapexample"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9001"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -642,7 +1213,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"db2example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9002"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -662,9 +1233,9 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example:</p>
 
 <blockquote>
-  <pre>sqlr-start -id oracleexample -config /home/myuser/mysqlrelay.conf
-sqlr-start -id oracleexample -config file:///home/myuser/mysqlrelay.conf
-sqlr-start -id oracleexample -config dir:///home/myuser/mysqlrelay.conf.d
+  <pre>sqlr-start -id oracleexample -config /home/myuser/sqlrelay.conf
+sqlr-start -id oracleexample -config file:///home/myuser/sqlrelay.conf
+sqlr-start -id oracleexample -config dir:///home/myuser/sqlrelay.conf.d
 </pre>
 
 </blockquote>
@@ -675,9 +1246,9 @@ sqlr-start -id oracleexample -config dir:///home/myuser/mysqlrelay.conf.d
 <p>For example:</p>
 
 <blockquote>
-  <pre>sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf
-sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf,dir:///home/myuser/mysqrelay.conf.d
-sqlr-start -id oracleexample -config /home/myuser/mysqlrelay-1.conf,/home/myuser/mysqlrelay-2.conf,dir:///home/myuser/mysqrelay-1.conf.d,dir:///home/myuser/mysqrelay-2.conf.d
+  <pre>sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/sqlrelay-2.conf
+sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/sqlrelay-2.conf,dir:///home/myuser/sqlrelay.conf.d
+sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/sqlrelay-2.conf,dir:///home/myuser/sqlrelay-1.conf.d,dir:///home/myuser/sqlrelay-2.conf.d
 </pre>
 
 </blockquote>
@@ -801,7 +1372,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -832,7 +1403,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -869,7 +1440,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -904,7 +1475,7 @@ http://www.gnu.org/software/src-highlite -->
 <i><font color="#9A1900">                on the masterdb machine.  This instance only listens on the</font></i>
 <i><font color="#9A1900">                unix socket /tmp/master.socket and thus cannot be connected to</font></i>
 <i><font color="#9A1900">                by clients from another machine. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/master.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/master.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"masteruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -918,7 +1489,7 @@ http://www.gnu.org/software/src-highlite -->
 <i><font color="#9A1900">                on 4 slave machines.  This instance only listens on the unix</font></i>
 <i><font color="#9A1900">                socket /tmp/slave.socket and thus cannot be connected to by</font></i>
 <i><font color="#9A1900">                clients from another machine. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/slave.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/slave.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"slaveuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -937,7 +1508,7 @@ http://www.gnu.org/software/src-highlite -->
 <i><font color="#9A1900">                This instance sends any other queries to the "slave" SQL Relay</font></i>
 <i><font color="#9A1900">                instance which, in turn, distributes them over the "slave"</font></i>
 <i><font color="#9A1900">                databases. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -1415,7 +1986,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>Be sure that whatever user/group SQL Relay is configured to run as has permissions to read all configuration files, including any database configuration files such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file.  Otherwise various thins will fail, including dynamic scaling.</p>
+<p>Be sure that whatever user/group SQL Relay is configured to run as has permissions to read all configuration files, including any database configuration files such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file.  Otherwise various things will fail, including dynamic scaling.</p>
 
 <br/><a name="deniedallowedips"/><h3>Allowed/Denied IP Addresses</h3>
 
@@ -2455,7 +3026,7 @@ http://www.gnu.org/software/src-highlite -->
 <i><font color="#9A1900">                on the masterdb machine.  This instance only listens on the</font></i>
 <i><font color="#9A1900">                unix socket /tmp/master.socket and thus cannot be connected to</font></i>
 <i><font color="#9A1900">                by clients from another machine. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/master.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/master.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"masteruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2469,7 +3040,7 @@ http://www.gnu.org/software/src-highlite -->
 <i><font color="#9A1900">                on 4 slave machines.  This instance only listens on the unix</font></i>
 <i><font color="#9A1900">                socket /tmp/slave.socket and thus cannot be connected to by</font></i>
 <i><font color="#9A1900">                clients from another machine. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/slave.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/slave.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"slaveuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2488,7 +3059,7 @@ http://www.gnu.org/software/src-highlite -->
 <i><font color="#9A1900">                This instance sends any other queries to the "slave" SQL Relay</font></i>
 <i><font color="#9A1900">                instance which, in turn, distributes them over the "slave"</font></i>
 <i><font color="#9A1900">                databases. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2561,7 +3132,7 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
 	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a MySQL database --&gt;</font></i>
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/mysqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/mysqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"mysqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2572,7 +3143,7 @@ http://www.gnu.org/software/src-highlite -->
 
 
 	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a PostgreSQL database --&gt;</font></i>
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/postgresqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/postgresqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2584,7 +3155,7 @@ http://www.gnu.org/software/src-highlite -->
 
 	<i><font color="#9A1900">&lt;!-- This instance sends queries containing "mysqldb." to the mysql</font></i>
 <i><font color="#9A1900">		database and "postgresqldb." to the postgresql database --&gt;</font></i>
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2639,7 +3210,7 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
         <i><font color="#9A1900">&lt;!-- This instance maintains connections to an Oracle database. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/oracle.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/oracle.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2650,7 +3221,7 @@ http://www.gnu.org/software/src-highlite -->
 
 
         <i><font color="#9A1900">&lt;!-- This instance maintains connections to an SAP database. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/sap.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/sap.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2662,7 +3233,7 @@ http://www.gnu.org/software/src-highlite -->
 
         <i><font color="#9A1900">&lt;!-- This instance sends one set of users to the Oracle database and</font></i>
 <i><font color="#9A1900">                all other users to the sap database. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
@@ -2741,7 +3312,7 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
         <i><font color="#9A1900">&lt;!-- This instance maintains connections to an Oracle database. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/oracle.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/oracle.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2752,7 +3323,7 @@ http://www.gnu.org/software/src-highlite -->
 
 
         <i><font color="#9A1900">&lt;!-- This instance maintains connections to an SAP database. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/sap.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/sap.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -2764,7 +3335,7 @@ http://www.gnu.org/software/src-highlite -->
 
         <i><font color="#9A1900">&lt;!-- This instance sends one set of users to the Oracle database and</font></i>
 <i><font color="#9A1900">                all other users to the sap database. --&gt;</font></i>
-        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
                 <b><font color="#0000FF">&lt;users&gt;</font></b>
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
@@ -3241,7 +3812,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
