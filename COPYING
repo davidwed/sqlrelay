@@ -123,6 +123,7 @@ versions of such code, with unchanged license):
 * PostgreSQL database client libraries and their dependencies.
 * SQLite client libraries and their dependencies.
 * Sybase/SAP client libraries and their dependencies.
+* SQL Relay Enterprise Modules and their dependencies.
 * Any other programs or libraries as designated, in writing, now or in the
   future, by David Muse, his authorized agents, authorized heirs, or authorized
   agents of his authorized heirs.
