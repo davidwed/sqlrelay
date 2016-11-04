@@ -46,6 +46,7 @@ static const char *eventtypes[]={
 	"DEBUG_MESSAGE",
 	"SCHEDULE_VIOLATION",
 	"INTEGRITY_VIOLATION",
+	"TRANSLATION_FAILURE",
 	NULL
 };
 

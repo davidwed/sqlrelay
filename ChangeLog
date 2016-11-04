@@ -27,6 +27,7 @@
 		instead of fieldbuffer for non-text to text translations
 	added support for negative times in mysql connection module and
 		drop-in library
+	added translation-failure event
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every
