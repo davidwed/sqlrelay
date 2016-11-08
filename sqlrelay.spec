@@ -440,6 +440,7 @@ rm -rf %{buildroot}
 %{_includedir}/sqlrelay/private/sqlrnotification.h
 %{_includedir}/sqlrelay/private/sqlrnotifications.h
 %{_includedir}/sqlrelay/private/sqlrparser.h
+%{_includedir}/sqlrelay/private/sqlrprotocol.h
 %{_includedir}/sqlrelay/private/sqlrprotocols.h
 %{_includedir}/sqlrelay/private/sqlrpwdenc.h
 %{_includedir}/sqlrelay/private/sqlrpwdencs.h
