@@ -5,7 +5,4 @@
 		void		unload();
 		void		loadSchedule(xmldomnode *schedule);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrscheduleplugin * >	llist;
+		sqlrschedulesprivate	*pvt;

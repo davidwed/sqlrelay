@@ -17,11 +17,7 @@
 				const char *schema,
 				const char *oldname);
 
-		const char	*libexecdir;
-		xmldom		*tree;
-		bool		debug;
-
-		singlylinkedlist< sqlrtranslationplugin * >	tlist;
+		sqlrtranslationsprivate	*pvt;
 
 	public:
 		// helper methods

@@ -16,15 +16,26 @@
 	}
 #endif
 
+class sqlrroutersprivate {
+	friend class sqlrrouters;
+	private:
+		const char	*_libexecdir;
+		bool		_debug;
+
+		singlylinkedlist< sqlrrouterplugin * >	_llist;
+};
+
 sqlrrouters::sqlrrouters(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
-	this->debug=debug;
+	pvt=new sqlrroutersprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_debug=debug;
 }
 
 sqlrrouters::~sqlrrouters() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrrouters::load(xmldomnode *parameters) {
@@ -46,14 +57,14 @@ bool sqlrrouters::load(xmldomnode *parameters) {
 void sqlrrouters::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
-						llist.getFirst();
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrrouterplugin	*sqlrsp=node->getValue();
 		delete sqlrsp->r;
 		delete sqlrsp->dl;
 		delete sqlrsp;
 	}
-	llist.clear();
+	pvt->_llist.clear();
 }
 
 void sqlrrouters::loadRouter(xmldomnode *router) {
@@ -75,14 +86,14 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		}
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("loading router: %s\n",module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the router module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("router_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -112,7 +123,7 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		delete dl;
 		return;
 	}
-	sqlrrouter	*r=(*newRouter)(router,debug);
+	sqlrrouter	*r=(*newRouter)(router,pvt->_debug);
 
 #else
 
@@ -128,14 +139,14 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	sqlrrouterplugin	*sqlrsp=new sqlrrouterplugin;
 	sqlrsp->r=r;
 	sqlrsp->dl=dl;
-	llist.append(sqlrsp);
+	pvt->_llist.append(sqlrsp);
 }
 
 const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
-						llist.getFirst();
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		const char	*connectionid=
 				node->getValue()->r->route(sqlrcon,sqlrcur);

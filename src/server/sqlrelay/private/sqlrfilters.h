@@ -5,7 +5,4 @@
 		void	unloadFilters();
 		void	loadFilter(xmldomnode *filter);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrfilterplugin * >	tlist;
+		sqlrfiltersprivate	*pvt;

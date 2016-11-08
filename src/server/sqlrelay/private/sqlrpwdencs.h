@@ -5,6 +5,4 @@
 		void	unload();
 		void	loadPasswordEncryption(xmldomnode *pwdenc);
 
-		const char	*libexecdir;
-
-		singlylinkedlist< sqlrpwdencplugin * >	llist;
+		sqlrpwdencsprivate	*pvt;

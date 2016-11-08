@@ -5,7 +5,4 @@
 		void	unload();
 		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrauthplugin * >	llist;
+		sqlrauthsprivate	*pvt;

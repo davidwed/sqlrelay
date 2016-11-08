@@ -1067,6 +1067,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocolplugin {
 		dynamiclib	*dl;
 };
 
+class sqlrprotocolsprivate;
+
 class SQLRSERVER_DLLSPEC sqlrprotocols {
 	public:
 			sqlrprotocols(sqlrservercontroller *cont,
@@ -1152,6 +1154,8 @@ class SQLRSERVER_DLLSPEC sqlrauthplugin {
 		dynamiclib	*dl;
 };
 
+class sqlrauthsprivate;
+
 class SQLRSERVER_DLLSPEC sqlrauths {
 	public:
 			sqlrauths(sqlrpaths *sqlrpth, bool debug);
@@ -1183,6 +1187,8 @@ class SQLRSERVER_DLLSPEC sqlrpwdencplugin {
 		sqlrpwdenc	*pe;
 		dynamiclib	*dl;
 };
+
+class sqlrpwdencsprivate;
 
 class SQLRSERVER_DLLSPEC sqlrpwdencs {
 	public:
@@ -1247,6 +1253,8 @@ class SQLRSERVER_DLLSPEC sqlrloggerplugin {
 		dynamiclib	*dl;
 };
 
+class sqlrloggersprivate;
+
 class SQLRSERVER_DLLSPEC sqlrloggers {
 	public:
 			sqlrloggers(sqlrpaths *sqlrpth);
@@ -1288,6 +1296,8 @@ class SQLRSERVER_DLLSPEC sqlrnotificationplugin {
 		sqlrnotification	*n;
 		dynamiclib		*dl;
 };
+
+class sqlrnotificationsprivate;
 
 class SQLRSERVER_DLLSPEC sqlrnotifications {
 	public:
@@ -1379,6 +1389,8 @@ class SQLRSERVER_DLLSPEC sqlrscheduleplugin {
 		dynamiclib	*dl;
 };
 
+class sqlrschedulesprivate;
+
 class SQLRSERVER_DLLSPEC sqlrschedules {
 	public:
 			sqlrschedules(sqlrpaths *sqlrpth, bool debug);
@@ -1409,6 +1421,8 @@ class SQLRSERVER_DLLSPEC sqlrrouterplugin {
 		sqlrrouter	*r;
 		dynamiclib	*dl;
 };
+
+class sqlrroutersprivate;
 
 class SQLRSERVER_DLLSPEC sqlrrouters {
 	public:
@@ -1483,6 +1497,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslationplugin {
 		dynamiclib	*dl;
 };
 
+class sqlrtranslationsprivate;
+
 class SQLRSERVER_DLLSPEC sqlrtranslations {
 	public:
 			sqlrtranslations(sqlrpaths *sqlrpth, bool debug);
@@ -1551,6 +1567,8 @@ class SQLRSERVER_DLLSPEC sqlrfilterplugin {
 		dynamiclib	*dl;
 };
 
+class sqlrfiltersprivate;
+
 class SQLRSERVER_DLLSPEC sqlrfilters {
 	public:
 			sqlrfilters(sqlrpaths *sqlrpth, bool debug);
@@ -1592,6 +1610,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslationplugin {
 		sqlrresultsettranslation	*rstr;
 		dynamiclib			*dl;
 };
+
+class sqlrresultsettranslationsprivate;
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 	public:
@@ -1636,6 +1656,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslationplugin {
 		dynamiclib			*dl;
 };
 
+class sqlrresultsetrowtranslationsprivate;
+
 class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 	public:
 			sqlrresultsetrowtranslations(sqlrpaths *sqlrpth,
@@ -1674,6 +1696,8 @@ class SQLRSERVER_DLLSPEC sqlrtriggerplugin {
 		sqlrtrigger	*tr;
 		dynamiclib	*dl;
 };
+
+class sqlrtriggersprivate;
 
 class SQLRSERVER_DLLSPEC sqlrtriggers {
 	public:
@@ -1725,6 +1749,8 @@ class SQLRSERVER_DLLSPEC sqlrqueryplugin {
 		sqlrquery	*qr;
 		dynamiclib	*dl;
 };
+
+class sqlrqueriesprivate;
 
 class SQLRSERVER_DLLSPEC sqlrqueries {
 	public:

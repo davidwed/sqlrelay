@@ -16,14 +16,24 @@
 	}
 #endif
 
+class sqlrloggersprivate {
+	friend class sqlrloggers;
+	private:
+		const char	*_libexecdir;
+
+		singlylinkedlist< sqlrloggerplugin * >	_llist;
+};
+
 sqlrloggers::sqlrloggers(sqlrpaths *sqlrpth) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
+	pvt=new sqlrloggersprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrloggers::~sqlrloggers() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrloggers::load(xmldomnode *parameters) {
@@ -45,14 +55,15 @@ bool sqlrloggers::load(xmldomnode *parameters) {
 
 void sqlrloggers::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrloggerplugin	*sqlrlp=node->getValue();
 		delete sqlrlp->lg;
 		delete sqlrlp->dl;
 		delete sqlrlp;
 	}
-	llist.clear();
+	pvt->_llist.clear();
 }
 
 void sqlrloggers::loadLogger(xmldomnode *logger) {
@@ -79,7 +90,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the logger module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("logger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -124,13 +135,14 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	sqlrloggerplugin	*sqlrlp=new sqlrloggerplugin;
 	sqlrlp->lg=lg;
 	sqlrlp->dl=dl;
-	llist.append(sqlrlp);
+	pvt->_llist.append(sqlrlp);
 }
 
 void sqlrloggers::init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->init(sqlrl,sqlrcon);
 	}
@@ -143,7 +155,8 @@ void sqlrloggers::run(sqlrlistener *sqlrl,
 				sqlrevent_t event,
 				const char *info) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->run(sqlrl,sqlrcon,sqlrcur,
 						level,event,info);

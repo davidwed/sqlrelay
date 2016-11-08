@@ -16,14 +16,24 @@
 	}
 #endif
 
+class sqlrqueriesprivate {
+	friend class sqlrqueries;
+	private:
+		const char	*_libexecdir;
+
+		singlylinkedlist< sqlrqueryplugin * >	_llist;
+};
+
 sqlrqueries::sqlrqueries(sqlrpaths *sqlrpth) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
+	pvt=new sqlrqueriesprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrqueries::~sqlrqueries() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrqueries::load(xmldomnode *parameters) {
@@ -45,14 +55,15 @@ bool sqlrqueries::load(xmldomnode *parameters) {
 
 void sqlrqueries::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrqueryplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrqueryplugin	*sqlrlp=node->getValue();
 		delete sqlrlp->qr;
 		delete sqlrlp->dl;
 		delete sqlrlp;
 	}
-	llist.clear();
+	pvt->_llist.clear();
 }
 
 void sqlrqueries::loadQuery(xmldomnode *query) {
@@ -79,7 +90,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the query module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("query_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -124,7 +135,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	sqlrqueryplugin	*sqlrlp=new sqlrqueryplugin;
 	sqlrlp->qr=qr;
 	sqlrlp->dl=dl;
-	llist.append(sqlrlp);
+	pvt->_llist.append(sqlrlp);
 }
 
 sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
@@ -132,7 +143,8 @@ sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 					uint32_t querylength,
 					uint16_t id) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrqueryplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrquery	*qr=node->getValue()->qr;
 		if (qr->match(querystring,querylength)) {

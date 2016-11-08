@@ -10,15 +10,27 @@
 
 #include <config.h>
 
+class sqlrtriggersprivate {
+	friend class sqlrtriggers;
+	private:
+		const char	*_libexecdir;
+		bool		_debug;
+
+		singlylinkedlist< sqlrtriggerplugin * >	_beforetriggers;
+		singlylinkedlist< sqlrtriggerplugin * >	_aftertriggers;
+};
+
 sqlrtriggers::sqlrtriggers(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
-	this->debug=debug;
+	pvt=new sqlrtriggersprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_debug=debug;
 }
 
 sqlrtriggers::~sqlrtriggers() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrtriggers::load(xmldomnode *parameters) {
@@ -34,22 +46,22 @@ bool sqlrtriggers::load(xmldomnode *parameters) {
 		if (charstring::contains(
 				trigger->getAttributeValue("when"),
 				"before")) {
-			if (debug) {
+			if (pvt->_debug) {
 				stdoutput.printf("loading trigger "
 							"before ...\n");
 			}
-			loadTrigger(trigger,&beforetriggers);
+			loadTrigger(trigger,&pvt->_beforetriggers);
 		}
 
 		// add trigger to after list
 		if (charstring::contains(
 				trigger->getAttributeValue("when"),
 				"after")) {
-			if (debug) {
+			if (pvt->_debug) {
 				stdoutput.printf("loading trigger "
 							"after ...\n");
 			}
-			loadTrigger(trigger,&aftertriggers);
+			loadTrigger(trigger,&pvt->_aftertriggers);
 		}
 	}
 	return true;
@@ -58,23 +70,23 @@ bool sqlrtriggers::load(xmldomnode *parameters) {
 void sqlrtriggers::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrtriggerplugin * > *bnode=
-				beforetriggers.getFirst();
+				pvt->_beforetriggers.getFirst();
 					bnode; bnode=bnode->getNext()) {
 		sqlrtriggerplugin	*sqlt=bnode->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
 	}
-	beforetriggers.clear();
+	pvt->_beforetriggers.clear();
 	for (singlylinkedlistnode< sqlrtriggerplugin * > *anode=
-				aftertriggers.getFirst();
+				pvt->_aftertriggers.getFirst();
 					anode; anode=anode->getNext()) {
 		sqlrtriggerplugin	*sqlt=anode->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
 	}
-	aftertriggers.clear();
+	pvt->_aftertriggers.clear();
 }
 
 void sqlrtriggers::loadTrigger(xmldomnode *trigger,
@@ -97,14 +109,14 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 		}
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("loading trigger: %s\n",module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the trigger module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("trigger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -133,7 +145,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 		delete dl;
 		return;
 	}
-	sqlrtrigger	*tr=(*newTrigger)(trigger,debug);
+	sqlrtrigger	*tr=(*newTrigger)(trigger,pvt->_debug);
 
 #else
 
@@ -141,7 +153,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	sqlrtrigger	*tr=NULL;
 #endif
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("success\n");
 	}
 
@@ -156,7 +168,7 @@ void sqlrtriggers::runBeforeTriggers(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
-	run(sqlrcon,sqlrcur,querytree,&beforetriggers,true,true);
+	run(sqlrcon,sqlrcur,querytree,&pvt->_beforetriggers,true,true);
 }
 
 void sqlrtriggers::runAfterTriggers(sqlrserverconnection *sqlrcon,
@@ -164,7 +176,7 @@ void sqlrtriggers::runAfterTriggers(sqlrserverconnection *sqlrcon,
 						xmldom *querytree,
 						bool success) {
 	debugFunction();
-	run(sqlrcon,sqlrcur,querytree,&aftertriggers,false,success);
+	run(sqlrcon,sqlrcur,querytree,&pvt->_aftertriggers,false,success);
 }
 
 void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
@@ -179,7 +191,7 @@ void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
 	}
 	for (singlylinkedlistnode< sqlrtriggerplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
-		if (debug) {
+		if (pvt->_debug) {
 			stdoutput.printf("\nrunning %s trigger...\n\n",
 						(before)?"before":"after");
 		}

@@ -17,13 +17,24 @@
 	}
 #endif
 
+class sqlrtranslationsprivate {
+	friend class sqlrtranslations;
+	private:
+		const char	*_libexecdir;
+		xmldom		*_tree;
+		bool		_debug;
+
+		singlylinkedlist< sqlrtranslationplugin * >	_tlist;
+};
+
 sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	tree=NULL;
-	this->debug=debug;
+	pvt=new sqlrtranslationsprivate;
+	pvt->_tree=NULL;
+	pvt->_debug=debug;
 	temptablepool=new memorypool(0,128,100);
 	tempindexpool=new memorypool(0,128,100);
-	libexecdir=sqlrpth->getLibExecDir();
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrtranslations::~sqlrtranslations() {
@@ -31,6 +42,7 @@ sqlrtranslations::~sqlrtranslations() {
 	unload();
 	delete temptablepool;
 	delete tempindexpool;
+	delete pvt;
 }
 
 bool sqlrtranslations::load(xmldomnode *parameters) {
@@ -53,14 +65,14 @@ bool sqlrtranslations::load(xmldomnode *parameters) {
 void sqlrtranslations::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
-						tlist.getFirst();
+						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrtranslationplugin	*sqlt=node->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
 	}
-	tlist.clear();
+	pvt->_tlist.clear();
 }
 
 void sqlrtranslations::loadTranslation(xmldomnode *translation) {
@@ -81,14 +93,14 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 		}
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("loading translation module: %s\n",module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the translation module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("translation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -119,7 +131,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 		delete dl;
 		return;
 	}
-	sqlrtranslation	*tr=(*newTranslation)(this,translation,debug);
+	sqlrtranslation	*tr=(*newTranslation)(this,translation,pvt->_debug);
 
 #else
 	dynamiclib	*dl=NULL;
@@ -130,7 +142,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	}
 #endif
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("success\n");
 	}
 
@@ -138,7 +150,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	sqlrtranslationplugin	*sqltp=new sqlrtranslationplugin;
 	sqltp->tr=tr;
 	sqltp->dl=dl;
-	tlist.append(sqltp);
+	pvt->_tlist.append(sqltp);
 }
 
 bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
@@ -152,14 +164,14 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 		return false;
 	}
 
-	tree=NULL;
+	pvt->_tree=NULL;
 
 	stringbuffer	tempquerystr;
 	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
-						tlist.getFirst();
+						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 
-		if (debug) {
+		if (pvt->_debug) {
 			stdoutput.printf("\nrunning translation...\n\n");
 		}
 
@@ -168,7 +180,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 		if (tr->usesTree()) {
 
 			if (!sqlrp) {
-				if (debug) {
+				if (pvt->_debug) {
 					stdoutput.printf("\ntranslation "
 							"requires query tree "
 							"but no parser "
@@ -177,34 +189,34 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 				return false;
 			}
 
-			if (!tree) {
+			if (!pvt->_tree) {
 				if (!sqlrp->parse(query)) {
 					return false;
 				}
-				tree=sqlrp->getTree();
-				if (debug) {
+				pvt->_tree=sqlrp->getTree();
+				if (pvt->_debug) {
 					stdoutput.printf(
 						"current query tree:\n");
-					if (tree) {
-						tree->getRootNode()->
+					if (pvt->_tree) {
+						pvt->_tree->getRootNode()->
 							print(&stdoutput);
 					}
 					stdoutput.printf("\n");
 				}
 			}
 
-			if (!tr->run(sqlrcon,sqlrcur,tree)) {
+			if (!tr->run(sqlrcon,sqlrcur,pvt->_tree)) {
 				return false;
 			}
 
 		} else {
 
 			bool	freequery=false;
-			if (tree) {
+			if (pvt->_tree) {
 				if (!sqlrp->write(&tempquerystr)) {
 					return false;
 				}
-				tree=NULL;
+				pvt->_tree=NULL;
 				query=tempquerystr.detachString();
 				freequery=true;
 			}
@@ -223,21 +235,21 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 		}
 	}
 
-	if (tree) {
+	if (pvt->_tree) {
 		if (!sqlrp->write(translatedquery)) {
 			return false;
 		}
 	} else {
 		translatedquery->append(query);
 		if (sqlrp->parse(translatedquery->getString())) {
-			tree=sqlrp->getTree();
+			pvt->_tree=sqlrp->getTree();
 		}
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("\nquery tree after translation:\n");
-		if (tree) {
-			tree->getRootNode()->print(&stdoutput);
+		if (pvt->_tree) {
+			pvt->_tree->getRootNode()->print(&stdoutput);
 		}
 		stdoutput.printf("\n");
 	}
@@ -254,7 +266,7 @@ void sqlrtranslations::endSession() {
 
 xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
 						const char *type) {
-	xmldomnode	*retval=new xmldomnode(tree,
+	xmldomnode	*retval=new xmldomnode(pvt->_tree,
 						parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,
 						NULL,type,NULL);
@@ -272,7 +284,7 @@ xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
 xmldomnode *sqlrtranslations::newNodeAfter(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
-	xmldomnode	*retval=new xmldomnode(tree,
+	xmldomnode	*retval=new xmldomnode(pvt->_tree,
 						parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,
 						NULL,type,NULL);
@@ -292,7 +304,7 @@ xmldomnode *sqlrtranslations::newNodeAfter(xmldomnode *parentnode,
 xmldomnode *sqlrtranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
-	xmldomnode	*retval=new xmldomnode(tree,
+	xmldomnode	*retval=new xmldomnode(pvt->_tree,
 						parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,
 						NULL,type,NULL);

@@ -12,11 +12,4 @@
 						const char *event,
 						const char *info);
 
-		const char	*libexecdir;
-		const char	*tmpdir;
-		char		*tmpfilename;
-		bool		debug;
-
-		xmldomnode	*transports;
-
-		singlylinkedlist< sqlrnotificationplugin * >	llist;
+		sqlrnotificationsprivate	*pvt;

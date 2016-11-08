@@ -16,15 +16,26 @@
 	}
 #endif
 
+class sqlrschedulesprivate {
+	friend class sqlrschedules;
+	private:
+		const char	*_libexecdir;
+		bool		_debug;
+
+		singlylinkedlist< sqlrscheduleplugin * >	_llist;
+};
+
 sqlrschedules::sqlrschedules(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
-	this->debug=debug;
+	pvt=new sqlrschedulesprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_debug=debug;
 }
 
 sqlrschedules::~sqlrschedules() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrschedules::load(xmldomnode *parameters) {
@@ -48,14 +59,14 @@ bool sqlrschedules::load(xmldomnode *parameters) {
 void sqlrschedules::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
-						llist.getFirst();
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrscheduleplugin	*sqlrsp=node->getValue();
 		delete sqlrsp->s;
 		delete sqlrsp->dl;
 		delete sqlrsp;
 	}
-	llist.clear();
+	pvt->_llist.clear();
 }
 
 void sqlrschedules::loadSchedule(xmldomnode *schedule) {
@@ -82,7 +93,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the schedule module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("schedule_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -112,7 +123,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 		delete dl;
 		return;
 	}
-	sqlrschedule	*s=(*newSchedule)(schedule,debug);
+	sqlrschedule	*s=(*newSchedule)(schedule,pvt->_debug);
 
 #else
 
@@ -128,13 +139,13 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 	sqlrscheduleplugin	*sqlrsp=new sqlrscheduleplugin;
 	sqlrsp->s=s;
 	sqlrsp->dl=dl;
-	llist.append(sqlrsp);
+	pvt->_llist.append(sqlrsp);
 }
 
 bool sqlrschedules::allowed(sqlrserverconnection *sqlrcon, const char *user) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
-						llist.getFirst();
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->s->allowed(sqlrcon,user)) {
 			return false;

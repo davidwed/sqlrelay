@@ -5,7 +5,4 @@
 		void		unload();
 		void		loadRouter(xmldomnode *route);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrrouterplugin * >	llist;
+		sqlrroutersprivate	*pvt;

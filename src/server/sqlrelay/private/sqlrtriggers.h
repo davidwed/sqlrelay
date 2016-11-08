@@ -14,8 +14,4 @@
 					bool before,
 					bool success);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrtriggerplugin * >	beforetriggers;
-		singlylinkedlist< sqlrtriggerplugin * >	aftertriggers;
+		sqlrtriggersprivate	*pvt;

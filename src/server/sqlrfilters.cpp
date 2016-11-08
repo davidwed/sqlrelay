@@ -17,15 +17,26 @@
 	}
 #endif
 
+class sqlrfiltersprivate {
+	friend class sqlrfilters;
+	private:
+		const char	*_libexecdir;
+		bool		_debug;
+
+		singlylinkedlist< sqlrfilterplugin * >	_tlist;
+};
+
 sqlrfilters::sqlrfilters(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	this->debug=debug;
-	libexecdir=sqlrpth->getLibExecDir();
+	pvt=new sqlrfiltersprivate;
+	pvt->_debug=debug;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrfilters::~sqlrfilters() {
 	debugFunction();
 	unloadFilters();
+	delete pvt;
 }
 
 bool sqlrfilters::loadFilters(xmldomnode *parameters) {
@@ -48,14 +59,14 @@ bool sqlrfilters::loadFilters(xmldomnode *parameters) {
 void sqlrfilters::unloadFilters() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
-						tlist.getFirst();
+						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrfilterplugin	*sqlrfp=node->getValue();
 		delete sqlrfp->f;
 		delete sqlrfp->dl;
 		delete sqlrfp;
 	}
-	tlist.clear();
+	pvt->_tlist.clear();
 }
 
 void sqlrfilters::loadFilter(xmldomnode *filter) {
@@ -76,14 +87,14 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 		}
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("loading filter: %s\n",module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the filter module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("filter_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -114,7 +125,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 		delete dl;
 		return;
 	}
-	sqlrfilter	*f=(*newFilter)(this,filter,debug);
+	sqlrfilter	*f=(*newFilter)(this,filter,pvt->_debug);
 
 #else
 	dynamiclib	*dl=NULL;
@@ -125,7 +136,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 	}
 #endif
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("success\n");
 	}
 
@@ -133,7 +144,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 	sqlrfilterplugin	*sqlrfp=new sqlrfilterplugin;
 	sqlrfp->f=f;
 	sqlrfp->dl=dl;
-	tlist.append(sqlrfp);
+	pvt->_tlist.append(sqlrfp);
 }
 
 bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
@@ -151,10 +162,10 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 	xmldom	*tree=NULL;
 
 	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
-						tlist.getFirst();
+						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 
-		if (debug) {
+		if (pvt->_debug) {
 			stdoutput.printf("\nrunning filter...\n\n");
 		}
 
@@ -163,7 +174,7 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 		if (f->usesTree()) {
 
 			if (!sqlrp) {
-				if (debug) {
+				if (pvt->_debug) {
 					stdoutput.printf("\nfilter "
 							"requires query tree "
 							"but no parser "
@@ -177,7 +188,7 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 					return false;
 				}
 				tree=sqlrp->getTree();
-				if (debug) {
+				if (pvt->_debug) {
 					stdoutput.printf(
 						"query tree:\n");
 					tree->getRootNode()->print(&stdoutput);

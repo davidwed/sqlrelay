@@ -6,7 +6,4 @@
 		void	loadResultSetRowTranslation(
 					xmldomnode *resultsetrowtranslation);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrresultsetrowtranslationplugin * >	tlist;
+		sqlrresultsetrowtranslationsprivate	*pvt;

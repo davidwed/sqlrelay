@@ -15,17 +15,29 @@
 	}
 #endif
 
+class sqlrprotocolsprivate {
+	friend class sqlrprotocols;
+	private:
+		sqlrservercontroller	*_cont;
+		const char		*_libexecdir;
+		bool			_debug;
+
+		dictionary< uint16_t , sqlrprotocolplugin * >	_protos;
+};
+
 sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont,
 				sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	this->cont=cont;
-	libexecdir=sqlrpth->getLibExecDir();
-	this->debug=debug;
+	pvt=new sqlrprotocolsprivate;
+	pvt->_cont=cont;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_debug=debug;
 }
 
 sqlrprotocols::~sqlrprotocols() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrprotocols::load(xmldomnode *parameters) {
@@ -52,14 +64,14 @@ bool sqlrprotocols::load(xmldomnode *parameters) {
 void sqlrprotocols::unload() {
 	debugFunction();
 	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
-			*node=protos.getList()->getFirst();
+			*node=pvt->_protos.getList()->getFirst();
 			node; node=node->getNext()) {
 		sqlrprotocolplugin	*sqlrpp=node->getValue()->getValue();
 		delete sqlrpp->pr;
 		delete sqlrpp->dl;
 		delete sqlrpp;
 	}
-	protos.clear();
+	pvt->_protos.clear();
 }
 
 void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
@@ -78,7 +90,7 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the protocol module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("protocol_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -109,7 +121,7 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 		delete dl;
 		return;
 	}
-	sqlrprotocol	*pr=(*newProtocol)(cont,listener,debug);
+	sqlrprotocol	*pr=(*newProtocol)(pvt->_cont,listener,pvt->_debug);
 
 #else
 
@@ -125,13 +137,13 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	sqlrprotocolplugin	*sqlrpp=new sqlrprotocolplugin;
 	sqlrpp->pr=pr;
 	sqlrpp->dl=dl;
-	protos.setValue(index,sqlrpp);
+	pvt->_protos.setValue(index,sqlrpp);
 }
 
 sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
 	debugFunction();
 	sqlrprotocolplugin	*pp=NULL;
-	if (!protos.getValue(index,&pp)) {
+	if (!pvt->_protos.getValue(index,&pp)) {
 		return NULL;
 	}
 	return pp->pr;

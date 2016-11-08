@@ -17,16 +17,27 @@
 	}
 #endif
 
+class sqlrresultsetrowtranslationsprivate {
+	friend class sqlrresultsetrowtranslations;
+	private:
+		const char	*_libexecdir;
+		bool		_debug;
+
+		singlylinkedlist< sqlrresultsetrowtranslationplugin * >	_tlist;
+};
+
 sqlrresultsetrowtranslations::sqlrresultsetrowtranslations(sqlrpaths *sqlrpth,
 								bool debug) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
-	this->debug=debug;
+	pvt=new sqlrresultsetrowtranslationsprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_debug=debug;
 }
 
 sqlrresultsetrowtranslations::~sqlrresultsetrowtranslations() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrresultsetrowtranslations::load(xmldomnode *parameters) {
@@ -50,14 +61,14 @@ bool sqlrresultsetrowtranslations::load(xmldomnode *parameters) {
 void sqlrresultsetrowtranslations::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
-						tlist.getFirst();
+						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrresultsetrowtranslationplugin	*sqlt=node->getValue();
 		delete sqlt->rstr;
 		delete sqlt->dl;
 		delete sqlt;
 	}
-	tlist.clear();
+	pvt->_tlist.clear();
 }
 
 void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
@@ -81,14 +92,14 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 		}
 	}
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("loading result set translation: %s\n",module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the result set translation module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("resultsetrowtranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -122,7 +133,8 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 		return;
 	}
 	sqlrresultsetrowtranslation	*rstr=
-		(*newResultSetTranslation)(this,resultsetrowtranslation,debug);
+		(*newResultSetTranslation)(
+			this,resultsetrowtranslation,pvt->_debug);
 
 #else
 	dynamiclib			*dl=NULL;
@@ -133,7 +145,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 	}
 #endif
 
-	if (debug) {
+	if (pvt->_debug) {
 		stdoutput.printf("success\n");
 	}
 
@@ -142,7 +154,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 				new sqlrresultsetrowtranslationplugin;
 	sqlrrstp->rstr=rstr;
 	sqlrrstp->dl=dl;
-	tlist.append(sqlrrstp);
+	pvt->_tlist.append(sqlrrstp);
 }
 
 bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
@@ -154,9 +166,9 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 	debugFunction();
 
 	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
-						tlist.getFirst();
+						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
-		if (debug) {
+		if (pvt->_debug) {
 			stdoutput.printf(
 				"\nrunning result set row translation...\n\n");
 		}

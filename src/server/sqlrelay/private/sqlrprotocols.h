@@ -5,8 +5,4 @@
 		void	unload();
 		void	loadProtocol(uint16_t index, xmldomnode *listener);
 
-		sqlrservercontroller	*cont;
-		const char		*libexecdir;
-		bool			debug;
-
-		dictionary< uint16_t , sqlrprotocolplugin * >	protos;
+		sqlrprotocolsprivate	*pvt;

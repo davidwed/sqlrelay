@@ -5,6 +5,4 @@
 		void	unload();
 		void	loadQuery(xmldomnode *logger);
 
-		const char	*libexecdir;
-
-		singlylinkedlist< sqlrqueryplugin * >	llist;
+		sqlrqueriesprivate	*pvt;

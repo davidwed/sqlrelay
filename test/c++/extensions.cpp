@@ -25,7 +25,7 @@ void checkSuccess(const char *value, const char *success) {
 			printf("failure ");
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -36,7 +36,7 @@ void checkSuccess(const char *value, const char *success) {
 		printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -51,7 +51,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 			printf("failure ");
 			delete cur;
 			delete con;
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -62,7 +62,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 		printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -75,7 +75,7 @@ void checkSuccess(int value, int success) {
 		printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -88,7 +88,7 @@ void checkSuccess(double value, double success) {
 		printf("failure ");
 		delete cur;
 		delete con;
-		process::exit(0);
+		process::exit(1);
 	}
 }
 

@@ -5,6 +5,4 @@
 		void		unload();
 		void		loadLogger(xmldomnode *logger);
 
-		const char	*libexecdir;
-
-		singlylinkedlist< sqlrloggerplugin * >	llist;
+		sqlrloggersprivate	*pvt;

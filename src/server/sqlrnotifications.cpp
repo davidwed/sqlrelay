@@ -19,18 +19,34 @@
 	}
 #endif
 
+class sqlrnotificationsprivate {
+	friend class sqlrnotifications;
+	private:
+		const char	*_libexecdir;
+		const char	*_tmpdir;
+		char		*_tmpfilename;
+		bool		_debug;
+
+		xmldomnode	*_transports;
+
+		singlylinkedlist< sqlrnotificationplugin * >	_llist;
+};
+
 sqlrnotifications::sqlrnotifications(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
-	tmpdir=sqlrpth->getTmpDir();
-	tmpfilename=new char[charstring::length(sqlrpth->getTmpDir())+6+1];
-	this->debug=debug;
+	pvt=new sqlrnotificationsprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_tmpdir=sqlrpth->getTmpDir();
+	pvt->_tmpfilename=new char[charstring::length(
+					sqlrpth->getTmpDir())+6+1];
+	pvt->_debug=debug;
 }
 
 sqlrnotifications::~sqlrnotifications() {
 	debugFunction();
 	unload();
-	delete[] tmpfilename;
+	delete[] pvt->_tmpfilename;
+	delete pvt;
 }
 
 bool sqlrnotifications::load(xmldomnode *parameters) {
@@ -38,7 +54,7 @@ bool sqlrnotifications::load(xmldomnode *parameters) {
 
 	unload();
 
-	transports=parameters->getFirstTagChild("transports");
+	pvt->_transports=parameters->getFirstTagChild("transports");
 
 	// run through the notification list
 	for (xmldomnode *notification=parameters->getFirstTagChild();
@@ -56,14 +72,14 @@ bool sqlrnotifications::load(xmldomnode *parameters) {
 void sqlrnotifications::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
-						llist.getFirst();
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrnotificationplugin	*sqlrnp=node->getValue();
 		delete sqlrnp->n;
 		delete sqlrnp->dl;
 		delete sqlrnp;
 	}
-	llist.clear();
+	pvt->_llist.clear();
 }
 
 void sqlrnotifications::loadNotification(xmldomnode *notification) {
@@ -90,7 +106,7 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the notification module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("notification_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -121,7 +137,8 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 		delete dl;
 		return;
 	}
-	sqlrnotification	*n=(*newNotification)(this,notification,debug);
+	sqlrnotification	*n=(*newNotification)(
+					this,notification,pvt->_debug);
 
 #else
 
@@ -137,7 +154,7 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 	sqlrnotificationplugin	*sqlrnp=new sqlrnotificationplugin;
 	sqlrnp->n=n;
 	sqlrnp->dl=dl;
-	llist.append(sqlrnp);
+	pvt->_llist.append(sqlrnp);
 }
 
 void sqlrnotifications::run(sqlrlistener *sqlrl,
@@ -147,7 +164,7 @@ void sqlrnotifications::run(sqlrlistener *sqlrl,
 					const char *info) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
-						llist.getFirst();
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->n->run(sqlrl,sqlrcon,sqlrcur,event,info);
 	}
@@ -257,9 +274,9 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 	// handle transports...
 	if (!charstring::compare(url,"mail")) {
 
-		charstring::copy(tmpfilename,tmpdir);
-		charstring::append(tmpfilename,"XXXXXX");
-		int32_t	tfd=file::createTemporaryFile(tmpfilename,
+		charstring::copy(pvt->_tmpfilename,pvt->_tmpdir);
+		charstring::append(pvt->_tmpfilename,"XXXXXX");
+		int32_t	tfd=file::createTemporaryFile(pvt->_tmpfilename,
 				permissions::evalPermString("rw-------"));
 		if (tfd==-1) {
 			delete[] subj;
@@ -267,7 +284,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 			return false;
 		}
 
-		debugPrintf("message file: %s\n",tmpfilename);
+		debugPrintf("message file: %s\n",pvt->_tmpfilename);
 
 		// write the message to the temp file
 		file	tf;
@@ -275,7 +292,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		if (tf.write(msg,charstring::length(msg))!=
 					(ssize_t)charstring::length(msg)) {
 			tf.close();
-			file::remove(tmpfilename);
+			file::remove(pvt->_tmpfilename);
 			delete[] subj;
 			delete[] msg;
 			return false;
@@ -289,7 +306,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		mailcmd.append(agent)->append(" ");
 		mailcmd.append("-s \"")->append(subj)->append("\" ");
 		mailcmd.append("\"")->append(address)->append("\" ");
-		mailcmd.append("< ")->append(tmpfilename);
+		mailcmd.append("< ")->append(pvt->_tmpfilename);
 		mailcmd.append(" 2> /dev/null");
 
 		debugPrintf("%s\n",mailcmd.getString());
@@ -307,7 +324,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		const char	*args[100];
 		uint32_t	a=0;
 		args[a++]=agent;
-		args[a++]=tmpfilename;
+		args[a++]=pvt->_tmpfilename;
 		args[a++]="-to";
 		args[a++]=address;
 		args[a++]="-subject";
@@ -325,7 +342,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		}
 
 		// clean up
-		file::remove(tmpfilename);
+		file::remove(pvt->_tmpfilename);
 	}
 	// FIXME: implement other transports
 
@@ -337,7 +354,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 }
 
 xmldomnode *sqlrnotifications::getTransport(const char *transportid) {
-	for (xmldomnode *tnode=transports->getFirstTagChild("transport");
+	for (xmldomnode *tnode=pvt->_transports->getFirstTagChild("transport");
 				!tnode->isNullNode();
 				tnode=tnode->getNextTagSibling("transport")) {
 		if (!charstring::compare(transportid,
@@ -345,7 +362,7 @@ xmldomnode *sqlrnotifications::getTransport(const char *transportid) {
 			return tnode;
 		}
 	}
-	return transports->getNullNode();
+	return pvt->_transports->getNullNode();
 }
 
 char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,

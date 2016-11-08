@@ -17,14 +17,24 @@
 	}
 #endif
 
+class sqlrpwdencsprivate {
+	friend class sqlrpwdencs;
+	private:
+		const char	*_libexecdir;
+
+		singlylinkedlist< sqlrpwdencplugin * >	_llist;
+};
+
 sqlrpwdencs::sqlrpwdencs(sqlrpaths *sqlrpth) {
 	debugFunction();
-	libexecdir=sqlrpth->getLibExecDir();
+	pvt=new sqlrpwdencsprivate;
+	pvt->_libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrpwdencs::~sqlrpwdencs() {
 	debugFunction();
 	unload();
+	delete pvt;
 }
 
 bool sqlrpwdencs::load(xmldomnode *parameters) {
@@ -46,14 +56,15 @@ bool sqlrpwdencs::load(xmldomnode *parameters) {
 
 void sqlrpwdencs::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrpwdencplugin	*sqlrpe=node->getValue();
 		delete sqlrpe->pe;
 		delete sqlrpe->dl;
 		delete sqlrpe;
 	}
-	llist.clear();
+	pvt->_llist.clear();
 }
 
 void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
@@ -84,7 +95,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the password encryption module
 	stringbuffer	modulename;
-	modulename.append(libexecdir);
+	modulename.append(pvt->_libexecdir);
 	modulename.append(SQLR);
 	modulename.append("pwdenc_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -131,11 +142,12 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	sqlrpwdencplugin	*sqlrpe=new sqlrpwdencplugin;
 	sqlrpe->pe=pe;
 	sqlrpe->dl=dl;
-	llist.append(sqlrpe);
+	pvt->_llist.append(sqlrpe);
 }
 
 sqlrpwdenc *sqlrpwdencs::getPasswordEncryptionById(const char *id) {
-	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=
+						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrpwdenc	*pe=node->getValue()->pe;
 		if (!charstring::compare(pe->getId(),id)) {
