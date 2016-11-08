@@ -1483,7 +1483,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 };
 
 
-class SQLRSERVER_DLLSPEC databaseobject {
+class SQLRSERVER_DLLSPEC sqlrdatabaseobject {
 	public:
 		const char	*database;
 		const char	*schema;
@@ -1519,7 +1519,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						const char *schema,
 						const char *oldname,
 						const char **newname);
-		databaseobject *createDatabaseObject(
+		sqlrdatabaseobject *createDatabaseObject(
 						memorypool *pool,
 						const char *database,
 						const char *schema,

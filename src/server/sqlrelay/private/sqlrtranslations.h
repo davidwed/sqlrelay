@@ -6,13 +6,13 @@
 		void	loadTranslation(xmldomnode *translation);
 
 		bool	getReplacementName(
-				dictionary< databaseobject *, char *> *dict,
+				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
 				const char *oldname,
 				const char **newname);
 		bool	removeReplacement(
-				dictionary< databaseobject *, char *> *dict,
+				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
 				const char *oldname);
@@ -47,5 +47,5 @@
 
 		memorypool	*temptablepool;
 		memorypool	*tempindexpool;
-		dictionary< databaseobject *, char * >	temptablemap;
-		dictionary< databaseobject *, char * >	tempindexmap;
+		dictionary< sqlrdatabaseobject *, char * >	temptablemap;
+		dictionary< sqlrdatabaseobject *, char * >	tempindexmap;

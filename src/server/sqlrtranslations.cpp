@@ -357,18 +357,18 @@ bool	sqlrtranslations::getReplacementIndexName(const char *database,
 }
 
 bool	sqlrtranslations::getReplacementName(
-				dictionary< databaseobject *, char *> *dict,
+				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
 				const char *oldname,
 				const char **newname) {
 
 	*newname=NULL;
-	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
+	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
 					*node=dict->getList()->getFirst();
 						node; node=node->getNext()) {
 
-		databaseobject	*dbo=node->getValue()->getKey();
+		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->object,oldname)) {
@@ -379,7 +379,7 @@ bool	sqlrtranslations::getReplacementName(
 	return false;
 }
 
-databaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
+sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
 						const char *database,
 						const char *schema,
 						const char *object,
@@ -414,8 +414,8 @@ databaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
 	}
 
 	// create the databaseobject
-	databaseobject	*dbo=
-		(databaseobject *)pool->allocate(sizeof(databaseobject));
+	sqlrdatabaseobject	*dbo=(sqlrdatabaseobject *)
+				pool->allocate(sizeof(sqlrdatabaseobject));
 
 
 	// populate it
@@ -441,10 +441,10 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 	}
 
 	// remove any indices that depend on the table
-	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
+	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
 			*node=tempindexmap.getList()->getFirst(); node;) {
 
-		databaseobject	*dbo=node->getValue()->getKey();
+		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
 
 		// make sure to move on to the next node here rather than
 		// after calling remove, otherwise it could cause a
@@ -468,16 +468,16 @@ bool sqlrtranslations::removeReplacementIndex(const char *database,
 }
 
 bool sqlrtranslations::removeReplacement(
-				dictionary< databaseobject *, char *> *dict,
+				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
 				const char *name) {
 
-	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
+	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
 				*node=dict->getList()->getFirst();
 					node; node=node->getNext()) {
 
-		databaseobject	*dbo=node->getValue()->getKey();
+		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
 		const char	*replacementname=node->getValue()->getValue();
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
