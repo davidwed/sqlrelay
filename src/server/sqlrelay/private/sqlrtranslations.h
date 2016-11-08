@@ -20,6 +20,11 @@
 		sqlrtranslationsprivate	*pvt;
 
 	public:
+		memorypool	*temptablepool;
+		memorypool	*tempindexpool;
+		dictionary< sqlrdatabaseobject *, char * >	temptablemap;
+		dictionary< sqlrdatabaseobject *, char * >	tempindexmap;
+
 		// helper methods
 		xmldomnode	*newNode(xmldomnode *parentnode,
 							const char *type);
@@ -44,8 +49,3 @@
 							const char *name,
 							const char *value);
 		bool		isString(const char *value);
-
-		memorypool	*temptablepool;
-		memorypool	*tempindexpool;
-		dictionary< sqlrdatabaseobject *, char * >	temptablemap;
-		dictionary< sqlrdatabaseobject *, char * >	tempindexmap;
