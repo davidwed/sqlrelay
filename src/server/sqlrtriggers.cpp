@@ -10,6 +10,12 @@
 
 #include <config.h>
 
+class sqlrtriggerplugin {
+	public:
+		sqlrtrigger	*tr;
+		dynamiclib	*dl;
+};
+
 class sqlrtriggersprivate {
 	friend class sqlrtriggers;
 	private:

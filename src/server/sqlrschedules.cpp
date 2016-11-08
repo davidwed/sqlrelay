@@ -16,6 +16,12 @@
 	}
 #endif
 
+class sqlrscheduleplugin {
+	public:
+		sqlrschedule	*s;
+		dynamiclib	*dl;
+};
+
 class sqlrschedulesprivate {
 	friend class sqlrschedules;
 	private:

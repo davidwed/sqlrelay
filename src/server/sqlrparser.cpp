@@ -3,12 +3,21 @@
 
 #include <sqlrelay/sqlrserver.h>
 
+class sqlrparserprivate {
+	friend class sqlrparser;
+	private:
+		xmldomnode	*_parameters;
+		bool		_debug;
+};
+
 sqlrparser::sqlrparser(xmldomnode *parameters, bool debug) {
-	this->parameters=parameters;
-	this->debug=debug;
+	pvt=new sqlrparserprivate;
+	pvt->_parameters=parameters;
+	pvt->_debug=debug;
 }
 
 sqlrparser::~sqlrparser() {
+	delete pvt;
 }
 
 bool sqlrparser::parse(const char *query) {
@@ -42,4 +51,12 @@ bool sqlrparser::write(xmldomnode *node, stringbuffer *output) {
 
 void sqlrparser::getMetaData(xmldomnode *node) {
 	// by default, do nothing...
+}
+
+xmldomnode *sqlrparser::getParameters() {
+	return pvt->_parameters;
+}
+
+bool sqlrparser::getDebug() {
+	return pvt->_debug;
 }

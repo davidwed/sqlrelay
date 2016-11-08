@@ -74,7 +74,7 @@ bool sqlrquery_sqlrcmdgstat::match(const char *querystring,
 sqlrquerycursor *sqlrquery_sqlrcmdgstat::newCursor(
 						sqlrserverconnection *sqlrcon,
 						uint16_t id) {
-	return new sqlrquery_sqlrcmdgstatcursor(sqlrcon,parameters,id);
+	return new sqlrquery_sqlrcmdgstatcursor(sqlrcon,getParameters(),id);
 }
 
 sqlrquery_sqlrcmdgstatcursor::sqlrquery_sqlrcmdgstatcursor(

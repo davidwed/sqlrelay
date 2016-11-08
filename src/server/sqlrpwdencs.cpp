@@ -17,6 +17,12 @@
 	}
 #endif
 
+class sqlrpwdencplugin {
+	public:
+		sqlrpwdenc	*pe;
+		dynamiclib	*dl;
+};
+
 class sqlrpwdencsprivate {
 	friend class sqlrpwdencs;
 	private:

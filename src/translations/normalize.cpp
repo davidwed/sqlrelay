@@ -57,7 +57,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("original query:\n\"%s\"\n\n",query);
 	}
 
@@ -117,7 +117,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("normalized query (pass 1):\n\"%s\"\n\n",
 							pass1.getString());
 	}
@@ -221,7 +221,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("normalized query (pass 2):\n\"%s\"\n\n",
 							pass2.getString());
 	}
@@ -313,7 +313,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("normalized query (pass 3):\n\"%s\"\n\n",
 							pass3.getString());
 	}
@@ -354,7 +354,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("normalized query (pass 4):\n\"%s\"\n\n",
 						translatedquery->getString());
 	}

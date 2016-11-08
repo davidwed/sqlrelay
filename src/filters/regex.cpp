@@ -48,7 +48,7 @@ bool sqlrfilter_regex::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (re.match(query)) {
-		if (debug) {
+		if (getDebug()) {
 			stdoutput.printf("regex: matches pattern \"%s\"\n\n",
 								pattern);
 		}

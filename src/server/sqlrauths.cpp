@@ -17,6 +17,12 @@
 	}
 #endif
 
+class sqlrauthplugin {
+	public:
+		sqlrauth	*au;
+		dynamiclib	*dl;
+};
+
 class sqlrauthsprivate {
 	friend class sqlrauths;
 	private:

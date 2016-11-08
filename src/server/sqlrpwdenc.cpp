@@ -4,15 +4,23 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 
+class sqlrpwdencprivate {
+	friend class sqlrpwdenc;
+	private:
+		xmldomnode	*_parameters;
+};
+
 sqlrpwdenc::sqlrpwdenc(xmldomnode *parameters) {
-	this->parameters=parameters;
+	pvt=new sqlrpwdencprivate;
+	pvt->_parameters=parameters;
 }
 
 sqlrpwdenc::~sqlrpwdenc() {
+	delete pvt;
 }
 
 const char *sqlrpwdenc::getId() {
-	return parameters->getAttributeValue("id");
+	return pvt->_parameters->getAttributeValue("id");
 }
 
 bool sqlrpwdenc::oneWay() {
@@ -25,4 +33,8 @@ char *sqlrpwdenc::encrypt(const char *value) {
 
 char *sqlrpwdenc::decrypt(const char *value) {
 	return NULL;
+}
+
+xmldomnode *sqlrpwdenc::getParameters() {
+	return pvt->_parameters;
 }

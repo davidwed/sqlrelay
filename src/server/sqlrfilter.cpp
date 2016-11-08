@@ -3,15 +3,25 @@
 
 #include <sqlrelay/sqlrserver.h>
 
+class sqlrfilterprivate {
+	friend class sqlrfilter;
+	private:
+		sqlrfilters	*_sqlrfs;
+		xmldomnode	*_parameters;
+		bool		_debug;
+};
+
 sqlrfilter::sqlrfilter(sqlrfilters *sqlrfs,
 				xmldomnode *parameters,
 				bool debug) {
-	this->sqlrfs=sqlrfs;
-	this->parameters=parameters;
-	this->debug=debug;
+	pvt=new sqlrfilterprivate;
+	pvt->_sqlrfs=sqlrfs;
+	pvt->_parameters=parameters;
+	pvt->_debug=debug;
 }
 
 sqlrfilter::~sqlrfilter() {
+	delete pvt;
 }
 
 bool sqlrfilter::usesTree() {
@@ -31,8 +41,10 @@ bool sqlrfilter::run(sqlrserverconnection *sqlrcon,
 }
 
 void sqlrfilter::getError(const char **err, int64_t *errn) {
-	const char	*error=parameters->getAttributeValue("error");
-	const char	*errnum=parameters->getAttributeValue("errornumber");
+	const char	*error=
+			pvt->_parameters->getAttributeValue("error");
+	const char	*errnum=
+			pvt->_parameters->getAttributeValue("errornumber");
 	if (err) {
 		if (!charstring::isNullOrEmpty(error)) {
 			*err=error;
@@ -47,4 +59,16 @@ void sqlrfilter::getError(const char **err, int64_t *errn) {
 			*errn=0;
 		}
 	}
+}
+
+sqlrfilters *sqlrfilter::getFilters() {
+	return pvt->_sqlrfs;
+}
+
+xmldomnode *sqlrfilter::getParameters() {
+	return pvt->_parameters;
+}
+
+bool sqlrfilter::getDebug() {
+	return pvt->_debug;
 }

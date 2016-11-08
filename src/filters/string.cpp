@@ -74,7 +74,7 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 
 	bool	result=!charstring::contains(query,pattern);
 
-	if (result && debug) {
+	if (result && getDebug()) {
 		stdoutput.printf("string: matches pattern \"%s\"\n\n",pattern);
 	}
 

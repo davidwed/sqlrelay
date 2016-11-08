@@ -3,11 +3,19 @@
 
 #include <sqlrelay/sqlrserver.h>
 
+class sqlrloggerprivate {
+	friend class sqlrlogger;
+	private:
+		xmldomnode	*_parameters;
+};
+
 sqlrlogger::sqlrlogger(xmldomnode *parameters) {
-	this->parameters=parameters;
+	pvt=new sqlrloggerprivate;
+	pvt->_parameters=parameters;
 }
 
 sqlrlogger::~sqlrlogger() {
+	delete pvt;
 }
 
 bool sqlrlogger::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
@@ -52,4 +60,8 @@ static const char *eventtypes[]={
 
 const char *sqlrlogger::eventType(sqlrevent_t event) {
 	return eventtypes[(uint16_t)event];
+}
+
+xmldomnode *sqlrlogger::getParameters() {
+	return pvt->_parameters;
 }

@@ -68,7 +68,7 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 	for (linkedlistnode< regularexpression *> *rn=relist.getFirst();
 							rn; rn=rn->getNext()) {
 		if (rn->getValue()->match(query)) {
-			if (debug) {
+			if (getDebug()) {
 				stdoutput.printf("\nrouting query:\n"
 							"	%s\nto: %s\n",
 							query,connectionid);

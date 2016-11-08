@@ -17,10 +17,4 @@
 				int32_t timepart);
 		bool	inDayParts(int32_t hour, int32_t minute);
 
-		bool	allow;
-
-		linkedlist< sqlrscheduleperiod * >	years;
-		linkedlist< sqlrscheduleperiod * >	months;
-		linkedlist< sqlrscheduleperiod * >	daysofmonth;
-		linkedlist< sqlrscheduleperiod * >	daysofweek;
-		linkedlist< sqlrscheduledaypart * >	dayparts;
+		sqlrscheduleruleprivate	*pvt;

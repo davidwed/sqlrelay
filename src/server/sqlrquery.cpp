@@ -4,29 +4,49 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/xmldomnode.h>
 
+class sqlrqueryprivate {
+	friend class sqlrquery;
+	private:
+		xmldomnode	*_parameters;
+};
+
 sqlrquery::sqlrquery(xmldomnode *parameters) {
-	this->parameters=parameters;
+	pvt=new sqlrqueryprivate;
+	pvt->_parameters=parameters;
 }
 
 sqlrquery::~sqlrquery() {
+	delete pvt;
 }
 
 bool sqlrquery::match(const char *querystring, uint32_t querylength) {
 	return false;
 }
 
+xmldomnode *sqlrquery::getParameters() {
+	return pvt->_parameters;
+}
+
 sqlrquerycursor *sqlrquery::newCursor(sqlrserverconnection *conn, uint16_t id) {
 	return NULL;
 }
+
+class sqlrquerycursorprivate {
+	friend class sqlrquerycursor;
+	private:
+		xmldomnode	*_parameters;
+};
 
 sqlrquerycursor::sqlrquerycursor(sqlrserverconnection *conn,
 					xmldomnode *parameters,
 					uint16_t id) :
 						sqlrservercursor(conn,id) {
-	this->parameters=parameters;
+	pvt=new sqlrquerycursorprivate;
+	pvt->_parameters=parameters;
 }
 
 sqlrquerycursor::~sqlrquerycursor() {
+	delete pvt;
 }
 
 sqlrquerytype_t	sqlrquerycursor::queryType(const char *query, uint32_t length) {
@@ -35,4 +55,8 @@ sqlrquerytype_t	sqlrquerycursor::queryType(const char *query, uint32_t length) {
 
 bool sqlrquerycursor::isCustomQuery() {
 	return true;
+}
+
+xmldomnode *sqlrquerycursor::getParameters() {
+	return pvt->_parameters;
 }

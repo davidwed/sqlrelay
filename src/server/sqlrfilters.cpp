@@ -17,6 +17,12 @@
 	}
 #endif
 
+class sqlrfilterplugin {
+	public:
+		sqlrfilter	*f;
+		dynamiclib	*dl;
+};
+
 class sqlrfiltersprivate {
 	friend class sqlrfilters;
 	private:

@@ -141,10 +141,12 @@ const char *sqlrauth_userlist::userPassword(const char *user,
 	}
 
 	// if password encryption is being used...
-	if (sqlrpe && charstring::length(passwordencryptions[index])) {
+	if (getPasswordEncryptions() &&
+		charstring::length(passwordencryptions[index])) {
 
 		// get the module
-		sqlrpwdenc	*pe=sqlrpe->getPasswordEncryptionById(
+		sqlrpwdenc	*pe=getPasswordEncryptions()->
+					getPasswordEncryptionById(
 						passwordencryptions[index]);
 		if (!pe) {
 			return NULL;

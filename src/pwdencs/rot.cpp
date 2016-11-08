@@ -18,12 +18,12 @@ sqlrpwenc_rot::sqlrpwenc_rot(xmldomnode *parameters) : sqlrpwdenc(parameters) {
 
 char *sqlrpwenc_rot::encrypt(const char *value) {
 	return rotate(value,charstring::toInteger(
-				parameters->getAttributeValue("count")));
+				getParameters()->getAttributeValue("count")));
 }
 
 char *sqlrpwenc_rot::decrypt(const char *value) {
 	return rotate(value,-charstring::toInteger(
-				parameters->getAttributeValue("count")));
+				getParameters()->getAttributeValue("count")));
 }
 
 char *sqlrpwenc_rot::rotate(const char *value, int64_t count) {

@@ -56,7 +56,7 @@ bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 	debugPrintf("user...\n");
 
 	bool	found=false;
-	for (xmldomnode *u=parameters->
+	for (xmldomnode *u=getParameters()->
 				getFirstTagChild("users")->
 				getFirstTagChild("user");
 			!u->isNullNode();

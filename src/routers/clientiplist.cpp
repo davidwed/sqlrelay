@@ -64,7 +64,7 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 
 		// if the clientip matches...
 		if (match(clientip,clientips[i])) {
-			if (debug) {
+			if (getDebug()) {
 				stdoutput.printf("routing client ip "
 							"%s to %s\n",
 							clientip,connectionid);
@@ -77,20 +77,20 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 
 bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("\n");
 	}
 
 	for (uint16_t i=0; i<4; i++) {
 
-		if (debug) {
+		if (getDebug()) {
 			stdoutput.printf("%d: ip=%s  pattern=%s\n",
 							i,ip,pattern);
 		}
 
 		// handle wildcards
 		if (!charstring::compare(pattern,"*")) {
-			if (debug) {
+			if (getDebug()) {
 				stdoutput.printf("	"
 						"%s matches "
 						"wildcard %s...\n",
@@ -99,7 +99,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			break;
 		}
 		if (!charstring::compare(pattern,"*.",2)) {
-			if (debug) {
+			if (getDebug()) {
 				stdoutput.printf("	"
 						"%s matches "
 						"wildcard %s...\n",
@@ -128,7 +128,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			delete[] chunk;
 
 			if (!inrange) {
-				if (debug) {
+				if (getDebug()) {
 					stdoutput.printf("	"
 							"%s doesn't "
 							"match %s...\n",
@@ -137,7 +137,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 				return false;
 			}
 
-			if (debug) {
+			if (getDebug()) {
 				stdoutput.printf("	"
 						"%s matches "
 						"range %s...\n",
@@ -156,7 +156,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 		if (charstring::toUnsignedInteger(pattern)==
 				charstring::toUnsignedInteger(ip)) {
 
-			if (debug) {
+			if (getDebug()) {
 				stdoutput.printf("	"
 						"%s matches "
 						"individual %s...\n",
@@ -169,14 +169,14 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			continue;
 		}
 
-		if (debug) {
+		if (getDebug()) {
 			stdoutput.printf("	%s doesn't match %s...\n",
 								ip,pattern);
 		}
 		return false;
 	}
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("match found\n");
 	}
 	return true;

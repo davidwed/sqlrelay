@@ -17,6 +17,12 @@
 	}
 #endif
 
+class sqlrtranslationplugin {
+	public:
+		sqlrtranslation	*tr;
+		dynamiclib	*dl;
+};
+
 class sqlrtranslationsprivate {
 	friend class sqlrtranslations;
 	private:

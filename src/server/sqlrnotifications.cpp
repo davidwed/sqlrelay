@@ -19,6 +19,12 @@
 	}
 #endif
 
+class sqlrnotificationplugin {
+	public:
+		sqlrnotification	*n;
+		dynamiclib		*dl;
+};
+
 class sqlrnotificationsprivate {
 	friend class sqlrnotifications;
 	private:

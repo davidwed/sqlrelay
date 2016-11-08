@@ -3,12 +3,21 @@
 
 #include <sqlrelay/sqlrserver.h>
 
+class sqlrtriggerprivate {
+	friend class sqlrtrigger;
+	private:
+		xmldomnode	*_parameters;
+		bool		_debug;
+};
+
 sqlrtrigger::sqlrtrigger(xmldomnode *parameters, bool debug) {
-	this->parameters=parameters;
-	this->debug=debug;
+	pvt=new sqlrtriggerprivate;
+	pvt->_parameters=parameters;
+	pvt->_debug=debug;
 }
 
 sqlrtrigger::~sqlrtrigger() {
+	delete pvt;
 }
 
 bool sqlrtrigger::run(sqlrserverconnection *sqlrcon,
@@ -17,4 +26,12 @@ bool sqlrtrigger::run(sqlrserverconnection *sqlrcon,
 				bool before,
 				bool success) {
 	return true;
+}
+
+xmldomnode *sqlrtrigger::getParameters() {
+	return pvt->_parameters;
+}
+
+bool sqlrtrigger::getDebug() {
+	return pvt->_debug;
 }

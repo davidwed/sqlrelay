@@ -6,18 +6,28 @@
 #include <config.h>
 
 sqlrcredentials::sqlrcredentials() {
+
 }
 
 sqlrcredentials::~sqlrcredentials() {
 }
 
 
+class sqlruserpasswordcredentialsprivate {
+	friend class sqlruserpasswordcredentials;
+	private:
+		const char	*_user;
+		const char	*_password;
+};
+
 sqlruserpasswordcredentials::sqlruserpasswordcredentials() : sqlrcredentials() {
-	user=NULL;
-	password=NULL;
+	pvt=new sqlruserpasswordcredentialsprivate;
+	pvt->_user=NULL;
+	pvt->_password=NULL;
 }
 
 sqlruserpasswordcredentials::~sqlruserpasswordcredentials() {
+	delete pvt;
 }
 
 const char *sqlruserpasswordcredentials::getType() {
@@ -25,27 +35,35 @@ const char *sqlruserpasswordcredentials::getType() {
 }
 
 void sqlruserpasswordcredentials::setUser(const char *user) {
-	this->user=user;
+	pvt->_user=user;
 }
 
 void sqlruserpasswordcredentials::setPassword(const char *password) {
-	this->password=password;
+	pvt->_password=password;
 }
 
 const char *sqlruserpasswordcredentials::getUser() {
-	return user;
+	return pvt->_user;
 }
 
 const char *sqlruserpasswordcredentials::getPassword() {
-	return password;
+	return pvt->_password;
 }
 
 
+class sqlrgsscredentialsprivate {
+	friend class sqlrgsscredentials;
+	private:
+		const char	*_initiator;
+};
+
 sqlrgsscredentials::sqlrgsscredentials() : sqlrcredentials() {
-	initiator=NULL;
+	pvt=new sqlrgsscredentialsprivate;
+	pvt->_initiator=NULL;
 }
 
 sqlrgsscredentials::~sqlrgsscredentials() {
+	delete pvt;
 }
 
 const char *sqlrgsscredentials::getType() {
@@ -53,21 +71,29 @@ const char *sqlrgsscredentials::getType() {
 }
 
 void sqlrgsscredentials::setInitiator(const char *initiator) {
-	this->initiator=initiator;
+	pvt->_initiator=initiator;
 }
 
 const char *sqlrgsscredentials::getInitiator() {
-	return initiator;
+	return pvt->_initiator;
 }
 
+class sqlrtlscredentialsprivate {
+	friend class sqlrtlscredentials;
+	private:
+		const char		*_commonname;
+		linkedlist< char * >	*_subjectalternatenames;
+};
 
 sqlrtlscredentials::sqlrtlscredentials() : sqlrcredentials() {
-	commonname=NULL;
-	subjectalternatenames=NULL;
+	pvt=new sqlrtlscredentialsprivate;
+	pvt->_commonname=NULL;
+	pvt->_subjectalternatenames=NULL;
 }
 
 
 sqlrtlscredentials::~sqlrtlscredentials() {
+	delete pvt;
 }
 
 const char *sqlrtlscredentials::getType() {
@@ -75,18 +101,18 @@ const char *sqlrtlscredentials::getType() {
 }
 
 void sqlrtlscredentials::setCommonName(const char *commonname) {
-	this->commonname=commonname;
+	pvt->_commonname=commonname;
 }
 
 void sqlrtlscredentials::setSubjectAlternateNames(
 				linkedlist< char * > *subjectalternatenames) {
-	this->subjectalternatenames=subjectalternatenames;
+	pvt->_subjectalternatenames=subjectalternatenames;
 }
 
 const char *sqlrtlscredentials::getCommonName() {
-	return commonname;
+	return pvt->_commonname;
 }
 
 linkedlist< char * > *sqlrtlscredentials::getSubjectAlternateNames() {
-	return subjectalternatenames;
+	return pvt->_subjectalternatenames;
 }

@@ -16,6 +16,12 @@
 	}
 #endif
 
+class sqlrloggerplugin {
+	public:
+		sqlrlogger	*lg;
+		dynamiclib	*dl;
+};
+
 class sqlrloggersprivate {
 	friend class sqlrloggers;
 	private:

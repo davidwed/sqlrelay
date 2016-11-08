@@ -2,4 +2,4 @@
 // See the file COPYING for more information
 
 	private:
-		const char	*initiator;
+		sqlrgsscredentialsprivate	*pvt;

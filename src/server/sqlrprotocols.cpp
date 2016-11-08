@@ -15,6 +15,12 @@
 	}
 #endif
 
+class sqlrprotocolplugin {
+	public:
+		sqlrprotocol	*pr;
+		dynamiclib	*dl;
+};
+
 class sqlrprotocolsprivate {
 	friend class sqlrprotocols;
 	private:

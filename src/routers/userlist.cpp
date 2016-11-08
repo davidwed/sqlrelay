@@ -63,7 +63,7 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 		// if the user matches...
 		if (!charstring::compare(user,users[i]) ||
 			!charstring::compare(users[i],"*")) {
-			if (debug) {
+			if (getDebug()) {
 				stdoutput.printf("\nrouting user %s to %s\n",
 							user,connectionid);
 			}

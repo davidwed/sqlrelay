@@ -16,6 +16,12 @@
 	}
 #endif
 
+class sqlrqueryplugin {
+	public:
+		sqlrquery	*qr;
+		dynamiclib	*dl;
+};
+
 class sqlrqueriesprivate {
 	friend class sqlrqueries;
 	private:

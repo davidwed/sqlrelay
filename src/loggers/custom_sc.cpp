@@ -36,7 +36,7 @@ sqlrlogger_custom_sc::sqlrlogger_custom_sc(xmldomnode *parameters) :
 	querylogname=NULL;
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
 	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+			getParameters()->getAttributeValue("enabled"),"no");
 }
 
 sqlrlogger_custom_sc::~sqlrlogger_custom_sc() {
@@ -52,7 +52,7 @@ bool sqlrlogger_custom_sc::init(sqlrlistener *sqlrl,
 	}
 
 	// get log level
-	const char	*ll=parameters->getAttributeValue("loglevel");
+	const char	*ll=getParameters()->getAttributeValue("loglevel");
 	if (!charstring::compareIgnoringCase(ll,"info")) {
 		loglevel=SQLRLOGGER_LOGLEVEL_INFO;
 	} else if (!charstring::compareIgnoringCase(ll,"warning")) {
@@ -62,11 +62,11 @@ bool sqlrlogger_custom_sc::init(sqlrlistener *sqlrl,
 	}
 
 	// get log path and name
-	const char	*path=parameters->getAttributeValue("path");
+	const char	*path=getParameters()->getAttributeValue("path");
 	if (!charstring::length(path)) {
 		path=(sqlrcon)?sqlrcon->cont->getLogDir():sqlrl->getLogDir();
 	}
-	const char	*name=parameters->getAttributeValue("name");
+	const char	*name=getParameters()->getAttributeValue("name");
 	if (!charstring::length(name)) {
 		name="sqlrelay.log";
 	}

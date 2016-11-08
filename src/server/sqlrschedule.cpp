@@ -5,7 +5,21 @@
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
+class sqlrscheduleruleprivate {
+	friend class sqlrschedulerule;
+	private:
+		bool	_allow;
+
+		linkedlist< sqlrscheduleperiod * >	_years;
+		linkedlist< sqlrscheduleperiod * >	_months;
+		linkedlist< sqlrscheduleperiod * >	_daysofmonth;
+		linkedlist< sqlrscheduleperiod * >	_daysofweek;
+		linkedlist< sqlrscheduledaypart * >	_dayparts;
+};
+
 sqlrschedulerule::sqlrschedulerule(bool allow, const char *when) {
+
+	pvt=new sqlrscheduleruleprivate;
 
 	char		**whenparts;
 	uint64_t	whenpartscount;
@@ -28,44 +42,51 @@ sqlrschedulerule::sqlrschedulerule(bool allow,
 					const char *daysofmonth,
 					const char *daysofweek,
 					const char *dayparts) {
+	pvt=new sqlrscheduleruleprivate;
 	init(allow,years,months,daysofmonth,daysofweek,dayparts);
 }
 
 sqlrschedulerule::~sqlrschedulerule() {
-	for (linkedlistnode< sqlrscheduleperiod * > *n=years.getFirst();
-							n; n=n->getNext()) {
+	for (linkedlistnode< sqlrscheduleperiod * > *n=
+						pvt->_years.getFirst();
+						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduleperiod * > *n=months.getFirst();
-							n; n=n->getNext()) {
+	for (linkedlistnode< sqlrscheduleperiod * > *n=
+						pvt->_months.getFirst();
+						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduleperiod * > *n=daysofmonth.getFirst();
-							n; n=n->getNext()) {
+	for (linkedlistnode< sqlrscheduleperiod * > *n=
+						pvt->_daysofmonth.getFirst();
+						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduleperiod * > *n=daysofweek.getFirst();
-							n; n=n->getNext()) {
+	for (linkedlistnode< sqlrscheduleperiod * > *n=
+						pvt->_daysofweek.getFirst();
+						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduledaypart * > *n=dayparts.getFirst();
-							n; n=n->getNext()) {
+	for (linkedlistnode< sqlrscheduledaypart * > *n=
+						pvt->_dayparts.getFirst();
+						n; n=n->getNext()) {
 		delete n->getValue();
 	}
+	delete pvt;
 }
 
 bool sqlrschedulerule::allowed(datetime *dt, bool currentlyallowed) {
 
 	// if ths rule applies...
-	if (inPeriods(&years,dt->getYear()) &&
-		inPeriods(&months,dt->getMonth()) &&
-		inPeriods(&daysofmonth,dt->getDayOfMonth()) &&
-		inPeriods(&daysofweek,dt->getDayOfWeek()) &&
+	if (inPeriods(&pvt->_years,dt->getYear()) &&
+		inPeriods(&pvt->_months,dt->getMonth()) &&
+		inPeriods(&pvt->_daysofmonth,dt->getDayOfMonth()) &&
+		inPeriods(&pvt->_daysofweek,dt->getDayOfWeek()) &&
 		inDayParts(dt->getHour(),dt->getMinutes())) {
 
 		// if the rule contradicts the current state then
 		// return the opposite of the current state
-		if (allow!=currentlyallowed) {
+		if (pvt->_allow!=currentlyallowed) {
 			return !currentlyallowed;
 		}
 	}
@@ -81,11 +102,11 @@ void sqlrschedulerule::init(bool allow,
 				const char *daysofmonth,
 				const char *daysofweek,
 				const char *dayparts) {
-	this->allow=allow;
-	splitTimePart(&(this->years),years);
-	splitTimePart(&(this->months),months);
-	splitTimePart(&(this->daysofmonth),daysofmonth);
-	splitTimePart(&(this->daysofweek),daysofweek);
+	pvt->_allow=allow;
+	splitTimePart(&(pvt->_years),years);
+	splitTimePart(&(pvt->_months),months);
+	splitTimePart(&(pvt->_daysofmonth),daysofmonth);
+	splitTimePart(&(pvt->_daysofweek),daysofweek);
 	splitDayParts(dayparts);
 }
 
@@ -94,16 +115,16 @@ bool sqlrschedulerule::inPeriods(
 			int32_t timepart) {
 
 	#ifdef DEBUG_MESSAGES
-		if (periods==&years) {
+		if (periods==&pvt->_years) {
 			stdoutput.printf("years...\n");
 		}
-		if (periods==&months) {
+		if (periods==&pvt->_months) {
 			stdoutput.printf("months...\n");
 		}
-		if (periods==&daysofmonth) {
+		if (periods==&pvt->_daysofmonth) {
 			stdoutput.printf("daysofmonth...\n");
 		}
-		if (periods==&daysofweek) {
+		if (periods==&pvt->_daysofweek) {
 			stdoutput.printf("daysofweek...\n");
 		}
 	#endif
@@ -131,7 +152,7 @@ bool sqlrschedulerule::inDayParts(int32_t hour, int32_t minute) {
 	debugPrintf("dayparts...\n");
 
 	for (linkedlistnode< sqlrscheduledaypart * >
-				*dpn=dayparts.getFirst();
+				*dpn=pvt->_dayparts.getFirst();
 				dpn; dpn=dpn->getNext()) {
 
 		sqlrscheduledaypart	*dp=dpn->getValue();
@@ -159,20 +180,20 @@ void sqlrschedulerule::splitTimePart(
 	// handle *'s
 	if (!charstring::compare(timepartlist,"*")) {
 		sqlrscheduleperiod	*p=new sqlrscheduleperiod;
-		if (periods==&years) {
+		if (periods==&pvt->_years) {
 			p->start=0;
 			// FIXME: is there a macro for this?
 			p->end=65535;
 		}
-		if (periods==&months) {
+		if (periods==&pvt->_months) {
 			p->start=1;
 			p->end=12;
 		}
-		if (periods==&daysofmonth) {
+		if (periods==&pvt->_daysofmonth) {
 			p->start=1;
 			p->end=31;
 		}
-		if (periods==&daysofweek) {
+		if (periods==&pvt->_daysofweek) {
 			p->start=1;
 			p->end=7;
 		}
@@ -227,7 +248,7 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 		dp->startminute=0;
 		dp->endhour=23;
 		dp->endminute=59;
-		dayparts.append(dp);
+		pvt->_dayparts.append(dp);
 		return;
 	}
 
@@ -272,7 +293,7 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 			dp->endhour=dp->starthour;
 			dp->endminute=dp->startminute;
 		}
-		this->dayparts.append(dp);
+		pvt->_dayparts.append(dp);
 
 		// clean up
 		for (uint64_t j=0; j<daypartpartscount; j++) {
@@ -287,18 +308,27 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 }
 
 
+class sqlrscheduleprivate {
+	friend class sqlrschedule;
+	private:
+		xmldomnode	*_parameters;
+		bool		_debug;
 
+		linkedlist< sqlrschedulerule * >	_rules;
+};
 
 sqlrschedule::sqlrschedule(xmldomnode *parameters, bool debug) {
-	this->parameters=parameters;
-	this->debug=debug;
+	pvt=new sqlrscheduleprivate;
+	pvt->_parameters=parameters;
+	pvt->_debug=debug;
 }
 
 sqlrschedule::~sqlrschedule() {
-	for (linkedlistnode< sqlrschedulerule * > *r=rules.getFirst();
+	for (linkedlistnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
 							r; r=r->getNext()) {
 		delete r->getValue();
 	}
+	delete pvt;
 }
 
 bool sqlrschedule::allowed(sqlrserverconnection *sqlrcon, const char *user) {
@@ -306,21 +336,29 @@ bool sqlrschedule::allowed(sqlrserverconnection *sqlrcon, const char *user) {
 }
 
 void sqlrschedule::addRule(bool allow, const char *when) {
-	rules.append(new sqlrschedulerule(allow,when));
+	pvt->_rules.append(new sqlrschedulerule(allow,when));
 }
 
 void sqlrschedule::addRule(bool allow,
 				const char *years, const char *months,
 				const char *daysofmonth, const char *daysofweek,
 				const char *dayparts) {
-	rules.append(new sqlrschedulerule(allow,years,months,
-				daysofmonth,daysofweek,dayparts));
+	pvt->_rules.append(new sqlrschedulerule(allow,years,months,
+					daysofmonth,daysofweek,dayparts));
 }
 
 bool sqlrschedule::rulesAllow(datetime *dt, bool currentlyallowed) {
-	for (linkedlistnode< sqlrschedulerule * > *r=rules.getFirst();
+	for (linkedlistnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
 							r; r=r->getNext()) {
 		currentlyallowed=r->getValue()->allowed(dt,currentlyallowed);
 	}
 	return currentlyallowed;
+}
+
+xmldomnode *sqlrschedule::getParameters() {
+	return pvt->_parameters;
+}
+
+bool sqlrschedule::getDebug() {
+	return pvt->_debug;
 }

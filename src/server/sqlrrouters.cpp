@@ -16,6 +16,12 @@
 	}
 #endif
 
+class sqlrrouterplugin {
+	public:
+		sqlrrouter	*r;
+		dynamiclib	*dl;
+};
+
 class sqlrroutersprivate {
 	friend class sqlrrouters;
 	private:

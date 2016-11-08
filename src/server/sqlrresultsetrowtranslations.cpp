@@ -17,6 +17,12 @@
 	}
 #endif
 
+class sqlrresultsetrowtranslationplugin {
+	public:
+		sqlrresultsetrowtranslation	*rstr;
+		dynamiclib			*dl;
+};
+
 class sqlrresultsetrowtranslationsprivate {
 	friend class sqlrresultsetrowtranslations;
 	private:

@@ -95,7 +95,7 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 		return true;
 	}
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("converted date \"%s\" ",*field);
 	}
 
@@ -111,7 +111,7 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 					dateformat,
 					timeformat);
 
-	if (debug) {
+	if (getDebug()) {
 		stdoutput.printf("\"%s\"\nusing ddmm=%d and yyyyddmm=%d\n",
 						*field,ddmm,yyyyddmm);
 	}
