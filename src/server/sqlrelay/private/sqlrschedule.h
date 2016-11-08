@@ -1,0 +1,9 @@
+// Copyright (c) 2016  David Muse
+// See the file COPYING for more information
+
+	protected:
+		xmldomnode	*parameters;
+		bool		debug;
+
+	private:
+		linkedlist< sqlrschedulerule * >	rules;

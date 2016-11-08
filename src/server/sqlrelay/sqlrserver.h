@@ -1076,15 +1076,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 
 		bool		load(xmldomnode *listeners);
 		sqlrprotocol	*getProtocol(uint16_t port);
-	private:
-		void	unload();
-		void	loadProtocol(uint16_t index, xmldomnode *listener);
 
-		sqlrservercontroller	*cont;
-		const char		*libexecdir;
-		bool			debug;
-
-		dictionary< uint16_t , sqlrprotocolplugin * >	protos;
+	#include <sqlrelay/private/sqlrprotocols.h>
 };
 
 
@@ -1106,9 +1099,8 @@ class SQLRSERVER_DLLSPEC sqlruserpasswordcredentials : public sqlrcredentials {
 
 		const char	*getUser();
 		const char	*getPassword();
-	private:
-		const char	*user;
-		const char	*password;
+
+	#include <sqlrelay/private/sqlruserpasswordcredentials.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrgsscredentials : public sqlrcredentials {
@@ -1120,8 +1112,8 @@ class SQLRSERVER_DLLSPEC sqlrgsscredentials : public sqlrcredentials {
 		void	setInitiator(const char *initiator);
 
 		const char	*getInitiator();
-	private:
-		const char	*initiator;
+
+	#include <sqlrelay/private/sqlrgsscredentials.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
@@ -1136,9 +1128,8 @@ class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 
 		const char		*getCommonName();
 		linkedlist< char * >	*getSubjectAlternateNames();
-	private:
-		const char		*commonname;
-		linkedlist< char * >	*subjectalternatenames;
+
+	#include <sqlrelay/private/sqlrtlscredentials.h>
 };
 
 
@@ -1150,10 +1141,8 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 		virtual	~sqlrauth();
 		virtual	const char	*auth(sqlrserverconnection *sqlrcon,
 							sqlrcredentials *cred);
-	protected:
-		xmldomnode		*parameters;
-		sqlrpwdencs		*sqlrpe;
-		bool			debug;
+
+	#include <sqlrelay/private/sqlrauth.h>
 };
 
 
@@ -1171,14 +1160,8 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		bool	load(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
 		const char	*auth(sqlrserverconnection *sqlrcon,
 						sqlrcredentials *cred);
-	private:
-		void	unload();
-		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrauthplugin * >	llist;
+	#include <sqlrelay/private/sqlrauths.h>
 };
 
 
@@ -1190,8 +1173,8 @@ class SQLRSERVER_DLLSPEC sqlrpwdenc {
 		virtual	bool	oneWay();
 		virtual	char	*encrypt(const char *value);
 		virtual	char	*decrypt(const char *value);
-	protected:
-		xmldomnode	*parameters;
+
+	#include <sqlrelay/private/sqlrpwdenc.h>
 };
 
 
@@ -1208,13 +1191,8 @@ class SQLRSERVER_DLLSPEC sqlrpwdencs {
 
 		bool		load(xmldomnode *parameters);
 		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
-	private:
-		void	unload();
-		void	loadPasswordEncryption(xmldomnode *pwdenc);
 
-		const char	*libexecdir;
-
-		singlylinkedlist< sqlrpwdencplugin * >	llist;
+	#include <sqlrelay/private/sqlrpwdencs.h>
 };
 
 
@@ -1258,10 +1236,8 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 					sqlrlogger_loglevel_t level,
 					sqlrevent_t event,
 					const char *info);
-	protected:
-		const char	*logLevel(sqlrlogger_loglevel_t level);
-		const char	*eventType(sqlrevent_t event);
-		xmldomnode	*parameters;
+
+	#include <sqlrelay/private/sqlrlogger.h>
 };
 
 
@@ -1285,13 +1261,8 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 				sqlrlogger_loglevel_t level,
 				sqlrevent_t event,
 				const char *info);
-	private:
-		void		unload();
-		void		loadLogger(xmldomnode *logger);
 
-		const char	*libexecdir;
-
-		singlylinkedlist< sqlrloggerplugin * >	llist;
+	#include <sqlrelay/private/sqlrloggers.h>
 };
 
 
@@ -1307,12 +1278,8 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
 					const char *info);
-	protected:
-		sqlrnotifications	*ns;
-		xmldomnode		*parameters;
-		xmldomnode		*transports;
-		xmldomnode		*recipients;
-		bool			debug;
+
+	#include <sqlrelay/private/sqlrnotification.h>
 };
 
 
@@ -1348,25 +1315,8 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 						const char *info);
 
 		xmldomnode	*getTransport(const char *transportid);
-	private:
-		void		unload();
-		void		loadNotification(xmldomnode *notification);
 
-		char		*substitutions(sqlrlistener *sqlrl,
-						sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						const char *str,
-						const char *event,
-						const char *info);
-
-		const char	*libexecdir;
-		const char	*tmpdir;
-		char		*tmpfilename;
-		bool		debug;
-
-		xmldomnode	*transports;
-
-		singlylinkedlist< sqlrnotificationplugin * >	llist;
+	#include <sqlrelay/private/sqlrnotifications.h>
 };
 
 
@@ -1397,28 +1347,7 @@ class SQLRSERVER_DLLSPEC sqlrschedulerule {
 
 		bool	allowed(datetime *dt, bool currentlyallowed);
 		
-	private:
-		void	init(bool allow,
-				const char *years,
-				const char *months,
-				const char *daysofmonth,
-				const char *daysofweek,
-				const char *dayparts);
-		void	splitTimePart(
-				linkedlist< sqlrscheduleperiod * > *periods,
-				const char *timepartlist);
-		void	splitDayParts(const char *daypartlist);
-		bool	inPeriods(
-				linkedlist< sqlrscheduleperiod * > *periods,
-				int32_t timepart);
-		bool	inDayParts(int32_t hour, int32_t minute);
-
-		bool			allow;
-		linkedlist< sqlrscheduleperiod * >	years;
-		linkedlist< sqlrscheduleperiod * >	months;
-		linkedlist< sqlrscheduleperiod * >	daysofmonth;
-		linkedlist< sqlrscheduleperiod * >	daysofweek;
-		linkedlist< sqlrscheduledaypart * >	dayparts;
+	#include <sqlrelay/private/sqlrschedulerule.h>
 };
 
 
@@ -1440,12 +1369,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 
 		virtual	bool	rulesAllow(datetime *dt, bool currentlyallowed);
 
-	protected:
-		xmldomnode	*parameters;
-		bool		debug;
-
-	private:
-		linkedlist< sqlrschedulerule * >	rules;
+	#include <sqlrelay/private/sqlrschedule.h>
 };
 
 
@@ -1463,14 +1387,8 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 		bool	load(xmldomnode *parameters);
 		bool	allowed(sqlrserverconnection *sqlrcon,
 						const char *user);
-	private:
-		void		unload();
-		void		loadSchedule(xmldomnode *schedule);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrscheduleplugin * >	llist;
+	#include <sqlrelay/private/sqlrschedules.h>
 };
 
 
@@ -1481,9 +1399,8 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 
 		virtual const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
-	protected:
-		xmldomnode	*parameters;
-		bool		debug;
+
+	#include <sqlrelay/private/sqlrrouter.h>
 };
 
 
@@ -1502,14 +1419,8 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
-	private:
-		void		unload();
-		void		loadRouter(xmldomnode *route);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrrouterplugin * >	llist;
+	#include <sqlrelay/private/sqlrrouters.h>
 };
 
 
@@ -1531,9 +1442,8 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 					stringbuffer *output);
 
 		virtual void	getMetaData(xmldomnode *node);
-	protected:
-		xmldomnode	*parameters;
-		bool		debug;
+
+	#include <sqlrelay/private/sqlrparser.h>
 };
 
 
@@ -1554,10 +1464,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
-	protected:
-		sqlrtranslations	*sqlts;
-		xmldomnode		*parameters;
-		bool			debug;
+
+	#include <sqlrelay/private/sqlrtranslation.h>
 };
 
 
@@ -1609,58 +1517,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						const char *index);
 
 		void	endSession();
-	private:
-		void	unload();
-		void	loadTranslation(xmldomnode *translation);
 
-		bool	getReplacementName(
-				dictionary< databaseobject *, char *> *dict,
-				const char *database,
-				const char *schema,
-				const char *oldname,
-				const char **newname);
-		bool	removeReplacement(
-				dictionary< databaseobject *, char *> *dict,
-				const char *database,
-				const char *schema,
-				const char *oldname);
-		
-		const char	*libexecdir;
-		xmldom		*tree;
-		bool		debug;
-
-		singlylinkedlist< sqlrtranslationplugin * >	tlist;
-
-	public:
-		// helper methods
-		xmldomnode	*newNode(xmldomnode *parentnode,
-							const char *type);
-		xmldomnode	*newNode(xmldomnode *parentnode,
-							const char *type,
-							const char *value);
-		xmldomnode	*newNodeAfter(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type);
-		xmldomnode	*newNodeAfter(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type,
-							const char *value);
-		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type);
-		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type,
-							const char *value);
-		void		setAttribute(xmldomnode *node,
-							const char *name,
-							const char *value);
-		bool		isString(const char *value);
-
-		memorypool	*temptablepool;
-		memorypool	*tempindexpool;
-		dictionary< databaseobject *, char * >	temptablemap;
-		dictionary< databaseobject *, char * >	tempindexmap;
+	#include <sqlrelay/private/sqlrtranslations.h>
 };
 
 
@@ -1682,10 +1540,8 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 					xmldom *querytree);
 
 		virtual void	getError(const char **err, int64_t *errn);
-	protected:
-		sqlrfilters		*sqlrfs;
-		xmldomnode		*parameters;
-		bool			debug;
+
+	#include <sqlrelay/private/sqlrfilter.h>
 };
 
 
@@ -1707,14 +1563,8 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 						const char *query,
 						const char **err,
 						int64_t *errn);
-	private:
-		void	unloadFilters();
-		void	loadFilter(xmldomnode *filter);
-		
-		const char	*libexecdir;
-		bool		debug;
 
-		singlylinkedlist< sqlrfilterplugin * >	tlist;
+	#include <sqlrelay/private/sqlrfilters.h>
 };
 
 
@@ -1732,10 +1582,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					uint32_t fieldindex,
 					const char **field,
 					uint64_t *fieldlength);
-	protected:
-		sqlrresultsettranslations	*sqlrrsts;
-		xmldomnode			*parameters;
-		bool				debug;
+
+	#include <sqlrelay/private/sqlrresultsettranslation.h>
 };
 
 
@@ -1758,15 +1606,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 						uint32_t fieldindex,
 						const char **field,
 						uint64_t *fieldlength);
-	private:
-		void	unload();
-		void	loadResultSetTranslation(
-					xmldomnode *resultsettranslation);
-		
-		const char	*libexecdir;
-		bool		debug;
 
-		singlylinkedlist< sqlrresultsettranslationplugin * >	tlist;
+	#include <sqlrelay/private/sqlrresultsettranslations.h>
 };
 
 
@@ -1784,10 +1625,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					const char * const *fieldnames,
 					const char ***fields,
 					uint64_t **fieldlengths);
-	protected:
-		sqlrresultsetrowtranslations	*sqlrrrsts;
-		xmldomnode			*parameters;
-		bool				debug;
+
+	#include <sqlrelay/private/sqlrresultsetrowtranslation.h>
 };
 
 
@@ -1810,15 +1649,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 						const char * const *fieldnames,
 						const char ***fields,
 						uint64_t **fieldlengths);
-	private:
-		void	unload();
-		void	loadResultSetRowTranslation(
-					xmldomnode *resultsetrowtranslation);
-		
-		const char	*libexecdir;
-		bool		debug;
 
-		singlylinkedlist< sqlrresultsetrowtranslationplugin * >	tlist;
+	#include <sqlrelay/private/sqlrresultsetrowtranslations.h>
 };
 
 
@@ -1832,9 +1664,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 					xmldom *querytree,
 					bool before,
 					bool success);
-	protected:
-		xmldomnode	*parameters;
-		bool		debug;
+
+	#include <sqlrelay/private/sqlrtrigger.h>
 };
 
 
@@ -1857,24 +1688,8 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 						sqlrservercursor *sqlrcur,
 						xmldom *querytree,
 						bool success);
-	private:
-		void		unload();
-		void		loadTrigger(xmldomnode *trigger,
-					singlylinkedlist< sqlrtriggerplugin *>
-					*list);
-		void		run(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					xmldom *querytree,
-					singlylinkedlist< sqlrtriggerplugin * >
-					*list,
-					bool before,
-					bool success);
 
-		const char	*libexecdir;
-		bool		debug;
-
-		singlylinkedlist< sqlrtriggerplugin * >	beforetriggers;
-		singlylinkedlist< sqlrtriggerplugin * >	aftertriggers;
+	#include <sqlrelay/private/sqlrtriggers.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrquery {
@@ -1887,8 +1702,8 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 		virtual sqlrquerycursor	*newCursor(	
 						sqlrserverconnection *sqlrcon,
 						uint16_t id);
-	protected:
-		xmldomnode	*parameters;
+
+	#include <sqlrelay/private/sqlrquery.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
@@ -1900,8 +1715,8 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 		virtual sqlrquerytype_t	queryType(const char *query,
 							uint32_t length);
 		bool	isCustomQuery();
-	protected:
-		xmldomnode	*parameters;
+
+	#include <sqlrelay/private/sqlrquerycursor.h>
 };
 
 
@@ -1921,13 +1736,8 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 						const char *querystring,
 						uint32_t querylength,
 						uint16_t id);
-	private:
-		void		unload();
-		void		loadQuery(xmldomnode *logger);
 
-		const char	*libexecdir;
-
-		singlylinkedlist< sqlrqueryplugin * >	llist;
+	#include <sqlrelay/private/sqlrqueries.h>
 };
 
 #endif
