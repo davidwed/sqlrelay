@@ -1047,17 +1047,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 		virtual clientsessionexitstatus_t	clientSession()=0;
 
-	protected:
-		sqlrservercontroller	*cont;
-		xmldomnode		*parameters;
-		bool			debug;
-
-		filedescriptor		*clientsock;
-
-		gsscredentials	gcred;
-		gssmechanism	gmech;
-		gsscontext	gctx;
-		tlscontext	tctx;
+	#include <sqlrelay/private/sqlrprotocol.h>
 };
 
 

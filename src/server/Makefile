@@ -372,6 +372,7 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrnotification.h $(includedir)/sqlrelay/private/sqlrnotification.h
 	$(CP) sqlrelay/private/sqlrnotifications.h $(includedir)/sqlrelay/private/sqlrnotifications.h
 	$(CP) sqlrelay/private/sqlrparser.h $(includedir)/sqlrelay/private/sqlrparser.h
+	$(CP) sqlrelay/private/sqlrprotocol.h $(includedir)/sqlrelay/private/sqlrprotocol.h
 	$(CP) sqlrelay/private/sqlrprotocols.h $(includedir)/sqlrelay/private/sqlrprotocols.h
 	$(CP) sqlrelay/private/sqlrpwdenc.h $(includedir)/sqlrelay/private/sqlrpwdenc.h
 	$(CP) sqlrelay/private/sqlrpwdencs.h $(includedir)/sqlrelay/private/sqlrpwdencs.h
