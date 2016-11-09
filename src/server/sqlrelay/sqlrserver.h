@@ -6,41 +6,6 @@
 
 #include <sqlrelay/private/sqlrserverincludes.h>
 
-class sqlrserverconnection;
-class sqlrservercursor;
-class sqlrprotocol;
-class sqlrprotocols;
-class sqlrcredentials;
-class sqlrauth;
-class sqlrauths;
-class sqlrpwdenc;
-class sqlrpwdencs;
-class sqlrlogger;
-class sqlrloggers;
-class sqlrnotification;
-class sqlrnotifications;
-class sqlrscheduleperiod;
-class sqlrscheduledaypart;
-class sqlrschedulerule;
-class sqlrschedule;
-class sqlrschedules;
-class sqlrparser;
-class sqlrtranslation;
-class sqlrtranslations;
-class sqlrfilter;
-class sqlrfilters;
-class sqlrresultsettranslation;
-class sqlrresultsettranslations;
-class sqlrresultsetrowtranslation;
-class sqlrresultsetrowtranslations;
-class sqlrtrigger;
-class sqlrtriggers;
-class sqlrquery;
-class sqlrquerycursor;
-class sqlrqueries;
-
-class sqlrlistenerprivate;
-
 class SQLRSERVER_DLLSPEC sqlrlistener {
 	public:
 			sqlrlistener();
@@ -128,8 +93,6 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 		sqlrserverbindvartype_t	type;
 		int16_t			isnull;
 };
-
-class sqlrservercontrollerprivate;
 
 class SQLRSERVER_DLLSPEC sqlrservercontroller {
 	public:
@@ -639,8 +602,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 	#include <sqlrelay/private/sqlrservercontroller.h>
 };
 
-class sqlrserverconnectionprivate;
-
 class SQLRSERVER_DLLSPEC sqlrserverconnection {
 	public:
 			sqlrserverconnection(sqlrservercontroller *cont);
@@ -757,8 +718,6 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 
 	#include <sqlrelay/private/sqlrserverconnection.h>
 };
-
-class sqlrservercursorprivate;
 
 class SQLRSERVER_DLLSPEC sqlrservercursor {
 	public:
@@ -1036,8 +995,6 @@ enum clientsessionexitstatus_t {
 	CLIENTSESSIONEXITSTATUS_SUSPENDED_SESSION
 };
 
-class sqlrprotocolprivate;
-
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
 			sqlrprotocol(sqlrservercontroller *cont,
@@ -1060,8 +1017,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 	#include <sqlrelay/private/sqlrprotocol.h>
 };
 
-class sqlrprotocolsprivate;
-
 class SQLRSERVER_DLLSPEC sqlrprotocols {
 	public:
 			sqlrprotocols(sqlrservercontroller *cont,
@@ -1082,8 +1037,6 @@ class SQLRSERVER_DLLSPEC sqlrcredentials {
 		virtual const char	*getType()=0;
 };
 
-class sqlruserpasswordcredentialsprivate;
-
 class SQLRSERVER_DLLSPEC sqlruserpasswordcredentials : public sqlrcredentials {
 	public:
 			sqlruserpasswordcredentials();
@@ -1099,8 +1052,6 @@ class SQLRSERVER_DLLSPEC sqlruserpasswordcredentials : public sqlrcredentials {
 	#include <sqlrelay/private/sqlruserpasswordcredentials.h>
 };
 
-class sqlrgsscredentialsprivate;
-
 class SQLRSERVER_DLLSPEC sqlrgsscredentials : public sqlrcredentials {
 	public:
 			sqlrgsscredentials();
@@ -1113,8 +1064,6 @@ class SQLRSERVER_DLLSPEC sqlrgsscredentials : public sqlrcredentials {
 
 	#include <sqlrelay/private/sqlrgsscredentials.h>
 };
-
-class sqlrtlscredentialsprivate;
 
 class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 	public:
@@ -1132,8 +1081,6 @@ class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 	#include <sqlrelay/private/sqlrtlscredentials.h>
 };
 
-class sqlrauthprivate;
-
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 			sqlrauth(xmldomnode *parameters,
@@ -1149,8 +1096,6 @@ class SQLRSERVER_DLLSPEC sqlrauth {
 	#include <sqlrelay/private/sqlrauth.h>
 };
 
-class sqlrauthsprivate;
-
 class SQLRSERVER_DLLSPEC sqlrauths {
 	public:
 			sqlrauths(sqlrpaths *sqlrpth, bool debug);
@@ -1162,8 +1107,6 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 
 	#include <sqlrelay/private/sqlrauths.h>
 };
-
-class sqlrpwdencprivate;
 
 class SQLRSERVER_DLLSPEC sqlrpwdenc {
 	public:
@@ -1179,8 +1122,6 @@ class SQLRSERVER_DLLSPEC sqlrpwdenc {
 
 	#include <sqlrelay/private/sqlrpwdenc.h>
 };
-
-class sqlrpwdencsprivate;
 
 class SQLRSERVER_DLLSPEC sqlrpwdencs {
 	public:
@@ -1220,8 +1161,6 @@ enum sqlrlogger_loglevel_t {
 	SQLRLOGGER_LOGLEVEL_ERROR
 };
 
-class sqlrloggerprivate;
-
 class SQLRSERVER_DLLSPEC sqlrlogger {
 	public:
 			sqlrlogger(xmldomnode *parameters);
@@ -1244,8 +1183,6 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 	#include <sqlrelay/private/sqlrlogger.h>
 };
 
-class sqlrloggersprivate;
-
 class SQLRSERVER_DLLSPEC sqlrloggers {
 	public:
 			sqlrloggers(sqlrpaths *sqlrpth);
@@ -1263,8 +1200,6 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 
 	#include <sqlrelay/private/sqlrloggers.h>
 };
-
-class sqlrnotificationprivate;
 
 class SQLRSERVER_DLLSPEC sqlrnotification {
 	public:
@@ -1286,8 +1221,6 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 
 	#include <sqlrelay/private/sqlrnotification.h>
 };
-
-class sqlrnotificationsprivate;
 
 class SQLRSERVER_DLLSPEC sqlrnotifications {
 	public:
@@ -1333,8 +1266,6 @@ class SQLRSERVER_DLLSPEC sqlrscheduledaypart {
 		uint16_t	endminute;
 };
 
-class sqlrscheduleruleprivate;
-
 class SQLRSERVER_DLLSPEC sqlrschedulerule {
 	public:
 		sqlrschedulerule(bool allow, const char *when);
@@ -1350,8 +1281,6 @@ class SQLRSERVER_DLLSPEC sqlrschedulerule {
 		
 	#include <sqlrelay/private/sqlrschedulerule.h>
 };
-
-class sqlrscheduleprivate;
 
 class SQLRSERVER_DLLSPEC sqlrschedule {
 	public:
@@ -1378,8 +1307,6 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 	#include <sqlrelay/private/sqlrschedule.h>
 };
 
-class sqlrschedulesprivate;
-
 class SQLRSERVER_DLLSPEC sqlrschedules {
 	public:
 			sqlrschedules(sqlrpaths *sqlrpth, bool debug);
@@ -1391,8 +1318,6 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 
 	#include <sqlrelay/private/sqlrschedules.h>
 };
-
-class sqlrrouterprivate;
 
 class SQLRSERVER_DLLSPEC sqlrrouter {
 	public:
@@ -1409,8 +1334,6 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 	#include <sqlrelay/private/sqlrrouter.h>
 };
 
-class sqlrroutersprivate;
-
 class SQLRSERVER_DLLSPEC sqlrrouters {
 	public:
 			sqlrrouters(sqlrpaths *sqlrpth, bool debug);
@@ -1423,8 +1346,6 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 
 	#include <sqlrelay/private/sqlrrouters.h>
 };
-
-class sqlrparserprivate;
 
 class SQLRSERVER_DLLSPEC sqlrparser {
 	public:
@@ -1452,8 +1373,6 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 	#include <sqlrelay/private/sqlrparser.h>
 };
 
-class sqlrtranslationprivate;
-
 class SQLRSERVER_DLLSPEC sqlrtranslation {
 	public:
 			sqlrtranslation(sqlrtranslations *sqlts,
@@ -1479,16 +1398,6 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 
 	#include <sqlrelay/private/sqlrtranslation.h>
 };
-
-class SQLRSERVER_DLLSPEC sqlrdatabaseobject {
-	public:
-		const char	*database;
-		const char	*schema;
-		const char	*object;
-		const char	*dependency;
-};
-
-class sqlrtranslationsprivate;
 
 class SQLRSERVER_DLLSPEC sqlrtranslations {
 	public:
@@ -1536,8 +1445,6 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 	#include <sqlrelay/private/sqlrtranslations.h>
 };
 
-class sqlrfilterprivate;
-
 class SQLRSERVER_DLLSPEC sqlrfilter {
 	public:
 			sqlrfilter(sqlrfilters *sqlrfs,
@@ -1565,8 +1472,6 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 	#include <sqlrelay/private/sqlrfilter.h>
 };
 
-class sqlrfiltersprivate;
-
 class SQLRSERVER_DLLSPEC sqlrfilters {
 	public:
 			sqlrfilters(sqlrpaths *sqlrpth, bool debug);
@@ -1582,8 +1487,6 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 
 	#include <sqlrelay/private/sqlrfilters.h>
 };
-
-class sqlrresultsettranslationprivate;
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
@@ -1608,8 +1511,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	#include <sqlrelay/private/sqlrresultsettranslation.h>
 };
 
-class sqlrresultsettranslationsprivate;
-
 class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 	public:
 			sqlrresultsettranslations(sqlrpaths *sqlrpth,
@@ -1626,8 +1527,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 
 	#include <sqlrelay/private/sqlrresultsettranslations.h>
 };
-
-class sqlrresultsetrowtranslationprivate;
 
 class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 	public:
@@ -1652,8 +1551,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 	#include <sqlrelay/private/sqlrresultsetrowtranslation.h>
 };
 
-class sqlrresultsetrowtranslationsprivate;
-
 class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 	public:
 			sqlrresultsetrowtranslations(sqlrpaths *sqlrpth,
@@ -1670,8 +1567,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 
 	#include <sqlrelay/private/sqlrresultsetrowtranslations.h>
 };
-
-class sqlrtriggerprivate;
 
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
@@ -1691,9 +1586,6 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 	#include <sqlrelay/private/sqlrtrigger.h>
 };
 
-class sqlrtriggersprivate;
-class sqlrtriggerplugin;
-
 class SQLRSERVER_DLLSPEC sqlrtriggers {
 	public:
 			sqlrtriggers(sqlrpaths *sqlrpth, bool debug);
@@ -1710,8 +1602,6 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 
 	#include <sqlrelay/private/sqlrtriggers.h>
 };
-
-class sqlrqueryprivate;
 
 class SQLRSERVER_DLLSPEC sqlrquery {
 	public:
@@ -1730,8 +1620,6 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 	#include <sqlrelay/private/sqlrquery.h>
 };
 
-class sqlrquerycursorprivate;
-
 class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 	public:
 			sqlrquerycursor(sqlrserverconnection *conn,
@@ -1747,8 +1635,6 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 
 	#include <sqlrelay/private/sqlrquerycursor.h>
 };
-
-class sqlrqueriesprivate;
 
 class SQLRSERVER_DLLSPEC sqlrqueries {
 	public:
