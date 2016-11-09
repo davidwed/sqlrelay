@@ -5,22 +5,27 @@
 		void	unload();
 		void	loadTranslation(xmldomnode *translation);
 
+		sqlrdatabaseobject *createDatabaseObject(
+						memorypool *pool,
+						const char *database,
+						const char *schema,
+						const char *object,
+						const char *dependency);
+
+		void	setReplacementName(
+				dictionary< sqlrdatabaseobject *, char *> *dict,
+				sqlrdatabaseobject *oldobject,
+				const char *newobject);
 		bool	getReplacementName(
 				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
-				const char *oldname,
-				const char **newname);
+				const char *oldobject,
+				const char **newobject);
 		bool	removeReplacement(
 				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
-				const char *oldname);
+				const char *oldobject);
 
 		sqlrtranslationsprivate	*pvt;
-
-	public:
-		memorypool	*temptablepool;
-		memorypool	*tempindexpool;
-		dictionary< sqlrdatabaseobject *, char * >	temptablemap;
-		dictionary< sqlrdatabaseobject *, char * >	tempindexmap;

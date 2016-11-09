@@ -1500,26 +1500,34 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						const char *query,
 						stringbuffer *translatedquery);
 
+		void	setReplacementTableName(const char *database,
+						const char *schema,
+						const char *oldtable,
+						const char *newtable);
+		void	setReplacementIndexName(const char *database,
+						const char *schema,
+						const char *oldindex,
+						const char *newindex,
+						const char *table);
+
 		bool	getReplacementTableName(const char *database,
 						const char *schema,
-						const char *oldname,
-						const char **newname);
+						const char *oldtable,
+						const char **newtable);
 		bool	getReplacementIndexName(const char *database,
 						const char *schema,
-						const char *oldname,
-						const char **newname);
-		sqlrdatabaseobject *createDatabaseObject(
-						memorypool *pool,
-						const char *database,
-						const char *schema,
-						const char *object,
-						const char *dependency);
+						const char *oldtable,
+						const char **newtable);
+
 		bool	removeReplacementTable(const char *database,
 						const char *schema,
 						const char *table);
 		bool	removeReplacementIndex(const char *database,
 						const char *schema,
 						const char *index);
+
+		memorypool	*getTableNamePool();
+		memorypool	*getIndexNamePool();
 
 		void	endSession();
 

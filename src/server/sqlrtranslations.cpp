@@ -31,6 +31,12 @@ class sqlrtranslationsprivate {
 		bool		_debug;
 
 		singlylinkedlist< sqlrtranslationplugin * >	_tlist;
+
+		memorypool	*_tablenamepool;
+		memorypool	*_indexnamepool;
+
+		dictionary< sqlrdatabaseobject *, char * >	_tablenamemap;
+		dictionary< sqlrdatabaseobject *, char * >	_indexnamemap;
 };
 
 sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
@@ -38,16 +44,16 @@ sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
 	pvt=new sqlrtranslationsprivate;
 	pvt->_tree=NULL;
 	pvt->_debug=debug;
-	temptablepool=new memorypool(0,128,100);
-	tempindexpool=new memorypool(0,128,100);
+	pvt->_tablenamepool=new memorypool(0,128,100);
+	pvt->_indexnamepool=new memorypool(0,128,100);
 	pvt->_libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrtranslations::~sqlrtranslations() {
 	debugFunction();
 	unload();
-	delete temptablepool;
-	delete tempindexpool;
+	delete pvt->_tablenamepool;
+	delete pvt->_indexnamepool;
 	delete pvt;
 }
 
@@ -263,54 +269,6 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-void sqlrtranslations::endSession() {
-	temptablepool->deallocate();
-	tempindexpool->deallocate();
-	temptablemap.clear();
-	tempindexmap.clear();
-}
-
-bool	sqlrtranslations::getReplacementTableName(const char *database,
-						const char *schema,
-						const char *oldname,
-						const char **newname) {
-		return getReplacementName(&temptablemap,
-						database,schema,
-						oldname,newname);
-}
-
-bool	sqlrtranslations::getReplacementIndexName(const char *database,
-						const char *schema,
-						const char *oldname,
-						const char **newname) {
-		return getReplacementName(&tempindexmap,
-						database,schema,
-						oldname,newname);
-}
-
-bool	sqlrtranslations::getReplacementName(
-				dictionary< sqlrdatabaseobject *, char *> *dict,
-				const char *database,
-				const char *schema,
-				const char *oldname,
-				const char **newname) {
-
-	*newname=NULL;
-	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
-					*node=dict->getList()->getFirst();
-						node; node=node->getNext()) {
-
-		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
-		if (!charstring::compare(dbo->database,database) &&
-			!charstring::compare(dbo->schema,schema) &&
-			!charstring::compare(dbo->object,oldname)) {
-			*newname=node->getValue()->getValue();
-			return true;
-		}
-	}
-	return false;
-}
-
 sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
 						const char *database,
 						const char *schema,
@@ -363,18 +321,95 @@ sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
 	return dbo;
 }
 
+void sqlrtranslations::setReplacementTableName(
+					const char *database,
+					const char *schema,
+					const char *oldtable,
+					const char *newtable) {
+	setReplacementName(&pvt->_tablenamemap,
+				createDatabaseObject(pvt->_tablenamepool,
+							database,
+							schema,
+							oldtable,
+							NULL),
+				newtable);
+}
+
+void sqlrtranslations::setReplacementIndexName(
+					const char *database,
+					const char *schema,
+					const char *oldindex,
+					const char *newindex,
+					const char *table) {
+	setReplacementName(&pvt->_indexnamemap,
+				createDatabaseObject(pvt->_indexnamepool,
+							database,
+							schema,
+							oldindex,
+							table),
+				newindex);
+}
+
+void sqlrtranslations::setReplacementName(
+				dictionary< sqlrdatabaseobject *, char *> *dict,
+				sqlrdatabaseobject *oldobject,
+				const char *newobject) {
+	dict->setValue(oldobject,(char *)newobject);
+}
+
+bool sqlrtranslations::getReplacementTableName(const char *database,
+						const char *schema,
+						const char *oldtable,
+						const char **newtable) {
+	return getReplacementName(&pvt->_tablenamemap,
+					database,schema,
+					oldtable,newtable);
+}
+
+bool sqlrtranslations::getReplacementIndexName(const char *database,
+						const char *schema,
+						const char *oldtable,
+						const char **newtable) {
+		return getReplacementName(&pvt->_indexnamemap,
+						database,schema,
+						oldtable,newtable);
+}
+
+bool sqlrtranslations::getReplacementName(
+				dictionary< sqlrdatabaseobject *, char *> *dict,
+				const char *database,
+				const char *schema,
+				const char *oldobject,
+				const char **newobject) {
+
+	*newobject=NULL;
+	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
+					*node=dict->getList()->getFirst();
+						node; node=node->getNext()) {
+
+		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
+		if (!charstring::compare(dbo->database,database) &&
+			!charstring::compare(dbo->schema,schema) &&
+			!charstring::compare(dbo->object,oldobject)) {
+			*newobject=node->getValue()->getValue();
+			return true;
+		}
+	}
+	return false;
+}
+
 bool sqlrtranslations::removeReplacementTable(const char *database,
 						const char *schema,
 						const char *table) {
 
 	// remove the table
-	if (!removeReplacement(&temptablemap,database,schema,table)) {
+	if (!removeReplacement(&pvt->_tablenamemap,database,schema,table)) {
 		return false;
 	}
 
 	// remove any indices that depend on the table
 	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
-			*node=tempindexmap.getList()->getFirst(); node;) {
+			*node=pvt->_indexnamemap.getList()->getFirst(); node;) {
 
 		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
 
@@ -387,7 +422,7 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->dependency,table)) {
 
-			tempindexmap.remove(dbo);
+			pvt->_indexnamemap.remove(dbo);
 		}
 	}
 	return true;
@@ -396,28 +431,43 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 bool sqlrtranslations::removeReplacementIndex(const char *database,
 						const char *schema,
 						const char *index) {
-	return removeReplacement(&tempindexmap,database,schema,index);
+	return removeReplacement(&pvt->_indexnamemap,database,schema,index);
 }
 
 bool sqlrtranslations::removeReplacement(
 				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
-				const char *name) {
+				const char *object) {
 
 	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
 				*node=dict->getList()->getFirst();
 					node; node=node->getNext()) {
 
 		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
-		const char	*replacementname=node->getValue()->getValue();
+		const char	*replacementobject=node->getValue()->getValue();
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
-			!charstring::compare(replacementname,name)) {
+			!charstring::compare(replacementobject,object)) {
 
 			dict->remove(dbo);
 			return true;
 		}
 	}
 	return false;
+}
+
+memorypool *sqlrtranslations::getTableNamePool() {
+	return pvt->_tablenamepool;
+}
+
+memorypool *sqlrtranslations::getIndexNamePool() {
+	return pvt->_indexnamepool;
+}
+
+void sqlrtranslations::endSession() {
+	pvt->_tablenamepool->deallocate();
+	pvt->_indexnamepool->deallocate();
+	pvt->_tablenamemap.clear();
+	pvt->_indexnamemap.clear();
 }
