@@ -26,73 +26,141 @@
 	#define MAXPATHLEN	256
 #endif
 
-signalhandler		sqlrlistener::alarmhandler;
-volatile sig_atomic_t	sqlrlistener::alarmrang=0;
+class sqlrlistenerprivate {
+	friend class sqlrlistener;
+	private:
+		listener	_lsnr;
+
+		uint32_t	_maxconnections;
+		bool		_dynamicscaling;
+
+		int64_t		_maxlisteners;
+		uint64_t	_listenertimeout;
+
+		char		*_pidfile;
+
+		sqlrcmdline	*_cmdl;
+		sqlrpaths	*_sqlrpth;
+		sqlrconfigs	*_sqlrcfgs;
+		sqlrconfig	*_cfg;
+
+		bool		_debugsqlrnotifications;
+
+		sqlrloggers		*_sqlrlg;
+		sqlrnotifications	*_sqlrn;
+
+		stringbuffer	_debugstr;
+
+		semaphoreset	*_semset;
+		sharedmemory	*_shmem;
+		sqlrshm		*_shm;
+		char		*_idfilename;
+
+		bool	_initialized;
+
+		inetsocketserver	**_clientsockin;
+		uint16_t		*_clientsockinprotoindex;
+		uint64_t		_clientsockincount;
+		uint64_t		_clientsockinindex;
+
+		unixsocketserver	**_clientsockun;
+		uint16_t		*_clientsockunprotoindex;
+		uint64_t		_clientsockuncount;
+		uint64_t		_clientsockunindex;
+
+		unixsocketserver	*_handoffsockun;
+		char			*_handoffsockname;
+		unixsocketserver	*_removehandoffsockun;
+		char			*_removehandoffsockname;
+		unixsocketserver	*_fixupsockun;
+		char			*_fixupsockname;
+
+		uint16_t		_handoffmode;
+		handoffsocketnode	*_handoffsocklist;
+
+		regularexpression	*_allowed;
+		regularexpression	*_denied;
+
+		uint32_t	_maxquerysize;
+		uint16_t	_maxbindcount;
+		uint16_t	_maxbindnamelength;
+		int32_t		_idleclienttimeout;
+
+		bool	_isforkedchild;
+		bool	_isforkedthread;
+
+		bool	_usethreads;
+};
+
+static signalhandler		alarmhandler;
+static volatile sig_atomic_t	alarmrang=0;
 
 sqlrlistener::sqlrlistener() {
 
-	cmdl=NULL;
-	sqlrcfgs=NULL;
-	cfg=NULL;
+	pvt=new sqlrlistenerprivate;
 
-	debugsqlrnotifications=false;
+	pvt->_cmdl=NULL;
+	pvt->_sqlrcfgs=NULL;
+	pvt->_cfg=NULL;
 
-	initialized=false;
+	pvt->_debugsqlrnotifications=false;
 
-	sqlrlg=NULL;
-	sqlrn=NULL;
+	pvt->_initialized=false;
 
-	semset=NULL;
-	shmem=NULL;
-	shm=NULL;
-	idfilename=NULL;
+	pvt->_sqlrlg=NULL;
+	pvt->_sqlrn=NULL;
 
-	pidfile=NULL;
-	sqlrpth=NULL;
+	pvt->_semset=NULL;
+	pvt->_shmem=NULL;
+	pvt->_shm=NULL;
+	pvt->_idfilename=NULL;
 
-	clientsockin=NULL;
-	clientsockinprotoindex=NULL;
-	clientsockincount=0;
-	clientsockinindex=0;
-	clientsockun=NULL;
-	clientsockunprotoindex=NULL;
-	clientsockuncount=0;
-	clientsockunindex=0;
+	pvt->_pidfile=NULL;
+	pvt->_sqlrpth=NULL;
 
-	handoffsockun=NULL;
-	handoffsockname=NULL;
-	removehandoffsockun=NULL;
-	removehandoffsockname=NULL;
-	fixupsockun=NULL;
-	fixupsockname=NULL;
+	pvt->_clientsockin=NULL;
+	pvt->_clientsockinprotoindex=NULL;
+	pvt->_clientsockincount=0;
+	pvt->_clientsockinindex=0;
+	pvt->_clientsockun=NULL;
+	pvt->_clientsockunprotoindex=NULL;
+	pvt->_clientsockuncount=0;
+	pvt->_clientsockunindex=0;
 
-	handoffsocklist=NULL;
+	pvt->_handoffsockun=NULL;
+	pvt->_handoffsockname=NULL;
+	pvt->_removehandoffsockun=NULL;
+	pvt->_removehandoffsockname=NULL;
+	pvt->_fixupsockun=NULL;
+	pvt->_fixupsockname=NULL;
 
-	denied=NULL;
-	allowed=NULL;
+	pvt->_handoffsocklist=NULL;
 
-	maxquerysize=0;
-	maxbindcount=0;
-	maxbindnamelength=0;
-	idleclienttimeout=-1;
+	pvt->_denied=NULL;
+	pvt->_allowed=NULL;
 
-	isforkedchild=false;
-	isforkedthread=false;
-	handoffmode=HANDOFF_PASS;
+	pvt->_maxquerysize=0;
+	pvt->_maxbindcount=0;
+	pvt->_maxbindnamelength=0;
+	pvt->_idleclienttimeout=-1;
 
-	usethreads=false;
+	pvt->_isforkedchild=false;
+	pvt->_isforkedthread=false;
+	pvt->_handoffmode=HANDOFF_PASS;
+
+	pvt->_usethreads=false;
 }
 
 sqlrlistener::~sqlrlistener() {
-	if (!isforkedchild && idfilename) {
-		file::remove(idfilename);
+	if (!pvt->_isforkedchild && pvt->_idfilename) {
+		file::remove(pvt->_idfilename);
 	}
-	delete[] idfilename;
+	delete[] pvt->_idfilename;
 
-	if (!isforkedchild) {
-		if (cfg && !cfg->getListeners()->isNullNode()) {
+	if (!pvt->_isforkedchild) {
+		if (pvt->_cfg && !pvt->_cfg->getListeners()->isNullNode()) {
 			for (xmldomnode *node=
-				cfg->getListeners()->
+				pvt->_cfg->getListeners()->
 					getFirstTagChild("listener");
 				!node->isNullNode();
 				node=node->getNextTagSibling("listener")) {
@@ -103,39 +171,40 @@ sqlrlistener::~sqlrlistener() {
 				}
 			}
 		}
-		if (pidfile) {
-			file::remove(pidfile);
+		if (pvt->_pidfile) {
+			file::remove(pvt->_pidfile);
 		}
 	}
-	if (initialized) {
+	if (pvt->_initialized) {
 		cleanUp();
 	}
 
 	// remove files that indicate whether the db is up or down
-	if (cfg && cfg->getConnectStringList()) {
+	if (pvt->_cfg && pvt->_cfg->getConnectStringList()) {
 		for (linkedlistnode< connectstringcontainer * > *node=
-					cfg->getConnectStringList()->getFirst();
-					node; node=node->getNext()) {
+				pvt->_cfg->getConnectStringList()->getFirst();
+				node; node=node->getNext()) {
 			connectstringcontainer	*cs=node->getValue();
 			const char	*connectionid=cs->getConnectionId();
 			size_t	updownlen=
-				charstring::length(sqlrpth->getIpcDir())+
-				charstring::length(cmdl->getId())+1+
+				charstring::length(pvt->_sqlrpth->getIpcDir())+
+				charstring::length(pvt->_cmdl->getId())+1+
 				charstring::length(connectionid)+1;
 			char	*updown=new char[updownlen];
 			charstring::printf(updown,updownlen,
 						"%s%s-%s",
-						sqlrpth->getIpcDir(),
-						cmdl->getId(),connectionid);
+						pvt->_sqlrpth->getIpcDir(),
+						pvt->_cmdl->getId(),
+						connectionid);
 			file::remove(updown);
 			delete[] updown;
 		}
 	}
-	delete sqlrpth;
-	delete sqlrcfgs;
-	delete cmdl;
+	delete pvt->_sqlrpth;
+	delete pvt->_sqlrcfgs;
+	delete pvt->_cmdl;
 
-	delete shmem;
+	delete pvt->_shmem;
 
 	// Delete the semset last...
 	// If the listener is killed while waiting on a semaphore, sometimes
@@ -143,105 +212,109 @@ sqlrlistener::~sqlrlistener() {
 	// the semaphore during the wait causes a segfault.  The shutdown
 	// process catches this and exits, but lets make sure that everything
 	// else is cleaned up before this can even happen.
-	delete semset;
+	delete pvt->_semset;
+
+	delete pvt;
 }
 
 void sqlrlistener::cleanUp() {
 
-	delete[] pidfile;
+	delete[] pvt->_pidfile;
 
 	uint64_t	csind;
-	for (csind=0; csind<clientsockincount; csind++) {
-		delete clientsockin[csind];
+	for (csind=0; csind<pvt->_clientsockincount; csind++) {
+		delete pvt->_clientsockin[csind];
 	}
-	delete[] clientsockin;
-	delete[] clientsockinprotoindex;
-	for (csind=0; csind<clientsockuncount; csind++) {
-		delete clientsockun[csind];
+	delete[] pvt->_clientsockin;
+	delete[] pvt->_clientsockinprotoindex;
+	for (csind=0; csind<pvt->_clientsockuncount; csind++) {
+		delete pvt->_clientsockun[csind];
 	}
-	delete[] clientsockun;
-	delete[] clientsockunprotoindex;
+	delete[] pvt->_clientsockun;
+	delete[] pvt->_clientsockunprotoindex;
 
-	if (!isforkedchild && handoffsockname) {
-		file::remove(handoffsockname);
+	if (!pvt->_isforkedchild && pvt->_handoffsockname) {
+		file::remove(pvt->_handoffsockname);
 	}
-	delete[] handoffsockname;
-	delete handoffsockun;
+	delete[] pvt->_handoffsockname;
+	delete pvt->_handoffsockun;
 
-	if (handoffsocklist) {
-		for (uint32_t i=0; i<maxconnections; i++) {
-			delete handoffsocklist[i].sock;
+	if (pvt->_handoffsocklist) {
+		for (uint32_t i=0; i<pvt->_maxconnections; i++) {
+			delete pvt->_handoffsocklist[i].sock;
 		}
-		delete[] handoffsocklist;
+		delete[] pvt->_handoffsocklist;
 	}
 
-	if (!isforkedchild && removehandoffsockname) {
-		file::remove(removehandoffsockname);
+	if (!pvt->_isforkedchild && pvt->_removehandoffsockname) {
+		file::remove(pvt->_removehandoffsockname);
 	}
-	delete[] removehandoffsockname;
-	delete removehandoffsockun;
+	delete[] pvt->_removehandoffsockname;
+	delete pvt->_removehandoffsockun;
 
-	if (!isforkedchild && fixupsockname) {
-		file::remove(fixupsockname);
+	if (!pvt->_isforkedchild && pvt->_fixupsockname) {
+		file::remove(pvt->_fixupsockname);
 	}
-	delete[] fixupsockname;
-	delete fixupsockun;
+	delete[] pvt->_fixupsockname;
+	delete pvt->_fixupsockun;
 
-	delete denied;
-	delete allowed;
-	delete sqlrlg;
-	delete sqlrn;
+	delete pvt->_denied;
+	delete pvt->_allowed;
+	delete pvt->_sqlrlg;
+	delete pvt->_sqlrn;
 }
 
 bool sqlrlistener::init(int argc, const char **argv) {
 
-	initialized=true;
+	pvt->_initialized=true;
 
-	cmdl=new sqlrcmdline(argc,argv);
-	sqlrpth=new sqlrpaths(cmdl);
-	sqlrcfgs=new sqlrconfigs(sqlrpth);
+	pvt->_cmdl=new sqlrcmdline(argc,argv);
+	pvt->_sqlrpth=new sqlrpaths(pvt->_cmdl);
+	pvt->_sqlrcfgs=new sqlrconfigs(pvt->_sqlrpth);
 
-	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
+	if (!charstring::compare(pvt->_cmdl->getId(),DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");
 	}
 
-	cfg=sqlrcfgs->load(sqlrpth->getConfigUrl(),cmdl->getId());
-	if (!cfg) {
+	pvt->_cfg=pvt->_sqlrcfgs->load(pvt->_sqlrpth->getConfigUrl(),
+							pvt->_cmdl->getId());
+	if (!pvt->_cfg) {
 		return false;
 	}
 
 	setUserAndGroup();
 
-	if (!verifyAccessToConfigUrl(sqlrpth->getConfigUrl())) {
+	if (!verifyAccessToConfigUrl(pvt->_sqlrpth->getConfigUrl())) {
 		return false;
 	}
 
-	if (!handlePidFile(cmdl->getId())) {
+	if (!handlePidFile(pvt->_cmdl->getId())) {
 		return false;
 	}
 
 	handleDynamicScaling();
 
-	xmldomnode	*loggers=cfg->getLoggers();
+	xmldomnode	*loggers=pvt->_cfg->getLoggers();
 	if (!loggers->isNullNode()) {
-		sqlrlg=new sqlrloggers(sqlrpth);
-		sqlrlg->load(loggers);
-		sqlrlg->init(this,NULL);
+		pvt->_sqlrlg=new sqlrloggers(pvt->_sqlrpth);
+		pvt->_sqlrlg->load(loggers);
+		pvt->_sqlrlg->init(this,NULL);
 	}
 
-	debugsqlrnotifications=cfg->getDebugNotifications();
-	xmldomnode	*notifications=cfg->getNotifications();
+	pvt->_debugsqlrnotifications=pvt->_cfg->getDebugNotifications();
+	xmldomnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
-		sqlrn=new sqlrnotifications(sqlrpth,debugsqlrnotifications);
-		sqlrn->load(notifications);
+		pvt->_sqlrn=new sqlrnotifications(pvt->_sqlrpth,
+						pvt->_debugsqlrnotifications);
+		pvt->_sqlrn->load(notifications);
 	}
 
-	idleclienttimeout=cfg->getIdleClientTimeout();
-	maxquerysize=cfg->getMaxQuerySize();
-	maxbindcount=cfg->getMaxBindCount();
-	maxbindnamelength=cfg->getMaxBindNameLength();
-	maxlisteners=cfg->getMaxListeners();
-	listenertimeout=cfg->getListenerTimeout();
+	pvt->_idleclienttimeout=pvt->_cfg->getIdleClientTimeout();
+	pvt->_maxquerysize=pvt->_cfg->getMaxQuerySize();
+	pvt->_maxbindcount=pvt->_cfg->getMaxBindCount();
+	pvt->_maxbindnamelength=pvt->_cfg->getMaxBindNameLength();
+	pvt->_maxlisteners=pvt->_cfg->getMaxListeners();
+	pvt->_listenertimeout=pvt->_cfg->getListenerTimeout();
 
 	setHandoffMethod();
 
@@ -249,25 +322,25 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	setIpPermissions();
 
-	if (!createSharedMemoryAndSemaphores(cmdl->getId())) {
+	if (!createSharedMemoryAndSemaphores(pvt->_cmdl->getId())) {
 		return false;
 	}
 
-	if (!listenOnHandoffSocket(cmdl->getId())) {
+	if (!listenOnHandoffSocket(pvt->_cmdl->getId())) {
 		return false;
 	}
-	if (!listenOnDeregistrationSocket(cmdl->getId())) {
+	if (!listenOnDeregistrationSocket(pvt->_cmdl->getId())) {
 		return false;
 	}
-	if (!listenOnFixupSocket(cmdl->getId())) {
+	if (!listenOnFixupSocket(pvt->_cmdl->getId())) {
 		return false;
 	}
 
 	process::detach();
 
-	process::createPidFile(pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pvt->_pidfile,permissions::ownerReadWrite());
 
-	setMaxListeners(maxlisteners);
+	setMaxListeners(pvt->_maxlisteners);
 
 	// set a handler for SIGALRMs
 	#ifdef SIGALRM
@@ -290,18 +363,18 @@ void sqlrlistener::setUserAndGroup() {
 
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
-	if (charstring::compare(currentgroup,cfg->getRunAsGroup()) &&
-				!process::setGroup(cfg->getRunAsGroup())) {
+	if (charstring::compare(currentgroup,pvt->_cfg->getRunAsGroup()) &&
+			!process::setGroup(pvt->_cfg->getRunAsGroup())) {
 		stderror.printf("Warning: could not change group to %s\n",
-						cfg->getRunAsGroup());
+						pvt->_cfg->getRunAsGroup());
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
-	if (charstring::compare(currentuser,cfg->getRunAsUser()) &&
-				!process::setUser(cfg->getRunAsUser())) {
+	if (charstring::compare(currentuser,pvt->_cfg->getRunAsUser()) &&
+				!process::setUser(pvt->_cfg->getRunAsUser())) {
 		stderror.printf("Warning: could not change user to %s\n",
-						cfg->getRunAsUser());
+						pvt->_cfg->getRunAsUser());
 	}
 
 	// clean up
@@ -311,18 +384,18 @@ void sqlrlistener::setUserAndGroup() {
 
 bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 
-	if (!cfg->getDynamicScaling()) {
+	if (!pvt->_cfg->getDynamicScaling()) {
 		return true;
 	}
 
-	if (!cfg->accessible()) {
+	if (!pvt->_cfg->accessible()) {
 		stderror.printf("\n%s-listener error:\n",SQLR);
 		stderror.printf("	This instance of %s is ",SQL_RELAY);
 		stderror.printf("configured to run as:\n");
 		stderror.printf("		user: %s\n",
-						cfg->getRunAsUser());
+						pvt->_cfg->getRunAsUser());
 		stderror.printf("		group: %s\n\n",
-						cfg->getRunAsGroup());
+						pvt->_cfg->getRunAsGroup());
 		stderror.printf("	However, the config url %s\n",url);
 		stderror.printf("	cannot be accessed by that user ");
 		stderror.printf("or group.\n\n");
@@ -330,17 +403,17 @@ bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 		stderror.printf("(ie. maxconnections>connections),\n");
 		stderror.printf("	new connections would be started as\n");
 		stderror.printf("		user: %s\n",
-						cfg->getRunAsUser());
+						pvt->_cfg->getRunAsUser());
 		stderror.printf("		group: %s\n\n",
-						cfg->getRunAsGroup());
+						pvt->_cfg->getRunAsGroup());
 		stderror.printf("	They would not be able to access the");
 		stderror.printf("config url and would shut down.\n\n");
 		stderror.printf("	To remedy this problem, make %s\n",url);
 		stderror.printf("	accessible by\n");
 		stderror.printf("		user: %s\n",
-						cfg->getRunAsUser());
+						pvt->_cfg->getRunAsUser());
 		stderror.printf("		group: %s\n",
-						cfg->getRunAsGroup());
+						pvt->_cfg->getRunAsGroup());
 		return false;
 	}
 	return true;
@@ -349,16 +422,16 @@ bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 bool sqlrlistener::handlePidFile(const char *id) {
 
 	// check/set pid file
-	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+14+
+	size_t	pidfilelen=charstring::length(pvt->_sqlrpth->getPidDir())+14+
 						charstring::length(id)+1;
-	pidfile=new char[pidfilelen];
-	charstring::printf(pidfile,pidfilelen,
+	pvt->_pidfile=new char[pidfilelen];
+	charstring::printf(pvt->_pidfile,pidfilelen,
 				"%ssqlr-listener-%s",
-				sqlrpth->getPidDir(),id);
+				pvt->_sqlrpth->getPidDir(),id);
 
-	if (process::checkForPidFile(pidfile)!=-1) {
+	if (process::checkForPidFile(pvt->_pidfile)!=-1) {
 		stderror.printf("\n%s-listener error:\n",SQLR);
-		stderror.printf("	The pid file %s",pidfile);
+		stderror.printf("	The pid file %s",pvt->_pidfile);
 		stderror.printf(" exists.\n");
 		stderror.printf("	This usually means that the ");
 		stderror.printf("%s-listener is already running for ",SQLR);
@@ -367,8 +440,8 @@ bool sqlrlistener::handlePidFile(const char *id) {
 		stderror.printf(" instance.\n");
 		stderror.printf("	If it is not running, please remove ");
 		stderror.printf("the file and restart.\n");
-		delete[] pidfile;
-		pidfile=NULL;
+		delete[] pvt->_pidfile;
+		pvt->_pidfile=NULL;
 		return false;
 	}
 	return true;
@@ -377,16 +450,16 @@ bool sqlrlistener::handlePidFile(const char *id) {
 void sqlrlistener::handleDynamicScaling() {
 
 	// get the dynamic connection scaling parameters
-	maxconnections=cfg->getMaxConnections();
+	pvt->_maxconnections=pvt->_cfg->getMaxConnections();
 
 	// if dynamic scaling isn't going to be used, disable it
-	dynamicscaling=cfg->getDynamicScaling();
+	pvt->_dynamicscaling=pvt->_cfg->getDynamicScaling();
 }
 
 void sqlrlistener::setSessionHandlerMethod() {
 	
-	usethreads=false;
-	if (!charstring::compare(cfg->getSessionHandler(),"thread")) {
+	pvt->_usethreads=false;
+	if (!charstring::compare(pvt->_cfg->getSessionHandler(),"thread")) {
 
 		if (!thread::supportsThreads()) {
 			stderror.printf("Warning: sessionhandler=\"thread\" "
@@ -399,7 +472,7 @@ void sqlrlistener::setSessionHandlerMethod() {
 			return;
 		}
 
-		usethreads=true;
+		pvt->_usethreads=true;
 
 	} else {
 
@@ -408,14 +481,14 @@ void sqlrlistener::setSessionHandlerMethod() {
 					"not supported on this platform, "
 					"falling back to "
 					"sessionhandler=\"thread\".\n");
-			usethreads=true;
+			pvt->_usethreads=true;
 		}
 	}
 }
 
 void sqlrlistener::setHandoffMethod() {
 
-	if (!charstring::compare(cfg->getHandoff(),"pass")) {
+	if (!charstring::compare(pvt->_cfg->getHandoff(),"pass")) {
 
         	// on some OS'es, force proxy, even if pass was specified...
 
@@ -427,12 +500,12 @@ void sqlrlistener::setHandoffMethod() {
         	// force proxy for Cygwin and Linux < 2.2
         	if (!charstring::compare(os,"CYGWIN",6) ||
                 	(!charstring::compare(os,"Linux",5) && ver<2.2)) {
-			handoffmode=HANDOFF_PROXY;
+			pvt->_handoffmode=HANDOFF_PROXY;
 			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
 					"handoff=\"proxy\".\n");
         	} else {
-			handoffmode=HANDOFF_PASS;
+			pvt->_handoffmode=HANDOFF_PASS;
 		}
 
         	// clean up
@@ -448,63 +521,63 @@ void sqlrlistener::setHandoffMethod() {
 	
         	// force pass for Windows
         	if (!charstring::compare(os,"Windows",7)) {
-			handoffmode=HANDOFF_PASS;
+			pvt->_handoffmode=HANDOFF_PASS;
 			stderror.printf("Warning: handoff=\"proxy\" not "
 					"supported, falling back to "
 					"handoff=\"pass\".\n");
 		} else {
-			handoffmode=HANDOFF_PROXY;
+			pvt->_handoffmode=HANDOFF_PROXY;
 		}
 	}
 
 	// create the list of handoff nodes
-	handoffsocklist=new handoffsocketnode[maxconnections];
-	for (uint32_t i=0; i<maxconnections; i++) {
-		handoffsocklist[i].pid=0;
-		handoffsocklist[i].sock=NULL;
+	pvt->_handoffsocklist=new handoffsocketnode[pvt->_maxconnections];
+	for (uint32_t i=0; i<pvt->_maxconnections; i++) {
+		pvt->_handoffsocklist[i].pid=0;
+		pvt->_handoffsocklist[i].sock=NULL;
 	}
 }
 
 void sqlrlistener::setIpPermissions() {
 
 	// get denied and allowed ip's and compile the expressions
-	const char	*deniedips=cfg->getDeniedIps();
-	const char	*allowedips=cfg->getAllowedIps();
+	const char	*deniedips=pvt->_cfg->getDeniedIps();
+	const char	*allowedips=pvt->_cfg->getAllowedIps();
 	if (!charstring::isNullOrEmpty(deniedips)) {
-		denied=new regularexpression(deniedips);
+		pvt->_denied=new regularexpression(deniedips);
 	}
 	if (!charstring::isNullOrEmpty(allowedips)) {
-		allowed=new regularexpression(allowedips);
+		pvt->_allowed=new regularexpression(allowedips);
 	}
 }
 
 bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// initialize the ipc filename
-	size_t	idfilenamelen=charstring::length(sqlrpth->getIpcDir())+
+	size_t	idfilenamelen=charstring::length(pvt->_sqlrpth->getIpcDir())+
 						charstring::length(id)+1;
-	idfilename=new char[idfilenamelen];
-	charstring::printf(idfilename,idfilenamelen,
-				"%s%s",sqlrpth->getIpcDir(),id);
+	pvt->_idfilename=new char[idfilenamelen];
+	charstring::printf(pvt->_idfilename,idfilenamelen,
+				"%s%s",pvt->_sqlrpth->getIpcDir(),id);
 
-	if (sqlrlg || sqlrn) {
-		debugstr.clear();
-		debugstr.append("creating shared memory "
-				"and semaphores: id filename: ");
-		debugstr.append(idfilename);
-		raiseDebugMessageEvent(debugstr.getString());
+	if (pvt->_sqlrlg || pvt->_sqlrn) {
+		pvt->_debugstr.clear();
+		pvt->_debugstr.append("creating shared memory "
+					"and semaphores: id filename: ");
+		pvt->_debugstr.append(pvt->_idfilename);
+		raiseDebugMessageEvent(pvt->_debugstr.getString());
 	}
 
 	// make sure that the file exists and is read/writeable
-	if (!file::createFile(idfilename,permissions::ownerReadWrite())) {
-		ipcFileError(idfilename);
+	if (!file::createFile(pvt->_idfilename,permissions::ownerReadWrite())) {
+		ipcFileError(pvt->_idfilename);
 		return false;
 	}
 
 	// get the ipc key
-	key_t	key=file::generateKey(idfilename,1);
+	key_t	key=file::generateKey(pvt->_idfilename,1);
 	if (key==-1) {
-		keyError(idfilename);
+		keyError(pvt->_idfilename);
 		return false;
 	}
 
@@ -512,15 +585,15 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// FIXME: if it already exists, attempt to remove and re-create it
 	raiseDebugMessageEvent("creating shared memory...");
 
-	shmem=new sharedmemory;
-	if (!shmem->create(key,sizeof(sqlrshm),
+	pvt->_shmem=new sharedmemory;
+	if (!pvt->_shmem->create(key,sizeof(sqlrshm),
 				permissions::evalPermString("rw-r-----"))) {
-		shmError(id,shmem->getId());
-		shmem->attach(key,sizeof(sqlrshm));
+		shmError(id,pvt->_shmem->getId());
+		pvt->_shmem->attach(key,sizeof(sqlrshm));
 		return false;
 	}
-	shm=(sqlrshm *)shmem->getPointer();
-	bytestring::zero(shm,sizeof(sqlrshm));
+	pvt->_shm=(sqlrshm *)pvt->_shmem->getPointer();
+	bytestring::zero(pvt->_shm,sizeof(sqlrshm));
 
 	setStartTime();
 
@@ -577,16 +650,16 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// 10 - listener: number of busy listeners
 	//
 	int32_t	vals[13]={1,1,0,0,1,1,0,0,0,1,0,0,0};
-	semset=new semaphoreset();
-	if (!semset->create(key,permissions::ownerReadWrite(),13,vals)) {
-		semError(id,semset->getId());
-		semset->attach(key,13);
+	pvt->_semset=new semaphoreset();
+	if (!pvt->_semset->create(key,permissions::ownerReadWrite(),13,vals)) {
+		semError(id,pvt->_semset->getId());
+		pvt->_semset->attach(key,13);
 		return false;
 	}
 
 	// issue warning about ttl if necessary
-	if (cfg->getTtl()>0 &&
-		!semset->supportsTimedSemaphoreOperations() &&
+	if (pvt->_cfg->getTtl()>0 &&
+		!pvt->_semset->supportsTimedSemaphoreOperations() &&
 		!sys::signalsInterruptSystemCalls()) {
 		stderror.printf("Warning: ttl forced to 0...\n"
 				"         semaphore waits cannot be "
@@ -598,10 +671,10 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	}
 
 	// issue warning about listener timeout if necessary
-	if (cfg->getListenerTimeout()>0 &&
-		!charstring::compare(cfg->getSessionHandler(),"thread") &&
+	if (pvt->_cfg->getListenerTimeout()>0 &&
+		!charstring::compare(pvt->_cfg->getSessionHandler(),"thread") &&
 		thread::supportsThreads() &&
-		!semset->supportsTimedSemaphoreOperations()) {
+		!pvt->_semset->supportsTimedSemaphoreOperations()) {
 		stderror.printf("Warning: listenertimeout disabled...\n"
 				"         sessionhandler=\"thread\" requested "
 				"(or defaulted) but system doesn't\n"
@@ -669,11 +742,11 @@ void sqlrlistener::semError(const char *id, int semid) {
 
 bool sqlrlistener::listenOnClientSockets() {
 
-	xmldomnode	*listenerlist=cfg->getListeners();
+	xmldomnode	*listenerlist=pvt->_cfg->getListeners();
 
 	// count sockets and build socket arrays
-	clientsockincount=0;
-	clientsockuncount=0;
+	pvt->_clientsockincount=0;
+	pvt->_clientsockuncount=0;
 	for (xmldomnode	*node=listenerlist->getFirstTagChild("listener");
 			!node->isNullNode();
 			node=node->getNextTagSibling("listener")) {
@@ -682,19 +755,20 @@ bool sqlrlistener::listenOnClientSockets() {
 						",",true,NULL,&addrcount);
 		if (!charstring::isNullOrEmpty(
 				node->getAttributeValue("port"))) {
-			clientsockincount=clientsockincount+addrcount;
+			pvt->_clientsockincount=
+				pvt->_clientsockincount+addrcount;
 		}
 		if (!charstring::isNullOrEmpty(
 				node->getAttributeValue("socket"))) {
-			clientsockuncount=clientsockuncount+1;
+			pvt->_clientsockuncount=pvt->_clientsockuncount+1;
 		}
 	}
-	clientsockin=new inetsocketserver *[clientsockincount];
-	clientsockinprotoindex=new uint16_t[clientsockincount];
-	clientsockinindex=0;
-	clientsockun=new unixsocketserver *[clientsockuncount];
-	clientsockunprotoindex=new uint16_t[clientsockuncount];
-	clientsockunindex=0;
+	pvt->_clientsockin=new inetsocketserver *[pvt->_clientsockincount];
+	pvt->_clientsockinprotoindex=new uint16_t[pvt->_clientsockincount];
+	pvt->_clientsockinindex=0;
+	pvt->_clientsockun=new unixsocketserver *[pvt->_clientsockuncount];
+	pvt->_clientsockunprotoindex=new uint16_t[pvt->_clientsockuncount];
+	pvt->_clientsockunindex=0;
 
 	// listen on sockets
 	bool		listening=false;
@@ -737,12 +811,14 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 
 		for ( index=0; index<addrcount; index++) {
 
-			uint64_t	ind=clientsockinindex+index;
-			clientsockin[ind]=new inetsocketserver();
-			clientsockinprotoindex[ind]=protocolindex;
+			uint64_t	ind=pvt->_clientsockinindex+index;
+			pvt->_clientsockin[ind]=new inetsocketserver();
+			pvt->_clientsockinprotoindex[ind]=protocolindex;
 
-			if (clientsockin[ind]->listen(addr[index],port,15)) {
-				lsnr.addReadFileDescriptor(clientsockin[ind]);
+			if (pvt->_clientsockin[ind]->
+					listen(addr[index],port,15)) {
+				pvt->_lsnr.addReadFileDescriptor(
+						pvt->_clientsockin[ind]);
 				listening=true;
 			} else {
 				stringbuffer	info;
@@ -762,11 +838,11 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 					addr[index],port,err);
 				delete[] err;
 
-				delete clientsockin[ind];
-				clientsockin[ind]=NULL;
+				delete pvt->_clientsockin[ind];
+				pvt->_clientsockin[ind]=NULL;
 			}
 
-			clientsockinindex++;
+			pvt->_clientsockinindex++;
 		}
 	}
 
@@ -774,12 +850,15 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 	const char	*sock=ln->getAttributeValue("socket");
 	if (!charstring::isNullOrEmpty(sock)) {
 
-		clientsockun[clientsockunindex]=new unixsocketserver();
-		clientsockunprotoindex[clientsockunindex]=protocolindex;
+		pvt->_clientsockun[pvt->_clientsockunindex]=
+						new unixsocketserver();
+		pvt->_clientsockunprotoindex[pvt->_clientsockunindex]=
+							protocolindex;
 
-		if (clientsockun[clientsockunindex]->listen(sock,0000,15)) {
-			lsnr.addReadFileDescriptor(
-					clientsockun[clientsockunindex]);
+		if (pvt->_clientsockun[pvt->_clientsockunindex]->
+						listen(sock,0000,15)) {
+			pvt->_lsnr.addReadFileDescriptor(
+				pvt->_clientsockun[pvt->_clientsockunindex]);
 			listening=true;
 		} else {
 			stringbuffer	info;
@@ -793,11 +872,11 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 			stderror.printf("directory are readable and writable.");
 			stderror.printf("\n\n");
 
-			delete clientsockun[clientsockunindex];
-			clientsockun[clientsockunindex]=NULL;
+			delete pvt->_clientsockun[pvt->_clientsockunindex];
+			pvt->_clientsockun[pvt->_clientsockunindex]=NULL;
 		}
 
-		clientsockunindex++;
+		pvt->_clientsockunindex++;
 	}
 
 	// clean up addresses
@@ -812,26 +891,28 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 
 	// the handoff socket
 	size_t	handoffsocknamelen=
-			charstring::length(sqlrpth->getSocketsDir())+
+			charstring::length(pvt->_sqlrpth->getSocketsDir())+
 						charstring::length(id)+8+1;
-	handoffsockname=new char[handoffsocknamelen];
-	charstring::printf(handoffsockname,handoffsocknamelen,
+	pvt->_handoffsockname=new char[handoffsocknamelen];
+	charstring::printf(pvt->_handoffsockname,
+				handoffsocknamelen,
 				"%s%s-handoff",
-				sqlrpth->getSocketsDir(),id);
+				pvt->_sqlrpth->getSocketsDir(),id);
 
-	handoffsockun=new unixsocketserver();
-	bool	success=handoffsockun->listen(handoffsockname,0066,15);
+	pvt->_handoffsockun=new unixsocketserver();
+	bool	success=pvt->_handoffsockun->listen(
+				pvt->_handoffsockname,0066,15);
 
 	if (success) {
-		lsnr.addReadFileDescriptor(handoffsockun);
+		pvt->_lsnr.addReadFileDescriptor(pvt->_handoffsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on handoff socket: ");
-		info.append(handoffsockname);
+		info.append(pvt->_handoffsockname);
 		raiseInternalErrorEvent(info.getString());
 
 		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",handoffsockname);
+		stderror.printf("%s\n",pvt->_handoffsockname);
 		stderror.printf("Make sure that the file and ");
 		stderror.printf("directory are readable and writable.");
 		stderror.printf("\n\n");
@@ -844,27 +925,28 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 
 	// the deregistration socket
 	size_t	removehandoffsocknamelen=
-			charstring::length(sqlrpth->getSocketsDir())+
+			charstring::length(pvt->_sqlrpth->getSocketsDir())+
 						charstring::length(id)+14+1;
-	removehandoffsockname=new char[removehandoffsocknamelen];
-	charstring::printf(removehandoffsockname,removehandoffsocknamelen,
+	pvt->_removehandoffsockname=new char[removehandoffsocknamelen];
+	charstring::printf(pvt->_removehandoffsockname,
+				removehandoffsocknamelen,
 				"%s%s-removehandoff",
-				sqlrpth->getSocketsDir(),id);
+				pvt->_sqlrpth->getSocketsDir(),id);
 
-	removehandoffsockun=new unixsocketserver();
-	bool	success=removehandoffsockun->listen(
-						removehandoffsockname,0066,15);
+	pvt->_removehandoffsockun=new unixsocketserver();
+	bool	success=pvt->_removehandoffsockun->listen(
+				pvt->_removehandoffsockname,0066,15);
 
 	if (success) {
-		lsnr.addReadFileDescriptor(removehandoffsockun);
+		pvt->_lsnr.addReadFileDescriptor(pvt->_removehandoffsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on deregistration socket: ");
-		info.append(removehandoffsockname);
+		info.append(pvt->_removehandoffsockname);
 		raiseInternalErrorEvent(info.getString());
 
 		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",removehandoffsockname);
+		stderror.printf("%s\n",pvt->_removehandoffsockname);
 		stderror.printf("Make sure that the file and ");
 		stderror.printf("directory are readable and writable.");
 		stderror.printf("\n\n");
@@ -877,26 +959,27 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 
 	// the fixup socket
 	size_t	fixupsocknamelen=
-			charstring::length(sqlrpth->getSocketsDir())+
+			charstring::length(pvt->_sqlrpth->getSocketsDir())+
 						charstring::length(id)+6+1;
-	fixupsockname=new char[fixupsocknamelen];
-	charstring::printf(fixupsockname,fixupsocknamelen,
+	pvt->_fixupsockname=new char[fixupsocknamelen];
+	charstring::printf(pvt->_fixupsockname,
+				fixupsocknamelen,
 				"%s%s-fixup",
-				sqlrpth->getSocketsDir(),id);
+				pvt->_sqlrpth->getSocketsDir(),id);
 
-	fixupsockun=new unixsocketserver();
-	bool	success=fixupsockun->listen(fixupsockname,0066,15);
+	pvt->_fixupsockun=new unixsocketserver();
+	bool	success=pvt->_fixupsockun->listen(pvt->_fixupsockname,0066,15);
 
 	if (success) {
-		lsnr.addReadFileDescriptor(fixupsockun);
+		pvt->_lsnr.addReadFileDescriptor(pvt->_fixupsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on fixup socket: ");
-		info.append(fixupsockname);
+		info.append(pvt->_fixupsockname);
 		raiseInternalErrorEvent(info.getString());
 
 		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",fixupsockname);
+		stderror.printf("%s\n",pvt->_fixupsockname);
 		stderror.printf("Make sure that the file and ");
 		stderror.printf("directory are readable and writable.");
 		stderror.printf("\n\n");
@@ -909,10 +992,10 @@ void sqlrlistener::listen() {
 
 	// wait until all of the connections have started
 	for (;;) {
-		int32_t	opendbconnections=shm->open_db_connections;
+		int32_t	opendbconnections=pvt->_shm->open_db_connections;
 
 		if (opendbconnections<
-			static_cast<int32_t>(cfg->getConnections())) {
+			static_cast<int32_t>(pvt->_cfg->getConnections())) {
 			raiseDebugMessageEvent("waiting for server "
 					"connections (sleeping 1s)");
 			snooze::macrosnooze(1);
@@ -941,13 +1024,14 @@ filedescriptor *sqlrlistener::waitForTraffic() {
 
 	// wait for data on one of the sockets...
 	// if something bad happened, return an invalid file descriptor
-	if (lsnr.listen(-1,-1)<1) {
+	if (pvt->_lsnr.listen(-1,-1)<1) {
 		return NULL;
 	}
 
 	// return first file descriptor that had data available or an invalid
 	// file descriptor on error
-	filedescriptor	*fd=lsnr.getReadReadyList()->getFirst()->getValue();
+	filedescriptor	*fd=
+		pvt->_lsnr.getReadReadyList()->getFirst()->getValue();
 
 	raiseDebugMessageEvent("finished waiting for traffic");
 
@@ -970,22 +1054,22 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	//
 	// Either way, handle it and loop back.
 	filedescriptor	*clientsock;
-	if (fd==handoffsockun) {
-		clientsock=handoffsockun->accept();
+	if (fd==pvt->_handoffsockun) {
+		clientsock=pvt->_handoffsockun->accept();
 		if (!clientsock) {
 			return false;
 		}
 		clientsock->dontUseNaglesAlgorithm();
 		return registerHandoff(clientsock);
-	} else if (fd==removehandoffsockun) {
-		clientsock=removehandoffsockun->accept();
+	} else if (fd==pvt->_removehandoffsockun) {
+		clientsock=pvt->_removehandoffsockun->accept();
 		if (!clientsock) {
 			return false;
 		}
 		clientsock->dontUseNaglesAlgorithm();
 		return deRegisterHandoff(clientsock);
-	} else if (fd==fixupsockun) {
-		clientsock=fixupsockun->accept();
+	} else if (fd==pvt->_fixupsockun) {
+		clientsock=pvt->_fixupsockun->accept();
 		if (!clientsock) {
 			return false;
 		}
@@ -998,18 +1082,19 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	inetsocketserver	*iss=NULL;
 	unixsocketserver	*uss=NULL;
 	uint16_t		protocolindex=0;
-	for (csind=0; csind<clientsockincount; csind++) {
-		if (fd==clientsockin[csind]) {
-			iss=clientsockin[csind];
-			protocolindex=clientsockinprotoindex[csind];
+	for (csind=0; csind<pvt->_clientsockincount; csind++) {
+		if (fd==pvt->_clientsockin[csind]) {
+			iss=pvt->_clientsockin[csind];
+			protocolindex=pvt->_clientsockinprotoindex[csind];
 			break;
 		}
 	}
 	if (!iss) {
-		for (csind=0; csind<clientsockuncount; csind++) {
-			if (fd==clientsockun[csind]) {
-				uss=clientsockun[csind];
-				protocolindex=clientsockunprotoindex[csind];
+		for (csind=0; csind<pvt->_clientsockuncount; csind++) {
+			if (fd==pvt->_clientsockun[csind]) {
+				uss=pvt->_clientsockun[csind];
+				protocolindex=
+					pvt->_clientsockunprotoindex[csind];
 				break;
 			}
 		}
@@ -1026,7 +1111,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		// For inet clients, make sure that the ip address is
 		// not denied.  If the ip was denied, disconnect the
 		// socket and loop back.
-		if (denied && deniedIp(clientsock)) {
+		if (pvt->_denied && deniedIp(clientsock)) {
 			delete clientsock;
 			return true;
 		}
@@ -1065,7 +1150,9 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	// id as this one and that is checked at startup.  However, if it did
 	// happen, getValue(10) would return something greater than 0 and we
 	// would have forked anyway.
-	if (dynamicscaling || getBusyListeners() || !semset->getValue(2)) {
+	if (pvt->_dynamicscaling ||
+			getBusyListeners() ||
+			!pvt->_semset->getValue(2)) {
 		forkChild(clientsock,protocolindex);
 	} else {
 		incrementBusyListeners();
@@ -1095,11 +1182,11 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	// replace it
 	bool		inserted=false;
 	uint32_t	index=0;
-	for (; index<maxconnections; index++) {
-		if (!handoffsocklist[index].pid ||
-			handoffsocklist[index].pid==processid) {
-			handoffsocklist[index].pid=processid;
-			handoffsocklist[index].sock=sock;
+	for (; index<pvt->_maxconnections; index++) {
+		if (!pvt->_handoffsocklist[index].pid ||
+			pvt->_handoffsocklist[index].pid==processid) {
+			pvt->_handoffsocklist[index].pid=processid;
+			pvt->_handoffsocklist[index].sock=sock;
 			inserted=true;
 			break;
 		}
@@ -1111,16 +1198,18 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	// fit in our list, grow the list to accommodate it...
 	if (inserted==false) {
 		handoffsocketnode	*newhandoffsocklist=
-				new handoffsocketnode[maxconnections+1];
-		for (uint32_t i=0; i<maxconnections; i++) {
-			newhandoffsocklist[i].pid=handoffsocklist[i].pid;
-			newhandoffsocklist[i].sock=handoffsocklist[i].sock;
+				new handoffsocketnode[pvt->_maxconnections+1];
+		for (uint32_t i=0; i<pvt->_maxconnections; i++) {
+			newhandoffsocklist[i].pid=
+				pvt->_handoffsocklist[i].pid;
+			newhandoffsocklist[i].sock=
+				pvt->_handoffsocklist[i].sock;
 		}
-		delete[] handoffsocklist;
-		newhandoffsocklist[maxconnections].pid=processid;
-		newhandoffsocklist[maxconnections].sock=sock;
-		maxconnections++;
-		handoffsocklist=newhandoffsocklist;
+		delete[] pvt->_handoffsocklist;
+		newhandoffsocklist[pvt->_maxconnections].pid=processid;
+		newhandoffsocklist[pvt->_maxconnections].sock=sock;
+		pvt->_maxconnections++;
+		pvt->_handoffsocklist=newhandoffsocklist;
 	}
 
 	raiseDebugMessageEvent("finished registering handoff...");
@@ -1141,11 +1230,11 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	}
 
 	// remove the matching socket from the list
-	for (uint32_t i=0; i<maxconnections; i++) {
-		if (handoffsocklist[i].pid==processid) {
-			handoffsocklist[i].pid=0;
-			delete handoffsocklist[i].sock;
-			handoffsocklist[i].sock=NULL;
+	for (uint32_t i=0; i<pvt->_maxconnections; i++) {
+		if (pvt->_handoffsocklist[i].pid==processid) {
+			pvt->_handoffsocklist[i].pid=0;
+			delete pvt->_handoffsocklist[i].sock;
+			pvt->_handoffsocklist[i].sock=NULL;
 			break;
 		}
 	}
@@ -1171,9 +1260,9 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 
 	// look through the handoffsocklist for the pid
 	bool	retval=false;
-	for (uint32_t i=0; i<maxconnections; i++) {
-		if (handoffsocklist[i].pid==processid) {
-			retval=sock->passSocket(handoffsocklist[i].
+	for (uint32_t i=0; i<pvt->_maxconnections; i++) {
+		if (pvt->_handoffsocklist[i].pid==processid) {
+			retval=sock->passSocket(pvt->_handoffsocklist[i].
 						sock->getFileDescriptor());
 			raiseDebugMessageEvent("found socket for requested pid ");
 			if (retval) {
@@ -1198,8 +1287,9 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 	raiseDebugMessageEvent("checking for valid ip...");
 
 	char	*ip=clientsock->getPeerAddress();
-	if (ip && denied->match(ip) &&
-			(!allowed || (allowed && !allowed->match(ip)))) {
+	if (ip && pvt->_denied->match(ip) &&
+			(!pvt->_allowed ||
+			(pvt->_allowed && !pvt->_allowed->match(ip)))) {
 
 		stringbuffer	info;
 		info.append("rejected IP address: ")->append(ip);
@@ -1249,7 +1339,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 
 	// if we already have too many listeners running,
 	// bail and return an error to the client
-	if (maxlisteners>-1 && forkedlisteners>maxlisteners) {
+	if (pvt->_maxlisteners>-1 && forkedlisteners>pvt->_maxlisteners) {
 
 		// since we've decided not to fork, decrement the counters
 		decrementBusyListeners();
@@ -1263,7 +1353,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 
 	// if threads are supported, fork a thread
 	// to handle the client connection
-	if (usethreads) {
+	if (pvt->_usethreads) {
 
 		// set up the thread
 		thread			*thr=new thread;
@@ -1277,7 +1367,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 
 		// run the thread
 		if (thr->runDetached()) {
-			isforkedthread=true;
+			pvt->_isforkedthread=true;
 			return;
 		}
 
@@ -1300,17 +1390,17 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 	if (!childpid) {
 
 		// child...
-		isforkedchild=true;
+		pvt->_isforkedchild=true;
 
 		// since this is the forked off listener, we don't
 		// want to actually remove the semaphore set or shared
 		// memory segment when it exits
-		shmem->dontRemove();
-		semset->dontRemove();
+		pvt->_shmem->dontRemove();
+		pvt->_semset->dontRemove();
 
 		// re-init loggers
-		if (sqlrlg) {
-			sqlrlg->init(this,NULL);
+		if (pvt->_sqlrlg) {
+			pvt->_sqlrlg->init(this,NULL);
 		}
 
 		clientSession(clientsock,protocolindex,NULL);
@@ -1324,11 +1414,11 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 	} else if (childpid>0) {
 
 		// parent...
-		if (sqlrlg || sqlrn) {
-			debugstr.clear();
-			debugstr.append("forked a child: ");
-			debugstr.append((int32_t)childpid);
-			raiseDebugMessageEvent(debugstr.getString());
+		if (pvt->_sqlrlg || pvt->_sqlrn) {
+			pvt->_debugstr.clear();
+			pvt->_debugstr.append("forked a child: ");
+			pvt->_debugstr.append((int32_t)childpid);
+			raiseDebugMessageEvent(pvt->_debugstr.getString());
 		}
 
 		// the main process doesn't need to stay connected
@@ -1360,7 +1450,7 @@ void sqlrlistener::clientSession(filedescriptor *clientsock,
 					uint16_t protocolindex,
 					thread *thr) {
 
-	if (dynamicscaling) {
+	if (pvt->_dynamicscaling) {
 		incrementConnectedClientCount();
 	}
 
@@ -1369,7 +1459,7 @@ void sqlrlistener::clientSession(filedescriptor *clientsock,
 	// If the handoff failed, decrement the connected client count.
 	// If it had succeeded then the connection daemon would
 	// decrement it later.
-	if (dynamicscaling && !passstatus) {
+	if (pvt->_dynamicscaling && !passstatus) {
 		decrementConnectedClientCount();
 	}
 
@@ -1415,12 +1505,12 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 		// been killed.  Loop back and get another connection...
 
 		// tell the connection what handoff mode to expect
-		connectionsock.write(handoffmode);
+		connectionsock.write(pvt->_handoffmode);
 
 		// tell the connection which protocol to use
 		connectionsock.write(protocolindex);
 
-		if (handoffmode==HANDOFF_PASS) {
+		if (pvt->_handoffmode==HANDOFF_PASS) {
 
 			// pass the file descriptor
 			if (!connectionsock.passSocket(
@@ -1466,28 +1556,29 @@ bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
 	// Loop, waiting.  Bail if timeout occurred
 	bool	result=true;
 	*timeout=false;
-	if (listenertimeout>0 && semset->supportsTimedSemaphoreOperations()) {
-		result=semset->waitWithUndo(1,listenertimeout,0);
+	if (pvt->_listenertimeout>0 &&
+			pvt->_semset->supportsTimedSemaphoreOperations()) {
+		result=pvt->_semset->waitWithUndo(1,pvt->_listenertimeout,0);
 		*timeout=(!result && error::getErrorNumber()==EAGAIN);
-	} else if (listenertimeout>0 &&
+	} else if (pvt->_listenertimeout>0 &&
 			!thr && sys::signalsInterruptSystemCalls()) {
 		// We can't use this when using threads because alarmrang isn't
 		// thread-local and there's no way to make it be.  Also, the
 		// alarm doesn't reliably interrupt the wait() when it's called
 		// from a thread, at least not on Linux.  Hopefully platforms
 		// that supports threads also supports timed semaphore ops.
-		semset->dontRetryInterruptedOperations();
+		pvt->_semset->dontRetryInterruptedOperations();
 		alarmrang=0;
-		signalmanager::alarm(listenertimeout);
+		signalmanager::alarm(pvt->_listenertimeout);
 		do {
-			result=semset->waitWithUndo(1);
+			result=pvt->_semset->waitWithUndo(1);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
 		*timeout=(alarmrang==1);
 		signalmanager::alarm(0);
-		semset->retryInterruptedOperations();
+		pvt->_semset->retryInterruptedOperations();
 	} else {
-		result=semset->waitWithUndo(1);
+		result=pvt->_semset->waitWithUndo(1);
 	}
 
 	// handle alarm...
@@ -1511,7 +1602,7 @@ bool sqlrlistener::releaseShmAccess() {
 
 	raiseDebugMessageEvent("releasing exclusive shm access");
 
-	if (!semset->signalWithUndo(1)) {
+	if (!pvt->_semset->signalWithUndo(1)) {
 		raiseDebugMessageEvent("failed to release exclusive shm access");
 		return false;
 	}
@@ -1527,10 +1618,10 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 	// If we don't want to wait for down databases, then check to see if
 	// any of the db's are up.  If none are, then don't even wait for an
 	// available connection, just bail immediately.
-	if (!cfg->getWaitForDownDatabase()) {
+	if (!pvt->_cfg->getWaitForDownDatabase()) {
 		*alldbsdown=true;
 		linkedlist< connectstringcontainer * >	*csl=
-					cfg->getConnectStringList();
+					pvt->_cfg->getConnectStringList();
 		for (linkedlistnode< connectstringcontainer * > *node=
 						csl->getFirst(); node;
 						node=node->getNext()) {
@@ -1553,28 +1644,29 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 	// listenertimeout here, rather than the entire listenertimeout.
 	bool	result=true;
 	*timeout=false;
-	if (listenertimeout>0 && semset->supportsTimedSemaphoreOperations()) {
-		result=semset->wait(2,listenertimeout,0);
+	if (pvt->_listenertimeout>0 &&
+			pvt->_semset->supportsTimedSemaphoreOperations()) {
+		result=pvt->_semset->wait(2,pvt->_listenertimeout,0);
 		*timeout=(!result && error::getErrorNumber()==EAGAIN);
-	} else if (listenertimeout>0 &&
+	} else if (pvt->_listenertimeout>0 &&
 			!thr && sys::signalsInterruptSystemCalls()) {
 		// We can't use this when using threads because alarmrang isn't
 		// thread-local and there's no way to make it be.  Also, the
 		// alarm doesn't reliably interrupt the wait() when it's called
 		// from a thread, at least not on Linux.  Hopefully platforms
 		// that supports threads also supports timed semaphore ops.
-		semset->dontRetryInterruptedOperations();
+		pvt->_semset->dontRetryInterruptedOperations();
 		alarmrang=0;
-		signalmanager::alarm(listenertimeout);
+		signalmanager::alarm(pvt->_listenertimeout);
 		do {
-			result=semset->wait(2);
+			result=pvt->_semset->wait(2);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
 		*timeout=(alarmrang==1);
 		signalmanager::alarm(0);
-		semset->retryInterruptedOperations();
+		pvt->_semset->retryInterruptedOperations();
 	} else {
-		result=semset->wait(2);
+		result=pvt->_semset->wait(2);
 	}
 
 	// handle alarm...
@@ -1598,7 +1690,7 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 	// waitForListenerToFinishReading().  It's ok to reset it here because
 	// no one except this process has access to this semaphore at this time
 	// because of the lock on semaphore 1.
-	semset->setValue(2,0);
+	pvt->_semset->setValue(2,0);
 
 	raiseDebugMessageEvent("succeeded in waiting for an available connection");
 	return true;
@@ -1608,7 +1700,7 @@ bool sqlrlistener::doneAcceptingAvailableConnection() {
 
 	raiseDebugMessageEvent("signalling accepted connection");
 
-	if (!semset->signal(3)) {
+	if (!pvt->_semset->signal(3)) {
 		raiseDebugMessageEvent("failed to signal accepted connection");
 		return false;
 	}
@@ -1619,7 +1711,7 @@ bool sqlrlistener::doneAcceptingAvailableConnection() {
 
 void sqlrlistener::waitForConnectionToBeReadyForHandoff() {
 	raiseDebugMessageEvent("waiting for connection to be ready for handoff");
-	semset->wait(12);
+	pvt->_semset->wait(12);
 	raiseDebugMessageEvent("done waiting for connection to be ready for handoff");
 }
 
@@ -1654,7 +1746,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 				// get the pid
 				*connectionpid=
-					shm->connectioninfo.connectionpid;
+					pvt->_shm->connectioninfo.connectionpid;
 
 				// signal the connection that we waited for
 				ok=doneAcceptingAvailableConnection();
@@ -1672,14 +1764,16 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			waitForConnectionToBeReadyForHandoff();
 
 			// make sure the connection is actually up...
-			if (connectionIsUp(shm->connectionid)) {
-				if (sqlrlg || sqlrn) {
-					debugstr.clear();
-					debugstr.append("finished getting "
+			if (connectionIsUp(pvt->_shm->connectionid)) {
+				if (pvt->_sqlrlg || pvt->_sqlrn) {
+					pvt->_debugstr.clear();
+					pvt->_debugstr.append(
+							"finished getting "
 							"a connection: ");
-					debugstr.append(
+					pvt->_debugstr.append(
 						(int32_t)*connectionpid);
-					raiseDebugMessageEvent(debugstr.getString());
+					raiseDebugMessageEvent(
+						pvt->_debugstr.getString());
 				}
 				return true;
 			}
@@ -1720,14 +1814,15 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
 
 	// initialize the database up/down filename
-	size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
-					charstring::length(cmdl->getId())+1+
-					charstring::length(connectionid)+1;
+	size_t	updownlen=charstring::length(
+				pvt->_sqlrpth->getIpcDir())+
+				charstring::length(pvt->_cmdl->getId())+1+
+				charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
 	charstring::printf(updown,updownlen,
 				"%s%s-%s",
-				sqlrpth->getIpcDir(),
-				cmdl->getId(),connectionid);
+				pvt->_sqlrpth->getIpcDir(),
+				pvt->_cmdl->getId(),connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;
@@ -1747,7 +1842,7 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 
 	// if threads are supported, fork a thread
 	// to ping the database
-	if (usethreads) {
+	if (pvt->_usethreads) {
 
 		// set up the thread
 		thread			*thr=new thread;
@@ -1769,7 +1864,7 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 	// process to ping the database
 	pid_t	childpid=process::fork();
 	if (!childpid) {
-		isforkedchild=true;
+		pvt->_isforkedchild=true;
 		pingDatabaseInternal(connectionpid,unixportstr,inetport);
 		cleanUp();
 		process::exit(0);
@@ -1802,10 +1897,10 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 	// connection that we got during the call to getAConnection().
 	// When we find it, send the descriptor of the clientsock to the 
 	// connection over the handoff socket associated with that node.
-	for (uint32_t i=0; i<maxconnections; i++) {
-		if (handoffsocklist[i].pid==connectionpid) {
+	for (uint32_t i=0; i<pvt->_maxconnections; i++) {
+		if (pvt->_handoffsocklist[i].pid==connectionpid) {
 			connectionsock->setFileDescriptor(
-						handoffsocklist[i].
+						pvt->_handoffsocklist[i].
 						sock->getFileDescriptor());
 			return true;
 		}
@@ -1824,8 +1919,8 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 
 	// connect to the fixup socket of the parent listener
 	unixsocketclient	fixupclientsockun;
-	if (fixupclientsockun.connect(fixupsockname,-1,-1,0,1)
-						!=RESULT_SUCCESS) {
+	if (fixupclientsockun.connect(pvt->_fixupsockname,-1,-1,0,1)
+							!=RESULT_SUCCESS) {
 		raiseInternalErrorEvent("fixup failed to connect");
 		return false;
 	}
@@ -1923,15 +2018,16 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// read whatever data was available
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
-			if (sqlrlg || sqlrn) {
-				debugstr.clear();
-				debugstr.append("read failed: ");
-				debugstr.append((uint32_t)readcount);
-				debugstr.append(" : ");
+			if (pvt->_sqlrlg || pvt->_sqlrn) {
+				pvt->_debugstr.clear();
+				pvt->_debugstr.append("read failed: ");
+				pvt->_debugstr.append((uint32_t)readcount);
+				pvt->_debugstr.append(" : ");
 				char	*err=error::getErrorString();
-				debugstr.append(err);
+				pvt->_debugstr.append(err);
 				delete[] err;
-				raiseDebugMessageEvent(debugstr.getString());
+				raiseDebugMessageEvent(
+					pvt->_debugstr.getString());
 			}
 			endsession=(fd==clientsock);
 			break;
@@ -1939,22 +2035,24 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 		// write the data to the other side
 		if (fd==serversock) {
-			if (sqlrlg || sqlrn) {
-				debugstr.clear();
-				debugstr.append("read ");
-				debugstr.append((uint32_t)readcount);
-				debugstr.append(" bytes from server");
-				raiseDebugMessageEvent(debugstr.getString());
+			if (pvt->_sqlrlg || pvt->_sqlrn) {
+				pvt->_debugstr.clear();
+				pvt->_debugstr.append("read ");
+				pvt->_debugstr.append((uint32_t)readcount);
+				pvt->_debugstr.append(" bytes from server");
+				raiseDebugMessageEvent(
+					pvt->_debugstr.getString());
 			}
 			clientsock->write(readbuffer,readcount);
 			clientsock->flushWriteBuffer(-1,-1);
 		} else if (fd==clientsock) {
-			if (sqlrlg || sqlrn) {
-				debugstr.clear();
-				debugstr.append("read ");
-				debugstr.append((uint32_t)readcount);
-				debugstr.append(" bytes from client");
-				raiseDebugMessageEvent(debugstr.getString());
+			if (pvt->_sqlrlg || pvt->_sqlrn) {
+				pvt->_debugstr.clear();
+				pvt->_debugstr.append("read ");
+				pvt->_debugstr.append((uint32_t)readcount);
+				pvt->_debugstr.append(" bytes from client");
+				raiseDebugMessageEvent(
+					pvt->_debugstr.getString());
 			}
 			serversock->write(readbuffer,readcount);
 			serversock->flushWriteBuffer(-1,-1);
@@ -2018,7 +2116,7 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 
 		uint32_t	counter=0;
 		clientsock->useNonBlockingMode();
-		while (clientsock->read(&dummy,idleclienttimeout,0)>0 &&
+		while (clientsock->read(&dummy,pvt->_idleclienttimeout,0)>0 &&
 					counter<
 					// sending auth
 					(sizeof(uint16_t)+
@@ -2031,17 +2129,19 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 					// executing new query
 					sizeof(uint16_t)+
 					// query size and query
-					sizeof(uint32_t)+maxquerysize+
+					sizeof(uint32_t)+pvt->_maxquerysize+
 					// input bind var count
 					sizeof(uint16_t)+
 					// input bind vars
-					maxbindcount*(2*sizeof(uint16_t)+
-							maxbindnamelength)+
+					pvt->_maxbindcount*
+						(2*sizeof(uint16_t)+
+						pvt->_maxbindnamelength)+
 					// output bind var count
 					sizeof(uint16_t)+
 					// output bind vars
-					maxbindcount*(2*sizeof(uint16_t)+
-							maxbindnamelength)+
+					pvt->_maxbindcount*
+						(2*sizeof(uint16_t)+
+						pvt->_maxbindnamelength)+
 					// get column info
 					sizeof(uint16_t)+
 					// skip/fetch
@@ -2058,40 +2158,44 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 void sqlrlistener::setStartTime() {
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	shm->starttime=dt.getEpoch();
+	pvt->_shm->starttime=dt.getEpoch();
 }
 
 void sqlrlistener::setMaxListeners(uint32_t maxlisteners) {
-	shm->max_listeners=maxlisteners;
+	pvt->_shm->max_listeners=maxlisteners;
 }
 
 void sqlrlistener::incrementMaxListenersErrors() {
-	shm->max_listeners_errors++;
+	pvt->_shm->max_listeners_errors++;
 }
 
 void sqlrlistener::incrementConnectedClientCount() {
 
 	raiseDebugMessageEvent("incrementing connected client count...");
 
-	if (!semset->waitWithUndo(5)) {
+	if (!pvt->_semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
 	// increment the connections-in-use counter
-	shm->connectedclients++;
+	pvt->_shm->connectedclients++;
 
 	// update the peak connections-in-use count
-	if (shm->connectedclients>shm->peak_connectedclients) {
-		shm->peak_connectedclients=shm->connectedclients;
+	if (pvt->_shm->connectedclients>pvt->_shm->peak_connectedclients) {
+		pvt->_shm->peak_connectedclients=pvt->_shm->connectedclients;
 	}
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (shm->connectedclients>shm->peak_connectedclients_1min ||
-		dt.getEpoch()/60>shm->peak_connectedclients_1min_time/60) {
-		shm->peak_connectedclients_1min=shm->connectedclients;
-		shm->peak_connectedclients_1min_time=dt.getEpoch();
+	if (pvt->_shm->connectedclients>
+			pvt->_shm->peak_connectedclients_1min ||
+		dt.getEpoch()/60>
+			pvt->_shm->peak_connectedclients_1min_time/60) {
+		pvt->_shm->peak_connectedclients_1min=
+				pvt->_shm->connectedclients;
+		pvt->_shm->peak_connectedclients_1min_time=
+				dt.getEpoch();
 	}
 
 	// If the system supports timed semaphore ops then the scaler can be
@@ -2099,25 +2203,25 @@ void sqlrlistener::incrementConnectedClientCount() {
 	// sytem does not support timed semaphore ops then the scaler will
 	// just loop periodically on its own and we shouldn't attempt to
 	// jog it.
-	if (semset->supportsTimedSemaphoreOperations()) {
+	if (pvt->_semset->supportsTimedSemaphoreOperations()) {
 
 		// signal the scaler to evaluate the connection count
 		// and start more connections if necessary
 		raiseDebugMessageEvent("signalling the scaler...");
-		if (!semset->signal(6)) {
+		if (!pvt->_semset->signal(6)) {
 			// FIXME: bail somehow
 		}
 		raiseDebugMessageEvent("finished signalling the scaler...");
 
 		// wait for the scaler
 		raiseDebugMessageEvent("waiting for the scaler...");
-		if (!semset->wait(7)) {
+		if (!pvt->_semset->wait(7)) {
 			// FIXME: bail somehow
 		}
 		raiseDebugMessageEvent("finished waiting for the scaler...");
 	}
 
-	if (!semset->signalWithUndo(5)) {
+	if (!pvt->_semset->signalWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
@@ -2128,15 +2232,15 @@ void sqlrlistener::decrementConnectedClientCount() {
 
 	raiseDebugMessageEvent("decrementing connected client count...");
  
-	if (!semset->waitWithUndo(5)) {
+	if (!pvt->_semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
-	if (shm->connectedclients) {
-		shm->connectedclients--;
+	if (pvt->_shm->connectedclients) {
+		pvt->_shm->connectedclients--;
 	}
 
-	if (!semset->signalWithUndo(5)) {
+	if (!pvt->_semset->signalWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
@@ -2145,20 +2249,20 @@ void sqlrlistener::decrementConnectedClientCount() {
 
 uint32_t sqlrlistener::incrementForkedListeners() {
 
-	semset->waitWithUndo(9);
-	uint32_t	forkedlisteners=++(shm->forked_listeners);
-	semset->signalWithUndo(9);
+	pvt->_semset->waitWithUndo(9);
+	uint32_t	forkedlisteners=++(pvt->_shm->forked_listeners);
+	pvt->_semset->signalWithUndo(9);
 	return forkedlisteners;
 }
 
 uint32_t sqlrlistener::decrementForkedListeners() {
 
-	semset->waitWithUndo(9);
-	if (shm->forked_listeners) {
-		shm->forked_listeners--;
+	pvt->_semset->waitWithUndo(9);
+	if (pvt->_shm->forked_listeners) {
+		pvt->_shm->forked_listeners--;
 	}
-	uint32_t	forkedlisteners=shm->forked_listeners;
-	semset->signalWithUndo(9);
+	uint32_t	forkedlisteners=pvt->_shm->forked_listeners;
+	pvt->_semset->signalWithUndo(9);
 	return forkedlisteners;
 }
 
@@ -2166,23 +2270,23 @@ void sqlrlistener::incrementBusyListeners() {
 
 	raiseDebugMessageEvent("incrementing busy listeners");
 
-	if (!semset->signal(10)) {
+	if (!pvt->_semset->signal(10)) {
 		// FIXME: bail somehow
 	}
 
 	// update the peak listeners count
-	uint32_t	busylisteners=semset->getValue(10);
-	if (shm->peak_listeners<busylisteners) {
-		shm->peak_listeners=busylisteners;
+	uint32_t	busylisteners=pvt->_semset->getValue(10);
+	if (pvt->_shm->peak_listeners<busylisteners) {
+		pvt->_shm->peak_listeners=busylisteners;
 	}
 
 	// update the peak listeners over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (busylisteners>shm->peak_listeners_1min ||
-		dt.getEpoch()/60>shm->peak_listeners_1min_time/60) {
-		shm->peak_listeners_1min=busylisteners;
-		shm->peak_listeners_1min_time=dt.getEpoch();
+	if (busylisteners>pvt->_shm->peak_listeners_1min ||
+		dt.getEpoch()/60>pvt->_shm->peak_listeners_1min_time/60) {
+		pvt->_shm->peak_listeners_1min=busylisteners;
+		pvt->_shm->peak_listeners_1min_time=dt.getEpoch();
 	}
 
 	raiseDebugMessageEvent("finished incrementing busy listeners");
@@ -2190,25 +2294,25 @@ void sqlrlistener::incrementBusyListeners() {
 
 void sqlrlistener::decrementBusyListeners() {
 	raiseDebugMessageEvent("decrementing busy listeners");
-	if (!semset->wait(10)) {
+	if (!pvt->_semset->wait(10)) {
 		// FIXME: bail somehow
 	}
 	raiseDebugMessageEvent("finished decrementing busy listeners");
 }
 
 int32_t sqlrlistener::getBusyListeners() {
-	return semset->getValue(10);
+	return pvt->_semset->getValue(10);
 }
 
 void sqlrlistener::raiseDebugMessageEvent(const char *info) {
-	if (sqlrlg) {
-		sqlrlg->run(this,NULL,NULL,
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_DEBUG,
 				SQLREVENT_DEBUG_MESSAGE,
 				info);
 	}
-	if (sqlrn) {
-		sqlrn->run(this,NULL,NULL,
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(this,NULL,NULL,
 				SQLREVENT_DEBUG_MESSAGE,
 				info);
 	}
@@ -2216,7 +2320,7 @@ void sqlrlistener::raiseDebugMessageEvent(const char *info) {
 
 void sqlrlistener::raiseClientProtocolErrorEvent(
 					const char *info, ssize_t result) {
-	if (!sqlrlg && !sqlrn) {
+	if (!pvt->_sqlrlg && !pvt->_sqlrn) {
 		return;
 	}
 	stringbuffer	errorbuffer;
@@ -2235,35 +2339,35 @@ void sqlrlistener::raiseClientProtocolErrorEvent(
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	if (sqlrlg) {
-		sqlrlg->run(this,NULL,NULL,
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_ERROR,
 				SQLREVENT_CLIENT_PROTOCOL_ERROR,
 				errorbuffer.getString());
 	}
-	if (sqlrn) {
-		sqlrn->run(this,NULL,NULL,
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(this,NULL,NULL,
 				SQLREVENT_CLIENT_PROTOCOL_ERROR,
 				errorbuffer.getString());
 	}
 }
 
 void sqlrlistener::raiseClientConnectionRefusedEvent(const char *info) {
-	if (sqlrlg) {
-		sqlrlg->run(this,NULL,NULL,
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_WARNING,
 				SQLREVENT_CLIENT_CONNECTION_REFUSED,
 				info);
 	}
-	if (sqlrn) {
-		sqlrn->run(this,NULL,NULL,
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(this,NULL,NULL,
 				SQLREVENT_CLIENT_CONNECTION_REFUSED,
 				info);
 	}
 }
 
 void sqlrlistener::raiseInternalErrorEvent(const char *info) {
-	if (!sqlrlg && !sqlrn) {
+	if (!pvt->_sqlrlg && !pvt->_sqlrn) {
 		return;
 	}
 	stringbuffer	errorbuffer;
@@ -2273,14 +2377,14 @@ void sqlrlistener::raiseInternalErrorEvent(const char *info) {
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	if (sqlrlg) {
-		sqlrlg->run(this,NULL,NULL,
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(this,NULL,NULL,
 				SQLRLOGGER_LOGLEVEL_ERROR,
 				SQLREVENT_INTERNAL_ERROR,
 				errorbuffer.getString());
 	}
-	if (sqlrn) {
-		sqlrn->run(this,NULL,NULL,
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(this,NULL,NULL,
 				SQLREVENT_INTERNAL_ERROR,
 				errorbuffer.getString());
 	}
@@ -2294,13 +2398,13 @@ void sqlrlistener::alarmHandler(int32_t signum) {
 }
 
 const char *sqlrlistener::getId() {
-	return cmdl->getId();
+	return pvt->_cmdl->getId();
 }
 
 const char *sqlrlistener::getLogDir() {
-	return sqlrpth->getLogDir();
+	return pvt->_sqlrpth->getLogDir();
 }
 
 const char *sqlrlistener::getDebugDir() {
-	return sqlrpth->getDebugDir();
+	return pvt->_sqlrpth->getDebugDir();
 }

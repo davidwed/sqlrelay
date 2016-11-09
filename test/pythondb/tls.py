@@ -22,7 +22,7 @@ def main():
 
 	# instantiation
 	print("INSTANTIATION")
-	con=PySQLRDB.connect("sqlrserver",9000,"/tmp/test.socket","test","test",0,1,tls='yes',tlscert=tlscert,tlsvalidate='ca',tlsca=tlsca)
+	con=PySQLRDB.connect("sqlrserver",9000,"/tmp/test.socket","","",0,1,tls='yes',tlscert=tlscert,tlsvalidate='ca',tlsca=tlsca)
 	cur=con.cursor()
 	print()
 	print()

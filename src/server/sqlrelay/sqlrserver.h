@@ -39,6 +39,8 @@ class sqlrquery;
 class sqlrquerycursor;
 class sqlrqueries;
 
+class sqlrlistenerprivate;
+
 class SQLRSERVER_DLLSPEC sqlrlistener {
 	public:
 			sqlrlistener();
