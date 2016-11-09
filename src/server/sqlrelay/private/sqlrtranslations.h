@@ -24,28 +24,3 @@
 		memorypool	*tempindexpool;
 		dictionary< sqlrdatabaseobject *, char * >	temptablemap;
 		dictionary< sqlrdatabaseobject *, char * >	tempindexmap;
-
-		// helper methods
-		xmldomnode	*newNode(xmldomnode *parentnode,
-							const char *type);
-		xmldomnode	*newNode(xmldomnode *parentnode,
-							const char *type,	
-							const char *value);
-		xmldomnode	*newNodeAfter(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type);
-		xmldomnode	*newNodeAfter(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type,
-							const char *value);
-		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type);
-		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
-							xmldomnode *node,
-							const char *type,
-							const char *value);
-		void		setAttribute(xmldomnode *node,
-							const char *name,
-							const char *value);
-		bool		isString(const char *value);
