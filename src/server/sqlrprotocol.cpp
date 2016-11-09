@@ -3,26 +3,38 @@
 
 #include <sqlrelay/sqlrserver.h>
 
+class sqlrprotocolprivate {
+	friend class sqlrprotocol;
+	private:
+		xmldomnode		*_parameters;
+		bool			_debug;
+};
+
 sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 				xmldomnode *parameters,
 				bool debug) {
+	pvt=new sqlrprotocolprivate;
 	this->cont=cont;
-	this->parameters=parameters;
-	this->debug=debug;
-	this->clientsock=NULL;
+	pvt->_parameters=parameters;
+	pvt->_debug=debug;
 }
 
 sqlrprotocol::~sqlrprotocol() {
-}
-
-void sqlrprotocol::setClientSocket(filedescriptor *clientsock) {
-	this->clientsock=clientsock;
+	delete pvt;
 }
 
 gsscontext *sqlrprotocol::getGSSContext() {
-	return &gctx;
+	return NULL;
 }
 
 tlscontext *sqlrprotocol::getTLSContext() {
-	return &tctx;
+	return NULL;
+}
+
+xmldomnode *sqlrprotocol::getParameters() {
+	return pvt->_parameters;
+}
+
+bool sqlrprotocol::getDebug() {
+	return pvt->_debug;
 }

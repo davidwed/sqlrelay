@@ -751,6 +751,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		bool		getErrorSetManually();
 		void		setErrorSetManually(bool errorsetmanually);
 
+		sqlrservercontroller	*cont;
+
 	#include <sqlrelay/private/sqlrserverconnection.h>
 };
 
@@ -1020,6 +1022,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		stringbuffer	*getQueryWithFakeInputBindsBuffer();
 
+		sqlrserverconnection	*conn;
+
 	#include <sqlrelay/private/sqlrservercursor.h>
 };
 
@@ -1030,6 +1034,8 @@ enum clientsessionexitstatus_t {
 	CLIENTSESSIONEXITSTATUS_SUSPENDED_SESSION
 };
 
+class sqlrprotocolprivate;
+
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
 			sqlrprotocol(sqlrservercontroller *cont,
@@ -1037,12 +1043,17 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 					bool debug);
 		virtual	~sqlrprotocol();
 
-		void	setClientSocket(filedescriptor *clientsock);
+		virtual clientsessionexitstatus_t
+				clientSession(filedescriptor *clientsock)=0;
 
 		virtual gsscontext	*getGSSContext();
 		virtual tlscontext	*getTLSContext();
 
-		virtual clientsessionexitstatus_t	clientSession()=0;
+	protected:
+		xmldomnode		*getParameters();
+		bool			getDebug();
+
+		sqlrservercontroller	*cont;
 
 	#include <sqlrelay/private/sqlrprotocol.h>
 };

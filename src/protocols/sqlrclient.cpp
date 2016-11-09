@@ -31,7 +31,12 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 							bool debug);
 		virtual	~sqlrprotocol_sqlrclient();
 
-		clientsessionexitstatus_t	clientSession();
+		clientsessionexitstatus_t	clientSession(
+							filedescriptor *cs);
+
+		gsscontext	*getGSSContext();
+		tlscontext	*getTLSContext();
+
 	private:
 		bool	acceptSecurityContext();
 		bool	getCommand(uint16_t *command);
@@ -168,9 +173,16 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		stringbuffer	debugstr;
 
+		filedescriptor	*clientsock;
+
 		securitycontext	*ctx;
 		bool		usekrb;
 		bool		usetls;
+
+		gsscredentials	gcred;
+		gssmechanism	gmech;
+		gsscontext	gctx;
+		tlscontext	tctx;
 
 		int32_t		idleclienttimeout;
 
@@ -222,6 +234,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	maxerrorlength=cont->getConfig()->getMaxErrorLength();
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
+	clientsock=NULL;
 	ctx=NULL;
 	usekrb=!charstring::compare(parameters->getAttributeValue("krb"),"yes");
 	usetls=!charstring::compare(parameters->getAttributeValue("tls"),"yes");
@@ -330,8 +343,11 @@ sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
 	delete[] clientinfo;
 }
 
-clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession() {
+clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
+						filedescriptor *cs) {
 	debugFunction();
+
+	clientsock=cs;
 
 	// set up the socket
 	clientsock->translateByteOrder();
@@ -3414,6 +3430,14 @@ bool sqlrprotocol_sqlrclient::getTranslatedQueryCommand(
 	clientsock->flushWriteBuffer(-1,-1);
 
 	return true;
+}
+
+gsscontext *sqlrprotocol_sqlrclient::getGSSContext() {
+	return &gctx;
+}
+
+tlscontext *sqlrprotocol_sqlrclient::getTLSContext() {
+	return &tctx;
 }
 
 extern "C" {

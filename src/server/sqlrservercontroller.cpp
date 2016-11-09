@@ -1907,8 +1907,8 @@ void sqlrservercontroller::clientSession() {
 	clientsessionexitstatus_t	exitstatus=
 					CLIENTSESSIONEXITSTATUS_ERROR;
 	if (pvt->_currentprotocol) {
-		pvt->_currentprotocol->setClientSocket(pvt->_clientsock);
-		exitstatus=pvt->_currentprotocol->clientSession();
+		exitstatus=pvt->_currentprotocol->clientSession(
+							pvt->_clientsock);
 	} else {
 		closeClientConnection(0);
 	}
