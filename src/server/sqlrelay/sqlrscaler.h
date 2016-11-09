@@ -3,6 +3,8 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <sqlrelay/sqlrutil.h>
+#include <rudiments/semaphoreset.h>
+#include <rudiments/sharedmemory.h>
 
 // for pid_t
 #include <sys/types.h>

@@ -17,6 +17,11 @@
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 #include <rudiments/thread.h>
+#include <rudiments/semaphoreset.h>
+#include <rudiments/sharedmemory.h>
+#include <rudiments/unixsocketserver.h>
+#include <rudiments/inetsocketserver.h>
+#include <rudiments/listener.h>
 
 #include <config.h>
 #include <defaults.h>
@@ -25,6 +30,13 @@
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN	256
 #endif
+
+class SQLRSERVER_DLLSPEC handoffsocketnode {
+	friend class sqlrlistener;
+	private:
+		uint32_t	pid;
+		filedescriptor	*sock;
+};
 
 class sqlrlistenerprivate {
 	friend class sqlrlistener;

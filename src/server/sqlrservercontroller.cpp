@@ -19,6 +19,12 @@
 #include <rudiments/sys.h>
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
+#include <rudiments/semaphoreset.h>
+#include <rudiments/sharedmemory.h>
+#include <rudiments/unixsocketserver.h>
+#include <rudiments/unixsocketclient.h>
+#include <rudiments/inetsocketserver.h>
+#include <rudiments/listener.h>
 
 #include <defines.h>
 #include <defaults.h>
