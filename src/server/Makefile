@@ -35,7 +35,6 @@ LIBSQLRSERVERSRCS = \
 	sqlrcredentials.cpp \
 	sqlrauths.cpp \
 	sqlrauth.cpp \
-	sqlrscaler.cpp \
 	$(STATICPLUGINSRCS)
 
 LIBSQLRSERVERLOBJS = \
@@ -70,8 +69,7 @@ LIBSQLRSERVERLOBJS = \
 	sqlrpwdenc.$(OBJ) \
 	sqlrcredentials.$(OBJ) \
 	sqlrauths.$(OBJ) \
-	sqlrauth.$(OBJ) \
-	sqlrscaler.$(OBJ)
+	sqlrauth.$(OBJ)
 
 .SUFFIXES: .lo .cpp.in
 
