@@ -86,6 +86,42 @@ void sqlrnotifications::unload() {
 	pvt->_llist.clear();
 }
 
+// FIXME: push up and consolidate
+static const char *eventtypes[]={
+	"CLIENT_CONNECTED",
+	"CLIENT_CONNECTION_REFUSED",
+	"CLIENT_DISCONNECTED",
+	"CLIENT_PROTOCOL_ERROR",
+	"DB_LOGIN",
+	"DB_LOGOUT",
+	"DB_ERROR",
+	"DB_WARNING",
+	"QUERY",
+	"FILTER_VIOLATION",
+	"INTERNAL_ERROR",
+	"INTERNAL_WARNING",
+	"DEBUG_MESSAGE",
+	"SCHEDULE_VIOLATION",
+	"INTEGRITY_VIOLATION",
+	"TRANSLATION_FAILURE",
+	NULL
+};
+
+const char *sqlrnotifications::eventType(sqlrevent_t event) {
+	return eventtypes[(uint16_t)event];
+}
+
+sqlrevent_t sqlrnotifications::eventType(const char *event) {
+	uint16_t	retval=SQLREVENT_CLIENT_CONNECTED;
+	for (const char * const *ev=eventtypes; *ev; ev++) {
+		if (!charstring::compareIgnoringCase(event,*ev)) {
+			break;
+		}
+		retval++;
+	}
+	return (sqlrevent_t)retval;
+}
+
 void sqlrnotifications::loadNotification(xmldomnode *notification) {
 
 	debugFunction();
@@ -172,42 +208,6 @@ void sqlrnotifications::run(sqlrlistener *sqlrl,
 						node; node=node->getNext()) {
 		node->getValue()->n->run(sqlrl,sqlrcon,sqlrcur,event,info);
 	}
-}
-
-// FIXME: push up and consolidate
-static const char *eventtypes[]={
-	"CLIENT_CONNECTED",
-	"CLIENT_CONNECTION_REFUSED",
-	"CLIENT_DISCONNECTED",
-	"CLIENT_PROTOCOL_ERROR",
-	"DB_LOGIN",
-	"DB_LOGOUT",
-	"DB_ERROR",
-	"DB_WARNING",
-	"QUERY",
-	"FILTER_VIOLATION",
-	"INTERNAL_ERROR",
-	"INTERNAL_WARNING",
-	"DEBUG_MESSAGE",
-	"SCHEDULE_VIOLATION",
-	"INTEGRITY_VIOLATION",
-	"TRANSLATION_FAILURE",
-	NULL
-};
-
-const char *sqlrnotifications::eventType(sqlrevent_t event) {
-	return eventtypes[(uint16_t)event];
-}
-
-sqlrevent_t sqlrnotifications::eventType(const char *event) {
-	uint16_t	retval=SQLREVENT_CLIENT_CONNECTED;
-	for (const char * const *ev=eventtypes; *ev; ev++) {
-		if (!charstring::compareIgnoringCase(event,*ev)) {
-			break;
-		}
-		retval++;
-	}
-	return (sqlrevent_t)retval;
 }
 
 bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,

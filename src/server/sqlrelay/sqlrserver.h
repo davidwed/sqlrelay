@@ -1353,7 +1353,8 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 
 class SQLRSERVER_DLLSPEC sqlrparser {
 	public:
-		sqlrparser(sqlrservercontroller *cont, xmldomnode *parameters);
+		sqlrparser(sqlrservercontroller *cont,
+				xmldomnode *parameters);
 		virtual	~sqlrparser();
 
 		virtual	bool	parse(const char *query);
