@@ -542,8 +542,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*translations=pvt->_cfg->getTranslations();
 	if (!translations->isNullNode()) {
 		pvt->_sqlrp=newParser();
-		pvt->_sqlrt=new sqlrtranslations(
-				pvt->_pth,pvt->_debugsqlrtranslation);
+		pvt->_sqlrt=new sqlrtranslations(this);
 		pvt->_sqlrt->load(translations);
 	}
 
@@ -554,8 +553,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		if (!pvt->_sqlrp) {
 			pvt->_sqlrp=newParser();
 		}
-		pvt->_sqlrf=new sqlrfilters(
-				pvt->_pth,pvt->_debugsqlrfilters);
+		pvt->_sqlrf=new sqlrfilters(this);
 		pvt->_sqlrf->loadFilters(filters);
 	}
 
@@ -565,8 +563,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*resultsettranslations=
 				pvt->_cfg->getResultSetTranslations();
 	if (!resultsettranslations->isNullNode()) {
-		pvt->_sqlrrst=new sqlrresultsettranslations(
-				pvt->_pth,pvt->_debugsqlrresultsettranslation);
+		pvt->_sqlrrst=new sqlrresultsettranslations(this);
 		pvt->_sqlrrst->load(resultsettranslations);
 	}
 
@@ -576,8 +573,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*resultsetrowtranslations=
 				pvt->_cfg->getResultSetRowTranslations();
 	if (!resultsetrowtranslations->isNullNode()) {
-		pvt->_sqlrrrst=new sqlrresultsetrowtranslations(
-			pvt->_pth,pvt->_debugsqlrresultsetrowtranslation);
+		pvt->_sqlrrrst=new sqlrresultsetrowtranslations(this);
 		pvt->_sqlrrrst->load(resultsetrowtranslations);
 	}
 
@@ -588,8 +584,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		if (!pvt->_sqlrp) {
 			pvt->_sqlrp=newParser();
 		}
-		pvt->_sqlrtr=new sqlrtriggers(
-				pvt->_pth,pvt->_cfg->getDebugTriggers());
+		pvt->_sqlrtr=new sqlrtriggers(this);
 		pvt->_sqlrtr->load(triggers);
 	}
 
@@ -646,8 +641,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the custom query handlers
 	xmldomnode	*queries=pvt->_cfg->getQueries();
 	if (!queries->isNullNode()) {
-		pvt->_sqlrq=new sqlrqueries(
-				pvt->_pth,pvt->_cfg->getDebugQueries());
+		pvt->_sqlrq=new sqlrqueries(this);
 		pvt->_sqlrq->load(queries);
 	}
 

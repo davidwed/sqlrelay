@@ -1369,16 +1369,15 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 
 	protected:
 		xmldomnode	*getParameters();
-		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrparser.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrtranslation {
 	public:
-		sqlrtranslation(sqlrtranslations *sqlts,
-					xmldomnode *parameters,
-					bool debug);
+		sqlrtranslation(sqlrservercontroller *cont,
+					sqlrtranslations *sqlts,
+					xmldomnode *parameters);
 		virtual	~sqlrtranslation();
 
 		virtual bool	usesTree();
@@ -1395,14 +1394,13 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 	protected:
 		sqlrtranslations	*getTranslations();
 		xmldomnode		*getParameters();
-		bool			getDebug();
 
 	#include <sqlrelay/private/sqlrtranslation.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrtranslations {
 	public:
-		sqlrtranslations(sqlrpaths *sqlrpth, bool debug);
+		sqlrtranslations(sqlrservercontroller *cont);
 		~sqlrtranslations();
 
 		bool	load(xmldomnode *parameters);
@@ -1448,9 +1446,9 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 
 class SQLRSERVER_DLLSPEC sqlrfilter {
 	public:
-		sqlrfilter(sqlrfilters *sqlrfs,
-					xmldomnode *parameters,
-					bool debug);
+		sqlrfilter(sqlrservercontroller *cont,
+					sqlrfilters *sqlrfs,
+					xmldomnode *parameters);
 		virtual	~sqlrfilter();
 
 		virtual bool	usesTree();
@@ -1468,14 +1466,13 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 	protected:
 		sqlrfilters	*getFilters();
 		xmldomnode	*getParameters();
-		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrfilter.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrfilters {
 	public:
-		sqlrfilters(sqlrpaths *sqlrpth, bool debug);
+		sqlrfilters(sqlrservercontroller *cont);
 		~sqlrfilters();
 
 		bool	loadFilters(xmldomnode *parameters);
@@ -1491,9 +1488,9 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
-		sqlrresultsettranslation(sqlrresultsettranslations *sqlrrsts,
-					xmldomnode *parameters,
-					bool debug);
+		sqlrresultsettranslation(sqlrservercontroller *cont,
+					sqlrresultsettranslations *sqlrrsts,
+					xmldomnode *parameters);
 		virtual	~sqlrresultsettranslation();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1506,14 +1503,13 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	protected:
 		sqlrresultsettranslations	*getResultSetTranslations();
 		xmldomnode			*getParameters();
-		bool				getDebug();
 
 	#include <sqlrelay/private/sqlrresultsettranslation.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 	public:
-		sqlrresultsettranslations(sqlrpaths *sqlrpth, bool debug);
+		sqlrresultsettranslations(sqlrservercontroller *cont);
 		~sqlrresultsettranslations();
 
 		bool	load(xmldomnode *parameters);
@@ -1530,9 +1526,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 	public:
 		sqlrresultsetrowtranslation(
+					sqlrservercontroller *cont,
 					sqlrresultsetrowtranslations *sqlrrrsts,
-					xmldomnode *parameters,
-					bool debug);
+					xmldomnode *parameters);
 		virtual	~sqlrresultsetrowtranslation();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1545,14 +1541,13 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 	protected:
 		sqlrresultsetrowtranslations	*getResultSetRowTranslations();
 		xmldomnode			*getParameters();
-		bool				getDebug();
 
 	#include <sqlrelay/private/sqlrresultsetrowtranslation.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 	public:
-		sqlrresultsetrowtranslations(sqlrpaths *sqlrpth, bool debug);
+		sqlrresultsetrowtranslations(sqlrservercontroller *cont);
 		~sqlrresultsetrowtranslations();
 
 		bool	load(xmldomnode *parameters);
@@ -1568,7 +1563,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
-		sqlrtrigger(xmldomnode *parameters, bool debug);
+		sqlrtrigger(sqlrservercontroller *cont,
+					xmldomnode *parameters);
 		virtual	~sqlrtrigger();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1579,14 +1575,13 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 
 	protected:
 		xmldomnode	*getParameters();
-		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrtrigger.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrtriggers {
 	public:
-		sqlrtriggers(sqlrpaths *sqlrpth, bool debug);
+		sqlrtriggers(sqlrservercontroller *cont);
 		~sqlrtriggers();
 
 		bool	load(xmldomnode *parameters);
@@ -1603,7 +1598,8 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 
 class SQLRSERVER_DLLSPEC sqlrquery {
 	public:
-		sqlrquery(xmldomnode *parameters, bool debug);
+		sqlrquery(sqlrservercontroller *cont,
+				xmldomnode *parameters);
 		virtual	~sqlrquery();
 
 		virtual bool	match(const char *querystring,
@@ -1614,7 +1610,6 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 
 	protected:
 		xmldomnode	*getParameters();
-		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrquery.h>
 };
@@ -1637,7 +1632,7 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 
 class SQLRSERVER_DLLSPEC sqlrqueries {
 	public:
-		sqlrqueries(sqlrpaths *sqlrpth, bool debug);
+		sqlrqueries(sqlrservercontroller *cont);
 		~sqlrqueries();
 
 		bool		load(xmldomnode *parameters);

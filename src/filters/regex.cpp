@@ -8,9 +8,9 @@
 
 class SQLRSERVER_DLLSPEC sqlrfilter_regex : public sqlrfilter {
 	public:
-			sqlrfilter_regex(sqlrfilters *sqlrfs,
-					xmldomnode *parameters,
-					bool debug);
+			sqlrfilter_regex(sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
@@ -19,13 +19,17 @@ class SQLRSERVER_DLLSPEC sqlrfilter_regex : public sqlrfilter {
 		const char		*pattern;
 
 		bool	enabled;
+
+		bool	debug;
 };
 
-sqlrfilter_regex::sqlrfilter_regex(sqlrfilters *sqlrfs,
-					xmldomnode *parameters,
-					bool debug) :
-					sqlrfilter(sqlrfs,parameters,debug) {
+sqlrfilter_regex::sqlrfilter_regex(sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters) :
+					sqlrfilter(cont,sqlrfs,parameters) {
 	debugFunction();
+
+	debug=cont->getConfig()->getDebugFilters();
 
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -48,7 +52,7 @@ bool sqlrfilter_regex::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (re.match(query)) {
-		if (getDebug()) {
+		if (debug) {
 			stdoutput.printf("regex: matches pattern \"%s\"\n\n",
 								pattern);
 		}
@@ -58,9 +62,10 @@ bool sqlrfilter_regex::run(sqlrserverconnection *sqlrcon,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrfilter *new_sqlrfilter_regex(sqlrfilters *sqlrfs,
-							xmldomnode *parameters,
-							bool debug) {
-		return new sqlrfilter_regex(sqlrfs,parameters,debug);
+	SQLRSERVER_DLLSPEC sqlrfilter *new_sqlrfilter_regex(
+						sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters) {
+		return new sqlrfilter_regex(cont,sqlrfs,parameters);
 	}
 }

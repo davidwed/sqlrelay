@@ -34,7 +34,8 @@ class sqlrdatabaseobject {
 class sqlrtranslationsprivate {
 	friend class sqlrtranslations;
 	private:
-		const char	*_libexecdir;
+		sqlrservercontroller	*_cont;
+		
 		xmldom		*_tree;
 		bool		_debug;
 
@@ -47,14 +48,14 @@ class sqlrtranslationsprivate {
 		dictionary< sqlrdatabaseobject *, char * >	_indexnamemap;
 };
 
-sqlrtranslations::sqlrtranslations(sqlrpaths *sqlrpth, bool debug) {
+sqlrtranslations::sqlrtranslations(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrtranslationsprivate;
+	pvt->_cont=cont;
+	pvt->_debug=cont->getConfig()->getDebugTranslations();
 	pvt->_tree=NULL;
-	pvt->_debug=debug;
 	pvt->_tablenamepool=new memorypool(0,128,100);
 	pvt->_indexnamepool=new memorypool(0,128,100);
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
 }
 
 sqlrtranslations::~sqlrtranslations() {
@@ -120,7 +121,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the translation module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("translation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -138,9 +139,12 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	// load the translation itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrtranslation_")->append(module);
-	sqlrtranslation *(*newTranslation)
-		(sqlrtranslations *, xmldomnode *, bool)=
-		(sqlrtranslation *(*)(sqlrtranslations *, xmldomnode *, bool))
+	sqlrtranslation *(*newTranslation)(sqlrservercontroller *,
+						sqlrtranslations *,
+						xmldomnode *)=
+		(sqlrtranslation *(*)(sqlrservercontroller *,
+						sqlrtranslations *,
+						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
 		stdoutput.printf("failed to create translation: %s\n",module);
@@ -151,7 +155,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 		delete dl;
 		return;
 	}
-	sqlrtranslation	*tr=(*newTranslation)(this,translation,pvt->_debug);
+	sqlrtranslation	*tr=(*newTranslation)(pvt->_cont,this,translation);
 
 #else
 	dynamiclib	*dl=NULL;

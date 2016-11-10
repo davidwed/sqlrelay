@@ -26,17 +26,18 @@ class sqlrfilterplugin {
 class sqlrfiltersprivate {
 	friend class sqlrfilters;
 	private:
-		const char	*_libexecdir;
-		bool		_debug;
+		sqlrservercontroller	*_cont;
+
+		bool	_debug;
 
 		singlylinkedlist< sqlrfilterplugin * >	_tlist;
 };
 
-sqlrfilters::sqlrfilters(sqlrpaths *sqlrpth, bool debug) {
+sqlrfilters::sqlrfilters(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrfiltersprivate;
-	pvt->_debug=debug;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_cont=cont;
+	pvt->_debug=cont->getConfig()->getDebugFilters();
 }
 
 sqlrfilters::~sqlrfilters() {
@@ -100,7 +101,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the filter module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("filter_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -118,9 +119,12 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 	// load the filter itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrfilter_")->append(module);
-	sqlrfilter *(*newFilter)
-		(sqlrfilters *, xmldomnode *, bool)=
-		(sqlrfilter *(*)(sqlrfilters *, xmldomnode *, bool))
+	sqlrfilter *(*newFilter)(sqlrservercontroller *,
+					sqlrfilters *,
+					xmldomnode *)=
+		(sqlrfilter *(*)(sqlrservercontroller *,
+					sqlrfilters *,
+					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newFilter) {
 		stdoutput.printf("failed to create filter: %s\n",module);
@@ -131,7 +135,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 		delete dl;
 		return;
 	}
-	sqlrfilter	*f=(*newFilter)(this,filter,pvt->_debug);
+	sqlrfilter	*f=(*newFilter)(pvt->_cont,this,filter);
 
 #else
 	dynamiclib	*dl=NULL;

@@ -8,16 +8,14 @@ class sqlrfilterprivate {
 	private:
 		sqlrfilters	*_sqlrfs;
 		xmldomnode	*_parameters;
-		bool		_debug;
 };
 
-sqlrfilter::sqlrfilter(sqlrfilters *sqlrfs,
-				xmldomnode *parameters,
-				bool debug) {
+sqlrfilter::sqlrfilter(sqlrservercontroller *cont,
+				sqlrfilters *sqlrfs,
+				xmldomnode *parameters) {
 	pvt=new sqlrfilterprivate;
 	pvt->_sqlrfs=sqlrfs;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrfilter::~sqlrfilter() {
@@ -67,8 +65,4 @@ sqlrfilters *sqlrfilter::getFilters() {
 
 xmldomnode *sqlrfilter::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrfilter::getDebug() {
-	return pvt->_debug;
 }

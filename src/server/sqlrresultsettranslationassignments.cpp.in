@@ -1,5 +1,4 @@
 	if (!charstring::compare(module,"@module@")) {
-		rstr=new_sqlrresultsettranslation_@module@(this,
-							resultsettranslation,
-							pvt->_debug);
+		rstr=new_sqlrresultsettranslation_@module@(pvt->_cont,this,
+							resultsettranslation);
 	} else

@@ -8,16 +8,14 @@ class sqlrtranslationprivate {
 	private:
 		sqlrtranslations	*_sqlts;
 		xmldomnode		*_parameters;
-		bool			_debug;
 };
 
-sqlrtranslation::sqlrtranslation(sqlrtranslations *sqlts,
-				xmldomnode *parameters,
-				bool debug) {
+sqlrtranslation::sqlrtranslation(sqlrservercontroller *cont,
+					sqlrtranslations *sqlts,
+					xmldomnode *parameters) {
 	pvt=new sqlrtranslationprivate;
 	pvt->_sqlts=sqlts;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrtranslation::~sqlrtranslation() {
@@ -47,8 +45,4 @@ sqlrtranslations *sqlrtranslation::getTranslations() {
 
 xmldomnode *sqlrtranslation::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrtranslation::getDebug() {
-	return pvt->_debug;
 }

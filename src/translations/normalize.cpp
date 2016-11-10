@@ -9,9 +9,9 @@
 
 class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 	public:
-			sqlrtranslation_normalize(sqlrtranslations *sqlts,
-							xmldomnode *parameters,
-							bool debug);
+			sqlrtranslation_normalize(sqlrservercontroller *cont,
+							sqlrtranslations *sqlts,
+							xmldomnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
@@ -28,14 +28,18 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 
 		bool	enabled;
 		bool	foreigndecimals;
+
+		bool	debug;
 };
 
 sqlrtranslation_normalize::sqlrtranslation_normalize(
+					sqlrservercontroller *cont,
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters,
-					bool debug) :
-				sqlrtranslation(sqlts,parameters,debug) {
+					xmldomnode *parameters) :
+				sqlrtranslation(cont,sqlts,parameters) {
 	debugFunction();
+
+	debug=cont->getConfig()->getDebugTranslations();
 
 	enabled=charstring::compareIgnoringCase(
 		parameters->getAttributeValue("enabled"),"no");
@@ -57,7 +61,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("original query:\n\"%s\"\n\n",query);
 	}
 
@@ -117,7 +121,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("normalized query (pass 1):\n\"%s\"\n\n",
 							pass1.getString());
 	}
@@ -221,7 +225,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("normalized query (pass 2):\n\"%s\"\n\n",
 							pass2.getString());
 	}
@@ -313,7 +317,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("normalized query (pass 3):\n\"%s\"\n\n",
 							pass3.getString());
 	}
@@ -354,7 +358,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("normalized query (pass 4):\n\"%s\"\n\n",
 						translatedquery->getString());
 	}
@@ -417,9 +421,9 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrtranslation *new_sqlrtranslation_normalize(
-							sqlrtranslations *sqlts,
-							xmldomnode *parameters,
-							bool debug) {
-		return new sqlrtranslation_normalize(sqlts,parameters,debug);
+						sqlrservercontroller *cont,
+						sqlrtranslations *sqlts,
+						xmldomnode *parameters) {
+		return new sqlrtranslation_normalize(cont,sqlts,parameters);
 	}
 }

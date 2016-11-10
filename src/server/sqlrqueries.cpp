@@ -25,17 +25,15 @@ class sqlrqueryplugin {
 class sqlrqueriesprivate {
 	friend class sqlrqueries;
 	private:
-		const char	*_libexecdir;
-		bool		_debug;
+		sqlrservercontroller	*_cont;
 
 		singlylinkedlist< sqlrqueryplugin * >	_llist;
 };
 
-sqlrqueries::sqlrqueries(sqlrpaths *sqlrpth, bool debug) {
+sqlrqueries::sqlrqueries(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrqueriesprivate;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
-	pvt->_debug=debug;
+	pvt->_cont=cont;
 }
 
 sqlrqueries::~sqlrqueries() {
@@ -98,7 +96,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the query module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("query_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -115,8 +113,10 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	// load the query itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrquery_")->append(module);
-	sqlrquery *(*newQuery)(xmldomnode *,bool)=
-			(sqlrquery *(*)(xmldomnode *,bool))
+	sqlrquery *(*newQuery)(sqlrservercontroller *,
+					xmldomnode *)=
+			(sqlrquery *(*)(sqlrservercontroller *,
+						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newQuery) {
 		stdoutput.printf("failed to create query: %s\n",module);
@@ -127,7 +127,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 		delete dl;
 		return;
 	}
-	sqlrquery	*qr=(*newQuery)(query,pvt->_debug);
+	sqlrquery	*qr=(*newQuery)(pvt->_cont,query);
 
 #else
 

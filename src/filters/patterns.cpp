@@ -22,9 +22,9 @@ struct pattern_t {
 
 class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 	public:
-			sqlrfilter_patterns(sqlrfilters *sqlrfs,
-					xmldomnode *parameters,
-					bool debug);
+			sqlrfilter_patterns(sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters);
 			~sqlrfilter_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -37,9 +37,10 @@ class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 		bool	enabled;
 };
 
-sqlrfilter_patterns::sqlrfilter_patterns(sqlrfilters *sqlrfs,
-			xmldomnode *parameters,
-			bool debug) : sqlrfilter(sqlrfs,parameters,debug) {
+sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters) :
+					sqlrfilter(cont,sqlrfs,parameters) {
 	debugFunction();
 
 	p=NULL;
@@ -230,9 +231,9 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
-			*new_sqlrfilter_patterns(sqlrfilters *sqlrfs,
-							xmldomnode *parameters,
-							bool debug) {
-		return new sqlrfilter_patterns(sqlrfs,parameters,debug);
+			*new_sqlrfilter_patterns(sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters) {
+		return new sqlrfilter_patterns(cont,sqlrfs,parameters);
 	}
 }

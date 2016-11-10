@@ -12,13 +12,12 @@ class sqlrresultsettranslationprivate {
 };
 
 sqlrresultsettranslation::sqlrresultsettranslation(
+				sqlrservercontroller *cont,
 				sqlrresultsettranslations *sqlrrsts,
-				xmldomnode *parameters,
-				bool debug) {
+				xmldomnode *parameters) {
 	pvt=new sqlrresultsettranslationprivate;
 	pvt->_sqlrrsts=sqlrrsts;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrresultsettranslation::~sqlrresultsettranslation() {
@@ -41,8 +40,4 @@ sqlrresultsettranslations *sqlrresultsettranslation::
 
 xmldomnode *sqlrresultsettranslation::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrresultsettranslation::getDebug() {
-	return pvt->_debug;
 }

@@ -26,18 +26,20 @@ class sqlrresultsettranslationplugin {
 class sqlrresultsettranslationsprivate {
 	friend class sqlrresultsettranslations;
 	private:
-		const char	*_libexecdir;
-		bool		_debug;
+		sqlrservercontroller	*_cont;
+
+		bool	_debug;
 
 		singlylinkedlist< sqlrresultsettranslationplugin * >	_tlist;
 };
 
-sqlrresultsettranslations::sqlrresultsettranslations(sqlrpaths *sqlrpth,
-								bool debug) {
+sqlrresultsettranslations::sqlrresultsettranslations(
+					sqlrservercontroller *cont) {
+
 	debugFunction();
 	pvt=new sqlrresultsettranslationsprivate;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
-	pvt->_debug=debug;
+	pvt->_cont=cont;
+	pvt->_debug=cont->getConfig()->getDebugResultSetTranslations();
 }
 
 sqlrresultsettranslations::~sqlrresultsettranslations() {
@@ -105,7 +107,7 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the result set translation module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("resultsettranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -124,9 +126,13 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 	stringbuffer	functionname;
 	functionname.append("new_sqlrresultsettranslation_")->append(module);
 	sqlrresultsettranslation *(*newResultSetTranslation)
-		(sqlrresultsettranslations *, xmldomnode *, bool)=
+					(sqlrservercontroller *,
+					sqlrresultsettranslations *,
+					xmldomnode *)=
 		(sqlrresultsettranslation *(*)
-		(sqlrresultsettranslations *, xmldomnode *, bool))
+					(sqlrservercontroller *,
+					sqlrresultsettranslations *,
+					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
 		stdoutput.printf("failed to create "
@@ -139,8 +145,8 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 		return;
 	}
 	sqlrresultsettranslation	*rstr=
-		(*newResultSetTranslation)(
-			this,resultsettranslation,pvt->_debug);
+		(*newResultSetTranslation)(pvt->_cont,this,
+						resultsettranslation);
 
 #else
 	dynamiclib			*dl=NULL;

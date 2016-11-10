@@ -108,10 +108,12 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	// load the protocol itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrprotocol_")->append(module);
-	sqlrprotocol *(*newProtocol)
-				(sqlrservercontroller *, xmldomnode *, bool)=
-			(sqlrprotocol *(*)
-				(sqlrservercontroller *, xmldomnode *, bool))
+	sqlrprotocol *(*newProtocol)(sqlrservercontroller *,
+					xmldomnode *,
+					bool)=
+			(sqlrprotocol *(*)(sqlrservercontroller *,
+						xmldomnode *,
+						bool))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
 		stdoutput.printf("failed to create protocol: %s\n",module);

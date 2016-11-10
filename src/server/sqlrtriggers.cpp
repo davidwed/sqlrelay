@@ -19,18 +19,19 @@ class sqlrtriggerplugin {
 class sqlrtriggersprivate {
 	friend class sqlrtriggers;
 	private:
-		const char	*_libexecdir;
+		sqlrservercontroller	*_cont;
+
 		bool		_debug;
 
 		singlylinkedlist< sqlrtriggerplugin * >	_beforetriggers;
 		singlylinkedlist< sqlrtriggerplugin * >	_aftertriggers;
 };
 
-sqlrtriggers::sqlrtriggers(sqlrpaths *sqlrpth, bool debug) {
+sqlrtriggers::sqlrtriggers(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrtriggersprivate;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
-	pvt->_debug=debug;
+	pvt->_cont=cont;
+	pvt->_debug=cont->getConfig()->getDebugTriggers();
 }
 
 sqlrtriggers::~sqlrtriggers() {
@@ -122,7 +123,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the trigger module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("trigger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -139,8 +140,10 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	// load the trigger itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrtrigger_")->append(module);
-	sqlrtrigger *(*newTrigger)(xmldomnode *, bool)=
-			(sqlrtrigger *(*)(xmldomnode *, bool))
+	sqlrtrigger *(*newTrigger)(sqlrservercontroller *,
+						xmldomnode *)=
+			(sqlrtrigger *(*)(sqlrservercontroller *,
+						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
 		stdoutput.printf("failed to create trigger: %s\n",module);
@@ -151,7 +154,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 		delete dl;
 		return;
 	}
-	sqlrtrigger	*tr=(*newTrigger)(trigger,pvt->_debug);
+	sqlrtrigger	*tr=(*newTrigger)(pvt->_cont,trigger);
 
 #else
 

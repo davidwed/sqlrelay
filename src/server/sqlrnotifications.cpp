@@ -128,8 +128,10 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 	// load the notification itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrnotification_")->append(module);
-	sqlrnotification *(*newNotification)(sqlrnotifications *, xmldomnode *)=
-		(sqlrnotification *(*)(sqlrnotifications *, xmldomnode *))
+	sqlrnotification *(*newNotification)(sqlrnotifications *,
+							xmldomnode *)=
+		(sqlrnotification *(*)(sqlrnotifications *,
+						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newNotification) {
 		stdoutput.printf("failed to create notification: %s\n",module);

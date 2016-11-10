@@ -115,8 +115,10 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	// load the router itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrrouter_")->append(module);
-	sqlrrouter *(*newRouter)(sqlrservercontroller *, xmldomnode *)=
-			(sqlrrouter *(*)(sqlrservercontroller *, xmldomnode *))
+	sqlrrouter *(*newRouter)(sqlrservercontroller *,
+						xmldomnode *)=
+			(sqlrrouter *(*)(sqlrservercontroller *,
+							xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newRouter) {
 		stdoutput.printf("failed to create router: %s\n",module);

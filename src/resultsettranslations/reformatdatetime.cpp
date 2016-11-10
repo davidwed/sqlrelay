@@ -9,9 +9,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 					public sqlrresultsettranslation {
 	public:
 			sqlrresultsettranslation_reformatdatetime(
+					sqlrservercontroller *cont,
 					sqlrresultsettranslations *sqlrrsts,
-					xmldomnode *parameters,
-					bool debug);
+					xmldomnode *parameters);
 			~sqlrresultsettranslation_reformatdatetime();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -32,14 +32,18 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 		const char	*timeformat;
 
 		bool	enabled;
+
+		bool	debug;
 };
 
 sqlrresultsettranslation_reformatdatetime::
 	sqlrresultsettranslation_reformatdatetime(
+				sqlrservercontroller *cont,
 				sqlrresultsettranslations *sqlrrsts,
-				xmldomnode *parameters,
-				bool debug) :
-			sqlrresultsettranslation(sqlrrsts,parameters,debug) {
+				xmldomnode *parameters) :
+			sqlrresultsettranslation(cont,sqlrrsts,parameters) {
+
+	debug=cont->getConfig()->getDebugResultSetTranslations();
 
 	reformattedfield=NULL;
 	reformattedfieldlength=0;
@@ -95,7 +99,7 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 		return true;
 	}
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("converted date \"%s\" ",*field);
 	}
 
@@ -111,7 +115,7 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 					dateformat,
 					timeformat);
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("\"%s\"\nusing ddmm=%d and yyyyddmm=%d\n",
 						*field,ddmm,yyyyddmm);
 	}
@@ -122,10 +126,10 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsettranslation
 			*new_sqlrresultsettranslation_reformatdatetime(
+					sqlrservercontroller *cont,
 					sqlrresultsettranslations *sqlrrsts,
-					xmldomnode *parameters,
-					bool debug) {
+					xmldomnode *parameters) {
 		return new sqlrresultsettranslation_reformatdatetime(
-						sqlrrsts,parameters,debug);
+						cont,sqlrrsts,parameters);
 	}
 }

@@ -8,17 +8,15 @@ class sqlrresultsetrowtranslationprivate {
 	private:
 		sqlrresultsetrowtranslations	*_sqlrrrsts;
 		xmldomnode			*_parameters;
-		bool				_debug;
 };
 
 sqlrresultsetrowtranslation::sqlrresultsetrowtranslation(
+				sqlrservercontroller *cont,
 				sqlrresultsetrowtranslations *sqlrrrsts,
-				xmldomnode *parameters,
-				bool debug) {
+				xmldomnode *parameters) {
 	pvt=new sqlrresultsetrowtranslationprivate;
 	pvt->_sqlrrrsts=sqlrrrsts;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrresultsetrowtranslation::~sqlrresultsetrowtranslation() {
@@ -41,8 +39,4 @@ sqlrresultsetrowtranslations *sqlrresultsetrowtranslation::
 
 xmldomnode *sqlrresultsetrowtranslation::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrresultsetrowtranslation::getDebug() {
-	return pvt->_debug;
 }

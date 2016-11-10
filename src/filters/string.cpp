@@ -8,9 +8,9 @@
 
 class SQLRSERVER_DLLSPEC sqlrfilter_string : public sqlrfilter {
 	public:
-			sqlrfilter_string(sqlrfilters *sqlrfs,
-					xmldomnode *parameters,
-					bool debug);
+			sqlrfilter_string(sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters);
 			~sqlrfilter_string();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -21,13 +21,17 @@ class SQLRSERVER_DLLSPEC sqlrfilter_string : public sqlrfilter {
 		bool			ignorecase;
 
 		bool	enabled;
+
+		bool	debug;
 };
 
-sqlrfilter_string::sqlrfilter_string(sqlrfilters *sqlrfs,
-					xmldomnode *parameters,
-					bool debug) :
-					sqlrfilter(sqlrfs,parameters,debug) {
+sqlrfilter_string::sqlrfilter_string(sqlrservercontroller *cont,
+					sqlrfilters *sqlrfs,
+					xmldomnode *parameters) :
+					sqlrfilter(cont,sqlrfs,parameters) {
 	debugFunction();
+
+	debug=cont->getConfig()->getDebugFilters();
 
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -74,7 +78,7 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 
 	bool	result=!charstring::contains(query,pattern);
 
-	if (result && getDebug()) {
+	if (result && debug) {
 		stdoutput.printf("string: matches pattern \"%s\"\n\n",pattern);
 	}
 
@@ -84,9 +88,9 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
-			*new_sqlrfilter_string(sqlrfilters *sqlrfs,
-							xmldomnode *parameters,
-							bool debug) {
-		return new sqlrfilter_string(sqlrfs,parameters,debug);
+			*new_sqlrfilter_string(sqlrservercontroller *cont,
+						sqlrfilters *sqlrfs,
+						xmldomnode *parameters) {
+		return new sqlrfilter_string(cont,sqlrfs,parameters);
 	}
 }

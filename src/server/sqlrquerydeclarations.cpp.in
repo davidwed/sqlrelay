@@ -1,1 +1,2 @@
-sqlrquery	*new_sqlrquery_@module@(xmldomnode *parameters);
+sqlrquery	*new_sqlrquery_@module@(sqlrservercontroller *cont,
+						xmldomnode *parameters);

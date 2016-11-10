@@ -8,13 +8,11 @@ class sqlrqueryprivate {
 	friend class sqlrquery;
 	private:
 		xmldomnode	*_parameters;
-		bool		_debug;
 };
 
-sqlrquery::sqlrquery(xmldomnode *parameters, bool debug) {
+sqlrquery::sqlrquery(sqlrservercontroller *cont, xmldomnode *parameters) {
 	pvt=new sqlrqueryprivate;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrquery::~sqlrquery() {
@@ -31,10 +29,6 @@ sqlrquerycursor *sqlrquery::newCursor(sqlrserverconnection *conn, uint16_t id) {
 
 xmldomnode *sqlrquery::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrquery::getDebug() {
-	return pvt->_debug;
 }
 
 class sqlrquerycursorprivate {
