@@ -1,4 +1,4 @@
 	if (!charstring::compare(module,"@module@")) {
 		rstr=new_sqlrresultsetrowtranslation_@module@(
-				pvt->_cont,this,resultsetrowtranslation);
+				pvt->_cont,resultsetrowtranslation);
 	} else

@@ -9,7 +9,6 @@
 class SQLRSERVER_DLLSPEC sqlrfilter_string : public sqlrfilter {
 	public:
 			sqlrfilter_string(sqlrservercontroller *cont,
-						sqlrfilters *sqlrfs,
 						xmldomnode *parameters);
 			~sqlrfilter_string();
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -26,9 +25,8 @@ class SQLRSERVER_DLLSPEC sqlrfilter_string : public sqlrfilter {
 };
 
 sqlrfilter_string::sqlrfilter_string(sqlrservercontroller *cont,
-					sqlrfilters *sqlrfs,
 					xmldomnode *parameters) :
-					sqlrfilter(cont,sqlrfs,parameters) {
+					sqlrfilter(cont,parameters) {
 	debugFunction();
 
 	debug=cont->getConfig()->getDebugFilters();
@@ -89,8 +87,7 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
 			*new_sqlrfilter_string(sqlrservercontroller *cont,
-						sqlrfilters *sqlrfs,
 						xmldomnode *parameters) {
-		return new sqlrfilter_string(cont,sqlrfs,parameters);
+		return new sqlrfilter_string(cont,parameters);
 	}
 }

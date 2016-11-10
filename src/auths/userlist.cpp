@@ -7,6 +7,7 @@
 class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 	public:
 			sqlrauth_userlist(sqlrservercontroller *cont,
+						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						xmldomnode *parameters);
 			~sqlrauth_userlist();
@@ -23,9 +24,10 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 };
 
 sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
+					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					xmldomnode *parameters) :
-					sqlrauth(cont,sqlrpe,parameters) {
+					sqlrauth(cont,auths,sqlrpe,parameters) {
 
 	users=NULL;
 	passwords=NULL;
@@ -194,8 +196,9 @@ const char *sqlrauth_userlist::userPassword(const char *user,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_userlist(
 						sqlrservercontroller *cont,
+						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						xmldomnode *parameters) {
-		return new sqlrauth_userlist(cont,sqlrpe,parameters);
+		return new sqlrauth_userlist(cont,auths,sqlrpe,parameters);
 	}
 }

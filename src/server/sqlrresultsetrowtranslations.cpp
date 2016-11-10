@@ -126,11 +126,9 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 	functionname.append("new_sqlrresultsetrowtranslation_")->append(module);
 	sqlrresultsetrowtranslation *(*newResultSetTranslation)
 					(sqlrservercontroller *,
-					sqlrresultsetrowtranslations *,
 					xmldomnode *)=
 		(sqlrresultsetrowtranslation *(*)
 					(sqlrservercontroller *,
-					sqlrresultsetrowtranslations *,
 					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
@@ -144,8 +142,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 		return;
 	}
 	sqlrresultsetrowtranslation	*rstr=
-		(*newResultSetTranslation)
-			(pvt->_cont,this,resultsetrowtranslation);
+		(*newResultSetTranslation)(pvt->_cont,resultsetrowtranslation);
 
 #else
 	dynamiclib			*dl=NULL;

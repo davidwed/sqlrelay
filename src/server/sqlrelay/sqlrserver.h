@@ -1085,12 +1085,14 @@ class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 		sqlrauth(sqlrservercontroller *cont,
+					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					xmldomnode *parameters);
 		virtual	~sqlrauth();
 		virtual	const char	*auth(sqlrcredentials *cred);
 
 	protected:
+		sqlrauths	*getAuths();
 		sqlrpwdencs	*getPasswordEncryptions();
 		xmldomnode	*getParameters();
 
@@ -1181,6 +1183,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 	protected:
 		const char	*logLevel(sqlrlogger_loglevel_t level);
 		const char	*eventType(sqlrevent_t event);
+		sqlrloggers	*getLoggers();
 		xmldomnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrlogger.h>
@@ -1447,7 +1450,6 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 class SQLRSERVER_DLLSPEC sqlrfilter {
 	public:
 		sqlrfilter(sqlrservercontroller *cont,
-					sqlrfilters *sqlrfs,
 					xmldomnode *parameters);
 		virtual	~sqlrfilter();
 
@@ -1489,8 +1491,7 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
 		sqlrresultsettranslation(sqlrservercontroller *cont,
-					sqlrresultsettranslations *sqlrrsts,
-					xmldomnode *parameters);
+						xmldomnode *parameters);
 		virtual	~sqlrresultsettranslation();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1501,7 +1502,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					uint64_t *fieldlength);
 
 	protected:
-		sqlrresultsettranslations	*getResultSetTranslations();
 		xmldomnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrresultsettranslation.h>
@@ -1527,7 +1527,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 	public:
 		sqlrresultsetrowtranslation(
 					sqlrservercontroller *cont,
-					sqlrresultsetrowtranslations *sqlrrrsts,
 					xmldomnode *parameters);
 		virtual	~sqlrresultsetrowtranslation();
 
@@ -1539,7 +1538,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					uint64_t **fieldlengths);
 
 	protected:
-		sqlrresultsetrowtranslations	*getResultSetRowTranslations();
 		xmldomnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrresultsetrowtranslation.h>

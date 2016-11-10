@@ -1,4 +1,3 @@
 sqlrresultsettranslation	*new_sqlrresultsettranslation_@module@(
-					sqlrservercontroller *cont,
-					sqlrresultsettranslations *sqlrrsts,
-					xmldomnode *parameters);
+						sqlrservercontroller *cont,
+						xmldomnode *parameters);

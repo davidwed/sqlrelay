@@ -120,10 +120,8 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrfilter_")->append(module);
 	sqlrfilter *(*newFilter)(sqlrservercontroller *,
-					sqlrfilters *,
 					xmldomnode *)=
 		(sqlrfilter *(*)(sqlrservercontroller *,
-					sqlrfilters *,
 					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newFilter) {
@@ -135,7 +133,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 		delete dl;
 		return;
 	}
-	sqlrfilter	*f=(*newFilter)(pvt->_cont,this,filter);
+	sqlrfilter	*f=(*newFilter)(pvt->_cont,filter);
 
 #else
 	dynamiclib	*dl=NULL;

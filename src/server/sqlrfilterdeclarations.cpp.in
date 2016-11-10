@@ -1,3 +1,2 @@
 sqlrfilter	*new_sqlrfilter_@module@(sqlrservercontroller *cont,
-						sqlrfilters *sqlfs,
 						xmldomnode *parameters);

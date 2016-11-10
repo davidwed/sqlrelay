@@ -23,7 +23,6 @@ struct pattern_t {
 class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 	public:
 			sqlrfilter_patterns(sqlrservercontroller *cont,
-						sqlrfilters *sqlrfs,
 						xmldomnode *parameters);
 			~sqlrfilter_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -38,9 +37,8 @@ class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 };
 
 sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
-						sqlrfilters *sqlrfs,
 						xmldomnode *parameters) :
-					sqlrfilter(cont,sqlrfs,parameters) {
+						sqlrfilter(cont,parameters) {
 	debugFunction();
 
 	p=NULL;
@@ -232,8 +230,7 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
 			*new_sqlrfilter_patterns(sqlrservercontroller *cont,
-						sqlrfilters *sqlrfs,
 						xmldomnode *parameters) {
-		return new sqlrfilter_patterns(cont,sqlrfs,parameters);
+		return new sqlrfilter_patterns(cont,parameters);
 	}
 }

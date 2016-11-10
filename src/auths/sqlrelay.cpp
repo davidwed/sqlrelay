@@ -8,6 +8,7 @@
 class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 	public:
 			sqlrauth_sqlrelay(sqlrservercontroller *cont,
+						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						xmldomnode *parameters);
 			~sqlrauth_sqlrelay();
@@ -31,9 +32,10 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 };
 
 sqlrauth_sqlrelay::sqlrauth_sqlrelay(sqlrservercontroller *cont,
+					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					xmldomnode *parameters) :
-					sqlrauth(cont,sqlrpe,parameters) {
+					sqlrauth(cont,auths,sqlrpe,parameters) {
 
 	host=parameters->getAttributeValue("host");
 	port=charstring::toInteger(parameters->getAttributeValue("port"));
@@ -123,8 +125,9 @@ const char *sqlrauth_sqlrelay::auth(sqlrcredentials *cred) {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrelay(
 						sqlrservercontroller *cont,
-						xmldomnode *parameters,
-						sqlrpwdencs *sqlrpe) {
-		return new sqlrauth_sqlrelay(cont,sqlrpe,parameters);
+						sqlrauths *auths,
+						sqlrpwdencs *sqlrpe,
+						xmldomnode *parameters) {
+		return new sqlrauth_sqlrelay(cont,auths,sqlrpe,parameters);
 	}
 }
