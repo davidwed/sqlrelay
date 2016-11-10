@@ -56,8 +56,6 @@ class sqlrlistenerprivate {
 		sqlrconfigs	*_sqlrcfgs;
 		sqlrconfig	*_cfg;
 
-		bool		_debugsqlrnotifications;
-
 		sqlrloggers		*_sqlrlg;
 		sqlrnotifications	*_sqlrn;
 
@@ -114,8 +112,6 @@ sqlrlistener::sqlrlistener() {
 	pvt->_cmdl=NULL;
 	pvt->_sqlrcfgs=NULL;
 	pvt->_cfg=NULL;
-
-	pvt->_debugsqlrnotifications=false;
 
 	pvt->_initialized=false;
 
@@ -313,11 +309,9 @@ bool sqlrlistener::init(int argc, const char **argv) {
 		pvt->_sqlrlg->init(this,NULL);
 	}
 
-	pvt->_debugsqlrnotifications=pvt->_cfg->getDebugNotifications();
 	xmldomnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
-		pvt->_sqlrn=new sqlrnotifications(pvt->_sqlrpth,
-						pvt->_debugsqlrnotifications);
+		pvt->_sqlrn=new sqlrnotifications(pvt->_sqlrpth);
 		pvt->_sqlrn->load(notifications);
 	}
 

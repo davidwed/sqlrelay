@@ -404,12 +404,13 @@ char *MD5::MD5Sum(const unsigned char *data, uint64_t size) {
 
 class SQLRSERVER_DLLSPEC sqlrpwenc_md5 : public sqlrpwdenc {
 	public:
-			sqlrpwenc_md5(xmldomnode *parameters);
+			sqlrpwenc_md5(xmldomnode *parameters, bool debug);
 		bool	oneWay();
 		char	*encrypt(const char *value);
 };
 
-sqlrpwenc_md5::sqlrpwenc_md5(xmldomnode *parameters) : sqlrpwdenc(parameters) {
+sqlrpwenc_md5::sqlrpwenc_md5(xmldomnode *parameters, bool debug) :
+						sqlrpwdenc(parameters,debug) {
 }
 
 bool sqlrpwenc_md5::oneWay() {
@@ -423,7 +424,8 @@ char *sqlrpwenc_md5::encrypt(const char *value) {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_md5(
-						xmldomnode *parameters) {
-		return new sqlrpwenc_md5(parameters);
+						xmldomnode *parameters,
+						bool debug) {
+		return new sqlrpwenc_md5(parameters,debug);
 	}
 }

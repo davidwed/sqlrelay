@@ -312,15 +312,13 @@ class sqlrscheduleprivate {
 	friend class sqlrschedule;
 	private:
 		xmldomnode	*_parameters;
-		bool		_debug;
 
 		linkedlist< sqlrschedulerule * >	_rules;
 };
 
-sqlrschedule::sqlrschedule(xmldomnode *parameters, bool debug) {
+sqlrschedule::sqlrschedule(sqlrservercontroller *cont, xmldomnode *parameters) {
 	pvt=new sqlrscheduleprivate;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrschedule::~sqlrschedule() {
@@ -357,8 +355,4 @@ bool sqlrschedule::rulesAllow(datetime *dt, bool currentlyallowed) {
 
 xmldomnode *sqlrschedule::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrschedule::getDebug() {
-	return pvt->_debug;
 }

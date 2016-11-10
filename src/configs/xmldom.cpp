@@ -83,9 +83,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugResultSetRowTranslations();
 		bool		getDebugProtocols();
 		bool		getDebugAuths();
+		bool		getDebugPasswordEncryptions();
+		bool		getDebugLoggers();
 		bool		getDebugNotifications();
 		bool		getDebugSchedules();
 		bool		getDebugRouters();
+		bool		getDebugQueries();
 		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
@@ -199,9 +202,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugresultsetrowtranslations;
 		bool		debugprotocols;
 		bool		debugauths;
+		bool		debugpwdencs;
+		bool		debugloggers;
 		bool		debugnotifications;
 		bool		debugschedules;
 		bool		debugrouters;
+		bool		debugqueries;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -328,9 +334,12 @@ void sqlrconfig_xmldom::init() {
 			charstring::contains(debug,"resultsetrowtranslations");
 	debugprotocols=charstring::contains(debug,"protocols");
 	debugauths=charstring::contains(debug,"auths");
+	debugpwdencs=charstring::contains(debug,"passwordencrypytions");
+	debugloggers=charstring::contains(debug,"loggers");
 	debugnotifications=charstring::contains(debug,"notifications");
 	debugschedules=charstring::contains(debug,"schedules");
 	debugrouters=charstring::contains(debug,"routers");
+	debugqueries=charstring::contains(debug,"queries");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -589,6 +598,14 @@ bool sqlrconfig_xmldom::getDebugAuths() {
 	return debugauths;
 }
 
+bool sqlrconfig_xmldom::getDebugPasswordEncryptions() {
+	return debugpwdencs;
+}
+
+bool sqlrconfig_xmldom::getDebugLoggers() {
+	return debugloggers;
+}
+
 bool sqlrconfig_xmldom::getDebugNotifications() {
 	return debugnotifications;
 }
@@ -599,6 +616,10 @@ bool sqlrconfig_xmldom::getDebugSchedules() {
 
 bool sqlrconfig_xmldom::getDebugRouters() {
 	return debugrouters;
+}
+
+bool sqlrconfig_xmldom::getDebugQueries() {
+	return debugqueries;
 }
 
 uint64_t sqlrconfig_xmldom::getMaxClientInfoLength() {
@@ -1658,9 +1679,12 @@ void sqlrconfig_xmldom::getTreeValues() {
 			charstring::contains(debug,"resultsetrowtranslations");
 		debugprotocols=charstring::contains(debug,"protocols");
 		debugauths=charstring::contains(debug,"auths");
+		debugpwdencs=charstring::contains(debug,"passwordencryptions");
+		debugloggers=charstring::contains(debug,"loggers");
 		debugnotifications=charstring::contains(debug,"notifications");
 		debugschedules=charstring::contains(debug,"schedules");
 		debugrouters=charstring::contains(debug,"routers");
+		debugqueries=charstring::contains(debug,"queries");
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {

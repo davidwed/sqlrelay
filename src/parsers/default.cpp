@@ -5,7 +5,8 @@
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrparser *new_sqlrparser_default(
-					xmldomnode *parameters, bool debug) {
-		return new sqlrparser(parameters,debug);
+						sqlrservercontroller *cont,
+						xmldomnode *parameters) {
+		return new sqlrparser(cont,parameters);
 	}
 }

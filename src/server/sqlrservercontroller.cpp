@@ -292,7 +292,6 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_decrypteddbpassword=NULL;
 
-	pvt->_debugsqlrparser=false;
 	pvt->_debugsqlrtranslation=false;
 	pvt->_debugsqlrfilters=false;
 	pvt->_debugbindtranslation=false;
@@ -447,15 +446,15 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get password encryptions
 	xmldomnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();
 	if (!pwdencs->isNullNode()) {
-		pvt->_sqlrpe=new sqlrpwdencs(pvt->_pth);
+		pvt->_sqlrpe=new sqlrpwdencs(
+			pvt->_pth,pvt->_cfg->getDebugPasswordEncryptions());
 		pvt->_sqlrpe->load(pwdencs);
 	}	
 
 	// initialize auth
 	xmldomnode	*auths=pvt->_cfg->getAuths();
 	if (!auths->isNullNode()) {
-		pvt->_sqlra=new sqlrauths(
-				pvt->_pth,pvt->_cfg->getDebugAuths());
+		pvt->_sqlra=new sqlrauths(this);
 		pvt->_sqlra->load(auths,pvt->_sqlrpe);
 	}
 
@@ -476,16 +475,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get notifications
 	xmldomnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
-		pvt->_sqlrn=new sqlrnotifications(
-				pvt->_pth,pvt->_cfg->getDebugNotifications());
+		pvt->_sqlrn=new sqlrnotifications(pvt->_pth);
 		pvt->_sqlrn->load(notifications);
 	}
 
 	// get schedules
 	xmldomnode	*schedules=pvt->_cfg->getSchedules();
 	if (!schedules->isNullNode()) {
-		pvt->_sqlrs=new sqlrschedules(
-				pvt->_pth,pvt->_cfg->getDebugSchedules());
+		pvt->_sqlrs=new sqlrschedules(this);
 		pvt->_sqlrs->load(schedules);
 	}
 
@@ -649,13 +646,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the custom query handlers
 	xmldomnode	*queries=pvt->_cfg->getQueries();
 	if (!queries->isNullNode()) {
-		pvt->_sqlrq=new sqlrqueries(pvt->_pth);
+		pvt->_sqlrq=new sqlrqueries(
+				pvt->_pth,pvt->_cfg->getDebugQueries());
 		pvt->_sqlrq->load(queries);
 	}
 
 	// init client protocols
-	pvt->_sqlrpr=new sqlrprotocols(
-			this,pvt->_pth,pvt->_cfg->getDebugProtocols());
+	pvt->_sqlrpr=new sqlrprotocols(this);
 	pvt->_sqlrpr->load(pvt->_cfg->getListeners());
 
 	// set a handler for SIGALARMs, if necessary
@@ -2089,7 +2086,7 @@ bool sqlrservercontroller::auth(sqlrcredentials *cred) {
 	// authenticate
 	const char	*autheduser=NULL;
 	if (pvt->_sqlra) {
-		autheduser=pvt->_sqlra->auth(pvt->_conn,cred);
+		autheduser=pvt->_sqlra->auth(cred);
 	}
 	if (autheduser) {
 
@@ -2120,6 +2117,12 @@ bool sqlrservercontroller::changeUser(const char *newuser,
 	setUser(newuser);
 	setPassword(newpassword);
 	return (logIn(false) && initCursors(pvt->_cursorcount));
+}
+
+bool sqlrservercontroller::changeProxiedUser(const char *newuser,
+						const char *newpassword) {
+	raiseDebugMessageEvent("change proxied user");
+	return pvt->_conn->changeProxiedUser(newuser,newpassword);
 }
 
 void sqlrservercontroller::beginSession() {
@@ -4791,8 +4794,8 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 	// load the parser itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrparser_")->append(module);
-	sqlrparser	*(*newParser)(xmldomnode *,bool)=
-			(sqlrparser *(*)(xmldomnode *,bool))
+	sqlrparser	*(*newParser)(sqlrservercontroller *, xmldomnode *)=
+			(sqlrparser *(*)(sqlrservercontroller *, xmldomnode *))
 			pvt->_sqlrpdl.getSymbol(functionname.getString());
 	if (!newParser) {
 		stderror.printf("failed to load parser: %s\n",module);
@@ -4802,8 +4805,7 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 		return NULL;
 	}
 
-	sqlrparser	*parser=
-			(*newParser)(pvt->_sqlrpnode,pvt->_debugsqlrparser);
+	sqlrparser	*parser=(*newParser)(this,pvt->_sqlrpnode);
 
 #else
 	sqlrparser	*parser;

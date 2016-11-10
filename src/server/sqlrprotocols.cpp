@@ -25,19 +25,14 @@ class sqlrprotocolsprivate {
 	friend class sqlrprotocols;
 	private:
 		sqlrservercontroller	*_cont;
-		const char		*_libexecdir;
-		bool			_debug;
 
 		dictionary< uint16_t , sqlrprotocolplugin * >	_protos;
 };
 
-sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont,
-				sqlrpaths *sqlrpth, bool debug) {
+sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrprotocolsprivate;
 	pvt->_cont=cont;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
-	pvt->_debug=debug;
 }
 
 sqlrprotocols::~sqlrprotocols() {
@@ -96,7 +91,7 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the protocol module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("protocol_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -127,7 +122,8 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 		delete dl;
 		return;
 	}
-	sqlrprotocol	*pr=(*newProtocol)(pvt->_cont,listener,pvt->_debug);
+	sqlrprotocol	*pr=(*newProtocol)(pvt->_cont,listener,
+				pvt->_cont->getConfig()->getDebugProtocols());
 
 #else
 

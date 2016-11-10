@@ -7,36 +7,30 @@
 class sqlrauthprivate {
 	friend class sqlrauth;
 	public:
-		xmldomnode	*_parameters;
 		sqlrpwdencs	*_sqlrpe;
-		bool		_debug;
+		xmldomnode	*_parameters;
 };
 
-sqlrauth::sqlrauth(xmldomnode *parameters, sqlrpwdencs *sqlrpe, bool debug) {
+sqlrauth::sqlrauth(sqlrservercontroller *cont, sqlrpwdencs *sqlrpe,
+						xmldomnode *parameters) {
 	pvt=new sqlrauthprivate;
+	this->cont=cont;
 	pvt->_parameters=parameters;
 	pvt->_sqlrpe=sqlrpe;
-	pvt->_debug=debug;
 }
 
 sqlrauth::~sqlrauth() {
 	delete pvt;
 }
 
-xmldomnode *sqlrauth::getParameters() {
-	return pvt->_parameters;
+const char *sqlrauth::auth(sqlrcredentials *cred) {
+	return NULL;
 }
 
 sqlrpwdencs *sqlrauth::getPasswordEncryptions() {
 	return pvt->_sqlrpe;
 }
 
-bool sqlrauth::getDebug() {
-	return pvt->_debug;
-}
-
-
-const char *sqlrauth::auth(sqlrserverconnection *sqlrcon,
-					sqlrcredentials *cred) {
-	return NULL;
+xmldomnode *sqlrauth::getParameters() {
+	return pvt->_parameters;
 }

@@ -73,15 +73,7 @@ class sqlrparser;
 class sqlrparserprivate;
 class sqlrtranslation;
 class sqlrtranslationprivate;
-
-class SQLRSERVER_DLLSPEC sqlrdatabaseobject {
-	public:
-		const char	*database;
-		const char	*schema;
-		const char	*object;
-		const char	*dependency;
-};
-
+class sqlrdatabaseobject;
 class sqlrtranslations;
 class sqlrtranslationsprivate;
 class sqlrfilter;

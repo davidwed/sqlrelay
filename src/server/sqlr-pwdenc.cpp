@@ -85,7 +85,7 @@ int main(int argc, const char **argv) {
 								pwdencid);
 		process::exit(1);
 	}
-	sqlrpwdencs	sqlrpe(&sqlrpth);
+	sqlrpwdencs	sqlrpe(&sqlrpth,false);
 	sqlrpe.load(pwdencs);
 	sqlrpwdenc	*sqlrp=sqlrpe.getPasswordEncryptionById(pwdencid);
 	if (!sqlrp) {

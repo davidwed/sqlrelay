@@ -6,13 +6,12 @@
 
 class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 	public:
-			sqlrauth_userlist(xmldomnode *parameters,
+			sqlrauth_userlist(sqlrservercontroller *cont,
 						sqlrpwdencs *sqlrpe,
-						bool debug);
+						xmldomnode *parameters);
 			~sqlrauth_userlist();
 
-		const char	*auth(sqlrserverconnection *sqlrcon,
-						sqlrcredentials *cred);
+		const char	*auth(sqlrcredentials *cred);
 	private:
 		const char	*userPassword(const char *user,
 						const char *password,
@@ -23,10 +22,10 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 		uint64_t	usercount;
 };
 
-sqlrauth_userlist::sqlrauth_userlist(xmldomnode *parameters,
+sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 					sqlrpwdencs *sqlrpe,
-					bool debug) :
-					sqlrauth(parameters,sqlrpe,debug) {
+					xmldomnode *parameters) :
+					sqlrauth(cont,sqlrpe,parameters) {
 
 	users=NULL;
 	passwords=NULL;
@@ -68,8 +67,7 @@ sqlrauth_userlist::~sqlrauth_userlist() {
 	delete[] passwordencryptions;
 }
 
-const char *sqlrauth_userlist::auth(sqlrserverconnection *sqlrcon,
-						sqlrcredentials *cred) {
+const char *sqlrauth_userlist::auth(sqlrcredentials *cred) {
 
 	// this module supports userpassword, gss, and tls credentials
 	bool		up=!charstring::compare(cred->getType(),"userpassword");
@@ -195,9 +193,9 @@ const char *sqlrauth_userlist::userPassword(const char *user,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_userlist(
-						xmldomnode *users,
+						sqlrservercontroller *cont,
 						sqlrpwdencs *sqlrpe,
-						bool debug) {
-		return new sqlrauth_userlist(users,sqlrpe,debug);
+						xmldomnode *parameters) {
+		return new sqlrauth_userlist(cont,sqlrpe,parameters);
 	}
 }

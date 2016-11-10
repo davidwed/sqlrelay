@@ -1,3 +1,4 @@
 	if (!charstring::compare(module,"@module@")) {
-		au=new_sqlrauth_@module@(auth,sqlrpe,pvt->_debug);
+		au=new_sqlrauth_@module@(pvt->_cont,sqlrpe,auth,
+				pvt->cont->getConfig()->getDebugAuths());
 	} else

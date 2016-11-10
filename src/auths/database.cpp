@@ -7,26 +7,24 @@
 
 class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 	public:
-			sqlrauth_database(xmldomnode *parameters,
+			sqlrauth_database(sqlrservercontroller *cont,
 						sqlrpwdencs *sqlrpe,
-						bool debug);
-		const char	*auth(sqlrserverconnection *sqlrcon,
-						sqlrcredentials *cred);
+						xmldomnode *parameters);
+		const char	*auth(sqlrcredentials *cred);
 	private:
 		bool		first;
 		stringbuffer	lastuser;
 		stringbuffer	lastpassword;
 };
 
-sqlrauth_database::sqlrauth_database(xmldomnode *parameters,
+sqlrauth_database::sqlrauth_database(sqlrservercontroller *cont,
 					sqlrpwdencs *sqlrpe,
-					bool debug) :
-					sqlrauth(parameters,sqlrpe,debug) {
+					xmldomnode *parameters) :
+					sqlrauth(cont,sqlrpe,parameters) {
 	first=true;
 }
 
-const char *sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
-						sqlrcredentials *cred) {
+const char *sqlrauth_database::auth(sqlrcredentials *cred) {
 
 	// this module only supports user/password credentials
 	if (charstring::compare(cred->getType(),"userpassword")) {
@@ -37,8 +35,8 @@ const char *sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
 	// from the user/password that was originally used to log in to the
 	// database
 	if (first) {
-		lastuser.append(sqlrcon->cont->getUser());
-		lastpassword.append(sqlrcon->cont->getPassword());
+		lastuser.append(cont->getUser());
+		lastpassword.append(cont->getPassword());
 		first=false;
 	}
 
@@ -57,7 +55,7 @@ const char *sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
 		charstring::compare(lastpassword.getString(),password)) {
 
 		// change user
-		success=sqlrcon->changeUser(user,password);
+		success=cont->changeUser(user,password);
 
 		// keep a record of which user we're changing to
 		// and whether that user was successful in auth
@@ -73,9 +71,9 @@ const char *sqlrauth_database::auth(sqlrserverconnection *sqlrcon,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_database(
-						xmldomnode *users,
+						sqlrservercontroller *cont,
 						sqlrpwdencs *sqlrpe,
-						bool debug) {
-		return new sqlrauth_database(users,sqlrpe,debug);
+						xmldomnode *parameters) {
+		return new sqlrauth_database(cont,sqlrpe,parameters);
 	}
 }

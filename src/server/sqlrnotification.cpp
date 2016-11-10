@@ -8,16 +8,13 @@ class sqlrnotificationprivate {
 	private:
 		sqlrnotifications	*_ns;
 		xmldomnode		*_parameters;
-		bool			_debug;
 };
 
 sqlrnotification::sqlrnotification(sqlrnotifications *ns,
-					xmldomnode *parameters,
-					bool debug) {
+					xmldomnode *parameters) {
 	pvt=new sqlrnotificationprivate;
 	pvt->_ns=ns;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrnotification::~sqlrnotification() {
@@ -38,8 +35,4 @@ sqlrnotifications *sqlrnotification::getNotifications() {
 
 xmldomnode *sqlrnotification::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrnotification::getDebug() {
-	return pvt->_debug;
 }

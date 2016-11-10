@@ -1,1 +1,2 @@
-sqlrrouter	*new_sqlrrouter_@module@(xmldomnode *parameters, bool debug);
+sqlrrouter	*new_sqlrrouter_@module@(sqlrservercontroller *cont,
+						xmldomnode *parameters);

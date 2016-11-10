@@ -8,11 +8,13 @@ class sqlrpwdencprivate {
 	friend class sqlrpwdenc;
 	private:
 		xmldomnode	*_parameters;
+		bool		_debug;
 };
 
-sqlrpwdenc::sqlrpwdenc(xmldomnode *parameters) {
+sqlrpwdenc::sqlrpwdenc(xmldomnode *parameters, bool debug) {
 	pvt=new sqlrpwdencprivate;
 	pvt->_parameters=parameters;
+	pvt->_debug=debug;
 }
 
 sqlrpwdenc::~sqlrpwdenc() {
@@ -37,4 +39,8 @@ char *sqlrpwdenc::decrypt(const char *value) {
 
 xmldomnode *sqlrpwdenc::getParameters() {
 	return pvt->_parameters;
+}
+
+bool sqlrpwdenc::getDebug() {
+	return pvt->_debug;
 }

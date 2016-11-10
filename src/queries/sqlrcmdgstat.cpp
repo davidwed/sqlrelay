@@ -12,7 +12,8 @@
 
 class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdgstat : public sqlrquery {
 	public:
-			sqlrquery_sqlrcmdgstat(xmldomnode *parameters);
+			sqlrquery_sqlrcmdgstat(xmldomnode *parameters,
+							bool debug);
 		bool	match(const char *querystring, uint32_t querylength);
 		sqlrquerycursor	*newCursor(sqlrserverconnection *conn,
 							uint16_t id);
@@ -60,8 +61,9 @@ class sqlrquery_sqlrcmdgstatcursor : public sqlrquerycursor {
 
 };
 
-sqlrquery_sqlrcmdgstat::sqlrquery_sqlrcmdgstat(xmldomnode *parameters) :
-							sqlrquery(parameters) {
+sqlrquery_sqlrcmdgstat::sqlrquery_sqlrcmdgstat(xmldomnode *parameters,
+							bool debug) :
+						sqlrquery(parameters,debug) {
 	debugFunction();
 }
 
@@ -284,7 +286,8 @@ void sqlrquery_sqlrcmdgstatcursor::getField(uint32_t col,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdgstat(
-						xmldomnode *parameters) {
-		return new sqlrquery_sqlrcmdgstat(parameters);
+						xmldomnode *parameters,
+						bool debug) {
+		return new sqlrquery_sqlrcmdgstat(parameters,debug);
 	}
 }

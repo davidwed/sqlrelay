@@ -8,8 +8,9 @@
 
 class SQLRSERVER_DLLSPEC sqlrlistener {
 	public:
-			sqlrlistener();
-			~sqlrlistener();
+		sqlrlistener();
+		~sqlrlistener();
+
 		bool	init(int argc, const char **argv);
 		void	listen();
 
@@ -96,8 +97,8 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 
 class SQLRSERVER_DLLSPEC sqlrservercontroller {
 	public:
-			sqlrservercontroller();
-		virtual	~sqlrservercontroller();
+		sqlrservercontroller();
+		~sqlrservercontroller();
 
 		bool	init(int argc, const char **argv);
 		bool	listen();
@@ -127,6 +128,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						bool usetls);
 		bool		auth(sqlrcredentials *cred);
 		bool		changeUser(const char *newuser,
+						const char *newpassword);
+		bool		changeProxiedUser(const char *newuser,
 						const char *newpassword);
 
 		// close client connection
@@ -543,7 +546,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// cursor state
 		void			setState(sqlrservercursor *cursor,
-						sqlrcursorstate_t state);
+							sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState(sqlrservercursor *cursor);
 
 		// query parser
@@ -604,7 +607,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 class SQLRSERVER_DLLSPEC sqlrserverconnection {
 	public:
-			sqlrserverconnection(sqlrservercontroller *cont);
+		sqlrserverconnection(sqlrservercontroller *cont);
 		virtual	~sqlrserverconnection();
 
 		virtual bool	mustDetachBeforeLogIn();
@@ -684,7 +687,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual const char	*isSynonymQuery();
 
 		virtual sqlrservercursor	*newCursor(uint16_t id)=0;
-		virtual void		deleteCursor(sqlrservercursor *curs)=0;
+		virtual void			deleteCursor(
+						sqlrservercursor *curs)=0;
 
 		virtual	const char	*bindFormat();
 		virtual	int16_t		nonNullBindValue();
@@ -701,9 +705,10 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		void	setAutoCommit(bool autocommit);
 		bool	getFakeAutoCommit();
 
-		void	clearError();
-		void	setError(const char *err, int64_t errn, bool liveconn);
-
+		void		clearError();
+		void		setError(const char *err,
+						int64_t errn,
+						bool liveconn);
 		char		*getErrorBuffer();
 		uint32_t	getErrorLength();
 		void		setErrorLength(uint32_t errorlength);
@@ -721,8 +726,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 
 class SQLRSERVER_DLLSPEC sqlrservercursor {
 	public:
-			sqlrservercursor(sqlrserverconnection *conn,
-							uint16_t id);
+		sqlrservercursor(sqlrserverconnection *conn, uint16_t id);
 		virtual	~sqlrservercursor();
 
 		virtual	bool	open();
@@ -894,6 +898,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual void	encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize);
 
+
+		// 
 		uint16_t	getId();
 
 		bool		fakeInputBinds();
@@ -997,9 +1003,8 @@ enum clientsessionexitstatus_t {
 
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
-			sqlrprotocol(sqlrservercontroller *cont,
-					xmldomnode *parameters,
-					bool debug);
+		sqlrprotocol(sqlrservercontroller *cont,
+					xmldomnode *parameters);
 		virtual	~sqlrprotocol();
 
 		virtual clientsessionexitstatus_t
@@ -1010,7 +1015,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 	protected:
 		xmldomnode		*getParameters();
-		bool			getDebug();
 
 		sqlrservercontroller	*cont;
 
@@ -1019,10 +1023,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 class SQLRSERVER_DLLSPEC sqlrprotocols {
 	public:
-			sqlrprotocols(sqlrservercontroller *cont,
-						sqlrpaths *sqlrpth,
-						bool debug);
-			~sqlrprotocols();
+		sqlrprotocols(sqlrservercontroller *cont);
+		~sqlrprotocols();
 
 		bool		load(xmldomnode *listeners);
 		sqlrprotocol	*getProtocol(uint16_t port);
@@ -1032,15 +1034,15 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 
 class SQLRSERVER_DLLSPEC sqlrcredentials {
 	public:
-			sqlrcredentials();
+		sqlrcredentials();
 		virtual	~sqlrcredentials();
 		virtual const char	*getType()=0;
 };
 
 class SQLRSERVER_DLLSPEC sqlruserpasswordcredentials : public sqlrcredentials {
 	public:
-			sqlruserpasswordcredentials();
-		virtual	~sqlruserpasswordcredentials();
+		sqlruserpasswordcredentials();
+		~sqlruserpasswordcredentials();
 		const char	*getType();
 
 		void	setUser(const char *user);
@@ -1054,12 +1056,11 @@ class SQLRSERVER_DLLSPEC sqlruserpasswordcredentials : public sqlrcredentials {
 
 class SQLRSERVER_DLLSPEC sqlrgsscredentials : public sqlrcredentials {
 	public:
-			sqlrgsscredentials();
-		virtual	~sqlrgsscredentials();
+		sqlrgsscredentials();
+		~sqlrgsscredentials();
 		const char	*getType();
 
-		void	setInitiator(const char *initiator);
-
+		void		setInitiator(const char *initiator);
 		const char	*getInitiator();
 
 	#include <sqlrelay/private/sqlrgsscredentials.h>
@@ -1067,8 +1068,8 @@ class SQLRSERVER_DLLSPEC sqlrgsscredentials : public sqlrcredentials {
 
 class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 	public:
-			sqlrtlscredentials();
-		virtual	~sqlrtlscredentials();
+		sqlrtlscredentials();
+		~sqlrtlscredentials();
 		const char	*getType();
 
 		void	setCommonName(const char *commonname);
@@ -1083,34 +1084,35 @@ class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
-			sqlrauth(xmldomnode *parameters,
+		sqlrauth(sqlrservercontroller *cont,
 					sqlrpwdencs *sqlrpe,
-					bool debug);
+					xmldomnode *parameters);
 		virtual	~sqlrauth();
-		virtual	const char	*auth(sqlrserverconnection *sqlrcon,
-							sqlrcredentials *cred);
-		xmldomnode	*getParameters();
+		virtual	const char	*auth(sqlrcredentials *cred);
+
+	protected:
 		sqlrpwdencs	*getPasswordEncryptions();
-		bool		getDebug();
+		xmldomnode	*getParameters();
+
+		sqlrservercontroller	*cont;
 
 	#include <sqlrelay/private/sqlrauth.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrauths {
 	public:
-			sqlrauths(sqlrpaths *sqlrpth, bool debug);
-			~sqlrauths();
+		sqlrauths(sqlrservercontroller *cont);
+		~sqlrauths();
 
 		bool	load(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
-		const char	*auth(sqlrserverconnection *sqlrcon,
-						sqlrcredentials *cred);
+		const char	*auth(sqlrcredentials *cred);
 
 	#include <sqlrelay/private/sqlrauths.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrpwdenc {
 	public:
-			sqlrpwdenc(xmldomnode *parameters);
+		sqlrpwdenc(xmldomnode *parameters, bool debug);
 		virtual	~sqlrpwdenc();
 		virtual const char	*getId();
 		virtual	bool	oneWay();
@@ -1119,14 +1121,15 @@ class SQLRSERVER_DLLSPEC sqlrpwdenc {
 
 	protected:
 		xmldomnode	*getParameters();
+		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrpwdenc.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrpwdencs {
 	public:
-			sqlrpwdencs(sqlrpaths *sqlrpth);
-			~sqlrpwdencs();
+		sqlrpwdencs(sqlrpaths *sqlrpth, bool debug);
+		~sqlrpwdencs();
 
 		bool		load(xmldomnode *parameters);
 		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
@@ -1163,7 +1166,7 @@ enum sqlrlogger_loglevel_t {
 
 class SQLRSERVER_DLLSPEC sqlrlogger {
 	public:
-			sqlrlogger(xmldomnode *parameters);
+		sqlrlogger(xmldomnode *parameters);
 		virtual	~sqlrlogger();
 
 		virtual bool	init(sqlrlistener *sqlrl,
@@ -1185,8 +1188,8 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 
 class SQLRSERVER_DLLSPEC sqlrloggers {
 	public:
-			sqlrloggers(sqlrpaths *sqlrpth);
-			~sqlrloggers();
+		sqlrloggers(sqlrpaths *sqlrpth);
+		~sqlrloggers();
 
 		bool	load(xmldomnode *parameters);
 		void	init(sqlrlistener *sqlrl,
@@ -1203,9 +1206,8 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 
 class SQLRSERVER_DLLSPEC sqlrnotification {
 	public:
-			sqlrnotification(sqlrnotifications *ns,
-						xmldomnode *parameters,
-						bool debug);
+		sqlrnotification(sqlrnotifications *ns,
+					xmldomnode *parameters);
 		virtual	~sqlrnotification();
 
 		virtual bool	run(sqlrlistener *sqlrl,
@@ -1217,15 +1219,14 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 	protected:
 		sqlrnotifications	*getNotifications();
 		xmldomnode		*getParameters();
-		bool			getDebug();
 
 	#include <sqlrelay/private/sqlrnotification.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrnotifications {
 	public:
-			sqlrnotifications(sqlrpaths *sqlrpth, bool debug);
-			~sqlrnotifications();
+		sqlrnotifications(sqlrpaths *sqlrpth);
+		~sqlrnotifications();
 
 		bool	load(xmldomnode *parameters);
 		void	run(sqlrlistener *sqlrl,
@@ -1284,7 +1285,8 @@ class SQLRSERVER_DLLSPEC sqlrschedulerule {
 
 class SQLRSERVER_DLLSPEC sqlrschedule {
 	public:
-			sqlrschedule(xmldomnode *parameters, bool debug);
+		sqlrschedule(sqlrservercontroller *cont,
+					xmldomnode *parameters);
 		virtual	~sqlrschedule();
 
 		virtual bool	allowed(sqlrserverconnection *sqlrcon,
@@ -1302,15 +1304,14 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 
 	protected:
 		xmldomnode	*getParameters();
-		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrschedule.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrschedules {
 	public:
-			sqlrschedules(sqlrpaths *sqlrpth, bool debug);
-			~sqlrschedules();
+		sqlrschedules(sqlrservercontroller *cont);
+		~sqlrschedules();
 
 		bool	load(xmldomnode *parameters);
 		bool	allowed(sqlrserverconnection *sqlrcon,
@@ -1321,7 +1322,8 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 
 class SQLRSERVER_DLLSPEC sqlrrouter {
 	public:
-			sqlrrouter(xmldomnode *parameters, bool debug);
+		sqlrrouter(sqlrservercontroller *cont,
+				xmldomnode *parameters);
 		virtual	~sqlrrouter();
 
 		virtual const char	*route(sqlrserverconnection *sqlrcon,
@@ -1329,15 +1331,14 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 
 	protected:
 		xmldomnode	*getParameters();
-		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrrouter.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrrouters {
 	public:
-			sqlrrouters(sqlrpaths *sqlrpth, bool debug);
-			~sqlrrouters();
+		sqlrrouters(sqlrservercontroller *cont);
+		~sqlrrouters();
 
 		bool	load(xmldomnode *parameters);
 
@@ -1349,7 +1350,7 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 
 class SQLRSERVER_DLLSPEC sqlrparser {
 	public:
-			sqlrparser(xmldomnode *parameters, bool debug);
+		sqlrparser(sqlrservercontroller *cont, xmldomnode *parameters);
 		virtual	~sqlrparser();
 
 		virtual	bool	parse(const char *query);
@@ -1375,7 +1376,7 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 
 class SQLRSERVER_DLLSPEC sqlrtranslation {
 	public:
-			sqlrtranslation(sqlrtranslations *sqlts,
+		sqlrtranslation(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
 		virtual	~sqlrtranslation();
@@ -1401,8 +1402,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 
 class SQLRSERVER_DLLSPEC sqlrtranslations {
 	public:
-			sqlrtranslations(sqlrpaths *sqlrpth, bool debug);
-			~sqlrtranslations();
+		sqlrtranslations(sqlrpaths *sqlrpth, bool debug);
+		~sqlrtranslations();
 
 		bool	load(xmldomnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -1447,7 +1448,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 
 class SQLRSERVER_DLLSPEC sqlrfilter {
 	public:
-			sqlrfilter(sqlrfilters *sqlrfs,
+		sqlrfilter(sqlrfilters *sqlrfs,
 					xmldomnode *parameters,
 					bool debug);
 		virtual	~sqlrfilter();
@@ -1474,8 +1475,8 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 
 class SQLRSERVER_DLLSPEC sqlrfilters {
 	public:
-			sqlrfilters(sqlrpaths *sqlrpth, bool debug);
-			~sqlrfilters();
+		sqlrfilters(sqlrpaths *sqlrpth, bool debug);
+		~sqlrfilters();
 
 		bool	loadFilters(xmldomnode *parameters);
 		bool	runFilters(sqlrserverconnection *sqlrcon,
@@ -1490,8 +1491,7 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
-			sqlrresultsettranslation(
-					sqlrresultsettranslations *sqlrrsts,
+		sqlrresultsettranslation(sqlrresultsettranslations *sqlrrsts,
 					xmldomnode *parameters,
 					bool debug);
 		virtual	~sqlrresultsettranslation();
@@ -1513,9 +1513,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 	public:
-			sqlrresultsettranslations(sqlrpaths *sqlrpth,
-							bool debug);
-			~sqlrresultsettranslations();
+		sqlrresultsettranslations(sqlrpaths *sqlrpth, bool debug);
+		~sqlrresultsettranslations();
 
 		bool	load(xmldomnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -1530,7 +1529,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 
 class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 	public:
-			sqlrresultsetrowtranslation(
+		sqlrresultsetrowtranslation(
 					sqlrresultsetrowtranslations *sqlrrrsts,
 					xmldomnode *parameters,
 					bool debug);
@@ -1553,9 +1552,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 
 class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 	public:
-			sqlrresultsetrowtranslations(sqlrpaths *sqlrpth,
-								bool debug);
-			~sqlrresultsetrowtranslations();
+		sqlrresultsetrowtranslations(sqlrpaths *sqlrpth, bool debug);
+		~sqlrresultsetrowtranslations();
 
 		bool	load(xmldomnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -1570,7 +1568,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
-			sqlrtrigger(xmldomnode *parameters, bool debug);
+		sqlrtrigger(xmldomnode *parameters, bool debug);
 		virtual	~sqlrtrigger();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1588,8 +1586,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 
 class SQLRSERVER_DLLSPEC sqlrtriggers {
 	public:
-			sqlrtriggers(sqlrpaths *sqlrpth, bool debug);
-			~sqlrtriggers();
+		sqlrtriggers(sqlrpaths *sqlrpth, bool debug);
+		~sqlrtriggers();
 
 		bool	load(xmldomnode *parameters);
 		void	runBeforeTriggers(sqlrserverconnection *sqlrcon,
@@ -1605,7 +1603,7 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 
 class SQLRSERVER_DLLSPEC sqlrquery {
 	public:
-			sqlrquery(xmldomnode *parameters);
+		sqlrquery(xmldomnode *parameters, bool debug);
 		virtual	~sqlrquery();
 
 		virtual bool	match(const char *querystring,
@@ -1616,13 +1614,14 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 
 	protected:
 		xmldomnode	*getParameters();
+		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrquery.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 	public:
-			sqlrquerycursor(sqlrserverconnection *conn,
+		sqlrquerycursor(sqlrserverconnection *conn,
 					xmldomnode *parameters,
 					uint16_t id);
 		virtual	~sqlrquerycursor();
@@ -1638,8 +1637,8 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 
 class SQLRSERVER_DLLSPEC sqlrqueries {
 	public:
-			sqlrqueries(sqlrpaths *sqlrpth);
-			~sqlrqueries();
+		sqlrqueries(sqlrpaths *sqlrpth, bool debug);
+		~sqlrqueries();
 
 		bool		load(xmldomnode *parameters);
 		sqlrquerycursor	*match(sqlrserverconnection *sqlrcon,

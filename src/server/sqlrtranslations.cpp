@@ -23,6 +23,14 @@ class sqlrtranslationplugin {
 		dynamiclib	*dl;
 };
 
+class sqlrdatabaseobject {
+	public:
+		const char	*database;
+		const char	*schema;
+		const char	*object;
+		const char	*dependency;
+};
+
 class sqlrtranslationsprivate {
 	friend class sqlrtranslations;
 	private:

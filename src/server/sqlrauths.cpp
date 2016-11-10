@@ -26,17 +26,15 @@ class sqlrauthplugin {
 class sqlrauthsprivate {
 	friend class sqlrauths;
 	private:
-		const char	*_libexecdir;
-		bool		_debug;
+		sqlrservercontroller	*_cont;
 
 		singlylinkedlist< sqlrauthplugin * >	_llist;
 };
 
-sqlrauths::sqlrauths(sqlrpaths *sqlrpth, bool debug) {
+sqlrauths::sqlrauths(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrauthsprivate;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
-	pvt->_debug=debug;
+	pvt->_cont=cont;
 }
 
 sqlrauths::~sqlrauths() {
@@ -95,7 +93,7 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the password encryption module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("auth_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -112,8 +110,12 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 	// load the password encryption itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrauth_")->append(module);
-	sqlrauth *(*newAuth)(xmldomnode *, sqlrpwdencs *, bool)=
-			(sqlrauth *(*)(xmldomnode *, sqlrpwdencs *, bool))
+	sqlrauth *(*newAuth)(sqlrservercontroller *,
+					sqlrpwdencs *,
+					xmldomnode *)=
+			(sqlrauth *(*)(sqlrservercontroller *,
+					sqlrpwdencs *,
+					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newAuth) {
 		stdoutput.printf("failed to create auth: %s\n",module);
@@ -124,7 +126,7 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 		delete dl;
 		return;
 	}
-	sqlrauth	*au=(*newAuth)(auth,sqlrpe,pvt->_debug);
+	sqlrauth	*au=(*newAuth)(pvt->_cont,sqlrpe,auth);
 
 #else
 
@@ -143,8 +145,7 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 	pvt->_llist.append(sqlrap);
 }
 
-const char *sqlrauths::auth(sqlrserverconnection *sqlrcon,
-					sqlrcredentials *cred) {
+const char *sqlrauths::auth(sqlrcredentials *cred) {
 	debugFunction();
 	if (!cred) {
 		return NULL;
@@ -152,8 +153,7 @@ const char *sqlrauths::auth(sqlrserverconnection *sqlrcon,
 	for (singlylinkedlistnode< sqlrauthplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
-		const char	*autheduser=
-				node->getValue()->au->auth(sqlrcon,cred);
+		const char	*autheduser=node->getValue()->au->auth(cred);
 		if (autheduser) {
 			return autheduser;
 		}

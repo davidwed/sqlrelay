@@ -1,1 +1,3 @@
-sqlrnotification	*new_sqlrnotification_@module@(sqlrnotifications *ns, xmldomnode *parameters, bool debug);
+sqlrnotification	*new_sqlrnotification_@module@(sqlrnotifications *ns,
+							xmldomnode *parameters,
+							bool debug);

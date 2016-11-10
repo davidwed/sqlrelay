@@ -6,8 +6,7 @@
 class SQLRSERVER_DLLSPEC sqlrnotification_events : public sqlrnotification {
 	public:
 			sqlrnotification_events(sqlrnotifications *ns,
-						xmldomnode *parameters,
-						bool debug);
+						xmldomnode *parameters);
 
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
@@ -21,9 +20,8 @@ class SQLRSERVER_DLLSPEC sqlrnotification_events : public sqlrnotification {
 };
 
 sqlrnotification_events::sqlrnotification_events(sqlrnotifications *ns,
-						xmldomnode *parameters,
-						bool debug) :
-					sqlrnotification(ns,parameters,debug) {
+						xmldomnode *parameters) :
+					sqlrnotification(ns,parameters) {
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 	eventsnode=parameters->getFirstTagChild("events");
@@ -74,8 +72,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrnotification *new_sqlrnotification_events(
 							sqlrnotifications *ns,
-							xmldomnode *parameters,
-							bool debug) {
-		return new sqlrnotification_events(ns,parameters,debug);
+							xmldomnode *parameters) {
+		return new sqlrnotification_events(ns,parameters);
 	}
 }

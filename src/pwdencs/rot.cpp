@@ -6,14 +6,15 @@
 
 class SQLRSERVER_DLLSPEC sqlrpwenc_rot : public sqlrpwdenc {
 	public:
-			sqlrpwenc_rot(xmldomnode *parameters);
+			sqlrpwenc_rot(xmldomnode *parameters, bool debug);
 		char	*encrypt(const char *value);
 		char	*decrypt(const char *value);
 	private:
 		char	*rotate(const char *value, int64_t count);
 };
 
-sqlrpwenc_rot::sqlrpwenc_rot(xmldomnode *parameters) : sqlrpwdenc(parameters) {
+sqlrpwenc_rot::sqlrpwenc_rot(xmldomnode *parameters, bool debug) :
+						sqlrpwdenc(parameters,debug) {
 }
 
 char *sqlrpwenc_rot::encrypt(const char *value) {
@@ -66,7 +67,8 @@ char *sqlrpwenc_rot::rotate(const char *value, int64_t count) {
 
 extern "C" {
 	 SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_rot(
-						xmldomnode *parameters) {
-		return new sqlrpwenc_rot(parameters);
+						xmldomnode *parameters,
+						bool debug) {
+		return new sqlrpwenc_rot(parameters,debug);
 	}
 }

@@ -1,3 +1,3 @@
 	if (!charstring::compare(module,"@module@")) {
-		pe=new_sqlrpwdenc_@module@(pwdenc);
+		pe=new_sqlrpwdenc_@module@(pwdenc,pvt->_debug);
 	} else

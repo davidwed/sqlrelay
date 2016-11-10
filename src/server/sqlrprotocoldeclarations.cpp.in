@@ -1,3 +1,2 @@
 sqlrprotocol	*new_sqlrprotocol_@module@(sqlrservercontroller *cont,
-							xmdomnode *paramters,
-							bool debug);
+							xmdomnode *parameters);

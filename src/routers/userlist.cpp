@@ -6,8 +6,8 @@
 
 class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 	public:
-			sqlrrouter_userlist(xmldomnode *parameters,
-							bool debug);
+			sqlrrouter_userlist(sqlrservercontroller *cont,
+						xmldomnode *parameters);
 			~sqlrrouter_userlist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -19,12 +19,16 @@ class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 		uint64_t	usercount;
 
 		bool	enabled;
+
+		bool	debug;
 };
 
-sqlrrouter_userlist::sqlrrouter_userlist(xmldomnode *parameters, bool debug) :
-						sqlrrouter(parameters,debug) {
+sqlrrouter_userlist::sqlrrouter_userlist(sqlrservercontroller *cont,
+						xmldomnode *parameters) :
+						sqlrrouter(cont,parameters) {
 	users=NULL;
 
+	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 	if (!enabled && debug) {
@@ -63,7 +67,7 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 		// if the user matches...
 		if (!charstring::compare(user,users[i]) ||
 			!charstring::compare(users[i],"*")) {
-			if (getDebug()) {
+			if (debug) {
 				stdoutput.printf("\nrouting user %s to %s\n",
 							user,connectionid);
 			}
@@ -75,8 +79,8 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_userlist(
-						xmldomnode *parameters,
-						bool debug) {
-		return new sqlrrouter_userlist(parameters,debug);
+						sqlrservercontroller *cont,
+						xmldomnode *parameters) {
+		return new sqlrrouter_userlist(cont,parameters);
 	}
 }

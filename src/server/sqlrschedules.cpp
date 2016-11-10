@@ -25,17 +25,15 @@ class sqlrscheduleplugin {
 class sqlrschedulesprivate {
 	friend class sqlrschedules;
 	private:
-		const char	*_libexecdir;
-		bool		_debug;
+		sqlrservercontroller	*_cont;
 
 		singlylinkedlist< sqlrscheduleplugin * >	_llist;
 };
 
-sqlrschedules::sqlrschedules(sqlrpaths *sqlrpth, bool debug) {
+sqlrschedules::sqlrschedules(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrschedulesprivate;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
-	pvt->_debug=debug;
+	pvt->_cont=cont;
 }
 
 sqlrschedules::~sqlrschedules() {
@@ -99,7 +97,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the schedule module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("schedule_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -117,8 +115,8 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 	// load the schedule itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrschedule_")->append(module);
-	sqlrschedule *(*newSchedule)(xmldomnode *, bool)=
-			(sqlrschedule *(*)(xmldomnode *, bool))
+	sqlrschedule *(*newSchedule)(xmldomnode *)=
+			(sqlrschedule *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newSchedule) {
 		stdoutput.printf("failed to create schedule: %s\n",module);
@@ -129,7 +127,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 		delete dl;
 		return;
 	}
-	sqlrschedule	*s=(*newSchedule)(schedule,pvt->_debug);
+	sqlrschedule	*s=(*newSchedule)(schedule);
 
 #else
 

@@ -1,1 +1,4 @@
-sqlrresultsetrowtranslation	*new_sqlrresultsetrowtranslation_@module@(sqlrresultsetrowtranslations *sqlrrsts, xmldomnode *parameters, bool debug);
+sqlrresultsetrowtranslation	*new_sqlrresultsetrowtranslation_@module@(
+					sqlrresultsetrowtranslations *sqlrrsts,
+					xmldomnode *parameters,
+					bool debug);

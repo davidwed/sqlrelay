@@ -1,1 +1,4 @@
-sqlrauth	*new_sqlrauth_@module@(xmldomnode *parameters, sqlrpwdencs *sqlrpe, bool debug);
+sqlrauth	*new_sqlrauth_@module@(sqlrservercontroller *cont,
+						sqlrpwdencs *sqlrpe,
+						xmldomnode *parameters,
+						bool debug);

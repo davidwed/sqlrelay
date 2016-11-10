@@ -27,14 +27,16 @@ class sqlrpwdencsprivate {
 	friend class sqlrpwdencs;
 	private:
 		const char	*_libexecdir;
+		bool		_debug;
 
 		singlylinkedlist< sqlrpwdencplugin * >	_llist;
 };
 
-sqlrpwdencs::sqlrpwdencs(sqlrpaths *sqlrpth) {
+sqlrpwdencs::sqlrpwdencs(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	pvt=new sqlrpwdencsprivate;
 	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_debug=debug;
 }
 
 sqlrpwdencs::~sqlrpwdencs() {
@@ -119,8 +121,8 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	// load the password encryption itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrpwdenc_")->append(module);
-	sqlrpwdenc *(*newPasswordEncryption)(xmldomnode *)=
-			(sqlrpwdenc *(*)(xmldomnode *))
+	sqlrpwdenc *(*newPasswordEncryption)(xmldomnode *, bool)=
+			(sqlrpwdenc *(*)(xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newPasswordEncryption) {
 		stdoutput.printf("failed to create password "
@@ -132,7 +134,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 		delete dl;
 		return;
 	}
-	sqlrpwdenc	*pe=(*newPasswordEncryption)(pwdenc);
+	sqlrpwdenc	*pe=(*newPasswordEncryption)(pwdenc,pvt->_debug);
 
 #else
 

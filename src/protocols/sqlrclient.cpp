@@ -27,8 +27,7 @@ enum sqlrclientquerytype_t {
 class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 	public:
 			sqlrprotocol_sqlrclient(sqlrservercontroller *cont,
-							xmldomnode *parameters,
-							bool debug);
+							xmldomnode *parameters);
 		virtual	~sqlrprotocol_sqlrclient();
 
 		clientsessionexitstatus_t	clientSession(
@@ -213,13 +212,14 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		uint64_t	*fieldlengths;
 		bool		*blob;
 		bool		*null;
+
+		bool		debug;
 };
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					sqlrservercontroller *cont,
-					xmldomnode *parameters,
-					bool debug) :
-					sqlrprotocol(cont,parameters,debug) {
+					xmldomnode *parameters) :
+					sqlrprotocol(cont,parameters) {
 	debugFunction();
 
 	idleclienttimeout=cont->getConfig()->getIdleClientTimeout();
@@ -335,6 +335,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					"TLS\n");
 		}
 	}
+
+	debug=cont->getConfig()->getDebugProtocols();
 }
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
@@ -3443,8 +3445,7 @@ tlscontext *sqlrprotocol_sqlrclient::getTLSContext() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_sqlrclient(
 						sqlrservercontroller *cont,
-						xmldomnode *parameters,
-						bool debug) {
-		return new sqlrprotocol_sqlrclient(cont,parameters,debug);
+						xmldomnode *parameters) {
+		return new sqlrprotocol_sqlrclient(cont,parameters);
 	}
 }

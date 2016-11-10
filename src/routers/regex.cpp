@@ -7,8 +7,8 @@
 
 class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 	public:
-			sqlrrouter_regex(xmldomnode *parameters,
-							bool debug);
+			sqlrrouter_regex(sqlrservercontroller *cont,
+						xmldomnode *parameters);
 			~sqlrrouter_regex();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -19,10 +19,14 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 		const char	*connectionid;
 
 		bool	enabled;
+
+		bool	debug;
 };
 
-sqlrrouter_regex::sqlrrouter_regex(xmldomnode *parameters, bool debug) :
-						sqlrrouter(parameters,debug) {
+sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
+					xmldomnode *parameters) :
+						sqlrrouter(cont,parameters) {
+	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 	if (!enabled && debug) {
@@ -68,7 +72,7 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 	for (linkedlistnode< regularexpression *> *rn=relist.getFirst();
 							rn; rn=rn->getNext()) {
 		if (rn->getValue()->match(query)) {
-			if (getDebug()) {
+			if (debug) {
 				stdoutput.printf("\nrouting query:\n"
 							"	%s\nto: %s\n",
 							query,connectionid);
@@ -81,8 +85,8 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_regex(
-						xmldomnode *parameters,
-						bool debug) {
-		return new sqlrrouter_regex(parameters,debug);
+						sqlrservercontroller *cont,
+						xmldomnode *parameters) {
+		return new sqlrrouter_regex(cont,parameters);
 	}
 }

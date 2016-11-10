@@ -7,12 +7,11 @@
 
 class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 	public:
-			sqlrauth_sqlrelay(xmldomnode *parameters,
+			sqlrauth_sqlrelay(sqlrservercontroller *cont,
 						sqlrpwdencs *sqlrpe,
-						bool debug);
+						xmldomnode *parameters);
 			~sqlrauth_sqlrelay();
-		const char	*auth(sqlrserverconnection *sqlrcon,
-						sqlrcredentials *cred);
+		const char	*auth(sqlrcredentials *cred);
 	private:
 		const char	*host;
 		uint16_t	port;
@@ -31,10 +30,10 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 		sqlrcursor	*sqlrcur;
 };
 
-sqlrauth_sqlrelay::sqlrauth_sqlrelay(xmldomnode *parameters,
+sqlrauth_sqlrelay::sqlrauth_sqlrelay(sqlrservercontroller *cont,
 					sqlrpwdencs *sqlrpe,
-					bool debug) :
-					sqlrauth(parameters,sqlrpe,debug) {
+					xmldomnode *parameters) :
+					sqlrauth(cont,sqlrpe,parameters) {
 
 	host=parameters->getAttributeValue("host");
 	port=charstring::toInteger(parameters->getAttributeValue("port"));
@@ -98,8 +97,7 @@ sqlrauth_sqlrelay::~sqlrauth_sqlrelay() {
 	delete sqlrcon;
 }
 
-const char *sqlrauth_sqlrelay::auth(sqlrserverconnection *sqlrcon,
-						sqlrcredentials *cred) {
+const char *sqlrauth_sqlrelay::auth(sqlrcredentials *cred) {
 
 	// this module only supports user/password credentials
 	if (charstring::compare(cred->getType(),"userpassword")) {
@@ -118,15 +116,15 @@ const char *sqlrauth_sqlrelay::auth(sqlrserverconnection *sqlrcon,
 	bool	success=(sqlrcur->executeQuery() &&
 				sqlrcur->rowCount() &&
 				sqlrcur->getFieldAsInteger(0,(uint32_t)0));
-	sqlrcon->endSession();
+	this->sqlrcon->endSession();
 	return (success)?user:NULL;
 }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrelay(
-						xmldomnode *users,
-						sqlrpwdencs *sqlrpe,
-						bool debug) {
-		return new sqlrauth_sqlrelay(users,sqlrpe,debug);
+						sqlrservercontroller *cont,
+						xmldomnode *parameters,
+						sqlrpwdencs *sqlrpe) {
+		return new sqlrauth_sqlrelay(cont,sqlrpe,parameters);
 	}
 }

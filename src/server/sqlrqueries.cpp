@@ -26,14 +26,16 @@ class sqlrqueriesprivate {
 	friend class sqlrqueries;
 	private:
 		const char	*_libexecdir;
+		bool		_debug;
 
 		singlylinkedlist< sqlrqueryplugin * >	_llist;
 };
 
-sqlrqueries::sqlrqueries(sqlrpaths *sqlrpth) {
+sqlrqueries::sqlrqueries(sqlrpaths *sqlrpth, bool debug) {
 	debugFunction();
 	pvt=new sqlrqueriesprivate;
 	pvt->_libexecdir=sqlrpth->getLibExecDir();
+	pvt->_debug=debug;
 }
 
 sqlrqueries::~sqlrqueries() {
@@ -113,8 +115,8 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	// load the query itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrquery_")->append(module);
-	sqlrquery *(*newQuery)(xmldomnode *)=
-			(sqlrquery *(*)(xmldomnode *))
+	sqlrquery *(*newQuery)(xmldomnode *,bool)=
+			(sqlrquery *(*)(xmldomnode *,bool))
 				dl->getSymbol(functionname.getString());
 	if (!newQuery) {
 		stdoutput.printf("failed to create query: %s\n",module);
@@ -125,7 +127,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 		delete dl;
 		return;
 	}
-	sqlrquery	*qr=(*newQuery)(query);
+	sqlrquery	*qr=(*newQuery)(query,pvt->_debug);
 
 #else
 

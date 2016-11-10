@@ -6,8 +6,8 @@
 
 class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 	public:
-			sqlrrouter_clientiplist(xmldomnode *parameters,
-							bool debug);
+			sqlrrouter_clientiplist(sqlrservercontroller *cont,
+							xmldomnode *parameters);
 			~sqlrrouter_clientiplist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -21,12 +21,16 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 		uint64_t	clientipcount;
 
 		bool	enabled;
+
+		bool	debug;
 };
 
-sqlrrouter_clientiplist::sqlrrouter_clientiplist(xmldomnode *parameters, bool debug) :
-						sqlrrouter(parameters,debug) {
+sqlrrouter_clientiplist::sqlrrouter_clientiplist(sqlrservercontroller *cont,
+						xmldomnode *parameters) :
+						sqlrrouter(cont,parameters) {
 	clientips=NULL;
 
+	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 	if (!enabled && debug) {
@@ -64,7 +68,7 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 
 		// if the clientip matches...
 		if (match(clientip,clientips[i])) {
-			if (getDebug()) {
+			if (debug) {
 				stdoutput.printf("routing client ip "
 							"%s to %s\n",
 							clientip,connectionid);
@@ -77,20 +81,20 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 
 bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("\n");
 	}
 
 	for (uint16_t i=0; i<4; i++) {
 
-		if (getDebug()) {
+		if (debug) {
 			stdoutput.printf("%d: ip=%s  pattern=%s\n",
 							i,ip,pattern);
 		}
 
 		// handle wildcards
 		if (!charstring::compare(pattern,"*")) {
-			if (getDebug()) {
+			if (debug) {
 				stdoutput.printf("	"
 						"%s matches "
 						"wildcard %s...\n",
@@ -99,7 +103,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			break;
 		}
 		if (!charstring::compare(pattern,"*.",2)) {
-			if (getDebug()) {
+			if (debug) {
 				stdoutput.printf("	"
 						"%s matches "
 						"wildcard %s...\n",
@@ -128,7 +132,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			delete[] chunk;
 
 			if (!inrange) {
-				if (getDebug()) {
+				if (debug) {
 					stdoutput.printf("	"
 							"%s doesn't "
 							"match %s...\n",
@@ -137,7 +141,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 				return false;
 			}
 
-			if (getDebug()) {
+			if (debug) {
 				stdoutput.printf("	"
 						"%s matches "
 						"range %s...\n",
@@ -156,7 +160,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 		if (charstring::toUnsignedInteger(pattern)==
 				charstring::toUnsignedInteger(ip)) {
 
-			if (getDebug()) {
+			if (debug) {
 				stdoutput.printf("	"
 						"%s matches "
 						"individual %s...\n",
@@ -169,14 +173,14 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			continue;
 		}
 
-		if (getDebug()) {
+		if (debug) {
 			stdoutput.printf("	%s doesn't match %s...\n",
 								ip,pattern);
 		}
 		return false;
 	}
 
-	if (getDebug()) {
+	if (debug) {
 		stdoutput.printf("match found\n");
 	}
 	return true;
@@ -184,8 +188,8 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_clientiplist(
-						xmldomnode *parameters,
-						bool debug) {
-		return new sqlrrouter_clientiplist(parameters,debug);
+						sqlrservercontroller *cont,
+						xmldomnode *parameters) {
+		return new sqlrrouter_clientiplist(cont,parameters);
 	}
 }

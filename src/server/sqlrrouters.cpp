@@ -25,17 +25,15 @@ class sqlrrouterplugin {
 class sqlrroutersprivate {
 	friend class sqlrrouters;
 	private:
-		const char	*_libexecdir;
-		bool		_debug;
+		sqlrservercontroller	*_cont;
 
 		singlylinkedlist< sqlrrouterplugin * >	_llist;
 };
 
-sqlrrouters::sqlrrouters(sqlrpaths *sqlrpth, bool debug) {
+sqlrrouters::sqlrrouters(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrroutersprivate;
-	pvt->_libexecdir=sqlrpth->getLibExecDir();
-	pvt->_debug=debug;
+	pvt->_cont=cont;
 }
 
 sqlrrouters::~sqlrrouters() {
@@ -92,14 +90,14 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		}
 	}
 
-	if (pvt->_debug) {
+	if (pvt->_cont->getConfig()->getDebugRouters()) {
 		stdoutput.printf("loading router: %s\n",module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the router module
 	stringbuffer	modulename;
-	modulename.append(pvt->_libexecdir);
+	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("router_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -117,8 +115,8 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	// load the router itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrrouter_")->append(module);
-	sqlrrouter *(*newRouter)(xmldomnode *,bool)=
-			(sqlrrouter *(*)(xmldomnode *,bool))
+	sqlrrouter *(*newRouter)(sqlrservercontroller *, xmldomnode *)=
+			(sqlrrouter *(*)(sqlrservercontroller *, xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newRouter) {
 		stdoutput.printf("failed to create router: %s\n",module);
@@ -129,7 +127,7 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		delete dl;
 		return;
 	}
-	sqlrrouter	*r=(*newRouter)(router,pvt->_debug);
+	sqlrrouter	*r=(*newRouter)(pvt->_cont,router);
 
 #else
 

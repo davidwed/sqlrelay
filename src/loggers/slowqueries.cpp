@@ -32,7 +32,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 };
 
 sqlrlogger_slowqueries::sqlrlogger_slowqueries(xmldomnode *parameters) :
-							sqlrlogger(parameters) {
+						sqlrlogger(parameters) {
 	querylogname=NULL;
 	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
 	usec=charstring::toInteger(parameters->getAttributeValue("usec"));

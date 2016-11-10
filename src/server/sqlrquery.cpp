@@ -8,11 +8,13 @@ class sqlrqueryprivate {
 	friend class sqlrquery;
 	private:
 		xmldomnode	*_parameters;
+		bool		_debug;
 };
 
-sqlrquery::sqlrquery(xmldomnode *parameters) {
+sqlrquery::sqlrquery(xmldomnode *parameters, bool debug) {
 	pvt=new sqlrqueryprivate;
 	pvt->_parameters=parameters;
+	pvt->_debug=debug;
 }
 
 sqlrquery::~sqlrquery() {
@@ -23,12 +25,16 @@ bool sqlrquery::match(const char *querystring, uint32_t querylength) {
 	return false;
 }
 
+sqlrquerycursor *sqlrquery::newCursor(sqlrserverconnection *conn, uint16_t id) {
+	return NULL;
+}
+
 xmldomnode *sqlrquery::getParameters() {
 	return pvt->_parameters;
 }
 
-sqlrquerycursor *sqlrquery::newCursor(sqlrserverconnection *conn, uint16_t id) {
-	return NULL;
+bool sqlrquery::getDebug() {
+	return pvt->_debug;
 }
 
 class sqlrquerycursorprivate {

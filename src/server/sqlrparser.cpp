@@ -6,14 +6,12 @@
 class sqlrparserprivate {
 	friend class sqlrparser;
 	private:
-		xmldomnode	*_parameters;
-		bool		_debug;
+		xmldomnode		*_parameters;
 };
 
-sqlrparser::sqlrparser(xmldomnode *parameters, bool debug) {
+sqlrparser::sqlrparser(sqlrservercontroller *cont, xmldomnode *parameters) {
 	pvt=new sqlrparserprivate;
 	pvt->_parameters=parameters;
-	pvt->_debug=debug;
 }
 
 sqlrparser::~sqlrparser() {
@@ -55,8 +53,4 @@ void sqlrparser::getMetaData(xmldomnode *node) {
 
 xmldomnode *sqlrparser::getParameters() {
 	return pvt->_parameters;
-}
-
-bool sqlrparser::getDebug() {
-	return pvt->_debug;
 }
