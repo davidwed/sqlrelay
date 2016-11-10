@@ -115,8 +115,10 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 	// load the schedule itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrschedule_")->append(module);
-	sqlrschedule *(*newSchedule)(xmldomnode *)=
-			(sqlrschedule *(*)(xmldomnode *))
+	sqlrschedule *(*newSchedule)(sqlrservercontroller *,
+						xmldomnode *)=
+			(sqlrschedule *(*)(sqlrservercontroller *,
+							xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newSchedule) {
 		stdoutput.printf("failed to create schedule: %s\n",module);
@@ -127,7 +129,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 		delete dl;
 		return;
 	}
-	sqlrschedule	*s=(*newSchedule)(schedule);
+	sqlrschedule	*s=(*newSchedule)(pvt->_cont,schedule);
 
 #else
 
