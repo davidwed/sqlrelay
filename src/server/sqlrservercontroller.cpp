@@ -6064,6 +6064,16 @@ uint16_t sqlrservercontroller::getId(sqlrservercursor *cursor) {
 	return cursor->getId();
 }
 
+void sqlrservercontroller::setFakeInputBindsForThisQuery(
+					sqlrservercursor *cursor, bool fake) {
+	cursor->setFakeInputBindsForThisQuery(fake);
+}
+
+bool sqlrservercontroller::getFakeInputBindsForThisQuery(
+					sqlrservercursor *cursor) {
+	return cursor->getFakeInputBindsForThisQuery();
+}
+
 void sqlrservercontroller::setInputBindCount(sqlrservercursor *cursor,
 						uint16_t inbindcount) {
 	cursor->setInputBindCount(inbindcount);
