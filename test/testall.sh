@@ -3,7 +3,8 @@
 sqlr-stop
 sleep 2
 
-for DB in db2 firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions
+#for DB in db2 firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions
+for DB in db2
 do
 	echo "testing database $DB..."
 
@@ -48,6 +49,7 @@ do
 		read
 	fi
 
+	sleep 2
 	sqlr-stop -id ${DB}test
 	sleep 2
 
