@@ -2019,9 +2019,11 @@ void sqlrconfig_xmldom::parseDir(const char *urlname) {
 	// attempt to parse files in the config dir
 	directory	d;
 	stringbuffer	fullpath;
+	char		*osname=sys::getOperatingSystemName();
 	const char	*slash=(!charstring::compareIgnoringCase(
-					sys::getOperatingSystemName(),
-					"Windows"))?"\\":"/";
+					osname,"Windows"))?"\\":"/";
+	delete[] osname;
+
 	if (!done && d.open(dir)) {
 		while (!done) {
 			char	*filename=d.read();
@@ -2035,10 +2037,10 @@ void sqlrconfig_xmldom::parseDir(const char *urlname) {
 				fullpath.append(dir);
 				fullpath.append(slash);
 				fullpath.append(filename);
-				delete[] filename;
 
 				parseFile(fullpath.getString());
 			}
+			delete[] filename;
 		}
 	}
 	d.close();
