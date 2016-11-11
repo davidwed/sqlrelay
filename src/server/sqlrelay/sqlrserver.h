@@ -288,7 +288,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							const char *info);
 		void	raiseScheduleViolationEvent(const char *info);
 		void	raiseIntegrityViolationEvent(const char *info);
-		void	raiseTranslationFailureEvent(const char *info);
+		void	raiseTranslationFailureEvent(sqlrservercursor *cursor,
+							const char *info);
 
 
 		// cursor api...

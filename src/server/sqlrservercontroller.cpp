@@ -2644,7 +2644,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 						"using original:\n\"%s\"\n\n",
 						query);
 		}
-		raiseTranslationFailureEvent(query);
+		raiseTranslationFailureEvent(cursor,query);
 		return false;
 	}
 
@@ -5777,15 +5777,17 @@ void sqlrservercontroller::raiseIntegrityViolationEvent(const char *info) {
 	}
 }
 
-void sqlrservercontroller::raiseTranslationFailureEvent(const char *info) {
+void sqlrservercontroller::raiseTranslationFailureEvent(
+						sqlrservercursor *cursor,
+						const char *info) {
 	if (pvt->_sqlrlg) {
-		pvt->_sqlrlg->run(NULL,pvt->_conn,NULL,
+		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
 					SQLRLOGGER_LOGLEVEL_ERROR,
 					SQLREVENT_TRANSLATION_FAILURE,
 					info);
 	}
 	if (pvt->_sqlrn) {
-		pvt->_sqlrn->run(NULL,pvt->_conn,NULL,
+		pvt->_sqlrn->run(NULL,pvt->_conn,cursor,
 					SQLREVENT_TRANSLATION_FAILURE,
 					info);
 	}
