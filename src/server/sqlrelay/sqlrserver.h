@@ -1004,6 +1004,7 @@ enum clientsessionexitstatus_t {
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
 		sqlrprotocol(sqlrservercontroller *cont,
+					sqlrprotocols *ps,
 					xmldomnode *parameters);
 		virtual	~sqlrprotocol();
 
@@ -1014,6 +1015,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		virtual tlscontext	*getTLSContext();
 
 	protected:
+		sqlrprotocols		*getProtocols();
 		xmldomnode		*getParameters();
 
 		sqlrservercontroller	*cont;
@@ -1301,6 +1303,7 @@ class SQLRSERVER_DLLSPEC sqlrschedulerule {
 class SQLRSERVER_DLLSPEC sqlrschedule {
 	public:
 		sqlrschedule(sqlrservercontroller *cont,
+					sqlrschedules *ss,
 					xmldomnode *parameters);
 		virtual	~sqlrschedule();
 
@@ -1318,6 +1321,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 		virtual	bool	rulesAllow(datetime *dt, bool currentlyallowed);
 
 	protected:
+		sqlrschedules	*getSchedules();
 		xmldomnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrschedule.h>
@@ -1340,6 +1344,7 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 class SQLRSERVER_DLLSPEC sqlrrouter {
 	public:
 		sqlrrouter(sqlrservercontroller *cont,
+				sqlrrouters *rs,
 				xmldomnode *parameters);
 		virtual	~sqlrrouter();
 
@@ -1347,6 +1352,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 						sqlrservercursor *sqlrcur);
 
 	protected:
+		sqlrrouters	*getRouters();
 		xmldomnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrrouter.h>
@@ -1467,6 +1473,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 class SQLRSERVER_DLLSPEC sqlrfilter {
 	public:
 		sqlrfilter(sqlrservercontroller *cont,
+					sqlrfilters *fs,
 					xmldomnode *parameters);
 		virtual	~sqlrfilter();
 
@@ -1510,6 +1517,7 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
 		sqlrresultsettranslation(sqlrservercontroller *cont,
+						sqlrresultsettranslations *rs,
 						xmldomnode *parameters);
 		virtual	~sqlrresultsettranslation();
 
@@ -1521,6 +1529,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					uint64_t *fieldlength);
 
 	protected:
+		sqlrresultsettranslations	*getResultSetTranslations();
 		xmldomnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrresultsettranslation.h>
@@ -1548,6 +1557,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 	public:
 		sqlrresultsetrowtranslation(
 					sqlrservercontroller *cont,
+					sqlrresultsetrowtranslations *rs,
 					xmldomnode *parameters);
 		virtual	~sqlrresultsetrowtranslation();
 
@@ -1559,6 +1569,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					uint64_t **fieldlengths);
 
 	protected:
+		sqlrresultsetrowtranslations	*getResultSetRowTranslations();
 		xmldomnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrresultsetrowtranslation.h>
@@ -1585,6 +1596,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
 		sqlrtrigger(sqlrservercontroller *cont,
+					sqlrtriggers *ts,
 					xmldomnode *parameters);
 		virtual	~sqlrtrigger();
 
@@ -1595,6 +1607,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 					bool success);
 
 	protected:
+		sqlrtriggers	*getTriggers();
 		xmldomnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrtrigger.h>
@@ -1622,6 +1635,7 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 class SQLRSERVER_DLLSPEC sqlrquery {
 	public:
 		sqlrquery(sqlrservercontroller *cont,
+				sqlrqueries *qs,
 				xmldomnode *parameters);
 		virtual	~sqlrquery();
 
@@ -1632,6 +1646,7 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 						uint16_t id);
 
 	protected:
+		sqlrqueries	*getQueries();
 		xmldomnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrquery.h>
@@ -1640,6 +1655,7 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 	public:
 		sqlrquerycursor(sqlrserverconnection *conn,
+					sqlrquery *q,
 					xmldomnode *parameters,
 					uint16_t id);
 		virtual	~sqlrquerycursor();
@@ -1648,6 +1664,8 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 		bool	isCustomQuery();
 
 	protected:
+		sqlrquery	*getQuery();
+		sqlrqueries	*getQueries();
 		xmldomnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrquerycursor.h>

@@ -68,6 +68,7 @@ class sqlrscheduleprivate;
 class sqlrschedules;
 class sqlrschedulesprivate;
 class sqlrrouterprivate;
+class sqlrrouters;
 class sqlrroutersprivate;
 class sqlrparser;
 class sqlrparserprivate;

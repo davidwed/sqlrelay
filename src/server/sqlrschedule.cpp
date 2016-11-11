@@ -311,13 +311,17 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 class sqlrscheduleprivate {
 	friend class sqlrschedule;
 	private:
+		sqlrschedules	*_ss;
 		xmldomnode	*_parameters;
 
 		linkedlist< sqlrschedulerule * >	_rules;
 };
 
-sqlrschedule::sqlrschedule(sqlrservercontroller *cont, xmldomnode *parameters) {
+sqlrschedule::sqlrschedule(sqlrservercontroller *cont,
+				sqlrschedules *ss,
+				xmldomnode *parameters) {
 	pvt=new sqlrscheduleprivate;
+	pvt->_ss=ss;
 	pvt->_parameters=parameters;
 }
 
@@ -351,6 +355,10 @@ bool sqlrschedule::rulesAllow(datetime *dt, bool currentlyallowed) {
 		currentlyallowed=r->getValue()->allowed(dt,currentlyallowed);
 	}
 	return currentlyallowed;
+}
+
+sqlrschedules *sqlrschedule::getSchedules() {
+	return pvt->_ss;
 }
 
 xmldomnode *sqlrschedule::getParameters() {

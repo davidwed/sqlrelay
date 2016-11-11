@@ -1,3 +1,3 @@
 	if (!charstring::compare(module,"@module@")) {
-		pr=new_sqlrprotocol_@module@(cont,listener);
+		pr=new_sqlrprotocol_@module@(pvt->_cont,this,listener);
 	} else

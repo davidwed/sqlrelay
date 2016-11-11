@@ -8,6 +8,7 @@
 class SQLRSERVER_DLLSPEC sqlrschedule_cron_userlist : public sqlrschedule {
 	public:
 			sqlrschedule_cron_userlist(sqlrservercontroller *cont,
+							sqlrschedules *ss,
 							xmldomnode *parameters);
 
 		bool	allowed(sqlrserverconnection *sqlrcon,
@@ -19,8 +20,9 @@ class SQLRSERVER_DLLSPEC sqlrschedule_cron_userlist : public sqlrschedule {
 
 sqlrschedule_cron_userlist::sqlrschedule_cron_userlist(
 						sqlrservercontroller *cont,
+						sqlrschedules *ss,
 						xmldomnode *parameters) :
-						sqlrschedule(cont,parameters) {
+					sqlrschedule(cont,ss,parameters) {
 
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -90,7 +92,8 @@ bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrschedule *new_sqlrschedule_cron_userlist(
 						sqlrservercontroller *cont,
+						sqlrschedules *ss,
 						xmldomnode *parameters) {
-		return new sqlrschedule_cron_userlist(cont,parameters);
+		return new sqlrschedule_cron_userlist(cont,ss,parameters);
 	}
 }

@@ -7,6 +7,7 @@
 class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 	public:
 			sqlrrouter_userlist(sqlrservercontroller *cont,
+						sqlrrouters *rs,
 						xmldomnode *parameters);
 			~sqlrrouter_userlist();
 
@@ -24,8 +25,9 @@ class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 };
 
 sqlrrouter_userlist::sqlrrouter_userlist(sqlrservercontroller *cont,
+						sqlrrouters *rs,
 						xmldomnode *parameters) :
-						sqlrrouter(cont,parameters) {
+						sqlrrouter(cont,rs,parameters) {
 	users=NULL;
 
 	debug=cont->getConfig()->getDebugRouters();
@@ -80,7 +82,8 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_userlist(
 						sqlrservercontroller *cont,
+						sqlrrouters *rs,
 						xmldomnode *parameters) {
-		return new sqlrrouter_userlist(cont,parameters);
+		return new sqlrrouter_userlist(cont,rs,parameters);
 	}
 }

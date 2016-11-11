@@ -109,8 +109,10 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrprotocol_")->append(module);
 	sqlrprotocol *(*newProtocol)(sqlrservercontroller *,
+					sqlrprotocols *,
 					xmldomnode *)=
 			(sqlrprotocol *(*)(sqlrservercontroller *,
+						sqlrprotocols *,
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
@@ -122,7 +124,7 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 		delete dl;
 		return;
 	}
-	sqlrprotocol	*pr=(*newProtocol)(pvt->_cont,listener);
+	sqlrprotocol	*pr=(*newProtocol)(pvt->_cont,this,listener);
 
 #else
 

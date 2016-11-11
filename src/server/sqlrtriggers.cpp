@@ -141,8 +141,10 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	stringbuffer	functionname;
 	functionname.append("new_sqlrtrigger_")->append(module);
 	sqlrtrigger *(*newTrigger)(sqlrservercontroller *,
+						sqlrtriggers *,
 						xmldomnode *)=
 			(sqlrtrigger *(*)(sqlrservercontroller *,
+						sqlrtriggers *,
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
@@ -154,7 +156,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 		delete dl;
 		return;
 	}
-	sqlrtrigger	*tr=(*newTrigger)(pvt->_cont,trigger);
+	sqlrtrigger	*tr=(*newTrigger)(pvt->_cont,this,trigger);
 
 #else
 

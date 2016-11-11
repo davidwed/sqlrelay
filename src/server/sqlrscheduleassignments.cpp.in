@@ -1,3 +1,3 @@
 	if (!charstring::compare(module,"@module@")) {
-		s=new_sqlrschedule_@module@(pvt->_cont,schedule);
+		s=new_sqlrschedule_@module@(pvt->_cont,this,schedule);
 	} else

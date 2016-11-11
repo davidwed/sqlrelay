@@ -10,6 +10,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 	public:
 			sqlrresultsettranslation_reformatdatetime(
 					sqlrservercontroller *cont,
+					sqlrresultsettranslations *rs,
 					xmldomnode *parameters);
 			~sqlrresultsettranslation_reformatdatetime();
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -38,8 +39,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 sqlrresultsettranslation_reformatdatetime::
 	sqlrresultsettranslation_reformatdatetime(
 				sqlrservercontroller *cont,
+				sqlrresultsettranslations *rs,
 				xmldomnode *parameters) :
-				sqlrresultsettranslation(cont,parameters) {
+				sqlrresultsettranslation(cont,rs,parameters) {
 
 	debug=cont->getConfig()->getDebugResultSetTranslations();
 
@@ -125,8 +127,9 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsettranslation
 			*new_sqlrresultsettranslation_reformatdatetime(
 					sqlrservercontroller *cont,
+					sqlrresultsettranslations *rs,
 					xmldomnode *parameters) {
 		return new sqlrresultsettranslation_reformatdatetime(
-							cont,parameters);
+							cont,rs,parameters);
 	}
 }

@@ -114,8 +114,10 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrquery_")->append(module);
 	sqlrquery *(*newQuery)(sqlrservercontroller *,
+					sqlrqueries *,
 					xmldomnode *)=
 			(sqlrquery *(*)(sqlrservercontroller *,
+						sqlrqueries *,
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newQuery) {
@@ -127,7 +129,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 		delete dl;
 		return;
 	}
-	sqlrquery	*qr=(*newQuery)(pvt->_cont,query);
+	sqlrquery	*qr=(*newQuery)(pvt->_cont,this,query);
 
 #else
 

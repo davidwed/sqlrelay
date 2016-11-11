@@ -6,12 +6,15 @@
 class sqlrfilterprivate {
 	friend class sqlrfilter;
 	private:
+		sqlrfilters	*_fs;
 		xmldomnode	*_parameters;
 };
 
 sqlrfilter::sqlrfilter(sqlrservercontroller *cont,
+				sqlrfilters *fs,
 				xmldomnode *parameters) {
 	pvt=new sqlrfilterprivate;
+	pvt->_fs=fs;
 	pvt->_parameters=parameters;
 }
 
@@ -54,6 +57,10 @@ void sqlrfilter::getError(const char **err, int64_t *errn) {
 			*errn=0;
 		}
 	}
+}
+
+sqlrfilters *sqlrfilter::getFilters() {
+	return pvt->_fs;
 }
 
 xmldomnode *sqlrfilter::getParameters() {

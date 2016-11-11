@@ -10,6 +10,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation_test :
 	public:
 			sqlrresultsetrowtranslation_test(
 					sqlrservercontroller *cont,
+					sqlrresultsetrowtranslations *rs,
 					xmldomnode *parameters);
 			~sqlrresultsetrowtranslation_test();
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -23,8 +24,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation_test :
 sqlrresultsetrowtranslation_test::
 	sqlrresultsetrowtranslation_test(
 				sqlrservercontroller *cont,
+				sqlrresultsetrowtranslations *rs,
 				xmldomnode *parameters) :
-		sqlrresultsetrowtranslation(cont,parameters) {
+		sqlrresultsetrowtranslation(cont,rs,parameters) {
 }
 
 sqlrresultsetrowtranslation_test::
@@ -44,7 +46,8 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation
 			*new_sqlrresultsetrowtranslation_test(
 					sqlrservercontroller *cont,
+					sqlrresultsetrowtranslations *rs,
 					xmldomnode *parameters) {
-		return new sqlrresultsetrowtranslation_test(cont,parameters);
+		return new sqlrresultsetrowtranslation_test(cont,rs,parameters);
 	}
 }

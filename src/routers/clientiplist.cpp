@@ -7,6 +7,7 @@
 class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 	public:
 			sqlrrouter_clientiplist(sqlrservercontroller *cont,
+							sqlrrouters *rs,
 							xmldomnode *parameters);
 			~sqlrrouter_clientiplist();
 
@@ -26,8 +27,9 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 };
 
 sqlrrouter_clientiplist::sqlrrouter_clientiplist(sqlrservercontroller *cont,
+						sqlrrouters *rs,
 						xmldomnode *parameters) :
-						sqlrrouter(cont,parameters) {
+						sqlrrouter(cont,rs,parameters) {
 	clientips=NULL;
 
 	debug=cont->getConfig()->getDebugRouters();
@@ -189,7 +191,8 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_clientiplist(
 						sqlrservercontroller *cont,
+						sqlrrouters *rs,
 						xmldomnode *parameters) {
-		return new sqlrrouter_clientiplist(cont,parameters);
+		return new sqlrrouter_clientiplist(cont,rs,parameters);
 	}
 }

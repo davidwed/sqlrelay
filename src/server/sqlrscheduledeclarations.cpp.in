@@ -1,2 +1,3 @@
 sqlrschedule	*new_sqlrschedule_@module@(sqlrservercontroller *cont,
+						sqlrschedules *ss,
 						xmldomnode *parameters);

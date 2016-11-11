@@ -27,6 +27,7 @@ enum sqlrclientquerytype_t {
 class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 	public:
 			sqlrprotocol_sqlrclient(sqlrservercontroller *cont,
+							sqlrprotocols *ps,
 							xmldomnode *parameters);
 		virtual	~sqlrprotocol_sqlrclient();
 
@@ -218,8 +219,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					sqlrservercontroller *cont,
+					sqlrprotocols *ps,
 					xmldomnode *parameters) :
-					sqlrprotocol(cont,parameters) {
+					sqlrprotocol(cont,ps,parameters) {
 	debugFunction();
 
 	idleclienttimeout=cont->getConfig()->getIdleClientTimeout();
@@ -3445,7 +3447,8 @@ tlscontext *sqlrprotocol_sqlrclient::getTLSContext() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_sqlrclient(
 						sqlrservercontroller *cont,
+						sqlrprotocols *ps,
 						xmldomnode *parameters) {
-		return new sqlrprotocol_sqlrclient(cont,parameters);
+		return new sqlrprotocol_sqlrclient(cont,ps,parameters);
 	}
 }

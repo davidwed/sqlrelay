@@ -6,11 +6,15 @@
 class sqlrrouterprivate {
 	friend class sqlrrouter;
 	private:
-		xmldomnode		*_parameters;
+		sqlrrouters	*_rs;
+		xmldomnode	*_parameters;
 };
 
-sqlrrouter::sqlrrouter(sqlrservercontroller *cont, xmldomnode *parameters) {
+sqlrrouter::sqlrrouter(sqlrservercontroller *cont,
+				sqlrrouters *rs,
+				xmldomnode *parameters) {
 	pvt=new sqlrrouterprivate;
+	pvt->_rs=rs;
 	pvt->_parameters=parameters;
 }
 
@@ -21,6 +25,10 @@ sqlrrouter::~sqlrrouter() {
 const char *sqlrrouter::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur) {
 	return NULL;
+}
+
+sqlrrouters *sqlrrouter::getRouters() {
+	return pvt->_rs;
 }
 
 xmldomnode *sqlrrouter::getParameters() {

@@ -6,13 +6,16 @@
 class sqlrprotocolprivate {
 	friend class sqlrprotocol;
 	private:
+		sqlrprotocols		*_ps;
 		xmldomnode		*_parameters;
 };
 
 sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
+				sqlrprotocols *ps,
 				xmldomnode *parameters) {
 	pvt=new sqlrprotocolprivate;
 	this->cont=cont;
+	pvt->_ps=ps;
 	pvt->_parameters=parameters;
 }
 
@@ -26,6 +29,10 @@ gsscontext *sqlrprotocol::getGSSContext() {
 
 tlscontext *sqlrprotocol::getTLSContext() {
 	return NULL;
+}
+
+sqlrprotocols *sqlrprotocol::getProtocols() {
+	return pvt->_ps;
 }
 
 xmldomnode *sqlrprotocol::getParameters() {
