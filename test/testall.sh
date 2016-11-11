@@ -8,7 +8,7 @@ do
 
 	if ( test "$DB" = "tls" -o "$DB" = "krb" -o "$DB" = "extensions" )
 	then
-		if ( test -z "`ls /usr/local/firstworks/lib*/sqlrelay/sqlrconnection_oracle.so`" )
+		if ( test -z "`ls /usr/local/firstworks/lib*/sqlrelay/sqlrconnection_oracle.so 2> /dev/null`" )
 		then
 			echo "skipping $DB..."
 			echo
@@ -17,7 +17,7 @@ do
 			continue
 		fi
 	else
-		if ( test -z "`ls /usr/local/firstworks/lib*/sqlrelay/sqlrconnection_$DB.so`" )
+		if ( test -z "`ls /usr/local/firstworks/lib*/sqlrelay/sqlrconnection_$DB.so 2> /dev/null`" )
 		then
 			echo "skipping $DB..."
 			echo
