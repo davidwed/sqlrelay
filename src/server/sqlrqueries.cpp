@@ -161,3 +161,7 @@ sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 	}
 	return NULL;
 }
+
+void sqlrqueries::endSession() {
+	// nothing for now, maybe in the future
+}

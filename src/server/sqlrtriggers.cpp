@@ -208,3 +208,7 @@ void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
 						querytree,before,success);
 	}
 }
+
+void sqlrtriggers::endSession() {
+	// nothing for now, maybe in the future
+}

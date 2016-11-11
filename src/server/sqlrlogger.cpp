@@ -6,11 +6,13 @@
 class sqlrloggerprivate {
 	friend class sqlrlogger;
 	private:
+		sqlrloggers	*_ls;
 		xmldomnode	*_parameters;
 };
 
-sqlrlogger::sqlrlogger(xmldomnode *parameters) {
+sqlrlogger::sqlrlogger(sqlrloggers *ls, xmldomnode *parameters) {
 	pvt=new sqlrloggerprivate;
+	pvt->_ls=ls;
 	pvt->_parameters=parameters;
 }
 
@@ -31,35 +33,8 @@ bool sqlrlogger::run(sqlrlistener *sqlrl,
 	return true;
 }
 
-static const char *loglevels[]={"DEBUG","INFO","WARNING","ERROR"};
-
-const char *sqlrlogger::logLevel(sqlrlogger_loglevel_t level) {
-	return loglevels[(uint8_t)level];
-}
-
-// FIXME: push up and consolidate
-static const char *eventtypes[]={
-	"CLIENT_CONNECTED",
-	"CLIENT_CONNECTION_REFUSED",
-	"CLIENT_DISCONNECTED",
-	"CLIENT_PROTOCOL_ERROR",
-	"DB_LOGIN",
-	"DB_LOGOUT",
-	"DB_ERROR",
-	"DB_WARNING",
-	"QUERY",
-	"FILTER_VIOLATION",
-	"INTERNAL_ERROR",
-	"INTERNAL_WARNING",
-	"DEBUG_MESSAGE",
-	"SCHEDULE_VIOLATION",
-	"INTEGRITY_VIOLATION",
-	"TRANSLATION_FAILURE",
-	NULL
-};
-
-const char *sqlrlogger::eventType(sqlrevent_t event) {
-	return eventtypes[(uint16_t)event];
+sqlrloggers *sqlrlogger::getLoggers() {
+	return pvt->_ls;
 }
 
 xmldomnode *sqlrlogger::getParameters() {

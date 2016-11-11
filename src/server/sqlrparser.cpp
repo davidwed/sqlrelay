@@ -54,3 +54,7 @@ void sqlrparser::getMetaData(xmldomnode *node) {
 xmldomnode *sqlrparser::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrparser::endSession() {
+	// nothing for now, maybe in the future
+}

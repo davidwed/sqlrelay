@@ -42,14 +42,14 @@ sqlrfilters::sqlrfilters(sqlrservercontroller *cont) {
 
 sqlrfilters::~sqlrfilters() {
 	debugFunction();
-	unloadFilters();
+	unload();
 	delete pvt;
 }
 
-bool sqlrfilters::loadFilters(xmldomnode *parameters) {
+bool sqlrfilters::load(xmldomnode *parameters) {
 	debugFunction();
 
-	unloadFilters();
+	unload();
 
 	// run through the filter list
 	for (xmldomnode *filter=parameters->getFirstTagChild();
@@ -63,7 +63,7 @@ bool sqlrfilters::loadFilters(xmldomnode *parameters) {
 	return true;
 }
 
-void sqlrfilters::unloadFilters() {
+void sqlrfilters::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
 						pvt->_tlist.getFirst();
@@ -155,7 +155,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 	pvt->_tlist.append(sqlrfp);
 }
 
-bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
+bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrparser *sqlrp,
 					const char *query,
@@ -220,3 +220,6 @@ bool sqlrfilters::runFilters(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+void sqlrfilters::endSession() {
+	// nothing for now, maybe in the future
+}

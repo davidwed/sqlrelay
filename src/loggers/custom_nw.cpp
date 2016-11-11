@@ -14,7 +14,8 @@
 
 class SQLRSERVER_DLLSPEC sqlrlogger_custom_nw : public sqlrlogger {
 	public:
-			sqlrlogger_custom_nw(xmldomnode *parameters);
+			sqlrlogger_custom_nw(sqlrloggers *ls,
+						xmldomnode *parameters);
 			~sqlrlogger_custom_nw();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
@@ -35,8 +36,9 @@ class SQLRSERVER_DLLSPEC sqlrlogger_custom_nw : public sqlrlogger {
 		bool	enabled;
 };
 
-sqlrlogger_custom_nw::sqlrlogger_custom_nw(xmldomnode *parameters) :
-						sqlrlogger(parameters) {
+sqlrlogger_custom_nw::sqlrlogger_custom_nw(sqlrloggers *ls,
+						xmldomnode *parameters) :
+						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -252,7 +254,8 @@ bool sqlrlogger_custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_nw(
+						sqlrloggers *ls,
 						xmldomnode *parameters) {
-		return new sqlrlogger_custom_nw(parameters);
+		return new sqlrlogger_custom_nw(ls,parameters);
 	}
 }

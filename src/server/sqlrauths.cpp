@@ -162,3 +162,7 @@ const char *sqlrauths::auth(sqlrcredentials *cred) {
 	}
 	return NULL;
 }
+
+void sqlrauths::endSession() {
+	// nothing for now, maybe in the future
+}

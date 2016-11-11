@@ -149,3 +149,7 @@ sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
 	}
 	return pp->pr;
 }
+
+void sqlrprotocols::endSession() {
+	// nothing for now, maybe in the future
+}

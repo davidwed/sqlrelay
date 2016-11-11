@@ -1,1 +1,2 @@
-sqlrlogger	*new_sqlrlogger_@module@(xmldomnode *parameters);
+sqlrlogger	*new_sqlrlogger_@module@(sqlrloggers *ls,
+						xmldomnode *parameters);

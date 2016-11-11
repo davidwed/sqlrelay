@@ -189,3 +189,7 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 	}
 	return true;
 }
+
+void sqlrresultsetrowtranslations::endSession() {
+	// nothing for now, maybe in the future
+}

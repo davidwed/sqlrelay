@@ -1029,6 +1029,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 		bool		load(xmldomnode *listeners);
 		sqlrprotocol	*getProtocol(uint16_t port);
 
+		void	endSession();
+
 	#include <sqlrelay/private/sqlrprotocols.h>
 };
 
@@ -1106,8 +1108,11 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		sqlrauths(sqlrservercontroller *cont);
 		~sqlrauths();
 
-		bool	load(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
+		bool		load(xmldomnode *parameters,
+					sqlrpwdencs *sqlrpe);
 		const char	*auth(sqlrcredentials *cred);
+
+		void	endSession();
 
 	#include <sqlrelay/private/sqlrauths.h>
 };
@@ -1168,7 +1173,7 @@ enum sqlrlogger_loglevel_t {
 
 class SQLRSERVER_DLLSPEC sqlrlogger {
 	public:
-		sqlrlogger(xmldomnode *parameters);
+		sqlrlogger(sqlrloggers *ls, xmldomnode *parameters);
 		virtual	~sqlrlogger();
 
 		virtual bool	init(sqlrlistener *sqlrl,
@@ -1179,10 +1184,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 					sqlrlogger_loglevel_t level,
 					sqlrevent_t event,
 					const char *info);
-
 	protected:
-		const char	*logLevel(sqlrlogger_loglevel_t level);
-		const char	*eventType(sqlrevent_t event);
 		sqlrloggers	*getLoggers();
 		xmldomnode	*getParameters();
 
@@ -1203,6 +1205,14 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 				sqlrlogger_loglevel_t level,
 				sqlrevent_t event,
 				const char *info);
+
+		void	endSession();
+
+		const char	*logLevel(sqlrlogger_loglevel_t level);
+		sqlrlogger_loglevel_t	logLevel(const char *level);
+
+		const char	*eventType(sqlrevent_t event);
+		sqlrevent_t	eventType(const char *event);
 
 	#include <sqlrelay/private/sqlrloggers.h>
 };
@@ -1237,6 +1247,8 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
 					const char *info);
+
+		void	endSession();
 
 		const char	*eventType(sqlrevent_t event);
 		sqlrevent_t	eventType(const char *event);
@@ -1320,6 +1332,8 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 		bool	allowed(sqlrserverconnection *sqlrcon,
 						const char *user);
 
+		void	endSession();
+
 	#include <sqlrelay/private/sqlrschedules.h>
 };
 
@@ -1343,10 +1357,11 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 		sqlrrouters(sqlrservercontroller *cont);
 		~sqlrrouters();
 
-		bool	load(xmldomnode *parameters);
-
+		bool		load(xmldomnode *parameters);
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
+
+		void	endSession();
 
 	#include <sqlrelay/private/sqlrrouters.h>
 };
@@ -1370,6 +1385,8 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 					stringbuffer *output);
 
 		virtual void	getMetaData(xmldomnode *node);
+
+		virtual void	endSession();
 
 	protected:
 		xmldomnode	*getParameters();
@@ -1414,6 +1431,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						const char *query,
 						stringbuffer *translatedquery);
 
+		void	endSession();
+
 		void	setReplacementTableName(const char *database,
 						const char *schema,
 						const char *oldtable,
@@ -1440,10 +1459,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						const char *schema,
 						const char *index);
 
-		memorypool	*getTableNamePool();
-		memorypool	*getIndexNamePool();
-
-		void	endSession();
+		memorypool	*getMemoryPool();
 
 	#include <sqlrelay/private/sqlrtranslations.h>
 };
@@ -1478,13 +1494,15 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 		sqlrfilters(sqlrservercontroller *cont);
 		~sqlrfilters();
 
-		bool	loadFilters(xmldomnode *parameters);
-		bool	runFilters(sqlrserverconnection *sqlrcon,
+		bool	load(xmldomnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						sqlrparser *sqlrp,
 						const char *query,
 						const char **err,
 						int64_t *errn);
+
+		void	endSession();
 
 	#include <sqlrelay/private/sqlrfilters.h>
 };
@@ -1520,6 +1538,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 						uint32_t fieldindex,
 						const char **field,
 						uint64_t *fieldlength);
+
+		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsettranslations.h>
 };
@@ -1557,6 +1577,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 						const char ***fields,
 						uint64_t **fieldlengths);
 
+		void	endSession();
+
 	#include <sqlrelay/private/sqlrresultsetrowtranslations.h>
 };
 
@@ -1591,6 +1613,8 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 						sqlrservercursor *sqlrcur,
 						xmldom *querytree,
 						bool success);
+
+		void	endSession();
 
 	#include <sqlrelay/private/sqlrtriggers.h>
 };
@@ -1639,6 +1663,8 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 						const char *querystring,
 						uint32_t querylength,
 						uint16_t id);
+
+		void	endSession();
 
 	#include <sqlrelay/private/sqlrqueries.h>
 };

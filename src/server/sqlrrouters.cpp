@@ -162,3 +162,7 @@ const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 	}
 	return NULL;
 }
+
+void sqlrrouters::endSession() {
+	// nothing for now, maybe in the future
+}

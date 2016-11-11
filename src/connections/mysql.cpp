@@ -726,6 +726,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 				"savepoint|SAVEPOINT|"
 				"release|RELEASE|"
 				"connect|CONNECT|"
+				"lock|LOCK|"
 				"unlock|UNLOCK|"
 				"show|SHOW"
 			")\\s+)|"

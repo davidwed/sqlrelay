@@ -554,7 +554,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 			pvt->_sqlrp=newParser();
 		}
 		pvt->_sqlrf=new sqlrfilters(this);
-		pvt->_sqlrf->loadFilters(filters);
+		pvt->_sqlrf->load(filters);
 	}
 
 	// get the result set translations
@@ -3131,8 +3131,7 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
 	// apply filters
 	const char	*err=NULL;
 	int64_t		errn=0;
-	if (!pvt->_sqlrf->runFilters(pvt->_conn,cursor,
-					pvt->_sqlrp,query,&err,&errn)) {
+	if (!pvt->_sqlrf->run(pvt->_conn,cursor,pvt->_sqlrp,query,&err,&errn)) {
 		setError(cursor,err,errn,true);
 		raiseFilterViolationEvent(cursor);
 		if (pvt->_debugsqlrfilters) {
@@ -4155,7 +4154,17 @@ void sqlrservercontroller::endSession() {
 	// set isolation level
 	pvt->_conn->setIsolationLevel(pvt->_isolationlevel);
 
-	// reset sql translation
+	// reset protocol modules
+	if (pvt->_sqlrpr) {
+		pvt->_sqlrpr->endSession();
+	}
+
+	// reset parser modules
+	if (pvt->_sqlrp) {
+		pvt->_sqlrp->endSession();
+	}
+
+	// reset translation modules
 	if (pvt->_sqlrt) {
 		pvt->_sqlrt->endSession();
 	}
@@ -4163,6 +4172,51 @@ void sqlrservercontroller::endSession() {
 		if (pvt->_cur[i]) {
 			pvt->_cur[i]->getTranslatedQueryBuffer()->clear();
 		}
+	}
+
+	// reset filter modules
+	if (pvt->_sqlrf) {
+		pvt->_sqlrf->endSession();
+	}
+
+	// reset result set translation modules
+	if (pvt->_sqlrrst) {
+		pvt->_sqlrrst->endSession();
+	}
+
+	// reset result set row translation modules
+	if (pvt->_sqlrrrst) {
+		pvt->_sqlrrrst->endSession();
+	}
+
+	// reset trigger modules
+	if (pvt->_sqlrtr) {
+		pvt->_sqlrtr->endSession();
+	}
+
+	// reset logger modules
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->endSession();
+	}
+
+	// reset notification modules
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->endSession();
+	}
+
+	// reset schedule modules
+	if (pvt->_sqlrs) {
+		pvt->_sqlrs->endSession();
+	}
+
+	// reset query modules
+	if (pvt->_sqlrq) {
+		pvt->_sqlrq->endSession();
+	}
+
+	// reset auth modules
+	if (pvt->_sqlra) {
+		pvt->_sqlra->endSession();
 	}
 
 	// shrink the cursor array, if necessary

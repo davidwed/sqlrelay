@@ -41,8 +41,7 @@ class sqlrtranslationsprivate {
 
 		singlylinkedlist< sqlrtranslationplugin * >	_tlist;
 
-		memorypool	*_tablenamepool;
-		memorypool	*_indexnamepool;
+		memorypool	*_memorypool;
 
 		dictionary< sqlrdatabaseobject *, char * >	_tablenamemap;
 		dictionary< sqlrdatabaseobject *, char * >	_indexnamemap;
@@ -54,15 +53,13 @@ sqlrtranslations::sqlrtranslations(sqlrservercontroller *cont) {
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugTranslations();
 	pvt->_tree=NULL;
-	pvt->_tablenamepool=new memorypool(0,128,100);
-	pvt->_indexnamepool=new memorypool(0,128,100);
+	pvt->_memorypool=new memorypool(0,128,100);
 }
 
 sqlrtranslations::~sqlrtranslations() {
 	debugFunction();
 	unload();
-	delete pvt->_tablenamepool;
-	delete pvt->_indexnamepool;
+	delete pvt->_memorypool;
 	delete pvt;
 }
 
@@ -339,7 +336,7 @@ void sqlrtranslations::setReplacementTableName(
 					const char *oldtable,
 					const char *newtable) {
 	setReplacementName(&pvt->_tablenamemap,
-				createDatabaseObject(pvt->_tablenamepool,
+				createDatabaseObject(pvt->_memorypool,
 							database,
 							schema,
 							oldtable,
@@ -354,7 +351,7 @@ void sqlrtranslations::setReplacementIndexName(
 					const char *newindex,
 					const char *table) {
 	setReplacementName(&pvt->_indexnamemap,
-				createDatabaseObject(pvt->_indexnamepool,
+				createDatabaseObject(pvt->_memorypool,
 							database,
 							schema,
 							oldindex,
@@ -469,17 +466,12 @@ bool sqlrtranslations::removeReplacement(
 	return false;
 }
 
-memorypool *sqlrtranslations::getTableNamePool() {
-	return pvt->_tablenamepool;
-}
-
-memorypool *sqlrtranslations::getIndexNamePool() {
-	return pvt->_indexnamepool;
+memorypool *sqlrtranslations::getMemoryPool() {
+	return pvt->_memorypool;
 }
 
 void sqlrtranslations::endSession() {
-	pvt->_tablenamepool->deallocate();
-	pvt->_indexnamepool->deallocate();
+	pvt->_memorypool->deallocate();
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
 }

@@ -159,3 +159,7 @@ bool sqlrschedules::allowed(sqlrserverconnection *sqlrcon, const char *user) {
 	}
 	return true;
 }
+
+void sqlrschedules::endSession() {
+	// nothing for now, maybe in the future
+}

@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 	private:
-		void	unloadFilters();
+		void	unload();
 		void	loadFilter(xmldomnode *filter);
 
 		sqlrfiltersprivate	*pvt;

@@ -13,7 +13,8 @@
 
 class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
 	public:
-			sqlrlogger_custom_sc(xmldomnode *parameters);
+			sqlrlogger_custom_sc(sqlrloggers *ls,
+						xmldomnode *parameters);
 			~sqlrlogger_custom_sc();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
@@ -31,8 +32,9 @@ class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
 		bool			enabled;
 };
 
-sqlrlogger_custom_sc::sqlrlogger_custom_sc(xmldomnode *parameters) :
-						sqlrlogger(parameters) {
+sqlrlogger_custom_sc::sqlrlogger_custom_sc(sqlrloggers *ls,
+						xmldomnode *parameters) :
+						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
 	enabled=charstring::compareIgnoringCase(
@@ -129,8 +131,8 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 	// append the event type and log level
 	// (except for db errors/warnings which are handled specially)
 	if (event!=SQLREVENT_DB_ERROR && event!=SQLREVENT_DB_WARNING) {
-		logbuffer.append(eventType(event))->append(' ');
-		logbuffer.append(logLevel(level))->append(": ");
+		logbuffer.append(getLoggers()->eventType(event))->append(' ');
+		logbuffer.append(getLoggers()->logLevel(level))->append(": ");
 	}
 
 	// get the client IP, it's needed for some events
@@ -177,11 +179,14 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 			const char	*colon=charstring::findFirst(info,':');
 			if (colon) {
 				logbuffer.append(info,colon-info)->append(' ');
-				logbuffer.append(logLevel(level))->append(": ");
+				logbuffer.append(getLoggers()->
+						logLevel(level))->append(": ");
 				logbuffer.append(colon+2);
 			} else {
-				logbuffer.append(eventType(event))->append(' ');
-				logbuffer.append(logLevel(level))->append(": ");
+				logbuffer.append(getLoggers()->
+						eventType(event))->append(' ');
+				logbuffer.append(getLoggers()->
+						logLevel(level))->append(": ");
 				logbuffer.append(info);
 			}
 			}
@@ -229,7 +234,8 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_sc(
+						sqlrloggers *ls,
 						xmldomnode *parameters) {
-		return new sqlrlogger_custom_sc(parameters);
+		return new sqlrlogger_custom_sc(ls,parameters);
 	}
 }
