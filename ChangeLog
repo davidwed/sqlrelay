@@ -30,6 +30,7 @@
 	added translation-failure event
 	general refactoring of server module API
 	consolidated sqlr-scaler code
+	fixed a 1-byte empty-blob memory leak in the client
 
 0.66.0 - fixed mysql set isolation level query
 	updated mysql connection to run commit/rollback at the end of every

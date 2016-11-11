@@ -963,6 +963,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	cur->sendQuery("drop table temptabledelete\n");
 	stdoutput.printf("\n");
+	cur->sendQuery("truncate table temptablepreserve\n");
 	cur->sendQuery("drop table temptablepreserve\n");
 	cur->sendQuery("create global temporary table temptablepreserve (col1 number) on commit preserve rows");
 	checkSuccess(cur->sendQuery("insert into temptablepreserve values (1)"),1);
@@ -975,7 +976,9 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	checkSuccess(cur->sendQuery("drop table temptablepreserve\n"),1);
+	checkSuccess(cur->sendQuery("truncate table temptablepreserve\n",1);
+	checkSuccess(cur->sendQuery("drop table temptablepreserve\n",1);
+	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),0);
 	stdoutput.printf("\n");
 
 

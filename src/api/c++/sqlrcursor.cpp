@@ -3913,7 +3913,11 @@ bool sqlrcursor::parseData() {
 			}
 
 			// create a buffer to hold the data
-			buffer=new char[totallength+1];
+			if (totallength) {
+				buffer=new char[totallength+1];
+			} else {
+				buffer=(char *)pvt->_rowstorage->allocate(1);
+			}
 
 			// handle a long datatype
 			uint64_t	offset=0;
@@ -3956,7 +3960,9 @@ bool sqlrcursor::parseData() {
 						new char[offset+length+1];
 					bytestring::copy(
 						newbuffer,buffer,offset);
-					delete[] buffer;
+					if (totallength) {
+						delete[] buffer;
+					}
 					buffer=newbuffer;
 					totallength=offset+length;
 				}

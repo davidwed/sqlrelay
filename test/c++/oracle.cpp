@@ -615,6 +615,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -631,6 +632,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -647,6 +649,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -668,6 +671,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	checkSuccess(cur->resumeResultSet(id),1);
 	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
@@ -770,6 +774,7 @@ int	main(int argc, char **argv) {
 	socket=charstring::duplicate(con->getConnectionSocket());
 	stdoutput.printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);
 	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
@@ -822,6 +827,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	checkSuccess(cur->resumeResultSet(id),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),NULL);
 	checkSuccess(cur->getField(5,(uint32_t)0),NULL);
@@ -995,6 +1001,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	cur->sendQuery("drop table temptabledelete\n");
 	stdoutput.printf("\n");
+	cur->sendQuery("truncate table temptablepreserve\n");
 	cur->sendQuery("drop table temptablepreserve\n");
 	cur->sendQuery("create global temporary table temptablepreserve (col1 number) on commit preserve rows");
 	checkSuccess(cur->sendQuery("insert into temptablepreserve values (1)"),1);
@@ -1007,7 +1014,9 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	cur->sendQuery("drop table temptablepreserve\n");
+	checkSuccess(cur->sendQuery("truncate table temptablepreserve\n"),1);
+	checkSuccess(cur->sendQuery("drop table temptablepreserve\n"),1);
+	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),0);
 	stdoutput.printf("\n");
 
 
