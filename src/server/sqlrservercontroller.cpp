@@ -4800,21 +4800,6 @@ sqlrparser *sqlrservercontroller::newParser() {
 
 	pvt->_debugsqlrparser=pvt->_cfg->getDebugParser();
 
-	sqlrparser	*p=NULL;
-	if (!charstring::isNullOrEmpty(module)) {
-		p=newParser(module,true);
-	} else {
-		p=newParser("enterprise",false);
-		if (!p) {
-			p=newParser("default",true);
-		}
-	}
-	return p;
-}
-
-sqlrparser *sqlrservercontroller::newParser(const char *module,
-						bool errorifnotfound) {
-
 	if (pvt->_debugsqlrparser) {
 		stdoutput.printf("loading parser module: %s\n",module);
 	}
@@ -4827,15 +4812,13 @@ sqlrparser *sqlrservercontroller::newParser(const char *module,
 	modulename.append("parser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!pvt->_sqlrpdl.open(modulename.getString(),true,true)) {
-		if (pvt->_debugsqlrparser || errorifnotfound) {
+		if (pvt->_debugsqlrparser) {
 			stderror.printf("failed to load parser module: %s\n",
 									module);
 		}
-		if (errorifnotfound) {
-			char	*error=pvt->_sqlrpdl.getError();
-			stderror.printf("%s\n",error);
-			delete[] error;
-		}
+		char	*error=pvt->_sqlrpdl.getError();
+		stderror.printf("%s\n",error);
+		delete[] error;
 		return NULL;
 	}
 

@@ -122,8 +122,6 @@
 		void	clearConnStats();
 
 		sqlrparser	*newParser();
-		sqlrparser	*newParser(const char *module,
-						bool errorifnotfound);
 
 		void	setClientSessionStartTime();
 		void	setClientAddr();
