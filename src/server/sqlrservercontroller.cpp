@@ -4797,6 +4797,9 @@ sqlrparser *sqlrservercontroller::newParser() {
 
 	pvt->_sqlrpnode=pvt->_cfg->getParser();
 	const char	*module=pvt->_sqlrpnode->getAttributeValue("module");
+	if (charstring::isNullOrEmpty(module)) {
+		module="default";
+	}
 
 	pvt->_debugsqlrparser=pvt->_cfg->getDebugParser();
 
