@@ -901,6 +901,7 @@ int	main(int argc, char **argv) {
 	clobval[8*1024]='\0';
 	cur->inputBindClob("clobval",clobval,8*1024);
 	checkSuccess(cur->executeQuery(),1);
+
 	cur->sendQuery("select testclob from testtable2");
 	checkSuccess(clobval,cur->getField(0,"testclob"));
 	cur->prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
