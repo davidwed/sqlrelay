@@ -28,7 +28,7 @@
 	added support for negative times in mysql connection module and
 		drop-in library
 	added translation-failure event
-	moved private members and support classes into server API's .cpp files
+	general refactoring of server module API
 	consolidated sqlr-scaler code
 
 0.66.0 - fixed mysql set isolation level query
