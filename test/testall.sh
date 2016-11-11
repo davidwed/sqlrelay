@@ -5,6 +5,15 @@ sleep 2
 
 for DB in db2 firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions
 do
+	if ( test -z "`ls /usr/local/firstworks/lib*/sqlrelay/sqlrconnection_$DB.so`" )
+	then
+		echo "skipping database $DB..."
+		echo
+		echo "================================================================================"
+		echo
+		continue
+	fi
+
 	echo "testing database $DB..."
 
 	sqlr-start -id ${DB}test
