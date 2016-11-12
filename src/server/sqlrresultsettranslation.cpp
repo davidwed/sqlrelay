@@ -8,7 +8,6 @@ class sqlrresultsettranslationprivate {
 	private:
 		sqlrresultsettranslations	*_rs;
 		xmldomnode			*_parameters;
-		bool				_debug;
 };
 
 sqlrresultsettranslation::sqlrresultsettranslation(
