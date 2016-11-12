@@ -2450,6 +2450,16 @@ then
 		fi
 	done
 
+	dnl On some platforms (opensuse), rpaths get excluded if libraries in
+	dnl that path aren't linked in, so if we're using rpath and we have an
+	dnl esql path, then add the esql path and add the libs that will get
+	dnl linked in from it.
+	dnl FIXME: Arguably we should test for those libs too.
+	if ( test "$INFORMIXUSERPATH" = "yes" -a -n "$INFORMIXESQLLIBSPATH" )
+	then
+		INFORMIXLIBS="$INFORMIXLIBS -L$INFORMIXESQLLIBSPATH -lifgls -lifglx"
+	fi
+
 	FW_INCLUDES(informix,[$INFORMIXINCLUDES])
 	FW_LIBS(informix,[$INFORMIXLIBS])
 

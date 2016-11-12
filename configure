@@ -29517,6 +29517,11 @@ fi
 		fi
 	done
 
+						if ( test "$INFORMIXUSERPATH" = "yes" -a -n "$INFORMIXESQLLIBSPATH" )
+	then
+		INFORMIXLIBS="$INFORMIXLIBS -L$INFORMIXESQLLIBSPATH -lifgls -lifglx"
+	fi
+
 
 if ( test -n "$INFORMIXINCLUDES" )
 then
