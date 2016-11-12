@@ -48,7 +48,7 @@ do
 		fi
 		echo $PING
 
-		if ( test "$PING" = "0: Couldn't connect to the listener." )
+		if ( test "$PING" = "0:\nCouldn't connect to the listener." )
 		then
 			sleep 2
 		else
