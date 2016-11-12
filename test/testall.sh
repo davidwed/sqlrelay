@@ -67,6 +67,8 @@ do
 	else
 		echo
 		echo "failed to start ${DB}test"
+		echo
+		echo "hit enter to continue or ctrl-c to stop..."
 		read
 	fi
 
