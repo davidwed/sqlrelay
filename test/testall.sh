@@ -32,7 +32,7 @@ do
 	sqlr-start -id ${DB}test
 	sleep 2
 
-	UP=""
+	PING=""
 	for attempts in 1 2 3 4 5 6 7 8 9 10
 	do
 		echo
@@ -48,17 +48,15 @@ do
 		fi
 		echo $PING
 
-		UP=`echo "$PING" | grep "The database is up"`
-
-		if ( test -n "$UP" )
+		if ( test "$PING" = "0: Couldn't connect to the listener" )
 		then
-			break
-		else
 			sleep 2
+		else
+			break
 		fi
 	done
 
-	if ( test -n "$UP" )
+	if ( test "$PING" = "        The database is up." )
 	then
 		echo
 		echo "success..."
