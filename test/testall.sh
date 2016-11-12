@@ -46,7 +46,11 @@ do
 		else
 			PING=`sqlrsh -id ${DB}test -command ping`
 		fi
+
+		# (this collapses whitespace)
 		PING=`echo $PING`
+
+		echo $PING
 
 		if ( test "$PING" = "0: Couldn't connect to the listener." )
 		then
