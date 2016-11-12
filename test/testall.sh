@@ -48,7 +48,7 @@ do
 		fi
 		echo $PING
 
-		if ( test "$PING" = "0: Couldn't connect to the listener" )
+		if ( test "$PING" = "0: Couldn't connect to the listener." )
 		then
 			sleep 2
 		else
@@ -56,7 +56,7 @@ do
 		fi
 	done
 
-	if ( test "$PING" = "        The database is up." )
+	if ( test "$PING" = "	The database is up." )
 	then
 		echo
 		echo "success..."
