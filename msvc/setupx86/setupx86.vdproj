@@ -51,12 +51,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0233E4142B6D4CC8AF2361D47F2BEACE"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_024CD896810F43D6967A77F01125DC1B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -135,19 +129,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0735DD8DA8CB4E7FA57EAAE576F80008"
+        "MsmKey" = "8:_07682FBAFC4E49AC8C3BCD2E5B358DC6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_076CC31D9A534B5EA110FD3AF24BF4CE"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_077A4B96C2B04290B70149EF8F9A492D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -231,12 +219,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0E66EF5DD7134126905FC43D1D25F1D8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0E7B66C2514548FD9F20CB98AC9DF794"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -267,6 +249,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_10075A0BAB654B4294FD5C60DDC5BF37"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_100F398C259544D9B29A073669203E01"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -291,7 +279,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_12B0784F250E41AE924A3F68075B5986"
+        "MsmKey" = "8:_12D1323C294F4B078D8A0E0BD296B669"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -381,7 +369,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_168F592149DF4093B300D9DE08073391"
+        "MsmKey" = "8:_167209B9EE434E30BC30B7A940D49295"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -687,13 +675,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2A4FB172D7844C608B37CAF33D925604"
+        "MsmKey" = "8:_29F957FF9D544E87A150A094EF03AEC6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_2B01E5167BDA424D8067F4D6E2838A4E"
+        "MsmKey" = "8:_2A41A1513DAD4C1785E118E5DA4E607A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2A4FB172D7844C608B37CAF33D925604"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -741,6 +735,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2CE4FE279CC84E4698C81825F586E3B4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2D4CF7E762974B0098CD00CFEC350D49"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -754,12 +754,6 @@
         "Entry"
         {
         "MsmKey" = "8:_2E8EF89A5CDA4ED9BF3885CA7C724092"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2E99730FB5B3483E9727568555CD4E36"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -849,6 +843,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_313C335745944C318FDA1F84C0BEFACE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3180B13F62DC47D2AD25289C645C984E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -861,7 +861,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_32306AAADC3541538646FB8B1746E1E3"
+        "MsmKey" = "8:_324CB4873D3547D89196B42AEC31A3B0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -981,6 +981,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_36220F0E36804C3CBBEF43C5447D11ED"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_36899CE21EA743428C8AAE40EF8114F3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1018,12 +1024,6 @@
         "Entry"
         {
         "MsmKey" = "8:_38E04A31813343968485609D7AD08354"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_39171C14FDE94A198F7CC4499C189B93"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1095,6 +1095,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3EE8156D28C24BF694A808D42DEA95C8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3F0CBDC0B98945D192EC0276646B3961"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1120,6 +1126,12 @@
         "Entry"
         {
         "MsmKey" = "8:_3FEB6949337043EA934190D965EC92EE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_41F6BDA849B046708CBC365A592AAC79"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1156,6 +1168,12 @@
         "Entry"
         {
         "MsmKey" = "8:_444BF275C4854273A29920182DCBABC4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_445D918109C74733BB15AE9EB166F97F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1221,13 +1239,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4A7F88C44ED54DD48B7AF8EFD1362986"
+        "MsmKey" = "8:_4AE5D641B0CC4085AFB74365F789ACC6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4AE5D641B0CC4085AFB74365F789ACC6"
+        "MsmKey" = "8:_4B1991658BFE4FBDAA8A87CB8B36BC21"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1294,6 +1312,12 @@
         "Entry"
         {
         "MsmKey" = "8:_4DD906FB897348D98C5B0A59E934BB16"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4E7E9EAAFEBF469A9AF0E9646E522F5F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1401,6 +1425,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_551AB70784B742748FD89968E96E23CD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5543109E5C6944DEB384B8F0270D4562"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1414,12 +1444,6 @@
         "Entry"
         {
         "MsmKey" = "8:_55774903D2FA44989BF0BE3063A665C8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_55EE825C0676418A96F8BF955F7348A9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1509,6 +1533,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5B1BECCDABC5424381DA0A8E3E3EA537"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5BA103D07CF14F85B2A848FF5FD454E7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1522,6 +1552,12 @@
         "Entry"
         {
         "MsmKey" = "8:_5C4F49396B3A4841BE851C1BEC4F08F7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5D3E971D1A9E4A2EA02E306374580143"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1773,6 +1809,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_69752802B8CE42DDADDF33ED83F17D25"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_698643936FD549FCBD24413137D62410"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1798,6 +1840,18 @@
         "Entry"
         {
         "MsmKey" = "8:_69D01D7D0C8944649722BA0623DA0409"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6A457D6768584E3DBE6C5DE6D644D021"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6A68FA04C52D4558A8302F6364CE5846"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1929,6 +1983,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_720F408E6D6641DA99DBBB2CE08A3DA1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_7270BE52EB844B03AA09EB6371CDE820"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1942,6 +2002,12 @@
         "Entry"
         {
         "MsmKey" = "8:_72DB0FBC91A04ECFB4BF763570884A6D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_732DA45243B7413195FA3094DE033B67"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2001,6 +2067,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_767E12C11E5E4329A593309D05472CD8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_76A81473D5F1440AB0A857C386B2E63B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2031,6 +2103,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_78B40CD8944545A48C9960A2303A983F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_79125AA7F2F046D4B71C16B1C7C00388"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2038,6 +2116,12 @@
         "Entry"
         {
         "MsmKey" = "8:_79E800A3BE374F6EB0F8AB0F77F625E2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7A05A2C57F5E401E9FDD2053D186F816"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2062,12 +2146,6 @@
         "Entry"
         {
         "MsmKey" = "8:_7B5DD36A3C2741239CDD225260A8BA5B"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7BA0F4EB2DE744458149D45A6558C56D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2104,18 +2182,6 @@
         "Entry"
         {
         "MsmKey" = "8:_7C9F88E0BC744F169EF7403E40EB0444"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7CB4E070CEBD4EDDAF9D03067EA60207"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7CF477B392694C568C6642895BCDDADC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2193,7 +2259,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_804AF4BD004E429B8FE64CCF0B183CAD"
+        "MsmKey" = "8:_803E5113B21C4C1492B8CE402517BF82"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2230,6 +2296,12 @@
         "Entry"
         {
         "MsmKey" = "8:_81A8FDE0EB3B4C19ACBBE7BA843B4B33"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_81AA5EED68654FA698C8006281B3F00B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2362,12 +2434,6 @@
         "Entry"
         {
         "MsmKey" = "8:_86FB78C28FC0472D950331CD8AFEB7EC"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_87027912547145BDA4ED9CA2661664F5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2518,6 +2584,12 @@
         "Entry"
         {
         "MsmKey" = "8:_9375348C7A504D23A4F1447A7E48861C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_942A24D11EE64053AF49E7FBD9EFABBE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2733,6 +2805,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9FF87B34DACF486CB1B51BB98AD4B99D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9FF9CD34199D41D88B5C288B0B2677D5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2752,6 +2830,12 @@
         "Entry"
         {
         "MsmKey" = "8:_A049D29C521F4CECA917ABB234BF3392"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A07251084096439D8541605E7035D194"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2835,6 +2919,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A53616BBC5BF415BB0E9B5FC6A605E93"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A638578A1A14403882323410BB5DAA8E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -2848,18 +2938,6 @@
         "Entry"
         {
         "MsmKey" = "8:_A6594219083F40D79252C6FB52282E23"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A71DF7A519D64605B35501EC3FD7BE17"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A74BF2A5D6AE474FAA4A5FEAD57BD3A9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2902,6 +2980,18 @@
         "Entry"
         {
         "MsmKey" = "8:_A89D07E8351D4D5E872FD307120EBF26"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A8A4B5E30BD244E98A2C8B381B6FDA58"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A90BE83A867E490790EDBA416F965D9D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -2950,6 +3040,12 @@
         "Entry"
         {
         "MsmKey" = "8:_ABB4F34F12204B1F89CE5B04DAC88DE6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ABD5275E1FF24E24ACC5308B64C83819"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3081,13 +3177,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B1C38C0A6C7D44D08D97E2DEA4675ABB"
+        "MsmKey" = "8:_B1B51E4FBF3E4EAD8DB50A7A7CEB30D2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B250A59C66C84EA69C28E1418833208F"
+        "MsmKey" = "8:_B1C38C0A6C7D44D08D97E2DEA4675ABB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3105,13 +3201,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B2D94D9BC1594A958CABAC042A2E182E"
+        "MsmKey" = "8:_B2F7B2EFD5A14578AB8B87F6C58F2510"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B2F7B2EFD5A14578AB8B87F6C58F2510"
+        "MsmKey" = "8:_B31AE19837FB4718BE23E0E200CE5E5B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3130,6 +3226,18 @@
         "Entry"
         {
         "MsmKey" = "8:_B5278E129BF740C791D8E4A36FDC9978"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B5E7155DEF52414A82688EE6155471DD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B644165FE5A74E1F81E86FAABFF286C9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3333,12 +3441,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C3019A639EF84CC09F2D7DEFA6DB284A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C3038E13BF4D4237AFC6523B24C0282B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3448,12 +3550,6 @@
         "Entry"
         {
         "MsmKey" = "8:_C9B9021A78634B09BA8D247CFC480B89"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C9C95AAC5B32439793E56A358931AF96"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3609,6 +3705,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D288A3CE93194A52A19D4CF1C1BCCC5F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_D28EBABE8C2C43FCABE347613E33A8B1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3694,6 +3796,12 @@
         "Entry"
         {
         "MsmKey" = "8:_D680806528E0488AA5813F7A5DD3CB27"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D6D2962EABAF4ACDA87BE952D2D9695E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3849,6 +3957,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DF2B374F558A4C839F53816E60742B17"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E096F2A14FD84AC6A35AC16B6A7A3761"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -3903,7 +4017,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E2F65BCCCE594FFEBEE3E736AA1D2D16"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E4038AE49FB14E9E89A89475F680B6FE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E40423852E0248A0B57D7168025FDCBF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3916,12 +4042,6 @@
         "Entry"
         {
         "MsmKey" = "8:_E4B577D707C448F5AE468EEC13893D64"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E4F1FC5130A54024A02B91172518C10F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3946,6 +4066,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E68CC883749546C6A84B0B23339930EC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E71C3D689FCB499EBF32A8C928B7D14A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -4089,6 +4215,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F1C2FD258F47407586FB2E1BEA6F2B92"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F22E9388B5924B09ADC865155B49F3A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -4138,12 +4270,6 @@
         "Entry"
         {
         "MsmKey" = "8:_F4673512B8B34DFA88BFF6BC75E4E16E"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F4712BC9F5554B6E835F03EAD91061E3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -4324,6 +4450,12 @@
         "Entry"
         {
         "MsmKey" = "8:_FDFE01B077864172A069F1F2BE2B25F5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FE76E9265AA34EA294B27EF2E6682153"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -4604,26 +4736,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0233E4142B6D4CC8AF2361D47F2BEACE"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\auths.html"
-            "TargetName" = "8:auths.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_024CD896810F43D6967A77F01125DC1B"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\images\\arrow_up.png"
@@ -4884,12 +4996,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0735DD8DA8CB4E7FA57EAAE576F80008"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_07682FBAFC4E49AC8C3BCD2E5B358DC6"
             {
-            "SourcePath" = "8:..\\..\\doc\\admin\\configreference.html"
-            "TargetName" = "8:configreference.html"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrtlscredentials.h"
+            "TargetName" = "8:sqlrtlscredentials.h"
             "Tag" = "8:"
-            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -4910,26 +5022,6 @@
             "TargetName" = "8:M000002.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_077A4B96C2B04290B70149EF8F9A492D"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\resultsettranslations.html"
-            "TargetName" = "8:resultsettranslations.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -5204,26 +5296,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0E66EF5DD7134126905FC43D1D25F1D8"
-            {
-            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrservercontroller.h"
-            "TargetName" = "8:sqlrservercontroller.h"
-            "Tag" = "8:"
-            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0E7B66C2514548FD9F20CB98AC9DF794"
             {
             "SourcePath" = "8:..\\..\\doc\\features\\multirowfetches.html"
@@ -5324,6 +5396,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_10075A0BAB654B4294FD5C60DDC5BF37"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrauth.h"
+            "TargetName" = "8:sqlrauth.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_100F398C259544D9B29A073669203E01"
             {
             "SourcePath" = "8:..\\..\\doc\\programming\\perldbi.html"
@@ -5404,12 +5496,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_12B0784F250E41AE924A3F68075B5986"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_12D1323C294F4B078D8A0E0BD296B669"
             {
-            "SourcePath" = "8:..\\..\\doc\\admin\\installing.html"
-            "TargetName" = "8:installing.html"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrshm.h"
+            "TargetName" = "8:sqlrshm.h"
             "Tag" = "8:"
-            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -5704,12 +5796,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_168F592149DF4093B300D9DE08073391"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_167209B9EE434E30BC30B7A940D49295"
             {
-            "SourcePath" = "8:..\\..\\doc\\modules\\schedules.html"
-            "TargetName" = "8:schedules.html"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrlogger.h"
+            "TargetName" = "8:sqlrlogger.h"
             "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -6528,7 +6620,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.66.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SQLRClient, Version=0.67.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_262F174C65C8408AB1A323DB9BB92EBA"
@@ -6715,12 +6807,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A4FB172D7844C608B37CAF33D925604"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_29F957FF9D544E87A150A094EF03AEC6"
             {
-            "SourcePath" = "8:..\\..\\doc\\api\\cs\\html\\nav_h.png"
-            "TargetName" = "8:nav_h.png"
+            "SourcePath" = "8:..\\..\\doc\\admin\\sqlr-connection-oracletest-querylog.2899.html"
+            "TargetName" = "8:sqlr-connection-oracletest-querylog.2899.html"
             "Tag" = "8:"
-            "Folder" = "8:_BB071E25355C4CE190B565A35068EF36"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -6735,12 +6827,32 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2B01E5167BDA424D8067F4D6E2838A4E"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A41A1513DAD4C1785E118E5DA4E607A"
             {
-            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrshm.h"
-            "TargetName" = "8:sqlrshm.h"
+            "SourcePath" = "8:..\\..\\doc\\admin\\running.html"
+            "TargetName" = "8:running.html"
             "Tag" = "8:"
-            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A4FB172D7844C608B37CAF33D925604"
+            {
+            "SourcePath" = "8:..\\..\\doc\\api\\cs\\html\\nav_h.png"
+            "TargetName" = "8:nav_h.png"
+            "Tag" = "8:"
+            "Folder" = "8:_BB071E25355C4CE190B565A35068EF36"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -6895,6 +7007,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2CE4FE279CC84E4698C81825F586E3B4"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrfilter.h"
+            "TargetName" = "8:sqlrfilter.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2D4CF7E762974B0098CD00CFEC350D49"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRCursor.src\\M000013.html"
@@ -6941,26 +7073,6 @@
             "TargetName" = "8:doc.png"
             "Tag" = "8:"
             "Folder" = "8:_BB071E25355C4CE190B565A35068EF36"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2E99730FB5B3483E9727568555CD4E36"
-            {
-            "SourcePath" = "8:..\\..\\doc\\admin\\configguide.html"
-            "TargetName" = "8:configguide.html"
-            "Tag" = "8:"
-            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -7255,6 +7367,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_313C335745944C318FDA1F84C0BEFACE"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\prerequisites.html"
+            "TargetName" = "8:prerequisites.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3180B13F62DC47D2AD25289C645C984E"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\tcl\\sqlrcurCmd.tcl.html"
@@ -7295,12 +7427,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_32306AAADC3541538646FB8B1746E1E3"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_324CB4873D3547D89196B42AEC31A3B0"
             {
-            "SourcePath" = "8:..\\..\\doc\\modules\\translations.html"
-            "TargetName" = "8:translations.html"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrresultsetrowtranslations.h"
+            "TargetName" = "8:sqlrresultsetrowtranslations.h"
             "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -7695,6 +7827,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_36220F0E36804C3CBBEF43C5447D11ED"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrresultsetrowtranslation.h"
+            "TargetName" = "8:sqlrresultsetrowtranslation.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_36899CE21EA743428C8AAE40EF8114F3"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRCursor.src\\M000059.html"
@@ -7821,26 +7973,6 @@
             "TargetName" = "8:redhat62-sparc-thumb.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_39171C14FDE94A198F7CC4499C189B93"
-            {
-            "SourcePath" = "8:..\\..\\doc\\admin\\oraclentier.html"
-            "TargetName" = "8:oraclentier.html"
-            "Tag" = "8:"
-            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -8075,6 +8207,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3EE8156D28C24BF694A808D42DEA95C8"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrtranslation.h"
+            "TargetName" = "8:sqlrtranslation.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3F0CBDC0B98945D192EC0276646B3961"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\cs\\html\\bc_s.png"
@@ -8161,6 +8313,26 @@
             "TargetName" = "8:dir_da61e3e9a357748887e3ca8d7c5a0c16.html"
             "Tag" = "8:"
             "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_41F6BDA849B046708CBC365A592AAC79"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrschedules.h"
+            "TargetName" = "8:sqlrschedules.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -8281,6 +8453,26 @@
             "TargetName" = "8:mysql.html"
             "Tag" = "8:"
             "Folder" = "8:_AB7FD74D3DDA49E5BFA2AAF1FEE06958"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_445D918109C74733BB15AE9EB166F97F"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\sqlr-listener.1869.html"
+            "TargetName" = "8:sqlr-listener.1869.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -8495,12 +8687,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4A7F88C44ED54DD48B7AF8EFD1362986"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AE5D641B0CC4085AFB74365F789ACC6"
             {
-            "SourcePath" = "8:..\\..\\doc\\modules\\pwdencs.html"
-            "TargetName" = "8:pwdencs.html"
+            "SourcePath" = "8:..\\..\\doc\\api\\php\\media\\stylesheet.css"
+            "TargetName" = "8:stylesheet.css"
             "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Folder" = "8:_125EAD9BDA1F4CB8A5A925B79F1DAEF1"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -8515,12 +8707,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AE5D641B0CC4085AFB74365F789ACC6"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B1991658BFE4FBDAA8A87CB8B36BC21"
             {
-            "SourcePath" = "8:..\\..\\doc\\api\\php\\media\\stylesheet.css"
-            "TargetName" = "8:stylesheet.css"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrpwdenc.h"
+            "TargetName" = "8:sqlrpwdenc.h"
             "Tag" = "8:"
-            "Folder" = "8:_125EAD9BDA1F4CB8A5A925B79F1DAEF1"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -8741,6 +8933,26 @@
             "TargetName" = "8:arrowright.png"
             "Tag" = "8:"
             "Folder" = "8:_BB071E25355C4CE190B565A35068EF36"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4E7E9EAAFEBF469A9AF0E9646E522F5F"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrresultsettranslation.h"
+            "TargetName" = "8:sqlrresultsettranslation.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -9095,6 +9307,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_551AB70784B742748FD89968E96E23CD"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\configguide.html"
+            "TargetName" = "8:configguide.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5543109E5C6944DEB384B8F0270D4562"
             {
             "SourcePath" = "8:..\\..\\doc\\images\\sybase.png"
@@ -9141,26 +9373,6 @@
             "TargetName" = "8:ftv2node.png"
             "Tag" = "8:"
             "Folder" = "8:_5BFCE3D2C583443DB10577904D6DBA74"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_55EE825C0676418A96F8BF955F7348A9"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\sqlr-connection.1871.html"
-            "TargetName" = "8:sqlr-connection.1871.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -9455,6 +9667,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5B1BECCDABC5424381DA0A8E3E3EA537"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrrouters.h"
+            "TargetName" = "8:sqlrrouters.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5BA103D07CF14F85B2A848FF5FD454E7"
             {
             "SourcePath" = "8:..\\..\\src\\pwdencs\\sqlrpwdenc_rot.dll"
@@ -9501,6 +9733,26 @@
             "TargetName" = "8:tab_s.png"
             "Tag" = "8:"
             "Folder" = "8:_6BF4818012BF4D27B3DFB2E12B81542B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5D3E971D1A9E4A2EA02E306374580143"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrserverincludes.h"
+            "TargetName" = "8:sqlrserverincludes.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -10335,6 +10587,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_69752802B8CE42DDADDF33ED83F17D25"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\oraclentier.html"
+            "TargetName" = "8:oraclentier.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_698643936FD549FCBD24413137D62410"
             {
             "SourcePath" = "8:..\\..\\doc\\images\\redhat62-sparc.png"
@@ -10421,6 +10693,46 @@
             "TargetName" = "8:package.json"
             "Tag" = "8:"
             "Folder" = "8:_03935DEB180840ABB9E661AEEB57BCCA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6A457D6768584E3DBE6C5DE6D644D021"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrtranslations.h"
+            "TargetName" = "8:sqlrtranslations.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6A68FA04C52D4558A8302F6364CE5846"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrquerycursor.h"
+            "TargetName" = "8:sqlrquerycursor.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -10855,6 +11167,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_720F408E6D6641DA99DBBB2CE08A3DA1"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrquery.h"
+            "TargetName" = "8:sqlrquery.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7270BE52EB844B03AA09EB6371CDE820"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ado.net\\html\\tab_s.png"
@@ -10901,6 +11233,26 @@
             "TargetName" = "8:arrowright.png"
             "Tag" = "8:"
             "Folder" = "8:_6BF4818012BF4D27B3DFB2E12B81542B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_732DA45243B7413195FA3094DE033B67"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlruserpasswordcredentials.h"
+            "TargetName" = "8:sqlruserpasswordcredentials.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -11095,6 +11447,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_767E12C11E5E4329A593309D05472CD8"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\installing.html"
+            "TargetName" = "8:installing.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_76A81473D5F1440AB0A857C386B2E63B"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\php\\li_sql_relay.html"
@@ -11175,6 +11547,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_78B40CD8944545A48C9960A2303A983F"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrserverconnection.h"
+            "TargetName" = "8:sqlrserverconnection.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_79125AA7F2F046D4B71C16B1C7C00388"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\c\\html\\dynsections.js"
@@ -11201,6 +11593,26 @@
             "TargetName" = "8:ado.net.html"
             "Tag" = "8:"
             "Folder" = "8:_4E56BA643A66410FA8E05D42268219BA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7A05A2C57F5E401E9FDD2053D186F816"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrtrigger.h"
+            "TargetName" = "8:sqlrtrigger.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -11281,26 +11693,6 @@
             "TargetName" = "8:M000063.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7BA0F4EB2DE744458149D45A6558C56D"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\filters.html"
-            "TargetName" = "8:filters.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -11421,46 +11813,6 @@
             "TargetName" = "8:PySQLRClient.py"
             "Tag" = "8:"
             "Folder" = "8:_9613D580051F449180854C835079EB9A"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7CB4E070CEBD4EDDAF9D03067EA60207"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\loggers.html"
-            "TargetName" = "8:loggers.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7CF477B392694C568C6642895BCDDADC"
-            {
-            "SourcePath" = "8:..\\..\\doc\\admin\\running.html"
-            "TargetName" = "8:running.html"
-            "Tag" = "8:"
-            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -11715,12 +12067,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_804AF4BD004E429B8FE64CCF0B183CAD"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_803E5113B21C4C1492B8CE402517BF82"
             {
-            "SourcePath" = "8:..\\..\\doc\\modules\\sqlr-connection-oracletest-querylog.2899.html"
-            "TargetName" = "8:sqlr-connection-oracletest-querylog.2899.html"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrauths.h"
+            "TargetName" = "8:sqlrauths.h"
             "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -11841,6 +12193,26 @@
             "TargetName" = "8:freebsd-i386.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_81AA5EED68654FA698C8006281B3F00B"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrresultsettranslations.h"
+            "TargetName" = "8:sqlrresultsettranslations.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -12281,26 +12653,6 @@
             "TargetName" = "8:M000043.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_87027912547145BDA4ED9CA2661664F5"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\notifications.html"
-            "TargetName" = "8:notifications.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -12801,6 +13153,26 @@
             "TargetName" = "8:netbsd-vax.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_942A24D11EE64053AF49E7FBD9EFABBE"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\configreference.html"
+            "TargetName" = "8:configreference.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -13515,6 +13887,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9FF87B34DACF486CB1B51BB98AD4B99D"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrpwdencs.h"
+            "TargetName" = "8:sqlrpwdencs.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9FF9CD34199D41D88B5C288B0B2677D5"
             {
             "SourcePath" = "8:..\\..\\src\\connections\\sqlrconnection_oracle.dll"
@@ -13581,6 +13973,26 @@
             "TargetName" = "8:annotated.html"
             "Tag" = "8:"
             "Folder" = "8:_6BF4818012BF4D27B3DFB2E12B81542B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A07251084096439D8541605E7035D194"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrprotocol.h"
+            "TargetName" = "8:sqlrprotocol.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -13855,6 +14267,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A53616BBC5BF415BB0E9B5FC6A605E93"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrgsscredentials.h"
+            "TargetName" = "8:sqlrgsscredentials.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A638578A1A14403882323410BB5DAA8E"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRConnection.src\\M000086.html"
@@ -13901,46 +14333,6 @@
             "TargetName" = "8:app-to-sqlr-to-db.png"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A71DF7A519D64605B35501EC3FD7BE17"
-            {
-            "SourcePath" = "8:..\\..\\doc\\admin\\router.html"
-            "TargetName" = "8:router.html"
-            "Tag" = "8:"
-            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A74BF2A5D6AE474FAA4A5FEAD57BD3A9"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\sqlr-listener.1869.html"
-            "TargetName" = "8:sqlr-listener.1869.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14081,6 +14473,46 @@
             "TargetName" = "8:closed.png"
             "Tag" = "8:"
             "Folder" = "8:_BB071E25355C4CE190B565A35068EF36"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A8A4B5E30BD244E98A2C8B381B6FDA58"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrqueries.h"
+            "TargetName" = "8:sqlrqueries.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A90BE83A867E490790EDBA416F965D9D"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrnotification.h"
+            "TargetName" = "8:sqlrnotification.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14241,6 +14673,26 @@
             "TargetName" = "8:M000052.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ABD5275E1FF24E24ACC5308B64C83819"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrtriggers.h"
+            "TargetName" = "8:sqlrtriggers.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14675,12 +15127,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B1C38C0A6C7D44D08D97E2DEA4675ABB"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B1B51E4FBF3E4EAD8DB50A7A7CEB30D2"
             {
-            "SourcePath" = "8:..\\..\\doc\\images\\unixodbc.png"
-            "TargetName" = "8:unixodbc.png"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrservercontroller.h"
+            "TargetName" = "8:sqlrservercontroller.h"
             "Tag" = "8:"
-            "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14695,12 +15147,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B250A59C66C84EA69C28E1418833208F"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B1C38C0A6C7D44D08D97E2DEA4675ABB"
             {
-            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrserverincludes.h"
-            "TargetName" = "8:sqlrserverincludes.h"
+            "SourcePath" = "8:..\\..\\doc\\images\\unixodbc.png"
+            "TargetName" = "8:unixodbc.png"
             "Tag" = "8:"
-            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14755,12 +15207,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2D94D9BC1594A958CABAC042A2E182E"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2F7B2EFD5A14578AB8B87F6C58F2510"
             {
-            "SourcePath" = "8:..\\..\\doc\\modules\\routers.html"
-            "TargetName" = "8:routers.html"
+            "SourcePath" = "8:..\\..\\doc\\api\\c++\\html\\dir_0912e6c65b091fa41da70873249342a4.html"
+            "TargetName" = "8:dir_0912e6c65b091fa41da70873249342a4.html"
             "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
+            "Folder" = "8:_6BF4818012BF4D27B3DFB2E12B81542B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14775,12 +15227,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2F7B2EFD5A14578AB8B87F6C58F2510"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B31AE19837FB4718BE23E0E200CE5E5B"
             {
-            "SourcePath" = "8:..\\..\\doc\\api\\c++\\html\\dir_0912e6c65b091fa41da70873249342a4.html"
-            "TargetName" = "8:dir_0912e6c65b091fa41da70873249342a4.html"
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrloggers.h"
+            "TargetName" = "8:sqlrloggers.h"
             "Tag" = "8:"
-            "Folder" = "8:_6BF4818012BF4D27B3DFB2E12B81542B"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -14841,6 +15293,46 @@
             "TargetName" = "8:WPM_4877_1.PNG"
             "Tag" = "8:"
             "Folder" = "8:_A655BCDA3A3C48CF8EEF1BF0DC69E998"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B5E7155DEF52414A82688EE6155471DD"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrprotocols.h"
+            "TargetName" = "8:sqlrprotocols.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B644165FE5A74E1F81E86FAABFF286C9"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrrouter.h"
+            "TargetName" = "8:sqlrrouter.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -15495,26 +15987,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C3019A639EF84CC09F2D7DEFA6DB284A"
-            {
-            "SourcePath" = "8:..\\..\\doc\\modules\\sqlr-listener.1886.html"
-            "TargetName" = "8:sqlr-listener.1886.html"
-            "Tag" = "8:"
-            "Folder" = "8:_C13D0B079A8A4553BE199C956827EBD5"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C3038E13BF4D4237AFC6523B24C0282B"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\cs\\html\\doxygen.css"
@@ -15881,26 +16353,6 @@
             "TargetName" = "8:sqlrelayCmd.tcl.html"
             "Tag" = "8:"
             "Folder" = "8:_488EB111DEE0458984B5ABCF01512E97"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C9C95AAC5B32439793E56A358931AF96"
-            {
-            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrserverconnection.h"
-            "TargetName" = "8:sqlrserverconnection.h"
-            "Tag" = "8:"
-            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -16415,6 +16867,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D288A3CE93194A52A19D4CF1C1BCCC5F"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrschedulerule.h"
+            "TargetName" = "8:sqlrschedulerule.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D28EBABE8C2C43FCABE347613E33A8B1"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\folderopen.png"
@@ -16701,6 +17173,26 @@
             "TargetName" = "8:M000073.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D6D2962EABAF4ACDA87BE952D2D9695E"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrservercursor.h"
+            "TargetName" = "8:sqlrservercursor.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -17215,6 +17707,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DF2B374F558A4C839F53816E60742B17"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrfilters.h"
+            "TargetName" = "8:sqlrfilters.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E096F2A14FD84AC6A35AC16B6A7A3761"
             {
             "SourcePath" = "8:..\\..\\doc\\images\\fetch-one.png"
@@ -17395,12 +17907,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E2F65BCCCE594FFEBEE3E736AA1D2D16"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\sqlr-listener.1886.html"
+            "TargetName" = "8:sqlr-listener.1886.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E4038AE49FB14E9E89A89475F680B6FE"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\nodejs\\html\\jquery.js"
             "TargetName" = "8:jquery.js"
             "Tag" = "8:"
             "Folder" = "8:_40E4FA8D017E4C2593AC53845FDAA29B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E40423852E0248A0B57D7168025FDCBF"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrschedule.h"
+            "TargetName" = "8:sqlrschedule.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -17441,26 +17993,6 @@
             "TargetName" = "8:M000065.html"
             "Tag" = "8:"
             "Folder" = "8:_06874C4D7FD7485DB9B6D23D5B23595D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E4F1FC5130A54024A02B91172518C10F"
-            {
-            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrservercursor.h"
-            "TargetName" = "8:sqlrservercursor.h"
-            "Tag" = "8:"
-            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -17541,6 +18073,26 @@
             "TargetName" = "8:nav_g.png"
             "Tag" = "8:"
             "Folder" = "8:_1D210F24103844498F8966485E987D0B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E71C3D689FCB499EBF32A8C928B7D14A"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrparser.h"
+            "TargetName" = "8:sqlrparser.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -18015,6 +18567,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F1C2FD258F47407586FB2E1BEA6F2B92"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrnotifications.h"
+            "TargetName" = "8:sqlrnotifications.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F22E9388B5924B09ADC865155B49F3A8"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ruby\\doc\\classes\\SQLRConnection.src\\M000112.html"
@@ -18181,26 +18753,6 @@
             "TargetName" = "8:tab_h.png"
             "Tag" = "8:"
             "Folder" = "8:_6BF4818012BF4D27B3DFB2E12B81542B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F4712BC9F5554B6E835F03EAD91061E3"
-            {
-            "SourcePath" = "8:..\\..\\doc\\admin\\prerequisites.html"
-            "TargetName" = "8:prerequisites.html"
-            "Tag" = "8:"
-            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -18815,6 +19367,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FE76E9265AA34EA294B27EF2E6682153"
+            {
+            "SourcePath" = "8:..\\..\\doc\\admin\\sqlr-connection.1871.html"
+            "TargetName" = "8:sqlr-connection.1871.html"
+            "Tag" = "8:"
+            "Folder" = "8:_D22FE89009FD4DB88BBAAA3036B1052E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FE77ECD0480948C7B4E11400074FB2F2"
             {
             "SourcePath" = "8:..\\..\\doc\\api\\ado.net\\html\\tab_b.png"
@@ -19290,17 +19862,6 @@
                                             "Condition" = "8:"
                                             "Transitive" = "11:FALSE"
                                             "Property" = "8:_829F9A3FC32346EEBC05D1A435F25F01"
-                                                "Folders"
-                                                {
-                                                }
-                                            }
-                                            "{9EF0B969-E518-4E46-987F-47570745A589}:_C13D0B079A8A4553BE199C956827EBD5"
-                                            {
-                                            "Name" = "8:modules"
-                                            "AlwaysCreate" = "11:FALSE"
-                                            "Condition" = "8:"
-                                            "Transitive" = "11:FALSE"
-                                            "Property" = "8:_7A938512D6D74CADACDB8160B033E95B"
                                                 "Folders"
                                                 {
                                                 }
