@@ -1,4 +1,4 @@
-1.0.0 - ...
+1.0.0 - updated md5 pwdenc to use rudiments md5 class
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile

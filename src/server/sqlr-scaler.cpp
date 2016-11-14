@@ -658,10 +658,9 @@ void scaler::killConnection(pid_t connpid) {
 				(long)connpid);
 
 			#ifdef SIGKILL
-			signalmanager::sendSignal(connpid,
-					(tries==1)?SIGTERM:SIGKILL);
+			process::sendSignal(connpid,(tries==1)?SIGTERM:SIGKILL);
 			#else
-			signalmanager::sendSignal(connpid,SIGTERM);
+			process::sendSignal(connpid,SIGTERM);
 			#endif
 
 			// wait for process to terminate

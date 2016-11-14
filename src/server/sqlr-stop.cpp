@@ -7,7 +7,6 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/directory.h>
 #include <rudiments/file.h>
-#include <rudiments/signalclasses.h>
 #include <rudiments/stdio.h>
 #include <config.h>
 #include <defaults.h>
@@ -147,7 +146,7 @@ int main(int argc, const char **argv) {
 
 			// kill the process
 			stdoutput.printf("killing process %lld\n",pid);
-			if (signalmanager::sendSignal(pid,SIGINT)) {
+			if (process::sendSignal(pid,SIGINT)) {
 				stdoutput.printf("   success\n");
 			} else {
 				stdoutput.printf("   failed\n");
