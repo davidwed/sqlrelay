@@ -1,18 +1,6 @@
-==== Enterprise Modules ====
-
-SQL Relay Enterprise Modules provide advanced features not available in the standard distribution.
-
 {{{#!blockquote
+'''SQL Relay Enterprise Modules''' provide advanced features not available in the standard distribution.
+
 [../sqlrenterprise/features/nativeprotocol.html MySQL Front-End Modules] - allow !MySQL applications to use SQL Relay without modification and without a drop-in replacement library[[br]]
-(additional Enterprise Modules coming soon...)
+(more Enterprise Modules coming soon...)
 }}}
-
-==== Administering Enterprise Modules ====
-
-{{{#!blockquote
-[../sqlrenterprise/modules/install_modules.html Installing the SQL Relay Enterprise Modules][[br]]
-[../sqlrenterprise/modules/license_mysql_frontend.html Licensing the MySQL Front-End Modules][[br]]
-[../sqlrenterprise/modules/configure_mysql_frontend.html Configuring the MySQL Front-End Modules][[br]]
-}}}
-
-----
