@@ -310,7 +310,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 
 		// wait for the command to finish
 		if (pid!=-1) {
-			process::waitForChildToExit(pid);
+			process::wait(pid);
 		}
 
 		// clean up

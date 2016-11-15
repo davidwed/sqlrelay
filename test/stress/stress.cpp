@@ -238,16 +238,16 @@ int main(int argc, const char **argv) {
 
 	stdoutput.printf("starting %lld threads\n",concount);
 	for (int64_t i=0; i<concount; i++) {
-		th[i].setFunction((heartbeat)?
-					(void *(*)(void *))heartbeatTest:
-					((void *(*)(void *))queriesTest));
-		if (!th[i].run((void *)i)) {
+		if (!th[i].spawn((heartbeat)?
+					((void *(*)(void *))heartbeatTest):
+					((void *(*)(void *))queriesTest),
+					(void *)i,false)) {
 			stdoutput.printf("%lld: failed to start\n",i);
 		}
 	}
 
 	for (int64_t i=0; i<concount; i++) {
-		th[i].join(NULL);
+		th[i].wait(NULL);
 	}
 	delete[] th;
 	process::exit(1);

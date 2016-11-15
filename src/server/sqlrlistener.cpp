@@ -1368,11 +1368,10 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		csa->lsnr=this;
 		csa->clientsock=clientsock;
 		csa->protocolindex=protocolindex;
-		thr->setFunction((void*(*)(void*))clientSessionThread);
-		thr->setArgument(csa);
 
-		// run the thread
-		if (thr->runDetached()) {
+		// spawn the thread
+		if (thr->spawn((void *(*)(void *))clientSessionThread,
+							(void *)csa,true)) {
 			pvt->_isforkedthread=true;
 			return;
 		}
@@ -1858,11 +1857,10 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 		pda->connectionpid=connectionpid;
 		pda->unixportstr=unixportstr;
 		pda->inetport=inetport;
-		thr->setFunction((void*(*)(void*))pingDatabaseThread);
-		thr->setArgument(pda);
 
-		// run the thread
-		thr->runDetached();
+		// spawn the thread
+		thr->spawn((void *(*)(void *))pingDatabaseThread,
+						(void *)pda,true);
 		return;
 	}
 
