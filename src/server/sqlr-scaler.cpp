@@ -562,6 +562,14 @@ bool scaler::openMoreConnections() {
 	// open "growby" connections
 	for (uint32_t i=0; i<growby; i++) {
 
+		// initialize attempts to start a connection...
+		// We'll try to start it some number of times.  If it fails,
+		// that many times then usually something bad happened, like
+		// the password expired or the DB died, or something, and it's
+		// a bad idea to keep trying to start more, so we'll stop that
+		// too.
+		uint16_t	attempts=0;
+
 		// loop until a connection is successfully started
 		pid_t	connpid=0;
 		while (!connpid) {
@@ -600,7 +608,7 @@ bool scaler::openMoreConnections() {
 				if (!connectionStarted()) {
 					// There is a race condition
 					// here.  connectionStarted()
-					// waits for 20 seconds.
+					// waits for some number seconds.
 					// Presumably the connection
 					// will start up and signal
 					// during that time, or will be
@@ -615,7 +623,17 @@ bool scaler::openMoreConnections() {
 					// 1 rather than 0.
 					killConnection(connpid);
 					connpid=0;
+					attempts++;
 				}
+			}
+
+			// Stop trying to start this connection and bail on
+			// trying to starting others too.  The listener should
+			// stop waiting in a few seconds and send errors to the
+			// clients.
+			if (attempts==DEFAULT_CONNECTION_START_ATTEMPTS) {
+				i=growby;
+				break;
 			}
 		}
 	}
@@ -626,13 +644,14 @@ bool scaler::openMoreConnections() {
 bool scaler::connectionStarted() {
 
 	// wait for the connection count to increase
-	// with 20 second timeout, if supported
-	// (the 20 second timeout is because, if logging is enabled, but
-	// someone forgot to put the database host name in DNS, it might take
-	// up to 15 seconds for the hostname/ipaddress lookup to time out)
+	// with a timeout, if supported
+	// (the timeout should be at least 20 seconds because, if logging is
+	// enabled, but someone forgot to put the database host name in DNS,
+	// it might take up to 15 seconds for the hostname/ipaddress lookup to
+	// time out)
 	return semset->supportsTimedSemaphoreOperations()?
-					semset->wait(8,20,0):
-					semset->wait(8);
+			semset->wait(8,DEFAULT_CONNECTION_START_TIMEOUT,0):
+			semset->wait(8);
 }
 
 void scaler::killConnection(pid_t connpid) {

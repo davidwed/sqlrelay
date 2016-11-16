@@ -1643,6 +1643,17 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 
 	raiseDebugMessageEvent("waiting for an available connection");
 
+	// If dynamic scaling is enabled then we need a timeout here.  Without
+	// one, if a spawned connection fails to start, then the wait() below
+	// will hang forever.  The timeout needs to be at least as long as the
+	// scaler will wait, plus a little grace.
+	uint64_t	oldlt=pvt->_listenertimeout;
+	uint64_t	scalertimeout=DEFAULT_CONNECTION_START_ATTEMPTS*
+					(DEFAULT_CONNECTION_START_TIMEOUT+2);
+	if (pvt->_dynamicscaling && pvt->_listenertimeout<scalertimeout) {
+		pvt->_listenertimeout=scalertimeout;
+	}
+
 	// Loop, waiting.  Bail if timeout occurred
 	// FIXME: Some of the listenertimeout might have already been consumed
 	// by acquireShmAccess().  Arguably, we should wait for the remaining
@@ -1673,6 +1684,9 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 	} else {
 		result=pvt->_semset->wait(2);
 	}
+
+	// restore the original timeout
+	pvt->_listenertimeout=oldlt;
 
 	// handle alarm...
 	if (*timeout) {

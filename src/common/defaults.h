@@ -152,3 +152,9 @@
 
 // default kerberos service
 #define DEFAULT_KRBSERVICE SQLRELAY
+
+// default connection-start attempts
+#define DEFAULT_CONNECTION_START_ATTEMPTS 5
+
+// default connection-start timeout
+#define DEFAULT_CONNECTION_START_TIMEOUT 20

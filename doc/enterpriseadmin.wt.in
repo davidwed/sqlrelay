@@ -1,0 +1,8 @@
+==== Administering Enterprise Modules ====
+
+{{{#!blockquote
+[../sqlrenterprise/modules/install_modules.html Installing the SQL Relay Enterprise Modules][[br]]
+[../sqlrenterprise/modules/license_mysql_frontend.html Licensing the MySQL Front-End Modules][[br]]
+[../sqlrenterprise/modules/configure_mysql_frontend.html Configuring the MySQL Front-End Modules][[br]]
+}}}
+
