@@ -90,6 +90,7 @@ struct CONN {
 	char				password[1024];
 	int32_t				retrytime;
 	int32_t				tries;
+	char				columnnamecase[6];
 	char				krb[16];
 	char				krbservice[16];
 	char				krbmech[128];
@@ -309,6 +310,15 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->executedbynumresultcols=false;
 				stmt->executedbynumresultcolsresult=SQL_SUCCESS;
 				stmt->rowbindtype=SQL_BIND_BY_COLUMN;
+
+				// set column name case
+				if (!charstring::compare(
+					conn->columnnamecase,"upper")) {
+					stmt->cur->upperCaseColumnNames();
+				} else if (!charstring::compare(
+					conn->columnnamecase,"lower")) {
+					stmt->cur->lowerCaseColumnNames();
+				}
 			}
 			return SQL_SUCCESS;
 			}
@@ -1979,6 +1989,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"ColumnNameCase","mixed",
+					conn->columnnamecase,
+					sizeof(conn->columnnamecase),
+					ODBC_INI);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","",
 					conn->krb,sizeof(conn->krb),
 					ODBC_INI);
@@ -2042,6 +2057,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  Password: %s\n",conn->password);
 	debugPrintf("  RetryTime: %d\n",(int)conn->retrytime);
 	debugPrintf("  Tries: %d\n",(int)conn->tries);
+	debugPrintf("  ColumnNameCase: %s\n",conn->columnnamecase);
 	debugPrintf("  Krb: %s\n",conn->krb);
 	debugPrintf("  Krbservice: %s\n",conn->krbservice);
 	debugPrintf("  Krbmech: %s\n",conn->krbmech);
