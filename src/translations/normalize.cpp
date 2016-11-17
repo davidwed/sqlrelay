@@ -82,7 +82,6 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 			uppercasedq=true;
 		}
 	}
-stdoutput.printf("upper=%d lower=%d upperdq=%d lowerdq=%d\n",uppercase,lowercase,uppercasedq,lowercasedq);
 }
 
 static const char beforeset[]=" +-/*=<>(";
