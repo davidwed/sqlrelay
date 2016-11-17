@@ -28,6 +28,9 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 						stringbuffer *sb,
 						const char **newptr,
 						bool upper);
+		bool	removeDoubleQuotes(const char *ptr,
+						stringbuffer *sb,
+						const char **newptr);
 
 		stringbuffer	pass1;
 		stringbuffer	pass2;
@@ -39,6 +42,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 		bool	lowercase;
 		bool	uppercasedq;
 		bool	lowercasedq;
+		bool	removedq;
 
 		bool	debug;
 };
@@ -82,6 +86,10 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 			uppercasedq=true;
 		}
 	}
+
+	removedq=!charstring::compareIgnoringCase(
+			parameters->getAttributeValue("removedoublequotes"),
+			"yes");
 }
 
 static const char beforeset[]=" +-/*=<>(";
@@ -141,13 +149,22 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 
 		// skip quoted strings
 		if (skipQuotedStrings(ptr,&pass1,&ptr,
-					true,(!uppercasedq && !lowercasedq),
+					true,(!uppercasedq &&
+						!lowercasedq &&
+						!removedq),
 					false)) {
 			continue;
 		}
 
+		// remove double quotes
+		if (removedq) {
+			if (removeDoubleQuotes(ptr,&pass1,&ptr)) {
+				continue;
+			}
+		}
+
 		// convert quoted strings
-		if (uppercasedq || lowercasedq) {
+		else if (uppercasedq || lowercasedq) {
 			if (caseConvertDoubleQuotedStrings(
 					ptr,&pass1,&ptr,uppercasedq)) {
 				continue;
@@ -528,6 +545,53 @@ bool sqlrtranslation_normalize::caseConvertDoubleQuotedStrings(
 		// write the end-quote
 		if (*ptr) {
 			sb->write(*ptr);
+			ptr++;
+		}
+	}
+
+	// set output pointer
+	*newptr=ptr;
+
+	return found;
+}
+
+bool sqlrtranslation_normalize::removeDoubleQuotes(
+					const char *ptr,
+					stringbuffer *sb,
+					const char **newptr) {
+
+	bool	found=false;
+
+	// if we're on a quote...
+	if (*ptr=='"') {
+
+		found=true;
+
+		// skip the quote
+		ptr++;
+
+		// until we find the end-quote...
+		do {
+
+			// if we found escaped quotes ("")...
+			if (*ptr=='"' && *(ptr+1)=='"') {
+
+				// unescape it
+				sb->write(*ptr);
+				ptr=ptr+2;
+
+			} else
+
+			// if we didn't find escaped quotes...
+			{
+				sb->write(*ptr);
+				ptr++;
+			}
+
+		} while (*ptr && *ptr!='"');
+
+		// skip the end-quote
+		if (*ptr) {
 			ptr++;
 		}
 	}
