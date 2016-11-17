@@ -548,18 +548,10 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		cont->setCommandEnd(cursor,
 				dt.getSeconds(),dt.getMicroseconds());
 
-		// log query-related commands
-		// FIXME: this won't log triggers
-		if (command==NEW_QUERY ||
-			command==REEXECUTE_QUERY ||
-			command==FETCH_FROM_BIND_CURSOR) {
-			cont->raiseQueryEvent(cursor);
-		}
-
 		// free memory used by binds...
-		// (it's tempting to do this inside of processQueryOrBindCursor
-		// but a log/notification module activated by the
-		// raiseQueryEvent above might still need the bind values)
+		// FIXME: can we move this inside of processQueryOrBindCursor?
+		// verify that log/notification modules activated by
+		// raise*Event calls don't still need the bind values
 		bindpool->deallocate();
 
 	} while (loop);

@@ -3421,6 +3421,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enablefilters,
 						bool enabletriggers) {
 
+	// we'll need this later
+	datetime	dt;
+
 	// set state
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
 
@@ -3469,6 +3472,10 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// filter query
 		if (enablefilters && pvt->_sqlrf) {
 			if (!filterQuery(cursor)) {
+
+				// log the query
+				raiseQueryEvent(cursor);
+
 				cursor->setQueryStatus(
 					SQLRQUERYSTATUS_FILTER_VIOLATION);
 				return false;
@@ -3502,12 +3509,26 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			}
 		}
 
+		// set the query start time (in case the query is intercepted)
+		dt.getSystemDateAndTime();
+		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+
 		// intercept some queries for special handling
 		success=interceptQuery(cursor);
 		if (cursor->getQueryWasIntercepted()) {
+
+			// set the query end time
+			dt.getSystemDateAndTime();
+			cursor->setQueryEnd(dt.getSeconds(),
+						dt.getMicroseconds());
+
 			if (success) {
 				cursor->setQueryStatus(SQLRQUERYSTATUS_SUCCESS);
 			}
+
+			// log the query
+			raiseQueryEvent(cursor);
+
 			return success;
 		}
 	}
@@ -3527,6 +3548,10 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		raiseDebugMessageEvent("preparing query...");
 
+		// set the query start time (in case the prepare fails)
+		dt.getSystemDateAndTime();
+		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+
 		// prepare the query
 		success=cursor->prepareQuery(query,querylen);
 
@@ -3536,6 +3561,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		raiseDebugMessageEvent("done with prepare query");
 
 		if (!success) {
+
+			// set the query end time
+			dt.getSystemDateAndTime();
+			cursor->setQueryEnd(dt.getSeconds(),
+						dt.getMicroseconds());
 
 			// update query and error counts
 			incrementQueryCounts(cursor->queryType(query,querylen));
@@ -3561,6 +3591,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			pvt->_debugstr.append("\"");
 			raiseDebugMessageEvent(pvt->_debugstr.getString());
 
+			// log the query (attempt)
+			raiseQueryEvent(cursor);
+
 			return false;
 		}
 
@@ -3575,7 +3608,17 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// handle binds (unless they were faked during the prepare)
 	if (!cursor->getBindsWereFaked()) {
+
+		// set the query start time (in case handleBinds fails)
+		dt.getSystemDateAndTime();
+		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+
 		if (!handleBinds(cursor)) {
+
+			// set the query end time
+			dt.getSystemDateAndTime();
+			cursor->setQueryEnd(dt.getSeconds(),
+						dt.getMicroseconds());
 
 			// update query and error counts
 			incrementQueryCounts(cursor->queryType(query,querylen));
@@ -3601,6 +3644,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			pvt->_debugstr.append("\"");
 			raiseDebugMessageEvent(pvt->_debugstr.getString());
 
+			// log the query (attempt)
+			raiseQueryEvent(cursor);
+
 			return false;
 		}
 	}
@@ -3611,15 +3657,14 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						cursor->getQueryTree());
 	}
 
-	// get the query start time
-	datetime	dt;
+	// (re)set the query start time
 	dt.getSystemDateAndTime();
 	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
 
 	// execute the query
 	success=cursor->executeQuery(query,querylen);
 
-	// get the query end time
+	// set the query end time
 	dt.getSystemDateAndTime();
 	cursor->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
 
@@ -3685,6 +3730,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	if (success) {
 		cursor->setQueryStatus(SQLRQUERYSTATUS_SUCCESS);
 	}
+
+	// log the query
+	raiseQueryEvent(cursor);
 
 	return success;
 }
