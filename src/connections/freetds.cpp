@@ -504,7 +504,7 @@ bool freetdsconnection::logIn(const char **error, const char **warning) {
 	if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
 			(CS_VOID *)&enc,CS_UNUSED,
 			(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("Failed to set the encryption",5);
+		*error=logInError("Failed to enable password encryption",5);
 		return false;
 	}
 	#endif
