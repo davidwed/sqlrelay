@@ -66,13 +66,23 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 				parameters->getAttributeValue(
 					"convertcase"),"no"));
 
-	uppercasedq=!charstring::compareIgnoringCase(
-		parameters->getAttributeValue(
-				"convertcasedoublequoted"),"upper");
-	lowercasedq=(!uppercasedq &&
-			charstring::compareIgnoringCase(
+	uppercasedq=false;
+	lowercasedq=false;
+	const char	*convertcasedq=
 				parameters->getAttributeValue(
-					"convertcasedoublequoted"),"no"));
+					"convertcasedoublequoted");
+	if (!charstring::compareIgnoringCase(convertcasedq,"upper")) {
+		uppercasedq=true;
+	} else if (!charstring::compareIgnoringCase(convertcasedq,"lower")) {
+		lowercasedq=true;
+	} else if (!charstring::compareIgnoringCase(convertcasedq,"yes")) {
+		if (lowercase) {
+			lowercasedq=true;
+		} else if (uppercase) {
+			uppercasedq=true;
+		}
+	}
+stdoutput.printf("upper=%d lower=%d upperdq=%d lowerdq=%d\n",uppercase,lowercase,uppercasedq,lowercasedq);
 }
 
 static const char beforeset[]=" +-/*=<>(";
