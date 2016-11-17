@@ -20,7 +20,14 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 		bool	skipQuotedStrings(const char *ptr,
 						stringbuffer *sb,
 						const char **newptr,
+						bool sq,
+						bool dq,
 						bool alreadyinside);
+		bool	caseConvertDoubleQuotedStrings(
+						const char *ptr,
+						stringbuffer *sb,
+						const char **newptr,
+						bool upper);
 
 		stringbuffer	pass1;
 		stringbuffer	pass2;
@@ -28,6 +35,10 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 
 		bool	enabled;
 		bool	foreigndecimals;
+		bool	uppercase;
+		bool	lowercase;
+		bool	uppercasedq;
+		bool	lowercasedq;
 
 		bool	debug;
 };
@@ -46,6 +57,22 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 
 	foreigndecimals=!charstring::compareIgnoringCase(
 		parameters->getAttributeValue("foreign_decimals"),"yes");
+
+	uppercase=!charstring::compareIgnoringCase(
+		parameters->getAttributeValue(
+				"convertcase"),"upper");
+	lowercase=(!uppercase &&
+			charstring::compareIgnoringCase(
+				parameters->getAttributeValue(
+					"convertcase"),"no"));
+
+	uppercasedq=!charstring::compareIgnoringCase(
+		parameters->getAttributeValue(
+				"convertcasedoublequoted"),"upper");
+	lowercasedq=(!uppercasedq &&
+			charstring::compareIgnoringCase(
+				parameters->getAttributeValue(
+					"convertcasedoublequoted"),"no"));
 }
 
 static const char beforeset[]=" +-/*=<>(";
@@ -73,7 +100,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	// normalize the query, first pass...
 	// * remove comments
 	// * translate all whitespace characters into spaces and compress it
-	// * lower-case whatever we can
+	// * case-convert whatever we can
 	// FIXME:
 	// * translate printable hex (or other) encoded values into characters
 	const char	*ptr=query;
@@ -104,8 +131,18 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass1,&ptr,false)) {
+		if (skipQuotedStrings(ptr,&pass1,&ptr,
+					true,(!uppercasedq && !lowercasedq),
+					false)) {
 			continue;
+		}
+
+		// convert quoted strings
+		if (uppercasedq || lowercasedq) {
+			if (caseConvertDoubleQuotedStrings(
+					ptr,&pass1,&ptr,uppercasedq)) {
+				continue;
+			}
 		}
 
 		// check for end of query
@@ -113,9 +150,12 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			break;
 		}
 
-		// convert the character to lower case and append it
-		// FIXME: what if the db supports case-sensitive identifiers?
-		pass1.append((char)character::toLowerCase(*ptr));
+		// case-convert the character and append it
+		if (uppercase) {
+			pass1.append((char)character::toUpperCase(*ptr));
+		} else if (lowercase) {
+			pass1.append((char)character::toLowerCase(*ptr));
+		}
 
 		// move on to the next character
 		ptr++;
@@ -145,7 +185,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass2,&ptr,false)) {
+		if (skipQuotedStrings(ptr,&pass2,&ptr,true,true,false)) {
 			continue;
 		}
 
@@ -237,7 +277,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	for (;;) {
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass3,&ptr,false)) {
+		if (skipQuotedStrings(ptr,&pass3,&ptr,true,true,false)) {
 			continue;
 		}
 
@@ -332,7 +372,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	for (;;) {
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,translatedquery,&ptr,false)) {
+		if (skipQuotedStrings(ptr,translatedquery,&ptr,
+							true,true,false)) {
 			continue;
 		}
 
@@ -341,7 +382,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			ptr=ptr+3;
 			translatedquery->setPosition(
 					translatedquery->getPosition()-1);
-			skipQuotedStrings(ptr,translatedquery,&ptr,true);
+			skipQuotedStrings(ptr,translatedquery,&ptr,
+							true,true,true);
 			continue;
 		}
 
@@ -369,12 +411,27 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 						stringbuffer *sb,
 						const char **newptr,
+						bool sq,
+						bool dq,
 						bool alreadyinside) {
+
+	// are we skipping single quoted strings,
+	// double quoted strings, or both
+	const char	*set="";
+	if (sq && dq) {
+		set="'\"";
+	} else if (sq && !dq) {
+		set="'";
+	} else if (!sq && dq) {
+		set="\"";
+	} else if (!sq && !dq) {
+		return false;
+	}
 
 	bool	found=false;
 
 	// if we're on a quote...
-	if (*ptr=='\'' || *ptr=='"' || alreadyinside) {
+	if (character::inSet(*ptr,set) || alreadyinside) {
 
 		found=true;
 
@@ -404,6 +461,60 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 			}
 
 		} while (*ptr && *ptr!=quote);
+
+		// write the end-quote
+		if (*ptr) {
+			sb->write(*ptr);
+			ptr++;
+		}
+	}
+
+	// set output pointer
+	*newptr=ptr;
+
+	return found;
+}
+
+bool sqlrtranslation_normalize::caseConvertDoubleQuotedStrings(
+						const char *ptr,
+						stringbuffer *sb,
+						const char **newptr,
+						bool upper) {
+
+	bool	found=false;
+
+	// if we're on a quote...
+	if (*ptr=='"') {
+
+		found=true;
+
+		// write the quote
+		sb->write(*ptr);
+		ptr++;
+
+		// until we find the end-quote...
+		do {
+
+			// if we found escaped quotes ("")...
+			if (*ptr=='"' && *(ptr+1)=='"') {
+				sb->write(*ptr)->write(*ptr);
+				ptr=ptr+2;
+
+			} else
+
+			// if we didn't find escaped quotes...
+			{
+				if (upper) {
+					sb->write((char)character::
+							toUpperCase(*ptr));
+				} else {
+					sb->write((char)character::
+							toLowerCase(*ptr));
+				}
+				ptr++;
+			}
+
+		} while (*ptr && *ptr!='"');
 
 		// write the end-quote
 		if (*ptr) {
