@@ -184,6 +184,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			pass1.append((char)character::toUpperCase(*ptr));
 		} else if (lowercase) {
 			pass1.append((char)character::toLowerCase(*ptr));
+		} else {
+			pass1.append(*ptr);
 		}
 
 		// move on to the next character
