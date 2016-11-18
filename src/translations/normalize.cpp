@@ -30,7 +30,9 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 						bool upper);
 		bool	removeDoubleQuotes(const char *ptr,
 						stringbuffer *sb,
-						const char **newptr);
+						const char **newptr,
+						bool upper,
+						bool lower);
 
 		stringbuffer	pass1;
 		stringbuffer	pass2;
@@ -158,7 +160,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 
 		// remove double quotes
 		if (removedq) {
-			if (removeDoubleQuotes(ptr,&pass1,&ptr)) {
+			if (removeDoubleQuotes(ptr,&pass1,&ptr,
+						uppercase,lowercase)) {
 				continue;
 			}
 		}
@@ -558,7 +561,9 @@ bool sqlrtranslation_normalize::caseConvertDoubleQuotedStrings(
 bool sqlrtranslation_normalize::removeDoubleQuotes(
 					const char *ptr,
 					stringbuffer *sb,
-					const char **newptr) {
+					const char **newptr,
+					bool upper,
+					bool lower) {
 
 	bool	found=false;
 
@@ -584,7 +589,15 @@ bool sqlrtranslation_normalize::removeDoubleQuotes(
 
 			// if we didn't find escaped quotes...
 			{
-				sb->write(*ptr);
+				if (upper) {
+					sb->write((char)character::
+							toUpperCase(*ptr));
+				} else if (lower) {
+					sb->write((char)character::
+							toLowerCase(*ptr));
+				} else {
+					sb->write(*ptr);
+				}
 				ptr++;
 			}
 
