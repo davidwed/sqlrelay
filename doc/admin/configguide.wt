@@ -1819,8 +1819,10 @@ The '''normalize''' module performs the following operations on a query:
 * Converts all white-space characters to spaces, outside of quoted strings.
 * Converts multiple spaces into a single space, outside of quoted strings.
 * Removes whitespace from around operators.
-* Converts everything to lower case, outside of quoted strings.
 * Converts static concatenations to equivalent strings.  Eg. converts 'he' ``|``| 'll' ``|``| 'o' to 'hello'.
+* Optionally converts the query to lower or upper case as specified by parameters described below.
+* Optionally converts comma-separated decimals to dot-separated decimals.
+* Optionally removes double-quotes around database object names.
 
 For example, the following query:
 
@@ -1840,6 +1842,41 @@ Would be translated to:
 
 Normalizing a query is useful when also using [#filtering query filtering] as it simplifies the patterns that have to be searched for.
 
+The following parameters are currently supported:
+
+* '''foreigndecimals''' - "yes" or "no".  Defaults to "no".
+ * SQL requires dots for decimal separators.  However, some internationalized apps are not well behaved and build queries with decimals that use commas for decimal separators.  This parameter instructs the module to try to identify comma-separated decimals and replace the commas with dots.
+ * This can be tricky, especially with decimals in parentheses, which can be misinterpreted as parameters.  To help manage this, a space before a set of comma-separated numbers is interpreted as a delimiter, and no number may have more than 1 decimal separator.
+ * For example:
+  * (111,222, 333,444) is interpreted as having 2 decimals: 111.222 and 333.444
+  * (111, 222, 333,444) is interpreted as having 2 integers and 1 decimal: 111 and 222 and 333.444
+  * (111,222, 333,444,555) is interpreted as having 2 decimals and 1 integer: 111.222 and 333.444 and 555
+  * (111,222) is interpreted as 2 integers: 111 and 222
+  * ( 111,222) is interpreted as 1 decimal: 111.222
+  * etc.
+* '''convertcase''' - "upper", "lower", or "no".  Defaults to "lower".
+ * If set to "upper" or "lower" then the entire query is converted to the specified case, except for strings surrounded by single or double quotes.
+ * If set to "no" then no case conversion is done.
+ * If omitted then the value defaults to "lower".
+* '''convertcasedoublequoted''' - "upper", "lower", "yes", or "no".  Defaults to "no".
+ * If set to "upper" or "lower" then values enclosed in double-quotes are converted to the specified case.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
+  * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table test (col1 int)' creates a table named //TEST// with a column named //COL1//.
+  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table test (col1 int)' creates a table named //test// with a column named //col1//.
+  * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
+ * If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase parameter.
+ * If set to "no" then no case conversion is done.
+ * If omitted then the value defaults to "no".
+* '''removedoublequotes''' - "yes" or "no".  Defaults to "no".
+ * If set to "yes" then double-quotes are removed, except for escaped double quotes.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
+  * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table test (col1 int)' creates a table named //TEST// with a column named //COL1//.
+  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table test (col1 int)' creates a table named //test// with a column named //col1//.
+  * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
+ * If set to "no" then double-quotes are not removed.
+ * If omitted then the value defaults to "no".
 
 [[br]][=#resultsettranslation]
 === Result Set Translation ===

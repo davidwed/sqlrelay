@@ -2781,8 +2781,10 @@ http://www.gnu.org/software/src-highlite -->
   <li>Converts all white-space characters to spaces, outside of quoted strings.</li>
   <li>Converts multiple spaces into a single space, outside of quoted strings.</li>
   <li>Removes whitespace from around operators.</li>
-  <li>Converts everything to lower case, outside of quoted strings.</li>
   <li>Converts static concatenations to equivalent strings.  Eg. converts 'he' || 'll' || 'o' to 'hello'.</li>
+  <li>Optionally converts the query to lower or upper case as specified by parameters described below.</li>
+  <li>Optionally converts comma-separated decimals to dot-separated decimals.</li>
+  <li>Optionally removes double-quotes around database object names.</li>
 </ul>
 
 <p>For example, the following query:</p>
@@ -2814,6 +2816,77 @@ http://www.gnu.org/software/src-highlite -->
 
 </blockquote>
 <p>Normalizing a query is useful when also using <a href="#filtering">query filtering</a> as it simplifies the patterns that have to be searched for.</p>
+
+<p>The following parameters are currently supported:</p>
+
+<ul>
+  <li><b>foreigndecimals</b> - "yes" or "no".  Defaults to "no".</li>
+  <ul>
+    <li>SQL requires dots for decimal separators.  However, some internationalized apps are not well behaved and build queries with decimals that use commas for decimal separators.  This parameter instructs the module to try to identify comma-separated decimals and replace the commas with dots.</li>
+    <li>This can be tricky, especially with decimals in parentheses, which can be misinterpreted as parameters.  To help manage this, a space before a set of comma-separated numbers is interpreted as a delimiter, and no number may have more than 1 decimal separator.</li>
+    <li>For example:</li>
+    <ul>
+      <li>(111,222, 333,444) is interpreted as having 2 decimals: 111.222 and 333.444</li>
+      <li>(111, 222, 333,444) is interpreted as having 2 integers and 1 decimal: 111 and 222 and 333.444</li>
+      <li>(111,222, 333,444,555) is interpreted as having 2 decimals and 1 integer: 111.222 and 333.444 and 555</li>
+      <li>(111,222) is interpreted as 2 integers: 111 and 222</li>
+      <li>( 111,222) is interpreted as 1 decimal: 111.222</li>
+      <li>etc.</li>
+    </ul>
+
+  </ul>
+
+  <li><b>convertcase</b> - "upper", "lower", or "no".  Defaults to "lower".</li>
+  <ul>
+    <li>If set to "upper" or "lower" then the entire query is converted to the specified case, except for strings surrounded by single or double quotes.</li>
+    <li>If set to "no" then no case conversion is done.</li>
+    <li>If omitted then the value defaults to "lower".</li>
+  </ul>
+
+  <li><b>convertcasedoublequoted</b> - "upper", "lower", "yes", or "no".  Defaults to "no".</li>
+  <ul>
+    <li>If set to "upper" or "lower" then values enclosed in double-quotes are converted to the specified case.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.</li>
+    <ul>
+      <li>Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.</li>
+      <ul>
+        <li>Eg. 'create table test (col1 int)' creates a table named <i>TEST</i> with a column named <i>COL1</i>.</li>
+      </ul>
+
+      <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
+      <ul>
+        <li>Eg. 'create table test (col1 int)' creates a table named <i>test</i> with a column named <i>col1</i>.</li>
+      </ul>
+
+      <li>This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.</li>
+    </ul>
+
+    <li>If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase parameter.</li>
+    <li>If set to "no" then no case conversion is done.</li>
+    <li>If omitted then the value defaults to "no".</li>
+  </ul>
+
+  <li><b>removedoublequotes</b> - "yes" or "no".  Defaults to "no".</li>
+  <ul>
+    <li>If set to "yes" then double-quotes are removed, except for escaped double quotes.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.</li>
+    <ul>
+      <li>Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.</li>
+      <ul>
+        <li>Eg. 'create table test (col1 int)' creates a table named <i>TEST</i> with a column named <i>COL1</i>.</li>
+      </ul>
+
+      <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
+      <ul>
+        <li>Eg. 'create table test (col1 int)' creates a table named <i>test</i> with a column named <i>col1</i>.</li>
+      </ul>
+
+      <li>This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.</li>
+    </ul>
+
+    <li>If set to "no" then double-quotes are not removed.</li>
+    <li>If omitted then the value defaults to "no".</li>
+  </ul>
+
+</ul>
 
 <br/><a name="resultsettranslation"/><h3>Result Set Translation</h3>
 

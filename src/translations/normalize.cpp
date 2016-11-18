@@ -62,7 +62,7 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 		parameters->getAttributeValue("enabled"),"no");
 
 	foreigndecimals=!charstring::compareIgnoringCase(
-		parameters->getAttributeValue("foreign_decimals"),"yes");
+		parameters->getAttributeValue("foreigndecimals"),"yes");
 
 	uppercase=!charstring::compareIgnoringCase(
 		parameters->getAttributeValue(
