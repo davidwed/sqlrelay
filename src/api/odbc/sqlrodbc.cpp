@@ -154,6 +154,7 @@ struct outputbind {
 
 struct STMT {
 	sqlrcursor				*cur;
+	bool					firstrownotfetched;
 	uint64_t				currentfetchrow;
 	uint64_t				currentstartrow;
 	uint64_t				currentgetdatarow;
@@ -314,6 +315,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				STMT	*stmt=new STMT;
 				stmt->cur=new sqlrcursor(conn->con,true);
 				*outputhandle=(SQLHANDLE)stmt;
+				stmt->firstrownotfetched=true;
 				stmt->currentfetchrow=0;
 				stmt->currentstartrow=0;
 				stmt->currentgetdatarow=0;
@@ -1928,6 +1930,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 	// reinit row indices
+	stmt->firstrownotfetched=true;
 	stmt->currentfetchrow=0;
 	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
@@ -2097,7 +2100,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 	char	resultsetbuffersizebuf[21];
 	SQLGetPrivateProfileString((const char *)conn->dsn,
-					"ResultSetBufferSize","100",
+					"ResultSetBufferSize","0",
 					resultsetbuffersizebuf,
 					sizeof(resultsetbuffersizebuf),
 					ODBC_INI);
@@ -2884,6 +2887,7 @@ static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 	}
 
 	// reinit row indices
+	stmt->firstrownotfetched=true;
 	stmt->currentfetchrow=0;
 	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
@@ -2947,6 +2951,7 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 	}
 
 	// reinit row indices
+	stmt->firstrownotfetched=true;
 	stmt->currentfetchrow=0;
 	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
@@ -3045,7 +3050,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		}
 	}
 
-	// reset the row that will be copied out
+	// set the row that will be copied out
 	// during the next call to SQLGetData
 	stmt->currentgetdatarow=stmt->currentstartrow;
 
@@ -3093,6 +3098,10 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	// move on to the next rowset
 	stmt->currentstartrow=stmt->currentfetchrow;
 	stmt->currentfetchrow=stmt->currentfetchrow+rowsfetched;
+	if (!stmt->firstrownotfetched) {
+		stmt->currentgetdatarow=stmt->currentgetdatarow+rowsfetched;
+	}
+	stmt->firstrownotfetched=false;
 
 	return fetchresult;
 }
