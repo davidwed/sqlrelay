@@ -2861,7 +2861,7 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 
 	// reinit row indices
 	stmt->currentfetchrow=0;
-	stmt->currentgetdatarow=0;
+	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
 
 	// clear the error
@@ -2958,6 +2958,10 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		}
 	}
 
+	// reset the row that will be copied out
+	// during the next call to SQLGetData
+	stmt->currentgetdatarow=stmt->currentstartrow;
+
 	// update column binds
 	uint32_t	colcount=stmt->cur->colCount();
 	for (uint64_t row=0; row<rowstofetch; row++) {
@@ -2993,8 +2997,10 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 			}
 		}
 
-		// move on to the next row
-		stmt->currentgetdatarow++;
+		// only bump currentgetdatarow if we've bound columns
+		if (stmt->fieldlist.getList()->getLength()) {
+			stmt->currentgetdatarow++;
+		}
 	}
 
 	// move on to the next rowset
