@@ -105,6 +105,10 @@ struct CONN {
 	uint16_t			tlsdepth;
 	bool				debug;
 	bool				attrmetadataid;
+
+	int32_t	compare(struct CONN *value) {
+		return _containerutil_compare((uint64_t)this,(uint64_t)value);
+	}
 };
 
 struct rowdesc {
@@ -155,6 +159,10 @@ struct STMT {
 	bool					executedbynumresultcols;
 	SQLRETURN				executedbynumresultcolsresult;
 	SQLULEN					rowbindtype;
+
+	int32_t	compare(struct STMT *value) {
+		return _containerutil_compare((uint64_t)this,(uint64_t)value);
+	}
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,

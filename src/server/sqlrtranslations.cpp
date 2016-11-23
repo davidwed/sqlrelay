@@ -29,6 +29,11 @@ class sqlrdatabaseobject {
 		const char	*schema;
 		const char	*object;
 		const char	*dependency;
+
+		int32_t	compare(sqlrdatabaseobject *value) {
+			return _containerutil_compare(
+					(uint64_t)this,(uint64_t)value);
+		}
 };
 
 class sqlrtranslationsprivate {
