@@ -16,7 +16,7 @@
 //#define DEBUG_MESSAGES 1
 //#define DEBUG_TO_FILE 1
 //static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
-static const char debugfile[]="C:\\Users\\dmuse\\sqlrodbcdebug.txt";
+//static const char debugfile[]="C:\\Users\\dmuse\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -82,7 +82,9 @@ struct CONN {
 	char				*error;
 	int64_t				errn;
 	const char			*sqlstate;
+
 	char				dsn[1024];
+
 	char				server[1024];
 	uint16_t			port;
 	char				socket[1024];
@@ -90,11 +92,12 @@ struct CONN {
 	char				password[1024];
 	int32_t				retrytime;
 	int32_t				tries;
-	char				columnnamecase[6];
+
 	char				krb[16];
 	char				krbservice[16];
 	char				krbmech[128];
 	char				krbflags[1024];
+
 	char				tls[16];
 	char				tlsversion[16];
 	char				tlscert[1024];
@@ -103,7 +106,18 @@ struct CONN {
 	char				tlsvalidate[1024];
 	char				tlsca[1024];
 	uint16_t			tlsdepth;
+
 	bool				debug;
+
+	char				columnnamecase[6];
+
+
+	char				db[1024];
+	uint64_t			resultsetbuffersize;
+	bool				dontgetcolumninfo;
+	bool				nullsasnulls;
+	bool				lazyconnect;
+
 	bool				attrmetadataid;
 
 	int32_t	compare(struct CONN *value) {
@@ -321,13 +335,25 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->executedbynumresultcolsresult=SQL_SUCCESS;
 				stmt->rowbindtype=SQL_BIND_BY_COLUMN;
 
-				// set column name case
+				// set flags
 				if (!charstring::compare(
 					conn->columnnamecase,"upper")) {
 					stmt->cur->upperCaseColumnNames();
 				} else if (!charstring::compare(
 					conn->columnnamecase,"lower")) {
 					stmt->cur->lowerCaseColumnNames();
+				}
+				stmt->cur->setResultSetBufferSize(
+						conn->resultsetbuffersize);
+				if (conn->dontgetcolumninfo) {
+					stmt->cur->dontGetColumnInfo();
+				} else {
+					stmt->cur->getColumnInfo();
+				}
+				if (conn->nullsasnulls) {
+					stmt->cur->getNullsAsNulls();
+				} else {
+					stmt->cur->getNullsAsEmptyStrings();
 				}
 			}
 			return SQL_SUCCESS;
@@ -1998,12 +2024,10 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Tries","1",
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
+
+
+	// krb options
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
-	SQLGetPrivateProfileString((const char *)conn->dsn,
-					"ColumnNameCase","mixed",
-					conn->columnnamecase,
-					sizeof(conn->columnnamecase),
-					ODBC_INI);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","",
 					conn->krb,sizeof(conn->krb),
 					ODBC_INI);
@@ -2019,6 +2043,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					conn->krbflags,
 					sizeof(conn->krbflags),
 					ODBC_INI);
+
+	// tls options
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Tls","",
 					conn->tls,sizeof(conn->tls),
 					ODBC_INI);
@@ -2052,11 +2078,54 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					sizeof(tlsdepthbuf),
 					ODBC_INI);
 	conn->tlsdepth=(uint16_t)charstring::toUnsignedInteger(tlsdepthbuf);
+
+	// db
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Db","",
+					conn->db,sizeof(conn->db),
+					ODBC_INI);
+
+	// flags
 	char	debugbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Debug","0",
 					debugbuf,sizeof(debugbuf),
 					ODBC_INI);
 	conn->debug=(charstring::toInteger(debugbuf)!=0);
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"ColumnNameCase","mixed",
+					conn->columnnamecase,
+					sizeof(conn->columnnamecase),
+					ODBC_INI);
+	char	resultsetbuffersizebuf[21];
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"ResultSetBufferSize","100",
+					resultsetbuffersizebuf,
+					sizeof(resultsetbuffersizebuf),
+					ODBC_INI);
+	conn->resultsetbuffersize=
+		(uint64_t)charstring::toInteger(resultsetbuffersizebuf);
+	char	dontgetcolumninfobuf[6];
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"DontGetColumnInfo","0",
+					dontgetcolumninfobuf,
+					sizeof(dontgetcolumninfobuf),
+					ODBC_INI);
+	conn->dontgetcolumninfo=
+		(charstring::toInteger(dontgetcolumninfobuf)!=0);
+	char	nullsasnullsbuf[6];
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"NullsAsNulls","0",
+					nullsasnullsbuf,
+					sizeof(nullsasnullsbuf),
+					ODBC_INI);
+	conn->nullsasnulls=
+		(charstring::toInteger(nullsasnullsbuf)!=0);
+	char	lazyconnectbuf[6];
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"LazyConnect","1",
+					lazyconnectbuf,
+					sizeof(lazyconnectbuf),
+					ODBC_INI);
+	conn->lazyconnect=(charstring::toInteger(lazyconnectbuf)!=0);
 
 	debugPrintf("  DSN: %s\n",conn->dsn);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
@@ -2067,7 +2136,6 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  Password: %s\n",conn->password);
 	debugPrintf("  RetryTime: %d\n",(int)conn->retrytime);
 	debugPrintf("  Tries: %d\n",(int)conn->tries);
-	debugPrintf("  ColumnNameCase: %s\n",conn->columnnamecase);
 	debugPrintf("  Krb: %s\n",conn->krb);
 	debugPrintf("  Krbservice: %s\n",conn->krbservice);
 	debugPrintf("  Krbmech: %s\n",conn->krbmech);
@@ -2080,7 +2148,13 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  Tlsvalidate: %s\n",conn->tlsvalidate);
 	debugPrintf("  Tlsca: %s\n",conn->tlsca);
 	debugPrintf("  Tlsdepth: %d\n",conn->tlsdepth);
+	debugPrintf("  Db: %s\n",conn->db);
 	debugPrintf("  Debug: %d\n",(int)conn->debug);
+	debugPrintf("  ColumnNameCase: %s\n",conn->columnnamecase);
+	debugPrintf("  ResultSetBufferSize: %lld\n",conn->resultsetbuffersize);
+	debugPrintf("  DontGetColumnInfo: %d\n",conn->dontgetcolumninfo);
+	debugPrintf("  NullsAsNulls: %d\n",conn->nullsasnulls);
+	debugPrintf("  LazyConnect: %d\n",conn->lazyconnect);
 
 	// create connection
 	conn->con=new sqlrconnection(conn->server,
@@ -2114,6 +2188,19 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	#ifdef DEBUG_MESSAGES
 	conn->con->debugOn();
 	#endif
+
+	// if we're not doing lazy connects, then do something lightweight
+	// that will verify whether SQL Relay is available or not
+	if (!conn->lazyconnect && !conn->con->identify()) {
+		delete conn->con;
+		conn->con=NULL;
+		return SQL_ERROR;
+	}
+
+
+	if (charstring::isNullOrEmpty(conn->db)) {
+		conn->con->selectDatabase(conn->db);
+	}
 
 	return SQL_SUCCESS;
 }
