@@ -19,6 +19,8 @@ class sqlrprotocolplugin {
 	public:
 		sqlrprotocol	*pr;
 		dynamiclib	*dl;
+
+		void	print() {}
 };
 
 class sqlrprotocolsprivate {

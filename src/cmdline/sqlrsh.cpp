@@ -46,6 +46,8 @@ class sqlrshbindvalue {
 		};
 		sqlrclientbindvartype_t	type;
 		uint32_t		outputstringbindlength;
+
+		void	print() {}
 };
 
 enum sqlrshformat {

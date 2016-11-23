@@ -124,6 +124,7 @@ struct FIELD {
 	SQLPOINTER	targetvalue;
 	SQLLEN		bufferlength;
 	SQLLEN		*strlen_or_ind;
+	void	print() {}
 };
 
 struct outputbind {
@@ -134,6 +135,7 @@ struct outputbind {
 	SQLPOINTER	parametervalue;
 	SQLLEN		bufferlength;
 	SQLLEN		*strlen_or_ind;
+	void	print() {}
 };
 
 struct STMT {

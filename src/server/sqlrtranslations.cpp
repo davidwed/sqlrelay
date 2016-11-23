@@ -34,6 +34,7 @@ class sqlrdatabaseobject {
 			return _containerutil_compare(
 					(uint64_t)this,(uint64_t)value);
 		}
+		void	print() {}
 };
 
 class sqlrtranslationsprivate {
