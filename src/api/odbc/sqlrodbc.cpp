@@ -6767,8 +6767,9 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ROWSET_SIZE:
-			debugPrintf("  attribute: SQL_ROWSET_SIZE\n");
-			// FIXME: implement
+			debugPrintf("  attribute: SQL_ROWSET_SIZE: "
+						"%lld\n",(uint64_t)(value));
+			stmt->cur->setResultSetBufferSize((uint64_t)value);
 			return SQL_SUCCESS;
 		//case SQL_ATTR_SIMULATE_CURSOR:
 		case SQL_SIMULATE_CURSOR:
