@@ -91,7 +91,7 @@ static void shutDown(int32_t signum) {
 		filename.append(backtrace);
 		filename.append(sys::getDirectorySeparator());
 		filename.append("sqlr-connection.");
-		filename.append(process::getProcessId());
+		filename.append((uint32_t)process::getProcessId());
 		filename.append(".bt");
 		process::backtrace(filename.getString());
 	}
