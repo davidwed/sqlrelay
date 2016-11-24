@@ -154,7 +154,6 @@ struct outputbind {
 
 struct STMT {
 	sqlrcursor				*cur;
-	bool					firstrownotfetched;
 	uint64_t				currentfetchrow;
 	uint64_t				currentstartrow;
 	uint64_t				currentgetdatarow;
@@ -315,7 +314,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				STMT	*stmt=new STMT;
 				stmt->cur=new sqlrcursor(conn->con,true);
 				*outputhandle=(SQLHANDLE)stmt;
-				stmt->firstrownotfetched=true;
 				stmt->currentfetchrow=0;
 				stmt->currentstartrow=0;
 				stmt->currentgetdatarow=0;
@@ -1930,7 +1928,6 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 	// reinit row indices
-	stmt->firstrownotfetched=true;
 	stmt->currentfetchrow=0;
 	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
@@ -2887,7 +2884,6 @@ static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 	}
 
 	// reinit row indices
-	stmt->firstrownotfetched=true;
 	stmt->currentfetchrow=0;
 	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
@@ -2951,7 +2947,6 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 	}
 
 	// reinit row indices
-	stmt->firstrownotfetched=true;
 	stmt->currentfetchrow=0;
 	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
@@ -3054,29 +3049,31 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	// during the next call to SQLGetData
 	stmt->currentgetdatarow=stmt->currentstartrow;
 
-	// update column binds
-	uint32_t	colcount=stmt->cur->colCount();
-	for (uint64_t row=0; row<rowstofetch; row++) {
+	// update column binds (if we have any)
+	if (stmt->fieldlist.getList()->getLength()) {
 
-		for (uint32_t index=0; index<colcount; index++) {
+		uint32_t	colcount=stmt->cur->colCount();
+		for (uint64_t row=0; row<rowstofetch; row++) {
 
-			// get the bound field, if this field isn't bound,
-			// move on
-			FIELD	*field=NULL;
-			if (!stmt->fieldlist.getValue(index,&field)) {
-				continue;
-			}
+			for (uint32_t index=0; index<colcount; index++) {
 
-			// handle the targetvalue
-			unsigned char	*targetvalue=NULL;
-			if (field->targetvalue) {
-				targetvalue=((unsigned char *)
+				// get the bound field, if this
+				// field isn't bound, move on
+				FIELD	*field=NULL;
+				if (!stmt->fieldlist.getValue(index,&field)) {
+					continue;
+				}
+
+				// handle the targetvalue
+				unsigned char	*targetvalue=NULL;
+				if (field->targetvalue) {
+					targetvalue=((unsigned char *)
 						field->targetvalue)+
 						(field->bufferlength*row);
-			}
+				}
 
-			// get the data into the bound column
-			SQLRETURN	getdataresult=
+				// get the data into the bound column
+				SQLRETURN	getdataresult=
 					SQLR_SQLGetData(
 						statementhandle,
 						index+1,
@@ -3084,24 +3081,28 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 						targetvalue,
 						field->bufferlength,
 						&(field->strlen_or_ind[row]));
-			if (getdataresult!=SQL_SUCCESS) {
-				return getdataresult;
+				if (getdataresult!=SQL_SUCCESS) {
+					return getdataresult;
+				}
 			}
-		}
 
-		// only bump currentgetdatarow if we've bound columns
-		if (stmt->fieldlist.getList()->getLength()) {
+			// bump currentgetdatarow
 			stmt->currentgetdatarow++;
 		}
+
+		// reset currentgetdatarow
+		stmt->currentgetdatarow=stmt->currentstartrow;
 	}
 
 	// move on to the next rowset
 	stmt->currentstartrow=stmt->currentfetchrow;
 	stmt->currentfetchrow=stmt->currentfetchrow+rowsfetched;
-	if (!stmt->firstrownotfetched) {
-		stmt->currentgetdatarow=stmt->currentgetdatarow+rowsfetched;
-	}
-	stmt->firstrownotfetched=false;
+
+	// At this point, currentgetdatarow will be set to the first row of
+	// this block of rows.  This may not seem correct, but it is.  This
+	// allows SQLGetData to be used to re-fetch fields, starting with the
+	// first one in the row.  SQLSetPos can be used to fields from the
+	// other rows.
 
 	return fetchresult;
 }
