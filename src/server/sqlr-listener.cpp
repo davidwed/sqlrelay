@@ -4,11 +4,13 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
+#include <rudiments/sys.h>
 #include <config.h>
 #include <version.h>
 
 sqlrlistener	*lsnr;
 bool		shutdownalready=false;
+const char	*backtrace=NULL;
 
 static void shutDown(int32_t signum) {
 
@@ -31,6 +33,16 @@ static void shutDown(int32_t signum) {
 	}
 
 	shutdownalready=true;
+
+	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGINT) {
+		stringbuffer	filename;
+		filename.append(backtrace);
+		filename.append(sys::getDirectorySeparator());
+		filename.append("sqlr-listener.");
+		filename.append(process::getProcessId());
+		filename.append(".bt");
+		process::backtrace(filename.getString());
+	}
 
 	delete lsnr;
 	process::exit(0);
@@ -67,6 +79,9 @@ int main(int argc, const char **argv) {
 			SQLR);
 		process::exit(0);
 	}
+
+	// enable/disable backtrace
+	backtrace=cmdl.getValue("-backtrace");
 
 	// set up default signal handling
 	process::exitOnShutDown();

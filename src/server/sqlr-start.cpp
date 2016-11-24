@@ -33,6 +33,7 @@ static bool startListener(sqlrpaths *sqlrpth,
 				const char *id,
 				const char *config,
 				const char *localstatedir,
+				const char *backtrace,
 				bool disablecrashhandler) {
 
 	// start the listener
@@ -51,7 +52,7 @@ static bool startListener(sqlrpaths *sqlrpth,
 
 	// build args
 	uint16_t	i=0;
-	const char	*args[9];
+	const char	*args[11];
 	args[i++]=cmdname.getString();
 	args[i++]="-id";
 	args[i++]=id;
@@ -62,6 +63,10 @@ static bool startListener(sqlrpaths *sqlrpth,
 	if (!charstring::isNullOrEmpty(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
+	}
+	if (!charstring::isNullOrEmpty(backtrace)) {
+		args[i++]="-backtrace";
+		args[i++]=backtrace;
 	}
 	if (disablecrashhandler) {
 		args[i++]="-disable-crash-handler";
@@ -90,6 +95,7 @@ static bool startConnection(sqlrpaths *sqlrpth,
 				const char *config,
 				const char *localstatedir,
 				bool strace,
+				const char *backtrace,
 				bool disablecrashhandler) {
 
 	// build command name
@@ -109,7 +115,7 @@ static bool startConnection(sqlrpaths *sqlrpth,
 
 	// build args
 	uint16_t	i=0;
-	const char	*args[15];
+	const char	*args[17];
 	if (strace) {
 		args[i++]="strace";
 		args[i++]="-ff";
@@ -129,6 +135,10 @@ static bool startConnection(sqlrpaths *sqlrpth,
 	if (!charstring::isNullOrEmpty(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
+	}
+	if (!charstring::isNullOrEmpty(backtrace)) {
+		args[i++]="-backtrace";
+		args[i++]=backtrace;
 	}
 	if (disablecrashhandler) {
 		args[i++]="-disable-crash-handler";
@@ -159,6 +169,7 @@ static bool startConnections(sqlrpaths *sqlrpth,
 				const char *config,
 				const char *localstatedir,
 				bool strace,
+				const char *backtrace,
 				bool disablecrashhandler) {
 
 	// get the connection count and total metric
@@ -174,7 +185,7 @@ static bool startConnections(sqlrpaths *sqlrpth,
 	// start 1 default one
 	if (!cfg->getConnectionCount()) {
 		return !startConnection(sqlrpth,id,config,localstatedir,NULL,
-						strace,disablecrashhandler);
+					strace,backtrace,disablecrashhandler);
 	}
 
 	// get number of connections
@@ -215,9 +226,10 @@ static bool startConnections(sqlrpaths *sqlrpth,
 
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
-			if (!startConnection(sqlrpth,id,csc->getConnectionId(),
-						config,localstatedir,strace,
-						disablecrashhandler)) {
+			if (!startConnection(sqlrpth,id,
+					csc->getConnectionId(),
+					config,localstatedir,strace,
+					backtrace,disablecrashhandler)) {
 				// it's ok if at least 1 connection started up
 				return (totalstarted>0 || i>0);
 			}
@@ -404,6 +416,7 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdl.getValue("-id");
 	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*config=cmdl.getValue("-config");
+	const char	*backtrace=cmdl.getValue("-backtrace");
 	bool		disablecrashhandler=
 				cmdl.found("-disable-crash-handler");
 	#ifndef _WIN32
@@ -466,10 +479,11 @@ int main(int argc, const char **argv) {
 		if (!cfg ||
 			!startListener(&sqlrpth,thisid,
 					config,localstatedir,
-					disablecrashhandler) ||
+					backtrace,disablecrashhandler) ||
 			!startConnections(&sqlrpth,cfg,thisid,
 					config,localstatedir,
-					strace,disablecrashhandler) ||
+					strace,backtrace,
+					disablecrashhandler) ||
 			!startScaler(&sqlrpth,cfg,thisid,
 					config,localstatedir,
 					disablecrashhandler)

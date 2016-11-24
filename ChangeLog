@@ -7,6 +7,7 @@
 	added ColumnCaseName parameter to ODBC driver
 	fixed a subtle bug in the ODBC driver that caused the first row to be
 		skipped if columns were not bound
+	added -backtrace option for debugging
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile
