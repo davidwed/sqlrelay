@@ -32,7 +32,7 @@ class sqlrdatabaseobject {
 
 		int32_t	compare(sqlrdatabaseobject *value) {
 			return _containerutil_compare(
-					(uint64_t)this,(uint64_t)value);
+					(void *)this,(void *)value);
 		}
 		void	print() {}
 };

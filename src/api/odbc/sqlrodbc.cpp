@@ -121,7 +121,7 @@ struct CONN {
 	bool				attrmetadataid;
 
 	int32_t	compare(struct CONN *value) {
-		return _containerutil_compare((uint64_t)this,(uint64_t)value);
+		return _containerutil_compare((void *)this,(void *)value);
 	}
 };
 
@@ -177,7 +177,7 @@ struct STMT {
 	SQLULEN					rowbindtype;
 
 	int32_t	compare(struct STMT *value) {
-		return _containerutil_compare((uint64_t)this,(uint64_t)value);
+		return _containerutil_compare((void *)this,(void *)value);
 	}
 };
 
