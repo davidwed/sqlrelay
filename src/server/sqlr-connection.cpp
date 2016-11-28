@@ -4,6 +4,9 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
+#include <rudiments/stringbuffer.h>
+#include <rudiments/file.h>
+#include <rudiments/permissions.h>
 #include <rudiments/sys.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/stdio.h>
@@ -93,7 +96,12 @@ static void shutDown(int32_t signum) {
 		filename.append("sqlr-connection.");
 		filename.append((uint32_t)process::getProcessId());
 		filename.append(".bt");
-		process::backtrace(filename.getString());
+		file	f;
+		if (f.create(filename.getString(),
+				permissions::evalPermString("rw-------"))) {
+			f.printf("signal: %d\n\n",signum);
+			process::backtrace(&f);
+		}
 	}
 
 	delete cont;
