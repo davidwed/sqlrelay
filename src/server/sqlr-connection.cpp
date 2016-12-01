@@ -30,6 +30,21 @@ static void shutDown(int32_t signum) {
 
 	shutdownalready=true;
 
+	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGINT) {
+		stringbuffer    filename;
+		filename.append(backtrace);
+		filename.append(sys::getDirectorySeparator());
+		filename.append("sqlr-connection.");
+		filename.append((uint32_t)process::getProcessId());
+		filename.append(".bt");
+		file	f;
+		if (f.create(filename.getString(),
+				permissions::evalPermString("rw-------"))) {
+			f.printf("signal: %d\n\n",signum);
+			process::backtrace(&f);
+		}
+	}
+
 	if (!signalhandler::isSignalHandlerIntUsed()) {
 		delete cont;
 		process::exit(0);
@@ -89,21 +104,6 @@ static void shutDown(int32_t signum) {
 			process::raiseSignal(signum);
 	}
 
-	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGINT) {
-		stringbuffer    filename;
-		filename.append(backtrace);
-		filename.append(sys::getDirectorySeparator());
-		filename.append("sqlr-connection.");
-		filename.append((uint32_t)process::getProcessId());
-		filename.append(".bt");
-		file	f;
-		if (f.create(filename.getString(),
-				permissions::evalPermString("rw-------"))) {
-			f.printf("signal: %d\n\n",signum);
-			process::backtrace(&f);
-		}
-	}
-
 	delete cont;
 	process::exit(exitcode);
 }
@@ -155,6 +155,7 @@ int main(int argc, const char **argv) {
 
 	// enable/disable backtrace
 	backtrace=cmdl.getValue("-backtrace");
+stdoutput.printf("backtrace: %s\n",backtrace);
 
 	// set up default signal handling
 	process::exitOnShutDown();

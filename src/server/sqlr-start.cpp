@@ -252,6 +252,7 @@ static bool startScaler(sqlrpaths *sqlrpth,
 			const char *id,
 			const char *config,
 			const char *localstatedir,
+			const char *backtrace,
 			bool disablecrashhandler) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
@@ -274,7 +275,7 @@ static bool startScaler(sqlrpaths *sqlrpth,
 
 	// build args
 	uint16_t	i=0;
-	const char	*args[9];
+	const char	*args[11];
 	args[i++]=cmdname.getString();
 	args[i++]="-id";
 	args[i++]=id;
@@ -285,6 +286,10 @@ static bool startScaler(sqlrpaths *sqlrpth,
 	if (!charstring::isNullOrEmpty(localstatedir)) {
 		args[i++]="-localstatedir";
 		args[i++]=localstatedir;
+	}
+	if (!charstring::isNullOrEmpty(backtrace)) {
+		args[i++]="-backtrace";
+		args[i++]=backtrace;
 	}
 	if (disablecrashhandler) {
 		args[i++]="-disable-crash-handler";
@@ -486,7 +491,7 @@ int main(int argc, const char **argv) {
 					disablecrashhandler) ||
 			!startScaler(&sqlrpth,cfg,thisid,
 					config,localstatedir,
-					disablecrashhandler)
+					backtrace,disablecrashhandler)
 			#ifndef _WIN32
 			|| (wait && !waitForInstance(&sqlrpth,cfg,thisid))
 			#endif

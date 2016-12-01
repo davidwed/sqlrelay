@@ -85,6 +85,8 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		bool		iswindows;
 
+		const char	*backtrace;
+
 		static	bool	shutdown;
 };
 
@@ -130,6 +132,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	if (!cmdl->found("-disable-crash-handler")) {
 		process::handleCrash(shutDown);
 	}
+
+	backtrace=cmdl->getValue("-backtrace");
 
 	init=true;
 
@@ -483,7 +487,7 @@ pid_t scaler::openOneConnection() {
 
 	// build args
 	uint16_t	p=0;
-	const char	*args[20];
+	const char	*args[17];
 	args[p++]=cmdname.getString();
 	args[p++]="-silent";
 	args[p++]="-nodetach";
@@ -499,6 +503,10 @@ pid_t scaler::openOneConnection() {
 	}
 	args[p++]="-localstatedir";
 	args[p++]=sqlrpth->getLocalStateDir();
+	if (!charstring::isNullOrEmpty(backtrace)) {
+		args[p++]="-backtrace";
+		args[p++]=backtrace;
+	}
 	args[p++]="-scaler";
 	args[p++]=NULL; // the last
 
