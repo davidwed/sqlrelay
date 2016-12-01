@@ -155,3 +155,15 @@ LOCALSTATEDIR
 "	-disable-crash-handler	Disable the built-in crash handler.\n" \
 "				Useful for debugging.\n" \
 "\n"
+
+#define BACKTRACE \
+"	-backtrace dir		Generate a backtrace in the specified\n" \
+"				directory on abnormal termination.\n" \
+"				Useful for debugging.\n" \
+"\n"
+
+#define BACKTRACECHILDREN \
+"	-backtrace dir		Instructs the program to spawn\n" \
+"				sqlr-connection processes with the same\n" \
+"				backtrace option and argument.\n" \
+"\n"

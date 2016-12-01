@@ -790,7 +790,8 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
-		DISABLECRASHHANDLER,
+		DISABLECRASHHANDLER
+		BACKTRACECHILDREN,
 		progname,SQL_RELAY,progname,SQL_RELAY,progname,SQLR,progname);
 }
 

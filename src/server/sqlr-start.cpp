@@ -370,6 +370,7 @@ static void helpmessage(const char *progname) {
 		"Options:\n"
 		SERVEROPTIONS
 		DISABLECRASHHANDLER
+		BACKTRACECHILDREN
 #ifdef _WIN32
 		"	-disable-new-window	Spawns child processes in the current window,\n"
 		"				rather than opening a new window.  Helpful\n"
