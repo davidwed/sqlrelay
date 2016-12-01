@@ -23,15 +23,6 @@
 #define FALSE (0)
 #endif
 
-// Using the statement API on Windows crashes for some reason.
-// I suspect that the module needs to be compiled with the same compiler options
-// as the library, otherwise various structs have mismatched sizes or something.
-// There's no good way to know what compiler options were used though.  This
-// seems to resolve the problem though.  So, for now we'll do this.
-#ifdef _WIN32
-	#undef HAVE_MYSQL_STMT_PREPARE
-#endif
-
 // mysql_change_user() once worked, but it hasn't for a long time.  It's not
 // clear why, but the problem appears to be on the server-side.  I'm disabling
 // it until I can figure out a workaround.
