@@ -713,7 +713,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	usestmtprepare=true;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
-			"^\\s*(("
+			"^[ 	\r\n]*(("
 				"create|CREATE|"
 				"drop|DROP|"
 				"procedure|PROCEDURE|"
@@ -729,11 +729,11 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 				"lock|LOCK|"
 				"unlock|UNLOCK|"
 				"show|SHOW"
-			")\\s+)|"
+			")[ 	\r\n]+)|"
 			"(("
 				"begin|BEGIN|"
 				"rollback|ROLLBACK"
-			")\\s*)");
+			")[ 	\r\n]*)");
 	unsupportedbystmt.study();
 
 	allocateResultSetBuffers(mysqlconn->maxselectlistsize,

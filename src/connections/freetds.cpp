@@ -945,12 +945,12 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
-	setCreateTempTablePattern("(create|CREATE)[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+#");
+	setCreateTempTablePattern("(create|CREATE)[ 	\r\n]+(table|TABLE)[ 	\r\n]+#");
 
-	cursorquery.compile("^(select|SELECT)[ 	\\r\\n]+");
+	cursorquery.compile("^(select|SELECT)[ 	\r\n]+");
 	cursorquery.study();
 
-	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ 	\\r\\n]+");
+	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ 	\r\n]+");
 	rpcquery.study();
 
 	allocateResultSetBuffers(freetdsconn->maxselectlistsize);

@@ -263,9 +263,9 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	nullbindvalue=nullBindValue();
 	nonnullbindvalue=nonNullBindValue();
 
-	beginregex.compile("^\\s*(begin|start\\s*transaction)");
+	beginregex.compile("^[ 	\r\n]*(begin|start[ 	\r\n]*transaction)");
 	beginregex.study();
-	beginendregex.compile("^\\s*begin\\s*.*\\s*end;\\s*$");
+	beginendregex.compile("^[ 	\r\n]*begin[ 	\r\n]*.*[ 	\r\n]*end;[ 	\r\n]*$");
 	beginendregex.study();
 
 	sqlrr=NULL;

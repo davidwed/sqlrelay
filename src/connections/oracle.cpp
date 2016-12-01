@@ -2052,8 +2052,8 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 	resultfreed=true;
 
 #ifdef HAVE_ORACLE_8i
-	setCreateTempTablePattern("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
-	preserverows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(preserve|PRESERVE)[ 	\\n\\r]+(rows|ROWS)");
+	setCreateTempTablePattern("(create|CREATE)[ 	\n\r]+(global|GLOBAL)[ 	\n\r]+(temporary|TEMPORARY)[ 	\n\r]+(table|TABLE)[ 	\n\r]+");
+	preserverows.compile("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
 	preserverows.study();
 #endif
 }

@@ -711,12 +711,12 @@ sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
 
 	// replace the regular expression used to detect creation of a
 	// temporary table
-	setCreateTempTablePattern("(create|CREATE)[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+#");
+	setCreateTempTablePattern("(create|CREATE)[ 	\r\n]+(table|TABLE)[ 	\r\n]+#");
 
-	cursorquery.compile("^(select|SELECT)[ 	\\r\\n]+");
+	cursorquery.compile("^(select|SELECT)[ 	\r\n]+");
 	cursorquery.study();
 
-	rpcquery.compile("^(execute|exec|EXECUTE|EXEC)[ 	\\r\\n]+");
+	rpcquery.compile("^(execute|exec|EXECUTE|EXEC)[ 	\r\n]+");
 	rpcquery.study();
 
 	selectlistsize=0;

@@ -387,8 +387,8 @@ sqlitecursor::sqlitecursor(sqlrserverconnection *conn, uint16_t id) :
 
 	sqliteconn=(sqliteconnection *)conn;
 
-	selectlastinsertrowid.compile("^\\s*(select|SELECT)\\s+"
-				"(last|LAST)\\s+(insert|INSERT)\\s+"
+	selectlastinsertrowid.compile("^[ 	\r\n]*(select|SELECT)[ 	\r\n]+"
+				"(last|LAST)[ 	\r\n]+(insert|INSERT)[ 	\r\n]+"
 				"(rowid|ROWID)");
 	selectlastinsertrowid.study();
 }
