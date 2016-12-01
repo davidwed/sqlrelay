@@ -155,7 +155,6 @@ int main(int argc, const char **argv) {
 
 	// enable/disable backtrace
 	backtrace=cmdl.getValue("-backtrace");
-stdoutput.printf("backtrace: %s\n",backtrace);
 
 	// set up default signal handling
 	process::exitOnShutDown();

@@ -10,6 +10,7 @@
 	added -backtrace option for debugging
 	fixed mysql connection module so it can use the statement API on
 		Windows
+	fixed semaphore reference-before-init bug in sqlrservercontroller
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile

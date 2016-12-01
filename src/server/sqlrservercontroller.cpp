@@ -416,15 +416,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_ttl=(!charstring::isNullOrEmpty(ttlstr))?
 				charstring::toInteger(ttlstr):-1;
 
-	// if there's no way to interrupt a semaphore wait,
-	// then force the ttl to zero
-	if (pvt->_ttl>0 &&
-			!pvt->_semset->supportsTimedSemaphoreOperations() &&
-			!sys::signalsInterruptSystemCalls()) {
-		pvt->_ttl=0;
-	}
-
-
+	// should we run quietly?
 	pvt->_silent=pvt->_cmdl->found("-silent");
 
 	// load the configuration
@@ -513,6 +505,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	if (!createSharedMemoryAndSemaphores(pvt->_cmdl->getId())) {
 		return false;
+	}
+
+	// if there's no way to interrupt a semaphore wait,
+	// then force the ttl to zero
+	if (pvt->_ttl>0 &&
+			!pvt->_semset->supportsTimedSemaphoreOperations() &&
+			!sys::signalsInterruptSystemCalls()) {
+		pvt->_ttl=0;
 	}
 
 	// log in and detach
