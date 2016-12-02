@@ -107,7 +107,7 @@ struct CONN {
 	char				tlsca[1024];
 	uint16_t			tlsdepth;
 
-	bool				debug;
+	char				debug[1024];
 
 	char				columnnamecase[6];
 
@@ -2085,11 +2085,10 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 
 	// flags
-	char	debugbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Debug","0",
-					debugbuf,sizeof(debugbuf),
+					conn->debug,
+					sizeof(conn->debug),
 					ODBC_INI);
-	conn->debug=(charstring::toInteger(debugbuf)!=0);
 	SQLGetPrivateProfileString((const char *)conn->dsn,
 					"ColumnNameCase","mixed",
 					conn->columnnamecase,
@@ -2149,7 +2148,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  Tlsca: %s\n",conn->tlsca);
 	debugPrintf("  Tlsdepth: %d\n",conn->tlsdepth);
 	debugPrintf("  Db: %s\n",conn->db);
-	debugPrintf("  Debug: %d\n",(int)conn->debug);
+	debugPrintf("  Debug: %s\n",conn->debug);
 	debugPrintf("  ColumnNameCase: %s\n",conn->columnnamecase);
 	debugPrintf("  ResultSetBufferSize: %lld\n",conn->resultsetbuffersize);
 	debugPrintf("  DontGetColumnInfo: %d\n",conn->dontgetcolumninfo);
@@ -2181,7 +2180,12 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						conn->tlsdepth);
 	}
 
-	if (conn->debug) {
+	// enable debug
+	if (!charstring::compare(conn->debug,"1")) {
+		conn->con->debugOn();
+	} else if (!charstring::isNullOrEmpty(conn->debug) &&
+				charstring::compare(conn->debug,"0")) {
+		conn->con->setDebugFile(conn->debug);
 		conn->con->debugOn();
 	}
 
