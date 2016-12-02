@@ -15,9 +15,10 @@
 		nullsasnulls, and lazyconnect connect-string options to all
 		drivers (though in some they are camel-case and others
 		lower-case)
-	debug, dontgetcolumninfo, nullsasnulls, lazyconnect, krb, and tls
-		connect-string options now support any yes/no equivalent
-		such as yes, Yes, y, Y, true, True, 1, (and similar for no)
+	in DB-abstraction-layer drivers, the debug, dontgetcolumninfo,
+		nullsasnulls, lazyconnect, krb, and tls connect-string options
+		now support any yes/no equivalent such as yes, Yes, y, Y, true,
+		True, 1, (and similar for no)
 	fixed a regression that could cause crashes in the C#/ADO driver
 		when binding null or date values
 	added all parameters to ODBC config screen
