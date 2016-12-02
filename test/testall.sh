@@ -62,6 +62,12 @@ do
 
 	if ( test "$PING" = "The database is up." )
 	then
+		if ( test "$DB" = "krb" )
+		then
+			kdestroy
+			kinit
+		fi
+
 		echo
 		echo "success..."
 		echo

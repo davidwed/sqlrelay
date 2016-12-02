@@ -33,7 +33,7 @@ namespace SQLRClient
         private String _tlsca = null;
         private UInt16 _tlsdepth = 0;
         private String _db = null;
-        private Boolean _debug = false;
+        private String _debug = "false";
         public String _columnnamecase = "mixed";
         public UInt64 _resultsetbuffersize = 0;
         public Boolean _dontgetcolumninfo = false;
@@ -137,7 +137,7 @@ namespace SQLRClient
                 _tlsvalidate = null;
                 _tlsca = null;
                 _tlsdepth = 0;
-                _debug = false;
+                _debug = "false";
                 _columnnamecase = "mixed";
                 _resultsetbuffersize = 0;
                 _dontgetcolumninfo = false;
@@ -243,7 +243,7 @@ namespace SQLRClient
                     }
                     else if (subparts[0] == "Debug")
                     {
-                        _debug = (subparts[1] == "true");
+                        _debug = subparts[1];
                     }
                     else if (subparts[0] == "ColumnNameCase")
                     {
@@ -300,7 +300,7 @@ namespace SQLRClient
         }
 
         /** Gets or sets whether debug is enabled. */
-        public Boolean Debug
+        public String Debug
         {
             get
             {
@@ -309,13 +309,18 @@ namespace SQLRClient
             set
             {
                 _debug = value;
-                if (_debug)
+                if (_debug == "true")
                 {
                     _sqlrcon.debugOn();
                 }
-                else
+                else if (_debug == "false")
                 {
                     _sqlrcon.debugOff();
+                }
+                else
+                {
+                    _sqlrcon.debugOn();
+                    _sqlrcon.setDebugFile(_debug);
                 }
             }
         }
@@ -351,10 +356,7 @@ namespace SQLRClient
                 _sqlrcon.enableTls(_tlsversion, _tlscert, _tlspassword, _tlsciphers, _tlsvalidate, _tlsca, _tlsdepth);
             }
 
-            if (_debug)
-            {
-                _sqlrcon.debugOn();
-            }
+            Debug = _debug;
 
             // If we're not doing lazy connects then do something
             // lightweight to connect to the server now.
