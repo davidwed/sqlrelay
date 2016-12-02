@@ -315,9 +315,9 @@ public class SQLRCursor : IDisposable
     /**  Defines a date input bind variable.  "day" should be
      *  1-31 and "month" should be 1-12.  "tz" may be left NULL.
      *  Most databases ignore "tz".  */
-    public void inputBind(String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, Int32 microsecond, String tz)
+    public void inputBind(String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, Int32 microsecond, String tz, Boolean isnegative)
     {
-        sqlrcur_inputBindDate(sqlrcurref, variable, year, month, day, hour, minute, second, microsecond, tz);
+        sqlrcur_inputBindDate(sqlrcurref, variable, year, month, day, hour, minute, second, microsecond, tz, (isnegative) ? 1 : 0);
     }
 
     /** Defines a binary lob input bind variable. */
@@ -1037,7 +1037,7 @@ public class SQLRCursor : IDisposable
     private static extern void sqlrcur_inputBindDouble(IntPtr sqlrcurref, String variable, Double val, UInt32 precision, UInt32 scale);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindDate(IntPtr sqlrcurref, String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, Int32 microsecond, String tz);
+    private static extern void sqlrcur_inputBindDate(IntPtr sqlrcurref, String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, Int32 microsecond, String tz, Int32 isnegative);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindBlob(IntPtr sqlrcurref, String variable, Byte[] val, UInt32 size);
