@@ -6,7 +6,7 @@ then
 	exit
 fi
 
-for DIR in c c++ java nodejs perl perldbi php phppdo python pythondb ruby tcl
+for DIR in c c++ cs java nodejs perl perldbi php phppdo python pythondb ruby tcl
 do
 	echo "testing in $DIR"
 	echo
