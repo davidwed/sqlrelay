@@ -11,6 +11,10 @@
 	fixed mysql connection module so it can use the statement API on
 		Windows
 	fixed semaphore reference-before-init bug in sqlrservercontroller
+	added support for db, debug, columnnamecase, dontgetcolumninfo,
+		nullsasnulls, and lazyconnect connect-string options to all
+		drivers (though in some they are camel-case and others
+		lower-case)
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile
