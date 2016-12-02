@@ -2,7 +2,7 @@
 
 The SQL Relay distribution provides an ODBC driver, enabling applications which use ODBC to access SQL Relay.
 
-On Windows, just use the ODBC control panel to create a DSN.
+== Unix/Linux ==
 
 On Unix or Linux platforms, using unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)
 
@@ -11,7 +11,7 @@ On Unix or Linux platforms, using unixODBC or iODBC, you can create an instance 
 [SQLRelay]
 Description=ODBC for SQL Relay
 Driver=/usr/local/firstworks/lib/libsqlrodbc.so
-FileUsage=1
+FileUsage=0
 }}}
 }}}
 
@@ -41,7 +41,7 @@ Alternatively, you could create a combined instance/DSN by adding an entry like 
 [sqlrtest]
 Description=Connection to SQL Relay
 Driver=/usr/local/firstworks/lib/libsqlrodbc.so
-FileUsage=1
+FileUsage=0
 Server=sqlrserver
 Port=9000
 Socket=/tmp/test.socket
@@ -50,7 +50,40 @@ Password=testpass
 }}}
 }}}
 
-In addition to the attributes described above, the following attributes can be used to establish Kerberos or Active Directory encryption and authentication with the server:
+== Windows ==
+
+On Windows, just use the ODBC control panel to create a DSN.
+
+== Attributes ==
+
+The following attributes can be configured:
+
+* '''Description''' - A user-friendly description of this configuration.
+* '''Driver'''
+ * In the odbc.ini file - The name of the section of the odbcinst.ini file that specifies which driver library to use.  If an odbc.ini file is being used but no odbcinst.ini file is being used, then this is the file name of the driver library to use.
+ * In the odbcinst.ini file - The file name of the driver library to use.
+ * This parameter is not available via the Windows control panel because the driver name is configured during installation and the parameter is hardcoded to the correct value for each instance.
+* '''!FileUsage''' - Always set to 0.  0 indicates that the driver is an RDBMS driver.  1 means that each file is a table (eg. Xbase).  2 means that each file is an entire database (eg. Access).  This parameter is not available via the Windows control panel because it is configured during installation.
+
+* '''Server''' - The SQL Relay server to connect to.
+* '''Port''' - The port that the SQL Relay server is listening on. Either port or socket must be specified. If both are specified, socket will be preferred to port.
+* '''Socket''' - The socket that the SQL Relay server is listening on. Either port or socket must be specified. If both are specified, socket will be preferred to port.
+* '''User''' - The username to use when logging into SQL Relay.
+* '''Password''' - The password to use when logging into SQL Relay.
+
+* '''Tries''' - If a connection fails, it will be retried this many times.
+* '''!RetryTime''' - If a connection fails, it will be retried on this interval (in seconds).
+
+* '''Db''' - The database to switch to when logging into SQL Relay.  May be left empty or omitted to accept the default database that SQL Relay is already connected to.
+* '''Debug''' -  If this is set to 1 or to a file name then debug is enabled. If set to a file name then debug will be written to the file. If set to 1 then debug will be written to standard output. Defaults to 0.
+* '''!ResultSetBufferSize''' - Sets the number of rows to buffer at a time.  If set to 0 (the default) then the entire result set is buffered.
+ * '''NOTE''': This parameter is dangerous to set and probably shouldn't be set unless you wrote the application and know that it is safe to set.  !ResultSetBufferSize basically sets SQL_ROWSET_SIZE, but apps generally assume that SQL_ROWSET_SIZE is set to 1 unless they explicitly set it to something else.  If !ResultSetBufferSize is set to something other than 0 or 1, and the app assumes that SQL_ROWSET_SIZE is 1 then the app will only fetch the first row of each rowset.
+* '''!ColumnNameCase''' - Indicates the case to convert column names to.  May be set to "mixed", "upper", or "lower".  Defaults to "mixed".
+* '''!DontGetColumnInfo''' - If this is set to 1 then column info is not fetched with the result set. If set to 0 then column info is fetched. Defaults to 0.
+* '''!NullsAsNulls''' - If this is set to 1 then NULL values are returned as NULLs. If set to 0 then NULL values are returned as empty strings. Defaults to 0.
+* '''!LazyConnect''' - By default, the SQL Relay client does "lazy connects". I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run. This optimizes availability of the connection pool but is inconstent with most other database API's. Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning undef, if the connection cannot be established. Defaults to 1.
+
+The following attributes can be used to establish Kerberos or Active Directory encryption and authentication with the server:
 
 See the [../admin/configguide.html#krb SQL Relay Configuration Guide] for more information about Kerberos and Active Directory configurations.  In particular, User and Password are not typically used when using Kerberos/AD.
 
@@ -73,7 +106,7 @@ See the [../admin/configguide.html#tls SQL Relay Configuration Guide] for more i
 
 Note that the supported Tlscert and Tlsca file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.
 
-[[br]]
+== Sample Session ==
 
 Now you can use the //isql// command line utility that comes with iODBC
 or unixODBC to access the database through SQL Relay as follows:
@@ -153,7 +186,7 @@ You can also use SQL Relay with any language that supports ODBC directly or has 
 
 {{{#!blockquote
 {{{#!code
-PHP -&gt; MDB2 -&gt; ODBC -&gt; SQL Relay -&gt; Oracle
+PHP -> MDB2 -> ODBC -> SQL Relay -> Oracle
 }}}
 }}}
 

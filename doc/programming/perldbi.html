@@ -53,6 +53,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
   <li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
   <li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
+  <li><b>db</b> - The database to switch to when logging into SQL Relay.  May be left empty or omitted to accept the default database that SQL Relay is already connected to.</li>
   <li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to standard output.  Defaults to 0.</li>
   <li><b>lazyconnect</b> - By default, the SQL Relay client does "lazy connects".  I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run.  This optimizes availability of the connection pool but is inconstent with most other database API's.  Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning undef, if the connection cannot be established.  Defaults to 1.</li>
 </ul>
@@ -99,6 +100,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <ul>
   <li><b>DBD::SQLRelay::ResultSetBufferSize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
+  <li><b>DBD::SQLRelay::ColumnNameCase</b> - Indicates the case to convert column names to.  May be set to "mixed", "upper", or "lower".  Defaults to "mixed".</li>
   <li><b>DBD::SQLRelay::DontGetColumnInfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
   <li><b>DBD::SQLRelay::GetNullsaAsEmptyStrings</b> - If this is set to 1 then NULL values are returned as empty strings.  If set to 0 then NULL values are returned as nulls.  Defaults to 0.</li>
 </ul>
@@ -113,7 +115,8 @@ http://www.gnu.org/software/src-highlite -->
 </ul>
 
 <p>After calling the constructor, a session is established when the first 
-query or other operation is run, unless lazyconnects=0 is used.</p>
+query or other operation is run, unless lazyconnect=0 is used, in which case
+a session is established immediately.</p>
 
 <p>For the duration of the session, the client occupies one of the database
 connections, so care should be taken to minimize the length of a
@@ -2023,6 +2026,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <ul>
   <li><b>DBD::SQLRelay::ResultSetBufferSize</b> - get/set, returns or sets the result set buffer size as described <a href="#largeresultsets">above</a>.</li>
+  <li><b>DBD::SQLRelay::ColumnNameCase</b> - set-only, returns the case that column names will be converted to - "mixed", "upper", or "lower".</li>
   <li><b>DBD::SQLRelay::DontGetColumnInfo</b> - set-only (1 or 0), sets whether or not to fetch column info with the result set, default (0) is to return column info</li>
   <li><b>PDO::SQLRelay::GetNullsAsEmptyStrings</b> - set-only (1 or 0), sets whether to return NULL values as empty strings or nulls, default (0) is to return NULL values as nulls</li>
 </ul>

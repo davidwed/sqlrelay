@@ -40,7 +40,15 @@ cur<font color="#990000">=</font>con<font color="#990000">.</font><b><font color
 </tt></pre>
 
 </blockquote>
-<p>In addition to the parameters above, the following named parameters can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
+<p>In addition to the parameters above, the following named parameters can be used to control attributes of the connection.</p>
+
+<ul>
+  <li><b>db</b> - The database to switch to when logging into SQL Relay.  May be left empty or omitted to accept the default database that SQL Relay is already connected to.</li>
+  <li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
+  <li><b>lazyconnect</b> - By default, the SQL Relay client does "lazy connects".  I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run.  This optimizes availability of the connection pool but is inconstent with most other database API's.  Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning 0, if the connection cannot be established.  Defaults to 1.</li>
+</ul>
+
+<p>In addition to the paramters above, the following named parameters can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
 
 <p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about Kerberos and Active Directory configurations.  In particular, user and password are not typically used when using Kerberos/AD.</p>
 
@@ -67,8 +75,18 @@ cur<font color="#990000">=</font>con<font color="#990000">.</font><b><font color
 
 <p>Note that the supported tlscert and tlsca file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.</p>
 
-<p>After calling the connect(), a session is established when the first 
-query is run.</p>
+<p>In addition to the paramters above, the following named parameters can be used to control the default statement attributes:</p>
+
+<ul>
+  <li><b>resultsetbuffersize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
+  <li><b>columnnamecase</b> - Indicates the case to convert column names to.  May be set to "mixed", "upper", or "lower".  Defaults to "mixed".</li>
+  <li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
+  <li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.</li>
+</ul>
+
+<p>After calling connect(), a session is established when the first 
+query or other operation is run, unless lazyconnect=0 is used, in which case
+a session is established immediately.</p>
 
 <p>For the duration of the session, the client occupies one of the database
 connections, so care should be taken to minimize the length of a

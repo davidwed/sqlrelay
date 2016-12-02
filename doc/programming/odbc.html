@@ -8,7 +8,7 @@
 
 <p>The SQL Relay distribution provides an ODBC driver, enabling applications which use ODBC to access SQL Relay.</p>
 
-<p>On Windows, just use the ODBC control panel to create a DSN.</p>
+<h2>Unix/Linux</h2>
 
 <p>On Unix or Linux platforms, using unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)</p>
 
@@ -20,7 +20,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#990000">[</font>SQLRelay<font color="#990000">]</font>
 Description<font color="#990000">=</font>ODBC <b><font color="#0000FF">for</font></b> SQL Relay
 Driver<font color="#990000">=/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib<font color="#990000">/</font>libsqlrodbc<font color="#990000">.</font>so
-FileUsage<font color="#990000">=</font><font color="#993399">1</font></tt></pre>
+FileUsage<font color="#990000">=</font><font color="#993399">0</font></tt></pre>
 
 </blockquote>
 <p>Note that the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.  Note also that on Mac OS X you'll need to replace the <b>.so</b> suffix with <b>.dylib</b></p>
@@ -54,7 +54,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#990000">[</font>sqlrtest<font color="#990000">]</font>
 Description<font color="#990000">=</font>Connection to SQL Relay
 Driver<font color="#990000">=/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib<font color="#990000">/</font>libsqlrodbc<font color="#990000">.</font>so
-FileUsage<font color="#990000">=</font><font color="#993399">1</font>
+FileUsage<font color="#990000">=</font><font color="#993399">0</font>
 Server<font color="#990000">=</font>sqlrserver
 Port<font color="#990000">=</font><font color="#993399">9000</font>
 Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>test<font color="#990000">.</font>socket
@@ -62,7 +62,45 @@ User<font color="#990000">=</font>testuser
 Password<font color="#990000">=</font>testpass</tt></pre>
 
 </blockquote>
-<p>In addition to the attributes described above, the following attributes can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
+<h2>Windows</h2>
+
+<p>On Windows, just use the ODBC control panel to create a DSN.</p>
+
+<h2>Attributes</h2>
+
+<p>The following attributes can be configured:</p>
+
+<ul>
+  <li><b>Description</b> - A user-friendly description of this configuration.</li>
+  <li><b>Driver</b></li>
+  <ul>
+    <li>In the odbc.ini file - The name of the section of the odbcinst.ini file that specifies which driver library to use.  If an odbc.ini file is being used but no odbcinst.ini file is being used, then this is the file name of the driver library to use.</li>
+    <li>In the odbcinst.ini file - The file name of the driver library to use.</li>
+    <li>This parameter is not available via the Windows control panel because the driver name is configured during installation and the parameter is hardcoded to the correct value for each instance.</li>
+  </ul>
+
+  <li><b>FileUsage</b> - Always set to 0.  0 indicates that the driver is an RDBMS driver.  1 means that each file is a table (eg. Xbase).  2 means that each file is an entire database (eg. Access).  This parameter is not available via the Windows control panel because it is configured during installation.</li>
+  <li><b>Server</b> - The SQL Relay server to connect to.</li>
+  <li><b>Port</b> - The port that the SQL Relay server is listening on. Either port or socket must be specified. If both are specified, socket will be preferred to port.</li>
+  <li><b>Socket</b> - The socket that the SQL Relay server is listening on. Either port or socket must be specified. If both are specified, socket will be preferred to port.</li>
+  <li><b>User</b> - The username to use when logging into SQL Relay.</li>
+  <li><b>Password</b> - The password to use when logging into SQL Relay.</li>
+  <li><b>Tries</b> - If a connection fails, it will be retried this many times.</li>
+  <li><b>RetryTime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
+  <li><b>Db</b> - The database to switch to when logging into SQL Relay.  May be left empty or omitted to accept the default database that SQL Relay is already connected to.</li>
+  <li><b>Debug</b> -  If this is set to 1 or to a file name then debug is enabled. If set to a file name then debug will be written to the file. If set to 1 then debug will be written to standard output. Defaults to 0.</li>
+  <li><b>ResultSetBufferSize</b> - Sets the number of rows to buffer at a time.  If set to 0 (the default) then the entire result set is buffered.</li>
+  <ul>
+    <li><b>NOTE</b>: This parameter is dangerous to set and probably shouldn't be set unless you wrote the application and know that it is safe to set.  ResultSetBufferSize basically sets SQL_ROWSET_SIZE, but apps generally assume that SQL_ROWSET_SIZE is set to 1 unless they explicitly set it to something else.  If ResultSetBufferSize is set to something other than 0 or 1, and the app assumes that SQL_ROWSET_SIZE is 1 then the app will only fetch the first row of each rowset.</li>
+  </ul>
+
+  <li><b>ColumnNameCase</b> - Indicates the case to convert column names to.  May be set to "mixed", "upper", or "lower".  Defaults to "mixed".</li>
+  <li><b>DontGetColumnInfo</b> - If this is set to 1 then column info is not fetched with the result set. If set to 0 then column info is fetched. Defaults to 0.</li>
+  <li><b>NullsAsNulls</b> - If this is set to 1 then NULL values are returned as NULLs. If set to 0 then NULL values are returned as empty strings. Defaults to 0.</li>
+  <li><b>LazyConnect</b> - By default, the SQL Relay client does "lazy connects". I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run. This optimizes availability of the connection pool but is inconstent with most other database API's. Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning undef, if the connection cannot be established. Defaults to 1.</li>
+</ul>
+
+<p>The following attributes can be used to establish Kerberos or Active Directory encryption and authentication with the server:</p>
 
 <p>See the <a href="../admin/configguide.html#krb">SQL Relay Configuration Guide</a> for more information about Kerberos and Active Directory configurations.  In particular, User and Password are not typically used when using Kerberos/AD.</p>
 
@@ -89,7 +127,9 @@ Password<font color="#990000">=</font>testpass</tt></pre>
 
 <p>Note that the supported Tlscert and Tlsca file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.</p>
 
-<br/><p>Now you can use the <i>isql</i> command line utility that comes with iODBC
+<h2>Sample Session</h2>
+
+<p>Now you can use the <i>isql</i> command line utility that comes with iODBC
 or unixODBC to access the database through SQL Relay as follows:</p>
 
 <blockquote>
@@ -173,7 +213,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>PHP <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> MDB2 <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> ODBC <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> <font color="#008080">SQL</font> Relay <font color="#990000">-&amp;</font>gt<font color="#990000">;</font> Oracle</tt></pre>
+<pre><tt>PHP <font color="#990000">-&gt;</font> MDB2 <font color="#990000">-&gt;</font> ODBC <font color="#990000">-&gt;</font> <font color="#008080">SQL</font> Relay <font color="#990000">-&gt;</font> Oracle</tt></pre>
 
 </blockquote>
 <p>Similarly, you could use SQL Relay via ODBC with PHP/PDO, PHP/ADODB, Java/JDBC (<a href="jdbc.html">using the JDBC-ODBC bridge</a>), with the ODBC Adapter for Ruby on Rails, and so on.</p>

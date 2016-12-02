@@ -120,6 +120,7 @@ The following connect string variables control attributes of the connection:
 * '''socket''' - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.
 * '''tries''' - If a connection fails, it will be retried this many times.
 * '''retrytime''' - If a connection fails, it will be retried on this interval (in seconds).
+* '''db''' - The database to switch to when logging into SQL Relay.  May be left empty or omitted to accept the default database that SQL Relay is already connected to.
 * '''debug''' - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.
 * '''lazyconnect''' - By default, the SQL Relay client does "lazy connects".  I.e. the connection to the SQL Relay server isn't established until the first query or other operation is run.  This optimizes availability of the connection pool but is inconstent with most other database API's.  Setting this parameter to 0 causes the connection to the SQL Relay server to be established immediately and the constructor to fail, returning 0, if the connection cannot be established.  Defaults to 1.
 
@@ -149,6 +150,7 @@ Note that the supported tlscert and tlsca file formats may vary between platform
 These additional connect string variables control the default statement attributes:
 
 * '''resultsetbuffersize''' - Sets the number of rows to buffer at a time.  See [#largeresultsets Dealing With Large Result Sets] below.  If set to 0 (the default) then the entire result set is buffered.
+* '''columnnamecase''' - Indicates the case to convert column names to.  May be set to "mixed", "upper", or "lower".  Defaults to "mixed".
 * '''dontgetcolumninfo''' - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.
 * '''nullsasnulls''' - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.
 
@@ -160,7 +162,8 @@ The other two parameters following the connect string are.
 * '''password''' - The password to use when logging into SQL Relay.
 
 After calling the constructor, a session is established when the first 
-query or other operation is run, unless lazyconnects=0 is used.
+query or other operation is run, unless lazyconnect=0 is used, in which case
+a session is established immediately.
 
 For the duration of the session, the client occupies one of the database
 connections, so care should be taken to minimize the length of a
