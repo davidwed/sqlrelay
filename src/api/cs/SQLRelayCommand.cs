@@ -597,7 +597,8 @@ namespace SQLRClient
                             Int16 second = 0;
                             Int32 microsecond = 0;
                             String tz = null;
-                            _sqlrcur.getOutputBindDate(param.ParameterName, out year, out month, out day, out hour, out minute, out second, out microsecond, out tz);
+                            Boolean isnegative = false;
+                            _sqlrcur.getOutputBindDate(param.ParameterName, out year, out month, out day, out hour, out minute, out second, out microsecond, out tz, out isnegative);
                             param.Value = new DateTime(year, month, day, hour, minute, second, microsecond/1000);
                             break;
 

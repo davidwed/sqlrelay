@@ -446,7 +446,7 @@ public class SQLRCursor : IDisposable
 
     /** Get the value stored in a previously defined
      *  decimal output bind variable. */
-    public Boolean getOutputBindDate(String variable, out Int16 year, out Int16 month, out Int16 day, out Int16 hour, out Int16 minute, out Int16 second, out Int32 microsecond, out String tz)
+    public Boolean getOutputBindDate(String variable, out Int16 year, out Int16 month, out Int16 day, out Int16 hour, out Int16 minute, out Int16 second, out Int32 microsecond, out String tz, out Boolean isnegative)
     {
         year = -1;
         month = -1;
@@ -456,9 +456,12 @@ public class SQLRCursor : IDisposable
         second = -1;
         microsecond = -1;
         tz = "";
+        isnegative = false;
         IntPtr tzptr = (IntPtr)0;
-        sqlrcur_getOutputBindDate(sqlrcurref, variable, ref year, ref month, ref day, ref hour, ref minute, ref second, ref microsecond, ref tzptr);
+        Int32 isneg = 0;
+        sqlrcur_getOutputBindDate(sqlrcurref, variable, ref year, ref month, ref day, ref hour, ref minute, ref second, ref microsecond, ref tzptr, ref isneg);
         tz = Marshal.PtrToStringAnsi(tzptr);
+        isnegative = (isneg!=0);
         return false;
     }
 
@@ -1094,7 +1097,7 @@ public class SQLRCursor : IDisposable
     private static extern Double sqlrcur_getOutputBindDouble(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern Int32 sqlrcur_getOutputBindDate(IntPtr sqlrcurref, String variable, ref Int16 year, ref Int16 month, ref Int16 day, ref Int16 hour, ref Int16 minute, ref Int16 second, ref Int32 microsecond, ref IntPtr tz);
+    private static extern Int32 sqlrcur_getOutputBindDate(IntPtr sqlrcurref, String variable, ref Int16 year, ref Int16 month, ref Int16 day, ref Int16 hour, ref Int16 minute, ref Int16 second, ref Int32 microsecond, ref IntPtr tz, ref Int32 isnegative);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, String variable);
