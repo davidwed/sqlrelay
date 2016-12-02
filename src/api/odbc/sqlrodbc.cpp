@@ -8102,7 +8102,25 @@ static HWND		useredit;
 static HWND		passwordedit;
 static HWND		retrytimeedit;
 static HWND		triesedit;
+static HWND		krbedit;
+static HWND		krbserviceedit;
+static HWND		krbmechedit;
+static HWND		krbflagsedit;
+static HWND		tlsedit;
+static HWND		tlsversionedit;
+static HWND		tlscertificateedit;
+static HWND		tlspasswordedit;
+static HWND		tlsciphersedit;
+static HWND		tlsvalidateedit;
+static HWND		tlscaedit;
+static HWND		tlsdepthedit;
+static HWND		dbedit;
 static HWND		debugedit;
+static HWND		columnnamecaseedit;
+static HWND		resultsetbuffersizeedit;
+static HWND		dontgetcolumninfoedit;
+static HWND		nullsasnullsedit;
+static HWND		lazyconnectedit;
 
 static const char	sqlrwindowclass[]="SQLRWindowClass";
 static const int	labelwidth=55;
@@ -8199,52 +8217,179 @@ static void createControls(HWND hwnd) {
 	// create labels...
 	int	x=xoffset;
 	int	y=yoffset;
-	createLabel(box,"DSN Name",x,y,labelwidth,labelheight);
-	createLabel(box,"Server",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
-	createLabel(box,"Port",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
-	createLabel(box,"Socket",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
-	createLabel(box,"User",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
-	createLabel(box,"Password",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
-	createLabel(box,"Retry Time",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
-	createLabel(box,"Tries",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
-	createLabel(box,"Debug",x,y+=(labelheight+labeloffset),
-					labelwidth,labelheight);
+	createLabel(box,"DSN Name",
+			x,y,labelwidth,labelheight);
+	createLabel(box,"Server",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Port",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Socket",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"User",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Password",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Retry Time",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Tries",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Enable Kerberos",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Kerberos Service",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Kerberos Mech",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Kerberos Flags",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"Enable TLS",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"TLS Version",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"TLS Certificate",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"TLS Certificate Password",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"TLS Ciphers",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"TLS Validation",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"TLS Certificate Authority",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+	createLabel(box,"TLS Depth",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
+
+	createLabel(box,"Debug",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
 
 	// create edits...
 	x=xoffset+labelwidth+xoffset;
 	y=yoffset;
-	dsnedit=createEdit(box,dsndict.getValue("DSN"),
+	dsnedit=createEdit(box,
+			dsndict.getValue("DSN"),
 			x,y,editwidth,labelheight,
 			1024,false,true);
-	serveredit=createEdit(box,dsndict.getValue("Server"),
+	serveredit=createEdit(box,
+			dsndict.getValue("Server"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1024,false,false);
-	portedit=createEdit(box,dsndict.getValue("Port"),
+	portedit=createEdit(box,
+			dsndict.getValue("Port"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			6,true,false);
-	socketedit=createEdit(box,dsndict.getValue("Socket"),
+	socketedit=createEdit(box,
+			dsndict.getValue("Socket"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1024,false,false);
-	useredit=createEdit(box,dsndict.getValue("User"),
+	useredit=createEdit(box,
+			dsndict.getValue("User"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1024,false,false);
-	passwordedit=createEdit(box,dsndict.getValue("Password"),
+	passwordedit=createEdit(box,
+			dsndict.getValue("Password"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1024,false,false);
-	retrytimeedit=createEdit(box,dsndict.getValue("RetryTime"),
+	retrytimeedit=createEdit(box,
+			dsndict.getValue("RetryTime"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			11,true,false);
-	triesedit=createEdit(box,dsndict.getValue("Tries"),
+	triesedit=createEdit(box,
+			dsndict.getValue("Tries"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			11,true,false);
-	debugedit=createEdit(box,dsndict.getValue("Debug"),
+	krbedit=createEdit(box,
+			dsndict.getValue("Krb"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1,true,false);
+	krbserviceedit=createEdit(box,
+			dsndict.getValue("Krbservice"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	krbmechedit=createEdit(box,
+			dsndict.getValue("Krbmech"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	krbflagsedit=createEdit(box,
+			dsndict.getValue("Krbflags"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	tlsedit=createEdit(box,
+			dsndict.getValue("Tls"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,true,false);
+	tlsversionedit=createEdit(box,
+			dsndict.getValue("Tlsversion"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	tlscertificateedit=createEdit(box,
+			dsndict.getValue("Tlscert"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	tlspasswordedit=createEdit(box,
+			dsndict.getValue("Tlspassword"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	tlsciphersedit=createEdit(box,
+			dsndict.getValue("Tlsciphers"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	tlsvalidateedit=createEdit(box,
+			dsndict.getValue("Tlsvalidate"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			9,false,false);
+	tlscaedit=createEdit(box,
+			dsndict.getValue("Tlsca"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	tlsdepthedit=createEdit(box,
+			dsndict.getValue("Tlsdepth"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			20,false,false);
+	dbedit=createEdit(box,
+			dsndict.getValue("Db"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	debugedit=createEdit(box,
+			dsndict.getValue("Debug"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,true,false);
+	columnnamecaseedit=createEdit(box,
+			dsndict.getValue("ColumnNameCase"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			5,false,false);
+	resultsetbuffersizeedit=createEdit(box,
+			dsndict.getValue("ResultSetBufferSize"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			20,true,false);
+	dontgetcolumninfoedit=createEdit(box,
+			dsndict.getValue("DontGetColumnInfo"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1,true,false);
+	nullsasnullsedit=createEdit(box,
+			dsndict.getValue("NullsAsNulls"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1,true,false);
+	lazyconnectedit=createEdit(box,
+			dsndict.getValue("LazyConnect"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1,true,false);
 
@@ -8281,8 +8426,30 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("Port",charstring::duplicate("9000"));
 		dsndict.setValue("RetryTime",charstring::duplicate("0"));
 		dsndict.setValue("Tries",charstring::duplicate("1"));
+		dsndict.setValue("Krb",charstring::duplicate("0"));
+		dsndict.setValue("Krbservice",charstring::duplicate(""));
+		dsndict.setValue("Krbmech",charstring::duplicate(""));
+		dsndict.setValue("Krbflags",charstring::duplicate(""));
+		dsndict.setValue("Tls",charstring::duplicate("0"));
+		dsndict.setValue("Tlsversion",charstring::duplicate(""));
+		dsndict.setValue("Tlscert",charstring::duplicate(""));
+		dsndict.setValue("Tlspassword",charstring::duplicate(""));
+		dsndict.setValue("Tlsciphers",charstring::duplicate(""));
+		dsndict.setValue("Tlsvalidate",charstring::duplicate(""));
+		dsndict.setValue("Tlsca",charstring::duplicate(""));
+		dsndict.setValue("Tlsdepth",charstring::duplicate(""));
+		dsndict.setValue("Db",charstring::duplicate(""));
 		dsndict.setValue("Debug",charstring::duplicate("0"));
-
+		dsndict.setValue("ColumnNameCase",
+					charstring::duplicate("mixed"));
+		dsndict.setValue("ResultSetBufferSize",
+					charstring::duplicate("0"));
+		dsndict.setValue("DontGetColumnInfo",
+					charstring::duplicate("0"));
+		dsndict.setValue("NullsAsNulls",
+					charstring::duplicate("0"));
+		dsndict.setValue("LazyConnect",
+					charstring::duplicate("1"));
 		return;
 	}
 
@@ -8329,11 +8496,119 @@ static void parseDsn(const char *dsn) {
 						tries,11,ODBC_INI);
 		dsndict.setValue("Tries",tries);
 	}
-	if (!dsndict.getValue("Debug")) {
-		char	*debug=new char[2];
-		SQLGetPrivateProfileString(dsnval,"Debug","0",
-						debug,2,ODBC_INI);
+	if (!dnsdict.getValue("Krb")) {
+		char	*krb=new char[1]
+		SQLGetPrivateProfileString(dsnval,"Krb","0",
+						krb,1,ODBC_INI);
+		dsndict.setValue("Krb",krb);
+	}
+	if (!dnsdict.getValue("Krbservice")) {
+		char	*krbservice=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Krbservice","",
+						krbservice,1024,ODBC_INI);
+		dsndict.setValue("Krbservice",krbservice);
+	}
+	if (!dnsdict.getValue("Krbmech")) {
+		char	*krbmech=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Krbmech","",
+						krbmech,1024,ODBC_INI);
+		dsndict.setValue("Krbmech",krbmech);
+	}
+	if (!dnsdict.getValue("Krbflags")) {
+		char	*krbflags=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Krbflags","",
+						krbflags,1024,ODBC_INI);
+		dsndict.setValue("Krbflags",krbflags);
+	}
+	if (!dnsdict.getValue("Tls")) {
+		char	*tls=new char[1]
+		SQLGetPrivateProfileString(dsnval,"Tls","0",
+						tls,1,ODBC_INI);
+		dsndict.setValue("Tls",tls);
+	}
+	if (!dnsdict.getValue("Tlsversion")) {
+		char	*tlsversion=new char[16]
+		SQLGetPrivateProfileString(dsnval,"Tlsversion","",
+						tlsversion,16,ODBC_INI);
+		dsndict.setValue("Tlsversion",tlsversion);
+	}
+	if (!dnsdict.getValue("Tlscert")) {
+		char	*tlscert=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Tlscert","",
+						tlscert,1024,ODBC_INI);
+		dsndict.setValue("Tlscert",tlscert);
+	}
+	if (!dnsdict.getValue("Tlspassword")) {
+		char	*tlspassword=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Tlspassword","",
+						tlspassword,1024,ODBC_INI);
+		dsndict.setValue("Tlspassword",tlspassword);
+	}
+	if (!dnsdict.getValue("Tlsciphers")) {
+		char	*tlsciphers=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Tlsciphers","",
+						tlsciphers,1024,ODBC_INI);
+		dsndict.setValue("Tlsciphers",tlsciphers);
+	}
+	if (!dnsdict.getValue("Tlsvalidate")) {
+		char	*tlsvalidate=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Tlsvalidate","",
+						tlsvalidate,1024,ODBC_INI);
+		dsndict.setValue("Tlsvalidate",tlsvalidate);
+	}
+	if (!dnsdict.getValue("Tlsca")) {
+		char	*tlsca=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Tlsvalidate","",
+						tlsca,1024,ODBC_INI);
+		dsndict.setValue("Tlsvalidate",tlsca);
+	}
+	if (!dnsdict.getValue("Tlsdepth")) {
+		char	*tlsdepth=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Tlsdepth","",
+						tlsdepth,1024,ODBC_INI);
+		dsndict.setValue("Tlsdepth",tlsdepth);
+	}
+	if (!dnsdict.getValue("Db")) {
+		char	*db=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Db","",
+						db,1024,ODBC_INI);
+		dsndict.setValue("Db",db);
+	}
+	if (!dnsdict.getValue("Debug")) {
+		char	*debug=new char[1024]
+		SQLGetPrivateProfileString(dsnval,"Debug","",
+						debug,1024,ODBC_INI);
 		dsndict.setValue("Debug",debug);
+	}
+	if (!dnsdict.getValue("ColumnNameCase")) {
+		char	*columnnamecase=new char[6]
+		SQLGetPrivateProfileString(dsnval,"ColumnNameCase","mixed",
+						columnnamecase,6,ODBC_INI);
+		dsndict.setValue("ColumnNameCase",columnnamecase);
+	}
+	if (!dnsdict.getValue("ResultSetBufferSize")) {
+		char	*resultsetbuffersize=new char[20]
+		SQLGetPrivateProfileString(dsnval,"ResultSetBufferSize","0",
+					resultsetbuffersize,20,ODBC_INI);
+		dsndict.setValue("ResultSetBufferSize",resultsetbuffersize);
+	}
+	if (!dnsdict.getValue("DontGetColumnInfo")) {
+		char	*dontgetcolumninfo=new char[1]
+		SQLGetPrivateProfileString(dsnval,"DontGetColumnInfo","0",
+						dontgetcolumninfo,1,ODBC_INI);
+		dsndict.setValue("DontGetColumnInfo",dontgetcolumninfo);
+	}
+	if (!dnsdict.getValue("NullsAsNulls")) {
+		char	*nullsasnulls=new char[1]
+		SQLGetPrivateProfileString(dsnval,"NullsAsNulls","0",
+						nullsasnulls,1,ODBC_INI);
+		dsndict.setValue("NullsAsNulls",nullsasnulls);
+	}
+	if (!dnsdict.getValue("LazyConnect")) {
+		char	*lazyconnect=new char[1]
+		SQLGetPrivateProfileString(dsnval,"LazyConnect","1",
+						lazyconnect,1,ODBC_INI);
+		dsndict.setValue("LazyConnect",lazyconnect);
 	}
 	dsndict.print();
 }
@@ -8434,12 +8709,138 @@ static void getDsnFromUi() {
 	delete[] dsndict.getValue("Tries");
 	dsndict.setValue("Tries",data);
 
+	// Krb
+	len=GetWindowTextLength(krbedit);
+	data=new char[len+1];
+	GetWindowText(krbedit,data,len+1);
+	delete[] dnsdict.getValue("Krb");
+	dnsdict.setValue("Krb",data);
+
+	// Krbservice
+	len=GetWindowTextLength(krbserviceedit);
+	data=new char[len+1];
+	GetWindowText(krbserviceedit,data,len+1);
+	delete[] dnsdict.getValue("Krbservice");
+	dnsdict.setValue("Krbservice",data);
+
+	// Krbmech
+	len=GetWindowTextLength(krbmechedit);
+	data=new char[len+1];
+	GetWindowText(krbmechedit,data,len+1);
+	delete[] dnsdict.getValue("Krbmech");
+	dnsdict.setValue("Krbmech",data);
+
+	// Krbflags
+	len=GetWindowTextLength(krbflagsedit);
+	data=new char[len+1];
+	GetWindowText(krbflagsedit,data,len+1);
+	delete[] dnsdict.getValue("Krbflags");
+	dnsdict.setValue("Krbflags",data);
+
+	// Tls
+	len=GetWindowTextLength(tlsedit);
+	data=new char[len+1];
+	GetWindowText(tlsedit,data,len+1);
+	delete[] dnsdict.getValue("Tls");
+	dnsdict.setValue("Tls",data);
+
+	// Tlsversion
+	len=GetWindowTextLength(tlsversionedit);
+	data=new char[len+1];
+	GetWindowText(tlsversionedit,data,len+1);
+	delete[] dnsdict.getValue("Tlsversion");
+	dnsdict.setValue("Tlsversion",data);
+
+	// Tlscert
+	len=GetWindowTextLength(tlscertificateedit);
+	data=new char[len+1];
+	GetWindowText(tlscertificateedit,data,len+1);
+	delete[] dnsdict.getValue("Tlscert");
+	dnsdict.setValue("Tlscert",data);
+
+	// Tlspassword
+	len=GetWindowTextLength(tlspasswordedit);
+	data=new char[len+1];
+	GetWindowText(tlspasswordedit,data,len+1);
+	delete[] dnsdict.getValue("Tlspassword");
+	dnsdict.setValue("Tlspassword",data);
+
+	// Tlsciphers
+	len=GetWindowTextLength(tlsciphersedit);
+	data=new char[len+1];
+	GetWindowText(tlsciphersedit,data,len+1);
+	delete[] dnsdict.getValue("Tlsciphers");
+	dnsdict.setValue("Tlsciphers",data);
+
+	// Tlsvalidate
+	len=GetWindowTextLength(tlsvalidateedit);
+	data=new char[len+1];
+	GetWindowText(tlsvalidateedit,data,len+1);
+	delete[] dnsdict.getValue("Tlsvalidate");
+	dnsdict.setValue("Tlsvalidate",data);
+
+	// Tlsca
+	len=GetWindowTextLength(tlscaedit);
+	data=new char[len+1];
+	GetWindowText(tlscaedit,data,len+1);
+	delete[] dnsdict.getValue("Tlsca");
+	dnsdict.setValue("Tlsca",data);
+
+	// Tlsdepth
+	len=GetWindowTextLength(tlsdepthedit);
+	data=new char[len+1];
+	GetWindowText(tlsdepthedit,data,len+1);
+	delete[] dnsdict.getValue("Tlsdepth");
+	dnsdict.setValue("Tlsdepth",data);
+
+	// Db
+	len=GetWindowTextLength(dbedit);
+	data=new char[len+1];
+	GetWindowText(dbedit,data,len+1);
+	delete[] dnsdict.getValue("Db");
+	dnsdict.setValue("Db",data);
+
 	// Debug...
 	len=GetWindowTextLength(debugedit);
 	data=new char[len+1];
 	GetWindowText(debugedit,data,len+1);
 	delete[] dsndict.getValue("Debug");
 	dsndict.setValue("Debug",data);
+
+	// ColumnNameCase
+	len=GetWindowTextLength(columnnamecaseedit);
+	data=new char[len+1];
+	GetWindowText(columnnamecaseedit,data,len+1);
+	delete[] dnsdict.getValue("ColumnNameCase");
+	dnsdict.setValue("ColumnNameCase",data);
+
+	// ResultSetBufferSize
+	len=GetWindowTextLength(resultsetbuffersizeedit);
+	data=new char[len+1];
+	GetWindowText(resultsetbuffersizeedit,data,len+1);
+	delete[] dnsdict.getValue("ResultSetBufferSize");
+	dnsdict.setValue("ResultSetBufferSize",data);
+
+	// DontGetColumnInfo
+	len=GetWindowTextLength(dontgetcolumninfoedit);
+	data=new char[len+1];
+	GetWindowText(dontgetcolumninfoedit,data,len+1);
+	delete[] dnsdict.getValue("DontGetColumnInfo");
+	dnsdict.setValue("DontGetColumnInfo",data);
+
+	// NullsAsNulls
+	len=GetWindowTextLength(nullsasnullsedit);
+	data=new char[len+1];
+	GetWindowText(nullsasnullsedit,data,len+1);
+	delete[] dnsdict.getValue("NullsAsNulls");
+	dnsdict.setValue("NullsAsNulls",data);
+
+	// LazyConnect
+	len=GetWindowTextLength(lazyconnectedit);
+	data=new char[len+1];
+	GetWindowText(lazyconnectedit,data,len+1);
+	delete[] dnsdict.getValue("LazyConnect");
+	dnsdict.setValue("LazyConnect",data);
 }
 
 static bool writeDsn() {
