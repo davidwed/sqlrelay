@@ -256,7 +256,7 @@ public class SQLRCursor : IDisposable
     /** Defines a String input bind variable. */
     public void inputBind(String variable, String val)
     {
-        sqlrcur_inputBindStringWithLength(sqlrcurref, variable, val, (uint)System.Text.Encoding.Default.GetByteCount(val));
+        sqlrcur_inputBindStringWithLength(sqlrcurref, variable, val, (val != null) ? (uint)System.Text.Encoding.Default.GetByteCount(val) : 0);
     }
 
     /** Defines a String input bind variable. */

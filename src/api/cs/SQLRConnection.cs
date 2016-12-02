@@ -21,7 +21,7 @@ public class SQLRConnection : IDisposable
      *  will be made to connect through the socket.*/
     public SQLRConnection(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries)
     {
-        sqlrconref = sqlrcon_alloc_copyrefs(server, port, socket, user, password, retrytime, tries, true);
+        sqlrconref = sqlrcon_alloc_copyrefs(server, port, socket, user, password, retrytime, tries, 1);
     }
     
     /** Dispose framework */
@@ -420,7 +420,7 @@ public class SQLRConnection : IDisposable
     private IntPtr sqlrconref;
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr sqlrcon_alloc_copyrefs(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries, Boolean copyreferences);
+    private static extern IntPtr sqlrcon_alloc_copyrefs(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries, Int32 copyreferences);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_free(IntPtr sqlrconref);

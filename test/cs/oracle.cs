@@ -842,13 +842,13 @@ namespace SQLRClientTest
             Console.WriteLine("\n");
 
             // unicode
-            Console.WriteLine("UNICODE:");
+            /*Console.WriteLine("UNICODE:");
             sqlrcom.CommandText = "select unistr('abc\00e5\00f1\00f6') from dual";
             datareader = ExecuteReader(sqlrcom);
             checkSuccess(datareader != null, true);
             checkSuccess(datareader.Read(), true);
             checkSuccess(datareader.GetString(0), "abcåñö");
-            Console.WriteLine("\n");
+            Console.WriteLine("\n");*/
 
             // closed datareader
             Console.WriteLine("CLOSED DATAREADER:");
