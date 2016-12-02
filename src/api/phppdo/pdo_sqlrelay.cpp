@@ -1423,6 +1423,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		{"tlsvalidate",(char *)"",0},
 		{"tlsca",(char *)"",0},
 		{"tlsdepth",(char *)"0",0},
+		{"db",(char *)"",0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1448,6 +1449,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*tlsvalidate=options[19].optval;
 	const char	*tlsca=options[20].optval;
 	uint16_t	tlsdepth=charstring::toInteger(options[21].optval);
+	const char	*db=options[22].optval;
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1484,6 +1486,10 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		delete sqlrdbh->sqlrcon;
 		sqlrdbh->sqlrcon=NULL;
 		return 0;
+	}
+
+	if (!charstring::isNullOrEmpty(db)) {
+		sqlrdbh->sqlrcon->selectDatabase(db);
 	}
 
 	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);

@@ -8,7 +8,6 @@ namespace SQLRClient
 {
     public class SQLRelayConnection : IDbConnection
     {
-
         #region member variables
 
         private ConnectionState _connectionstate = ConnectionState.Closed;
@@ -35,6 +34,11 @@ namespace SQLRClient
         private UInt16 _tlsdepth = 0;
         private String _db = null;
         private Boolean _debug = false;
+        public String _columnnamecase = "mixed";
+        public UInt64 _resultsetbuffersize = 0;
+        public Boolean _dontgetcolumninfo = false;
+        public Boolean _nullsasnulls = false;
+        private Boolean _lazyconnect = true;
 
         #endregion
 
@@ -134,6 +138,11 @@ namespace SQLRClient
                 _tlsca = null;
                 _tlsdepth = 0;
                 _debug = false;
+                _columnnamecase = "mixed";
+                _resultsetbuffersize = 0;
+                _dontgetcolumninfo = false;
+                _nullsasnulls = false;
+                _lazyconnect = true;
 
                 // parse the connection string
                 String[] parts = ConnectionString.Split(";".ToCharArray());
@@ -236,6 +245,26 @@ namespace SQLRClient
                     {
                         _debug = (subparts[1] == "true");
                     }
+                    else if (subparts[0] == "ColumnNameCase")
+                    {
+                        _columnnamecase = subparts[1];
+                    }
+                    else if (subparts[0] == "ResultSetBufferSize")
+                    {
+                        _resultsetbuffersize = 0;
+                    }
+                    else if (subparts[0] == "DontGetColumnInfo")
+                    {
+                        _dontgetcolumninfo = (subparts[1] == "true");
+                    }
+                    else if (subparts[0] == "NullsAsNulls")
+                    {
+                        _nullsasnulls = (subparts[1] == "true");
+                    }
+                    else if (subparts[0] == "LazyConnect")
+                    {
+                        _lazyconnect = (subparts[1] == "false");
+                    }
                 }
             }
         }
@@ -325,6 +354,13 @@ namespace SQLRClient
             if (_debug)
             {
                 _sqlrcon.debugOn();
+            }
+
+            // If we're not doing lazy connects then do something
+            // lightweight to connect to the server now.
+            if (!_lazyconnect)
+            {
+                _sqlrcon.identify();
             }
 
             ChangeDatabase(_db);

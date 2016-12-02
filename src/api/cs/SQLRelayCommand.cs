@@ -326,6 +326,27 @@ namespace SQLRClient
             if (_sqlrcur == null)
             {
                 _sqlrcur = new SQLRCursor(_sqlrelaycon.SQLRConnection);
+
+                if (_sqlrelaycon._columnnamecase == "upper")
+                {
+                    _sqlrcur.upperCaseColumnNames();
+                }
+                else if (_sqlrelaycon._columnnamecase == "lower")
+                {
+                    _sqlrcur.lowerCaseColumnNames();
+                }
+
+                _sqlrcur.setResultSetBufferSize(_sqlrelaycon._resultsetbuffersize);
+
+                if (_sqlrelaycon._dontgetcolumninfo)
+                {
+                    _sqlrcur.dontGetColumnInfo();
+                }
+
+                if (_sqlrelaycon._nullsasnulls)
+                {
+                    _sqlrcur.getNullsAsNulls();
+                }
             }
             return _sqlrcur;
         }
