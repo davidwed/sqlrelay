@@ -93,12 +93,12 @@ struct CONN {
 	int32_t				retrytime;
 	int32_t				tries;
 
-	char				krb[16];
+	char				krb[4];
 	char				krbservice[16];
 	char				krbmech[128];
 	char				krbflags[1024];
 
-	char				tls[16];
+	char				tls[4];
 	char				tlsversion[16];
 	char				tlscert[1024];
 	char				tlspassword[1024];
@@ -2015,7 +2015,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						sizeof(conn->password),
 						ODBC_INI);
 	}
-	char	retrytimebuf[6];
+	char	retrytimebuf[11];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"RetryTime","0",
 					retrytimebuf,sizeof(retrytimebuf),
 					ODBC_INI);
@@ -2028,7 +2028,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 
 	// krb options
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
-	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","0",
 					conn->krb,sizeof(conn->krb),
 					ODBC_INI);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Krbservice","",
@@ -2045,7 +2045,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 
 	// tls options
-	SQLGetPrivateProfileString((const char *)conn->dsn,"Tls","",
+	SQLGetPrivateProfileString((const char *)conn->dsn,"Tls","0",
 					conn->tls,sizeof(conn->tls),
 					ODBC_INI);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Tlsversion","",
@@ -8353,12 +8353,12 @@ static void createControls(HWND hwnd) {
 	triesedit=createEdit(box1,
 			dsndict.getValue("Tries"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
-			11,true,false);
+			6,true,false);
 	y=yoffset;
 	krbedit=createEdit(box2,
 			dsndict.getValue("Krb"),
 			x,y,editwidth,labelheight,
-			1,true,false);
+			3,false,false);
 	krbserviceedit=createEdit(box2,
 			dsndict.getValue("Krbservice"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
@@ -8374,7 +8374,7 @@ static void createControls(HWND hwnd) {
 	tlsedit=createEdit(box2,
 			dsndict.getValue("Tls"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
-			1024,true,false);
+			3,false,false);
 	tlsversionedit=createEdit(box2,
 			dsndict.getValue("Tlsversion"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
@@ -8466,11 +8466,11 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("Port",charstring::duplicate("9000"));
 		dsndict.setValue("RetryTime",charstring::duplicate("0"));
 		dsndict.setValue("Tries",charstring::duplicate("1"));
-		dsndict.setValue("Krb",charstring::duplicate("0"));
+		dsndict.setValue("Krb",charstring::duplicate("no"));
 		dsndict.setValue("Krbservice",charstring::duplicate(""));
 		dsndict.setValue("Krbmech",charstring::duplicate(""));
 		dsndict.setValue("Krbflags",charstring::duplicate(""));
-		dsndict.setValue("Tls",charstring::duplicate("0"));
+		dsndict.setValue("Tls",charstring::duplicate("no"));
 		dsndict.setValue("Tlsversion",charstring::duplicate(""));
 		dsndict.setValue("Tlscert",charstring::duplicate(""));
 		dsndict.setValue("Tlspassword",charstring::duplicate(""));
@@ -8531,15 +8531,15 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("RetryTime",retrytime);
 	}
 	if (!dsndict.getValue("Tries")) {
-		char	*tries=new char[11];
+		char	*tries=new char[6];
 		SQLGetPrivateProfileString(dsnval,"Tries","1",
-						tries,11,ODBC_INI);
+						tries,6,ODBC_INI);
 		dsndict.setValue("Tries",tries);
 	}
 	if (!dsndict.getValue("Krb")) {
-		char	*krb=new char[1];
-		SQLGetPrivateProfileString(dsnval,"Krb","0",
-						krb,1,ODBC_INI);
+		char	*krb=new char[4];
+		SQLGetPrivateProfileString(dsnval,"Krb","no",
+						krb,4,ODBC_INI);
 		dsndict.setValue("Krb",krb);
 	}
 	if (!dsndict.getValue("Krbservice")) {
@@ -8561,9 +8561,9 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("Krbflags",krbflags);
 	}
 	if (!dsndict.getValue("Tls")) {
-		char	*tls=new char[1];
-		SQLGetPrivateProfileString(dsnval,"Tls","0",
-						tls,1,ODBC_INI);
+		char	*tls=new char[4];
+		SQLGetPrivateProfileString(dsnval,"Tls","no",
+						tls,4,ODBC_INI);
 		dsndict.setValue("Tls",tls);
 	}
 	if (!dsndict.getValue("Tlsversion")) {
@@ -8598,9 +8598,9 @@ static void parseDsn(const char *dsn) {
 	}
 	if (!dsndict.getValue("Tlsca")) {
 		char	*tlsca=new char[1024];
-		SQLGetPrivateProfileString(dsnval,"Tlsvalidate","",
+		SQLGetPrivateProfileString(dsnval,"Tlsca","",
 						tlsca,1024,ODBC_INI);
-		dsndict.setValue("Tlsvalidate",tlsca);
+		dsndict.setValue("Tlsca",tlsca);
 	}
 	if (!dsndict.getValue("Tlsdepth")) {
 		char	*tlsdepth=new char[6];
@@ -8633,21 +8633,21 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("ResultSetBufferSize",resultsetbuffersize);
 	}
 	if (!dsndict.getValue("DontGetColumnInfo")) {
-		char	*dontgetcolumninfo=new char[1];
+		char	*dontgetcolumninfo=new char[2];
 		SQLGetPrivateProfileString(dsnval,"DontGetColumnInfo","0",
-						dontgetcolumninfo,1,ODBC_INI);
+						dontgetcolumninfo,2,ODBC_INI);
 		dsndict.setValue("DontGetColumnInfo",dontgetcolumninfo);
 	}
 	if (!dsndict.getValue("NullsAsNulls")) {
-		char	*nullsasnulls=new char[1];
+		char	*nullsasnulls=new char[2];
 		SQLGetPrivateProfileString(dsnval,"NullsAsNulls","0",
-						nullsasnulls,1,ODBC_INI);
+						nullsasnulls,2,ODBC_INI);
 		dsndict.setValue("NullsAsNulls",nullsasnulls);
 	}
 	if (!dsndict.getValue("LazyConnect")) {
-		char	*lazyconnect=new char[1];
+		char	*lazyconnect=new char[2];
 		SQLGetPrivateProfileString(dsnval,"LazyConnect","1",
-						lazyconnect,1,ODBC_INI);
+						lazyconnect,2,ODBC_INI);
 		dsndict.setValue("LazyConnect",lazyconnect);
 	}
 	dsndict.print();
