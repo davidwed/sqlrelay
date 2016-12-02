@@ -83,7 +83,7 @@ class SQLRConnection:
 
         # if we're not doing lazy connects then do something
         # lightweight to connect to the server now
-        if lazyconnect!=1:
+        if CSQLRelay.isNo(str(lazyconnect)):
                 CSQLRelay.identify();
 
         # create the cursor dictionary

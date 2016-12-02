@@ -263,7 +263,7 @@ namespace SQLRClient
                     }
                     else if (subparts[0] == "LazyConnect")
                     {
-                        _lazyconnect = SQLRConnection.isNo(subparts[1]);
+                        _lazyconnect = !SQLRConnection.isNo(subparts[1]);
                     }
                 }
             }
