@@ -45,20 +45,45 @@ class NotSupportedError(DatabaseError):
     pass
 
 
-def connect(host, port, socket, user, password, retrytime=0, tries=1, krb='no', krbservice='', krbmech='', krbflags='', tls='no', tlsversion='', tlscert='', tlspassword='', tlsciphers='', tlsvalidate='', tlsca='', tlsdepth=0):
-    return SQLRConnection(host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth)
+def connect(host, port, socket, user, password, retrytime=0, tries=1, krb='no', krbservice='', krbmech='', krbflags='', tls='no', tlsversion='', tlscert='', tlspassword='', tlsciphers='', tlsvalidate='', tlsca='', tlsdepth=0, db='', debug=0, columnnamecase='mixed', resultsetbuffersize=0, dontgetcolumninfo=0, nullsasnone=1, lazyconnect=1):
+    return SQLRConnection(host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth, db, debug, columnnamecase, resultsetbuffersize, dontgetcolumninfo, nullsasnone, lazyconnect)
 
 
 class SQLRConnection:
 
     connection=None
 
-    def __init__(self, host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth):
+    def __init__(self, host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth, db, debug, columnnamecase, resultsetbuffersize, dontgetcolumninfo, nullsasnone, lazyconnect):
+
+        # create the connection
         self.connection=CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
+
+        # enable kerberos or tls if requested
         if krb=='yes':
                 CSQLRelay.enableKerberos(self.connection, krbservice, krbmech, krbflags)
         elif tls=='yes':
                 CSQLRelay.enableTls(self.connection, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth)
+
+        # select db if requested
+        if db!='':
+                CSQLRelay.selectDatabase(db)
+
+        # enable debug if requested
+        if debug==1:
+                CSQLRelay.debugOn()
+
+        # set flags
+        self.columnnamecase=columnnamecase
+        self.resultsetbuffersize=resultsetbuffersize
+        self.dontgetcolumninfo=dontgetcolumninfo
+        self.nullsasnone=nullsasnone
+
+        # if we're not doing lazy connects then do something
+        # lightweight to connect to the server now
+        if lazyconnect!=1:
+                CSQLRelay.identify();
+
+        # create the cursor dictionary
         self._cursors=weakref.WeakValueDictionary()
 
     def __del__(self):
@@ -84,7 +109,7 @@ class SQLRConnection:
                 return CSQLRelay.rollback(self.connection)
 
     def cursor(self):
-        cursor=SQLRCursor(self.connection)
+        cursor=SQLRCursor(self.connection, self.columnnamecase, self.resultsetbuffersize, self.dontgetcolumninfo, self.nullsasnone)
         self._cursors[id(cursor)]=cursor
         return cursor
 
@@ -93,9 +118,33 @@ class SQLRCursor:
 
     cursor=None
 
-    def __init__(self, con):
+    def __init__(self, con, columnnamecase='mixed', resultsetbuffersize=0, dontgetcolumninfo=0, nullsasnone=1):
         self.cursor=CSQLRelay.sqlrcur_alloc(con)
         self.arraysize=1
+
+        # set column case
+        if columnnamecase=='upper':
+            CSQLRelay.upperCaseColumnNames(self.cursor)
+        elif columnnamecase=='lower':
+            CSQLRelay.lowerCaseColumnNames(self.cursor)
+        else:
+            CSQLRelay.mixedCaseColumnNames(self.cursor)
+
+        # set result set buffer size
+        CSQLRelay.setResultSetBufferSize(self.cursor, resultsetbuffersize)
+
+        # set column info
+        if dontgetcolumninfo:
+            CSQLRelay.dontGetColumnInfo(self.cursor)
+        else:
+            CSQLRelay.getColumnInfo(self.cursor)
+
+        # set null/none behavior for nulls
+        if nullsasnone:
+            CSQLRelay.getNullsAsNone(self.cursor)
+        else:
+            CSQLRelay.getNullsAsEmptyStrings(self.cursor)
+    
 
     def __del__(self):
         self.close()

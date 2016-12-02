@@ -77,6 +77,7 @@ sub connect {
 	$dsn{'tlsdepth'}=0;
 	$dsn{'retrytime'}=0;
 	$dsn{'tries'}=1;
+	$dsn{'db'}='';
 	$dsn{'debug'}=0;
 	$dsn{'lazyconnect'}=1;
 
@@ -130,6 +131,10 @@ sub connect {
 		$connection=undef;
 		$dbh=undef;
 		return $dbh;
+	}
+
+	if (length($dsn{'db'})) {
+		$connection->selectDatabase($dsn{'db'});
 	}
 
 	# store some references in the database handle
@@ -191,12 +196,28 @@ sub _new_statement {
 
 	# handle the row cache size
 	my $rowcachesize=$dbh->FETCH('RowCacheSize');
+	if (!defined($rowcachesize)) {
+		$rowcachesize=$dbh->FETCH('DBD::SQLRelay::ResultSetBufferSize');
+	}
 	if (!defined($rowcachesize) || $rowcachesize<0) {
 		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',0);
 	} elsif ($rowcachesize==0) {
 		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',100);
 	} else {
 		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',$rowcachesize);
+	}
+
+	# handle column case
+	my $columncase=$dbh->FETCH('DBD::SQLRelay::ColumnNameCase');
+	if (!defined($columncase) || !$columncase) {
+		$sth->STORE('DBD::SQLRelay::ColumnNameCase',$columncase);
+	}
+
+	# handle column info
+	my $dontgetcolumninfo=$dbh->FETCH('DBD::SQLRelay::DontGetColumnInfo');
+	if (!defined($columncase) || !$columncase) {
+		$sth->STORE('DBD::SQLRelay::DontGetColumnInfo',
+						$dontgetcolumninfo);
 	}
 
 	# handle nulls/empty-strings
@@ -709,6 +730,15 @@ sub STORE {
 	if ($attr eq 'DBD::SQLRelay::ResultSetBufferSize') {
 		$sth->FETCH('driver_cursor')->setResultSetBufferSize($val);
 		return 1;
+	} elsif ($attr eq 'DBD::SQLRelay::ColumnNameCase') {
+		my $cursor=$sth->FETCH('driver_cursor');
+		if ($val eq "upper") {
+			$cursor->upperCaseColumnNames();
+		} elsif ($val eq "lower") {
+			$cursor->lowerCaseColumnNames();
+		} else {
+			$cursor->mixedCaseColumnNames();
+		}
 	} elsif ($attr eq 'DBD::SQLRelay::DontGetColumnInfo') {
 		my $cursor=$sth->FETCH('driver_cursor');
 		if ($val) {
