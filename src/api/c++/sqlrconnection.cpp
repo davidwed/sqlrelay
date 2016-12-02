@@ -1963,3 +1963,11 @@ void sqlrconnection::lastcursor(sqlrcursor *cur) {
 sqlrcursor *sqlrconnection::lastcursor() {
 	return pvt->_lastcursor;
 }
+
+bool sqlrconnection::isYes(const char *str) {
+	return charstring::isYes(str);
+}
+
+bool sqlrconnection::isNo(const char *str) {
+	return charstring::isNo(str);
+}

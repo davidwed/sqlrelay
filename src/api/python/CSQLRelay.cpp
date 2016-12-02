@@ -456,6 +456,24 @@ static PyObject *getClientInfo(PyObject *self, PyObject *args) {
   return Py_BuildValue("s", rc);
 }
 
+static PyObject *isYes(PyObject *self, PyObject *args) {
+  char *str;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "s", &str))
+    return NULL;
+  rc=charstring::isYes(str);
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *isNo(PyObject *self, PyObject *args) {
+  char *str;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "s", &str))
+    return NULL;
+  rc=charstring::isNo(str);
+  return Py_BuildValue("h", (short)rc);
+}
+
 static PyObject *sqlrcur_alloc(PyObject *self, PyObject *args) {
   long	sqlrcon;
   sqlrcursor *sqlrcur;
@@ -1925,6 +1943,8 @@ static PyMethodDef SQLRMethods[] = {
   {"setDebugFile", setDebugFile, METH_VARARGS},
   {"setClientInfo", setClientInfo, METH_VARARGS},
   {"getClientInfo", getClientInfo, METH_VARARGS},
+  {"isYes", isYes, METH_VARARGS},
+  {"isNo", isNo, METH_VARARGS},
   {"sqlrcur_alloc",  sqlrcur_alloc, METH_VARARGS},
   {"sqlrcur_free",  sqlrcur_free, METH_VARARGS},
   {"setResultSetBufferSize", setResultSetBufferSize, METH_VARARGS},

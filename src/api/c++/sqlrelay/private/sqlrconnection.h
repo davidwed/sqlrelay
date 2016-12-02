@@ -66,5 +66,7 @@
 					const char *user, const char *password, 
 					int32_t retrytime, int32_t tries,
 					bool copyreferences);
+		static	bool	isYes(const char *str);
+		static	bool	isNo(const char *str);
 
 	friend class sqlrcursor;

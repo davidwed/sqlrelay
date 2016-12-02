@@ -6,6 +6,12 @@ sqlrcon	sqlrcon_alloc_copyrefs(const char *server,
 					int copyreferences);
 
 SQLRCLIENT_DLLSPEC
+int sqlrcon_isYes(const char *string);
+
+SQLRCLIENT_DLLSPEC
+int sqlrcon_isNo(const char *string);
+
+SQLRCLIENT_DLLSPEC
 sqlrcur	sqlrcur_alloc_copyrefs(sqlrcon sqlrconref, int copyreferences);
 
 SQLRCLIENT_DLLSPEC

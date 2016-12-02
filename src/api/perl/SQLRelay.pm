@@ -103,19 +103,19 @@ sub connect {
 							$dsn{'tries'});
 
 	# turn on debugging if debugging was specified in the dsn
-	if ($dsn{'debug'} eq "1") {
+	if (SQLRelay::Connection->isYes($dsn{'debug'})) {
 		$connection->debugOn();
-	} elsif ($dsn{'debug'} ne "0") {
+	} elsif (!SQLRelay::Connection->isNo($dsn{'debug'})) {
 		$connection->setDebugFile($dsn{'debug'});
 		$connection->debugOn();
 	}
 
 	# turn on kerberos or tls
-	if ($dsn{'krb'} eq "yes") {
+	if (SQLRelay::Connection->isYes($dsn{'krb'})) {
 		$connection->enableKerberos($dsn{'krbservice'},
 						$dsn{'krbmech'},
 						$dsn{'krbflags'});
-	} elsif ($dsn{'tls'} eq "yes") {
+	} elsif (SQLRelay::Connection->isYes($dsn{'tls'})) {
 		$connection->enableTls($dsn{'tlsversion'},
 					$dsn{'tlscert'},
 					$dsn{'tlspassword'},
@@ -127,7 +127,8 @@ sub connect {
 
 	# if we're not doing lazy connects, then do something lightweight
 	# that will verify whether SQL Relay is available or not
-	if (!$dsn{'lazyconnect'} && !$connection->identify()) {
+	if (SQLRelay::Connection->isNo($dsn{'lazyconnect'}) &&
+					!$connection->identify()) {
 		$connection=undef;
 		$dbh=undef;
 		return $dbh;
@@ -215,7 +216,7 @@ sub _new_statement {
 
 	# handle column info
 	my $dontgetcolumninfo=$dbh->FETCH('DBD::SQLRelay::DontGetColumnInfo');
-	if (!defined($columncase) || !$columncase) {
+	if (!defined($dontgetcolumninfo) || !$dontgetcolumninfo) {
 		$sth->STORE('DBD::SQLRelay::DontGetColumnInfo',
 						$dontgetcolumninfo);
 	}
@@ -741,7 +742,7 @@ sub STORE {
 		}
 	} elsif ($attr eq 'DBD::SQLRelay::DontGetColumnInfo') {
 		my $cursor=$sth->FETCH('driver_cursor');
-		if ($val) {
+		if (SQLRelay::Connection->isYes($val)) {
 			$cursor->dontGetColumnInfo();
 		} else {
 			$cursor->getColumnInfo();
@@ -749,7 +750,7 @@ sub STORE {
 		return 1;
 	} elsif ($attr eq 'DBD::SQLRelay::GetNullsAsEmptyStrings') {
 		my $cursor=$sth->FETCH('driver_cursor');
-		if ($val) {
+		if (SQLRelay::Connection->isYes($val)) {
 			$cursor->getNullsAsEmptyStrings();
 		} else {
 			$cursor->getNullsAsUndefined();

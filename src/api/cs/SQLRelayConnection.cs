@@ -33,7 +33,7 @@ namespace SQLRClient
         private String _tlsca = null;
         private UInt16 _tlsdepth = 0;
         private String _db = null;
-        private String _debug = "false";
+        private String _debug = null;
         public String _columnnamecase = "mixed";
         public UInt64 _resultsetbuffersize = 0;
         public Boolean _dontgetcolumninfo = false;
@@ -255,15 +255,15 @@ namespace SQLRClient
                     }
                     else if (subparts[0] == "DontGetColumnInfo")
                     {
-                        _dontgetcolumninfo = (subparts[1] == "true");
+                        _dontgetcolumninfo = SQLRConnection.isYes(subparts[1]);
                     }
                     else if (subparts[0] == "NullsAsNulls")
                     {
-                        _nullsasnulls = (subparts[1] == "true");
+                        _nullsasnulls = SQLRConnection.isYes(subparts[1]);
                     }
                     else if (subparts[0] == "LazyConnect")
                     {
-                        _lazyconnect = (subparts[1] == "false");
+                        _lazyconnect = SQLRConnection.isNo(subparts[1]);
                     }
                 }
             }
@@ -309,11 +309,12 @@ namespace SQLRClient
             set
             {
                 _debug = value;
-                if (_debug == "true")
+                if (SQLRConnection.isYes(_debug))
                 {
                     _sqlrcon.debugOn();
                 }
-                else if (_debug == "false")
+                else if (SQLRConnection.isNo(_debug) ||
+				_debug == null || _debug == "")
                 {
                     _sqlrcon.debugOff();
                 }
@@ -347,11 +348,11 @@ namespace SQLRClient
             _connectionstate = ConnectionState.Open;
             _sqlrcon = new SQLRConnection(_host, _port, _socket, _user, _password, _retrytime, _tries);
 
-            if (_krb == "yes")
+            if (SQLRConnection.isYes(_krb))
             {
                 _sqlrcon.enableKerberos(_krbservice, _krbmech, _krbflags);
             }
-            else if (_tls == "yes")
+            else if (SQLRConnection.isYes(_tls))
             {
                 _sqlrcon.enableTls(_tlsversion, _tlscert, _tlspassword, _tlsciphers, _tlsvalidate, _tlsca, _tlsdepth);
             }

@@ -17,6 +17,7 @@
 		lower-case)
 	fixed a regression that could cause crashes in the C#/ADO driver
 		when binding null or date values
+	added all parameters to ODBC config screen
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile

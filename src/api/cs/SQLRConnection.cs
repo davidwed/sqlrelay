@@ -228,14 +228,14 @@ public class SQLRConnection : IDisposable
      *  is only valid after a call to suspendSession(). */
     public String getConnectionSocket()
     {
-    	return sqlrcon_getConnectionSocket(sqlrconref);
+        return sqlrcon_getConnectionSocket(sqlrconref);
     }
     
     /** Resumes a session previously left open using sqlrcon_suspendSession().
      *  Returns true on success and false on failure. */
     public Boolean resumeSession(UInt16 port, String socket)
     {
-    	return sqlrcon_resumeSession(sqlrconref, port, socket)!=0;
+        return sqlrcon_resumeSession(sqlrconref, port, socket)!=0;
     }
     
     
@@ -255,19 +255,19 @@ public class SQLRConnection : IDisposable
     /** Returns the version of the database */
     public String dbVersion()
     {
-    	return sqlrcon_dbVersion(sqlrconref);
+        return sqlrcon_dbVersion(sqlrconref);
     }
     
     /** Returns the host name of the database */
     public String dbHostName()
     {
-    	return sqlrcon_dbHostName(sqlrconref);
+        return sqlrcon_dbHostName(sqlrconref);
     }
     
     /** Returns the ip address of the database */
     public String dbIpAddress()
     {
-    	return sqlrcon_dbIpAddress(sqlrconref);
+        return sqlrcon_dbIpAddress(sqlrconref);
     }
     
     /** Returns the version of the sqlrelay server software. */
@@ -417,6 +417,16 @@ public class SQLRConnection : IDisposable
         return sqlrconref;
     }
 
+    public static Boolean isYes(String str)
+    {
+        return (sqlrcon_isYes(str) != 0);
+    }
+
+    public static Boolean isNo(String str)
+    {
+        return (sqlrcon_isNo(str) != 0);
+    }
+
     private IntPtr sqlrconref;
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -529,6 +539,12 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern String sqlrcon_getClientInfo(IntPtr sqlrconref);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern Int32 sqlrcon_isYes(String str);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern Int32 sqlrcon_isNo(String str);
 }
 
 }

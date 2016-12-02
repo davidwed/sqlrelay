@@ -59,18 +59,21 @@ class SQLRConnection:
         self.connection=CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
 
         # enable kerberos or tls if requested
-        if krb=='yes':
+        if CSQLRelay.isYes(str(krb)):
                 CSQLRelay.enableKerberos(self.connection, krbservice, krbmech, krbflags)
-        elif tls=='yes':
+        elif CSQLRelay.isYes(str(tls)):
                 CSQLRelay.enableTls(self.connection, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth)
 
         # select db if requested
         if db!='':
-                CSQLRelay.selectDatabase(db)
+                CSQLRelay.selectDatabase(self.connection, db)
 
         # enable debug if requested
-        if debug==1:
-                CSQLRelay.debugOn()
+        if CSQLRelay.isYes(str(debug)):
+                CSQLRelay.debugOn(self.connection)
+        elif not CSQLRelay.isNo(str(debug)):
+                CSQLRelay.debugOn(self.connection)
+                CSQLRelay.setDebugFile(self.connection, str(debug))
 
         # set flags
         self.columnnamecase=columnnamecase
@@ -134,13 +137,13 @@ class SQLRCursor:
         CSQLRelay.setResultSetBufferSize(self.cursor, resultsetbuffersize)
 
         # set column info
-        if dontgetcolumninfo:
+        if CSQLRelay.isYes(str(dontgetcolumninfo)):
             CSQLRelay.dontGetColumnInfo(self.cursor)
         else:
             CSQLRelay.getColumnInfo(self.cursor)
 
         # set null/none behavior for nulls
-        if nullsasnone:
+        if CSQLRelay.isYes(str(nullsasnone)):
             CSQLRelay.getNullsAsNone(self.cursor)
         else:
             CSQLRelay.getNullsAsEmptyStrings(self.cursor)

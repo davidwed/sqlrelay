@@ -1435,8 +1435,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	int32_t		tries=charstring::toInteger(options[3].optval);
 	int32_t		retrytime=charstring::toInteger(options[4].optval);
 	const char	*debug=options[5].optval;
-	bool		lazyconnect=(charstring::toInteger(
-						options[6].optval)>0);
+	bool		lazyconnect=!charstring::isNo(options[6].optval);
 	const char	*krb=options[10].optval;
 	const char	*krbservice=options[11].optval;
 	const char	*krbmech=options[12].optval;
@@ -1460,9 +1459,9 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 							true);
 
 	// enable kerberos or tls
-	if (!charstring::compare(krb,"yes")) {
+	if (charstring::isYes(krb)) {
 		sqlrdbh->sqlrcon->enableKerberos(krbservice,krbmech,krbflags);
-	} else if (!charstring::compare(tls,"yes")) {
+	} else if (charstring::isYes(tls)) {
 		sqlrdbh->sqlrcon->enableTls(tlsversion,
 						tlscert,tlspassword,
 						tlsciphers,tlsvalidate,
@@ -1470,12 +1469,12 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	}
 
 	// enable debug
-	if (!charstring::compare(debug,"1")) {
+	if (charstring::isYes(debug)) {
 		sqlrdbh->sqlrcon->debugOn();
 		sqlrdbh->sqlrcon->debugPrintFunction(
 				(int (*)(const char *,...))zend_printf);
-	} else if (!charstring::isNullOrEmpty(debug) &&
-				charstring::compare(debug,"0")) {
+	} else if (!charstring::isNo(debug) &&
+				!charstring::isNullOrEmpty(debug)) {
 		sqlrdbh->sqlrcon->setDebugFile(debug);
 		sqlrdbh->sqlrcon->debugOn();
 	}
@@ -1493,8 +1492,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	}
 
 	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);
-	sqlrdbh->dontgetcolumninfo=charstring::toInteger(options[7].optval);
-	sqlrdbh->nullsasnulls=charstring::toInteger(options[8].optval);
+	sqlrdbh->dontgetcolumninfo=charstring::isYes(options[7].optval);
+	sqlrdbh->nullsasnulls=charstring::isYes(options[8].optval);
 
 	sqlrdbh->translatebindsonserver=false;
 	sqlrdbh->usesubvars=false;

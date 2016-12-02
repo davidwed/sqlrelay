@@ -229,3 +229,11 @@ sqlrconnection::setClientInfo(clientinfo)
 
 const char *
 sqlrconnection::getClientInfo()
+
+static bool
+sqlrconnection::isYes(str)
+		const char	*str
+
+static bool
+sqlrconnection::isNo(str)
+		const char	*str

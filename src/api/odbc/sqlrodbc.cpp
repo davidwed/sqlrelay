@@ -1976,7 +1976,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 	char	portbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Port","",
-					portbuf,sizeof(portbuf),ODBC_INI);
+					portbuf,sizeof(portbuf),
+					ODBC_INI);
 	conn->port=(uint16_t)charstring::toUnsignedInteger(portbuf);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Socket","",
 					conn->socket,sizeof(conn->socket),
@@ -2104,27 +2105,25 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		(uint64_t)charstring::toInteger(resultsetbuffersizebuf);
 	char	dontgetcolumninfobuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,
-					"DontGetColumnInfo","0",
+					"DontGetColumnInfo","no",
 					dontgetcolumninfobuf,
 					sizeof(dontgetcolumninfobuf),
 					ODBC_INI);
-	conn->dontgetcolumninfo=
-		(charstring::toInteger(dontgetcolumninfobuf)!=0);
+	conn->dontgetcolumninfo=charstring::isYes(dontgetcolumninfobuf);
 	char	nullsasnullsbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,
-					"NullsAsNulls","0",
+					"NullsAsNulls","no",
 					nullsasnullsbuf,
 					sizeof(nullsasnullsbuf),
 					ODBC_INI);
-	conn->nullsasnulls=
-		(charstring::toInteger(nullsasnullsbuf)!=0);
+	conn->nullsasnulls=charstring::isYes(nullsasnullsbuf);
 	char	lazyconnectbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,
-					"LazyConnect","1",
+					"LazyConnect","yes",
 					lazyconnectbuf,
 					sizeof(lazyconnectbuf),
 					ODBC_INI);
-	conn->lazyconnect=(charstring::toInteger(lazyconnectbuf)!=0);
+	conn->lazyconnect=!charstring::isNo(lazyconnectbuf);
 
 	debugPrintf("  DSN: %s\n",conn->dsn);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
@@ -2166,11 +2165,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					true);
 
 	// enable kerberos or tls
-	if (!charstring::compare(conn->krb,"yes")) {
+	if (sqlrconnection::isYes(conn->krb)) {
 		conn->con->enableKerberos(conn->krbservice,
 							conn->krbmech,
 							conn->krbflags);
-	} else if (!charstring::compare(conn->tls,"yes")) {
+	} else if (sqlrconnection::isYes(conn->tls)) {
 		conn->con->enableTls(conn->tlsversion,
 						conn->tlscert,
 						conn->tlspassword,
@@ -2181,10 +2180,10 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	}
 
 	// enable debug
-	if (!charstring::compare(conn->debug,"1")) {
+	if (charstring::isYes(conn->debug)) {
 		conn->con->debugOn();
-	} else if (!charstring::isNullOrEmpty(conn->debug) &&
-				charstring::compare(conn->debug,"0")) {
+	} else if (!charstring::isNo(conn->debug) &&
+			!charstring::isNullOrEmpty(conn->debug)) {
 		conn->con->setDebugFile(conn->debug);
 		conn->con->debugOn();
 	}
@@ -2201,8 +2200,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		return SQL_ERROR;
 	}
 
-
-	if (charstring::isNullOrEmpty(conn->db)) {
+	if (!charstring::isNullOrEmpty(conn->db)) {
 		conn->con->selectDatabase(conn->db);
 	}
 

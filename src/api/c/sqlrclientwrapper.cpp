@@ -25,6 +25,14 @@ sqlrcon sqlrcon_alloc_copyrefs(const char *server,
 	return sqlrconref;
 }
 
+int sqlrcon_isYes(const char *string) {
+	return sqlrconnection::isYes(string);
+}
+
+int sqlrcon_isNo(const char *string) {
+	return sqlrconnection::isNo(string);
+}
+
 void sqlrcon_free(sqlrcon sqlrconref) {
 	delete (sqlrconnection *)sqlrconref;
 }
