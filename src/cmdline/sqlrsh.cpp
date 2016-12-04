@@ -250,7 +250,7 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 		// optimize
 		filesystem	fs;
-		if (fs.initialize(trimmedfilename)) {
+		if (fs.open(trimmedfilename)) {
 			scriptfile.setReadBufferSize(
 				fs.getOptimumTransferBlockSize());
 		}

@@ -87,7 +87,7 @@ bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 
 	// optimize
 	filesystem	fs;
-	fs.initialize(querylogname);
+	fs.open(querylogname);
 	querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
 	return true;
 }

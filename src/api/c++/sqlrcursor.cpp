@@ -579,7 +579,7 @@ void sqlrcursor::startCaching() {
 		// calculate and set write buffer size
 		// FIXME: I think rudiments bugs keep this from working...
 		/*filesystem	fs;
-		if (fs.initialize(pvt->_cachedestname)) {
+		if (fs.open(pvt->_cachedestname)) {
 			off64_t	optblocksize=fs.getOptimumTransferBlockSize();
 			pvt->_cachedest->setWriteBufferSize(
 					(optblocksize)?optblocksize:1024);
