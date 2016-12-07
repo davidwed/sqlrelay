@@ -475,14 +475,3 @@ void sqlrtranslations::endSession() {
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
 }
-
-
-
-/*int32_t _containerutil_compare(sqlrdatabaseobject *value1,
-				sqlrdatabaseobject *value2) {
-	return _containerutil_compare((void *)value1,(void *)value2);
-}
-
-void _containerutil_print(sqlrdatabaseobject *value) {
-	_containerutil_print((void *)value);
-}*/
