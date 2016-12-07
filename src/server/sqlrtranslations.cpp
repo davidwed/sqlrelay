@@ -29,12 +29,6 @@ class sqlrdatabaseobject {
 		const char	*schema;
 		const char	*object;
 		const char	*dependency;
-
-		int32_t	compare(sqlrdatabaseobject *value) {
-			return _containerutil_compare(
-					(void *)this,(void *)value);
-		}
-		void	print() {}
 };
 
 class sqlrtranslationsprivate {
@@ -480,4 +474,15 @@ void sqlrtranslations::endSession() {
 	pvt->_memorypool->deallocate();
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
+}
+
+
+
+int32_t	_containerutil_compare(sqlrdatabaseobject *value1,
+				sqlrdatabaseobject *value2) {
+	return _containerutil_compare((void *)value1,(void *)value2);
+}
+
+void _containerutil_print(sqlrdatabaseobject *value) {
+	_containerutil_print((void *)value);
 }

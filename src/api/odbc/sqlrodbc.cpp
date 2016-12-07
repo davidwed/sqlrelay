@@ -119,10 +119,6 @@ struct CONN {
 	bool				lazyconnect;
 
 	bool				attrmetadataid;
-
-	int32_t	compare(struct CONN *value) {
-		return _containerutil_compare((void *)this,(void *)value);
-	}
 };
 
 struct rowdesc {
@@ -175,10 +171,6 @@ struct STMT {
 	bool					executedbynumresultcols;
 	SQLRETURN				executedbynumresultcolsresult;
 	SQLULEN					rowbindtype;
-
-	int32_t	compare(struct STMT *value) {
-		return _containerutil_compare((void *)this,(void *)value);
-	}
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -9059,4 +9051,22 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 
 #endif
 
+}
+
+
+
+int32_t _containerutil_compare(struct CONN *value1, struct CONN *value2) {
+	return _containerutil_compare((void *)value1,(void *)value2);
+}
+
+void _containerutil_print(struct CONN *value) {
+	_containerutil_print((void *)value);
+}
+
+int32_t _containerutil_compare(struct STMT *value1, struct STMT *value2) {
+	return _containerutil_compare((void *)value1,(void *)value2);
+}
+
+void _containerutil_print(struct STMT *value) {
+	_containerutil_print((void *)value);
 }
