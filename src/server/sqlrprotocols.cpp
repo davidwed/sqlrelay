@@ -158,11 +158,11 @@ void sqlrprotocols::endSession() {
 
 
 
-int32_t	_containerutil_compare(sqlrprotocolplugin *value1,
+/*int32_t _containerutil_compare(sqlrprotocolplugin *value1,
 				sqlrprotocolplugin *value2) {
 	return _containerutil_compare((void *)value1,(void *)value2);
 }
 
 void _containerutil_print(sqlrprotocolplugin *value) {
 	_containerutil_print((void *)value);
-}
+}*/

@@ -9055,7 +9055,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 
 
 
-int32_t _containerutil_compare(struct CONN *value1, struct CONN *value2) {
+/*int32_t _containerutil_compare(struct CONN *value1, struct CONN *value2) {
 	return _containerutil_compare((void *)value1,(void *)value2);
 }
 
@@ -9069,4 +9069,4 @@ int32_t _containerutil_compare(struct STMT *value1, struct STMT *value2) {
 
 void _containerutil_print(struct STMT *value) {
 	_containerutil_print((void *)value);
-}
+}*/
