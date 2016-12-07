@@ -79,7 +79,7 @@ do
 		echo "hit enter to continue or ctrl-c to stop..."
 		if ( test "$DB" = "krb" )
 		then
-			read 20
+			read -t 20
 		else
 			read
 		fi
