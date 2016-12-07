@@ -22,3 +22,6 @@ clean:
 	cd ruby $(AND) $(MAKE) clean
 	cd stress $(AND) $(MAKE) clean
 	cd tcl $(AND) $(MAKE) clean
+
+tests: all
+	$(THISDIR)testall$(SCRIPTEXT)

@@ -108,3 +108,9 @@ distclean: clean
 
 cppcheck:
 	cppcheck -j4 --enable=warning,performance,portability src > /dev/null
+
+tests:
+	cd test $(AND) $(MAKE) tests
+
+tests-clean:
+	cd test $(AND) $(MAKE) clean

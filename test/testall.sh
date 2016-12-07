@@ -3,7 +3,7 @@
 sqlr-stop
 sleep 2
 
-for DB in db2 firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions
+for DB in firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions db2
 do
 
 	if ( test "$DB" = "tls" -o "$DB" = "krb" -o "$DB" = "extensions" )
@@ -77,7 +77,12 @@ do
 		echo "failed to start ${DB}test"
 		echo
 		echo "hit enter to continue or ctrl-c to stop..."
-		read
+		if ( test "$DB" = "krb" )
+		then
+			read 20
+		else
+			read
+		fi
 	fi
 
 	sleep 2

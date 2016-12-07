@@ -32,6 +32,14 @@ initscript_prefix = @initscript_prefix@
 AND = &
 
 
+# "this directory" prefix
+THISDIR =
+
+
+# script extension
+SCRIPTEXT = .bat
+
+
 # slash
 SLASH = \\
 
