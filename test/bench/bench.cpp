@@ -222,8 +222,7 @@ void benchmarks::benchSelect(
 	stdoutput.printf("queries-per-cx  queries-per-second\n");
 
 	// run selects
-	uint64_t	qcount=1;
-	for (uint64_t ccount=queries; ccount>=1 && !shutdown; ccount--) {
+	for (uint64_t qcount=1; qcount<=queries && !shutdown; qcount++) {
 
 		// get start time
 		datetime	start;
@@ -232,7 +231,7 @@ void benchmarks::benchSelect(
 		// run all of this some number of times and average the results
 		for (uint16_t iter=0; iter<iterations && !shutdown; iter++) {
 
-			for (uint64_t i=0; i<ccount && !shutdown; i++) {
+			for (uint64_t i=0; i<iterations && !shutdown; i++) {
 
 				// connect and open
 				if (debug) {
@@ -315,12 +314,12 @@ void benchmarks::benchSelect(
 		float	totalsec=(float)sec+(((float)usec)/1000000.0);
 
 		// average number of seconds per query
-		float	spq=totalsec/(iterations*ccount*qcount);
+		float	spq=totalsec/(iterations*iterations*qcount);
 
 		// average number of queries per second
 		float	qps=1.0/spq;
 		
-		// calcualate queries per connection
+		// calculate queries per connection
 		float	qpc=(float)qcount;
 
 		// display stats
@@ -334,8 +333,6 @@ void benchmarks::benchSelect(
 			stats->setValue(qpc,d);
 		}
 		d->append(qps);
-
-		qcount++;
 	}
 }
 

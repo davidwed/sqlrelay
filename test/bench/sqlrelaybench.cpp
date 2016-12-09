@@ -88,6 +88,7 @@ sqlrelaybenchcursor::sqlrelaybenchcursor(benchconnection *con) :
 							benchcursor(con) {
 	sqlrbcon=(sqlrelaybenchconnection *)con;
 	sqlrcur=new sqlrcursor(sqlrbcon->sqlrcon);
+	sqlrcur->setResultSetBufferSize(10);
 }
 
 sqlrelaybenchcursor::~sqlrelaybenchcursor() {

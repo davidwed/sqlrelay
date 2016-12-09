@@ -64,7 +64,7 @@ int main(int argc, const char **argv) {
 	const char	*db="oracle";
 	const char	*dbconnectstring=NULL;
 	const char	*sqlrconnectstring=NULL;
-	uint64_t	queries=20;
+	uint64_t	queries=30;
 	uint64_t	rows=256;
 	uint32_t	cols=16;
 	uint32_t	colsize=32;
@@ -219,7 +219,7 @@ int main(int argc, const char **argv) {
 				!charstring::compare(db,"oracle8")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-					"sid="ORACLE_SID";"
+					"sid=" ORACLE_SID ";"
 					"user=testuser;password=testpassword;";
 			}
 			bm=new oraclebenchmarks(
@@ -355,13 +355,17 @@ void graphStats(const char *graph, const char *db,
 		"gnuplot","-e",dbvar.getString(),"plot.gnu",NULL
 	};
 	pid_t	pid=process::spawn("gnuplot",args,false);
-	process::getChildStateChange(pid,true,true,true,NULL,NULL,NULL,NULL);
+	process::wait(pid);
 
 	// move temp.png to the specified graph file name
 	file::rename("temp.png",graph);
 
-	// clean up
-	file::remove("temp.csv");
+	// move temp.csv to a similar file name as the graph
+	stringbuffer	tempcsv;
+	char	*base=file::basename(graph,".png");
+	tempcsv.append(base)->append(".csv");
+	delete[] base;
+	file::rename("temp.csv",tempcsv.getString());
 
 	stdoutput.printf("done\n");
 }
