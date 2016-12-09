@@ -101,5 +101,7 @@ bool sqlrelaybenchcursor::query(const char *query, bool getcolumns) {
 	} else {
 		sqlrcur->dontGetColumnInfo();
 	}
+	// FIXME: run through the rows
+	// (now that we're setting a result set buffer size
 	return sqlrcur->sendQuery(query);
 }
