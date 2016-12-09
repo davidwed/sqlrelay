@@ -242,7 +242,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	usetls=!charstring::compare(parameters->getAttributeValue("tls"),"yes");
 
 	if (usekrb) {
-		if (gss::supportsGSS()) {
+		if (gss::supported()) {
 
 			// set the keytab file to use
 			const char	*keytab=
@@ -293,7 +293,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					"kerberos\n");
 		}
 	} else if (usetls) {
-		if (tls::supportsTLS()) {
+		if (tls::supported()) {
 
 			// get the protocol version to use
 			tctx.setProtocolVersion(
@@ -609,13 +609,13 @@ bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
 
 	cont->raiseDebugMessageEvent("accepting security context");
 
-	if (usekrb && !gss::supportsGSS()) {
+	if (usekrb && !gss::supported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept gss security "
 				"context (kerberos requested but "
 				"not supported)");
 		return false;
-	} else if (usetls && !tls::supportsTLS()) {
+	} else if (usetls && !tls::supported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept tls security "
 				"context (tls requested but "
