@@ -3,7 +3,7 @@
 sqlr-stop
 sleep 2
 
-for DB in firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions db2
+for DB in firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions router db2
 do
 
 	if ( test "$DB" = "tls" -o "$DB" = "krb" -o "$DB" = "extensions" )
@@ -28,6 +28,15 @@ do
 	fi
 
 	echo "testing $DB..."
+
+	if ( test "$DB" = "router" )
+	then
+		sqlr-start -id routermaster
+		sleep 2
+
+		sqlr-start -id routerslave
+		sleep 2
+	fi
 
 	sqlr-start -id ${DB}test
 	sleep 2
@@ -83,6 +92,14 @@ do
 		else
 			read
 		fi
+	fi
+
+	if ( test "$DB" = "router" )
+	then
+		sleep 2
+		sqlr-stop -id routermaster
+		sleep 2
+		sqlr-stop -id routerslave
 	fi
 
 	sleep 2
