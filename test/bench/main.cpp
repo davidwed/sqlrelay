@@ -57,7 +57,7 @@ int main(int argc, const char **argv) {
 			"	[-rsbs result-set-buffer-size] \\\n"
 			"	[-dbonly|-sqlrelayonly] \\\n"
 			"	[-debug] \\\n"
-			"	[-graph graph]\n");
+			"	[-graph graph-file-name]\n");
 		process::exit(1);
 	}
 

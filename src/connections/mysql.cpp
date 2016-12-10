@@ -1306,11 +1306,10 @@ uint32_t mysqlcursor::colCount() {
 
 bool mysqlcursor::knowsRowCount() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (usestmtprepare) {
-		return false;
-	}
-#endif
+	return !usestmtprepare;
+#else
 	return true;
+#endif
 }
 
 uint64_t mysqlcursor::rowCount() {
@@ -1417,15 +1416,13 @@ uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 			return (uint32_t)mysqlfields[col]->length+1;
 		case DECIMAL_DATATYPE:
 			{
-			uint32_t	length=0;
-			if (mysqlfields[col]->decimals>0) {
-				length=mysqlfields[col]->length+2;
-			} else if (mysqlfields[col]->decimals==0) {
-				length=mysqlfields[col]->length+1;
+			uint32_t	length=mysqlfields[col]->length+1;
+			unsigned int	decimals=mysqlfields[col]->decimals;
+			if (decimals>0) {
+				length++;
 			}
-			if (mysqlfields[col]->length<
-					mysqlfields[col]->decimals) {
-				length=mysqlfields[col]->decimals+2;
+			if (mysqlfields[col]->length<decimals) {
+				length=decimals+2;
 			}
 			return length;
 			}
@@ -1436,11 +1433,7 @@ uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 		case INT_DATATYPE:
 			return 4;
 		case FLOAT_DATATYPE:
-			if (mysqlfields[col]->length<=24) {
-				return 4;
-			} else {
-				return 8;
-			}
+			return (mysqlfields[col]->length<=24)?4:8;
 		case REAL_DATATYPE:
 			return 8;
 		case BIGINT_DATATYPE:
