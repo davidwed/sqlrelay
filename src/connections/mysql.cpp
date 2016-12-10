@@ -102,10 +102,8 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
-#ifndef HAVE_MYSQL_STMT_PREPARE
 		bool		knowsRowCount();
 		uint64_t	rowCount();
-#endif
 		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
@@ -1306,15 +1304,18 @@ uint32_t mysqlcursor::colCount() {
 	return ncols;
 }
 
-#ifndef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::knowsRowCount() {
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (usestmtprepare) {
+		return false;
+	}
+#endif
 	return true;
 }
 
 uint64_t mysqlcursor::rowCount() {
 	return nrows;
 }
-#endif
 
 uint64_t mysqlcursor::affectedRows() {
 	return affectedrows;
