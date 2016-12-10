@@ -123,18 +123,28 @@ postgresqlbenchcursor::~postgresqlbenchcursor() {
 
 bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 
+#ifdef HAVE_POSTGRESQL_PQPREPARE
+	// prepare the query
+	pgresult=PQprepare(pgbcon->pgconn,"",query,0,NULL);
+	PQclear(pgresult);
+
+	// run the query
+	pgresult=PQexecPrepared(pgbcon->pgconn,"",0,NULL,NULL,NULL,0);
+	if (pgresult==(PGresult *)NULL) {
+		stdoutput.printf("PQexec failed\n");
+		return false;
+	}
+#else
 	// run the query
 	pgresult=PQexec(pgbcon->pgconn,query);
 	if (pgresult==(PGresult *)NULL) {
 		stdoutput.printf("PQexec failed\n");
 		return false;
 	}
-
-	// get the row count
-	PQntuples(pgresult);
+#endif
 
 	// get the affected row count
-	PQntuples(pgresult);
+	PQcmdTuples(pgresult);
 
 	// get the column count
 	int32_t	cols=PQnfields(pgresult);
@@ -152,7 +162,9 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 	int	rows=PQntuples(pgresult);
 	for (int i=0; i<rows; i++) {
 		for (int j=0; j<cols; j++) {
+			PQgetisnull(pgresult,i,j);
 			PQgetvalue(pgresult,i,j);
+			PQgetlength(pgresult,i,j);
 		}
 	}
 
