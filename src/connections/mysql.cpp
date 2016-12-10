@@ -1639,9 +1639,7 @@ void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		boundvariables=0;
-		uint16_t	maxbindcount=
-				conn->cont->getConfig()->getMaxBindCount();
-		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
+		bytestring::zero(bind,bindcount*sizeof(MYSQL_BIND));
 		mysql_stmt_reset(stmt);
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);

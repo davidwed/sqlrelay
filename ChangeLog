@@ -26,6 +26,10 @@
 		mysql connection to improve performance.  mysql connection
 		doesn't know the total number of rows prior to full fetch
 		now (which is consistent with most other databases).
+	updated postgresql connection to use an unnamed cursor instead of
+		naming it and having to deallocate it over an over
+	tweaked skipWhitespaceAndComments and related methods to use
+		charstring::isNullOrEmpty and character::isWhitespace
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile

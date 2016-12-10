@@ -123,14 +123,23 @@ postgresqlbenchcursor::~postgresqlbenchcursor() {
 
 bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 
+	// run the query
 	pgresult=PQexec(pgbcon->pgconn,query);
 	if (pgresult==(PGresult *)NULL) {
 		stdoutput.printf("PQexec failed\n");
 		return false;
 	}
 
+	// get the row count
+	PQntuples(pgresult);
+
+	// get the affected row count
+	PQntuples(pgresult);
+
+	// get the column count
 	int32_t	cols=PQnfields(pgresult);
 
+	// run through the columns
 	if (getcolumns) {
 		for (int i=0; i<cols; i++) {
 			PQfname(pgresult,i);
@@ -146,6 +155,8 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 			PQgetvalue(pgresult,i,j);
 		}
 	}
+
+	// free the result set
 	PQclear(pgresult);
 
 	return true;

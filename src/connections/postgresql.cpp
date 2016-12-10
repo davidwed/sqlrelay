@@ -46,9 +46,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getLastInsertIdQuery();
 		const char	*bindFormat();
 
-		int	datatypecount;
-		int32_t	*datatypeids;
-		char	**datatypenames;
+		dictionary< int32_t, char *>	datatypes;
 
 		PGconn	*pgconn;
 
@@ -91,7 +89,6 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-		bool		deallocateStatement();
 #endif
 		bool		supportsNativeBinds(const char *query,
 							uint32_t length);
@@ -166,13 +163,11 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-		bool		deallocatestatement;
 		int		bindcount;
 		int		bindcounter;
 		char		**bindvalues;
 		int		*bindlengths;
 		int		*bindformats;
-		char		*cursorname;
 
 		bool		bindformaterror;
 #endif
@@ -186,9 +181,7 @@ static void nullNoticeProcessor(void *arg, const char *message) {
 postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
 	dbversion=NULL;
-	datatypecount=0;
-	datatypeids=NULL;
-	datatypenames=NULL;
+	datatypes.setTrackInsertionOrder(false);
 	pgconn=NULL;
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	currentoid=InvalidOid;
@@ -241,11 +234,14 @@ void postgresqlconnection::handleConnectString() {
 
 bool postgresqlconnection::logIn(const char **error, const char **warning) {
 
-	// initialize the datatype storage buffers
+	// clear the datatype dictionary
 	if (typemangling==2) {
-		datatypecount=0;
-		datatypeids=NULL;
-		datatypenames=NULL;
+		for (avltreenode< dictionarynode<int32_t,char *> *>
+					*node=datatypes.getTree()->getFirst();
+					node; node=node->getNext()) {
+			delete[] node->getValue()->getValue();
+		}
+		datatypes.clear();
 	}
 
 	// log in
@@ -301,7 +297,7 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 	}
 #endif
 
-	// get the datatypes
+	// build the datatype dictionary
 	if (typemangling==2) {
 		PGresult	*result=PQexec(pgconn,
 					"select oid,typname from pg_type");
@@ -309,21 +305,11 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 			*error=logInError("Get datatypes failed");
 			return false;
 		}
-
-		// create the datatype storage buffers
-		datatypecount=PQntuples(result);
-		datatypeids=new int32_t[datatypecount];
-		datatypenames=new char *[datatypecount];
-
-		// copy the datatype ids/names into the buffers
-		for (int i=0; i<datatypecount; i++) {
-			datatypeids[i]=
-				charstring::toInteger(PQgetvalue(result,i,0));
-			datatypenames[i]=
-				charstring::duplicate(PQgetvalue(result,i,1));
+		for (int i=0; i<PQntuples(result); i++) {
+			datatypes.setValue(
+				charstring::toInteger(PQgetvalue(result,i,0)),
+				charstring::duplicate(PQgetvalue(result,i,1)));
 		}
-	
-		// clean up
 		PQclear(result);
 	}
 
@@ -369,19 +355,14 @@ void postgresqlconnection::logOut() {
 		pgconn=NULL;
 	}
 
+	// clear the datatype dictionary
 	if (typemangling==2) {
-
-		// delete the datatype storage buffers
-		for (int i=0; i<datatypecount; i++) {
-			delete[] datatypenames[i];
+		for (avltreenode< dictionarynode<int32_t,char *> *>
+					*node=datatypes.getTree()->getFirst();
+					node; node=node->getNext()) {
+			delete[] node->getValue()->getValue();
 		}
-		delete[] datatypeids;
-		delete[] datatypenames;
-
-		// re-initialize the datatype storage buffers
-		datatypecount=0;
-		datatypeids=NULL;
-		datatypenames=NULL;
+		datatypes.clear();
 	}
 }
 
@@ -605,15 +586,13 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	pgresult=NULL;
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-	deallocatestatement=false;
-	size_t	cursornamelen=6+charstring::integerLength(id)+1;
-	cursorname=new char[cursornamelen];
-	charstring::printf(cursorname,cursornamelen,"cursor%d",id);
 	bindcounter=0;
 	bindcount=0;
-	bindvalues=NULL;
-	bindlengths=NULL;
-	bindformats=NULL;
+	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
+	bindvalues=new char *[maxbindcount];
+	bytestring::zero(bindvalues,maxbindcount*sizeof(char *));
+	bindlengths=new int[maxbindcount];
+	bindformats=new int[maxbindcount];
 	bindformaterror=false;
 #endif
 }
@@ -621,9 +600,6 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 postgresqlcursor::~postgresqlcursor() {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-	deallocateStatement();
-	delete[] cursorname;
-
 	for (uint16_t i=0; i<bindcounter; i++) {
 		delete[] bindvalues[i];
 	}
@@ -635,20 +611,6 @@ postgresqlcursor::~postgresqlcursor() {
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-bool postgresqlcursor::deallocateStatement() {
-	if (deallocatestatement) {
-		stringbuffer	rmquery;
-		rmquery.append("deallocate ")->append(cursorname);
-		pgresult=PQexec(postgresqlconn->pgconn,rmquery.getString());
-		if (!pgresult) {
-			return false;
-		}
-		PQclear(pgresult);
-		deallocatestatement=true;
-	}
-	return true;
-}
-
 bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize the column count
@@ -663,36 +625,11 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// reset bind counter
 	bindcounter=0;
 
-	if (bindcount) {
-
-		// clear bind arrays
-		delete[] bindvalues;
-		delete[] bindlengths;
-		delete[] bindformats;
-
-		// create new bind arrays
-		bindvalues=new char *[bindcount];
-		bindlengths=new int[bindcount];
-		bindformats=new int[bindcount];
-
-		// initialize bind arrays
-		for (int i=0; i<bindcount; i++) {
-			bindvalues[i]=NULL;
-			bindlengths[i]=0;
-			bindformats[i]=0;
-		}
-	}
-
 	// reset the bind format error flag
 	bindformaterror=false;
 
-	// remove this named statement, if it exists already
-	if (!deallocateStatement()) {
-		return false;
-	}
-
 	// prepare the query
-	pgresult=PQprepare(postgresqlconn->pgconn,cursorname,query,0,NULL);
+	pgresult=PQprepare(postgresqlconn->pgconn,"",query,0,NULL);
 
 	// handle some kind of outright failure
 	if (!pgresult) {
@@ -706,8 +643,6 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 		pgstatus==PGRES_NONFATAL_ERROR ||
 		pgstatus==PGRES_FATAL_ERROR) {
 		result=false;
-	} else {
-		deallocatestatement=true;
 	}
 
 	// clean up
@@ -898,8 +833,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	if (bindcounter) {
 		// execute the query
-		pgresult=PQexecPrepared(postgresqlconn->pgconn,
-					cursorname,
+		pgresult=PQexecPrepared(postgresqlconn->pgconn,"",
 					bindcounter,bindvalues,
 					bindlengths,bindformats,0);
 		// reset bind counter
@@ -1258,12 +1192,7 @@ const char *postgresqlcursor::getColumnTypeName(uint32_t col) {
 						"%d",(int32_t)pgfieldtype);
 		return typenamebuffer;
 	} else {
-		for (int i=0; i<postgresqlconn->datatypecount; i++) {
-			if ((int32_t)pgfieldtype==
-				postgresqlconn->datatypeids[i]) {
-				return postgresqlconn->datatypenames[i];
-			}
-		}
+		return postgresqlconn->datatypes.getValue((int32_t)pgfieldtype);
 	}
 	return NULL;
 }

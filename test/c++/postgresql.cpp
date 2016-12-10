@@ -753,7 +753,11 @@ int	main(int argc, char **argv) {
 	// temporary tables
 	stdoutput.printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptable\n");
-	cur->sendQuery("create temporary table temptable (col1 int)");
+	cur->sendQuery("-- this should be skipped\n"
+			"-- so should this\n"
+			"-- and the whitespace below too\n"
+			"        				\n\n"
+			"create temporary table temptable (col1 int)");
 	checkSuccess(cur->sendQuery("insert into temptable values (1)"),1);
 	checkSuccess(cur->sendQuery("select count(*) from temptable"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");

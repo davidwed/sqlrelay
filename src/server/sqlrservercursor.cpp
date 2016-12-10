@@ -368,8 +368,7 @@ void sqlrservercursor::checkForTempTable(const char *query, uint32_t length) {
 	// get the table name
 	stringbuffer	tablename;
 	const char	*endptr=query+length;
-	while (ptr && *ptr && *ptr!=' ' &&
-		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
+	while (*ptr && !character::isWhitespace(*ptr) && ptr<endptr) {
 		tablename.append(*ptr);
 		ptr++;
 	}
@@ -1002,7 +1001,7 @@ void sqlrservercursor::setCreateTempTablePattern(const char *createtemp) {
 
 const char *sqlrservercursor::skipCreateTempTableClause(const char *query) {
 	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
-	if (ptr && *ptr && pvt->_createtemp.match(ptr)) {
+	if (!charstring::isNullOrEmpty(ptr) && pvt->_createtemp.match(ptr)) {
 		return pvt->_createtemp.getSubstringEnd(0);
 	}
 	return NULL;

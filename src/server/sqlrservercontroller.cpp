@@ -2454,7 +2454,7 @@ bool sqlrservercontroller::skipComment(const char **ptr, const char *endptr) {
 }
 
 bool sqlrservercontroller::skipWhitespace(const char **ptr, const char *endptr) {
-	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
+	while (character::isWhitespace(**ptr) && *ptr<endptr) {
 		(*ptr)++;
 	}
 	return *ptr!=endptr;
@@ -2462,14 +2462,19 @@ bool sqlrservercontroller::skipWhitespace(const char **ptr, const char *endptr) 
 
 const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 	const char	*ptr=query;
-	while (*ptr && 
-		(*ptr==' ' || *ptr=='\n' || *ptr=='	' || *ptr=='-')) {
-		if (*ptr=='-') {
+	while (*ptr) {
+		if (character::isWhitespace(*ptr)) {
+			ptr++;
+		} else if (!charstring::compare(ptr,"--",2)) {
 			while (*ptr && *ptr!='\n') {
 				ptr++;
 			}
+			if (*ptr) {
+				ptr++;
+			}
+		} else {
+			return ptr;
 		}
-		ptr++;
 	}
 	return ptr;
 }

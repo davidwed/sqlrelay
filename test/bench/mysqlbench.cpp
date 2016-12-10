@@ -204,7 +204,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 			return false;
 		}
 
-		// get column count
+		// get the column count
 		uint32_t	ncols=mysql_stmt_field_count(stmt);
 
 		// get statement metadata
@@ -251,7 +251,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 	MYSQL_RES	*mysqlresult=mysql_store_result(&mbcon->mysql);
 	if (mysqlresult) {
 
-		// get column info
+		// get the column count
 		uint32_t	ncols=mysql_num_fields(mysqlresult);
 
 		// get the row count
@@ -260,6 +260,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 		// get the affected row count
 		mysql_affected_rows(&mbcon->mysql);
 
+		// run through the columns
 		if (getcolumns) {
 			mysql_field_seek(mysqlresult,0);
 			for (uint32_t i=0; i<ncols; i++) {
