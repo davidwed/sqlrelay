@@ -91,8 +91,7 @@ bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
 	// insert
 	stdoutput.printf("  inserting %lld rows...\n",rows);
 	for (uint64_t i=0; i<rows && !shutdown; i++) {
-		char	*insertquery=
-			insertQuery(cols,colsize);
+		char	*insertquery=insertQuery(cols,colsize);
 		if (debug) {
 			stdoutput.printf("  row %lld\n%s\n",i,insertquery);
 		}

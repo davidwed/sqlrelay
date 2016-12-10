@@ -143,10 +143,8 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 	int	rows=PQntuples(pgresult);
 	for (int i=0; i<rows; i++) {
 		for (int j=0; j<cols; j++) {
-			//printf("%s,",PQgetvalue(pgresult,i,j));
 			PQgetvalue(pgresult,i,j);
 		}
-		//printf("\n");
 	}
 	PQclear(pgresult);
 
