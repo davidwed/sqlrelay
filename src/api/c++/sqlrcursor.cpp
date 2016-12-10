@@ -24,17 +24,17 @@
 // we're optimistic that the average query will contain 16 bind variables
 #define OPTIMISTIC_BIND_COUNT 16
 
-// we're optimistic that the average query will contain 15 columns whose names
-// average 10 characters in length
-#define OPTIMISTIC_COLUMN_COUNT 15
-#define OPTIMISTIC_AVERAGE_COLUMN_NAME_LENGTH 10
+// we're optimistic that the average query will contain 16 columns whose names
+// average 16 characters in length
+#define OPTIMISTIC_COLUMN_COUNT 16
+#define OPTIMISTIC_AVERAGE_COLUMN_NAME_LENGTH 16
 #define OPTIMISTIC_COLUMN_DATA_SIZE OPTIMISTIC_COLUMN_COUNT*\
 					OPTIMISTIC_AVERAGE_COLUMN_NAME_LENGTH
 
-// we're optimistic that the average query will contain 15 rows whose fields
-// average 15 characters in length
-#define OPTIMISTIC_ROW_COUNT 15
-#define OPTIMISTIC_AVERAGE_FIELD_LENGTH 15
+// we're optimistic that the average query will contain 16 rows whose fields
+// average 16 characters in length
+#define OPTIMISTIC_ROW_COUNT 16
+#define OPTIMISTIC_AVERAGE_FIELD_LENGTH 16
 #define OPTIMISTIC_RESULT_SET_SIZE OPTIMISTIC_COLUMN_COUNT*\
 					OPTIMISTIC_ROW_COUNT*\
 					OPTIMISTIC_AVERAGE_FIELD_LENGTH

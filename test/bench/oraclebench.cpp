@@ -81,11 +81,12 @@ oraclebenchmarks::oraclebenchmarks(const char *connectstring,
 					uint64_t rows,
 					uint32_t cols,
 					uint32_t colsize,
-					uint16_t iterations,
+					uint16_t samples,
+					uint64_t rsbs,
 					bool debug) :
 					benchmarks(connectstring,db,
 						queries,rows,cols,colsize,
-						iterations,debug) {
+						samples,rsbs,debug) {
 	con=new oraclebenchconnection(connectstring,db);
 	cur=new oraclebenchcursor(con);
 }

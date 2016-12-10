@@ -366,7 +366,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("TOTAL ROWS: \n");
-	checkSuccessInt(sqlrcur_totalRows(cur),8);
+	checkSuccessInt(sqlrcur_totalRows(cur),0);
 	printf("\n");
 
 	printf("FIRST ROW INDEX: \n");

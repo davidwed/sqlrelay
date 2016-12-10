@@ -13,7 +13,8 @@ class sapbenchmarks : public benchmarks {
 					uint64_t rows,
 					uint32_t cols,
 					uint32_t colsize,
-					uint16_t iterations,
+					uint16_t samples,
+					uint64_t rsbs,
 					bool debug);
 };
 

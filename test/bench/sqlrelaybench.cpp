@@ -29,7 +29,8 @@ class sqlrelaybenchconnection : public benchconnection {
 
 class sqlrelaybenchcursor : public benchcursor {
 	public:
-			sqlrelaybenchcursor(benchconnection *con);
+			sqlrelaybenchcursor(benchconnection *con,
+							uint64_t rsbs);
 			~sqlrelaybenchcursor();
 
 		bool	query(const char *query, bool getcolumns);
@@ -45,13 +46,15 @@ sqlrelaybenchmarks::sqlrelaybenchmarks(const char *connectstring,
 					uint64_t rows,
 					uint32_t cols,
 					uint32_t colsize,
-					uint16_t iterations,
+					uint16_t samples,
+					uint64_t rsbs,
 					bool debug) :
 					benchmarks(connectstring,db,
 						queries,rows,cols,colsize,
-						iterations,debug) {
+						samples,rsbs,debug) {
 	con=new sqlrelaybenchconnection(connectstring,db);
-	cur=new sqlrelaybenchcursor(con);
+	cur=new sqlrelaybenchcursor(con,rsbs);
+	issqlrelay=true;
 }
 
 
@@ -84,11 +87,12 @@ bool sqlrelaybenchconnection::disconnect() {
 	return true;
 }
 
-sqlrelaybenchcursor::sqlrelaybenchcursor(benchconnection *con) :
-							benchcursor(con) {
+sqlrelaybenchcursor::sqlrelaybenchcursor(benchconnection *con,
+						uint64_t rsbs) :
+						benchcursor(con) {
 	sqlrbcon=(sqlrelaybenchconnection *)con;
 	sqlrcur=new sqlrcursor(sqlrbcon->sqlrcon);
-	sqlrcur->setResultSetBufferSize(10);
+	sqlrcur->setResultSetBufferSize(rsbs);
 }
 
 sqlrelaybenchcursor::~sqlrelaybenchcursor() {
@@ -101,7 +105,18 @@ bool sqlrelaybenchcursor::query(const char *query, bool getcolumns) {
 	} else {
 		sqlrcur->dontGetColumnInfo();
 	}
-	// FIXME: run through the rows
-	// (now that we're setting a result set buffer size
-	return sqlrcur->sendQuery(query);
+	if (!sqlrcur->sendQuery(query)) {
+		return false;
+	}
+	uint32_t	colcount=sqlrcur->colCount();
+	if (!colcount) {
+		return true;
+	}
+	for (uint64_t row=0; ; row++) {
+		for (uint32_t col=0; col<colcount; col++) {
+			if (!sqlrcur->getField(row,col)) {
+				return true;
+			}
+		}
+	}
 }

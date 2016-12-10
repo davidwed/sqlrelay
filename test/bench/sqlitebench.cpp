@@ -6,6 +6,10 @@
 
 #include "sqlitebench.h"
 
+extern "C" {
+	#include <sqlite3.h>
+}
+
 class sqlitebenchconnection : public benchconnection {
 	friend class sqlitebenchcursor;
 	public:
@@ -18,6 +22,8 @@ class sqlitebenchconnection : public benchconnection {
 
 	private:
 		const char	*db;
+
+		sqlite3		*sqlitecon;
 };
 
 class sqlitebenchcursor : public benchcursor {
@@ -31,6 +37,7 @@ class sqlitebenchcursor : public benchcursor {
 
 	private:
 		sqlitebenchconnection	*sbcon;
+		sqlite3_stmt		*sqlitestmt;
 };
 
 sqlitebenchmarks::sqlitebenchmarks(const char *connectstring,
@@ -39,11 +46,12 @@ sqlitebenchmarks::sqlitebenchmarks(const char *connectstring,
 					uint64_t rows,
 					uint32_t cols,
 					uint32_t colsize,
-					uint16_t iterations,
+					uint16_t samples,
+					uint64_t rsbs,
 					bool debug) :
 					benchmarks(connectstring,db,
 						queries,rows,cols,colsize,
-						iterations,debug) {
+						samples,rsbs,debug) {
 	con=new sqlitebenchconnection(connectstring,db);
 	cur=new sqlitebenchcursor(con);
 }
@@ -54,9 +62,11 @@ sqlitebenchconnection::sqlitebenchconnection(
 				const char *db) :
 				benchconnection(connectstring,db) {
 	db=getParam("db");
+	sqlite3_open(db,&sqlitecon);
 }
 
 sqlitebenchconnection::~sqlitebenchconnection() {
+	sqlite3_close(sqlitecon);
 }
 
 bool sqlitebenchconnection::connect() {
@@ -80,7 +90,41 @@ bool sqlitebenchcursor::open() {
 }
 
 bool sqlitebenchcursor::query(const char *query, bool getcolumns) {
-	return true;
+
+	bool	retval=false;
+
+	if (sqlite3_prepare_v2(sbcon->sqlitecon,
+					query,
+					charstring::length(query),
+					&sqlitestmt,
+					NULL)==SQLITE_OK) {
+
+		int	res=sqlite3_step(sqlitestmt);
+		if (res==SQLITE_ROW) {
+
+			int	ncolumn=sqlite3_column_count(sqlitestmt);
+			if (getcolumns) {
+				for (int i=0; i<ncolumn; i++) {
+					sqlite3_column_name(sqlitestmt,i);
+					sqlite3_column_type(sqlitestmt,i);
+				}
+			}
+
+			while (sqlite3_step(sqlitestmt)==SQLITE_ROW) {
+				for (int i=0; i<ncolumn; i++) {
+					sqlite3_column_text(sqlitestmt,i);
+				}
+			}
+
+			retval=true;
+
+		} else if (res==SQLITE_DONE) {
+			retval=true;
+		}
+	}
+
+	sqlite3_finalize(sqlitestmt);
+	return retval;
 }
 
 bool sqlitebenchcursor::close() {

@@ -102,8 +102,10 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
+#ifndef HAVE_MYSQL_STMT_PREPARE
 		bool		knowsRowCount();
 		uint64_t	rowCount();
+#endif
 		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
@@ -698,9 +700,12 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
 	stmtfreeresult=false;
-	bind=new MYSQL_BIND[conn->cont->getConfig()->getMaxBindCount()];
-	bindvaluesize=
-		new unsigned long[conn->cont->getConfig()->getMaxBindCount()];
+
+	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
+	bind=new MYSQL_BIND[maxbindcount];
+	bindvaluesize=new unsigned long[maxbindcount];
+	bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
+
 	usestmtprepare=true;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
@@ -762,8 +767,8 @@ void mysqlcursor::allocateResultSetBuffers(int32_t selectlistsize,
 		field=new char[selectlistsize*itembuffersize];
 		isnull=new my_bool[selectlistsize];
 		fieldlength=new unsigned long[selectlistsize];
+		bytestring::zero(fieldbind,selectlistsize*sizeof(MYSQL_BIND));
 		for (unsigned short index=0; index<selectlistsize; index++) {
-			bytestring::zero(&fieldbind[index],sizeof(MYSQL_BIND));
 			fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
 			fieldbind[index].buffer=&field[index*itembuffersize];
 			fieldbind[index].buffer_length=itembuffersize;
@@ -833,11 +838,6 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// reset bound variables flag
 	boundvariables=false;
-
-	// re-init bind buffers
-	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
-		bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
-	}
 
 	// prepare the statement
 	if (mysql_stmt_prepare(stmt,query,length)) {
@@ -1158,16 +1158,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 					mysqlconn->maxitembuffersize);
 		}
 
-		// store the result set
-		// FIXME: this causes the entire result set to be buffered,
-		// do we want to do that?
-		if (mysql_stmt_store_result(stmt)) {
-			return false;
-		}
-
-		// get the row count
-		nrows=mysql_stmt_num_rows(stmt);
-	
 		// get the affected row count
 		// (call after mysql_stmt_store_result or this will return
 		// -1 when the query is a select, which we don't want if
@@ -1316,6 +1306,7 @@ uint32_t mysqlcursor::colCount() {
 	return ncols;
 }
 
+#ifndef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::knowsRowCount() {
 	return true;
 }
@@ -1323,6 +1314,7 @@ bool mysqlcursor::knowsRowCount() {
 uint64_t mysqlcursor::rowCount() {
 	return nrows;
 }
+#endif
 
 uint64_t mysqlcursor::affectedRows() {
 	return affectedrows;
@@ -1333,55 +1325,56 @@ const char *mysqlcursor::getColumnName(uint32_t col) {
 }
 
 uint16_t mysqlcursor::getColumnType(uint32_t col) {
-	if (mysqlfields[col]->type==FIELD_TYPE_STRING) {
-		return STRING_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_VAR_STRING) {
-		return CHAR_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_DECIMAL
+	switch (mysqlfields[col]->type) {
+		case FIELD_TYPE_STRING:
+			return STRING_DATATYPE;
+		case FIELD_TYPE_VAR_STRING:
+			return CHAR_DATATYPE;
+		case FIELD_TYPE_DECIMAL:
+			return DECIMAL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
-		|| mysqlfields[col]->type==FIELD_TYPE_NEWDECIMAL
+		case FIELD_TYPE_NEWDECIMAL:
+			return DECIMAL_DATATYPE;
 #endif
-		) {
-		return DECIMAL_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_TINY) {
-		return TINYINT_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_SHORT) {
-		return SMALLINT_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_LONG) {
-		return INT_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_FLOAT) {
-		return FLOAT_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_DOUBLE) {
-		return REAL_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_LONGLONG) {
-		return BIGINT_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_INT24) {
-		return MEDIUMINT_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_TIMESTAMP) {
-		return TIMESTAMP_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_DATE) {
-		return DATE_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_TIME) {
-		return TIME_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_DATETIME) {
-		return DATETIME_DATATYPE;
+		case FIELD_TYPE_TINY:
+			return TINYINT_DATATYPE;
+		case FIELD_TYPE_SHORT:
+			return SMALLINT_DATATYPE;
+		case FIELD_TYPE_LONG:
+			return INT_DATATYPE;
+		case FIELD_TYPE_FLOAT:
+			return FLOAT_DATATYPE;
+		case FIELD_TYPE_DOUBLE:
+			return REAL_DATATYPE;
+		case FIELD_TYPE_LONGLONG:
+			return BIGINT_DATATYPE;
+		case FIELD_TYPE_INT24:
+			return MEDIUMINT_DATATYPE;
+		case FIELD_TYPE_TIMESTAMP:
+			return TIMESTAMP_DATATYPE;
+		case FIELD_TYPE_DATE:
+			return DATE_DATATYPE;
+		case FIELD_TYPE_TIME:
+			return TIME_DATATYPE;
+		case FIELD_TYPE_DATETIME:
+			return DATETIME_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_YEAR
-	} else if (mysqlfields[col]->type==FIELD_TYPE_YEAR) {
-		return YEAR_DATATYPE;
+		case FIELD_TYPE_YEAR:
+			return YEAR_DATATYPE;
 #endif
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDATE
-	} else if (mysqlfields[col]->type==FIELD_TYPE_NEWDATE) {
-		return NEWDATE_DATATYPE;
+		case FIELD_TYPE_NEWDATE:
+			return NEWDATE_DATATYPE;
 #endif
-	} else if (mysqlfields[col]->type==FIELD_TYPE_NULL) {
-		return NULL_DATATYPE;
+		case FIELD_TYPE_NULL:
+			return NULL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_ENUM
-	} else if (mysqlfields[col]->type==FIELD_TYPE_ENUM) {
-		return ENUM_DATATYPE;
+		case FIELD_TYPE_ENUM:
+			return ENUM_DATATYPE;
 #endif
 #ifdef HAVE_MYSQL_FIELD_TYPE_SET
-	} else if (mysqlfields[col]->type==FIELD_TYPE_SET) {
-		return SET_DATATYPE;
+		case FIELD_TYPE_SET:
+			return SET_DATATYPE;
 #endif
 	// For some versions of mysql, tinyblobs, mediumblobs and
 	// longblobs all show up as FIELD_TYPE_BLOB despite field types
@@ -1393,95 +1386,103 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 	// more standard than TEXT.  I wonder if this will be
 	// changed in a future incarnation of mysql.  I also wonder
 	// what happens on a 64 bit machine.
-	} else if (mysqlfields[col]->type==FIELD_TYPE_TINY_BLOB ||
-			(mysqlfields[col]->type==FIELD_TYPE_BLOB &&
-					mysqlfields[col]->length<256)) {
-		return TINY_BLOB_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_BLOB &&
-					mysqlfields[col]->length<65536) {
-		return BLOB_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_MEDIUM_BLOB ||
-			(mysqlfields[col]->type==FIELD_TYPE_BLOB &&
-					mysqlfields[col]->length<16777216)) {
-		return MEDIUM_BLOB_DATATYPE;
-	} else if (mysqlfields[col]->type==FIELD_TYPE_LONG_BLOB ||
-				mysqlfields[col]->type==FIELD_TYPE_BLOB) {
-		return LONG_BLOB_DATATYPE;
-	} else {
-		return UNKNOWN_DATATYPE;
+		case FIELD_TYPE_TINY_BLOB:
+			return TINY_BLOB_DATATYPE;
+		case FIELD_TYPE_BLOB:
+			if (mysqlfields[col]->length<256) {
+				return TINY_BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<65536) {
+				return BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<16777216) {
+				return MEDIUM_BLOB_DATATYPE;
+			} else {
+				return LONG_BLOB_DATATYPE;
+			}
+		case FIELD_TYPE_MEDIUM_BLOB:
+			return MEDIUM_BLOB_DATATYPE;
+		case FIELD_TYPE_LONG_BLOB:
+			return LONG_BLOB_DATATYPE;
+		default:
+			return UNKNOWN_DATATYPE;
 	}
 }
 
 uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 
-	if (getColumnType(col)==STRING_DATATYPE) {
-		return (uint32_t)mysqlfields[col]->length;
-	} else if (getColumnType(col)==CHAR_DATATYPE) {
-		return (uint32_t)mysqlfields[col]->length+1;
-	} else if (getColumnType(col)==DECIMAL_DATATYPE) {
-		uint32_t	length=0;
-		if (mysqlfields[col]->decimals>0) {
-			length=mysqlfields[col]->length+2;
-		} else if (mysqlfields[col]->decimals==0) {
-			length=mysqlfields[col]->length+1;
-		}
-		if (mysqlfields[col]->length<mysqlfields[col]->decimals) {
-			length=mysqlfields[col]->decimals+2;
-		}
-		return length;
-	} else if (getColumnType(col)==TINYINT_DATATYPE) {
-		return 1;
-	} else if (getColumnType(col)==SMALLINT_DATATYPE) {
-		return 2;
-	} else if (getColumnType(col)==INT_DATATYPE) {
-		return 4;
-	} else if (getColumnType(col)==FLOAT_DATATYPE) {
-		if (mysqlfields[col]->length<=24) {
+	switch (getColumnType(col)) {
+		case STRING_DATATYPE:
+			return (uint32_t)mysqlfields[col]->length;
+		case CHAR_DATATYPE:
+			return (uint32_t)mysqlfields[col]->length+1;
+		case DECIMAL_DATATYPE:
+			{
+			uint32_t	length=0;
+			if (mysqlfields[col]->decimals>0) {
+				length=mysqlfields[col]->length+2;
+			} else if (mysqlfields[col]->decimals==0) {
+				length=mysqlfields[col]->length+1;
+			}
+			if (mysqlfields[col]->length<
+					mysqlfields[col]->decimals) {
+				length=mysqlfields[col]->decimals+2;
+			}
+			return length;
+			}
+		case TINYINT_DATATYPE:
+			return 1;
+		case SMALLINT_DATATYPE:
+			return 2;
+		case INT_DATATYPE:
 			return 4;
-		} else {
+		case FLOAT_DATATYPE:
+			if (mysqlfields[col]->length<=24) {
+				return 4;
+			} else {
+				return 8;
+			}
+		case REAL_DATATYPE:
 			return 8;
-		}
-	} else if (getColumnType(col)==REAL_DATATYPE) {
-		return 8;
-	} else if (getColumnType(col)==BIGINT_DATATYPE) {
-		return 8;
-	} else if (getColumnType(col)==MEDIUMINT_DATATYPE) {
-		return 3;
-	} else if (getColumnType(col)==TIMESTAMP_DATATYPE) {
-		return 4;
-	} else if (getColumnType(col)==DATE_DATATYPE) {
-		return 3;
-	} else if (getColumnType(col)==TIME_DATATYPE) {
-		return 3;
-	} else if (getColumnType(col)==DATETIME_DATATYPE) {
-		return 8;
+		case BIGINT_DATATYPE:
+			return 8;
+		case MEDIUMINT_DATATYPE:
+			return 3;
+		case TIMESTAMP_DATATYPE:
+			return 4;
+		case DATE_DATATYPE:
+			return 3;
+		case TIME_DATATYPE:
+			return 3;
+		case DATETIME_DATATYPE:
+			return 8;
 #ifdef HAVE_MYSQL_FIELD_TYPE_YEAR
-	} else if (getColumnType(col)==YEAR_DATATYPE) {
-		return 1;
+		case YEAR_DATATYPE:
+			return 1;
 #endif
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDATE
-	} else if (getColumnType(col)==NEWDATE_DATATYPE) {
-		return 1;
+		case NEWDATE_DATATYPE:
+			return 1;
 #endif
-	} else if (getColumnType(col)==NULL_DATATYPE) {
+		case NULL_DATATYPE:
 #ifdef HAVE_MYSQL_FIELD_TYPE_ENUM
-	} else if (getColumnType(col)==ENUM_DATATYPE) {
-		// 1 or 2 bytes delepending on the # of enum values (65535 max)
-		return 2;
+		case ENUM_DATATYPE:
+			// 1 or 2 bytes delepending
+			// on the # of enum values (65535 max)
+			return 2;
 #endif
 #ifdef HAVE_MYSQL_FIELD_TYPE_SET
-	} else if (getColumnType(col)==SET_DATATYPE) {
-		// 1,2,3,4 or 8 bytes depending on the # of members (64 max)
-		return 8;
+		case SET_DATATYPE:
+			// 1,2,3,4 or 8 bytes depending
+			// on the # of members (64 max)
+			return 8;
 #endif
-	} else if (getColumnType(col)==TINY_BLOB_DATATYPE) {
-		return 255;
-	} else if (getColumnType(col)==BLOB_DATATYPE) {
-		return 65535;
-	} else if (getColumnType(col)==MEDIUM_BLOB_DATATYPE) {
-		return 16777215;
-	} else if (getColumnType(col)==LONG_BLOB_DATATYPE) {
-		return 2147483647;
+		case TINY_BLOB_DATATYPE:
+			return 255;
+		case BLOB_DATATYPE:
+			return 65535;
+		case MEDIUM_BLOB_DATATYPE:
+			return 16777215;
+		case LONG_BLOB_DATATYPE:
+			return 2147483647;
 	}
 	return (uint32_t)mysqlfields[col]->length;
 }
@@ -1644,11 +1645,9 @@ void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		boundvariables=0;
-		for (uint16_t i=0;
-			i<conn->cont->getConfig()->getMaxBindCount();
-			i++) {
-			bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
-		}
+		uint16_t	maxbindcount=
+				conn->cont->getConfig()->getMaxBindCount();
+		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
 		mysql_stmt_reset(stmt);
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);

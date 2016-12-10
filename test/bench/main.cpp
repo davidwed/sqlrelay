@@ -53,7 +53,8 @@ int main(int argc, const char **argv) {
 			"	[-rows rows-per-query] \\\n"
 			"	[-cols columns-per-row] \\\n"
 			"	[-colsize characters-per-column] \\\n"
-			"	[-iterations iterations-per-test] \\\n"
+			"	[-samples samples-per-test] \\\n"
+			"	[-rsbs result-set-buffer-size] \\\n"
 			"	[-dbonly|-sqlrelayonly] \\\n"
 			"	[-debug] \\\n"
 			"	[-graph graph]\n");
@@ -68,7 +69,8 @@ int main(int argc, const char **argv) {
 	uint64_t	rows=256;
 	uint32_t	cols=16;
 	uint32_t	colsize=32;
-	uint16_t	iterations=10;
+	uint16_t	samples=10;
+	uint64_t	rsbs=0;
 	bool		dbonly=false;
 	bool		sqlrelayonly=false;
 	bool		debug=false;
@@ -96,8 +98,11 @@ int main(int argc, const char **argv) {
 	if (cmdl.found("colsize")) {
 		colsize=charstring::toInteger(cmdl.getValue("colsize"));
 	}
-	if (cmdl.found("iterations")) {
-		iterations=charstring::toInteger(cmdl.getValue("iterations"));
+	if (cmdl.found("samples")) {
+		samples=charstring::toInteger(cmdl.getValue("samples"));
+	}
+	if (cmdl.found("rsbs")) {
+		rsbs=charstring::toInteger(cmdl.getValue("rsbs"));
 	}
 	if (cmdl.found("dbonly")) {
 		dbonly=true;
@@ -108,14 +113,18 @@ int main(int argc, const char **argv) {
 	if (cmdl.found("debug")) {
 		debug=true;
 	}
+	stringbuffer	graphname;
 	if (cmdl.found("graph")) {
 		graph=cmdl.getValue("graph");
+		graphname.append(graph);
 		if (charstring::compare(
 			charstring::findFirst(graph,".png"),".png")) {
-			stdoutput.printf("\nWARNING: the -graph parameter "
-					"should specify a png file name.\n\n");
+			graphname.append(".png");
 		}
+	} else {
+		graphname.append(db)->append(".png");
 	}
+	graph=graphname.getString();
 
 	// handle signals
 	bm=NULL;
@@ -153,8 +162,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new sqlrelaybenchmarks(
 					sqlrconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"db2")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
@@ -164,8 +173,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new db2benchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"firebird")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
@@ -176,20 +185,20 @@ int main(int argc, const char **argv) {
 			}
 			bm=new firebirdbenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		#ifndef _WIN32
 		} else if (!charstring::compare(db,"freetds")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"sybase=/etc;"
-					"server=DB64;db=testdb;"
+					"server=server;db=testdb;"
 					"user=testuser;password=testpassword;";
 			}
 			bm=new freetdsbenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		#endif
 		} else if (!charstring::compare(db,"mysql")) {
 			if (!dbconnectstring) {
@@ -200,8 +209,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new mysqlbenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"mysqlssl")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
@@ -213,8 +222,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new mysqlbenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"oracle") ||
 				!charstring::compare(db,"oracle8")) {
 			if (!dbconnectstring) {
@@ -224,8 +233,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new oraclebenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"postgresql")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
@@ -234,8 +243,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new postgresqlbenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"postgresqlssl")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
@@ -245,8 +254,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new postgresqlbenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		#ifndef _WIN32
 		} else if (!charstring::compare(db,"sqlite")) {
 			if (!dbconnectstring) {
@@ -255,8 +264,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new sqlitebenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		#endif
 		} else if (!charstring::compare(db,"sap") ||
 				!charstring::compare(db,"sybase")) {
@@ -268,8 +277,8 @@ int main(int argc, const char **argv) {
 			}
 			bm=new sapbenchmarks(
 					dbconnectstring,
-					db,queries,rows,
-					cols,colsize,iterations,debug);
+					db,queries,rows,cols,colsize,
+					samples,rsbs,debug);
 		}
 		if (!bm) {
 			stdoutput.printf("error creating benchmarks\n");

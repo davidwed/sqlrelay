@@ -1,6 +1,8 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
 #include <rudiments/datetime.h>
+#include <rudiments/process.h>
+#include <rudiments/snooze.h>
 
 #include "bench.h"
 
@@ -10,7 +12,8 @@ benchmarks::benchmarks(const char *connectstring,
 				uint64_t rows,
 				uint32_t cols,
 				uint32_t colsize,
-				uint16_t iterations,
+				uint16_t samples,
+				uint64_t rsbs,
 				bool debug) {
 
 	this->connectstring=connectstring;
@@ -19,10 +22,13 @@ benchmarks::benchmarks(const char *connectstring,
 	this->rows=rows;
 	this->cols=cols;
 	this->colsize=colsize;
-	this->iterations=iterations;
+	this->samples=samples;
+	this->rsbs=rsbs;
 	this->debug=debug;
 	this->con=NULL;
 	this->cur=NULL;
+
+	issqlrelay=false;
 
 	rnd.setSeed(randomnumber::getSeed());
 
@@ -36,6 +42,7 @@ benchmarks::~benchmarks() {
 
 void benchmarks::shutDown() {
 	stdoutput.printf("shutting down, please wait...\n");
+	snooze::macrosnooze(1);
 	shutdown=true;
 }
 
@@ -98,13 +105,13 @@ bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
 	}
 
 	// select
-	stdoutput.printf("  selecting...\n",rows,cols);
+	stdoutput.printf("  selecting...\n");
 	if (debug) {
-		stdoutput.printf("%s\n",rows,cols,selectquery);
+		stdoutput.printf("%s\n",selectquery);
 	}
 	if (!shutdown) {
 		benchSelect(selectquery,queries,rows,cols,
-					colsize,iterations,stats);
+					colsize,samples,stats);
 	}
 
 	// connect and open
@@ -193,7 +200,7 @@ void benchmarks::benchSelect(
 			const char *selectquery,
 			uint64_t queries, uint64_t rows,
 			uint32_t cols, uint32_t colsize,
-			uint16_t iterations,
+			uint16_t samples,
 			dictionary< float, linkedlist< float > *> *stats) {
 
 	// close and disconnect
@@ -216,10 +223,21 @@ void benchmarks::benchSelect(
 	}
 
 	// display stats
-	stdoutput.printf("\nqueries rows cols colsize iterations\n");
-	stdoutput.printf("   % 4lld % 4lld % 4d    % 4d       % 4d\n",
-					queries,rows,cols,colsize,iterations);
-	stdoutput.printf("queries-per-cx  queries-per-second\n");
+	uint64_t	bytesperquery=rows*cols*colsize;
+	stdoutput.printf("\nsamples queries cols colsize "
+				"bytes-per-row rows bytes-per-query");
+	if (issqlrelay) {
+		stdoutput.printf(" rsbs");
+	}
+	stdoutput.printf("\n");
+	stdoutput.printf("% 7d % 7lld % 4ld % 7ld % 13ld % 4lld % 15lld",
+				samples,queries,cols,colsize,
+				cols*colsize,rows,rows*cols*colsize);
+	if (issqlrelay) {
+		stdoutput.printf(" % 4lld",rsbs);
+	}
+	stdoutput.printf("\n");
+	stdoutput.printf("queries-per-cx  queries-per-second      Mbps\n");
 
 	// run selects
 	for (uint64_t qcount=1; qcount<=queries && !shutdown; qcount++) {
@@ -229,9 +247,9 @@ void benchmarks::benchSelect(
 		start.getSystemDateAndTime();
 
 		// run all of this some number of times and average the results
-		for (uint16_t iter=0; iter<iterations && !shutdown; iter++) {
+		for (uint16_t iter=0; iter<samples && !shutdown; iter++) {
 
-			for (uint64_t i=0; i<iterations && !shutdown; i++) {
+			for (uint64_t i=0; i<samples && !shutdown; i++) {
 
 				// connect and open
 				if (debug) {
@@ -282,15 +300,15 @@ void benchmarks::benchSelect(
 			}
 
 			// progress
-			if (iterations>=100) {
-				if (!((iter+1)%(iterations/10))) {
-					if (iter/(iterations/10)) {
+			if (samples>=100) {
+				if (!((iter+1)%(samples/10))) {
+					if (iter/(samples/10)) {
 						stdoutput.printf(".");
 					}
 					stdoutput.printf("%d",
-						(iter+1)/(iterations/10));
+						(iter+1)/(samples/10));
 					stdoutput.flush();
-					if (iter+1==iterations) {
+					if (iter+1==samples) {
 						stdoutput.printf("\n");
 					}
 				}
@@ -314,17 +332,19 @@ void benchmarks::benchSelect(
 		float	totalsec=(float)sec+(((float)usec)/1000000.0);
 
 		// average number of seconds per query
-		float	spq=totalsec/(iterations*iterations*qcount);
+		float	spq=totalsec/(samples*samples*qcount);
 
 		// average number of queries per second
 		float	qps=1.0/spq;
+
+		// calculate Mbps per second
+		float	mbps=(qps*(float)bytesperquery)/1024.0/1024.0*8.0;
 		
 		// calculate queries per connection
 		float	qpc=(float)qcount;
 
 		// display stats
-		stdoutput.printf("          % 4lld             % 4.2f\n",
-								qcount,qps);
+		stdoutput.printf("% 14lld  % 18.2f  % 8.2f\n",qcount,qps,mbps);
 
 		// update stats
 		linkedlist< float >	*d=stats->getValue(qpc);

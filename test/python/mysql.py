@@ -313,7 +313,7 @@ def main():
 	print()
 
 	print("TOTAL ROWS: ")
-	checkSuccess(cur.totalRows(),8)
+	checkSuccess(cur.totalRows(),0)
 	print()
 
 	print("FIRST ROW INDEX: ")

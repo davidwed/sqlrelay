@@ -5,6 +5,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/environment.h>
 #include <rudiments/datetime.h>
+#include <rudiments/process.h>
 
 #include "mysqlbench.h"
 
@@ -40,20 +41,31 @@ class mysqlbenchconnection : public benchconnection {
 		const char	*sslkey;
 		const char	*sslcipher;
 
-		MYSQL	mysql;
+		MYSQL		mysql;
 
 		bool		firstquery;
 };
 
 class mysqlbenchcursor : public benchcursor {
 	public:
-			mysqlbenchcursor(benchconnection *con);
+			mysqlbenchcursor(benchconnection *con,
+						uint32_t cols,
+						uint32_t colsize);
 			~mysqlbenchcursor();
 
 		bool	query(const char *query, bool getcolumns);
 
 	private:
 		mysqlbenchconnection	*mbcon;
+
+		#ifdef HAVE_MYSQL_STMT_PREPARE
+		uint32_t	colsize;
+		MYSQL_STMT	*stmt;
+		MYSQL_BIND	*fieldbind;
+		char		*field;
+		my_bool		*isnull;
+		unsigned long	*fieldlength;
+		#endif
 };
 
 mysqlbenchmarks::mysqlbenchmarks(const char *connectstring,
@@ -62,13 +74,14 @@ mysqlbenchmarks::mysqlbenchmarks(const char *connectstring,
 					uint64_t rows,
 					uint32_t cols,
 					uint32_t colsize,
-					uint16_t iterations,
+					uint16_t samples,
+					uint64_t rsbs,
 					bool debug) :
 					benchmarks(connectstring,db,
 						queries,rows,cols,colsize,
-						iterations,debug) {
+						samples,rsbs,debug) {
 	con=new mysqlbenchconnection(connectstring,db);
-	cur=new mysqlbenchcursor(con);
+	cur=new mysqlbenchcursor(con,cols,colsize);
 }
 
 
@@ -136,17 +149,40 @@ bool mysqlbenchconnection::disconnect() {
 	return true;
 }
 
-mysqlbenchcursor::mysqlbenchcursor(benchconnection *con) : benchcursor(con) {
+mysqlbenchcursor::mysqlbenchcursor(benchconnection *con,
+						uint32_t cols,
+						uint32_t colsize) :
+						benchcursor(con) {
 	mbcon=(mysqlbenchconnection *)con;
+	#ifdef HAVE_MYSQL_STMT_PREPARE
+	stmt=mysql_stmt_init(&mbcon->mysql);
+
+	this->colsize=colsize;
+	fieldbind=new MYSQL_BIND[cols];
+	field=new char[cols*colsize];
+	isnull=new my_bool[cols];
+	fieldlength=new unsigned long[cols];
+	for (unsigned short index=0; index<cols; index++) {
+		bytestring::zero(&fieldbind[index],sizeof(MYSQL_BIND));
+		fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
+		fieldbind[index].buffer=&field[index*colsize];
+		fieldbind[index].buffer_length=colsize;
+		fieldbind[index].is_null=&isnull[index];
+		fieldbind[index].length=&fieldlength[index];
+	}
+	#endif
 }
 
 mysqlbenchcursor::~mysqlbenchcursor() {
+	#ifdef HAVE_MYSQL_STMT_PREPARE
+	delete[] fieldbind;
+	delete[] field;
+	delete[] isnull;
+	delete[] fieldlength;
+	#endif
 }
 
 bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
-/*datetime	start;
-datetime	end;
-start.getSystemDateAndTime();*/
 
 	#ifdef HAVE_MYSQL_COMMIT
 	if (mbcon->firstquery) {
@@ -158,9 +194,56 @@ start.getSystemDateAndTime();*/
 	}
 	#endif
 
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (charstring::compare(query,"create",6) && 
+		charstring::compare(query,"drop",4) && 
+		charstring::compare(query,"insert",6)) {
+
+		// prepare the query
+		if (mysql_stmt_prepare(stmt,query,charstring::length(query))) {
+			return false;
+		}
+
+		// get column count
+		uint32_t	ncols=mysql_stmt_field_count(stmt);
+
+		// get statement metadata
+		MYSQL_RES	*mysqlresult=mysql_stmt_result_metadata(stmt);
+
+		// bind result set buffers
+		if (mysql_stmt_bind_result(stmt,fieldbind)) {
+			return false;
+		}
+
+		// execute the query
+		if (mysql_stmt_execute(stmt)) {
+			return false;
+		}
+	
+		// get the affected row count
+		mysql_stmt_affected_rows(stmt);
+
+		// run through the columns
+		if (getcolumns) {
+			mysql_field_seek(mysqlresult,0);
+			for (uint32_t i=0; i<ncols; i++) {
+				mysql_fetch_field(mysqlresult);
+			}
+		}
+
+		// run through the rows
+		while (!mysql_stmt_fetch(stmt)) {
+		}
+
+		// free the result set
+		mysql_stmt_reset(stmt);
+		mysql_stmt_free_result(stmt);
+
+		return true;
+	}
+#endif
 	// execute the query
-	if (mysql_real_query(&mbcon->mysql,query,
-					charstring::length(query))) {
+	if (mysql_real_query(&mbcon->mysql,query,charstring::length(query))) {
 		return false;
 	}
 
@@ -180,11 +263,8 @@ start.getSystemDateAndTime();*/
 		if (getcolumns) {
 			mysql_field_seek(mysqlresult,0);
 			for (uint32_t i=0; i<ncols; i++) {
-				//MYSQL_FIELD	*mysqlfields=
-					mysql_fetch_field(mysqlresult);
-				//stdoutput.printf("%s,",mysqlfields->name);
+				mysql_fetch_field(mysqlresult);
 			}
-			//stdoutput.printf("\n");
 		}
 
 		// run through the rows
@@ -192,19 +272,7 @@ start.getSystemDateAndTime();*/
 		unsigned long	*mysqlrowlengths;
 		while ((mysqlrow=mysql_fetch_row(mysqlresult)) &&
 			(mysqlrowlengths=mysql_fetch_lengths(mysqlresult))) {
-			/*stdoutput.printf("row...\n");
-			for (uint32_t i=0; i<ncols; i++) {
-				stdoutput.printf("  \"%s\"\n",mysqlrow[i]);
-			}*/
 		}
-/*end.getSystemDateAndTime();
-uint32_t	sec=end.getEpoch()-start.getEpoch();
-int32_t		usec=end.getMicroseconds()-start.getMicroseconds();
-if (usec<0) {
-	sec--;
-	usec=usec+1000000;
-}
-stdoutput.printf("% 4d.%06d\n",sec,usec);*/
 
 		// free the result set
 		mysql_free_result(mysqlresult);

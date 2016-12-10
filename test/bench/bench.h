@@ -20,7 +20,8 @@ class benchmarks {
 						uint64_t rows,
 						uint32_t cols,
 						uint32_t colsize,
-						uint16_t iterations,
+						uint16_t samples,
+						uint64_t rsbs,
 						bool debug);
 		virtual	~benchmarks();
 		void	shutDown();
@@ -29,6 +30,7 @@ class benchmarks {
 	protected:
 		benchconnection	*con;
 		benchcursor	*cur;
+		bool		issqlrelay;
 
 	private:
 		char	*createQuery(uint32_t cols, uint32_t colsize);
@@ -37,7 +39,7 @@ class benchmarks {
 		void	benchSelect(const char *selectquery,
 					uint64_t queries,
 					uint64_t rows, uint32_t cols,
-					uint32_t colsize, uint16_t iterations,
+					uint32_t colsize, uint16_t samples,
 					dictionary< float,
 						linkedlist< float > *> *stats);
 
@@ -47,7 +49,8 @@ class benchmarks {
 		uint64_t	rows;
 		uint32_t	cols;
 		uint32_t	colsize;
-		uint16_t	iterations;
+		uint16_t	samples;
+		uint64_t	rsbs;
 		bool		debug;
 
 		randomnumber	rnd;

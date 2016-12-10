@@ -418,7 +418,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("TOTAL ROWS: \n");
-	checkSuccess(cur->totalRows(),8);
+	checkSuccess(cur->totalRows(),0);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIRST ROW INDEX: \n");

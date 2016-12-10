@@ -340,7 +340,7 @@ checkSuccess($cur->rowCount(),8);
 print("\n");
 
 print("TOTAL ROWS: \n");
-checkSuccess($cur->totalRows(),8);
+checkSuccess($cur->totalRows(),0);
 print("\n");
 
 print("FIRST ROW INDEX: \n");
