@@ -69,7 +69,9 @@ class informixbenchcursor : public sqlrbenchcursor {
 			informixbenchcursor(sqlrbenchconnection *con);
 			~informixbenchcursor();
 
+		bool	open();
 		bool	query(const char *query, bool getcolumns);
+		bool	close();
 
 	private:
 		informixbenchconnection	*informixbcon;
@@ -186,7 +188,7 @@ informixbenchcursor::informixbenchcursor(sqlrbenchconnection *con) :
 informixbenchcursor::~informixbenchcursor() {
 }
 
-bool informixbenchcursor::query(const char *query, bool getcolumns) {
+bool informixbenchcursor::open() {
 
 	erg=SQLAllocHandle(SQL_HANDLE_STMT,informixbcon->dbc,&stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -199,6 +201,10 @@ bool informixbenchcursor::query(const char *query, bool getcolumns) {
 		stdoutput.printf("SQLSetStmtAttr (ROW_ARRAY_SIZE) failed\n");
 		return false;
 	}
+	return true;
+}
+
+bool informixbenchcursor::query(const char *query, bool getcolumns) {
 
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,charstring::length(query));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -345,6 +351,11 @@ bool informixbenchcursor::query(const char *query, bool getcolumns) {
 		}
 	}
 
+	SQLCloseCursor(stmt);
+	return true;
+}
+
+bool informixbenchcursor::close() {
 	SQLFreeHandle(SQL_HANDLE_STMT,stmt);
 	return true;
 }

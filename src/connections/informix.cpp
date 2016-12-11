@@ -885,8 +885,8 @@ bool informixcursor::close() {
 
 bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 
-	// FIXME: we shouldn't have to do this...
-	// I'd think there'd be a way to reuse a statement like db2 can.
+	// FIXME: we shouldn't have to do this, but the tests crash in
+	// multiple locations if we don't...
 	if (!close() || !open()) {
 		return false;
 	}

@@ -32,6 +32,8 @@
 		charstring::isNullOrEmpty and character::isWhitespace
 	replaced regular expression comparisons in sap/freetds connections
 		with simpler charstring comparisons
+	updated db2 connection to reuse the statement instead of recreating
+		it with each prepare
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile

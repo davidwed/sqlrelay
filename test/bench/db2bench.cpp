@@ -69,7 +69,9 @@ class db2benchcursor : public sqlrbenchcursor {
 			db2benchcursor(sqlrbenchconnection *con);
 			~db2benchcursor();
 
+		bool	open();
 		bool	query(const char *query, bool getcolumns);
+		bool	close();
 
 	private:
 		db2benchconnection	*db2bcon;
@@ -157,7 +159,7 @@ db2benchcursor::db2benchcursor(sqlrbenchconnection *con) :
 db2benchcursor::~db2benchcursor() {
 }
 
-bool db2benchcursor::query(const char *query, bool getcolumns) {
+bool db2benchcursor::open() {
 
 	erg=SQLAllocHandle(SQL_HANDLE_STMT,db2bcon->dbc,&stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -179,6 +181,11 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 		return false;
 	}
 	#endif
+
+	return true;
+}
+
+bool db2benchcursor::query(const char *query, bool getcolumns) {
 
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,charstring::length(query));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -322,6 +329,11 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 		}
 	}
 
+	SQLCloseCursor(stmt);
+	return true;
+}
+
+bool db2benchcursor::close() {
 	SQLFreeHandle(SQL_HANDLE_STMT,stmt);
 	return true;
 }
