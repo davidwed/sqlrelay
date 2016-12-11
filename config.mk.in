@@ -844,67 +844,7 @@ DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 # bench
 BENCHCPPFLAGS = $(BASECPPFLAGS) $(RUDIMENTSINCLUDES) -I$(top_builddir)/src/api/c++
-BENCHLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(EXTRALIBS)
-ifneq ($(strip $(DB2LIBSPATH)),)
-ifeq ($(DB2USERPATH),yes)
-BENCHLIBS += -R $(DB2LIBSPATH)
-endif
-endif
-BENCHLIBS += $(DB2LIBS)
-ifneq ($(strip $(FIREBIRDLIBSPATH)),)
-ifeq ($(FIREBIRDUSERPATH),yes)
-BENCHLIBS += -R $(FIREBIRDLIBSPATH)
-endif
-endif
-BENCHLIBS += $(FIREBIRDLIBS)
-ifneq ($(strip $(FREETDSLIBSPATH)),)
-ifeq ($(FREETDSUSERPATH),yes)
-BENCHLIBS += -R $(FREETDSLIBSPATH)
-endif
-endif
-BENCHLIBS += $(FREETDSLIBS)
-ifneq ($(strip $(MDBTOOLSLIBSPATH)),)
-ifeq ($(MDBTOOLSUSERPATH),yes)
-BENCHLIBS += -R $(MDBTOOLSLIBSPATH)
-endif
-endif
-BENCHLIBS += $(MDBTOOLSLIBS)
-ifneq ($(strip $(MYSQLLIBSPATH)),)
-ifeq ($(MYSQLUSERPATH),yes)
-BENCHLIBS += -R $(MYSQLLIBSPATH)
-endif
-endif
-BENCHLIBS += $(MYSQLLIBS)
-ifneq ($(strip $(ODBCLIBSPATH)),)
-ifeq ($(ODBCUSERPATH),yes)
-BENCHLIBS += -R $(ODBCLIBSPATH)
-endif
-endif
-BENCHLIBS += $(ODBCLIBS)
-ifneq ($(strip $(ORACLELIBSPATH)),)
-ifeq ($(ORACLEUSERPATH),yes)
-BENCHLIBS += -R $(ORACLELIBSPATH)
-endif
-endif
-BENCHLIBS += $(ORACLELIBS)
-ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
-ifeq ($(POSTGRESQLUSERPATH),yes)
-BENCHLIBS += -R $(POSTGRESQLLIBSPATH)
-endif
-endif
-BENCHLIBS += $(POSTGRESQLLIBS)
-ifneq ($(strip $(SQLITELIBSPATH)),)
-ifeq ($(SQLITEUSERPATH),yes)
-BENCHLIBS += -R $(SQLITELIBSPATH)
-endif
-endif
-BENCHLIBS += $(SQLITELIBS)
-ifneq ($(strip $(SYBASELIBSPATH)),)
-ifeq ($(SYBASEUSERPATH),yes)
-BENCHLIBS += -R $(SYBASELIBSPATH)
-endif
-endif
-BENCHLIBS += $(SYBASELIBS)
+BENCHLIBS = $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 
 # stress tests

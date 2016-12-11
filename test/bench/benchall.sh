@@ -4,7 +4,7 @@ sqlr-stop
 sleep 2
 
 #for DB in firebird freetds informix mysql oracle postgresql sap sqlite db2
-for DB in freetds informix mysql oracle postgresql sap sqlite db2
+for DB in informix mysql oracle postgresql sap sqlite db2
 do
 
 	echo "benching $DB..."
