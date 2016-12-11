@@ -3177,9 +3177,6 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 		// run through the columns...
 		for (sword i=0; i<ncols; i++) {
 
-			// FIXME: neowiz bzero's desc[i] here
-			//bytestring::zero(&desc[i],sizeof(describe));
-
 			// get the entire column definition
 			if (OCIParamGet(stmt,OCI_HTYPE_STMT,
 				oracleconn->err,

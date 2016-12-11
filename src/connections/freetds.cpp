@@ -5,6 +5,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
+#include <rudiments/character.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/stdio.h>
 #include <rudiments/snooze.h>
@@ -226,6 +227,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 		uint16_t	outbindindex;
 
 		int32_t		selectlistsize;
+		CS_DATAFMT	templatecolumn;
 		CS_DATAFMT	*column;
 		char		**data;
 		CS_INT		**datalength;
@@ -238,7 +240,6 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 
 		regularexpression	cursorquery;
 		regularexpression	rpcquery;
-		bool			isrpcquery;
 
 		freetdsconnection	*freetdsconn;
 };
@@ -945,7 +946,8 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
-	setCreateTempTablePattern("(create|CREATE)[ 	\r\n]+(table|TABLE)[ 	\r\n]+#");
+	setCreateTempTablePattern("^(create|CREATE)[ 	\r\n]"
+					"+(table|TABLE)[ 	\r\n]+#");
 
 	cursorquery.compile("^(select|SELECT)[ 	\r\n]+");
 	cursorquery.study();
@@ -954,6 +956,19 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	rpcquery.study();
 
 	allocateResultSetBuffers(freetdsconn->maxselectlistsize);
+
+	// define a template column-bind definition...
+	// get the field as a null terminated character string
+	// no longer than MAX_ITEM_BUFFER_SIZE, override some
+	templatecolumn.datatype=CS_CHAR_TYPE;
+	templatecolumn.format=CS_FMT_NULLTERM;
+	templatecolumn.maxlength=freetdsconn->maxitembuffersize;
+	templatecolumn.scale=CS_UNUSED;
+	templatecolumn.precision=CS_UNUSED;
+	templatecolumn.status=CS_UNUSED;
+	templatecolumn.count=freetdsconn->fetchatonce;
+	templatecolumn.usertype=CS_UNUSED;
+	templatecolumn.locale=NULL;
 }
 
 freetdscursor::~freetdscursor() {
@@ -1120,33 +1135,46 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 	paramindex=0;
 	outbindindex=0;
 
-	isrpcquery=false;
-
-	if (cursorquery.match(query)) {
+	if (!charstring::compareIgnoringCase(query,"select",6) &&
+					character::isWhitespace(query[6])) {
 
 		// initiate a cursor command
 		cmd=cursorcmd;
 		#ifdef FREETDS_SUPPORTS_CURSORS
-		if (ct_cursor(cursorcmd,CS_CURSOR_DECLARE,
+		if (ct_cursor(cursorcmd,
+				CS_CURSOR_DECLARE,
 				(CS_CHAR *)cursorname,
 				(CS_INT)cursornamelength,
-				(CS_CHAR *)query,length,
+				(CS_CHAR *)query,
+				length,
 				//CS_READ_ONLY)!=CS_SUCCEED) {
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
 		#endif
 
-	} else if (rpcquery.match(query)) {
+	} else if (
+		(!charstring::compareIgnoringCase(query,"exec",4) &&
+					character::isWhitespace(query[4])) ||
+		(!charstring::compareIgnoringCase(query,"execute",7) &&
+					character::isWhitespace(query[7]))) {
+
+		// find the beginning of the rpc
+		const char	*rpc=query+5;
+		uint32_t	rpclength=length-5;
+		if (!character::isWhitespace(*(rpc-1))) {
+			rpc=query+8;
+			rpclength=length-8;
+		}
 
 		// initiate an rpc command
-		isrpcquery=true;
 		cmd=languagecmd;
 		#ifdef FREETDS_SUPPORTS_CURSORS
-		if (ct_command(languagecmd,CS_RPC_CMD,
-			(CS_CHAR *)rpcquery.getSubstringEnd(0),
-			length-rpcquery.getSubstringEndOffset(0),
-			CS_UNUSED)!=CS_SUCCEED) {
+		if (ct_command(languagecmd,
+				CS_RPC_CMD,
+				(CS_CHAR *)rpc,
+				rpclength,
+				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
 		#endif
@@ -1156,8 +1184,10 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 		// initiate a language command
 		cmd=languagecmd;
 		#ifdef FREETDS_SUPPORTS_CURSORS
-		if (ct_command(languagecmd,CS_LANG_CMD,
-				(CS_CHAR *)query,length,
+		if (ct_command(languagecmd,
+				CS_LANG_CMD,
+				(CS_CHAR *)query,
+				length,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
@@ -1507,7 +1537,6 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	results=CS_UNSUPPORTED;
 
 	// clear out any errors
-	freetdsconn->errorstring.clear();
 	freetdsconn->errorcode=0;
 	freetdsconn->liveconnection=true;
 
@@ -1612,7 +1641,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		// the result set was a type that we want to ignore
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 			freetdsconn->liveconnection=false;
-			// FIXME: call ct_close(CS_FORCE_CLOSE)
+			// FIXME: call ct_close(CS_FORCE_CLOSE)?
 			return false;
 		}
 	}
@@ -1657,55 +1686,42 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 					moneycolumn=true;
 					freetdsconn->errorstring.clear();
 					freetdsconn->errorstring.append(
-						"FreeTDS versions prior to ");
-					freetdsconn->errorstring.append( 
-						"0.53 do not support MONEY ");
-					freetdsconn->errorstring.append( 
-						"or SMALLMONEY datatypes. ");
-					freetdsconn->errorstring.append( 
-						"Please upgrade SQL Relay to ");
-					freetdsconn->errorstring.append( 
-						"a version compiled against ");
-					freetdsconn->errorstring.append( 
+						"FreeTDS versions prior to "
+						"0.53 do not support MONEY "
+						"or SMALLMONEY datatypes. "
+						"Please upgrade SQL Relay to "
+						"a version compiled against "
 						"FreeTDS >= 0.53 ");
 				}
 			}
 
-			// get the field as a null terminated character string
-			// no longer than MAX_ITEM_BUFFER_SIZE, override some
-			// other values that might have been set also...
-			//
-			// however, if we're getting the output bind variables
-			// of a stored procedure that returns dates, then use
-			// the datetime type instead...
+			// reset the column-bind
+			column[i]=templatecolumn;
+
+			// actually...
+			// if we're getting the output bind variables of a
+			// stored procedure that returns dates, then use the
+			// datetime type instead...
 			if (resultstype==CS_PARAM_RESULT &&
 				outbindtype[i]==CS_DATETIME_TYPE) {
 				column[i].datatype=CS_DATETIME_TYPE;
 				column[i].format=CS_FMT_UNUSED;
 				column[i].maxlength=sizeof(CS_DATETIME);
-			} else {
-				column[i].datatype=CS_CHAR_TYPE;
-				column[i].format=CS_FMT_NULLTERM;
-				column[i].maxlength=
-					freetdsconn->maxitembuffersize;
 			}
-			column[i].scale=CS_UNUSED;
-			column[i].precision=CS_UNUSED;
-			column[i].status=CS_UNUSED;
-			column[i].count=freetdsconn->fetchatonce;
-			column[i].usertype=CS_UNUSED;
-			column[i].locale=NULL;
 	
 			// bind the columns for the fetches
-			if (ct_bind(cmd,i+1,&column[i],(CS_VOID *)data[i],
-				datalength[i],nullindicator[i])!=CS_SUCCEED) {
+			if (ct_bind(cmd,i+1,
+					&column[i],
+					(CS_VOID *)data[i],
+					datalength[i],
+					nullindicator[i])!=CS_SUCCEED) {
 				break;
 			}
 
 			// describe the columns
 			if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
-				if (ct_describe(cmd,i+1,&column[i])!=
-								CS_SUCCEED) {
+				if (ct_describe(cmd,i+1,
+						&column[i])!=CS_SUCCEED) {
 					break;
 				}
 			}
@@ -1719,7 +1735,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	if (moneycolumn) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 			freetdsconn->liveconnection=false;
-			// FIXME: call ct_close(CS_FORCE_CLOSE)
+			// FIXME: call ct_close(CS_FORCE_CLOSE)?
 			return false;
 		}
 		return false;
@@ -1731,8 +1747,11 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	// bind variables...
 	if (resultstype==CS_PARAM_RESULT) {
 
-		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
-				&rowsread)!=CS_SUCCEED && !rowsread) {
+		if (ct_fetch(cmd,
+				CS_UNUSED,
+				CS_UNUSED,
+				CS_UNUSED,
+				&rowsread)!=CS_SUCCEED || !rowsread) {
 			return false;
 		}
 		
@@ -1781,10 +1800,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// return success only if no error was generated
-	if (freetdsconn->errorstring.getStringLength()) {
-		return false;
-	}
-	return true;
+	return (!freetdsconn->errorcode);
 }
 
 bool freetdscursor::knowsAffectedRows() {
@@ -1983,7 +1999,9 @@ bool freetdscursor::fetchRow() {
 	}
 	if (!row) {
 		CS_RETCODE	fetchresult=ct_fetch(cmd,CS_UNUSED,
-						CS_UNUSED,CS_UNUSED,&rowsread);
+							CS_UNUSED,
+							CS_UNUSED,
+							&rowsread);
 
 		// This is essential with freetds.
 		// http://www.freetds.org/faq.html#pending
@@ -2061,8 +2079,7 @@ void freetdscursor::discardResults() {
 		do {
 			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 				freetdsconn->liveconnection=false;
-				// FIXME: call ct_close(CS_FORCE_CLOSE)
-				// maybe return false
+				// FIXME: call ct_close(CS_FORCE_CLOSE)?
 			}
 			results=ct_results(cmd,&resultstype);
 		} while (results==CS_SUCCEED);
@@ -2071,8 +2088,7 @@ void freetdscursor::discardResults() {
 	if (results==CS_FAIL) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
 			freetdsconn->liveconnection=false;
-			// FIXME: call ct_close(CS_FORCE_CLOSE)
-			// maybe return false
+			// FIXME: call ct_close(CS_FORCE_CLOSE)?
 		}
 	}
 
@@ -2086,8 +2102,10 @@ void freetdscursor::discardCursor() {
 
 	#ifdef FREETDS_SUPPORTS_CURSORS
 	if (cmd==cursorcmd) {
-		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,
-				NULL,CS_UNUSED,CS_DEALLOC)==CS_SUCCEED) {
+		if (ct_cursor(cursorcmd,CS_CURSOR_CLOSE,
+					NULL,CS_UNUSED,
+					NULL,CS_UNUSED,
+					CS_DEALLOC)==CS_SUCCEED) {
 			if (ct_send(cursorcmd)==CS_SUCCEED) {
 				results=ct_results(cmd,&resultstype);
 				discardResults();
@@ -2099,7 +2117,7 @@ void freetdscursor::discardCursor() {
 
 CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
-	if (errorstring.getStringLength()) {
+	if (errorcode) {
 		return CS_SUCCEED;
 	}
 
@@ -2145,7 +2163,7 @@ CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CONNECTION *cnn,
 						CS_CLIENTMSG *msgp) {
-	if (errorstring.getStringLength()) {
+	if (errorcode) {
 		return CS_SUCCEED;
 	}
 
@@ -2202,7 +2220,7 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 		return CS_SUCCEED;
 	}
 
-	if (errorstring.getStringLength()) {
+	if (errorcode) {
 		return CS_SUCCEED;
 	}
 
