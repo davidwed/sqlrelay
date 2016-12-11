@@ -4,11 +4,24 @@
 
 #include "../../config.h"
 
-#include "sqlitebench.h"
-
 extern "C" {
 	#include <sqlite3.h>
 }
+
+#include "bench.h"
+
+class sqlitebenchmarks : public benchmarks {
+	public:
+		sqlitebenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug);
+};
 
 class sqlitebenchconnection : public benchconnection {
 	friend class sqlitebenchcursor;
@@ -129,6 +142,22 @@ bool sqlitebenchcursor::query(const char *query, bool getcolumns) {
 
 bool sqlitebenchcursor::close() {
 	return true;
+}
+
+extern "C" {
+	benchmarks *new_sqlitebenchmarks(const char *connectstring,
+						const char *db,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						uint16_t samples,
+						uint64_t rsbs,
+						bool debug) {
+		return new sqlitebenchmarks(connectstring,db,queries,
+						rows,cols,colsize,
+						samples,rsbs,debug);
+	}
 }
 
 #endif

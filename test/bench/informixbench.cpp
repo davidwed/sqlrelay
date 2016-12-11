@@ -4,13 +4,13 @@
 
 #include <rudiments/environment.h>
 
-#include <sqlcli1.h>
+#include <infxcli.h>
 
 #include "bench.h"
 
-class db2benchmarks : public benchmarks {
+class informixbenchmarks : public benchmarks {
 	public:
-		db2benchmarks(const char *connectstring,
+		informixbenchmarks(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -21,75 +21,72 @@ class db2benchmarks : public benchmarks {
 					bool debug);
 };
 
-#define DB2_FETCH_AT_ONCE		10
-#define DB2_MAX_SELECT_LIST_SIZE	256
-#define DB2_MAX_ITEM_BUFFER_SIZE	32768
+#define INFORMIX_FETCH_AT_ONCE		10
+#define INFORMIX_MAX_SELECT_LIST_SIZE	256
+#define INFORMIX_MAX_ITEM_BUFFER_SIZE	32768
 
-struct db2column {
+struct informixcolumn {
 	char		name[4096];
-	uint16_t	namelength;
-	// SQLColAttribute requires that these are signed, 32 bit integers
-	int32_t		type;
-	int32_t		length;
-	int32_t		precision;
-	int32_t		scale;
-	int32_t		nullable;
-	uint16_t	primarykey;
-	uint16_t	unique;
-	uint16_t	partofkey;
-	uint16_t	unsignednumber;
-	uint16_t	zerofill;
-	uint16_t	binary;
-	uint16_t	autoincrement;
+	SQLSMALLINT	namelength;
+	SQLLEN		type;
+	SQLLEN		precision;
+	SQLLEN		scale;
+	SQLLEN		flags;
+	SQLLEN		primarykey;
+	SQLLEN		unique;
+	SQLLEN		partofkey;
+	SQLLEN		unsignednumber;
+	SQLLEN		zerofill;
+	SQLLEN		binary;
+	SQLLEN		autoincrement;
 };
 
-class db2benchconnection : public benchconnection {
-	friend class db2benchcursor;
+class informixbenchconnection : public benchconnection {
+	friend class informixbenchcursor;
 	public:
-			db2benchconnection(const char *connectstring,
+			informixbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~db2benchconnection();
+			~informixbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
 
 	private:
+		const char	*informixdir;
+		const char	*servername;
 		const char	*dbname;
-		const char	*lang;
 		const char	*user;
 		const char	*password;
+		stringbuffer	dsn;
 
 		SQLHENV		env;
 		SQLRETURN	erg;
 		SQLHDBC		dbc;
 };
 
-class db2benchcursor : public benchcursor {
+class informixbenchcursor : public benchcursor {
 	public:
-			db2benchcursor(benchconnection *con);
-			~db2benchcursor();
+			informixbenchcursor(benchconnection *con);
+			~informixbenchcursor();
 
 		bool	query(const char *query, bool getcolumns);
 
 	private:
-		db2benchconnection	*db2bcon;
+		informixbenchconnection	*informixbcon;
 
 		SQLHSTMT	stmt;
 		SQLRETURN	erg;
 		SQLSMALLINT	ncols;
 
-		db2column	column[DB2_MAX_SELECT_LIST_SIZE];
-		char		field[DB2_MAX_SELECT_LIST_SIZE]
-						[DB2_FETCH_AT_ONCE]
-						[DB2_MAX_ITEM_BUFFER_SIZE];
-		SQLINTEGER	indicator[DB2_MAX_SELECT_LIST_SIZE]
-						[DB2_FETCH_AT_ONCE];
-		#if (DB2VERSION>7)
-		SQLUSMALLINT	rowstat[DB2_FETCH_AT_ONCE];
-		#endif
+		informixcolumn	column[INFORMIX_MAX_SELECT_LIST_SIZE];
+		char		field[INFORMIX_MAX_SELECT_LIST_SIZE]
+						[INFORMIX_FETCH_AT_ONCE]
+						[INFORMIX_MAX_ITEM_BUFFER_SIZE];
+		SQLLEN		indicator[INFORMIX_MAX_SELECT_LIST_SIZE]
+						[INFORMIX_FETCH_AT_ONCE];
 };
 
-db2benchmarks::db2benchmarks(const char *connectstring,
+informixbenchmarks::informixbenchmarks(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -101,27 +98,57 @@ db2benchmarks::db2benchmarks(const char *connectstring,
 					benchmarks(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
-	con=new db2benchconnection(connectstring,db);
-	cur=new db2benchcursor(con);
+	con=new informixbenchconnection(connectstring,db);
+	cur=new informixbenchcursor(con);
 }
 
 
-db2benchconnection::db2benchconnection(
+informixbenchconnection::informixbenchconnection(
 				const char *connectstring,
 				const char *db) :
 				benchconnection(connectstring,db) {
+	informixdir=getParam("informixdir");
+	servername=getParam("servername");
 	dbname=getParam("db");
-	lang=getParam("lang");
 	user=getParam("user");
 	password=getParam("password");
-
-	environment::setValue("LANG",lang);
 }
 
-db2benchconnection::~db2benchconnection() {
+informixbenchconnection::~informixbenchconnection() {
 }
 
-bool db2benchconnection::connect() {
+bool informixbenchconnection::connect() {
+
+	if (charstring::length(informixdir) &&
+		!environment::setValue("INFORMIXDIR",informixdir)) {
+		stdoutput.printf("Failed to set INFORMIXDIR "
+					"environment variable");
+		return false;
+	}
+
+	dsn.clear();
+	if (!charstring::isNullOrEmpty(servername)) {
+		dsn.append("Servername=")->append(servername);
+	}
+	if (!charstring::isNullOrEmpty(dbname)) {
+		if (dsn.getStringLength()) {
+			dsn.append(";");
+		}
+		dsn.append("Database=")->append(dbname);
+	}
+	if (!charstring::isNullOrEmpty(user)) {
+		if (dsn.getStringLength()) {
+			dsn.append(";");
+		}
+		dsn.append("LogonID=")->append(user);
+	}
+	if (!charstring::isNullOrEmpty(password)) {
+		if (dsn.getStringLength()) {
+			dsn.append(";");
+		}
+		dsn.append("pwd=")->append(password);
+	}
+
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		stdoutput.printf("SQLAllocHandle (ENV) failed\n");
@@ -132,52 +159,46 @@ bool db2benchconnection::connect() {
 		stdoutput.printf("SQLAllocHandle (DBC) failed\n");
 		return false;
 	}
-	erg=SQLConnect(dbc,(SQLCHAR *)dbname,SQL_NTS,
-				(SQLCHAR *)user,SQL_NTS,
-				(SQLCHAR *)password,SQL_NTS);
+
+	erg=SQLDriverConnect(dbc,NULL,
+				(SQLCHAR *)dsn.getString(),
+				dsn.getStringLength(),
+				NULL,0,NULL,SQL_DRIVER_COMPLETE);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		stdoutput.printf("SQLConnect failed\n");
+		stdoutput.printf("SQLDriverConnect failed\n");
 		return false;
 	}
 	return true;
 }
 
-bool db2benchconnection::disconnect() {
+bool informixbenchconnection::disconnect() {
 	SQLDisconnect(dbc);
 	SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 	SQLFreeHandle(SQL_HANDLE_ENV,env);
 	return true;
 }
 
-db2benchcursor::db2benchcursor(benchconnection *con) : benchcursor(con) {
-	db2bcon=(db2benchconnection *)con;
+informixbenchcursor::informixbenchcursor(benchconnection *con) :
+							benchcursor(con) {
+	informixbcon=(informixbenchconnection *)con;
 }
 
-db2benchcursor::~db2benchcursor() {
+informixbenchcursor::~informixbenchcursor() {
 }
 
-bool db2benchcursor::query(const char *query, bool getcolumns) {
+bool informixbenchcursor::query(const char *query, bool getcolumns) {
 
-	erg=SQLAllocHandle(SQL_HANDLE_STMT,db2bcon->dbc,&stmt);
+	erg=SQLAllocHandle(SQL_HANDLE_STMT,informixbcon->dbc,&stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		stdoutput.printf("SQLAllocHandle (STMT) failed\n");
 		return false;
 	}
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)DB2_FETCH_AT_ONCE,0);
+				(SQLPOINTER)INFORMIX_FETCH_AT_ONCE,0);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		stdoutput.printf("SQLSetStmtAttr (ROW_ARRAY_SIZE) failed\n");
 		return false;
 	}
-
-	#if (DB2VERSION>7)
-	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
-					(SQLPOINTER)rowstat,0);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		stdoutput.printf("SQLSetStmtAttr (ROW_STATUS_PTR) failed\n");
-		return false;
-	}
-	#endif
 
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,charstring::length(query));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -202,18 +223,14 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
 					column[i].name,4096,
-					(SQLSMALLINT *)&(column[i].namelength),
+					&(column[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
-			// column length
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LENGTH,
-					NULL,0,NULL,&(column[i].length));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+			// informix doesn't support column length,
+			// so we'll just use the precision
 
 			// column type
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_TYPE,
@@ -237,11 +254,19 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 			}
 
 			// column nullable
-			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
-					NULL,0,NULL,&(column[i].nullable));
+			// Informix doesn't support SQL_COLUMN_NULLABLE.
+			// Nullability is just part of the "flags".
+			erg=SQLColAttribute(stmt,i+1,SQL_INFX_ATTR_FLAGS,
+					NULL,0,NULL,&(column[i].flags));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+
+			// primary key
+
+			// unique
+
+			// part of key
 
 			// unsigned number
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_UNSIGNED,
@@ -251,6 +276,10 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 				return false;
 			}
 
+			// zero fill
+
+			// binary
+
 			// autoincrement
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_AUTO_INCREMENT,
 					NULL,0,NULL,&(column[i].autoincrement));
@@ -259,10 +288,18 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 			}
 		}
 
-		// bind field and null indicator
-		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-				field[i],DB2_MAX_ITEM_BUFFER_SIZE,
-				(SQLINTEGER *)indicator[i]);
+		if (column[i].type==SQL_LONGVARBINARY ||
+			column[i].type==SQL_INFX_UDT_BLOB) {
+			erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
+					field[i],
+					INFORMIX_MAX_ITEM_BUFFER_SIZE,
+					indicator[i]);
+		} else {
+			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+					field[i],
+					INFORMIX_MAX_ITEM_BUFFER_SIZE,
+					indicator[i]);
+		}
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			stdoutput.printf("SQLBindCol failed\n");
 			return false;
@@ -283,21 +320,8 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 				break;
 			}
 
-			#if (DB2VERSION>7)
-			// An apparant bug in version 8.1 causes the
-			// SQL_ATTR_ROW_NUMBER to always be 1, running through
-			// the row status buffer appears to work though.
-			uint32_t	index=0;
-			while (index<DB2_FETCH_AT_ONCE &&
-				(rowstat[index]==SQL_ROW_SUCCESS ||
-				rowstat[index]==SQL_ROW_SUCCESS_WITH_INFO)) {
-				index++;
-			}
-			rownumber=totalrows+index;
-			#else
 			SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 					(SQLPOINTER)&rownumber,0,NULL);
-			#endif
 
 			if (rownumber==oldrow) {
 				break;
@@ -326,7 +350,7 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 }
 
 extern "C" {
-	benchmarks *new_db2benchmarks(const char *connectstring,
+	benchmarks *new_informixbenchmarks(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -335,7 +359,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new db2benchmarks(connectstring,db,queries,
+		return new informixbenchmarks(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

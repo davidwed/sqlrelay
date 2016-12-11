@@ -5,11 +5,24 @@
 #include <rudiments/charstring.h>
 #include <rudiments/environment.h>
 
-#include "oraclebench.h"
-
 extern "C" {
 	#include <oci.h>
 }
+
+#include "bench.h"
+
+class oraclebenchmarks : public benchmarks {
+	public:
+		oraclebenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug);
+};
 
 #define ORACLE_FETCH_AT_ONCE		10
 #define ORACLE_MAX_ITEM_BUFFER_SIZE	2048
@@ -394,4 +407,20 @@ bool oraclebenchcursor::close() {
 
 	OCIHandleFree(stmt,OCI_HTYPE_STMT);
 	return true;
+}
+
+extern "C" {
+	benchmarks *new_oraclebenchmarks(const char *connectstring,
+						const char *db,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						uint16_t samples,
+						uint64_t rsbs,
+						bool debug) {
+		return new oraclebenchmarks(connectstring,db,queries,
+						rows,cols,colsize,
+						samples,rsbs,debug);
+	}
 }

@@ -5,16 +5,28 @@
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
 
-#include "sapbench.h"
-
 extern "C" {
 	#include <ctpublic.h>
 }
 
+#include "bench.h"
+
+class sapbenchmarks : public benchmarks {
+	public:
+		sapbenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug);
+};
+
 #define SAP_FETCH_AT_ONCE 10
 #define SAP_MAX_SELECT_LIST_SIZE 256
 #define SAP_MAX_ITEM_BUFFER_SIZE 2048
-
 
 class sapbenchconnection : public benchconnection {
 	friend class sapbenchcursor;
@@ -417,4 +429,20 @@ bool sapbenchcursor::close() {
 	ct_cmd_drop(cmd);
 	cmd=NULL;
 	return true;
+}
+
+extern "C" {
+	benchmarks *new_sapbenchmarks(const char *connectstring,
+						const char *db,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						uint16_t samples,
+						uint64_t rsbs,
+						bool debug) {
+		return new sapbenchmarks(connectstring,db,queries,
+						rows,cols,colsize,
+						samples,rsbs,debug);
+	}
 }

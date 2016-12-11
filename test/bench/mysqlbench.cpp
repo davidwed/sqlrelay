@@ -7,8 +7,6 @@
 #include <rudiments/datetime.h>
 #include <rudiments/process.h>
 
-#include "mysqlbench.h"
-
 #ifdef _WIN32
 #include <winsock2.h>
 #endif
@@ -16,6 +14,21 @@
 extern "C" {
 	#include <mysql.h>
 }
+
+#include "bench.h"
+
+class mysqlbenchmarks : public benchmarks {
+	public:
+		mysqlbenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug);
+};
 
 class mysqlbenchconnection : public benchconnection {
 	friend class mysqlbenchcursor;
@@ -279,4 +292,20 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 		mysql_free_result(mysqlresult);
 	}
 	return true;
+}
+
+extern "C" {
+	benchmarks *new_mysqlbenchmarks(const char *connectstring,
+						const char *db,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						uint16_t samples,
+						uint64_t rsbs,
+						bool debug) {
+		return new mysqlbenchmarks(connectstring,db,queries,
+						rows,cols,colsize,
+						samples,rsbs,debug);
+	}
 }

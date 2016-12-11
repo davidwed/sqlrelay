@@ -5,11 +5,24 @@
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
 
-#include "freetdsbench.h"
+#include "bench.h"
 
 extern "C" {
 	#include <ctpublic.h>
 }
+
+class freetdsbenchmarks : public benchmarks {
+	public:
+		freetdsbenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug);
+};
 
 #define SAP_FETCH_AT_ONCE 10
 #define SAP_MAX_SELECT_LIST_SIZE 256
@@ -417,4 +430,20 @@ bool freetdsbenchcursor::close() {
 	ct_cmd_drop(cmd);
 	cmd=NULL;
 	return true;
+}
+
+extern "C" {
+	benchmarks *new_freetdsbenchmarks(const char *connectstring,
+						const char *db,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						uint16_t samples,
+						uint64_t rsbs,
+						bool debug) {
+		return new freetdsbenchmarks(connectstring,db,queries,
+						rows,cols,colsize,
+						samples,rsbs,debug);
+	}
 }

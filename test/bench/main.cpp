@@ -8,27 +8,14 @@
 #include <rudiments/linkedlist.h>
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
+#include <rudiments/dynamiclib.h>
 
 // for system()
 #include <stdlib.h>
 
 #include "bench.h"
 
-#include "sqlrelaybench.h"
-#include "db2bench.h"
-#include "firebirdbench.h"
-#ifndef _WIN32
-	#include "freetdsbench.h"
-#endif
-#include "mysqlbench.h"
-#include "oraclebench.h"
-#include "postgresqlbench.h"
-#ifndef _WIN32
-	#include "sqlitebench.h"
-#endif
-#include "sapbench.h"
-
-#define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
+#define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
 
 void shutDown(int32_t signum);
 void graphStats(const char *graph, const char *db,
@@ -45,7 +32,7 @@ int main(int argc, const char **argv) {
 	if (cmdl.found("help") || cmdl.found("h")) {
 		stdoutput.printf(
 			"usage: sqlr-bench \\\n"
-			"	[-db db2|firebird|freetds|mysql|"
+			"	[-db db2|informix|firebird|freetds|mysql|"
 			"oracle|postgresql|sap|sqlite] \\\n"
 			"	[-dbconnectstring dbconnectstring] \\\n"
 			"	[-sqlrconnectstring sqlrconnectstring] \\\n"
@@ -150,8 +137,7 @@ int main(int argc, const char **argv) {
 						"%s via sqlrelay:\n\n",db);
 		}
 
-		// init benchmarks
-		delete bm;
+		// default connect strings
 		if (which) {
 			if (!sqlrconnectstring) {
 				sqlrconnectstring=
@@ -160,34 +146,30 @@ int main(int argc, const char **argv) {
 					"user=test;password=test;"
 					"debug=no";
 			}
-			bm=new sqlrelaybenchmarks(
-					sqlrconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"db2")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"db=testdb;lang=C;"
 					"user=db2inst1;"
-					"password=1qazxdr5;";
+					"password=testpassword;";
 			}
-			bm=new db2benchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
+		} else if (!charstring::compare(db,"informix")) {
+			if (!dbconnectstring) {
+				dbconnectstring=
+					"informixdir=/opt/informix;"
+					"servername=ol_informix1210;"
+					"db=testdb;"
+					"user=testuser;"
+					"password=testpassword;";
+			}
 		} else if (!charstring::compare(db,"firebird")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"user=testuser;password=testpassword;"
-					"db=db64.firstworks.com:"
+					"db=firebird:"
 					"/opt/firebird/testdb.gdb;"
 					"dialect=3";
 			}
-			bm=new firebirdbenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
-		#ifndef _WIN32
 		} else if (!charstring::compare(db,"freetds")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
@@ -195,35 +177,22 @@ int main(int argc, const char **argv) {
 					"server=server;db=testdb;"
 					"user=testuser;password=testpassword;";
 			}
-			bm=new freetdsbenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
-		#endif
 		} else if (!charstring::compare(db,"mysql")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-				"host=db64;db=testdb;"
+				"host=mysql;db=testdb;"
 				"user=testuser;password=testpassword;"
 				;
 			}
-			bm=new mysqlbenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"mysqlssl")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-				"host=db64;db=testdb;"
+				"host=mysql;db=testdb;"
 				"user=testuser;password=testpassword;"
 				"sslca=/etc/mysql-ssl/ca-cert.pem;"
 				"sslcert=/etc/mysql-ssl/client-cert.pem;"
 				"sslkey=/etc/mysql-ssl/client-key.pem";
 			}
-			bm=new mysqlbenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"oracle") ||
 				!charstring::compare(db,"oracle8")) {
 			if (!dbconnectstring) {
@@ -231,42 +200,24 @@ int main(int argc, const char **argv) {
 					"sid=" ORACLE_SID ";"
 					"user=testuser;password=testpassword;";
 			}
-			bm=new oraclebenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"postgresql")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"user=testuser;password=testpassword;"
-					"db=testdb;host=db64.firstworks.com;";
+					"db=testdb;host=postgresql;";
 			}
-			bm=new postgresqlbenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
 		} else if (!charstring::compare(db,"postgresqlssl")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"user=testuser;password=testpassword;"
-					"db=testdb;host=db64.firstworks.com;"
+					"db=testdb;host=postgresql;"
 					"sslmode=verify-ca;";
 			}
-			bm=new postgresqlbenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
-		#ifndef _WIN32
 		} else if (!charstring::compare(db,"sqlite")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"db=/usr/local/sqlite/var/testdb;";
 			}
-			bm=new sqlitebenchmarks(
-					dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
-		#endif
 		} else if (!charstring::compare(db,"sap") ||
 				!charstring::compare(db,"sybase")) {
 			if (!dbconnectstring) {
@@ -275,11 +226,55 @@ int main(int argc, const char **argv) {
 					"server=TESTDB;db=testdb;"
 					"user=testuser;password=testpassword;";
 			}
-			bm=new sapbenchmarks(
-					dbconnectstring,
+		}
+
+		// init benchmarks
+		dynamiclib	dl;
+		stringbuffer	modulename;
+		modulename.append(".libs/sqlrbench_");
+		modulename.append((which)?"sqlrelay":db)->append(".so");
+		if (!dl.open(modulename.getString(),true,true)) {
+			stdoutput.printf("failed to load "
+					"bench module: %s\n",
+					modulename.getString());
+			char	*error=dl.getError();
+			stdoutput.printf("%s\n",error);
+			delete[] error;
+			continue;
+		}
+		stringbuffer	functionname;
+		functionname.append("new_")->append((which)?"sqlrelay":db);
+		functionname.append("benchmarks");
+		benchmarks	*(*newBm)(const char *,
+						const char *,
+						uint64_t,
+						uint64_t,
+						uint32_t,
+						uint32_t,
+						uint16_t,
+						uint64_t,
+						bool)=
+			(benchmarks	*(*)(const char *,
+						const char *,
+						uint64_t,
+						uint64_t,
+						uint32_t,
+						uint32_t,
+						uint16_t,
+						uint64_t,
+						bool))
+			dl.getSymbol(functionname.getString());
+		if (!newBm) {
+			stdoutput.printf("failed to load benchmarks\n");
+			char	*error=dl.getError();
+			stdoutput.printf("%s\n",error);
+			delete[] error;
+			continue;
+		}
+
+		bm=newBm((which)?sqlrconnectstring:dbconnectstring,
 					db,queries,rows,cols,colsize,
 					samples,rsbs,debug);
-		}
 		if (!bm) {
 			stdoutput.printf("error creating benchmarks\n");
 			continue;
@@ -287,6 +282,8 @@ int main(int argc, const char **argv) {
 
 		// run the benchmarks
 		shutdown=!bm->run(&stats);
+
+		delete bm;
 	}
 
 	// graph stats
@@ -323,6 +320,8 @@ void graphStats(const char *graph, const char *db,
 	// rename db
 	if (!charstring::compare(db,"db2")) {
 		db="IBM DB2";
+	} else if (!charstring::compare(db,"informix")) {
+		db="Informix";
 	} else if (!charstring::compare(db,"firebird")) {
 		db="Firebird";
 	} else if (!charstring::compare(db,"freetds")) {

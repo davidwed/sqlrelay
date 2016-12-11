@@ -2,30 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-SRCS = bench.cpp \
-	main.cpp \
-	sqlrelaybench.cpp \
-	db2bench.cpp \
-	firebirdbench.cpp \
-	freetdsbench.cpp \
-	mysqlbench.cpp \
-	oraclebench.cpp \
-	postgresqlbench.cpp \
-	sqlitebench.cpp \
-	sapbench.cpp
-
-LOBJS = bench.$(OBJ) \
-	main.$(OBJ) \
-	sqlrelaybench.$(OBJ) \
-	db2bench.$(OBJ) \
-	firebirdbench.$(OBJ) \
-	freetdsbench.$(OBJ) \
-	mysqlbench.$(OBJ) \
-	oraclebench.$(OBJ) \
-	postgresqlbench.$(OBJ) \
-	sqlitebench.$(OBJ) \
-	sapbench.$(OBJ)
-
 .SUFFIXES: .lo
 
 .cpp.lo:
@@ -34,10 +10,21 @@ LOBJS = bench.$(OBJ) \
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(COMPILE) $<
 
-all: sqlr-bench
+all: sqlrbench_db2.$(LIBEXT) \
+	sqlrbench_firebird.$(LIBEXT) \
+	sqlrbench_freetds.$(LIBEXT) \
+	sqlrbench_informix.$(LIBEXT) \
+	sqlrbench_mysql.$(LIBEXT) \
+	sqlrbench_oracle.$(LIBEXT) \
+	sqlrbench_postgresql.$(LIBEXT) \
+	sqlrbench_sap.$(LIBEXT) \
+	sqlrbench_sqlite.$(LIBEXT) \
+	sqlrbench_sqlrelay.$(LIBEXT) \
+	sqlr-bench
 
 clean:
-	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest *.png *.csv
+	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.png *.csv
+	$(RMTREE) .libs
 
 db2bench.lo: db2bench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(DB2INCLUDES) $(COMPILE) $< $(OUT)$@
@@ -45,11 +32,17 @@ db2bench.lo: db2bench.cpp
 db2bench.obj: db2bench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(DB2INCLUDES) $(COMPILE) db2bench.cpp
 
+sqlrbench_db2.$(LIBEXT): db2bench.$(OBJ) db2bench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ db2bench.$(OBJ) $(LDFLAGS) $(DB2CONNECTIONLIBS) $(MODLINKFLAGS)
+
 firebirdbench.lo: firebirdbench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(FIREBIRDINCLUDES) $(COMPILE) $< $(OUT)$@
 
 firebirdbench.obj: firebirdbench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(FIREBIRDINCLUDES) $(COMPILE) firebirdbench.cpp
+
+sqlrbench_firebird.$(LIBEXT): firebirdbench.$(OBJ) firebirdbench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ firebirdbench.$(OBJ) $(LDFLAGS) $(FIREBIRDCONNECTIONLIBS) $(MODLINKFLAGS)
 
 freetdsbench.lo: freetdsbench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(FREETDSINCLUDES) $(COMPILE) $< $(OUT)$@
@@ -57,11 +50,26 @@ freetdsbench.lo: freetdsbench.cpp
 freetdsbench.obj: freetdsbench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(FREETDSINCLUDES) $(COMPILE) freetdsbench.cpp
 
+sqlrbench_freetds.$(LIBEXT): freetdsbench.$(OBJ) freetdsbench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ freetdsbench.$(OBJ) $(LDFLAGS) $(FREETDSCONNECTIONLIBS) $(MODLINKFLAGS)
+
+informixbench.lo: informixbench.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(INFORMIXINCLUDES) $(COMPILE) $< $(OUT)$@
+
+informixbench.obj: informixbench.cpp
+	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(INFORMIXINCLUDES) $(COMPILE) informixbench.cpp
+
+sqlrbench_informix.$(LIBEXT): informixbench.$(OBJ) informixbench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ informixbench.$(OBJ) $(LDFLAGS) $(INFORMIXCONNECTIONLIBS) $(MODLINKFLAGS)
+
 mysqlbench.lo: mysqlbench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) $< $(OUT)$@
 
 mysqlbench.obj: mysqlbench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) mysqlbench.cpp
+
+sqlrbench_mysql.$(LIBEXT): mysqlbench.$(OBJ) mysqlbench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ mysqlbench.$(OBJ) $(LDFLAGS) $(MYSQLCONNECTIONLIBS) $(MODLINKFLAGS)
 
 oraclebench.lo: oraclebench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(ORACLEINCLUDES) $(COMPILE) $< $(OUT)$@
@@ -69,11 +77,17 @@ oraclebench.lo: oraclebench.cpp
 oraclebench.obj: oraclebench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(ORACLEINCLUDES) $(COMPILE) oraclebench.cpp
 
+sqlrbench_oracle.$(LIBEXT): oraclebench.$(OBJ) oraclebench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ oraclebench.$(OBJ) $(LDFLAGS) $(ORACLECONNECTIONLIBS) $(MODLINKFLAGS)
+
 postgresqlbench.lo: postgresqlbench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(POSTGRESQLINCLUDES) $(COMPILE) $< $(OUT)$@
 
 postgresqlbench.obj: postgresqlbench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(POSTGRESQLINCLUDES) $(COMPILE) postgresqlbench.cpp
+
+sqlrbench_postgresql.$(LIBEXT): postgresqlbench.$(OBJ) postgresqlbench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ postgresqlbench.$(OBJ) $(LDFLAGS) $(POSTGRESQLCONNECTIONLIBS) $(MODLINKFLAGS)
 
 sqlitebench.lo: sqlitebench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SQLITEINCLUDES) $(COMPILE) $< $(OUT)$@
@@ -81,11 +95,26 @@ sqlitebench.lo: sqlitebench.cpp
 sqlitebench.obj: sqlitebench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SQLITEINCLUDES) $(COMPILE) sqlitebench.cpp
 
+sqlrbench_sqlite.$(LIBEXT): sqlitebench.$(OBJ) sqlitebench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ sqlitebench.$(OBJ) $(LDFLAGS) $(SQLITECONNECTIONLIBS) $(MODLINKFLAGS)
+
+sqlrelaybench.lo: sqlrelaybench.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+sqlrelaybench.obj: sqlrelaybench.cpp
+	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(COMPILE) sqlrelaybench.cpp
+
+sqlrbench_sqlrelay.$(LIBEXT): sqlrelaybench.$(OBJ) sqlrelaybench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelaybench.$(OBJ) $(LDFLAGS) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(EXTRALIBS) $(MODLINKFLAGS)
+
 sapbench.lo: sapbench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SYBASEINCLUDES) $(COMPILE) $< $(OUT)$@
 
 sapbench.obj: sapbench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SYBASEINCLUDES) $(COMPILE) sapbench.cpp
 
-sqlr-bench: $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@$(EXE) $(LOBJS) $(LDFLAGS) $(BENCHLIBS)
+sqlrbench_sap.$(LIBEXT): sapbench.$(OBJ) sapbench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ sapbench.$(OBJ) $(LDFLAGS) $(SAPCONNECTIONLIBS) $(MODLINKFLAGS)
+
+sqlr-bench: bench.cpp bench.$(OBJ) main.cpp main.$(OBJ) 
+	$(LTLINK) $(LINK) $(OUT)$@$(EXE) bench.$(OBJ) main.$(OBJ) $(LDFLAGS) -export-dynamic $(BENCHLIBS)

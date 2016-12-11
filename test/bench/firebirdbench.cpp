@@ -2,7 +2,20 @@
 // See the file COPYING for more information
 #include "../../config.h"
 
-#include "firebirdbench.h"
+#include "bench.h"
+
+class firebirdbenchmarks : public benchmarks {
+	public:
+		firebirdbenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug);
+};
 
 class firebirdbenchconnection : public benchconnection {
 	friend class firebirdbenchcursor;
@@ -90,4 +103,20 @@ bool firebirdbenchcursor::query(const char *query, bool getcolumns) {
 
 bool firebirdbenchcursor::close() {
 	return true;
+}
+
+extern "C" {
+	benchmarks *new_firebirdbenchmarks(const char *connectstring,
+						const char *db,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						uint16_t samples,
+						uint64_t rsbs,
+						bool debug) {
+		return new firebirdbenchmarks(connectstring,db,queries,
+						rows,cols,colsize,
+						samples,rsbs,debug);
+	}
 }

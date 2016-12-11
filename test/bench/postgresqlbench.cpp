@@ -2,9 +2,22 @@
 // See the file COPYING for more information
 #include "../../config.h"
 
-#include "postgresqlbench.h"
-
 #include <libpq-fe.h>
+
+#include "bench.h"
+
+class postgresqlbenchmarks : public benchmarks {
+	public:
+		postgresqlbenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug);
+};
 
 class postgresqlbenchconnection : public benchconnection {
 	friend class postgresqlbenchcursor;
@@ -172,4 +185,20 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 	PQclear(pgresult);
 
 	return true;
+}
+
+extern "C" {
+	benchmarks *new_postgresqlbenchmarks(const char *connectstring,
+						const char *db,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						uint16_t samples,
+						uint64_t rsbs,
+						bool debug) {
+		return new postgresqlbenchmarks(connectstring,db,queries,
+						rows,cols,colsize,
+						samples,rsbs,debug);
+	}
 }
