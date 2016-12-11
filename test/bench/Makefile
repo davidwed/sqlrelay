@@ -114,7 +114,7 @@ sapbench.obj: sapbench.cpp
 	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(SYBASEINCLUDES) $(COMPILE) sapbench.cpp
 
 sqlrbench_sap.$(LIBEXT): sapbench.$(OBJ) sapbench.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ sapbench.$(OBJ) $(LDFLAGS) $(SAPCONNECTIONLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sapbench.$(OBJ) $(LDFLAGS) $(SYBASECONNECTIONLIBS) $(MODLINKFLAGS)
 
 sqlr-bench: sqlrbench.cpp sqlrbench.$(OBJ) sqlr-bench.cpp sqlr-bench.$(OBJ) 
 	$(LTLINK) $(LINK) $(OUT)$@$(EXE) sqlrbench.$(OBJ) sqlr-bench.$(OBJ) $(LDFLAGS) -export-dynamic $(BENCHLIBS)

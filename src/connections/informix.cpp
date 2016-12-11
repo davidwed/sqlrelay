@@ -59,6 +59,8 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		void		allocateResultSetBuffers(
 						int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
+		bool		open();
+		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		inputBind(const char *variable, 
@@ -845,34 +847,52 @@ void informixcursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool informixcursor::prepareQuery(const char *query, uint32_t length) {
+bool informixcursor::open() {
+
+	if (!stmt) {
+
+		// allocate the cursor
+		erg=SQLAllocHandle(SQL_HANDLE_STMT,informixconn->dbc,&stmt);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+
+		// set the row array size
+		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
+				(SQLPOINTER)informixconn->fetchatonce,0);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+
+		// enable smart-large-object automation for non-selects
+		erg=SQLSetStmtAttr(stmt,SQL_INFX_ATTR_LO_AUTOMATIC,
+						(SQLPOINTER)truevalue,0);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool informixcursor::close() {
 
 	if (stmt) {
 		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
+		stmt=0;
+	}
+	return true;
+}
+
+bool informixcursor::prepareQuery(const char *query, uint32_t length) {
+
+	// FIXME: we shouldn't have to do this...
+	// I'd think there'd be a way to reuse a statement like db2 can.
+	if (!close() || !open()) {
+		return false;
 	}
 
 	// initialize column count
 	ncols=0;
-
-	// allocate the cursor
-	erg=SQLAllocHandle(SQL_HANDLE_STMT,informixconn->dbc,&stmt);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-
-	// set the row array size
-	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)informixconn->fetchatonce,0);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-
-	// enable smart-large-object automation for non-selects
-	erg=SQLSetStmtAttr(stmt,SQL_INFX_ATTR_LO_AUTOMATIC,
-					(SQLPOINTER)truevalue,0);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -1405,7 +1425,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<maxbindcount; i++) {
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -1759,7 +1779,7 @@ void informixcursor::closeResultSet() {
 		SQLCloseCursor(stmt);
 	}
 
-	for (uint16_t i=0; i<maxbindcount; i++) {
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
 		delete outlobbind[i];
