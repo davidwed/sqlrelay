@@ -6,11 +6,11 @@
 
 #include <infxcli.h>
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class informixbenchmarks : public benchmarks {
+class informixbench : public sqlrbench {
 	public:
-		informixbenchmarks(const char *connectstring,
+		informixbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -41,7 +41,7 @@ struct informixcolumn {
 	SQLLEN		autoincrement;
 };
 
-class informixbenchconnection : public benchconnection {
+class informixbenchconnection : public sqlrbenchconnection {
 	friend class informixbenchcursor;
 	public:
 			informixbenchconnection(const char *connectstring,
@@ -64,9 +64,9 @@ class informixbenchconnection : public benchconnection {
 		SQLHDBC		dbc;
 };
 
-class informixbenchcursor : public benchcursor {
+class informixbenchcursor : public sqlrbenchcursor {
 	public:
-			informixbenchcursor(benchconnection *con);
+			informixbenchcursor(sqlrbenchconnection *con);
 			~informixbenchcursor();
 
 		bool	query(const char *query, bool getcolumns);
@@ -86,7 +86,7 @@ class informixbenchcursor : public benchcursor {
 						[INFORMIX_FETCH_AT_ONCE];
 };
 
-informixbenchmarks::informixbenchmarks(const char *connectstring,
+informixbench::informixbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -95,7 +95,7 @@ informixbenchmarks::informixbenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new informixbenchconnection(connectstring,db);
@@ -106,7 +106,7 @@ informixbenchmarks::informixbenchmarks(const char *connectstring,
 informixbenchconnection::informixbenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	informixdir=getParam("informixdir");
 	servername=getParam("servername");
 	dbname=getParam("db");
@@ -178,8 +178,8 @@ bool informixbenchconnection::disconnect() {
 	return true;
 }
 
-informixbenchcursor::informixbenchcursor(benchconnection *con) :
-							benchcursor(con) {
+informixbenchcursor::informixbenchcursor(sqlrbenchconnection *con) :
+							sqlrbenchcursor(con) {
 	informixbcon=(informixbenchconnection *)con;
 }
 
@@ -350,7 +350,7 @@ bool informixbenchcursor::query(const char *query, bool getcolumns) {
 }
 
 extern "C" {
-	benchmarks *new_informixbenchmarks(const char *connectstring,
+	sqlrbench *new_informixbench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -359,7 +359,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new informixbenchmarks(connectstring,db,queries,
+		return new informixbench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

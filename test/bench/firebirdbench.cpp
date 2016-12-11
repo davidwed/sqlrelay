@@ -2,11 +2,11 @@
 // See the file COPYING for more information
 #include "../../config.h"
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class firebirdbenchmarks : public benchmarks {
+class firebirdbench : public sqlrbench {
 	public:
-		firebirdbenchmarks(const char *connectstring,
+		firebirdbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -17,7 +17,7 @@ class firebirdbenchmarks : public benchmarks {
 					bool debug);
 };
 
-class firebirdbenchconnection : public benchconnection {
+class firebirdbenchconnection : public sqlrbenchconnection {
 	friend class firebirdbenchcursor;
 	public:
 			firebirdbenchconnection(const char *connectstring,
@@ -34,9 +34,9 @@ class firebirdbenchconnection : public benchconnection {
 		const char	*password;
 };
 
-class firebirdbenchcursor : public benchcursor {
+class firebirdbenchcursor : public sqlrbenchcursor {
 	public:
-			firebirdbenchcursor(benchconnection *con);
+			firebirdbenchcursor(sqlrbenchconnection *con);
 			~firebirdbenchcursor();
 
 		bool	open();
@@ -47,7 +47,7 @@ class firebirdbenchcursor : public benchcursor {
 		firebirdbenchconnection	*fbbcon;
 };
 
-firebirdbenchmarks::firebirdbenchmarks(const char *connectstring,
+firebirdbench::firebirdbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -56,7 +56,7 @@ firebirdbenchmarks::firebirdbenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new firebirdbenchconnection(connectstring,db);
@@ -67,7 +67,7 @@ firebirdbenchmarks::firebirdbenchmarks(const char *connectstring,
 firebirdbenchconnection::firebirdbenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	db=getParam("db");
 	dialect=getParam("dialect");
 	user=getParam("user");
@@ -85,8 +85,8 @@ bool firebirdbenchconnection::disconnect() {
 	return true;
 }
 
-firebirdbenchcursor::firebirdbenchcursor(benchconnection *con) :
-							benchcursor(con) {
+firebirdbenchcursor::firebirdbenchcursor(sqlrbenchconnection *con) :
+						sqlrbenchcursor(con) {
 	fbbcon=(firebirdbenchconnection *)con;
 }
 
@@ -106,7 +106,7 @@ bool firebirdbenchcursor::close() {
 }
 
 extern "C" {
-	benchmarks *new_firebirdbenchmarks(const char *connectstring,
+	sqlrbench *new_firebirdbench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -115,7 +115,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new firebirdbenchmarks(connectstring,db,queries,
+		return new firebirdbench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

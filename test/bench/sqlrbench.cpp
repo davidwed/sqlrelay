@@ -4,17 +4,17 @@
 #include <rudiments/process.h>
 #include <rudiments/snooze.h>
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-benchmarks::benchmarks(const char *connectstring,
-				const char *db,
-				uint64_t queries,
-				uint64_t rows,
-				uint32_t cols,
-				uint32_t colsize,
-				uint16_t samples,
-				uint64_t rsbs,
-				bool debug) {
+sqlrbench::sqlrbench(const char *connectstring,
+					const char *db,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					uint16_t samples,
+					uint64_t rsbs,
+					bool debug) {
 
 	this->connectstring=connectstring;
 	this->db=db;
@@ -35,18 +35,18 @@ benchmarks::benchmarks(const char *connectstring,
 	shutdown=false;
 }
 
-benchmarks::~benchmarks() {
+sqlrbench::~sqlrbench() {
 	delete cur;
 	delete con;
 }
 
-void benchmarks::shutDown() {
+void sqlrbench::shutDown() {
 	stdoutput.printf("shutting down, please wait...\n");
 	snooze::macrosnooze(1);
 	shutdown=true;
 }
 
-bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
+bool sqlrbench::run(dictionary< float, linkedlist< float > *> *stats) {
 
 	// connect and open
 	if (debug) {
@@ -153,7 +153,7 @@ bool benchmarks::run(dictionary< float, linkedlist< float > *> *stats) {
 	return !shutdown;
 }
 
-char *benchmarks::createQuery(uint32_t cols, uint32_t colsize) {
+char *sqlrbench::createQuery(uint32_t cols, uint32_t colsize) {
 
 	stringbuffer	createquerystr;
 	createquerystr.append("create table testtable (");
@@ -173,7 +173,7 @@ char *benchmarks::createQuery(uint32_t cols, uint32_t colsize) {
 	return createquerystr.detachString();
 }
 
-char *benchmarks::insertQuery(uint32_t cols, uint32_t colsize) {
+char *sqlrbench::insertQuery(uint32_t cols, uint32_t colsize) {
 	stringbuffer	insertquerystr;
 	insertquerystr.append("insert into testtable values ('");
 	for (uint32_t i=0; i<cols; i++) {
@@ -187,7 +187,7 @@ char *benchmarks::insertQuery(uint32_t cols, uint32_t colsize) {
 	return insertquerystr.detachString();
 }
 
-void benchmarks::appendRandomString(stringbuffer *str, uint32_t colsize) {
+void sqlrbench::appendRandomString(stringbuffer *str, uint32_t colsize) {
 	for (uint32_t j=0; j<colsize; j++) {
 		int32_t	result;
 		rnd.generateScaledNumber('a','z',&result);
@@ -195,7 +195,7 @@ void benchmarks::appendRandomString(stringbuffer *str, uint32_t colsize) {
 	}
 }
 
-void benchmarks::benchSelect(
+void sqlrbench::benchSelect(
 			const char *selectquery,
 			uint64_t queries, uint64_t rows,
 			uint32_t cols, uint32_t colsize,
@@ -355,30 +355,30 @@ void benchmarks::benchSelect(
 	}
 }
 
-benchconnection::benchconnection(const char *connectstring,
-						const char *db) {
+sqlrbenchconnection::sqlrbenchconnection(const char *connectstring,
+							const char *db) {
 	pstring.parse(connectstring);
 	this->db=db;
 }
 
-benchconnection::~benchconnection() {
+sqlrbenchconnection::~sqlrbenchconnection() {
 }
 
-const char *benchconnection::getParam(const char *param) {
+const char *sqlrbenchconnection::getParam(const char *param) {
 	return pstring.getValue(param);
 }
 
-benchcursor::benchcursor(benchconnection *bcon) {
+sqlrbenchcursor::sqlrbenchcursor(sqlrbenchconnection *bcon) {
 	this->bcon=bcon;
 }
 
-benchcursor::~benchcursor() {
+sqlrbenchcursor::~sqlrbenchcursor() {
 }
 
-bool benchcursor::open() {
+bool sqlrbenchcursor::open() {
 	return true;
 }
 
-bool benchcursor::close() {
+bool sqlrbenchcursor::close() {
 	return true;
 }

@@ -1,7 +1,7 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
-#ifndef BENCH_H
-#define BENCH_H
+#ifndef SQLRBENCHMARKS_H
+#define SQLRBENCHMARKS_H
 
 #include <rudiments/parameterstring.h>
 #include <rudiments/stringbuffer.h>
@@ -9,12 +9,12 @@
 #include <rudiments/dictionary.h>
 #include <rudiments/linkedlist.h>
 
-class benchconnection;
-class benchcursor;
+class sqlrbenchconnection;
+class sqlrbenchcursor;
 
-class benchmarks {
+class sqlrbench {
 	public:
-			benchmarks(const char *connectstring,
+			sqlrbench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -23,14 +23,14 @@ class benchmarks {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug);
-		virtual	~benchmarks();
+		virtual	~sqlrbench();
 		void	shutDown();
 		bool	run(dictionary< float, linkedlist< float > *> *stats);
 
 	protected:
-		benchconnection	*con;
-		benchcursor	*cur;
-		bool		issqlrelay;
+		sqlrbenchconnection	*con;
+		sqlrbenchcursor		*cur;
+		bool				issqlrelay;
 
 	private:
 		char	*createQuery(uint32_t cols, uint32_t colsize);
@@ -58,11 +58,11 @@ class benchmarks {
 		bool		shutdown;
 };
 
-class benchconnection {
+class sqlrbenchconnection {
 	public:
-			benchconnection(const char *connectstring,
-					const char *db);
-		virtual	~benchconnection();
+			sqlrbenchconnection(const char *connectstring,
+								const char *db);
+		virtual	~sqlrbenchconnection();
 
 		virtual	bool	connect()=0;
 		virtual	bool	disconnect()=0;
@@ -74,17 +74,17 @@ class benchconnection {
 		const char	*db;
 };
 
-class benchcursor {
+class sqlrbenchcursor {
 	public:
-			benchcursor(benchconnection *bcon);
-		virtual	~benchcursor();
+			sqlrbenchcursor(sqlrbenchconnection *bcon);
+		virtual	~sqlrbenchcursor();
 
 		virtual	bool	open();
 		virtual	bool	query(const char *query, bool getcolumns)=0;
 		virtual	bool	close();
 
 	protected:
-		benchconnection	*bcon;
+		sqlrbenchconnection	*bcon;
 };
 
 #endif

@@ -8,11 +8,11 @@ extern "C" {
 	#include <sqlite3.h>
 }
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class sqlitebenchmarks : public benchmarks {
+class sqlitebench : public sqlrbench {
 	public:
-		sqlitebenchmarks(const char *connectstring,
+		sqlitebench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -23,7 +23,7 @@ class sqlitebenchmarks : public benchmarks {
 					bool debug);
 };
 
-class sqlitebenchconnection : public benchconnection {
+class sqlitebenchconnection : public sqlrbenchconnection {
 	friend class sqlitebenchcursor;
 	public:
 			sqlitebenchconnection(const char *connectstring,
@@ -39,9 +39,9 @@ class sqlitebenchconnection : public benchconnection {
 		sqlite3		*sqlitecon;
 };
 
-class sqlitebenchcursor : public benchcursor {
+class sqlitebenchcursor : public sqlrbenchcursor {
 	public:
-			sqlitebenchcursor(benchconnection *con);
+			sqlitebenchcursor(sqlrbenchconnection *con);
 			~sqlitebenchcursor();
 
 		bool	open();
@@ -53,7 +53,7 @@ class sqlitebenchcursor : public benchcursor {
 		sqlite3_stmt		*sqlitestmt;
 };
 
-sqlitebenchmarks::sqlitebenchmarks(const char *connectstring,
+sqlitebench::sqlitebench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -62,7 +62,7 @@ sqlitebenchmarks::sqlitebenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new sqlitebenchconnection(connectstring,db);
@@ -73,7 +73,7 @@ sqlitebenchmarks::sqlitebenchmarks(const char *connectstring,
 sqlitebenchconnection::sqlitebenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	db=getParam("db");
 	sqlite3_open(db,&sqlitecon);
 }
@@ -90,8 +90,8 @@ bool sqlitebenchconnection::disconnect() {
 	return true;
 }
 
-sqlitebenchcursor::sqlitebenchcursor(benchconnection *con) :
-							benchcursor(con) {
+sqlitebenchcursor::sqlitebenchcursor(sqlrbenchconnection *con) :
+							sqlrbenchcursor(con) {
 	sbcon=(sqlitebenchconnection *)con;
 }
 
@@ -145,7 +145,7 @@ bool sqlitebenchcursor::close() {
 }
 
 extern "C" {
-	benchmarks *new_sqlitebenchmarks(const char *connectstring,
+	sqlrbench *new_sqlitebench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -154,7 +154,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new sqlitebenchmarks(connectstring,db,queries,
+		return new sqlitebench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

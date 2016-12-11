@@ -13,7 +13,7 @@
 // for system()
 #include <stdlib.h>
 
-#include "bench.h"
+#include "sqlrbench.h"
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
 
@@ -21,7 +21,7 @@ void shutDown(int32_t signum);
 void graphStats(const char *graph, const char *db,
 		dictionary< float, linkedlist< float > *> *stats);
 
-benchmarks	*bm;
+sqlrbench	*bm;
 
 int main(int argc, const char **argv) {
 
@@ -228,7 +228,7 @@ int main(int argc, const char **argv) {
 			}
 		}
 
-		// init benchmarks
+		// init bench
 		dynamiclib	dl;
 		stringbuffer	modulename;
 		modulename.append(".libs/sqlrbench_");
@@ -244,8 +244,8 @@ int main(int argc, const char **argv) {
 		}
 		stringbuffer	functionname;
 		functionname.append("new_")->append((which)?"sqlrelay":db);
-		functionname.append("benchmarks");
-		benchmarks	*(*newBm)(const char *,
+		functionname.append("bench");
+		sqlrbench	*(*newBm)(const char *,
 						const char *,
 						uint64_t,
 						uint64_t,
@@ -254,7 +254,7 @@ int main(int argc, const char **argv) {
 						uint16_t,
 						uint64_t,
 						bool)=
-			(benchmarks	*(*)(const char *,
+			(sqlrbench	*(*)(const char *,
 						const char *,
 						uint64_t,
 						uint64_t,
@@ -265,7 +265,7 @@ int main(int argc, const char **argv) {
 						bool))
 			dl.getSymbol(functionname.getString());
 		if (!newBm) {
-			stdoutput.printf("failed to load benchmarks\n");
+			stdoutput.printf("failed to load bench\n");
 			char	*error=dl.getError();
 			stdoutput.printf("%s\n",error);
 			delete[] error;
@@ -276,7 +276,7 @@ int main(int argc, const char **argv) {
 					db,queries,rows,cols,colsize,
 					samples,rsbs,debug);
 		if (!bm) {
-			stdoutput.printf("error creating benchmarks\n");
+			stdoutput.printf("error creating bench\n");
 			continue;
 		}
 

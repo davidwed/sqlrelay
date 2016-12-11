@@ -3,11 +3,11 @@
 #include <rudiments/charstring.h>
 #include <sqlrelay/sqlrclient.h>
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class sqlrelaybenchmarks : public benchmarks {
+class sqlrelaybench : public sqlrbench {
 	public:
-		sqlrelaybenchmarks(const char *connectstring,
+		sqlrelaybench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -18,7 +18,7 @@ class sqlrelaybenchmarks : public benchmarks {
 					bool debug);
 };
 
-class sqlrelaybenchconnection : public benchconnection {
+class sqlrelaybenchconnection : public sqlrbenchconnection {
 	friend class sqlrelaybenchcursor;
 	public:
 			sqlrelaybenchconnection(const char *connectstring,
@@ -39,9 +39,9 @@ class sqlrelaybenchconnection : public benchconnection {
 		sqlrconnection	*sqlrcon;
 };
 
-class sqlrelaybenchcursor : public benchcursor {
+class sqlrelaybenchcursor : public sqlrbenchcursor {
 	public:
-			sqlrelaybenchcursor(benchconnection *con,
+			sqlrelaybenchcursor(sqlrbenchconnection *con,
 							uint64_t rsbs);
 			~sqlrelaybenchcursor();
 
@@ -52,7 +52,7 @@ class sqlrelaybenchcursor : public benchcursor {
 		sqlrcursor		*sqlrcur;
 };
 
-sqlrelaybenchmarks::sqlrelaybenchmarks(const char *connectstring,
+sqlrelaybench::sqlrelaybench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -61,7 +61,7 @@ sqlrelaybenchmarks::sqlrelaybenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new sqlrelaybenchconnection(connectstring,db);
@@ -73,7 +73,7 @@ sqlrelaybenchmarks::sqlrelaybenchmarks(const char *connectstring,
 sqlrelaybenchconnection::sqlrelaybenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	host=getParam("host");
 	port=charstring::toInteger(getParam("port"));
 	socket=getParam("socket");
@@ -99,9 +99,9 @@ bool sqlrelaybenchconnection::disconnect() {
 	return true;
 }
 
-sqlrelaybenchcursor::sqlrelaybenchcursor(benchconnection *con,
-						uint64_t rsbs) :
-						benchcursor(con) {
+sqlrelaybenchcursor::sqlrelaybenchcursor(sqlrbenchconnection *con,
+							uint64_t rsbs) :
+							sqlrbenchcursor(con) {
 	sqlrbcon=(sqlrelaybenchconnection *)con;
 	sqlrcur=new sqlrcursor(sqlrbcon->sqlrcon);
 	sqlrcur->setResultSetBufferSize(rsbs);
@@ -134,7 +134,7 @@ bool sqlrelaybenchcursor::query(const char *query, bool getcolumns) {
 }
 
 extern "C" {
-	benchmarks *new_sqlrelaybenchmarks(const char *connectstring,
+	sqlrbench *new_sqlrelaybench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -143,7 +143,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new sqlrelaybenchmarks(connectstring,db,queries,
+		return new sqlrelaybench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

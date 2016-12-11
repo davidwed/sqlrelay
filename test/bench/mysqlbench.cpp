@@ -15,11 +15,11 @@ extern "C" {
 	#include <mysql.h>
 }
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class mysqlbenchmarks : public benchmarks {
+class mysqlbench : public sqlrbench {
 	public:
-		mysqlbenchmarks(const char *connectstring,
+		mysqlbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -30,7 +30,7 @@ class mysqlbenchmarks : public benchmarks {
 					bool debug);
 };
 
-class mysqlbenchconnection : public benchconnection {
+class mysqlbenchconnection : public sqlrbenchconnection {
 	friend class mysqlbenchcursor;
 	public:
 			mysqlbenchconnection(const char *connectstring,
@@ -59,9 +59,9 @@ class mysqlbenchconnection : public benchconnection {
 		bool		firstquery;
 };
 
-class mysqlbenchcursor : public benchcursor {
+class mysqlbenchcursor : public sqlrbenchcursor {
 	public:
-			mysqlbenchcursor(benchconnection *con,
+			mysqlbenchcursor(sqlrbenchconnection *con,
 						uint32_t cols,
 						uint32_t colsize);
 			~mysqlbenchcursor();
@@ -81,7 +81,7 @@ class mysqlbenchcursor : public benchcursor {
 		#endif
 };
 
-mysqlbenchmarks::mysqlbenchmarks(const char *connectstring,
+mysqlbench::mysqlbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -90,7 +90,7 @@ mysqlbenchmarks::mysqlbenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new mysqlbenchconnection(connectstring,db);
@@ -101,7 +101,7 @@ mysqlbenchmarks::mysqlbenchmarks(const char *connectstring,
 mysqlbenchconnection::mysqlbenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	host=getParam("host");
 	port=charstring::toInteger(getParam("port"));
 	socket=getParam("socket");
@@ -162,10 +162,10 @@ bool mysqlbenchconnection::disconnect() {
 	return true;
 }
 
-mysqlbenchcursor::mysqlbenchcursor(benchconnection *con,
+mysqlbenchcursor::mysqlbenchcursor(sqlrbenchconnection *con,
 						uint32_t cols,
 						uint32_t colsize) :
-						benchcursor(con) {
+						sqlrbenchcursor(con) {
 	mbcon=(mysqlbenchconnection *)con;
 	#ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=mysql_stmt_init(&mbcon->mysql);
@@ -295,7 +295,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 }
 
 extern "C" {
-	benchmarks *new_mysqlbenchmarks(const char *connectstring,
+	sqlrbench *new_mysqlbench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -304,7 +304,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new mysqlbenchmarks(connectstring,db,queries,
+		return new mysqlbench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

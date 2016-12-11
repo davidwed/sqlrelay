@@ -5,15 +5,15 @@
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
 
-#include "bench.h"
+#include "sqlrbench.h"
 
 extern "C" {
 	#include <ctpublic.h>
 }
 
-class freetdsbenchmarks : public benchmarks {
+class freetdsbench : public sqlrbench {
 	public:
-		freetdsbenchmarks(const char *connectstring,
+		freetdsbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -29,7 +29,7 @@ class freetdsbenchmarks : public benchmarks {
 #define SAP_MAX_ITEM_BUFFER_SIZE 2048
 
 
-class freetdsbenchconnection : public benchconnection {
+class freetdsbenchconnection : public sqlrbenchconnection {
 	friend class freetdsbenchcursor;
 	public:
 			freetdsbenchconnection(const char *connectstring,
@@ -61,9 +61,9 @@ class freetdsbenchconnection : public benchconnection {
 						CS_SERVERMSG *msgp);
 };
 
-class freetdsbenchcursor : public benchcursor {
+class freetdsbenchcursor : public sqlrbenchcursor {
 	public:
-			freetdsbenchcursor(benchconnection *con);
+			freetdsbenchcursor(sqlrbenchconnection *con);
 			~freetdsbenchcursor();
 
 		bool	open();
@@ -87,7 +87,7 @@ class freetdsbenchcursor : public benchcursor {
 		CS_INT		rowcount;
 };
 
-freetdsbenchmarks::freetdsbenchmarks(const char *connectstring,
+freetdsbench::freetdsbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -96,7 +96,7 @@ freetdsbenchmarks::freetdsbenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new freetdsbenchconnection(connectstring,db);
@@ -107,7 +107,7 @@ freetdsbenchmarks::freetdsbenchmarks(const char *connectstring,
 freetdsbenchconnection::freetdsbenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	sybase=getParam("sybase");
 	lang=getParam("lang");
 	server=getParam("server");
@@ -246,7 +246,8 @@ CS_RETCODE freetdsbenchconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-freetdsbenchcursor::freetdsbenchcursor(benchconnection *con) : benchcursor(con) {
+freetdsbenchcursor::freetdsbenchcursor(sqlrbenchconnection *con) :
+						sqlrbenchcursor(con) {
 	sybbcon=(freetdsbenchconnection *)con;
 }
 
@@ -433,7 +434,7 @@ bool freetdsbenchcursor::close() {
 }
 
 extern "C" {
-	benchmarks *new_freetdsbenchmarks(const char *connectstring,
+	sqlrbench *new_freetdsbench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -442,7 +443,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new freetdsbenchmarks(connectstring,db,queries,
+		return new freetdsbench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

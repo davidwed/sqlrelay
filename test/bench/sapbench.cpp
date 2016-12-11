@@ -9,11 +9,11 @@ extern "C" {
 	#include <ctpublic.h>
 }
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class sapbenchmarks : public benchmarks {
+class sapbench : public sqlrbench {
 	public:
-		sapbenchmarks(const char *connectstring,
+		sapbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -28,7 +28,7 @@ class sapbenchmarks : public benchmarks {
 #define SAP_MAX_SELECT_LIST_SIZE 256
 #define SAP_MAX_ITEM_BUFFER_SIZE 2048
 
-class sapbenchconnection : public benchconnection {
+class sapbenchconnection : public sqlrbenchconnection {
 	friend class sapbenchcursor;
 	public:
 			sapbenchconnection(const char *connectstring,
@@ -60,9 +60,9 @@ class sapbenchconnection : public benchconnection {
 						CS_SERVERMSG *msgp);
 };
 
-class sapbenchcursor : public benchcursor {
+class sapbenchcursor : public sqlrbenchcursor {
 	public:
-			sapbenchcursor(benchconnection *con);
+			sapbenchcursor(sqlrbenchconnection *con);
 			~sapbenchcursor();
 
 		bool	open();
@@ -86,7 +86,7 @@ class sapbenchcursor : public benchcursor {
 		CS_INT		rowcount;
 };
 
-sapbenchmarks::sapbenchmarks(const char *connectstring,
+sapbench::sapbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -95,7 +95,7 @@ sapbenchmarks::sapbenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new sapbenchconnection(connectstring,db);
@@ -106,7 +106,7 @@ sapbenchmarks::sapbenchmarks(const char *connectstring,
 sapbenchconnection::sapbenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	sybase=getParam("sybase");
 	lang=getParam("lang");
 	server=getParam("server");
@@ -245,7 +245,8 @@ CS_RETCODE sapbenchconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-sapbenchcursor::sapbenchcursor(benchconnection *con) : benchcursor(con) {
+sapbenchcursor::sapbenchcursor(sqlrbenchconnection *con) :
+						sqlrbenchcursor(con) {
 	sybbcon=(sapbenchconnection *)con;
 }
 
@@ -432,7 +433,7 @@ bool sapbenchcursor::close() {
 }
 
 extern "C" {
-	benchmarks *new_sapbenchmarks(const char *connectstring,
+	sqlrbench *new_sapbench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -441,7 +442,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new sapbenchmarks(connectstring,db,queries,
+		return new sapbench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

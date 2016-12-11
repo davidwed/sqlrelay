@@ -4,11 +4,11 @@
 
 #include <libpq-fe.h>
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class postgresqlbenchmarks : public benchmarks {
+class postgresqlbench : public sqlrbench {
 	public:
-		postgresqlbenchmarks(const char *connectstring,
+		postgresqlbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -19,7 +19,7 @@ class postgresqlbenchmarks : public benchmarks {
 					bool debug);
 };
 
-class postgresqlbenchconnection : public benchconnection {
+class postgresqlbenchconnection : public sqlrbenchconnection {
 	friend class postgresqlbenchcursor;
 	public:
 			postgresqlbenchconnection(const char *connectstring,
@@ -44,9 +44,9 @@ class postgresqlbenchconnection : public benchconnection {
 		PGconn	*pgconn;
 };
 
-class postgresqlbenchcursor : public benchcursor {
+class postgresqlbenchcursor : public sqlrbenchcursor {
 	public:
-			postgresqlbenchcursor(benchconnection *con);
+			postgresqlbenchcursor(sqlrbenchconnection *con);
 			~postgresqlbenchcursor();
 
 		bool	query(const char *query, bool getcolumns);
@@ -57,7 +57,7 @@ class postgresqlbenchcursor : public benchcursor {
 		PGresult	*pgresult;
 };
 
-postgresqlbenchmarks::postgresqlbenchmarks(const char *connectstring,
+postgresqlbench::postgresqlbench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -66,7 +66,7 @@ postgresqlbenchmarks::postgresqlbenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new postgresqlbenchconnection(connectstring,db);
@@ -77,7 +77,7 @@ postgresqlbenchmarks::postgresqlbenchmarks(const char *connectstring,
 postgresqlbenchconnection::postgresqlbenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	host=getParam("host");
 	port=getParam("port");
 	dbname=getParam("db");
@@ -126,8 +126,8 @@ bool postgresqlbenchconnection::disconnect() {
 	return true;
 }
 
-postgresqlbenchcursor::postgresqlbenchcursor(benchconnection *con) :
-							benchcursor(con) {
+postgresqlbenchcursor::postgresqlbenchcursor(sqlrbenchconnection *con) :
+							sqlrbenchcursor(con) {
 	pgbcon=(postgresqlbenchconnection *)con;
 }
 
@@ -188,7 +188,7 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 }
 
 extern "C" {
-	benchmarks *new_postgresqlbenchmarks(const char *connectstring,
+	sqlrbench *new_postgresqlbench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -197,7 +197,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new postgresqlbenchmarks(connectstring,db,queries,
+		return new postgresqlbench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

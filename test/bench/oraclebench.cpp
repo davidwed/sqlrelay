@@ -9,11 +9,11 @@ extern "C" {
 	#include <oci.h>
 }
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class oraclebenchmarks : public benchmarks {
+class oraclebench : public sqlrbench {
 	public:
-		oraclebenchmarks(const char *connectstring,
+		oraclebench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -36,7 +36,7 @@ struct describe {
 	sb4	buflen;
 };
 
-class oraclebenchconnection : public benchconnection {
+class oraclebenchconnection : public sqlrbenchconnection {
 	friend class oraclebenchcursor;
 	public:
 			oraclebenchconnection(const char *connectstring,
@@ -59,9 +59,9 @@ class oraclebenchconnection : public benchconnection {
 		OCITrans	*trans;
 };
 
-class oraclebenchcursor : public benchcursor {
+class oraclebenchcursor : public sqlrbenchcursor {
 	public:
-			oraclebenchcursor(benchconnection *con);
+			oraclebenchcursor(sqlrbenchconnection *con);
 			~oraclebenchcursor();
 
 		bool	open();
@@ -88,7 +88,7 @@ class oraclebenchcursor : public benchcursor {
 							[ORACLE_FETCH_AT_ONCE];
 };
 
-oraclebenchmarks::oraclebenchmarks(const char *connectstring,
+oraclebench::oraclebench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -97,7 +97,7 @@ oraclebenchmarks::oraclebenchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new oraclebenchconnection(connectstring,db);
@@ -108,7 +108,7 @@ oraclebenchmarks::oraclebenchmarks(const char *connectstring,
 oraclebenchconnection::oraclebenchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	sid=getParam("sid");
 	user=getParam("user");
 	password=getParam("password");
@@ -260,7 +260,8 @@ bool oraclebenchconnection::disconnect() {
 	return true;
 }
 
-oraclebenchcursor::oraclebenchcursor(benchconnection *con) : benchcursor(con) {
+oraclebenchcursor::oraclebenchcursor(sqlrbenchconnection *con) :
+						sqlrbenchcursor(con) {
 	orabcon=(oraclebenchconnection *)con;
 }
 
@@ -410,7 +411,7 @@ bool oraclebenchcursor::close() {
 }
 
 extern "C" {
-	benchmarks *new_oraclebenchmarks(const char *connectstring,
+	sqlrbench *new_oraclebench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -419,7 +420,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new oraclebenchmarks(connectstring,db,queries,
+		return new oraclebench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}

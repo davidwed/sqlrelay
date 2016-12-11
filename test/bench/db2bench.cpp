@@ -6,11 +6,11 @@
 
 #include <sqlcli1.h>
 
-#include "bench.h"
+#include "sqlrbench.h"
 
-class db2benchmarks : public benchmarks {
+class db2bench : public sqlrbench {
 	public:
-		db2benchmarks(const char *connectstring,
+		db2bench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -43,7 +43,7 @@ struct db2column {
 	uint16_t	autoincrement;
 };
 
-class db2benchconnection : public benchconnection {
+class db2benchconnection : public sqlrbenchconnection {
 	friend class db2benchcursor;
 	public:
 			db2benchconnection(const char *connectstring,
@@ -64,9 +64,9 @@ class db2benchconnection : public benchconnection {
 		SQLHDBC		dbc;
 };
 
-class db2benchcursor : public benchcursor {
+class db2benchcursor : public sqlrbenchcursor {
 	public:
-			db2benchcursor(benchconnection *con);
+			db2benchcursor(sqlrbenchconnection *con);
 			~db2benchcursor();
 
 		bool	query(const char *query, bool getcolumns);
@@ -89,7 +89,7 @@ class db2benchcursor : public benchcursor {
 		#endif
 };
 
-db2benchmarks::db2benchmarks(const char *connectstring,
+db2bench::db2bench(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -98,7 +98,7 @@ db2benchmarks::db2benchmarks(const char *connectstring,
 					uint16_t samples,
 					uint64_t rsbs,
 					bool debug) :
-					benchmarks(connectstring,db,
+					sqlrbench(connectstring,db,
 						queries,rows,cols,colsize,
 						samples,rsbs,debug) {
 	con=new db2benchconnection(connectstring,db);
@@ -109,7 +109,7 @@ db2benchmarks::db2benchmarks(const char *connectstring,
 db2benchconnection::db2benchconnection(
 				const char *connectstring,
 				const char *db) :
-				benchconnection(connectstring,db) {
+				sqlrbenchconnection(connectstring,db) {
 	dbname=getParam("db");
 	lang=getParam("lang");
 	user=getParam("user");
@@ -149,7 +149,8 @@ bool db2benchconnection::disconnect() {
 	return true;
 }
 
-db2benchcursor::db2benchcursor(benchconnection *con) : benchcursor(con) {
+db2benchcursor::db2benchcursor(sqlrbenchconnection *con) :
+						sqlrbenchcursor(con) {
 	db2bcon=(db2benchconnection *)con;
 }
 
@@ -326,7 +327,7 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 }
 
 extern "C" {
-	benchmarks *new_db2benchmarks(const char *connectstring,
+	sqlrbench *new_db2bench(const char *connectstring,
 						const char *db,
 						uint64_t queries,
 						uint64_t rows,
@@ -335,7 +336,7 @@ extern "C" {
 						uint16_t samples,
 						uint64_t rsbs,
 						bool debug) {
-		return new db2benchmarks(connectstring,db,queries,
+		return new db2bench(connectstring,db,queries,
 						rows,cols,colsize,
 						samples,rsbs,debug);
 	}
