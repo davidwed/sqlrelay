@@ -116,5 +116,5 @@ sapbench.obj: sapbench.cpp
 sqlrbench_sap.$(LIBEXT): sapbench.$(OBJ) sapbench.cpp
 	$(LTLINK) $(LINK) $(OUT)$@ sapbench.$(OBJ) $(LDFLAGS) $(SAPCONNECTIONLIBS) $(MODLINKFLAGS)
 
-sqlr-bench: bench.cpp bench.$(OBJ) main.cpp main.$(OBJ) 
-	$(LTLINK) $(LINK) $(OUT)$@$(EXE) bench.$(OBJ) main.$(OBJ) $(LDFLAGS) -export-dynamic $(BENCHLIBS)
+sqlr-bench: bench.cpp bench.$(OBJ) sqlr-bench.cpp sqlr-bench.$(OBJ) 
+	$(LTLINK) $(LINK) $(OUT)$@$(EXE) bench.$(OBJ) sqlr-bench.$(OBJ) $(LDFLAGS) -export-dynamic $(BENCHLIBS)
