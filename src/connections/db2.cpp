@@ -58,6 +58,8 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		void		allocateResultSetBuffers(
 						int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
+		bool		open();
+		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		void		encodeBlob(stringbuffer *buffer,
@@ -817,45 +819,71 @@ void db2cursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool db2cursor::prepareQuery(const char *query, uint32_t length) {
+bool db2cursor::open() {
 
-	// initialize column count
-	ncols=0;
+	if (!stmt) {
 
-	if (stmt) {
-		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
+		// allocate the cursor
+		erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&stmt);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+
+		// set the row array size
+		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
+					(SQLPOINTER)db2conn->fetchatonce,0);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+
+		#if (DB2VERSION>7)
+		if (db2conn->maxselectlistsize!=-1) {
+
+			// set the row status ptr
+			// (only do this here if we're not
+			// dynamically allocating row buffers)
+			erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
+						(SQLPOINTER)rowstat,0);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+		}
+		#endif
 	}
-	if (lobstmt) {
-		SQLFreeHandle(SQL_HANDLE_STMT,lobstmt);
-		lobstmt=0;
-	}
 
-	// allocate the cursor
-	erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&stmt);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
+	if (!lobstmt) {
 
-	// set the row array size
-	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)db2conn->fetchatonce,0);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-
-	#if (DB2VERSION>7)
-	if (db2conn->maxselectlistsize!=-1) {
-
-		// set the row status ptr
-		// (only do this here if we're not
-		// dynamically allocating row buffers)
-		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
-					(SQLPOINTER)rowstat,0);
+		// allocate a lob handle, in case we need it
+		erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&lobstmt);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
 	}
-	#endif
+
+	return true;
+}
+
+bool db2cursor::close() {
+
+	if (stmt) {
+		// free stmt handle
+		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
+		stmt=0;
+	}
+
+	if (lobstmt) {
+		// free lob handle
+		SQLFreeHandle(SQL_HANDLE_STMT,lobstmt);
+		lobstmt=0;
+	}
+
+	return true;
+}
+
+bool db2cursor::prepareQuery(const char *query, uint32_t length) {
+
+	// initialize column count
+	ncols=0;
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -1397,18 +1425,23 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// bind the column to a lob locator or buffer
-		if (column[i].type==SQL_CLOB) {
-			erg=SQLBindCol(stmt,i+1,SQL_C_CLOB_LOCATOR,
-					loblocator[i],0,
-					(SQLINTEGER *)indicator[i]);
-		} else if (column[i].type==SQL_BLOB) {
-			erg=SQLBindCol(stmt,i+1,SQL_C_BLOB_LOCATOR,
-					loblocator[i],0,
-					(SQLINTEGER *)indicator[i]);
-		} else {
-			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-					field[i],db2conn->maxitembuffersize,
-					(SQLINTEGER *)indicator[i]);
+		switch (column[i].type) {
+			case SQL_CLOB:
+				erg=SQLBindCol(stmt,i+1,SQL_C_CLOB_LOCATOR,
+						loblocator[i],0,
+						(SQLINTEGER *)indicator[i]);
+				break;
+			case SQL_BLOB:
+				erg=SQLBindCol(stmt,i+1,SQL_C_BLOB_LOCATOR,
+						loblocator[i],0,
+						(SQLINTEGER *)indicator[i]);
+				break;
+			default:
+				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+						field[i],
+						db2conn->maxitembuffersize,
+						(SQLINTEGER *)indicator[i]);
+				break;
 		}
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
@@ -1422,7 +1455,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<maxbindcount; i++) {
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -1665,14 +1698,6 @@ void db2cursor::nextRow() {
 
 bool db2cursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 
-	// create a new handle if necessary
-	if (!lobstmt) {
-		erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&lobstmt);
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
-	}
-
 	// get the length of the lob
 	SQLINTEGER	ind;
 	SQLSMALLINT	locatortype=(column[col].type==SQL_CLOB)?
@@ -1706,14 +1731,6 @@ bool db2cursor::getLobFieldSegment(uint32_t col,
 	// bail if we're attempting to start reading past the end
 	if (offset>(uint64_t)loblength[col][rowgroupindex]) {
 		return false;
-	}
-
-	// create a new handle if necessary
-	if (!lobstmt) {
-		erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&lobstmt);
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
 	}
 
 	// prevent attempts to read past the end
@@ -1775,7 +1792,7 @@ bool db2cursor::getLobFieldSegment(uint32_t col,
 void db2cursor::closeResultSet() {
 	SQLCloseCursor(stmt);
 
-	for (uint16_t i=0; i<maxbindcount; i++) {
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
 		delete outlobbind[i];
