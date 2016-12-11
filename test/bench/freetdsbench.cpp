@@ -5,11 +5,11 @@
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
 
-#include "sqlrbench.h"
-
 extern "C" {
 	#include <ctpublic.h>
 }
+
+#include "sqlrbench.h"
 
 class freetdsbench : public sqlrbench {
 	public:
@@ -24,10 +24,12 @@ class freetdsbench : public sqlrbench {
 					bool debug);
 };
 
-#define SAP_FETCH_AT_ONCE 10
-#define SAP_MAX_SELECT_LIST_SIZE 256
-#define SAP_MAX_ITEM_BUFFER_SIZE 2048
+//#define FREETDS_FETCH_AT_ONCE 10
+#define FREETDS_FETCH_AT_ONCE 1
+#define FREETDS_MAX_SELECT_LIST_SIZE 256
+#define FREETDS_MAX_ITEM_BUFFER_SIZE 2048
 
+//#define FREETDS_SUPPORTS_CURSORS
 
 class freetdsbenchconnection : public sqlrbenchconnection {
 	friend class freetdsbenchcursor;
@@ -71,19 +73,26 @@ class freetdsbenchcursor : public sqlrbenchcursor {
 		bool	close();
 
 	private:
+		bool	runQuery(const char *query, bool getcolumns);
+		void	discardResultSet();
+		void	discardCursor();
+
 		freetdsbenchconnection	*sybbcon;
 
+#ifdef FREETDS_SUPPORTS_CURSORS
+		bool		cursorcmd;
+#endif
 		CS_COMMAND	*cmd;
 		CS_INT		resultstype;
 		CS_INT		ncols;
-		CS_DATAFMT	column[SAP_MAX_SELECT_LIST_SIZE];
-		char		data[SAP_MAX_SELECT_LIST_SIZE]
-						[SAP_FETCH_AT_ONCE]
-						[SAP_MAX_ITEM_BUFFER_SIZE];
-		CS_INT		datalength[SAP_MAX_SELECT_LIST_SIZE]
-						[SAP_FETCH_AT_ONCE];
-		CS_SMALLINT	nullindicator[SAP_MAX_SELECT_LIST_SIZE]
-						[SAP_FETCH_AT_ONCE];
+		CS_DATAFMT	column[FREETDS_MAX_SELECT_LIST_SIZE];
+		char		data[FREETDS_MAX_SELECT_LIST_SIZE]
+						[FREETDS_FETCH_AT_ONCE]
+						[FREETDS_MAX_ITEM_BUFFER_SIZE];
+		CS_INT		datalength[FREETDS_MAX_SELECT_LIST_SIZE]
+						[FREETDS_FETCH_AT_ONCE];
+		CS_SMALLINT	nullindicator[FREETDS_MAX_SELECT_LIST_SIZE]
+						[FREETDS_FETCH_AT_ONCE];
 		CS_INT		rowcount;
 };
 
@@ -211,6 +220,9 @@ bool freetdsbenchconnection::connect() {
 		stdoutput.printf("connect: ct_results failed (CS_CMD_FAIL)\n");
 		return false;
 	}
+	do {
+		ct_cancel(NULL,dbcmd,CS_CANCEL_CURRENT);
+	} while (ct_results(dbcmd,&resultstype)==CS_SUCCEED);
 	ct_cancel(NULL,dbcmd,CS_CANCEL_ALL);
 	ct_cmd_drop(dbcmd);
 	return true;
@@ -249,6 +261,9 @@ CS_RETCODE freetdsbenchconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 freetdsbenchcursor::freetdsbenchcursor(sqlrbenchconnection *con) :
 						sqlrbenchcursor(con) {
 	sybbcon=(freetdsbenchconnection *)con;
+#ifdef FREETDS_SUPPORTS_CURSORS
+	cursorcmd=false;
+#endif
 }
 
 freetdsbenchcursor::~freetdsbenchcursor() {
@@ -265,13 +280,20 @@ bool freetdsbenchcursor::open() {
 }
 
 bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
+	bool	success=runQuery(query,getcolumns);
+	discardResultSet();
+	discardCursor();
+	return success;
+}
+
+bool freetdsbenchcursor::runQuery(const char *query, bool getcolumns) {
 
 	// initialize number of columns
 	ncols=0;
 
-	bool	cursorcmd=false;
-	// FIXME: ct_results fails if we use a cursor.  Why???
-	/*if (!charstring::compare(query,"select ",7)) {
+#ifdef FREETDS_SUPPORTS_CURSORS
+	cursorcmd=false;
+	if (!charstring::compare(query,"select ",7)) {
 
 		// initiate a cursor command
 		if (ct_cursor(cmd,CS_CURSOR_DECLARE,
@@ -287,7 +309,7 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 		if (ct_cursor(cmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
 					NULL,CS_UNUSED,
-					(CS_INT)SAP_FETCH_AT_ONCE)!=
+					(CS_INT)FREETDS_FETCH_AT_ONCE)!=
 					CS_SUCCEED) {
 			stdoutput.printf("ct_cursor (rows) failed\n");
 			return false;
@@ -303,7 +325,8 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 
 		cursorcmd=true;
 
-	} else {*/
+	} else {
+#endif
 
 		// initiate a language command
 		if (ct_command(cmd,CS_LANG_CMD,
@@ -313,7 +336,10 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 			stdoutput.printf("ct_command failed\n");
 			return false;
 		}
-	//}
+
+#ifdef FREETDS_SUPPORTS_CURSORS
+	}
+#endif
 
 	// send the command
 	if (ct_send(cmd)!=CS_SUCCEED) {
@@ -326,37 +352,27 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 
 		CS_INT	results=ct_results(cmd,&resultstype);
 
-		if (results==CS_END_RESULTS) {
-			break;
-		}
 		if (results==CS_FAIL) {
 			stdoutput.printf("query: ct_results "
 					"failed (CS_FAIL)\n");
 			return false;
+		} else if (results==CS_END_RESULTS) {
+			return true;
 		}
+
 		if (resultstype==CS_CMD_FAIL) {
 			stdoutput.printf("query: ct_results "
 					"failed (CS_CMD_FAIL)\n");
 			return false;
-		}
-
-		// DDL/DML
-		/*if (!cursorcmd) {
-			if (resultstype!=CS_CMD_SUCCEED) {
-				stdoutput.printf(
-					"query: resultstype!=CS_CMD_SUCCEED\n");
-			}
-		}*/
-
-		// select
-		if (resultstype==CS_CMD_SUCCEED ||
-				resultstype==CS_ROW_RESULT ||
+		} else if (resultstype==CS_CMD_SUCCEED) {
+			return true;
+		} else if (resultstype==CS_ROW_RESULT ||
 				resultstype==CS_CURSOR_RESULT ||
 				resultstype==CS_COMPUTE_RESULT) {
 			break;
 		}
 
-		// cancel any result that isn't row-related
+		// cancel any other result
 		ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
 	}
 
@@ -372,11 +388,11 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 	
 		column[i].datatype=CS_CHAR_TYPE;
 		column[i].format=CS_FMT_NULLTERM;
-		column[i].maxlength=SAP_MAX_ITEM_BUFFER_SIZE;
+		column[i].maxlength=FREETDS_MAX_ITEM_BUFFER_SIZE;
 		column[i].scale=CS_UNUSED;
 		column[i].precision=CS_UNUSED;
 		column[i].status=CS_UNUSED;
-		column[i].count=SAP_FETCH_AT_ONCE;
+		column[i].count=FREETDS_FETCH_AT_ONCE;
 		column[i].usertype=CS_UNUSED;
 		column[i].locale=NULL;
 
@@ -397,7 +413,7 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 	// go fetch all rows and columns
 	for (;;) {
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,
-					CS_UNUSED,&rowcount)!=CS_SUCCEED &&
+					CS_UNUSED,&rowcount)!=CS_SUCCEED ||
 					!rowcount) {
 			break;
 		}
@@ -413,16 +429,30 @@ bool freetdsbenchcursor::query(const char *query, bool getcolumns) {
 			//stdoutput.printf("\n");
 		}
 	}
-
-	// cancel this result set
-	ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
-
-	// deallocate the cursor
-	ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,NULL,CS_UNUSED,CS_DEALLOC);
-	ct_send(cmd);
-	ct_results(cmd,&resultstype);
-	ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
 	return true;
+}
+
+void freetdsbenchcursor::discardResultSet() {
+	do {
+		ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
+	} while (ct_results(cmd,&resultstype)==CS_SUCCEED);
+	ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+}
+
+void freetdsbenchcursor::discardCursor() {
+#ifdef FREETDS_SUPPORTS_CURSORS
+	if (cursorcmd) {
+		ct_cursor(cmd,CS_CURSOR_CLOSE
+				,NULL,CS_UNUSED,NULL,CS_UNUSED,
+				CS_DEALLOC);
+		ct_send(cmd);
+		ct_results(cmd,&resultstype);
+		do {
+			ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
+		} while (ct_results(cmd,&resultstype)==CS_SUCCEED);
+		ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+	}
+#endif
 }
 
 bool freetdsbenchcursor::close() {

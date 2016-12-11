@@ -70,8 +70,13 @@ class sapbenchcursor : public sqlrbenchcursor {
 		bool	close();
 
 	private:
+		bool	runQuery(const char *query, bool getcolumns);
+		void	discardResultSet();
+		void	discardCursor();
+
 		sapbenchconnection	*sybbcon;
 
+		bool		cursorcmd;
 		CS_COMMAND	*cmd;
 		CS_INT		resultstype;
 		CS_INT		ncols;
@@ -210,6 +215,9 @@ bool sapbenchconnection::connect() {
 		stdoutput.printf("connect: ct_results failed (CS_CMD_FAIL)\n");
 		return false;
 	}
+	do {
+		ct_cancel(NULL,dbcmd,CS_CANCEL_CURRENT);
+	} while (ct_results(dbcmd,&resultstype)==CS_SUCCEED);
 	ct_cancel(NULL,dbcmd,CS_CANCEL_ALL);
 	ct_cmd_drop(dbcmd);
 	return true;
@@ -248,6 +256,7 @@ CS_RETCODE sapbenchconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 sapbenchcursor::sapbenchcursor(sqlrbenchconnection *con) :
 						sqlrbenchcursor(con) {
 	sybbcon=(sapbenchconnection *)con;
+	cursorcmd=false;
 }
 
 sapbenchcursor::~sapbenchcursor() {
@@ -264,13 +273,19 @@ bool sapbenchcursor::open() {
 }
 
 bool sapbenchcursor::query(const char *query, bool getcolumns) {
+	bool	success=runQuery(query,getcolumns);
+	discardResultSet();
+	discardCursor();
+	return success;
+}
+
+bool sapbenchcursor::runQuery(const char *query, bool getcolumns) {
 
 	// initialize number of columns
 	ncols=0;
 
-	bool	cursorcmd=false;
-	// FIXME: ct_results fails if we use a cursor.  Why???
-	/*if (!charstring::compare(query,"select ",7)) {
+	cursorcmd=false;
+	if (!charstring::compare(query,"select ",7)) {
 
 		// initiate a cursor command
 		if (ct_cursor(cmd,CS_CURSOR_DECLARE,
@@ -302,7 +317,7 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 
 		cursorcmd=true;
 
-	} else {*/
+	} else {
 
 		// initiate a language command
 		if (ct_command(cmd,CS_LANG_CMD,
@@ -312,7 +327,7 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 			stdoutput.printf("ct_command failed\n");
 			return false;
 		}
-	//}
+	}
 
 	// send the command
 	if (ct_send(cmd)!=CS_SUCCEED) {
@@ -325,37 +340,27 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 
 		CS_INT	results=ct_results(cmd,&resultstype);
 
-		if (results==CS_END_RESULTS) {
-			break;
-		}
 		if (results==CS_FAIL) {
 			stdoutput.printf("query: ct_results "
 					"failed (CS_FAIL)\n");
 			return false;
+		} else if (results==CS_END_RESULTS) {
+			return true;
 		}
+
 		if (resultstype==CS_CMD_FAIL) {
 			stdoutput.printf("query: ct_results "
 					"failed (CS_CMD_FAIL)\n");
 			return false;
-		}
-
-		// DDL/DML
-		/*if (!cursorcmd) {
-			if (resultstype!=CS_CMD_SUCCEED) {
-				stdoutput.printf(
-					"query: resultstype!=CS_CMD_SUCCEED\n");
-			}
-		}*/
-
-		// select
-		if (resultstype==CS_CMD_SUCCEED ||
-				resultstype==CS_ROW_RESULT ||
+		} else if (resultstype==CS_CMD_SUCCEED) {
+			return true;
+		} else if (resultstype==CS_ROW_RESULT ||
 				resultstype==CS_CURSOR_RESULT ||
 				resultstype==CS_COMPUTE_RESULT) {
 			break;
 		}
 
-		// cancel any result that isn't row-related
+		// cancel any other result
 		ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
 	}
 
@@ -396,7 +401,7 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 	// go fetch all rows and columns
 	for (;;) {
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,
-					CS_UNUSED,&rowcount)!=CS_SUCCEED &&
+					CS_UNUSED,&rowcount)!=CS_SUCCEED ||
 					!rowcount) {
 			break;
 		}
@@ -412,16 +417,28 @@ bool sapbenchcursor::query(const char *query, bool getcolumns) {
 			//stdoutput.printf("\n");
 		}
 	}
-
-	// cancel this result set
-	ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
-
-	// deallocate the cursor
-	ct_cursor(cmd,CS_CURSOR_CLOSE,NULL,CS_UNUSED,NULL,CS_UNUSED,CS_DEALLOC);
-	ct_send(cmd);
-	ct_results(cmd,&resultstype);
-	ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
 	return true;
+}
+
+void sapbenchcursor::discardResultSet() {
+	do {
+		ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
+	} while (ct_results(cmd,&resultstype)==CS_SUCCEED);
+	ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+}
+
+void sapbenchcursor::discardCursor() {
+	if (cursorcmd) {
+		ct_cursor(cmd,CS_CURSOR_CLOSE
+				,NULL,CS_UNUSED,NULL,CS_UNUSED,
+				CS_DEALLOC);
+		ct_send(cmd);
+		ct_results(cmd,&resultstype);
+		do {
+			ct_cancel(NULL,cmd,CS_CANCEL_CURRENT);
+		} while (ct_results(cmd,&resultstype)==CS_SUCCEED);
+		ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+	}
 }
 
 bool sapbenchcursor::close() {
