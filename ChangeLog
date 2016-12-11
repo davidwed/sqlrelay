@@ -30,6 +30,8 @@
 		naming it and having to deallocate it over an over
 	tweaked skipWhitespaceAndComments and related methods to use
 		charstring::isNullOrEmpty and character::isWhitespace
+	replaced regular expression comparisons in sap/freetds connections
+		with simpler charstring comparisons
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile
