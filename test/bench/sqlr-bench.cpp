@@ -174,7 +174,7 @@ int main(int argc, const char **argv) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"sybase=/etc;"
-					"server=server;db=testdb;"
+					"server=mssql;db=testdb;"
 					"user=testuser;password=testpassword;";
 			}
 		} else if (!charstring::compare(db,"mysql")) {
@@ -223,7 +223,7 @@ int main(int argc, const char **argv) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"sybase=/opt/sap;lang=en_US;"
-					"server=TESTDB;db=testdb;"
+					"server=SAP;db=testdb;"
 					"user=testuser;password=testpassword;";
 			}
 		}
