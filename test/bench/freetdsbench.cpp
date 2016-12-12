@@ -36,7 +36,6 @@ class freetdsbenchconnection : public sqlrbenchconnection {
 	public:
 			freetdsbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~freetdsbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -66,7 +65,6 @@ class freetdsbenchconnection : public sqlrbenchconnection {
 class freetdsbenchcursor : public sqlrbenchcursor {
 	public:
 			freetdsbenchcursor(sqlrbenchconnection *con);
-			~freetdsbenchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
@@ -127,9 +125,6 @@ freetdsbenchconnection::freetdsbenchconnection(
 	environment::setValue("SYBASE",sybase);
 	environment::setValue("LANG",lang);
 	environment::setValue("DSQUERY",server);
-}
-
-freetdsbenchconnection::~freetdsbenchconnection() {
 }
 
 bool freetdsbenchconnection::connect() {
@@ -264,9 +259,6 @@ freetdsbenchcursor::freetdsbenchcursor(sqlrbenchconnection *con) :
 #ifdef FREETDS_SUPPORTS_CURSORS
 	cursorcmd=false;
 #endif
-}
-
-freetdsbenchcursor::~freetdsbenchcursor() {
 }
 
 bool freetdsbenchcursor::open() {

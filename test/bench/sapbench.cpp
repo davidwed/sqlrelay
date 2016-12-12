@@ -33,7 +33,6 @@ class sapbenchconnection : public sqlrbenchconnection {
 	public:
 			sapbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~sapbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -63,7 +62,6 @@ class sapbenchconnection : public sqlrbenchconnection {
 class sapbenchcursor : public sqlrbenchcursor {
 	public:
 			sapbenchcursor(sqlrbenchconnection *con);
-			~sapbenchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
@@ -122,9 +120,6 @@ sapbenchconnection::sapbenchconnection(
 	environment::setValue("SYBASE",sybase);
 	environment::setValue("LANG",lang);
 	environment::setValue("DSQUERY",server);
-}
-
-sapbenchconnection::~sapbenchconnection() {
 }
 
 bool sapbenchconnection::connect() {
@@ -257,9 +252,6 @@ sapbenchcursor::sapbenchcursor(sqlrbenchconnection *con) :
 						sqlrbenchcursor(con) {
 	sybbcon=(sapbenchconnection *)con;
 	cursorcmd=false;
-}
-
-sapbenchcursor::~sapbenchcursor() {
 }
 
 bool sapbenchcursor::open() {

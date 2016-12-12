@@ -46,7 +46,6 @@ class informixbenchconnection : public sqlrbenchconnection {
 	public:
 			informixbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~informixbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -67,7 +66,6 @@ class informixbenchconnection : public sqlrbenchconnection {
 class informixbenchcursor : public sqlrbenchcursor {
 	public:
 			informixbenchcursor(sqlrbenchconnection *con);
-			~informixbenchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
@@ -114,9 +112,6 @@ informixbenchconnection::informixbenchconnection(
 	dbname=getParam("db");
 	user=getParam("user");
 	password=getParam("password");
-}
-
-informixbenchconnection::~informixbenchconnection() {
 }
 
 bool informixbenchconnection::connect() {
@@ -183,9 +178,6 @@ bool informixbenchconnection::disconnect() {
 informixbenchcursor::informixbenchcursor(sqlrbenchconnection *con) :
 							sqlrbenchcursor(con) {
 	informixbcon=(informixbenchconnection *)con;
-}
-
-informixbenchcursor::~informixbenchcursor() {
 }
 
 bool informixbenchcursor::open() {

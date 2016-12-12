@@ -41,7 +41,6 @@ sqlrbench::~sqlrbench() {
 }
 
 void sqlrbench::shutDown() {
-	stdoutput.printf("shutting down, please wait...\n");
 	snooze::macrosnooze(1);
 	shutdown=true;
 }

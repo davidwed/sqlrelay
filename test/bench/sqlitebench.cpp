@@ -28,7 +28,6 @@ class sqlitebenchconnection : public sqlrbenchconnection {
 	public:
 			sqlitebenchconnection(const char *connectstring,
 						const char *dbtype);
-			~sqlitebenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -42,7 +41,6 @@ class sqlitebenchconnection : public sqlrbenchconnection {
 class sqlitebenchcursor : public sqlrbenchcursor {
 	public:
 			sqlitebenchcursor(sqlrbenchconnection *con);
-			~sqlitebenchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
@@ -75,27 +73,20 @@ sqlitebenchconnection::sqlitebenchconnection(
 				const char *db) :
 				sqlrbenchconnection(connectstring,db) {
 	db=getParam("db");
-	sqlite3_open(db,&sqlitecon);
-}
-
-sqlitebenchconnection::~sqlitebenchconnection() {
-	sqlite3_close(sqlitecon);
 }
 
 bool sqlitebenchconnection::connect() {
-	return true;
+	return (sqlite3_open(db,&sqlitecon)==SQLITE_OK);
 }
 
 bool sqlitebenchconnection::disconnect() {
+	sqlite3_close(sqlitecon);
 	return true;
 }
 
 sqlitebenchcursor::sqlitebenchcursor(sqlrbenchconnection *con) :
 							sqlrbenchcursor(con) {
 	sbcon=(sqlitebenchconnection *)con;
-}
-
-sqlitebenchcursor::~sqlitebenchcursor() {
 }
 
 bool sqlitebenchcursor::open() {

@@ -57,6 +57,8 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 
+for (uint16_t a=0; a<50; a++) {
+
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};
@@ -1130,4 +1132,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	stdoutput.printf("\n");
+
+	delete secondcur;
+	delete secondcon;
+	delete cur;
+	delete con;
+}
 }

@@ -22,7 +22,6 @@ class firebirdbenchconnection : public sqlrbenchconnection {
 	public:
 			firebirdbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~firebirdbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -37,7 +36,6 @@ class firebirdbenchconnection : public sqlrbenchconnection {
 class firebirdbenchcursor : public sqlrbenchcursor {
 	public:
 			firebirdbenchcursor(sqlrbenchconnection *con);
-			~firebirdbenchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
@@ -74,9 +72,6 @@ firebirdbenchconnection::firebirdbenchconnection(
 	password=getParam("password");
 }
 
-firebirdbenchconnection::~firebirdbenchconnection() {
-}
-
 bool firebirdbenchconnection::connect() {
 	return true;
 }
@@ -88,9 +83,6 @@ bool firebirdbenchconnection::disconnect() {
 firebirdbenchcursor::firebirdbenchcursor(sqlrbenchconnection *con) :
 						sqlrbenchcursor(con) {
 	fbbcon=(firebirdbenchconnection *)con;
-}
-
-firebirdbenchcursor::~firebirdbenchcursor() {
 }
 
 bool firebirdbenchcursor::open() {

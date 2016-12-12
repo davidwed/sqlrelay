@@ -41,7 +41,6 @@ class oraclebenchconnection : public sqlrbenchconnection {
 	public:
 			oraclebenchconnection(const char *connectstring,
 						const char *dbtype);
-			~oraclebenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -62,7 +61,6 @@ class oraclebenchconnection : public sqlrbenchconnection {
 class oraclebenchcursor : public sqlrbenchcursor {
 	public:
 			oraclebenchcursor(sqlrbenchconnection *con);
-			~oraclebenchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
@@ -115,9 +113,6 @@ oraclebenchconnection::oraclebenchconnection(
 
 	environment::setValue("ORACLE_SID",sid);
 	environment::setValue("TWO_TASK",sid);
-}
-
-oraclebenchconnection::~oraclebenchconnection() {
 }
 
 bool oraclebenchconnection::connect() {
@@ -263,9 +258,6 @@ bool oraclebenchconnection::disconnect() {
 oraclebenchcursor::oraclebenchcursor(sqlrbenchconnection *con) :
 						sqlrbenchcursor(con) {
 	orabcon=(oraclebenchconnection *)con;
-}
-
-oraclebenchcursor::~oraclebenchcursor() {
 }
 
 bool oraclebenchcursor::open() {

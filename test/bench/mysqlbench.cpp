@@ -35,7 +35,6 @@ class mysqlbenchconnection : public sqlrbenchconnection {
 	public:
 			mysqlbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~mysqlbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -115,9 +114,6 @@ mysqlbenchconnection::mysqlbenchconnection(
 	sslcert=getParam("sslcert");
 	sslkey=getParam("sslkey");
 	sslcipher=getParam("sslcipher");
-}
-
-mysqlbenchconnection::~mysqlbenchconnection() {
 }
 
 bool mysqlbenchconnection::connect() {
@@ -207,7 +203,7 @@ bool mysqlbenchcursor::open() {
 
 bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 
-	#ifdef HAVE_MYSQL_COMMIT
+	/*#ifdef HAVE_MYSQL_COMMIT
 	if (mbcon->firstquery) {
 		if (mysql_commit(&mbcon->mysql)) {
 			stdoutput.printf("mysql_commit failed\n");
@@ -215,7 +211,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 		}
 		mbcon->firstquery=false;
 	}
-	#endif
+	#endif*/
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (charstring::compare(query,"create",6) && 

@@ -9,6 +9,7 @@
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/dynamiclib.h>
+#include <rudiments/snooze.h>
 
 // for system()
 #include <stdlib.h>
@@ -22,6 +23,7 @@ void graphStats(const char *graph, const char *db,
 		dictionary< float, linkedlist< float > *> *stats);
 
 sqlrbench	*bm;
+bool		stop;
 
 int main(int argc, const char **argv) {
 
@@ -115,6 +117,7 @@ int main(int argc, const char **argv) {
 
 	// handle signals
 	bm=NULL;
+	stop=false;
 	process::handleShutDown(shutDown);
 	process::handleCrash(shutDown);
 
@@ -127,10 +130,9 @@ int main(int argc, const char **argv) {
 	dynamiclib	*dl;
 
 	// first time for the real db, second time for sqlrelay...
-	bool		shutdown=false;
 	uint16_t	start=(dbonly)?1:0;
 	uint16_t	end=(sqlrelayonly)?1:2;
-	for (uint16_t direct=start; direct<end && !shutdown; direct++) {
+	for (uint16_t direct=start; direct<end && !stop; direct++) {
 
 		if (!direct) {
 			stdoutput.printf("\nbenchmarking "
@@ -140,6 +142,14 @@ int main(int argc, const char **argv) {
 			stdoutput.printf("\nbenchmarking "
 						"%s directly:\n\n",db);
 			dl=&dbdl;
+		}
+
+		stdoutput.printf("settling for 20 seconds\n\n");
+		for (uint16_t i=0; i<20 && !stop; i++) {
+			snooze::macrosnooze(1);
+		}
+		if (stop) {
+			break;
 		}
 
 		// default connect strings
@@ -285,13 +295,14 @@ int main(int argc, const char **argv) {
 		}
 
 		// run the benchmarks
-		shutdown=!bm->run(&stats);
+		stop=!bm->run(&stats);
 
 		delete bm;
+		bm=NULL;
 	}
 
 	// graph stats
-	if (!shutdown) {
+	if (!stop) {
 		graphStats(graph,db,&stats);
 	}
 
@@ -306,9 +317,11 @@ int main(int argc, const char **argv) {
 }
 
 void shutDown(int32_t signum) {
+	stdoutput.printf("shutting down, please wait...\n");
 	if (bm) {
 		bm->shutDown();
 	}
+	stop=true;
 }
 
 void graphStats(const char *graph, const char *db,

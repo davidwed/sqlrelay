@@ -1131,7 +1131,6 @@ uint16_t sqlrcursor::countBindVariables() const {
 }
 
 void sqlrcursor::clearVariables() {
-
 	deleteSubstitutionVariables();
 	pvt->_subvars->clear();
 	pvt->_dirtysubs=false;

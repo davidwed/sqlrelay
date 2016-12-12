@@ -48,7 +48,6 @@ class db2benchconnection : public sqlrbenchconnection {
 	public:
 			db2benchconnection(const char *connectstring,
 						const char *dbtype);
-			~db2benchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -67,7 +66,6 @@ class db2benchconnection : public sqlrbenchconnection {
 class db2benchcursor : public sqlrbenchcursor {
 	public:
 			db2benchcursor(sqlrbenchconnection *con);
-			~db2benchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
@@ -107,7 +105,6 @@ db2bench::db2bench(const char *connectstring,
 	cur=new db2benchcursor(con);
 }
 
-
 db2benchconnection::db2benchconnection(
 				const char *connectstring,
 				const char *db) :
@@ -118,9 +115,6 @@ db2benchconnection::db2benchconnection(
 	password=getParam("password");
 
 	environment::setValue("LANG",lang);
-}
-
-db2benchconnection::~db2benchconnection() {
 }
 
 bool db2benchconnection::connect() {
@@ -154,9 +148,6 @@ bool db2benchconnection::disconnect() {
 db2benchcursor::db2benchcursor(sqlrbenchconnection *con) :
 						sqlrbenchcursor(con) {
 	db2bcon=(db2benchconnection *)con;
-}
-
-db2benchcursor::~db2benchcursor() {
 }
 
 bool db2benchcursor::open() {

@@ -24,7 +24,6 @@ class postgresqlbenchconnection : public sqlrbenchconnection {
 	public:
 			postgresqlbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~postgresqlbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
@@ -47,7 +46,6 @@ class postgresqlbenchconnection : public sqlrbenchconnection {
 class postgresqlbenchcursor : public sqlrbenchcursor {
 	public:
 			postgresqlbenchcursor(sqlrbenchconnection *con);
-			~postgresqlbenchcursor();
 
 		bool	query(const char *query, bool getcolumns);
 
@@ -90,8 +88,6 @@ postgresqlbenchconnection::postgresqlbenchconnection(
 	pgconn=NULL;
 }
 
-postgresqlbenchconnection::~postgresqlbenchconnection() {
-}
 
 bool postgresqlbenchconnection::connect() {
 #ifdef HAVE_POSTGRESQL_PQCONNECTDB
@@ -129,9 +125,6 @@ bool postgresqlbenchconnection::disconnect() {
 postgresqlbenchcursor::postgresqlbenchcursor(sqlrbenchconnection *con) :
 							sqlrbenchcursor(con) {
 	pgbcon=(postgresqlbenchconnection *)con;
-}
-
-postgresqlbenchcursor::~postgresqlbenchcursor() {
 }
 
 bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
