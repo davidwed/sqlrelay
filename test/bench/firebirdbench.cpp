@@ -27,7 +27,7 @@ class firebirdbenchconnection : public sqlrbenchconnection {
 		bool	disconnect();
 
 	private:
-		const char	*db;
+		const char	*dbase;
 		const char	*dialect;
 		const char	*user;
 		const char	*password;
@@ -66,7 +66,7 @@ firebirdbenchconnection::firebirdbenchconnection(
 				const char *connectstring,
 				const char *db) :
 				sqlrbenchconnection(connectstring,db) {
-	db=getParam("db");
+	dbase=getParam("db");
 	dialect=getParam("dialect");
 	user=getParam("user");
 	password=getParam("password");

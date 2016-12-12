@@ -33,7 +33,7 @@ class sqlitebenchconnection : public sqlrbenchconnection {
 		bool	disconnect();
 
 	private:
-		const char	*db;
+		const char	*dbase;
 
 		sqlite3		*sqlitecon;
 };
@@ -72,11 +72,11 @@ sqlitebenchconnection::sqlitebenchconnection(
 				const char *connectstring,
 				const char *db) :
 				sqlrbenchconnection(connectstring,db) {
-	db=getParam("db");
+	dbase=getParam("db");
 }
 
 bool sqlitebenchconnection::connect() {
-	return (sqlite3_open(db,&sqlitecon)==SQLITE_OK);
+	return (sqlite3_open(dbase,&sqlitecon)==SQLITE_OK);
 }
 
 bool sqlitebenchconnection::disconnect() {
