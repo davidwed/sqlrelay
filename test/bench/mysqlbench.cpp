@@ -66,7 +66,9 @@ class mysqlbenchcursor : public sqlrbenchcursor {
 						uint32_t colsize);
 			~mysqlbenchcursor();
 
+		bool	open();
 		bool	query(const char *query, bool getcolumns);
+		bool	close();
 
 	private:
 		mysqlbenchconnection	*mbcon;
@@ -168,8 +170,7 @@ mysqlbenchcursor::mysqlbenchcursor(sqlrbenchconnection *con,
 						sqlrbenchcursor(con) {
 	mbcon=(mysqlbenchconnection *)con;
 	#ifdef HAVE_MYSQL_STMT_PREPARE
-	stmt=mysql_stmt_init(&mbcon->mysql);
-
+	stmt=NULL;
 	this->colsize=colsize;
 	fieldbind=new MYSQL_BIND[cols];
 	field=new char[cols*colsize];
@@ -193,6 +194,15 @@ mysqlbenchcursor::~mysqlbenchcursor() {
 	delete[] isnull;
 	delete[] fieldlength;
 	#endif
+}
+
+bool mysqlbenchcursor::open() {
+	#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (!stmt) {
+		stmt=mysql_stmt_init(&mbcon->mysql);
+	}
+	#endif
+	return (stmt!=NULL);
 }
 
 bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
@@ -291,6 +301,16 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 		// free the result set
 		mysql_free_result(mysqlresult);
 	}
+	return true;
+}
+
+bool mysqlbenchcursor::close() {
+	#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (stmt) {
+		mysql_stmt_close(stmt);
+		stmt=NULL;
+	}
+	#endif
 	return true;
 }
 

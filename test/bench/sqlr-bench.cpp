@@ -122,23 +122,28 @@ int main(int argc, const char **argv) {
 	dictionary< float, linkedlist< float > *>	stats;
 
 	// for each database...
+	dynamiclib	sqlrdl;
+	dynamiclib	dbdl;
+	dynamiclib	*dl;
 
 	// first time for the real db, second time for sqlrelay...
 	bool		shutdown=false;
-	uint16_t	start=(sqlrelayonly)?1:0;
-	uint16_t	end=(dbonly)?1:2;
-	for (uint16_t which=start; which<end && !shutdown; which++) {
+	uint16_t	start=(dbonly)?1:0;
+	uint16_t	end=(sqlrelayonly)?1:2;
+	for (uint16_t direct=start; direct<end && !shutdown; direct++) {
 
-		if (!which) {
-			stdoutput.printf("\nbenchmarking "
-						"%s directly:\n\n",db);
-		} else {
+		if (!direct) {
 			stdoutput.printf("\nbenchmarking "
 						"%s via sqlrelay:\n\n",db);
+			dl=&sqlrdl;
+		} else {
+			stdoutput.printf("\nbenchmarking "
+						"%s directly:\n\n",db);
+			dl=&dbdl;
 		}
 
 		// default connect strings
-		if (which) {
+		if (!direct) {
 			if (!sqlrconnectstring) {
 				sqlrconnectstring=
 					"host=localhost;port=9000;"
@@ -229,21 +234,20 @@ int main(int argc, const char **argv) {
 		}
 
 		// init bench
-		dynamiclib	dl;
 		stringbuffer	modulename;
 		modulename.append(".libs/sqlrbench_");
-		modulename.append((which)?"sqlrelay":db)->append(".so");
-		if (!dl.open(modulename.getString(),true,true)) {
+		modulename.append((!direct)?"sqlrelay":db)->append(".so");
+		if (!dl->open(modulename.getString(),true,true)) {
 			stdoutput.printf("failed to load "
 					"bench module: %s\n",
 					modulename.getString());
-			char	*error=dl.getError();
+			char	*error=dl->getError();
 			stdoutput.printf("%s\n",error);
 			delete[] error;
 			continue;
 		}
 		stringbuffer	functionname;
-		functionname.append("new_")->append((which)?"sqlrelay":db);
+		functionname.append("new_")->append((!direct)?"sqlrelay":db);
 		functionname.append("bench");
 		sqlrbench	*(*newBm)(const char *,
 						const char *,
@@ -263,16 +267,16 @@ int main(int argc, const char **argv) {
 						uint16_t,
 						uint64_t,
 						bool))
-			dl.getSymbol(functionname.getString());
+			dl->getSymbol(functionname.getString());
 		if (!newBm) {
 			stdoutput.printf("failed to load bench\n");
-			char	*error=dl.getError();
+			char	*error=dl->getError();
 			stdoutput.printf("%s\n",error);
 			delete[] error;
 			continue;
 		}
 
-		bm=newBm((which)?sqlrconnectstring:dbconnectstring,
+		bm=newBm((!direct)?sqlrconnectstring:dbconnectstring,
 					db,queries,rows,cols,colsize,
 					samples,rsbs,debug);
 		if (!bm) {
