@@ -136,7 +136,7 @@ int	main(int argc, char **argv) {
 	// instantiation
 	con=sqlrcon_alloc("sqlrserver",9000,"/tmp/test.socket",NULL,NULL,0,1);
 	cur=sqlrcur_alloc(con);
-	sqlrcon_enableKerberos(con,NULL,NULL,NULL);
+	sqlrcon_enableKerberos(con,service,NULL,NULL);
 
 	// get database type
 	printf("IDENTIFY: \n");
