@@ -28,7 +28,7 @@ proc checkSuccess {value success} {
 }
 
 # instantiation
-set con [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
+set con [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set cur [$con sqlrcur]
 
 # get database type

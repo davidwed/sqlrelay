@@ -15,7 +15,7 @@
 		}
 	}
 
-	$host="sqlrserver";
+	$host="sqlrelay";
 	$port=9000;
 	$socket="/tmp/test.socket";
 	$user="test";

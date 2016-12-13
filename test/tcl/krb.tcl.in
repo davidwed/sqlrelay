@@ -28,7 +28,7 @@ proc checkSuccess {value success} {
 }
 
 # instantiation
-set con [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "" -password "" -retrytime 0 -tries 1]
+set con [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "" -password "" -retrytime 0 -tries 1]
 set cur [$con sqlrcur]
 $con enableKerberos "" "" ""
 
@@ -604,7 +604,7 @@ $cur setResultSetBufferSize 0
 puts ""
 
 puts "COMMIT AND ROLLBACK: "
-set secondcon [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
+set secondcon [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set secondcur [$secondcon sqlrcur]
 $secondcon enableKerberos "" "" ""
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1

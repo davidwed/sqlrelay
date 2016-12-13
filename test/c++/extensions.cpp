@@ -95,7 +95,7 @@ void checkSuccess(double value, double success) {
 int	main(int argc, char **argv) {
 
 	// instantiation
-	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
@@ -154,7 +154,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
 
 	// open a second connection and set autocommit off there too
-	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+	secondcon=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcon->autoCommitOff(),1);
@@ -193,7 +193,7 @@ int	main(int argc, char **argv) {
 	delete secondcon;
 	delete cur;
 	delete con;
-	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
 	checkSuccess(cur->sendQuery("drop table testtable"),1);

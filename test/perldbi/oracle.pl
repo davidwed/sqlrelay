@@ -62,7 +62,7 @@ sub checkSuccessString {
 
 # instantiation
 my $prefix="DBI:SQLRelay(AutoCommit=>0,PrintError=>0):";
-my $connectstring="host=sqlrserver;port=9000;socket=/tmp/test.socket;debug=0";
+my $connectstring="host=sqlrelay;port=9000;socket=/tmp/test.socket;debug=0";
 my $dsn=$prefix.$connectstring;
 
 # parse dsn

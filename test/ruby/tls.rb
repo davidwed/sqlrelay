@@ -27,7 +27,7 @@ end
 
 
 # instantiation
-con=SQLRConnection.new("sqlrserver",9000,"/tmp/test.socket","","",0,1)
+con=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket","","",0,1)
 cur=SQLRCursor.new(con)
 con.enableTls("",cert,"","","ca",ca,0)
 
@@ -660,7 +660,7 @@ cur.setResultSetBufferSize(0)
 print "\n"
 
 print "COMMIT AND ROLLBACK: \n"
-secondcon=SQLRConnection.new("sqlrserver",9000,"/tmp/test.socket",
+secondcon=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
 							"","",0,1)
 secondcur=SQLRCursor.new(secondcon)
 secondcon.enableTls("",cert,"","","ca",ca,0)

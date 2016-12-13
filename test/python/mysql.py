@@ -22,7 +22,7 @@ def main():
 	PySQLRClient.getNumericFieldsAsNumbers()
 
 	# instantiation
-	con=PySQLRClient.sqlrconnection("sqlrserver",9000,
+	con=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
 						"test","test")
 	cur=PySQLRClient.sqlrcursor(con)
@@ -905,7 +905,7 @@ def main():
 	# Note: Mysql's default isolation level is repeatable-read,
 	# not read-committed like most other db's.  Both sessions must
 	# commit to see the changes that each other has made.
-	secondcon=PySQLRClient.sqlrconnection("sqlrserver",9000,
+	secondcon=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
 						"test","test")
 	secondcur=PySQLRClient.sqlrcursor(secondcon)

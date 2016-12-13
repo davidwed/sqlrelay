@@ -27,31 +27,14 @@ int main(int argc, const char **argv) {
 	// process the command line
 	commandline	cmdl(argc,argv);
 
-	// usage info
-	if (cmdl.found("help") || cmdl.found("h")) {
-		stdoutput.printf(
-			"usage: sqlr-bench \\\n"
-			"	[-db db2|informix|firebird|freetds|mysql|"
-			"oracle|postgresql|sap|sqlite] \\\n"
-			"	[-dbconnectstring dbconnectstring] \\\n"
-			"	[-sqlrconnectstring sqlrconnectstring] \\\n"
-			"	[-queries total-query-count] \\\n"
-			"	[-rows rows-per-query] \\\n"
-			"	[-cols columns-per-row] \\\n"
-			"	[-colsize characters-per-column] \\\n"
-			"	[-samples samples-per-test] \\\n"
-			"	[-rsbs result-set-buffer-size] \\\n"
-			"	[-dbonly|-sqlrelayonly] \\\n"
-			"	[-debug] \\\n"
-			"	[-graph graph-file-name] \\\n"
-			"	[-nosettle]\n");
-		process::exit(1);
-	}
+	// show usage?
+	bool	usage=false;
 
 	// default parameters
 	const char	*db="oracle";
 	const char	*dbconnectstring=NULL;
 	const char	*sqlrconnectstring=NULL;
+	const char	*sqlr="local";
 	uint64_t	queries=30;
 	uint64_t	rows=256;
 	uint32_t	cols=16;
@@ -73,6 +56,14 @@ int main(int argc, const char **argv) {
 	}
 	if (cmdl.found("sqlrconnectstring")) {
 		sqlrconnectstring=cmdl.getValue("sqlrconnectstring");
+	}
+	if (cmdl.found("sqlr")) {
+		sqlr=cmdl.getValue("sqlr");
+		if (charstring::compare(sqlr,"local") &&
+			charstring::compare(sqlr,"remote") &&
+			charstring::compare(sqlr,"db")) {
+			usage=true;
+		}
 	}
 	if (cmdl.found("queries")) {
 		queries=charstring::toInteger(cmdl.getValue("queries"));
@@ -116,6 +107,31 @@ int main(int argc, const char **argv) {
 		graphname.append(db)->append(".png");
 	}
 	graph=graphname.getString();
+	if (cmdl.found("help","h")) {
+		usage=true;
+	}
+
+	// usage info
+	if (usage) {
+		stdoutput.printf(
+			"usage: sqlr-bench \\\n"
+			"	[-db db2|informix|firebird|freetds|mysql|"
+			"oracle|postgresql|sap|sqlite] \\\n"
+			"	[-dbconnectstring dbconnectstring] \\\n"
+			"	[-sqlrconnectstring sqlrconnectstring] \\\n"
+			"	[-sqlr [local|remote|db]] \\\n"
+			"	[-queries total-query-count] \\\n"
+			"	[-rows rows-per-query] \\\n"
+			"	[-cols columns-per-row] \\\n"
+			"	[-colsize characters-per-column] \\\n"
+			"	[-samples samples-per-test] \\\n"
+			"	[-rsbs result-set-buffer-size] \\\n"
+			"	[-dbonly|-sqlrelayonly] \\\n"
+			"	[-debug] \\\n"
+			"	[-graph graph-file-name] \\\n"
+			"	[-nosettle]\n");
+		process::exit(1);
+	}
 
 	// handle signals
 	bm=NULL;
@@ -130,6 +146,17 @@ int main(int argc, const char **argv) {
 	dynamiclib	sqlrdl;
 	dynamiclib	dbdl;
 	dynamiclib	*dl;
+
+	// default sqlrelay connect string
+	stringbuffer	sqlrc;
+	if (!charstring::compare(sqlr,"local")) {
+		sqlrc.append("socket=/tmp/test.socket;");
+	} else if (!charstring::compare(sqlr,"remote")) {
+		sqlrc.append("host=sqlrelay;port=9000;");
+	} else if (!charstring::compare(sqlr,"db")) {
+		sqlrc.append("host=")->append(db)->append(";port=9000;");
+	}
+	sqlrc.append("user=test;password=test;debug=no");
 
 	// first time for the real db, second time for sqlrelay...
 	uint16_t	start=(dbonly)?1:0;
@@ -159,11 +186,7 @@ int main(int argc, const char **argv) {
 		// default connect strings
 		if (!direct) {
 			if (!sqlrconnectstring) {
-				sqlrconnectstring=
-					"host=localhost;port=9000;"
-					"socket=/tmp/test.socket;"
-					"user=test;password=test;"
-					"debug=no";
+				sqlrconnectstring=sqlrc.getString();
 			}
 		} else if (!charstring::compare(db,"db2")) {
 			if (!dbconnectstring) {

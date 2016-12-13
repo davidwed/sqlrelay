@@ -22,7 +22,7 @@ end
 
 
 # instantiation
-con=SQLRConnection.new("sqlrserver",9000,"/tmp/test.socket","","",0,1)
+con=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket","","",0,1)
 cur=SQLRCursor.new(con)
 con.enableKerberos("","","")
 
@@ -655,7 +655,7 @@ cur.setResultSetBufferSize(0)
 print "\n"
 
 print "COMMIT AND ROLLBACK: \n"
-secondcon=SQLRConnection.new("sqlrserver",9000,"/tmp/test.socket","","",0,1)
+secondcon=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket","","",0,1)
 secondcur=SQLRCursor.new(secondcon)
 secondcon.enableKerberos("","","")
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)

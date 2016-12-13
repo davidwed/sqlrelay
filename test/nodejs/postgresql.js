@@ -32,7 +32,7 @@ var	filename;
 var	fieldlens;
 	
 // instantiation
-var	con=new sqlrelay.SQLRConnection("sqlrserver",
+var	con=new sqlrelay.SQLRConnection("sqlrelay",
 				9000,
 				"/tmp/test.socket",
 				"test","test",0,1);
@@ -623,7 +623,7 @@ cur.setResultSetBufferSize(0);
 console.log("\n");
 	
 console.log("COMMIT AND ROLLBACK: ");
-var	secondcon=new sqlrelay.SQLRConnection("sqlrserver",
+var	secondcon=new sqlrelay.SQLRConnection("sqlrelay",
 				9000,
 				"/tmp/test.socket",
 				"test","test",0,1);

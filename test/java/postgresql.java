@@ -72,7 +72,7 @@ class postgresql {
 		long[]	fieldlens;
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection("sqlrserver",
+		SQLRConnection con=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
 						"test","test",0,1);
@@ -663,7 +663,7 @@ class postgresql {
 		System.out.println();
 	
 		System.out.println("COMMIT AND ROLLBACK: ");
-		SQLRConnection secondcon=new SQLRConnection("sqlrserver",
+		SQLRConnection secondcon=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
 						"test","test",0,1);

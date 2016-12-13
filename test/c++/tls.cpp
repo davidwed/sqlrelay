@@ -124,7 +124,7 @@ int	main(int argc, char **argv) {
 	#endif
 
 	// instantiation
-	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
 	cur=new sqlrcursor(con);
 	con->enableTls(NULL,cert,NULL,NULL,"ca",ca,0);
@@ -808,7 +808,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("COMMIT AND ROLLBACK: \n");
-	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+	secondcon=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
 	secondcur=new sqlrcursor(secondcon);
 	secondcon->enableTls(NULL,cert,NULL,NULL,"ca",ca,0);

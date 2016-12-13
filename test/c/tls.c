@@ -136,7 +136,7 @@ int	main(int argc, char **argv) {
 
 
 	// instantiation
-	con=sqlrcon_alloc("sqlrserver",9000,"/tmp/test.socket",NULL,NULL,0,1);
+	con=sqlrcon_alloc("sqlrelay",9000,"/tmp/test.socket",NULL,NULL,0,1);
 	cur=sqlrcur_alloc(con);
 	sqlrcon_enableTls(con,NULL,cert,NULL,NULL,"ca",ca,0);
 
@@ -797,7 +797,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=sqlrcon_alloc("sqlrserver",9000,
+	secondcon=sqlrcon_alloc("sqlrelay",9000,
 				"/tmp/test.socket",NULL,NULL,0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	sqlrcon_enableTls(secondcon,NULL,cert,NULL,NULL,"ca",ca,0);

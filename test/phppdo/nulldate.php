@@ -3,7 +3,7 @@
 # See the file COPYING for more information.
 
 	# sqlrelay
-	$host="sqlrserver";
+	$host="sqlrelay";
 	$port=9000;
 	$socket="/tmp/test.socket";
 	$user="test";

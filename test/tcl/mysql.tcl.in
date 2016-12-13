@@ -28,7 +28,7 @@ proc checkSuccess {value success} {
 }
 
 # instantiation
-set con [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
+set con [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set cur [$con sqlrcur]
 
 # get database type
@@ -804,7 +804,7 @@ puts "COMMIT AND ROLLBACK: "
 # Note: Mysql's default isolation level is repeatable-read,
 # not read-committed like most other db's.  Both sessions must
 # commit to see the changes that each other has made.
-set secondcon [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
+set secondcon [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set secondcur [$secondcon sqlrcur]
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1
 checkSuccess [$secondcur getFieldByIndex 0 0] "0"

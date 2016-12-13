@@ -22,7 +22,7 @@ def main():
 	#PySQLRClient.getNumericFieldsAsNumbers()
 
 	# instantiation
-	con=PySQLRClient.sqlrconnection("sqlrserver",9000,
+	con=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
 						"test","test")
 	cur=PySQLRClient.sqlrcursor(con)
@@ -902,7 +902,7 @@ def main():
 	print()
 
 	print("COMMIT AND ROLLBACK: ")
-	secondcon=PySQLRClient.sqlrconnection("sqlrserver",9000,
+	secondcon=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
 						"test","test")
 	secondcur=PySQLRClient.sqlrcursor(secondcon)

@@ -764,7 +764,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("COMMIT AND ROLLBACK: \n");
 	sqlrconnection	*secondcon=
-		new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
+		new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	sqlrcursor	*secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);

@@ -22,7 +22,7 @@ end
 
 
 # instantiation
-con=SQLRConnection.new("sqlrserver",9000,"/tmp/test.socket",
+con=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
 						"test","test",0,1)
 cur=SQLRCursor.new(con)
 
@@ -632,7 +632,7 @@ cur.setResultSetBufferSize(0)
 print "\n"
 
 print "COMMIT AND ROLLBACK: \n"
-secondcon=SQLRConnection.new("sqlrserver",9000,"/tmp/test.socket",
+secondcon=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
 						"test","test",0,1)
 secondcur=SQLRCursor.new(secondcon)
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)

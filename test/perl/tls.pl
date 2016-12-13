@@ -56,7 +56,7 @@ if ($^O eq "MSWin32") {
 
 
 # instantiation
-$con=SQLRelay::Connection->new("sqlrserver",9000,"/tmp/test.socket","","",0,1);
+$con=SQLRelay::Connection->new("sqlrelay",9000,"/tmp/test.socket","","",0,1);
 $cur=SQLRelay::Cursor->new($con);
 $con->enableTls("",$cert,"","","ca",$ca,0);
 
@@ -695,7 +695,7 @@ $cur->setResultSetBufferSize(0);
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
-$secondcon=SQLRelay::Connection->new("sqlrserver",9000,"/tmp/test.socket",
+$secondcon=SQLRelay::Connection->new("sqlrelay",9000,"/tmp/test.socket",
 								"","",0,1);
 $secondcur=SQLRelay::Cursor->new($secondcon);
 $secondcon->enableTls("",$cert,"","","ca",$ca,0);

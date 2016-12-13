@@ -55,7 +55,7 @@ int	main(int argc, char **argv) {
 	const char	*password;
 	const char	*db;
 	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		host="sqlrserver";
+		host="sqlrelay";
 		port="9000";
 		socket="/tmp/test.socket";
 		user="test";
@@ -67,7 +67,7 @@ int	main(int argc, char **argv) {
 		if (argc==2) {
 			host=argv[1];
 		} else {
-			host="sqlrserver";
+			host="sqlrelay";
 		}
 		db="testdb";
 		port="3306";

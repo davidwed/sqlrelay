@@ -20,7 +20,7 @@ end
 
 
 # instantiation
-con=SQLRConnection.new("sqlrserver",9000,"/tmp/test.socket","test","test",0,1)
+con=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket","test","test",0,1)
 cur=SQLRCursor.new(con)
 
 # get database type

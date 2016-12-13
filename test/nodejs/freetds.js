@@ -33,7 +33,7 @@ var	filename;
 var	fieldlens;
 	
 // instantiation
-var	con=new sqlrelay.SQLRConnection("sqlrserver",
+var	con=new sqlrelay.SQLRConnection("sqlrelay",
 					9000,
 					"/tmp/test.socket",
 					"test","test",0,1);

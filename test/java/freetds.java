@@ -72,7 +72,7 @@ class freetds {
 		long[]	fieldlens;
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection("sqlrserver",
+		SQLRConnection con=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
 						"test","test",0,1);

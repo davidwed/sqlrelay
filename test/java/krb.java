@@ -147,7 +147,7 @@ class krb {
 	
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection("sqlrserver",
+		SQLRConnection con=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
 						null,null,0,1);
@@ -813,7 +813,7 @@ class krb {
 		System.out.println();
 	
 		System.out.println("COMMIT AND ROLLBACK: ");
-		SQLRConnection secondcon=new SQLRConnection("sqlrserver",
+		SQLRConnection secondcon=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
 						null,null,0,1);

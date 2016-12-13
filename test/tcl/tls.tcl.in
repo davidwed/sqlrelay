@@ -36,7 +36,7 @@ if { $OS == "Windows" } {
 }
 
 # instantiation
-set con [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "" -password "" -retrytime 0 -tries 1]
+set con [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "" -password "" -retrytime 0 -tries 1]
 set cur [$con sqlrcur]
 $con enableTls "" $cert "" "" "ca" $ca 0
 
@@ -612,7 +612,7 @@ $cur setResultSetBufferSize 0
 puts ""
 
 puts "COMMIT AND ROLLBACK: "
-set secondcon [sqlrcon -server "sqlrserver" -port 9000 -socket "/tmp/test.socket" -user "" -password "" -retrytime 0 -tries 1]
+set secondcon [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "" -password "" -retrytime 0 -tries 1]
 set secondcur [$secondcon sqlrcur]
 $secondcon enableTls "" $cert "" "" "ca" $ca 0
 

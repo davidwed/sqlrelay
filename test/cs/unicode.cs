@@ -139,7 +139,7 @@ namespace SQLRClientTest
 
         public static void Main(String[] args)
         {
-            SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+            SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrelay:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
             sqlrcon.Open();
             SQLRelayCommand sqlrcom = (SQLRelayCommand)sqlrcon.CreateCommand();
             Console.WriteLine("UNICODE:");
