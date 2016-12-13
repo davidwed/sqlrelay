@@ -24,12 +24,20 @@
 // we're optimistic that the average query will contain 16 bind variables
 #define OPTIMISTIC_BIND_COUNT 16
 
-// we're optimistic that the average query will contain 16 columns whose names
-// average 16 characters in length
+// we're optimistic that the average query will contain 16 columns whose data
+// requires an average of 16 bytes to store
 #define OPTIMISTIC_COLUMN_COUNT 16
-#define OPTIMISTIC_AVERAGE_COLUMN_NAME_LENGTH 16
+#define OPTIMISTIC_AVERAGE_COLUMN_DATA_LENGTH 16
 #define OPTIMISTIC_COLUMN_DATA_SIZE OPTIMISTIC_COLUMN_COUNT*\
-					OPTIMISTIC_AVERAGE_COLUMN_NAME_LENGTH
+					OPTIMISTIC_AVERAGE_COLUMN_DATA_LENGTH
+// we're also optimistic that if we need more space, that growing at a rate of
+// 4 columns at a time will work out well
+//#define OPTIMISTIC_COLUMN_DATA_GROWTH_SIZE OPTIMISTIC_COLUMN_DATA_SIZE/4
+
+// we're also optimistic that if we need more space, that growing at a rate of
+// 1 column at a time will work out well
+#define OPTIMISTIC_COLUMN_DATA_GROWTH_SIZE \
+		OPTIMISTIC_COLUMN_DATA_SIZE/OPTIMISTIC_COLUMN_COUNT
 
 // we're optimistic that the average query will contain 16 rows whose fields
 // average 16 characters in length
@@ -38,6 +46,14 @@
 #define OPTIMISTIC_RESULT_SET_SIZE OPTIMISTIC_COLUMN_COUNT*\
 					OPTIMISTIC_ROW_COUNT*\
 					OPTIMISTIC_AVERAGE_FIELD_LENGTH
+// we're also optimistic that if we need more space, that growing at a rate of
+// 16 rows at a time will work out well
+//#define OPTIMISTIC_RESULT_SET_GROWTH_SIZE OPTIMISTIC_RESULT_SET_SIZE
+
+// we're also optimistic that if we need more space, that growing at a rate of
+// 1 row at a time will work out well
+#define OPTIMISTIC_RESULT_SET_GROWTH_SIZE \
+		OPTIMISTIC_RESULT_SET_SIZE/OPTIMISTIC_ROW_COUNT*4
 
 
 
@@ -350,7 +366,8 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	pvt->_extrarows=NULL;
 	pvt->_firstextrarow=NULL;
 	pvt->_rowstorage=new memorypool(OPTIMISTIC_RESULT_SET_SIZE,
-			OPTIMISTIC_RESULT_SET_SIZE/OPTIMISTIC_ROW_COUNT,5);
+					OPTIMISTIC_RESULT_SET_GROWTH_SIZE,
+					5);
 	pvt->_fields=NULL;
 	pvt->_fieldlengths=NULL;
 
@@ -359,7 +376,8 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	pvt->_columns=NULL;
 	pvt->_extracolumns=NULL;
 	pvt->_colstorage=new memorypool(OPTIMISTIC_COLUMN_DATA_SIZE,
-			OPTIMISTIC_COLUMN_DATA_SIZE/OPTIMISTIC_COLUMN_COUNT,5);
+					OPTIMISTIC_COLUMN_DATA_GROWTH_SIZE,
+					5);
 	pvt->_columnnamearray=NULL;
 
 	pvt->_returnnulls=false;
