@@ -53,12 +53,14 @@ bool sqlrbench::run(dictionary< float, linkedlist< float > *> *stats) {
 	}
 	if (!con->connect()) {
 		stdoutput.printf("error connecting\n");
+		return false;
 	}
 	if (debug) {
 		stdoutput.printf("opening\n");
 	}
 	if (!cur->open()) {
 		stdoutput.printf("error opening\n");
+		return false;
 	}
 
 	// drop table (just in case)

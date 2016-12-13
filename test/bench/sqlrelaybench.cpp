@@ -37,6 +37,8 @@ class sqlrelaybenchconnection : public sqlrbenchconnection {
 		bool		debug;
 
 		sqlrconnection	*sqlrcon;
+
+		bool		first=true;
 };
 
 class sqlrelaybenchcursor : public sqlrbenchcursor {
@@ -91,6 +93,14 @@ sqlrelaybenchconnection::~sqlrelaybenchconnection() {
 }
 
 bool sqlrelaybenchconnection::connect() {
+	if (first) {
+		if (charstring::compare(sqlrcon->identify(),db)) {
+			stdoutput.printf("\nSQL Relay is not "
+					"connected to %s\n\n",db);
+			return false;
+		}
+		first=false;
+	}
 	return true;
 }
 
