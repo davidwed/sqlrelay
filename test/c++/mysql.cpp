@@ -5,7 +5,7 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
-//#define PROFILING 1
+#define PROFILING 1
 
 #ifdef PROFILING
 	class noio {

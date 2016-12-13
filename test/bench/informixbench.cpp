@@ -311,7 +311,6 @@ bool informixbenchcursor::query(const char *query, bool getcolumns) {
 
 		int32_t	oldrow=0;
 		int32_t	rownumber=0;
-		int32_t	totalrows=0;
 		for (;;) {
 			erg=SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -339,7 +338,6 @@ bool informixbenchcursor::query(const char *query, bool getcolumns) {
 				//stdoutput.printf("\n");
 			}
 			oldrow=rownumber;
-			totalrows=rownumber;
 		}
 	}
 

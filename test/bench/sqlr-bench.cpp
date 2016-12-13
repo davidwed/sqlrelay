@@ -11,9 +11,6 @@
 #include <rudiments/dynamiclib.h>
 #include <rudiments/snooze.h>
 
-// for system()
-#include <stdlib.h>
-
 #include "sqlrbench.h"
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
@@ -46,7 +43,8 @@ int main(int argc, const char **argv) {
 			"	[-rsbs result-set-buffer-size] \\\n"
 			"	[-dbonly|-sqlrelayonly] \\\n"
 			"	[-debug] \\\n"
-			"	[-graph graph-file-name]\n");
+			"	[-graph graph-file-name] \\\n"
+			"	[-nosettle]\n");
 		process::exit(1);
 	}
 
@@ -64,6 +62,7 @@ int main(int argc, const char **argv) {
 	bool		sqlrelayonly=false;
 	bool		debug=false;
 	const char	*graph=NULL;
+	bool		nosettle=false;
 
 	// override defaults with command line parameters
 	if (cmdl.found("db")) {
@@ -101,6 +100,9 @@ int main(int argc, const char **argv) {
 	}
 	if (cmdl.found("debug")) {
 		debug=true;
+	}
+	if (cmdl.found("nosettle")) {
+		nosettle=true;
 	}
 	stringbuffer	graphname;
 	if (cmdl.found("graph")) {
@@ -144,12 +146,14 @@ int main(int argc, const char **argv) {
 			dl=&dbdl;
 		}
 
-		stdoutput.printf("settling for 20 seconds\n\n");
-		for (uint16_t i=0; i<20 && !stop; i++) {
-			snooze::macrosnooze(1);
-		}
-		if (stop) {
-			break;
+		if (!nosettle) {
+			stdoutput.printf("settling for 20 seconds\n\n");
+			for (uint16_t i=0; i<20 && !stop; i++) {
+				snooze::macrosnooze(1);
+			}
+			if (stop) {
+				break;
+			}
 		}
 
 		// default connect strings
