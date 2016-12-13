@@ -10,6 +10,7 @@ all: db2.class\
 	postgresql.class \
 	sqlite.class \
 	sap.class \
+	krb.class \
 	tls.class \
 	run.bat
 

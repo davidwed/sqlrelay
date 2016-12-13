@@ -245,8 +245,8 @@ int	main(int argc, char **argv) {
 	int16_t	minute=0;
 	int16_t	second=0;
 	int32_t	microsecond=0;
-	const char	*tz=NULL;
 	bool	isnegative=false;
+	const char	*tz=NULL;
 	cur->getOutputBindDate("datevar",&year,&month,&day,
 					&hour,&minute,&second,&microsecond,&tz,
 					&isnegative);
@@ -302,8 +302,8 @@ int	main(int argc, char **argv) {
 	stringvar=cur->getOutputBindString("stringvar");
 	floatvar=cur->getOutputBindDouble("floatvar");
 	cur->getOutputBindDate("datevar",&year,&month,&day,
-					&hour,&minute,&second,&microsecond,&tz,
-					&isnegative);
+				&hour,&minute,&second,&microsecond,&tz,
+				&isnegative);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
@@ -345,53 +345,53 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("COLUMN TYPES: \n");
 	checkSuccess(cur->getColumnType((uint32_t)0),"NUMBER");
-	checkSuccess(cur->getColumnType("testnumber"),"NUMBER");
+	checkSuccess(cur->getColumnType("TESTNUMBER"),"NUMBER");
 	checkSuccess(cur->getColumnType(1),"CHAR");
-	checkSuccess(cur->getColumnType("testchar"),"CHAR");
+	checkSuccess(cur->getColumnType("TESTCHAR"),"CHAR");
 	checkSuccess(cur->getColumnType(2),"VARCHAR2");
-	checkSuccess(cur->getColumnType("testvarchar"),"VARCHAR2");
+	checkSuccess(cur->getColumnType("TESTVARCHAR"),"VARCHAR2");
 	checkSuccess(cur->getColumnType(3),"DATE");
-	checkSuccess(cur->getColumnType("testdate"),"DATE");
+	checkSuccess(cur->getColumnType("TESTDATE"),"DATE");
 	checkSuccess(cur->getColumnType(4),"LONG");
-	checkSuccess(cur->getColumnType("testlong"),"LONG");
+	checkSuccess(cur->getColumnType("TESTLONG"),"LONG");
 	checkSuccess(cur->getColumnType(5),"CLOB");
-	checkSuccess(cur->getColumnType("testclob"),"CLOB");
+	checkSuccess(cur->getColumnType("TESTCLOB"),"CLOB");
 	checkSuccess(cur->getColumnType(6),"BLOB");
-	checkSuccess(cur->getColumnType("testblob"),"BLOB");
+	checkSuccess(cur->getColumnType("TESTBLOB"),"BLOB");
 	stdoutput.printf("\n");
 
 	stdoutput.printf("COLUMN LENGTH: \n");
 	checkSuccess(cur->getColumnLength((uint32_t)0),22);
-	checkSuccess(cur->getColumnLength("testnumber"),22);
+	checkSuccess(cur->getColumnLength("TESTNUMBER"),22);
 	checkSuccess(cur->getColumnLength(1),40);
-	checkSuccess(cur->getColumnLength("testchar"),40);
+	checkSuccess(cur->getColumnLength("TESTCHAR"),40);
 	checkSuccess(cur->getColumnLength(2),40);
-	checkSuccess(cur->getColumnLength("testvarchar"),40);
+	checkSuccess(cur->getColumnLength("TESTVARCHAR"),40);
 	checkSuccess(cur->getColumnLength(3),7);
-	checkSuccess(cur->getColumnLength("testdate"),7);
+	checkSuccess(cur->getColumnLength("TESTDATE"),7);
 	checkSuccess(cur->getColumnLength(4),0);
-	checkSuccess(cur->getColumnLength("testlong"),0);
+	checkSuccess(cur->getColumnLength("TESTLONG"),0);
 	checkSuccess(cur->getColumnLength(5),0);
-	checkSuccess(cur->getColumnLength("testclob"),0);
+	checkSuccess(cur->getColumnLength("TESTCLOB"),0);
 	checkSuccess(cur->getColumnLength(6),0);
-	checkSuccess(cur->getColumnLength("testblob"),0);
+	checkSuccess(cur->getColumnLength("TESTBLOB"),0);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("LONGEST COLUMN: \n");
 	checkSuccess(cur->getLongest((uint32_t)0),1);
-	checkSuccess(cur->getLongest("testnumber"),1);
+	checkSuccess(cur->getLongest("TESTNUMBER"),1);
 	checkSuccess(cur->getLongest(1),40);
-	checkSuccess(cur->getLongest("testchar"),40);
+	checkSuccess(cur->getLongest("TESTCHAR"),40);
 	checkSuccess(cur->getLongest(2),12);
-	checkSuccess(cur->getLongest("testvarchar"),12);
+	checkSuccess(cur->getLongest("TESTVARCHAR"),12);
 	checkSuccess(cur->getLongest(3),9);
-	checkSuccess(cur->getLongest("testdate"),9);
+	checkSuccess(cur->getLongest("TESTDATE"),9);
 	checkSuccess(cur->getLongest(4),9);
-	checkSuccess(cur->getLongest("testlong"),9);
+	checkSuccess(cur->getLongest("TESTLONG"),9);
 	checkSuccess(cur->getLongest(5),9);
-	checkSuccess(cur->getLongest("testclob"),9);
+	checkSuccess(cur->getLongest("TESTCLOB"),9);
 	checkSuccess(cur->getLongest(6),9);
-	checkSuccess(cur->getLongest("testblob"),9);
+	checkSuccess(cur->getLongest("TESTBLOB"),9);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("ROW COUNT: \n");
@@ -447,39 +447,39 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIELDS BY NAME: \n");
-	checkSuccess(cur->getField(0,"testnumber"),"1");
-	checkSuccess(cur->getField(0,"testchar"),"testchar1                               ");
-	checkSuccess(cur->getField(0,"testvarchar"),"testvarchar1");
-	checkSuccess(cur->getField(0,"testdate"),"01-JAN-01");
-	checkSuccess(cur->getField(0,"testlong"),"testlong1");
-	checkSuccess(cur->getField(0,"testclob"),"testclob1");
-	checkSuccess(cur->getField(0,"testblob"),"");
+	checkSuccess(cur->getField(0,"TESTNUMBER"),"1");
+	checkSuccess(cur->getField(0,"TESTCHAR"),"testchar1                               ");
+	checkSuccess(cur->getField(0,"TESTVARCHAR"),"testvarchar1");
+	checkSuccess(cur->getField(0,"TESTDATE"),"01-JAN-01");
+	checkSuccess(cur->getField(0,"TESTLONG"),"testlong1");
+	checkSuccess(cur->getField(0,"TESTCLOB"),"testclob1");
+	checkSuccess(cur->getField(0,"TESTBLOB"),"");
 	stdoutput.printf("\n");
-	checkSuccess(cur->getField(7,"testnumber"),"8");
-	checkSuccess(cur->getField(7,"testchar"),"testchar8                               ");
-	checkSuccess(cur->getField(7,"testvarchar"),"testvarchar8");
-	checkSuccess(cur->getField(7,"testdate"),"01-JAN-08");
-	checkSuccess(cur->getField(7,"testlong"),"testlong8");
-	checkSuccess(cur->getField(7,"testclob"),"testclob8");
-	checkSuccess(cur->getField(7,"testblob"),"testblob8");
+	checkSuccess(cur->getField(7,"TESTNUMBER"),"8");
+	checkSuccess(cur->getField(7,"TESTCHAR"),"testchar8                               ");
+	checkSuccess(cur->getField(7,"TESTVARCHAR"),"testvarchar8");
+	checkSuccess(cur->getField(7,"TESTDATE"),"01-JAN-08");
+	checkSuccess(cur->getField(7,"TESTLONG"),"testlong8");
+	checkSuccess(cur->getField(7,"TESTCLOB"),"testclob8");
+	checkSuccess(cur->getField(7,"TESTBLOB"),"testblob8");
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIELD LENGTHS BY NAME: \n");
-	checkSuccess(cur->getFieldLength(0,"testnumber"),1);
-	checkSuccess(cur->getFieldLength(0,"testchar"),40);
-	checkSuccess(cur->getFieldLength(0,"testvarchar"),12);
-	checkSuccess(cur->getFieldLength(0,"testdate"),9);
-	checkSuccess(cur->getFieldLength(0,"testlong"),9);
-	checkSuccess(cur->getFieldLength(0,"testclob"),9);
-	checkSuccess(cur->getFieldLength(0,"testblob"),0);
+	checkSuccess(cur->getFieldLength(0,"TESTNUMBER"),1);
+	checkSuccess(cur->getFieldLength(0,"TESTCHAR"),40);
+	checkSuccess(cur->getFieldLength(0,"TESTVARCHAR"),12);
+	checkSuccess(cur->getFieldLength(0,"TESTDATE"),9);
+	checkSuccess(cur->getFieldLength(0,"TESTLONG"),9);
+	checkSuccess(cur->getFieldLength(0,"TESTCLOB"),9);
+	checkSuccess(cur->getFieldLength(0,"TESTBLOB"),0);
 	stdoutput.printf("\n");
-	checkSuccess(cur->getFieldLength(7,"testnumber"),1);
-	checkSuccess(cur->getFieldLength(7,"testchar"),40);
-	checkSuccess(cur->getFieldLength(7,"testvarchar"),12);
-	checkSuccess(cur->getFieldLength(7,"testdate"),9);
-	checkSuccess(cur->getFieldLength(7,"testlong"),9);
-	checkSuccess(cur->getFieldLength(7,"testclob"),9);
-	checkSuccess(cur->getFieldLength(7,"testblob"),9);
+	checkSuccess(cur->getFieldLength(7,"TESTNUMBER"),1);
+	checkSuccess(cur->getFieldLength(7,"TESTCHAR"),40);
+	checkSuccess(cur->getFieldLength(7,"TESTVARCHAR"),12);
+	checkSuccess(cur->getFieldLength(7,"TESTDATE"),9);
+	checkSuccess(cur->getFieldLength(7,"TESTLONG"),9);
+	checkSuccess(cur->getFieldLength(7,"TESTCLOB"),9);
+	checkSuccess(cur->getFieldLength(7,"TESTBLOB"),9);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIELDS BY ARRAY: \n");
@@ -623,6 +623,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -639,6 +640,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -655,6 +657,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
@@ -676,6 +679,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	checkSuccess(cur->resumeResultSet(id),1);
 	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
@@ -778,6 +782,7 @@ int	main(int argc, char **argv) {
 	socket=charstring::duplicate(con->getConnectionSocket());
 	stdoutput.printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);
 	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
@@ -831,6 +836,7 @@ int	main(int argc, char **argv) {
 	port=con->getConnectionPort();
 	socket=charstring::duplicate(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
+	delete[] socket;
 	checkSuccess(cur->resumeResultSet(id),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),NULL);
 	checkSuccess(cur->getField(5,(uint32_t)0),NULL);
@@ -910,8 +916,9 @@ int	main(int argc, char **argv) {
 	clobval[8*1024]='\0';
 	cur->inputBindClob("clobval",clobval,8*1024);
 	checkSuccess(cur->executeQuery(),1);
+
 	cur->sendQuery("select testclob from testtable2");
-	checkSuccess(clobval,cur->getField(0,"testclob"));
+	checkSuccess(clobval,cur->getField(0,"TESTCLOB"));
 	cur->prepareQuery("begin select testclob into :clobbindval from testtable2; end;");
 	cur->defineOutputBindClob("clobbindval");
 	checkSuccess(cur->executeQuery(),1);
@@ -934,7 +941,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("testval",testval);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testval from testtable2");
-	checkSuccess(testval,cur->getField(0,"testval"));
+	checkSuccess(testval,cur->getField(0,"TESTVAL"));
 	char	query[4000+25];
 	charstring::printf(query,sizeof(query),
 				"begin :bindval:='%s'; end;",testval);
@@ -953,7 +960,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("testval",-1);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testval from testtable2");
-	checkSuccess(cur->getField(0,"testval"),"-1");
+	checkSuccess(cur->getField(0,"TESTVAL"),"-1");
 	cur->sendQuery("drop table testtable2");
 	stdoutput.printf("\n");
 

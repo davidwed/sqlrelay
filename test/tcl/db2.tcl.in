@@ -280,51 +280,51 @@ checkSuccess [$cur getFieldLengthByIndex 7 9] 8
 puts ""
 
 puts "FIELDS BY NAME: "
-checkSuccess [$cur getFieldByName 0 "testsmallint"] "1"
-checkSuccess [$cur getFieldByName 0 "testint"] "1"
-checkSuccess [$cur getFieldByName 0 "testbigint"] "1"
-checkSuccess [$cur getFieldByName 0 "testdecimal"] "1.10"
-#checkSuccess [$cur getFieldByName 0 "testreal"] "1.1"
-#checkSuccess [$cur getFieldByName 0 "testdouble"] "1.1"
-checkSuccess [$cur getFieldByName 0 "testchar"] "testchar1                               "
-checkSuccess [$cur getFieldByName 0 "testvarchar"] "testvarchar1"
-checkSuccess [$cur getFieldByName 0 "testdate"] "2001-01-01"
-checkSuccess [$cur getFieldByName 0 "testtime"] "01:00:00"
+checkSuccess [$cur getFieldByName 0 "TESTSMALLINT"] "1"
+checkSuccess [$cur getFieldByName 0 "TESTINT"] "1"
+checkSuccess [$cur getFieldByName 0 "TESTBIGINT"] "1"
+checkSuccess [$cur getFieldByName 0 "TESTDECIMAL"] "1.10"
+#checkSuccess [$cur getFieldByName 0 "TESTREAL"] "1.1"
+#checkSuccess [$cur getFieldByName 0 "TESTDOUBLE"] "1.1"
+checkSuccess [$cur getFieldByName 0 "TESTCHAR"] "testchar1                               "
+checkSuccess [$cur getFieldByName 0 "TESTVARCHAR"] "testvarchar1"
+checkSuccess [$cur getFieldByName 0 "TESTDATE"] "2001-01-01"
+checkSuccess [$cur getFieldByName 0 "TESTTIME"] "01:00:00"
 puts ""
-checkSuccess [$cur getFieldByName 7 "testsmallint"] "8"
-checkSuccess [$cur getFieldByName 7 "testint"] "8"
-checkSuccess [$cur getFieldByName 7 "testbigint"] "8"
-checkSuccess [$cur getFieldByName 7 "testdecimal"] "8.80"
-#checkSuccess [$cur getFieldByName 7 "testreal"] "8.8"
-#checkSuccess [$cur getFieldByName 7 "testdouble"] "8.8"
-checkSuccess [$cur getFieldByName 7 "testchar"] "testchar8                               "
-checkSuccess [$cur getFieldByName 7 "testvarchar"] "testvarchar8"
-checkSuccess [$cur getFieldByName 7 "testdate"] "2008-01-01"
-checkSuccess [$cur getFieldByName 7 "testtime"] "08:00:00"
+checkSuccess [$cur getFieldByName 7 "TESTSMALLINT"] "8"
+checkSuccess [$cur getFieldByName 7 "TESTINT"] "8"
+checkSuccess [$cur getFieldByName 7 "TESTBIGINT"] "8"
+checkSuccess [$cur getFieldByName 7 "TESTDECIMAL"] "8.80"
+#checkSuccess [$cur getFieldByName 7 "TESTREAL"] "8.8"
+#checkSuccess [$cur getFieldByName 7 "TESTDOUBLE"] "8.8"
+checkSuccess [$cur getFieldByName 7 "TESTCHAR"] "testchar8                               "
+checkSuccess [$cur getFieldByName 7 "TESTVARCHAR"] "testvarchar8"
+checkSuccess [$cur getFieldByName 7 "TESTDATE"] "2008-01-01"
+checkSuccess [$cur getFieldByName 7 "TESTTIME"] "08:00:00"
 puts ""
 
 puts "FIELD LENGTHS BY NAME: "
-checkSuccess [$cur getFieldLengthByName 0 "testsmallint"] 1
-checkSuccess [$cur getFieldLengthByName 0 "testint"] 1
-checkSuccess [$cur getFieldLengthByName 0 "testbigint"] 1
-checkSuccess [$cur getFieldLengthByName 0 "testdecimal"] 4
-#checkSuccess [$cur getFieldLengthByName 0 "testreal"] 3
-#checkSuccess [$cur getFieldLengthByName 0 "testdouble"] 3
-checkSuccess [$cur getFieldLengthByName 0 "testchar"] 40
-checkSuccess [$cur getFieldLengthByName 0 "testvarchar"] 12
-checkSuccess [$cur getFieldLengthByName 0 "testdate"] 10
-checkSuccess [$cur getFieldLengthByName 0 "testtime"] 8
+checkSuccess [$cur getFieldLengthByName 0 "TESTSMALLINT"] 1
+checkSuccess [$cur getFieldLengthByName 0 "TESTINT"] 1
+checkSuccess [$cur getFieldLengthByName 0 "TESTBIGINT"] 1
+checkSuccess [$cur getFieldLengthByName 0 "TESTDECIMAL"] 4
+#checkSuccess [$cur getFieldLengthByName 0 "TESTREAL"] 3
+#checkSuccess [$cur getFieldLengthByName 0 "TESTDOUBLE"] 3
+checkSuccess [$cur getFieldLengthByName 0 "TESTCHAR"] 40
+checkSuccess [$cur getFieldLengthByName 0 "TESTVARCHAR"] 12
+checkSuccess [$cur getFieldLengthByName 0 "TESTDATE"] 10
+checkSuccess [$cur getFieldLengthByName 0 "TESTTIME"] 8
 puts ""
-checkSuccess [$cur getFieldLengthByName 7 "testsmallint"] 1
-checkSuccess [$cur getFieldLengthByName 7 "testint"] 1
-checkSuccess [$cur getFieldLengthByName 7 "testbigint"] 1
-checkSuccess [$cur getFieldLengthByName 7 "testdecimal"] 4
-#checkSuccess [$cur getFieldLengthByName 7 "testreal"] 3
-#checkSuccess [$cur getFieldLengthByName 7 "testdouble"] 3
-checkSuccess [$cur getFieldLengthByName 7 "testchar"] 40
-checkSuccess [$cur getFieldLengthByName 7 "testvarchar"] 12
-checkSuccess [$cur getFieldLengthByName 7 "testdate"] 10
-checkSuccess [$cur getFieldLengthByName 7 "testtime"] 8
+checkSuccess [$cur getFieldLengthByName 7 "TESTSMALLINT"] 1
+checkSuccess [$cur getFieldLengthByName 7 "TESTINT"] 1
+checkSuccess [$cur getFieldLengthByName 7 "TESTBIGINT"] 1
+checkSuccess [$cur getFieldLengthByName 7 "TESTDECIMAL"] 4
+#checkSuccess [$cur getFieldLengthByName 7 "TESTREAL"] 3
+#checkSuccess [$cur getFieldLengthByName 7 "TESTDOUBLE"] 3
+checkSuccess [$cur getFieldLengthByName 7 "TESTCHAR"] 40
+checkSuccess [$cur getFieldLengthByName 7 "TESTVARCHAR"] 12
+checkSuccess [$cur getFieldLengthByName 7 "TESTDATE"] 10
+checkSuccess [$cur getFieldLengthByName 7 "TESTTIME"] 8
 puts ""
 
 puts "FIELDS BY ARRAY: "

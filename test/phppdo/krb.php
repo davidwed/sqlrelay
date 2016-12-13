@@ -573,6 +573,8 @@
 	$dbh->exec("drop table testtable");
 	$dbh->exec("drop table testtable1");
 
+# output binds don't appear to work with PDO for PHP7
+if (PHP_VERSION_ID < 70000) {
 	echo("OUTPUT BIND BY NAME: \n");
 	$stmt=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; end;");
 	$param1=0;
@@ -628,14 +630,22 @@
 	fclose($stream);
 	unlink("test.blob");
 	echo("\n");
-
-	echo("NON-LAZY CONNECT: \n");
-	$dsn = "sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;krb=yes;debug=0;lazyconnect=0";
-	checkSuccess(new PDO($dsn,$user,$password),0);
-	echo("\n");
-
+}
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
+
+	# this throws an execption and doesn't continue on PHP7
+	try {
+
+		echo("NON-LAZY CONNECT: \n");
+		$dsn = "sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;krb=yes;debug=0;lazyconnect=0";
+		checkSuccess(new PDO($dsn,$user,$password),0);
+		echo("\n");
+
+	} catch (Exception $e) {
+		echo($e->getMessage());
+		echo("\n");
+	}
 
 	echo("INVALID QUERIES: \n");
 	checkSuccess($dbh->query("select 1"),0);

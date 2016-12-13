@@ -193,8 +193,8 @@ int	main(int argc, char **argv) {
 	cur->inputBindClob("1",blobval,20*1024);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testblob from testtable1");
-	checkSuccess(cur->getFieldLength(0,"testblob"),20*1024);
-	checkSuccess(cur->getField(0,"testblob"),blobval);
+	checkSuccess(cur->getFieldLength(0,"TESTBLOB"),20*1024);
+	checkSuccess(cur->getField(0,"TESTBLOB"),blobval);
 	cur->prepareQuery("execute procedure testproc1 ?");
 	cur->inputBindBlob("1",blobval,20*1024);
 	cur->defineOutputBindBlob("1");

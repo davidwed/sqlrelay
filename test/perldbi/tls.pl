@@ -66,10 +66,10 @@ if ($^O eq "MSWin32") {
 	$tlsca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
 }
 
+
 # instantiation
 my $prefix="DBI:SQLRelay(AutoCommit=>0,PrintError=>0):";
 my $connectstring="host=sqlrserver;port=9000;socket=/tmp/test.socket;debug=0;tls=yes;tlscert=$tlscert;tlsvalidate=ca;tlsca=$tlsca";
-printf("$connectstring\n");
 my $dsn=$prefix.$connectstring;
 
 # parse dsn
