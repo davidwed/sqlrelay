@@ -197,41 +197,41 @@ puts ""
 
 puts "COLUMN TYPES: "
 checkSuccess [$cur getColumnTypeByIndex 0] "NUMBER"
-checkSuccess [$cur getColumnTypeByName "testnumber"] "NUMBER"
+checkSuccess [$cur getColumnTypeByName "TESTNUMBER"] "NUMBER"
 checkSuccess [$cur getColumnTypeByIndex 1] "CHAR"
-checkSuccess [$cur getColumnTypeByName "testchar"] "CHAR"
+checkSuccess [$cur getColumnTypeByName "TESTCHAR"] "CHAR"
 checkSuccess [$cur getColumnTypeByIndex 2] "VARCHAR2"
-checkSuccess [$cur getColumnTypeByName "testvarchar"] "VARCHAR2"
+checkSuccess [$cur getColumnTypeByName "TESTVARCHAR"] "VARCHAR2"
 checkSuccess [$cur getColumnTypeByIndex 3] "DATE"
-checkSuccess [$cur getColumnTypeByName "testdate"] "DATE"
+checkSuccess [$cur getColumnTypeByName "TESTDATE"] "DATE"
 checkSuccess [$cur getColumnTypeByIndex 4] "LONG"
-checkSuccess [$cur getColumnTypeByName "testlong"] "LONG"
+checkSuccess [$cur getColumnTypeByName "TESTLONG"] "LONG"
 puts ""
 
 puts "COLUMN LENGTH: "
 checkSuccess [$cur getColumnLengthByIndex 0] 22
-checkSuccess [$cur getColumnLengthByName "testnumber"] 22
+checkSuccess [$cur getColumnLengthByName "TESTNUMBER"] 22
 checkSuccess [$cur getColumnLengthByIndex 1] 40
-checkSuccess [$cur getColumnLengthByName "testchar"] 40
+checkSuccess [$cur getColumnLengthByName "TESTCHAR"] 40
 checkSuccess [$cur getColumnLengthByIndex 2] 40
-checkSuccess [$cur getColumnLengthByName "testvarchar"] 40
+checkSuccess [$cur getColumnLengthByName "TESTVARCHAR"] 40
 checkSuccess [$cur getColumnLengthByIndex 3] 7
-checkSuccess [$cur getColumnLengthByName "testdate"] 7
+checkSuccess [$cur getColumnLengthByName "TESTDATE"] 7
 checkSuccess [$cur getColumnLengthByIndex 4] 0
-checkSuccess [$cur getColumnLengthByName "testlong"] 0
+checkSuccess [$cur getColumnLengthByName "TESTLONG"] 0
 puts ""
 
 puts "LONGEST COLUMN: "
 checkSuccess [$cur getLongestByIndex 0] 1
-checkSuccess [$cur getLongestByName "testnumber"] 1
+checkSuccess [$cur getLongestByName "TESTNUMBER"] 1
 checkSuccess [$cur getLongestByIndex 1] 40
-checkSuccess [$cur getLongestByName "testchar"] 40
+checkSuccess [$cur getLongestByName "TESTCHAR"] 40
 checkSuccess [$cur getLongestByIndex 2] 12
-checkSuccess [$cur getLongestByName "testvarchar"] 12
+checkSuccess [$cur getLongestByName "TESTVARCHAR"] 12
 checkSuccess [$cur getLongestByIndex 3] 9
-checkSuccess [$cur getLongestByName "testdate"] 9
+checkSuccess [$cur getLongestByName "TESTDATE"] 9
 checkSuccess [$cur getLongestByIndex 4] 9
-checkSuccess [$cur getLongestByName "testlong"] 9
+checkSuccess [$cur getLongestByName "TESTLONG"] 9
 puts ""
 
 puts "ROW COUNT: "
@@ -287,39 +287,39 @@ checkSuccess [$cur getFieldLengthByIndex 7 6] 9
 puts ""
 
 puts "FIELDS BY NAME: "
-checkSuccess [$cur getFieldByName 0 "testnumber"] "1"
-checkSuccess [$cur getFieldByName 0 "testchar"] "testchar1                               "
-checkSuccess [$cur getFieldByName 0 "testvarchar"] "testvarchar1"
-checkSuccess [$cur getFieldByName 0 "testdate"] "01-JAN-01"
-checkSuccess [$cur getFieldByName 0 "testlong"] "testlong1"
-checkSuccess [$cur getFieldByName 0 "testclob"] "testclob1"
-checkSuccess [$cur getFieldByName 0 "testblob"] ""
+checkSuccess [$cur getFieldByName 0 "TESTNUMBER"] "1"
+checkSuccess [$cur getFieldByName 0 "TESTCHAR"] "testchar1                               "
+checkSuccess [$cur getFieldByName 0 "TESTVARCHAR"] "testvarchar1"
+checkSuccess [$cur getFieldByName 0 "TESTDATE"] "01-JAN-01"
+checkSuccess [$cur getFieldByName 0 "TESTLONG"] "testlong1"
+checkSuccess [$cur getFieldByName 0 "TESTCLOB"] "testclob1"
+checkSuccess [$cur getFieldByName 0 "TESTBLOB"] ""
 puts ""
-checkSuccess [$cur getFieldByName 7 "testnumber"] "8"
-checkSuccess [$cur getFieldByName 7 "testchar"] "testchar8                               "
-checkSuccess [$cur getFieldByName 7 "testvarchar"] "testvarchar8"
-checkSuccess [$cur getFieldByName 7 "testdate"] "01-JAN-08"
-checkSuccess [$cur getFieldByName 7 "testlong"] "testlong8"
-checkSuccess [$cur getFieldByName 7 "testclob"] "testclob8"
-checkSuccess [$cur getFieldByName 7 "testblob"] "testblob8"
+checkSuccess [$cur getFieldByName 7 "TESTNUMBER"] "8"
+checkSuccess [$cur getFieldByName 7 "TESTCHAR"] "testchar8                               "
+checkSuccess [$cur getFieldByName 7 "TESTVARCHAR"] "testvarchar8"
+checkSuccess [$cur getFieldByName 7 "TESTDATE"] "01-JAN-08"
+checkSuccess [$cur getFieldByName 7 "TESTLONG"] "testlong8"
+checkSuccess [$cur getFieldByName 7 "TESTCLOB"] "testclob8"
+checkSuccess [$cur getFieldByName 7 "TESTBLOB"] "testblob8"
 puts ""
 
 puts "FIELD LENGTHS BY NAME: "
-checkSuccess [$cur getFieldLengthByName 0 "testnumber"] 1
-checkSuccess [$cur getFieldLengthByName 0 "testchar"] 40
-checkSuccess [$cur getFieldLengthByName 0 "testvarchar"] 12
-checkSuccess [$cur getFieldLengthByName 0 "testdate"] 9
-checkSuccess [$cur getFieldLengthByName 0 "testlong"] 9
-checkSuccess [$cur getFieldLengthByName 0 "testclob"] 9
-checkSuccess [$cur getFieldLengthByName 0 "testblob"] 0
+checkSuccess [$cur getFieldLengthByName 0 "TESTNUMBER"] 1
+checkSuccess [$cur getFieldLengthByName 0 "TESTCHAR"] 40
+checkSuccess [$cur getFieldLengthByName 0 "TESTVARCHAR"] 12
+checkSuccess [$cur getFieldLengthByName 0 "TESTDATE"] 9
+checkSuccess [$cur getFieldLengthByName 0 "TESTLONG"] 9
+checkSuccess [$cur getFieldLengthByName 0 "TESTCLOB"] 9
+checkSuccess [$cur getFieldLengthByName 0 "TESTBLOB"] 0
 puts ""
-checkSuccess [$cur getFieldLengthByName 7 "testnumber"] 1
-checkSuccess [$cur getFieldLengthByName 7 "testchar"] 40
-checkSuccess [$cur getFieldLengthByName 7 "testvarchar"] 12
-checkSuccess [$cur getFieldLengthByName 7 "testdate"] 9
-checkSuccess [$cur getFieldLengthByName 7 "testlong"] 9
-checkSuccess [$cur getFieldLengthByName 7 "testclob"] 9
-checkSuccess [$cur getFieldLengthByName 7 "testblob"] 9
+checkSuccess [$cur getFieldLengthByName 7 "TESTNUMBER"] 1
+checkSuccess [$cur getFieldLengthByName 7 "TESTCHAR"] 40
+checkSuccess [$cur getFieldLengthByName 7 "TESTVARCHAR"] 12
+checkSuccess [$cur getFieldLengthByName 7 "TESTDATE"] 9
+checkSuccess [$cur getFieldLengthByName 7 "TESTLONG"] 9
+checkSuccess [$cur getFieldLengthByName 7 "TESTCLOB"] 9
+checkSuccess [$cur getFieldLengthByName 7 "TESTBLOB"] 9
 puts ""
 
 puts "FIELDS BY ARRAY: "
@@ -685,7 +685,7 @@ set clobval [join $clobvallist ""]
 $cur inputBindClob "clobval" $clobval [expr 8*1]
 checkSuccess [$cur executeQuery] 1
 catch {$cur sendQuery "select testclob from testtable2"}
-checkSuccess $clobval [$cur getFieldByName 0 "testclob"]
+checkSuccess $clobval [$cur getFieldByName 0 "TESTCLOB"]
 $cur prepareQuery "begin  select testclob into :clobbindval from testtable2;  end;"
 $cur defineOutputBindClob "clobbindval"
 checkSuccess [$cur executeQuery] 1
@@ -703,7 +703,7 @@ set clobval [join $clobvallist ""]
 $cur inputBindClob "clobval" $clobval [expr 8*1]
 checkSuccess [$cur executeQuery] 1
 catch {$cur sendQuery "select testclob from testtable2"}
-checkSuccess $clobval [$cur getFieldByName 0 "testclob"]
+checkSuccess $clobval [$cur getFieldByName 0 "TESTCLOB"]
 $cur prepareQuery "begin  select testclob into :clobbindval from testtable2;  end;"
 $cur defineOutputBindClob "clobbindval"
 checkSuccess [$cur executeQuery] 1
@@ -724,7 +724,7 @@ for {set i 0} {$i<2000} {incr i} {
 $cur inputBind "testval" $testval
 checkSuccess [$cur executeQuery] 1
 catch {$cur sendQuery "select testval from testtable2"}
-checkSuccess $testval [$cur getFieldByName 0 "testval"]
+checkSuccess $testval [$cur getFieldByName 0 "TESTVAL"]
 set query "begin  :bindval:='$testval';  end;"
 $cur prepareQuery $query
 $cur defineOutputBindString "bindval" 4000
@@ -741,7 +741,7 @@ $cur prepareQuery "insert into testtable2 values (:testval)"
 $cur inputBind "testval" -1
 checkSuccess [$cur executeQuery] 1
 catch {$cur sendQuery "select testval from testtable2"}
-checkSuccess [$cur getFieldByName 0 "testval"] "-1"
+checkSuccess [$cur getFieldByName 0 "TESTVAL"] "-1"
 catch {$cur sendQuery "drop table testtable2"}
 puts ""
 

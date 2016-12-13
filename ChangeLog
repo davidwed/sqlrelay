@@ -34,6 +34,7 @@
 		with simpler charstring comparisons
 	updated db2 connection to reuse the statement instead of recreating
 		it with each prepare
+	made column-lookup by name case sensitive to improve performance
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile

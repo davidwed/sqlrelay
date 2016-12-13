@@ -4421,8 +4421,7 @@ sqlrclientcolumn *sqlrcursor::getColumn(const char *name) {
 		sqlrclientcolumn	*whichcolumn;
 		for (uint32_t i=0; i<pvt->_colcount; i++) {
 			whichcolumn=getColumnInternal(i);
-			if (!charstring::compareIgnoringCase(
-						whichcolumn->name,name)) {
+			if (!charstring::compare(whichcolumn->name,name)) {
 				return whichcolumn;
 			}
 		}
@@ -4711,7 +4710,7 @@ const char *sqlrcursor::getField(uint64_t row, const char *col) {
 			pvt->_sentcolumninfo==SEND_COLUMN_INFO &&
 			pvt->_rowcount && row>=pvt->_firstrowindex) {
 		for (uint32_t i=0; i<pvt->_colcount; i++) {
-			if (!charstring::compareIgnoringCase(
+			if (!charstring::compare(
 					getColumnInternal(i)->name,col)) {
 
 				// in the event that we're stepping through the
@@ -4763,7 +4762,7 @@ uint32_t sqlrcursor::getFieldLength(uint64_t row, const char *col) {
 			pvt->_rowcount && row>=pvt->_firstrowindex) {
 
 		for (uint32_t i=0; i<pvt->_colcount; i++) {
-			if (!charstring::compareIgnoringCase(
+			if (!charstring::compare(
 					getColumnInternal(i)->name,col)) {
 
 				// in the event that we're stepping through the

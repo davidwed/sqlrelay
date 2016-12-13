@@ -395,31 +395,31 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIELDS BY NAME: \n");
-	checkSuccess(cur->getField(0,"testnumber"),"1");
-	checkSuccess(cur->getField(0,"testchar"),"testchar1                               ");
-	checkSuccess(cur->getField(0,"testvarchar"),"testvarchar1");
-	checkSuccess(cur->getField(0,"testdate"),"01-JAN-01");
-	checkSuccess(cur->getField(0,"testlong"),"testlong1");
+	checkSuccess(cur->getField(0,"TESTNUMBER"),"1");
+	checkSuccess(cur->getField(0,"TESTCHAR"),"testchar1                               ");
+	checkSuccess(cur->getField(0,"TESTVARCHAR"),"testvarchar1");
+	checkSuccess(cur->getField(0,"TESTDATE"),"01-JAN-01");
+	checkSuccess(cur->getField(0,"TESTLONG"),"testlong1");
 	stdoutput.printf("\n");
-	checkSuccess(cur->getField(7,"testnumber"),"8");
-	checkSuccess(cur->getField(7,"testchar"),"testchar8                               ");
-	checkSuccess(cur->getField(7,"testvarchar"),"testvarchar8");
-	checkSuccess(cur->getField(7,"testdate"),"01-JAN-08");
-	checkSuccess(cur->getField(7,"testlong"),"testlong8");
+	checkSuccess(cur->getField(7,"TESTNUMBER"),"8");
+	checkSuccess(cur->getField(7,"TESTCHAR"),"testchar8                               ");
+	checkSuccess(cur->getField(7,"TESTVARCHAR"),"testvarchar8");
+	checkSuccess(cur->getField(7,"TESTDATE"),"01-JAN-08");
+	checkSuccess(cur->getField(7,"TESTLONG"),"testlong8");
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIELD LENGTHS BY NAME: \n");
-	checkSuccess(cur->getFieldLength(0,"testnumber"),1);
-	checkSuccess(cur->getFieldLength(0,"testchar"),40);
-	checkSuccess(cur->getFieldLength(0,"testvarchar"),12);
-	checkSuccess(cur->getFieldLength(0,"testdate"),9);
-	checkSuccess(cur->getFieldLength(0,"testlong"),9);
+	checkSuccess(cur->getFieldLength(0,"TESTNUMBER"),1);
+	checkSuccess(cur->getFieldLength(0,"TESTCHAR"),40);
+	checkSuccess(cur->getFieldLength(0,"TESTVARCHAR"),12);
+	checkSuccess(cur->getFieldLength(0,"TESTDATE"),9);
+	checkSuccess(cur->getFieldLength(0,"TESTLONG"),9);
 	stdoutput.printf("\n");
-	checkSuccess(cur->getFieldLength(7,"testnumber"),1);
-	checkSuccess(cur->getFieldLength(7,"testchar"),40);
-	checkSuccess(cur->getFieldLength(7,"testvarchar"),12);
-	checkSuccess(cur->getFieldLength(7,"testdate"),9);
-	checkSuccess(cur->getFieldLength(7,"testlong"),9);
+	checkSuccess(cur->getFieldLength(7,"TESTNUMBER"),1);
+	checkSuccess(cur->getFieldLength(7,"TESTCHAR"),40);
+	checkSuccess(cur->getFieldLength(7,"TESTVARCHAR"),12);
+	checkSuccess(cur->getFieldLength(7,"TESTDATE"),9);
+	checkSuccess(cur->getFieldLength(7,"TESTLONG"),9);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIELDS BY ARRAY: \n");
@@ -765,7 +765,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("testval",testval);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testval from testtable2");
-	checkSuccess(testval,cur->getField(0,"testval"));
+	checkSuccess(testval,cur->getField(0,"TESTVAL"));
 	char	query[2000+25];
 	charstring::printf(query,sizeof(query),
 				"begin :bindval:='%s'; end;",testval);
@@ -784,7 +784,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("testval",-1);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testval from testtable2");
-	checkSuccess(cur->getField(0,"testval"),"-1");
+	checkSuccess(cur->getField(0,"TESTVAL"),"-1");
 	cur->sendQuery("drop table testtable2");
 	stdoutput.printf("\n");
 

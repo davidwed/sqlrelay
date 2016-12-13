@@ -5,6 +5,18 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
+//#define PROFILING 1
+
+#ifdef PROFILING
+	class noio {
+		public:
+			void printf(const char * str, ...) {};
+			void flush() {};
+	};
+	static noio nooutput;
+	#define stdoutput nooutput
+#endif
+
 sqlrconnection	*con;
 sqlrcursor	*cur;
 sqlrconnection	*secondcon;
@@ -57,7 +69,9 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 
+#ifdef PROFILING
 for (uint16_t a=0; a<50; a++) {
+#endif
 
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
@@ -1137,5 +1151,9 @@ for (uint16_t a=0; a<50; a++) {
 	delete secondcon;
 	delete cur;
 	delete con;
+
+#ifdef PROFILING
 }
+#endif
+
 }
