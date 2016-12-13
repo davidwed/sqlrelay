@@ -1065,21 +1065,18 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		if (!clientsock) {
 			return false;
 		}
-		clientsock->dontUseNaglesAlgorithm();
 		return registerHandoff(clientsock);
 	} else if (fd==pvt->_removehandoffsockun) {
 		clientsock=pvt->_removehandoffsockun->accept();
 		if (!clientsock) {
 			return false;
 		}
-		clientsock->dontUseNaglesAlgorithm();
 		return deRegisterHandoff(clientsock);
 	} else if (fd==pvt->_fixupsockun) {
 		clientsock=pvt->_fixupsockun->accept();
 		if (!clientsock) {
 			return false;
 		}
-		clientsock->dontUseNaglesAlgorithm();
 		return fixup(clientsock);
 	}
 
@@ -1112,7 +1109,6 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		if (!clientsock) {
 			return false;
 		}
-		clientsock->translateByteOrder();
 
 		// For inet clients, make sure that the ip address is
 		// not denied.  If the ip was denied, disconnect the
@@ -1121,6 +1117,9 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 			delete clientsock;
 			return true;
 		}
+
+		clientsock->dontUseNaglesAlgorithm();
+		clientsock->translateByteOrder();
 
 	} else if (uss) {
 
@@ -1133,11 +1132,6 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	} else {
 		return true;
 	}
-
-	clientsock->dontUseNaglesAlgorithm();
-	// FIXME: not the same as the client or connection?
-	clientsock->setReadBufferSize(8192);
-	clientsock->setWriteBufferSize(8192);
 
 	// Don't fork unless we have to.
 	//
@@ -1942,8 +1936,6 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 		raiseInternalErrorEvent("fixup failed to connect");
 		return false;
 	}
-
-	fixupclientsockun.dontUseNaglesAlgorithm();
 
 	// send the pid of the connection that we need
 	if (fixupclientsockun.write(connectionpid)!=sizeof(uint32_t)) {

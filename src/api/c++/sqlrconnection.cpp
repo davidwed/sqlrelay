@@ -604,6 +604,10 @@ bool sqlrconnection::openSession() {
 						pvt->_connecttimeoutusec,
 						pvt->_retrytime,pvt->_tries);
 		if (openresult==RESULT_SUCCESS) {
+
+			// disable nagle's algorithm
+			pvt->_ics.dontUseNaglesAlgorithm();
+
 			pvt->_cs=&pvt->_ics;
 		}
 	}
@@ -736,13 +740,11 @@ bool sqlrconnection::validateCertificate() {
 
 bool sqlrconnection::reConfigureSockets() {
 
-	pvt->_ucs.dontUseNaglesAlgorithm();
 	//pvt->_ucs.setTcpReadBufferSize(65536);
 	//pvt->_ucs.setTcpWriteBufferSize(65536);
 	pvt->_ucs.setReadBufferSize(65536);
 	pvt->_ucs.setWriteBufferSize(65536);
 
-	pvt->_ics.dontUseNaglesAlgorithm();
 	//pvt->_ics.setTcpReadBufferSize(65536);
 	//pvt->_ics.setTcpWriteBufferSize(65536);
 	pvt->_ics.setReadBufferSize(65536);

@@ -1653,7 +1653,6 @@ void sqlrservercontroller::registerForHandoff() {
 		if (pvt->_handoffsockun.connect(handoffsockname,
 							-1,-1,1,0)==
 							RESULT_SUCCESS) {
-			pvt->_handoffsockun.dontUseNaglesAlgorithm();
 			if (pvt->_handoffsockun.write(
 				(uint32_t)process::getProcessId())==
 							sizeof(uint32_t)) {
@@ -1694,7 +1693,6 @@ void sqlrservercontroller::deRegisterForHandoff() {
 	// attach to the socket and write the process id
 	unixsocketclient	removehandoffsockun;
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
-	removehandoffsockun.dontUseNaglesAlgorithm();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 	removehandoffsockun.flushWriteBuffer(-1,-1);
 
