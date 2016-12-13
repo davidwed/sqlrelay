@@ -30,14 +30,10 @@
 #define OPTIMISTIC_AVERAGE_COLUMN_DATA_LENGTH 16
 #define OPTIMISTIC_COLUMN_DATA_SIZE OPTIMISTIC_COLUMN_COUNT*\
 					OPTIMISTIC_AVERAGE_COLUMN_DATA_LENGTH
-// we're also optimistic that if we need more space, that growing at a rate of
-// 4 columns at a time will work out well
-//#define OPTIMISTIC_COLUMN_DATA_GROWTH_SIZE OPTIMISTIC_COLUMN_DATA_SIZE/4
 
 // we're also optimistic that if we need more space, that growing at a rate of
 // 1 column at a time will work out well
-#define OPTIMISTIC_COLUMN_DATA_GROWTH_SIZE \
-		OPTIMISTIC_COLUMN_DATA_SIZE/OPTIMISTIC_COLUMN_COUNT
+#define OPTIMISTIC_COLUMN_DATA_GROWTH_SIZE OPTIMISTIC_COLUMN_DATA_SIZE
 
 // we're optimistic that the average query will contain 16 rows whose fields
 // average 16 characters in length
@@ -46,14 +42,11 @@
 #define OPTIMISTIC_RESULT_SET_SIZE OPTIMISTIC_COLUMN_COUNT*\
 					OPTIMISTIC_ROW_COUNT*\
 					OPTIMISTIC_AVERAGE_FIELD_LENGTH
-// we're also optimistic that if we need more space, that growing at a rate of
-// 16 rows at a time will work out well
-//#define OPTIMISTIC_RESULT_SET_GROWTH_SIZE OPTIMISTIC_RESULT_SET_SIZE
 
 // we're also optimistic that if we need more space, that growing at a rate of
-// 1 row at a time will work out well
-#define OPTIMISTIC_RESULT_SET_GROWTH_SIZE \
-		OPTIMISTIC_RESULT_SET_SIZE/OPTIMISTIC_ROW_COUNT*4
+// 4 rows at a time will work out well
+#define OPTIMISTIC_RESULT_SET_GROWTH_SIZE OPTIMISTIC_COLUMN_COUNT*4*\
+					OPTIMISTIC_AVERAGE_FIELD_LENGTH
 
 
 
