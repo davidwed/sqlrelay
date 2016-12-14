@@ -556,11 +556,8 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 	} while (loop);
 
-	// end the session if necessary
-	if (endsession) {
-		cont->endSession();
-	}
-
+	// close the client connection
+	//
 	// If an error occurred, the client could still be sending an entire
 	// session's worth of data before it reads the error and closes the
 	// socket.  We have to absorb all of that data.  We shouldn't just loop
@@ -596,6 +593,11 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 				// divide by two because we're
 				// reading 2 bytes at a time
 				)/2);
+
+	// end the session if necessary
+	if (endsession) {
+		cont->endSession();
+	}
 
 	// return the exit status
 	return status;

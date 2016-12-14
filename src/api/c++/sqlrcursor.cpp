@@ -288,6 +288,9 @@ class sqlrcursorprivate {
 		// query translation
 		char		*_querytree;
 		char		*_translatedquery;
+
+		// socket client
+		socketclient	*_cs;
 };
 
 // This method is a member of sqlrcursorprivate, rather than sqlrcuror, because
@@ -397,6 +400,9 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	// query translation
 	pvt->_querytree=NULL;
 	pvt->_translatedquery=NULL;
+
+	// socket client
+	pvt->_cs=NULL;
 
 	// initialize all bind/substitution-related variables
 	pvt->_subvars=new dynamicarray<sqlrclientbindvar>(
@@ -936,28 +942,31 @@ bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 	pvt->_cached=false;
 	pvt->_endofresultset=false;
 
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
 	// tell the server we want to get a db list
-	pvt->_sqlrc->cs()->write(command);
+	pvt->_cs->write(command);
 
 	// tell the server whether we'll need a cursor or not
 	sendCursorStatus();
 
 	// send the list format
-	pvt->_sqlrc->cs()->write((uint16_t)listformat);
+	pvt->_cs->write((uint16_t)listformat);
 
 	// send the wild parameter
 	uint32_t	len=charstring::length(wild);
-	pvt->_sqlrc->cs()->write(len);
+	pvt->_cs->write(len);
 	if (len) {
-		pvt->_sqlrc->cs()->write(wild,len);
+		pvt->_cs->write(wild,len);
 	}
 
 	// send the table parameter
 	if (table) {
 		len=charstring::length(table);
-		pvt->_sqlrc->cs()->write(len);
+		pvt->_cs->write(len);
 		if (len) {
-			pvt->_sqlrc->cs()->write(table,len);
+			pvt->_cs->write(table,len);
 		}
 	}
 
@@ -2160,11 +2169,14 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 	pvt->_cached=false;
 	pvt->_endofresultset=false;
 
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
 	// send the query to the server.
 	if (!pvt->_reexecute) {
 
 		// tell the server we're sending a query
-		pvt->_sqlrc->cs()->write((uint16_t)NEW_QUERY);
+		pvt->_cs->write((uint16_t)NEW_QUERY);
 
 		// tell the server whether we'll need a cursor or not
 		sendCursorStatus();
@@ -2184,8 +2196,8 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 
 		// send the client info
 		// FIXME: arguably this should be its own command
-		pvt->_sqlrc->cs()->write(pvt->_sqlrc->clientinfolen());
-		pvt->_sqlrc->cs()->write(pvt->_sqlrc->clientinfo(),
+		pvt->_cs->write(pvt->_sqlrc->clientinfolen());
+		pvt->_cs->write(pvt->_sqlrc->clientinfo(),
 					pvt->_sqlrc->clientinfolen());
 
 		if (pvt->_sqlrc->debug()) {
@@ -2201,8 +2213,8 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		}
 
 		// send the query
-		pvt->_sqlrc->cs()->write(pvt->_querylen);
-		pvt->_sqlrc->cs()->write(query,pvt->_querylen);
+		pvt->_cs->write(pvt->_querylen);
+		pvt->_cs->write(query,pvt->_querylen);
 
 	} else {
 
@@ -2218,10 +2230,10 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		}
 
 		// tell the server we're sending a query
-		pvt->_sqlrc->cs()->write((uint16_t)REEXECUTE_QUERY);
+		pvt->_cs->write((uint16_t)REEXECUTE_QUERY);
 
 		// send the cursor id to the server
-		pvt->_sqlrc->cs()->write(pvt->_cursorid);
+		pvt->_cs->write(pvt->_cursorid);
 	}
 
 	return true;
@@ -2232,10 +2244,10 @@ void sqlrcursor::sendCursorStatus() {
 	if (pvt->_havecursorid) {
 
 		// tell the server we already have a cursor
-		pvt->_sqlrc->cs()->write((uint16_t)DONT_NEED_NEW_CURSOR);
+		pvt->_cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
 
 		// send the cursor id to the server
-		pvt->_sqlrc->cs()->write(pvt->_cursorid);
+		pvt->_cs->write(pvt->_cursorid);
 
 		if (pvt->_sqlrc->debug()) {
 			pvt->_sqlrc->debugPreStart();
@@ -2248,7 +2260,7 @@ void sqlrcursor::sendCursorStatus() {
 	} else {
 
 		// tell the server we need a cursor
-		pvt->_sqlrc->cs()->write((uint16_t)NEED_NEW_CURSOR);
+		pvt->_cs->write((uint16_t)NEED_NEW_CURSOR);
 
 		if (pvt->_sqlrc->debug()) {
 			pvt->_sqlrc->debugPreStart();
@@ -2280,7 +2292,7 @@ void sqlrcursor::sendInputBinds() {
 	}
 
 	// write the input bind variables/values to the server.
-	pvt->_sqlrc->cs()->write(count);
+	pvt->_cs->write(count);
 	uint16_t	size;
 	i=0;
 	while (i<count) {
@@ -2292,9 +2304,8 @@ void sqlrcursor::sendInputBinds() {
 
 		// send the variable
 		size=charstring::length((*pvt->_inbindvars)[i].variable);
-		pvt->_sqlrc->cs()->write(size);
-		pvt->_sqlrc->cs()->write(
-				(*pvt->_inbindvars)[i].variable,(size_t)size);
+		pvt->_cs->write(size);
+		pvt->_cs->write((*pvt->_inbindvars)[i].variable,(size_t)size);
 		if (pvt->_sqlrc->debug()) {
 			pvt->_sqlrc->debugPreStart();
 			pvt->_sqlrc->debugPrint(
@@ -2304,7 +2315,7 @@ void sqlrcursor::sendInputBinds() {
 		}
 
 		// send the type
-		pvt->_sqlrc->cs()->write((uint16_t)(*pvt->_inbindvars)[i].type);
+		pvt->_cs->write((uint16_t)(*pvt->_inbindvars)[i].type);
 
 		// send the value
 		if ((*pvt->_inbindvars)[i].type==
@@ -2318,10 +2329,9 @@ void sqlrcursor::sendInputBinds() {
 		} else if ((*pvt->_inbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_STRING) {
 
-			pvt->_sqlrc->cs()->write(
-					(*pvt->_inbindvars)[i].valuesize);
+			pvt->_cs->write((*pvt->_inbindvars)[i].valuesize);
 			if ((*pvt->_inbindvars)[i].valuesize>0) {
-				pvt->_sqlrc->cs()->write(
+				pvt->_cs->write(
 					(*pvt->_inbindvars)[i].value.stringval,
 					(size_t)(*pvt->_inbindvars)[i].
 								valuesize);
@@ -2343,8 +2353,7 @@ void sqlrcursor::sendInputBinds() {
 		} else if ((*pvt->_inbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_INTEGER) {
 
-			pvt->_sqlrc->cs()->write(
-					(uint64_t)(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint64_t)(*pvt->_inbindvars)[i].
 							value.integerval);
 
 			if (pvt->_sqlrc->debug()) {
@@ -2359,12 +2368,11 @@ void sqlrcursor::sendInputBinds() {
 		} else if ((*pvt->_inbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_DOUBLE) {
 
-			pvt->_sqlrc->cs()->write(
-					(*pvt->_inbindvars)[i].value.
+			pvt->_cs->write((*pvt->_inbindvars)[i].value.
 							doubleval.value);
-			pvt->_sqlrc->cs()->write((*pvt->_inbindvars)[i].value.
+			pvt->_cs->write((*pvt->_inbindvars)[i].value.
 							doubleval.precision);
-			pvt->_sqlrc->cs()->write((*pvt->_inbindvars)[i].value.
+			pvt->_cs->write((*pvt->_inbindvars)[i].value.
 							doubleval.scale);
 
 			if (pvt->_sqlrc->debug()) {
@@ -2387,36 +2395,26 @@ void sqlrcursor::sendInputBinds() {
 		} else if ((*pvt->_inbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_DATE) {
 
-			pvt->_sqlrc->cs()->write((uint16_t)
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint16_t)(*pvt->_inbindvars)[i].
 						value.dateval.year);
-			pvt->_sqlrc->cs()->write((uint16_t)
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint16_t)(*pvt->_inbindvars)[i].
 						value.dateval.month);
-			pvt->_sqlrc->cs()->write((uint16_t)
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint16_t)(*pvt->_inbindvars)[i].
 						value.dateval.day);
-			pvt->_sqlrc->cs()->write((uint16_t)
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint16_t)(*pvt->_inbindvars)[i].
 						value.dateval.hour);
-			pvt->_sqlrc->cs()->write((uint16_t)
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint16_t)(*pvt->_inbindvars)[i].
 						value.dateval.minute);
-			pvt->_sqlrc->cs()->write((uint16_t)
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint16_t)(*pvt->_inbindvars)[i].
 						value.dateval.second);
-			pvt->_sqlrc->cs()->write((uint32_t)
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint32_t)(*pvt->_inbindvars)[i].
 						value.dateval.microsecond);
-			pvt->_sqlrc->cs()->write((uint16_t)
-					charstring::length(
-					(*pvt->_inbindvars)[i].
-						value.dateval.tz));
-			pvt->_sqlrc->cs()->write(
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((uint16_t)charstring::length(
+						(*pvt->_inbindvars)[i].
+							value.dateval.tz));
+			pvt->_cs->write((*pvt->_inbindvars)[i].
 						value.dateval.tz);
-			pvt->_sqlrc->cs()->write(
-					(*pvt->_inbindvars)[i].
+			pvt->_cs->write((*pvt->_inbindvars)[i].
 						value.dateval.isnegative);
 
 			if (pvt->_sqlrc->debug()) {
@@ -2465,12 +2463,10 @@ void sqlrcursor::sendInputBinds() {
 				(*pvt->_inbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_CLOB) {
 
-			pvt->_sqlrc->cs()->write(
-					(*pvt->_inbindvars)[i].valuesize);
+			pvt->_cs->write((*pvt->_inbindvars)[i].valuesize);
 			if ((*pvt->_inbindvars)[i].valuesize>0) {
-				pvt->_sqlrc->cs()->write(
-					(*pvt->_inbindvars)[i].value.lobval,
-					(size_t)(*pvt->_inbindvars)[i].
+				pvt->_cs->write((*pvt->_inbindvars)[i].value.lobval,
+						(size_t)(*pvt->_inbindvars)[i].
 								valuesize);
 			}
 
@@ -2528,7 +2524,7 @@ void sqlrcursor::sendOutputBinds() {
 	}
 
 	// write the output bind variables to the server.
-	pvt->_sqlrc->cs()->write(count);
+	pvt->_cs->write(count);
 	uint16_t	size;
 	i=0;
 	while (i<count) {
@@ -2540,11 +2536,9 @@ void sqlrcursor::sendOutputBinds() {
 
 		// send the variable, type and size that the buffer needs to be
 		size=charstring::length((*pvt->_outbindvars)[i].variable);
-		pvt->_sqlrc->cs()->write(size);
-		pvt->_sqlrc->cs()->write(
-				(*pvt->_outbindvars)[i].variable,(size_t)size);
-		pvt->_sqlrc->cs()->write((uint16_t)
-				(*pvt->_outbindvars)[i].type);
+		pvt->_cs->write(size);
+		pvt->_cs->write((*pvt->_outbindvars)[i].variable,(size_t)size);
+		pvt->_cs->write((uint16_t)(*pvt->_outbindvars)[i].type);
 		if ((*pvt->_outbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_STRING ||
 			(*pvt->_outbindvars)[i].type==
@@ -2553,8 +2547,7 @@ void sqlrcursor::sendOutputBinds() {
 					SQLRCLIENTBINDVARTYPE_CLOB ||
 			(*pvt->_outbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_NULL) {
-			pvt->_sqlrc->cs()->write(
-				(*pvt->_outbindvars)[i].valuesize);
+			pvt->_cs->write((*pvt->_outbindvars)[i].valuesize);
 		}
 
 		if (pvt->_sqlrc->debug()) {
@@ -2618,14 +2611,14 @@ void sqlrcursor::sendGetColumnInfo() {
 			pvt->_sqlrc->debugPrint("Send Column Info: yes\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
-		pvt->_sqlrc->cs()->write((uint16_t)SEND_COLUMN_INFO);
+		pvt->_cs->write((uint16_t)SEND_COLUMN_INFO);
 	} else {
 		if (pvt->_sqlrc->debug()) {
 			pvt->_sqlrc->debugPreStart();
 			pvt->_sqlrc->debugPrint("Send Column Info: no\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
-		pvt->_sqlrc->cs()->write((uint16_t)DONT_SEND_COLUMN_INFO);
+		pvt->_cs->write((uint16_t)DONT_SEND_COLUMN_INFO);
 	}
 }
 
@@ -2746,7 +2739,7 @@ void sqlrcursor::fetchRows() {
 	}
 
 	// otherwise, send to the connection the number of rows to send back
-	pvt->_sqlrc->cs()->write(pvt->_rsbuffersize);
+	pvt->_cs->write(pvt->_rsbuffersize);
 }
 
 bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
@@ -2793,7 +2786,7 @@ bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
 
 	// if we're reading from a connection, send the connection the 
 	// number of rows to skip
-	pvt->_sqlrc->cs()->write(skip);
+	pvt->_cs->write(skip);
 	return true;
 }
 
@@ -2845,7 +2838,7 @@ bool sqlrcursor::getCursorId() {
 		pvt->_sqlrc->debugPrint("Getting Cursor ID...\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	if (pvt->_sqlrc->cs()->read(&pvt->_cursorid)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&pvt->_cursorid)!=sizeof(uint16_t)) {
 		if (!pvt->_error) {
 			char	*err=error::getErrorString();
 			stringbuffer	errstr;
@@ -2872,7 +2865,7 @@ bool sqlrcursor::getSuspended() {
 
 	// see if the result set of that cursor is actually suspended
 	uint16_t	suspendedresultset;
-	if (pvt->_sqlrc->cs()->read(&suspendedresultset)!=sizeof(uint16_t)) {
+	if (pvt->_cs->read(&suspendedresultset)!=sizeof(uint16_t)) {
 		setError("Failed to determine whether "
 			"the session was suspended or not.\n "
 			"A network error may have ocurred.");
@@ -2884,8 +2877,7 @@ bool sqlrcursor::getSuspended() {
 		// If it was suspended the server will send the index of the 
 		// last row from the previous result set.
 		// Initialize firstrowindex and rowcount from this index.
-		if (pvt->_sqlrc->cs()->read(&pvt->_firstrowindex)!=
-							sizeof(uint64_t)) {
+		if (pvt->_cs->read(&pvt->_firstrowindex)!=sizeof(uint64_t)) {
 			setError("Failed to get the index of the "
 				"last row of a previously suspended result "
 				"set.\n A network error may have ocurred.");
@@ -4117,7 +4109,7 @@ void sqlrcursor::getErrorFromServer() {
 
 			// get the error string
 			pvt->_error=new char[length+1];
-			pvt->_sqlrc->cs()->read(pvt->_error,length);
+			pvt->_cs->read(pvt->_error,length);
 			pvt->_error[length]='\0';
 
 			networkerror=false;
@@ -4187,10 +4179,8 @@ bool sqlrcursor::fetchRowIntoBuffer(bool getallrows, uint64_t row,
 			// if we're not fetching from a cached result set,
 			// tell the server to send one 
 			if (!pvt->_cachesource && !pvt->_cachesourceind) {
-				pvt->_sqlrc->cs()->write(
-						(uint16_t)FETCH_RESULT_SET);
-				pvt->_sqlrc->cs()->write(
-						pvt->_cursorid);
+				pvt->_cs->write((uint16_t)FETCH_RESULT_SET);
+				pvt->_cs->write(pvt->_cursorid);
 			}
 
 			if (!skipAndFetch(getallrows,row) || !parseData()) {
@@ -4218,7 +4208,7 @@ int32_t sqlrcursor::getBool(bool *boolean) {
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 		return pvt->_cachesource->read(boolean);
 	} else {
-		return pvt->_sqlrc->cs()->read(boolean);
+		return pvt->_cs->read(boolean);
 	}
 }
 
@@ -4230,7 +4220,7 @@ int32_t sqlrcursor::getShort(uint16_t *integer,
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 		return pvt->_cachesource->read(integer);
 	} else {
-		return pvt->_sqlrc->cs()->read(integer,timeoutsec,timeoutusec);
+		return pvt->_cs->read(integer,timeoutsec,timeoutusec);
 	}
 }
 
@@ -4241,7 +4231,7 @@ int32_t sqlrcursor::getShort(uint16_t *integer) {
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 		return pvt->_cachesource->read(integer);
 	} else {
-		return pvt->_sqlrc->cs()->read(integer);
+		return pvt->_cs->read(integer);
 	}
 }
 
@@ -4252,7 +4242,7 @@ int32_t sqlrcursor::getLong(uint32_t *integer) {
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 		return pvt->_cachesource->read(integer);
 	} else {
-		return pvt->_sqlrc->cs()->read(integer);
+		return pvt->_cs->read(integer);
 	}
 }
 
@@ -4263,7 +4253,7 @@ int32_t sqlrcursor::getLongLong(uint64_t *integer) {
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 		return pvt->_cachesource->read(integer);
 	} else {
-		return pvt->_sqlrc->cs()->read(integer);
+		return pvt->_cs->read(integer);
 	}
 }
 
@@ -4274,7 +4264,7 @@ int32_t sqlrcursor::getString(char *string, int32_t size) {
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 		return pvt->_cachesource->read(string,size);
 	} else {
-		return pvt->_sqlrc->cs()->read(string,size);
+		return pvt->_cs->read(string,size);
 	}
 }
 
@@ -4285,7 +4275,7 @@ int32_t sqlrcursor::getDouble(double *value) {
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 		return pvt->_cachesource->read(value);
 	} else {
-		return pvt->_sqlrc->cs()->read(value);
+		return pvt->_cs->read(value);
 	}
 }
 
@@ -4302,11 +4292,14 @@ bool sqlrcursor::fetchFromBindCursor() {
 	pvt->_cached=false;
 	pvt->_endofresultset=false;
 
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
 	// tell the server we're fetching from a bind cursor
-	pvt->_sqlrc->cs()->write((uint16_t)FETCH_FROM_BIND_CURSOR);
+	pvt->_cs->write((uint16_t)FETCH_FROM_BIND_CURSOR);
 
 	// send the cursor id to the server
-	pvt->_sqlrc->cs()->write((uint16_t)pvt->_cursorid);
+	pvt->_cs->write((uint16_t)pvt->_cursorid);
 
 	sendGetColumnInfo();
 
@@ -4873,8 +4866,11 @@ void sqlrcursor::suspendResultSet() {
 
 	if (pvt->_sqlrc->connected() && !pvt->_cached) {
 
-		pvt->_sqlrc->cs()->write((uint16_t)SUSPEND_RESULT_SET);
-		pvt->_sqlrc->cs()->write(pvt->_cursorid);
+		// refresh socket client
+		pvt->_cs=pvt->_sqlrc->cs();
+
+		pvt->_cs->write((uint16_t)SUSPEND_RESULT_SET);
+		pvt->_cs->write(pvt->_cursorid);
 
 		pvt->_sqlrc->flushWriteBuffer();
 	}
@@ -4914,12 +4910,15 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 		pvt->_sqlrc->debugPreEnd();
 	}
 
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
 	// tell the server we want to resume the result set
-	pvt->_sqlrc->cs()->write((uint16_t)RESUME_RESULT_SET);
+	pvt->_cs->write((uint16_t)RESUME_RESULT_SET);
 
 	// send the id of the cursor we want to 
 	// resume the result set of to the server
-	pvt->_sqlrc->cs()->write(id);
+	pvt->_cs->write(id);
 
 	// process the result set
 	if (!charstring::isNullOrEmpty(filename)) {
@@ -4950,6 +4949,9 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 	// won't have to abort the result set in that case, the server will
 	// do it.
 
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
 	if (pvt->_sqlrc->connected() || pvt->_cached) {
 		if (pvt->_cachedest && pvt->_cachedestind) {
 			if (pvt->_sqlrc->debug()) {
@@ -4966,10 +4968,8 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 				// set tell the server to send one 
 				if (!pvt->_cachesource &&
 						!pvt->_cachesourceind) {
-					pvt->_sqlrc->cs()->write((uint16_t)
-							FETCH_RESULT_SET);
-					pvt->_sqlrc->cs()->write(
-							pvt->_cursorid);
+					pvt->_cs->write((uint16_t)FETCH_RESULT_SET);
+					pvt->_cs->write(pvt->_cursorid);
 				}
 
 				// parseData should call finishCaching when
@@ -4993,11 +4993,9 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 				pvt->_sqlrc->debugPreEnd();
 			}
 
-			pvt->_sqlrc->cs()->write(
-					(uint16_t)ABORT_RESULT_SET);
-			pvt->_sqlrc->cs()->write(
-					(uint16_t)DONT_NEED_NEW_CURSOR);
-			pvt->_sqlrc->cs()->write(pvt->_cursorid);
+			pvt->_cs->write((uint16_t)ABORT_RESULT_SET);
+			pvt->_cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
+			pvt->_cs->write(pvt->_cursorid);
 			pvt->_sqlrc->flushWriteBuffer();
 		}
 	}
@@ -5139,8 +5137,11 @@ const char *sqlrcursor::getQueryTree() {
 	pvt->_cached=false;
 	pvt->_endofresultset=false;
 
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
 	// tell the server we want to get a query tree
-	pvt->_sqlrc->cs()->write((uint16_t)GET_QUERY_TREE);
+	pvt->_cs->write((uint16_t)GET_QUERY_TREE);
 
 	// tell the server whether we'll need a cursor or not
 	sendCursorStatus();
@@ -5162,13 +5163,13 @@ const char *sqlrcursor::getQueryTree() {
 
 	// get the size of the tree
 	uint64_t	len;
-	if (pvt->_sqlrc->cs()->read(&len)!=sizeof(uint64_t)) {
+	if (pvt->_cs->read(&len)!=sizeof(uint64_t)) {
 		return NULL;
 	}
 
 	// get the tree itself
 	pvt->_querytree=new char[len+1];
-	if ((uint64_t)pvt->_sqlrc->cs()->read(pvt->_querytree,len)!=len) {
+	if ((uint64_t)pvt->_cs->read(pvt->_querytree,len)!=len) {
 		delete[] pvt->_querytree;
 		pvt->_querytree=NULL;
 		return NULL;
@@ -5200,8 +5201,11 @@ const char *sqlrcursor::getTranslatedQuery() {
 	pvt->_cached=false;
 	pvt->_endofresultset=false;
 
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
 	// tell the server we want to get a translated query
-	pvt->_sqlrc->cs()->write((uint16_t)GET_TRANSLATED_QUERY);
+	pvt->_cs->write((uint16_t)GET_TRANSLATED_QUERY);
 
 	// tell the server whether we'll need a cursor or not
 	sendCursorStatus();
@@ -5223,13 +5227,13 @@ const char *sqlrcursor::getTranslatedQuery() {
 
 	// get the size of the query
 	uint64_t	len;
-	if (pvt->_sqlrc->cs()->read(&len)!=sizeof(uint64_t)) {
+	if (pvt->_cs->read(&len)!=sizeof(uint64_t)) {
 		return NULL;
 	}
 
 	// get the query itself
 	pvt->_translatedquery=new char[len+1];
-	if ((uint64_t)pvt->_sqlrc->cs()->read(pvt->_translatedquery,len)!=len) {
+	if ((uint64_t)pvt->_cs->read(pvt->_translatedquery,len)!=len) {
 		delete[] pvt->_translatedquery;
 		pvt->_translatedquery=NULL;
 		return NULL;
