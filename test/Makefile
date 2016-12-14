@@ -3,6 +3,7 @@ include ../config.mk
 all:
 	cd c $(AND) $(MAKE) all
 	cd c++ $(AND) $(MAKE) all
+	cd cs $(AND) $(MAKE) all
 	cd java $(AND) $(MAKE) all
 	cd stress $(AND) $(MAKE) all
 	cd tcl $(AND) $(MAKE) all
