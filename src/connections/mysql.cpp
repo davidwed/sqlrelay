@@ -699,11 +699,13 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=NULL;
 	stmtfreeresult=false;
 
+	bindcount=0;
+	boundvariables=false;
+
 	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	bind=new MYSQL_BIND[maxbindcount];
 	bindvaluesize=new unsigned long[maxbindcount];
 	bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
-	bindcount=0;
 
 	usestmtprepare=true;
 	bindformaterror=false;
@@ -1639,10 +1641,7 @@ void mysqlcursor::closeLobField(uint32_t col) {
 void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		boundvariables=0;
-stdoutput.printf("bindcount=%d\n",bindcount);
-stdoutput.printf("zero size=%d\n",bindcount*sizeof(MYSQL_BIND));
-stdoutput.printf("actual size=%d\n",sizeof(bind));
+		boundvariables=false;
 		bytestring::zero(bind,bindcount*sizeof(MYSQL_BIND));
 		mysql_stmt_reset(stmt);
 		if (stmtfreeresult) {
