@@ -356,8 +356,8 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 	// set up the socket
 	clientsock->translateByteOrder();
 	clientsock->dontUseNaglesAlgorithm();
-	//clientsock->setTcpReadBufferSize(65536);
-	//clientsock->setTcpWriteBufferSize(65536);
+	clientsock->setSocketReadBufferSize(65536);
+	clientsock->setSocketWriteBufferSize(65536);
 	clientsock->setReadBufferSize(65536);
 	clientsock->setWriteBufferSize(65536);
 
