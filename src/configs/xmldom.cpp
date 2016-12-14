@@ -313,7 +313,7 @@ void sqlrconfig_xmldom::init() {
 	runasuser=DEFAULT_RUNASUSER;
 	runasgroup=DEFAULT_RUNASGROUP;
 	cursors=charstring::toInteger(DEFAULT_CURSORS);
-	maxcursors=charstring::toInteger(DEFAULT_CURSORS);
+	maxcursors=charstring::toInteger(DEFAULT_MAXCURSORS);
 	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=DEFAULT_AUTHTIER;
 	authonconnection=true;

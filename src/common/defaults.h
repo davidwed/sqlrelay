@@ -52,6 +52,9 @@
 // default number of cursors to open
 #define DEFAULT_CURSORS "1"
 
+// default maximum number of cursors to open
+#define DEFAULT_MAXCURSORS "5"
+
 // when we need more cursors, allocate this many more in one shot
 #define DEFAULT_CURSORS_GROWBY "1"
 

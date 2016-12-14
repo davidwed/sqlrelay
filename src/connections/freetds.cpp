@@ -1135,8 +1135,9 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 	paramindex=0;
 	outbindindex=0;
 
-	if (!charstring::compareIgnoringCase(query,"select",6) &&
-					character::isWhitespace(query[6])) {
+	if ((!charstring::compare(query,"select",6) ||
+		!charstring::compare(query,"SELECT",6)) &&
+		character::isWhitespace(query[6])) {
 
 		// initiate a cursor command
 		cmd=cursorcmd;
@@ -1153,27 +1154,33 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 		}
 		#endif
 
-	} else if (
-		(!charstring::compareIgnoringCase(query,"exec",4) &&
-					character::isWhitespace(query[4])) ||
-		(!charstring::compareIgnoringCase(query,"execute",7) &&
-					character::isWhitespace(query[7]))) {
-
-		// find the beginning of the rpc
-		const char	*rpc=query+5;
-		uint32_t	rpclength=length-5;
-		if (!character::isWhitespace(*(rpc-1))) {
-			rpc=query+8;
-			rpclength=length-8;
-		}
+	} else if ((!charstring::compare(query,"exec",4) ||
+			!charstring::compare(query,"EXEC",4)) &&
+					character::isWhitespace(query[4])) {
 
 		// initiate an rpc command
 		cmd=languagecmd;
 		#ifdef FREETDS_SUPPORTS_CURSORS
 		if (ct_command(languagecmd,
 				CS_RPC_CMD,
-				(CS_CHAR *)rpc,
-				rpclength,
+				(CS_CHAR *)query+5,
+				length-5,
+				CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
+		#endif
+
+	} else if ((!charstring::compare(query,"execute",7) ||
+			!charstring::compare(query,"EXECUTE",7)) &&
+					character::isWhitespace(query[7])) {
+
+		// initiate an rpc command
+		cmd=languagecmd;
+		#ifdef FREETDS_SUPPORTS_CURSORS
+		if (ct_command(languagecmd,
+				CS_RPC_CMD,
+				(CS_CHAR *)query+8,
+				length-8,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}

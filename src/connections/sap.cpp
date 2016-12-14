@@ -880,8 +880,9 @@ bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 	paramindex=0;
 	outbindindex=0;
 
-	if (!charstring::compareIgnoringCase(query,"select",6) &&
-					character::isWhitespace(query[6])) {
+	if ((!charstring::compare(query,"select",6) ||
+		!charstring::compare(query,"SELECT",6)) &&
+		character::isWhitespace(query[6])) {
 
 		// initiate a cursor command
 		// (don't use CS_NULLTERM for the 4th parameter, it randomly
@@ -897,26 +898,30 @@ bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 			return false;
 		}
 
-	} else if (
-		(!charstring::compareIgnoringCase(query,"exec",4) &&
-					character::isWhitespace(query[4])) ||
-		(!charstring::compareIgnoringCase(query,"execute",7) &&
-					character::isWhitespace(query[7]))) {
-
-		// find the beginning of the rpc
-		const char	*rpc=query+5;
-		uint32_t	rpclength=length-5;
-		if (!character::isWhitespace(*(rpc-1))) {
-			rpc=query+8;
-			rpclength=length-8;
-		}
+	} else if ((!charstring::compare(query,"exec",4) ||
+			!charstring::compare(query,"EXEC",4)) &&
+					character::isWhitespace(query[4])) {
 
 		// initiate an rpc command
 		cmd=languagecmd;
 		if (ct_command(languagecmd,
 				CS_RPC_CMD,
-				(CS_CHAR *)rpc,
-				rpclength,
+				(CS_CHAR *)query+5,
+				length-5,
+				CS_UNUSED)!=CS_SUCCEED) {
+			return false;
+		}
+
+	} else if ((!charstring::compare(query,"execute",7) ||
+			!charstring::compare(query,"EXECUTE",7)) &&
+					character::isWhitespace(query[7])) {
+
+		// initiate an rpc command
+		cmd=languagecmd;
+		if (ct_command(languagecmd,
+				CS_RPC_CMD,
+				(CS_CHAR *)query+8,
+				length-8,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
@@ -957,6 +962,7 @@ void sapcursor::checkRePrepare() {
 	// Sybase doesn't allow you to rebind and re-execute when using 
 	// ct_command.  You have to re-prepare too.  I'll make this transparent
 	// to the user.
+	// FIXME: skip if cmd==cursorcmd?
 	if (!prepared) {
 		prepareQuery(query,length);
 	}

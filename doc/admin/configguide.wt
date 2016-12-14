@@ -167,7 +167,9 @@ SQL Relay maintains persistent cursors as well as connections.  By default, each
 
 Any number of cursors can be opened.  A good rule of thumb is to open as few as possible, but as many as you know that your application will need.
 
-NOTE: The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open a second cursor on-demand.  This is because it is not uncommon for an app to do a single level of nest queries.  For example, to run a select and then run an insert, update, or delete for each row in the result set.
+NOTE: The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open additional cursors on-demand, up to 5.
+
+This is because it is common for an app to run at least one level of nested queries.  For example, it is common to run a select and then run an insert, update, or delete for each row in the result set.  Unfortunately, it is also common for apps to just manage cursors poorly.  So, by default, SQL Relay offers a bit of flexibility to accommodate these circumstances.
 
 See the next section on Dynamic Scaling for more information about configuring connections and cursors to scale up and down on-demand.
 
