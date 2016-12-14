@@ -428,6 +428,9 @@ bool sqlitecursor::supportsNativeBinds(const char *query, uint32_t length) {
 #ifdef HAVE_SQLITE3_STMT
 bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 
+	// reinit justexecuted flag
+	justexecuted=false;
+
 	// initialize column count
 	ncolumn=0;
 
@@ -592,7 +595,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 	// cache off the columns so they can be returned later if the result
 	// set is suspended/resumed
 	#ifdef HAVE_SQLITE3_STMT
-	columnnames=new char * [ncolumn];
+	columnnames=new char *[ncolumn];
 	columntypes=new int[ncolumn];
 	if (lastinsertrowid) {
 		columnnames[0]=charstring::duplicate("LASTINSERTROWID");
@@ -605,7 +608,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 		}
 	}
 	#else
-	columnnames=new char * [ncolumn];
+	columnnames=new char *[ncolumn];
 	for (int i=0; i<ncolumn; i++) {
 		columnnames[i]=charstring::duplicate(result[i]);
 	}
@@ -648,6 +651,7 @@ int sqlitecursor::runQuery(const char *query) {
 	// handle special case of selecting the last row id
 	if (selectlastinsertrowid.match(query)) {
 		lastinsertrowid=true;
+		justexecuted=true;
 		selectLastInsertRowId();
 		return SQLITE_OK;
 	}
@@ -710,7 +714,7 @@ void sqlitecursor::selectLastInsertRowId() {
 					(int64_t)sqlite3_last_insert_rowid(
 							sqliteconn->sqliteptr));
 	#else
-	result=new char * [2];
+	result=new char *[2];
 	result[0]=charstring::duplicate("LASTINSERTROWID");
 	result[1]=charstring::parseNumber((int64_t)sqlite3_last_insert_rowid(
 							sqliteconn->sqliteptr));

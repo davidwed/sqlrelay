@@ -3,8 +3,7 @@
 sqlr-stop
 sleep 2
 
-#for DB in firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions router db2
-for DB in router
+for DB in firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions router db2
 do
 
 	if ( test "$DB" = "tls" -o "$DB" = "krb" -o "$DB" = "extensions" )
