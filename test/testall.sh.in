@@ -1,14 +1,16 @@
 #!/bin/sh
 
-sqlr-stop
+PREFIX=@prefix@
+
+$PREFIX/bin/sqlr-stop
 sleep 2
 
-for DB in firebird freetds informix mysql oracle postgresql sap sqlite tls krb extensions router db2
+for DB in  firebird freetds informix mdbtools mysql oracle tls krb extensions postgresql sqlite sap router db2
 do
 
 	if ( test "$DB" = "tls" -o "$DB" = "krb" -o "$DB" = "extensions" )
 	then
-		if ( test -z "`ls /usr/local/firstworks/lib*/sqlrelay/sqlrconnection_oracle.so 2> /dev/null`" )
+		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_oracle.so 2> /dev/null`" )
 		then
 			echo "skipping $DB..."
 			echo
@@ -17,7 +19,7 @@ do
 			continue
 		fi
 	else
-		if ( test -z "`ls /usr/local/firstworks/lib*/sqlrelay/sqlrconnection_$DB.so 2> /dev/null`" )
+		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_$DB.so 2> /dev/null`" )
 		then
 			echo "skipping $DB..."
 			echo
@@ -31,14 +33,14 @@ do
 
 	if ( test "$DB" = "router" )
 	then
-		sqlr-start -id routermaster
+		$PREFIX/bin/sqlr-start -id routermaster
 		sleep 2
 
-		sqlr-start -id routerslave
+		$PREFIX/bin/sqlr-start -id routerslave
 		sleep 2
 	fi
 
-	sqlr-start -id ${DB}test
+	$PREFIX/bin/sqlr-start -id ${DB}test
 	sleep 2
 
 	PING=""
@@ -48,7 +50,7 @@ do
 		echo "pinging $DB..."
 		if ( test "$DB" = "tls" )
 		then
-			PING=`sqlrsh -host localhost -tls -tlscert /usr/local/firstworks/etc/client.pem -tlsca /usr/local/firstworks/etc/ca.pem -tlsvalidate ca -command ping`
+			PING=`sqlrsh -host localhost -tls -tlscert $PREFIX/etc/client.pem -tlsca $PREFIX/etc/ca.pem -tlsvalidate ca -command ping`
 		elif ( test "$DB" = "extensions" )
 		then
 			PING=`sqlrsh -host localhost -user test -password test -command ping`
@@ -97,13 +99,13 @@ do
 	if ( test "$DB" = "router" )
 	then
 		sleep 2
-		sqlr-stop -id routermaster
+		$PREFIX/bin/sqlr-stop -id routermaster
 		sleep 2
-		sqlr-stop -id routerslave
+		$PREFIX/bin/sqlr-stop -id routerslave
 	fi
 
 	sleep 2
-	sqlr-stop -id ${DB}test
+	$PREFIX/bin/sqlr-stop -id ${DB}test
 	sleep 2
 
 	echo
