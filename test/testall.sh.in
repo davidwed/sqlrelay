@@ -29,7 +29,7 @@ do
 		fi
 	fi
 
-	echo "testing $DB..."
+	echo "testing $DB (from `hostname`)..."
 
 	if ( test "$DB" = "router" )
 	then
