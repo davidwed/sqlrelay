@@ -80,7 +80,7 @@ do
 			echo "$1 failed in $DIR"
 			echo
 			echo "hit enter to continue or ctrl-c to stop..."
-			read
+			read PROMPT
 		else
 			echo
 			echo "test complete"
