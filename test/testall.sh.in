@@ -33,14 +33,14 @@ do
 
 	if ( test "$DB" = "router" )
 	then
-		$PREFIX/bin/sqlr-start -id routermaster
+		$PREFIX/bin/sqlr-start -id routermaster -backtrace `pwd`
 		sleep 2
 
-		$PREFIX/bin/sqlr-start -id routerslave
+		$PREFIX/bin/sqlr-start -id routerslave -backtrace `pwd`
 		sleep 2
 	fi
 
-	$PREFIX/bin/sqlr-start -id ${DB}test
+	$PREFIX/bin/sqlr-start -id ${DB}test -backtrace `pwd`
 	sleep 2
 
 	PING=""

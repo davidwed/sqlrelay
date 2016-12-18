@@ -37,6 +37,7 @@
 	made column-lookup by name case sensitive to improve performance
 	fixed nagle-disable and sizing of socket read/write buffers
 	changed default maxcursors to 5
+	fixed an uninitialized variable in the firebird connection
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile

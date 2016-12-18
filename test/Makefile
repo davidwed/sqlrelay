@@ -25,6 +25,7 @@ clean:
 	cd ruby $(AND) $(MAKE) clean
 	cd stress $(AND) $(MAKE) clean
 	cd tcl $(AND) $(MAKE) clean
+	$(RM) sqlr-connection.*.bt
 
 tests: all testall$(SCRIPTEXT)
 	$(THISDIR)testall$(SCRIPTEXT)
