@@ -791,6 +791,11 @@ endif
 
 
 # tests
+TESTALLSUBDIRS = all-c all-cpp all-java all-stress all-tcl
+ifneq ($(HAVE_MONO),)
+	TESTALLSUBDIRS += all-cs
+endif
+
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = -L$(libdir) -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBEFENCE)
 

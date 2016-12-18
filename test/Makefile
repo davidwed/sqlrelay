@@ -2,12 +2,24 @@ top_builddir = ..
 
 include ../config.mk
 
-all:
+all: $(TESTALLSUBDIRS) 
+
+all-c:
 	cd c $(AND) $(MAKE) all
+
+all-cpp:
 	cd c++ $(AND) $(MAKE) all
+
+all-cs:
 	cd cs $(AND) $(MAKE) all
+
+all-java:
 	cd java $(AND) $(MAKE) all
+
+all-stress:
 	cd stress $(AND) $(MAKE) all
+
+all-tcl:
 	cd tcl $(AND) $(MAKE) all
 
 clean:
