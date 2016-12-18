@@ -141,7 +141,7 @@ namespace SQLRClientTest
         {
 
             // open connection and command
-            SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrelay:9000;Retry Time=0;Tries=1;Krb=yes;Debug=false");
+            SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrelay:9000:/tmp/test.socket;Retry Time=0;Tries=1;Krb=yes;Debug=false");
             sqlrcon.Open();
 
 
@@ -572,7 +572,7 @@ namespace SQLRClientTest
 
             // commit and rollback
             Console.WriteLine("COMMIT AND ROLLBACK:");
-            SQLRelayConnection sqlrcon2 = new SQLRelayConnection("Data Source=sqlrelay:9000;Retry Time=0;Tries=1;Krb=yes;Debug=false");
+            SQLRelayConnection sqlrcon2 = new SQLRelayConnection("Data Source=sqlrelay:9000:/tmp/test.socket;Retry Time=0;Tries=1;Krb=yes;Debug=false");
             sqlrcon2.Open();
             SQLRelayCommand sqlrcom2 = new SQLRelayCommand("select count(*) from testtable", sqlrcon2);
             checkSuccess(Convert.ToInt64(sqlrcom2.ExecuteScalar()), 0);
