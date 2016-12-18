@@ -2,12 +2,15 @@
 
 PREFIX=@prefix@
 
+# stop any existing instances
 $PREFIX/bin/sqlr-stop
 sleep 2
 
+# for each database/configuration...
 for DB in  firebird freetds informix mdbtools mysql oracle tls krb extensions postgresql sqlite sap router db2
 do
 
+	# for tls, krb, and extensions tests, verify that we support oracle
 	if ( test "$DB" = "tls" -o "$DB" = "krb" -o "$DB" = "extensions" )
 	then
 		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_oracle.so 2> /dev/null`" )
@@ -18,6 +21,8 @@ do
 			echo
 			continue
 		fi
+
+	# for other tests, verify that we support the database
 	else
 		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_$DB.so 2> /dev/null`" )
 		then
@@ -29,8 +34,23 @@ do
 		fi
 	fi
 
+	# for router tests, also verify that we support mysql
+	if ( test "$DB" = "router" )
+	then
+		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_mysql.so 2> /dev/null`" )
+		then
+			echo "skipping $DB..."
+			echo
+			echo "================================================================================"
+			echo
+			continue
+		fi
+	fi
+
+	# testing...
 	echo "testing $DB (from `hostname`)..."
 
+	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
 	then
 		$PREFIX/bin/sqlr-start -id routermaster -backtrace `pwd`
@@ -40,9 +60,11 @@ do
 		sleep 2
 	fi
 
+	# start the instance
 	$PREFIX/bin/sqlr-start -id ${DB}test -backtrace `pwd`
 	sleep 2
 
+	# make sure that the instance is up
 	PING=""
 	for attempts in 1 2 3 4 5 6 7 8 9 10
 	do
@@ -71,8 +93,11 @@ do
 		fi
 	done
 
+	# run the tests
 	if ( test "$PING" = "The database is up." )
 	then
+
+		# kinit for krb tests
 		if ( test "$DB" = "krb" )
 		then
 			kdestroy
@@ -96,6 +121,7 @@ do
 		fi
 	fi
 
+	# shut down the instance(s)
 	if ( test "$DB" = "router" )
 	then
 		sleep 2
@@ -103,7 +129,6 @@ do
 		sleep 2
 		$PREFIX/bin/sqlr-stop -id routerslave
 	fi
-
 	sleep 2
 	$PREFIX/bin/sqlr-stop -id ${DB}test
 	sleep 2

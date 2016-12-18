@@ -24,48 +24,92 @@ do
 			TESTFILE="$1"
 			;;
 		cs)
-			TEST="mono $1.exe"
-			TESTFILE="$1.exe"
+			mono --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="mono $1.exe"
+				TESTFILE="$1.exe"
+			fi
 			;;
 		java)
-			TEST="./run $1"
-			TESTFILE="$1.class"
+			java -h > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="./run $1"
+				TESTFILE="$1.class"
+			fi
 			;;
 		nodejs)
-			TEST="node $1.js"
-			TESTFILE="$1.js"
+			node --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="node $1.js"
+				TESTFILE="$1.js"
+			fi
 			;;
 		perl)
-			TEST="perl $1.pl"
-			TESTFILE="$1.pl"
+			perl --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="perl $1.pl"
+				TESTFILE="$1.pl"
+			fi
 			;;
 		perldbi)
-			TEST="perl $1.pl"
-			TESTFILE="$1.pl"
+			perl --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="perl $1.pl"
+				TESTFILE="$1.pl"
+			fi
 			;;
 		php)
-			TEST="php $1.php"
-			TESTFILE="$1.php"
+			php --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="php $1.php"
+				TESTFILE="$1.php"
+			fi
  			;;
 		phppdo)
-			TEST="php $1.php"
-			TESTFILE="$1.php"
+			php --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="php $1.php"
+				TESTFILE="$1.php"
+			fi
 			;;
 		python)
-			TEST="python $1.py"
-			TESTFILE="$1.py"
+			python --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="python $1.py"
+				TESTFILE="$1.py"
+			fi
 			;;
 		pythondb)
-			TEST="python $1.py"
-			TESTFILE="$1.py"
+			python --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="python $1.py"
+				TESTFILE="$1.py"
+			fi
 			;;
 		ruby)
-			TEST="ruby $1.rb"
-			TESTFILE="$1.rb"
+			ruby --version > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="ruby $1.rb"
+				TESTFILE="$1.rb"
+			fi
 			;;
 		tcl)
-			TEST="tclsh $1.tcl"
-			TESTFILE="$1.tcl"
+			echo 'puts $tcl_version;exit 0'|tclsh > /dev/null 2>&1
+			if ( test "$?" = "0" )
+			then
+				TEST="tclsh $1.tcl"
+				TESTFILE="$1.tcl"
+			fi
 			;;
 	esac
 
