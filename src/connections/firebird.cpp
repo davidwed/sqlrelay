@@ -708,6 +708,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 
 	firebirdconn=(firebirdconnection *)conn;
 
+	outsqlda=NULL;
 	allocateResultSetBuffers(firebirdconn->maxselectlistsize,
 					firebirdconn->maxitembuffersize);
 
@@ -734,7 +735,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	outdatebind=new datebind[maxbindcount];
 
 	querytype=0;
-	stmt=NULL;
+	stmt=0;
 
 	queryisexecsp=false;
 	bindformaterror=false;
@@ -812,7 +813,7 @@ bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	// allocate a cursor handle
-	stmt=NULL;
+	stmt=0;
 	if (isc_dsql_allocate_statement(firebirdconn->error,
 					&firebirdconn->db,&stmt)) {
 		return false;
@@ -1242,7 +1243,7 @@ bool firebirdcursor::outputBindClob(const char *variable,
 bool firebirdcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
 
 	// open the blob
-	outbindblobhandle[index]=NULL;
+	outbindblobhandle[index]=0;
 	if (isc_open_blob2(firebirdconn->error,
 				&firebirdconn->db,
 				&firebirdconn->tr,
@@ -1304,7 +1305,7 @@ bool firebirdcursor::getLobOutputBindSegment(uint16_t index,
 
 	// open the blob, if necessary
 	if (!outbindblobisopen[index]) {
-		outbindblobhandle[index]=NULL;
+		outbindblobhandle[index]=0;
 		if (isc_open_blob2(firebirdconn->error,
 					&firebirdconn->db,
 					&firebirdconn->tr,
@@ -1964,7 +1965,7 @@ bool firebirdcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 	}
 
 	// open the blob
-	field[col].blobhandle=NULL;
+	field[col].blobhandle=0;
 	if (isc_open_blob2(firebirdconn->error,
 				&firebirdconn->db,
 				&firebirdconn->tr,
@@ -2031,7 +2032,7 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 
 	// open the blob, if necessary
 	if (!field[col].blobisopen) {
-		field[col].blobhandle=NULL;
+		field[col].blobhandle=0;
 		if (isc_open_blob2(firebirdconn->error,
 					&firebirdconn->db,
 					&firebirdconn->tr,
