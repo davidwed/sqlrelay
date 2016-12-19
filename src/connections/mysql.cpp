@@ -1392,11 +1392,20 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_TINY_BLOB:
 			return TINY_BLOB_DATATYPE;
 		case FIELD_TYPE_BLOB:
-			if (mysqlfields[col]->length<256) {
+			/*if (mysqlfields[col]->length<256) {
 				return TINY_BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<65536) {
 				return BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<16777216) {
+				return MEDIUM_BLOB_DATATYPE;
+			} else {
+				return LONG_BLOB_DATATYPE;
+			}*/
+			if (mysqlfields[col]->length<766) {
+				return TINY_BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<196606) {
+				return BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<50441646) {
 				return MEDIUM_BLOB_DATATYPE;
 			} else {
 				return LONG_BLOB_DATATYPE;
