@@ -165,6 +165,18 @@ const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 	return NULL;
 }
 
+bool sqlrrouters::routeEntireSession() {
+	debugFunction();
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		if (!node->getValue()->r->routeEntireSession()) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void sqlrrouters::endSession() {
 	// nothing for now, maybe in the future
 }

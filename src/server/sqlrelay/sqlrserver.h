@@ -1352,6 +1352,8 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 		virtual const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
 
+		virtual	bool	routeEntireSession();
+
 	protected:
 		sqlrrouters	*getRouters();
 		xmldomnode	*getParameters();
@@ -1367,6 +1369,7 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 		bool		load(xmldomnode *parameters);
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
+		bool	routeEntireSession();
 
 		void	endSession();
 

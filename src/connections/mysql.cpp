@@ -1379,19 +1379,15 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_SET:
 			return SET_DATATYPE;
 #endif
-	// For some versions of mysql, tinyblobs, mediumblobs and
-	// longblobs all show up as FIELD_TYPE_BLOB despite field types
-	// being defined for those types.  tinyblobs have a length
-	// of 255 though, so that can be used for something.  medium
-	// and long blobs both have the same length though.  Go
-	// figure.  Also, the word TEXT and BLOB appear to be
-	// interchangable.  We'll use BLOB because it appears to be
-	// more standard than TEXT.  I wonder if this will be
-	// changed in a future incarnation of mysql.  I also wonder
-	// what happens on a 64 bit machine.
+	// For some versions of mysql, tinyblobs, mediumblobs and longblobs all
+	// show up as FIELD_TYPE_BLOB despite field types being defined for
+	// those types.  The different types have predictable lengths though,
+	// so we'll use those to differentiate them. 
 		case FIELD_TYPE_TINY_BLOB:
 			return TINY_BLOB_DATATYPE;
 		case FIELD_TYPE_BLOB:
+			// I originally thought that these were the
+			// lengths...
 			/*if (mysqlfields[col]->length<256) {
 				return TINY_BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<65536) {
@@ -1401,6 +1397,8 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 			} else {
 				return LONG_BLOB_DATATYPE;
 			}*/
+			// But it appears that some platforms have larger
+			// lengths.  These appear to work most reliably...
 			if (mysqlfields[col]->length<766) {
 				return TINY_BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<196606) {

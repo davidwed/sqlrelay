@@ -27,6 +27,10 @@ const char *sqlrrouter::route(sqlrserverconnection *sqlrcon,
 	return NULL;
 }
 
+bool sqlrrouter::routeEntireSession() {
+	return false;
+}
+
 sqlrrouters *sqlrrouter::getRouters() {
 	return pvt->_rs;
 }

@@ -13,6 +13,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
+		bool		routeEntireSession();
 	private:
 		bool	match(const char *ip, const char *pattern);
 
@@ -185,6 +186,10 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 	if (debug) {
 		stdoutput.printf("match found\n");
 	}
+	return true;
+}
+
+bool sqlrrouter_clientiplist::routeEntireSession() {
 	return true;
 }
 

@@ -13,6 +13,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
+		bool		routeEntireSession();
 	private:
 		const char	*connectionid;
 
@@ -77,6 +78,10 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 		}
 	}
 	return NULL;
+}
+
+bool sqlrrouter_userlist::routeEntireSession() {
+	return true;
 }
 
 extern "C" {
