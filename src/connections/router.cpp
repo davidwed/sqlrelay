@@ -6,7 +6,7 @@
 #include <rudiments/character.h>
 #include <rudiments/regularexpression.h>
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
 #include <datatypes.h>
