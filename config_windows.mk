@@ -405,10 +405,7 @@ CONNECTIONSINSTALLTARGETS = @INSTALLDB2@ @INSTALLFIREBIRD@ @INSTALLMYSQL@ @INSTA
 
 
 # tests
-TESTALLSUBDIRS = all-c all-cpp all-java all-stress all-tcl
-ifneq ($(HAVE_MONO),)
-	TESTALLSUBDIRS += all-cs
-endif
+TESTALLSUBDIRS = all-c all-cpp all-cs all-java all-stress all-tcl
 
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib $(RUDIMENTSLIBS)
