@@ -38,6 +38,8 @@
 	fixed nagle-disable and sizing of socket read/write buffers
 	changed default maxcursors to 5
 	fixed an uninitialized variable in the firebird connection
+	python api's are installed in dist-packages subdirectory on systems
+		that have that instead of site-packages
 
 0.67.0 - general documenation clean-up
 	added missing all: target to man/Makefile
