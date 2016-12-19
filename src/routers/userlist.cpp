@@ -63,6 +63,13 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 
 	// get the user
 	const char	*user=sqlrcon->cont->getCurrentUser();
+	if (charstring::isNullOrEmpty(user)) {
+		if (debug) {
+				stdoutput.printf("\nrouting user "
+						"(null/empty) to -1\n");
+		}
+		return "-1";
+	}
 
 	// run through the user array...
 	for (uint64_t i=0; i<usercount; i++) {

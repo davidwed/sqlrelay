@@ -65,6 +65,13 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 
 	// get the clientip
 	const char	*clientip=sqlrcon->cont->getClientAddr();
+	if (charstring::isNullOrEmpty(clientip)) {
+		if (debug) {
+			stdoutput.printf("routing client ip "
+					"(null/empty) to -1\n");
+		}
+		return "-1";
+	}
 
 	// run through the clientip array...
 	for (uint64_t i=0; i<clientipcount; i++) {
@@ -73,7 +80,7 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 		if (match(clientip,clientips[i])) {
 			if (debug) {
 				stdoutput.printf("routing client ip "
-							"%s to %s\n",
+							"\"%s\" to %s\n",
 							clientip,connectionid);
 			}
 			return connectionid;

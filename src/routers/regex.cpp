@@ -66,7 +66,7 @@ sqlrrouter_regex::~sqlrrouter_regex() {
 
 const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur) {
-	if (!enabled) {
+	if (!enabled || !sqlrcon || !sqlrcur) {
 		return NULL;
 	}
 
