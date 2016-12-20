@@ -1,21 +1,20 @@
 = Persistent Database Connection Pooling =
 
-Solves - "I've analyzed my app's performance and it seems to be spending a lot of time just logging into the database."
+Solves - "I've analyzed my app's performance and it seems to be spending a lot of time just logging in to the database."
 
-A persistent database connection pooling system maintains a pool of already-logged-in database connections and hands them off to applications, reducing the time it takes the app to connect to the database.
+Logging in to most databases takes a noticable amount of time...
 
-Logging into some databases can take a noticable amount of time...
+[[Image(../images/app-to-db.png,nolink)]]
 
-[[Image(../images/app-to-db.png",nolink)]]
+So much time, in fact, that transient apps (such as web-based applications) which start up, connect, query, disconnect, and shut down to deliver each bit of content, often take longer to log in than to run the queries.  As a result, overall throughput (queries-per-second) is generally low unless many queries are run per connection.
 
-In fact, it may take longer for an application to log in than to run all of the queries it needs to run.  This can be especially problematic for transient apps such as web-based applications which start up, connect, query, and shut down, over and over.
-
-Logging into a connection pooling takes a very short amount of time and since the connection pooling system has been maintaining already-logged-in database connections, the database is immediately available.
+A persistent database connection pool maintains a pool of already-logged-in database connections, and logging in to a connection pool is substantially faster than logging into the database directly.
 
 [[Image(../images/app-to-sqlr-to-db.png,nolink)]]
 
-A connection pooling system can significantly reduce the amount of time it takes an app to begin running queries.
+As a result, overall throughput (queries-per-second) is maximized, and doesn't depend nearly as much on the number of queries that are run per connection.
 
-This is especially true when an application uses a cloud service database located across the internet, and even more significant when that database requires TLS/SSL authentication.
+[[Image(../images/mysql-bench.png,width=320,height=240)]]
+[[Image(../images/oracle-bench.png,width=320,height=240)]]
 
 Many connection pooling systems are built into application servers or run within a web-server but can only be used by applications running within that server and usually only by applications written in a particular language.  SQL Relay runs stand-alone and may be used by any application, including applications running on other machines across the network.  This is especially useful if you have a variety of apps, written in different languages, running on various platforms that all need to talk to the same database.
