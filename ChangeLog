@@ -1,3 +1,5 @@
+1.0.1 - ...
+
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password
 		expired while sqlrelay was running, and the sqlr-scaler
