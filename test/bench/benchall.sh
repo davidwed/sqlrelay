@@ -37,7 +37,7 @@ do
 		echo
 		echo "success..."
 		echo
-		./sqlr-bench -db $DB -graph $DB.png
+		./sqlr-bench -db $DB
 	else
 		echo
 		echo "failed to start ${DB}test"
