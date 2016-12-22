@@ -17,4 +17,6 @@ As a result, overall throughput (queries-per-second) is maximized, and doesn't d
 [[Image(../images/mysql-bench.png,width=320,height=240)]]
 [[Image(../images/oracle-bench.png,width=320,height=240)]]
 
+([http://software.firstworks.com/2016/12/benchmarking-sql-relay-100.html See Here for More Benchmarks])
+
 Many connection pooling systems are built into application servers or run within a web-server but can only be used by applications running within that server and usually only by applications written in a particular language.  SQL Relay runs stand-alone and may be used by any application, including applications running on other machines across the network.  This is especially useful if you have a variety of apps, written in different languages, running on various platforms that all need to talk to the same database.
