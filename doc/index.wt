@@ -45,7 +45,7 @@ Guides and references for SQL Relay administration.
  [admin/configreference.html SQL Relay Configuration Reference][[br]]
  [admin/running.html SQL Relay Command Line Programs][[br]]
  [admin/tuning.html Tuning SQL Relay][[br]]
- [http://software.firstworks.com/2016/12/benchmarking-sql-relay-100.html SQL Relay Benchmarks][[br]]
+ [http://software.firstworks.com/p/current-sql-relay-benchmarks.html Current Benchmarks][[br]]
 }}}
 }}}
 {{{#!td

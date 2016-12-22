@@ -1327,7 +1327,7 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 [[br]][=#se]
 == Security Enhancement ==
 
-SQL Relay offers several security enhancement features.
+In addition to [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication], SQL Relay offers several additional features to enhance security.
 
 [[br]][=#runas]
 === Run-As User and Group ===
