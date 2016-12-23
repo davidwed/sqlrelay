@@ -49,6 +49,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/js
 	$(MKINSTALLDIRS) $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
+	$(MKINSTALLDIRS) $(docdir)/api/erlang/html
 	$(MKINSTALLDIRS) $(docdir)/api/nodejs/html
 	$(MKINSTALLDIRS) $(docdir)/dropin
 	$(MKINSTALLDIRS) $(docdir)/features
@@ -144,6 +145,14 @@ install:
 	$(CHMOD) 644 $(docdir)/api/tcl/*.html
 	$(CP) api/tcl/*.txt $(docdir)/api/tcl
 	$(CHMOD) 644 $(docdir)/api/tcl/*.txt
+	$(CP) api/erlang/html/edoc-info $(docdir)/api/erlang/html
+	$(CHMOD) 644 $(docdir)/api/erlang/html/edoc-info
+	$(CP) api/erlang/html/*.png $(docdir)/api/erlang/html
+	$(CHMOD) 644 $(docdir)/api/erlang/html/*.png
+	$(CP) api/erlang/html/*.html $(docdir)/api/erlang/html
+	$(CHMOD) 644 $(docdir)/api/erlang/html/*.html
+	$(CP) api/erlang/html/*.css $(docdir)/api/erlang/html
+	$(CHMOD) 644 $(docdir)/api/erlang/html/*.css
 	$(CP) api/nodejs/html/*.html $(docdir)/api/nodejs/html
 	$(CHMOD) 644 $(docdir)/api/nodejs/html/*.html
 	$(CP) api/nodejs/html/*.css $(docdir)/api/nodejs/html
