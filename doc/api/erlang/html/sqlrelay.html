@@ -1,0 +1,805 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module sqlrelay</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module sqlrelay</h1>
+<ul class="index"><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#affectedRows-0">affectedRows/0</a></td><td>Returns the number of rows that were updated, inserted or deleted by the query.</td></tr>
+<tr><td valign="top"><a href="#alloc-7">alloc/7</a></td><td>Initiates a connection to "server" on "port" or to the unix "socket" on the local machine and auths with "user" and "password".</td></tr>
+<tr><td valign="top"><a href="#autoCommitOff-0">autoCommitOff/0</a></td><td>Instructs the database to wait for the client to tell it when to commit.</td></tr>
+<tr><td valign="top"><a href="#autoCommitOn-0">autoCommitOn/0</a></td><td>Instructs the database to perform a commit after every successful query.</td></tr>
+<tr><td valign="top"><a href="#beginTransaction-0">beginTransaction/0</a></td><td>Begins a transaction.</td></tr>
+<tr><td valign="top"><a href="#bindFormat-0">bindFormat/0</a></td><td>Returns a string representing the format of the bind variables used in the db.</td></tr>
+<tr><td valign="top"><a href="#cacheOff-0">cacheOff/0</a></td><td>Sets query caching off.</td></tr>
+<tr><td valign="top"><a href="#cacheToFile-1">cacheToFile/1</a></td><td>Sets query caching on.</td></tr>
+<tr><td valign="top"><a href="#clearBinds-0">clearBinds/0</a></td><td>Clears all bind variables.</td></tr>
+<tr><td valign="top"><a href="#closeResultSet-0">closeResultSet/0</a></td><td>Closes the current result set, if one is open.</td></tr>
+<tr><td valign="top"><a href="#colCount-0">colCount/0</a></td><td>Returns the number of columns in the current result set.</td></tr>
+<tr><td valign="top"><a href="#commit-0">commit/0</a></td><td>Commits a transaction.</td></tr>
+<tr><td valign="top"><a href="#connectionErrorMessage-0">connectionErrorMessage/0</a></td><td>If an operation failed and generated an error, the error message is available here.</td></tr>
+<tr><td valign="top"><a href="#connectionErrorNumber-0">connectionErrorNumber/0</a></td><td>If an operation failed and generated an error, the error number is available here.</td></tr>
+<tr><td valign="top"><a href="#connectionFree-0">connectionFree/0</a></td><td>Disconnects and ends the session if it hasn't been ended already.</td></tr>
+<tr><td valign="top"><a href="#countBindVariables-0">countBindVariables/0</a></td><td>Parses the previously prepared query, counts the number of bind variables defined in it and returns that number.</td></tr>
+<tr><td valign="top"><a href="#cursorFree-0">cursorFree/0</a></td><td>Destroys the cursor and cleans up all associated result set data.</td></tr>
+<tr><td valign="top"><a href="#dbHostName-0">dbHostName/0</a></td><td>Returns the host name of the database.</td></tr>
+<tr><td valign="top"><a href="#dbIpAddress-0">dbIpAddress/0</a></td><td>Returns the ip address of the database.</td></tr>
+<tr><td valign="top"><a href="#dbVersion-0">dbVersion/0</a></td><td>Returns the version of the database.</td></tr>
+<tr><td valign="top"><a href="#debugOff-0">debugOff/0</a></td><td>Turns debugging off.</td></tr>
+<tr><td valign="top"><a href="#debugOn-0">debugOn/0</a></td><td>Causes verbose debugging information to be sent to standard output.</td></tr>
+<tr><td valign="top"><a href="#defineOutputBindBlob-1">defineOutputBindBlob/1</a></td><td>Defines a binary lob output bind variable.</td></tr>
+<tr><td valign="top"><a href="#defineOutputBindClob-1">defineOutputBindClob/1</a></td><td>Defines a character lob output bind variable.</td></tr>
+<tr><td valign="top"><a href="#defineOutputBindCursor-1">defineOutputBindCursor/1</a></td><td>Defines a cursor output bind variable.</td></tr>
+<tr><td valign="top"><a href="#defineOutputBindDouble-1">defineOutputBindDouble/1</a></td><td>Defines a decimal output bind variable.</td></tr>
+<tr><td valign="top"><a href="#defineOutputBindInteger-1">defineOutputBindInteger/1</a></td><td>Defines an integer output bind variable.</td></tr>
+<tr><td valign="top"><a href="#defineOutputBindString-2">defineOutputBindString/2</a></td><td>Defines an output bind variable.</td></tr>
+<tr><td valign="top"><a href="#disableEncryption-0">disableEncryption/0</a></td><td>Disables encryption.</td></tr>
+<tr><td valign="top"><a href="#dontGetColumnInfo-0">dontGetColumnInfo/0</a></td><td>Tells the server not to send any column info (names, types, sizes).</td></tr>
+<tr><td valign="top"><a href="#enableKerberos-3">enableKerberos/3</a></td><td>Enables Kerberos authentication and encryption.</td></tr>
+<tr><td valign="top"><a href="#enableTls-7">enableTls/7</a></td><td>Enables TLS/SSL encryption, and optionally authentication.</td></tr>
+<tr><td valign="top"><a href="#endOfResultSet-0">endOfResultSet/0</a></td><td>Returns false if part of the result set is still pending on the server and true if not.</td></tr>
+<tr><td valign="top"><a href="#endSession-0">endSession/0</a></td><td>Ends the session.</td></tr>
+<tr><td valign="top"><a href="#errorMessage-0">errorMessage/0</a></td><td>If a query failed and generated an error, the error message is available here.</td></tr>
+<tr><td valign="top"><a href="#errorNumber-0">errorNumber/0</a></td><td>If a query failed and generated an error, the error number is available here.</td></tr>
+<tr><td valign="top"><a href="#executeQuery-0">executeQuery/0</a></td><td>Execute the query that was previously prepared and bound.</td></tr>
+<tr><td valign="top"><a href="#fetchFromBindCursor-0">fetchFromBindCursor/0</a></td><td>Fetch from a cursor that was returned as an output bind variable.</td></tr>
+<tr><td valign="top"><a href="#firstRowIndex-0">firstRowIndex/0</a></td><td>Returns the index of the first buffered row.</td></tr>
+<tr><td valign="top"><a href="#getCacheFileName-0">getCacheFileName/0</a></td><td>Returns the name of the file containing the cached result set.</td></tr>
+<tr><td valign="top"><a href="#getClientInfo-0">getClientInfo/0</a></td><td>Returns the string that was set by setClientInfo().</td></tr>
+<tr><td valign="top"><a href="#getColumnInfo-0">getColumnInfo/0</a></td><td>Tells the server to send column info.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsAutoIncrementByIndex-1">getColumnIsAutoIncrementByIndex/1</a></td><td>Returns true if the specified column auto-increments and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsAutoIncrementByName-1">getColumnIsAutoIncrementByName/1</a></td><td>Returns true if the specified column auto-increments and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsBinaryByIndex-1">getColumnIsBinaryByIndex/1</a></td><td>Returns true if the specified column contains binary data and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsBinaryByName-1">getColumnIsBinaryByName/1</a></td><td>Returns true if the specified column contains binary data and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsNullableByIndex-1">getColumnIsNullableByIndex/1</a></td><td>Returns true if the specified column can contain nulls and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsNullableByName-1">getColumnIsNullableByName/1</a></td><td>Returns true if the specified column can contain nulls and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsPartOfKeyByIndex-1">getColumnIsPartOfKeyByIndex/1</a></td><td>Returns true if the specified column is part of a composite key and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsPartOfKeyByName-1">getColumnIsPartOfKeyByName/1</a></td><td>Returns true if the specified column is part of a composite key and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsPrimaryKeyByIndex-1">getColumnIsPrimaryKeyByIndex/1</a></td><td>Returns true if the specified column is a primary key and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsPrimaryKeyByName-1">getColumnIsPrimaryKeyByName/1</a></td><td>Returns true if the specified column is a primary key and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsUniqueByIndex-1">getColumnIsUniqueByIndex/1</a></td><td>Returns true if the specified column is unique and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsUniqueByName-1">getColumnIsUniqueByName/1</a></td><td>Returns true if the specified column is unique and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsUnsignedByIndex-1">getColumnIsUnsignedByIndex/1</a></td><td>Returns true if the specified column is an unsigned number and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsUnsignedByName-1">getColumnIsUnsignedByName/1</a></td><td>Returns true if the specified column is an unsigned number and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsZeroFilledByIndex-1">getColumnIsZeroFilledByIndex/1</a></td><td>Returns true if the specified column was created with the zero-fill flag and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnIsZeroFilledByName-1">getColumnIsZeroFilledByName/1</a></td><td>Returns true if the specified column was created with the zero-fill flag and false otherwise.</td></tr>
+<tr><td valign="top"><a href="#getColumnLengthByIndex-1">getColumnLengthByIndex/1</a></td><td>Returns the number of bytes required on the server to store the data for the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnLengthByName-1">getColumnLengthByName/1</a></td><td>Returns the number of bytes required on the server to store the data for the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnName-1">getColumnName/1</a></td><td>Returns the name of the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnNames-0">getColumnNames/0</a></td><td>Returns a null terminated array of the column names of the current result set.</td></tr>
+<tr><td valign="top"><a href="#getColumnPrecisionByIndex-1">getColumnPrecisionByIndex/1</a></td><td>Returns the precision of the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnPrecisionByName-1">getColumnPrecisionByName/1</a></td><td>Returns the precision of the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnScaleByIndex-1">getColumnScaleByIndex/1</a></td><td>Returns the scale of the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnScaleByName-1">getColumnScaleByName/1</a></td><td>Returns the scale of the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnTypeByIndex-1">getColumnTypeByIndex/1</a></td><td>Returns the type of the specified column.</td></tr>
+<tr><td valign="top"><a href="#getColumnTypeByName-1">getColumnTypeByName/1</a></td><td>Returns the type of the specified column.</td></tr>
+<tr><td valign="top"><a href="#getConnectionPort-0">getConnectionPort/0</a></td><td>Returns the inet port that the connection is communicating over.</td></tr>
+<tr><td valign="top"><a href="#getConnectionSocket-0">getConnectionSocket/0</a></td><td>Returns the unix socket that the connection is communicating over.</td></tr>
+<tr><td valign="top"><a href="#getCurrentDatabase-0">getCurrentDatabase/0</a></td><td>Returns the database/schema that is currently in use.</td></tr>
+<tr><td valign="top"><a href="#getDebug-0">getDebug/0</a></td><td>Returns false if debugging is off and true if debugging is on.</td></tr>
+<tr><td valign="top"><a href="#getFieldAsDoubleByIndex-2">getFieldAsDoubleByIndex/2</a></td><td>Returns the specified field as a decimal.</td></tr>
+<tr><td valign="top"><a href="#getFieldAsDoubleByName-2">getFieldAsDoubleByName/2</a></td><td>Returns the specified field as a decimal.</td></tr>
+<tr><td valign="top"><a href="#getFieldAsIntegerByIndex-2">getFieldAsIntegerByIndex/2</a></td><td>Returns the specified field as an integer.</td></tr>
+<tr><td valign="top"><a href="#getFieldAsIntegerByName-2">getFieldAsIntegerByName/2</a></td><td>Returns the specified field as an integer.</td></tr>
+<tr><td valign="top"><a href="#getFieldByIndex-2">getFieldByIndex/2</a></td><td>Returns the specified field as a string.</td></tr>
+<tr><td valign="top"><a href="#getFieldByName-2">getFieldByName/2</a></td><td>Returns the specified field as a string.</td></tr>
+<tr><td valign="top"><a href="#getFieldLengthByIndex-2">getFieldLengthByIndex/2</a></td><td>Returns the length of the specified field.</td></tr>
+<tr><td valign="top"><a href="#getFieldLengthByName-2">getFieldLengthByName/2</a></td><td>Returns the length of the specified field.</td></tr>
+<tr><td valign="top"><a href="#getLongestByIndex-1">getLongestByIndex/1</a></td><td>Returns the length of the longest field in the specified column.</td></tr>
+<tr><td valign="top"><a href="#getLongestByName-1">getLongestByName/1</a></td><td>Returns the length of the longest field in the specified column.</td></tr>
+<tr><td valign="top"><a href="#getNullsAsEmptyStrings-0">getNullsAsEmptyStrings/0</a></td><td>Tells the connection to return NULL fields and output bind variables as empty strings.</td></tr>
+<tr><td valign="top"><a href="#getNullsAsNulls-0">getNullsAsNulls/0</a></td><td>Tells the connection to return NULL fields and output bind variables as NULL's rather than as empty strings.</td></tr>
+<tr><td valign="top"><a href="#getOutputBindBlob-1">getOutputBindBlob/1</a></td><td>Get the value stored in a previously defined binary lob output bind variable.</td></tr>
+<tr><td valign="top"><a href="#getOutputBindClob-1">getOutputBindClob/1</a></td><td>Get the value stored in a previously defined character lob output bind variable.</td></tr>
+<tr><td valign="top"><a href="#getOutputBindCursor-1">getOutputBindCursor/1</a></td><td>Get the cursor associated with a previously defined output bind variable.</td></tr>
+<tr><td valign="top"><a href="#getOutputBindDouble-1">getOutputBindDouble/1</a></td><td>Get the value stored in a previously defined decimal output bind variable.</td></tr>
+<tr><td valign="top"><a href="#getOutputBindInteger-1">getOutputBindInteger/1</a></td><td>Get the value stored in a previously defined integer output bind variable.</td></tr>
+<tr><td valign="top"><a href="#getOutputBindLength-1">getOutputBindLength/1</a></td><td>Get the length of the value stored in a previously defined output bind variable.</td></tr>
+<tr><td valign="top"><a href="#getOutputBindString-1">getOutputBindString/1</a></td><td>Get the value stored in a previously defined string output bind variable.</td></tr>
+<tr><td valign="top"><a href="#getResultSetBufferSize-0">getResultSetBufferSize/0</a></td><td>Returns the number of result set rows that will be buffered at a time or 0 for the entire result set.</td></tr>
+<tr><td valign="top"><a href="#getResultSetId-0">getResultSetId/0</a></td><td>Returns the internal ID of this result set.</td></tr>
+<tr><td valign="top"><a href="#getRow-1">getRow/1</a></td><td>Returns a tuple containing the value of the fields in the specified row.</td></tr>
+<tr><td valign="top"><a href="#getRowLengths-1">getRowLengths/1</a></td><td>Returns a null terminated array of the lengths of the fields in the specified row.</td></tr>
+<tr><td valign="top"><a href="#identify-0">identify/0</a></td><td>Returns the type of database: oracle, postgresql, mysql, etc.</td></tr>
+<tr><td valign="top"><a href="#inputBindBlob-3">inputBindBlob/3</a></td><td>Defines a binary lob input bind variable.</td></tr>
+<tr><td valign="top"><a href="#inputBindClob-3">inputBindClob/3</a></td><td>Defines a character lob input bind variable.</td></tr>
+<tr><td valign="top"><a href="#inputBindDouble-4">inputBindDouble/4</a></td><td>Defines a decimal input bind variable.</td></tr>
+<tr><td valign="top"><a href="#inputBindLong-2">inputBindLong/2</a></td><td>Defines a integer input bind variable.</td></tr>
+<tr><td valign="top"><a href="#inputBindString-2">inputBindString/2</a></td><td>Defines a string input bind variable.</td></tr>
+<tr><td valign="top"><a href="#lowerCaseColumnNames-0">lowerCaseColumnNames/0</a></td><td>Columns names are converted to lower case.</td></tr>
+<tr><td valign="top"><a href="#mixedCaseColumnNames-0">mixedCaseColumnNames/0</a></td><td>Columns names are returned in the same case as they are defined in the database.</td></tr>
+<tr><td valign="top"><a href="#openCachedResultSet-1">openCachedResultSet/1</a></td><td>Opens a cached result set.</td></tr>
+<tr><td valign="top"><a href="#ping-0">ping/0</a></td><td>Returns true if the database is up and false if it's down.</td></tr>
+<tr><td valign="top"><a href="#prepareFileQuery-2">prepareFileQuery/2</a></td><td>Prepare to execute the contents of "path"/"filename".</td></tr>
+<tr><td valign="top"><a href="#prepareQuery-1">prepareQuery/1</a></td><td>Prepare to execute "query".</td></tr>
+<tr><td valign="top"><a href="#prepareQueryWithLength-2">prepareQueryWithLength/2</a></td><td>Prepare to execute "query" with length "length".</td></tr>
+<tr><td valign="top"><a href="#resumeCachedResultSet-2">resumeCachedResultSet/2</a></td><td>Resumes a result set previously left open using suspendSession() and continues caching the result set to "filename".</td></tr>
+<tr><td valign="top"><a href="#resumeResultSet-1">resumeResultSet/1</a></td><td>Resumes a result set previously left open using suspendSession().</td></tr>
+<tr><td valign="top"><a href="#resumeSession-2">resumeSession/2</a></td><td>Resumes a session previously left open using suspendSession().</td></tr>
+<tr><td valign="top"><a href="#rollback-0">rollback/0</a></td><td>Rolls back a transaction.</td></tr>
+<tr><td valign="top"><a href="#rowCount-0">rowCount/0</a></td><td>Returns the number of rows in the current result set (if the result set is being stepped through, this returns the number of rows processed so far).</td></tr>
+<tr><td valign="top"><a href="#selectDatabase-1">selectDatabase/1</a></td><td>Sets the current database/schema to "database".</td></tr>
+<tr><td valign="top"><a href="#sendFileQuery-2">sendFileQuery/2</a></td><td>Sends the query in file "path"/"filename" directly and gets a result set.</td></tr>
+<tr><td valign="top"><a href="#sendQuery-1">sendQuery/1</a></td><td>Sends "query" directly and gets a result set.</td></tr>
+<tr><td valign="top"><a href="#sendQueryWithLength-2">sendQueryWithLength/2</a></td><td>Sends "query" with length "length" directly and gets a result set.</td></tr>
+<tr><td valign="top"><a href="#setCacheTtl-1">setCacheTtl/1</a></td><td>Sets the time-to-live for cached result sets.</td></tr>
+<tr><td valign="top"><a href="#setClientInfo-1">setClientInfo/1</a></td><td>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client.</td></tr>
+<tr><td valign="top"><a href="#setDebugFile-1">setDebugFile/1</a></td><td>Allows you to specify a file to write debug to.</td></tr>
+<tr><td valign="top"><a href="#setResultSetBufferSize-1">setResultSetBufferSize/1</a></td><td>Sets the number of rows of the result set to buffer at a time.</td></tr>
+<tr><td valign="top"><a href="#subDouble-4">subDouble/4</a></td><td>Defines a decimal substitution variable.</td></tr>
+<tr><td valign="top"><a href="#subLong-2">subLong/2</a></td><td>Defines an integer substitution variable.</td></tr>
+<tr><td valign="top"><a href="#subString-2">subString/2</a></td><td>Defines a string substitution variable.</td></tr>
+<tr><td valign="top"><a href="#suspendResultSet-0">suspendResultSet/0</a></td><td>Tells the server to leave this result set open when the connection calls suspendSession() so that another connection can connect to it using resumeResultSet() after it calls resumeSession().</td></tr>
+<tr><td valign="top"><a href="#suspendSession-0">suspendSession/0</a></td><td>Disconnects this connection from the current session but leaves the session open so that another connection can connect to it using resumeSession().</td></tr>
+<tr><td valign="top"><a href="#totalRows-0">totalRows/0</a></td><td>Returns the total number of rows that will be returned in the result set.</td></tr>
+<tr><td valign="top"><a href="#upperCaseColumnNames-0">upperCaseColumnNames/0</a></td><td>Columns names are converted to upper case.</td></tr>
+<tr><td valign="top"><a href="#validBind-1">validBind/1</a></td><td>Returns true if "variable" was a valid bind variable of the query.</td></tr>
+<tr><td valign="top"><a href="#validateBinds-0">validateBinds/0</a></td><td>If you are binding to any variables that might not actually be in your query, call this to ensure that the database won't try to bind them unless they really are in the query.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="affectedRows-0">affectedRows/0</a></h3>
+<div class="spec">
+<p><tt>affectedRows() -&gt; any()</tt></p>
+</div><p>Returns the number of rows that were updated, inserted or deleted by the query.  Not all databases support this call.  Don't use it for applications which are designed to be portable across databases.  0 is returned by databases which don't support this option.</p>
+
+<h3 class="function"><a name="alloc-7">alloc/7</a></h3>
+<div class="spec">
+<p><tt>alloc(Server, Port, Socket, User, Password, Retrytime, Tries) -&gt; any()</tt></p>
+</div><p>Initiates a connection to "server" on "port" or to the unix "socket" on the local machine and auths with "user" and "password".  Failed connections will be retried for "tries" times, waiting "retrytime" seconds between each try.  If "tries" is 0 then retries will continue forever.  If "retrytime" is 0 then retries will be attempted on a default interval.  If the "socket" parameter is neither NULL nor "" then an attempt will be made to connect through it before attempting to connect to "server" on "port".  If it is NULL or "" then no attempt will be made to connect through the socket.</p>
+
+<h3 class="function"><a name="autoCommitOff-0">autoCommitOff/0</a></h3>
+<div class="spec">
+<p><tt>autoCommitOff() -&gt; any()</tt></p>
+</div><p>Instructs the database to wait for the client to tell it when to commit.</p>
+
+<h3 class="function"><a name="autoCommitOn-0">autoCommitOn/0</a></h3>
+<div class="spec">
+<p><tt>autoCommitOn() -&gt; any()</tt></p>
+</div><p>Instructs the database to perform a commit after every successful query.</p>
+
+<h3 class="function"><a name="beginTransaction-0">beginTransaction/0</a></h3>
+<div class="spec">
+<p><tt>beginTransaction() -&gt; any()</tt></p>
+</div><p>Begins a transaction.  Returns true if the begin succeeded, false if it failed.  If the database automatically begins a new transaction when a commit or rollback is issued then this doesn't do anything unless SQL Relay is faking transaction blocks.</p>
+
+<h3 class="function"><a name="bindFormat-0">bindFormat/0</a></h3>
+<div class="spec">
+<p><tt>bindFormat() -&gt; any()</tt></p>
+</div><p>Returns a string representing the format of the bind variables used in the db.</p>
+
+<h3 class="function"><a name="cacheOff-0">cacheOff/0</a></h3>
+<div class="spec">
+<p><tt>cacheOff() -&gt; any()</tt></p>
+</div><p>Sets query caching off.</p>
+
+<h3 class="function"><a name="cacheToFile-1">cacheToFile/1</a></h3>
+<div class="spec">
+<p><tt>cacheToFile(Filename) -&gt; any()</tt></p>
+</div><p><p>Sets query caching on.  Future queries will be cached to the file "filename".</p> <p>A default time-to-live of 10 minutes is also set.</p> <p>Note that once cacheToFile() is called, the result sets of all future queries will be cached to that file until another call to cacheToFile() changes which file to cache to or a call to cacheOff() turns off caching.</p></p>
+
+<h3 class="function"><a name="clearBinds-0">clearBinds/0</a></h3>
+<div class="spec">
+<p><tt>clearBinds() -&gt; any()</tt></p>
+</div><p>Clears all bind variables.</p>
+
+<h3 class="function"><a name="closeResultSet-0">closeResultSet/0</a></h3>
+<div class="spec">
+<p><tt>closeResultSet() -&gt; any()</tt></p>
+</div><p>Closes the current result set, if one is open.  Data that has been fetched already is still available but no more data may be fetched.  Server side resources for the result set are freed as well.</p>
+
+<h3 class="function"><a name="colCount-0">colCount/0</a></h3>
+<div class="spec">
+<p><tt>colCount() -&gt; any()</tt></p>
+</div><p>Returns the number of columns in the current result set.</p>
+
+<h3 class="function"><a name="commit-0">commit/0</a></h3>
+<div class="spec">
+<p><tt>commit() -&gt; any()</tt></p>
+</div><p>Commits a transaction.  Returns true if the commit succeeded, false if it failed.</p>
+
+<h3 class="function"><a name="connectionErrorMessage-0">connectionErrorMessage/0</a></h3>
+<div class="spec">
+<p><tt>connectionErrorMessage() -&gt; any()</tt></p>
+</div><p>If an operation failed and generated an error, the error message is available here.  If there is no error then this method returns NULL.</p>
+
+<h3 class="function"><a name="connectionErrorNumber-0">connectionErrorNumber/0</a></h3>
+<div class="spec">
+<p><tt>connectionErrorNumber() -&gt; any()</tt></p>
+</div><p>If an operation failed and generated an error, the error number is available here.  If there is no error then this method returns 0.</p>
+
+<h3 class="function"><a name="connectionFree-0">connectionFree/0</a></h3>
+<div class="spec">
+<p><tt>connectionFree() -&gt; any()</tt></p>
+</div><p>Disconnects and ends the session if it hasn't been ended already.</p>
+
+<h3 class="function"><a name="countBindVariables-0">countBindVariables/0</a></h3>
+<div class="spec">
+<p><tt>countBindVariables() -&gt; any()</tt></p>
+</div><p>Parses the previously prepared query, counts the number of bind variables defined in it and returns that number.</p>
+
+<h3 class="function"><a name="cursorFree-0">cursorFree/0</a></h3>
+<div class="spec">
+<p><tt>cursorFree() -&gt; any()</tt></p>
+</div><p>Destroys the cursor and cleans up all associated result set data.</p>
+
+<h3 class="function"><a name="dbHostName-0">dbHostName/0</a></h3>
+<div class="spec">
+<p><tt>dbHostName() -&gt; any()</tt></p>
+</div><p>Returns the host name of the database.</p>
+
+<h3 class="function"><a name="dbIpAddress-0">dbIpAddress/0</a></h3>
+<div class="spec">
+<p><tt>dbIpAddress() -&gt; any()</tt></p>
+</div><p>Returns the ip address of the database.</p>
+
+<h3 class="function"><a name="dbVersion-0">dbVersion/0</a></h3>
+<div class="spec">
+<p><tt>dbVersion() -&gt; any()</tt></p>
+</div><p>Returns the version of the database.</p>
+
+<h3 class="function"><a name="debugOff-0">debugOff/0</a></h3>
+<div class="spec">
+<p><tt>debugOff() -&gt; any()</tt></p>
+</div><p>Turns debugging off.</p>
+
+<h3 class="function"><a name="debugOn-0">debugOn/0</a></h3>
+<div class="spec">
+<p><tt>debugOn() -&gt; any()</tt></p>
+</div><p>Causes verbose debugging information to be sent to standard output.  Another way to do this is to start a query with "-- debug\n".  Yet another way is to set the environment variable SQLR_CLIENT_DEBUG to "ON"</p>
+
+<h3 class="function"><a name="defineOutputBindBlob-1">defineOutputBindBlob/1</a></h3>
+<div class="spec">
+<p><tt>defineOutputBindBlob(Variable) -&gt; any()</tt></p>
+</div><p>Defines a binary lob output bind variable.</p>
+
+<h3 class="function"><a name="defineOutputBindClob-1">defineOutputBindClob/1</a></h3>
+<div class="spec">
+<p><tt>defineOutputBindClob(Variable) -&gt; any()</tt></p>
+</div><p>Defines a character lob output bind variable.</p>
+
+<h3 class="function"><a name="defineOutputBindCursor-1">defineOutputBindCursor/1</a></h3>
+<div class="spec">
+<p><tt>defineOutputBindCursor(Variable) -&gt; any()</tt></p>
+</div><p>Defines a cursor output bind variable.</p>
+
+<h3 class="function"><a name="defineOutputBindDouble-1">defineOutputBindDouble/1</a></h3>
+<div class="spec">
+<p><tt>defineOutputBindDouble(Variable) -&gt; any()</tt></p>
+</div><p>Defines a decimal output bind variable.</p>
+
+<h3 class="function"><a name="defineOutputBindInteger-1">defineOutputBindInteger/1</a></h3>
+<div class="spec">
+<p><tt>defineOutputBindInteger(Variable) -&gt; any()</tt></p>
+</div><p>Defines an integer output bind variable.</p>
+
+<h3 class="function"><a name="defineOutputBindString-2">defineOutputBindString/2</a></h3>
+<div class="spec">
+<p><tt>defineOutputBindString(Variable, Length) -&gt; any()</tt></p>
+</div><p>Defines an output bind variable.  "bufferlength" bytes will be reserved to store the value.</p>
+
+<h3 class="function"><a name="disableEncryption-0">disableEncryption/0</a></h3>
+<div class="spec">
+<p><tt>disableEncryption() -&gt; any()</tt></p>
+</div><p>Disables encryption.</p>
+
+<h3 class="function"><a name="dontGetColumnInfo-0">dontGetColumnInfo/0</a></h3>
+<div class="spec">
+<p><tt>dontGetColumnInfo() -&gt; any()</tt></p>
+</div><p>Tells the server not to send any column info (names, types, sizes).  If you don't need that info, you should call this method to improve performance.</p>
+
+<h3 class="function"><a name="enableKerberos-3">enableKerberos/3</a></h3>
+<div class="spec">
+<p><tt>enableKerberos(Service, Mech, Flags) -&gt; any()</tt></p>
+</div><p><p>Enables Kerberos authentication and encryption.</p>  <p>"service" indicates the Kerberos service name of the SQL Relay server.  If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</p> <p>"mech" indicates the specific Kerberos mechanism to use. On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as:</p> <p>{ 1 2 840 113554 1 2 2 }</p><p>On Windows platforms, this should be a string like:</p><p>Kerberos</p><p>If left empty or NULL then the default mechanism will be used.  Only set this if you know that you have a good reason to.</p> <p>"flags" indicates what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used.  Only set this if you know that you have a good reason to.</p> <p>Valid flags include:</p> <ul><li>GSS_C_MUTUAL_FLAG</li><li>GSS_C_REPLAY_FLAG</li><li>GSS_C_SEQUENCE_FLAG</li><li>GSS_C_CONF_FLAG</li><li>GSS_C_INTEG_FLAG</li></ul> <p>For a full list of flags, consult the GSSAPI documentation, though note that only the flags listed above are supported on Windows.</p></p>
+
+<h3 class="function"><a name="enableTls-7">enableTls/7</a></h3>
+<div class="spec">
+<p><tt>enableTls(Version, Cert, Password, Ciphers, Validate, Ca, Depth) -&gt; any()</tt></p>
+</div><p><p>Enables TLS/SSL encryption, and optionally authentication.</p> <p>"version" specifies the TLS/SSL protocol version that the client will attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If left blank or empty then the highest supported version will be negotiated.</p> <p>"cert" is the file name of the certificate chain file to send to the SQL Relay server.  This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.</p> <p>If "cert" contains a password-protected private key, then "password" may be supplied to access it.  If the private key is not password-protected, then this argument is ignored, and may be left empty or NULL.</p> <p>"ciphers" is a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If "ciphers" is empty or NULL then a default set is used.  Only set this if you know that you have a good reason to.</p> <p> For a list of valid ciphers on Linux/Unix platforms, see:</p> <p>man ciphers</p> <p>For a list of valid ciphers on Windows platforms, see:</p> <p>https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx</p> <p>On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes.</p> <p>For example: 3DES_112</p> <p>"validate" indicates whether to validate the SQL Relay's server certificate, and may be set to one of the following:</p>  <ul><li>"no" - Don't validate the server's certificate.</li><li>"ca" - Validate that the server's certificate was signed by a trusted certificate authority.</li><li>"ca+host" - Perform "ca" validation and also validate that one of the subject altenate names (or the common name if no SANs are present) in the certificate matches the host parameter. (Falls back to "ca" validation when a unix socket is used.)</li><li>"ca+domain" - Perform "ca" validation and also validate that the domain name of one of the subject alternate names (or the common name if no SANs are present) in the certificate matches the domain name of the host parameter.  (Falls back to "ca" validation when a unix socket is used.)</li></ul> <p>"ca" is the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate.  This is useful if the SQL Relay server's certificate is self-signed.</p> <p>On Windows, "ca" must be a file name.</p> <p>On non-Windows systems, "ca" can be either a file or directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.</p> <p>Note that the supported "cert" and "ca" file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.</p></p>
+
+<h3 class="function"><a name="endOfResultSet-0">endOfResultSet/0</a></h3>
+<div class="spec">
+<p><tt>endOfResultSet() -&gt; any()</tt></p>
+</div><p>Returns false if part of the result set is still pending on the server and true if not.  This method can only return false if setResultSetBufferSize() has been called with a parameter other than 0.</p>
+
+<h3 class="function"><a name="endSession-0">endSession/0</a></h3>
+<div class="spec">
+<p><tt>endSession() -&gt; any()</tt></p>
+</div><p>Ends the session.</p>
+
+<h3 class="function"><a name="errorMessage-0">errorMessage/0</a></h3>
+<div class="spec">
+<p><tt>errorMessage() -&gt; any()</tt></p>
+</div><p>If a query failed and generated an error, the error message is available here.  If the query succeeded then this method returns NULL.</p>
+
+<h3 class="function"><a name="errorNumber-0">errorNumber/0</a></h3>
+<div class="spec">
+<p><tt>errorNumber() -&gt; any()</tt></p>
+</div><p>If a query failed and generated an error, the error number is available here.  If there is no error then this method returns 0.</p>
+
+<h3 class="function"><a name="executeQuery-0">executeQuery/0</a></h3>
+<div class="spec">
+<p><tt>executeQuery() -&gt; any()</tt></p>
+</div><p>Execute the query that was previously prepared and bound.</p>
+
+<h3 class="function"><a name="fetchFromBindCursor-0">fetchFromBindCursor/0</a></h3>
+<div class="spec">
+<p><tt>fetchFromBindCursor() -&gt; any()</tt></p>
+</div><p>Fetch from a cursor that was returned as an output bind variable.</p>
+
+<h3 class="function"><a name="firstRowIndex-0">firstRowIndex/0</a></h3>
+<div class="spec">
+<p><tt>firstRowIndex() -&gt; any()</tt></p>
+</div><p>Returns the index of the first buffered row.  This is useful when buffering only part of the result set at a time.</p>
+
+<h3 class="function"><a name="getCacheFileName-0">getCacheFileName/0</a></h3>
+<div class="spec">
+<p><tt>getCacheFileName() -&gt; any()</tt></p>
+</div><p>Returns the name of the file containing the cached result set.</p>
+
+<h3 class="function"><a name="getClientInfo-0">getClientInfo/0</a></h3>
+<div class="spec">
+<p><tt>getClientInfo() -&gt; any()</tt></p>
+</div><p>Returns the string that was set by setClientInfo().</p>
+
+<h3 class="function"><a name="getColumnInfo-0">getColumnInfo/0</a></h3>
+<div class="spec">
+<p><tt>getColumnInfo() -&gt; any()</tt></p>
+</div><p>Tells the server to send column info.</p>
+
+<h3 class="function"><a name="getColumnIsAutoIncrementByIndex-1">getColumnIsAutoIncrementByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsAutoIncrementByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column auto-increments and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsAutoIncrementByName-1">getColumnIsAutoIncrementByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsAutoIncrementByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column auto-increments and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsBinaryByIndex-1">getColumnIsBinaryByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsBinaryByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column contains binary data and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsBinaryByName-1">getColumnIsBinaryByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsBinaryByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column contains binary data and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsNullableByIndex-1">getColumnIsNullableByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsNullableByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column can contain nulls and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsNullableByName-1">getColumnIsNullableByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsNullableByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column can contain nulls and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsPartOfKeyByIndex-1">getColumnIsPartOfKeyByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsPartOfKeyByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is part of a composite key and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsPartOfKeyByName-1">getColumnIsPartOfKeyByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsPartOfKeyByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is part of a composite key and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsPrimaryKeyByIndex-1">getColumnIsPrimaryKeyByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsPrimaryKeyByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is a primary key and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsPrimaryKeyByName-1">getColumnIsPrimaryKeyByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsPrimaryKeyByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is a primary key and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsUniqueByIndex-1">getColumnIsUniqueByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsUniqueByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is unique and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsUniqueByName-1">getColumnIsUniqueByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsUniqueByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is unique and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsUnsignedByIndex-1">getColumnIsUnsignedByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsUnsignedByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is an unsigned number and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsUnsignedByName-1">getColumnIsUnsignedByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsUnsignedByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column is an unsigned number and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsZeroFilledByIndex-1">getColumnIsZeroFilledByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsZeroFilledByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column was created with the zero-fill flag and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnIsZeroFilledByName-1">getColumnIsZeroFilledByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnIsZeroFilledByName(Col) -&gt; any()</tt></p>
+</div><p>Returns true if the specified column was created with the zero-fill flag and false otherwise.</p>
+
+<h3 class="function"><a name="getColumnLengthByIndex-1">getColumnLengthByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnLengthByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns the number of bytes required on the server to store the data for the specified column</p>
+
+<h3 class="function"><a name="getColumnLengthByName-1">getColumnLengthByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnLengthByName(Col) -&gt; any()</tt></p>
+</div><p>Returns the number of bytes required on the server to store the data for the specified column</p>
+
+<h3 class="function"><a name="getColumnName-1">getColumnName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnName(Col) -&gt; any()</tt></p>
+</div><p>Returns the name of the specified column.</p>
+
+<h3 class="function"><a name="getColumnNames-0">getColumnNames/0</a></h3>
+<div class="spec">
+<p><tt>getColumnNames() -&gt; any()</tt></p>
+</div><p>Returns a null terminated array of the column names of the current result set.</p>
+
+<h3 class="function"><a name="getColumnPrecisionByIndex-1">getColumnPrecisionByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnPrecisionByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns the precision of the specified column.  Precision is the total number of digits in a number.  eg: 123.45 has a precision of 5.  For non-numeric types, it's the number of characters in the string.</p>
+
+<h3 class="function"><a name="getColumnPrecisionByName-1">getColumnPrecisionByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnPrecisionByName(Col) -&gt; any()</tt></p>
+</div><p>Returns the precision of the specified column.  Precision is the total number of digits in a number.  eg: 123.45 has a precision of 5.  For non-numeric types, it's the number of characters in the string.</p>
+
+<h3 class="function"><a name="getColumnScaleByIndex-1">getColumnScaleByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnScaleByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns the scale of the specified column.  Scale is the total number of digits to the right of the decimal point in a number.  eg: 123.45 has a scale of 2.</p>
+
+<h3 class="function"><a name="getColumnScaleByName-1">getColumnScaleByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnScaleByName(Col) -&gt; any()</tt></p>
+</div><p>Returns the scale of the specified column.  Scale is the total number of digits to the right of the decimal point in a number.  eg: 123.45 has a scale of 2.</p>
+
+<h3 class="function"><a name="getColumnTypeByIndex-1">getColumnTypeByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getColumnTypeByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns the type of the specified column.</p>
+
+<h3 class="function"><a name="getColumnTypeByName-1">getColumnTypeByName/1</a></h3>
+<div class="spec">
+<p><tt>getColumnTypeByName(Col) -&gt; any()</tt></p>
+</div><p>Returns the type of the specified column.</p>
+
+<h3 class="function"><a name="getConnectionPort-0">getConnectionPort/0</a></h3>
+<div class="spec">
+<p><tt>getConnectionPort() -&gt; any()</tt></p>
+</div><p>Returns the inet port that the connection is communicating over. This parameter may be passed to another connection for use in the resumeSession() method.  Note: The value this method returns is only valid after a call to suspendSession().</p>
+
+<h3 class="function"><a name="getConnectionSocket-0">getConnectionSocket/0</a></h3>
+<div class="spec">
+<p><tt>getConnectionSocket() -&gt; any()</tt></p>
+</div><p>Returns the unix socket that the connection is communicating over. This parameter may be passed to another connection for use in the resumeSession() method.  Note: The value this method returns is only valid after a call to suspendSession().</p>
+
+<h3 class="function"><a name="getCurrentDatabase-0">getCurrentDatabase/0</a></h3>
+<div class="spec">
+<p><tt>getCurrentDatabase() -&gt; any()</tt></p>
+</div><p>Returns the database/schema that is currently in use.</p>
+
+<h3 class="function"><a name="getDebug-0">getDebug/0</a></h3>
+<div class="spec">
+<p><tt>getDebug() -&gt; any()</tt></p>
+</div><p>Returns false if debugging is off and true if debugging is on.</p>
+
+<h3 class="function"><a name="getFieldAsDoubleByIndex-2">getFieldAsDoubleByIndex/2</a></h3>
+<div class="spec">
+<p><tt>getFieldAsDoubleByIndex(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the specified field as a decimal.</p>
+
+<h3 class="function"><a name="getFieldAsDoubleByName-2">getFieldAsDoubleByName/2</a></h3>
+<div class="spec">
+<p><tt>getFieldAsDoubleByName(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the specified field as a decimal.</p>
+
+<h3 class="function"><a name="getFieldAsIntegerByIndex-2">getFieldAsIntegerByIndex/2</a></h3>
+<div class="spec">
+<p><tt>getFieldAsIntegerByIndex(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the specified field as an integer.</p>
+
+<h3 class="function"><a name="getFieldAsIntegerByName-2">getFieldAsIntegerByName/2</a></h3>
+<div class="spec">
+<p><tt>getFieldAsIntegerByName(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the specified field as an integer.</p>
+
+<h3 class="function"><a name="getFieldByIndex-2">getFieldByIndex/2</a></h3>
+<div class="spec">
+<p><tt>getFieldByIndex(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the specified field as a string.</p>
+
+<h3 class="function"><a name="getFieldByName-2">getFieldByName/2</a></h3>
+<div class="spec">
+<p><tt>getFieldByName(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the specified field as a string.</p>
+
+<h3 class="function"><a name="getFieldLengthByIndex-2">getFieldLengthByIndex/2</a></h3>
+<div class="spec">
+<p><tt>getFieldLengthByIndex(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the length of the specified field.</p>
+
+<h3 class="function"><a name="getFieldLengthByName-2">getFieldLengthByName/2</a></h3>
+<div class="spec">
+<p><tt>getFieldLengthByName(Row, Col) -&gt; any()</tt></p>
+</div><p>Returns the length of the specified field.</p>
+
+<h3 class="function"><a name="getLongestByIndex-1">getLongestByIndex/1</a></h3>
+<div class="spec">
+<p><tt>getLongestByIndex(Col) -&gt; any()</tt></p>
+</div><p>Returns the length of the longest field in the specified column.</p>
+
+<h3 class="function"><a name="getLongestByName-1">getLongestByName/1</a></h3>
+<div class="spec">
+<p><tt>getLongestByName(Col) -&gt; any()</tt></p>
+</div><p>Returns the length of the longest field in the specified column.</p>
+
+<h3 class="function"><a name="getNullsAsEmptyStrings-0">getNullsAsEmptyStrings/0</a></h3>
+<div class="spec">
+<p><tt>getNullsAsEmptyStrings() -&gt; any()</tt></p>
+</div><p>Tells the connection to return NULL fields and output bind variables as empty strings.  This is the default.</p>
+
+<h3 class="function"><a name="getNullsAsNulls-0">getNullsAsNulls/0</a></h3>
+<div class="spec">
+<p><tt>getNullsAsNulls() -&gt; any()</tt></p>
+</div><p>Tells the connection to return NULL fields and output bind variables as NULL's rather than as empty strings.</p>
+
+<h3 class="function"><a name="getOutputBindBlob-1">getOutputBindBlob/1</a></h3>
+<div class="spec">
+<p><tt>getOutputBindBlob(Variable) -&gt; any()</tt></p>
+</div><p>Get the value stored in a previously defined binary lob output bind variable.</p>
+
+<h3 class="function"><a name="getOutputBindClob-1">getOutputBindClob/1</a></h3>
+<div class="spec">
+<p><tt>getOutputBindClob(Variable) -&gt; any()</tt></p>
+</div><p>Get the value stored in a previously defined character lob output bind variable.</p>
+
+<h3 class="function"><a name="getOutputBindCursor-1">getOutputBindCursor/1</a></h3>
+<div class="spec">
+<p><tt>getOutputBindCursor(Variable) -&gt; any()</tt></p>
+</div><p>Get the cursor associated with a previously defined output bind variable.</p>
+
+<h3 class="function"><a name="getOutputBindDouble-1">getOutputBindDouble/1</a></h3>
+<div class="spec">
+<p><tt>getOutputBindDouble(Variable) -&gt; any()</tt></p>
+</div><p>Get the value stored in a previously defined decimal output bind variable.</p>
+
+<h3 class="function"><a name="getOutputBindInteger-1">getOutputBindInteger/1</a></h3>
+<div class="spec">
+<p><tt>getOutputBindInteger(Variable) -&gt; any()</tt></p>
+</div><p>Get the value stored in a previously defined integer output bind variable.</p>
+
+<h3 class="function"><a name="getOutputBindLength-1">getOutputBindLength/1</a></h3>
+<div class="spec">
+<p><tt>getOutputBindLength(Variable) -&gt; any()</tt></p>
+</div><p>Get the length of the value stored in a previously defined output bind variable.</p>
+
+<h3 class="function"><a name="getOutputBindString-1">getOutputBindString/1</a></h3>
+<div class="spec">
+<p><tt>getOutputBindString(Variable) -&gt; any()</tt></p>
+</div><p>Get the value stored in a previously defined string output bind variable.</p>
+
+<h3 class="function"><a name="getResultSetBufferSize-0">getResultSetBufferSize/0</a></h3>
+<div class="spec">
+<p><tt>getResultSetBufferSize() -&gt; any()</tt></p>
+</div><p>Returns the number of result set rows that will be buffered at a time or 0 for the entire result set.</p>
+
+<h3 class="function"><a name="getResultSetId-0">getResultSetId/0</a></h3>
+<div class="spec">
+<p><tt>getResultSetId() -&gt; any()</tt></p>
+</div><p>Returns the internal ID of this result set.  This parameter may be passed to another cursor for use in the resumeResultSet() method.  Note: The value this method returns is only valid after a call to suspendResultSet().</p>
+
+<h3 class="function"><a name="getRow-1">getRow/1</a></h3>
+<div class="spec">
+<p><tt>getRow(Row) -&gt; any()</tt></p>
+</div><p>Returns a tuple containing the value of the fields in the specified row.</p>
+
+<h3 class="function"><a name="getRowLengths-1">getRowLengths/1</a></h3>
+<div class="spec">
+<p><tt>getRowLengths(Row) -&gt; any()</tt></p>
+</div><p>Returns a null terminated array of the lengths of the fields in the specified row.</p>
+
+<h3 class="function"><a name="identify-0">identify/0</a></h3>
+<div class="spec">
+<p><tt>identify() -&gt; any()</tt></p>
+</div><p>Returns the type of database: oracle, postgresql, mysql, etc.</p>
+
+<h3 class="function"><a name="inputBindBlob-3">inputBindBlob/3</a></h3>
+<div class="spec">
+<p><tt>inputBindBlob(Variable, Value, Size) -&gt; any()</tt></p>
+</div><p>Defines a binary lob input bind variable.</p>
+
+<h3 class="function"><a name="inputBindClob-3">inputBindClob/3</a></h3>
+<div class="spec">
+<p><tt>inputBindClob(Variable, Value, Size) -&gt; any()</tt></p>
+</div><p>Defines a character lob input bind variable.</p>
+
+<h3 class="function"><a name="inputBindDouble-4">inputBindDouble/4</a></h3>
+<div class="spec">
+<p><tt>inputBindDouble(Variable, Value, Precision, Scale) -&gt; any()</tt></p>
+</div><p>Defines a decimal input bind variable. (If you don't have the precision and scale then set them both 0.  However in that case you may get unexpected rounding behavior if the server is faking binds.)</p>
+
+<h3 class="function"><a name="inputBindLong-2">inputBindLong/2</a></h3>
+<div class="spec">
+<p><tt>inputBindLong(Variable, Value) -&gt; any()</tt></p>
+</div><p>Defines a integer input bind variable.</p>
+
+<h3 class="function"><a name="inputBindString-2">inputBindString/2</a></h3>
+<div class="spec">
+<p><tt>inputBindString(Variable, Value) -&gt; any()</tt></p>
+</div><p>Defines a string input bind variable.</p>
+
+<h3 class="function"><a name="lowerCaseColumnNames-0">lowerCaseColumnNames/0</a></h3>
+<div class="spec">
+<p><tt>lowerCaseColumnNames() -&gt; any()</tt></p>
+</div><p>Columns names are converted to lower case.</p>
+
+<h3 class="function"><a name="mixedCaseColumnNames-0">mixedCaseColumnNames/0</a></h3>
+<div class="spec">
+<p><tt>mixedCaseColumnNames() -&gt; any()</tt></p>
+</div><p>Columns names are returned in the same case as they are defined in the database.  This is the default.</p>
+
+<h3 class="function"><a name="openCachedResultSet-1">openCachedResultSet/1</a></h3>
+<div class="spec">
+<p><tt>openCachedResultSet(Filename) -&gt; any()</tt></p>
+</div><p>Opens a cached result set.  Returns true on success and false on failure.</p>
+
+<h3 class="function"><a name="ping-0">ping/0</a></h3>
+<div class="spec">
+<p><tt>ping() -&gt; any()</tt></p>
+</div><p>Returns true if the database is up and false if it's down.</p>
+
+<h3 class="function"><a name="prepareFileQuery-2">prepareFileQuery/2</a></h3>
+<div class="spec">
+<p><tt>prepareFileQuery(Path, Filename) -&gt; any()</tt></p>
+</div><p>Prepare to execute the contents of "path"/"filename".  Returns false if the file couldn't be opened.</p>
+
+<h3 class="function"><a name="prepareQuery-1">prepareQuery/1</a></h3>
+<div class="spec">
+<p><tt>prepareQuery(Query) -&gt; any()</tt></p>
+</div><p>Prepare to execute "query".</p>
+
+<h3 class="function"><a name="prepareQueryWithLength-2">prepareQueryWithLength/2</a></h3>
+<div class="spec">
+<p><tt>prepareQueryWithLength(Query, Length) -&gt; any()</tt></p>
+</div><p>Prepare to execute "query" with length "length".  This method must be used if the query contains binary data.</p>
+
+<h3 class="function"><a name="resumeCachedResultSet-2">resumeCachedResultSet/2</a></h3>
+<div class="spec">
+<p><tt>resumeCachedResultSet(Id, Filename) -&gt; any()</tt></p>
+</div><p>Resumes a result set previously left open using suspendSession() and continues caching the result set to "filename".  Returns true on success and false on failure.</p>
+
+<h3 class="function"><a name="resumeResultSet-1">resumeResultSet/1</a></h3>
+<div class="spec">
+<p><tt>resumeResultSet(Id) -&gt; any()</tt></p>
+</div><p>Resumes a result set previously left open using suspendSession().  Returns true on success and false on failure.</p>
+
+<h3 class="function"><a name="resumeSession-2">resumeSession/2</a></h3>
+<div class="spec">
+<p><tt>resumeSession(Port, Socket) -&gt; any()</tt></p>
+</div><p>Resumes a session previously left open using suspendSession().  Returns true on success and false on failure.</p>
+
+<h3 class="function"><a name="rollback-0">rollback/0</a></h3>
+<div class="spec">
+<p><tt>rollback() -&gt; any()</tt></p>
+</div><p>Rolls back a transaction.  Returns true if the rollback succeeded, false if it failed.</p>
+
+<h3 class="function"><a name="rowCount-0">rowCount/0</a></h3>
+<div class="spec">
+<p><tt>rowCount() -&gt; any()</tt></p>
+</div><p>Returns the number of rows in the current result set (if the result set is being stepped through, this returns the number of rows processed so far).</p>
+
+<h3 class="function"><a name="selectDatabase-1">selectDatabase/1</a></h3>
+<div class="spec">
+<p><tt>selectDatabase(Database) -&gt; any()</tt></p>
+</div><p>Sets the current database/schema to "database".</p>
+
+<h3 class="function"><a name="sendFileQuery-2">sendFileQuery/2</a></h3>
+<div class="spec">
+<p><tt>sendFileQuery(Path, Filename) -&gt; any()</tt></p>
+</div><p>Sends the query in file "path"/"filename" directly and gets a result set.</p>
+
+<h3 class="function"><a name="sendQuery-1">sendQuery/1</a></h3>
+<div class="spec">
+<p><tt>sendQuery(Query) -&gt; any()</tt></p>
+</div><p>Sends "query" directly and gets a result set.</p>
+
+<h3 class="function"><a name="sendQueryWithLength-2">sendQueryWithLength/2</a></h3>
+<div class="spec">
+<p><tt>sendQueryWithLength(Query, Length) -&gt; any()</tt></p>
+</div><p>Sends "query" with length "length" directly and gets a result set. This method must be used if the query contains binary data.</p>
+
+<h3 class="function"><a name="setCacheTtl-1">setCacheTtl/1</a></h3>
+<div class="spec">
+<p><tt>setCacheTtl(Ttl) -&gt; any()</tt></p>
+</div><p>Sets the time-to-live for cached result sets. The sqlr-cachemanger will remove each cached result set "ttl" seconds after it's created, provided it's scanning the directory containing the cache files.</p>
+
+<h3 class="function"><a name="setClientInfo-1">setClientInfo/1</a></h3>
+<div class="spec">
+<p><tt>setClientInfo(ClientInfo) -&gt; any()</tt></p>
+</div><p>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client.</p>
+
+<h3 class="function"><a name="setDebugFile-1">setDebugFile/1</a></h3>
+<div class="spec">
+<p><tt>setDebugFile(FileName) -&gt; any()</tt></p>
+</div><p>Allows you to specify a file to write debug to.  Setting "filename" to NULL or an empty string causes debug to be written to standard output (the default).</p>
+
+<h3 class="function"><a name="setResultSetBufferSize-1">setResultSetBufferSize/1</a></h3>
+<div class="spec">
+<p><tt>setResultSetBufferSize(Rows) -&gt; any()</tt></p>
+</div><p>Sets the number of rows of the result set to buffer at a time.  0 (the default) means buffer the entire result set.</p>
+
+<h3 class="function"><a name="subDouble-4">subDouble/4</a></h3>
+<div class="spec">
+<p><tt>subDouble(Variable, Value, Precision, Scale) -&gt; any()</tt></p>
+</div><p>Defines a decimal substitution variable.</p>
+
+<h3 class="function"><a name="subLong-2">subLong/2</a></h3>
+<div class="spec">
+<p><tt>subLong(Variable, Value) -&gt; any()</tt></p>
+</div><p>Defines an integer substitution variable.</p>
+
+<h3 class="function"><a name="subString-2">subString/2</a></h3>
+<div class="spec">
+<p><tt>subString(Variable, Value) -&gt; any()</tt></p>
+</div><p>Defines a string substitution variable.</p>
+
+<h3 class="function"><a name="suspendResultSet-0">suspendResultSet/0</a></h3>
+<div class="spec">
+<p><tt>suspendResultSet() -&gt; any()</tt></p>
+</div><p>Tells the server to leave this result set open when the connection calls suspendSession() so that another connection can connect to it using resumeResultSet() after it calls resumeSession().</p>
+
+<h3 class="function"><a name="suspendSession-0">suspendSession/0</a></h3>
+<div class="spec">
+<p><tt>suspendSession() -&gt; any()</tt></p>
+</div><p>Disconnects this connection from the current session but leaves the session open so that another connection can connect to it using resumeSession().</p>
+
+<h3 class="function"><a name="totalRows-0">totalRows/0</a></h3>
+<div class="spec">
+<p><tt>totalRows() -&gt; any()</tt></p>
+</div><p>Returns the total number of rows that will be returned in the result set.  Not all databases support this call.  Don't use it for applications which are designed to be portable across databases.  0 is returned by databases which don't support this option.</p>
+
+<h3 class="function"><a name="upperCaseColumnNames-0">upperCaseColumnNames/0</a></h3>
+<div class="spec">
+<p><tt>upperCaseColumnNames() -&gt; any()</tt></p>
+</div><p>Columns names are converted to upper case.</p>
+
+<h3 class="function"><a name="validBind-1">validBind/1</a></h3>
+<div class="spec">
+<p><tt>validBind(Variable) -&gt; any()</tt></p>
+</div><p>Returns true if "variable" was a valid bind variable of the query.</p>
+
+<h3 class="function"><a name="validateBinds-0">validateBinds/0</a></h3>
+<div class="spec">
+<p><tt>validateBinds() -&gt; any()</tt></p>
+</div><p>If you are binding to any variables that might not actually be in your query, call this to ensure that the database won't try to bind them unless they really are in the query.  There is a performance penalty for calling this method.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Dec 23 2016, 00:36:07.</i></p>
+</body>
+</html>

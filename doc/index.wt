@@ -130,6 +130,7 @@ The native SQL Relay client APIs provide advanced features like suspended sessio
  [api/ruby/doc/index.html Ruby][[br]]
  [api/java/index.html Java][[br]]
  [api/tcl/index.html TCL][[br]]
+ [api/erlang/html/index.html Erlang][[br]]
  [api/nodejs/html/annotated.html node.js][[br]]
 }}}
 }}}
