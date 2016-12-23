@@ -30,6 +30,10 @@ enterprise:
 	$(CP) enterpriseadmin.wt.in enterpriseadmin.wt
 	$(MAKE) all
 
+nonenterprise:
+	$(RM) enterprise.wt enterpriseadmin.wt index.html
+	$(MAKE) enterprise.wt enterpriseadmin.wt index.html
+
 install:
 	$(MKINSTALLDIRS) $(docdir)
 	$(MKINSTALLDIRS) $(docdir)/admin
