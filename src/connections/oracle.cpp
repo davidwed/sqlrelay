@@ -1,10 +1,7 @@
-// Copyright (c) 1999-2015  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#ifdef HAVE_ORACLE_8i
-	#include <rudiments/regularexpression.h>
-#endif
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
@@ -17,6 +14,14 @@
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
+
+#ifdef ORACLE_ON_DEMAND
+	#include "oracleondemand.cpp"
+#endif
+
+#ifdef HAVE_ORACLE_8i
+	#include <rudiments/regularexpression.h>
+#endif
 
 #define MAX_BYTES_PER_CHAR	4
 
@@ -36,7 +41,9 @@ extern "C" {
 	#ifdef __CYGWIN__
 		#define _int64 long long
 	#endif
-	#include <oci.h>
+	#ifndef ORACLE_ON_DEMAND
+		#include <oci.h>
+	#endif
 
 	#define VARCHAR2_TYPE 1
 	#define	NUMBER_TYPE 2
@@ -3777,6 +3784,11 @@ void oraclecursor::closeResultSet() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_oracleconnection(
 						sqlrservercontroller *cont) {
+		#ifdef ORACLE_ON_DEMAND
+		if (!openOnDemand()) {
+			return NULL;
+		}
+		#endif
 		return new oracleconnection(cont);
 	}
 }

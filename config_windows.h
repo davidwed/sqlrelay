@@ -7,6 +7,9 @@
 /* Version of DB2 */
 #define DB2VERSION 8
 
+/* Load Oracle libraries on-demand at runtime. */
+#undef ORACLE_ON_DEMAND
+
 /* Use dmalloc */
 #define DMALLOC 1
 

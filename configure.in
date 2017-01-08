@@ -1031,93 +1031,97 @@ echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIB
 echo
 
 
-ORACLE8BUILD="no     "
-MYSQLBUILD="no     "
-POSTGRESQLBUILD="no     "
-SQLITEBUILD="no     "
-FREETDSBUILD="no     "
-SYBASEBUILD="no     "
-ODBCBUILD="no     "
-DB2BUILD="no     "
-FIREBIRDBUILD="no     "
-MDBTOOLSBUILD="no     "
-INFORMIXBUILD="no     "
-ROUTERBUILD="no     "
+ORACLEBUILD="no       "
+MYSQLBUILD="no       "
+POSTGRESQLBUILD="no       "
+SQLITEBUILD="no       "
+FREETDSBUILD="no       "
+SYBASEBUILD="no       "
+ODBCBUILD="no       "
+DB2BUILD="no       "
+FIREBIRDBUILD="no       "
+MDBTOOLSBUILD="no       "
+INFORMIXBUILD="no       "
+ROUTERBUILD="no       "
 if ( test -n "$ORACLEVERSION" ); then
-	ORACLE8BUILD="dynamic"
+	ORACLEBUILD="dynamic  "
 	if ( test -n "$ORACLESTATIC" ); then
-		ORACLE8BUILD="static "
+		ORACLEBUILD="static   "
+	fi
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		ORACLEBUILD="on-demand"
 	fi
 fi
 if ( test -n "$MYSQLLIBS" ); then
-	MYSQLBUILD="dynamic"
+	MYSQLBUILD="dynamic  "
 	if ( test -n "$MYSQLSTATIC" ); then
-		MYSQLBUILD="static "
+		MYSQLBUILD="static   "
 	fi
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
-	POSTGRESQLBUILD="dynamic"
+	POSTGRESQLBUILD="dynamic  "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
-		POSTGRESQLBUILD="static "
+		POSTGRESQLBUILD="static   "
 	fi
 fi
 if ( test -n "$SQLITELIBS" ); then
-	SQLITEBUILD="dynamic"
+	SQLITEBUILD="dynamic  "
 	if ( test -n "$SQLITESTATIC" ); then
-		SQLITEBUILD="static "
+		SQLITEBUILD="static   "
 	fi
 fi
 if ( test -n "$FREETDSLIBS" ); then
-	FREETDSBUILD="dynamic"
+	FREETDSBUILD="dynamic  "
 	if ( test -n "$FREETDSSTATIC" ); then
-		FREETDSBUILD="static "
+		FREETDSBUILD="static   "
 	fi
 fi
 if ( test -n "$SYBASELIBS" ); then
-	SYBASEBUILD="dynamic"
+	SYBASEBUILD="dynamic  "
 	if ( test -n "$SYBASESTATIC" ); then
-		SYBASEBUILD="static "
+		SYBASEBUILD="static   "
 	fi
 fi
 if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
-	ODBCBUILD="dynamic"
+	ODBCBUILD="dynamic  "
 	if ( test -n "$ODBCSTATIC" ); then
-		ODBCBUILD="static "
+		ODBCBUILD="static   "
 	fi
 fi
 if ( test -n "$DB2LIBS" ); then
-	DB2BUILD="dynamic"
+	DB2BUILD="dynamic  "
 	if ( test -n "$DB2STATIC" ); then
-		DB2BUILD="static "
+		DB2BUILD="static   "
 	fi
 fi
 if ( test -n "$FIREBIRDLIBS" ); then
-	FIREBIRDBUILD="dynamic"
+	FIREBIRDBUILD="dynamic  "
 	if ( test -n "$FIREBIRDSTATIC" ); then
-		FIREBIRDBUILD="static "
+		FIREBIRDBUILD="static   "
 	fi
 fi
 if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic"
+	MDBTOOLSBUILD="dynamic  "
 	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static "
+		MDBTOOLSBUILD="static   "
 	fi
 fi
 if ( test -n "$INFORMIXLIBS" ); then
-	INFORMIXBUILD="dynamic"
+	INFORMIXBUILD="dynamic  "
 	if ( test -n "$INFORMIXSTATIC" ); then
-		INFORMIXBUILD="static "
+		INFORMIXBUILD="static   "
 	fi
 fi
 if ( test -n "$ENABLE_ROUTER" ); then
 	ROUTERBUILD="yes   "
 fi
-echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
-echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
-echo "                FreeTDS     $FREETDSBUILD       SAP/Sybase $SYBASEBUILD"
-echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
-echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD       Router     $ROUTERBUILD"
+echo " Databases    : Oracle      $ORACLEBUILD     MySQL      $MYSQLBUILD     "
+echo "                PostgreSQL  $POSTGRESQLBUILD     SQLite     $SQLITEBUILD"
+echo "                FreeTDS     $FREETDSBUILD     SAP/Sybase $SYBASEBUILD"
+echo "                ODBC        $ODBCBUILD     DB2        $DB2BUILD"
+echo "                Firebird    $FIREBIRDBUILD     MDB Tools  $MDBTOOLSBUILD"
+echo "                Informix    $INFORMIXBUILD     Router     $ROUTERBUILD"
 
 echo "*************************************************************"
 echo

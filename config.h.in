@@ -225,6 +225,9 @@
 /* Some versions of glibc-2.3 need a fixup */
 #undef NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
+/* Load Oracle libraries on-demand at runtime. */
+#undef ORACLE_ON_DEMAND
+
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 

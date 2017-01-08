@@ -106,7 +106,7 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		stdoutput.printf(
 			"failed to load router module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -123,9 +123,9 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newRouter) {
-		stdoutput.printf("failed to create router: %s\n",module);
+		stdoutput.printf("failed to load router: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

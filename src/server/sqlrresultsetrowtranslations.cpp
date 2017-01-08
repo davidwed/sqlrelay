@@ -115,7 +115,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 		stdoutput.printf("failed to load "
 				"result set translation module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -134,10 +134,10 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
-		stdoutput.printf("failed to create "
+		stdoutput.printf("failed to load "
 				"result set translation: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

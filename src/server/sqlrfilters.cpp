@@ -110,7 +110,7 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 		stdoutput.printf("failed to load "
 				"filter module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -127,9 +127,9 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newFilter) {
-		stdoutput.printf("failed to create filter: %s\n",module);
+		stdoutput.printf("failed to load filter: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

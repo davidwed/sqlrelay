@@ -104,7 +104,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf("failed to load query module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -121,9 +121,9 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newQuery) {
-		stdoutput.printf("failed to create query: %s\n",module);
+		stdoutput.printf("failed to load query: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

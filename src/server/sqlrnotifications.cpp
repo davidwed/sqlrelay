@@ -119,7 +119,7 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 		stdoutput.printf(
 			"failed to load notification module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -134,9 +134,9 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newNotification) {
-		stdoutput.printf("failed to create notification: %s\n",module);
+		stdoutput.printf("failed to load notification: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

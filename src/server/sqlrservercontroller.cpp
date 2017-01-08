@@ -706,7 +706,7 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 		stderror.printf("failed to load connection module: %s\n",
 							modulename.getString());
 		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("%s\n",(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -720,7 +720,7 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	if (!newConn) {
 		stderror.printf("failed to load connection: %s\n",dbase);
 		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("%s\n",(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -734,15 +734,6 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 		conn=NULL;
 	}
 #endif
-
-	if (!conn) {
-		stderror.printf("failed to create connection: %s\n",dbase);
-#ifdef SQLRELAY_ENABLE_SHARED
-		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",error);
-		delete[] error;
-#endif
-	}
 	return conn;
 }
 
@@ -4871,7 +4862,7 @@ sqlrparser *sqlrservercontroller::newParser() {
 									module);
 		}
 		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("%s\n",(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -4885,7 +4876,7 @@ sqlrparser *sqlrservercontroller::newParser() {
 	if (!newParser) {
 		stderror.printf("failed to load parser: %s\n",module);
 		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("%s\n",(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -4901,15 +4892,6 @@ sqlrparser *sqlrservercontroller::newParser() {
 		parser=NULL;
 	}
 #endif
-
-	if (!parser) {
-		stderror.printf("failed to create parser: %s\n",module);
-#ifdef SQLRELAY_ENABLE_SHARED
-		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",error);
-		delete[] error;
-#endif
-	}
 
 	if (pvt->_debugsqlrparser) {
 		stdoutput.printf("success\n");
@@ -5634,7 +5616,7 @@ void sqlrservercontroller::raiseClientProtocolErrorEvent(
 	}
 	if (error::getErrorNumber()) {
 		char	*error=error::getErrorString();
-		errorbuffer.append(": ")->append(error);
+		errorbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
 	if (pvt->_sqlrlg) {
@@ -5745,7 +5727,7 @@ void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 	errorbuffer.append(info);
 	if (error::getErrorNumber()) {
 		char	*error=error::getErrorString();
-		errorbuffer.append(": ")->append(error);
+		errorbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
 	if (pvt->_sqlrlg) {
@@ -5770,7 +5752,7 @@ void sqlrservercontroller::raiseInternalWarningEvent(sqlrservercursor *cursor,
 	warningbuffer.append(info);
 	if (error::getErrorNumber()) {
 		char	*error=error::getErrorString();
-		warningbuffer.append(": ")->append(error);
+		warningbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
 	if (pvt->_sqlrlg) {

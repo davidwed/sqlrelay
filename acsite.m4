@@ -1258,7 +1258,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
-		AC_MSG_WARN(Oracle support will not be built.)
+		AC_DEFINE(ORACLE_ON_DEMAND,1,Load Oracle libraries on-demand at runtime.)
 	fi
 
 	AC_SUBST(ORACLEVERSION)
@@ -1267,6 +1267,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 	AC_SUBST(ORACLELIBSPATH)
 	AC_SUBST(ORACLESTATIC)
 fi
+AC_SUBST(ENABLE_ORACLE)
 ])
 
 
