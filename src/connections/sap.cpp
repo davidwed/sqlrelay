@@ -13,9 +13,14 @@
 #include <datatypes.h>
 #include <defines.h>
 
-extern "C" {
-	#include <ctpublic.h>
-}
+//#define SAP_ON_DEMAND 1
+#ifdef SAP_ON_DEMAND
+	#include "sapondemand.cpp"
+#else
+	extern "C" {
+		#include <ctpublic.h>
+	}
+#endif
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
@@ -340,6 +345,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 			"Failed to allocate a context structure",2);
 		return false;
 	}
+
 	// init the context
 	if (ct_init(context,CS_VERSION_100)!=CS_SUCCEED) {
 		*error=logInError(
@@ -1856,6 +1862,11 @@ void sapconnection::errorMessage(char *errorbuffer,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_sapconnection(
 						sqlrservercontroller *cont) {
+		#ifdef SAP_ON_DEMAND
+		if (!openOnDemand()) {
+			return NULL;
+		}
+		#endif
 		return new sapconnection(cont);
 	}
 }

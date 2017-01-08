@@ -811,6 +811,7 @@ error:
 	err.append("\nFailed to load ")->append(module);
 	err.append(" libraries on-demand.\n");
 	err.append(error)->append('\n');
+	stdoutput.write(err.getString());
 	delete[] error;
 	return false;
 }
