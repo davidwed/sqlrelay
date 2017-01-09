@@ -971,10 +971,12 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 	const char	*warning=NULL;
 	if (!pvt->_conn->logIn(&err,&warning)) {
 		if (printerrors) {
-			stderror.printf("Couldn't log into database.\n");
+			stringbuffer	loginerror;
+			loginerror.append("Couldn't log into database.\n");
 			if (err) {
-				stderror.printf("%s\n",err);
+				loginerror.append(err)->append('\n');
 			}
+			stderror.write(loginerror.getString());
 		}
 		if (pvt->_sqlrlg) {
 			pvt->_debugstr.clear();

@@ -4,9 +4,9 @@
 #include <rudiments/dynamiclib.h>
 
 
-// for now we only support 10.5...
+// FIXME: for now, assume version 8+
 #undef DB2VERSION
-#define DB2VERSION	10
+#define DB2VERSION	8
 
 
 // types...
@@ -268,21 +268,78 @@ SQLRETURN (*SQLCloseCursor)(SQLHSTMT hStmt);
 
 
 // dlopen infrastructure...
+static bool		alreadyopen=false;
 static dynamiclib	lib;
-static const char	*module="db2";
-static const char	*libname="libdb2.so";
-static const char	*pathnames[]={
-	"/opt/ibm/db2/V10.5/lib64",
-	"/opt/ibm/db2/V10.5/lib32",
-	NULL
-};
 
-static bool openOnDemand() {
+static bool loadLibraries(stringbuffer *errormessage, const char *db2path) {
 
-	// buffer to store any errors we might get
-	stringbuffer	err;
+	// don't open multiple times...
+	if (alreadyopen) {
+		return true;
+	}
+	alreadyopen=true;
+
+	// build path names
+	const char	**pathnames=new const char *[37];
+	uint16_t	p=0;
+	stringbuffer	libdir64;
+	stringbuffer	libdir32;
+	stringbuffer	libdir;
+	if (!charstring::isNullOrEmpty(db2path)) {
+		libdir64.append(db2path)->append("/lib64");
+		libdir32.append(db2path)->append("/lib32");
+		libdir.append(db2path)->append("/lib");
+		pathnames[p++]=libdir64.getString();
+		pathnames[p++]=libdir32.getString();
+		pathnames[p++]=libdir.getString();
+	}
+	// FIXME: decide whether to use 32 or 64 bit libraries rather than
+	// checking for both...
+	pathnames[p++]="/opt/ibm/db2/V10.5/lib64";
+	pathnames[p++]="/opt/IBM/db2/V10.5/lib64";
+	pathnames[p++]="/opt/ibm/db2/V10.5/lib32";
+	pathnames[p++]="/opt/IBM/db2/V10.5/lib32";
+	pathnames[p++]="/opt/ibm/db2/V10.5/lib";
+	pathnames[p++]="/opt/IBM/db2/V10.5/lib";
+
+	pathnames[p++]="/opt/ibm/db2/V10.1/lib64";
+	pathnames[p++]="/opt/IBM/db2/V10.1/lib64";
+	pathnames[p++]="/opt/ibm/db2/V10.1/lib32";
+	pathnames[p++]="/opt/IBM/db2/V10.1/lib32";
+	pathnames[p++]="/opt/ibm/db2/V10.1/lib";
+	pathnames[p++]="/opt/IBM/db2/V10.1/lib";
+
+	pathnames[p++]="/opt/ibm/db2/V9.7/lib64";
+	pathnames[p++]="/opt/IBM/db2/V9.7/lib64";
+	pathnames[p++]="/opt/ibm/db2/V9.7/lib32";
+	pathnames[p++]="/opt/IBM/db2/V9.7/lib32";
+	pathnames[p++]="/opt/ibm/db2/V9.7/lib";
+	pathnames[p++]="/opt/IBM/db2/V9.7/lib";
+
+	pathnames[p++]="/opt/ibm/db2/V9.5/lib64";
+	pathnames[p++]="/opt/IBM/db2/V9.5/lib64";
+	pathnames[p++]="/opt/ibm/db2/V9.5/lib32";
+	pathnames[p++]="/opt/IBM/db2/V9.5/lib32";
+	pathnames[p++]="/opt/ibm/db2/V9.5/lib";
+	pathnames[p++]="/opt/IBM/db2/V9.5/lib";
+
+	pathnames[p++]="/opt/ibm/db2/V9.1/lib64";
+	pathnames[p++]="/opt/IBM/db2/V9.1/lib64";
+	pathnames[p++]="/opt/ibm/db2/V9.1/lib32";
+	pathnames[p++]="/opt/IBM/db2/V9.1/lib32";
+	pathnames[p++]="/opt/ibm/db2/V9.1/lib";
+	pathnames[p++]="/opt/IBM/db2/V9.1/lib";
+
+	pathnames[p++]="/opt/IBM/db2/V8.1/lib";
+
+	// FIXME: for now we only support 8+
+	//pathnames[p++]="/opt/IBM/db2/V7.1/lib";
+	//pathnames[p++]="/usr/IBM/db2/V7.1/lib";
+
+	pathnames[p++]=NULL;
 
 	// look for the library
+	const char	*libname="libdb2.so";
 	stringbuffer	libfilename;
 	const char	**path=pathnames;
 	while (*path) {
@@ -294,16 +351,18 @@ static bool openOnDemand() {
 		path++;
 	}
 	if (!*path) {
-		err.append("\nFailed to load ")->append(module);
-		err.append(" libraries.\n");
-		err.append(libname)->append(" was not found in any "
-						"of these paths:\n");
+		errormessage->clear();
+		errormessage->append("\nFailed to load DB2 libraries.\n");
+		if (charstring::isNullOrEmpty(db2path)) {
+			errormessage->append("db2 parameter not set and ");
+		}
+		errormessage->append(libname)->append(" was not found in any "
+							"of these paths:\n");
 		path=pathnames;
 		while (*path) {
-			err.append('	')->append(*path)->append('\n');
+			errormessage->append('	')->append(*path)->append('\n');
 			path++;
 		}
-		stdoutput.write(err.getString());
 		return false;
 	}
 
@@ -464,9 +523,30 @@ static bool openOnDemand() {
 	// error
 error:
 	char	*error=lib.getError();
-	err.append("\nFailed to load ")->append(module);
-	err.append(" libraries on-demand.\n");
-	err.append(error)->append('\n');
+	errormessage->clear();
+	errormessage->append("\nFailed to load DB2 libraries.\n");
+	errormessage->append(error)->append('\n');
+	#ifndef _WIN32
+	if (charstring::contains(error,"No such file or directory")) {
+		errormessage->append("\n(NOTE: The error message above may "
+					"be misleading.  Most likely it means "
+					"that a library that ");
+		errormessage->append(libname);
+		errormessage->append(" depends on could not be located.  ");
+		errormessage->append(libname)->append(" was found in ");
+		errormessage->append(*path)->append(".  Verify that ");
+		errormessage->append(*path);
+		errormessage->append(" and directories containing each of "
+					"the libraries that ");
+		errormessage->append(libname);
+		errormessage->append(" depends on are included in your "
+					"LD_LIBRARY_PATH, /etc/ld.so.conf, "
+					"or /etc/ld.so.conf.d.  Try using "
+					"ldd to show ");
+		errormessage->append(*path)->append('/')->append(libname);
+		errormessage->append("'s dependencies.)\n");
+	}
+	#endif
 	delete[] error;
 	return false;
 }

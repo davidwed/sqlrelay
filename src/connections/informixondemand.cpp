@@ -249,20 +249,32 @@ SQLRETURN (*SQLCloseCursor)(SQLHSTMT hStmt);
 
 
 // dlopen infrastructure...
+static bool		alreadyopen=false;
 static dynamiclib	lib;
-static const char	*module="informix";
-static const char	*libname="libifcli.so";
-static const char	*pathnames[]={
-	"/opt/informix/lib/cli",
-	NULL
-};
 
-static bool openOnDemand() {
+static bool loadLibraries(stringbuffer *errormessage) {
 
-	// buffer to store any errors we might get
-	stringbuffer	err;
+	// don't open multiple times...
+	if (alreadyopen) {
+		return true;
+	}
+	alreadyopen=true;
+
+	// build path names
+	const char	**pathnames=new const char *[4];
+	uint16_t	p=0;
+	stringbuffer	libdir;
+	const char	*informix=environment::getValue("INFORMIXDIR");
+	if (!charstring::isNullOrEmpty(informix)) {
+		libdir.append(informix)->append("/lib/cli");
+		pathnames[p++]=libdir.getString();
+	}
+	pathnames[p++]="/opt/informix/lib/cli";
+	pathnames[p++]="/usr/local/informix/lib/cli";
+	pathnames[p++]=NULL;
 
 	// look for the library
+	const char	*libname="libifcli.so";
 	stringbuffer	libfilename;
 	const char	**path=pathnames;
 	while (*path) {
@@ -274,16 +286,18 @@ static bool openOnDemand() {
 		path++;
 	}
 	if (!*path) {
-		err.append("\nFailed to load ")->append(module);
-		err.append(" libraries.\n");
-		err.append(libname)->append(" was not found in any "
-						"of these paths:\n");
+		errormessage->clear();
+		errormessage->append("\nFailed to load Informix libraries.\n");
+		if (charstring::isNullOrEmpty(informix)) {
+			errormessage->append("INFORMIXDIR not set and ");
+		}
+		errormessage->append(libname)->append(" was not found in any "
+							"of these paths:\n");
 		path=pathnames;
 		while (*path) {
-			err.append('	')->append(*path)->append('\n');
+			errormessage->append('	')->append(*path)->append('\n');
 			path++;
 		}
-		stdoutput.write(err.getString());
 		return false;
 	}
 
@@ -483,9 +497,30 @@ static bool openOnDemand() {
 	// error
 error:
 	char	*error=lib.getError();
-	err.append("\nFailed to load ")->append(module);
-	err.append(" libraries on-demand.\n");
-	err.append(error)->append('\n');
+	errormessage->clear();
+	errormessage->append("\nFailed to load Informix libraries.\n");
+	errormessage->append(error)->append('\n');
+	#ifndef _WIN32
+	if (charstring::contains(error,"No such file or directory")) {
+		errormessage->append("\n(NOTE: The error message above may "
+					"be misleading.  Most likely it means "
+					"that a library that ");
+		errormessage->append(libname);
+		errormessage->append(" depends on could not be located.  ");
+		errormessage->append(libname)->append(" was found in ");
+		errormessage->append(*path)->append(".  Verify that ");
+		errormessage->append(*path);
+		errormessage->append(" and directories containing each of "
+					"the libraries that ");
+		errormessage->append(libname);
+		errormessage->append(" depends on are included in your "
+					"LD_LIBRARY_PATH, /etc/ld.so.conf, "
+					"or /etc/ld.so.conf.d.  Try using "
+					"ldd to show ");
+		errormessage->append(*path)->append('/')->append(libname);
+		errormessage->append("'s dependencies.)\n");
+	}
+	#endif
 	delete[] error;
 	return false;
 }

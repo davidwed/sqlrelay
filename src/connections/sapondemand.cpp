@@ -379,20 +379,44 @@ CS_RETCODE (*cs_dt_crack)(
 
 
 // dlopen infrastructure...
+static bool		alreadyopen=false;
 static dynamiclib	lib;
-static const char	*module="sap";
-static const char	*libname="libsybblk64.so";
-static const char	*pathnames[]={
-	"/opt/sap/OCS-16_0/lib",
-	NULL
-};
 
-static bool openOnDemand() {
+static bool loadLibraries(stringbuffer *errormessage) {
 
-	// buffer to store any errors we might get
-	stringbuffer	err;
+	// don't open multiple times...
+	if (alreadyopen) {
+		return true;
+	}
+	alreadyopen=true;
+
+	// build path names
+	const char	**pathnames=new const char *[12];
+	uint16_t	p=0;
+	stringbuffer	libdir16;
+	stringbuffer	libdir15;
+	stringbuffer	libdir125;
+	const char	*sybase=environment::getValue("SYBASE");
+	if (!charstring::isNullOrEmpty(sybase)) {
+		libdir16.append(sybase)->append("/OCS-16_0/lib");
+		libdir15.append(sybase)->append("/OCS-15_0/lib");
+		libdir125.append(sybase)->append("/OCS-12_5/lib");
+		pathnames[p++]=libdir16.getString();
+		pathnames[p++]=libdir15.getString();
+		pathnames[p++]=libdir125.getString();
+	}
+	pathnames[p++]="/opt/sap/OCS-16_0/lib";
+	pathnames[p++]="/opt/sybase/OCS-15_0/lib";
+	pathnames[p++]="/opt/sybase/OCS-12_5/lib";
+	pathnames[p++]="/opt/sybase-12.5/OCS-12_5/lib";
+	pathnames[p++]="/opt/sybase-11.9.2/lib";
+	pathnames[p++]="/opt/sybase-11.0.3.3/lib";
+	pathnames[p++]="/opt/sybase/lib";
+	pathnames[p++]="/usr/local/sybase/lib";
+	pathnames[p++]=NULL;
 
 	// look for the library
+	const char	*libname="libsybblk64.so";
 	stringbuffer	libfilename;
 	const char	**path=pathnames;
 	while (*path) {
@@ -404,16 +428,18 @@ static bool openOnDemand() {
 		path++;
 	}
 	if (!*path) {
-		err.append("\nFailed to load ")->append(module);
-		err.append(" libraries.\n");
-		err.append(libname)->append(" was not found in any "
-						"of these paths:\n");
+		errormessage->clear();
+		errormessage->append("\nFailed to load SAP libraries.\n");
+		if (charstring::isNullOrEmpty(sybase)) {
+			errormessage->append("SYBASE not set and ");
+		}
+		errormessage->append(libname)->append(" was not found in any "
+							"of these paths:\n");
 		path=pathnames;
 		while (*path) {
-			err.append('	')->append(*path)->append('\n');
+			errormessage->append('	')->append(*path)->append('\n');
 			path++;
 		}
-		stdoutput.write(err.getString());
 		return false;
 	}
 
@@ -683,10 +709,30 @@ static bool openOnDemand() {
 	// error
 error:
 	char	*error=lib.getError();
-	err.append("\nFailed to load ")->append(module);
-	err.append(" libraries on-demand.\n");
-	err.append(error)->append('\n');
-	stdoutput.write(err.getString());
+	errormessage->clear();
+	errormessage->append("\nFailed to load SAP libraries.\n");
+	errormessage->append(error)->append('\n');
+	#ifndef _WIN32
+	if (charstring::contains(error,"No such file or directory")) {
+		errormessage->append("\n(NOTE: The error message above may "
+					"be misleading.  Most likely it means "
+					"that a library that ");
+		errormessage->append(libname);
+		errormessage->append(" depends on could not be located.  ");
+		errormessage->append(libname)->append(" was found in ");
+		errormessage->append(*path)->append(".  Verify that ");
+		errormessage->append(*path);
+		errormessage->append(" and directories containing each of "
+					"the libraries that ");
+		errormessage->append(libname);
+		errormessage->append(" depends on are included in your "
+					"LD_LIBRARY_PATH, /etc/ld.so.conf, "
+					"or /etc/ld.so.conf.d.  Try using "
+					"ldd to show ");
+		errormessage->append(*path)->append('/')->append(libname);
+		errormessage->append("'s dependencies.)\n");
+	}
+	#endif
 	delete[] error;
 	return false;
 }

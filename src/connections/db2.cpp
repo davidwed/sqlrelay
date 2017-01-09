@@ -268,6 +268,7 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		SQLRETURN	erg;
 		SQLHDBC		dbc;
 
+		const char	*db2path;
 		const char	*server;
 		const char	*lang;
 		uint32_t	timeout;
@@ -302,6 +303,8 @@ db2connection::db2connection(sqlrservercontroller *cont) :
 }
 
 void db2connection::handleConnectString() {
+
+	db2path=cont->getConnectStringValue("db2path");
 
 	// override legacy "server" parameter with modern "db" parameter
 	server=cont->getConnectStringValue("server");
@@ -371,6 +374,13 @@ bool db2connection::logIn(const char **error, const char **warning) {
 		*error="Failed to set LANG environment variable";
 		return false;
 	}
+
+	#ifdef DB2_ON_DEMAND
+	if (!loadLibraries(&errormessage,db2path)) {
+		*error=errormessage.getString();
+		return false;
+	}
+	#endif
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
@@ -1812,11 +1822,6 @@ void db2cursor::closeResultSet() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_db2connection(
 						sqlrservercontroller *cont) {
-		#ifdef DB2_ON_DEMAND
-		if (!openOnDemand()) {
-			return NULL;
-		}
-		#endif
 		return new db2connection(cont);
 	}
 }

@@ -388,6 +388,13 @@ bool informixconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
+	#ifdef INFORMIX_ON_DEMAND
+	if (!loadLibraries(&errormessage)) {
+		*error=errormessage.getString();
+		return NULL;
+	}
+	#endif
+
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1799,11 +1806,6 @@ void informixcursor::closeResultSet() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_informixconnection(
 						sqlrservercontroller *cont) {
-		#ifdef INFORMIX_ON_DEMAND
-		if (!openOnDemand()) {
-			return NULL;
-		}
-		#endif
 		return new informixconnection(cont);
 	}
 }

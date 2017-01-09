@@ -4,7 +4,7 @@
 #include <rudiments/dynamiclib.h>
 
 
-// for now we only support 12c, so this is true...
+// FIXME: for now, assume version 8i+
 #undef HAVE_ORACLE_8i
 #define HAVE_ORACLE_8i	1
 
@@ -331,6 +331,7 @@ sword (*OCITransRollback)(OCISvcCtx *,
 #define OCI_CRED_EXT	2
 #define OCI_CRED_PROXY	3
 
+// FIXME: for now, assume this is supported...
 #define OCI_ATTR_PROXY_CREDENTIALS	99
 
 #define OCI_NTV_SYNTAX	1
@@ -339,6 +340,7 @@ sword (*OCITransRollback)(OCISvcCtx *,
 
 #define OCI_STRLS_CACHE_DELETE	0x0010
 
+// FIXME: for now, assume this is supported...
 #define OCI_STMT_CACHE	0x00000040
 
 #define OCI_STMT_SELECT	1
@@ -377,47 +379,73 @@ sword (*OCITransRollback)(OCISvcCtx *,
 
 
 // dlopen infrastructure...
+static bool		alreadyopen=false;
 static dynamiclib	lib;
-static const char	*module="oracle";
-static const char	*libname="libclntsh.so";
-static const char	*pathnames[]={
-	"/usr/lib/oracle/12.1/client64/lib",
-	"/usr/lib/oracle/12.1/client/lib",
-	NULL
-};
 
-static bool openOnDemand() {
+static bool loadLibraries(stringbuffer *errormessage) {
 
-	// buffer to store any errors we might get
-	stringbuffer	err;
+	// don't open multiple times...
+	if (alreadyopen) {
+		return true;
+	}
+	alreadyopen=true;
+
+	// build lib names
+	const char	**libnames=new const char *[14];
+	uint16_t	p=0;
+	stringbuffer	libdir;
+	const char	*oraclehome=environment::getValue("ORACLE_HOME");
+	if (!charstring::isNullOrEmpty(oraclehome)) {
+		libdir.append(oraclehome)->append("/lib/libclntsh.so");
+		libnames[p++]=libdir.getString();
+	}
+	// FIXME: decide whether to use 32 or 64 bit libraries rather than
+	// checking for both...
+	libnames[p++]="/usr/lib/oracle/12.1/client64/lib/libclntsh.so";
+	libnames[p++]="/usr/lib/oracle/12.1/client/lib/libclntsh.so";
+	libnames[p++]="/opt/instantclient_12_1/libclntsh.so.12.1";
+	libnames[p++]="/usr/local/instantclient_12_1/libclntsh.so.12.1";
+
+	libnames[p++]="/usr/lib/oracle/11.2/client64/lib/libclntsh.so";
+	libnames[p++]="/usr/lib/oracle/11.2/client/lib/libclntsh.so";
+	libnames[p++]="/opt/instantclient_11_2/libclntsh.so.11.2";
+	libnames[p++]="/usr/local/instantclient_11_2/libclntsh.so.11.2";
+
+	libnames[p++]="/usr/lib/oracle/10.2/client64/lib/libclntsh.so";
+	libnames[p++]="/usr/lib/oracle/10.2/client/lib/libclntsh.so";
+	libnames[p++]="/opt/instantclient_10_2/libclntsh.so.10.2";
+	libnames[p++]="/usr/local/instantclient_10_2/libclntsh.so.10.2";
+
+	libnames[p++]=NULL;
 
 	// look for the library
-	stringbuffer	libfilename;
-	const char	**path=pathnames;
-	while (*path) {
-		libfilename.clear();
-		libfilename.append(*path)->append('/')->append(libname);
-		if (file::readable(libfilename.getString())) {
+	const char	**libname=libnames;
+	while (*libname) {
+		if (file::readable(*libname)) {
 			break;
 		}
-		path++;
+		libname++;
 	}
-	if (!*path) {
-		err.append("\nFailed to load ")->append(module);
-		err.append(" libraries.\n");
-		err.append(libname)->append(" was not found in any "
-						"of these paths:\n");
-		path=pathnames;
-		while (*path) {
-			err.append('	')->append(*path)->append('\n');
-			path++;
+	if (!*libname) {
+		errormessage->clear();
+		errormessage->append("\nFailed to load Oracle libraries.\n");
+		if (charstring::isNullOrEmpty(oraclehome)) {
+			errormessage->append("ORACLE_HOME not set and none");
+		} else {
+			errormessage->append("None");
 		}
-		stdoutput.write(err.getString());
+		errormessage->append(" of these libraries were found:\n");
+		libname=libnames;
+		while (*libname) {
+			errormessage->append('	');
+			errormessage->append(*libname)->append('\n');
+			libname++;
+		}
 		return false;
 	}
 
 	// open the library
-	if (!lib.open(libfilename.getString(),true,true)) {
+	if (!lib.open(*libname,true,true)) {
 		goto error;
 	}
 
@@ -808,10 +836,33 @@ static bool openOnDemand() {
 	// error
 error:
 	char	*error=lib.getError();
-	err.append("\nFailed to load ")->append(module);
-	err.append(" libraries on-demand.\n");
-	err.append(error)->append('\n');
-	stdoutput.write(err.getString());
+	errormessage->clear();
+	errormessage->append("\nFailed to load Oracle libraries.\n");
+	errormessage->append(error)->append('\n');
+	#ifndef _WIN32
+	if (charstring::contains(error,"No such file or directory")) {
+		char		*path=file::dirname(*libname);
+		const char	*lib=(*libname)+charstring::length(path)+1;
+		errormessage->append("\n(NOTE: The error message above may "
+					"be misleading.  Most likely it means "
+					"that a library that ");
+		errormessage->append(lib);
+		errormessage->append(" depends on could not be located.  ");
+		errormessage->append(lib)->append(" was found in ");
+		errormessage->append(path)->append(".  Verify that ");
+		errormessage->append(path);
+		errormessage->append(" and directories containing each of "
+					"the libraries that ");
+		errormessage->append(lib);
+		errormessage->append(" depends on are included in your "
+					"LD_LIBRARY_PATH, /etc/ld.so.conf, "
+					"or /etc/ld.so.conf.d.  Try using "
+					"ldd to show ");
+		errormessage->append(*path)->append('/')->append(lib);
+		errormessage->append("'s dependencies.)\n");
+		delete[] path;
+	}
+	#endif
 	delete[] error;
 	return false;
 }

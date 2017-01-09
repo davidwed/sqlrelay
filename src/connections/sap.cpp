@@ -337,6 +337,13 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
+	#ifdef SYBASE_ON_DEMAND
+	if (!loadLibraries(&loginerror)) {
+		*error=loginerror.getString();
+		return false;
+	}
+	#endif
+
 	// allocate a context
 	context=(CS_CONTEXT *)NULL;
 	if (cs_ctx_alloc(CS_VERSION_100,&context)!=CS_SUCCEED) {
@@ -1861,11 +1868,6 @@ void sapconnection::errorMessage(char *errorbuffer,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_sapconnection(
 						sqlrservercontroller *cont) {
-		#ifdef SYBASE_ON_DEMAND
-		if (!openOnDemand()) {
-			return NULL;
-		}
-		#endif
 		return new sapconnection(cont);
 	}
 }
