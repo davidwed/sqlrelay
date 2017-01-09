@@ -1,7 +1,7 @@
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
 	updated some module-load error verbage
-	added initial support for loading Oracle, SAP/Sybase, DB2 and Informix
+	added initial support for loading Oracle, SAP/Sybase, DB2, and Informix
 		libraries on-demand at runtime
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
