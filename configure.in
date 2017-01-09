@@ -1082,6 +1082,10 @@ if ( test -n "$SYBASELIBS" ); then
 	if ( test -n "$SYBASESTATIC" ); then
 		SYBASEBUILD="static   "
 	fi
+else
+	if ( test -n "$ENABLE_SYBASE" ); then
+		SYBASEBUILD="on-demand"
+	fi
 fi
 if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
 	ODBCBUILD="dynamic  "

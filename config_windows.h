@@ -410,5 +410,8 @@
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
 
+/* Load SAP/Sybase libraries on-demand at runtime. */
+/* #undef SYBASE_ON_DEMAND */
+
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef mode_t */

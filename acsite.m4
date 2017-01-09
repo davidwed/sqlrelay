@@ -1258,6 +1258,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
+		AC_MSG_WARN(Oracle libraries will be loaded on-demand at runtime.)
 		AC_DEFINE(ORACLE_ON_DEMAND,1,Load Oracle libraries on-demand at runtime.)
 	fi
 
@@ -2042,7 +2043,8 @@ $GLIBC23HACKCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],
 
 		if ( test -z "$SYBASELIBS" )
 		then
-			AC_MSG_WARN(Sybase support will not be built.)
+			AC_MSG_WARN(SAP/Sybase libraries will be loaded on-demand at runtime.)
+			AC_DEFINE(SYBASE_ON_DEMAND,1,Load SAP/Sybase libraries on-demand at runtime.)
 		fi
 	fi
 
@@ -2054,6 +2056,7 @@ $GLIBC23HACKCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],
 	AC_SUBST(SYBASELIBSPATH)
 	AC_SUBST(SYBASESTATIC)
 fi
+AC_SUBST(ENABLE_SYBASE)
 ])
 
 

@@ -465,6 +465,7 @@ endif
 
 
 # sap/sybase
+ENABLE_SYBASE = @ENABLE_SYBASE@
 SYBASEINCLUDES = @SYBASEINCLUDES@
 SYBASELIBS = @SYBASELIBS@
 SYBASELIBSPATH = @SYBASELIBSPATH@
@@ -772,7 +773,7 @@ ifneq ($(strip $(SQLITELIBS)),)
 CONNECTIONSALLTARGETS += all-sqlite
 CONNECTIONSINSTALLTARGETS += installsharedlib-sqlite
 endif
-ifneq ($(strip $(SYBASELIBS)),)
+ifeq ($(strip $(ENABLE_SYBASE)),yes)
 CONNECTIONSALLTARGETS += all-sap
 CONNECTIONSINSTALLTARGETS += installsharedlib-sap
 endif

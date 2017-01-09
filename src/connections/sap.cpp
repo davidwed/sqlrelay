@@ -13,8 +13,7 @@
 #include <datatypes.h>
 #include <defines.h>
 
-//#define SAP_ON_DEMAND 1
-#ifdef SAP_ON_DEMAND
+#ifdef SYBASE_ON_DEMAND
 	#include "sapondemand.cpp"
 #else
 	extern "C" {
@@ -1862,7 +1861,7 @@ void sapconnection::errorMessage(char *errorbuffer,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_sapconnection(
 						sqlrservercontroller *cont) {
-		#ifdef SAP_ON_DEMAND
+		#ifdef SYBASE_ON_DEMAND
 		if (!openOnDemand()) {
 			return NULL;
 		}

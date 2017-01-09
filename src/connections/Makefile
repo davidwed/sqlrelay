@@ -164,7 +164,7 @@ sap.obj: sap.cpp
 	$(CXX) $(CXXFLAGS) $(SYBASECONNECTIONCPPFLAGS) $(COMPILE) sap.cpp
 
 $(SQLR)connection_sap.$(LIBEXT): sap.$(OBJ) sap.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ sap.$(OBJ) $(LDFLAGS) $(SYBASECONNECTIONLIBS) $(MODLINKFLAGS) -lefence
+	$(LTLINK) $(LINK) $(OUT)$@ sap.$(OBJ) $(LDFLAGS) $(SYBASECONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 

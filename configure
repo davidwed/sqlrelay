@@ -725,6 +725,7 @@ ODBCSTATIC
 ODBCLIBSPATH
 ODBCLIBS
 ODBCINCLUDES
+ENABLE_SYBASE
 SYBASESTATIC
 SYBASELIBSPATH
 SYBASELIBS
@@ -19412,6 +19413,8 @@ fi
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Oracle libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: WARNING: Oracle libraries will be loaded on-demand at runtime." >&2;}
 
 $as_echo "#define ORACLE_ON_DEMAND 1" >>confdefs.h
 
@@ -25388,8 +25391,11 @@ $as_echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 
 		if ( test -z "$SYBASELIBS" )
 		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Sybase support will not be built." >&5
-$as_echo "$as_me: WARNING: Sybase support will not be built." >&2;}
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SAP/Sybase libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: WARNING: SAP/Sybase libraries will be loaded on-demand at runtime." >&2;}
+
+$as_echo "#define SYBASE_ON_DEMAND 1" >>confdefs.h
+
 		fi
 	fi
 
@@ -25411,6 +25417,7 @@ fi
 
 
 fi
+
 
 echo "******************************"
 
@@ -37070,6 +37077,10 @@ if ( test -n "$SYBASELIBS" ); then
 	SYBASEBUILD="dynamic  "
 	if ( test -n "$SYBASESTATIC" ); then
 		SYBASEBUILD="static   "
+	fi
+else
+	if ( test -n "$ENABLE_SYBASE" ); then
+		SYBASEBUILD="on-demand"
 	fi
 fi
 if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
