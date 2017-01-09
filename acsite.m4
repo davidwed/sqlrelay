@@ -2395,16 +2395,19 @@ then
 			AC_MSG_CHECKING(for build with $DB2LIBS)
 			FW_TRY_LINK([#include <sqlcli1.h>],[SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,NULL);],[$DB2INCLUDES],[$DB2LIBS],[$DB2LIBSPATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); DB2INCLUDES=""; DB2LIBS=""; DB2LIBSPATH=""])
 		fi
-		if ( test -z "$DB2LIBS" )
-		then
-			AC_MSG_WARN(DB2 support will not be built.)
-		fi
+	fi
+
+	if ( test -z "$DB2LIBS" )
+	then
+		AC_MSG_WARN(DB2 libraries will be loaded on-demand at runtime.)
+		AC_DEFINE(DB2_ON_DEMAND,1,Load DB2 libraries on-demand at runtime.)
 	fi
 
 	if ( test -n "$DB2LIBS" )
 	then
 		FW_VERSION(db2,[$DB2VERSION])
 	fi
+
 	FW_INCLUDES(db2,[$DB2INCLUDES])
 	FW_LIBS(db2,[$DB2LIBS])
 		
@@ -2414,6 +2417,7 @@ then
 	AC_SUBST(DB2STATIC)
 	AC_DEFINE_UNQUOTED(DB2VERSION,$DB2VERSION,Version of DB2)
 fi
+AC_SUBST(ENABLE_DB2)
 ])
 
 

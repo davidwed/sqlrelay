@@ -8,7 +8,11 @@
 #include <defines.h>
 #include <config.h>
 
-#include <sqlcli1.h>
+#ifdef DB2_ON_DEMAND
+	#include "db2ondemand.cpp"
+#else
+	#include <sqlcli1.h>
+#endif
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
@@ -1808,6 +1812,11 @@ void db2cursor::closeResultSet() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_db2connection(
 						sqlrservercontroller *cont) {
+		#ifdef DB2_ON_DEMAND
+		if (!openOnDemand()) {
+			return NULL;
+		}
+		#endif
 		return new db2connection(cont);
 	}
 }

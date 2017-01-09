@@ -6,6 +6,9 @@
 /* Version of DB2 */
 #undef DB2VERSION
 
+/* Load DB2 libraries on-demand at runtime. */
+#undef DB2_ON_DEMAND
+
 /* Use dmalloc */
 #undef DMALLOC
 

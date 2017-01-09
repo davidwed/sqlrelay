@@ -716,6 +716,7 @@ INFORMIXESQLLIBSPATH
 INFORMIXCLILIBSPATH
 INFORMIXLIBS
 INFORMIXINCLUDES
+ENABLE_DB2
 DB2STATIC
 DB2LIBSPATH
 DB2LIBS
@@ -29409,11 +29410,15 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 		fi
-		if ( test -z "$DB2LIBS" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 support will not be built." >&5
-$as_echo "$as_me: WARNING: DB2 support will not be built." >&2;}
-		fi
+	fi
+
+	if ( test -z "$DB2LIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: WARNING: DB2 libraries will be loaded on-demand at runtime." >&2;}
+
+$as_echo "#define DB2_ON_DEMAND 1" >>confdefs.h
+
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -29425,6 +29430,7 @@ then
 fi
 
 	fi
+
 
 if ( test -n "$DB2INCLUDES" )
 then
@@ -29448,6 +29454,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 fi
+
 
 echo "******************************"
 
@@ -37093,6 +37100,10 @@ if ( test -n "$DB2LIBS" ); then
 	DB2BUILD="dynamic  "
 	if ( test -n "$DB2STATIC" ); then
 		DB2BUILD="static   "
+	fi
+else
+	if ( test -n "$ENABLE_DB2" ); then
+		DB2BUILD="on-demand"
 	fi
 fi
 if ( test -n "$FIREBIRDLIBS" ); then

@@ -1098,6 +1098,10 @@ if ( test -n "$DB2LIBS" ); then
 	if ( test -n "$DB2STATIC" ); then
 		DB2BUILD="static   "
 	fi
+else
+	if ( test -n "$ENABLE_DB2" ); then
+		DB2BUILD="on-demand"
+	fi
 fi
 if ( test -n "$FIREBIRDLIBS" ); then
 	FIREBIRDBUILD="dynamic  "
