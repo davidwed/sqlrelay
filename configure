@@ -712,6 +712,7 @@ FIREBIRDSTATIC
 FIREBIRDLIBSPATH
 FIREBIRDLIBS
 FIREBIRDINCLUDES
+ENABLE_INFORMIX
 INFORMIXESQLLIBSPATH
 INFORMIXCLILIBSPATH
 INFORMIXLIBS
@@ -29540,6 +29541,15 @@ fi
 		INFORMIXLIBS="$INFORMIXLIBS -L$INFORMIXESQLLIBSPATH -lifgls -lifglx"
 	fi
 
+	if ( test -z "$INFORMIXLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Informix libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: WARNING: Informix libraries will be loaded on-demand at runtime." >&2;}
+
+$as_echo "#define INFORMIX_ON_DEMAND 1" >>confdefs.h
+
+	fi
+
 
 if ( test -n "$INFORMIXINCLUDES" )
 then
@@ -29559,6 +29569,7 @@ fi
 
 
 fi
+
 
 echo "******************************"
 
@@ -37122,6 +37133,10 @@ if ( test -n "$INFORMIXLIBS" ); then
 	INFORMIXBUILD="dynamic  "
 	if ( test -n "$INFORMIXSTATIC" ); then
 		INFORMIXBUILD="static   "
+	fi
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		INFORMIXBUILD="on-demand"
 	fi
 fi
 if ( test -n "$ENABLE_ROUTER" ); then

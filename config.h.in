@@ -219,6 +219,9 @@
 /* Some iconv implementations use a const char ** parameter */
 #undef ICONV_CONST_CHAR
 
+/* Load Informix libraries on-demand at runtime. */
+#undef INFORMIX_ON_DEMAND
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 

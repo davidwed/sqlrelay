@@ -2468,6 +2468,12 @@ then
 		INFORMIXLIBS="$INFORMIXLIBS -L$INFORMIXESQLLIBSPATH -lifgls -lifglx"
 	fi
 
+	if ( test -z "$INFORMIXLIBS" )
+	then
+		AC_MSG_WARN(Informix libraries will be loaded on-demand at runtime.)
+		AC_DEFINE(INFORMIX_ON_DEMAND,1,Load Informix libraries on-demand at runtime.)
+	fi
+
 	FW_INCLUDES(informix,[$INFORMIXINCLUDES])
 	FW_LIBS(informix,[$INFORMIXLIBS])
 
@@ -2477,6 +2483,7 @@ then
 	AC_SUBST(INFORMIXESQLLIBSPATH)
 	AC_SUBST(INFORMIXUSERPATH)
 fi
+AC_SUBST(ENABLE_INFORMIX)
 ])
 
 

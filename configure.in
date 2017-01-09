@@ -1120,6 +1120,10 @@ if ( test -n "$INFORMIXLIBS" ); then
 	if ( test -n "$INFORMIXSTATIC" ); then
 		INFORMIXBUILD="static   "
 	fi
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		INFORMIXBUILD="on-demand"
+	fi
 fi
 if ( test -n "$ENABLE_ROUTER" ); then
 	ROUTERBUILD="yes   "

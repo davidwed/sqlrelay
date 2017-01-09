@@ -8,7 +8,11 @@
 #include <defines.h>
 #include <config.h>
 
-#include <infxcli.h>
+#ifdef INFORMIX_ON_DEMAND
+	#include "informixondemand.cpp"
+#else
+	#include <infxcli.h>
+#endif
 
 // multi-row fetch doesn't work with clobs/blobs because you're already on a
 // different row when SQLGetData is called to get the data for the clob/blob
@@ -1795,6 +1799,11 @@ void informixcursor::closeResultSet() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_informixconnection(
 						sqlrservercontroller *cont) {
+		#ifdef INFORMIX_ON_DEMAND
+		if (!openOnDemand()) {
+			return NULL;
+		}
+		#endif
 		return new informixconnection(cont);
 	}
 }
