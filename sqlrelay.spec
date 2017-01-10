@@ -7,7 +7,7 @@ License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
-BuildRequires: rudiments-devel >= 1.0.1,mysql-devel,unixODBC-devel,postgresql-devel,perl,python3-devel,ruby-devel,tcl-devel,erlang,mono-devel,mono-data,nodejs-devel
+BuildRequires: rudiments-devel >= 1.0.1,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,unixODBC-devel,firebird-devel,mdbtools-devel,perl-devel,python3-devel,ruby-devel,php-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,nodejs-devel
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
