@@ -345,7 +345,11 @@ Man pages for SQL Relay.
 %autosetup -p1
 
 %build
-%configure --disable-static
+%configure --disable-static \
+		--enable-oracle-on-demand \
+		--enable-sap-on-demand \
+		--enable-db2-on-demand \
+		--enable-informix-on-demand
 make %{?_smp_mflags}
 
 %install
