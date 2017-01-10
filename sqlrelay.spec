@@ -8,7 +8,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 # FIXME: I think readline/pcre/openssl/libcurl/krb-devel all need to be moved to the rudiments-devel package
-BuildRequires: rudiments-devel >= 1.0.2,perl-devel,python3-devel,ruby-devel,php-devel,java-1.8.0-openjdk-devel,unixODBC-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,nodejs-devel,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,firebird-devel,mdbtools-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
+BuildRequires: rudiments-devel >= 1.0.2,perl-devel,python3-devel,ruby-devel,php-devel,java-1.8.0-openjdk-devel,unixODBC-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,node-gyp,nodejs-devel,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,firebird-devel,mdbtools-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
