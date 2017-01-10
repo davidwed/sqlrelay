@@ -666,9 +666,9 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 - Added --enable-*-on-demand flags to the configure command.
 - Added --with-perl/ruby-* flags to the configure command.
 - Excluded lib*.la.
-- Updated to use perl, python, php, and ruby macros.
+- Updated to use perl, python, php, ruby, and nodejs macros.
 - Updated to build/package for python3.
-- Split out perl-dbi and php-pdo drivers into separate packages.
+- Split out perl-dbi, php-pdo, and python-db drivers into separate packages.
 
 * Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
