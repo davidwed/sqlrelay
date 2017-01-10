@@ -1167,6 +1167,6 @@ then
 	echo "NOTE: Python 2 and Python 3 were both found.  For now SQL Relay defaults to"
 	echo "Python 2, however Python 3 will become the default soon."
 	echo
-	echo "To force a build for Python 3, use the  --disable-python2  option."
+	echo "To force a build for Python 3, use the  --disable-python  option."
 	echo
 fi
