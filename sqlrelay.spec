@@ -215,7 +215,6 @@ Perl bindings for the SQL Relay client API.
 License: Artistic
 Summary: Perl DBI driver for SQL Relay
 Requires: %{name}-perl%{?_isa} = %{version}-%{release}
-BuildArch: noarch
 
 %description connector-perl-dbi
 Perl DBI driver for SQL Relay.
@@ -232,7 +231,6 @@ PHP bindings for the SQL Relay client API.
 %package connector-php-pdo
 License: LGPLv2
 Summary: PHP PDO driver for SQL Relay.
-BuildArch: noarch
 
 %description connector-php-pdo
 PHP PDO driver for SQL Relay.
@@ -250,7 +248,6 @@ Python 3 bindings for the SQL Relay client API.
 License: PointOne
 Summary: Python 3 DB bindings for SQL Relay
 Requires: %{name}-python3%{?_isa} = %{version}-%{release}
-BuildArch: noarch
 
 %description connector-python3-db
 Python 3 DB bindings for SQL Relay.
