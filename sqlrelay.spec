@@ -7,8 +7,8 @@ License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
-# FIXME: I think pcre/openssl/libcurl/krb-devel all need to be moved to the rudiments-devel package
-BuildRequires: rudiments-devel >= 1.0.2,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,unixODBC-devel,firebird-devel,mdbtools-devel,perl-devel,python3-devel,ruby-devel,php-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,nodejs-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
+# FIXME: I think pcre/openssl/libcurl/krb/readline-devel all need to be moved to the rudiments-devel package
+BuildRequires: rudiments-devel >= 1.0.2,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,unixODBC-devel,firebird-devel,mdbtools-devel,perl-devel,python3-devel,ruby-devel,php-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,nodejs-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
