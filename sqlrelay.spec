@@ -612,6 +612,7 @@ rmdir %{_localstatedir}/sqlrelay || :
 - Added --disable-static option to configure.
 - Added Requires to devel packages.
 - Added License to all packages.
+- Added --enable-*-on-demand flags to configure command.
 
 * Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
