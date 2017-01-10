@@ -333,7 +333,7 @@ Man pages for SQL Relay.
 		--with-perl-site-lib=%{perl_sitelib} \
 		--with-perl-site-arch=%{perl_sitearch} \
 		--with-ruby-site-arch-dir=%{ruby_sitearchdir}
-make %{?_smp_mflags}
+make
 
 %install
 make install DESTDIR=%{buildroot}
