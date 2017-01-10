@@ -7,8 +7,8 @@ License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
-# FIXME: I think pcre/openssl/libcurl/krb/readline-devel all need to be moved to the rudiments-devel package
-BuildRequires: rudiments-devel >= 1.0.2,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,unixODBC-devel,firebird-devel,mdbtools-devel,perl-devel,python3-devel,ruby-devel,php-devel,java-1.8.0-openjdk-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,nodejs-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
+# FIXME: I think readline/pcre/openssl/libcurl/krb-devel all need to be moved to the rudiments-devel package
+BuildRequires: rudiments-devel >= 1.0.2,perl-devel,python3-devel,ruby-devel,php-devel,java-1.8.0-openjdk-devel,unixODBC-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,nodejs-devel,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,firebird-devel,mdbtools-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -76,132 +76,12 @@ Requires: %{name}-c%{?_isa} = %{version}-%{release}
 Development files for the SQL Relay C client libraries.
 
 
-%package dropin-postgresql
-License: PostgreSQL
-Summary: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
-
-%description dropin-postgresql
-Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
-
-
-%package dropin-mysql
-License: GPLv2
-Summary: Drop in replacement library that redirects MySQL clients to SQL Relay
-
-%description dropin-mysql
-Drop in replacement library that redirects MySQL clients to SQL Relay.
-
-
 %package connector-odbc
 License: LGPLv2
 Summary: ODBC connector for SQL Relay
 
 %description connector-odbc
 ODBC connector for SQL Relay.
-
-
-%package db2
-License: GPLv2 with exceptions
-Summary: IBM DB2 back-end module for SQL Relay
-
-%description db2
-IBM DB2 back-end module for SQL Relay
-
-
-%package freetds
-License: GPLv2 with exceptions
-Summary: FreeTDS back-end module for SQL Relay
-
-%description freetds
-FreeTDS back-end module for SQL Relay.  Enables access to SAP/Sybase and MS SQL Server databases.
-
-
-%package firebird
-License: GPLv2 with exceptions
-Summary: Firebird back-end module for SQL Relay
-
-%description firebird
-Firebird back-end module for SQL Relay.
-
-
-%package mdbtools
-License: GPLv2 with exceptions
-Summary: MDB Tools back-end module for SQL Relay
-
-%description mdbtools
-MDB Tools back-end module for SQL Relay.  Enables read-only access to Microsoft Access databases.
-
-
-%package mysql
-License: GPLv2 with exceptions
-Summary: MySQL back-end module for SQL Relay
-
-%description mysql
-MySQL back-end module for SQL Relay.
-
-
-%package odbc
-License: GPLv2 with exceptions
-Summary: ODBC back-end module for SQL Relay
-
-%description odbc
-ODBC back-end module for SQL Relay.
-
-
-%package oracle
-License: GPLv2 with exceptions
-Summary: Oracle back-end module for SQL Relay
-
-%description oracle
-Oracle back-end module for SQL Relay.
-
-
-%package postgresql
-License: GPLv2 with exceptions
-Summary: PostgreSQL back-end module for SQL Relay
-
-%description postgresql
-PostgreSQL back-end module for SQL Relay.
-
-
-%package sqlite
-License: GPLv2 with exceptions
-Summary: SQLite back-end module for SQL Relay
-
-%description sqlite
-SQLite back-end module for SQL Relay.
-
-
-%package sap
-License: GPLv2 with exceptions
-Summary: SAP/Sybase back-end module for SQL Relay
-
-%description sap
-SAP/Sybase back-end module for SQL Relay.
-
-
-%package informix
-License: GPLv2 with exceptions
-Summary: Informix back-end module for SQL Relay
-
-%description informix
-Informix back-end module for SQL Relay.
-
-
-%package router
-License: GPLv2 with exceptions
-Summary: Session/query router back-end module for SQL Relay
-
-%description router
-Session/query router back-end module for SQL Relay.
-
-
-%package java
-License: LGPLv2
-Summary: Java bindings for the SQL Relay client API
-
-%description java
-Java bindings for the SQL Relay client API.
 
 
 %package perl
@@ -219,22 +99,6 @@ Requires: %{name}-perl%{?_isa} = %{version}-%{release}
 
 %description connector-perl-dbi
 Perl DBI driver for SQL Relay.
-
-
-%package php
-License: LGPLv2
-Summary: PHP bindings for the SQL Relay client API
-
-%description php
-PHP bindings for the SQL Relay client API.
-
-
-%package connector-php-pdo
-License: LGPLv2
-Summary: PHP PDO driver for SQL Relay.
-
-%description connector-php-pdo
-PHP PDO driver for SQL Relay.
 
 
 %package python3
@@ -260,6 +124,30 @@ Summary: Ruby bindings for the SQL Relay client API.
 
 %description ruby
 Ruby bindings for the SQL Relay client API.
+
+
+%package php
+License: LGPLv2
+Summary: PHP bindings for the SQL Relay client API
+
+%description php
+PHP bindings for the SQL Relay client API.
+
+
+%package connector-php-pdo
+License: LGPLv2
+Summary: PHP PDO driver for SQL Relay.
+
+%description connector-php-pdo
+PHP PDO driver for SQL Relay.
+
+
+%package java
+License: LGPLv2
+Summary: Java bindings for the SQL Relay client API
+
+%description java
+Java bindings for the SQL Relay client API.
 
 
 %package tcl
@@ -292,6 +180,118 @@ Summary: Nodejs bindings for the SQL Relay client API
 
 %description nodejs
 Nodejs bindings for the SQL Relay client API.
+
+
+%package dropin-mysql
+License: GPLv2
+Summary: Drop in replacement library that redirects MySQL clients to SQL Relay
+
+%description dropin-mysql
+Drop in replacement library that redirects MySQL clients to SQL Relay.
+
+
+%package dropin-postgresql
+License: PostgreSQL
+Summary: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
+
+%description dropin-postgresql
+Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
+
+
+%package oracle
+License: GPLv2 with exceptions
+Summary: Oracle back-end module for SQL Relay
+
+%description oracle
+Oracle back-end module for SQL Relay.
+
+
+%package mysql
+License: GPLv2 with exceptions
+Summary: MySQL back-end module for SQL Relay
+
+%description mysql
+MySQL back-end module for SQL Relay.
+
+
+%package postgresql
+License: GPLv2 with exceptions
+Summary: PostgreSQL back-end module for SQL Relay
+
+%description postgresql
+PostgreSQL back-end module for SQL Relay.
+
+
+%package sqlite
+License: GPLv2 with exceptions
+Summary: SQLite back-end module for SQL Relay
+
+%description sqlite
+SQLite back-end module for SQL Relay.
+
+
+%package freetds
+License: GPLv2 with exceptions
+Summary: FreeTDS back-end module for SQL Relay
+
+%description freetds
+FreeTDS back-end module for SQL Relay.  Enables access to SAP/Sybase and MS SQL Server databases.
+
+
+%package sap
+License: GPLv2 with exceptions
+Summary: SAP/Sybase back-end module for SQL Relay
+
+%description sap
+SAP/Sybase back-end module for SQL Relay.
+
+
+%package odbc
+License: GPLv2 with exceptions
+Summary: ODBC back-end module for SQL Relay
+
+%description odbc
+ODBC back-end module for SQL Relay.
+
+
+%package db2
+License: GPLv2 with exceptions
+Summary: IBM DB2 back-end module for SQL Relay
+
+%description db2
+IBM DB2 back-end module for SQL Relay
+
+
+%package firebird
+License: GPLv2 with exceptions
+Summary: Firebird back-end module for SQL Relay
+
+%description firebird
+Firebird back-end module for SQL Relay.
+
+
+%package mdbtools
+License: GPLv2 with exceptions
+Summary: MDB Tools back-end module for SQL Relay
+
+%description mdbtools
+MDB Tools back-end module for SQL Relay.  Enables read-only access to Microsoft Access databases.
+
+
+%package informix
+License: GPLv2 with exceptions
+Summary: Informix back-end module for SQL Relay
+
+%description informix
+Informix back-end module for SQL Relay.
+
+
+%package router
+License: GPLv2 with exceptions
+Summary: Session/query router back-end module for SQL Relay
+
+%description router
+Session/query router back-end module for SQL Relay.
 
 
 %package doc
@@ -332,7 +332,7 @@ Man pages for SQL Relay.
 		--disable-python \
 		--with-perl-site-lib=%{perl_sitelib} \
 		--with-perl-site-arch=%{perl_sitearch} \
-		--with-ruby-site-arch=%{ruby_sitearchdir}
+		--with-ruby-site-arch-dir=%{ruby_sitearchdir}
 make %{?_smp_mflags}
 
 %install
@@ -509,93 +509,9 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 rmdir %{_includedir}/sqlrelay 2> /dev/null || :
 rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 
-%files dropin-postgresql
-%{_libdir}/libpqsqlrelay.so.*
-%{_libdir}/libpqsqlrelay.so
-
-%files dropin-mysql
-%{_libdir}/libmysql*sqlrelay.so.*
-%{_libdir}/libmysql*sqlrelay.so
-
 %files connector-odbc
 %{_libdir}/libsqlrodbc.so.*
 %{_libdir}/libsqlrodbc.so
-
-%files db2
-%{_libexecdir}/sqlrelay/sqlrconnection_db2*
-
-%postun db2
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files freetds
-%{_libexecdir}/sqlrelay/sqlrconnection_freetds*
-
-%postun freetds
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files firebird
-%{_libexecdir}/sqlrelay/sqlrconnection_firebird*
-
-%postun firebird
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files mdbtools
-%{_libexecdir}/sqlrelay/sqlrconnection_mdbtools*
-
-%postun mdbtools
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files mysql
-%{_libexecdir}/sqlrelay/sqlrconnection_mysql*
-
-%postun mysql
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files odbc
-%{_libexecdir}/sqlrelay/sqlrconnection_odbc*
-
-%postun odbc
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files oracle
-%{_libexecdir}/sqlrelay/sqlrconnection_oracle*
-
-%postun oracle
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files postgresql
-%{_libexecdir}/sqlrelay/sqlrconnection_postgresql*
-
-%postun postgresql
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files sqlite
-%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*
-
-%postun sqlite
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files sap
-%{_libexecdir}/sqlrelay/sqlrconnection_sap*
-
-%postun sap
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files informix
-%{_libexecdir}/sqlrelay/sqlrconnection_informix*
-
-%postun informix
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files router
-%{_libexecdir}/sqlrelay/sqlrconnection_router*
-%{_libexecdir}/sqlrelay/sqlrrouter_*
-
-%postun router
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-
-%files java
-%{_prefix}/java/*
 
 %files perl
 %{perl_sitearch}/SQLRelay/Connection.pm
@@ -609,14 +525,6 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 %{perl_sitelib}/DBD/SQLRelay.pm
 %{perl_sitearch}/auto/DBD/SQLRelay
 %{_datadir}/man/man3/DBD::SQLRelay.3pm*
-
-%files php
-%{php_extdir}/sql_relay.so
-%{php_inidir}/sql_relay.ini
-
-%files connector-php-pdo
-%{php_extdir}/pdo_sqlrelay.so
-%{php_inidir}/pdo_sqlrelay.ini
 
 %files python3
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
@@ -632,6 +540,17 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 %files ruby
 %{ruby_sitearchdir}/sqlrelay.so
 
+%files php
+%{php_extdir}/sql_relay.so
+%{php_inidir}/sql_relay.ini
+
+%files connector-php-pdo
+%{php_extdir}/pdo_sqlrelay.so
+%{php_inidir}/pdo_sqlrelay.ini
+
+%files java
+%{_prefix}/java/*
+
 %files tcl
 %{_libdir}/sqlrelay/*
 
@@ -644,6 +563,87 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 
 %files nodejs
 %{nodejs_sitearch}/sqlrelay
+
+%files dropin-mysql
+%{_libdir}/libmysql*sqlrelay.so.*
+%{_libdir}/libmysql*sqlrelay.so
+
+%files dropin-postgresql
+%{_libdir}/libpqsqlrelay.so.*
+%{_libdir}/libpqsqlrelay.so
+
+%files oracle
+%{_libexecdir}/sqlrelay/sqlrconnection_oracle*
+
+%postun oracle
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files mysql
+%{_libexecdir}/sqlrelay/sqlrconnection_mysql*
+
+%postun mysql
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files postgresql
+%{_libexecdir}/sqlrelay/sqlrconnection_postgresql*
+
+%postun postgresql
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files sqlite
+%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*
+
+%postun sqlite
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files freetds
+%{_libexecdir}/sqlrelay/sqlrconnection_freetds*
+
+%postun freetds
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files sap
+%{_libexecdir}/sqlrelay/sqlrconnection_sap*
+
+%postun sap
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files odbc
+%{_libexecdir}/sqlrelay/sqlrconnection_odbc*
+
+%postun odbc
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files db2
+%{_libexecdir}/sqlrelay/sqlrconnection_db2*
+
+%postun db2
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files firebird
+%{_libexecdir}/sqlrelay/sqlrconnection_firebird*
+
+%postun firebird
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files mdbtools
+%{_libexecdir}/sqlrelay/sqlrconnection_mdbtools*
+
+%postun mdbtools
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files informix
+%{_libexecdir}/sqlrelay/sqlrconnection_informix*
+
+%postun informix
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+
+%files router
+%{_libexecdir}/sqlrelay/sqlrconnection_router*
+%{_libexecdir}/sqlrelay/sqlrrouter_*
+
+%postun router
+rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 
 %files doc
 %{_docdir}/%{name}
@@ -670,6 +670,7 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 - Updated to use perl, python, php, ruby, and nodejs macros.
 - Updated to build/package for python3.
 - Split out perl-dbi, php-pdo, and python-db drivers into separate packages.
+- Reordered package definitions.
 
 * Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
