@@ -1,288 +1,284 @@
-# Available build options, you need rpm-build >= 4.0.3 for this to work.
-# Example: rpmbuild -ba --without mysql --without php sqlrelay.spec
-#
-# Database options:
-# ================
-# --without db2
-# --without freetds
-# --without firebird
-# --without mdbtools
-# --without mysql
-# --without odbc
-# --without oracle
-# --without postgresql
-# --without sqlite
-# --without sap
-# --without informix
-#
-# Language options:
-# ================
-# --without java
-# --without perl
-# --without php
-# --without python
-# --without ruby
-# --without tcl
-# --without erlang
-# --without mono
-# --without nodejs
-
 Name: sqlrelay
 Version: 1.0.1
 Release: 1%{?dist}
-Summary: Persistent database connection system
+Summary: Database proxy
 
-License: GPLv2/LGPLv2 and Others
+License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
-Source0: http://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
+Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
-%define fedoraversion %(for word in `cat /etc/redhat-release 2> /dev/null`; do VAR=`echo $word | grep -x "[0-9]*"`; if ( test -n "$VAR" ); then echo $VAR; fi ; done)
-
-%if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
-	%define phpconfdir /etc/php5/conf.d
-%else
-	%define phpconfdir /etc/php.d
-%endif
-
-%if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
-%ifarch x86_64
-	%define nodejsdir /usr/lib64/node_modules
-%else
-	%define nodejsdir /usr/lib/node_modules
-%endif
-%else
-	%define nodejsdir /usr/lib/node_modules
-%endif
-
-BuildRequires: rudiments-devel
-%{!?_without_mysql:BuildRequires: ,mysql-devel}
-%{!?_without_odbc:BuildRequires: ,unixODBC-devel}
-%{!?_without_postgresql:BuildRequires: ,postgresql-devel}
-%{!?_without_perl:BuildRequires: ,perl}
-%{!?_without_python:BuildRequires: ,python-devel}
-%{!?_without_ruby:BuildRequires: ,ruby-devel}
-%{!?_without_tcl:BuildRequires: ,tcl-devel}
-%{!?_without_erlang:BuildRequires: ,erlang}
-%{!?_without_mono:BuildRequires: ,mono-devel,mono-data}
-%{!?_without_nodejs:BuildRequires: ,nodejs-devel}
+BuildRequires: rudiments-devel >= 1.0.1,mysql-devel,unixODBC-devel,postgresql-devel,perl,python-devel,ruby-devel,tcl-devel,erlang,mono-devel,mono-data,nodejs-devel
 
 %description
-SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2, Informix, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
+SQL Relay is a persistent database connection pooling, proxying, throttling,
+load balancing and query routing/filtering system for Unix and Linux supporting 
+ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2, Informix, 
+Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, 
+Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js,
+ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and
+PostgreSQL, command line clients and extensive documentation.  The APIs support
+advanced database operations such as bind variables, multi-row fetches,
+client-side result set caching and suspended transactions.  It is ideal for
+speeding up database-driven web-based applications, accessing databases from
+unsupported platforms, migrating between databases, distributing access to
+replicated or clustered databases and throttling database access.
 
 
 %package server-devel
-Summary: Development files for developing modules for the SQL Relay server
+License: GPLv2 with exceptions
+Summary: Development files for SQL Relay server modules
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description server-devel
-Development files for developing modules for the SQL Relay server.
+Development files for SQL Relay server modules.
 
 
-%package clients
-Summary: Command line applications for accessing databases through SQL Relay
+%package client
+License: GPLv2
+Summary: Command line clients for accessing databases via SQL Relay
 
-%description clients
-Command line applications for accessing databases through SQL Relay.
-
-
-%package client-runtime-c++
-Summary: Runtime libraries for SQL Relay clients written in C++
-
-%description client-runtime-c++
-Runtime libraries for SQL Relay clients written in C++.
+%description client
+Command line clients for accessing databases via SQL Relay
 
 
-%package client-runtime-c
-Summary: Runtime libraries for SQL Relay clients written in C
+%package client-c++
+License: LGPLv2
+Summary: SQL Relay C++ client libraries
 
-%description client-runtime-c
-Runtime libraries for SQL Relay clients written in C.
-
-
-%package client-devel-c++
-Summary: Development files for developing programs in C++ that use SQL Relay
-
-%description client-devel-c++
-Header files and static libraries to use for developing programs in C++ that
-use SQL Relay.
+%description client-c++
+SQL Relay C++ client libraries.
 
 
-%package client-devel-c
-Summary: Development files for developing programs C that use SQL Relay
+%package client-c
+License: LGPLv2
+Summary: SQL Relay C client libraries
 
-%description client-devel-c
-Header files and static libraries to use for developing programs in C that
-use SQL Relay.
+%description client-c
+SQL Relay C client libraries.
+
+
+%package client-c++-devel
+License: LGPLv2
+Summary: Development files for the SQL Relay C++ client libraries
+Requires: %{name}-client-c++%{?_isa} = %{version}-%{release}
+
+%description client-c++-devel
+Development files for the SQL Relay C++ client libraries.
+
+
+%package client-c-devel
+License: LGPLv2
+Summary: Development files for the SQL Relay C client libraries
+Requires: %{name}-client-c%{?_isa} = %{version}-%{release}
+
+%description client-c-devel
+Development files for the SQL Relay C client libraries.
 
 
 %package client-postgresql
-Summary: Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead
+License: PostgreSQL
+Summary: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
 
 %description client-postgresql
-Drop in replacement library allowing PostgreSQL clients to use SQL Relay instead.
+Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
 
 
 %package client-mysql
-Summary: Drop in replacement library allowing MySQL clients to use SQL Relay instead
+License: GPLv2
+Summary: Drop in replacement library that redirects MySQL clients to SQL Relay
 
 %description client-mysql
-Drop in replacement library allowing MySQL clients to use SQL Relay instead.
+Drop in replacement library that redirects MySQL clients to SQL Relay.
 
 
 %package client-odbc
-Summary: ODBC driver
+License: LGPLv2
+Summary: ODBC driver for SQL Relay
 
 %description client-odbc
-ODBC driver
+ODBC driver for SQL Relay.
 
 
 %package db2
-Summary: SQL Relay connection plugin for IBM DB2
+License: GPLv2 with exceptions
+Summary: IBM DB2 back-end module for SQL Relay
 
 %description db2
-SQL Relay connection plugin for IBM DB2.
+IBM DB2 back-end module for SQL Relay
 
 
 %package freetds
-Summary: SQL Relay connection plugin for FreeTDS (SAP/Sybase and MS SQL Server)
+License: GPLv2 with exceptions
+Summary: FreeTDS back-end module for SQL Relay
 
 %description freetds
-SQL Relay connection plugin for FreeTDS (SAP/Sybase and MS SQL Server).
+FreeTDS back-end module for SQL Relay.  Enables access to SAP/Sybase and MS SQL Server databases.
 
 
 %package firebird
-Summary: SQL Relay connection plugin for Firebird
+License: GPLv2 with exceptions
+Summary: Firebird back-end module for SQL Relay
 
 %description firebird
-SQL Relay connection plugin for Firebird.
+Firebird back-end module for SQL Relay.
 
 
 %package mdbtools
-Summary: SQL Relay connection plugin for MDB Tools (Microsoft Access)
+License: GPLv2 with exceptions
+Summary: MDB Tools back-end module for SQL Relay
 
 %description mdbtools
-SQL Relay connection plugin for MDB Tools (Microsoft Access).
+MDB Tools back-end module for SQL Relay.  Enables read-only access to Microsoft Access databases.
 
 
 %package mysql
-Summary: SQL Relay connection plugin for MySQL
+License: GPLv2 with exceptions
+Summary: MySQL back-end module for SQL Relay
 
 %description mysql
-SQL Relay connection plugin for MySQL.
+MySQL back-end module for SQL Relay.
 
 
 %package odbc
-Summary: SQL Relay connection plugin for ODBC
+License: GPLv2 with exceptions
+Summary: ODBC back-end module for SQL Relay
 
 %description odbc
-SQL Relay connection plugin for ODBC.
+ODBC back-end module for SQL Relay.
 
 
 %package oracle
-Summary: SQL Relay connection plugin for Oracle
+License: GPLv2 with exceptions
+Summary: Oracle back-end module for SQL Relay
 
 %description oracle
-SQL Relay connection plugin for Oracle.
+Oracle back-end module for SQL Relay.
 
 
 %package postgresql
-Summary: SQL Relay connection plugin for PostgreSQL
+License: GPLv2 with exceptions
+Summary: PostgreSQL back-end module for SQL Relay
 
 %description postgresql
-SQL Relay connection plugin for PostgreSQL.
+PostgreSQL back-end module for SQL Relay.
 
 
 %package sqlite
-Summary: SQL Relay connection plugin for SQLite
+License: GPLv2 with exceptions
+Summary: SQLite back-end module for SQL Relay
 
 %description sqlite
-SQL Relay connection plugin for SQLite.
+SQLite back-end module for SQL Relay.
 
 
 %package sap
-Summary: SQL Relay connection plugin for SAP/Sybase
+License: GPLv2 with exceptions
+Summary: SAP/Sybase back-end module for SQL Relay
 
 %description sap
-SQL Relay connection plugin for SAP/Sybase.
+SAP/Sybase back-end module for SQL Relay.
 
 
 %package informix
-Summary: SQL Relay connection plugin for Informix
+License: GPLv2 with exceptions
+Summary: Informix back-end module for SQL Relay
 
 %description informix
-SQL Relay connection plugin for Informix
+Informix back-end module for SQL Relay.
 
 
 %package router
-Summary: SQL Relay query routing daemon
+License: GPLv2 with exceptions
+Summary: Session/query router back-end module for SQL Relay
 
 %description router
-SQL Relay query routing daemon.
+Session/query router back-end module for SQL Relay.
 
 
 %package java
-Summary: SQL Relay modules for Java
+License: LGPLv2
+Summary: Java bindings for the SQL Relay client API
 
 %description java
-SQL Relay modules for Java.
+Java bindings for the SQL Relay client API.
 
 
 %package perl
-Summary: SQL Relay modules for Perl
+License: Artistic
+Summary: Perl bindings for the SQL Relay client API
 
 %description perl
-SQL Relay modules for Perl.
+Perl bindings for the SQL Relay client API.
 
 
 %package php
-Summary: SQL Relay modules for PHP
+License: LGPLv2
+Summary: PHP bindings for the SQL Relay client API
 
 %description php
-SQL Relay modules for PHP.
+PHP bindings for the SQL Relay client API.
+
+
+%package php-pdo
+License: LGPLv2
+Summary: PHP bindings for the SQL Relay client API
+
+%description php-pdo
+PHP PDO driver for SQL Relay.
 
 
 %package python
-Summary: SQL Relay modules for Python
+License: PointOne
+Summary: Python bindings for the SQL Relay client API
 
 %description python
-SQL Relay modules for Python.
+Python bindings for the SQL Relay client API.
 
 
 %package ruby
-Summary: SQL Relay modules for Ruby
+License: LGPLv2
+Summary: Ruby bindings for the SQL Relay client API.
 
 %description ruby
-SQL Relay modules for Ruby.
+Ruby bindings for the SQL Relay client API.
 
 
 %package tcl
-Summary: SQL Relay modules for TCL
+License: LGPLv2
+Summary: TCL bindings for the SQL Relay client API
 
 %description tcl
-SQL Relay modules for TCL.
+TCL bindings for the SQL Relay client API.
 
 
 %package erlang
-Summary: SQL Relay modules for Erlang
+License: CC-BY
+Summary: Erlang bindings for the SQL Relay client API
 
 %description erlang
-SQL Relay modules for Erlang.
+Erlang bindings for the SQL Relay client API.
 
 
 %package mono
-Summary: SQL Relay modules for Mono
+License: LGPLv2
+Summary: Mono bindings for the SQL Relay client API
 
 %description mono
-SQL Relay modules for Mono.
+Mono bindings for the SQL Relay client API.
 
 
 %package nodejs
-Summary: SQL Relay modules for node.js
+License: LGPLv2
+Summary: Nodejs bindings for the SQL Relay client API
 
 %description nodejs
-SQL Relay modules for node.js.
+Nodejs bindings for the SQL Relay client API.
 
 
 %package doc
+# Documentation is GPLv2 except for example code in the documentation.
+# Example code is FSFUL.
+License: GPLv2 and FSFUL
 Summary: Documentation for SQL Relay
 BuildArch: noarch
 
@@ -291,6 +287,7 @@ Documentation for SQL Relay.
 
 
 %package man
+License: GPLv2
 Summary: Man pages for SQL Relay
 BuildArch: noarch
 
@@ -298,65 +295,66 @@ BuildArch: noarch
 Man pages for SQL Relay.
 
 
-%define	tclconfig	%(TCLCONFIG=`rpm -q -l tcl-devel | grep -m1 "/tclConfig.sh"`; RTCLCONFIG=`readlink $TCLCONFIG`; if ( test -n "$RTCLCONFIG" ) then echo $RTCLCONFIG; else echo $TCLCONFIG; fi)
-%define	tcldir		%(dirname %{tclconfig})
-%ifarch x86_64
-%define	erlangdir	%(ERLPATH=""; for i in "/usr/local/lib64/erlang/lib" "/usr/lib64/erlang/lib"; do if ( test -d "$i" ); then ERLPATH="$i"; fi; done; echo $ERLPATH)
-%else
-%define	erlangdir	%(ERLPATH=""; for i in "/usr/local/lib/erlang/lib" "/usr/lib/erlang/lib"; do if ( test -d "$i" ); then ERLPATH="$i"; fi; done; echo $ERLPATH)
-%endif
-%ifarch x86_64
-%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib64/python$j" "/usr/local/lib64/python$j" "/usr/pkg/lib64/python$j" "/usr/local/python$j/lib64/python$j" "/opt/sfw/lib64/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
-%else
-%define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
-%endif
-%define	phpextdir	%(php-config --extension-dir)
-%define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
-%define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
-%define	perl_installarchlib	%(eval "export `perl -V:installarchlib`"; echo $installarchlib)
-%define	perl_installsitearch	%(eval "export `perl -V:installsitearch`"; echo $installsitearch)
-%define	perl_sitearch	%(eval "export `perl -V:sitearch`"; echo $sitearch)
-%define	perl_installman3dir	%(eval "export `perl -V:installman3dir`"; echo $installman3dir)
-%define	perl_man3ext	%(eval "export `perl -V:man3ext`"; echo $man3ext)
+# /etc/php5/conf.d on suse
+%define phpconfdir /etc/php.d
 
-# On opensuse 13.2, for some reason, rubylibprefix uses RUBY_BSE_NAME rather
-# than RUBY_BASE_NAME when building RPM's, but only when building rpms, not
-# normally.  It's weird.
-%define	ruby_sitearchdir	%(ruby -e 'require "mkmf"' -e 'drive = File::PATH_SEPARATOR == ";" ? /\A\w:/ : /\A/' -e 'print "arch = "' -e 'print CONFIG["arch"]' -e 'print "\\n"' -e 'print "sitearch = "' -e 'print CONFIG["sitearch"]' -e 'print "\\n"' -e 'print "ruby_version = "' -e 'begin' -e 'print Config::CONFIG["ruby_version"]' -e 'rescue' -e 'print CONFIG["ruby_version"]' -e 'end' -e 'print "\\n"' -e 'print "prefix = "' -e 'print with_destdir(CONFIG["prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "exec_prefix = "' -e 'print with_destdir(CONFIG["exec_prefix"].sub(drive, ""))' -e 'print "\\n"' -e 'print "libdir = "' -e 'print with_destdir($libdir.sub(drive, ""))' -e 'print "\\n"' -e 'if CONFIG["RUBY_BASE_NAME"]!=nil then' -e 'print "RUBY_BASE_NAME = "' -e 'print CONFIG["RUBY_BASE_NAME"]' -e 'print "\\n"' -e 'print "RUBY_BSE_NAME = "' -e 'print CONFIG["RUBY_BASE_NAME"]' -e 'print "\\n"' -e 'end' -e 'if CONFIG["rubylibprefix"]!=nil then' -e 'print "rubylibprefix = "' -e 'print with_destdir(CONFIG["rubylibprefix"].sub(drive, ""))' -e 'print "\\n"' -e 'end' -e 'print "rubylibdir = "' -e 'print with_destdir($rubylibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "archdir = "' -e 'print with_destdir($archdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "_fc_sitedir = "' -e 'print with_destdir($sitedir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitelibdir = "' -e 'print with_destdir($sitelibdir.sub(drive, ""))' -e 'print "\\n"' -e 'print "sitearchdir = "' -e 'print with_destdir($sitearchdir.sub(drive, ""))' -e 'print "\\n\\n"' -e 'print "all:\\n"' -e 'print "	echo $(sitearchdir)\\n"' | make -s -f - )
+# /usr/lib64/node_modules on x64 suse
+%define nodejsdir /usr/lib/node_modules
+
+%ifarch x86_64
+%define tcldir /usr/lib64
+%define erlangdir /usr/lib64/erlang/lib
+%define pythondir /usr/lib64/python2.7
+# /usr/lib64/php5/extensions on suse
+%define phpextdir /usr/lib64/php/modules
+# /usr/lib64/ruby/site_ruby/2.1.0/x86_64-linux-gnu/sqlrelay.so on suse
+%define ruby_sitearchdir /usr/local/lib64/ruby/site_ruby
+%else
+%define tcldir /usr/lib
+%define erlangdir /usr/lib/erlang/lib
+%define pythondir /usr/lib/python2.7
+# /usr/lib/php5/extensions on suse
+%define phpextdir /usr/lib/php/modules
+# not sure on suse
+%define ruby_sitearchdir /usr/local/lib/ruby/site_ruby
+%endif
+
+%define perl_prefix /usr
+# /usr/lib/perl5/site_perl/5.20.1 on suse
+%define perl_sitelib /usr/local/share/perl5
+%ifarch x86_64
+# /usr/lib/perl5/5.20.1/x86_64-linux-thread-multi on suse
+%define perl_installarchlib /usr/lib64/perl5
+# /usr/lib/perl5/site_perl/5.20.1/x86_64-linux-thread-multi on suse
+%define perl_installsitearch /usr/local/lib64/perl5
+# /usr/lib/perl5/site_perl/5.20.1/x86_64-linux-thread-multi on suse
+%define perl_sitearch /usr/local/lib64/perl5
+%else
+# not sure on suse
+%define perl_installarchlib /usr/lib/perl5
+# not sure on suse
+%define perl_installsitearch /usr/local/lib/perl5
+# not sure on suse
+%define perl_sitearch /usr/local/lib64/perl5
+%endif
+%define perl_installman3dir /usr/share/man/man3
+%define perl_man3ext 3pm
+
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-%configure \
-	%{?_without_db2:	--disable-db2} \
-	%{?_without_freetds:	--disable-freetds} \
-	%{?_without_firebird:	--disable-firebird} \
-	%{?_without_mdbtools:	--disable-mdbtools} \
-	%{?_without_mysql:	--disable-mysql} \
-	%{?_without_odbc:	--disable-odbc} \
-	%{?_without_oracle:	--disable-oracle} \
-	%{?_without_postgresql:	--disable-postgresql} \
-	%{?_without_sqlite:	--disable-sqlite} \
-	%{?_without_sap:	--disable-sap} \
-	%{?_without_informix:	--disable-informix} \
-	%{?_without_java:	--disable-java} \
-	%{?_without_tcl:	--disable-tcl} \
-	%{?_without_erlang:	--disable-erlang} \
-	%{?_without_nodejs:	--disable-nodejs} \
-	%{?_without_mono:	--disable-mono} \
-	%{?_without_perl:	--disable-perl} \
-	%{?_without_php:	--disable-php} \
-	%{?_without_python:	--disable-python} \
-	%{?_without_ruby:	--disable-ruby}
-	
-make
+%configure --disable-static
+make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
-make DESTDIR=%{buildroot} docdir=%{buildroot}%{_docdir}/%{name} install
-# get rid of some garbage
-rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
+make install DESTDIR=%{buildroot}
+# "make install" installs COPYING in: (buildroot)/usr/share/licenses/rudiments
+# But, since we prefer to get it directly from the source code, we'll remove it
+# from the buildroot so it doesn't trigger an "Installed (but unpackaged)
+# file(s) found" error.
+make uninstall-license DESTDIR=%{buildroot}
 
 %pre
 # Add the "sqlrelay" user
@@ -390,10 +388,6 @@ rmdir %{_libexecdir}/sqlrelay || :
 rmdir %{_localstatedir}/sqlrelay || :
 
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %{_sysconfdir}/sqlrelay.conf.d
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
@@ -425,6 +419,9 @@ rm -rf %{buildroot}
 %{_localstatedir}/sqlrelay/debug
 %{_localstatedir}/sqlrelay/log
 %{_localstatedir}/sqlrelay/cache
+%doc AUTHORS ChangeLog
+%license COPYING
+%exclude %{_libdir}/lib*.la
 
 %files server-devel
 %{_bindir}/sqlrserver-config
@@ -469,42 +466,38 @@ rm -rf %{buildroot}
 %{_includedir}/sqlrelay/private/sqlruserpasswordcredentials.h
 %{_includedir}/sqlrelay/sqlrutil.h
 %{_includedir}/sqlrelay/private/sqlrutilincludes.h
-%{_libdir}/libsqlrserver.a
 %{_libdir}/libsqlrserver.la
 %{_libdir}/libsqlrserver.so
-%{_libdir}/libsqlrutil.a
 %{_libdir}/libsqlrutil.la
 %{_libdir}/libsqlrutil.so
 
-%files clients
+%files client
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
 %{_bindir}/sqlr-status*
 
-%files client-runtime-c++
+%files client-c++
 %{_libdir}/libsqlrclient.so.*
 
-%files client-runtime-c
+%files client-c
 %{_libdir}/libsqlrclientwrapper.so.*
 
-%files client-devel-c++
+%files client-c++-devel
 %{_bindir}/sqlrclient-config
 %{_includedir}/sqlrelay/sqlrclient.h
 %{_includedir}/sqlrelay/private/sqlrclientincludes.h
 %{_includedir}/sqlrelay/private/sqlrconnection.h
 %{_includedir}/sqlrelay/private/sqlrcursor.h
-%{_libdir}/libsqlrclient.a
 %{_libdir}/libsqlrclient.la
 %{_libdir}/libsqlrclient.so
 %{_libdir}/pkgconfig/sqlrelay-c++.pc
 
-%files client-devel-c
+%files client-c-devel
 %{_bindir}/sqlrclientwrapper-config
 %{_includedir}/sqlrelay/sqlrclientwrapper.h
 %{_includedir}/sqlrelay/private/sqlrclientwrapper.h
 %{_includedir}/sqlrelay/private/sqlrclientwrapperincludes.h
-%{_libdir}/libsqlrclientwrapper.a
 %{_libdir}/libsqlrclientwrapper.la
 %{_libdir}/libsqlrclientwrapper.so
 %{_libdir}/pkgconfig/sqlrelay-c.pc
@@ -517,82 +510,84 @@ rm -rf %{buildroot}
 %{_libdir}/libmysql*sqlrelay.so.*
 %{_libdir}/libmysql*sqlrelay.so
 
-%{!?_without_odbc:%files client-odbc}
-%{!?_without_odbc:%{_libdir}/libsqlrodbc.so.*}
-%{!?_without_odbc:%{_libdir}/libsqlrodbc.so}
+%files client-odbc
+%{_libdir}/libsqlrodbc.so.*
+%{_libdir}/libsqlrodbc.so
 
-%{!?_without_db2:%files db2}
-%{!?_without_db2:%{_libexecdir}/sqlrelay/sqlrconnection_db2*}
+%files db2
+%{_libexecdir}/sqlrelay/sqlrconnection_db2*
 
-%{!?_without_freetds:%files freetds}
-%{!?_without_freetds:%{_libexecdir}/sqlrelay/sqlrconnection_freetds*}
+%files freetds
+%{_libexecdir}/sqlrelay/sqlrconnection_freetds*
 
-%{!?_without_firebird:%files firebird}
-%{!?_without_firebird:%{_libexecdir}/sqlrelay/sqlrconnection_firebird*}
+%files firebird
+%{_libexecdir}/sqlrelay/sqlrconnection_firebird*
 
-%{!?_without_mdbtools:%files mdbtools}
-%{!?_without_mdbtools:%{_libexecdir}/sqlrelay/sqlrconnection_mdbtools*}
+%files mdbtools
+%{_libexecdir}/sqlrelay/sqlrconnection_mdbtools*
 
-%{!?_without_mysql:%files mysql}
-%{!?_without_mysql:%{_libexecdir}/sqlrelay/sqlrconnection_mysql*}
+%files mysql
+%{_libexecdir}/sqlrelay/sqlrconnection_mysql*
 
-%{!?_without_odbc:%files odbc}
-%{!?_without_odbc:%{_libexecdir}/sqlrelay/sqlrconnection_odbc*}
+%files odbc
+%{_libexecdir}/sqlrelay/sqlrconnection_odbc*
 
-%{!?_without_oracle:%files oracle}
-%{!?_without_oracle:%{_libexecdir}/sqlrelay/sqlrconnection_oracle*}
+%files oracle
+%{_libexecdir}/sqlrelay/sqlrconnection_oracle*
 
-%{!?_without_postgresql:%files postgresql}
-%{!?_without_postgresql:%{_libexecdir}/sqlrelay/sqlrconnection_postgresql*}
+%files postgresql
+%{_libexecdir}/sqlrelay/sqlrconnection_postgresql*
 
-%{!?_without_sqlite:%files sqlite}
-%{!?_without_sqlite:%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*}
+%files sqlite
+%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*
 
-%{!?_without_sap:%files sap}
-%{!?_without_sap:%{_libexecdir}/sqlrelay/sqlrconnection_sap*}
+%files sap
+%{_libexecdir}/sqlrelay/sqlrconnection_sap*
 
-%{!?_without_informix:%files informix}
-%{!?_without_informix:%{_libexecdir}/sqlrelay/sqlrconnection_informix*}
+%files informix
+%{_libexecdir}/sqlrelay/sqlrconnection_informix*
 
-%{!?_without_router:%files router}
-%{!?_without_router:%{_libexecdir}/sqlrelay/sqlrconnection_router*}
+%files router
+%{_libexecdir}/sqlrelay/sqlrconnection_router*
 
-%{!?_without_java:%files java}
-%{!?_without_java:%{_prefix}/java/*}
+%files java
+%{_prefix}/java/*
 
-%{!?_without_perl:%files perl}
-%{!?_without_perl:%{perl_sitelib}/DBD/SQLRelay.pm}
-%{!?_without_perl:%{perl_sitearch}/auto/DBD/SQLRelay}
-%{!?_without_perl:%{perl_sitearch}/SQLRelay/Connection.pm}
-%{!?_without_perl:%{perl_sitearch}/SQLRelay/Cursor.pm}
-%{!?_without_perl:%{perl_sitearch}/auto/SQLRelay/Connection}
-%{!?_without_perl:%{perl_sitearch}/auto/SQLRelay/Cursor}
-%{!?_without_perl:%{perl_installman3dir}/*.%{perl_man3ext}*}
+%files perl
+%{perl_sitelib}/DBD/SQLRelay.pm
+%{perl_sitearch}/auto/DBD/SQLRelay
+%{perl_sitearch}/SQLRelay/Connection.pm
+%{perl_sitearch}/SQLRelay/Cursor.pm
+%{perl_sitearch}/auto/SQLRelay/Connection
+%{perl_sitearch}/auto/SQLRelay/Cursor
+%{perl_installman3dir}/*.%{perl_man3ext}*
 
-%{!?_without_php:%files php}
-%{!?_without_php:%{phpextdir}/sql_relay.so}
-%{!?_without_php:%{phpextdir}/pdo_sqlrelay.so}
-%{!?_without_php:%{phpconfdir}/sql_relay.ini}
-%{!?_without_php:%{phpconfdir}/pdo_sqlrelay.ini}
+%files php
+%{phpextdir}/sql_relay.so
+%{phpconfdir}/sql_relay.ini
 
-%{!?_without_python:%files python}
-%{!?_without_python:%{pythondir}/site-packages/SQLRelay}
+%files php-pdo
+%{phpextdir}/pdo_sqlrelay.so
+%{phpconfdir}/pdo_sqlrelay.ini
 
-%{!?_without_ruby:%files ruby}
-%{!?_without_ruby:%{ruby_sitearchdir}/sqlrelay.so}
+%files python
+%{pythondir}/site-packages/SQLRelay
 
-%{!?_without_tcl:%files tcl}
-%{!?_without_tcl:%{tcldir}/sqlrelay/*}
+%files ruby
+%{ruby_sitearchdir}/sqlrelay.so
 
-%{!?_without_erlang:%files erlang}
-%{!?_without_erlang:%{erlangdir}/sqlrelay-%{version}}
+%files tcl
+%{tcldir}/sqlrelay/*
 
-%{!?_without_mono:%files mono}
-%{!?_without_mono:%{_libdir}/SQLRClient.dll}
-%{!?_without_mono:%{_libdir}/SQLRClient.dll.config}
+%files erlang
+%{erlangdir}/sqlrelay-%{version}
 
-%{!?_without_nodejs:%files nodejs}
-%{!?_without_nodejs:%{nodejsdir}/sqlrelay}
+%files mono
+%{_libdir}/SQLRClient.dll
+%{_libdir}/SQLRClient.dll.config
+
+%files nodejs
+%{nodejsdir}/sqlrelay
 
 %files doc
 %{_docdir}/%{name}
@@ -603,6 +598,17 @@ rm -rf %{buildroot}
 %{_mandir}
 
 %changelog
+* Mon Jan 09 2012 David Muse <david.muse@firstworks.com> - 1.0.1-1
+- Removed --without options.
+- Removed dynamic generation of language-related directory names.
+- Added dependency on a specific verion of rudiments.
+- Replaced setup with autosetup.
+- Added AUTHORS, ChangeLog, and COPYING.
+- Updated package names and descriptions to match established conventions.
+- Added --disable-static option to configure.
+- Added Requires to devel packages.
+- Added License to all packages.
+
 * Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
 - uses init script and /etc/sysconfig/sqlrelay from the distribution

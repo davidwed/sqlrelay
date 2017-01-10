@@ -953,6 +953,8 @@ AC_SUBST(RUDIMENTSLIBSPATH)
 
 AC_DEFUN([FW_CHECK_ORACLE],
 [
+if ( test -z "$ORACLEONDEMAND" )
+then
 if ( test "$ENABLE_ORACLE" = "yes" )
 then
 
@@ -1258,8 +1260,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
-		AC_MSG_WARN(Oracle libraries will be loaded on-demand at runtime.)
-		AC_DEFINE(ORACLE_ON_DEMAND,1,Load Oracle libraries on-demand at runtime.)
+		ORACLEONDEMAND="yes"
 	fi
 
 	AC_SUBST(ORACLEVERSION)
@@ -1267,6 +1268,12 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 	AC_SUBST(ORACLELIBS)
 	AC_SUBST(ORACLELIBSPATH)
 	AC_SUBST(ORACLESTATIC)
+fi
+fi
+if ( test "$ORACLEONDEMAND" = "yes" )
+then
+	AC_MSG_NOTICE(Oracle libraries will be loaded on-demand at runtime.)
+	AC_DEFINE(ORACLE_ON_DEMAND,1,Load Oracle libraries on-demand at runtime.)
 fi
 AC_SUBST(ENABLE_ORACLE)
 ])
@@ -1912,6 +1919,8 @@ fi
 
 AC_DEFUN([FW_CHECK_SYBASE],
 [
+if ( test -z "$SYBASEONDEMAND" )
+then
 if ( test "$ENABLE_SYBASE" = "yes" )
 then
 
@@ -2043,8 +2052,7 @@ $GLIBC23HACKCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],
 
 		if ( test -z "$SYBASELIBS" )
 		then
-			AC_MSG_WARN(SAP/Sybase libraries will be loaded on-demand at runtime.)
-			AC_DEFINE(SYBASE_ON_DEMAND,1,Load SAP/Sybase libraries on-demand at runtime.)
+			SYBASEONDEMAND="yes"
 		fi
 	fi
 
@@ -2055,6 +2063,12 @@ $GLIBC23HACKCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],
 	AC_SUBST(SYBASELIBS)
 	AC_SUBST(SYBASELIBSPATH)
 	AC_SUBST(SYBASESTATIC)
+fi
+fi
+if ( test "$SYBASEONDEMAND" = "yes" )
+then
+	AC_MSG_NOTICE(SAP/Sybase libraries will be loaded on-demand at runtime.)
+	AC_DEFINE(SYBASE_ON_DEMAND,1,Load SAP/Sybase libraries on-demand at runtime.)
 fi
 AC_SUBST(ENABLE_SYBASE)
 ])
@@ -2277,6 +2291,8 @@ fi
 
 AC_DEFUN([FW_CHECK_DB2],
 [
+if ( test -z "$DB2ONDEMAND" )
+then
 if ( test "$ENABLE_DB2" = "yes" )
 then
 
@@ -2399,8 +2415,7 @@ then
 
 	if ( test -z "$DB2LIBS" )
 	then
-		AC_MSG_WARN(DB2 libraries will be loaded on-demand at runtime.)
-		AC_DEFINE(DB2_ON_DEMAND,1,Load DB2 libraries on-demand at runtime.)
+		DB2ONDEMAND="yes"
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -2417,6 +2432,12 @@ then
 	AC_SUBST(DB2STATIC)
 	AC_DEFINE_UNQUOTED(DB2VERSION,$DB2VERSION,Version of DB2)
 fi
+fi
+if ( test "$DB2ONDEMAND" = "yes" )
+then
+	AC_MSG_NOTICE(DB2 libraries will be loaded on-demand at runtime.)
+	AC_DEFINE(DB2_ON_DEMAND,1,Load DB2 libraries on-demand at runtime.)
+fi
 AC_SUBST(ENABLE_DB2)
 ])
 
@@ -2424,6 +2445,8 @@ AC_SUBST(ENABLE_DB2)
 
 AC_DEFUN([FW_CHECK_INFORMIX],
 [
+if ( test -z "$INFORMIXONDEMAND" )
+then
 if ( test "$ENABLE_INFORMIX" = "yes" )
 then
 	INFORMIXINCLUDES=""
@@ -2470,8 +2493,7 @@ then
 
 	if ( test -z "$INFORMIXLIBS" )
 	then
-		AC_MSG_WARN(Informix libraries will be loaded on-demand at runtime.)
-		AC_DEFINE(INFORMIX_ON_DEMAND,1,Load Informix libraries on-demand at runtime.)
+		INFORMIXONDEMAND="yes"
 	fi
 
 	FW_INCLUDES(informix,[$INFORMIXINCLUDES])
@@ -2482,6 +2504,12 @@ then
 	AC_SUBST(INFORMIXCLILIBSPATH)
 	AC_SUBST(INFORMIXESQLLIBSPATH)
 	AC_SUBST(INFORMIXUSERPATH)
+fi
+fi
+if ( test "$INFORMIXONDEMAND" = "yes" )
+then
+	AC_MSG_NOTICE(Informix libraries will be loaded on-demand at runtime.)
+	AC_DEFINE(INFORMIX_ON_DEMAND,1,Load Informix libraries on-demand at runtime.)
 fi
 AC_SUBST(ENABLE_INFORMIX)
 ])

@@ -3,6 +3,7 @@
 	updated some module-load error verbage
 	added initial support for loading Oracle, SAP/Sybase, DB2, and Informix
 		libraries on-demand at runtime
+	overhauled spec file
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

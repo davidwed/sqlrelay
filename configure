@@ -934,6 +934,7 @@ with_oracle_home
 with_oracle_instantclient_prefix
 enable_oracle
 enable_oracle_rpath
+enable_oracle_on_demand
 with_mysql_prefix
 enable_mysql
 enable_mysql_rpath
@@ -950,6 +951,7 @@ enable_freetds_rpath
 with_sap_prefix
 enable_sap
 enable_sap_rpath
+enable_sap_on_demand
 with_odbc_prefix
 enable_odbc
 enable_odbc_rpath
@@ -957,12 +959,14 @@ with_db2_prefix
 with_db2_version
 enable_db2
 enable_db2_rpath
+enable_db2_on_demand
 with_firebird_prefix
 enable_firebird
 enable_firebird_rpath
 with_informix_prefix
 enable_informix
 enable_informix_rpath
+enable_informix_on_demand
 with_mdbtools_prefix
 enable_mdbtools
 enable_mdbtools_rpath
@@ -1663,6 +1667,7 @@ Optional Features:
   --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries
   --disable-oracle              Don't build Oracle connection module
   --disable-oracle-rpath        Don't use -rpath when building Oracle connection module
+  --enable-oracle-on-demand     Disable static/dynamic linking against Oracle client libraries and force the connection module to load them on-demand at runtime
   --disable-mysql               Don't build MySQL connection module
   --enable-mysql-rpath          Use -rpath when building MySQL connection module
   --disable-postgresql          Don't build PostgreSQL connection module
@@ -1674,14 +1679,17 @@ Optional Features:
   --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection module
   --disable-sap                 Don't build SAP/Sybase connection module
   --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module
+  --enable-sap-on-demand        Disable static/dynamic linking against SAP/Sybase client libraries and force the connection module to load them on-demand at runtime
   --disable-odbc                Don't build ODBC connection module
   --enable-odbc-rpath           Use -rpath when building ODBC connection module
   --disable-db2                 Don't build DB2 connection module
   --disable-db2-rpath           Use -rpath when building DB2 connection module
+  --enable-db2-on-demand        Disable static/dynamic linking against DB2 client libraries and force the connection module to load them on-demand at runtime
   --disable-firebird            Don't build Firebird connection module
   --enable-firebird-rpath       Use -rpath when building Firebird connection module
   --disable-informix            Don't build Informix connection module
   --disable-informix-rpath      Don't use -rpath when building Informix connection module
+  --enable-informix-on-demand   Disable static/dynamic linking against Informix client libraries and force the connection module to load them on-demand at runtime
   --disable-mdbtools            Don't build MDB Tools connection module
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module
   --disable-router              Don't build router connection module
@@ -2806,6 +2814,13 @@ else
   ORACLEUSERPATH="yes"
 fi
 
+# Check whether --enable-oracle-on-demand was given.
+if test "${enable_oracle_on_demand+set}" = set; then :
+  enableval=$enable_oracle_on_demand; ORACLEONDEMAND="yes"
+else
+  ORACLEONDEMAND=""
+fi
+
 
 # Check whether --with-mysql-prefix was given.
 if test "${with_mysql_prefix+set}" = set; then :
@@ -2923,6 +2938,13 @@ else
   SYBASEUSERPATH="yes"
 fi
 
+# Check whether --enable-sap-on-demand was given.
+if test "${enable_sap_on_demand+set}" = set; then :
+  enableval=$enable_sap_on_demand; SYBASEONDEMAND="yes"
+else
+  SYBASEONDEMAND=""
+fi
+
 
 # Check whether --with-odbc-prefix was given.
 if test "${with_odbc_prefix+set}" = set; then :
@@ -2975,6 +2997,13 @@ else
   DB2USERPATH="yes"
 fi
 
+# Check whether --enable-db2-on-demand was given.
+if test "${enable_db2_on_demand+set}" = set; then :
+  enableval=$enable_db2_on_demand; DB2ONDEMAND="yes"
+else
+  DB2ONDEMAND=""
+fi
+
 
 # Check whether --with-firebird-prefix was given.
 if test "${with_firebird_prefix+set}" = set; then :
@@ -3017,6 +3046,13 @@ if test "${enable_informix_rpath+set}" = set; then :
   enableval=$enable_informix_rpath; INFORMIXUSERPATH=""
 else
   INFORMIXUSERPATH="yes"
+fi
+
+# Check whether --enable-informix-on-demand was given.
+if test "${enable_informix_on_demand+set}" = set; then :
+  enableval=$enable_informix_on_demand; INFORMIXONDEMAND="yes"
+else
+  INFORMIXONDEMAND=""
 fi
 
 
@@ -18595,6 +18631,8 @@ echo "******************************"
 echo
 echo "***** Oracle *****************"
 
+if ( test -z "$ORACLEONDEMAND" )
+then
 if ( test "$ENABLE_ORACLE" = "yes" )
 then
 
@@ -19415,17 +19453,22 @@ fi
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Oracle libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: WARNING: Oracle libraries will be loaded on-demand at runtime." >&2;}
-
-$as_echo "#define ORACLE_ON_DEMAND 1" >>confdefs.h
-
+		ORACLEONDEMAND="yes"
 	fi
 
 
 
 
 
+
+fi
+fi
+if ( test "$ORACLEONDEMAND" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: Oracle libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: Oracle libraries will be loaded on-demand at runtime." >&6;}
+
+$as_echo "#define ORACLE_ON_DEMAND 1" >>confdefs.h
 
 fi
 
@@ -24610,6 +24653,8 @@ echo "******************************"
 echo
 echo "***** SAP/Sybase *************"
 
+if ( test -z "$SYBASEONDEMAND" )
+then
 if ( test "$ENABLE_SYBASE" = "yes" )
 then
 
@@ -25393,11 +25438,7 @@ $as_echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 
 		if ( test -z "$SYBASELIBS" )
 		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SAP/Sybase libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: WARNING: SAP/Sybase libraries will be loaded on-demand at runtime." >&2;}
-
-$as_echo "#define SYBASE_ON_DEMAND 1" >>confdefs.h
-
+			SYBASEONDEMAND="yes"
 		fi
 	fi
 
@@ -25417,6 +25458,15 @@ fi
 
 
 
+
+fi
+fi
+if ( test "$SYBASEONDEMAND" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: SAP/Sybase libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: SAP/Sybase libraries will be loaded on-demand at runtime." >&6;}
+
+$as_echo "#define SYBASE_ON_DEMAND 1" >>confdefs.h
 
 fi
 
@@ -27988,6 +28038,8 @@ echo "******************************"
 echo
 echo "***** DB2 ********************"
 
+if ( test -z "$DB2ONDEMAND" )
+then
 if ( test "$ENABLE_DB2" = "yes" )
 then
 
@@ -29415,11 +29467,7 @@ export LD_LIBRARY_PATH
 
 	if ( test -z "$DB2LIBS" )
 	then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: WARNING: DB2 libraries will be loaded on-demand at runtime." >&2;}
-
-$as_echo "#define DB2_ON_DEMAND 1" >>confdefs.h
-
+		DB2ONDEMAND="yes"
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -29455,6 +29503,15 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 fi
+fi
+if ( test "$DB2ONDEMAND" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: DB2 libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: DB2 libraries will be loaded on-demand at runtime." >&6;}
+
+$as_echo "#define DB2_ON_DEMAND 1" >>confdefs.h
+
+fi
 
 
 echo "******************************"
@@ -29464,6 +29521,8 @@ echo "******************************"
 echo
 echo "***** Informix ***************"
 
+if ( test -z "$INFORMIXONDEMAND" )
+then
 if ( test "$ENABLE_INFORMIX" = "yes" )
 then
 	INFORMIXINCLUDES=""
@@ -29543,11 +29602,7 @@ fi
 
 	if ( test -z "$INFORMIXLIBS" )
 	then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Informix libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: WARNING: Informix libraries will be loaded on-demand at runtime." >&2;}
-
-$as_echo "#define INFORMIX_ON_DEMAND 1" >>confdefs.h
-
+		INFORMIXONDEMAND="yes"
 	fi
 
 
@@ -29567,6 +29622,15 @@ fi
 
 
 
+
+fi
+fi
+if ( test "$INFORMIXONDEMAND" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: Informix libraries will be loaded on-demand at runtime." >&5
+$as_echo "$as_me: Informix libraries will be loaded on-demand at runtime." >&6;}
+
+$as_echo "#define INFORMIX_ON_DEMAND 1" >>confdefs.h
 
 fi
 
