@@ -109,76 +109,80 @@ Summary: Python bindings for the SQL Relay client API
 Python bindings for the SQL Relay client API.
 
 
-%package -n python3-%{name}-db
+%package -n python3-db-%{name}
 License: PointOne
 Summary: Python DB bindings for SQL Relay
 Requires:python3%-%{name}{?_isa} = %{version}-%{release}
 
-%description -n python3-%{name}-db
+%description -n python3-db-%{name}
 Python DB bindings for SQL Relay.
 
 
-%package ruby
+%package -n ruby-%{name}
 License: LGPLv2
 Summary: Ruby bindings for the SQL Relay client API.
 
-%description ruby
+%description -n ruby-%{name}
 Ruby bindings for the SQL Relay client API.
 
 
-%package php
+%package -n php-%{name}
 License: LGPLv2
 Summary: PHP bindings for the SQL Relay client API
+Requires: php(zend-abi) = %{php_zend_api}
+Requires: php(api) = %{php_core_api}
 
-%description php
+%description -n php-%{name}
 PHP bindings for the SQL Relay client API.
 
 
-%package connector-php-pdo
+%package -n php-pdo-%{name}
 License: LGPLv2
 Summary: PHP PDO driver for SQL Relay.
+Requires: php(zend-abi) = %{php_zend_api}
+Requires: php(api) = %{php_core_api}
 
-%description connector-php-pdo
+%description -n php-pdo-%{name}
 PHP PDO driver for SQL Relay.
 
 
-%package java
+%package -n java-%{name}
 License: LGPLv2
 Summary: Java bindings for the SQL Relay client API
 
-%description java
+%description -n java-%{name}
 Java bindings for the SQL Relay client API.
 
 
-%package tcl
+%package -n tcl-%{name}
 License: LGPLv2
 Summary: TCL bindings for the SQL Relay client API
 
-%description tcl
+%description -n tcl-%{name}
 TCL bindings for the SQL Relay client API.
 
 
-%package erlang
+%package -n erlang-%{name}
 License: CC-BY
 Summary: Erlang bindings for the SQL Relay client API
 
-%description erlang
+%description -n erlang-%{name}
 Erlang bindings for the SQL Relay client API.
 
 
-%package mono
+%package -n mono-%{name}
 License: LGPLv2
 Summary: Mono bindings for the SQL Relay client API
 
-%description mono
+%description -n mono-%{name}
 Mono bindings for the SQL Relay client API.
 
 
-%package nodejs
+%package -n nodejs-%{name}
 License: LGPLv2
 Summary: Nodejs bindings for the SQL Relay client API
 
-%description nodejs
+%description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
 
 
@@ -526,46 +530,46 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %{perl_sitearch}/auto/DBD/SQLRelay
 %{_datadir}/man/man3/DBD::SQLRelay.3pm*
 
-%files -n python3-%{name}
+%files -n python3-db-%{name}
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
 %{python3_sitearch}/SQLRelay/PySQLRClient.py
 %{python3_sitearch}/SQLRelay/__init__.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRClient.*
 %{python3_sitearch}/SQLRelay/__pycache__/__init__.*
 
-%postun -n python3-%{name}
+%postun -n python3-db-%{name}
 rmdir %{python3_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
 rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 
-%files -n python3-%{name}-db
+%files -n python3-db-%{name}
 %{python3_sitearch}/SQLRelay/PySQLRDB.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRDB.*
 
-%files ruby
+%files -n ruby-%{name}
 %{ruby_sitearchdir}/sqlrelay.so
 
-%files php
+%files -n php-%{name}
 %{php_extdir}/sql_relay.so
 %{php_inidir}/sql_relay.ini
 
-%files connector-php-pdo
+%files -n php-pdo-%{name}
 %{php_extdir}/pdo_sqlrelay.so
 %{php_inidir}/pdo_sqlrelay.ini
 
-%files java
+%files -n java-%{name}
 %{_prefix}/java/*
 
-%files tcl
+%files -n tcl-%{name}
 %{_libdir}/sqlrelay/*
 
-%files erlang
+%files -n erlang-%{name}
 %{_libdir}/erlang/lib/sqlrelay-%{version}
 
-%files mono
+%files -n mono-%{name}
 %{_libdir}/SQLRClient.dll
 %{_libdir}/SQLRClient.dll.config
 
-%files nodejs
+%files -n nodejs-%{name}
 %{nodejs_sitearch}/sqlrelay
 
 %files dropin-mysql
