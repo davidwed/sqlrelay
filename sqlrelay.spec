@@ -1,3 +1,6 @@
+%{!?tcl_version: %global tcl_version %(echo 'puts $tcl_version' | tclsh)}
+%{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
+
 Name: sqlrelay
 Version: 1.0.1
 Release: 1%{?dist}
@@ -7,8 +10,8 @@ License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
-# FIXME: I think readline/pcre/openssl/libcurl/krb-devel all need to be moved to the rudiments-devel package
-BuildRequires: rudiments-devel >= 1.0.2,perl-generators,perl,perl-devel,python3-devel,ruby-devel,php-devel,java-1.8.0-openjdk-devel,unixODBC-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,node-gyp,nodejs-devel,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,firebird-devel,mdbtools-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
+# FIXME: move readline/pcre/openssl/libcurl/krb-devel the rudiments-devel package?
+BuildRequires: rudiments-devel >= 1.0.2, readline-devel, pcre-devel, openssl-devel, libcurl-devel, krb5-devel
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -61,7 +64,7 @@ SQL Relay C client libraries.
 %package c++-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C++ client libraries
-Requires: %{name}-c++%{?_isa} = %{version}-%{release},rudiments-devel >= 1.0.2
+Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.2
 
 %description c++-devel
 Development files for the SQL Relay C++ client libraries.
@@ -70,7 +73,7 @@ Development files for the SQL Relay C++ client libraries.
 %package c-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C client libraries
-Requires: %{name}-c%{?_isa} = %{version}-%{release},%{name}-c++-devel%{?_isa} = %{version}-%{release}
+Requires: %{name}-c%{?_isa} = %{version}-%{release}, %{name}-c++-devel%{?_isa} = %{version}-%{release}
 
 %description c-devel
 Development files for the SQL Relay C client libraries.
@@ -79,6 +82,7 @@ Development files for the SQL Relay C client libraries.
 %package connector-odbc
 License: LGPLv2
 Summary: ODBC connector for SQL Relay
+BuildRequires: unixODBC-devel
 
 %description connector-odbc
 ODBC connector for SQL Relay.
@@ -87,6 +91,7 @@ ODBC connector for SQL Relay.
 %package -n perl-%{name}
 License: Artistic
 Summary: Perl bindings for the SQL Relay client API
+BuildRequires: perl-generators, perl, perl-devel
 
 %description -n perl-%{name}
 Perl bindings for the SQL Relay client API.
@@ -95,6 +100,7 @@ Perl bindings for the SQL Relay client API.
 %package -n perl-DBD-%{name}
 License: Artistic
 Summary: Perl DBI driver for SQL Relay
+BuildRequires: perl-generators, perl, perl-devel
 Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 
 %description -n perl-DBD-%{name}
@@ -104,6 +110,7 @@ Perl DBI driver for SQL Relay.
 %package -n python3-%{name}
 License: PointOne
 Summary: Python bindings for the SQL Relay client API
+BuildRequires: python3-devel
 
 %description -n python3-%{name}
 Python bindings for the SQL Relay client API.
@@ -112,7 +119,8 @@ Python bindings for the SQL Relay client API.
 %package -n python3-db-%{name}
 License: PointOne
 Summary: Python DB bindings for SQL Relay
-Requires:python3-%{name}{?_isa} = %{version}-%{release}
+BuildRequires: python3-devel
+Requires: python3-%{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-db-%{name}
 Python DB bindings for SQL Relay.
@@ -121,6 +129,8 @@ Python DB bindings for SQL Relay.
 %package -n ruby-%{name}
 License: LGPLv2
 Summary: Ruby bindings for the SQL Relay client API.
+BuildRequires: ruby-devel
+Requires: ruby(release)
 
 %description -n ruby-%{name}
 Ruby bindings for the SQL Relay client API.
@@ -129,6 +139,7 @@ Ruby bindings for the SQL Relay client API.
 %package -n php-%{name}
 License: LGPLv2
 Summary: PHP bindings for the SQL Relay client API
+BuildRequires: php-devel
 Requires: php(zend-abi) = %{php_zend_api}
 Requires: php(api) = %{php_core_api}
 
@@ -139,6 +150,7 @@ PHP bindings for the SQL Relay client API.
 %package -n php-pdo-%{name}
 License: LGPLv2
 Summary: PHP PDO driver for SQL Relay.
+BuildRequires: php-devel
 Requires: php(zend-abi) = %{php_zend_api}
 Requires: php(api) = %{php_core_api}
 
@@ -149,6 +161,8 @@ PHP PDO driver for SQL Relay.
 %package -n java-%{name}
 License: LGPLv2
 Summary: Java bindings for the SQL Relay client API
+BuildRequires: java-1.8.0-openjdk-devel
+Requires: java-1.8.0-openjdk-devel
 
 %description -n java-%{name}
 Java bindings for the SQL Relay client API.
@@ -157,6 +171,8 @@ Java bindings for the SQL Relay client API.
 %package -n tcl-%{name}
 License: LGPLv2
 Summary: TCL bindings for the SQL Relay client API
+BuildRequires: tcl-devel
+Requires: tcl(api) = 8.6
 
 %description -n tcl-%{name}
 TCL bindings for the SQL Relay client API.
@@ -165,6 +181,8 @@ TCL bindings for the SQL Relay client API.
 %package -n erlang-%{name}
 License: CC-BY
 Summary: Erlang bindings for the SQL Relay client API
+BuildRequires: erlang
+Requires: erlang
 
 %description -n erlang-%{name}
 Erlang bindings for the SQL Relay client API.
@@ -173,6 +191,8 @@ Erlang bindings for the SQL Relay client API.
 %package -n mono-%{name}
 License: LGPLv2
 Summary: Mono bindings for the SQL Relay client API
+BuildRequires: mono-devel, mono-data, mono-data-oracle
+Requires: mono-core, mono-data, mono-data-oracle
 
 %description -n mono-%{name}
 Mono bindings for the SQL Relay client API.
@@ -181,6 +201,8 @@ Mono bindings for the SQL Relay client API.
 %package -n nodejs-%{name}
 License: LGPLv2
 Summary: Nodejs bindings for the SQL Relay client API
+BuildRequires: node-gyp, nodejs-devel
+Requires: nodejs
 
 %description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
@@ -197,6 +219,7 @@ Drop in replacement library that redirects MySQL clients to SQL Relay.
 %package dropin-postgresql
 License: PostgreSQL
 Summary: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
+BuildRequires: postgresql-devel
 
 %description dropin-postgresql
 Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
@@ -213,6 +236,7 @@ Oracle back-end module for SQL Relay.
 %package mysql
 License: GPLv2 with exceptions
 Summary: MySQL back-end module for SQL Relay
+BuildRequires: mysql-devel
 
 %description mysql
 MySQL back-end module for SQL Relay.
@@ -229,6 +253,7 @@ PostgreSQL back-end module for SQL Relay.
 %package sqlite
 License: GPLv2 with exceptions
 Summary: SQLite back-end module for SQL Relay
+BuildRequires: sqlite-devel
 
 %description sqlite
 SQLite back-end module for SQL Relay.
@@ -237,6 +262,7 @@ SQLite back-end module for SQL Relay.
 %package freetds
 License: GPLv2 with exceptions
 Summary: FreeTDS back-end module for SQL Relay
+BuildRequires: freetds-devel
 
 %description freetds
 FreeTDS back-end module for SQL Relay.  Enables access to SAP/Sybase and MS SQL Server databases.
@@ -253,6 +279,7 @@ SAP/Sybase back-end module for SQL Relay.
 %package odbc
 License: GPLv2 with exceptions
 Summary: ODBC back-end module for SQL Relay
+BuildRequires: unixODBC-devel
 
 %description odbc
 ODBC back-end module for SQL Relay.
@@ -269,6 +296,7 @@ IBM DB2 back-end module for SQL Relay
 %package firebird
 License: GPLv2 with exceptions
 Summary: Firebird back-end module for SQL Relay
+BuildRequires: firebird-devel
 
 %description firebird
 Firebird back-end module for SQL Relay.
@@ -277,6 +305,7 @@ Firebird back-end module for SQL Relay.
 %package mdbtools
 License: GPLv2 with exceptions
 Summary: MDB Tools back-end module for SQL Relay
+BuildRequires: mdbtools-devel
 
 %description mdbtools
 MDB Tools back-end module for SQL Relay.  Enables read-only access to Microsoft Access databases.
@@ -330,16 +359,13 @@ Man pages for SQL Relay.
 		--disable-python \
 		--with-perl-site-lib=%{perl_vendorlib} \
 		--with-perl-site-arch=%{perl_vendorarch} \
-		--with-ruby-site-arch-dir=%{ruby_sitearchdir}
+		--with-ruby-site-arch-dir=%{ruby_vendorarchdir}
 make
 
 %install
 make install DESTDIR=%{buildroot}
-# "make install" installs COPYING in: (buildroot)/usr/share/licenses/rudiments
-# But, since we prefer to get it directly from the source code, we'll remove it
-# from the buildroot so it doesn't trigger an "Installed (but unpackaged)
-# file(s) found" error.
-make uninstall-license DESTDIR=%{buildroot}
+install -d $RPM_BUILD_ROOT%{tcl_sitearch}
+mv $RPM_BUILD_ROOT%{_libdir}/sqlrelay $RPM_BUILD_ROOT%{tcl_sitearch}/sqlrelay
 
 %pre
 # Add the "sqlrelay" user
@@ -404,6 +430,7 @@ rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
 %doc AUTHORS ChangeLog
 %license COPYING
 %exclude %{_libdir}/lib*.la
+%exclude %{_datadir}licenses/sqlrelay
 
 %files server-devel
 %{_bindir}/sqlrserver-config
@@ -540,7 +567,7 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRDB.*
 
 %files -n ruby-%{name}
-%{ruby_sitearchdir}/sqlrelay.so
+%{ruby_vendorarchdir}/sqlrelay.so
 
 %files -n php-%{name}
 %{php_extdir}/sql_relay.so
@@ -554,7 +581,7 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %{_prefix}/java/*
 
 %files -n tcl-%{name}
-%{_libdir}/sqlrelay/*
+%{tcl_sitearch}/sqlrelay
 
 %files -n erlang-%{name}
 %{_libdir}/erlang/lib/sqlrelay-%{version}
