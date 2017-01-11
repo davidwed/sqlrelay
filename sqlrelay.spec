@@ -172,7 +172,7 @@ Java bindings for the SQL Relay client API.
 License: LGPLv2
 Summary: TCL bindings for the SQL Relay client API
 BuildRequires: tcl-devel
-Requires: tcl(api) = 8.6
+Requires: tcl(abi) = 8.6
 
 %description -n tcl-%{name}
 TCL bindings for the SQL Relay client API.
