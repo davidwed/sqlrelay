@@ -530,14 +530,14 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %{perl_sitearch}/auto/DBD/SQLRelay
 %{_datadir}/man/man3/DBD::SQLRelay.3pm*
 
-%files -n python3-db-%{name}
+%files -n python3-%{name}
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
 %{python3_sitearch}/SQLRelay/PySQLRClient.py
 %{python3_sitearch}/SQLRelay/__init__.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRClient.*
 %{python3_sitearch}/SQLRelay/__pycache__/__init__.*
 
-%postun -n python3-db-%{name}
+%postun -n python3-%{name}
 rmdir %{python3_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
 rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 
