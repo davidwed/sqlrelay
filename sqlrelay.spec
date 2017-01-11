@@ -402,11 +402,11 @@ rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
 /lib/systemd/system/sqlrelay.service
 /lib/systemd/system/sqlrcachemanager.service
-%{_bindir}/sqlr-cachemanager*
-%{_bindir}/sqlr-listener*
-%{_bindir}/sqlr-connection*
-%{_bindir}/sqlr-scaler*
-%{_bindir}/sqlr-start*
+%{_bindir}/sqlr-cachemanager
+%{_bindir}/sqlr-listener
+%{_bindir}/sqlr-connection
+%{_bindir}/sqlr-scaler
+%{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver.so.*
