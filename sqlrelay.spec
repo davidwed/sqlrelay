@@ -8,7 +8,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 # FIXME: I think readline/pcre/openssl/libcurl/krb-devel all need to be moved to the rudiments-devel package
-BuildRequires: rudiments-devel >= 1.0.2,perl-devel,python3-devel,ruby-devel,php-devel,java-1.8.0-openjdk-devel,unixODBC-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,node-gyp,nodejs-devel,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,firebird-devel,mdbtools-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
+BuildRequires: rudiments-devel >= 1.0.2,perl-generators,perl,perl-devel,python3-devel,ruby-devel,php-devel,java-1.8.0-openjdk-devel,unixODBC-devel,tcl-devel,erlang,mono-devel,mono-data,mono-data-oracle,node-gyp,nodejs-devel,mysql-devel,postgresql-devel,sqlite-devel,freetds-devel,firebird-devel,mdbtools-devel,readline-devel,pcre-devel,openssl-devel,libcurl-devel,krb5-devel
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -70,7 +70,7 @@ Development files for the SQL Relay C++ client libraries.
 %package c-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C client libraries
-Requires: %{name}-c%{?_isa} = %{version}-%{release}
+Requires: %{name}-c%{?_isa} = %{version}-%{release},%{name}-c++-devel%{?_isa} = %{version}-%{release}
 
 %description c-devel
 Development files for the SQL Relay C client libraries.
@@ -84,38 +84,38 @@ Summary: ODBC connector for SQL Relay
 ODBC connector for SQL Relay.
 
 
-%package perl
+%package -n perl-%{name}
 License: Artistic
 Summary: Perl bindings for the SQL Relay client API
 
-%description perl
+%description -n perl-%{name}
 Perl bindings for the SQL Relay client API.
 
 
-%package connector-perl-dbi
+%package -n perl-DBD-%{name}
 License: Artistic
 Summary: Perl DBI driver for SQL Relay
-Requires: %{name}-perl%{?_isa} = %{version}-%{release}
+Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 
-%description connector-perl-dbi
+%description -n perl-DBD-%{name}
 Perl DBI driver for SQL Relay.
 
 
-%package python3
+%package -n python3-%{name}
 License: PointOne
-Summary: Python 3 bindings for the SQL Relay client API
+Summary: Python bindings for the SQL Relay client API
 
-%description python3
-Python 3 bindings for the SQL Relay client API.
+%description -n python3-%{name}
+Python bindings for the SQL Relay client API.
 
 
-%package connector-python3-db
+%package -n python3-%{name}-db
 License: PointOne
-Summary: Python 3 DB bindings for SQL Relay
-Requires: %{name}-python3%{?_isa} = %{version}-%{release}
+Summary: Python DB bindings for SQL Relay
+Requires:python3%-%{name}{?_isa} = %{version}-%{release}
 
-%description connector-python3-db
-Python 3 DB bindings for SQL Relay.
+%description -n python3-%{name}-db
+Python DB bindings for SQL Relay.
 
 
 %package ruby
@@ -513,7 +513,7 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %{_libdir}/libsqlrodbc.so.*
 %{_libdir}/libsqlrodbc.so
 
-%files perl
+%files -n perl-%{name}
 %{perl_sitearch}/SQLRelay/Connection.pm
 %{perl_sitearch}/SQLRelay/Cursor.pm
 %{perl_sitearch}/auto/SQLRelay/Connection
@@ -521,19 +521,23 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %{_datadir}/man/man3/SQLRelay::Connection.3pm*
 %{_datadir}/man/man3/SQLRelay::Cursor.3pm*
 
-%files connector-perl-dbi
+%files -n perl-DBD-%{name}
 %{perl_sitelib}/DBD/SQLRelay.pm
 %{perl_sitearch}/auto/DBD/SQLRelay
 %{_datadir}/man/man3/DBD::SQLRelay.3pm*
 
-%files python3
+%files -n python3-%{name}
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
 %{python3_sitearch}/SQLRelay/PySQLRClient.py
 %{python3_sitearch}/SQLRelay/__init__.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRClient.*
 %{python3_sitearch}/SQLRelay/__pycache__/__init__.*
 
-%files connector-python3-db
+%postun -n python3-%{name}
+rmdir %{python3_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
+rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
+
+%files -n python3-%{name}-db
 %{python3_sitearch}/SQLRelay/PySQLRDB.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRDB.*
 
@@ -660,7 +664,7 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 - Added dependency on a specific verion of rudiments.
 - Replaced setup with autosetup.
 - Added AUTHORS, ChangeLog, and COPYING.
-- Updated package names and descriptions to match established conventions.
+- Updated package names and descriptions to match guidelines.
 - Added --disable-static option to configure.
 - Added Requires to devel packages.
 - Added License to all packages.
