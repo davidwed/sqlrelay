@@ -258,7 +258,12 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 
 static int sqlrcursorFetch(pdo_stmt_t *stmt,
 				enum pdo_fetch_orientation ori,
-				long offset TSRMLS_DC) {
+#if PHP_MAJOR_VERSION >= 7
+				ssize_t offset TSRMLS_DC
+#else
+				long offset TSRMLS_DC
+#endif
+				) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
@@ -360,7 +365,11 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 static int sqlrcursorGetField(pdo_stmt_t *stmt,
 				int colno,
 				char **ptr,
+#if PHP_MAJOR_VERSION >= 7
+				size_t *len,
+#else
 				unsigned long *len,
+#endif
 				int *caller_frees TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
@@ -683,7 +692,12 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 }
 
 static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
-					long attr, zval *val TSRMLS_DC) {
+#if PHP_MAJOR_VERSION >= 7
+					ssize_t attr,
+#else
+					long attr,
+#endif
+					zval *val TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
@@ -715,7 +729,12 @@ static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 }
 
 static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
-					long attr, zval *retval TSRMLS_DC) {
+#if PHP_MAJOR_VERSION >= 7
+					ssize_t attr,
+#else
+					long attr,
+#endif
+					zval *retval TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
@@ -730,7 +749,11 @@ static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
 }
 
 static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
+#if PHP_MAJOR_VERSION >= 7
+					ssize_t colno,
+#else
 					long colno,
+#endif
 					zval *returnvalue TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
@@ -866,7 +889,7 @@ static void sqlrconnectionRewriteQuery(const char *query,
 
 static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 #if PHP_MAJOR_VERSION >= 7
-					unsigned long sqllen,
+					size_t sqllen,
 #else
 					long sqllen,
 #endif
@@ -933,10 +956,16 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	return 1;
 }
 
-static long sqlrconnectionExecute(pdo_dbh_t *dbh,
+static
+#if PHP_MAJOR_VERSION >= 7
+zend_long
+#else
+long
+#endif
+sqlrconnectionExecute(pdo_dbh_t *dbh,
 					const char *sql,
 #if PHP_MAJOR_VERSION >= 7
-					unsigned long sqllen TSRMLS_DC
+					size_t sqllen TSRMLS_DC
 #else
 					long sqllen TSRMLS_DC
 #endif
@@ -978,7 +1007,12 @@ static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) {
 }
 
 static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
-					long attr, zval *val TSRMLS_DC) {
+#if PHP_MAJOR_VERSION >= 7
+					ssize_t attr,
+#else
+					long attr,
+#endif
+					zval *val TSRMLS_DC) {
 
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
@@ -1064,7 +1098,7 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 static char *sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 					const char *name,
 #if PHP_MAJOR_VERSION >= 7
-					unsigned long *len TSRMLS_DC
+					size_t *len TSRMLS_DC
 #else
 					unsigned int *len TSRMLS_DC
 #endif
@@ -1112,7 +1146,12 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 }
 
 static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
-				long attr, zval *retval TSRMLS_DC) {
+#if PHP_MAJOR_VERSION >= 7
+					ssize_t attr,
+#else
+					long attr,
+#endif
+					zval *retval TSRMLS_DC) {
 
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
