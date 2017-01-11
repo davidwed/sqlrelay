@@ -921,6 +921,7 @@ enable_option_checking
 enable_small_code
 enable_debug
 enable_profiling
+enable_fortify
 enable_server
 enable_client
 enable_cmdline
@@ -1660,6 +1661,7 @@ Optional Features:
   --enable-small-code           optimize for small code size
   --enable-debug                compile with -g option
   --enable-profiling            compile with -pg options
+  --enable-fortify              compile with various gcc fortification options
   --disable-server              Don't build any SQL Relay server components
   --disable-client              Don't build any SQL Relay client components
   --disable-cmdline             Don't build any SQL Relay command line client programs
@@ -2713,6 +2715,13 @@ fi
 # Check whether --enable-profiling was given.
 if test "${enable_profiling+set}" = set; then :
   enableval=$enable_profiling; CFLAGS="$CFLAGS -pg"; CXXFLAGS="$CXXFLAGS -pg"
+else
+  CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
+fi
+
+# Check whether --enable-fortify was given.
+if test "${enable_fortify+set}" = set; then :
+  enableval=$enable_fortify; CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector-strong"
 else
   CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
 fi

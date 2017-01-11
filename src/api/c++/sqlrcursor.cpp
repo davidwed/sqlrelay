@@ -586,9 +586,11 @@ void sqlrcursor::startCaching() {
 					permissions::ownerReadWrite());
 	} else {
 		pvt->_cachedest->open(pvt->_cachedestname,
-					O_RDWR|O_CREAT|O_APPEND);
+					O_RDWR|O_CREAT|O_APPEND,
+					permissions::ownerReadWrite());
 		pvt->_cachedestind->open(pvt->_cachedestindname,
-					O_RDWR|O_CREAT|O_APPEND);
+					O_RDWR|O_CREAT|O_APPEND,
+					permissions::ownerReadWrite());
 	}
 
 	if (pvt->_cachedest && pvt->_cachedestind) {

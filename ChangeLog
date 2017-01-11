@@ -5,6 +5,7 @@
 		libraries on-demand at runtime
 	overhauled spec file
 	fixed PDO driver for PHP 7 on 32-bit platforms
+	added permissions to all open() with O_CREAT calls
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

@@ -112,7 +112,7 @@ Python bindings for the SQL Relay client API.
 %package -n python3-db-%{name}
 License: PointOne
 Summary: Python DB bindings for SQL Relay
-Requires:python3%-%{name}{?_isa} = %{version}-%{release}
+Requires:python3-%{name}{?_isa} = %{version}-%{release}
 
 %description -n python3-db-%{name}
 Python DB bindings for SQL Relay.
@@ -318,12 +318,6 @@ BuildArch: noarch
 Man pages for SQL Relay.
 
 
-# /usr/lib/perl5/site_perl/5.20.1 on suse
-%define perl_sitelib %{_datadir}/perl5
-# /usr/lib/perl5/site_perl/5.20.1/x86_64-linux-thread-multi on suse
-%define perl_sitearch %{_libdir}/perl5
-
-
 %prep
 %autosetup -p1
 
@@ -334,8 +328,8 @@ Man pages for SQL Relay.
 		--enable-db2-on-demand \
 		--enable-informix-on-demand \
 		--disable-python \
-		--with-perl-site-lib=%{perl_sitelib} \
-		--with-perl-site-arch=%{perl_sitearch} \
+		--with-perl-site-lib=%{perl_vendorlib} \
+		--with-perl-site-arch=%{perl_vendorarch} \
 		--with-ruby-site-arch-dir=%{ruby_sitearchdir}
 make
 
@@ -518,16 +512,16 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
-%{perl_sitearch}/SQLRelay/Connection.pm
-%{perl_sitearch}/SQLRelay/Cursor.pm
-%{perl_sitearch}/auto/SQLRelay/Connection
-%{perl_sitearch}/auto/SQLRelay/Cursor
+%{perl_vendorarch}/*
+%exclude %{perl_vendorarch}/auto/DBD/
+%exclude %{perl_vendorarch}/auto/SQLRelay/*/.packlist
+%exclude %{perl_vendorarch}/auto/SQLRelay/*/*.bs
+%exclude %dir %{perl_vendorarch}/auto/
 %{_datadir}/man/man3/SQLRelay::Connection.3pm*
 %{_datadir}/man/man3/SQLRelay::Cursor.3pm*
 
 %files -n perl-DBD-%{name}
-%{perl_sitelib}/DBD/SQLRelay.pm
-%{perl_sitearch}/auto/DBD/SQLRelay
+%{perl_vendorlib}/*
 %{_datadir}/man/man3/DBD::SQLRelay.3pm*
 
 %files -n python3-%{name}
