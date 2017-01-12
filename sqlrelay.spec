@@ -10,8 +10,9 @@ License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
+%{?systemd_requires}
 # FIXME: move readline/pcre/openssl/libcurl/krb-devel the rudiments-devel package?
-BuildRequires: rudiments-devel >= 1.0.2, readline-devel, pcre-devel, openssl-devel, libcurl-devel, krb5-devel
+BuildRequires: rudiments-devel >= 1.0.2, readline-devel, pcre-devel, openssl-devel, libcurl-devel, krb5-devel, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -373,10 +374,13 @@ make
 
 %install
 make install DESTDIR=%{buildroot}
+# move systemd files to (_unitdir)
+mkdir -p %{buildroot}%{_unitdir}
+mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
 # move tcl modules to (tcl_sitearch)/(name)
 mkdir -p %{buildroot}%{tcl_sitearch}
 mv %{buildroot}%{_libdir}/sqlrelay %{buildroot}%{tcl_sitearch}/%{name}
-# install mono modules with gacutil into (monogacdir)
+# install mono modules with gacutil into (_monogacdir)
 #mkdir -p %{buildroot}%{_monogacdir}
 # FIXME: for this to work, the assembly must be signed with a Strong Name
 #gacutil -i src/api/cs/SQLRClient.dll -f -package SQLRClient -root %{buildroot}/usr/lib
@@ -398,26 +402,16 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 %post
 /sbin/ldconfig
-if [ $1 = 1 ]; then
-	/usr/bin/systemctl daemon-reload
-	/usr/bin/systemctl enable sqlrelay.service
-	/usr/bin/systemctl enable sqlrcachemanager.service
-fi
+%systemd_post %{name}.service
+%systemd_post %{name}cachemanager.service
 
 %preun
-if [ $1 = 0 ]; then
-	/usr/bin/systemctl stop sqlrelay.service
-	/usr/bin/systemctl stop sqlrcachemanager.service
-	/usr/bin/systemctl disable sqlrelay.service
-	/usr/bin/systemctl disable sqlrcachemanager.service
-fi
+%systemd_preun %{name}.service
+%systemd_preun %{name}cachemanager.service
 
 %postun
 /sbin/ldconfig
-if [ "$1" -ge "1" ]; then
-	/usr/bin/systemctl daemon-reload
-	/sbin/service sqlrelay condrestart >/dev/null 2>&1 || :
-fi
+%systemd_postun_with_restart %{name}.service
 rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 rm -rf %{_localstatedir}/sqlrelay/tmp
 rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
@@ -426,8 +420,8 @@ rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
 %files
 %{_sysconfdir}/sqlrelay.conf.d
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
-/lib/systemd/system/sqlrelay.service
-/lib/systemd/system/sqlrcachemanager.service
+%{_unitdir}/sqlrelay.service
+%{_unitdir}/sqlrcachemanager.service
 %{_bindir}/sqlr-cachemanager
 %{_bindir}/sqlr-listener
 %{_bindir}/sqlr-connection
@@ -611,7 +605,7 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %{tcl_sitearch}/sqlrelay
 
 %files -n erlang-%{name}
-%{_libdir}/erlang/lib/sqlrelay-%{version}
+%{_libdir}/erlang/lib/%{name}-%{version}
 
 %files -n mono-data-%{name}
 %{_libdir}/SQLRClient.dll
