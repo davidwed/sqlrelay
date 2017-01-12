@@ -140,8 +140,7 @@ Ruby bindings for the SQL Relay client API.
 License: LGPLv2
 Summary: PHP bindings for the SQL Relay client API
 BuildRequires: php-devel
-Requires: php(zend-abi) = %{php_zend_api}
-Requires: php(api) = %{php_core_api}
+Requires: php(zend-abi) = %{php_zend_api}, php(api) = %{php_core_api}
 
 %description -n php-%{name}
 PHP bindings for the SQL Relay client API.
@@ -151,8 +150,7 @@ PHP bindings for the SQL Relay client API.
 License: LGPLv2
 Summary: PHP PDO driver for SQL Relay.
 BuildRequires: php-devel
-Requires: php(zend-abi) = %{php_zend_api}
-Requires: php(api) = %{php_core_api}
+Requires: php(zend-abi) = %{php_zend_api}, php(api) = %{php_core_api}
 
 %description -n php-pdo-%{name}
 PHP PDO driver for SQL Relay.
@@ -161,8 +159,8 @@ PHP PDO driver for SQL Relay.
 %package -n java-%{name}
 License: LGPLv2
 Summary: Java bindings for the SQL Relay client API
-BuildRequires: java-1.8.0-openjdk-devel
-Requires: java-1.8.0-openjdk-devel
+BuildRequires: java-devel
+Requires: java-headless, javapackages-tools
 
 %description -n java-%{name}
 Java bindings for the SQL Relay client API.
@@ -188,21 +186,22 @@ Requires: erlang
 Erlang bindings for the SQL Relay client API.
 
 
-%package -n mono-%{name}
+%package -n mono-data-%{name}
 License: LGPLv2
-Summary: Mono bindings for the SQL Relay client API
+Summary: Mono bindings for the SQL Relay client API and ADO.NET driver
+ExclusiveArch: %{mono_arches}
 BuildRequires: mono-devel, mono-data, mono-data-oracle
 Requires: mono-core, mono-data, mono-data-oracle
 
-%description -n mono-%{name}
-Mono bindings for the SQL Relay client API.
+%description -n mono-data-%{name}
+Mono bindings for the SQL Relay client API and ADO.NET driver
 
 
 %package -n nodejs-%{name}
 License: LGPLv2
 Summary: Nodejs bindings for the SQL Relay client API
-BuildRequires: node-gyp, nodejs-devel
-Requires: nodejs
+ExclusiveArch: %{nodejs_arches}
+BuildRequires: nodejs-packaging, node-gyp, nodejs-devel
 
 %description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
@@ -333,9 +332,19 @@ Session/query router back-end module for SQL Relay.
 License: GPLv2 and FSFUL
 Summary: Documentation for SQL Relay
 BuildArch: noarch
+Requires: sqlrelay-javadoc
 
 %description doc
 Documentation for SQL Relay.
+
+
+%package javadoc
+License: GPLv2
+Summary: API documentation for SQL Relay
+BuildArch: noarch
+
+%description javadoc
+API documentation for SQL Relay.
 
 
 %package man
@@ -364,8 +373,23 @@ make
 
 %install
 make install DESTDIR=%{buildroot}
-install -d $RPM_BUILD_ROOT%{tcl_sitearch}
-mv $RPM_BUILD_ROOT%{_libdir}/sqlrelay $RPM_BUILD_ROOT%{tcl_sitearch}/sqlrelay
+# move tcl modules to (tcl_sitearch)/(name)
+mkdir -p %{buildroot}%{tcl_sitearch}
+mv %{buildroot}%{_libdir}/sqlrelay %{buildroot}%{tcl_sitearch}/%{name}
+# install mono modules with gacutil into (monogacdir)
+#mkdir -p %{buildroot}%{_monogacdir}
+# FIXME: for this to work, the assembly must be signed with a Strong Name
+#gacutil -i src/api/cs/SQLRClient.dll -f -package SQLRClient -root %{buildroot}/usr/lib
+# .move jar files to (_javadir)
+mkdir -p %{buildroot}%{_javadir}
+mv %{buildroot}%{_prefix}/java/*.jar %{buildroot}%{_javadir}
+# move jni shared object files to (_libdir)/(name)
+mkdir -p %{buildroot}%{_libdir}/%{name}
+mv %{buildroot}%{_prefix}/java/com/firstworks/sqlrelay/*.so %{buildroot}%{_libdir}/%{name}
+rm -rf %{buildroot}%{_prefix}/java
+# copy java documentation to (_javadocdir)/(name)
+mkdir -p %{buildroot}%{_javadocdir}
+cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 %pre
 # Add the "sqlrelay" user
@@ -375,6 +399,7 @@ mv $RPM_BUILD_ROOT%{_libdir}/sqlrelay $RPM_BUILD_ROOT%{tcl_sitearch}/sqlrelay
 %post
 /sbin/ldconfig
 if [ $1 = 1 ]; then
+	/usr/bin/systemctl daemon-reload
 	/usr/bin/systemctl enable sqlrelay.service
 	/usr/bin/systemctl enable sqlrcachemanager.service
 fi
@@ -390,6 +415,7 @@ fi
 %postun
 /sbin/ldconfig
 if [ "$1" -ge "1" ]; then
+	/usr/bin/systemctl daemon-reload
 	/sbin/service sqlrelay condrestart >/dev/null 2>&1 || :
 fi
 rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
@@ -578,7 +604,8 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %{php_inidir}/pdo_sqlrelay.ini
 
 %files -n java-%{name}
-%{_prefix}/java/*
+%{_javadir}/*.jar
+%{_libdir}/%{name}/*.so
 
 %files -n tcl-%{name}
 %{tcl_sitearch}/sqlrelay
@@ -586,9 +613,13 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %files -n erlang-%{name}
 %{_libdir}/erlang/lib/sqlrelay-%{version}
 
-%files -n mono-%{name}
+%files -n mono-data-%{name}
 %{_libdir}/SQLRClient.dll
 %{_libdir}/SQLRClient.dll.config
+#%{_monogacdir}/SQLRClient
+#%{_monodir}/SQLRClient.dll
+#%exclude %{_libdir}/SQLRClient.dll
+#%exclude %{_libdir}/SQLRClient.dll.config
 
 %files -n nodejs-%{name}
 %{nodejs_sitearch}/sqlrelay
@@ -678,6 +709,9 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 %{_docdir}/%{name}
 %{_datadir}/licenses/%{name}
 %{_datadir}/%{name}/examples
+
+%files javadoc
+%{_javadocdir}/%{name}
 
 %files man
 %{_mandir}
