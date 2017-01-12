@@ -109,7 +109,7 @@ Perl DBI driver for SQL Relay.
 
 
 %package -n python3-%{name}
-License: PointOne
+License: ZPL 1.0 or MIT
 Summary: Python bindings for the SQL Relay client API
 BuildRequires: python3-devel
 
@@ -118,7 +118,7 @@ Python bindings for the SQL Relay client API.
 
 
 %package -n python3-db-%{name}
-License: PointOne
+License: ZPL 1.0 or MIT
 Summary: Python DB bindings for SQL Relay
 BuildRequires: python3-devel
 Requires: python3-%{name}%{?_isa} = %{version}-%{release}
@@ -720,6 +720,7 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 - Added --disable-static option to configure.
 - Added Requires to devel packages.
 - Added License to all packages.
+- Updated license names to match guidelines.
 - Added --enable-*-on-demand flags to the configure command.
 - Added --with-perl/ruby-* flags to the configure command.
 - Excluded lib*.la.
