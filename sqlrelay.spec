@@ -448,7 +448,7 @@ rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
 %doc AUTHORS ChangeLog
 %license COPYING
 %exclude %{_libdir}/lib*.la
-%exclude %{_datadir}licenses/sqlrelay
+%exclude %{_datadir}/licenses/sqlrelay
 
 %files server-devel
 %{_bindir}/sqlrserver-config
@@ -508,7 +508,7 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %{_bindir}/sqlr-status
 %{_mandir}/*/sqlrsh.*
 %{_mandir}/*/sqlr-export.*
-%{_mandir}/*/sqlr-export.*
+%{_mandir}/*/sqlr-import.*
 %{_mandir}/*/sqlr-status.*
 
 %files c++
