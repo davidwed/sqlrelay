@@ -43,50 +43,50 @@ License: GPLv2
 Summary: Command line clients for accessing databases via SQL Relay
 
 %description clients
-Command line clients for accessing databases via SQL Relay
+Command line clients for accessing databases via SQL Relay.
 
 
 %package c++
 License: LGPLv2
-Summary: SQL Relay C++ client libraries
+Summary: The SQL Relay C++ client library
 
 %description c++
-SQL Relay C++ client libraries.
+The SQL Relay C++ client library.
 
 
 %package c
 License: LGPLv2
-Summary: SQL Relay C client libraries
+Summary: The SQL Relay C client library
 
 %description c
-SQL Relay C client libraries.
+The SQL Relay C client library.
 
 
 %package c++-devel
 License: LGPLv2
-Summary: Development files for the SQL Relay C++ client libraries
+Summary: Development files for the SQL Relay C++ client library
 Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.2
 
 %description c++-devel
-Development files for the SQL Relay C++ client libraries.
+Development files for the SQL Relay C++ client library.
 
 
 %package c-devel
 License: LGPLv2
-Summary: Development files for the SQL Relay C client libraries
+Summary: Development files for the SQL Relay C client library
 Requires: %{name}-c%{?_isa} = %{version}-%{release}, %{name}-c++-devel%{?_isa} = %{version}-%{release}
 
 %description c-devel
-Development files for the SQL Relay C client libraries.
+Development files for the SQL Relay C client library.
 
 
-%package connector-odbc
+%package -n odbc-%{name}
 License: LGPLv2
-Summary: ODBC connector for SQL Relay
+Summary: ODBC driver for SQL Relay
 BuildRequires: unixODBC-devel
 
-%description connector-odbc
-ODBC connector for SQL Relay.
+%description -n odbc-%{name}
+ODBC driver for SQL Relay.
 
 
 %package -n perl-%{name}
@@ -195,7 +195,7 @@ BuildRequires: mono-devel, mono-data, mono-data-oracle
 Requires: mono-core, mono-data, mono-data-oracle
 
 %description -n mono-data-%{name}
-Mono bindings for the SQL Relay client API and ADO.NET driver
+Mono bindings for the SQL Relay client API and ADO.NET driver.
 
 
 %package -n nodejs-%{name}
@@ -290,7 +290,7 @@ License: GPLv2 with exceptions
 Summary: IBM DB2 back-end module for SQL Relay
 
 %description db2
-IBM DB2 back-end module for SQL Relay
+IBM DB2 back-end module for SQL Relay.
 
 
 %package firebird
@@ -346,15 +346,6 @@ BuildArch: noarch
 
 %description javadoc
 API documentation for SQL Relay.
-
-
-%package man
-License: GPLv2
-Summary: Man pages for SQL Relay
-BuildArch: noarch
-
-%description man
-Man pages for SQL Relay.
 
 
 %prep
@@ -447,6 +438,13 @@ rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
 %{_localstatedir}/sqlrelay/debug
 %{_localstatedir}/sqlrelay/log
 %{_localstatedir}/sqlrelay/cache
+%{_mandir}/*/sqlr-cachemanager.*
+%{_mandir}/*/sqlr-listener.*
+%{_mandir}/*/sqlr-connection.*
+%{_mandir}/*/sqlr-scaler.*
+%{_mandir}/*/sqlr-start.*
+%{_mandir}/*/sqlr-stop.*
+%{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
 %license COPYING
 %exclude %{_libdir}/lib*.la
@@ -507,7 +505,11 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
-%{_bindir}/sqlr-status*
+%{_bindir}/sqlr-status
+%{_mandir}/*/sqlrsh.*
+%{_mandir}/*/sqlr-export.*
+%{_mandir}/*/sqlr-export.*
+%{_mandir}/*/sqlr-status.*
 
 %files c++
 %{_libdir}/libsqlrclient.so.*
@@ -554,22 +556,22 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 rmdir %{_includedir}/sqlrelay 2> /dev/null || :
 rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 
-%files connector-odbc
+%files -n odbc-%{name}
 %{_libdir}/libsqlrodbc.so.*
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
 %{perl_vendorarch}/*
+%{_mandir}/*/SQLRelay::Connection.*
+%{_mandir}/*/SQLRelay::Cursor.*
 %exclude %{perl_vendorarch}/auto/DBD/
 %exclude %{perl_vendorarch}/auto/SQLRelay/*/.packlist
 %exclude %{perl_vendorarch}/auto/SQLRelay/*/*.bs
 %exclude %dir %{perl_vendorarch}/auto/
-%{_datadir}/man/man3/SQLRelay::Connection.3pm*
-%{_datadir}/man/man3/SQLRelay::Cursor.3pm*
 
 %files -n perl-DBD-%{name}
 %{perl_vendorlib}/*
-%{_datadir}/man/man3/DBD::SQLRelay.3pm*
+%{_mandir}/*/DBD::SQLRelay.*
 
 %files -n python3-%{name}
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
@@ -706,9 +708,6 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 
 %files javadoc
 %{_javadocdir}/%{name}
-
-%files man
-%{_mandir}
 
 %changelog
 * Mon Jan 09 2012 David Muse <david.muse@firstworks.com> - 1.0.1-1
