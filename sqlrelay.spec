@@ -727,6 +727,10 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 - Updated to build/package for python3.
 - Split out perl-dbi, php-pdo, and python-db drivers into separate packages.
 - Reordered package definitions.
+- Updated package definitions to use macros.
+- Updated install target to move files to the required places.
+- Separated javadocs into their own subpackage.
+- Combined the man pages with the subpackages containing their programs.
 
 * Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
