@@ -2721,7 +2721,7 @@ fi
 
 # Check whether --enable-fortify was given.
 if test "${enable_fortify+set}" = set; then :
-  enableval=$enable_fortify; CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector-strong"
+  enableval=$enable_fortify; CFLAGS="$CFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"
 else
   CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
 fi

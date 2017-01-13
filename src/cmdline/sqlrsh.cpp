@@ -1834,7 +1834,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	// init some variables
 	stringbuffer	command;
 	stringbuffer	prmpt;
-	int		exitprogram=0;
+	int		exitprogram=false;
 	uint32_t	promptcount;
 
 	// Blocking mode is apparently not the default on some systems
@@ -1859,6 +1859,11 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			char	*cmd=pr.read();
 
 			size_t	len=charstring::length(cmd);
+			// len=0 if you hit ctrl-D
+			if (!len) {
+				return;
+			}
+
 			command.append(cmd);
 			done=(cmd[len-1]==env->delimiter);
 			if (!done) {

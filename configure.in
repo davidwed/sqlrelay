@@ -16,7 +16,7 @@ AC_ARG_ENABLE(profiling,
 	CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS")
 AC_ARG_ENABLE(fortify,
 	[  --enable-fortify              compile with various gcc fortification options],
-	CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector-strong",
+	CFLAGS="$CFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong",
 	CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS")
 
 CFLAGS="$SMALLCODE $CFLAGS"

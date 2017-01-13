@@ -280,7 +280,7 @@ static bool loadLibraries(stringbuffer *errormessage, const char *db2path) {
 	alreadyopen=true;
 
 	// build path names
-	const char	**pathnames=new const char *[37];
+	const char	**pathnames=new const char *[26];
 	uint16_t	p=0;
 	stringbuffer	libdir64;
 	stringbuffer	libdir32;
@@ -289,44 +289,61 @@ static bool loadLibraries(stringbuffer *errormessage, const char *db2path) {
 		libdir64.append(db2path)->append("/lib64");
 		libdir32.append(db2path)->append("/lib32");
 		libdir.append(db2path)->append("/lib");
-		pathnames[p++]=libdir64.getString();
-		pathnames[p++]=libdir32.getString();
+		if (sizeof(long)==8) {
+			pathnames[p++]=libdir64.getString();
+		} else {
+			pathnames[p++]=libdir32.getString();
+		}
 		pathnames[p++]=libdir.getString();
 	}
-	// FIXME: decide whether to use 32 or 64 bit libraries rather than
-	// checking for both...
-	pathnames[p++]="/opt/ibm/db2/V10.5/lib64";
-	pathnames[p++]="/opt/IBM/db2/V10.5/lib64";
-	pathnames[p++]="/opt/ibm/db2/V10.5/lib32";
-	pathnames[p++]="/opt/IBM/db2/V10.5/lib32";
+
+	if (sizeof(long)==8) {
+		pathnames[p++]="/opt/ibm/db2/V10.5/lib64";
+		pathnames[p++]="/opt/IBM/db2/V10.5/lib64";
+	} else {
+		pathnames[p++]="/opt/ibm/db2/V10.5/lib32";
+		pathnames[p++]="/opt/IBM/db2/V10.5/lib32";
+	}
 	pathnames[p++]="/opt/ibm/db2/V10.5/lib";
 	pathnames[p++]="/opt/IBM/db2/V10.5/lib";
 
-	pathnames[p++]="/opt/ibm/db2/V10.1/lib64";
-	pathnames[p++]="/opt/IBM/db2/V10.1/lib64";
-	pathnames[p++]="/opt/ibm/db2/V10.1/lib32";
-	pathnames[p++]="/opt/IBM/db2/V10.1/lib32";
+	if (sizeof(long)==8) {
+		pathnames[p++]="/opt/ibm/db2/V10.1/lib64";
+		pathnames[p++]="/opt/IBM/db2/V10.1/lib64";
+	} else {
+		pathnames[p++]="/opt/ibm/db2/V10.1/lib32";
+		pathnames[p++]="/opt/IBM/db2/V10.1/lib32";
+	}
 	pathnames[p++]="/opt/ibm/db2/V10.1/lib";
 	pathnames[p++]="/opt/IBM/db2/V10.1/lib";
 
-	pathnames[p++]="/opt/ibm/db2/V9.7/lib64";
-	pathnames[p++]="/opt/IBM/db2/V9.7/lib64";
-	pathnames[p++]="/opt/ibm/db2/V9.7/lib32";
-	pathnames[p++]="/opt/IBM/db2/V9.7/lib32";
+	if (sizeof(long)==8) {
+		pathnames[p++]="/opt/ibm/db2/V9.7/lib64";
+		pathnames[p++]="/opt/IBM/db2/V9.7/lib64";
+	} else {
+		pathnames[p++]="/opt/ibm/db2/V9.7/lib32";
+		pathnames[p++]="/opt/IBM/db2/V9.7/lib32";
+	}
 	pathnames[p++]="/opt/ibm/db2/V9.7/lib";
 	pathnames[p++]="/opt/IBM/db2/V9.7/lib";
 
-	pathnames[p++]="/opt/ibm/db2/V9.5/lib64";
-	pathnames[p++]="/opt/IBM/db2/V9.5/lib64";
-	pathnames[p++]="/opt/ibm/db2/V9.5/lib32";
-	pathnames[p++]="/opt/IBM/db2/V9.5/lib32";
+	if (sizeof(long)==8) {
+		pathnames[p++]="/opt/ibm/db2/V9.5/lib64";
+		pathnames[p++]="/opt/IBM/db2/V9.5/lib64";
+	} else {
+		pathnames[p++]="/opt/ibm/db2/V9.5/lib32";
+		pathnames[p++]="/opt/IBM/db2/V9.5/lib32";
+	}
 	pathnames[p++]="/opt/ibm/db2/V9.5/lib";
 	pathnames[p++]="/opt/IBM/db2/V9.5/lib";
 
-	pathnames[p++]="/opt/ibm/db2/V9.1/lib64";
-	pathnames[p++]="/opt/IBM/db2/V9.1/lib64";
-	pathnames[p++]="/opt/ibm/db2/V9.1/lib32";
-	pathnames[p++]="/opt/IBM/db2/V9.1/lib32";
+	if (sizeof(long)==8) {
+		pathnames[p++]="/opt/ibm/db2/V9.1/lib64";
+		pathnames[p++]="/opt/IBM/db2/V9.1/lib64";
+	} else {
+		pathnames[p++]="/opt/ibm/db2/V9.1/lib32";
+		pathnames[p++]="/opt/IBM/db2/V9.1/lib32";
+	}
 	pathnames[p++]="/opt/ibm/db2/V9.1/lib";
 	pathnames[p++]="/opt/IBM/db2/V9.1/lib";
 

@@ -391,7 +391,7 @@ static bool loadLibraries(stringbuffer *errormessage) {
 	alreadyopen=true;
 
 	// build lib names
-	const char	**libnames=new const char *[14];
+	const char	**libnames=new const char *[11];
 	uint16_t	p=0;
 	stringbuffer	libdir;
 	const char	*oraclehome=environment::getValue("ORACLE_HOME");
@@ -399,20 +399,28 @@ static bool loadLibraries(stringbuffer *errormessage) {
 		libdir.append(oraclehome)->append("/lib/libclntsh.so");
 		libnames[p++]=libdir.getString();
 	}
-	// FIXME: decide whether to use 32 or 64 bit libraries rather than
-	// checking for both...
-	libnames[p++]="/usr/lib/oracle/12.1/client64/lib/libclntsh.so";
-	libnames[p++]="/usr/lib/oracle/12.1/client/lib/libclntsh.so";
+
+	if (sizeof(long)==8) {
+		libnames[p++]="/usr/lib/oracle/12.1/client64/lib/libclntsh.so";
+	} else {
+		libnames[p++]="/usr/lib/oracle/12.1/client/lib/libclntsh.so";
+	}
 	libnames[p++]="/opt/instantclient_12_1/libclntsh.so.12.1";
 	libnames[p++]="/usr/local/instantclient_12_1/libclntsh.so.12.1";
 
-	libnames[p++]="/usr/lib/oracle/11.2/client64/lib/libclntsh.so";
-	libnames[p++]="/usr/lib/oracle/11.2/client/lib/libclntsh.so";
+	if (sizeof(long)==8) {
+		libnames[p++]="/usr/lib/oracle/11.2/client64/lib/libclntsh.so";
+	} else {
+		libnames[p++]="/usr/lib/oracle/11.2/client/lib/libclntsh.so";
+	}
 	libnames[p++]="/opt/instantclient_11_2/libclntsh.so.11.2";
 	libnames[p++]="/usr/local/instantclient_11_2/libclntsh.so.11.2";
 
-	libnames[p++]="/usr/lib/oracle/10.2/client64/lib/libclntsh.so";
-	libnames[p++]="/usr/lib/oracle/10.2/client/lib/libclntsh.so";
+	if (sizeof(long)==8) {
+		libnames[p++]="/usr/lib/oracle/10.2/client64/lib/libclntsh.so";
+	} else {
+		libnames[p++]="/usr/lib/oracle/10.2/client/lib/libclntsh.so";
+	}
 	libnames[p++]="/opt/instantclient_10_2/libclntsh.so.10.2";
 	libnames[p++]="/usr/local/instantclient_10_2/libclntsh.so.10.2";
 
@@ -858,7 +866,7 @@ error:
 					"LD_LIBRARY_PATH, /etc/ld.so.conf, "
 					"or /etc/ld.so.conf.d.  Try using "
 					"ldd to show ");
-		errormessage->append(*path)->append('/')->append(lib);
+		errormessage->append(path)->append('/')->append(lib);
 		errormessage->append("'s dependencies.)\n");
 		delete[] path;
 	}
