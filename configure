@@ -680,6 +680,13 @@ HAVE_JAVA
 RUBYLIB
 HAVE_RUBY
 RUBY
+EXCEPTIONSSTANDARDERROR
+IMPORTEXCEPTIONS
+PYTHONLIB
+PYTHONSITEDIR
+PYTHONDIR
+PYTHONINCLUDES
+HAVE_PYTHON
 PERLREALLYOLD
 PERL500
 POD2MAN
@@ -32833,7 +32840,41 @@ fi
 	fi
 fi
 
-FW_PYTHON_DECIDE
+
+	IMPORTEXCEPTIONS="import exceptions"
+	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+	PYTHONWARN=""
+
+	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "yes" )
+	then
+		PYTHONWARN="yes"
+	fi
+
+	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "" )
+	then
+		HAVE_PYTHON="$HAVE_PYTHON3"
+		PYTHONINCLUDES="$PYTHON3INCLUDES"
+		PYTHONDIR="$PYTHON3DIR"
+		PYTHONSITEDIR="$PYTHON3SITEDIR"
+		PYTHONLIB="$PYTHON3LIB"
+		IMPORTEXCEPTIONS=""
+		EXCEPTIONSSTANDARDERROR="Exception"
+	fi
+
+
+
+
+
+
+
+
+
+	if ( test "$HAVE_PYTHON" = "" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Python API will not be built." >&5
+$as_echo "$as_me: WARNING: The Python API will not be built." >&2;}
+	fi
+
 echo "******************************"
 
 
