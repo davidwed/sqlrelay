@@ -680,13 +680,6 @@ HAVE_JAVA
 RUBYLIB
 HAVE_RUBY
 RUBY
-EXCEPTIONSSTANDARDERROR
-IMPORTEXCEPTIONS
-PYTHONLIB
-PYTHONSITEDIR
-PYTHONDIR
-PYTHONINCLUDES
-HAVE_PYTHON
 PERLREALLYOLD
 PERL500
 POD2MAN
@@ -935,7 +928,7 @@ with_oracle_home
 with_oracle_instantclient_prefix
 enable_oracle
 enable_oracle_rpath
-enable_oracle_on_demand
+enable_oracle_at_runtime
 with_mysql_prefix
 enable_mysql
 enable_mysql_rpath
@@ -952,7 +945,7 @@ enable_freetds_rpath
 with_sap_prefix
 enable_sap
 enable_sap_rpath
-enable_sap_on_demand
+enable_sap_at_runtime
 with_odbc_prefix
 enable_odbc
 enable_odbc_rpath
@@ -960,14 +953,14 @@ with_db2_prefix
 with_db2_version
 enable_db2
 enable_db2_rpath
-enable_db2_on_demand
+enable_db2_at_runtime
 with_firebird_prefix
 enable_firebird
 enable_firebird_rpath
 with_informix_prefix
 enable_informix
 enable_informix_rpath
-enable_informix_on_demand
+enable_informix_at_runtime
 with_mdbtools_prefix
 enable_mdbtools
 enable_mdbtools_rpath
@@ -1669,7 +1662,7 @@ Optional Features:
   --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries
   --disable-oracle              Don't build Oracle connection module
   --disable-oracle-rpath        Don't use -rpath when building Oracle connection module
-  --enable-oracle-on-demand     Disable static/dynamic linking against Oracle client libraries and force the connection module to load them on-demand at runtime
+  --enable-oracle-at-runtime    Disable static/dynamic linking against Oracle client libraries and force the connection module to load them at runtime
   --disable-mysql               Don't build MySQL connection module
   --enable-mysql-rpath          Use -rpath when building MySQL connection module
   --disable-postgresql          Don't build PostgreSQL connection module
@@ -1681,17 +1674,17 @@ Optional Features:
   --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection module
   --disable-sap                 Don't build SAP/Sybase connection module
   --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module
-  --enable-sap-on-demand        Disable static/dynamic linking against SAP/Sybase client libraries and force the connection module to load them on-demand at runtime
+  --enable-sap-at-runtime       Disable static/dynamic linking against SAP/Sybase client libraries and force the connection module to load them at runtime
   --disable-odbc                Don't build ODBC connection module
   --enable-odbc-rpath           Use -rpath when building ODBC connection module
   --disable-db2                 Don't build DB2 connection module
   --disable-db2-rpath           Use -rpath when building DB2 connection module
-  --enable-db2-on-demand        Disable static/dynamic linking against DB2 client libraries and force the connection module to load them on-demand at runtime
+  --enable-db2-at-runtime       Disable static/dynamic linking against DB2 client libraries and force the connection module to load them at runtime
   --disable-firebird            Don't build Firebird connection module
   --enable-firebird-rpath       Use -rpath when building Firebird connection module
   --disable-informix            Don't build Informix connection module
   --disable-informix-rpath      Don't use -rpath when building Informix connection module
-  --enable-informix-on-demand   Disable static/dynamic linking against Informix client libraries and force the connection module to load them on-demand at runtime
+  --enable-informix-at-runtime  Disable static/dynamic linking against Informix client libraries and force the connection module to load them at runtime
   --disable-mdbtools            Don't build MDB Tools connection module
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module
   --disable-router              Don't build router connection module
@@ -2823,11 +2816,11 @@ else
   ORACLEUSERPATH="yes"
 fi
 
-# Check whether --enable-oracle-on-demand was given.
-if test "${enable_oracle_on_demand+set}" = set; then :
-  enableval=$enable_oracle_on_demand; ORACLEONDEMAND="yes"
+# Check whether --enable-oracle-at-runtime was given.
+if test "${enable_oracle_at_runtime+set}" = set; then :
+  enableval=$enable_oracle_at_runtime; ORACLEATRUNTIME="yes"
 else
-  ORACLEONDEMAND=""
+  ORACLEATRUNTIME=""
 fi
 
 
@@ -2947,11 +2940,11 @@ else
   SYBASEUSERPATH="yes"
 fi
 
-# Check whether --enable-sap-on-demand was given.
-if test "${enable_sap_on_demand+set}" = set; then :
-  enableval=$enable_sap_on_demand; SYBASEONDEMAND="yes"
+# Check whether --enable-sap-at-runtime was given.
+if test "${enable_sap_at_runtime+set}" = set; then :
+  enableval=$enable_sap_at_runtime; SYBASEATRUNTIME="yes"
 else
-  SYBASEONDEMAND=""
+  SYBASEATRUNTIME=""
 fi
 
 
@@ -3006,11 +2999,11 @@ else
   DB2USERPATH="yes"
 fi
 
-# Check whether --enable-db2-on-demand was given.
-if test "${enable_db2_on_demand+set}" = set; then :
-  enableval=$enable_db2_on_demand; DB2ONDEMAND="yes"
+# Check whether --enable-db2-at-runtime was given.
+if test "${enable_db2_at_runtime+set}" = set; then :
+  enableval=$enable_db2_at_runtime; DB2ATRUNTIME="yes"
 else
-  DB2ONDEMAND=""
+  DB2ATRUNTIME=""
 fi
 
 
@@ -3057,11 +3050,11 @@ else
   INFORMIXUSERPATH="yes"
 fi
 
-# Check whether --enable-informix-on-demand was given.
-if test "${enable_informix_on_demand+set}" = set; then :
-  enableval=$enable_informix_on_demand; INFORMIXONDEMAND="yes"
+# Check whether --enable-informix-at-runtime was given.
+if test "${enable_informix_at_runtime+set}" = set; then :
+  enableval=$enable_informix_at_runtime; INFORMIXATRUNTIME="yes"
 else
-  INFORMIXONDEMAND=""
+  INFORMIXATRUNTIME=""
 fi
 
 
@@ -18640,7 +18633,7 @@ echo "******************************"
 echo
 echo "***** Oracle *****************"
 
-if ( test -z "$ORACLEONDEMAND" )
+if ( test -z "$ORACLEATRUNTIME" )
 then
 if ( test "$ENABLE_ORACLE" = "yes" )
 then
@@ -19462,7 +19455,7 @@ fi
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
-		ORACLEONDEMAND="yes"
+		ORACLEATRUNTIME="yes"
 	fi
 
 
@@ -19472,12 +19465,12 @@ fi
 
 fi
 fi
-if ( test "$ORACLEONDEMAND" = "yes" )
+if ( test "$ORACLEATRUNTIME" = "yes" )
 then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: Oracle libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: Oracle libraries will be loaded on-demand at runtime." >&6;}
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: Oracle libraries will be loaded at runtime." >&5
+$as_echo "$as_me: Oracle libraries will be loaded at runtime." >&6;}
 
-$as_echo "#define ORACLE_ON_DEMAND 1" >>confdefs.h
+$as_echo "#define ORACLE_AT_RUNTIME 1" >>confdefs.h
 
 fi
 
@@ -24662,7 +24655,7 @@ echo "******************************"
 echo
 echo "***** SAP/Sybase *************"
 
-if ( test -z "$SYBASEONDEMAND" )
+if ( test -z "$SYBASEATRUNTIME" )
 then
 if ( test "$ENABLE_SYBASE" = "yes" )
 then
@@ -25447,7 +25440,7 @@ $as_echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 
 		if ( test -z "$SYBASELIBS" )
 		then
-			SYBASEONDEMAND="yes"
+			SYBASEATRUNTIME="yes"
 		fi
 	fi
 
@@ -25470,12 +25463,12 @@ fi
 
 fi
 fi
-if ( test "$SYBASEONDEMAND" = "yes" )
+if ( test "$SYBASEATRUNTIME" = "yes" )
 then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: SAP/Sybase libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: SAP/Sybase libraries will be loaded on-demand at runtime." >&6;}
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: SAP/Sybase libraries will be loaded at runtime." >&5
+$as_echo "$as_me: SAP/Sybase libraries will be loaded at runtime." >&6;}
 
-$as_echo "#define SYBASE_ON_DEMAND 1" >>confdefs.h
+$as_echo "#define SYBASE_AT_RUNTIME 1" >>confdefs.h
 
 fi
 
@@ -28047,7 +28040,7 @@ echo "******************************"
 echo
 echo "***** DB2 ********************"
 
-if ( test -z "$DB2ONDEMAND" )
+if ( test -z "$DB2ATRUNTIME" )
 then
 if ( test "$ENABLE_DB2" = "yes" )
 then
@@ -29476,7 +29469,7 @@ export LD_LIBRARY_PATH
 
 	if ( test -z "$DB2LIBS" )
 	then
-		DB2ONDEMAND="yes"
+		DB2ATRUNTIME="yes"
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -29513,12 +29506,12 @@ _ACEOF
 
 fi
 fi
-if ( test "$DB2ONDEMAND" = "yes" )
+if ( test "$DB2ATRUNTIME" = "yes" )
 then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: DB2 libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: DB2 libraries will be loaded on-demand at runtime." >&6;}
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: DB2 libraries will be loaded at runtime." >&5
+$as_echo "$as_me: DB2 libraries will be loaded at runtime." >&6;}
 
-$as_echo "#define DB2_ON_DEMAND 1" >>confdefs.h
+$as_echo "#define DB2_AT_RUNTIME 1" >>confdefs.h
 
 fi
 
@@ -29530,7 +29523,7 @@ echo "******************************"
 echo
 echo "***** Informix ***************"
 
-if ( test -z "$INFORMIXONDEMAND" )
+if ( test -z "$INFORMIXATRUNTIME" )
 then
 if ( test "$ENABLE_INFORMIX" = "yes" )
 then
@@ -29611,7 +29604,7 @@ fi
 
 	if ( test -z "$INFORMIXLIBS" )
 	then
-		INFORMIXONDEMAND="yes"
+		INFORMIXATRUNTIME="yes"
 	fi
 
 
@@ -29634,12 +29627,12 @@ fi
 
 fi
 fi
-if ( test "$INFORMIXONDEMAND" = "yes" )
+if ( test "$INFORMIXATRUNTIME" = "yes" )
 then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: Informix libraries will be loaded on-demand at runtime." >&5
-$as_echo "$as_me: Informix libraries will be loaded on-demand at runtime." >&6;}
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: Informix libraries will be loaded at runtime." >&5
+$as_echo "$as_me: Informix libraries will be loaded at runtime." >&6;}
 
-$as_echo "#define INFORMIX_ON_DEMAND 1" >>confdefs.h
+$as_echo "#define INFORMIX_AT_RUNTIME 1" >>confdefs.h
 
 fi
 
@@ -32840,41 +32833,7 @@ fi
 	fi
 fi
 
-
-	IMPORTEXCEPTIONS="import exceptions"
-	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
-	PYTHONWARN=""
-
-	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "yes" )
-	then
-		PYTHONWARN="yes"
-	fi
-
-	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "" )
-	then
-		HAVE_PYTHON="$HAVE_PYTHON3"
-		PYTHONINCLUDES="$PYTHON3INCLUDES"
-		PYTHONDIR="$PYTHON3DIR"
-		PYTHONSITEDIR="$PYTHON3SITEDIR"
-		PYTHONLIB="$PYTHON3LIB"
-		IMPORTEXCEPTIONS=""
-		EXCEPTIONSSTANDARDERROR="Exception"
-	fi
-
-
-
-
-
-
-
-
-
-	if ( test "$HAVE_PYTHON" = "" )
-	then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Python API will not be built." >&5
-$as_echo "$as_me: WARNING: The Python API will not be built." >&2;}
-	fi
-
+FW_PYTHON_DECIDE
 echo "******************************"
 
 
@@ -37118,109 +37077,109 @@ echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIB
 echo
 
 
-ORACLEBUILD="no       "
-MYSQLBUILD="no       "
-POSTGRESQLBUILD="no       "
-SQLITEBUILD="no       "
-FREETDSBUILD="no       "
-SYBASEBUILD="no       "
-ODBCBUILD="no       "
-DB2BUILD="no       "
-FIREBIRDBUILD="no       "
-MDBTOOLSBUILD="no       "
-INFORMIXBUILD="no       "
-ROUTERBUILD="no       "
+ORACLEBUILD="no        "
+MYSQLBUILD="no        "
+POSTGRESQLBUILD="no        "
+SQLITEBUILD="no        "
+FREETDSBUILD="no        "
+SYBASEBUILD="no        "
+ODBCBUILD="no        "
+DB2BUILD="no        "
+FIREBIRDBUILD="no        "
+MDBTOOLSBUILD="no        "
+INFORMIXBUILD="no        "
+ROUTERBUILD="no        "
 if ( test -n "$ORACLEVERSION" ); then
-	ORACLEBUILD="dynamic  "
+	ORACLEBUILD="dynamic   "
 	if ( test -n "$ORACLESTATIC" ); then
-		ORACLEBUILD="static   "
+		ORACLEBUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_ORACLE" ); then
-		ORACLEBUILD="on-demand"
+		ORACLEBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$MYSQLLIBS" ); then
-	MYSQLBUILD="dynamic  "
+	MYSQLBUILD="dynamic   "
 	if ( test -n "$MYSQLSTATIC" ); then
-		MYSQLBUILD="static   "
+		MYSQLBUILD="static    "
 	fi
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
-	POSTGRESQLBUILD="dynamic  "
+	POSTGRESQLBUILD="dynamic   "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
-		POSTGRESQLBUILD="static   "
+		POSTGRESQLBUILD="static    "
 	fi
 fi
 if ( test -n "$SQLITELIBS" ); then
-	SQLITEBUILD="dynamic  "
+	SQLITEBUILD="dynamic   "
 	if ( test -n "$SQLITESTATIC" ); then
-		SQLITEBUILD="static   "
+		SQLITEBUILD="static    "
 	fi
 fi
 if ( test -n "$FREETDSLIBS" ); then
-	FREETDSBUILD="dynamic  "
+	FREETDSBUILD="dynamic   "
 	if ( test -n "$FREETDSSTATIC" ); then
-		FREETDSBUILD="static   "
+		FREETDSBUILD="static    "
 	fi
 fi
 if ( test -n "$SYBASELIBS" ); then
-	SYBASEBUILD="dynamic  "
+	SYBASEBUILD="dynamic   "
 	if ( test -n "$SYBASESTATIC" ); then
-		SYBASEBUILD="static   "
+		SYBASEBUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_SYBASE" ); then
-		SYBASEBUILD="on-demand"
+		SYBASEBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
-	ODBCBUILD="dynamic  "
+	ODBCBUILD="dynamic   "
 	if ( test -n "$ODBCSTATIC" ); then
-		ODBCBUILD="static   "
+		ODBCBUILD="static    "
 	fi
 fi
 if ( test -n "$DB2LIBS" ); then
-	DB2BUILD="dynamic  "
+	DB2BUILD="dynamic   "
 	if ( test -n "$DB2STATIC" ); then
-		DB2BUILD="static   "
+		DB2BUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_DB2" ); then
-		DB2BUILD="on-demand"
+		DB2BUILD="at-runtime"
 	fi
 fi
 if ( test -n "$FIREBIRDLIBS" ); then
-	FIREBIRDBUILD="dynamic  "
+	FIREBIRDBUILD="dynamic   "
 	if ( test -n "$FIREBIRDSTATIC" ); then
-		FIREBIRDBUILD="static   "
+		FIREBIRDBUILD="static    "
 	fi
 fi
 if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic  "
+	MDBTOOLSBUILD="dynamic   "
 	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static   "
+		MDBTOOLSBUILD="static    "
 	fi
 fi
 if ( test -n "$INFORMIXLIBS" ); then
-	INFORMIXBUILD="dynamic  "
+	INFORMIXBUILD="dynamic   "
 	if ( test -n "$INFORMIXSTATIC" ); then
-		INFORMIXBUILD="static   "
+		INFORMIXBUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_ORACLE" ); then
-		INFORMIXBUILD="on-demand"
+		INFORMIXBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$ENABLE_ROUTER" ); then
-	ROUTERBUILD="yes   "
+	ROUTERBUILD="yes"
 fi
-echo " Databases    : Oracle      $ORACLEBUILD     MySQL      $MYSQLBUILD     "
-echo "                PostgreSQL  $POSTGRESQLBUILD     SQLite     $SQLITEBUILD"
-echo "                FreeTDS     $FREETDSBUILD     SAP/Sybase $SYBASEBUILD"
-echo "                ODBC        $ODBCBUILD     DB2        $DB2BUILD"
-echo "                Firebird    $FIREBIRDBUILD     MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD     Router     $ROUTERBUILD"
+echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
+echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
+echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
+echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
+echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
+echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
 
 echo "*************************************************************"
 echo

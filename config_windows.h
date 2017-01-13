@@ -7,11 +7,11 @@
 /* Version of DB2 */
 #define DB2VERSION 8
 
-/* Load DB2 libraries on-demand at runtime. */
-/* #undef DB2_ON_DEMAND */
+/* Load DB2 libraries at runtime. */
+/* #undef DB2_AT_RUNTIME */
 
-/* Load Oracle libraries on-demand at runtime. */
-/* #undef ORACLE_ON_DEMAND */
+/* Load Oracle libraries at runtime. */
+/* #undef ORACLE_AT_RUNTIME */
 
 /* Use dmalloc */
 #define DMALLOC 1
@@ -346,8 +346,8 @@
 /* Some iconv implementations use a const char ** parameter */
 /* #undef ICONV_CONST_CHAR */
 
-/* Load Informix libraries on-demand at runtime. */
-/* #undef INFORMIX_ON_DEMAND */
+/* Load Informix libraries at runtime. */
+/* #undef INFORMIX_AT_RUNTIME */
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
@@ -416,8 +416,8 @@
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
 
-/* Load SAP/Sybase libraries on-demand at runtime. */
-/* #undef SYBASE_ON_DEMAND */
+/* Load SAP/Sybase libraries at runtime. */
+/* #undef SYBASE_AT_RUNTIME */
 
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef mode_t */

@@ -8,8 +8,8 @@
 #include <defines.h>
 #include <config.h>
 
-#ifdef INFORMIX_ON_DEMAND
-	#include "informixondemand.cpp"
+#ifdef INFORMIX_AT_RUNTIME
+	#include "informixatruntime.cpp"
 #else
 	#include <infxcli.h>
 #endif
@@ -388,7 +388,7 @@ bool informixconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
-	#ifdef INFORMIX_ON_DEMAND
+	#ifdef INFORMIX_AT_RUNTIME
 	if (!loadLibraries(&errormessage)) {
 		*error=errormessage.getString();
 		return NULL;

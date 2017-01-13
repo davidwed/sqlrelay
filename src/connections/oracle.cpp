@@ -15,8 +15,8 @@
 #include <defines.h>
 #include <config.h>
 
-#ifdef ORACLE_ON_DEMAND
-	#include "oracleondemand.cpp"
+#ifdef ORACLE_AT_RUNTIME
+	#include "oracleatruntime.cpp"
 #endif
 
 #ifdef HAVE_ORACLE_8i
@@ -41,7 +41,7 @@ extern "C" {
 	#ifdef __CYGWIN__
 		#define _int64 long long
 	#endif
-	#ifndef ORACLE_ON_DEMAND
+	#ifndef ORACLE_AT_RUNTIME
 		#include <oci.h>
 	#endif
 
@@ -657,7 +657,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// load libraries on demand, if necessary
-	#ifdef ORACLE_ON_DEMAND
+	#ifdef ORACLE_AT_RUNTIME
 	if (!loadLibraries(&errormessage)) {
 		*error=errormessage.getString();
 		return false;

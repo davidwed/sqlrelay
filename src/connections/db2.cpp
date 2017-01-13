@@ -8,8 +8,8 @@
 #include <defines.h>
 #include <config.h>
 
-#ifdef DB2_ON_DEMAND
-	#include "db2ondemand.cpp"
+#ifdef DB2_AT_RUNTIME
+	#include "db2atruntime.cpp"
 #else
 	#include <sqlcli1.h>
 #endif
@@ -375,7 +375,7 @@ bool db2connection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
-	#ifdef DB2_ON_DEMAND
+	#ifdef DB2_AT_RUNTIME
 	if (!loadLibraries(&errormessage,db2path)) {
 		*error=errormessage.getString();
 		return false;

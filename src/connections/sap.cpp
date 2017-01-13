@@ -13,8 +13,8 @@
 #include <datatypes.h>
 #include <defines.h>
 
-#ifdef SYBASE_ON_DEMAND
-	#include "sapondemand.cpp"
+#ifdef SYBASE_AT_RUNTIME
+	#include "sapatruntime.cpp"
 #else
 	extern "C" {
 		#include <ctpublic.h>
@@ -337,7 +337,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
-	#ifdef SYBASE_ON_DEMAND
+	#ifdef SYBASE_AT_RUNTIME
 	if (!loadLibraries(&loginerror)) {
 		*error=loginerror.getString();
 		return false;

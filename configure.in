@@ -72,10 +72,10 @@ AC_ARG_ENABLE(oracle-rpath,
 	[  --disable-oracle-rpath        Don't use -rpath when building Oracle connection module],
 	ORACLEUSERPATH="",
 	ORACLEUSERPATH="yes")
-AC_ARG_ENABLE(oracle-on-demand,
-	[  --enable-oracle-on-demand     Disable static/dynamic linking against Oracle client libraries and force the connection module to load them on-demand at runtime],
-	ORACLEONDEMAND="yes",
-	ORACLEONDEMAND="")
+AC_ARG_ENABLE(oracle-at-runtime,
+	[  --enable-oracle-at-runtime    Disable static/dynamic linking against Oracle client libraries and force the connection module to load them at runtime],
+	ORACLEATRUNTIME="yes",
+	ORACLEATRUNTIME="")
 AC_ARG_WITH(mysql-prefix,
 	[  --with-mysql-prefix           Location of MySQL],
 	MYSQLPATH="$withval",
@@ -140,10 +140,10 @@ AC_ARG_ENABLE(sap-rpath,
 	[  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module],
 	SYBASEUSERPATH="",
 	SYBASEUSERPATH="yes")
-AC_ARG_ENABLE(sap-on-demand,
-	[  --enable-sap-on-demand        Disable static/dynamic linking against SAP/Sybase client libraries and force the connection module to load them on-demand at runtime],
-	SYBASEONDEMAND="yes",
-	SYBASEONDEMAND="")
+AC_ARG_ENABLE(sap-at-runtime,
+	[  --enable-sap-at-runtime       Disable static/dynamic linking against SAP/Sybase client libraries and force the connection module to load them at runtime],
+	SYBASEATRUNTIME="yes",
+	SYBASEATRUNTIME="")
 AC_ARG_WITH(odbc-prefix,
 	[  --with-odbc-prefix            Location of ODBC],
 	ODBCPATH="$withval",
@@ -172,10 +172,10 @@ AC_ARG_ENABLE(db2-rpath,
 	[  --disable-db2-rpath           Use -rpath when building DB2 connection module],
 	DB2USERPATH="",
 	DB2USERPATH="yes")
-AC_ARG_ENABLE(db2-on-demand,
-	[  --enable-db2-on-demand        Disable static/dynamic linking against DB2 client libraries and force the connection module to load them on-demand at runtime],
-	DB2ONDEMAND="yes",
-	DB2ONDEMAND="")
+AC_ARG_ENABLE(db2-at-runtime,
+	[  --enable-db2-at-runtime       Disable static/dynamic linking against DB2 client libraries and force the connection module to load them at runtime],
+	DB2ATRUNTIME="yes",
+	DB2ATRUNTIME="")
 AC_ARG_WITH(firebird-prefix,
 	[  --with-firebird-prefix        Location of Firebird],
 	FIREBIRDPATH="$withval",
@@ -200,10 +200,10 @@ AC_ARG_ENABLE(informix-rpath,
 	[  --disable-informix-rpath      Don't use -rpath when building Informix connection module],
 	INFORMIXUSERPATH="",
 	INFORMIXUSERPATH="yes")
-AC_ARG_ENABLE(informix-on-demand,
-	[  --enable-informix-on-demand   Disable static/dynamic linking against Informix client libraries and force the connection module to load them on-demand at runtime],
-	INFORMIXONDEMAND="yes",
-	INFORMIXONDEMAND="")
+AC_ARG_ENABLE(informix-at-runtime,
+	[  --enable-informix-at-runtime  Disable static/dynamic linking against Informix client libraries and force the connection module to load them at runtime],
+	INFORMIXATRUNTIME="yes",
+	INFORMIXATRUNTIME="")
 AC_ARG_WITH(mdbtools-prefix,
 	[  --with-mdbtools-prefix        Location of MDB Tools],
 	MDBTOOLSPATH="$withval",
@@ -1051,109 +1051,109 @@ echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIB
 echo
 
 
-ORACLEBUILD="no       "
-MYSQLBUILD="no       "
-POSTGRESQLBUILD="no       "
-SQLITEBUILD="no       "
-FREETDSBUILD="no       "
-SYBASEBUILD="no       "
-ODBCBUILD="no       "
-DB2BUILD="no       "
-FIREBIRDBUILD="no       "
-MDBTOOLSBUILD="no       "
-INFORMIXBUILD="no       "
-ROUTERBUILD="no       "
+ORACLEBUILD="no        "
+MYSQLBUILD="no        "
+POSTGRESQLBUILD="no        "
+SQLITEBUILD="no        "
+FREETDSBUILD="no        "
+SYBASEBUILD="no        "
+ODBCBUILD="no        "
+DB2BUILD="no        "
+FIREBIRDBUILD="no        "
+MDBTOOLSBUILD="no        "
+INFORMIXBUILD="no        "
+ROUTERBUILD="no        "
 if ( test -n "$ORACLEVERSION" ); then
-	ORACLEBUILD="dynamic  "
+	ORACLEBUILD="dynamic   "
 	if ( test -n "$ORACLESTATIC" ); then
-		ORACLEBUILD="static   "
+		ORACLEBUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_ORACLE" ); then
-		ORACLEBUILD="on-demand"
+		ORACLEBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$MYSQLLIBS" ); then
-	MYSQLBUILD="dynamic  "
+	MYSQLBUILD="dynamic   "
 	if ( test -n "$MYSQLSTATIC" ); then
-		MYSQLBUILD="static   "
+		MYSQLBUILD="static    "
 	fi
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
-	POSTGRESQLBUILD="dynamic  "
+	POSTGRESQLBUILD="dynamic   "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
-		POSTGRESQLBUILD="static   "
+		POSTGRESQLBUILD="static    "
 	fi
 fi
 if ( test -n "$SQLITELIBS" ); then
-	SQLITEBUILD="dynamic  "
+	SQLITEBUILD="dynamic   "
 	if ( test -n "$SQLITESTATIC" ); then
-		SQLITEBUILD="static   "
+		SQLITEBUILD="static    "
 	fi
 fi
 if ( test -n "$FREETDSLIBS" ); then
-	FREETDSBUILD="dynamic  "
+	FREETDSBUILD="dynamic   "
 	if ( test -n "$FREETDSSTATIC" ); then
-		FREETDSBUILD="static   "
+		FREETDSBUILD="static    "
 	fi
 fi
 if ( test -n "$SYBASELIBS" ); then
-	SYBASEBUILD="dynamic  "
+	SYBASEBUILD="dynamic   "
 	if ( test -n "$SYBASESTATIC" ); then
-		SYBASEBUILD="static   "
+		SYBASEBUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_SYBASE" ); then
-		SYBASEBUILD="on-demand"
+		SYBASEBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
-	ODBCBUILD="dynamic  "
+	ODBCBUILD="dynamic   "
 	if ( test -n "$ODBCSTATIC" ); then
-		ODBCBUILD="static   "
+		ODBCBUILD="static    "
 	fi
 fi
 if ( test -n "$DB2LIBS" ); then
-	DB2BUILD="dynamic  "
+	DB2BUILD="dynamic   "
 	if ( test -n "$DB2STATIC" ); then
-		DB2BUILD="static   "
+		DB2BUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_DB2" ); then
-		DB2BUILD="on-demand"
+		DB2BUILD="at-runtime"
 	fi
 fi
 if ( test -n "$FIREBIRDLIBS" ); then
-	FIREBIRDBUILD="dynamic  "
+	FIREBIRDBUILD="dynamic   "
 	if ( test -n "$FIREBIRDSTATIC" ); then
-		FIREBIRDBUILD="static   "
+		FIREBIRDBUILD="static    "
 	fi
 fi
 if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic  "
+	MDBTOOLSBUILD="dynamic   "
 	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static   "
+		MDBTOOLSBUILD="static    "
 	fi
 fi
 if ( test -n "$INFORMIXLIBS" ); then
-	INFORMIXBUILD="dynamic  "
+	INFORMIXBUILD="dynamic   "
 	if ( test -n "$INFORMIXSTATIC" ); then
-		INFORMIXBUILD="static   "
+		INFORMIXBUILD="static    "
 	fi
 else
 	if ( test -n "$ENABLE_ORACLE" ); then
-		INFORMIXBUILD="on-demand"
+		INFORMIXBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$ENABLE_ROUTER" ); then
-	ROUTERBUILD="yes   "
+	ROUTERBUILD="yes"
 fi
-echo " Databases    : Oracle      $ORACLEBUILD     MySQL      $MYSQLBUILD     "
-echo "                PostgreSQL  $POSTGRESQLBUILD     SQLite     $SQLITEBUILD"
-echo "                FreeTDS     $FREETDSBUILD     SAP/Sybase $SYBASEBUILD"
-echo "                ODBC        $ODBCBUILD     DB2        $DB2BUILD"
-echo "                Firebird    $FIREBIRDBUILD     MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD     Router     $ROUTERBUILD"
+echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
+echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
+echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
+echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
+echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
+echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
 
 echo "*************************************************************"
 echo
