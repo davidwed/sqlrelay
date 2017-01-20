@@ -360,6 +360,8 @@ API documentation for SQL Relay.
 		--with-perl-site-lib=%{perl_vendorlib} \
 		--with-perl-site-arch=%{perl_vendorarch} \
 		--with-ruby-site-arch-dir=%{ruby_vendorarchdir}
+# modify libtool to avoid unused-direct-shlib-dependency errors
+sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 make
 
 %install
