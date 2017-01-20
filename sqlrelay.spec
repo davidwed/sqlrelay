@@ -724,7 +724,7 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 - Split out perl-dbi, php-pdo, and python-db drivers into separate packages.
 - Reordered package definitions.
 - Updated package definitions to use macros.
-- Updated install target to move files to the required places.
+- Updated install target to move various files to the required places.
 - Separated javadocs into their own subpackage.
 - Combined the man pages with the subpackages containing their programs.
 
