@@ -11,8 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-# FIXME: move readline/pcre/openssl/libcurl/krb-devel the rudiments-devel package?
-BuildRequires: rudiments-devel >= 1.0.2, readline-devel, pcre-devel, openssl-devel, libcurl-devel, krb5-devel, systemd
+BuildRequires: rudiments-devel >= 1.0.3, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -65,7 +64,7 @@ The SQL Relay C client library.
 %package c++-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C++ client library
-Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.2
+Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.3
 
 %description c++-devel
 Development files for the SQL Relay C++ client library.
