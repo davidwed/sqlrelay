@@ -353,10 +353,10 @@ API documentation for SQL Relay.
 
 %build
 %configure --disable-static \
-		--enable-oracle-on-demand \
-		--enable-sap-on-demand \
-		--enable-db2-on-demand \
-		--enable-informix-on-demand \
+		--enable-oracle-at-runtime \
+		--enable-sap-at-runtime \
+		--enable-db2-at-runtime \
+		--enable-informix-at-runtime \
 		--disable-python \
 		--with-perl-site-lib=%{perl_vendorlib} \
 		--with-perl-site-arch=%{perl_vendorarch} \
