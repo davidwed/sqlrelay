@@ -1858,14 +1858,19 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 			char	*cmd=pr.read();
 
-			size_t	len=charstring::length(cmd);
-			// len=0 if you hit ctrl-D
-			if (!len) {
+			// cmd is NULL if you hit ctrl-D
+			if (!cmd) {
 				return;
 			}
 
-			command.append(cmd);
-			done=(cmd[len-1]==env->delimiter);
+			size_t	len=charstring::length(cmd);
+
+			// len=0 and cmd="" if you just hit return
+			if (len) {
+				command.append(cmd);
+				done=(cmd[len-1]==env->delimiter);
+			}
+
 			if (!done) {
 				promptcount++;
 				command.append('\n');
