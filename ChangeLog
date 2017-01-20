@@ -10,6 +10,8 @@
 	fixed a segfault on ctrl-D in sqlrsh
 	fixed uncoordinated access to shared debugstr among listener threads
 		by using local instances instead
+	added ping-loop to router connection module's logIn() method to manage
+		cases where routed-to instances are started after the router
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

@@ -4,6 +4,7 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
+#include <rudiments/snooze.h>
 #include <rudiments/regularexpression.h>
 
 //#define DEBUG_MESSAGES 1
@@ -360,7 +361,12 @@ void routerconnection::handleConnectString() {
 }
 
 bool routerconnection::logIn(const char **error, const char **warning) {
+
 	justloggedin=true;
+
+	while (!ping()) {
+		snooze::macrosnooze(1);
+	}
 	return true;
 }
 
