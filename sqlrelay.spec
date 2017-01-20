@@ -264,7 +264,7 @@ Summary: FreeTDS back-end module for SQL Relay
 BuildRequires: freetds-devel
 
 %description freetds
-FreeTDS back-end module for SQL Relay.  Enables access to SAP/Sybase and MS SQL Server databases.
+FreeTDS back-end module for SQL Relay.
 
 
 %package sap
@@ -307,7 +307,7 @@ Summary: MDB Tools back-end module for SQL Relay
 BuildRequires: mdbtools-devel
 
 %description mdbtools
-MDB Tools back-end module for SQL Relay.  Enables read-only access to Microsoft Access databases.
+MDB Tools back-end module for SQL Relay.
 
 
 %package informix
