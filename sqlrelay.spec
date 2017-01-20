@@ -361,7 +361,7 @@ API documentation for SQL Relay.
 		--with-perl-site-arch=%{perl_vendorarch} \
 		--with-ruby-site-arch-dir=%{ruby_vendorarchdir}
 # modify libtool to avoid unused-direct-shlib-dependency errors
-sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
+#sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 make
 
 %install
@@ -515,20 +515,16 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 %files c++
 %{_libdir}/libsqlrclient.so.*
 
-%post c++
-/sbin/ldconfig
+%post c++ -p /sbin/ldconfig
 
-%postun c++
-/sbin/ldconfig
+%postun c++ -p /sbin/ldconfig
 
 %files c
 %{_libdir}/libsqlrclientwrapper.so.*
 
-%post c
-/sbin/ldconfig
+%post c -p /sbin/ldconfig
 
-%postun c
-/sbin/ldconfig
+%postun c -p /sbin/ldconfig
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
@@ -619,11 +615,19 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 
 %files dropin-mysql
 %{_libdir}/libmysql*sqlrelay.so.*
-%{_libdir}/libmysql*sqlrelay.so
+%exclude %{_libdir}/libmysql*sqlrelay.so
+
+%post dropin-mysql -p /sbin/ldconfig
+
+%postun dropin-mysql -p /sbin/ldconfig
 
 %files dropin-postgresql
 %{_libdir}/libpqsqlrelay.so.*
-%{_libdir}/libpqsqlrelay.so
+%exclude %{_libdir}/libpqsqlrelay.so
+
+%post dropin-postgresql -p /sbin/ldconfig
+
+%postun dropin-postgresql -p /sbin/ldconfig
 
 %files oracle
 %{_libexecdir}/sqlrelay/sqlrconnection_oracle*
@@ -729,6 +733,8 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 - Updated install target to move various files to the required places.
 - Separated javadocs into their own subpackage.
 - Combined the man pages with the subpackages containing their programs.
+- Added postin/postun with calls to /sbin/ldconfig for all library subpackages.
+- Excluded .so files from dropin-postgresql and dropin-mysql subpackages.
 
 * Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
