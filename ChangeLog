@@ -8,6 +8,8 @@
 	added permissions to all open() with O_CREAT calls
 	added --with-fortify configure option
 	fixed a segfault on ctrl-D in sqlrsh
+	fixed uncoordinated access to shared debugstr among listener threads
+		by using local instances instead
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password
