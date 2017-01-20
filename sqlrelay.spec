@@ -371,10 +371,10 @@ mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
 # move tcl modules to (tcl_sitearch)/(name)
 mkdir -p %{buildroot}%{tcl_sitearch}
 mv %{buildroot}%{_libdir}/sqlrelay %{buildroot}%{tcl_sitearch}/%{name}
-# install mono modules with gacutil into (_monogacdir)
-#mkdir -p %{buildroot}%{_monogacdir}
-# FIXME: for this to work, the assembly must be signed with a Strong Name
-#gacutil -i src/api/cs/SQLRClient.dll -f -package SQLRClient -root %{buildroot}/usr/lib
+# move mono modules to (libdir)/(name)
+mkdir -p %{buildroot}%{_libdir}/%{name}
+mv %{buildroot}%{_libdir}/SQLRClient.dll %{buildroot}%{_libdir}/%{name}
+mv %{buildroot}%{_libdir}/SQLRClient.dll.config %{buildroot}%{_libdir}/%{name}
 # .move jar files to (_javadir)
 mkdir -p %{buildroot}%{_javadir}
 mv %{buildroot}%{_prefix}/java/*.jar %{buildroot}%{_javadir}
@@ -610,12 +610,8 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %{_libdir}/erlang/lib/%{name}-%{version}
 
 %files -n mono-data-%{name}
-%{_libdir}/SQLRClient.dll
-%{_libdir}/SQLRClient.dll.config
-#%{_monogacdir}/SQLRClient
-#%{_monodir}/SQLRClient.dll
-#%exclude %{_libdir}/SQLRClient.dll
-#%exclude %{_libdir}/SQLRClient.dll.config
+%{_libdir}/%{name}/SQLRClient.dll
+%{_libdir}/%{name}/SQLRClient.dll.config
 
 %files -n nodejs-%{name}
 %{nodejs_sitearch}/sqlrelay
