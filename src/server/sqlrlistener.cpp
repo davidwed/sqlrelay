@@ -59,8 +59,6 @@ class sqlrlistenerprivate {
 		sqlrloggers		*_sqlrlg;
 		sqlrnotifications	*_sqlrn;
 
-		stringbuffer	_debugstr;
-
 		semaphoreset	*_semset;
 		sharedmemory	*_shmem;
 		sqlrshm		*_shm;
@@ -567,11 +565,11 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 				"%s%s",pvt->_sqlrpth->getIpcDir(),id);
 
 	if (pvt->_sqlrlg || pvt->_sqlrn) {
-		pvt->_debugstr.clear();
-		pvt->_debugstr.append("creating shared memory "
+		stringbuffer	debugstr;
+		debugstr.append("creating shared memory "
 					"and semaphores: id filename: ");
-		pvt->_debugstr.append(pvt->_idfilename);
-		raiseDebugMessageEvent(pvt->_debugstr.getString());
+		debugstr.append(pvt->_idfilename);
+		raiseDebugMessageEvent(debugstr.getString());
 	}
 
 	// make sure that the file exists and is read/writeable
@@ -1414,10 +1412,10 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 
 		// parent...
 		if (pvt->_sqlrlg || pvt->_sqlrn) {
-			pvt->_debugstr.clear();
-			pvt->_debugstr.append("forked a child: ");
-			pvt->_debugstr.append((int32_t)childpid);
-			raiseDebugMessageEvent(pvt->_debugstr.getString());
+			stringbuffer	debugstr;
+			debugstr.append("forked a child: ");
+			debugstr.append((int32_t)childpid);
+			raiseDebugMessageEvent(debugstr.getString());
 		}
 
 		// the main process doesn't need to stay connected
@@ -1519,7 +1517,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 				// died because its ttl expired...
 
 				raiseInternalErrorEvent("failed to pass "
-						"file descriptor");
+							"file descriptor");
 				continue;
 			}
 
@@ -1779,14 +1777,13 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// make sure the connection is actually up...
 			if (connectionIsUp(pvt->_shm->connectionid)) {
 				if (pvt->_sqlrlg || pvt->_sqlrn) {
-					pvt->_debugstr.clear();
-					pvt->_debugstr.append(
-							"finished getting "
+					stringbuffer	debugstr;
+					debugstr.append("finished getting "
 							"a connection: ");
-					pvt->_debugstr.append(
+					debugstr.append(
 						(int32_t)*connectionpid);
 					raiseDebugMessageEvent(
-						pvt->_debugstr.getString());
+						debugstr.getString());
 				}
 				return true;
 			}
@@ -1927,7 +1924,8 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 bool sqlrlistener::requestFixup(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
-	raiseDebugMessageEvent("requesting socket of newly spawned connection...");
+	raiseDebugMessageEvent("requesting socket of newly "
+					"spawned connection...");
 
 	// connect to the fixup socket of the parent listener
 	unixsocketclient	fixupclientsockun;
@@ -1977,13 +1975,13 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	unsigned char	ack=0;
 	if (serversock->read(&ack,5,0)!=sizeof(unsigned char)) {
 		raiseDebugMessageEvent("proxying client failed: "
-				"failed to receive ack");
+					"failed to receive ack");
 		return false;
 	}
 	#define ACK	6
 	if (ack!=ACK) {
 		raiseDebugMessageEvent("proxying client failed: "
-				"received bad ack");
+					"received bad ack");
 		return false;
 	}
 
@@ -2029,15 +2027,14 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append("read failed: ");
-				pvt->_debugstr.append((uint32_t)readcount);
-				pvt->_debugstr.append(" : ");
+				stringbuffer	debugstr;
+				debugstr.append("read failed: ");
+				debugstr.append((uint32_t)readcount);
+				debugstr.append(" : ");
 				char	*err=error::getErrorString();
-				pvt->_debugstr.append(err);
+				debugstr.append(err);
 				delete[] err;
-				raiseDebugMessageEvent(
-					pvt->_debugstr.getString());
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			endsession=(fd==clientsock);
 			break;
@@ -2046,23 +2043,21 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// write the data to the other side
 		if (fd==serversock) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append("read ");
-				pvt->_debugstr.append((uint32_t)readcount);
-				pvt->_debugstr.append(" bytes from server");
-				raiseDebugMessageEvent(
-					pvt->_debugstr.getString());
+				stringbuffer	debugstr;
+				debugstr.append("read ");
+				debugstr.append((uint32_t)readcount);
+				debugstr.append(" bytes from server");
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			clientsock->write(readbuffer,readcount);
 			clientsock->flushWriteBuffer(-1,-1);
 		} else if (fd==clientsock) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append("read ");
-				pvt->_debugstr.append((uint32_t)readcount);
-				pvt->_debugstr.append(" bytes from client");
-				raiseDebugMessageEvent(
-					pvt->_debugstr.getString());
+				stringbuffer	debugstr;
+				debugstr.append("read ");
+				debugstr.append((uint32_t)readcount);
+				debugstr.append(" bytes from client");
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			serversock->write(readbuffer,readcount);
 			serversock->flushWriteBuffer(-1,-1);
