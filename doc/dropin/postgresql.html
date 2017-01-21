@@ -41,7 +41,7 @@ oracleuser/oraclepass.</p>
 <p>For sh-based shells:</p>
 
 <blockquote>
-  <pre>LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+  <pre>LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so.4
 export LD_PRELOAD
 psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
@@ -51,7 +51,7 @@ Password: oraclepass
 <p>For csh-based shells:</p>
 
 <blockquote>
-  <pre>setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
+  <pre>setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so.4
 psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
 </pre>
@@ -107,7 +107,7 @@ daemon.</p>
 <blockquote>
   <pre>.include /lib/systemd/system/httpd.service
 [Service]
-Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so.4
 </pre>
 
 </blockquote>
@@ -156,7 +156,7 @@ follows:</p>
 
 <blockquote>
   <pre>#!/bin/sh
-LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so.4
 export LD_PRELOAD
 /usr/local/bin/pop3d $@
 </pre>

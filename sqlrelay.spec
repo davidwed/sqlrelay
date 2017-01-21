@@ -364,26 +364,34 @@ make
 
 %install
 make install DESTDIR=%{buildroot}
+
 # move systemd files to (_unitdir)
 mkdir -p %{buildroot}%{_unitdir}
 mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
-# create tempfiles module
+
+# create tmpfiles.d directories and config file
+mkdir -p %{buildroot}/run/%{name}
 mkdir -p %{buildroot}%{_tmpfilesdir}
 echo "d /run/%{name} 0777 root root -" > %{buildroot}%{_tmpfilesdir}/%{name}.conf
+
 # move tcl modules to (tcl_sitearch)/(name)
 mkdir -p %{buildroot}%{tcl_sitearch}
 mv %{buildroot}%{_libdir}/%{name} %{buildroot}%{tcl_sitearch}/%{name}
+
 # move mono assembly to (libdir)/(name)
 mkdir -p %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/SQLRClient.dll %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/SQLRClient.dll.config %{buildroot}%{_libdir}/%{name}
+
 # .move jar files to (_javadir)
 mkdir -p %{buildroot}%{_javadir}
 mv %{buildroot}%{_prefix}/java/*.jar %{buildroot}%{_javadir}
+
 # move jni shared object files to (_libdir)/(name)
 mkdir -p %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_prefix}/java/com/firstworks/%{name}/*.so %{buildroot}%{_libdir}/%{name}
 rm -rf %{buildroot}%{_prefix}/java
+
 # copy java documentation to (_javadocdir)/(name)
 mkdir -p %{buildroot}%{_javadocdir}
 cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
@@ -434,9 +442,6 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libexecdir}/%{name}/sqlrresultsettranslation_*
 %{_libexecdir}/%{name}/sqlrschedule_*
 %{_libexecdir}/%{name}/sqlrtranslation_*
-%{_localstatedir}/cache/%{name}
-%{_localstatedir}/log/%{name}
-%{_tmpfilesdir}/%{name}.conf
 %{_mandir}/*/sqlr-cachemanager.*
 %{_mandir}/*/sqlr-listener.*
 %{_mandir}/*/sqlr-connection.*
@@ -446,6 +451,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
 %license COPYING
+%dir %{_localstatedir}/cache/%{name}
+%dir %{_localstatedir}/log/%{name}
+%attr(777, -, -) %dir /run/%{name}
+%{_tmpfilesdir}/%{name}.conf
 %exclude %{_libdir}/lib*.la
 %exclude %{_datadir}/licenses/%{name}
 %exclude %{_localstatedir}/run

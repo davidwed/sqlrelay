@@ -28,8 +28,9 @@ installdll:
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) $(CP) libpq$(SQLRELAY).$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libpq$(SQLRELAY).a
-	$(RM) $(libdir)/libpq$(SQLRELAY).$(LIBEXT)
+	$(RM) $(libdir)/libpq$(SQLRELAY).a \
+		$(libdir)/libpq$(SQLRELAY).so \
+		$(libdir)/libpq$(SQLRELAY).$(LIBEXT)
 
 uninstall: $(UNINSTALLLIB)
 

@@ -77,7 +77,7 @@ of oracleuser/oraclepass.</p>
 <p>For sh-based shells:</p>
 
 <blockquote>
-  <pre>LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+  <pre>LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so.4
 export LD_PRELOAD
 mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
 </pre>
@@ -86,7 +86,7 @@ mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
 <p>For csh-based shells:</p>
 
 <blockquote>
-  <pre>setenv LD_PRELOAD /usr/local/firstworks/lib/libmysql51sqlrelay.so
+  <pre>setenv LD_PRELOAD /usr/local/firstworks/lib/libmysql51sqlrelay.so.4
 mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
 </pre>
 
@@ -150,7 +150,7 @@ daemon itself.</p>
 <blockquote>
 .include /lib/systemd/system/httpd.service
 <a href="Service">Service</a>
-Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so.4
 </blockquote>
 <p>Unfortunately this approach does not work with PHP.  See the section below
 for how to use the drop-in replacement library with PHP.</p>
@@ -199,7 +199,7 @@ follows:</p>
 
 <blockquote>
   <pre>#!/bin/sh
-LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so.4
 export LD_PRELOAD
 /usr/local/bin/pop3d $@
 </pre>

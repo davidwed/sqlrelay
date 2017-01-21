@@ -36,7 +36,7 @@ For sh-based shells:
 
 {{{#!blockquote
 {{{
-LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so.4
 export LD_PRELOAD
 psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
@@ -47,7 +47,7 @@ For csh-based shells:
 
 {{{#!blockquote
 {{{
-setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so
+setenv LD_PRELOAD /usr/local/firstworks/lib/libpqsqlrelay.so.4
 psql -h localhost -p 9000 -U oracleuser -W
 Password: oraclepass
 }}}
@@ -106,7 +106,7 @@ If your system uses systemd instead of init scripts, then you can modify the sys
 {{{
 .include /lib/systemd/system/httpd.service
 [Service]
-Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so
+Environment=LD_PRELOAD=/usr/local/firstworks/lib/libmysql51sqlrelay.so.4
 }}}
 }}}
 
@@ -159,7 +159,7 @@ follows:
 {{{#!blockquote
 {{{
 #!/bin/sh
-LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so
+LD_PRELOAD=/usr/local/firstworks/lib/libpqsqlrelay.so.4
 export LD_PRELOAD
 /usr/local/bin/pop3d $@
 }}}
