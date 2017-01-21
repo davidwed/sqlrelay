@@ -104,9 +104,8 @@ class sqlrservercontrollerprivate {
 	char		*_updown;
 
 	uint16_t	_inetport;
-	char		*_unixsocket;
-	char		*_unixsocketptr;
-	size_t		_unixsocketptrlen;
+	stringbuffer	_unixsocket;
+	randomnumber	_unixsocketrnd;
 
 	bool		_autocommitforthissession;
 
@@ -237,9 +236,13 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_dbchanged=false;
 	pvt->_originaldb=NULL;
 
-	pvt->_unixsocket=NULL;
-	pvt->_unixsocketptr=NULL;
-	pvt->_unixsocketptrlen=0;
+	// Ideally we'd use randomnumber:getSeed for
+	// this, but on some platforms that's generated
+	// from the epoch and could end up being the
+	// same for all sqlr-connections.  The process
+	// id is guaranteed unique.
+	pvt->_unixsocketrnd.setSeed(process::getProcessId());
+
 	pvt->_serversockun=NULL;
 	pvt->_serversockin=NULL;
 	pvt->_serversockincount=0;
@@ -345,9 +348,8 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete pvt->_semset;
 
-	if (pvt->_unixsocket) {
-		file::remove(pvt->_unixsocket);
-		delete[] pvt->_unixsocket;
+	if (pvt->_unixsocket.getStringLength()) {
+		file::remove(pvt->_unixsocket.getString());
 	}
 
 	delete pvt->_bindmappingspool;
@@ -478,11 +480,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		pvt->_sqlrs->load(schedules);
 	}
 
-	// handle the unix socket directory
-	if (pvt->_cfg->getListenOnUnix()) {
-		setUnixSocketDirectory();
-	}
-
 	// handle the pid file
 	if (!handlePidFile()) {
 		return false;
@@ -498,10 +495,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_conn->handleConnectString();
 
 	initDatabaseAvailableFileName();
-
-	if (pvt->_cfg->getListenOnUnix() && !getUnixSocket()) {
-		return false;
-	}
 
 	if (!createSharedMemoryAndSemaphores(pvt->_cmdl->getId())) {
 		return false;
@@ -738,14 +731,8 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 }
 
 void sqlrservercontroller::setUnixSocketDirectory() {
-	size_t	unixsocketlen=charstring::length(pvt->_pth->getSocketsDir())+22;
-	pvt->_unixsocket=new char[unixsocketlen];
-	charstring::printf(pvt->_unixsocket,unixsocketlen,"%s",
-					pvt->_pth->getSocketsDir());
-	pvt->_unixsocketptr=
-		pvt->_unixsocket+charstring::length(pvt->_pth->getSocketsDir());
-	pvt->_unixsocketptrlen=
-		unixsocketlen-(pvt->_unixsocketptr-pvt->_unixsocket);
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 }
 
 bool sqlrservercontroller::handlePidFile() {
@@ -824,119 +811,32 @@ void sqlrservercontroller::initDatabaseAvailableFileName() {
 }
 
 bool sqlrservercontroller::getUnixSocket() {
-
-	raiseDebugMessageEvent("getting unix socket...");
-
-	file	sockseq;
-	if (!openSequenceFile(&sockseq) || !lockSequenceFile(&sockseq)) {
-		return false;
-	}
-	if (!getAndIncrementSequenceNumber(&sockseq)) {
-		unLockSequenceFile(&sockseq);
-		sockseq.close();
-		return false;
-	}
-	if (!unLockSequenceFile(&sockseq)) {
-		sockseq.close();
-		return false;
-	}
-	if (!sockseq.close()) {
-		return false;
-	}
-
-	raiseDebugMessageEvent("done getting unix socket");
-
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
 bool sqlrservercontroller::openSequenceFile(file *sockseq) {
-
-	// open the sequence file and get the current port number
-	const char	*sockseqfile=pvt->_pth->getSockSeqFile();
-
-	pvt->_debugstr.clear();
-	pvt->_debugstr.append("opening ")->append(sockseqfile);
-	raiseDebugMessageEvent(pvt->_debugstr.getString());
-
-	mode_t	oldumask=process::setFileCreationMask(011);
-	bool	success=sockseq->open(sockseqfile,O_RDWR|O_CREAT,
-					permissions::everyoneReadWrite());
-	process::setFileCreationMask(oldumask);
-
-	// handle error
-	if (!success) {
-
-		stderror.printf("Could not open: %s\n",sockseqfile);
-		stderror.printf("Make sure that the file and directory are \n");
-		stderror.printf("readable and writable.\n\n");
-		pvt->_unixsocketptr[0]='\0';
-
-		pvt->_debugstr.clear();
-		pvt->_debugstr.append("failed to open socket sequence file: ");
-		pvt->_debugstr.append(sockseqfile);
-		raiseInternalErrorEvent(NULL,pvt->_debugstr.getString());
-	}
-
-	return success;
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
+	return true;
 }
 
 bool sqlrservercontroller::lockSequenceFile(file *sockseq) {
-
-	raiseDebugMessageEvent("locking...");
-
-	if (!sockseq->lockFile(F_WRLCK)) {
-		raiseInternalErrorEvent(NULL,"failed to lock socket sequence file");
-		return false;
-	}
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
 bool sqlrservercontroller::unLockSequenceFile(file *sockseq) {
-
-	// unlock and close the file in a platform-independent manner
-	raiseDebugMessageEvent("unlocking...");
-
-	if (!sockseq->unlockFile()) {
-		raiseInternalErrorEvent(NULL,"failed to unlock socket sequence file");
-		return false;
-	}
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
 bool sqlrservercontroller::getAndIncrementSequenceNumber(file *sockseq) {
-
-	// get the sequence number from the file
-	int32_t	buffer;
-	if (sockseq->read(&buffer)!=sizeof(int32_t)) {
-		buffer=0;
-	}
-	charstring::printf(pvt->_unixsocketptr,
-				pvt->_unixsocketptrlen,
-				"%d",buffer);
-
-	pvt->_debugstr.clear();
-	pvt->_debugstr.append("got sequence number: ");
-	pvt->_debugstr.append(pvt->_unixsocketptr);
-	raiseDebugMessageEvent(pvt->_debugstr.getString());
-
-	// increment the sequence number but don't let it roll over
-	if (buffer==2147483647) {
-		buffer=0;
-	} else {
-		buffer=buffer+1;
-	}
-
-	pvt->_debugstr.clear();
-	pvt->_debugstr.append("writing new sequence number: ");
-	pvt->_debugstr.append(buffer);
-	raiseDebugMessageEvent(pvt->_debugstr.getString());
-
-	// write the sequence number back to the file
-	if (sockseq->setPositionRelativeToBeginning(0)==-1 ||
-			sockseq->write(buffer)!=sizeof(int32_t)) {
-		raiseInternalErrorEvent(NULL,"failed to update socket sequence file");
-		return false;
-	}
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
@@ -1213,34 +1113,81 @@ bool sqlrservercontroller::openSockets() {
 	raiseDebugMessageEvent("listening on sockets...");
 
 	// get the next available unix socket and open it
-	if (pvt->_cfg->getListenOnUnix() &&
-		!charstring::isNullOrEmpty(pvt->_unixsocketptr) &&
-		!pvt->_serversockun) {
+	if (pvt->_cfg->getListenOnUnix() && !pvt->_serversockun) {
 
 		pvt->_serversockun=new unixsocketserver();
-		if (pvt->_serversockun->listen(pvt->_unixsocket,0000,5)) {
 
-			pvt->_debugstr.clear();
-			pvt->_debugstr.append("listening on unix socket: ");
-			pvt->_debugstr.append(pvt->_unixsocket);
-			raiseDebugMessageEvent(pvt->_debugstr.getString());
+		// Generate a random socket name and try to listen on it.
+		// If that fail because someone else is already listening on
+		// that socket, then try again, unless it failed 
+		for (;;) {
 
-			pvt->_lsnr.addReadFileDescriptor(pvt->_serversockun);
+			// generate a random socket name...
+			pvt->_unixsocket.clear();
+			uint32_t	num;
+			if (!pvt->_unixsocketrnd.generateNumber(&num)) {
+				pvt->_debugstr.clear();
+				pvt->_debugstr.append("failed to generate "
+							"unix socket name");
+				raiseInternalErrorEvent(NULL,
+						pvt->_debugstr.getString());
+				delete pvt->_serversockun;
+				pvt->_serversockun=NULL;
+				return false;
+			}
+			pvt->_unixsocket.append(pvt->_pth->getSocketsDir())->
+						append(num)->append(".sock");
 
-		} else {
-			pvt->_debugstr.clear();
-			pvt->_debugstr.append("failed to listen on socket: ");
-			pvt->_debugstr.append(pvt->_unixsocket);
-			raiseInternalErrorEvent(NULL,pvt->_debugstr.getString());
+			// try to listen on it...
+			error::clearError();
+			bool	success=pvt->_serversockun->listen(
+						pvt->_unixsocket.getString(),
+						0000,5);
 
-			stderror.printf("Could not listen on ");
-			stderror.printf("unix socket: ");
-			stderror.printf("%s\n",pvt->_unixsocket);
-			stderror.printf("Make sure that the file and ");
-			stderror.printf("directory are readable ");
-			stderror.printf("and writable.\n\n");
-			delete pvt->_serversockun;
-			return false;
+			if (success) {
+
+				// success
+				pvt->_debugstr.clear();
+				pvt->_debugstr.append(
+						"listening on unix socket: ");
+				pvt->_debugstr.append(
+						pvt->_unixsocket.getString());
+				raiseDebugMessageEvent(
+						pvt->_debugstr.getString());
+
+				pvt->_lsnr.addReadFileDescriptor(
+						pvt->_serversockun);
+
+				break;
+
+			} else if (error::getErrorNumber()==EADDRINUSE) {
+
+				// try again if the problem was that someone
+				// else is already listening on this socket
+				continue;
+
+			} else {
+
+				// failure
+				pvt->_debugstr.clear();
+				pvt->_debugstr.append(
+						"failed to listen on socket: ");
+				pvt->_debugstr.append(
+						pvt->_unixsocket.getString());
+				raiseInternalErrorEvent(NULL,
+						pvt->_debugstr.getString());
+
+				stderror.printf("Could not listen on ");
+				stderror.printf("unix socket: ");
+				stderror.printf("%s\n",
+						pvt->_unixsocket.getString());
+				stderror.printf("Make sure that the file and ");
+				stderror.printf("directory are readable ");
+				stderror.printf("and writable.\n\n");
+				delete pvt->_serversockun;
+				pvt->_serversockun=NULL;
+				return false;
+			}
 		}
 	}
 
@@ -1332,9 +1279,7 @@ bool sqlrservercontroller::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-		if (!announceAvailability(pvt->_unixsocket,
-						pvt->_inetport,
-						pvt->_connectionid)) {
+		if (!announceAvailability(NULL,0,pvt->_connectionid)) {
 			return true;
 		}
 
@@ -1527,6 +1472,9 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 						unsigned short inetport,
 						const char *connectionid) {
 
+	// FIXME: unixsocket and inetport are unused and
+	// should be removed in the next minor release
+
 	raiseDebugMessageEvent("announcing availability...");
 
 	// connect to listener if we haven't already
@@ -1551,7 +1499,8 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 	// we don't need to release it.  We also don't need to reset the
 	// ttl because we're going to exit.
 	if (!acquireAnnounceMutex()) {
-		raiseDebugMessageEvent("ttl reached, aborting announcing availabilty");
+		raiseDebugMessageEvent("ttl reached, "
+					"aborting announcing availabilty");
 		return false;
 	}
 
@@ -1603,7 +1552,8 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 		// connection.
 		pvt->_handoffsockun.close();
 
-		raiseDebugMessageEvent("ttl reached, aborting announcing availabilty");
+		raiseDebugMessageEvent("ttl reached, "
+					"aborting announcing availabilty");
 	}
 
 	// signal the listener to hand off...
@@ -2138,7 +2088,7 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 	*inetport=0;
 	if (openSockets()) {
 		if (pvt->_serversockun) {
-			*unixsocket=pvt->_unixsocket;
+			*unixsocket=pvt->_unixsocket.getString();
 		}
 		*inetport=pvt->_inetport;
 	}

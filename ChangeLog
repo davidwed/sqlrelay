@@ -20,6 +20,7 @@
 	moved .../var/sqlrelay/log to .../var/log/sqlrelay
 	moved .../var/sqlrelay/cache to .../var/cache/sqlrelay
 	libmysql*sqlrelay.so and libpqsqlrelay.so are no longer installed
+	replaced sockseq-generated unix socket with random unix socket
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password
