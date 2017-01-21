@@ -454,9 +454,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
 %license COPYING
-%attr(-, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
-%attr(-, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
-%attr(-, sqlrelay, sqlrelay) %dir /run/%{name}
+%attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
+%attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
+%attr(755, sqlrelay, sqlrelay) %dir /run/%{name}
 %{_tmpfilesdir}/%{name}.conf
 %exclude %{_libdir}/lib*.la
 %exclude %{_datadir}/licenses/%{name}
