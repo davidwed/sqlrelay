@@ -97,9 +97,8 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	scratch.append(logdir)->append("debug")->append(slash);
 	debugdir=scratch.detachString();
 
-	scratch.append(localstatedir)->append(slash)->append("run")->
-			append(slash)->append(SQLRELAY)->
-			append(slash)->append("cache")->append(slash);
+	scratch.append(localstatedir)->append("cache")->
+			append(slash)->append(SQLRELAY)->append(slash);
 	cachedir=scratch.detachString();
 
 	scratch.append(sysconfdir)->append(SQLRELAY)->append(".conf");

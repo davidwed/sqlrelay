@@ -367,6 +367,9 @@ make install DESTDIR=%{buildroot}
 # move systemd files to (_unitdir)
 mkdir -p %{buildroot}%{_unitdir}
 mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
+# create tempfiles module
+mkdir -p %{buildroot}%{_tmpfilesdir}
+echo "d /run/sqlrelay 0777 root root -" > %{buildroot}%{_tmpfilesdir}/%{name}.conf
 # move tcl modules to (tcl_sitearch)/(name)
 mkdir -p %{buildroot}%{tcl_sitearch}
 mv %{buildroot}%{_libdir}/sqlrelay %{buildroot}%{tcl_sitearch}/%{name}
@@ -431,7 +434,7 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 %{_libexecdir}/sqlrelay/sqlrresultsettranslation_*
 %{_libexecdir}/sqlrelay/sqlrschedule_*
 %{_libexecdir}/sqlrelay/sqlrtranslation_*
-%{_localstatedir}/run/sqlrelay
+%{_localstatedir}/cache/sqlrelay
 %{_localstatedir}/log/sqlrelay
 %{_mandir}/*/sqlr-cachemanager.*
 %{_mandir}/*/sqlr-listener.*
@@ -444,6 +447,7 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 %license COPYING
 %exclude %{_libdir}/lib*.la
 %exclude %{_datadir}/licenses/sqlrelay
+%exclude %{_localstatedir}/run
 
 %files server-devel
 %{_bindir}/sqlrserver-config
