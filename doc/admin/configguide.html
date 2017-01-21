@@ -3617,7 +3617,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <h4>debug</h4>
 
-<p>The <b>debug</b> module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.</p>
+<p>The <b>debug</b> module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/log/sqlrelay/debug or /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.</p>
 
 <p>This module takes three parameters: <b>listener</b>, <b>connection</b> and <b>perms</b>.  The <b>listener</b> parameter may be set to "no" to disable logging of the sqlr-listener processes.  The <b>connection</b> parameter may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either parameter is omitted or set to any other value.  The <b>perms</b> parameter may be set to any ls -l style permissions string.  The default is "rw-------" which translates to read/write for owner only.</p>
 
@@ -3634,7 +3634,7 @@ Sample log for connecton process: <a href="sqlr-connection.1871.html">sqlr-conne
 
 <h4>slowqueries</h4>
 
-<p>The <b>slowqueries</b> module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.</p>
+<p>The <b>slowqueries</b> module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay or /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.</p>
 
 <p>This module takes two parameters: <b>sec</b> and <b>usec</b>.  Queries that take longer than <b>sec</b> seconds and <b>usec</b> microseconds will be logged.  Both parameters default to 0 and omitting them causes all queries to be logged.</p>
 
