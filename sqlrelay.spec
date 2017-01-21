@@ -332,7 +332,7 @@ Session/query router back-end module for SQL Relay.
 License: GPLv2 and FSFUL
 Summary: Documentation for SQL Relay
 BuildArch: noarch
-Requires: sqlrelay-javadoc
+Requires: %{name}-javadoc
 
 %description doc
 Documentation for SQL Relay.
@@ -369,10 +369,10 @@ mkdir -p %{buildroot}%{_unitdir}
 mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
 # create tempfiles module
 mkdir -p %{buildroot}%{_tmpfilesdir}
-echo "d /run/sqlrelay 0777 root root -" > %{buildroot}%{_tmpfilesdir}/%{name}.conf
+echo "d /run/%{name} 0777 root root -" > %{buildroot}%{_tmpfilesdir}/%{name}.conf
 # move tcl modules to (tcl_sitearch)/(name)
 mkdir -p %{buildroot}%{tcl_sitearch}
-mv %{buildroot}%{_libdir}/sqlrelay %{buildroot}%{tcl_sitearch}/%{name}
+mv %{buildroot}%{_libdir}/%{name} %{buildroot}%{tcl_sitearch}/%{name}
 # move mono assembly to (libdir)/(name)
 mkdir -p %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/SQLRClient.dll %{buildroot}%{_libdir}/%{name}
@@ -382,7 +382,7 @@ mkdir -p %{buildroot}%{_javadir}
 mv %{buildroot}%{_prefix}/java/*.jar %{buildroot}%{_javadir}
 # move jni shared object files to (_libdir)/(name)
 mkdir -p %{buildroot}%{_libdir}/%{name}
-mv %{buildroot}%{_prefix}/java/com/firstworks/sqlrelay/*.so %{buildroot}%{_libdir}/%{name}
+mv %{buildroot}%{_prefix}/java/com/firstworks/%{name}/*.so %{buildroot}%{_libdir}/%{name}
 rm -rf %{buildroot}%{_prefix}/java
 # copy java documentation to (_javadocdir)/(name)
 mkdir -p %{buildroot}%{_javadocdir}
@@ -391,7 +391,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %pre
 # Add the "sqlrelay" user
 /usr/sbin/useradd -c "SQL Relay" -s /bin/false \
-	-r -d %{_localstatedir}/sqlrelay sqlrelay 2> /dev/null || :
+	-r -d %{_localstatedir}/%{name} %{name} 2> /dev/null || :
 
 %post
 /sbin/ldconfig
@@ -405,13 +405,13 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %postun
 /sbin/ldconfig
 %systemd_postun_with_restart %{name}.service
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %files
-%{_sysconfdir}/sqlrelay.conf.d
-%{_sysconfdir}/sqlrelay.xsd
-%{_unitdir}/sqlrelay.service
+%{_sysconfdir}/%{name}.conf.d
+%{_sysconfdir}/%{name}.xsd
+%{_unitdir}/%{name}.service
 %{_unitdir}/sqlrcachemanager.service
 %{_bindir}/sqlr-cachemanager
 %{_bindir}/sqlr-listener
@@ -422,20 +422,21 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver.so.*
 %{_libdir}/libsqlrutil.so.*
-%{_libexecdir}/sqlrelay/sqlrauth_*
-%{_libexecdir}/sqlrelay/sqlrconfig_*
-%{_libexecdir}/sqlrelay/sqlrfilter_*
-%{_libexecdir}/sqlrelay/sqlrnotification_*
-%{_libexecdir}/sqlrelay/sqlrparser_*
-%{_libexecdir}/sqlrelay/sqlrprotocol_*
-%{_libexecdir}/sqlrelay/sqlrpwdenc_*
-%{_libexecdir}/sqlrelay/sqlrlogger_*
-%{_libexecdir}/sqlrelay/sqlrquery_*
-%{_libexecdir}/sqlrelay/sqlrresultsettranslation_*
-%{_libexecdir}/sqlrelay/sqlrschedule_*
-%{_libexecdir}/sqlrelay/sqlrtranslation_*
-%{_localstatedir}/cache/sqlrelay
-%{_localstatedir}/log/sqlrelay
+%{_libexecdir}/%{name}/sqlrauth_*
+%{_libexecdir}/%{name}/sqlrconfig_*
+%{_libexecdir}/%{name}/sqlrfilter_*
+%{_libexecdir}/%{name}/sqlrnotification_*
+%{_libexecdir}/%{name}/sqlrparser_*
+%{_libexecdir}/%{name}/sqlrprotocol_*
+%{_libexecdir}/%{name}/sqlrpwdenc_*
+%{_libexecdir}/%{name}/sqlrlogger_*
+%{_libexecdir}/%{name}/sqlrquery_*
+%{_libexecdir}/%{name}/sqlrresultsettranslation_*
+%{_libexecdir}/%{name}/sqlrschedule_*
+%{_libexecdir}/%{name}/sqlrtranslation_*
+%{_localstatedir}/cache/%{name}
+%{_localstatedir}/log/%{name}
+%{_tmpfilesdir}/%{name}.conf
 %{_mandir}/*/sqlr-cachemanager.*
 %{_mandir}/*/sqlr-listener.*
 %{_mandir}/*/sqlr-connection.*
@@ -446,59 +447,59 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 %doc AUTHORS ChangeLog
 %license COPYING
 %exclude %{_libdir}/lib*.la
-%exclude %{_datadir}/licenses/sqlrelay
+%exclude %{_datadir}/licenses/%{name}
 %exclude %{_localstatedir}/run
 
 %files server-devel
 %{_bindir}/sqlrserver-config
-%{_includedir}/sqlrelay/sqlrserver.h
-%{_includedir}/sqlrelay/private/sqlrauth.h
-%{_includedir}/sqlrelay/private/sqlrauths.h
-%{_includedir}/sqlrelay/private/sqlrfilter.h
-%{_includedir}/sqlrelay/private/sqlrfilters.h
-%{_includedir}/sqlrelay/private/sqlrgsscredentials.h
-%{_includedir}/sqlrelay/private/sqlrlistener.h
-%{_includedir}/sqlrelay/private/sqlrlogger.h
-%{_includedir}/sqlrelay/private/sqlrloggers.h
-%{_includedir}/sqlrelay/private/sqlrnotification.h
-%{_includedir}/sqlrelay/private/sqlrnotifications.h
-%{_includedir}/sqlrelay/private/sqlrparser.h
-%{_includedir}/sqlrelay/private/sqlrprotocol.h
-%{_includedir}/sqlrelay/private/sqlrprotocols.h
-%{_includedir}/sqlrelay/private/sqlrpwdenc.h
-%{_includedir}/sqlrelay/private/sqlrpwdencs.h
-%{_includedir}/sqlrelay/private/sqlrqueries.h
-%{_includedir}/sqlrelay/private/sqlrquerycursor.h
-%{_includedir}/sqlrelay/private/sqlrquery.h
-%{_includedir}/sqlrelay/private/sqlrresultsetrowtranslation.h
-%{_includedir}/sqlrelay/private/sqlrresultsetrowtranslations.h
-%{_includedir}/sqlrelay/private/sqlrresultsettranslation.h
-%{_includedir}/sqlrelay/private/sqlrresultsettranslations.h
-%{_includedir}/sqlrelay/private/sqlrrouter.h
-%{_includedir}/sqlrelay/private/sqlrrouters.h
-%{_includedir}/sqlrelay/private/sqlrschedule.h
-%{_includedir}/sqlrelay/private/sqlrschedulerule.h
-%{_includedir}/sqlrelay/private/sqlrschedules.h
-%{_includedir}/sqlrelay/private/sqlrserverconnection.h
-%{_includedir}/sqlrelay/private/sqlrservercontroller.h
-%{_includedir}/sqlrelay/private/sqlrservercursor.h
-%{_includedir}/sqlrelay/private/sqlrserverincludes.h
-%{_includedir}/sqlrelay/private/sqlrshm.h
-%{_includedir}/sqlrelay/private/sqlrtlscredentials.h
-%{_includedir}/sqlrelay/private/sqlrtranslation.h
-%{_includedir}/sqlrelay/private/sqlrtranslations.h
-%{_includedir}/sqlrelay/private/sqlrtrigger.h
-%{_includedir}/sqlrelay/private/sqlrtriggers.h
-%{_includedir}/sqlrelay/private/sqlruserpasswordcredentials.h
-%{_includedir}/sqlrelay/sqlrutil.h
-%{_includedir}/sqlrelay/private/sqlrutilincludes.h
+%{_includedir}/%{name}/sqlrserver.h
+%{_includedir}/%{name}/private/sqlrauth.h
+%{_includedir}/%{name}/private/sqlrauths.h
+%{_includedir}/%{name}/private/sqlrfilter.h
+%{_includedir}/%{name}/private/sqlrfilters.h
+%{_includedir}/%{name}/private/sqlrgsscredentials.h
+%{_includedir}/%{name}/private/sqlrlistener.h
+%{_includedir}/%{name}/private/sqlrlogger.h
+%{_includedir}/%{name}/private/sqlrloggers.h
+%{_includedir}/%{name}/private/sqlrnotification.h
+%{_includedir}/%{name}/private/sqlrnotifications.h
+%{_includedir}/%{name}/private/sqlrparser.h
+%{_includedir}/%{name}/private/sqlrprotocol.h
+%{_includedir}/%{name}/private/sqlrprotocols.h
+%{_includedir}/%{name}/private/sqlrpwdenc.h
+%{_includedir}/%{name}/private/sqlrpwdencs.h
+%{_includedir}/%{name}/private/sqlrqueries.h
+%{_includedir}/%{name}/private/sqlrquerycursor.h
+%{_includedir}/%{name}/private/sqlrquery.h
+%{_includedir}/%{name}/private/sqlrresultsetrowtranslation.h
+%{_includedir}/%{name}/private/sqlrresultsetrowtranslations.h
+%{_includedir}/%{name}/private/sqlrresultsettranslation.h
+%{_includedir}/%{name}/private/sqlrresultsettranslations.h
+%{_includedir}/%{name}/private/sqlrrouter.h
+%{_includedir}/%{name}/private/sqlrrouters.h
+%{_includedir}/%{name}/private/sqlrschedule.h
+%{_includedir}/%{name}/private/sqlrschedulerule.h
+%{_includedir}/%{name}/private/sqlrschedules.h
+%{_includedir}/%{name}/private/sqlrserverconnection.h
+%{_includedir}/%{name}/private/sqlrservercontroller.h
+%{_includedir}/%{name}/private/sqlrservercursor.h
+%{_includedir}/%{name}/private/sqlrserverincludes.h
+%{_includedir}/%{name}/private/sqlrshm.h
+%{_includedir}/%{name}/private/sqlrtlscredentials.h
+%{_includedir}/%{name}/private/sqlrtranslation.h
+%{_includedir}/%{name}/private/sqlrtranslations.h
+%{_includedir}/%{name}/private/sqlrtrigger.h
+%{_includedir}/%{name}/private/sqlrtriggers.h
+%{_includedir}/%{name}/private/sqlruserpasswordcredentials.h
+%{_includedir}/%{name}/sqlrutil.h
+%{_includedir}/%{name}/private/sqlrutilincludes.h
 %{_libdir}/libsqlrserver.so
 %{_libdir}/libsqlrutil.so
 %exclude %{_libdir}/lib*.la
 
 %postun server-devel
-rmdir %{_includedir}/sqlrelay 2> /dev/null || :
-rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
+rmdir %{_includedir}/%{name} 2> /dev/null || :
+rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %files clients
 %{_bindir}/sqlrsh
@@ -526,30 +527,30 @@ rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
-%{_includedir}/sqlrelay/sqlrclient.h
-%{_includedir}/sqlrelay/private/sqlrclientincludes.h
-%{_includedir}/sqlrelay/private/sqlrconnection.h
-%{_includedir}/sqlrelay/private/sqlrcursor.h
+%{_includedir}/%{name}/sqlrclient.h
+%{_includedir}/%{name}/private/sqlrclientincludes.h
+%{_includedir}/%{name}/private/sqlrconnection.h
+%{_includedir}/%{name}/private/sqlrcursor.h
 %{_libdir}/libsqlrclient.so
-%{_libdir}/pkgconfig/sqlrelay-c++.pc
+%{_libdir}/pkgconfig/%{name}-c++.pc
 %exclude %{_libdir}/lib*.la
 
 %postun c++-devel
-rmdir %{_includedir}/sqlrelay 2> /dev/null || :
-rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
+rmdir %{_includedir}/%{name} 2> /dev/null || :
+rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %files c-devel
 %{_bindir}/sqlrclientwrapper-config
-%{_includedir}/sqlrelay/sqlrclientwrapper.h
-%{_includedir}/sqlrelay/private/sqlrclientwrapper.h
-%{_includedir}/sqlrelay/private/sqlrclientwrapperincludes.h
+%{_includedir}/%{name}/sqlrclientwrapper.h
+%{_includedir}/%{name}/private/sqlrclientwrapper.h
+%{_includedir}/%{name}/private/sqlrclientwrapperincludes.h
 %{_libdir}/libsqlrclientwrapper.so
-%{_libdir}/pkgconfig/sqlrelay-c.pc
+%{_libdir}/pkgconfig/%{name}-c.pc
 %exclude %{_libdir}/lib*.la
 
 %postun c-devel
-rmdir %{_includedir}/sqlrelay 2> /dev/null || :
-rmdir %{_includedir}/sqlrelay/private 2> /dev/null || :
+rmdir %{_includedir}/%{name} 2> /dev/null || :
+rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %files -n odbc-%{name}
 %{_libdir}/libsqlrodbc.so.*
@@ -584,22 +585,22 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRDB.*
 
 %files -n ruby-%{name}
-%{ruby_vendorarchdir}/sqlrelay.so
+%{ruby_vendorarchdir}/%{name}.so
 
 %files -n php-%{name}
 %{php_extdir}/sql_relay.so
 %{php_inidir}/sql_relay.ini
 
 %files -n php-pdo-%{name}
-%{php_extdir}/pdo_sqlrelay.so
-%{php_inidir}/pdo_sqlrelay.ini
+%{php_extdir}/pdo_%{name}.so
+%{php_inidir}/pdo_%{name}.ini
 
 %files -n java-%{name}
 %{_javadir}/*.jar
 %{_libdir}/%{name}/*.so
 
 %files -n tcl-%{name}
-%{tcl_sitearch}/sqlrelay
+%{tcl_sitearch}/%{name}
 
 %files -n erlang-%{name}
 %{_libdir}/erlang/lib/%{name}-%{version}
@@ -609,96 +610,96 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %{_libdir}/%{name}/SQLRClient.dll.config
 
 %files -n nodejs-%{name}
-%{nodejs_sitearch}/sqlrelay
+%{nodejs_sitearch}/%{name}
 
 %files dropin-mysql
-%{_libdir}/libmysql*sqlrelay.so.*
-%exclude %{_libdir}/libmysql*sqlrelay.so
+%{_libdir}/libmysql*%{name}.so.*
+%exclude %{_libdir}/libmysql*%{name}.so
 
 %post dropin-mysql -p /sbin/ldconfig
 
 %postun dropin-mysql -p /sbin/ldconfig
 
 %files dropin-postgresql
-%{_libdir}/libpqsqlrelay.so.*
-%exclude %{_libdir}/libpqsqlrelay.so
+%{_libdir}/libpq%{name}.so.*
+%exclude %{_libdir}/libpq%{name}.so
 
 %post dropin-postgresql -p /sbin/ldconfig
 
 %postun dropin-postgresql -p /sbin/ldconfig
 
 %files oracle
-%{_libexecdir}/sqlrelay/sqlrconnection_oracle*
+%{_libexecdir}/%{name}/sqlrconnection_oracle*
 
 %postun oracle
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files mysql
-%{_libexecdir}/sqlrelay/sqlrconnection_mysql*
+%{_libexecdir}/%{name}/sqlrconnection_mysql*
 
 %postun mysql
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files postgresql
-%{_libexecdir}/sqlrelay/sqlrconnection_postgresql*
+%{_libexecdir}/%{name}/sqlrconnection_postgresql*
 
 %postun postgresql
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files sqlite
-%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*
+%{_libexecdir}/%{name}/sqlrconnection_sqlite*
 
 %postun sqlite
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files freetds
-%{_libexecdir}/sqlrelay/sqlrconnection_freetds*
+%{_libexecdir}/%{name}/sqlrconnection_freetds*
 
 %postun freetds
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files sap
-%{_libexecdir}/sqlrelay/sqlrconnection_sap*
+%{_libexecdir}/%{name}/sqlrconnection_sap*
 
 %postun sap
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files odbc
-%{_libexecdir}/sqlrelay/sqlrconnection_odbc*
+%{_libexecdir}/%{name}/sqlrconnection_odbc*
 
 %postun odbc
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files db2
-%{_libexecdir}/sqlrelay/sqlrconnection_db2*
+%{_libexecdir}/%{name}/sqlrconnection_db2*
 
 %postun db2
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files firebird
-%{_libexecdir}/sqlrelay/sqlrconnection_firebird*
+%{_libexecdir}/%{name}/sqlrconnection_firebird*
 
 %postun firebird
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files mdbtools
-%{_libexecdir}/sqlrelay/sqlrconnection_mdbtools*
+%{_libexecdir}/%{name}/sqlrconnection_mdbtools*
 
 %postun mdbtools
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files informix
-%{_libexecdir}/sqlrelay/sqlrconnection_informix*
+%{_libexecdir}/%{name}/sqlrconnection_informix*
 
 %postun informix
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files router
-%{_libexecdir}/sqlrelay/sqlrconnection_router*
-%{_libexecdir}/sqlrelay/sqlrrouter_*
+%{_libexecdir}/%{name}/sqlrconnection_router*
+%{_libexecdir}/%{name}/sqlrrouter_*
 
 %postun router
-rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
+rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files doc
 %{_docdir}/%{name}
