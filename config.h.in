@@ -9,6 +9,12 @@
 /* Load DB2 libraries at runtime. */
 #undef DB2_AT_RUNTIME
 
+/* default group to run SQL Relay as */
+#undef DEFAULT_RUNASGROUP
+
+/* default user to run SQL Relay as */
+#undef DEFAULT_RUNASUSER
+
 /* Use dmalloc */
 #undef DMALLOC
 

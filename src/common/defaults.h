@@ -43,12 +43,6 @@
 // default session timeout
 #define DEFAULT_SESSIONTIMEOUT "600"
 
-// default user to run as
-#define DEFAULT_RUNASUSER "nobody"
-
-// default group to run as
-#define DEFAULT_RUNASGROUP "nobody"
-
 // default number of cursors to open
 #define DEFAULT_CURSORS "1"
 

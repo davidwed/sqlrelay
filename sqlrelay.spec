@@ -359,7 +359,9 @@ API documentation for SQL Relay.
 		--disable-python \
 		--with-perl-site-lib=%{perl_vendorlib} \
 		--with-perl-site-arch=%{perl_vendorarch} \
-		--with-ruby-site-arch-dir=%{ruby_vendorarchdir}
+		--with-ruby-site-arch-dir=%{ruby_vendorarchdir} \
+		--with-default-runasuser=sqlrelay \
+		--with-default-runasgroup=sqlrelay
 make
 
 %install
@@ -372,7 +374,7 @@ mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
 # create tmpfiles.d directories and config file
 mkdir -p %{buildroot}/run/%{name}
 mkdir -p %{buildroot}%{_tmpfilesdir}
-echo "d /run/%{name} 0777 root root -" > %{buildroot}%{_tmpfilesdir}/%{name}.conf
+echo "d /run/%{name} 0775 root root -" > %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
 # move tcl modules to (tcl_sitearch)/(name)
 mkdir -p %{buildroot}%{tcl_sitearch}
@@ -400,6 +402,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 # Add the "sqlrelay" user
 /usr/sbin/useradd -c "SQL Relay" -s /bin/false \
 	-r -d %{_localstatedir}/%{name} %{name} 2> /dev/null || :
+
 
 %post
 /sbin/ldconfig
@@ -451,9 +454,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
 %license COPYING
-%dir %{_localstatedir}/cache/%{name}
-%dir %{_localstatedir}/log/%{name}
-%attr(777, -, -) %dir /run/%{name}
+%attr(-, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
+%attr(-, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
+%attr(-, sqlrelay, sqlrelay) %dir /run/%{name}
 %{_tmpfilesdir}/%{name}.conf
 %exclude %{_libdir}/lib*.la
 %exclude %{_datadir}/licenses/%{name}
@@ -743,6 +746,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 - Combined the man pages with the subpackages containing their programs.
 - Added postin/postun with calls to /sbin/ldconfig for all library subpackages.
 - Excluded .so files from dropin-postgresql and dropin-mysql subpackages.
+- Added tmpfiles.d configuration.
+- Made log, cache, and run owned by the sqlrelay group and gave them 775 perms.
 
 * Mon Feb 17 2003 David Muse <david.muse@firstworks.com>
 - removed the -u from useradd
