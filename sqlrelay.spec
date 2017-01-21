@@ -407,7 +407,7 @@ rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
 
 %files
 %{_sysconfdir}/sqlrelay.conf.d
-%config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
+%{_sysconfdir}/sqlrelay.xsd
 %{_unitdir}/sqlrelay.service
 %{_unitdir}/sqlrcachemanager.service
 %{_bindir}/sqlr-cachemanager

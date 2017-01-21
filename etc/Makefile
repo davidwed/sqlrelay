@@ -5,6 +5,7 @@ include ../config.mk
 install:
 	$(MKINSTALLDIRS) $(sysconfdir)/$(SQLRELAY).conf.d
 	$(CP) sqlrelay.xsd $(sysconfdir)/$(SQLRELAY).xsd
+	$(CHMOD) 644 $(sysconfdir)/$(SQLRELAY).xsd
 	$(MKINSTALLDIRS) $(EXAMPLEDIR)
 	$(CP) sqlrelay.conf $(EXAMPLEDIR)/$(SQLRELAY).conf
 	$(CHMOD) 644 $(EXAMPLEDIR)/$(SQLRELAY).conf
