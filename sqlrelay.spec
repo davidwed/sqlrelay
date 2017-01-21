@@ -360,8 +360,6 @@ API documentation for SQL Relay.
 		--with-perl-site-lib=%{perl_vendorlib} \
 		--with-perl-site-arch=%{perl_vendorarch} \
 		--with-ruby-site-arch-dir=%{ruby_vendorarchdir}
-# modify libtool to avoid unused-direct-shlib-dependency errors
-#sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 make
 
 %install
@@ -405,8 +403,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 /sbin/ldconfig
 %systemd_postun_with_restart %{name}.service
 rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-rm -rf %{_localstatedir}/sqlrelay/tmp
-rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
+rm -rf %{_localstatedir}/run/sqlrelay
+rm -rf %{_localstatedir}/log/sqlrelay
 
 
 %files
@@ -435,10 +433,10 @@ rmdir %{_localstatedir}/sqlrelay 2> /dev/null || :
 %{_libexecdir}/sqlrelay/sqlrresultsettranslation_*
 %{_libexecdir}/sqlrelay/sqlrschedule_*
 %{_libexecdir}/sqlrelay/sqlrtranslation_*
-%{_localstatedir}/sqlrelay/tmp
-%{_localstatedir}/sqlrelay/debug
-%{_localstatedir}/sqlrelay/log
-%{_localstatedir}/sqlrelay/cache
+%{_localstatedir}/run/sqlrelay/tmp
+%{_localstatedir}/run/sqlrelay/cache
+%{_localstatedir}/log/sqlrelay/debug
+%{_localstatedir}/log/sqlrelay
 %{_mandir}/*/sqlr-cachemanager.*
 %{_mandir}/*/sqlr-listener.*
 %{_mandir}/*/sqlr-connection.*

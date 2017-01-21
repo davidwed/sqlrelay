@@ -68,7 +68,7 @@ int main(int argc, const char **argv) {
 	// get the id filename and key
 	sqlrpaths	sqlrp(&cmdl);
 	stringbuffer	idfilename;
-	idfilename.append(sqlrp.getIpcDir())->append("/")->append(id);
+	idfilename.append(sqlrp.getIpcDir())->append(id)->append(".ipc");
 	key_t	key=file::generateKey(idfilename.getString(),1);
 
 	// attach to the shared memory segment for the specified instance

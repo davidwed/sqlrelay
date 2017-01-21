@@ -151,10 +151,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// start up after the sqlr-listener has forked, but before it writes
 	// out the pid file)
 	size_t	listenerpidfilelen=charstring::length(sqlrpth->getPidDir())+14+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
-					"%ssqlr-listener-%s",
+					"%ssqlr-listener-%s.pid",
 					sqlrpth->getPidDir(),id);
 
 	// On most platforms, 3 seconds is plenty of time to wait for the
@@ -192,10 +192,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// check/set pid file
 	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+12+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
-				"%ssqlr-scaler-%s",
+				"%ssqlr-scaler-%s.pid",
 				sqlrpth->getPidDir(),id);
 	if (process::checkForPidFile(pidfile)!=-1) {
 		stderror.printf("\n%s-scaler error:\n",SQLR);
@@ -325,10 +325,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// initialize the shared memory segment filename
 	size_t	idfilenamelen=charstring::length(sqlrpth->getIpcDir())+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	char	*idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,
-				"%s%s",sqlrpth->getIpcDir(),id);
+				"%s%s.ipc",sqlrpth->getIpcDir(),id);
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;
 
@@ -721,9 +721,9 @@ bool scaler::availableDatabase() {
 	// initialize the database up/down filename
 	size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
 					charstring::length(id)+1+
-					charstring::length(connectionid)+1;
+					charstring::length(connectionid)+3+1;
 	char	*updown=new char[updownlen];
-	charstring::printf(updown,updownlen,"%s%s-%s",
+	charstring::printf(updown,updownlen,"%s%s-%s.up",
 				sqlrpth->getIpcDir(),id,connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;

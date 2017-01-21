@@ -195,10 +195,10 @@ sqlrlistener::~sqlrlistener() {
 			size_t	updownlen=
 				charstring::length(pvt->_sqlrpth->getIpcDir())+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::length(connectionid)+1;
+				charstring::length(connectionid)+3+1;
 			char	*updown=new char[updownlen];
 			charstring::printf(updown,updownlen,
-						"%s%s-%s",
+						"%s%s-%s.up",
 						pvt->_sqlrpth->getIpcDir(),
 						pvt->_cmdl->getId(),
 						connectionid);
@@ -427,10 +427,10 @@ bool sqlrlistener::handlePidFile(const char *id) {
 
 	// check/set pid file
 	size_t	pidfilelen=charstring::length(pvt->_sqlrpth->getPidDir())+14+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	pvt->_pidfile=new char[pidfilelen];
 	charstring::printf(pvt->_pidfile,pidfilelen,
-				"%ssqlr-listener-%s",
+				"%ssqlr-listener-%s.pid",
 				pvt->_sqlrpth->getPidDir(),id);
 
 	if (process::checkForPidFile(pvt->_pidfile)!=-1) {
@@ -559,10 +559,10 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// initialize the ipc filename
 	size_t	idfilenamelen=charstring::length(pvt->_sqlrpth->getIpcDir())+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	pvt->_idfilename=new char[idfilenamelen];
 	charstring::printf(pvt->_idfilename,idfilenamelen,
-				"%s%s",pvt->_sqlrpth->getIpcDir(),id);
+				"%s%s.ipc",pvt->_sqlrpth->getIpcDir(),id);
 
 	if (pvt->_sqlrlg || pvt->_sqlrn) {
 		stringbuffer	debugstr;
@@ -896,16 +896,16 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 	// the handoff socket
 	size_t	handoffsocknamelen=
 			charstring::length(pvt->_sqlrpth->getSocketsDir())+
-						charstring::length(id)+8+1;
+						charstring::length(id)+13+1;
 	pvt->_handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(pvt->_handoffsockname,
 				handoffsocknamelen,
-				"%s%s-handoff",
+				"%s%s-handoff.sock",
 				pvt->_sqlrpth->getSocketsDir(),id);
 
 	pvt->_handoffsockun=new unixsocketserver();
 	bool	success=pvt->_handoffsockun->listen(
-				pvt->_handoffsockname,0066,15);
+				pvt->_handoffsockname,0077,15);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_handoffsockun);
@@ -930,16 +930,16 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 	// the deregistration socket
 	size_t	removehandoffsocknamelen=
 			charstring::length(pvt->_sqlrpth->getSocketsDir())+
-						charstring::length(id)+14+1;
+						charstring::length(id)+19+1;
 	pvt->_removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(pvt->_removehandoffsockname,
 				removehandoffsocknamelen,
-				"%s%s-removehandoff",
+				"%s%s-removehandoff.sock",
 				pvt->_sqlrpth->getSocketsDir(),id);
 
 	pvt->_removehandoffsockun=new unixsocketserver();
 	bool	success=pvt->_removehandoffsockun->listen(
-				pvt->_removehandoffsockname,0066,15);
+				pvt->_removehandoffsockname,0077,15);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_removehandoffsockun);
@@ -964,15 +964,15 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	// the fixup socket
 	size_t	fixupsocknamelen=
 			charstring::length(pvt->_sqlrpth->getSocketsDir())+
-						charstring::length(id)+6+1;
+						charstring::length(id)+11+1;
 	pvt->_fixupsockname=new char[fixupsocknamelen];
 	charstring::printf(pvt->_fixupsockname,
 				fixupsocknamelen,
-				"%s%s-fixup",
+				"%s%s-fixup.sock",
 				pvt->_sqlrpth->getSocketsDir(),id);
 
 	pvt->_fixupsockun=new unixsocketserver();
-	bool	success=pvt->_fixupsockun->listen(pvt->_fixupsockname,0066,15);
+	bool	success=pvt->_fixupsockun->listen(pvt->_fixupsockname,0077,15);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_fixupsockun);
@@ -1827,10 +1827,10 @@ bool sqlrlistener::connectionIsUp(const char *connectionid) {
 	size_t	updownlen=charstring::length(
 				pvt->_sqlrpth->getIpcDir())+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::length(connectionid)+1;
+				charstring::length(connectionid)+3+1;
 	char	*updown=new char[updownlen];
 	charstring::printf(updown,updownlen,
-				"%s%s-%s",
+				"%s%s-%s.up",
 				pvt->_sqlrpth->getIpcDir(),
 				pvt->_cmdl->getId(),connectionid);
 	bool	retval=file::exists(updown);

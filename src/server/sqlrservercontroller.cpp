@@ -614,10 +614,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	size_t	pidfilelen=charstring::length(
 				pvt->_pth->getPidDir())+16+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::integerLength((uint64_t)pid)+1;
+				charstring::integerLength((uint64_t)pid)+4+1;
 	pvt->_pidfile=new char[pidfilelen];
 	charstring::printf(pvt->_pidfile,pidfilelen,
-				"%ssqlr-connection-%s.%ld",
+				"%ssqlr-connection-%s.%ld.pid",
 				pvt->_pth->getPidDir(),
 				pvt->_cmdl->getId(),
 				(long)pid);
@@ -757,10 +757,10 @@ bool sqlrservercontroller::handlePidFile() {
 	// writes out the pid file)
 	size_t	listenerpidfilelen=
 			charstring::length(pvt->_pth->getPidDir())+14+
-			charstring::length(pvt->_cmdl->getId())+1;
+			charstring::length(pvt->_cmdl->getId())+4+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
-						"%ssqlr-listener-%s",
+						"%ssqlr-listener-%s.pid",
 						pvt->_pth->getPidDir(),
 						pvt->_cmdl->getId());
 
@@ -815,9 +815,9 @@ void sqlrservercontroller::initDatabaseAvailableFileName() {
 	size_t	updownlen=charstring::length(
 				pvt->_pth->getIpcDir())+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::length(pvt->_connectionid)+1;
+				charstring::length(pvt->_connectionid)+3+1;
 	pvt->_updown=new char[updownlen];
-	charstring::printf(pvt->_updown,updownlen,"%s%s-%s",
+	charstring::printf(pvt->_updown,updownlen,"%s%s-%s.up",
 						pvt->_pth->getIpcDir(),
 						pvt->_cmdl->getId(),
 						pvt->_connectionid);
@@ -1624,10 +1624,10 @@ void sqlrservercontroller::registerForHandoff() {
 	// construct the name of the socket to connect to
 	size_t	handoffsocknamelen=
 			charstring::length(pvt->_pth->getSocketsDir())+
-			charstring::length(pvt->_cmdl->getId())+8+1;
+			charstring::length(pvt->_cmdl->getId())+13+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
-						"%s%s-handoff",
+						"%s%s-handoff.sock",
 						pvt->_pth->getSocketsDir(),
 						pvt->_cmdl->getId());
 
@@ -1670,11 +1670,11 @@ void sqlrservercontroller::deRegisterForHandoff() {
 	// construct the name of the socket to connect to
 	size_t	removehandoffsocknamelen=
 				charstring::length(pvt->_pth->getSocketsDir())+
-				charstring::length(pvt->_cmdl->getId())+14+1;
+				charstring::length(pvt->_cmdl->getId())+19+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
-				"%s%s-removehandoff",
+				"%s%s-removehandoff.sock",
 				pvt->_pth->getSocketsDir(),
 				pvt->_cmdl->getId());
 
@@ -4590,9 +4590,9 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
 	size_t	idfilenamelen=charstring::length(
 					pvt->_pth->getIpcDir())+
-					charstring::length(id)+1;
+					charstring::length(id)+4+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printf(idfilename,idfilenamelen,"%s%s",
+	charstring::printf(idfilename,idfilenamelen,"%s%s.ipc",
 					pvt->_pth->getIpcDir(),id);
 
 	pvt->_debugstr.clear();

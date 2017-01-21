@@ -21,10 +21,10 @@ datadir = "@datadir@"
 docdir = $(datadir)\\doc\\$(SQLRELAY)
 licensedir = $(datadir)\\licenses\\$(SQLRELAY)
 EXAMPLEDIR = $(datadir)\\$(SQLRELAY)\\examples
-tmpdir = $(localstatedir)\\$(SQLRELAY)\\tmp
-cachedir = $(localstatedir)\\$(SQLRELAY)\\cache
-debugdir = $(localstatedir)\\$(SQLRELAY)\\debug
-logdir = $(localstatedir)\\$(SQLRELAY)\\log
+tmpdir = $(localstatedir)\\run\\$(SQLRELAY)
+cachedir = $(tmpdir)\\cache
+logdir = $(localstatedir)\\log\\$(SQLRELAY)
+debugdir = $(logdir)\\debug
 initscript_prefix = @initscript_prefix@
 
 

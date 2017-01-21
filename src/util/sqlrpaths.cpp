@@ -73,32 +73,33 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 		localstatedir=defaultlocalstatedir;
 	}
 
-	scratch.append(localstatedir)->append(SQLRELAY)->append(slash);
-	char	*lsdir=scratch.detachString();
-
-	scratch.append(lsdir)->append("tmp")->append(slash);
+	scratch.append(localstatedir)->append("run")->
+			append(slash)->append(SQLRELAY)->append(slash);
 	tmpdirlen=scratch.getStringLength();
 	tmpdir=scratch.detachString();
 
 	scratch.append(tmpdir)->append("sockseq");
 	sockseqfile=scratch.detachString();
 
-	scratch.append(tmpdir)->append("sockets")->append(slash);
+	scratch.append(tmpdir);
 	socketsdir=scratch.detachString();
 
-	scratch.append(tmpdir)->append("ipc")->append(slash);
+	scratch.append(tmpdir);
 	ipcdir=scratch.detachString();
 
-	scratch.append(tmpdir)->append("pids")->append(slash);
+	scratch.append(tmpdir);
 	piddir=scratch.detachString();
 
-	scratch.append(lsdir)->append("log")->append(slash);
+	scratch.append(localstatedir)->append("log")->
+			append(slash)->append(SQLRELAY)->append(slash);
 	logdir=scratch.detachString();
 
-	scratch.append(lsdir)->append("debug")->append(slash);
+	scratch.append(logdir)->append("debug")->append(slash);
 	debugdir=scratch.detachString();
 
-	scratch.append(lsdir)->append("cache")->append(slash);
+	scratch.append(localstatedir)->append(slash)->append("run")->
+			append(slash)->append(SQLRELAY)->
+			append(slash)->append("cache")->append(slash);
 	cachedir=scratch.detachString();
 
 	scratch.append(sysconfdir)->append(SQLRELAY)->append(".conf");

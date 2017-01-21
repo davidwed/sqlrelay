@@ -12,6 +12,12 @@
 		by using local instances instead
 	added ping-loop to router connection module's logIn() method to manage
 		cases where routed-to instances are started after the router
+	moved .../var/sqlrelay/tmp/*/* to .../var/run/sqlrelay
+	added .sock extension to sockets, .ipc extension to ipc key files,
+		.pid extension to pid files, and .up extension to files which
+		indicate that the db is up
+	changed mode of listener-connection sockets to 700 from 711
+	moved .../var/sqlrelay/log to .../var/log/sqlrelay
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password
