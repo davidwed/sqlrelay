@@ -403,8 +403,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 /sbin/ldconfig
 %systemd_postun_with_restart %{name}.service
 rmdir %{_libexecdir}/sqlrelay 2> /dev/null || :
-rm -rf %{_localstatedir}/run/sqlrelay
-rm -rf %{_localstatedir}/log/sqlrelay
 
 
 %files
@@ -433,9 +431,7 @@ rm -rf %{_localstatedir}/log/sqlrelay
 %{_libexecdir}/sqlrelay/sqlrresultsettranslation_*
 %{_libexecdir}/sqlrelay/sqlrschedule_*
 %{_libexecdir}/sqlrelay/sqlrtranslation_*
-%{_localstatedir}/run/sqlrelay/tmp
-%{_localstatedir}/run/sqlrelay/cache
-%{_localstatedir}/log/sqlrelay/debug
+%{_localstatedir}/run/sqlrelay
 %{_localstatedir}/log/sqlrelay
 %{_mandir}/*/sqlr-cachemanager.*
 %{_mandir}/*/sqlr-listener.*
