@@ -11,20 +11,29 @@ include ../../../config.mk
 		$(CP) rubyincludes2.h rubyincludes.h; \
 		$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(RUBYCPPFLAGS) $(COMPILE) $< $(OUT)$@ 2> errors2; \
 		if ( test ! -r sqlrelay.lo ); then \
-			if ( test -s errors1 ); then \
-				echo "first try errors : "; cat errors1; echo; \
+			$(CP) rubyincludes3.h rubyincludes.h; \
+			$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(RUBYCPPFLAGS) $(COMPILE) $< $(OUT)$@ 2> errors3; \
+			if ( test ! -r sqlrelay.lo ); then \
+				if ( test -s errors1 ); then \
+					echo "first try errors : "; cat errors1; echo; \
+				fi; \
+				if ( test -s errors2 ); then \
+					echo "second try errors : "; cat errors2; echo; \
+				fi; \
+				if ( test -s errors3 ); then \
+					echo "second try errors : "; cat errors3; echo; \
+				fi; \
+				exit 1; \
+			else \
+				cat errors3; \
 			fi; \
-			if ( test -s errors2 ); then \
-				echo "second try errors : "; cat errors2; echo; \
-			fi; \
-			exit 1; \
 		else \
 			cat errors2; \
 		fi; \
 	else \
 		cat errors1; \
 	fi; \
-	$(RM) errors1 errors2 rubyincludes.h
+	$(RM) errors1 errors2 errors3 rubyincludes.h
 
 .cpp.obj:
 	$(CP) rubyincludes2.h rubyincludes.h

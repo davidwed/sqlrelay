@@ -105,7 +105,6 @@ class sqlrservercontrollerprivate {
 
 	uint16_t	_inetport;
 	stringbuffer	_unixsocket;
-	randomnumber	_unixsocketrnd;
 
 	bool		_autocommitforthissession;
 
@@ -235,13 +234,6 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_dbchanged=false;
 	pvt->_originaldb=NULL;
-
-	// Ideally we'd use randomnumber:getSeed for
-	// this, but on some platforms that's generated
-	// from the epoch and could end up being the
-	// same for all sqlr-connections.  The process
-	// id is guaranteed unique.
-	pvt->_unixsocketrnd.setSeed(process::getProcessId());
 
 	pvt->_serversockun=NULL;
 	pvt->_serversockin=NULL;
@@ -495,6 +487,11 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_conn->handleConnectString();
 
 	initDatabaseAvailableFileName();
+
+	// set unix socket filename (for suspended/resumed sessions)
+	pvt->_unixsocket.append(pvt->_pth->getSocketsDir())->
+					append(process::getProcessId())->
+					append(".sock");
 
 	if (!createSharedMemoryAndSemaphores(pvt->_cmdl->getId())) {
 		return false;
@@ -1112,82 +1109,34 @@ bool sqlrservercontroller::openSockets() {
 
 	raiseDebugMessageEvent("listening on sockets...");
 
-	// get the next available unix socket and open it
+	// open the unix socket
 	if (pvt->_cfg->getListenOnUnix() && !pvt->_serversockun) {
 
 		pvt->_serversockun=new unixsocketserver();
+		if (pvt->_serversockun->listen(
+				pvt->_unixsocket.getString(),0000,5)) {
+			pvt->_debugstr.clear();
+			pvt->_debugstr.append("listening on unix socket: ");
+			pvt->_debugstr.append(pvt->_unixsocket.getString());
+			raiseDebugMessageEvent(pvt->_debugstr.getString());
 
-		// Generate a random socket name and try to listen on it.
-		// If that fail because someone else is already listening on
-		// that socket, then try again, unless it failed 
-		for (;;) {
-
-			// generate a random socket name...
-			pvt->_unixsocket.clear();
-			uint32_t	num;
-			if (!pvt->_unixsocketrnd.generateNumber(&num)) {
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append("failed to generate "
-							"unix socket name");
-				raiseInternalErrorEvent(NULL,
-						pvt->_debugstr.getString());
-				delete pvt->_serversockun;
-				pvt->_serversockun=NULL;
-				return false;
-			}
-			pvt->_unixsocket.append(pvt->_pth->getSocketsDir())->
-						append(num)->append(".sock");
-
-			// try to listen on it...
-			error::clearError();
-			bool	success=pvt->_serversockun->listen(
-						pvt->_unixsocket.getString(),
-						0000,5);
-
-			if (success) {
-
-				// success
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append(
-						"listening on unix socket: ");
-				pvt->_debugstr.append(
-						pvt->_unixsocket.getString());
-				raiseDebugMessageEvent(
+			pvt->_lsnr.addReadFileDescriptor(pvt->_serversockun);
+		} else {
+			pvt->_debugstr.clear();
+			pvt->_debugstr.append("failed to listen on socket: ");
+			pvt->_debugstr.append(pvt->_unixsocket.getString());
+			raiseInternalErrorEvent(NULL,
 						pvt->_debugstr.getString());
 
-				pvt->_lsnr.addReadFileDescriptor(
-						pvt->_serversockun);
-
-				break;
-
-			} else if (error::getErrorNumber()==EADDRINUSE) {
-
-				// try again if the problem was that someone
-				// else is already listening on this socket
-				continue;
-
-			} else {
-
-				// failure
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append(
-						"failed to listen on socket: ");
-				pvt->_debugstr.append(
-						pvt->_unixsocket.getString());
-				raiseInternalErrorEvent(NULL,
-						pvt->_debugstr.getString());
-
-				stderror.printf("Could not listen on ");
-				stderror.printf("unix socket: ");
-				stderror.printf("%s\n",
-						pvt->_unixsocket.getString());
-				stderror.printf("Make sure that the file and ");
-				stderror.printf("directory are readable ");
-				stderror.printf("and writable.\n\n");
-				delete pvt->_serversockun;
-				pvt->_serversockun=NULL;
-				return false;
-			}
+			stderror.printf("Could not listen on ");
+			stderror.printf("unix socket: ");
+			stderror.printf("%s\n",pvt->_unixsocket.getString());
+			stderror.printf("Make sure that the file and ");
+			stderror.printf("directory are readable ");
+			stderror.printf("and writable.\n\n");
+			delete pvt->_serversockun;
+			pvt->_serversockun=NULL;
+			return false;
 		}
 	}
 
