@@ -142,7 +142,7 @@ or a tnsnames-style expression such as:
 {{{#!blockquote
 //oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))//
 }}}
-* '''oracle_home''': The base directory of the oracle installation to use.  Optional if the ORACLE_HOME environment variable is set.  The SID will be looked up in $ORACLE_HOME/network/admin/tnsnames.ora
+* '''oracle_home''': The base directory of the Oracle installation to use.  Optional if the ORACLE_HOME environment variable is set.  The SID will be looked up in $ORACLE_HOME/network/admin/tnsnames.ora.  If SQL Relay was built to load the Oracle client libraries at runtime, then the lib subdirectory of this directory will be searched for the client libraries.
 * '''nls_lang''': The NLS_LANG to use.  Optional if the NLS_LANG environment variable is set.  Overrides the NLS_LANG environment variable.
 * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
 * '''fetchatonce''': The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see [tuning.html#memoryusage here] for more info on this parameter)
@@ -161,7 +161,7 @@ or a tnsnames-style expression such as:
 [=#freetds]
 For '''freetds''' databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"
 
-* '''sybase''': The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.
+* '''sybase''': The directory containing the "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
 * '''server''': The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.
@@ -178,7 +178,7 @@ For '''freetds''' databases, the connect string syntax is "sybase=SYBASE;user=US
 [=#sap]
 For '''sap''' (or '''sybase''') databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"
 
-* '''sybase''': The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.
+* '''sybase''': The directory containing the "interfaces" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.  If SQL Relay was built to load the SAP/Sybase libraries at runtime, then the lib subdirectory of this directory will be searched for the SAP/Sybase client libraries.
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
 * '''server''': The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.
@@ -208,6 +208,7 @@ For '''db2''' databases, the connect string syntax is "user=USER;password=PASSWO
 * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''maxoutlobbindsize''': The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.
 * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+* '''db2''': The base directory of the DB2 installation.  Only used if SQL Relay was built to load the DB2 client libraries at runtime.  Then the lib, lib32, and lib64 subdirectories of this directory will be searched, as appropriate, for the client libraries.
 
 
 [=#informix]
@@ -215,7 +216,7 @@ For '''informix''' databases, the connect string syntax is "user=USER;password=P
 
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
-* '''informixdir''': Specifies the path to the informix instance that should be used.  This is used for locating the sqlhosts file and other dependencies.  If not specified, this defaults to the value of the INFORMIXDIR environment variable, if set.
+* '''informixdir''': Specifies the path to the Informix instance that should be used.  This is used for locating the sqlhosts file and other dependencies.  If not specified, this defaults to the value of the INFORMIXDIR environment variable, if set.  If SQL Relay was built to load the Informix client libraries at runtime, then the lib/cli subdirectory of this directory will be searched for the client libraries.
 * '''servername''': The server to connect to, as defined in sqlhosts.  If not specified, this defaults to the value of the INFORMIXSERVER environment variable, if set.
 * '''db''': The database instance to connect to, on the specified server.
 * '''informixdir''': The server instance to connect to.

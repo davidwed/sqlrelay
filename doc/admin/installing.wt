@@ -109,7 +109,7 @@ This will create a sqlrelay-X.XX directory.
 [=#compiling]
 == Building SQL Relay ==
 
-To build SQL Relay, navigate to the directory that was created by the extraction, make sure your ORACLE_HOME environment variable is set if you want to include support for Oracle, and run:
+To build SQL Relay, navigate to the directory that was created by the extraction, and run:
 
 {{{#!blockquote
 '''configure[[br]]

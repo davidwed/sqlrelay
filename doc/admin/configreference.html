@@ -232,7 +232,7 @@ or a tnsnames-style expression such as:
 <i>oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))</i>
   </blockquote>
 </li>
-  <li><b>oracle_home</b>: The base directory of the oracle installation to use.  Optional if the ORACLE_HOME environment variable is set.  The SID will be looked up in $ORACLE_HOME/network/admin/tnsnames.ora</li>
+  <li><b>oracle_home</b>: The base directory of the Oracle installation to use.  Optional if the ORACLE_HOME environment variable is set.  The SID will be looked up in $ORACLE_HOME/network/admin/tnsnames.ora.  If SQL Relay was built to load the Oracle client libraries at runtime, then the lib subdirectory of this directory will be searched for the client libraries.</li>
   <li><b>nls_lang</b>: The NLS_LANG to use.  Optional if the NLS_LANG environment variable is set.  Overrides the NLS_LANG environment variable.</li>
   <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
   <li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
@@ -251,7 +251,7 @@ or a tnsnames-style expression such as:
 <br/><a name="freetds"/><p>For <b>freetds</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"</p>
 
 <ul>
-  <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
+  <li><b>sybase</b>: The directory containing the "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
   <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
   <li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.</li>
@@ -268,7 +268,7 @@ or a tnsnames-style expression such as:
 <br/><a name="sap"/><p>For <b>sap</b> (or <b>sybase</b>) databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;identity=ID"</p>
 
 <ul>
-  <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
+  <li><b>sybase</b>: The directory containing the "interfaces" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.  If SQL Relay was built to load the SAP/Sybase libraries at runtime, then the lib subdirectory of this directory will be searched for the SAP/Sybase client libraries.</li>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
   <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
   <li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.</li>
@@ -298,6 +298,7 @@ or a tnsnames-style expression such as:
   <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
   <li><b>maxoutlobbindsize</b>: The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.</li>
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
+  <li><b>db2</b>: The base directory of the DB2 installation.  Only used if SQL Relay was built to load the DB2 client libraries at runtime.  Then the lib, lib32, and lib64 subdirectories of this directory will be searched, as appropriate, for the client libraries.</li>
 </ul>
 
 <br/><a name="informix"/><p>For <b>informix</b> databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</p>
@@ -305,7 +306,7 @@ or a tnsnames-style expression such as:
 <ul>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
   <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
-  <li><b>informixdir</b>: Specifies the path to the informix instance that should be used.  This is used for locating the sqlhosts file and other dependencies.  If not specified, this defaults to the value of the INFORMIXDIR environment variable, if set.</li>
+  <li><b>informixdir</b>: Specifies the path to the Informix instance that should be used.  This is used for locating the sqlhosts file and other dependencies.  If not specified, this defaults to the value of the INFORMIXDIR environment variable, if set.  If SQL Relay was built to load the Informix client libraries at runtime, then the lib/cli subdirectory of this directory will be searched for the client libraries.</li>
   <li><b>servername</b>: The server to connect to, as defined in sqlhosts.  If not specified, this defaults to the value of the INFORMIXSERVER environment variable, if set.</li>
   <li><b>db</b>: The database instance to connect to, on the specified server.</li>
   <li><b>informixdir</b>: The server instance to connect to.</li>
