@@ -204,13 +204,16 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The number of connections determines how many client applications can access the database simultaneously.  In this example, up to 10, assuming each client only needs one connection.  Additional clients would be queued and would have to wait for one of the first 10 to disconnect before being able to access the database.</p>
 
-<p>Any number of connections may be configured, up to an "absolute max connections" limit defined at compile-time, which defaults to 4096.  To find the limit on your system, run:</p>
+<blockquote>
+  <p><b>NOTE:</b> Any number of connections may be configured, up to an "absolute max connections" limit defined at compile-time, which defaults to 4096.  To find the limit on your system, run:</p>
 
-<pre>sqlr-start -abs-max-connections
+  <blockquote>
+    <pre>sqlr-start -abs-max-connections
 </pre>
 
-<p>Note that the command also returns the "shmmax requirement" for the configuration.  "shmmax" refers to the maximum size of a single shared memory segment, a tunable kernel parameter on most systems.  The default shmmax requirement is about 5mb.  On modern systems, shmmax defaults to at least 32mb, but on some very old systems it defaults to 512k.  If the shmmax requirement exceeds the shmmax configuration for your system, then you will have to reconfigure the kernel parameter before you can run sqlr-start.   This may be done at runtime on most modern systems, but on some older systems it requires a kernel reconfiguraton, and/or rebuild and reboot.</p>
-
+  </blockquote>
+The command above also returns the "shmmax requirement" for the configuration.  "shmmax" refers to the maximum size of a single shared memory segment, a tunable kernel parameter on most systems.  The default shmmax requirement is about 5mb.  On modern systems, shmmax defaults to at least 32mb, but on older systems it commonly defaulted to 512k.  In any case, if the shmmax requirement exceeds the value of your system's shmmax parameter, then you will have to reconfigure the parameter before SQL Relay will start successfully.   This may be done at runtime on most modern systems, but on older systems you may have to reconfigure and rebuild the kernel, and reboot.
+</blockquote>
 <a name="dbconnections-performance"/><h3>For Performance</h3>
 
 <p>In a performance-oriented configuration, a good rule of thumb is to open as many connections as you can.  That number is usually environment-specific, and dictated by database, system and network resources.</p>
@@ -248,13 +251,10 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>Any number of cursors can be opened.  A good rule of thumb is to open as few as possible, but as many as you know that your application will need.</p>
 
-<p>NOTE: The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open additional cursors on-demand, up to 5.</p>
-
-<p>This is because it is common for an app to run at least one level of nested queries.  For example, it is common to run a select and then run an insert, update, or delete for each row in the result set.  Unfortunately, it is also common for apps to just manage cursors poorly.  So, by default, SQL Relay offers a bit of flexibility to accommodate these circumstances.</p>
-
-<p>See the next section on Dynamic Scaling for more information about configuring connections and cursors to scale up and down on-demand.</p>
-
-<br/><a name="dynamicscaling"/><h3>Dynamic Scaling</h3>
+<blockquote>
+<b>NOTE:</b> The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open additional cursors on-demand, up to 5.  This is because it is common for an app to run at least one level of nested queries.  For example, it is common to run a select and then run an insert, update, or delete for each row in the result set.  Unfortunately, it is also not uncommon for apps to just manage cursors poorly.  So, SQL Relay's default configuration offers a bit of flexibility to accommodate these circumstances.  See the next section on Dynamic Scaling for more information about configuring connections and cursors to scale up and down on-demand.
+</blockquote>
+<br/><br/><a name="dynamicscaling"/><h3>Dynamic Scaling</h3>
 
 <p>Both connections and cursors can be configured to scale dynamically - open on demand and then die off when no longer needed.  This feature is useful if you have spikes in traffic during certain times of day or if your application has a few modules that occasionally need more cursors than usual.</p>
 
@@ -1289,8 +1289,9 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 </pre>
 
 </blockquote>
-<p>(Note: the https and scp examples would only work if Rudiments is compiled with support for libcurl.)</p>
-
+<blockquote>
+<b>NOTE:</b> The https and scp examples only work if Rudiments was compiled with support for libcurl.
+</blockquote>
 <p>In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.</p>
 
 <p>For example:</p>
