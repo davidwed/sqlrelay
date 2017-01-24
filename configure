@@ -835,6 +835,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+ABS_MAXCONNECTIONS
 ENABLE_DOC
 ENABLE_UTIL
 ENABLE_SERVER
@@ -1023,6 +1024,7 @@ with_sql_relay
 enable_doc
 with_default_runasuser
 with_default_runasgroup
+with_abs_max_connections
 enable_shared
 enable_static
 with_pic
@@ -1774,6 +1776,7 @@ Optional Packages:
   --with-sql-relay              replacement for "SQL Relay"
   --with-default-runasuser      Default user to run SQL Relay as
   --with-default-runasgroup     Default group to run SQL Relay as
+  --with-abs-max-connections    Set the absolute maximum number of connections that may be started for an instance.  Defaults to 512.
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-aix-soname=aix|svr4|both
@@ -3487,6 +3490,14 @@ else
 fi
 
 
+# Check whether --with-abs-max-connections was given.
+if test "${with_abs_max_connections+set}" = set; then :
+  withval=$with_abs_max_connections; ABS_MAXCONNECTIONS="$withval"
+else
+  ABS_MAXCONNECTIONS="512"
+fi
+
+
 
 if ( test -z "$ENABLE_ODBC" )
 then
@@ -3558,6 +3569,7 @@ if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
 then
 	ENABLE_UTIL=""
 fi
+
 
 
 
@@ -34655,7 +34667,7 @@ then
 fi
 
 
-MAKELIST="config.mk bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF

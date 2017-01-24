@@ -23,6 +23,7 @@
 	replaced sockseq-generated unix socket with pid-based unix socket
 	updated ruby api to support unification of Fixnum and Bignum classes
 		into Integer class
+	added --with-abs-max-connections configure script parameter
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

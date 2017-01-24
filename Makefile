@@ -79,6 +79,7 @@ distclean: clean
 		config.log \
 		config.status \
 		config.mk \
+		src/server/sqlrelay/private/sqlrshm.h \
 		bin/sqlrclient-config \
 		bin/sqlrclientwrapper-config \
 		bin/sqlrserver-config \

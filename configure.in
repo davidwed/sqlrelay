@@ -425,6 +425,10 @@ AC_ARG_WITH(default-runasgroup,
 	[  --with-default-runasgroup     Default group to run SQL Relay as],
 	DEFAULT_RUNASGROUP="$withval",
 	DEFAULT_RUNASGROUP="nobody")
+AC_ARG_WITH(abs-max-connections,
+	[  --with-abs-max-connections    Set the absolute maximum number of connections that may be started for an instance.  Defaults to 512.],
+	ABS_MAXCONNECTIONS="$withval",
+	ABS_MAXCONNECTIONS="512")
 
 
 dnl tweak enabled/disabled things
@@ -540,6 +544,7 @@ AC_SUBST(ENABLE_CMDLINE)
 AC_SUBST(ENABLE_SERVER)
 AC_SUBST(ENABLE_UTIL)
 AC_SUBST(ENABLE_DOC)
+AC_SUBST(ABS_MAXCONNECTIONS)
 
 AC_DEFINE_UNQUOTED(SQLR,["$SQLR"],replacement for "sqlr")
 AC_DEFINE_UNQUOTED(SQLRELAY,["$SQLRELAY"],replacement for "sqlrelay")
@@ -959,7 +964,7 @@ then
 fi
 
 
-MAKELIST="config.mk bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config
