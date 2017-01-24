@@ -662,21 +662,26 @@ void sqlrservercontroller::setUserAndGroup() {
 	char	*currentgroup=
 		groupentry::getName(process::getEffectiveGroupId());
 
+	stringbuffer	errorstr;
+
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
 	if (charstring::compare(currentgroup,pvt->_cfg->getRunAsGroup()) &&
 			!process::setGroup(pvt->_cfg->getRunAsGroup())) {
-		stderror.printf("Warning: could not change group to %s\n",
-						pvt->_cfg->getRunAsGroup());
+		errorstr.append("Warning: could not change group to ")->
+			append(pvt->_cfg->getRunAsGroup())->append('\n');
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
 	if (charstring::compare(currentuser,pvt->_cfg->getRunAsUser()) &&
 			!process::setUser(pvt->_cfg->getRunAsUser())) {
-		stderror.printf("Warning: could not change user to %s\n",
-						pvt->_cfg->getRunAsUser());
+		errorstr.append("Warning: could not change user to ")->
+			append(pvt->_cfg->getRunAsUser())->append('\n');
 	}
+
+	// write the error, if there was one
+	stderror.write(errorstr.getString(),errorstr.getStringLength());
 
 	// clean up
 	delete[] currentuser;
@@ -693,10 +698,9 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	modulename.append("connection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!pvt->_conndl.open(modulename.getString(),true,true)) {
-		stderror.printf("failed to load connection module: %s\n",
-							modulename.getString());
 		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",(error)?error:"");
+		stderror.printf("failed to load connection module: %s\n%s\n",
+				modulename.getString(),(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -708,9 +712,9 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 			(sqlrserverconnection *(*)(sqlrservercontroller *))
 			pvt->_conndl.getSymbol(functionname.getString());
 	if (!newConn) {
-		stderror.printf("failed to load connection: %s\n",dbase);
 		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",(error)?error:"");
+		stderror.printf("failed to load connection: %s\n%s\n",
+				dbase,(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -777,14 +781,15 @@ bool sqlrservercontroller::handlePidFile() {
 		found=(process::checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
-		stderror.printf("\n%s-connection error:\n",SQLR);
-		stderror.printf("	The pid file %s",listenerpidfile);
-		stderror.printf(" was not found.\n");
-		stderror.printf("	This usually means "
-					"that the %s-listener \n",SQLR);
-		stderror.printf("is not running.\n");
-		stderror.printf("	The %s-listener must be running ",SQLR);
-		stderror.printf("for the %s-connection to start.\n\n",SQLR);
+		stderror.printf("\n%s-connection error:\n"
+				"	The pid file %s"
+				" was not found.\n"
+				"	This usually means "
+					"that the %s-listener \n"
+				"is not running.\n"
+				"	The %s-listener must be running "
+				"for the %s-connection to start.\n\n",
+				SQLR,listenerpidfile,SQLR,SQLR,SQLR);
 		retval=false;
 	}
 
@@ -888,10 +893,8 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 	}
 	if (warning) {
 		if (printerrors) {
-			stderror.printf("Warning logging into database.\n");
-			if (warning) {
-				stderror.printf("%s\n",warning);
-			}
+			stderror.printf("Warning logging into database.\n%s\n",
+					(warning)?warning:"");
 		}
 		if (pvt->_sqlrlg) {
 			pvt->_debugstr.clear();
@@ -1128,12 +1131,19 @@ bool sqlrservercontroller::openSockets() {
 			raiseInternalErrorEvent(NULL,
 						pvt->_debugstr.getString());
 
-			stderror.printf("Could not listen on ");
-			stderror.printf("unix socket: ");
-			stderror.printf("%s\n",pvt->_unixsocket.getString());
-			stderror.printf("Make sure that the file and ");
-			stderror.printf("directory are readable ");
-			stderror.printf("and writable.\n\n");
+			char	*currentuser=
+					userentry::getName(
+						process::getEffectiveUserId());
+			char	*currentgroup=
+					groupentry::getName(
+						process::getEffectiveGroupId());
+			stderror.printf("Could not listen on unix socket: %s\n"
+					"Make sure that the directory is "
+					"writable by %s:%s.\n\n",
+					pvt->_unixsocket.getString(),
+					currentuser,currentgroup);
+			delete[] currentuser;
+			delete[] currentgroup;
 			delete pvt->_serversockun;
 			pvt->_serversockun=NULL;
 			return false;
@@ -1186,9 +1196,9 @@ bool sqlrservercontroller::openSockets() {
 				raiseInternalErrorEvent(NULL,
 						pvt->_debugstr.getString());
 
-				stderror.printf("Could not listen on ");
-				stderror.printf("inet socket: ");
-				stderror.printf("%d\n\n",pvt->_inetport);
+				stderror.printf("Could not listen on "
+						"inet socket: ",
+						"%d\n\n",pvt->_inetport);
 				retval=false;
 			}
 		}
@@ -4505,8 +4515,8 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	if (!pvt->_shmem->attach(file::generateKey(idfilename,1),
 						sizeof(sqlrshm))) {
 		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to shared memory segment: ");
-		stderror.printf("%s\n",err);
+		stderror.printf("Couldn't attach to shared memory segment: "
+				"%s\n",err);
 		delete[] err;
 		delete pvt->_shmem;
 		pvt->_shmem=NULL;
@@ -4515,7 +4525,7 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	}
 	pvt->_shm=(sqlrshm *)pvt->_shmem->getPointer();
 	if (!pvt->_shm) {
-		stderror.printf("failed to get pointer to shm\n");
+		stderror.printf("Failed to get pointer to shm\n");
 		delete pvt->_shmem;
 		pvt->_shmem=NULL;
 		delete[] idfilename;
@@ -4527,8 +4537,8 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	pvt->_semset=new semaphoreset();
 	if (!pvt->_semset->attach(file::generateKey(idfilename,1),13)) {
 		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to semaphore set: ");
-		stderror.printf("%s\n",err);
+		stderror.printf("Couldn't attach to semaphore set: "
+				"%s\n",err);
 		delete[] err;
 		delete pvt->_semset;
 		delete pvt->_shmem;
@@ -4758,12 +4768,9 @@ sqlrparser *sqlrservercontroller::newParser() {
 	modulename.append("parser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!pvt->_sqlrpdl.open(modulename.getString(),true,true)) {
-		if (pvt->_debugsqlrparser) {
-			stderror.printf("failed to load parser module: %s\n",
-									module);
-		}
 		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",(error)?error:"");
+		stderror.printf("failed to load parser module: %s\n%s\n",
+						module,(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -4775,9 +4782,9 @@ sqlrparser *sqlrservercontroller::newParser() {
 			(sqlrparser *(*)(sqlrservercontroller *, xmldomnode *))
 			pvt->_sqlrpdl.getSymbol(functionname.getString());
 	if (!newParser) {
-		stderror.printf("failed to load parser: %s\n",module);
 		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",(error)?error:"");
+		stderror.printf("failed to load parser: %s\n%s\n",
+				module,(error)?error:"");
 		delete[] error;
 		return NULL;
 	}

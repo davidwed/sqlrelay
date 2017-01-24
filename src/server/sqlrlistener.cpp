@@ -365,21 +365,26 @@ void sqlrlistener::setUserAndGroup() {
 	char	*currentgroup=
 		groupentry::getName(process::getEffectiveGroupId());
 
+	stringbuffer	errorstr;
+
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
 	if (charstring::compare(currentgroup,pvt->_cfg->getRunAsGroup()) &&
 			!process::setGroup(pvt->_cfg->getRunAsGroup())) {
-		stderror.printf("Warning: could not change group to %s\n",
-						pvt->_cfg->getRunAsGroup());
+		errorstr.append("Warning: could not change group to ")->
+			append(pvt->_cfg->getRunAsGroup())->append('\n');
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
 	if (charstring::compare(currentuser,pvt->_cfg->getRunAsUser()) &&
 				!process::setUser(pvt->_cfg->getRunAsUser())) {
-		stderror.printf("Warning: could not change user to %s\n",
-						pvt->_cfg->getRunAsUser());
+		errorstr.append("Warning: could not change user to ")->
+			append(pvt->_cfg->getRunAsUser())->append('\n');
 	}
+
+	// write the error, if there was one
+	stderror.write(errorstr.getString(),errorstr.getStringLength());
 
 	// clean up
 	delete[] currentuser;
@@ -393,31 +398,35 @@ bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 	}
 
 	if (!pvt->_cfg->accessible()) {
-		stderror.printf("\n%s-listener error:\n",SQLR);
-		stderror.printf("	This instance of %s is ",SQL_RELAY);
-		stderror.printf("configured to run as:\n");
-		stderror.printf("		user: %s\n",
-						pvt->_cfg->getRunAsUser());
-		stderror.printf("		group: %s\n\n",
-						pvt->_cfg->getRunAsGroup());
-		stderror.printf("	However, the config url %s\n",url);
-		stderror.printf("	cannot be accessed by that user ");
-		stderror.printf("or group.\n\n");
-		stderror.printf("	Since you're using dynamic scaling ");
-		stderror.printf("(ie. maxconnections>connections),\n");
-		stderror.printf("	new connections would be started as\n");
-		stderror.printf("		user: %s\n",
-						pvt->_cfg->getRunAsUser());
-		stderror.printf("		group: %s\n\n",
-						pvt->_cfg->getRunAsGroup());
-		stderror.printf("	They would not be able to access the");
-		stderror.printf("config url and would shut down.\n\n");
-		stderror.printf("	To remedy this problem, make %s\n",url);
-		stderror.printf("	accessible by\n");
-		stderror.printf("		user: %s\n",
-						pvt->_cfg->getRunAsUser());
-		stderror.printf("		group: %s\n",
-						pvt->_cfg->getRunAsGroup());
+		stderror.printf("\n%s-listener error:\n"
+				"	This instance of %s is "
+				"configured to run as:\n"
+				"		user: %s\n"
+				"		group: %s\n\n"
+				"	However, the config url %s\n"
+				"	cannot be accessed by that user "
+				"or group.\n\n"
+				"	Since you're using dynamic scaling "
+				"(ie. maxconnections>connections),\n"
+				"	new connections would be started as\n"
+				"		user: %s\n"
+				"		group: %s\n\n"
+				"	They would not be able to access the"
+				"config url and would shut down.\n\n"
+				"	To remedy this problem, make %s\n"
+				"	accessible by\n"
+				"		user: %s\n"
+				"		group: %s\n"
+				SQLR,
+				SQL_RELAY,
+				pvt->_cfg->getRunAsUser(),
+				pvt->_cfg->getRunAsGroup(),
+				url,
+				pvt->_cfg->getRunAsUser(),
+				pvt->_cfg->getRunAsGroup(),
+				url,
+				pvt->_cfg->getRunAsUser(),
+				pvt->_cfg->getRunAsGroup());
 		return false;
 	}
 	return true;
@@ -434,16 +443,17 @@ bool sqlrlistener::handlePidFile(const char *id) {
 				pvt->_sqlrpth->getPidDir(),id);
 
 	if (process::checkForPidFile(pvt->_pidfile)!=-1) {
-		stderror.printf("\n%s-listener error:\n",SQLR);
-		stderror.printf("	The pid file %s",pvt->_pidfile);
-		stderror.printf(" exists.\n");
-		stderror.printf("	This usually means that the ");
-		stderror.printf("%s-listener is already running for ",SQLR);
-		stderror.printf("the \n");
-		stderror.printf("	%s",id);
-		stderror.printf(" instance.\n");
-		stderror.printf("	If it is not running, please remove ");
-		stderror.printf("the file and restart.\n");
+		stderror.printf("\n%s-listener error:\n"
+				"	The pid file %s"
+				" exists.\n"
+				"	This usually means that the "
+				"%s-listener is already running for "
+				"the \n"
+				"	%s"
+				" instance.\n"
+				"	If it is not running, please remove "
+				"the file and restart.\n",
+				SQLR,pvt->_pidfile,SQLR,id);
 		delete[] pvt->_pidfile;
 		pvt->_pidfile=NULL;
 		return false;
@@ -690,57 +700,69 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 }
 
 void sqlrlistener::ipcFileError(const char *idfilename) {
-	stderror.printf("Could not open: %s\n",idfilename);
-	stderror.printf("Make sure that the file and directory are ");
-	stderror.printf("readable and writable.\n\n");
+
+	char	*currentuser=
+		userentry::getName(process::getEffectiveUserId());
+	char	*currentgroup=
+		groupentry::getName(process::getEffectiveGroupId());
+
+	stderror.printf("Could not open: %s\n"
+			"Make sure that the directory "
+			"is writable by %s:%s.\n\n",
+			idfilename,currentuser,currentgroup);
+	delete[] currentuser;
+	delete[] currentgroup;
 }
 
 void sqlrlistener::keyError(const char *idfilename) {
 	char	*err=error::getErrorString();
-	stderror.printf("\n%s-listener error:\n",SQLR);
-	stderror.printf("	Unable to generate a key from ");
-	stderror.printf("%s\n",idfilename);
-	stderror.printf("	Error was: %s\n\n",err);
+	stderror.printf("\n%s-listener error:\n"
+			"	Unable to generate a key from "
+			"%s\n"
+			"	Error was: %s\n\n",
+			SQLR,idfilename,err);
 	delete[] err;
 }
 
 void sqlrlistener::shmError(const char *id, int shmid) {
 	char	*err=error::getErrorString();
-	stderror.printf("\n%s-listener error:\n",SQLR);
-	stderror.printf("	Unable to create a shared memory ");
-	stderror.printf("segment.  This is usally because an \n");
-	stderror.printf("	%s-listener is already running for ",SQLR);
-	stderror.printf("the %s instance.\n\n",id);
-	stderror.printf("	If it is not running, something may ");
-	stderror.printf("have crashed and left an old segment\n");
-	stderror.printf("	lying around.  Use the ipcs command ");
-	stderror.printf("to inspect existing shared memory \n");
-	stderror.printf("	segments and the ipcrm command to ");
-	stderror.printf("remove the shared memory segment with ");
-	stderror.printf("\n	id %d.\n\n",shmid);
-	stderror.printf("	Error was: %s\n\n",err);
+	stderror.printf("\n%s-listener error:\n"
+			"	Unable to create a shared memory "
+			"segment.  This is usally because an \n"
+			"	%s-listener is already running for "
+			"the %s instance.\n\n"
+			"	If it is not running, something may "
+			"have crashed and left an old segment\n"
+			"	lying around.  Use the ipcs command "
+			"to inspect existing shared memory \n"
+			"	segments and the ipcrm command to "
+			"remove the shared memory segment with "
+			"\n	id %d.\n\n"
+			"	Error was: %s\n\n",
+			SQLR,SQLR,id,shmid,err);
 	delete[] err;
 }
 
 void sqlrlistener::semError(const char *id, int semid) {
 	char	*err=error::getErrorString();
-	stderror.printf("\n%s-listener error:\n",SQLR);
-	stderror.printf("	Unable to create a semaphore ");
-	stderror.printf("set.  This is usally because an \n");
-	stderror.printf("	%s-listener is already ",SQLR);
-	stderror.printf("running for the %s",id);
-	stderror.printf(" instance.\n\n");
-	stderror.printf("	If it is not running, ");
-	stderror.printf("something may have crashed and left ");
-	stderror.printf("an old semaphore set\n");
-	stderror.printf("	lying around.  Use the ipcs ");
-	stderror.printf("command to inspect existing ");
-	stderror.printf("semaphore sets \n");
-	stderror.printf("	and the ipcrm ");
-	stderror.printf("command to remove the semaphore set ");
-	stderror.printf("with \n");
-	stderror.printf("	id %d.\n\n",semid);
-	stderror.printf("	Error was: %s\n\n",err);
+	stderror.printf("\n%s-listener error:\n"
+			"	Unable to create a semaphore "
+			"set.  This is usally because an \n"
+			"	%s-listener is already "
+			"running for the %s"
+			" instance.\n\n"
+			"	If it is not running, "
+			"something may have crashed and left "
+			"an old semaphore set\n"
+			"	lying around.  Use the ipcs "
+			"command to inspect existing "
+			"semaphore sets \n"
+			"	and the ipcrm "
+			"command to remove the semaphore set "
+			"with \n"
+			"	id %d.\n\n"
+			"	Error was: %s\n\n"
+			SQLR,SQLR,id,semid,err);
 	delete[] err;
 }
 
@@ -870,11 +892,19 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 			info.append(sock);
 			raiseInternalErrorEvent(info.getString());
 
-			stderror.printf("Could not listen on unix socket: ");
-			stderror.printf("%s\n",sock);
-			stderror.printf("Make sure that the file and ");
-			stderror.printf("directory are readable and writable.");
-			stderror.printf("\n\n");
+			char	*currentuser=
+					userentry::getName(
+						process::getEffectiveUserId());
+			char	*currentgroup=
+					groupentry::getName(
+						process::getEffectiveGroupId());
+			stderror.printf("Could not listen on unix socket: "
+					"%s\n"
+					"Make sure that the directory is "
+					"writable by %s:%s.\n\n",
+					sock,currentuser,currentgroup);
+			delete[] currentuser;
+			delete[] currentgroup;
 
 			delete pvt->_clientsockun[pvt->_clientsockunindex];
 			pvt->_clientsockun[pvt->_clientsockunindex]=NULL;
@@ -915,11 +945,16 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 		info.append(pvt->_handoffsockname);
 		raiseInternalErrorEvent(info.getString());
 
-		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",pvt->_handoffsockname);
-		stderror.printf("Make sure that the file and ");
-		stderror.printf("directory are readable and writable.");
-		stderror.printf("\n\n");
+		char	*currentuser=userentry::getName(
+						process::getEffectiveUserId());
+		char	*currentgroup=groupentry::getName(
+						process::getEffectiveGroupId());
+		stderror.printf("Could not listen on unix socket: %s\n"
+				"Make sure that the directory is "
+				"writable by %s:%s.\n\n",
+				pvt->_handoffsockname,currentuser,currentgroup);
+		delete[] currentuser;
+		delete[] currentgroup;
 	}
 
 	return success;
@@ -949,11 +984,17 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 		info.append(pvt->_removehandoffsockname);
 		raiseInternalErrorEvent(info.getString());
 
-		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",pvt->_removehandoffsockname);
-		stderror.printf("Make sure that the file and ");
-		stderror.printf("directory are readable and writable.");
-		stderror.printf("\n\n");
+		char	*currentuser=userentry::getName(
+						process::getEffectiveUserId());
+		char	*currentgroup=groupentry::getName(
+						process::getEffectiveGroupId());
+		stderror.printf("Could not listen on unix socket: %s\n"
+				"Make sure that the directory is "
+				"writable by %s:%s.\n\n",
+				pvt->_removehandoffsockname,
+				currentuser,currentgroup);
+		delete[] currentuser;
+		delete[] currentgroup;
 	}
 
 	return success;
@@ -982,11 +1023,17 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 		info.append(pvt->_fixupsockname);
 		raiseInternalErrorEvent(info.getString());
 
-		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",pvt->_fixupsockname);
-		stderror.printf("Make sure that the file and ");
-		stderror.printf("directory are readable and writable.");
-		stderror.printf("\n\n");
+		char	*currentuser=userentry::getName(
+						process::getEffectiveUserId());
+		char	*currentgroup=groupentry::getName(
+						process::getEffectiveGroupId());
+		stderror.printf("Could not listen on unix socket: %s\n"
+				"Make sure that the directory is "
+				"writable by %s:%s.\n\n",
+				pvt->_fixupsockname,
+				currentuser,currentgroup);
+		delete[] currentuser;
+		delete[] currentgroup;
 	}
 
 	return success;
