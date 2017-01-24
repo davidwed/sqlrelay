@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrutil.h>
+#include <sqlrelay/private/sqlrshm.h>
 #include <rudiments/process.h>
 #ifndef _WIN32
 	#include <rudiments/inetsocketclient.h>
@@ -369,6 +370,10 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
+		"	-abs-max-connections	Displays the absolute maximum number of\n"
+		"				database connections that may be opened by\n"
+		"				instance of SQL Relay and exits.n\n"
+		"\n"
 		DISABLECRASHHANDLER
 		BACKTRACECHILDREN
 #ifdef _WIN32
@@ -407,10 +412,24 @@ static void helpmessage(const char *progname) {
 		progname,progname,progname,progname,progname);
 }
 
+static void absmaxconnections(int argc, const char **argv) {
+
+	if (argc!=2 || (charstring::compare(argv[1],"-abs-max-connections") &&
+			charstring::compare(argv[1],"--abs-max-connections"))) {
+		return;
+	}
+
+	stdoutput.printf("abs max connections: %d\n",MAXCONNECTIONS);
+	stdoutput.printf("shmmax requirement:  %d\n",sizeof(sqlrshm));
+
+	process::exit(0);
+}
+
 int main(int argc, const char **argv) {
 
 	version(argc,argv);
 	help(argc,argv);
+	absmaxconnections(argc,argv);
 
 	sqlrcmdline	cmdl(argc,argv);
 	sqlrpaths	sqlrpth(&cmdl);

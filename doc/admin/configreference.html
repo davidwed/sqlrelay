@@ -138,8 +138,8 @@ http://www.gnu.org/software/src-highlite -->
     </ul>
 
     <li><b>dbase</b> - The type of database the connection daemon should connect to.  Should be one of: "oracle", "freetds", "sap", "db2", "informix", "mysql", "postgresql", "firebird", "sqlite", odbc", or "mdbtools".  Defaults to "oracle".  Note: for historical reasons, "oracle8" and "sybase" are also supported, and are synonymous with "oracle" and "sap"</li>
-    <li><b>connections</b> - The number of database connections to open at startup.  This may be set to any positive number or 0.  Defaults to 5.</li>
-    <li><b>maxconnections</b> - The maximum number of database connections to scale up to.  If this is set to a number lower than the value for the <b>connections</b> parameter then it will be automatically bumped up to the value set for <b>connections</b>.  Defaults to the same value as <b>connections</b>.</li>
+    <li><b>connections</b> - The number of database connections to open at startup.  This may be set to any positive number or 0.  Defaults to 5.  (Note: implicitly limited to a compile time limit, which is configurable, but defaults to 4096.)</li>
+    <li><b>maxconnections</b> - The maximum number of database connections to scale up to.  If this is set to a number lower than the value for the <b>connections</b> parameter then it will be automatically bumped up to the value set for <b>connections</b>.  Defaults to the same value as <b>connections</b>.  (Note: implicitly limited to a compile time limit, which is configurable, but defaults to 4096.)</li>
     <li><b>maxqueuelength</b> - The size the queue of waiting clients has to grow to before more connections will be spawned.  Defaults to 0.</li>
     <li><b>growby</b> - The number of connections that will be started at a time when new connections are spawned.  Defaults to 1.</li>
     <li><b>ttl</b> - The number of seconds that a dynamically spawned connection will sit idle, waiting for a client, before giving up and shutting down.  Setting this parameter to 0 causes each dynamically spawned connection to die immediately after handling one client session.  Defaults to 60 (one minute).</li>

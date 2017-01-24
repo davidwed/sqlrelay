@@ -426,9 +426,9 @@ AC_ARG_WITH(default-runasgroup,
 	DEFAULT_RUNASGROUP="$withval",
 	DEFAULT_RUNASGROUP="nobody")
 AC_ARG_WITH(abs-max-connections,
-	[  --with-abs-max-connections    Set the absolute maximum number of connections that may be started for an instance.  Defaults to 512.],
+	[  --with-abs-max-connections    Set the absolute maximum number of connections that may be started for an instance.  Defaults to 4096.],
 	ABS_MAXCONNECTIONS="$withval",
-	ABS_MAXCONNECTIONS="512")
+	ABS_MAXCONNECTIONS="4096")
 
 
 dnl tweak enabled/disabled things
@@ -964,7 +964,7 @@ then
 fi
 
 
-MAKELIST="config.mk src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config

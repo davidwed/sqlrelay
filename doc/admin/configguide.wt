@@ -142,10 +142,18 @@ By default, SQL Relay opens and maintains a pool of 5 [../features/connectionpoo
 
 The number of connections determines how many client applications can access the database simultaneously.  In this example, up to 10, assuming each client only needs one connection.  Additional clients would be queued and would have to wait for one of the first 10 to disconnect before being able to access the database.
 
+Any number of connections may be configured, up to an "absolute max connections" limit defined at compile-time, which defaults to 4096.  To find the limit on your system, run:
+
+{{{
+sqlr-start -abs-max-connections
+}}}
+
+Note that the command also returns the "shmmax requirement" for the configuration.  "shmmax" refers to the maximum size of a single shared memory segment, a tunable kernel parameter on most systems.  The default shmmax requirement is about 5mb.  On modern systems, shmmax defaults to at least 32mb, but on some very old systems it defaults to 512k.  If the shmmax requirement exceeds the shmmax configuration for your system, then you will have to reconfigure the kernel parameter before you can run sqlr-start.   This may be done at runtime on most modern systems, but on some older systems it requires a kernel reconfiguraton, and/or rebuild and reboot.
+
 [=#dbconnections-performance]
 === For Performance ===
 
-Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can.  That number is usually environment-specific, and dictated by database, system and network resources.
+In a performance-oriented configuration, a good rule of thumb is to open as many connections as you can.  That number is usually environment-specific, and dictated by database, system and network resources.
 
 [=#dbconnections-throttling]
 === Throttling ===

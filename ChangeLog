@@ -24,6 +24,7 @@
 	updated ruby api to support unification of Fixnum and Bignum classes
 		into Integer class
 	added --with-abs-max-connections configure script parameter
+	increased default absolute max connections to 4096 (from 512)
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password
