@@ -26,6 +26,7 @@
 	added --with-abs-max-connections configure script parameter
 	increased default absolute max connections to 4096 (from 512)
 	updated "can't open ... file" errors to mention user/group
+	added SQLR_MYSQL_MAP_DATE_TO_DATETIME
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password
