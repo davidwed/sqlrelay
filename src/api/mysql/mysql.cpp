@@ -1861,6 +1861,21 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 				retval==MYSQL_TYPE_NEWDECIMAL) && !scale) {
 				retval=MYSQL_TYPE_LONG;
 			}
+
+			// Some DB's, like oracle, don't have separate DATE
+			// and DATETIME types.  Rather, a DATE can store the
+			// date and time, but which components it reports
+			// depends on something like the NLS_DATE_FORMAT.  By
+			// default, we map DATE to MYSQL_TYPE_DATE, but we also
+			// provide the option of mapping it to
+			// MYSQL_TYPE_DATETIME.
+			if (retval==MYSQL_TYPE_DATE &&
+				!charstring::compare(
+					environment::getValue(
+					"SQLR_MYSQL_MAP_DATE_TO_DATETIME"),
+					"yes")) {
+				retval=MYSQL_TYPE_DATETIME;
+			}
 			return retval;
 		}
 	}
