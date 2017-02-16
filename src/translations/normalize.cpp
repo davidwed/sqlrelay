@@ -344,7 +344,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 				!charstring::compare(ptr-4," and ",5) ||
 				!charstring::compare(ptr-4," div ",5) ||
 				!charstring::compare(ptr-4," mod ",5) ||
-				!charstring::compare(ptr-4," not ",5))) ||
+				!charstring::compare(ptr-4," not ",5) ||
+				!charstring::compare(ptr-4," for ",5))) ||
 				(ptr-start>=3 &&
 				!charstring::compare(ptr-3," or ",4)) ||
 				(ptr-start>=8 && (
@@ -355,7 +356,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 				!charstring::compare(ptr-5," case ",6) ||
 				!charstring::compare(ptr-5," then ",6) ||
 				!charstring::compare(ptr-5," when ",6) ||
-				!charstring::compare(ptr-5," else ",6))) ||
+				!charstring::compare(ptr-5," else ",6) ||
+				!charstring::compare(ptr-5," from ",6))) ||
 				(ptr-start>=9 && (
 				!charstring::compare(ptr-9," order by ",10) ||
 				!charstring::compare(ptr-9," interval ",10)))

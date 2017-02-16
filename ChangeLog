@@ -29,6 +29,7 @@
 	added SQLR_MYSQL_MAP_DATE_TO_DATETIME option to mysql drop-in
 		replacement library
 	fixed normalize translation not to remove spaces before unary - and !
+	updated sqlrsh to set error code correctly and write errors to stderr
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

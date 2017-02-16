@@ -122,20 +122,25 @@ class	sqlrsh {
 	public:
 			sqlrsh();
 			~sqlrsh();
-		void	execute(int argc, const char **argv);
+		bool	execute(int argc, const char **argv);
 	private:
 		void	startupMessage(sqlrshenv *env,
-					const char *host, uint16_t port,
+					const char *host,
+					uint16_t port,
 					const char *user);
 		void	userRcFile(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
 					sqlrshenv *env);
-		void	runScript(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, sqlrshenv *env, 
-					const char *filename, bool returnerror);
+		bool	runScript(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur,
+					sqlrshenv *env, 
+					const char *filename,
+					bool displayerror);
 		bool	runCommands(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, sqlrshenv *env, 
-					const char *commands);
+					sqlrcursor *sqlrcur,
+					sqlrshenv *env, 
+					const char *commands,
+					bool *exitprogram);
 		bool	getCommandFromFileOrString(file *fl,
 					const char *string,
 					const char **stringpos,
@@ -143,15 +148,20 @@ class	sqlrsh {
 					sqlrshenv *env);
 		bool	runCommand(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
-					sqlrshenv *env, const char *command);
+					sqlrshenv *env,
+					const char *command,
+					bool *exitprogram);
 		int	commandType(const char *command);
-		void	internalCommand(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, sqlrshenv *env,
+		bool	internalCommand(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur,
+					sqlrshenv *env,
 					const char *command);
-		void	externalCommand(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, sqlrshenv *env, 
+		bool	externalCommand(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur,
+					sqlrshenv *env, 
 					const char *command);
-		void	executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env);
+		void	executeQuery(sqlrcursor *sqlrcur,
+					sqlrshenv *env);
 		char	*getWild(const char *command);
 		char	*getTable(enum querytype_t querytype,
 					const char *command);
@@ -160,26 +170,35 @@ class	sqlrsh {
 					const char *message,
 					const char *error,
 					int64_t errornumber);
-		void	displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env);
-		void	displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env);
-		void	displayStats(sqlrcursor *sqlrcur, sqlrshenv *env);
-		void	ping(sqlrconnection *sqlrcon, sqlrshenv *env);
-		void	identify(sqlrconnection *sqlrcon, sqlrshenv *env);
-		void	dbversion(sqlrconnection *sqlrcon, sqlrshenv *env);
-		void	dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env);
-		void	dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env);
+		void	displayHeader(sqlrcursor *sqlrcur,
+						sqlrshenv *env);
+		void	displayResultSet(sqlrcursor *sqlrcur,
+						sqlrshenv *env);
+		void	displayStats(sqlrcursor *sqlrcur,
+						sqlrshenv *env);
+		bool	ping(sqlrconnection *sqlrcon,
+						sqlrshenv *env);
+		bool	identify(sqlrconnection *sqlrcon,
+						sqlrshenv *env);
+		bool	dbversion(sqlrconnection *sqlrcon,
+						sqlrshenv *env);
+		bool	dbhostname(sqlrconnection *sqlrcon,
+						sqlrshenv *env);
+		bool	dbipaddress(sqlrconnection *sqlrcon,
+						sqlrshenv *env);
 		void	clientversion(sqlrconnection *sqlrcon,
 						sqlrshenv *env);
-		void	serverversion(sqlrconnection *sqlrcon,
+		bool	serverversion(sqlrconnection *sqlrcon,
 						sqlrshenv *env);
-		bool	lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env);
-		void	inputbind(sqlrcursor *sqlrcur,
+		bool	lastinsertid(sqlrconnection *sqlrcon,
+						sqlrshenv *env);
+		bool	inputbind(sqlrcursor *sqlrcur,
 						sqlrshenv *env,
 						const char *command);
-		void	inputbindblob(sqlrcursor *sqlrcur,
+		bool	inputbindblob(sqlrcursor *sqlrcur,
 						sqlrshenv *env,
 						const char *command);
-		void	outputbind(sqlrcursor *sqlrcur,
+		bool	outputbind(sqlrcursor *sqlrcur,
 						sqlrshenv *env,
 						const char *command);
 		void	printbinds(const char *type,
@@ -191,13 +210,14 @@ class	sqlrsh {
 		void	getclientinfo(sqlrconnection *sqlrcon);
 		void	responseTimeout(sqlrconnection *sqlrcon,
 						const char *command);
-		void	cache(sqlrshenv *env, sqlrcursor *sqlrcur,
+		bool	cache(sqlrshenv *env, sqlrcursor *sqlrcur,
 							const char *command);
-		void	openCache(sqlrshenv *env, sqlrcursor *sqlrcur,
+		bool	openCache(sqlrshenv *env, sqlrcursor *sqlrcur,
 							const char *command);
 		void	displayHelp(sqlrshenv *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, sqlrshenv *env);
+						sqlrcursor *sqlrcur,
+						sqlrshenv *env);
 
 		sqlrcmdline	*cmdline;
 		sqlrpaths	*sqlrpth;
@@ -237,9 +257,11 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	delete[] userrcfile;
 }
 
-void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
+bool sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 			sqlrshenv *env, const char *filename,
-			bool returnerror) {
+			bool displayerror) {
+
+	bool	retval=true;
 
 	char	*trimmedfilename=charstring::duplicate(filename);
 	charstring::bothTrim(trimmedfilename);
@@ -261,40 +283,56 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			stringbuffer	command;
 			if (!getCommandFromFileOrString(
 					&scriptfile,NULL,NULL,&command,env)) {
+				retval=false;
 				break;
 			}
 
 			// run the command
 			if (!runCommand(sqlrcon,sqlrcur,env,
-						command.getString())) {
+						command.getString(),
+						NULL)) {
+				retval=false;
 				break;
 			}
 		}
 
 		// close the file
 		scriptfile.close();
+
 	} else {
 
 		// error message
-		if (returnerror) {
-			stdoutput.printf("Couldn't open file: %s\n\n",
+		if (displayerror) {
+			stderror.printf("Couldn't open file: %s\n\n",
 							trimmedfilename);
 		}
+		retval=false;
 	}
 
 	delete[] trimmedfilename;
+
+	return retval;
 }
 
-bool sqlrsh::runCommands(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-					sqlrshenv *env, const char *commands) {
+bool sqlrsh::runCommands(sqlrconnection *sqlrcon,
+				sqlrcursor *sqlrcur, 
+				sqlrshenv *env,
+				const char *commands,
+				bool *exitprogram) {
+
 	const char	*nextcommand=commands;
 	for (;;) {
 		stringbuffer	command;
-		if (!getCommandFromFileOrString(
-				NULL,nextcommand,&nextcommand,&command,env)) {
+		if (!getCommandFromFileOrString(NULL,
+						nextcommand,
+						&nextcommand,
+						&command,
+						env)) {
 			break;
 		}
-		if (!runCommand(sqlrcon,sqlrcur,env,command.getString())) {
+		if (!runCommand(sqlrcon,sqlrcur,env,
+					command.getString(),
+					exitprogram)) {
 			return false;
 		}
 	}
@@ -397,27 +435,34 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 	}
 }
 
-bool sqlrsh::runCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-					sqlrshenv *env, const char *command) {
+bool sqlrsh::runCommand(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur, 
+					sqlrshenv *env,
+					const char *command,
+					bool *exitprogram) {
 
 	int	cmdtype=commandType(command);
+	if (exitprogram) {
+		*exitprogram=false;
+	}
 
 	// init stats
 	initStats(env);
 
 	if (cmdtype>0) {
 		// if the command an internal command, run it as one
-		internalCommand(sqlrcon,sqlrcur,env,command);
-		return true;
+		return internalCommand(sqlrcon,sqlrcur,env,command);
 	} else if (cmdtype==0) {
 		// if the command is not an internal command, 
 		// execute it as a query and display the result set
-		externalCommand(sqlrcon,sqlrcur,env,command);
-		return true;
-	} else {
-		// exit
-		return false;
+		return externalCommand(sqlrcon,sqlrcur,env,command);
 	}
+
+	// exit
+	if (exitprogram) {
+		*exitprogram=true;
+	}
+	return true;
 }
 
 int sqlrsh::commandType(const char *command) {
@@ -487,7 +532,7 @@ int sqlrsh::commandType(const char *command) {
 	return 0;
 }
 
-void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					sqlrshenv *env, const char *command) {
 
 	// skip white space
@@ -521,17 +566,17 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		cmdtype=5;
 	} else if (!charstring::compareIgnoringCase(ptr,"help")) {	
 		displayHelp(env);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"ping")) {	
-		ping(sqlrcon,env);
-		return;
+		return ping(sqlrcon,env);
 	} else if (!charstring::compareIgnoringCase(ptr,"use ",4)) {	
 		if (!sqlrcon->selectDatabase(ptr+4)) {
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+			return false;
 		}
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"currentdb")) {	
 		const char	*currentdb=sqlrcon->getCurrentDatabase();
 		if (currentdb) {
@@ -540,10 +585,11 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+			return false;
 		} else {
 			stdoutput.printf("\n");
 		}
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
 		ptr=ptr+3;
 		cmdtype=6;
@@ -555,61 +601,53 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		ptr=ptr+9;
 		cmdtype=7;
 	} else if (!charstring::compareIgnoringCase(ptr,"identify")) {	
-		identify(sqlrcon,env);
-		return;
+		return identify(sqlrcon,env);
 	} else if (!charstring::compareIgnoringCase(ptr,"dbversion")) {	
-		dbversion(sqlrcon,env);
-		return;
+		return dbversion(sqlrcon,env);
 	} else if (!charstring::compareIgnoringCase(ptr,"dbhostname")) {	
-		dbhostname(sqlrcon,env);
-		return;
+		return dbhostname(sqlrcon,env);
 	} else if (!charstring::compareIgnoringCase(ptr,"dbipaddress")) {	
-		dbipaddress(sqlrcon,env);
-		return;
+		return dbipaddress(sqlrcon,env);
 	} else if (!charstring::compareIgnoringCase(ptr,"clientversion")) {	
 		clientversion(sqlrcon,env);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"serverversion")) {	
-		serverversion(sqlrcon,env);
-		return;
+		return serverversion(sqlrcon,env);
 	} else if (!charstring::compareIgnoringCase(ptr,"inputbind ",10)) {	
-		inputbind(sqlrcur,env,command);
-		return;
+		return inputbind(sqlrcur,env,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"inputbindblob ",14)) {	
-		inputbindblob(sqlrcur,env,command);
-		return;
+		return inputbindblob(sqlrcur,env,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"outputbind ",11)) {	
-		outputbind(sqlrcur,env,command);
-		return;
+		return outputbind(sqlrcur,env,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"printbinds")) {	
 		printbinds("Input",&env->inputbinds);
 		stdoutput.printf("\n");
 		printbinds("Output",&env->outputbinds);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"clearinputbind",14)) {	
 		env->clearbinds(&env->inputbinds);
-		return;
-	} else if (!charstring::compareIgnoringCase(
-					ptr,"clearoutputbind",15)) {	
+		return true;
+	} else if (!charstring::compareIgnoringCase(ptr,"clearoutputbind",15)) {
 		env->clearbinds(&env->outputbinds);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"clearbinds")) {	
 		env->clearbinds(&env->inputbinds);
 		env->clearbinds(&env->outputbinds);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"lastinsertid")) {	
 		if (!lastinsertid(sqlrcon,env)) {
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+			return false;
 		}
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"setclientinfo ",14)) {	
 		setclientinfo(sqlrcon,command);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"getclientinfo")) {	
 		getclientinfo(sqlrcon);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"setresultsetbuffersize ",23)) {	
 		ptr=ptr+23;
@@ -617,35 +655,33 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		if (!env->rsbs) {
 			env->rsbs=100;
 		}
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"getresultsetbuffersize")) {	
 		stdoutput.printf("%lld\n",(long long)env->rsbs);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"endsession")) {	
 		sqlrcon->endSession();
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"querytree")) {	
 		xmldom	xmld;
 		if (xmld.parseString(sqlrcur->getQueryTree())) {
 			xmld.getRootNode()->print(&stdoutput);
 		}
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"translatedquery")) {	
 		stdoutput.printf("%s\n",sqlrcur->getTranslatedQuery());
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"response timeout",16)) {
 		responseTimeout(sqlrcon,command);
-		return;
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"cache ",6)) {
-		cache(env,sqlrcur,command);
-		return;
+		return cache(env,sqlrcur,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
-		openCache(env,sqlrcur,command);
-		return;
+		return openCache(env,sqlrcur,command);
 	} else {
-		return;
+		return false;
 	}
 
 	// skip white space
@@ -655,8 +691,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 	// handle scripts
 	if (cmdtype==6) {
-		runScript(sqlrcon,sqlrcur,env,ptr,true);
-		return;
+		return runScript(sqlrcon,sqlrcur,env,ptr,true);
 	}
 
 	// handle debug
@@ -671,7 +706,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			sqlrcon->debugOn();
 			sqlrcon->setDebugFile(ptr);
 		}
-		return;
+		return true;
 	}
 
 	// handle nullsasnulls
@@ -681,7 +716,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
 			sqlrcur->getNullsAsEmptyStrings();
 		}
-		return;
+		return true;
 	}
 
 	// handle format
@@ -691,7 +726,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		} else {
 			env->format=SQLRSH_FORMAT_PLAIN;
 		}
-		return;
+		return true;
 	}
 
 	// on or off?
@@ -718,6 +753,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+				return false;
 			}
 		} else {
 			if (sqlrcon->autoCommitOff()) {
@@ -726,14 +762,18 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+				return false;
 			}
 		}
 	}
+	return true;
 }
 
-void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
+bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 				sqlrcursor *sqlrcur, sqlrshenv *env, 
 				const char *command) {
+
+	bool	retval=true;
 
 	// handle begin, commit and rollback
 	if (!charstring::compareIgnoringCase(command,"begin")) {
@@ -742,6 +782,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+			retval=false;
 		}
 
 	} else if (!charstring::compareIgnoringCase(command,"commit")) {
@@ -750,6 +791,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+			retval=false;
 		}
 
 	} else if (!charstring::compareIgnoringCase(command,"rollback")) {
@@ -758,6 +800,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
+			retval=false;
 		}
 
 	} else if (!charstring::compareIgnoringCase(command,"fields ",7)) {
@@ -842,6 +885,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			displayError(env,NULL,
 					sqlrcur->errorMessage(),
 					sqlrcur->errorNumber());
+			retval=false;
 
 		} else {
 
@@ -859,6 +903,8 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 	// display statistics
 	displayStats(sqlrcur,env);
+
+	return retval;
 }
 
 void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
@@ -1019,11 +1065,11 @@ void sqlrsh::displayError(sqlrshenv *env,
 				const char *error,
 				int64_t errornumber) {
 	if (!charstring::isNullOrEmpty(message)) {
-		stdoutput.printf("%s\n",message);
+		stderror.printf("%s\n",message);
 	}
-	stdoutput.printf("%lld:\n",(long long)errornumber);
+	stderror.printf("%lld:\n",(long long)errornumber);
 	if (!charstring::isNullOrEmpty(error)) {
-		stdoutput.printf("%s\n\n",error);
+		stderror.printf("%s\n\n",error);
 	}
 }
 
@@ -1195,7 +1241,7 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	stdoutput.printf("\n");
 }
 
-void sqlrsh::ping(sqlrconnection *sqlrcon, sqlrshenv *env) {
+bool sqlrsh::ping(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	bool	result=sqlrcon->ping();
 	if (result) {
 		stdoutput.printf("	The database is up.\n");
@@ -1203,9 +1249,11 @@ void sqlrsh::ping(sqlrconnection *sqlrcon, sqlrshenv *env) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
+		return false;
 	} else {
 		stdoutput.printf("	The database is down.\n");
 	}
+	return true;
 }
 
 bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
@@ -1218,7 +1266,7 @@ bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	return retval;
 }
 
-void sqlrsh::identify(sqlrconnection *sqlrcon, sqlrshenv *env) {
+bool sqlrsh::identify(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->identify();
 	if (value) {
 		stdoutput.printf("%s\n",value);
@@ -1226,12 +1274,14 @@ void sqlrsh::identify(sqlrconnection *sqlrcon, sqlrshenv *env) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
+		return false;
 	} else {
 		stdoutput.printf("\n");
 	}
+	return true;
 }
 
-void sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
+bool sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->dbVersion();
 	if (value) {
 		stdoutput.printf("%s\n",value);
@@ -1239,12 +1289,14 @@ void sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
+		return false;
 	} else {
 		stdoutput.printf("\n");
 	}
+	return true;
 }
 
-void sqlrsh::dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env) {
+bool sqlrsh::dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->dbHostName();
 	if (value) {
 		stdoutput.printf("%s\n",value);
@@ -1252,12 +1304,14 @@ void sqlrsh::dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
+		return false;
 	} else {
 		stdoutput.printf("\n");
 	}
+	return true;
 }
 
-void sqlrsh::dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env) {
+bool sqlrsh::dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->dbIpAddress();
 	if (value) {
 		stdoutput.printf("%s\n",value);
@@ -1265,16 +1319,18 @@ void sqlrsh::dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
+		return false;
 	} else {
 		stdoutput.printf("\n");
 	}
+	return true;
 }
 
 void sqlrsh::clientversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	stdoutput.printf("%s\n",sqlrcon->clientVersion());
 }
 
-void sqlrsh::serverversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
+bool sqlrsh::serverversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->serverVersion();
 	if (value) {
 		stdoutput.printf("%s\n",value);
@@ -1282,20 +1338,22 @@ void sqlrsh::serverversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
+		return false;
 	} else {
 		stdoutput.printf("\n");
 	}
+	return true;
 }
 
-void sqlrsh::inputbind(sqlrcursor *sqlrcur,
+bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 				sqlrshenv *env, const char *command) {
 
 	// sanity check
 	const char	*ptr=command+10;
 	const char	*space=charstring::findFirst(ptr,' ');
 	if (!space) {
-		stdoutput.printf("usage: inputbind [variable] = [value]\n");
-		return;
+		stderror.printf("usage: inputbind [variable] = [value]\n");
+		return false;
 	}
 
 	// get the variable name
@@ -1308,9 +1366,9 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr+1,"is null")) {
 		ptr=NULL;
 	} else {
-		stdoutput.printf("usage: inputbind [variable] = [value]\n");
-		stdoutput.printf("       inputbind [variable] is null\n");
-		return;
+		stderror.printf("usage: inputbind [variable] = [value]\n");
+		stderror.printf("       inputbind [variable] is null\n");
+		return false;
 	}
 		
 	// get the value
@@ -1394,17 +1452,19 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 
 	// put the bind variable in the list
 	env->inputbinds.setValue(variable,bv);
+
+	return true;
 }
 
-void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
+bool sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 				sqlrshenv *env, const char *command) {
 
 	// sanity check
 	const char	*ptr=command+14;
 	const char	*space=charstring::findFirst(ptr,' ');
 	if (!space) {
-		stdoutput.printf("usage: inputbindblob [variable] = [value]\n");
-		return;
+		stderror.printf("usage: inputbindblob [variable] = [value]\n");
+		return false;
 	}
 
 	// get the variable name
@@ -1417,9 +1477,9 @@ void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr+1,"is null")) {
 		ptr=NULL;
 	} else {
-		stdoutput.printf("usage: inputbindblob [variable] = [value]\n");
-		stdoutput.printf("       inputbindblob [variable] is null\n");
-		return;
+		stderror.printf("usage: inputbindblob [variable] = [value]\n");
+		stderror.printf("       inputbindblob [variable] is null\n");
+		return false;
 	}
 		
 	// get the value
@@ -1466,9 +1526,11 @@ void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 
 	// put the bind variable in the list
 	env->inputbinds.setValue(variable,bv);
+
+	return true;
 }
 
-void sqlrsh::outputbind(sqlrcursor *sqlrcur,
+bool sqlrsh::outputbind(sqlrcursor *sqlrcur,
 				sqlrshenv *env, const char *command) {
 
 	// split the command on ' '
@@ -1543,13 +1605,15 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 	if (sane) {
 		delete[] parts[0];
 	} else {
-		stdoutput.printf("usage: outputbind "
+		stderror.printf("usage: outputbind "
 				"[variable] [type] [length] [scale]\n");
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
 		}
 	}
 	delete[] parts;
+
+	return sane;
 }
 
 void sqlrsh::printbinds(const char *type,
@@ -1637,7 +1701,7 @@ void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
 	stdoutput.printf("Response Timeout set to %d.%04d seconds\n",sec,msec);
 }
 
-void sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
+bool sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
 
 	// move to file name
 	const char	*ptr=command+6;
@@ -1649,8 +1713,8 @@ void sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
 
 	// bail if no file name was given
 	if (!*ptr) {
-		stdoutput.printf("	No file name given\n\n");
-		return;
+		stderror.printf("	No file name given\n\n");
+		return false;
 	}
 
 	// build filename
@@ -1685,9 +1749,11 @@ void sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
 	// begin caching
 	sqlrcur->cacheToFile(env->cacheto);
 	sqlrcur->setCacheTtl(cachettl);
+
+	return true;
 }
 
-void sqlrsh::openCache(sqlrshenv *env,
+bool sqlrsh::openCache(sqlrshenv *env,
 			sqlrcursor *sqlrcur, const char *command) {
 
 	// move to file name
@@ -1700,7 +1766,8 @@ void sqlrsh::openCache(sqlrshenv *env,
 
 	// bail if no file name was given
 	if (!*command) {
-		return;
+		stderror.printf("	No file name given\n\n");
+		return false;
 	}
 
 	// if the file name starts with a slash then use it as-is, otherwise
@@ -1709,7 +1776,10 @@ void sqlrsh::openCache(sqlrshenv *env,
 	fn.append(sqlrpth->getCacheDir())->append(command);
 
 	// open the cached result set
-	sqlrcur->openCachedResultSet(fn.getString());
+	if (!sqlrcur->openCachedResultSet(fn.getString())) {
+		stderror.printf("	Cannot open cache file\n\n");
+		return false;
+	}
 
 	// display the header
 	displayHeader(sqlrcur,env);
@@ -1719,6 +1789,8 @@ void sqlrsh::openCache(sqlrshenv *env,
 
 	// display statistics
 	displayStats(sqlrcur,env);
+
+	return true;
 }
 
 void sqlrsh::displayHelp(sqlrshenv *env) {
@@ -1834,7 +1906,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	// init some variables
 	stringbuffer	command;
 	stringbuffer	prmpt;
-	int		exitprogram=false;
+	bool		exitprogram=false;
 	uint32_t	promptcount;
 
 	// Blocking mode is apparently not the default on some systems
@@ -1880,16 +1952,14 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		char	*cmd=command.detachString();
 
 		// run the command
-		if (!runCommands(sqlrcon,sqlrcur,env,cmd)) {
-			exitprogram=1;
-		}
+		runCommands(sqlrcon,sqlrcur,env,cmd,&exitprogram);
 
 		// clean up
 		delete[] cmd;
 	}
 }
 
-void sqlrsh::execute(int argc, const char **argv) {
+bool sqlrsh::execute(int argc, const char **argv) {
 
 	cmdline=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdline);
@@ -1929,7 +1999,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		charstring::isNullOrEmpty(host) &&
 		charstring::isNullOrEmpty(socket)) {
 
-		stdoutput.printf("usage:\n"
+		stderror.printf("usage:\n"
 			" %ssh -host host -port port -socket socket\n"
 			"        [-user user] [-password password]\n"
 			"        [-krb] [-krbservice svc] [-krbmech mech] "
@@ -2035,12 +2105,14 @@ void sqlrsh::execute(int argc, const char **argv) {
 		pr.setMaxHistoryLines(100);
 	}
 
+	bool	retval=true;
+
 	if (!charstring::isNullOrEmpty(script)) {
 		// if a script was specified, run it
-		runScript(&sqlrcon,&sqlrcur,&env,script,true);
+		retval=runScript(&sqlrcon,&sqlrcur,&env,script,true);
 	} else if (!charstring::isNullOrEmpty(command)) {
 		// if a command was specified, run it
-		runCommands(&sqlrcon,&sqlrcur,&env,command);
+		retval=runCommands(&sqlrcon,&sqlrcur,&env,command,NULL);
 	} else {
 		// otherwise go into interactive mode
 		startupMessage(&env,host,port,user);
@@ -2049,6 +2121,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	// clean up
 	pr.flushHistory();
+
+	return retval;
 }
 
 static void helpmessage(const char *progname) {
@@ -2125,7 +2199,10 @@ int main(int argc, const char **argv) {
 	signalmanager::ignoreSignals(&set);
 	#endif
 
-	sqlrsh	s;
-	s.execute(argc,argv);
-	process::exit(0);
+	int32_t	exitcode=0;
+	{
+		sqlrsh	s;
+		exitcode=!s.execute(argc,argv);
+	}
+	process::exit(exitcode);
 }
