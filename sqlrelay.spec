@@ -1,6 +1,10 @@
 %{!?tcl_version: %global tcl_version %(echo 'puts $tcl_version' | tclsh)}
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
+%if 0%{?rhel} <= 6
+%define ruby_vendorarchdir %{_libdir}/ruby/vendor_ruby
+%endif
+
 Name: sqlrelay
 Version: 1.0.1
 Release: 1%{?dist}
@@ -10,8 +14,13 @@ License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
+%if 0%{?fedora} || 0%{?rhel} >= 7
 %{?systemd_requires}
-BuildRequires: rudiments-devel >= 1.0.3, systemd
+%endif
+BuildRequires: rudiments-devel >= 1.0.3
+%if 0%{?fedora} || 0%{?rhel} >= 7
+BuildRequires: systemd}
+%endif
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -191,7 +200,9 @@ PHP PDO driver for SQL Relay.
 %package -n java-%{name}
 License: LGPLv2
 Summary: Java bindings for the SQL Relay client API
+%if 0%{?fedora} || 0%{?rhel} >= 7
 BuildRequires: java-devel
+%endif
 Requires: java-headless, javapackages-tools
 
 %description -n java-%{name}
@@ -418,9 +429,17 @@ make
 %install
 make install DESTDIR=%{buildroot}
 
+%if 0%{?fedora} || 0%{?rhel} >= 7
 # move systemd files to (_unitdir)
 mkdir -p %{buildroot}%{_unitdir}
 mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
+%else
+# move init files to rc.d/init.d
+mkdir -p %{buildroot}/etc/rc.d/init.d
+mv %{buildroot}/etc/init.d/sqlrelay %{buildroot}%{_initddir}/sqlrelay
+mv %{buildroot}/etc/init.d/sqlrcachemanager %{buildroot}%{_initddir}/sqlrcachemanager
+rmdir %{buildroot}/etc/init.d
+%endif
 
 # create tmpfiles.d directories and config file
 mkdir -p %{buildroot}/run/%{name}
@@ -463,24 +482,35 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 %post
 /sbin/ldconfig
+%if 0%{?fedora} || 0%{?rhel} >= 7
 %systemd_post %{name}.service
 %systemd_post %{name}cachemanager.service
+%endif
 
 %preun
+%if 0%{?fedora} || 0%{?rhel} >= 7
 %systemd_preun %{name}.service
 %systemd_preun %{name}cachemanager.service
+%endif
 
 %postun
 /sbin/ldconfig
+%if 0%{?fedora} || 0%{?rhel} >= 7
 %systemd_postun_with_restart %{name}.service
+%endif
 rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %files
 %{_sysconfdir}/%{name}.conf.d
 %{_sysconfdir}/%{name}.xsd
+%if 0%{?fedora} || 0%{?rhel} >= 7
 %{_unitdir}/%{name}.service
 %{_unitdir}/sqlrcachemanager.service
+%else
+%{_initddir}/sqlrelay
+%{_initddir}/sqlrcachemanager
+%endif
 %{_bindir}/sqlr-cachemanager
 %{_bindir}/sqlr-listener
 %{_bindir}/sqlr-connection
@@ -513,7 +543,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir /run/%{name}
+%if 0%{?fedora} || 0%{?rhel} >= 7
 %{_tmpfilesdir}/%{name}.conf
+%endif
 %exclude %{_libdir}/lib*.la
 %if 0%{?fedora}
 %license COPYING
@@ -713,7 +745,6 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 
 %files dropin-mysql
 %{_libdir}/libmysql*%{name}.so.*
-%exclude %{_libdir}/libmysql*%{name}.so
 
 %post dropin-mysql -p /sbin/ldconfig
 
@@ -721,7 +752,6 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 
 %files dropin-postgresql
 %{_libdir}/libpq%{name}.so.*
-%exclude %{_libdir}/libpq%{name}.so
 
 %post dropin-postgresql -p /sbin/ldconfig
 
