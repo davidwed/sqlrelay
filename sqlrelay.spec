@@ -91,7 +91,11 @@ ODBC driver for SQL Relay.
 %package -n perl-%{name}
 License: Artistic
 Summary: Perl bindings for the SQL Relay client API
+%if 0%{?fedora}
 BuildRequires: perl-generators, perl, perl-devel
+%else
+BuildRequires: perl, perl-devel
+%endif
 
 %description -n perl-%{name}
 Perl bindings for the SQL Relay client API.
@@ -100,12 +104,18 @@ Perl bindings for the SQL Relay client API.
 %package -n perl-DBD-%{name}
 License: Artistic
 Summary: Perl DBI driver for SQL Relay
+%if 0%{?fedora}
 BuildRequires: perl-generators, perl, perl-devel
+%else
+BuildRequires: perl, perl-devel
+%endif
 Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 
 %description -n perl-DBD-%{name}
 Perl DBI driver for SQL Relay.
 
+
+%if 0%{?fedora}
 
 %package -n python3-%{name}
 License: ZPL 1.0 or MIT
@@ -124,6 +134,28 @@ Requires: python3-%{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-db-%{name}
 Python DB bindings for SQL Relay.
+
+%else
+
+%package -n python-%{name}
+License: ZPL 1.0 or MIT
+Summary: Python bindings for the SQL Relay client API
+BuildRequires: python-devel
+
+%description -n python-%{name}
+Python bindings for the SQL Relay client API.
+
+
+%package -n python-db-%{name}
+License: ZPL 1.0 or MIT
+Summary: Python DB bindings for SQL Relay
+BuildRequires: python-devel
+Requires: python-%{name}%{?_isa} = %{version}-%{release}
+
+%description -n python-db-%{name}
+Python DB bindings for SQL Relay.
+
+%endif
 
 
 %package -n ruby-%{name}
@@ -170,11 +202,17 @@ Java bindings for the SQL Relay client API.
 License: LGPLv2
 Summary: TCL bindings for the SQL Relay client API
 BuildRequires: tcl-devel
+%if 0%{?fedora}
 Requires: tcl(abi) = 8.6
+%else
+Requires: tcl
+%endif
 
 %description -n tcl-%{name}
 TCL bindings for the SQL Relay client API.
 
+
+%if 0%{?fedora}
 
 %package -n erlang-%{name}
 License: CC-BY
@@ -205,6 +243,8 @@ BuildRequires: nodejs-packaging, node-gyp, nodejs-devel
 
 %description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
+
+%endif
 
 
 %package dropin-mysql
@@ -258,6 +298,8 @@ BuildRequires: sqlite-devel
 SQLite back-end module for SQL Relay.
 
 
+%if 0%{?fedora}
+
 %package freetds
 License: GPLv2 with exceptions
 Summary: FreeTDS back-end module for SQL Relay
@@ -265,6 +307,8 @@ BuildRequires: freetds-devel
 
 %description freetds
 FreeTDS back-end module for SQL Relay.
+
+%endif
 
 
 %package sap
@@ -292,6 +336,8 @@ Summary: IBM DB2 back-end module for SQL Relay
 IBM DB2 back-end module for SQL Relay.
 
 
+%if 0%{?fedora}
+
 %package firebird
 License: GPLv2 with exceptions
 Summary: Firebird back-end module for SQL Relay
@@ -300,7 +346,6 @@ BuildRequires: firebird-devel
 %description firebird
 Firebird back-end module for SQL Relay.
 
-
 %package mdbtools
 License: GPLv2 with exceptions
 Summary: MDB Tools back-end module for SQL Relay
@@ -308,6 +353,8 @@ BuildRequires: mdbtools-devel
 
 %description mdbtools
 MDB Tools back-end module for SQL Relay.
+
+%endif
 
 
 %package informix
@@ -356,7 +403,11 @@ API documentation for SQL Relay.
 		--enable-sap-at-runtime \
 		--enable-db2-at-runtime \
 		--enable-informix-at-runtime \
+%if 0%{?fedora}
 		--disable-python \
+%else
+		--disable-python3 \
+%endif
 		--with-perl-site-lib=%{perl_vendorlib} \
 		--with-perl-site-arch=%{perl_vendorarch} \
 		--with-ruby-site-arch-dir=%{ruby_vendorarchdir} \
@@ -380,10 +431,16 @@ echo "d /run/%{name} 0775 root root -" > %{buildroot}%{_tmpfilesdir}/%{name}.con
 mkdir -p %{buildroot}%{tcl_sitearch}
 mv %{buildroot}%{_libdir}/%{name} %{buildroot}%{tcl_sitearch}/%{name}
 
+
+%if 0%{?fedora}
+
 # move mono assembly to (libdir)/(name)
 mkdir -p %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/SQLRClient.dll %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/SQLRClient.dll.config %{buildroot}%{_libdir}/%{name}
+
+%endif
+
 
 # .move jar files to (_javadir)
 mkdir -p %{buildroot}%{_javadir}
@@ -453,13 +510,17 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_mandir}/*/sqlr-stop.*
 %{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
-%license COPYING
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir /run/%{name}
 %{_tmpfilesdir}/%{name}.conf
 %exclude %{_libdir}/lib*.la
+%if 0%{?fedora}
+%license COPYING
 %exclude %{_datadir}/licenses/%{name}
+%else
+%{_datadir}/licenses/%{name}
+%endif
 %exclude %{_localstatedir}/run
 
 %files server-devel
@@ -581,6 +642,9 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %{perl_vendorlib}/*
 %{_mandir}/*/DBD::SQLRelay.*
 
+
+%if 0%{?fedora}
+
 %files -n python3-%{name}
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
 %{python3_sitearch}/SQLRelay/PySQLRClient.py
@@ -595,6 +659,23 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %files -n python3-db-%{name}
 %{python3_sitearch}/SQLRelay/PySQLRDB.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRDB.*
+
+%else
+
+%files -n python-%{name}
+%{python_sitearch}/SQLRelay/CSQLRelay.so
+%{python_sitearch}/SQLRelay/PySQLRClient.py*
+%{python_sitearch}/SQLRelay/__init__.py*
+
+%postun -n python-%{name}
+rmdir %{python_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
+rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
+
+%files -n python-db-%{name}
+%{python_sitearch}/SQLRelay/PySQLRDB.py*
+
+%endif
+
 
 %files -n ruby-%{name}
 %{ruby_vendorarchdir}/%{name}.so
@@ -614,6 +695,9 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 %files -n tcl-%{name}
 %{tcl_sitearch}/%{name}
 
+
+%if 0%{?fedora}
+
 %files -n erlang-%{name}
 %{_libdir}/erlang/lib/%{name}-%{version}
 
@@ -623,6 +707,9 @@ rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
 
 %files -n nodejs-%{name}
 %{nodejs_sitearch}/%{name}
+
+%endif
+
 
 %files dropin-mysql
 %{_libdir}/libmysql*%{name}.so.*
@@ -664,11 +751,17 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %postun sqlite
 rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
+
+%if 0%{?fedora}
+
 %files freetds
 %{_libexecdir}/%{name}/sqlrconnection_freetds*
 
 %postun freetds
 rmdir %{_libexecdir}/%{name} 2> /dev/null || :
+
+%endif
+
 
 %files sap
 %{_libexecdir}/%{name}/sqlrconnection_sap*
@@ -688,6 +781,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %postun db2
 rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
+
+%if 0%{?fedora}
+
 %files firebird
 %{_libexecdir}/%{name}/sqlrconnection_firebird*
 
@@ -699,6 +795,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %postun mdbtools
 rmdir %{_libexecdir}/%{name} 2> /dev/null || :
+
+%endif
+
 
 %files informix
 %{_libexecdir}/%{name}/sqlrconnection_informix*
@@ -722,7 +821,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Jan 09 2012 David Muse <david.muse@firstworks.com> - 1.0.1-1
+* Thu Feb 15 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
+- Added dist-tag conditionals.
+
+* Mon Jan 09 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
 - Removed --without options.
 - Removed dynamic generation of language-related directory names.
 - Added dependency on a specific verion of rudiments.
