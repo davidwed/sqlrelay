@@ -46,11 +46,27 @@ Command line clients for accessing databases via SQL Relay.
 
 
 %package cachemanager
-License: GPLv2
+License: GPLv2 with exceptions
 Summary: SQL Relay client-side result-set cache manager
 
 %description cachemanager
 SQL Relay client-side result-set cache manager
+
+
+%package common
+License: GPLv2 with exceptions
+Summary: Components used by SQL Relay client-side and server-side programs
+
+%description common
+Components used by SQL Relay client-side and server-side programs.
+
+
+%package common-devel
+License: GPLv2 with exceptions
+Summary: Development files for SQL Relay common components.
+
+%description common-devel
+Development files for SQL Relay common components.
 
 
 %package c++
@@ -491,7 +507,6 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver.so.*
-%{_libdir}/libsqlrutil.so.*
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrconfig_*
 %{_libexecdir}/%{name}/sqlrfilter_*
@@ -564,10 +579,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrtrigger.h
 %{_includedir}/%{name}/private/sqlrtriggers.h
 %{_includedir}/%{name}/private/sqlruserpasswordcredentials.h
-%{_includedir}/%{name}/sqlrutil.h
-%{_includedir}/%{name}/private/sqlrutilincludes.h
 %{_libdir}/libsqlrserver.so
-%{_libdir}/libsqlrutil.so
 %exclude %{_libdir}/lib*.la
 
 %postun server-devel
@@ -595,6 +607,14 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %preun cachemanager
 %systemd_preun %{name}cachemanager.service
+
+%files common
+%{_libdir}/libsqlrutil.so.*
+
+%files common-devel
+%{_includedir}/%{name}/sqlrutil.h
+%{_includedir}/%{name}/private/sqlrutilincludes.h
+%{_libdir}/libsqlrutil.so
 
 %files c++
 %{_libdir}/libsqlrclient.so.*
