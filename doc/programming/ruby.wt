@@ -1206,6 +1206,80 @@ Second page:
 }}}
 }}}
 
+For result-set caching to be effective, the sqlr-cachemanager process must be enabled and running on the client system.  The sqlr-cachemanager scans the cache periodically and deletes cached result sets whos ttl's have expired.  If it is not running, stale result sets persist beyond their intended ttl's.
+
+To enable the sqlr-cachemanager at boot on systemd platforms:
+
+{{{#!blockquote
+{{{#!code
+systemctl enable sqlrcachemanager.service
+}}}
+}}}
+
+To start the sqlr-cachemanager on systemd platforms:
+
+{{{#!blockquote
+{{{#!code
+systemctl start sqlrcachemanager.service
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on most non-systemd platforms, you must create a symlink into the /etc/rc2.d or /etc/rc3.d directory.  Eg:
+
+{{{#!blockquote
+{{{#!code
+cd /etc/rc2.d
+ln -s ../init.d/sqlrcachemanager S15sqlrcachemanager
+}}}
+
+or
+
+{{{#!code
+cd /etc/rc3.d
+ln -s ../init.d/sqlrcachemanager S15sqlrcachemanager
+}}}
+}}}
+
+To start the sqlr-cachemanager on most non-systemd platforms:
+
+{{{#!blockquote
+{{{#!code
+/etc/init.d/sqlrcachemanager start
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on !FreeBSD platforms, edit /etc/rc.conf and add a line like:
+
+{{{#!blockquote
+{{{#!code
+sqlrcachemanager_enable=YES
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on !NetBSD platforms, edit /etc/rc.conf and add a line like:
+
+{{{#!blockquote
+{{{#!code
+sqlrcachemanager=YES
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on !OpenBSD platforms, edit /etc/rc.conf and add a line like:
+
+{{{#!blockquote
+{{{#!code
+sqlrcachemanager_flags=YES
+}}}
+}}}
+
+To start the sqlr-cachemanager on BSD platforms:
+
+{{{#!blockquote
+{{{#!code
+/etc/init.d/sqlrcachemanager start
+}}}
+}}}
+
 
 [=#suspending]
 == Suspending and Resuming Sessions ==

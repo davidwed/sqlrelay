@@ -2106,68 +2106,153 @@ just open the file for each page of the report.</p>
 <p>First page:</p>
 
 <blockquote>
-  <p><PRE>
-<FONT color=#6a5acd>&lt;?</FONT></p>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">&lt;?</font>
+     $con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+     $cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
 
-  <blockquote>
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-<B><FONT color=#a52a2a>...</FONT></B> generate a unique file name <B><FONT color=#a52a2a>...</FONT></B>
-  </blockquote>
-  <blockquote>
-sqlrcur_cacheToFile<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>,</FONT><FONT color=#008b8b>filename</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcur_setCacheTtl<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<FONT color=#ff00ff>600</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
-sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcur_cacheOff<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-<B><FONT color=#a52a2a>...</FONT></B> pass the filename to the next page <B><FONT color=#a52a2a>...</FONT></B>
-  </blockquote>
-  <blockquote>
-sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-<FONT color=#6a5acd>?&gt;</FONT>
-</PRE>
+     <font color="#990000">...</font> generate a unique <font color="#008080">file</font> name <font color="#990000">...</font>
+
+     <b><font color="#000000">sqlrcur_cacheToFile</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font>filename<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcur_setCacheTtl</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font><font color="#993399">600</font><font color="#990000">);</font>
+     <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcur_cacheOff</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font>
+
+     <font color="#990000">...</font> pass the filename to the <font color="#008080">next</font> page <font color="#990000">...</font>
+
+     <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+<font color="#990000">?&gt;</font>
+</tt></pre>
+
 </blockquote>
 <p>Second page:</p>
 
 <blockquote>
-  <p><PRE>
-<FONT color=#6a5acd>&lt;?</FONT></p>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">&lt;?</font>
+     <font color="#990000">...</font> get the filename from the <font color="#008080">previous</font> page <font color="#990000">...</font>
 
-  <blockquote>
-<B><FONT color=#a52a2a>...</FONT></B> get the filename from the previous page <B><FONT color=#a52a2a>...</FONT></B>
-  </blockquote>
-  <blockquote>
-<B><FONT color=#a52a2a>...</FONT></B> get the page to display from the previous page <B><FONT color=#a52a2a>...</FONT></B>
-  </blockquote>
-  <blockquote>
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-sqlrcur_openCachedResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,filename<FONT color=#6a5acd>)</FONT>;
-sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-<B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>=$</FONT></B><FONT color=#008b8b>pagetodisplay</FONT><B><FONT color=#a52a2a>*</FONT></B><FONT color=#ff00ff>20</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>&lt;</FONT></B><FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>pagetodisplay</FONT><B><FONT color=#a52a2a>+</FONT></B><FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT><B><FONT color=#a52a2a>*</FONT></B><FONT color=#ff00ff>20</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
-<B><FONT color=#a52a2a>for</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>=</FONT></B><FONT color=#ff00ff>0</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>&lt;</FONT></B>sqlrcur_colCount<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>; <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><B><FONT color=#a52a2a>++</FONT></B><FONT color=#6a5acd>)</FONT> <FONT color=#6a5acd>{</FONT>
-<FONT color=#008b8b>echo</FONT> sqlrcur_getField<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>row</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>col</FONT><FONT color=#6a5acd>)</FONT>;
-<FONT color=#008b8b>echo</FONT> &quot;<FONT color=#ff00ff>,</FONT>&quot;;
-<FONT color=#6a5acd>}</FONT>
-<FONT color=#008b8b>echo</FONT> &quot;<FONT color=#6a5acd>\n</FONT>&quot;;
-<FONT color=#6a5acd>}</FONT>
-  </blockquote>
-  <blockquote>
-sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-<FONT color=#6a5acd>?&gt;</FONT>
-</PRE>
+     <font color="#990000">...</font> get the page to display from the <font color="#008080">previous</font> page <font color="#990000">...</font>
+
+     $con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+     $cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+
+     <b><font color="#000000">sqlrcur_openCachedResultSet</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font>filename<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+
+     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>$row<font color="#990000">=</font>$pagetodisplay<font color="#990000">*</font><font color="#993399">20</font><font color="#990000">;</font> $row<font color="#990000">&lt;(</font>$pagetodisplay<font color="#990000">+</font><font color="#993399">1</font><font color="#990000">)*</font><font color="#993399">20</font><font color="#990000">;</font> $row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+             <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>$col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> $col<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font> $col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                     <font color="#008080">echo</font> <b><font color="#000000">sqlrcur_getField</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font>$row<font color="#990000">,</font>$col<font color="#990000">);</font>
+                     echo <font color="#FF0000">","</font><font color="#990000">;</font>
+             <font color="#FF0000">}</font>
+             echo <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">;</font>
+     <font color="#FF0000">}</font>
+
+     <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+<font color="#990000">?&gt;</font>
+</tt></pre>
+
+</blockquote>
+<p>For result-set caching to be effective, the sqlr-cachemanager process must be enabled and running on the client system.  The sqlr-cachemanager scans the cache periodically and deletes cached result sets whos ttl's have expired.  If it is not running, stale result sets persist beyond their intended ttl's.</p>
+
+<p>To enable the sqlr-cachemanager at boot on systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">enable</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">start</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on most non-systemd platforms, you must create a symlink into the /etc/rc2.d or /etc/rc3.d directory.  Eg:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc2<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
+
+  <p>or</p>
+
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc3<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on most non-systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on FreeBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_enable<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on NetBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on OpenBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_flags<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on BSD platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
 </blockquote>
 <br/><a name="suspending"/><h2>Suspending and Resuming Sessions</h2>
 
@@ -2178,56 +2263,52 @@ is possible.</p>
 <p>First page:</p>
 
 <blockquote>
-  <p><PRE>
-<FONT color=#6a5acd>&lt;?</FONT></p>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">&lt;?</font>
+     $con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+     $cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
 
-  <blockquote>
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
-sqlrcur_suspendResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcon_suspendSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rs</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_getResultSetId<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_getConnectionPort<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_getConnectionSocket<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-<B><FONT color=#a52a2a>...</FONT></B> pass the rs, port <B><FONT color=#a52a2a>and</FONT></B> socket to the <FONT color=#008b8b>next</FONT> page <B><FONT color=#a52a2a>...</FONT></B>
-  </blockquote>
-  <blockquote>
-sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-<FONT color=#6a5acd>?&gt;</FONT>
-</PRE>
+     <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font><font color="#FF0000">"insert into my_table values (1,2,3)"</font><font color="#990000">);</font>
+     <b><font color="#000000">sqlrcur_suspendResultSet</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_suspendSession</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+     $rs<font color="#990000">=</font><b><font color="#000000">sqlrcur_getResultSetId</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font>
+     $port<font color="#990000">=</font><b><font color="#000000">sqlrcon_getConnectionPort</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+     $socket<font color="#990000">=</font><b><font color="#000000">sqlrcon_getConnectionSocket</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+
+     <font color="#990000">...</font> pass <font color="#008080">the</font> rs<font color="#990000">,</font> port and socket to the <font color="#008080">next</font> page <font color="#990000">...</font>
+
+     <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+<font color="#990000">?&gt;</font>
+</tt></pre>
+
 </blockquote>
 <p>Second page:</p>
 
 <blockquote>
-  <p><PRE>
-<FONT color=#6a5acd>&lt;?</FONT></p>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">&lt;?</font>
+     <font color="#990000">...</font> <font color="#008080">get</font> rs<font color="#990000">,</font> port and socket from <font color="#008080">previous</font> page <font color="#990000">...</font>
 
-  <blockquote>
-<B><FONT color=#a52a2a>...</FONT></B> get rs, port <B><FONT color=#a52a2a>and</FONT></B> socket from previous page <B><FONT color=#a52a2a>...</FONT></B>
-  </blockquote>
-  <blockquote>
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
-<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-sqlrcon_resumeSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcur_resumeResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>rs</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>commit</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
-sqlrcon_endSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-  <blockquote>
-sqlrcur_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><FONT color=#6a5acd>)</FONT>;
-sqlrcon_free<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
-  </blockquote>
-<FONT color=#6a5acd>?&gt;</FONT>
-</PRE>
+     $con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+     $cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+
+     <b><font color="#000000">sqlrcon_resumeSession</font></b><font color="#990000">(</font>$con<font color="#990000">,</font>$port<font color="#990000">,</font>$socket<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcur_resumeResultSet</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font>$rs<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>$cur<font color="#990000">,</font><font color="#FF0000">"commit"</font><font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+
+     <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>$cur<font color="#990000">);</font>
+     <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>$con<font color="#990000">);</font>
+<font color="#990000">?&gt;</font>
+</tt></pre>
+
 </blockquote>
 <p>You can also distribute the processing of a result set across a series of
 pages using suspended sessions.  If you're buffering a result set in chunks
