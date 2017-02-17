@@ -45,6 +45,14 @@ Summary: Command line clients for accessing databases via SQL Relay
 Command line clients for accessing databases via SQL Relay.
 
 
+%package cachemanager
+License: GPLv2
+Summary: SQL Relay client-side result-set cache manager
+
+%description cachemanager
+SQL Relay client-side result-set cache manager
+
+
 %package c++
 License: LGPLv2
 Summary: The SQL Relay C++ client library
@@ -462,11 +470,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %post
 /sbin/ldconfig
 %systemd_post %{name}.service
-%systemd_post %{name}cachemanager.service
 
 %preun
 %systemd_preun %{name}.service
-%systemd_preun %{name}cachemanager.service
 
 %postun
 /sbin/ldconfig
@@ -478,8 +484,6 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_sysconfdir}/%{name}.conf.d
 %{_sysconfdir}/%{name}.xsd
 %{_unitdir}/%{name}.service
-%{_unitdir}/sqlrcachemanager.service
-%{_bindir}/sqlr-cachemanager
 %{_bindir}/sqlr-listener
 %{_bindir}/sqlr-connection
 %{_bindir}/sqlr-scaler
@@ -500,7 +504,6 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libexecdir}/%{name}/sqlrresultsettranslation_*
 %{_libexecdir}/%{name}/sqlrschedule_*
 %{_libexecdir}/%{name}/sqlrtranslation_*
-%{_mandir}/*/sqlr-cachemanager.*
 %{_mandir}/*/sqlr-listener.*
 %{_mandir}/*/sqlr-connection.*
 %{_mandir}/*/sqlr-scaler.*
@@ -508,7 +511,6 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_mandir}/*/sqlr-stop.*
 %{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
-%attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir /run/%{name}
 %{_tmpfilesdir}/%{name}.conf
@@ -581,6 +583,18 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %{_mandir}/*/sqlr-export.*
 %{_mandir}/*/sqlr-import.*
 %{_mandir}/*/sqlr-status.*
+
+%files cachemanager
+%{_unitdir}/sqlrcachemanager.service
+%{_bindir}/sqlr-cachemanager
+%{_mandir}/*/sqlr-cachemanager.*
+%attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
+
+%post cachemanager
+%systemd_post %{name}cachemanager.service
+
+%preun cachemanager
+%systemd_preun %{name}cachemanager.service
 
 %files c++
 %{_libdir}/libsqlrclient.so.*
@@ -817,8 +831,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Thu Feb 16 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
+* Fri Feb 17 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
 - Added fedora dist-tag conditionals.
+- Split sqlr-cachemanager into its own package.
 
 * Mon Jan 09 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
 - Removed --without options.
