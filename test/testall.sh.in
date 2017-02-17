@@ -72,12 +72,12 @@ do
 		echo "pinging $DB..."
 		if ( test "$DB" = "tls" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/client.pem -tlsca $PREFIX/etc/ca.pem -tlsvalidate ca -command ping`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/client.pem -tlsca $PREFIX/etc/ca.pem -tlsvalidate ca -command ping 2>&1`
 		elif ( test "$DB" = "extensions" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping 2>&1`
 		else
-			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping`
+			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping 2>&1`
 		fi
 
 		# (this collapses whitespace)
