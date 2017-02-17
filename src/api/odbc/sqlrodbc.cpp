@@ -3039,12 +3039,12 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		}
 	}
 
-	// set the row that will be copied out
-	// during the next call to SQLGetData
-	stmt->currentgetdatarow=stmt->currentstartrow;
-
 	// update column binds (if we have any)
 	if (stmt->fieldlist.getList()->getLength()) {
+
+		// we'll use SQLR_SQLGetData below to copy out data, so set the
+		// row that will be copied out during the next call to that
+		stmt->currentgetdatarow=stmt->currentstartrow;
 
 		uint32_t	colcount=stmt->cur->colCount();
 		for (uint64_t row=0; row<rowstofetch; row++) {
@@ -3083,20 +3083,30 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 			// bump currentgetdatarow
 			stmt->currentgetdatarow++;
 		}
-
-		// reset currentgetdatarow
-		stmt->currentgetdatarow=stmt->currentstartrow;
 	}
 
-	// move on to the next rowset
+	// update the various row indices
 	stmt->currentstartrow=stmt->currentfetchrow;
 	stmt->currentfetchrow=stmt->currentfetchrow+rowsfetched;
+	stmt->currentgetdatarow=stmt->currentstartrow;
 
-	// At this point, currentgetdatarow will be set to the first row of
-	// this block of rows.  This may not seem correct, but it is.  This
-	// allows SQLGetData to be used to re-fetch fields, starting with the
-	// first one in the row.  SQLSetPos can be used to fields from the
-	// other rows.
+	debugPrintf("  currentstartrow  : %lld\n",stmt->currentstartrow);
+	debugPrintf("  currentfetchrow  : %lld\n",stmt->currentfetchrow);
+	debugPrintf("  currentgetdatarow: %lld\n",stmt->currentgetdatarow);
+
+	// At this point:
+	//
+	// currentstartrow is set to the index of the first row of this block
+	// of rows.
+	//
+	// currentfetchrow is set to the index of the first row of the next
+	// block of rows.
+	//
+	// currentgetdatarow is also set to the index of the first row of this
+	// block of rows.  This may not seem correct, but it is.  This allows
+	// SQLGetData to be used to re-fetch fields, starting with the first
+	// one in the row.  SQLSetPos can be used to get fields from the other
+	// rows.
 
 	return fetchresult;
 }
