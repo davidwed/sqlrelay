@@ -432,16 +432,16 @@ make
 %install
 make install DESTDIR=%{buildroot}
 
-%if 0%{?fedora} || 0%{?rhel} >= 7
-# move systemd files to (_unitdir)
-mkdir -p %{buildroot}%{_unitdir}
-mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
-%else
+%if 0%{?rhel} <= 7
 # move init files to rc.d/init.d
 mkdir -p %{buildroot}/etc/rc.d/init.d
 mv %{buildroot}/etc/init.d/sqlrelay %{buildroot}%{_initddir}/sqlrelay
 mv %{buildroot}/etc/init.d/sqlrcachemanager %{buildroot}%{_initddir}/sqlrcachemanager
 rmdir %{buildroot}/etc/init.d
+%else
+# move systemd files to (_unitdir)
+mkdir -p %{buildroot}%{_unitdir}
+mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
 %endif
 
 # create tmpfiles.d directories and config file
