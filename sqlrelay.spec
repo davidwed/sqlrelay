@@ -853,7 +853,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %changelog
 * Fri Feb 17 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
 - Added fedora dist-tag conditionals.
-- Split some components into sqlrelay-cachemanager and sqlrelay-common packages.
+- Created sqlrelay-cachemanager subpackage.
+- Created sqlrelay-common and sqlrelay-common-devel subpackages.
 
 * Mon Jan 09 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
 - Removed --without options.
