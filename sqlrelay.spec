@@ -1,6 +1,7 @@
 %{!?tcl_version: %global tcl_version %(echo 'puts $tcl_version' | tclsh)}
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
+# define some macros that might not already be defined
 %if 0%{?rhel} <= 6
 %define ruby_vendorarchdir %{_libdir}/ruby/vendor_ruby
 %endif
@@ -101,10 +102,9 @@ ODBC driver for SQL Relay.
 License: Artistic
 Summary: Perl bindings for the SQL Relay client API
 %if 0%{?fedora}
-BuildRequires: perl-generators, perl, perl-devel
-%else
-BuildRequires: perl, perl-devel
+BuildRequires: perl-generators
 %endif
+BuildRequires: perl, perl-devel
 
 %description -n perl-%{name}
 Perl bindings for the SQL Relay client API.
@@ -114,10 +114,9 @@ Perl bindings for the SQL Relay client API.
 License: Artistic
 Summary: Perl DBI driver for SQL Relay
 %if 0%{?fedora}
-BuildRequires: perl-generators, perl, perl-devel
-%else
-BuildRequires: perl, perl-devel
+BuildRequires: perl-generators
 %endif
+BuildRequires: perl, perl-devel
 Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 
 %description -n perl-DBD-%{name}
@@ -851,7 +850,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Thu Feb 15 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
+* Thu Feb 16 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
 - Added dist-tag conditionals.
 
 * Mon Jan 09 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
