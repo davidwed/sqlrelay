@@ -351,6 +351,7 @@ STATICPLUGINLIBS =
 SERVERCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D SQLRSERVER_EXPORTS
 LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib
 SERVERLIBS = /LIBPATH:./ lib$(SQLR)server.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+CACHEMANAGERLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 
 # plugins

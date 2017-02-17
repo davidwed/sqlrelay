@@ -661,6 +661,7 @@ endif
 SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
 LIBSQLRSERVERLIBS = -L$(top_builddir)/src/util -l$(SQLR)util
 SERVERLIBS = -L./ -l$(SQLR)server $(STATICPLUGINLIBS) -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CACHEMANAGERLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
 	SERVERLIBS += -R $(libdir)

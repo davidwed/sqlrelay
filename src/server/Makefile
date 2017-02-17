@@ -113,7 +113,7 @@ $(SQLR)-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-scaler.$(OBJ) $(SERVERLIBS)
 
 $(SQLR)-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(SERVERLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(CACHEMANAGERLIBS)
 
 $(SQLR)-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) $(SERVERLIBS)

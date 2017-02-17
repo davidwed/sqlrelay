@@ -88,6 +88,10 @@ sqlr-start -id example
 }}}
 }}}
 
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+}}}
+
 It can be accessed locally using:
 
 {{{#!blockquote
@@ -144,7 +148,7 @@ The number of connections determines how many client applications can access the
 
 
 {{{#!blockquote
-'''NOTE:''' Any number of connections may be configured, up to an "absolute max connections" limit defined at compile-time, which defaults to 4096.  To find the limit on your system, run:
+( '''NOTE:''' Any number of connections may be configured, up to an "absolute max connections" limit defined at compile-time, which defaults to 4096.  To find the limit on your system, run:
 
 {{{#!blockquote
 {{{
@@ -152,7 +156,7 @@ sqlr-start -abs-max-connections
 }}}
 }}}
 
-The command above also returns the "shmmax requirement" for the configuration.  "shmmax" refers to the maximum size of a single shared memory segment, a tunable kernel parameter on most systems.  The default shmmax requirement is about 5mb.  On modern systems, shmmax defaults to at least 32mb, but on older systems it commonly defaulted to 512k.  In any case, if the shmmax requirement exceeds the value of your system's shmmax parameter, then you will have to reconfigure the parameter before SQL Relay will start successfully.   This may be done at runtime on most modern systems, but on older systems you may have to reconfigure and rebuild the kernel, and reboot.
+The command above also returns the "shmmax requirement" for the configuration.  "shmmax" refers to the maximum size of a single shared memory segment, a tunable kernel parameter on most systems.  The default shmmax requirement is about 5mb.  On modern systems, shmmax defaults to at least 32mb, but on older systems it commonly defaulted to 512k.  In any case, if the shmmax requirement exceeds the value of your system's shmmax parameter, then you will have to reconfigure the parameter before SQL Relay will start successfully.   This may be done at runtime on most modern systems, but on older systems you may have to reconfigure and rebuild the kernel, and reboot.)
 }}}
 
 [=#dbconnections-performance]
@@ -181,7 +185,7 @@ SQL Relay maintains persistent cursors as well as connections.  By default, each
 Any number of cursors can be opened.  A good rule of thumb is to open as few as possible, but as many as you know that your application will need.
 
 {{{#!blockquote
-'''NOTE:''' The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open additional cursors on-demand, up to 5.  This is because it is common for an app to run at least one level of nested queries.  For example, it is common to run a select and then run an insert, update, or delete for each row in the result set.  Unfortunately, it is also not uncommon for apps to just manage cursors poorly.  So, SQL Relay's default configuration offers a bit of flexibility to accommodate these circumstances.  See the next section on Dynamic Scaling for more information about configuring connections and cursors to scale up and down on-demand.
+( '''NOTE:''' The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open additional cursors on-demand, up to 5.  This is because it is common for an app to run at least one level of nested queries.  For example, it is common to run a select and then run an insert, update, or delete for each row in the result set.  Unfortunately, it is also not uncommon for apps to just manage cursors poorly.  So, SQL Relay's default configuration offers a bit of flexibility to accommodate these circumstances.  See the next section on Dynamic Scaling for more information about configuring connections and cursors to scale up and down on-demand.)
 }}}
 
 
@@ -663,6 +667,10 @@ sqlr-start -id db2example
 }}}
 }}}
 
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+}}}
+
 ...and accessed using:
 
 {{{#!blockquote
@@ -802,6 +810,10 @@ sqlr-start -id oracleexample -config dir:///home/myuser/sqlrelay.conf.d
 }}}
 }}}
 
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+}}}
+
 (the file:// prefix is optional when specifying a file, but the dir:// prefix must be included when specifying a directory)
 
 The -config option may also be used to specify a comma-separated list of files or directories.
@@ -814,6 +826,10 @@ sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/s
 sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/sqlrelay-2.conf,dir:///home/myuser/sqlrelay.conf.d
 sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/sqlrelay-2.conf,dir:///home/myuser/sqlrelay-1.conf.d,dir:///home/myuser/sqlrelay-2.conf.d
 }}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 Files and directories are processed in the order that they are specified.
@@ -844,7 +860,9 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 }}}
 
 {{{#!blockquote
-'''NOTE:''' The https and scp examples only work if Rudiments was compiled with support for libcurl.
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+[[br]][[br]]
+( '''NOTE:''' The https and scp examples only work if Rudiments was compiled with support for libcurl.)
 }}}
 
 In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.
@@ -1018,6 +1036,10 @@ sqlr-start -id router
 }}}
 }}}
 
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+}}}
+
 Client applications should connect to the router instance rather than the master or slave instances.
 
 {{{#!blockquote
@@ -1086,11 +1108,9 @@ To enable database auth, omit the list of user/passwords and configure authtier=
 }}}
 
 {{{#!blockquote
-'''NOTE:''' Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.
-}}}
-
-{{{#!blockquote
-'''NOTE:''' Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.
+( '''NOTE:''' Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.)
+[[br]][[br]]
+( '''NOTE:''' Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
 }}}
 
 [[br]][=#proxiedauth]
@@ -1111,7 +1131,7 @@ To enable proxied auth, omit the list of user/passwords and configure authtier="
 }}}
 
 {{{#!blockquote
-'''NOTE:''' Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.
+( '''NOTE:''' Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.)
 }}}
 
 [[br]][=#krb]
@@ -1151,6 +1171,10 @@ If those criteria are met, starting the Kerberized instance of SQL Relay is the 
 {{{
 sqlr-start -id example
 }}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 To access the instance, you must acquire a Kerberos ticket-granting ticket.  On a Linux or Unix system, this typically involves running //kinit//, though a fully Kerberized environment may acquire this during login.  On a Windows system, you must log in as an Active Directory domain user.
@@ -1223,6 +1247,10 @@ To start the instance on a Linux or Unix system, you must be logged in as a user
 {{{
 sqlr-start -id example
 }}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 The instance may be accessed as follows:
@@ -1345,9 +1373,11 @@ In addition to [#krb Kerberos and Active Directory Encryption and Authentication
 [[br]][=#runas]
 === Run-As User and Group ===
 
-By default, the SQL Relay server runs as whatever user runs sqlr-start.  On unix and linux systems, the root user generally runs all init scripts.  As such, when started at boot, by default, the SQL Relay server also runs as root.
+When a non-root user runs sqlr-start, the SQL Relay server runs as that user and as the primary group of that user.
 
-However, when run as root, the runasuser and runasgroup attributes can be used to control what user and group the SQL Relay server runs as.
+When root runs sqlr-start, the SQL Relay server runs as a more secure user and group, usually nobody/nobody when built from source, or sqlrelay/sqlrelay when installed from packages.
+
+However, the runasuser and runasgroup attributes can be used to control what user and group the SQL Relay server runs as.
 
 {{{#!blockquote
 {{{#!code
@@ -1355,7 +1385,12 @@ However, when run as root, the runasuser and runasgroup attributes can be used t
 }}}
 }}}
 
-Be sure that whatever user/group SQL Relay is configured to run as has permissions to read all configuration files, including any database configuration files such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file.  Otherwise various things will fail, including dynamic scaling.
+There are several important considerations when setting runasuser/runasgroup:
+
+* runasuser is only effective if sqlr-start is run as root.
+* runasgroup only effective if sqlr-start is run by a member of the group, or by root.
+* All SQL Relay configuration files, and any appropriate database configuration files (such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file) must be readable by the runasuser/runasgroup.  Otherwise various things will fail, most notably, dynamic scaling.
+* SQL Relay must be able to write to "run" and "log" directories.  However, when installed from RPM packages, the /var/run/sqlrelay and /var/log/sqlrelay directories are owned by sqlrelay/sqlrelay and have fairly restrictive 755 permissions.  Thus, the permissions on these directories must be manually changed if runasuser or runasgroup are set to any value other than "sqlrelay".  This is not an issue if SQL Relay is built from source, and is not an issue on Windows.
 
 
 [[br]][=#deniedallowedips]
