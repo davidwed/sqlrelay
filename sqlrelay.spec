@@ -1,11 +1,6 @@
 %{!?tcl_version: %global tcl_version %(echo 'puts $tcl_version' | tclsh)}
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
-# define some macros that might not already be defined
-%if 0%{?rhel} <= 6
-%define ruby_vendorarchdir %{_libdir}/ruby/vendor_ruby
-%endif
-
 Name: sqlrelay
 Version: 1.0.1
 Release: 1%{?dist}
@@ -15,13 +10,8 @@ License: GPLv2 with exceptions
 URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
-%if 0%{?fedora} || 0%{?rhel} >= 7
 %{?systemd_requires}
-%endif
-BuildRequires: rudiments-devel >= 1.0.3
-%if 0%{?fedora} || 0%{?rhel} >= 7
-BuildRequires: systemd
-%endif
+BuildRequires: rudiments-devel >= 1.0.3, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -199,9 +189,7 @@ PHP PDO driver for SQL Relay.
 %package -n java-%{name}
 License: LGPLv2
 Summary: Java bindings for the SQL Relay client API
-%if 0%{?fedora} || 0%{?rhel} >= 7
 BuildRequires: java-devel
-%endif
 Requires: java-headless, javapackages-tools
 
 %description -n java-%{name}
@@ -215,7 +203,7 @@ BuildRequires: tcl-devel
 %if 0%{?fedora}
 Requires: tcl(abi) = 8.6
 %else
-Requires: tcl
+Requires: tcl(abi) = 8.5
 %endif
 
 %description -n tcl-%{name}
@@ -405,11 +393,7 @@ API documentation for SQL Relay.
 
 
 %prep
-%if 0%{?rhel} <= 6
-%setup -q
-%else
 %autosetup -p1
-%endif
 
 %build
 %configure --disable-static \
@@ -432,17 +416,9 @@ make
 %install
 make install DESTDIR=%{buildroot}
 
-%if 0%{?rhel} <= 7
-# move init files to rc.d/init.d
-mkdir -p %{buildroot}/etc/rc.d/init.d
-mv %{buildroot}/etc/init.d/sqlrelay %{buildroot}%{_initddir}/sqlrelay
-mv %{buildroot}/etc/init.d/sqlrcachemanager %{buildroot}%{_initddir}/sqlrcachemanager
-rmdir %{buildroot}/etc/init.d
-%else
 # move systemd files to (_unitdir)
 mkdir -p %{buildroot}%{_unitdir}
 mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
-%endif
 
 # create tmpfiles.d directories and config file
 mkdir -p %{buildroot}/run/%{name}
@@ -485,35 +461,24 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 %post
 /sbin/ldconfig
-%if 0%{?fedora} || 0%{?rhel} >= 7
 %systemd_post %{name}.service
 %systemd_post %{name}cachemanager.service
-%endif
 
 %preun
-%if 0%{?fedora} || 0%{?rhel} >= 7
 %systemd_preun %{name}.service
 %systemd_preun %{name}cachemanager.service
-%endif
 
 %postun
 /sbin/ldconfig
-%if 0%{?fedora} || 0%{?rhel} >= 7
 %systemd_postun_with_restart %{name}.service
-%endif
 rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %files
 %{_sysconfdir}/%{name}.conf.d
 %{_sysconfdir}/%{name}.xsd
-%if 0%{?fedora} || 0%{?rhel} >= 7
 %{_unitdir}/%{name}.service
 %{_unitdir}/sqlrcachemanager.service
-%else
-%{_initddir}/sqlrelay
-%{_initddir}/sqlrcachemanager
-%endif
 %{_bindir}/sqlr-cachemanager
 %{_bindir}/sqlr-listener
 %{_bindir}/sqlr-connection
@@ -546,9 +511,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/cache/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir /run/%{name}
-%if 0%{?fedora} || 0%{?rhel} >= 7
 %{_tmpfilesdir}/%{name}.conf
-%endif
 %exclude %{_libdir}/lib*.la
 %if 0%{?fedora}
 %license COPYING
@@ -855,7 +818,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %changelog
 * Thu Feb 16 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
-- Added dist-tag conditionals.
+- Added fedora dist-tag conditionals.
 
 * Mon Jan 09 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
 - Removed --without options.
