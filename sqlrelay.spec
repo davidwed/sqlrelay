@@ -19,7 +19,7 @@ Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 %endif
 BuildRequires: rudiments-devel >= 1.0.3
 %if 0%{?fedora} || 0%{?rhel} >= 7
-BuildRequires: systemd}
+BuildRequires: systemd
 %endif
 
 %description
