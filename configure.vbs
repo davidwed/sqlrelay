@@ -55,6 +55,7 @@ NODEJSPREFIX=""
 SQLR="sqlr"
 SQLRELAY="sqlrelay"
 SQL_RELAY="SQL Relay"
+ABS_MAXCONNECTIONS="4096"
 
 if WScript.Arguments.Count>0 then
 	if Wscript.Arguments.Item(0)="--help" then
@@ -868,6 +869,8 @@ end if
 infiles=Array(_
 	"config_windows.mk",_
 	configwindowsh,_
+	"src\\common\\defines.h.in",_
+	"src\\server\\sqlrelay\\private\\sqlrshm.h.in",_
 	"bin\\sqlrclient-config.in",_
 	"bin\\sqlrclientwrapper-config.in",_
 	"bin\\sqlrserver-config.in",_
@@ -877,6 +880,8 @@ infiles=Array(_
 outfiles=Array(_
 	"config.mk",_
 	"config.h",_
+	"src\\common\\defines.h",_
+	"src\\server\\sqlrelay\\private\\sqlrshm.h",_
 	"bin\\sqlrclient-config",_
 	"bin\\sqlrclientwrapper-config",_
 	"bin\\sqlrserver-config",_
@@ -1039,6 +1044,9 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@SQLR@",SQLR,1,-1,0)
 	content=replace(content,"@SQLRELAY@",SQLRELAY,1,-1,0)
 	content=replace(content,"@SQL_RELAY@",SQL_RELAY,1,-1,0)
+
+	' max connections
+	content=replace(content,"@ABS_MAXCONNECTIONS@",ABS_MAXCONNECTIONS,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)
