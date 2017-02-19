@@ -982,38 +982,49 @@ ERLANGBUILD="no "
 MONOBUILD="no "
 NODEJSBUILD="no "
 ODBCDRIVERBUILD="no "
+TESTAPIS=""
 if ( test -n "$ENABLE_CPP" ); then
 	CPPBUILD="yes"
+	TESTAPIS="$TESTAPIS c c++"
 fi
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
+	TESTAPIS="$TESTAPIS perl perldbi"
 fi
 if ( test -n "$HAVE_PYTHON" ); then
 	PYTHONBUILD="yes"
+	TESTAPIS="$TESTAPIS python pythondb"
 fi
 if ( test -n "$HAVE_RUBY" ); then
 	RUBYBUILD="yes"
+	TESTAPIS="$TESTAPIS ruby"
 fi
 if ( test -n "$HAVE_PHP" ); then
 	PHPBUILD="yes"
+	TESTAPIS="$TESTAPIS php"
 fi
 if ( test -n "$HAVE_PHP_PDO" ); then
 	PHPPDOBUILD="yes"
+	TESTAPIS="$TESTAPIS phppdo"
 fi
 if ( test -n "$HAVE_JAVA" ); then
 	JAVABUILD="yes"
+	TESTAPIS="$TESTAPIS java"
 fi
 if ( test -n "$HAVE_TCL" ); then
 	TCLBUILD="yes"
+	TESTAPIS="$TESTAPIS tcl"
 fi
 if ( test -n "$HAVE_ERLANG" ); then
 	ERLANGBUILD="yes"
 fi
 if ( test -n "$HAVE_MONO" ); then
 	MONOBUILD="yes"
+	TESTAPIS="$TESTAPIS cs"
 fi
 if ( test -n "$HAVE_NODEJS" ); then
 	NODEJSBUILD="yes"
+	TESTAPIS="$TESTAPIS nodejs"
 fi
 if ( test -n "$ENABLE_ODBC_DRIVER" ); then
 	ODBCDRIVERBUILD="yes"
@@ -1138,9 +1149,10 @@ if ( test -n "$ENABLE_ROUTER" ); then
 	TESTDBS="$TESTDBS router"
 fi
 AC_SUBST(TESTDBS)
+AC_SUBST(TESTAPIS)
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config
@@ -1148,6 +1160,7 @@ chmod 755 bin/sqlrserver-config
 chmod 755 init/rc.sqlrelay
 chmod 755 init/rc.sqlrcachemanager
 chmod 755 test/testall.sh
+chmod 755 test/test.sh
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
 mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
