@@ -40,4 +40,4 @@ clean:
 	$(RM) sqlr-*.*.bt sybinit.err
 
 tests: all
-	$(THISDIR)testall$(SCRIPTEXT)
+	$(SCRIPTINT) $(THISDIR)testall$(SCRIPTEXT)

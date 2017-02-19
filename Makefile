@@ -98,8 +98,9 @@ distclean: clean
 		sqlrelay-c++.pc \
 		src/api/cs/SQLRClient/SQLRClient.suo \
 		test/testall.sh \
-		test/testall.bat \
-		test/test.sh
+		test/testall.vbs \
+		test/test.sh \
+		test/test.vbs
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \

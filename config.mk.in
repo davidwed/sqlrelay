@@ -38,6 +38,7 @@ THISDIR = ./
 
 
 # script extension
+SCRIPTINT =
 SCRIPTEXT = .sh
 
 

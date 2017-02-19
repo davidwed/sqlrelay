@@ -37,7 +37,8 @@ THISDIR =
 
 
 # script extension
-SCRIPTEXT = .bat
+SCRIPTINT = cscript /nologo
+SCRIPTEXT = .vbs
 
 
 # slash
