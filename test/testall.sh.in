@@ -6,6 +6,12 @@ PREFIX=@prefix@
 $PREFIX/bin/sqlr-stop
 sleep 2
 
+# really kill them
+kill `ps aux | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
+kill `ps aux | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
+kill `ps aux | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+sleep 2
+
 # for each database/configuration...
 for DB in  @TESTDBS@
 do
