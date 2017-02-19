@@ -126,7 +126,12 @@ do
 		echo "hit enter to continue or ctrl-c to stop..."
 		if ( test "$DB" = "krb" )
 		then
-			read -t 20 PROMPT
+			read -t 20 PROMPT 2> /dev/null
+			# (ubuntu's dash doesn't support read -t)
+			if ( test "$?" != "0" )
+			then
+				read PROMPT
+			fi
 		else
 			read PROMPT
 		fi

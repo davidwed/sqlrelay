@@ -37,7 +37,7 @@ clean:
 	cd ruby $(AND) $(MAKE) clean
 	cd stress $(AND) $(MAKE) clean
 	cd tcl $(AND) $(MAKE) clean
-	$(RM) sqlr-*.*.bt
+	$(RM) sqlr-*.*.bt sybinit.err
 
 tests: all
 	$(THISDIR)testall$(SCRIPTEXT)
