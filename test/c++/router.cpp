@@ -302,6 +302,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testreal"),8);
 	checkSuccess(cur->getColumnLength(3),2);
 	checkSuccess(cur->getColumnLength("testsmallint"),2);
+	// not reliable... some mysql client return the number of bytes
+	// rather than chars, which can be 3 times the number of chars if
+	// the db supports multibyte characters
 	//checkSuccess(cur->getColumnLength(4),40);
 	//checkSuccess(cur->getColumnLength("testchar"),40);
 	//checkSuccess(cur->getColumnLength(5),41);
