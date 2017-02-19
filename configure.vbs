@@ -977,6 +977,7 @@ end if
 
 ' truncate the trailing comma
 TESTDBS=left(TESTDBS,len(TESTDBS)-1)
+TESTAPIS=left(TESTAPIS,len(TESTAPIS)-1)
 
 ' input and output files
 infiles=Array(_

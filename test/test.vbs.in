@@ -17,23 +17,23 @@ set fso=CreateObject("Scripting.FileSystemObject")
 ' create shell object
 set WshShell=WScript.CreateObject("WScript.Shell")
 
-for each lang in Array("c","c++","cs","java","nodejs","perl","perldbi","php","phppdo","python","pythondb","ruby","tcl")
-	if runtest(lang)=false then
+for each api in Array(@TESTAPIS@)
+	if runtest(api)=false then
 		exit for
 	end if
 next
 
-function runtest(lang)
+function runtest(api)
 
 	retval=true
 
-	WScript.echo("testing in " & lang)
+	WScript.echo("testing in " & api)
 	WScript.echo("")
-	WshShell.CurrentDirectory=lang 
+	WshShell.CurrentDirectory=api 
 
 	TEST=""
 	TESTFILE=""
-	select case lang
+	select case api
 		case "c"
 			TEST=db & ".exe"
 			TESTFILE=db & ".exe"
@@ -83,7 +83,7 @@ function runtest(lang)
 		if cmd.ExitCode=1 then
 			WScript.echo("")
 			WScript.echo("")
-			WScript.echo(db & " failed in " & lang)
+			WScript.echo(db & " failed in " & api)
 			WScript.StdIn.ReadLine()
 			retval=false
 		else
@@ -91,7 +91,7 @@ function runtest(lang)
 			WScript.echo("test complete")
 		end if
 	else
-		WScript.echo("no test found for " & db & " in " & lang)
+		WScript.echo("no test found for " & db & " in " & api)
 	end if
 
 	WScript.echo("")
