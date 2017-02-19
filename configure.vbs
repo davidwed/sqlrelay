@@ -874,6 +874,7 @@ infiles=Array(_
 	"bin\\sqlrclient-config.in",_
 	"bin\\sqlrclientwrapper-config.in",_
 	"bin\\sqlrserver-config.in",_
+	"test\\testall.bat.in",_
 	"sqlrelay-c.pc.in",_
 	"sqlrelay-c++.pc.in"_
 	)
@@ -885,6 +886,7 @@ outfiles=Array(_
 	"bin\\sqlrclient-config",_
 	"bin\\sqlrclientwrapper-config",_
 	"bin\\sqlrserver-config",_
+	"test\\testall.bat",_
 	"sqlrelay-c.pc",_
 	"sqlrelay-c++.pc"_
 	)

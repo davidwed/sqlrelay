@@ -632,6 +632,7 @@ ac_includes_default="\
 ac_default_prefix=/usr/local/firstworks
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+TESTDBS
 abs_builddir
 abs_srcdir
 STATICLINK
@@ -34667,7 +34668,183 @@ then
 fi
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
+
+CMDLINEBUILD="no "
+if ( test -n "$ENABLE_CMDLINE" ); then
+	CMDLINEBUILD="yes"
+fi
+
+CPPBUILD="no "
+PERLBUILD="no "
+PYTHONBUILD="no "
+RUBYBUILD="no "
+PHPBUILD="no "
+PHPPDOBUILD="no "
+JAVABUILD="no "
+TCLBUILD="no "
+ERLANGBUILD="no "
+MONOBUILD="no "
+NODEJSBUILD="no "
+ODBCDRIVERBUILD="no "
+if ( test -n "$ENABLE_CPP" ); then
+	CPPBUILD="yes"
+fi
+if ( test -n "$HAVE_PERL" ); then
+	PERLBUILD="yes"
+fi
+if ( test -n "$HAVE_PYTHON" ); then
+	PYTHONBUILD="yes"
+fi
+if ( test -n "$HAVE_RUBY" ); then
+	RUBYBUILD="yes"
+fi
+if ( test -n "$HAVE_PHP" ); then
+	PHPBUILD="yes"
+fi
+if ( test -n "$HAVE_PHP_PDO" ); then
+	PHPPDOBUILD="yes"
+fi
+if ( test -n "$HAVE_JAVA" ); then
+	JAVABUILD="yes"
+fi
+if ( test -n "$HAVE_TCL" ); then
+	TCLBUILD="yes"
+fi
+if ( test -n "$HAVE_ERLANG" ); then
+	ERLANGBUILD="yes"
+fi
+if ( test -n "$HAVE_MONO" ); then
+	MONOBUILD="yes"
+fi
+if ( test -n "$HAVE_NODEJS" ); then
+	NODEJSBUILD="yes"
+fi
+if ( test -n "$ENABLE_ODBC_DRIVER" ); then
+	ODBCDRIVERBUILD="yes"
+fi
+
+MYSQLDIBUILD="no    "
+POSTGRESQLDIBUILD="no    "
+if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
+	MYSQLDIBUILD="yes   "
+fi
+if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
+	POSTGRESQLDIBUILD="yes   "
+fi
+
+ORACLEBUILD="no        "
+MYSQLBUILD="no        "
+POSTGRESQLBUILD="no        "
+SQLITEBUILD="no        "
+FREETDSBUILD="no        "
+SYBASEBUILD="no        "
+ODBCBUILD="no        "
+DB2BUILD="no        "
+FIREBIRDBUILD="no        "
+MDBTOOLSBUILD="no        "
+INFORMIXBUILD="no        "
+ROUTERBUILD="no        "
+TESTDBS=""
+if ( test -n "$ORACLEVERSION" ); then
+	ORACLEBUILD="dynamic   "
+	if ( test -n "$ORACLESTATIC" ); then
+		ORACLEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS oracle tls krb extensions"
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		ORACLEBUILD="at-runtime"
+	fi
+fi
+if ( test -n "$MYSQLLIBS" ); then
+	MYSQLBUILD="dynamic   "
+	if ( test -n "$MYSQLSTATIC" ); then
+		MYSQLBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS mysql"
+fi
+if ( test -n "$POSTGRESQLLIBS" ); then
+	POSTGRESQLBUILD="dynamic   "
+	if ( test -n "$POSTGRESQLSTATIC" ); then
+		POSTGRESQLBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS postgresql"
+fi
+if ( test -n "$SQLITELIBS" ); then
+	SQLITEBUILD="dynamic   "
+	if ( test -n "$SQLITESTATIC" ); then
+		SQLITEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS sqlite"
+fi
+if ( test -n "$FREETDSLIBS" ); then
+	FREETDSBUILD="dynamic   "
+	if ( test -n "$FREETDSSTATIC" ); then
+		FREETDSBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS freetds"
+fi
+if ( test -n "$SYBASELIBS" ); then
+	SYBASEBUILD="dynamic   "
+	if ( test -n "$SYBASESTATIC" ); then
+		SYBASEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS sap"
+else
+	if ( test -n "$ENABLE_SYBASE" ); then
+		SYBASEBUILD="at-runtime"
+	fi
+fi
+if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
+	ODBCBUILD="dynamic   "
+	if ( test -n "$ODBCSTATIC" ); then
+		ODBCBUILD="static    "
+	fi
+fi
+if ( test -n "$DB2LIBS" ); then
+	DB2BUILD="dynamic   "
+	if ( test -n "$DB2STATIC" ); then
+		DB2BUILD="static    "
+	fi
+	TESTDBS="$TESTDBS db2"
+else
+	if ( test -n "$ENABLE_DB2" ); then
+		DB2BUILD="at-runtime"
+	fi
+fi
+if ( test -n "$FIREBIRDLIBS" ); then
+	FIREBIRDBUILD="dynamic   "
+	if ( test -n "$FIREBIRDSTATIC" ); then
+		FIREBIRDBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS firebird"
+fi
+if ( test -n "$MDBTOOLSLIBS" ); then
+	MDBTOOLSBUILD="dynamic   "
+	if ( test -n "$MDBTOOLSSTATIC" ); then
+		MDBTOOLSBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS mdbtools"
+fi
+if ( test -n "$INFORMIXLIBS" ); then
+	INFORMIXBUILD="dynamic   "
+	if ( test -n "$INFORMIXSTATIC" ); then
+		INFORMIXBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS informix"
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		INFORMIXBUILD="at-runtime"
+	fi
+fi
+if ( test -n "$ENABLE_ROUTER" ); then
+	ROUTERBUILD="yes"
+	TESTDBS="$TESTDBS router"
+fi
+
+
+
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF
@@ -37066,6 +37243,7 @@ chmod 755 bin/sqlrclientwrapper-config
 chmod 755 bin/sqlrserver-config
 chmod 755 init/rc.sqlrelay
 chmod 755 init/rc.sqlrcachemanager
+chmod 755 test/testall.sh
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
 mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
@@ -37074,71 +37252,15 @@ sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$lib
 sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
 
 
-
 echo
 echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
 echo
 echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
-
-CMDLINEBUILD="no "
-if ( test -n "$ENABLE_CMDLINE" ); then
-	CMDLINEBUILD="yes"
-fi
-
 echo
 echo " Command Line : Clients     $CMDLINEBUILD"
 echo
-
-CPPBUILD="no "
-PERLBUILD="no "
-PYTHONBUILD="no "
-RUBYBUILD="no "
-PHPBUILD="no "
-PHPPDOBUILD="no "
-JAVABUILD="no "
-TCLBUILD="no "
-ERLANGBUILD="no "
-MONOBUILD="no "
-NODEJSBUILD="no "
-ODBCDRIVERBUILD="no "
-if ( test -n "$ENABLE_CPP" ); then
-	CPPBUILD="yes"
-fi
-if ( test -n "$HAVE_PERL" ); then
-	PERLBUILD="yes"
-fi
-if ( test -n "$HAVE_PYTHON" ); then
-	PYTHONBUILD="yes"
-fi
-if ( test -n "$HAVE_RUBY" ); then
-	RUBYBUILD="yes"
-fi
-if ( test -n "$HAVE_PHP" ); then
-	PHPBUILD="yes"
-fi
-if ( test -n "$HAVE_PHP_PDO" ); then
-	PHPPDOBUILD="yes"
-fi
-if ( test -n "$HAVE_JAVA" ); then
-	JAVABUILD="yes"
-fi
-if ( test -n "$HAVE_TCL" ); then
-	TCLBUILD="yes"
-fi
-if ( test -n "$HAVE_ERLANG" ); then
-	ERLANGBUILD="yes"
-fi
-if ( test -n "$HAVE_MONO" ); then
-	MONOBUILD="yes"
-fi
-if ( test -n "$HAVE_NODEJS" ); then
-	NODEJSBUILD="yes"
-fi
-if ( test -n "$ENABLE_ODBC_DRIVER" ); then
-	ODBCDRIVERBUILD="yes"
-fi
 echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
@@ -37146,125 +37268,15 @@ echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERB
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
 echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
 echo
-
-
-MYSQLDIBUILD="no    "
-POSTGRESQLDIBUILD="no    "
-if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
-	MYSQLDIBUILD="yes   "
-fi
-if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
-	POSTGRESQLDIBUILD="yes   "
-fi
 echo " Drop-In Replacement Libraries:"
 echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
 echo
-
-
-ORACLEBUILD="no        "
-MYSQLBUILD="no        "
-POSTGRESQLBUILD="no        "
-SQLITEBUILD="no        "
-FREETDSBUILD="no        "
-SYBASEBUILD="no        "
-ODBCBUILD="no        "
-DB2BUILD="no        "
-FIREBIRDBUILD="no        "
-MDBTOOLSBUILD="no        "
-INFORMIXBUILD="no        "
-ROUTERBUILD="no        "
-if ( test -n "$ORACLEVERSION" ); then
-	ORACLEBUILD="dynamic   "
-	if ( test -n "$ORACLESTATIC" ); then
-		ORACLEBUILD="static    "
-	fi
-else
-	if ( test -n "$ENABLE_ORACLE" ); then
-		ORACLEBUILD="at-runtime"
-	fi
-fi
-if ( test -n "$MYSQLLIBS" ); then
-	MYSQLBUILD="dynamic   "
-	if ( test -n "$MYSQLSTATIC" ); then
-		MYSQLBUILD="static    "
-	fi
-fi
-if ( test -n "$POSTGRESQLLIBS" ); then
-	POSTGRESQLBUILD="dynamic   "
-	if ( test -n "$POSTGRESQLSTATIC" ); then
-		POSTGRESQLBUILD="static    "
-	fi
-fi
-if ( test -n "$SQLITELIBS" ); then
-	SQLITEBUILD="dynamic   "
-	if ( test -n "$SQLITESTATIC" ); then
-		SQLITEBUILD="static    "
-	fi
-fi
-if ( test -n "$FREETDSLIBS" ); then
-	FREETDSBUILD="dynamic   "
-	if ( test -n "$FREETDSSTATIC" ); then
-		FREETDSBUILD="static    "
-	fi
-fi
-if ( test -n "$SYBASELIBS" ); then
-	SYBASEBUILD="dynamic   "
-	if ( test -n "$SYBASESTATIC" ); then
-		SYBASEBUILD="static    "
-	fi
-else
-	if ( test -n "$ENABLE_SYBASE" ); then
-		SYBASEBUILD="at-runtime"
-	fi
-fi
-if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
-	ODBCBUILD="dynamic   "
-	if ( test -n "$ODBCSTATIC" ); then
-		ODBCBUILD="static    "
-	fi
-fi
-if ( test -n "$DB2LIBS" ); then
-	DB2BUILD="dynamic   "
-	if ( test -n "$DB2STATIC" ); then
-		DB2BUILD="static    "
-	fi
-else
-	if ( test -n "$ENABLE_DB2" ); then
-		DB2BUILD="at-runtime"
-	fi
-fi
-if ( test -n "$FIREBIRDLIBS" ); then
-	FIREBIRDBUILD="dynamic   "
-	if ( test -n "$FIREBIRDSTATIC" ); then
-		FIREBIRDBUILD="static    "
-	fi
-fi
-if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic   "
-	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static    "
-	fi
-fi
-if ( test -n "$INFORMIXLIBS" ); then
-	INFORMIXBUILD="dynamic   "
-	if ( test -n "$INFORMIXSTATIC" ); then
-		INFORMIXBUILD="static    "
-	fi
-else
-	if ( test -n "$ENABLE_ORACLE" ); then
-		INFORMIXBUILD="at-runtime"
-	fi
-fi
-if ( test -n "$ENABLE_ROUTER" ); then
-	ROUTERBUILD="yes"
-fi
 echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
 echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
 echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
 echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
-
 echo "*************************************************************"
 echo
 echo "If you expected a Database or API that doesn't show up in the Summary"

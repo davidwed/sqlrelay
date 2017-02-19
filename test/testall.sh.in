@@ -7,7 +7,7 @@ $PREFIX/bin/sqlr-stop
 sleep 2
 
 # for each database/configuration...
-for DB in  firebird freetds informix mdbtools mysql oracle tls krb extensions postgresql sqlite sap router db2
+for DB in  @TESTDBS@
 do
 
 	# for tls, krb, and extensions tests, verify that we support oracle

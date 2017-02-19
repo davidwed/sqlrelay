@@ -96,7 +96,9 @@ distclean: clean
 		libtool.gcc \
 		sqlrelay-c.pc \
 		sqlrelay-c++.pc \
-		src/api/cs/SQLRClient/SQLRClient.suo
+		src/api/cs/SQLRClient/SQLRClient.suo \
+		test/testall.sh \
+		test/testall.bat \
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \

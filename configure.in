@@ -964,38 +964,11 @@ then
 fi
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
-AC_OUTPUT($MAKELIST)
-chmod 755 bin/sqlrclient-config
-chmod 755 bin/sqlrclientwrapper-config
-chmod 755 bin/sqlrserver-config
-chmod 755 init/rc.sqlrelay
-chmod 755 init/rc.sqlrcachemanager
-sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
-mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
-sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
-mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
-sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
-sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
-
-
-
-dnl Summary.
-echo
-echo "***** Summary ***********************************************"
-
-echo " Version      : $SQLR_VERSION"
-echo
-echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
 
 CMDLINEBUILD="no "
 if ( test -n "$ENABLE_CMDLINE" ); then
 	CMDLINEBUILD="yes"
 fi
-
-echo
-echo " Command Line : Clients     $CMDLINEBUILD"
-echo
 
 CPPBUILD="no "
 PERLBUILD="no "
@@ -1045,14 +1018,6 @@ fi
 if ( test -n "$ENABLE_ODBC_DRIVER" ); then
 	ODBCDRIVERBUILD="yes"
 fi
-echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
-echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
-echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
-echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERBUILD"
-echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
-echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
-echo
-
 
 MYSQLDIBUILD="no    "
 POSTGRESQLDIBUILD="no    "
@@ -1062,10 +1027,6 @@ fi
 if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
 	POSTGRESQLDIBUILD="yes   "
 fi
-echo " Drop-In Replacement Libraries:"
-echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
-echo
-
 
 ORACLEBUILD="no        "
 MYSQLBUILD="no        "
@@ -1079,11 +1040,13 @@ FIREBIRDBUILD="no        "
 MDBTOOLSBUILD="no        "
 INFORMIXBUILD="no        "
 ROUTERBUILD="no        "
+TESTDBS=""
 if ( test -n "$ORACLEVERSION" ); then
 	ORACLEBUILD="dynamic   "
 	if ( test -n "$ORACLESTATIC" ); then
 		ORACLEBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS oracle tls krb extensions"
 else
 	if ( test -n "$ENABLE_ORACLE" ); then
 		ORACLEBUILD="at-runtime"
@@ -1094,30 +1057,35 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS mysql"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
 		POSTGRESQLBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS postgresql"
 fi
 if ( test -n "$SQLITELIBS" ); then
 	SQLITEBUILD="dynamic   "
 	if ( test -n "$SQLITESTATIC" ); then
 		SQLITEBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS sqlite"
 fi
 if ( test -n "$FREETDSLIBS" ); then
 	FREETDSBUILD="dynamic   "
 	if ( test -n "$FREETDSSTATIC" ); then
 		FREETDSBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS freetds"
 fi
 if ( test -n "$SYBASELIBS" ); then
 	SYBASEBUILD="dynamic   "
 	if ( test -n "$SYBASESTATIC" ); then
 		SYBASEBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS sap"
 else
 	if ( test -n "$ENABLE_SYBASE" ); then
 		SYBASEBUILD="at-runtime"
@@ -1134,6 +1102,7 @@ if ( test -n "$DB2LIBS" ); then
 	if ( test -n "$DB2STATIC" ); then
 		DB2BUILD="static    "
 	fi
+	TESTDBS="$TESTDBS db2"
 else
 	if ( test -n "$ENABLE_DB2" ); then
 		DB2BUILD="at-runtime"
@@ -1144,18 +1113,21 @@ if ( test -n "$FIREBIRDLIBS" ); then
 	if ( test -n "$FIREBIRDSTATIC" ); then
 		FIREBIRDBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS firebird"
 fi
 if ( test -n "$MDBTOOLSLIBS" ); then
 	MDBTOOLSBUILD="dynamic   "
 	if ( test -n "$MDBTOOLSSTATIC" ); then
 		MDBTOOLSBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS mdbtools"
 fi
 if ( test -n "$INFORMIXLIBS" ); then
 	INFORMIXBUILD="dynamic   "
 	if ( test -n "$INFORMIXSTATIC" ); then
 		INFORMIXBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS informix"
 else
 	if ( test -n "$ENABLE_ORACLE" ); then
 		INFORMIXBUILD="at-runtime"
@@ -1163,14 +1135,53 @@ else
 fi
 if ( test -n "$ENABLE_ROUTER" ); then
 	ROUTERBUILD="yes"
+	TESTDBS="$TESTDBS router"
 fi
+AC_SUBST(TESTDBS)
+
+
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh"
+AC_OUTPUT($MAKELIST)
+chmod 755 bin/sqlrclient-config
+chmod 755 bin/sqlrclientwrapper-config
+chmod 755 bin/sqlrserver-config
+chmod 755 init/rc.sqlrelay
+chmod 755 init/rc.sqlrcachemanager
+chmod 755 test/testall.sh
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
+mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
+mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
+sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
+sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
+
+
+dnl Summary.
+echo
+echo "***** Summary ***********************************************"
+
+echo " Version      : $SQLR_VERSION"
+echo
+echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
+echo
+echo " Command Line : Clients     $CMDLINEBUILD"
+echo
+echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
+echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
+echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
+echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERBUILD"
+echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
+echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
+echo
+echo " Drop-In Replacement Libraries:"
+echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
+echo
 echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
 echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
 echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
 echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
-
 echo "*************************************************************"
 echo
 echo "If you expected a Database or API that doesn't show up in the Summary"
