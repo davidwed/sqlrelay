@@ -490,8 +490,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// set unix socket filename (for suspended/resumed sessions)
 	pvt->_unixsocket.append(pvt->_pth->getSocketsDir())->
-					append(process::getProcessId())->
-					append(".sock");
+				append((uint32_t)process::getProcessId())->
+				append(".sock");
 
 	if (!createSharedMemoryAndSemaphores(pvt->_cmdl->getId())) {
 		return false;

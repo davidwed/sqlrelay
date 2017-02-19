@@ -130,7 +130,7 @@ do
 			# (ubuntu's dash doesn't support read -t)
 			if ( test "$?" != "0" )
 			then
-				read PROMPT
+				sleep 20
 			fi
 		else
 			read PROMPT
