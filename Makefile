@@ -99,8 +99,7 @@ distclean: clean
 		src/api/cs/SQLRClient/SQLRClient.suo \
 		test/testall.sh \
 		test/testall.vbs \
-		test/test.sh \
-		test/test.vbs
+		test/test.sh
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \

@@ -989,7 +989,6 @@ infiles=Array(_
 	"bin\\sqlrclientwrapper-config.in",_
 	"bin\\sqlrserver-config.in",_
 	"test\\testall.vbs.in",_
-	"test\\test.vbs.in",_
 	"sqlrelay-c.pc.in",_
 	"sqlrelay-c++.pc.in"_
 	)
@@ -1002,7 +1001,6 @@ outfiles=Array(_
 	"bin\\sqlrclientwrapper-config",_
 	"bin\\sqlrserver-config",_
 	"test\\testall.vbs",_
-	"test\\test.vbs",_
 	"sqlrelay-c.pc",_
 	"sqlrelay-c++.pc"_
 	)
