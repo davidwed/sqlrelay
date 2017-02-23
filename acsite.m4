@@ -2050,12 +2050,12 @@ $GLIBC23HACKCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],
 			SYBASELIBSPATH=""
 			SYBASESTATIC=""
 		fi
+	fi
 
-		if ( test -z "$SYBASELIBS" )
-		then
-			AC_MSG_WARN(SAP/Sybase support will not be built.)
-			ENABLE_SYBASE=""
-		fi
+	if ( test -z "$SYBASELIBS" )
+	then
+		AC_MSG_WARN(SAP/Sybase support will not be built.)
+		ENABLE_SYBASE=""
 	fi
 
 	FW_INCLUDES(sybase,[$SYBASEINCLUDES])

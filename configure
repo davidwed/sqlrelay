@@ -25491,13 +25491,13 @@ $as_echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 			SYBASELIBSPATH=""
 			SYBASESTATIC=""
 		fi
+	fi
 
-		if ( test -z "$SYBASELIBS" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SAP/Sybase support will not be built." >&5
+	if ( test -z "$SYBASELIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SAP/Sybase support will not be built." >&5
 $as_echo "$as_me: WARNING: SAP/Sybase support will not be built." >&2;}
-			ENABLE_SYBASE=""
-		fi
+		ENABLE_SYBASE=""
 	fi
 
 
