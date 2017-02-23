@@ -33,6 +33,7 @@
 	sqlr-cachemanager is no longer enabled at boot by default
 	fixed another subtle bug in the ODBC driver that caused the first row
 		to be duplicated if columns were not bound
+	added --disable-wall and --disable-werror configure options
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

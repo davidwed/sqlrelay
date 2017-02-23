@@ -299,36 +299,40 @@ AC_SUBST(FPIC)
 dnl checks to see if -Werror option works or not
 AC_DEFUN([FW_CHECK_WERROR],
 [
-
-AC_MSG_CHECKING(for -Werror)
-FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Werror],[],[],[WERROR="-Werror"],[WERROR=""])
-
-dnl if -Werror appers to be supported...
-if ( test -n "$WERROR" )
+WERROR=""
+if ( test "$ENABLE_WERROR" = "yes" )
 then
 
-	dnl disable -Werror with gcc < 2.7 because
-	dnl it misinterprets placement new
-	CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+	AC_MSG_CHECKING(for -Werror)
+	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Werror],[],[],[WERROR="-Werror"])
 
-	dnl Newer versions of gcc output the version differently
-	dnl and the above results in "g+".  These all work correctly.
-	if ( test "$CXX_VERSION" != "g+" )
+	dnl if -Werror appers to be supported...
+	if ( test -n "$WERROR" )
 	then
-		dnl older versions output something like 27, 28, 29, etc.
-		if (  test "$CXX_VERSION" -lt "27" )
+
+		dnl disable -Werror with gcc < 2.7 because
+		dnl it misinterprets placement new
+		CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+
+		dnl Newer versions of gcc output the version differently
+		dnl and the above results in "g+".  These all work correctly.
+		if ( test "$CXX_VERSION" != "g+" )
 		then
-			WERROR=""
+			dnl older versions output something like 27, 28, 29, etc.
+			if (  test "$CXX_VERSION" -lt "27" )
+			then
+				WERROR=""
+			fi
 		fi
+
 	fi
 
-fi
-
-if ( test -n "$WERROR" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
+	if ( test -n "$WERROR" )
+	then
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
 fi
 AC_SUBST(WERROR)
 ])
@@ -337,26 +341,31 @@ AC_SUBST(WERROR)
 dnl checks to see if -Wall option works or not
 AC_DEFUN([FW_CHECK_WALL],
 [
-AC_MSG_CHECKING(for -Wall)
-FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wall],[],[],[WALL="-Wall"],[WALL=""])
-if ( test -n "$WALL" )
+WALL=""
+if ( test "$ENABLE_WALL" = "yes" )
 then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
+	AC_MSG_CHECKING(for -Wall)
+	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wall],[],[],[WALL="-Wall"])
+	if ( test -n "$WALL" )
+	then
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
 
-if ( test -n "$WALL" )
-then
-	dnl Sometimes -Wall includes -Wunused-variables and -Wunused-parameters
-	dnl which we don't care about.  Disable it if it does.
-	OLDCPPFLAGS=$CPPFLAGS
-	CPPFLAGS="$WALL $WERROR $CPPFLAGS"
-	AC_MSG_CHECKING(whether -Wall includes -Wunused-*)
-	AC_TRY_COMPILE([void f(int a) { return; }],[f(1);],AC_MSG_RESULT(no),WALL=""; AC_MSG_RESULT(yes))	
-	CPPFLAGS=$OLDCPPFLAGS
+	if ( test -n "$WALL" )
+	then
+		dnl Sometimes -Wall includes -Wunused-variables and
+		dnl -Wunused-parameters which we don't care about.  Disable it
+		dnl if it does.
+		OLDCPPFLAGS=$CPPFLAGS
+		CPPFLAGS="$WALL $WERROR $CPPFLAGS"
+		AC_MSG_CHECKING(whether -Wall includes -Wunused-*)
+		AC_TRY_COMPILE([void f(int a) { return; }],[f(1);],AC_MSG_RESULT(no),WALL=""; AC_MSG_RESULT(yes))	
+		CPPFLAGS=$OLDCPPFLAGS
+	fi
 fi
-
+	
 AC_SUBST(WALL)
 ])
 

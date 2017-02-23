@@ -925,6 +925,8 @@ enable_small_code
 enable_debug
 enable_profiling
 enable_fortify
+enable_wall
+enable_werror
 enable_server
 enable_client
 enable_cmdline
@@ -1668,6 +1670,8 @@ Optional Features:
   --enable-debug                compile with -g option
   --enable-profiling            compile with -pg options
   --enable-fortify              compile with various gcc fortification options
+  --disable-wall          compile without -Wall, even if supported
+  --disable-werror        compile without -Werror, even if supported
   --disable-server              Don't build any SQL Relay server components
   --disable-client              Don't build any SQL Relay client components
   --disable-cmdline             Don't build any SQL Relay command line client programs
@@ -2733,6 +2737,20 @@ if test "${enable_fortify+set}" = set; then :
   enableval=$enable_fortify; CFLAGS="$CFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"
 else
   CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
+fi
+
+# Check whether --enable-wall was given.
+if test "${enable_wall+set}" = set; then :
+  enableval=$enable_wall; ENABLE_WALL=""
+else
+  ENABLE_WALL="yes"
+fi
+
+# Check whether --enable-werror was given.
+if test "${enable_werror+set}" = set; then :
+  enableval=$enable_werror; ENABLE_WERROR=""
+else
+  ENABLE_WERROR="yes"
 fi
 
 
@@ -17094,8 +17112,11 @@ fi
 
 
 
+WERROR=""
+if ( test "$ENABLE_WERROR" = "yes" )
+then
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Werror" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Werror" >&5
 $as_echo_n "checking for -Werror... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -17118,8 +17139,6 @@ printf("hello");
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   WERROR="-Werror"
-else
-  WERROR=""
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -17129,33 +17148,37 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-if ( test -n "$WERROR" )
-then
-
-			CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
-
-			if ( test "$CXX_VERSION" != "g+" )
+		if ( test -n "$WERROR" )
 	then
-				if (  test "$CXX_VERSION" -lt "27" )
+
+						CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+
+						if ( test "$CXX_VERSION" != "g+" )
 		then
-			WERROR=""
+						if (  test "$CXX_VERSION" -lt "27" )
+			then
+				WERROR=""
+			fi
 		fi
+
 	fi
 
-fi
-
-if ( test -n "$WERROR" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$WERROR" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+	fi
 fi
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wall" >&5
+WALL=""
+if ( test "$ENABLE_WALL" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wall" >&5
 $as_echo_n "checking for -Wall... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -17178,8 +17201,6 @@ printf("hello");
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   WALL="-Wall"
-else
-  WALL=""
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -17188,22 +17209,22 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-if ( test -n "$WALL" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$WALL" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-fi
+	fi
 
-if ( test -n "$WALL" )
-then
-			OLDCPPFLAGS=$CPPFLAGS
-	CPPFLAGS="$WALL $WERROR $CPPFLAGS"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -Wall includes -Wunused-*" >&5
+	if ( test -n "$WALL" )
+	then
+								OLDCPPFLAGS=$CPPFLAGS
+		CPPFLAGS="$WALL $WERROR $CPPFLAGS"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -Wall includes -Wunused-*" >&5
 $as_echo_n "checking whether -Wall includes -Wunused-*... " >&6; }
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 void f(int a) { return; }
 int
@@ -17222,7 +17243,8 @@ else
 $as_echo "yes" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-	CPPFLAGS=$OLDCPPFLAGS
+		CPPFLAGS=$OLDCPPFLAGS
+	fi
 fi
 
 

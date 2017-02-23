@@ -18,6 +18,14 @@ AC_ARG_ENABLE(fortify,
 	[  --enable-fortify              compile with various gcc fortification options],
 	CFLAGS="$CFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong",
 	CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS")
+AC_ARG_ENABLE(wall,
+	[  --disable-wall          compile without -Wall, even if supported],
+	ENABLE_WALL="",
+	ENABLE_WALL="yes")
+AC_ARG_ENABLE(werror,
+	[  --disable-werror        compile without -Werror, even if supported],
+	ENABLE_WERROR="",
+	ENABLE_WERROR="yes")
 
 CFLAGS="$SMALLCODE $CFLAGS"
 CXXFLAGS="$SMALLCODE $CXXFLAGS"
