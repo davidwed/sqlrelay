@@ -19509,6 +19509,7 @@ fi
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Oracle support will not be built." >&5
 $as_echo "$as_me: WARNING: Oracle support will not be built." >&2;}
+		ENABLE_ORACLE=""
 	fi
 
 
@@ -25495,6 +25496,7 @@ $as_echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SAP/Sybase support will not be built." >&5
 $as_echo "$as_me: WARNING: SAP/Sybase support will not be built." >&2;}
+			ENABLE_SYBASE=""
 		fi
 	fi
 
@@ -29525,6 +29527,7 @@ export LD_LIBRARY_PATH
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 support will not be built." >&5
 $as_echo "$as_me: WARNING: DB2 support will not be built." >&2;}
+		ENABLE_DB2=""
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -29661,6 +29664,7 @@ fi
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Informix support will not be built." >&5
 $as_echo "$as_me: WARNING: Informix support will not be built." >&2;}
+		ENABLE_INFORMIX=""
 	fi
 
 
