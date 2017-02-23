@@ -1260,7 +1260,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
-		ORACLEATRUNTIME="yes"
+		AC_MSG_WARN(Oracle support will not be built.)
 	fi
 
 	AC_SUBST(ORACLEVERSION)
@@ -2052,7 +2052,7 @@ $GLIBC23HACKCODE],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],
 
 		if ( test -z "$SYBASELIBS" )
 		then
-			SYBASEATRUNTIME="yes"
+			AC_MSG_WARN(SAP/Sybase support will not be built.)
 		fi
 	fi
 
@@ -2415,7 +2415,7 @@ then
 
 	if ( test -z "$DB2LIBS" )
 	then
-		DB2ATRUNTIME="yes"
+		AC_MSG_WARN(DB2 support will not be built.)
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -2493,7 +2493,7 @@ then
 
 	if ( test -z "$INFORMIXLIBS" )
 	then
-		INFORMIXATRUNTIME="yes"
+		AC_MSG_WARN(Informix support will not be built.)
 	fi
 
 	FW_INCLUDES(informix,[$INFORMIXINCLUDES])

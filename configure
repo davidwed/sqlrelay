@@ -19507,7 +19507,8 @@ fi
 
 	if ( test -z "$ORACLELIBS" -o -n "$LINKFAIL" )
 	then
-		ORACLEATRUNTIME="yes"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Oracle support will not be built." >&5
+$as_echo "$as_me: WARNING: Oracle support will not be built." >&2;}
 	fi
 
 
@@ -25492,7 +25493,8 @@ $as_echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 
 		if ( test -z "$SYBASELIBS" )
 		then
-			SYBASEATRUNTIME="yes"
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SAP/Sybase support will not be built." >&5
+$as_echo "$as_me: WARNING: SAP/Sybase support will not be built." >&2;}
 		fi
 	fi
 
@@ -29521,7 +29523,8 @@ export LD_LIBRARY_PATH
 
 	if ( test -z "$DB2LIBS" )
 	then
-		DB2ATRUNTIME="yes"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 support will not be built." >&5
+$as_echo "$as_me: WARNING: DB2 support will not be built." >&2;}
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -29656,7 +29659,8 @@ fi
 
 	if ( test -z "$INFORMIXLIBS" )
 	then
-		INFORMIXATRUNTIME="yes"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Informix support will not be built." >&5
+$as_echo "$as_me: WARNING: Informix support will not be built." >&2;}
 	fi
 
 
