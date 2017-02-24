@@ -79,6 +79,8 @@ distclean: clean
 		config.log \
 		config.status \
 		config.mk \
+		src/common/defines.h \
+		src/server/sqlrelay/private/sqlrshm.h \
 		bin/sqlrclient-config \
 		bin/sqlrclientwrapper-config \
 		bin/sqlrserver-config \
@@ -94,7 +96,11 @@ distclean: clean
 		libtool.gcc \
 		sqlrelay-c.pc \
 		sqlrelay-c++.pc \
-		src/api/cs/SQLRClient/SQLRClient.suo
+		src/api/cs/SQLRClient/SQLRClient.suo \
+		test/testall.sh \
+		test/testall.vbs \
+		test/test.sh \
+		test/test.bat
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \

@@ -7,6 +7,15 @@
 /* Version of DB2 */
 #define DB2VERSION 8
 
+/* Load DB2 libraries at runtime. */
+/* #undef DB2_AT_RUNTIME */
+
+/* default group to run SQL Relay as */
+#define DEFAULT_RUNASGROUP "nobody"
+
+/* default user to run SQL Relay as */
+#define DEFAULT_RUNASUSER "nobody"
+
 /* Use dmalloc */
 #define DMALLOC 1
 
@@ -340,6 +349,9 @@
 /* Some iconv implementations use a const char ** parameter */
 /* #undef ICONV_CONST_CHAR */
 
+/* Load Informix libraries at runtime. */
+/* #undef INFORMIX_AT_RUNTIME */
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #define LT_OBJDIR ".libs/"
@@ -349,6 +361,9 @@
 
 /* Some versions of glibc-2.3 need a fixup */
 /* #undef NEED_REDHAT_9_GLIBC_2_3_2_HACK */
+
+/* Load Oracle libraries at runtime. */
+/* #undef ORACLE_AT_RUNTIME */
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT ""
@@ -406,6 +421,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
+
+/* Load SAP/Sybase libraries at runtime. */
+/* #undef SYBASE_AT_RUNTIME */
 
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef mode_t */

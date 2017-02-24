@@ -112,7 +112,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 		stdoutput.printf("failed to load password "
 				"encryption module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -125,10 +125,10 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 			(sqlrpwdenc *(*)(xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newPasswordEncryption) {
-		stdoutput.printf("failed to create password "
+		stdoutput.printf("failed to load password "
 				"encryption: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

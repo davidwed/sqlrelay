@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2015  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -8,7 +8,11 @@
 #include <defines.h>
 #include <config.h>
 
-#include <infxcli.h>
+#ifdef INFORMIX_AT_RUNTIME
+	#include "informixatruntime.cpp"
+#else
+	#include <infxcli.h>
+#endif
 
 // multi-row fetch doesn't work with clobs/blobs because you're already on a
 // different row when SQLGetData is called to get the data for the clob/blob
@@ -383,6 +387,13 @@ bool informixconnection::logIn(const char **error, const char **warning) {
 		*error="Failed to set LANG environment variable";
 		return false;
 	}
+
+	#ifdef INFORMIX_AT_RUNTIME
+	if (!loadLibraries(&errormessage)) {
+		*error=errormessage.getString();
+		return NULL;
+	}
+	#endif
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);

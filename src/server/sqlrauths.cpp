@@ -101,7 +101,7 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf("failed to load auth module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -120,9 +120,9 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 					xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newAuth) {
-		stdoutput.printf("failed to create auth: %s\n",module);
+		stdoutput.printf("failed to load auth: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

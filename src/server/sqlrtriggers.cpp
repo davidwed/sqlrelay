@@ -131,7 +131,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf("failed to load trigger module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -148,9 +148,9 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
-		stdoutput.printf("failed to create trigger: %s\n",module);
+		stdoutput.printf("failed to load trigger: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

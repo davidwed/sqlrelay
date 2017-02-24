@@ -15,6 +15,8 @@
 		}
 	}
 
+	try {
+
 	$host="sqlrelay";
 	$port=9000;
 	$socket="/tmp/test.socket";
@@ -941,5 +943,9 @@
 	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable"),0);
 	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable"),0);
 	echo("\n");
+
+	} catch (Exception $e) {
+		exit(1);
+	}
 
 ?></pre></html>

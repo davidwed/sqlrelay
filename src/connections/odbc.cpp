@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2015  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 // note that config.h must come first to avoid some macro redefinition warnings

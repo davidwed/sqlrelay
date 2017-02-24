@@ -7,7 +7,7 @@
 % API
 -export([start/0, start/1, stop/0]).
 
--export([alloc/7, connectionFree/0, cursorFree/0, enableKerberos/3, enableTls/7, endSession/0, suspendSession/0, resumeSession/2]).
+-export([alloc/7, connectionFree/0, cursorFree/0, enableKerberos/3, enableTls/7, disableEncryption/0, endSession/0, suspendSession/0, resumeSession/2]).
 -export([ping/0, identify/0, dbVersion/0, dbHostName/0, dbIpAddress/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
 -export([selectDatabase/1, getCurrentDatabase/0]).
 -export([getConnectionPort/0, getConnectionSocket/0]).
@@ -64,10 +64,13 @@
 %
 % Driver control functions
 %
+%% @hidden
 start() ->
     start("@SQLRELAY_PATH@/sqlrelay").
+%% @hidden
 start(ExtPrg) ->
     spawn_link(?MODULE, init, [ExtPrg]).
+%% @hidden
 stop() ->
 	case(get("cursor")) of 
 		"true" ->
@@ -88,307 +91,447 @@ stop() ->
 % API functions
 %
 
-% alloc function documentation...
+%% @doc Initiates a connection to "server" on "port" or to the unix "socket" on the local machine and auths with "user" and "password".  Failed connections will be retried for "tries" times, waiting "retrytime" seconds between each try.  If "tries" is 0 then retries will continue forever.  If "retrytime" is 0 then retries will be attempted on a default interval.  If the "socket" parameter is neither NULL nor "" then an attempt will be made to connect through it before attempting to connect to "server" on "port".  If it is NULL or "" then no attempt will be made to connect through the socket.
 alloc(Server, Port, Socket, User, Password, Retrytime, Tries) 
 	when is_list(Server), is_integer(Port), is_list(User), is_list(Password), is_integer(Retrytime), is_integer(Tries) -> 
 	put("connection", "true"),
 	call_port({alloc, Server, Port, Socket, User, Password, Retrytime, Tries}).
 
-ping() -> call_port({ping}).
-
+%% @doc Disconnects and ends the session if it hasn't been ended already.
 connectionFree() -> erase("connection"), call_port({connectionFree}).
 
+%% @doc Destroys the cursor and cleans up all associated result set data.
 cursorFree() -> erase("cursor"), call_port({cursorFree}).
 
+%% @doc <p>Enables Kerberos authentication and encryption.</p>  <p>"service" indicates the Kerberos service name of the SQL Relay server.  If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</p> <p>"mech" indicates the specific Kerberos mechanism to use. On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as:</p> <p>{ 1 2 840 113554 1 2 2 }</p><p>On Windows platforms, this should be a string like:</p><p>Kerberos</p><p>If left empty or NULL then the default mechanism will be used.  Only set this if you know that you have a good reason to.</p> <p>"flags" indicates what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used.  Only set this if you know that you have a good reason to.</p> <p>Valid flags include:</p> <ul><li>GSS_C_MUTUAL_FLAG</li><li>GSS_C_REPLAY_FLAG</li><li>GSS_C_SEQUENCE_FLAG</li><li>GSS_C_CONF_FLAG</li><li>GSS_C_INTEG_FLAG</li></ul> <p>For a full list of flags, consult the GSSAPI documentation, though note that only the flags listed above are supported on Windows.</p>
 enableKerberos(Service, Mech, Flags) -> call_port({enableKerberos, Service, Mech, Flags}).
 
+%% @doc <p>Enables TLS/SSL encryption, and optionally authentication.</p> <p>"version" specifies the TLS/SSL protocol version that the client will attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If left blank or empty then the highest supported version will be negotiated.</p> <p>"cert" is the file name of the certificate chain file to send to the SQL Relay server.  This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.</p> <p>If "cert" contains a password-protected private key, then "password" may be supplied to access it.  If the private key is not password-protected, then this argument is ignored, and may be left empty or NULL.</p> <p>"ciphers" is a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If "ciphers" is empty or NULL then a default set is used.  Only set this if you know that you have a good reason to.</p> <p> For a list of valid ciphers on Linux/Unix platforms, see:</p> <p>man ciphers</p> <p>For a list of valid ciphers on Windows platforms, see:</p> <p>https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx</p> <p>On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes.</p> <p>For example: 3DES_112</p> <p>"validate" indicates whether to validate the SQL Relay's server certificate, and may be set to one of the following:</p>  <ul><li>"no" - Don't validate the server's certificate.</li><li>"ca" - Validate that the server's certificate was signed by a trusted certificate authority.</li><li>"ca+host" - Perform "ca" validation and also validate that one of the subject altenate names (or the common name if no SANs are present) in the certificate matches the host parameter. (Falls back to "ca" validation when a unix socket is used.)</li><li>"ca+domain" - Perform "ca" validation and also validate that the domain name of one of the subject alternate names (or the common name if no SANs are present) in the certificate matches the domain name of the host parameter.  (Falls back to "ca" validation when a unix socket is used.)</li></ul> <p>"ca" is the location of a certificate authority file to use, in addition to the system's root certificates, when validating the SQL Relay server's certificate.  This is useful if the SQL Relay server's certificate is self-signed.</p> <p>On Windows, "ca" must be a file name.</p> <p>On non-Windows systems, "ca" can be either a file or directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.</p> <p>Note that the supported "cert" and "ca" file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.</p>
 enableTls(Version, Cert, Password, Ciphers, Validate, Ca, Depth) -> call_port({enableTls, Version, Cert, Password, Ciphers, Validate, Ca, Depth}).
 
+%% @doc Disables encryption.
 disableEncryption() -> call_port({disableEncryption}).
 
+%% @doc Ends the session.
 endSession() -> call_port({endSession}).
 
+%% @doc Disconnects this connection from the current session but leaves the session open so that another connection can connect to it using resumeSession().
 suspendSession() -> call_port({suspendSession}).
 
+%% @doc Returns the inet port that the connection is communicating over. This parameter may be passed to another connection for use in the resumeSession() method.  Note: The value this method returns is only valid after a call to suspendSession().
 getConnectionPort() -> call_port({getConnectionPort}).
 
+%% @doc Returns the unix socket that the connection is communicating over. This parameter may be passed to another connection for use in the resumeSession() method.  Note: The value this method returns is only valid after a call to suspendSession().
 getConnectionSocket() -> call_port({getConnectionSocket}).
 
+%% @doc Resumes a session previously left open using suspendSession().  Returns true on success and false on failure.
 resumeSession(Port, Socket) when is_integer(Port), is_list(Socket) -> call_port({getConnectionSocket, Port, Socket}).
 
+%% @doc Returns true if the database is up and false if it's down.
+ping() -> call_port({ping}).
+
+%% @doc Returns the type of database: oracle, postgresql, mysql, etc.
 identify() -> call_port({identify}).
 
+%% @doc Returns the version of the database.
 dbVersion() -> call_port({dbVersion}).
 
+%% @doc Returns the host name of the database.
 dbHostName() -> call_port({dbHostName}).
 
+%% @doc Returns the ip address of the database.
 dbIpAddress() -> call_port({dbIpAddress}).
 
+%% @doc Returns a string representing the format of the bind variables used in the db.
 bindFormat() -> call_port({bindFormat}).
 
+%% @doc Sets the current database/schema to "database".
 selectDatabase(Database) when is_list(Database) -> call_port({selectDatabase, Database}).
 
+%% @doc Returns the database/schema that is currently in use.
 getCurrentDatabase() -> call_port({getCurrentDatabase}).
 
+%% @doc Instructs the database to perform a commit after every successful query.
 autoCommitOn() -> call_port({autoCommitOn}).
 
+%% @doc Instructs the database to wait for the client to tell it when to commit.
 autoCommitOff() -> call_port({autoCommitOff}).
 
+%% @doc Begins a transaction.  Returns true if the begin succeeded, false if it failed.  If the database automatically begins a new transaction when a commit or rollback is issued then this doesn't do anything unless SQL Relay is faking transaction blocks.
 beginTransaction() -> call_port({beginTransaction}).
 
+%% @doc Commits a transaction.  Returns true if the commit succeeded, false if it failed.
 commit() -> call_port({commit}).
 
+%% @doc Rolls back a transaction.  Returns true if the rollback succeeded, false if it failed.
 rollback() -> call_port({rollback}).
 
+%% @doc Causes verbose debugging information to be sent to standard output.  Another way to do this is to start a query with "-- debug\n".  Yet another way is to set the environment variable SQLR_CLIENT_DEBUG to "ON"
 debugOn() -> call_port({debugOn}).
 
+%% @doc Turns debugging off.
 debugOff() -> call_port({debugOff}).
 
+%% @doc Returns false if debugging is off and true if debugging is on.
 getDebug() -> call_port({getDebug}).
 
+%% @doc Allows you to specify a file to write debug to.  Setting "filename" to NULL or an empty string causes debug to be written to standard output (the default).
 setDebugFile(FileName) when is_list(FileName) -> call_port({setDebugFile, FileName}).
 
+%% @doc Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client.
 setClientInfo(ClientInfo) when is_list(ClientInfo) -> call_port({setClientInfo, ClientInfo}).
 
+%% @doc Returns the string that was set by setClientInfo().
 getClientInfo() -> call_port({getClientInfo}).
 
+%% @doc Sets the number of rows of the result set to buffer at a time.  0 (the default) means buffer the entire result set.
 setResultSetBufferSize(Rows) when is_integer(Rows) -> call_port({setResultSetBufferSize, Rows}).
 
+%% @doc Returns the number of result set rows that will be buffered at a time or 0 for the entire result set.
 getResultSetBufferSize() -> call_port({getResultSetBufferSize}).
 
+%% @doc Tells the server not to send any column info (names, types, sizes).  If you don't need that info, you should call this method to improve performance.
 dontGetColumnInfo() -> call_port({dontGetColumnInfo}).
 
+%% @doc Tells the server to send column info.
 getColumnInfo() -> call_port({getColumnInfo}).
 
+%% @doc Columns names are returned in the same case as they are defined in the database.  This is the default.
 mixedCaseColumnNames() -> call_port({mixedCaseColumnNames}).
 
+%% @doc Columns names are converted to upper case.
 upperCaseColumnNames() -> call_port({upperCaseColumnNames}).
 
+%% @doc Columns names are converted to lower case.
 lowerCaseColumnNames() -> call_port({lowerCaseColumnNames}).
 
+%% @doc <p>Sets query caching on.  Future queries will be cached to the file "filename".</p> <p>A default time-to-live of 10 minutes is also set.</p> <p>Note that once cacheToFile() is called, the result sets of all future queries will be cached to that file until another call to cacheToFile() changes which file to cache to or a call to cacheOff() turns off caching.</p>
 cacheToFile(Filename) when is_list(Filename) ->  call_port({cacheToFile, Filename}).
 
+%% @doc Sets the time-to-live for cached result sets. The sqlr-cachemanger will remove each cached result set "ttl" seconds after it's created, provided it's scanning the directory containing the cache files.
 setCacheTtl(Ttl) ->  call_port({setCacheTtl, Ttl}).
 
+%% @doc Returns the name of the file containing the cached result set.
 getCacheFileName() ->  call_port({getCacheFileName}).
 
+%% @doc Sets query caching off.
 cacheOff() ->  call_port({cacheOff}).
 
+%% @doc Sends "query" directly and gets a result set.
 sendQuery(Query) when is_list(Query) -> 
 	put("cursor", "true"),
 	call_port({sendQuery, Query}).  
 
+%% @doc Sends "query" with length "length" directly and gets a result set. This method must be used if the query contains binary data.
 sendQueryWithLength(Query, Length) when is_list(Query), is_integer(Length) -> 
 	put("cursor", "true"),
 	call_port({sendQueryWithLength, Query, Length}).  
 
+%% @doc Sends the query in file "path"/"filename" directly and gets a result set.
 sendFileQuery(Path, Filename) when is_list(Path), is_list(Filename) -> 
 	put("cursor", "true"),
 	call_port({sendFileQuery, Path, Filename}).  
 
+%% @doc Prepare to execute "query".
 prepareQuery(Query) when is_list(Query) -> call_port({prepareQuery, Query}).  
 
+%% @doc Prepare to execute "query" with length "length".  This method must be used if the query contains binary data.
 prepareQueryWithLength(Query, Length) when is_list(Query), is_integer(Length) -> 
 	call_port({prepareQueryWithLength, Query, Length}).  
 
+%% @doc Prepare to execute the contents of "path"/"filename".  Returns false if the file couldn't be opened.
 prepareFileQuery(Path, Filename) when is_list(Path), is_list(Filename) -> 
 	call_port({prepareFileQuery, Path, Filename}).  
 
+%% @doc Defines a string substitution variable.
 subString(Variable, Value) when is_list(Variable), is_list(Value) ->
 	call_port({subString, Variable, Value}).  
 
+%% @doc Defines an integer substitution variable.
 subLong(Variable, Value) when is_list(Variable), is_integer(Value) ->
 	call_port({subLong, Variable, Value}).  
 
+%% @doc Defines a decimal substitution variable.
 subDouble(Variable, Value, Precision, Scale) 
 	when is_list(Variable), is_float(Value), is_integer(Precision), is_integer(Scale) ->
 	call_port({subDouble, Variable, Value, Precision, Scale}).  
 
+%% @doc Clears all bind variables.
 clearBinds() -> call_port({clearBinds}).
 
+%% @doc Parses the previously prepared query, counts the number of bind variables defined in it and returns that number.
 countBindVariables() -> call_port({countBindVariables}).
 
+%% @doc Defines a string input bind variable.
 inputBindString(Variable, Value) when is_list(Variable), is_list(Value) ->
 	call_port({inputBindString, Variable, Value}).  
 
+%% @doc Defines a integer input bind variable.
 inputBindLong(Variable, Value) when is_list(Variable), is_integer(Value) ->
 	call_port({inputBindLong, Variable, Value}).  
 
+%% @doc Defines a decimal input bind variable. (If you don't have the precision and scale then set them both 0.  However in that case you may get unexpected rounding behavior if the server is faking binds.)
 inputBindDouble(Variable, Value, Precision, Scale) 
 	when is_list(Variable), is_float(Value), is_integer(Precision), is_integer(Scale) ->
 	call_port({inputBindDouble, Variable, Value, Precision, Scale}).  
 
+%% @doc Defines a binary lob input bind variable.
 inputBindBlob(Variable, Value, Size) 
 	when is_list(Variable), is_list(Value), is_integer(Size) ->
 	call_port({inputBindBlob, Variable, Value, Size}).  
 
+%% @doc Defines a character lob input bind variable.
 inputBindClob(Variable, Value, Size) 
 	when is_list(Variable), is_list(Value), is_integer(Size) ->
 	call_port({inputBindClob, Variable, Value, Size}).  
 
 
+%% @doc Defines an output bind variable.  "bufferlength" bytes will be reserved to store the value.
 defineOutputBindString(Variable, Length) 
 	when is_list(Variable), is_integer(Length) ->
 	call_port({defineOutputBindString, Variable, Length}).  
 
+%% @doc Defines an integer output bind variable.
 defineOutputBindInteger(Variable) when is_list(Variable)  ->
 	call_port({defineOutputBindInteger, Variable}).  
 
+%% @doc Defines a decimal output bind variable.
 defineOutputBindDouble(Variable) when is_list(Variable)  ->
 	call_port({defineOutputBindDouble, Variable}).  
 
+%% @doc Defines a binary lob output bind variable.
 defineOutputBindBlob(Variable) when is_list(Variable)  ->
 	call_port({defineOutputBindBlob, Variable}).  
 
+%% @doc Defines a character lob output bind variable.
 defineOutputBindClob(Variable) when is_list(Variable)  ->
 	call_port({defineOutputBindClob, Variable}).  
 
+%% @doc Defines a cursor output bind variable.
 defineOutputBindCursor(Variable) when is_list(Variable)  ->
 	call_port({defineOutputBindCursor, Variable}).  
 
 
+%% @doc If you are binding to any variables that might not actually be in your query, call this to ensure that the database won't try to bind them unless they really are in the query.  There is a performance penalty for calling this method.
 validateBinds() -> call_port({validateBinds}).
 
+%% @doc Returns true if "variable" was a valid bind variable of the query.
 validBind(Variable) when is_list(Variable) -> 
 	call_port({validBind, Variable}).
 
+%% @doc Execute the query that was previously prepared and bound.
 executeQuery() -> call_port({executeQuery}).
 
+%% @doc Fetch from a cursor that was returned as an output bind variable.
 fetchFromBindCursor() -> call_port({fetchFromBindCursor}).
 
 
+%% @doc Get the value stored in a previously defined string output bind variable.
 getOutputBindString(Variable) when is_list(Variable) ->
 	call_port({getOutputBindString, Variable}).  
 
-getOutputBindBlob(Variable) when is_list(Variable) ->
-	call_port({getOutputBindBlob, Variable}).  
-
-getOutputBindClob(Variable) when is_list(Variable) ->
-	call_port({getOutputBindClob, Variable}).  
-
+%% @doc Get the value stored in a previously defined integer output bind variable.
 getOutputBindInteger(Variable) when is_list(Variable) ->
 	call_port({getOutputBindInteger, Variable}).  
 
+%% @doc Get the value stored in a previously defined decimal output bind variable.
 getOutputBindDouble(Variable) when is_list(Variable) ->
 	call_port({getOutputBindDouble, Variable}).  
 
+%% @doc Get the length of the value stored in a previously defined output bind variable.
 getOutputBindLength(Variable) when is_list(Variable) ->
 	call_port({getOutputBindLength, Variable}).  
 
+%% @doc Get the value stored in a previously defined binary lob output bind variable.
+getOutputBindBlob(Variable) when is_list(Variable) ->
+	call_port({getOutputBindBlob, Variable}).  
+
+%% @doc Get the value stored in a previously defined character lob output bind variable.
+getOutputBindClob(Variable) when is_list(Variable) ->
+	call_port({getOutputBindClob, Variable}).  
+
+%% @doc Get the cursor associated with a previously defined output bind variable.
 getOutputBindCursor(Variable) when is_list(Variable) ->
 	% function not implemented
 	false.
 
+%% @doc Opens a cached result set.  Returns true on success and false on failure.
 openCachedResultSet(Filename) when is_list(Filename) ->
 	call_port({openCachedResultSet, Filename}).  
 
 
+%% @doc Returns the number of columns in the current result set.
 colCount() -> call_port({colCount}).
 
+%% @doc Returns the number of rows in the current result set (if the result set is being stepped through, this returns the number of rows processed so far).
 rowCount() -> call_port({rowCount}).
 
+%% @doc Returns the total number of rows that will be returned in the result set.  Not all databases support this call.  Don't use it for applications which are designed to be portable across databases.  0 is returned by databases which don't support this option.
 totalRows() -> call_port({totalRows}).
 
+%% @doc Returns the number of rows that were updated, inserted or deleted by the query.  Not all databases support this call.  Don't use it for applications which are designed to be portable across databases.  0 is returned by databases which don't support this option.
 affectedRows() -> call_port({affectedRows}).
 
+%% @doc Returns the index of the first buffered row.  This is useful when buffering only part of the result set at a time.
 firstRowIndex() -> call_port({firstRowIndex}).
 
+%% @doc Returns false if part of the result set is still pending on the server and true if not.  This method can only return false if setResultSetBufferSize() has been called with a parameter other than 0.
 endOfResultSet() -> call_port({endOfResultSet}).
 
+%% @doc If an operation failed and generated an error, the error message is available here.  If there is no error then this method returns NULL.
 connectionErrorMessage() -> call_port({connectionErrorMessage}).
 
+%% @doc If an operation failed and generated an error, the error number is available here.  If there is no error then this method returns 0.
 connectionErrorNumber() -> call_port({connectionErrorNumber}).
 
+%% @doc If a query failed and generated an error, the error message is available here.  If the query succeeded then this method returns NULL.
 errorMessage() -> call_port({errorMessage}).
 
+%% @doc If a query failed and generated an error, the error number is available here.  If there is no error then this method returns 0.
 errorNumber() -> call_port({errorNumber}).
 
+%% @doc Tells the connection to return NULL fields and output bind variables as empty strings.  This is the default.
 getNullsAsEmptyStrings() -> call_port({getNullsAsEmptyStrings}).
 
+%% @doc Tells the connection to return NULL fields and output bind variables as NULL's rather than as empty strings.
 getNullsAsNulls() -> call_port({getNullsAsNulls}).
 
-
-
+%% @doc Returns the specified field as a string.
 getFieldByIndex(Row, Col) when is_integer(Row), is_integer(Col) -> 
 	call_port({getFieldByIndex, Row, Col}).
 
+%% @doc Returns the specified field as a string.
 getFieldByName(Row, Col) when is_integer(Row), is_list(Col) -> 
 	call_port({getFieldByName, Row, Col}).
 
+%% @doc Returns the specified field as an integer.
 getFieldAsIntegerByIndex(Row, Col) when is_integer(Row), is_integer(Col) -> 
 	call_port({getFieldAsIntegerByIndex, Row, Col}).
 
+%% @doc Returns the specified field as an integer.
 getFieldAsIntegerByName(Row, Col) when is_integer(Row), is_list(Col) -> 
 	call_port({getFieldAsIntegerByName, Row, Col}).
 
+%% @doc Returns the specified field as a decimal.
 getFieldAsDoubleByIndex(Row, Col) when is_integer(Row), is_integer(Col) -> 
 	call_port({getFieldAsDoubleByIndex, Row, Col}).
 
+%% @doc Returns the specified field as a decimal.
 getFieldAsDoubleByName(Row, Col) when is_integer(Row), is_list(Col) -> 
 	call_port({getFieldAsDoubleByName, Row, Col}).
 
+%% @doc Returns the length of the specified field.
 getFieldLengthByIndex(Row, Col) when is_integer(Row), is_integer(Col) -> 
 	call_port({getFieldLengthByIndex, Row, Col}).
 
+%% @doc Returns the length of the specified field.
 getFieldLengthByName(Row, Col) when is_integer(Row), is_list(Col) -> 
 	call_port({getFieldLengthByName, Row, Col}).
 
+%% @doc Returns a null terminated array of the lengths of the fields in the specified row.
 getRowLengths(Row) when is_integer(Row) -> call_port({getRowLengths, Row}).
 
+%% @doc Returns a null terminated array of the column names of the current result set.
 getColumnNames() -> call_port({getColumnNames}).
 
+%% @doc Returns the name of the specified column.
 getColumnName(Col) when is_integer(Col) -> call_port({getColumnName, Col}).
 
-
+%% @doc Returns the type of the specified column.
 getColumnTypeByIndex(Col) when is_integer(Col) -> call_port({getColumnTypeByIndex, Col}).
+
+%% @doc Returns the type of the specified column.
 getColumnTypeByName(Col) when is_list(Col) -> call_port({getColumnTypeByName, Col}).
 
+%% @doc Returns the number of bytes required on the server to store the data for the specified column
 getColumnLengthByIndex(Col) when is_integer(Col) -> call_port({getColumnLengthByIndex, Col}).
+
+%% @doc Returns the number of bytes required on the server to store the data for the specified column
 getColumnLengthByName(Col) when is_list(Col) -> call_port({getColumnLengthByName, Col}).
 
+%% @doc Returns the precision of the specified column.  Precision is the total number of digits in a number.  eg: 123.45 has a precision of 5.  For non-numeric types, it's the number of characters in the string.
 getColumnPrecisionByIndex(Col) when is_integer(Col) -> call_port({getColumnPrecisionByIndex, Col}).
+
+%% @doc Returns the precision of the specified column.  Precision is the total number of digits in a number.  eg: 123.45 has a precision of 5.  For non-numeric types, it's the number of characters in the string.
 getColumnPrecisionByName(Col) when is_list(Col) -> call_port({getColumnPrecisionByName, Col}).
 
+%% @doc Returns the scale of the specified column.  Scale is the total number of digits to the right of the decimal point in a number.  eg: 123.45 has a scale of 2.
 getColumnScaleByIndex(Col) when is_integer(Col) -> call_port({getColumnScaleByIndex, Col}).
+
+%% @doc Returns the scale of the specified column.  Scale is the total number of digits to the right of the decimal point in a number.  eg: 123.45 has a scale of 2.
 getColumnScaleByName(Col) when is_list(Col) -> call_port({getColumnScaleByName, Col}).
 
+%% @doc Returns true if the specified column can contain nulls and false otherwise.
 getColumnIsNullableByIndex(Col) when is_integer(Col) -> call_port({getColumnIsNullableByIndex, Col}).
+
+%% @doc Returns true if the specified column can contain nulls and false otherwise.
 getColumnIsNullableByName(Col) when is_list(Col) -> call_port({getColumnIsNullableByName, Col}).
 
+%% @doc Returns true if the specified column is a primary key and false otherwise.
 getColumnIsPrimaryKeyByIndex(Col) when is_integer(Col) -> call_port({getColumnIsPrimaryKeyByIndex, Col}).
+
+%% @doc Returns true if the specified column is a primary key and false otherwise.
 getColumnIsPrimaryKeyByName(Col) when is_list(Col) -> call_port({getColumnIsPrimaryKeyByName, Col}).
 
+%% @doc Returns true if the specified column is unique and false otherwise.
 getColumnIsUniqueByIndex(Col) when is_integer(Col) -> call_port({getColumnIsUniqueByIndex, Col}).
+
+%% @doc Returns true if the specified column is unique and false otherwise.
 getColumnIsUniqueByName(Col) when is_list(Col) -> call_port({getColumnIsUniqueByName, Col}).
 
+%% @doc Returns true if the specified column is part of a composite key and false otherwise.
 getColumnIsPartOfKeyByIndex(Col) when is_integer(Col) -> call_port({getColumnIsPartOfKeyByIndex, Col}).
+
+%% @doc Returns true if the specified column is part of a composite key and false otherwise.
 getColumnIsPartOfKeyByName(Col) when is_list(Col) -> call_port({getColumnIsPartOfKeyByName, Col}).
 
+%% @doc Returns true if the specified column is an unsigned number and false otherwise.
 getColumnIsUnsignedByIndex(Col) when is_integer(Col) -> call_port({getColumnIsUnsignedByIndex, Col}).
+
+%% @doc Returns true if the specified column is an unsigned number and false otherwise.
 getColumnIsUnsignedByName(Col) when is_list(Col) -> call_port({getColumnIsUnsignedByName, Col}).
 
+%% @doc Returns true if the specified column was created with the zero-fill flag and false otherwise.
 getColumnIsZeroFilledByIndex(Col) when is_integer(Col) -> call_port({getColumnIsZeroFilledByIndex, Col}).
+
+%% @doc Returns true if the specified column was created with the zero-fill flag and false otherwise.
 getColumnIsZeroFilledByName(Col) when is_list(Col) -> call_port({getColumnIsZeroFilledByName, Col}).
 
+%% @doc Returns true if the specified column contains binary data and false otherwise.
 getColumnIsBinaryByIndex(Col) when is_integer(Col) -> call_port({getColumnIsBinaryByIndex, Col}).
+
+%% @doc Returns true if the specified column contains binary data and false otherwise.
 getColumnIsBinaryByName(Col) when is_list(Col) -> call_port({getColumnIsBinaryByName, Col}).
 
+%% @doc Returns true if the specified column auto-increments and false otherwise.
 getColumnIsAutoIncrementByIndex(Col) when is_integer(Col) -> call_port({getColumnIsAutoIncrementByIndex, Col}).
+
+%% @doc Returns true if the specified column auto-increments and false otherwise.
 getColumnIsAutoIncrementByName(Col) when is_list(Col) -> call_port({getColumnIsAutoIncrementByName, Col}).
 
+%% @doc Returns the length of the longest field in the specified column.
 getLongestByIndex(Col) when is_integer(Col) -> call_port({getLongestByIndex, Col}).
+
+%% @doc Returns the length of the longest field in the specified column.
 getLongestByName(Col) when is_list(Col) -> call_port({getLongestByName, Col}).
 
+%% @doc Tells the server to leave this result set open when the connection calls suspendSession() so that another connection can connect to it using resumeResultSet() after it calls resumeSession().
 suspendResultSet() -> call_port({suspendResultSet}).
+
+%% @doc Returns the internal ID of this result set.  This parameter may be passed to another cursor for use in the resumeResultSet() method.  Note: The value this method returns is only valid after a call to suspendResultSet().
 getResultSetId() -> call_port({getResultSetId}).
+
+%% @doc Resumes a result set previously left open using suspendSession().  Returns true on success and false on failure.
 resumeResultSet(Id) when is_integer(Id) -> call_port({resumeResultSet, Id}).
+
+%% @doc Resumes a result set previously left open using suspendSession() and continues caching the result set to "filename".  Returns true on success and false on failure.
 resumeCachedResultSet(Id, Filename) when is_integer(Id), is_list(Filename) -> 
 	call_port({resumeCachedResultSet, Id, Filename}).
+
+%% @doc Closes the current result set, if one is open.  Data that has been fetched already is still available but no more data may be fetched.  Server side resources for the result set are freed as well.
 closeResultSet() -> call_port({closeResultSet}).
 
-% Special function to replace the getRow from the SQLRelay client wrapper
-% After a query has been run return a tuple
-% containing each column for a given row
+%% @doc Returns a tuple containing the value of the fields in the specified row.
 getRow(Row) when is_integer(Row) ->
         {ok, Columns} = colCount(),
         L = appendColumnForRow([], Row, Columns-1),
@@ -406,6 +549,7 @@ appendColumnForRow(L, Row, Col) ->
 %
 % Port communication functions
 %
+%% @hidden
 call_port(Msg) ->
     ?MODULE ! {call, self(), Msg},
     receive
@@ -413,12 +557,14 @@ call_port(Msg) ->
         Result
     end.
 
+%% @hidden
 init(ExtPrg) ->
     register(?MODULE, self()),
     process_flag(trap_exit, true),
     Port = open_port({spawn, ExtPrg}, [{packet, 2}, binary, exit_status]),
     loop(Port).
 
+%% @hidden
 loop(Port) ->
     receive
     {call, Caller, Msg} ->

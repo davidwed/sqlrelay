@@ -104,9 +104,7 @@ class sqlrservercontrollerprivate {
 	char		*_updown;
 
 	uint16_t	_inetport;
-	char		*_unixsocket;
-	char		*_unixsocketptr;
-	size_t		_unixsocketptrlen;
+	stringbuffer	_unixsocket;
 
 	bool		_autocommitforthissession;
 
@@ -237,9 +235,6 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_dbchanged=false;
 	pvt->_originaldb=NULL;
 
-	pvt->_unixsocket=NULL;
-	pvt->_unixsocketptr=NULL;
-	pvt->_unixsocketptrlen=0;
 	pvt->_serversockun=NULL;
 	pvt->_serversockin=NULL;
 	pvt->_serversockincount=0;
@@ -345,9 +340,8 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete pvt->_semset;
 
-	if (pvt->_unixsocket) {
-		file::remove(pvt->_unixsocket);
-		delete[] pvt->_unixsocket;
+	if (pvt->_unixsocket.getStringLength()) {
+		file::remove(pvt->_unixsocket.getString());
 	}
 
 	delete pvt->_bindmappingspool;
@@ -478,11 +472,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		pvt->_sqlrs->load(schedules);
 	}
 
-	// handle the unix socket directory
-	if (pvt->_cfg->getListenOnUnix()) {
-		setUnixSocketDirectory();
-	}
-
 	// handle the pid file
 	if (!handlePidFile()) {
 		return false;
@@ -499,9 +488,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	initDatabaseAvailableFileName();
 
-	if (pvt->_cfg->getListenOnUnix() && !getUnixSocket()) {
-		return false;
-	}
+	// set unix socket filename (for suspended/resumed sessions)
+	pvt->_unixsocket.append(pvt->_pth->getSocketsDir())->
+				append((uint32_t)process::getProcessId())->
+				append(".sock");
 
 	if (!createSharedMemoryAndSemaphores(pvt->_cmdl->getId())) {
 		return false;
@@ -614,10 +604,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	size_t	pidfilelen=charstring::length(
 				pvt->_pth->getPidDir())+16+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::integerLength((uint64_t)pid)+1;
+				charstring::integerLength((uint64_t)pid)+4+1;
 	pvt->_pidfile=new char[pidfilelen];
 	charstring::printf(pvt->_pidfile,pidfilelen,
-				"%ssqlr-connection-%s.%ld",
+				"%ssqlr-connection-%s.%ld.pid",
 				pvt->_pth->getPidDir(),
 				pvt->_cmdl->getId(),
 				(long)pid);
@@ -672,21 +662,26 @@ void sqlrservercontroller::setUserAndGroup() {
 	char	*currentgroup=
 		groupentry::getName(process::getEffectiveGroupId());
 
+	stringbuffer	errorstr;
+
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
 	if (charstring::compare(currentgroup,pvt->_cfg->getRunAsGroup()) &&
 			!process::setGroup(pvt->_cfg->getRunAsGroup())) {
-		stderror.printf("Warning: could not change group to %s\n",
-						pvt->_cfg->getRunAsGroup());
+		errorstr.append("Warning: could not change group to ")->
+			append(pvt->_cfg->getRunAsGroup())->append('\n');
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
 	if (charstring::compare(currentuser,pvt->_cfg->getRunAsUser()) &&
 			!process::setUser(pvt->_cfg->getRunAsUser())) {
-		stderror.printf("Warning: could not change user to %s\n",
-						pvt->_cfg->getRunAsUser());
+		errorstr.append("Warning: could not change user to ")->
+			append(pvt->_cfg->getRunAsUser())->append('\n');
 	}
+
+	// write the error, if there was one
+	stderror.write(errorstr.getString(),errorstr.getStringLength());
 
 	// clean up
 	delete[] currentuser;
@@ -703,10 +698,9 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	modulename.append("connection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!pvt->_conndl.open(modulename.getString(),true,true)) {
-		stderror.printf("failed to load connection module: %s\n",
-							modulename.getString());
 		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("failed to load connection module: %s\n%s\n",
+				modulename.getString(),(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -718,9 +712,9 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 			(sqlrserverconnection *(*)(sqlrservercontroller *))
 			pvt->_conndl.getSymbol(functionname.getString());
 	if (!newConn) {
-		stderror.printf("failed to load connection: %s\n",dbase);
 		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("failed to load connection: %s\n%s\n",
+				dbase,(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -734,27 +728,12 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 		conn=NULL;
 	}
 #endif
-
-	if (!conn) {
-		stderror.printf("failed to create connection: %s\n",dbase);
-#ifdef SQLRELAY_ENABLE_SHARED
-		char	*error=pvt->_conndl.getError();
-		stderror.printf("%s\n",error);
-		delete[] error;
-#endif
-	}
 	return conn;
 }
 
 void sqlrservercontroller::setUnixSocketDirectory() {
-	size_t	unixsocketlen=charstring::length(pvt->_pth->getSocketsDir())+22;
-	pvt->_unixsocket=new char[unixsocketlen];
-	charstring::printf(pvt->_unixsocket,unixsocketlen,"%s",
-					pvt->_pth->getSocketsDir());
-	pvt->_unixsocketptr=
-		pvt->_unixsocket+charstring::length(pvt->_pth->getSocketsDir());
-	pvt->_unixsocketptrlen=
-		unixsocketlen-(pvt->_unixsocketptr-pvt->_unixsocket);
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 }
 
 bool sqlrservercontroller::handlePidFile() {
@@ -766,10 +745,10 @@ bool sqlrservercontroller::handlePidFile() {
 	// writes out the pid file)
 	size_t	listenerpidfilelen=
 			charstring::length(pvt->_pth->getPidDir())+14+
-			charstring::length(pvt->_cmdl->getId())+1;
+			charstring::length(pvt->_cmdl->getId())+4+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
-						"%ssqlr-listener-%s",
+						"%ssqlr-listener-%s.pid",
 						pvt->_pth->getPidDir(),
 						pvt->_cmdl->getId());
 
@@ -802,14 +781,15 @@ bool sqlrservercontroller::handlePidFile() {
 		found=(process::checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
-		stderror.printf("\n%s-connection error:\n",SQLR);
-		stderror.printf("	The pid file %s",listenerpidfile);
-		stderror.printf(" was not found.\n");
-		stderror.printf("	This usually means "
-					"that the %s-listener \n",SQLR);
-		stderror.printf("is not running.\n");
-		stderror.printf("	The %s-listener must be running ",SQLR);
-		stderror.printf("for the %s-connection to start.\n\n",SQLR);
+		stderror.printf("\n%s-connection error:\n"
+				"	The pid file %s"
+				" was not found.\n"
+				"	This usually means "
+					"that the %s-listener \n"
+				"is not running.\n"
+				"	The %s-listener must be running "
+				"for the %s-connection to start.\n\n",
+				SQLR,listenerpidfile,SQLR,SQLR,SQLR);
 		retval=false;
 	}
 
@@ -824,128 +804,41 @@ void sqlrservercontroller::initDatabaseAvailableFileName() {
 	size_t	updownlen=charstring::length(
 				pvt->_pth->getIpcDir())+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::length(pvt->_connectionid)+1;
+				charstring::length(pvt->_connectionid)+3+1;
 	pvt->_updown=new char[updownlen];
-	charstring::printf(pvt->_updown,updownlen,"%s%s-%s",
+	charstring::printf(pvt->_updown,updownlen,"%s%s-%s.up",
 						pvt->_pth->getIpcDir(),
 						pvt->_cmdl->getId(),
 						pvt->_connectionid);
 }
 
 bool sqlrservercontroller::getUnixSocket() {
-
-	raiseDebugMessageEvent("getting unix socket...");
-
-	file	sockseq;
-	if (!openSequenceFile(&sockseq) || !lockSequenceFile(&sockseq)) {
-		return false;
-	}
-	if (!getAndIncrementSequenceNumber(&sockseq)) {
-		unLockSequenceFile(&sockseq);
-		sockseq.close();
-		return false;
-	}
-	if (!unLockSequenceFile(&sockseq)) {
-		sockseq.close();
-		return false;
-	}
-	if (!sockseq.close()) {
-		return false;
-	}
-
-	raiseDebugMessageEvent("done getting unix socket");
-
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
 bool sqlrservercontroller::openSequenceFile(file *sockseq) {
-
-	// open the sequence file and get the current port number
-	const char	*sockseqfile=pvt->_pth->getSockSeqFile();
-
-	pvt->_debugstr.clear();
-	pvt->_debugstr.append("opening ")->append(sockseqfile);
-	raiseDebugMessageEvent(pvt->_debugstr.getString());
-
-	mode_t	oldumask=process::setFileCreationMask(011);
-	bool	success=sockseq->open(sockseqfile,O_RDWR|O_CREAT,
-					permissions::everyoneReadWrite());
-	process::setFileCreationMask(oldumask);
-
-	// handle error
-	if (!success) {
-
-		stderror.printf("Could not open: %s\n",sockseqfile);
-		stderror.printf("Make sure that the file and directory are \n");
-		stderror.printf("readable and writable.\n\n");
-		pvt->_unixsocketptr[0]='\0';
-
-		pvt->_debugstr.clear();
-		pvt->_debugstr.append("failed to open socket sequence file: ");
-		pvt->_debugstr.append(sockseqfile);
-		raiseInternalErrorEvent(NULL,pvt->_debugstr.getString());
-	}
-
-	return success;
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
+	return true;
 }
 
 bool sqlrservercontroller::lockSequenceFile(file *sockseq) {
-
-	raiseDebugMessageEvent("locking...");
-
-	if (!sockseq->lockFile(F_WRLCK)) {
-		raiseInternalErrorEvent(NULL,"failed to lock socket sequence file");
-		return false;
-	}
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
 bool sqlrservercontroller::unLockSequenceFile(file *sockseq) {
-
-	// unlock and close the file in a platform-independent manner
-	raiseDebugMessageEvent("unlocking...");
-
-	if (!sockseq->unlockFile()) {
-		raiseInternalErrorEvent(NULL,"failed to unlock socket sequence file");
-		return false;
-	}
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
 bool sqlrservercontroller::getAndIncrementSequenceNumber(file *sockseq) {
-
-	// get the sequence number from the file
-	int32_t	buffer;
-	if (sockseq->read(&buffer)!=sizeof(int32_t)) {
-		buffer=0;
-	}
-	charstring::printf(pvt->_unixsocketptr,
-				pvt->_unixsocketptrlen,
-				"%d",buffer);
-
-	pvt->_debugstr.clear();
-	pvt->_debugstr.append("got sequence number: ");
-	pvt->_debugstr.append(pvt->_unixsocketptr);
-	raiseDebugMessageEvent(pvt->_debugstr.getString());
-
-	// increment the sequence number but don't let it roll over
-	if (buffer==2147483647) {
-		buffer=0;
-	} else {
-		buffer=buffer+1;
-	}
-
-	pvt->_debugstr.clear();
-	pvt->_debugstr.append("writing new sequence number: ");
-	pvt->_debugstr.append(buffer);
-	raiseDebugMessageEvent(pvt->_debugstr.getString());
-
-	// write the sequence number back to the file
-	if (sockseq->setPositionRelativeToBeginning(0)==-1 ||
-			sockseq->write(buffer)!=sizeof(int32_t)) {
-		raiseInternalErrorEvent(NULL,"failed to update socket sequence file");
-		return false;
-	}
+	// FIXME: this method is unused and should
+	// be removed in the next minor release
 	return true;
 }
 
@@ -980,10 +873,12 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 	const char	*warning=NULL;
 	if (!pvt->_conn->logIn(&err,&warning)) {
 		if (printerrors) {
-			stderror.printf("Couldn't log into database.\n");
+			stringbuffer	loginerror;
+			loginerror.append("Couldn't log into database.\n");
 			if (err) {
-				stderror.printf("%s\n",err);
+				loginerror.append(err)->append('\n');
 			}
+			stderror.write(loginerror.getString());
 		}
 		if (pvt->_sqlrlg) {
 			pvt->_debugstr.clear();
@@ -998,10 +893,8 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 	}
 	if (warning) {
 		if (printerrors) {
-			stderror.printf("Warning logging into database.\n");
-			if (warning) {
-				stderror.printf("%s\n",warning);
-			}
+			stderror.printf("Warning logging into database.\n%s\n",
+					(warning)?warning:"");
 		}
 		if (pvt->_sqlrlg) {
 			pvt->_debugstr.clear();
@@ -1219,34 +1112,40 @@ bool sqlrservercontroller::openSockets() {
 
 	raiseDebugMessageEvent("listening on sockets...");
 
-	// get the next available unix socket and open it
-	if (pvt->_cfg->getListenOnUnix() &&
-		!charstring::isNullOrEmpty(pvt->_unixsocketptr) &&
-		!pvt->_serversockun) {
+	// open the unix socket
+	if (pvt->_cfg->getListenOnUnix() && !pvt->_serversockun) {
 
 		pvt->_serversockun=new unixsocketserver();
-		if (pvt->_serversockun->listen(pvt->_unixsocket,0000,5)) {
-
+		if (pvt->_serversockun->listen(
+				pvt->_unixsocket.getString(),0000,5)) {
 			pvt->_debugstr.clear();
 			pvt->_debugstr.append("listening on unix socket: ");
-			pvt->_debugstr.append(pvt->_unixsocket);
+			pvt->_debugstr.append(pvt->_unixsocket.getString());
 			raiseDebugMessageEvent(pvt->_debugstr.getString());
 
 			pvt->_lsnr.addReadFileDescriptor(pvt->_serversockun);
-
 		} else {
 			pvt->_debugstr.clear();
 			pvt->_debugstr.append("failed to listen on socket: ");
-			pvt->_debugstr.append(pvt->_unixsocket);
-			raiseInternalErrorEvent(NULL,pvt->_debugstr.getString());
+			pvt->_debugstr.append(pvt->_unixsocket.getString());
+			raiseInternalErrorEvent(NULL,
+						pvt->_debugstr.getString());
 
-			stderror.printf("Could not listen on ");
-			stderror.printf("unix socket: ");
-			stderror.printf("%s\n",pvt->_unixsocket);
-			stderror.printf("Make sure that the file and ");
-			stderror.printf("directory are readable ");
-			stderror.printf("and writable.\n\n");
+			char	*currentuser=
+					userentry::getName(
+						process::getEffectiveUserId());
+			char	*currentgroup=
+					groupentry::getName(
+						process::getEffectiveGroupId());
+			stderror.printf("Could not listen on unix socket: %s\n"
+					"Make sure that the directory is "
+					"writable by %s:%s.\n\n",
+					pvt->_unixsocket.getString(),
+					currentuser,currentgroup);
+			delete[] currentuser;
+			delete[] currentgroup;
 			delete pvt->_serversockun;
+			pvt->_serversockun=NULL;
 			return false;
 		}
 	}
@@ -1297,9 +1196,9 @@ bool sqlrservercontroller::openSockets() {
 				raiseInternalErrorEvent(NULL,
 						pvt->_debugstr.getString());
 
-				stderror.printf("Could not listen on ");
-				stderror.printf("inet socket: ");
-				stderror.printf("%d\n\n",pvt->_inetport);
+				stderror.printf("Could not listen on "
+						"inet socket: ",
+						"%d\n\n",pvt->_inetport);
 				retval=false;
 			}
 		}
@@ -1339,9 +1238,7 @@ bool sqlrservercontroller::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-		if (!announceAvailability(pvt->_unixsocket,
-						pvt->_inetport,
-						pvt->_connectionid)) {
+		if (!announceAvailability(NULL,0,pvt->_connectionid)) {
 			return true;
 		}
 
@@ -1534,6 +1431,9 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 						unsigned short inetport,
 						const char *connectionid) {
 
+	// FIXME: unixsocket and inetport are unused and
+	// should be removed in the next minor release
+
 	raiseDebugMessageEvent("announcing availability...");
 
 	// connect to listener if we haven't already
@@ -1558,7 +1458,8 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 	// we don't need to release it.  We also don't need to reset the
 	// ttl because we're going to exit.
 	if (!acquireAnnounceMutex()) {
-		raiseDebugMessageEvent("ttl reached, aborting announcing availabilty");
+		raiseDebugMessageEvent("ttl reached, "
+					"aborting announcing availabilty");
 		return false;
 	}
 
@@ -1610,7 +1511,8 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 		// connection.
 		pvt->_handoffsockun.close();
 
-		raiseDebugMessageEvent("ttl reached, aborting announcing availabilty");
+		raiseDebugMessageEvent("ttl reached, "
+					"aborting announcing availabilty");
 	}
 
 	// signal the listener to hand off...
@@ -1631,10 +1533,10 @@ void sqlrservercontroller::registerForHandoff() {
 	// construct the name of the socket to connect to
 	size_t	handoffsocknamelen=
 			charstring::length(pvt->_pth->getSocketsDir())+
-			charstring::length(pvt->_cmdl->getId())+8+1;
+			charstring::length(pvt->_cmdl->getId())+13+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
-						"%s%s-handoff",
+						"%s%s-handoff.sock",
 						pvt->_pth->getSocketsDir(),
 						pvt->_cmdl->getId());
 
@@ -1677,11 +1579,11 @@ void sqlrservercontroller::deRegisterForHandoff() {
 	// construct the name of the socket to connect to
 	size_t	removehandoffsocknamelen=
 				charstring::length(pvt->_pth->getSocketsDir())+
-				charstring::length(pvt->_cmdl->getId())+14+1;
+				charstring::length(pvt->_cmdl->getId())+19+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
-				"%s%s-removehandoff",
+				"%s%s-removehandoff.sock",
 				pvt->_pth->getSocketsDir(),
 				pvt->_cmdl->getId());
 
@@ -2145,7 +2047,7 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 	*inetport=0;
 	if (openSockets()) {
 		if (pvt->_serversockun) {
-			*unixsocket=pvt->_unixsocket;
+			*unixsocket=pvt->_unixsocket.getString();
 		}
 		*inetport=pvt->_inetport;
 	}
@@ -4597,9 +4499,9 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
 	size_t	idfilenamelen=charstring::length(
 					pvt->_pth->getIpcDir())+
-					charstring::length(id)+1;
+					charstring::length(id)+4+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printf(idfilename,idfilenamelen,"%s%s",
+	charstring::printf(idfilename,idfilenamelen,"%s%s.ipc",
 					pvt->_pth->getIpcDir(),id);
 
 	pvt->_debugstr.clear();
@@ -4613,8 +4515,8 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	if (!pvt->_shmem->attach(file::generateKey(idfilename,1),
 						sizeof(sqlrshm))) {
 		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to shared memory segment: ");
-		stderror.printf("%s\n",err);
+		stderror.printf("Couldn't attach to shared memory segment: "
+				"%s\n",err);
 		delete[] err;
 		delete pvt->_shmem;
 		pvt->_shmem=NULL;
@@ -4623,7 +4525,7 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	}
 	pvt->_shm=(sqlrshm *)pvt->_shmem->getPointer();
 	if (!pvt->_shm) {
-		stderror.printf("failed to get pointer to shm\n");
+		stderror.printf("Failed to get pointer to shm\n");
 		delete pvt->_shmem;
 		pvt->_shmem=NULL;
 		delete[] idfilename;
@@ -4635,8 +4537,8 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	pvt->_semset=new semaphoreset();
 	if (!pvt->_semset->attach(file::generateKey(idfilename,1),13)) {
 		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to semaphore set: ");
-		stderror.printf("%s\n",err);
+		stderror.printf("Couldn't attach to semaphore set: "
+				"%s\n",err);
 		delete[] err;
 		delete pvt->_semset;
 		delete pvt->_shmem;
@@ -4866,12 +4768,9 @@ sqlrparser *sqlrservercontroller::newParser() {
 	modulename.append("parser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!pvt->_sqlrpdl.open(modulename.getString(),true,true)) {
-		if (pvt->_debugsqlrparser) {
-			stderror.printf("failed to load parser module: %s\n",
-									module);
-		}
 		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("failed to load parser module: %s\n%s\n",
+						module,(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -4883,9 +4782,9 @@ sqlrparser *sqlrservercontroller::newParser() {
 			(sqlrparser *(*)(sqlrservercontroller *, xmldomnode *))
 			pvt->_sqlrpdl.getSymbol(functionname.getString());
 	if (!newParser) {
-		stderror.printf("failed to load parser: %s\n",module);
 		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",error);
+		stderror.printf("failed to load parser: %s\n%s\n",
+				module,(error)?error:"");
 		delete[] error;
 		return NULL;
 	}
@@ -4901,15 +4800,6 @@ sqlrparser *sqlrservercontroller::newParser() {
 		parser=NULL;
 	}
 #endif
-
-	if (!parser) {
-		stderror.printf("failed to create parser: %s\n",module);
-#ifdef SQLRELAY_ENABLE_SHARED
-		char	*error=pvt->_sqlrpdl.getError();
-		stderror.printf("%s\n",error);
-		delete[] error;
-#endif
-	}
 
 	if (pvt->_debugsqlrparser) {
 		stdoutput.printf("success\n");
@@ -5634,7 +5524,7 @@ void sqlrservercontroller::raiseClientProtocolErrorEvent(
 	}
 	if (error::getErrorNumber()) {
 		char	*error=error::getErrorString();
-		errorbuffer.append(": ")->append(error);
+		errorbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
 	if (pvt->_sqlrlg) {
@@ -5745,7 +5635,7 @@ void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 	errorbuffer.append(info);
 	if (error::getErrorNumber()) {
 		char	*error=error::getErrorString();
-		errorbuffer.append(": ")->append(error);
+		errorbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
 	if (pvt->_sqlrlg) {
@@ -5770,7 +5660,7 @@ void sqlrservercontroller::raiseInternalWarningEvent(sqlrservercursor *cursor,
 	warningbuffer.append(info);
 	if (error::getErrorNumber()) {
 		char	*error=error::getErrorString();
-		warningbuffer.append(": ")->append(error);
+		warningbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
 	if (pvt->_sqlrlg) {

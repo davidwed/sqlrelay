@@ -16,7 +16,7 @@ all: db2.tcl \
 	krb.tcl
 
 db2.tcl: db2.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -24,7 +24,7 @@ db2.tcl: db2.tcl.in
 	$(CHMOD) 755 $@
 
 firebird.tcl: firebird.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -32,7 +32,7 @@ firebird.tcl: firebird.tcl.in
 	$(CHMOD) 755 $@
 
 freetds.tcl: freetds.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -40,7 +40,7 @@ freetds.tcl: freetds.tcl.in
 	$(CHMOD) 755 $@
 
 mysql.tcl: mysql.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -48,7 +48,7 @@ mysql.tcl: mysql.tcl.in
 	$(CHMOD) 755 $@
 
 oracle.tcl: oracle.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -56,7 +56,7 @@ oracle.tcl: oracle.tcl.in
 	$(CHMOD) 755 $@
 
 postgresql.tcl: postgresql.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -64,7 +64,7 @@ postgresql.tcl: postgresql.tcl.in
 	$(CHMOD) 755 $@
 
 sqlite.tcl: sqlite.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -72,7 +72,7 @@ sqlite.tcl: sqlite.tcl.in
 	$(CHMOD) 755 $@
 
 sap.tcl: sap.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -80,7 +80,7 @@ sap.tcl: sap.tcl.in
 	$(CHMOD) 755 $@
 
 tls.tcl: tls.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@
@@ -88,7 +88,7 @@ tls.tcl: tls.tcl.in
 	$(CHMOD) 755 $@
 
 krb.tcl: krb.tcl.in
-	$(REPLACE) @TCLLIBSPATH@ $(TCLLIBSPATH) $@.in > $@.in.in.in.in
+	$(REPLACE) @TCLLIBSPATH@ "$(TCLLIBSPATH)" $@.in > $@.in.in.in.in
 	$(REPLACE) @SOSUFFIX@ $(SOSUFFIX) $@.in.in.in.in > $@.in.in.in
 	$(REPLACE) @SLASH@ $(SLASH) $@.in.in.in > $@.in.in
 	$(REPLACE) C:\Tcl\lib C:\\Tcl\\lib $@.in.in > $@

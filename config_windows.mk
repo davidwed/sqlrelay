@@ -21,10 +21,10 @@ datadir = "@datadir@"
 docdir = $(datadir)\\doc\\$(SQLRELAY)
 licensedir = $(datadir)\\licenses\\$(SQLRELAY)
 EXAMPLEDIR = $(datadir)\\$(SQLRELAY)\\examples
-tmpdir = $(localstatedir)\\$(SQLRELAY)\\tmp
-cachedir = $(localstatedir)\\$(SQLRELAY)\\cache
-debugdir = $(localstatedir)\\$(SQLRELAY)\\debug
-logdir = $(localstatedir)\\$(SQLRELAY)\\log
+tmpdir = $(localstatedir)\\run\\$(SQLRELAY)
+cachedir = $(localstatedir)\\cache\\$(SQLRELAY)
+logdir = $(localstatedir)\\log\\$(SQLRELAY)
+debugdir = $(logdir)\\debug
 initscript_prefix = @initscript_prefix@
 
 
@@ -37,7 +37,8 @@ THISDIR =
 
 
 # script extension
-SCRIPTEXT = .bat
+SCRIPTINT = cscript /nologo
+SCRIPTEXT = .vbs
 
 
 # slash
@@ -351,6 +352,7 @@ STATICPLUGINLIBS =
 SERVERCPPFLAGS = $(BASECPPFLAGS) /I./ /I$(top_builddir)/ /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) /D SQLRSERVER_EXPORTS
 LIBSQLRSERVERLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib
 SERVERLIBS = /LIBPATH:./ lib$(SQLR)server.lib $(STATICPLUGINLIBS) /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+CACHEMANAGERLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 
 
 # plugins

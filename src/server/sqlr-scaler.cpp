@@ -151,10 +151,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// start up after the sqlr-listener has forked, but before it writes
 	// out the pid file)
 	size_t	listenerpidfilelen=charstring::length(sqlrpth->getPidDir())+14+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	charstring::printf(listenerpidfile,listenerpidfilelen,
-					"%ssqlr-listener-%s",
+					"%ssqlr-listener-%s.pid",
 					sqlrpth->getPidDir(),id);
 
 	// On most platforms, 3 seconds is plenty of time to wait for the
@@ -178,13 +178,14 @@ bool scaler::initScaler(int argc, const char **argv) {
 		found=(process::checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
-		stderror.printf("\n%s-scaler error: \n",SQLR);
-		stderror.printf("	The file %s",listenerpidfile);
-		stderror.printf(" was not found.\n");
-		stderror.printf("	This usually means that the ");
-		stderror.printf("%s-listener is not running.\n",SQLR);
-		stderror.printf("	The %s-listener must be running ",SQLR);
-		stderror.printf("for the %s-scaler to start.\n\n",SQLR);
+		stderror.printf("\n%s-scaler error: \n"
+				"	The file %s"
+				" was not found.\n"
+				"	This usually means that the "
+				"%s-listener is not running.\n"
+				"	The %s-listener must be running "
+				"for the %s-scaler to start.\n\n",
+				SQLR,listenerpidfile,SQLR,SQLR,SQLR);
 		delete[] listenerpidfile;
 		return false;
 	}
@@ -192,20 +193,21 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// check/set pid file
 	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+12+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
-				"%ssqlr-scaler-%s",
+				"%ssqlr-scaler-%s.pid",
 				sqlrpth->getPidDir(),id);
 	if (process::checkForPidFile(pidfile)!=-1) {
-		stderror.printf("\n%s-scaler error:\n",SQLR);
-		stderror.printf("	The pid file %s",pidfile);
-		stderror.printf(" exists.\n");
-		stderror.printf("	This usually means that the ");
-		stderror.printf("%s-scaler is already running for the \n",SQLR);
-		stderror.printf("	%s instance.\n",id);
-		stderror.printf("	If it is not running, please remove ");
-		stderror.printf("the file and restart.\n");
+		stderror.printf("\n%s-scaler error:\n"
+				"	The pid file %s"
+				" exists.\n"
+				"	This usually means that the "
+				"%s-scaler is already running for the \n"
+				"	%s instance.\n"
+				"	If it is not running, please remove "
+				"the file and restart.\n",
+				SQLR,pidfile,SQLR,id);
 		delete[] pidfile;
 		pidfile=NULL;
 		return false;
@@ -239,15 +241,18 @@ bool scaler::initScaler(int argc, const char **argv) {
 			char	*currentgroup=
 			groupentry::getName(process::getEffectiveGroupId());
 
+			stringbuffer	errorstr;
+
 			// switch groups, but only if we're not currently
 			// running as the group that we should switch to
 			if (charstring::compare(currentgroup,
 						cfg->getRunAsGroup()) &&
 					!process::setGroup(
 						cfg->getRunAsGroup())) {
-				stderror.printf("Warning: could not change ");
-				stderror.printf("group to %s\n",
-						cfg->getRunAsGroup());
+				errorstr.append(
+					"Warning: could not change group to ")->
+					append(cfg->getRunAsGroup())->
+					append('\n');
 			}
 
 			// switch users, but only if we're not currently
@@ -256,10 +261,15 @@ bool scaler::initScaler(int argc, const char **argv) {
 						cfg->getRunAsUser()) &&
 					!process::setUser(
 						cfg->getRunAsUser())) {
-				stderror.printf("Warning: could not change ");
-				stderror.printf("user to %s\n",
-						cfg->getRunAsUser());
+				errorstr.append(
+					"Warning: could not change user to ")->
+					append(cfg->getRunAsUser())->
+					append('\n');
 			}
+
+			// write the error, if there was one
+			stderror.write(errorstr.getString(),
+					errorstr.getStringLength());
 
 			// clean up
 			delete[] currentuser;
@@ -273,37 +283,40 @@ bool scaler::initScaler(int argc, const char **argv) {
 		// could get crafty and force the sqlr-scaler to start so
 		// we'll do this check just to make sure)
 		if (!cfg->accessible()) {
-			stderror.printf("\n%s-scaler error:\n",SQLR);
-			stderror.printf("	This instance of ");
-			stderror.printf("%s is ",SQL_RELAY);
-			stderror.printf("configured to run as:\n");
-			stderror.printf("		user: %s\n",
-						cfg->getRunAsUser());
-			stderror.printf("		group: %s\n\n",
-						cfg->getRunAsGroup());
-			stderror.printf("	However, the config url %s\n",
-								configurl);
-			stderror.printf("	cannot be accessed by that ");
-			stderror.printf("user or group.\n\n");
-			stderror.printf("	Since you're using ");
-			stderror.printf("dynamic scaling ");
-			stderror.printf("(ie. maxconnections>connections),\n");
-			stderror.printf("	new connections would be ");
-			stderror.printf("started as\n");
-			stderror.printf("		user: %s\n",
-						cfg->getRunAsUser());
-			stderror.printf("		group: %s\n\n",
-						cfg->getRunAsGroup());
-			stderror.printf("	They would not be able to ");
-			stderror.printf("access the");
-			stderror.printf("config url and would shut down.\n\n");
-			stderror.printf("	To remedy this problem, ");
-			stderror.printf("make %s\n",configurl);
-			stderror.printf("	accessible by\n");
-			stderror.printf("		user: %s\n",
-						cfg->getRunAsUser());
-			stderror.printf("		group: %s\n",
-						cfg->getRunAsGroup());
+			stderror.printf("\n%s-scaler error:\n"
+					"	This instance of "
+					"%s is "
+					"configured to run as:\n"
+					"		user: %s\n"
+					"		group: %s\n\n"
+					"	However, the config url %s\n"
+					"	cannot be accessed by that "
+					"user or group.\n\n"
+					"	Since you're using "
+					"dynamic scaling "
+					"(ie. maxconnections>connections),\n"
+					"	new connections would be "
+					"started as\n"
+					"		user: %s\n"
+					"		group: %s\n\n"
+					"	They would not be able to "
+					"access the"
+					"config url and would shut down.\n\n"
+					"	To remedy this problem, "
+					"make %s\n"
+					"	accessible by\n"
+					"		user: %s\n"
+					"		group: %s\n",
+					SQLR,
+					SQL_RELAY,
+					cfg->getRunAsUser(),
+					cfg->getRunAsGroup(),
+					configurl,
+					cfg->getRunAsUser(),
+					cfg->getRunAsGroup(),
+					configurl,
+					cfg->getRunAsUser(),
+					cfg->getRunAsGroup());
 			return false;
 		}
 
@@ -325,10 +338,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// initialize the shared memory segment filename
 	size_t	idfilenamelen=charstring::length(sqlrpth->getIpcDir())+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	char	*idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,
-				"%s%s",sqlrpth->getIpcDir(),id);
+				"%s%s.ipc",sqlrpth->getIpcDir(),id);
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;
 
@@ -336,8 +349,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	shmem=new sharedmemory;
 	if (!shmem->attach(key,sizeof(sqlrshm))) {
 		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to shared memory segment: ");
-		stderror.printf("%s\n",err);
+		stderror.printf("Couldn't attach to shared memory segment: "
+				"%s\n",err);
 		delete[] err;
 		delete shmem;
 		shmem=NULL;
@@ -355,8 +368,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	semset=new semaphoreset;
 	if (!semset->attach(key,13)) {
 		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to semaphore set: ");
-		stderror.printf("%s\n",err);
+		stderror.printf("Couldn't attach to semaphore set: "
+				"%s\n",err);
 		delete[] err;
 		delete semset;
 		delete shmem;
@@ -721,9 +734,9 @@ bool scaler::availableDatabase() {
 	// initialize the database up/down filename
 	size_t	updownlen=charstring::length(sqlrpth->getIpcDir())+
 					charstring::length(id)+1+
-					charstring::length(connectionid)+1;
+					charstring::length(connectionid)+3+1;
 	char	*updown=new char[updownlen];
-	charstring::printf(updown,updownlen,"%s%s-%s",
+	charstring::printf(updown,updownlen,"%s%s-%s.up",
 				sqlrpth->getIpcDir(),id,connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;

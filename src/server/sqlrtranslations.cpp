@@ -127,7 +127,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 		stdoutput.printf("failed to load "
 				"translation module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -144,9 +144,9 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
-		stdoutput.printf("failed to create translation: %s\n",module);
+		stdoutput.printf("failed to load translation: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

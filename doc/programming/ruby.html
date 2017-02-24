@@ -2057,6 +2057,98 @@ end
 </tt></pre>
 
 </blockquote>
+<p>For result-set caching to be effective, the sqlr-cachemanager process must be enabled and running on the client system.  The sqlr-cachemanager scans the cache periodically and deletes cached result sets whos ttl's have expired.  If it is not running, stale result sets persist beyond their intended ttl's.</p>
+
+<p>To enable the sqlr-cachemanager at boot on systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">enable</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">start</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on most non-systemd platforms, you must create a symlink into the /etc/rc2.d or /etc/rc3.d directory.  Eg:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc2<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
+
+  <p>or</p>
+
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc3<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on most non-systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on FreeBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_enable<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on NetBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on OpenBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_flags<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on BSD platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
+</blockquote>
 <br/><a name="suspending"/><h2>Suspending and Resuming Sessions</h2>
 
 <p>Sometimes web-based applications need a single database transaction to span

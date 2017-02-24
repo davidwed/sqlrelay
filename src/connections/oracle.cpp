@@ -1,10 +1,7 @@
-// Copyright (c) 1999-2015  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#ifdef HAVE_ORACLE_8i
-	#include <rudiments/regularexpression.h>
-#endif
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
@@ -17,6 +14,14 @@
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
+
+#ifdef ORACLE_AT_RUNTIME
+	#include "oracleatruntime.cpp"
+#endif
+
+#ifdef HAVE_ORACLE_8i
+	#include <rudiments/regularexpression.h>
+#endif
 
 #define MAX_BYTES_PER_CHAR	4
 
@@ -36,7 +41,9 @@ extern "C" {
 	#ifdef __CYGWIN__
 		#define _int64 long long
 	#endif
-	#include <oci.h>
+	#ifndef ORACLE_AT_RUNTIME
+		#include <oci.h>
+	#endif
 
 	#define VARCHAR2_TYPE 1
 	#define	NUMBER_TYPE 2
@@ -89,18 +96,18 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 				~oracleconnection();
 	private:
 		void		handleConnectString();
-#ifdef HAVE_ORACLE_8i
+		#ifdef HAVE_ORACLE_8i
 		bool		tempTableTruncateBeforeDrop();
-#endif
+		#endif
 		bool		logIn(const char **error, const char **warning);
 		const char	*logInError(const char *errmsg);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
-#ifdef OCI_ATTR_PROXY_CREDENTIALS
+		#ifdef OCI_ATTR_PROXY_CREDENTIALS
 		bool		changeProxiedUser(const char *newuser,
 						const char *newpassword);
-#endif
+		#endif
 		bool		supportsTransactionBlocks();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
@@ -143,10 +150,10 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 
 		char		versionbuf[512];
 
-#ifdef OCI_ATTR_PROXY_CREDENTIALS
+		#ifdef OCI_ATTR_PROXY_CREDENTIALS
 		OCISession	*newsession;
 		bool		supportsproxycredentials;
-#endif
+		#endif
 		bool		supportssyscontext;
 		bool		requiresreprepare;
 
@@ -161,13 +168,13 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		uint32_t	fetchatonce;
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
-#ifdef OCI_STMT_CACHE
+		#ifdef OCI_STMT_CACHE
 		uint32_t	stmtcachesize;
-#endif
-#ifdef HAVE_ORACLE_8i
+		#endif
+		#ifdef HAVE_ORACLE_8i
 		bool		droptemptables;
 		bool		temptabletruncatebeforedrop;
-#endif
+		#endif
 		bool		rejectduplicatebinds;
 		bool		disablekeylookup;
 
@@ -247,7 +254,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		bool		outputBindCursor(const char *variable,
 						uint16_t variablesize,
 						sqlrservercursor *cursor);
-#ifdef HAVE_ORACLE_8i
+		#ifdef HAVE_ORACLE_8i
 		bool		inputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -284,7 +291,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
-#endif
+		#endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		bool		fetchFromBindCursor();
@@ -293,11 +300,11 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 						uint32_t length,
 						bool execute);
 		bool		validBinds();
-#ifdef HAVE_ORACLE_8i
+		#ifdef HAVE_ORACLE_8i
 		void		checkForTempTable(const char *query,
 							uint32_t length);
 		const char	*truncateTableQuery();
-#endif
+		#endif
 		bool		queryIsNotSelect();
 		void		errorMessage(char *errorbuffer,
 						uint32_t errorbufferlength,
@@ -352,9 +359,9 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 
 		OCIStmt		*stmt;
 		ub2		stmttype;
-#ifdef OCI_STMT_CACHE
+		#ifdef OCI_STMT_CACHE
 		ub4		stmtreleasemode;
-#endif
+		#endif
 		sword		ncols;
 
 		int32_t		resultsetbuffercount;
@@ -388,12 +395,12 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		ub1		*bvnl;
 		OCIBind		**hndl;
 
-#ifdef HAVE_ORACLE_8i
+		#ifdef HAVE_ORACLE_8i
 		OCILobLocator	**inbind_lob;
 		OCILobLocator	**outbind_lob;
 		uint16_t	orainbindlobcount;
 		uint16_t	oraoutbindlobcount;
-#endif
+		#endif
 
 		bool		bindformaterror;
 
@@ -411,9 +418,9 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 
 		oracleconnection	*oracleconn;
 
-#ifdef HAVE_ORACLE_8i
+		#ifdef HAVE_ORACLE_8i
 		regularexpression	preserverows;
-#endif
+		#endif
 };
 
 oracleconnection::oracleconnection(sqlrservercontroller *cont) :
@@ -427,10 +434,10 @@ oracleconnection::oracleconnection(sqlrservercontroller *cont) :
 	session=NULL;
 	trans=NULL;
 
-#ifdef OCI_ATTR_PROXY_CREDENTIALS
+	#ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
 	supportsproxycredentials=false;
-#endif
+	#endif
 	supportssyscontext=false;
 	requiresreprepare=false;
 
@@ -443,13 +450,13 @@ oracleconnection::oracleconnection(sqlrservercontroller *cont) :
 	fetchatonce=FETCH_AT_ONCE;
 	maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	stmtcachesize=STMT_CACHE_SIZE;
-#endif
-#ifdef HAVE_ORACLE_8i
+	#endif
+	#ifdef HAVE_ORACLE_8i
 	droptemptables=false;
 	temptabletruncatebeforedrop=false;
-#endif
+	#endif
 	rejectduplicatebinds=false;
 	disablekeylookup=false;
 	identity=NULL;
@@ -501,26 +508,26 @@ void oracleconnection::handleConnectString() {
 	#endif
 
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	stmtcachesize=charstring::toUnsignedInteger(
 				cont->getConnectStringValue("stmtcachesize"));
 	if (!stmtcachesize) {
 		stmtcachesize=STMT_CACHE_SIZE;
 	}
-#endif
+	#endif
 
 	cont->setFakeTransactionBlocksBehavior(
 		!charstring::compare(
 			cont->getConnectStringValue("faketransactionblocks"),
 			"yes"));
 
-#ifdef HAVE_ORACLE_8i
+	#ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
 			cont->getConnectStringValue("droptemptables"),"yes");
 
 	cont->addGlobalTempTables(
 			cont->getConnectStringValue("globaltemptables"));
-#endif
+	#endif
 
 	rejectduplicatebinds=!charstring::compare(
 			cont->getConnectStringValue("rejectduplicatebinds"),
@@ -649,8 +656,16 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		}
 	}
 
+	// load libraries on demand, if necessary
+	#ifdef ORACLE_AT_RUNTIME
+	if (!loadLibraries(&errormessage)) {
+		*error=errormessage.getString();
+		return false;
+	}
+	#endif
+
 	// init OCI
-#ifdef HAVE_ORACLE_8i
+	#ifdef HAVE_ORACLE_8i
 	if (OCIEnvCreate((OCIEnv **)&env,OCI_DEFAULT|OCI_OBJECT,(dvoid *)0,
 				(dvoid *(*)(dvoid *, size_t))0,
 				(dvoid *(*)(dvoid *, dvoid *, size_t))0,
@@ -659,7 +674,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		*error=logInError("OCIEnvCreate() failed");
 		return false;
 	}
-#else
+	#else
 	if (OCIInitialize(OCI_DEFAULT,NULL,NULL,NULL,NULL)!=OCI_SUCCESS) {
 		*error=logInError("OCIInitialize() failed");
 		return false;
@@ -669,7 +684,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		*error=logInError("OCIEnvInit() failed");
 		return false;
 	}
-#endif
+	#endif
 
 	// allocate an error handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&err,
@@ -770,11 +785,11 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 
 	// use statement caching if available
 	ub4	mode=OCI_DEFAULT;
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	if (stmtcachesize) {
 		mode=OCI_STMT_CACHE;
 	}
-#endif
+	#endif
 
 	// begin the session
 	sword	result=OCISessionBegin(svc,err,session,cred,mode);
@@ -808,7 +823,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	// set the statement cache size
 	if (OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
@@ -835,7 +850,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 			cont->raiseDebugMessageEvent(debugstr.getString());
 		}
 	}
-#endif
+	#endif
 
 	// allocate a transaction handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&trans,
@@ -907,11 +922,11 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// reprepare is required when using OCI 8 (not 8i or higher)
-#ifndef HAVE_ORACLE_8i
+	#ifndef HAVE_ORACLE_8i
 	requiresreprepare=true;
-#endif
+	#endif
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	if (stmtcachesize) {
 
 		// disable cursor sharing when statement caching is used...
@@ -964,7 +979,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 			return false;
 		}
 	}
-#endif
+	#endif
 	return true;
 }
 
@@ -997,12 +1012,12 @@ void oracleconnection::deleteCursor(sqlrservercursor *curs) {
 
 void oracleconnection::logOut() {
 
-#ifdef OCI_ATTR_PROXY_CREDENTIALS
+	#ifdef OCI_ATTR_PROXY_CREDENTIALS
 	if (newsession) {
 		OCISessionEnd(svc,err,newsession,OCI_DEFAULT);
 		OCIHandleFree(newsession,OCI_HTYPE_SESSION);
 	}
-#endif
+	#endif
 	OCIHandleFree(trans,OCI_HTYPE_TRANS);
 	OCISessionEnd(svc,err,session,OCI_DEFAULT);
 	OCIHandleFree(session,OCI_HTYPE_SESSION);
@@ -1066,11 +1081,11 @@ bool oracleconnection::changeProxiedUser(const char *newuser,
 
 	// use statement caching if available
 	ub4	mode=OCI_DEFAULT;
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	if (stmtcachesize) {
 		mode=OCI_STMT_CACHE;
 	}
-#endif
+	#endif
 
 	// start the session
 	if (OCISessionBegin(svc,err,newsession,
@@ -1984,9 +1999,9 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 
 	stmt=NULL;
 	stmttype=0;
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	stmtreleasemode=OCI_DEFAULT;
-#endif
+	#endif
 	ncols=0;
 
 	oracleconn=(oracleconnection *)conn;
@@ -2028,7 +2043,7 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 	oracurbindcount=0;
 	bindvarcount=0;
 
-#ifdef HAVE_ORACLE_8i
+	#ifdef HAVE_ORACLE_8i
 	inbind_lob=new OCILobLocator *[maxbindcount];
 	outbind_lob=new OCILobLocator *[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
@@ -2037,7 +2052,7 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 	}
 	orainbindlobcount=0;
 	oraoutbindlobcount=0;
-#endif
+	#endif
 	bindformaterror=false;
 
 	row=0;
@@ -2051,11 +2066,11 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 
 	resultfreed=true;
 
-#ifdef HAVE_ORACLE_8i
+	#ifdef HAVE_ORACLE_8i
 	setCreateTempTablePattern("(create|CREATE)[ 	\n\r]+(global|GLOBAL)[ 	\n\r]+(temporary|TEMPORARY)[ 	\n\r]+(table|TABLE)[ 	\n\r]+");
 	preserverows.compile("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
 	preserverows.study();
-#endif
+	#endif
 }
 
 oraclecursor::~oraclecursor() {
@@ -2089,10 +2104,10 @@ oraclecursor::~oraclecursor() {
 	delete[] bvnl;
 	delete[] hndl;
 
-#ifdef HAVE_ORACLE_8i
+	#ifdef HAVE_ORACLE_8i
 	delete[] inbind_lob;
 	delete[] outbind_lob;
-#endif
+	#endif
 
 	deallocateResultSetBuffers();
 }
@@ -2158,7 +2173,7 @@ bool oraclecursor::open() {
 
 	stmt=NULL;
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	// If statement caching is available then we don't need to allocate
 	// a cursor handle here, as it will be allocated by the call to
 	// OCIStmtPrepare2 later.
@@ -2169,7 +2184,7 @@ bool oraclecursor::open() {
 	if (oracleconn->stmtcachesize) {
 		return true;
 	}
-#endif
+	#endif
 
 	// allocate a cursor handle
 	if (OCIHandleAlloc((dvoid *)oracleconn->env,
@@ -2190,12 +2205,12 @@ bool oraclecursor::close() {
 
 	closeResultSet();
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	if (oracleconn->stmtcachesize && stmt) {
 		return OCIStmtRelease(stmt,oracleconn->err,
 				NULL,0,OCI_STRLS_CACHE_DELETE)==OCI_SUCCESS;
 	}
-#endif
+	#endif
 
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
@@ -2220,7 +2235,7 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 	// If statement caching is available then use OCIStmtPrepare2,
 	// otherwise just use OCIStmtPrepare.
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	if (oracleconn->stmtcachesize) {
 
 		// release any prior-allocated statement...
@@ -2289,7 +2304,7 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 				(OCIError *)oracleconn->err)==OCI_SUCCESS);
 
 	}
-#endif
+	#endif
 
 	// reset the statement type
 	stmttype=0;
@@ -2751,7 +2766,7 @@ bool oraclecursor::outputBindCursor(const char *variable,
 					uint16_t variablesize,
 					sqlrservercursor *cursor) {
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	// If the statement cache is in use then OCIStmtExecute will crash
 	// if the query includes cursor binds.  I'm not sure if this is an OCI
 	// bug or a problem caused by SQL Relay somehow, but until I discover
@@ -2760,7 +2775,7 @@ bool oraclecursor::outputBindCursor(const char *variable,
 	if (oracleconn->stmtcachesize) {
 		return false;
 	}
-#endif
+	#endif
 
 	checkRePrepare();
 
@@ -3101,12 +3116,12 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 	// execute the query
 	if (execute) {
 
-#ifdef HAVE_ORACLE_8i
+		#ifdef HAVE_ORACLE_8i
 		// check for create temp table query
 		if (stmttype==OCI_STMT_CREATE) {
 			checkForTempTable(query,length);
 		}
-#endif
+		#endif
 
 		// validate binds
 		if (!validBinds()) {
@@ -3445,13 +3460,13 @@ void oraclecursor::errorMessage(char *errorbuffer,
 						liveconnection);
 	}
 
-#ifdef OCI_STMT_CACHE
+	#ifdef OCI_STMT_CACHE
 	// set the statement release mode such that this query will be
 	// removed from the statement cache on the next iteration
 	if (charstring::length(errorbuffer)) {
 		stmtreleasemode=OCI_STRLS_CACHE_DELETE;
 	}
-#endif
+	#endif
 }
 
 uint64_t oraclecursor::affectedRows() {
@@ -3642,7 +3657,7 @@ bool oraclecursor::getLobFieldSegment(uint32_t col,
 }
 
 void oraclecursor::closeLobField(uint32_t col) {
-#ifdef HAVE_ORACLE_8i
+	#ifdef HAVE_ORACLE_8i
 	// if the lob is temporary, deallocate it
 	boolean	templob;
 	if (OCILobIsTemporary(oracleconn->env,
@@ -3656,7 +3671,7 @@ void oraclecursor::closeLobField(uint32_t col) {
 					oracleconn->err,
 					def_lob[col][row]);
 	}
-#endif
+	#endif
 }
 
 void oraclecursor::closeResultSet() {
@@ -3721,7 +3736,7 @@ void oraclecursor::closeResultSet() {
 		resultfreed=true;
 	}
 
-#ifdef HAVE_ORACLE_8i
+	#ifdef HAVE_ORACLE_8i
 	// free lob bind resources
 	for (uint16_t i=0; i<orainbindlobcount; i++) {
 		OCILobFreeTemporary(oracleconn->svc,
@@ -3745,7 +3760,7 @@ void oraclecursor::closeResultSet() {
 	}
 	orainbindlobcount=0;
 	oraoutbindlobcount=0;
-#endif
+	#endif
 
 	// free regular bind resources
 	for (uint16_t i=0; i<orainbindcount; i++) {

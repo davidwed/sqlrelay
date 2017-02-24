@@ -1,0 +1,187 @@
+PREFIX="@prefix@"
+
+' run with cscript
+if instr(lcase(WScript.FullName),"cscript")=0 Then
+	WScript.Echo("Please run:  cscript /nologo testall.vbs")
+	WScript.Quit
+end if
+
+' dbs and apis to test
+testdbs=Array(@TESTDBS@)
+testapis=Array(@TESTAPIS@)
+
+' create file system object
+set fso=CreateObject("Scripting.FileSystemObject")
+
+' create shell object
+set WshShell=WScript.CreateObject("WScript.Shell")
+
+' get hostname
+COMPUTERNAME=WshShell.ExpandEnvironmentStrings("%COMPUTERNAME%")
+
+' stop any existing instances
+WshShell.Exec(PREFIX & "\bin\sqlr-stop")
+WScript.Sleep(2000)
+
+' for each database/configuration...
+for each db in testdbs
+
+	' testing...
+	WScript.Echo("testing " & db & " (from " & COMPUTERNAME & ")...")
+
+	' for the router test, start the master/slave instances
+	if db="router" then
+		WshShell.Exec(PREFIX & "\bin\sqlr-start -id routermaster")
+		WScript.Sleep(2000)
+
+		WshShell.Exec(PREFIX & "\bin\sqlr-start -id routerslave")
+		WScript.Sleep(2000)
+	end if
+
+	' start the instance
+	WshShell.Exec(PREFIX & "\bin\sqlr-start -id " & db & "test")
+	WScript.Sleep(2000)
+
+	' make sure that the instance is up
+	PING=""
+	for i=1 to 10
+
+		WScript.Echo("")
+		WScript.Echo("pinging " & db & "...")
+		sqlrsh=""
+		if db="extensions" then
+			sqlrsh=PREFIX & "\bin\sqlrsh -host localhost -user test -password test -command ping"
+		else
+			sqlrsh=PREFIX & "\bin\sqlrsh -id " & db & "test -command ping"
+		end if
+		set cmd=WshShell.Exec(sqlrsh)
+
+		' get the output/error
+		set re = new RegExp
+		re.Pattern = "^\s*"
+		re.Multiline = False
+		PING=""
+		do until cmd.StdOut.AtEndOfStream
+			PING=PING & re.Replace(cmd.StdOut.ReadLine(),"")
+		loop
+		pingerr=""
+		do until cmd.StdErr.AtEndOfStream
+			pingerr=pingerr & re.Replace(cmd.StdErr.ReadLine(),"")
+		loop
+
+		Wscript.Echo(PING)
+		Wscript.Echo(pingerr)
+
+		if pingerr="0:Couldn't connect to the listener." then
+			WScript.Sleep(2000)
+		else
+			exit for
+		end if
+	next
+
+	' run the tests
+	if PING="The database is up." then
+		WScript.Echo("")
+		WScript.Echo("success...")
+		WScript.Echo("")
+		for each api in testapis
+			runapitest db,api
+		next
+	else
+		WScript.Echo("")
+		WScript.Echo("failed to start " & db & "test")
+		WScript.Echo("")
+		WScript.Echo("hit enter to continue or ctrl-c to stop...")
+		Wscript.StdIn.ReadLine()
+	end if
+
+	' shut down the instance(s)
+	if db="router" then
+		WScript.Sleep(2000)
+		WshShell.Exec(PREFIX & "\bin\sqlr-stop -id routermaster")
+		WScript.Sleep(2000)
+		WshShell.Exec(PREFIX & "\bin\sqlr-stop -id routerslave")
+	end if
+	WScript.Sleep(2000)
+	WshShell.Exec(PREFIX & "\bin\sqlr-stop -id " & db & "test")
+	WScript.Sleep(2000)
+
+	WScript.Echo("")
+	WScript.Echo("================================================================================")
+	WScript.Echo("")
+next
+
+function runapitest(db,api)
+
+	WScript.echo("testing in " & api)
+	WScript.echo("")
+	WshShell.CurrentDirectory=api 
+
+	TEST=""
+	TESTFILE=""
+	select case api
+		case "c"
+			TEST=db & ".exe"
+			TESTFILE=db & ".exe"
+		case "c++"
+			TEST=db & ".exe"
+			TESTFILE=db & ".exe"
+		case "cs"
+			TEST=db & ".exe"
+			TESTFILE=db & ".exe"
+		case "java"
+			TEST="run.bat " & db
+			TESTFILE=db & ".class"
+		case "nodejs"
+			TEST="node " & db & ".js"
+			TESTFILE=db & ".js"
+		case "perl"
+			TEST="perl " & db & ".pl"
+			TESTFILE=db & ".pl"
+		case "perldbi"
+			TEST="perl " & db & ".pl"
+			TESTFILE=db & ".pl"
+		case "php"
+			TEST="php " & db & ".php"
+			TESTFILE=db & ".php"
+		case "phppdo"
+			TEST="php " & db & ".php"
+			TESTFILE=db & ".php"
+		case "python"
+			TEST="python " & db & ".py"
+			TESTFILE=db & ".py"
+		case "pythondb"
+			TEST="python " & db & ".py"
+			TESTFILE=db & ".py"
+		case "ruby"
+			TEST="ruby " & db & ".rb"
+			TESTFILE=db & ".rb"
+		case "tcl"
+			TEST="tclsh " & db & ".tcl"
+			TESTFILE=db & ".tcl"
+	end select
+
+	if fso.FileExists(TESTFILE) then
+		set cmd=WshShell.Exec(TEST)
+		do until cmd.StdOut.AtEndOfStream
+			WScript.Echo(cmd.StdOut.ReadLine())
+		loop
+		if cmd.ExitCode=1 then
+			WScript.echo("")
+			WScript.echo("")
+			WScript.echo(db & " failed in " & api)
+			WScript.StdIn.ReadLine()
+		else
+			WScript.echo("")
+			WScript.echo("test complete")
+		end if
+	else
+		WScript.echo("no test found for " & db & " in " & api)
+	end if
+
+	WScript.echo("")
+	WScript.echo("================================================================================")
+	WScript.echo("")
+
+	WshShell.CurrentDirectory=".."
+end function

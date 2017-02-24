@@ -23,8 +23,6 @@ lib$(SQLR)clientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(CLIBS) $(LINKFLAGS)
 
 install: $(INSTALLLIB)
-	$(MKINSTALLDIRS) $(cachedir)
-	$(CHMOD) 777 $(cachedir)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/sqlrclientwrapper.h $(includedir)/sqlrelay
@@ -46,7 +44,6 @@ installlib:
 	$(LTFINISH) $(libdir)
 
 uninstall: $(UNINSTALLLIB)
-	$(RMTREE) $(cachedir)
 	$(RM) $(includedir)/sqlrclientwrapper.h \
 		$(includedir)/sqlrelay/sqlrclientwrapper.h \
 		$(includedir)/sqlrelay/private/sqlrclientwrapperincludes.h \

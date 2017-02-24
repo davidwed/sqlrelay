@@ -22,10 +22,10 @@ datadir = @datadir@
 docdir = ${datadir}/doc/$(SQLRELAY)
 licensedir = ${datadir}/licenses/$(SQLRELAY)
 EXAMPLEDIR = ${datadir}/$(SQLRELAY)/examples
-tmpdir = ${localstatedir}/$(SQLRELAY)/tmp
-cachedir = ${localstatedir}/$(SQLRELAY)/cache
-debugdir = ${localstatedir}/$(SQLRELAY)/debug
-logdir = ${localstatedir}/$(SQLRELAY)/log
+tmpdir = ${localstatedir}/run/$(SQLRELAY)
+cachedir = ${localstatedir}/cache/$(SQLRELAY)
+logdir = ${localstatedir}/log/$(SQLRELAY)
+debugdir = ${logdir}/debug
 initscript_prefix = @initscript_prefix@
 
 
@@ -38,6 +38,7 @@ THISDIR = ./
 
 
 # script extension
+SCRIPTINT =
 SCRIPTEXT = .sh
 
 
@@ -380,6 +381,7 @@ SOCKETLIBS = @SOCKETLIBS@
 
 
 # oracle
+ENABLE_ORACLE = @ENABLE_ORACLE@
 ORACLEINCLUDES = @ORACLEINCLUDES@
 ORACLELIBS = @ORACLELIBS@
 ORACLELIBSPATH = @ORACLELIBSPATH@
@@ -464,6 +466,7 @@ endif
 
 
 # sap/sybase
+ENABLE_SYBASE = @ENABLE_SYBASE@
 SYBASEINCLUDES = @SYBASEINCLUDES@
 SYBASELIBS = @SYBASELIBS@
 SYBASELIBSPATH = @SYBASELIBSPATH@
@@ -515,6 +518,7 @@ endif
 
 
 # db2
+ENABLE_DB2 = @ENABLE_DB2@
 DB2INCLUDES = @DB2INCLUDES@
 DB2LIBS = @DB2LIBS@
 DB2LIBSPATH = @DB2LIBSPATH@
@@ -543,6 +547,7 @@ endif
 
 
 # informix
+ENABLE_INFORMIX = @ENABLE_INFORMIX@
 INFORMIXINCLUDES = @INFORMIXINCLUDES@
 INFORMIXLIBS = @INFORMIXLIBS@
 INFORMIXCLILIBSPATH = @INFORMIXCLILIBSPATH@
@@ -657,6 +662,7 @@ endif
 SERVERCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
 LIBSQLRSERVERLIBS = -L$(top_builddir)/src/util -l$(SQLR)util
 SERVERLIBS = -L./ -l$(SQLR)server $(STATICPLUGINLIBS) -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+CACHEMANAGERLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
 	SERVERLIBS += -R $(libdir)
@@ -729,7 +735,7 @@ SYBASECONNECTIONLIBS = $(SYBASELIBS) $(CONNECTIONLIBS)
 CONNECTIONSALLTARGETS =
 CONNECTIONSINSTALLTARGETS =
 
-ifneq ($(strip $(DB2LIBS)),)
+ifeq ($(strip $(ENABLE_DB2)),yes)
 CONNECTIONSALLTARGETS += all-db2
 CONNECTIONSINSTALLTARGETS += installsharedlib-db2
 endif
@@ -741,7 +747,7 @@ ifneq ($(strip $(FIREBIRDLIBS)),)
 CONNECTIONSALLTARGETS += all-firebird
 CONNECTIONSINSTALLTARGETS += installsharedlib-firebird
 endif
-ifneq ($(strip $(INFORMIXLIBS)),)
+ifeq ($(strip $(ENABLE_INFORMIX)),yes)
 CONNECTIONSALLTARGETS += all-informix
 CONNECTIONSINSTALLTARGETS += installsharedlib-informix
 endif
@@ -759,7 +765,7 @@ CONNECTIONSALLTARGETS += all-odbc
 CONNECTIONSINSTALLTARGETS += installsharedlib-odbc
 endif
 endif
-ifneq ($(strip $(ORACLELIBS)),)
+ifeq ($(strip $(ENABLE_ORACLE)),yes)
 CONNECTIONSALLTARGETS += all-oracle
 CONNECTIONSINSTALLTARGETS += installsharedlib-oracle
 endif
@@ -771,7 +777,7 @@ ifneq ($(strip $(SQLITELIBS)),)
 CONNECTIONSALLTARGETS += all-sqlite
 CONNECTIONSINSTALLTARGETS += installsharedlib-sqlite
 endif
-ifneq ($(strip $(SYBASELIBS)),)
+ifeq ($(strip $(ENABLE_SYBASE)),yes)
 CONNECTIONSALLTARGETS += all-sap
 CONNECTIONSINSTALLTARGETS += installsharedlib-sap
 endif

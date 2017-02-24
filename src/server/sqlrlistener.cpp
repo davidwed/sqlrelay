@@ -59,8 +59,6 @@ class sqlrlistenerprivate {
 		sqlrloggers		*_sqlrlg;
 		sqlrnotifications	*_sqlrn;
 
-		stringbuffer	_debugstr;
-
 		semaphoreset	*_semset;
 		sharedmemory	*_shmem;
 		sqlrshm		*_shm;
@@ -197,10 +195,10 @@ sqlrlistener::~sqlrlistener() {
 			size_t	updownlen=
 				charstring::length(pvt->_sqlrpth->getIpcDir())+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::length(connectionid)+1;
+				charstring::length(connectionid)+3+1;
 			char	*updown=new char[updownlen];
 			charstring::printf(updown,updownlen,
-						"%s%s-%s",
+						"%s%s-%s.up",
 						pvt->_sqlrpth->getIpcDir(),
 						pvt->_cmdl->getId(),
 						connectionid);
@@ -367,21 +365,26 @@ void sqlrlistener::setUserAndGroup() {
 	char	*currentgroup=
 		groupentry::getName(process::getEffectiveGroupId());
 
+	stringbuffer	errorstr;
+
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
 	if (charstring::compare(currentgroup,pvt->_cfg->getRunAsGroup()) &&
 			!process::setGroup(pvt->_cfg->getRunAsGroup())) {
-		stderror.printf("Warning: could not change group to %s\n",
-						pvt->_cfg->getRunAsGroup());
+		errorstr.append("Warning: could not change group to ")->
+			append(pvt->_cfg->getRunAsGroup())->append('\n');
 	}
 
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
 	if (charstring::compare(currentuser,pvt->_cfg->getRunAsUser()) &&
 				!process::setUser(pvt->_cfg->getRunAsUser())) {
-		stderror.printf("Warning: could not change user to %s\n",
-						pvt->_cfg->getRunAsUser());
+		errorstr.append("Warning: could not change user to ")->
+			append(pvt->_cfg->getRunAsUser())->append('\n');
 	}
+
+	// write the error, if there was one
+	stderror.write(errorstr.getString(),errorstr.getStringLength());
 
 	// clean up
 	delete[] currentuser;
@@ -395,31 +398,35 @@ bool sqlrlistener::verifyAccessToConfigUrl(const char *url) {
 	}
 
 	if (!pvt->_cfg->accessible()) {
-		stderror.printf("\n%s-listener error:\n",SQLR);
-		stderror.printf("	This instance of %s is ",SQL_RELAY);
-		stderror.printf("configured to run as:\n");
-		stderror.printf("		user: %s\n",
-						pvt->_cfg->getRunAsUser());
-		stderror.printf("		group: %s\n\n",
-						pvt->_cfg->getRunAsGroup());
-		stderror.printf("	However, the config url %s\n",url);
-		stderror.printf("	cannot be accessed by that user ");
-		stderror.printf("or group.\n\n");
-		stderror.printf("	Since you're using dynamic scaling ");
-		stderror.printf("(ie. maxconnections>connections),\n");
-		stderror.printf("	new connections would be started as\n");
-		stderror.printf("		user: %s\n",
-						pvt->_cfg->getRunAsUser());
-		stderror.printf("		group: %s\n\n",
-						pvt->_cfg->getRunAsGroup());
-		stderror.printf("	They would not be able to access the");
-		stderror.printf("config url and would shut down.\n\n");
-		stderror.printf("	To remedy this problem, make %s\n",url);
-		stderror.printf("	accessible by\n");
-		stderror.printf("		user: %s\n",
-						pvt->_cfg->getRunAsUser());
-		stderror.printf("		group: %s\n",
-						pvt->_cfg->getRunAsGroup());
+		stderror.printf("\n%s-listener error:\n"
+				"	This instance of %s is "
+				"configured to run as:\n"
+				"		user: %s\n"
+				"		group: %s\n\n"
+				"	However, the config url %s\n"
+				"	cannot be accessed by that user "
+				"or group.\n\n"
+				"	Since you're using dynamic scaling "
+				"(ie. maxconnections>connections),\n"
+				"	new connections would be started as\n"
+				"		user: %s\n"
+				"		group: %s\n\n"
+				"	They would not be able to access the"
+				"config url and would shut down.\n\n"
+				"	To remedy this problem, make %s\n"
+				"	accessible by\n"
+				"		user: %s\n"
+				"		group: %s\n"
+				SQLR,
+				SQL_RELAY,
+				pvt->_cfg->getRunAsUser(),
+				pvt->_cfg->getRunAsGroup(),
+				url,
+				pvt->_cfg->getRunAsUser(),
+				pvt->_cfg->getRunAsGroup(),
+				url,
+				pvt->_cfg->getRunAsUser(),
+				pvt->_cfg->getRunAsGroup());
 		return false;
 	}
 	return true;
@@ -429,23 +436,24 @@ bool sqlrlistener::handlePidFile(const char *id) {
 
 	// check/set pid file
 	size_t	pidfilelen=charstring::length(pvt->_sqlrpth->getPidDir())+14+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	pvt->_pidfile=new char[pidfilelen];
 	charstring::printf(pvt->_pidfile,pidfilelen,
-				"%ssqlr-listener-%s",
+				"%ssqlr-listener-%s.pid",
 				pvt->_sqlrpth->getPidDir(),id);
 
 	if (process::checkForPidFile(pvt->_pidfile)!=-1) {
-		stderror.printf("\n%s-listener error:\n",SQLR);
-		stderror.printf("	The pid file %s",pvt->_pidfile);
-		stderror.printf(" exists.\n");
-		stderror.printf("	This usually means that the ");
-		stderror.printf("%s-listener is already running for ",SQLR);
-		stderror.printf("the \n");
-		stderror.printf("	%s",id);
-		stderror.printf(" instance.\n");
-		stderror.printf("	If it is not running, please remove ");
-		stderror.printf("the file and restart.\n");
+		stderror.printf("\n%s-listener error:\n"
+				"	The pid file %s"
+				" exists.\n"
+				"	This usually means that the "
+				"%s-listener is already running for "
+				"the \n"
+				"	%s"
+				" instance.\n"
+				"	If it is not running, please remove "
+				"the file and restart.\n",
+				SQLR,pvt->_pidfile,SQLR,id);
 		delete[] pvt->_pidfile;
 		pvt->_pidfile=NULL;
 		return false;
@@ -561,17 +569,17 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// initialize the ipc filename
 	size_t	idfilenamelen=charstring::length(pvt->_sqlrpth->getIpcDir())+
-						charstring::length(id)+1;
+						charstring::length(id)+4+1;
 	pvt->_idfilename=new char[idfilenamelen];
 	charstring::printf(pvt->_idfilename,idfilenamelen,
-				"%s%s",pvt->_sqlrpth->getIpcDir(),id);
+				"%s%s.ipc",pvt->_sqlrpth->getIpcDir(),id);
 
 	if (pvt->_sqlrlg || pvt->_sqlrn) {
-		pvt->_debugstr.clear();
-		pvt->_debugstr.append("creating shared memory "
+		stringbuffer	debugstr;
+		debugstr.append("creating shared memory "
 					"and semaphores: id filename: ");
-		pvt->_debugstr.append(pvt->_idfilename);
-		raiseDebugMessageEvent(pvt->_debugstr.getString());
+		debugstr.append(pvt->_idfilename);
+		raiseDebugMessageEvent(debugstr.getString());
 	}
 
 	// make sure that the file exists and is read/writeable
@@ -692,57 +700,69 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 }
 
 void sqlrlistener::ipcFileError(const char *idfilename) {
-	stderror.printf("Could not open: %s\n",idfilename);
-	stderror.printf("Make sure that the file and directory are ");
-	stderror.printf("readable and writable.\n\n");
+
+	char	*currentuser=
+		userentry::getName(process::getEffectiveUserId());
+	char	*currentgroup=
+		groupentry::getName(process::getEffectiveGroupId());
+
+	stderror.printf("Could not open: %s\n"
+			"Make sure that the directory "
+			"is writable by %s:%s.\n\n",
+			idfilename,currentuser,currentgroup);
+	delete[] currentuser;
+	delete[] currentgroup;
 }
 
 void sqlrlistener::keyError(const char *idfilename) {
 	char	*err=error::getErrorString();
-	stderror.printf("\n%s-listener error:\n",SQLR);
-	stderror.printf("	Unable to generate a key from ");
-	stderror.printf("%s\n",idfilename);
-	stderror.printf("	Error was: %s\n\n",err);
+	stderror.printf("\n%s-listener error:\n"
+			"	Unable to generate a key from "
+			"%s\n"
+			"	Error was: %s\n\n",
+			SQLR,idfilename,err);
 	delete[] err;
 }
 
 void sqlrlistener::shmError(const char *id, int shmid) {
 	char	*err=error::getErrorString();
-	stderror.printf("\n%s-listener error:\n",SQLR);
-	stderror.printf("	Unable to create a shared memory ");
-	stderror.printf("segment.  This is usally because an \n");
-	stderror.printf("	%s-listener is already running for ",SQLR);
-	stderror.printf("the %s instance.\n\n",id);
-	stderror.printf("	If it is not running, something may ");
-	stderror.printf("have crashed and left an old segment\n");
-	stderror.printf("	lying around.  Use the ipcs command ");
-	stderror.printf("to inspect existing shared memory \n");
-	stderror.printf("	segments and the ipcrm command to ");
-	stderror.printf("remove the shared memory segment with ");
-	stderror.printf("\n	id %d.\n\n",shmid);
-	stderror.printf("	Error was: %s\n\n",err);
+	stderror.printf("\n%s-listener error:\n"
+			"	Unable to create a shared memory "
+			"segment.  This is usally because an \n"
+			"	%s-listener is already running for "
+			"the %s instance.\n\n"
+			"	If it is not running, something may "
+			"have crashed and left an old segment\n"
+			"	lying around.  Use the ipcs command "
+			"to inspect existing shared memory \n"
+			"	segments and the ipcrm command to "
+			"remove the shared memory segment with "
+			"\n	id %d.\n\n"
+			"	Error was: %s\n\n",
+			SQLR,SQLR,id,shmid,err);
 	delete[] err;
 }
 
 void sqlrlistener::semError(const char *id, int semid) {
 	char	*err=error::getErrorString();
-	stderror.printf("\n%s-listener error:\n",SQLR);
-	stderror.printf("	Unable to create a semaphore ");
-	stderror.printf("set.  This is usally because an \n");
-	stderror.printf("	%s-listener is already ",SQLR);
-	stderror.printf("running for the %s",id);
-	stderror.printf(" instance.\n\n");
-	stderror.printf("	If it is not running, ");
-	stderror.printf("something may have crashed and left ");
-	stderror.printf("an old semaphore set\n");
-	stderror.printf("	lying around.  Use the ipcs ");
-	stderror.printf("command to inspect existing ");
-	stderror.printf("semaphore sets \n");
-	stderror.printf("	and the ipcrm ");
-	stderror.printf("command to remove the semaphore set ");
-	stderror.printf("with \n");
-	stderror.printf("	id %d.\n\n",semid);
-	stderror.printf("	Error was: %s\n\n",err);
+	stderror.printf("\n%s-listener error:\n"
+			"	Unable to create a semaphore "
+			"set.  This is usally because an \n"
+			"	%s-listener is already "
+			"running for the %s"
+			" instance.\n\n"
+			"	If it is not running, "
+			"something may have crashed and left "
+			"an old semaphore set\n"
+			"	lying around.  Use the ipcs "
+			"command to inspect existing "
+			"semaphore sets \n"
+			"	and the ipcrm "
+			"command to remove the semaphore set "
+			"with \n"
+			"	id %d.\n\n"
+			"	Error was: %s\n\n"
+			SQLR,SQLR,id,semid,err);
 	delete[] err;
 }
 
@@ -872,11 +892,19 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 			info.append(sock);
 			raiseInternalErrorEvent(info.getString());
 
-			stderror.printf("Could not listen on unix socket: ");
-			stderror.printf("%s\n",sock);
-			stderror.printf("Make sure that the file and ");
-			stderror.printf("directory are readable and writable.");
-			stderror.printf("\n\n");
+			char	*currentuser=
+					userentry::getName(
+						process::getEffectiveUserId());
+			char	*currentgroup=
+					groupentry::getName(
+						process::getEffectiveGroupId());
+			stderror.printf("Could not listen on unix socket: "
+					"%s\n"
+					"Make sure that the directory is "
+					"writable by %s:%s.\n\n",
+					sock,currentuser,currentgroup);
+			delete[] currentuser;
+			delete[] currentgroup;
 
 			delete pvt->_clientsockun[pvt->_clientsockunindex];
 			pvt->_clientsockun[pvt->_clientsockunindex]=NULL;
@@ -898,16 +926,16 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 	// the handoff socket
 	size_t	handoffsocknamelen=
 			charstring::length(pvt->_sqlrpth->getSocketsDir())+
-						charstring::length(id)+8+1;
+						charstring::length(id)+13+1;
 	pvt->_handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(pvt->_handoffsockname,
 				handoffsocknamelen,
-				"%s%s-handoff",
+				"%s%s-handoff.sock",
 				pvt->_sqlrpth->getSocketsDir(),id);
 
 	pvt->_handoffsockun=new unixsocketserver();
 	bool	success=pvt->_handoffsockun->listen(
-				pvt->_handoffsockname,0066,15);
+				pvt->_handoffsockname,0077,15);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_handoffsockun);
@@ -917,11 +945,16 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 		info.append(pvt->_handoffsockname);
 		raiseInternalErrorEvent(info.getString());
 
-		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",pvt->_handoffsockname);
-		stderror.printf("Make sure that the file and ");
-		stderror.printf("directory are readable and writable.");
-		stderror.printf("\n\n");
+		char	*currentuser=userentry::getName(
+						process::getEffectiveUserId());
+		char	*currentgroup=groupentry::getName(
+						process::getEffectiveGroupId());
+		stderror.printf("Could not listen on unix socket: %s\n"
+				"Make sure that the directory is "
+				"writable by %s:%s.\n\n",
+				pvt->_handoffsockname,currentuser,currentgroup);
+		delete[] currentuser;
+		delete[] currentgroup;
 	}
 
 	return success;
@@ -932,16 +965,16 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 	// the deregistration socket
 	size_t	removehandoffsocknamelen=
 			charstring::length(pvt->_sqlrpth->getSocketsDir())+
-						charstring::length(id)+14+1;
+						charstring::length(id)+19+1;
 	pvt->_removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(pvt->_removehandoffsockname,
 				removehandoffsocknamelen,
-				"%s%s-removehandoff",
+				"%s%s-removehandoff.sock",
 				pvt->_sqlrpth->getSocketsDir(),id);
 
 	pvt->_removehandoffsockun=new unixsocketserver();
 	bool	success=pvt->_removehandoffsockun->listen(
-				pvt->_removehandoffsockname,0066,15);
+				pvt->_removehandoffsockname,0077,15);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_removehandoffsockun);
@@ -951,11 +984,17 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 		info.append(pvt->_removehandoffsockname);
 		raiseInternalErrorEvent(info.getString());
 
-		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",pvt->_removehandoffsockname);
-		stderror.printf("Make sure that the file and ");
-		stderror.printf("directory are readable and writable.");
-		stderror.printf("\n\n");
+		char	*currentuser=userentry::getName(
+						process::getEffectiveUserId());
+		char	*currentgroup=groupentry::getName(
+						process::getEffectiveGroupId());
+		stderror.printf("Could not listen on unix socket: %s\n"
+				"Make sure that the directory is "
+				"writable by %s:%s.\n\n",
+				pvt->_removehandoffsockname,
+				currentuser,currentgroup);
+		delete[] currentuser;
+		delete[] currentgroup;
 	}
 
 	return success;
@@ -966,15 +1005,15 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	// the fixup socket
 	size_t	fixupsocknamelen=
 			charstring::length(pvt->_sqlrpth->getSocketsDir())+
-						charstring::length(id)+6+1;
+						charstring::length(id)+11+1;
 	pvt->_fixupsockname=new char[fixupsocknamelen];
 	charstring::printf(pvt->_fixupsockname,
 				fixupsocknamelen,
-				"%s%s-fixup",
+				"%s%s-fixup.sock",
 				pvt->_sqlrpth->getSocketsDir(),id);
 
 	pvt->_fixupsockun=new unixsocketserver();
-	bool	success=pvt->_fixupsockun->listen(pvt->_fixupsockname,0066,15);
+	bool	success=pvt->_fixupsockun->listen(pvt->_fixupsockname,0077,15);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_fixupsockun);
@@ -984,11 +1023,17 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 		info.append(pvt->_fixupsockname);
 		raiseInternalErrorEvent(info.getString());
 
-		stderror.printf("Could not listen on unix socket: ");
-		stderror.printf("%s\n",pvt->_fixupsockname);
-		stderror.printf("Make sure that the file and ");
-		stderror.printf("directory are readable and writable.");
-		stderror.printf("\n\n");
+		char	*currentuser=userentry::getName(
+						process::getEffectiveUserId());
+		char	*currentgroup=groupentry::getName(
+						process::getEffectiveGroupId());
+		stderror.printf("Could not listen on unix socket: %s\n"
+				"Make sure that the directory is "
+				"writable by %s:%s.\n\n",
+				pvt->_fixupsockname,
+				currentuser,currentgroup);
+		delete[] currentuser;
+		delete[] currentgroup;
 	}
 
 	return success;
@@ -1414,10 +1459,10 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 
 		// parent...
 		if (pvt->_sqlrlg || pvt->_sqlrn) {
-			pvt->_debugstr.clear();
-			pvt->_debugstr.append("forked a child: ");
-			pvt->_debugstr.append((int32_t)childpid);
-			raiseDebugMessageEvent(pvt->_debugstr.getString());
+			stringbuffer	debugstr;
+			debugstr.append("forked a child: ");
+			debugstr.append((int32_t)childpid);
+			raiseDebugMessageEvent(debugstr.getString());
 		}
 
 		// the main process doesn't need to stay connected
@@ -1519,7 +1564,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 				// died because its ttl expired...
 
 				raiseInternalErrorEvent("failed to pass "
-						"file descriptor");
+							"file descriptor");
 				continue;
 			}
 
@@ -1779,14 +1824,13 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// make sure the connection is actually up...
 			if (connectionIsUp(pvt->_shm->connectionid)) {
 				if (pvt->_sqlrlg || pvt->_sqlrn) {
-					pvt->_debugstr.clear();
-					pvt->_debugstr.append(
-							"finished getting "
+					stringbuffer	debugstr;
+					debugstr.append("finished getting "
 							"a connection: ");
-					pvt->_debugstr.append(
+					debugstr.append(
 						(int32_t)*connectionpid);
 					raiseDebugMessageEvent(
-						pvt->_debugstr.getString());
+						debugstr.getString());
 				}
 				return true;
 			}
@@ -1830,10 +1874,10 @@ bool sqlrlistener::connectionIsUp(const char *connectionid) {
 	size_t	updownlen=charstring::length(
 				pvt->_sqlrpth->getIpcDir())+
 				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::length(connectionid)+1;
+				charstring::length(connectionid)+3+1;
 	char	*updown=new char[updownlen];
 	charstring::printf(updown,updownlen,
-				"%s%s-%s",
+				"%s%s-%s.up",
 				pvt->_sqlrpth->getIpcDir(),
 				pvt->_cmdl->getId(),connectionid);
 	bool	retval=file::exists(updown);
@@ -1927,7 +1971,8 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 bool sqlrlistener::requestFixup(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
-	raiseDebugMessageEvent("requesting socket of newly spawned connection...");
+	raiseDebugMessageEvent("requesting socket of newly "
+					"spawned connection...");
 
 	// connect to the fixup socket of the parent listener
 	unixsocketclient	fixupclientsockun;
@@ -1977,13 +2022,13 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	unsigned char	ack=0;
 	if (serversock->read(&ack,5,0)!=sizeof(unsigned char)) {
 		raiseDebugMessageEvent("proxying client failed: "
-				"failed to receive ack");
+					"failed to receive ack");
 		return false;
 	}
 	#define ACK	6
 	if (ack!=ACK) {
 		raiseDebugMessageEvent("proxying client failed: "
-				"received bad ack");
+					"received bad ack");
 		return false;
 	}
 
@@ -2029,15 +2074,14 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append("read failed: ");
-				pvt->_debugstr.append((uint32_t)readcount);
-				pvt->_debugstr.append(" : ");
+				stringbuffer	debugstr;
+				debugstr.append("read failed: ");
+				debugstr.append((uint32_t)readcount);
+				debugstr.append(" : ");
 				char	*err=error::getErrorString();
-				pvt->_debugstr.append(err);
+				debugstr.append(err);
 				delete[] err;
-				raiseDebugMessageEvent(
-					pvt->_debugstr.getString());
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			endsession=(fd==clientsock);
 			break;
@@ -2046,23 +2090,21 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// write the data to the other side
 		if (fd==serversock) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append("read ");
-				pvt->_debugstr.append((uint32_t)readcount);
-				pvt->_debugstr.append(" bytes from server");
-				raiseDebugMessageEvent(
-					pvt->_debugstr.getString());
+				stringbuffer	debugstr;
+				debugstr.append("read ");
+				debugstr.append((uint32_t)readcount);
+				debugstr.append(" bytes from server");
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			clientsock->write(readbuffer,readcount);
 			clientsock->flushWriteBuffer(-1,-1);
 		} else if (fd==clientsock) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				pvt->_debugstr.clear();
-				pvt->_debugstr.append("read ");
-				pvt->_debugstr.append((uint32_t)readcount);
-				pvt->_debugstr.append(" bytes from client");
-				raiseDebugMessageEvent(
-					pvt->_debugstr.getString());
+				stringbuffer	debugstr;
+				debugstr.append("read ");
+				debugstr.append((uint32_t)readcount);
+				debugstr.append(" bytes from client");
+				raiseDebugMessageEvent(debugstr.getString());
 			}
 			serversock->write(readbuffer,readcount);
 			serversock->flushWriteBuffer(-1,-1);

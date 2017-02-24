@@ -6,8 +6,14 @@ PREFIX=@prefix@
 $PREFIX/bin/sqlr-stop
 sleep 2
 
+# really kill them
+kill `ps aux | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
+kill `ps aux | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
+kill `ps aux | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+sleep 2
+
 # for each database/configuration...
-for DB in  firebird freetds informix mdbtools mysql oracle tls krb extensions postgresql sqlite sap router db2
+for DB in  @TESTDBS@
 do
 
 	# for tls, krb, and extensions tests, verify that we support oracle
@@ -72,12 +78,12 @@ do
 		echo "pinging $DB..."
 		if ( test "$DB" = "tls" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/client.pem -tlsca $PREFIX/etc/ca.pem -tlsvalidate ca -command ping`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/client.pem -tlsca $PREFIX/etc/ca.pem -tlsvalidate ca -command ping 2>&1`
 		elif ( test "$DB" = "extensions" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping 2>&1`
 		else
-			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping`
+			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping 2>&1`
 		fi
 
 		# (this collapses whitespace)
@@ -87,7 +93,12 @@ do
 
 		if ( test "$PING" = "0: Couldn't connect to the listener." )
 		then
-			sleep 2
+			if ( test "$DB" = "db2" )
+			then
+				sleep 5
+			else
+				sleep 2
+			fi
 		else
 			break
 		fi
@@ -115,7 +126,12 @@ do
 		echo "hit enter to continue or ctrl-c to stop..."
 		if ( test "$DB" = "krb" )
 		then
-			read -t 20 PROMPT
+			read -t 20 PROMPT 2> /dev/null
+			# (ubuntu's dash doesn't support read -t)
+			if ( test "$?" != "0" )
+			then
+				sleep 20
+			fi
 		else
 			read PROMPT
 		fi

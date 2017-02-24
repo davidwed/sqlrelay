@@ -103,10 +103,10 @@ void sqlrcachemanager::scan() {
 	// create pid file
 	pid_t	pid=process::getProcessId();
 	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+18+
-				charstring::integerLength((uint64_t)pid)+1;
+				charstring::integerLength((uint64_t)pid)+4+1;
 	pidfile=new char[pidfilelen];
 	charstring::printf(pidfile,pidfilelen,
-				"%ssqlr-cachemanager.%ld",
+				"%ssqlr-cachemanager.%ld.pid",
 				sqlrpth->getPidDir(),(long)pid);
 
 	process::createPidFile(pidfile,permissions::ownerReadWrite());

@@ -91,7 +91,7 @@
 #define USERSIZE 128
 #define MAXCONNECTIONIDLEN 256
 #define MAXUNIXSOCKETLEN 1024
-#define MAXCONNECTIONS 512
+#define MAXCONNECTIONS @ABS_MAXCONNECTIONS@
 
 // errors...
 // (hopefully the 900000+ range doesn't collide with anyone's native codes)

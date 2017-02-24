@@ -14,6 +14,18 @@ AC_ARG_ENABLE(profiling,
 	[  --enable-profiling            compile with -pg options],
 	CFLAGS="$CFLAGS -pg"; CXXFLAGS="$CXXFLAGS -pg",
 	CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS")
+AC_ARG_ENABLE(fortify,
+	[  --enable-fortify              compile with various gcc fortification options],
+	CFLAGS="$CFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong",
+	CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS")
+AC_ARG_ENABLE(wall,
+	[  --disable-wall          compile without -Wall, even if supported],
+	ENABLE_WALL="",
+	ENABLE_WALL="yes")
+AC_ARG_ENABLE(werror,
+	[  --disable-werror        compile without -Werror, even if supported],
+	ENABLE_WERROR="",
+	ENABLE_WERROR="yes")
 
 CFLAGS="$SMALLCODE $CFLAGS"
 CXXFLAGS="$SMALLCODE $CXXFLAGS"
@@ -68,6 +80,10 @@ AC_ARG_ENABLE(oracle-rpath,
 	[  --disable-oracle-rpath        Don't use -rpath when building Oracle connection module],
 	ORACLEUSERPATH="",
 	ORACLEUSERPATH="yes")
+AC_ARG_ENABLE(oracle-at-runtime,
+	[  --enable-oracle-at-runtime    Disable static/dynamic linking against Oracle client libraries and force the connection module to load them at runtime],
+	ORACLEATRUNTIME="yes",
+	ORACLEATRUNTIME="")
 AC_ARG_WITH(mysql-prefix,
 	[  --with-mysql-prefix           Location of MySQL],
 	MYSQLPATH="$withval",
@@ -132,6 +148,10 @@ AC_ARG_ENABLE(sap-rpath,
 	[  --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module],
 	SYBASEUSERPATH="",
 	SYBASEUSERPATH="yes")
+AC_ARG_ENABLE(sap-at-runtime,
+	[  --enable-sap-at-runtime       Disable static/dynamic linking against SAP/Sybase client libraries and force the connection module to load them at runtime],
+	SYBASEATRUNTIME="yes",
+	SYBASEATRUNTIME="")
 AC_ARG_WITH(odbc-prefix,
 	[  --with-odbc-prefix            Location of ODBC],
 	ODBCPATH="$withval",
@@ -160,6 +180,10 @@ AC_ARG_ENABLE(db2-rpath,
 	[  --disable-db2-rpath           Use -rpath when building DB2 connection module],
 	DB2USERPATH="",
 	DB2USERPATH="yes")
+AC_ARG_ENABLE(db2-at-runtime,
+	[  --enable-db2-at-runtime       Disable static/dynamic linking against DB2 client libraries and force the connection module to load them at runtime],
+	DB2ATRUNTIME="yes",
+	DB2ATRUNTIME="")
 AC_ARG_WITH(firebird-prefix,
 	[  --with-firebird-prefix        Location of Firebird],
 	FIREBIRDPATH="$withval",
@@ -184,6 +208,10 @@ AC_ARG_ENABLE(informix-rpath,
 	[  --disable-informix-rpath      Don't use -rpath when building Informix connection module],
 	INFORMIXUSERPATH="",
 	INFORMIXUSERPATH="yes")
+AC_ARG_ENABLE(informix-at-runtime,
+	[  --enable-informix-at-runtime  Disable static/dynamic linking against Informix client libraries and force the connection module to load them at runtime],
+	INFORMIXATRUNTIME="yes",
+	INFORMIXATRUNTIME="")
 AC_ARG_WITH(mdbtools-prefix,
 	[  --with-mdbtools-prefix        Location of MDB Tools],
 	MDBTOOLSPATH="$withval",
@@ -397,6 +425,18 @@ AC_ARG_ENABLE(doc,
 	[  --disable-doc                 Don't install docs or man pages],
 	ENABLE_DOC="",
 	ENABLE_DOC="yes")
+AC_ARG_WITH(default-runasuser,
+	[  --with-default-runasuser      Default user to run SQL Relay as],
+	DEFAULT_RUNASUSER="$withval",
+	DEFAULT_RUNASUSER="nobody")
+AC_ARG_WITH(default-runasgroup,
+	[  --with-default-runasgroup     Default group to run SQL Relay as],
+	DEFAULT_RUNASGROUP="$withval",
+	DEFAULT_RUNASGROUP="nobody")
+AC_ARG_WITH(abs-max-connections,
+	[  --with-abs-max-connections    Set the absolute maximum number of connections that may be started for an instance.  Defaults to 4096.],
+	ABS_MAXCONNECTIONS="$withval",
+	ABS_MAXCONNECTIONS="4096")
 
 
 dnl tweak enabled/disabled things
@@ -512,10 +552,14 @@ AC_SUBST(ENABLE_CMDLINE)
 AC_SUBST(ENABLE_SERVER)
 AC_SUBST(ENABLE_UTIL)
 AC_SUBST(ENABLE_DOC)
+AC_SUBST(ABS_MAXCONNECTIONS)
 
 AC_DEFINE_UNQUOTED(SQLR,["$SQLR"],replacement for "sqlr")
 AC_DEFINE_UNQUOTED(SQLRELAY,["$SQLRELAY"],replacement for "sqlrelay")
 AC_DEFINE_UNQUOTED(SQL_RELAY,["$SQL_RELAY"],replacement for "SQL Relay")
+
+AC_DEFINE_UNQUOTED(DEFAULT_RUNASUSER,["$DEFAULT_RUNASUSER"],default user to run SQL Relay as)
+AC_DEFINE_UNQUOTED(DEFAULT_RUNASGROUP,["$DEFAULT_RUNASGROUP"],default group to run SQL Relay as)
 
 
 dnl Rewrite supplied paths.
@@ -851,7 +895,7 @@ dnl    (and set MINOR and PATCH to 0)
 dnl 2. MINOR when you add backwards-compatible features
 dnl    (and set PATCH to 0)
 dnl 3. PATCH when you make backwards-compatible fixes
-SQLR_VERSION="1.0.0"
+SQLR_VERSION="1.0.1"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 
@@ -862,7 +906,7 @@ dnl if library source changed at all,         c:r:a -> c:r+1:a
 dnl if interfaces added, removed, or changed, c:r:a -> c+1:0:a
 dnl if interfaces added,                      c:r:a -> c:r:a+1
 dnl if interfaces removed,                    c:r:a -> c:r:0
-SONAME_VERSION_INFO="4:0:0"
+SONAME_VERSION_INFO="4:1:0"
 AC_SUBST(SONAME_VERSION_INFO)
 
 
@@ -928,38 +972,11 @@ then
 fi
 
 
-MAKELIST="config.mk bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
-AC_OUTPUT($MAKELIST)
-chmod 755 bin/sqlrclient-config
-chmod 755 bin/sqlrclientwrapper-config
-chmod 755 bin/sqlrserver-config
-chmod 755 init/rc.sqlrelay
-chmod 755 init/rc.sqlrcachemanager
-sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
-mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
-sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
-mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
-sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
-sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
-
-
-
-dnl Summary.
-echo
-echo "***** Summary ***********************************************"
-
-echo " Version      : $SQLR_VERSION"
-echo
-echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
 
 CMDLINEBUILD="no "
 if ( test -n "$ENABLE_CMDLINE" ); then
 	CMDLINEBUILD="yes"
 fi
-
-echo
-echo " Command Line : Clients     $CMDLINEBUILD"
-echo
 
 CPPBUILD="no "
 PERLBUILD="no "
@@ -973,50 +990,53 @@ ERLANGBUILD="no "
 MONOBUILD="no "
 NODEJSBUILD="no "
 ODBCDRIVERBUILD="no "
+TESTAPIS=""
 if ( test -n "$ENABLE_CPP" ); then
 	CPPBUILD="yes"
+	TESTAPIS="$TESTAPIS c c++"
 fi
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
+	TESTAPIS="$TESTAPIS perl perldbi"
 fi
 if ( test -n "$HAVE_PYTHON" ); then
 	PYTHONBUILD="yes"
+	TESTAPIS="$TESTAPIS python pythondb"
 fi
 if ( test -n "$HAVE_RUBY" ); then
 	RUBYBUILD="yes"
+	TESTAPIS="$TESTAPIS ruby"
 fi
 if ( test -n "$HAVE_PHP" ); then
 	PHPBUILD="yes"
+	TESTAPIS="$TESTAPIS php"
 fi
 if ( test -n "$HAVE_PHP_PDO" ); then
 	PHPPDOBUILD="yes"
+	TESTAPIS="$TESTAPIS phppdo"
 fi
 if ( test -n "$HAVE_JAVA" ); then
 	JAVABUILD="yes"
+	TESTAPIS="$TESTAPIS java"
 fi
 if ( test -n "$HAVE_TCL" ); then
 	TCLBUILD="yes"
+	TESTAPIS="$TESTAPIS tcl"
 fi
 if ( test -n "$HAVE_ERLANG" ); then
 	ERLANGBUILD="yes"
 fi
 if ( test -n "$HAVE_MONO" ); then
 	MONOBUILD="yes"
+	TESTAPIS="$TESTAPIS cs"
 fi
 if ( test -n "$HAVE_NODEJS" ); then
 	NODEJSBUILD="yes"
+	TESTAPIS="$TESTAPIS nodejs"
 fi
 if ( test -n "$ENABLE_ODBC_DRIVER" ); then
 	ODBCDRIVERBUILD="yes"
 fi
-echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
-echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
-echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
-echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERBUILD"
-echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
-echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
-echo
-
 
 MYSQLDIBUILD="no    "
 POSTGRESQLDIBUILD="no    "
@@ -1026,99 +1046,163 @@ fi
 if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
 	POSTGRESQLDIBUILD="yes   "
 fi
-echo " Drop-In Replacement Libraries:"
-echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
-echo
 
-
-ORACLE8BUILD="no     "
-MYSQLBUILD="no     "
-POSTGRESQLBUILD="no     "
-SQLITEBUILD="no     "
-FREETDSBUILD="no     "
-SYBASEBUILD="no     "
-ODBCBUILD="no     "
-DB2BUILD="no     "
-FIREBIRDBUILD="no     "
-MDBTOOLSBUILD="no     "
-INFORMIXBUILD="no     "
-ROUTERBUILD="no     "
+ORACLEBUILD="no        "
+MYSQLBUILD="no        "
+POSTGRESQLBUILD="no        "
+SQLITEBUILD="no        "
+FREETDSBUILD="no        "
+SYBASEBUILD="no        "
+ODBCBUILD="no        "
+DB2BUILD="no        "
+FIREBIRDBUILD="no        "
+MDBTOOLSBUILD="no        "
+INFORMIXBUILD="no        "
+ROUTERBUILD="no        "
+TESTDBS=""
 if ( test -n "$ORACLEVERSION" ); then
-	ORACLE8BUILD="dynamic"
+	ORACLEBUILD="dynamic   "
 	if ( test -n "$ORACLESTATIC" ); then
-		ORACLE8BUILD="static "
+		ORACLEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS oracle tls krb extensions"
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		ORACLEBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$MYSQLLIBS" ); then
-	MYSQLBUILD="dynamic"
+	MYSQLBUILD="dynamic   "
 	if ( test -n "$MYSQLSTATIC" ); then
-		MYSQLBUILD="static "
+		MYSQLBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS mysql"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
-	POSTGRESQLBUILD="dynamic"
+	POSTGRESQLBUILD="dynamic   "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
-		POSTGRESQLBUILD="static "
+		POSTGRESQLBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS postgresql"
 fi
 if ( test -n "$SQLITELIBS" ); then
-	SQLITEBUILD="dynamic"
+	SQLITEBUILD="dynamic   "
 	if ( test -n "$SQLITESTATIC" ); then
-		SQLITEBUILD="static "
+		SQLITEBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS sqlite"
 fi
 if ( test -n "$FREETDSLIBS" ); then
-	FREETDSBUILD="dynamic"
+	FREETDSBUILD="dynamic   "
 	if ( test -n "$FREETDSSTATIC" ); then
-		FREETDSBUILD="static "
+		FREETDSBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS freetds"
 fi
 if ( test -n "$SYBASELIBS" ); then
-	SYBASEBUILD="dynamic"
+	SYBASEBUILD="dynamic   "
 	if ( test -n "$SYBASESTATIC" ); then
-		SYBASEBUILD="static "
+		SYBASEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS sap"
+else
+	if ( test -n "$ENABLE_SYBASE" ); then
+		SYBASEBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
-	ODBCBUILD="dynamic"
+	ODBCBUILD="dynamic   "
 	if ( test -n "$ODBCSTATIC" ); then
-		ODBCBUILD="static "
+		ODBCBUILD="static    "
 	fi
 fi
 if ( test -n "$DB2LIBS" ); then
-	DB2BUILD="dynamic"
+	DB2BUILD="dynamic   "
 	if ( test -n "$DB2STATIC" ); then
-		DB2BUILD="static "
+		DB2BUILD="static    "
+	fi
+	TESTDBS="$TESTDBS db2"
+else
+	if ( test -n "$ENABLE_DB2" ); then
+		DB2BUILD="at-runtime"
 	fi
 fi
 if ( test -n "$FIREBIRDLIBS" ); then
-	FIREBIRDBUILD="dynamic"
+	FIREBIRDBUILD="dynamic   "
 	if ( test -n "$FIREBIRDSTATIC" ); then
-		FIREBIRDBUILD="static "
+		FIREBIRDBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS firebird"
 fi
 if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic"
+	MDBTOOLSBUILD="dynamic   "
 	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static "
+		MDBTOOLSBUILD="static    "
 	fi
+	TESTDBS="$TESTDBS mdbtools"
 fi
 if ( test -n "$INFORMIXLIBS" ); then
-	INFORMIXBUILD="dynamic"
+	INFORMIXBUILD="dynamic   "
 	if ( test -n "$INFORMIXSTATIC" ); then
-		INFORMIXBUILD="static "
+		INFORMIXBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS informix"
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		INFORMIXBUILD="at-runtime"
 	fi
 fi
 if ( test -n "$ENABLE_ROUTER" ); then
-	ROUTERBUILD="yes   "
+	ROUTERBUILD="yes"
+	TESTDBS="$TESTDBS router"
 fi
-echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
-echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
-echo "                FreeTDS     $FREETDSBUILD       SAP/Sybase $SYBASEBUILD"
-echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
-echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD       Router     $ROUTERBUILD"
+AC_SUBST(TESTDBS)
+AC_SUBST(TESTAPIS)
 
+
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh"
+AC_OUTPUT($MAKELIST)
+chmod 755 bin/sqlrclient-config
+chmod 755 bin/sqlrclientwrapper-config
+chmod 755 bin/sqlrserver-config
+chmod 755 init/rc.sqlrelay
+chmod 755 init/rc.sqlrcachemanager
+chmod 755 test/testall.sh
+chmod 755 test/test.sh
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
+mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
+mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
+sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
+sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
+
+
+dnl Summary.
+echo
+echo "***** Summary ***********************************************"
+
+echo " Version      : $SQLR_VERSION"
+echo
+echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
+echo
+echo " Command Line : Clients     $CMDLINEBUILD"
+echo
+echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
+echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
+echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
+echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERBUILD"
+echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
+echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
+echo
+echo " Drop-In Replacement Libraries:"
+echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
+echo
+echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
+echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
+echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
+echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
+echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
+echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
 echo "*************************************************************"
 echo
 echo "If you expected a Database or API that doesn't show up in the Summary"
@@ -1135,6 +1219,6 @@ then
 	echo "NOTE: Python 2 and Python 3 were both found.  For now SQL Relay defaults to"
 	echo "Python 2, however Python 3 will become the default soon."
 	echo
-	echo "To force a build for Python 3, use the  --disable-python2  option."
+	echo "To force a build for Python 3, use the  --disable-python  option."
 	echo
 fi

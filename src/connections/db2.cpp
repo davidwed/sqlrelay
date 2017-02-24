@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2015  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -8,7 +8,11 @@
 #include <defines.h>
 #include <config.h>
 
-#include <sqlcli1.h>
+#ifdef DB2_AT_RUNTIME
+	#include "db2atruntime.cpp"
+#else
+	#include <sqlcli1.h>
+#endif
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
@@ -264,6 +268,7 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		SQLRETURN	erg;
 		SQLHDBC		dbc;
 
+		const char	*db2path;
 		const char	*server;
 		const char	*lang;
 		uint32_t	timeout;
@@ -298,6 +303,8 @@ db2connection::db2connection(sqlrservercontroller *cont) :
 }
 
 void db2connection::handleConnectString() {
+
+	db2path=cont->getConnectStringValue("db2path");
 
 	// override legacy "server" parameter with modern "db" parameter
 	server=cont->getConnectStringValue("server");
@@ -367,6 +374,13 @@ bool db2connection::logIn(const char **error, const char **warning) {
 		*error="Failed to set LANG environment variable";
 		return false;
 	}
+
+	#ifdef DB2_AT_RUNTIME
+	if (!loadLibraries(&errormessage,db2path)) {
+		*error=errormessage.getString();
+		return false;
+	}
+	#endif
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);

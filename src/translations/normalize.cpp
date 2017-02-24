@@ -316,9 +316,55 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// Parentheses, asterisks and right brackets require special
 		// handling.
 		static const char symbols[]="!%^-_+=[{}\\|;,<.>/";
-		if (*ptr==' ' &&
+		if (
+			(*ptr==' ' &&
 			(character::inSet(*(ptr+1),symbols) ||
-			character::inSet(*(ptr-1),symbols))) {
+			character::inSet(*(ptr-1),symbols))) &&
+
+			// actually, - and ! also require special handling
+			// because they can be unary operators and we don't
+			// want to remove the space if they follow certain
+			// other things...
+			!(
+				(*(ptr+1)=='-' || *(ptr+1)=='!') &&
+				(
+				(ptr-start==6 &&
+				!charstring::compare(ptr-6,"select ",7)) ||
+				(ptr-start>=7 && (
+				!charstring::compare(ptr-7,"(select ",8) ||
+				!charstring::compare(ptr-7," select ",8) ||
+				!charstring::compare(ptr-7," regexp ",8) ||
+				!charstring::compare(ptr-7," having ",8) ||
+				!charstring::compare(ptr-7," offset ",8))) ||
+				(ptr-start>=6 && (
+				!charstring::compare(ptr-6," where ",7) ||
+				!charstring::compare(ptr-6," rlike ",7) ||
+				!charstring::compare(ptr-6," limit ",7))) ||
+				(ptr-start>=4 && (
+				!charstring::compare(ptr-4," and ",5) ||
+				!charstring::compare(ptr-4," div ",5) ||
+				!charstring::compare(ptr-4," mod ",5) ||
+				!charstring::compare(ptr-4," not ",5) ||
+				!charstring::compare(ptr-4," for ",5))) ||
+				(ptr-start>=3 &&
+				!charstring::compare(ptr-3," or ",4)) ||
+				(ptr-start>=8 && (
+				!charstring::compare(ptr-8," between ",9) ||
+				!charstring::compare(ptr-8," matches ",9))) ||
+				(ptr-start>=5 && (
+				!charstring::compare(ptr-5," like ",6) ||
+				!charstring::compare(ptr-5," case ",6) ||
+				!charstring::compare(ptr-5," then ",6) ||
+				!charstring::compare(ptr-5," when ",6) ||
+				!charstring::compare(ptr-5," else ",6) ||
+				!charstring::compare(ptr-5," from ",6))) ||
+				(ptr-start>=9 && (
+				!charstring::compare(ptr-9," order by ",10) ||
+				!charstring::compare(ptr-9," interval ",10)))
+				)
+			)
+			) {
+
 			ptr++;
 			continue;
 		}

@@ -1,3 +1,40 @@
+1.0.1 - updated sqlr-bench to create "db"-bench.png
+	added edoc-generated API docs for the Erlang API
+	updated some module-load error verbage
+	added initial support for loading Oracle, SAP/Sybase, DB2, and Informix
+		libraries on-demand at runtime
+	overhauled spec file
+	fixed PDO driver for PHP 7 on 32-bit platforms
+	added permissions to all open() with O_CREAT calls
+	added --with-fortify configure option
+	fixed a segfault on ctrl-D in sqlrsh
+	fixed uncoordinated access to shared debugstr among listener threads
+		by using local instances instead
+	added ping-loop to router connection module's logIn() method to manage
+		cases where routed-to instances are started after the router
+	moved .../var/sqlrelay/tmp/*/* to .../var/run/sqlrelay
+	added .sock extension to sockets, .ipc extension to ipc key files,
+		.pid extension to pid files, and .up extension to files which
+		indicate that the db is up
+	changed mode of listener-connection sockets to 700 from 711
+	moved .../var/sqlrelay/log to .../var/log/sqlrelay
+	moved .../var/sqlrelay/cache to .../var/cache/sqlrelay
+	libmysql*sqlrelay.so and libpqsqlrelay.so are no longer installed
+	replaced sockseq-generated unix socket with pid-based unix socket
+	updated ruby api to support unification of Fixnum and Bignum classes
+		into Integer class
+	added --with-abs-max-connections configure script parameter
+	increased default absolute max connections to 4096 (from 512)
+	updated "can't open ... file" errors to mention user/group
+	added SQLR_MYSQL_MAP_DATE_TO_DATETIME option to mysql drop-in
+		replacement library
+	fixed normalize translation not to remove spaces before unary - and !
+	updated sqlrsh to set error code correctly and write errors to stderr
+	sqlr-cachemanager is no longer enabled at boot by default
+	fixed another subtle bug in the ODBC driver that caused the first row
+		to be duplicated if columns were not bound
+	added --disable-wall and --disable-werror configure options
+
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password
 		expired while sqlrelay was running, and the sqlr-scaler

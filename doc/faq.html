@@ -667,7 +667,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>When the cacheToFile() and setCacheTtl() methods are called prior to running a query, the client caches the result set from the query in a file on the local file system and attaches a time-to-live tag to the file.  The full pathname of this file can be retrieved using the getCacheFileName() method.</p>
 
-<p>The file sits in the cache directory (usually /usr/local/firstworks/var/sqlrelay/cache) until it is removed by the sqlr-cachemanager program.  sqlr-cachemanager scans the files in the cache directory every so often and removes the ones who's time to live has expired.</p>
+<p>The file sits in the cache directory (usually /usr/local/firstworks/var/run/sqlrealy/cache or /usr/local/firstworks/var/sqlrelay/cache) until it is removed by the sqlr-cachemanager program.  sqlr-cachemanager scans the files in the cache directory every so often and removes the ones who's time to live has expired.</p>
 
 <p>Until the file is removed, other applications can open the file by name using the openCachedResultSet() methods.  At this point, the API acts as if it had run a query that generated that result set.</p>
 
@@ -693,7 +693,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>Another fairly common cause is that the SQL Relay daemons use semaphores and shared memory segments, and if a daemon crashes unexpectedly, even if you kill all the other daemons, a semaphore or shared memory segment may still be hanging around.  These can interfere with future attempts to start up daemons with the same ID.  You can use the <i>ipcs</i> command to inspect the shared memory segments and semaphores and the <i>ipcrm</i> command to remove any lingering ones.</p>
 
-<p>Another less common, though still fairly common cause is that the SQL Relay daemons also use temporary files, usually located in /usr/local/firstworks/var/sqlrelay/tmp.  That directory should have 777 permissions, but sometimes it doesn't.  The sockseq file in that directory should have 666 permissions, but sometimes it doesn't.  The files named ID and ID-CONNECTIONID owned by the user that started the connections in that directory should get removed by <b>sqlr-stop</b>, but sometimes they don't.  Stop the SQL Relay server processes, verify these permissions, and verify that the files have been removed, before restarting them.</p>
+<p>Another less common, though still fairly common cause is that the SQL Relay daemons also use temporary files, usually located in /usr/local/firstworks/var/run/sqlrealy or /usr/local/firstworks/var/sqlrelay/tmp.  That directory should have 777 permissions, but sometimes it doesn't.  The sockseq file in that directory should have 666 permissions, but sometimes it doesn't.  The files named ID and ID-CONNECTIONID owned by the user that started the connections in that directory should get removed by <b>sqlr-stop</b>, but sometimes they don't.  Stop the SQL Relay server processes, verify these permissions, and verify that the files have been removed, before restarting them.</p>
 
 <br/><a name="tweaks"/><h3>What system parameters can I tweak to get better performance out of SQL Relay?</h3>
 

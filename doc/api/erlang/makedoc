@@ -1,0 +1,13 @@
+#!/bin/sh
+
+rm -f html/*
+
+erl << EOF
+c(makedoc).
+makedoc:start().
+EOF
+
+mv ../../../src/api/erlang/doc/* html
+rmdir ../../../src/api/erlang/doc
+
+rm -f makedoc.beam

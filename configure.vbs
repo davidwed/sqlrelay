@@ -55,6 +55,7 @@ NODEJSPREFIX=""
 SQLR="sqlr"
 SQLRELAY="sqlrelay"
 SQL_RELAY="SQL Relay"
+ABS_MAXCONNECTIONS="4096"
 
 if WScript.Arguments.Count>0 then
 	if Wscript.Arguments.Item(0)="--help" then
@@ -229,7 +230,7 @@ end if
 
 
 ' version
-SQLR_VERSION="1.0.0"
+SQLR_VERSION="1.0.1"
 
 ' paths
 pfix="C:\\Program Files\\Firstworks"
@@ -862,24 +863,144 @@ if disabledoc=false then
 	INSTALLDOC="install-doc"
 end if
 
+TESTDBS=""
+TESTAPIS=""
 
+CMDLINEBUILD="no "
+CPPBUILD="no "
+PERLBUILD="no "
+PYTHONBUILD="no "
+RUBYBUILD="no "
+PHPBUILD="no "
+PHPPDOBUILD="no "
+ODBCDRIVERBUILD="no "
+JAVABUILD="no "
+TCLBUILD="no "
+CSBUILD="no "
+NODEJSBUILD="no "
+ODBCBUILD="no "
+if disablecmdline=false then
+	CMDLINEBUILD="yes"
+end if
+if disablecpp=false then
+	CPPBUILD="yes"
+	TESTAPIS=TESTAPIS & """c"",""c++"","
+end if
+if disableperl=false then
+	PERLBUILD="yes"
+	TESTAPIS=TESTAPIS & """perl"",""perldbi"","
+end if
+if disablepython=false then
+	PYTHONBUILD="yes"
+	TESTAPIS=TESTAPIS & """python"",""pythondb"","
+end if
+if disableruby=false then
+	RUBYBUILD="yes"
+	TESTAPIS=TESTAPIS & """ruby"","
+end if
+if disablephp=false then
+	PHPBUILD="yes"
+	TESTAPIS=TESTAPIS & """php"","
+end if
+if disablephp=false then
+	PHPPDOBUILD="yes"
+	TESTAPIS=TESTAPIS & """phppdo"","
+end if
+if disableodbcdriver=false then
+	ODBCDRIVERBUILD="yes"
+end if
+if disablejava=false then
+	JAVABUILD="yes"
+	TESTAPIS=TESTAPIS & """java"","
+end if
+if disabletcl=false then
+	TCLBUILD="yes"
+	TESTAPIS=TESTAPIS & """tcl"","
+end if
+if disablecs=false then
+	CSBUILD="yes"
+	TESTAPIS=TESTAPIS & """cs"","
+end if
+if disablenodejs=false then
+	NODEJSBUILD="yes"
+	TESTAPIS=TESTAPIS & """nodejs"","
+end if
+if disableodbc=false then
+	ODBCBUILD="yes"
+end if
+ORACLE8BUILD="no     "
+MYSQLBUILD="no     "
+POSTGRESQLBUILD="no     "
+FREETDSBUILD="no     "
+SYBASEBUILD="no     "
+ODBCBUILD="no     "
+DB2BUILD="no     "
+FIREBIRDBUILD="no     "
+MDBTOOLSBUILD="no     "
+INFORMIXBUILD="no     "
+ROUTERBUILD="no     "
+if disableoracle=false then
+	ORACLE8BUILD="yes    "
+	TESTDBS=TESTDBs&"""oracle"","
+end if
+if disablemysql=false then
+	MYSQLBUILD="yes    "
+	TESTDBS=TESTDBs&"""mysql"","
+end if
+if disablepostgresql=false then
+	POSTGRESQLBUILD="yes    "
+	TESTDBS=TESTDBs&"""postgresql"","
+end if
+if disablesap=false then
+	SYBASEBUILD="yes    "
+	TESTDBS=TESTDBs&"""sap"","
+end if
+if disableodbc=false then
+	ODBCBUILD="yes    "
+end if
+if disabledb2=false then
+	DB2BUILD="yes    "
+	TESTDBS=TESTDBs&"""db2"","
+end if
+if disablefirebird=false then
+	FIREBIRDBUILD="yes    "
+	TESTDBS=TESTDBs&"""firebird"","
+end if
+if disableinformix=false then
+	INFORMIXBUILD="yes    "
+	TESTDBS=TESTDBs&"""informix"","
+end if
+if disablerouter=false then
+	ROUTERBUILD="yes    "
+	TESTDBS=TESTDBs&"""router"","
+end if
+
+' truncate the trailing comma
+TESTDBS=left(TESTDBS,len(TESTDBS)-1)
+TESTAPIS=left(TESTAPIS,len(TESTAPIS)-1)
 
 ' input and output files
 infiles=Array(_
 	"config_windows.mk",_
 	configwindowsh,_
+	"src\\common\\defines.h.in",_
+	"src\\server\\sqlrelay\\private\\sqlrshm.h.in",_
 	"bin\\sqlrclient-config.in",_
 	"bin\\sqlrclientwrapper-config.in",_
 	"bin\\sqlrserver-config.in",_
+	"test\\testall.vbs.in",_
 	"sqlrelay-c.pc.in",_
 	"sqlrelay-c++.pc.in"_
 	)
 outfiles=Array(_
 	"config.mk",_
 	"config.h",_
+	"src\\common\\defines.h",_
+	"src\\server\\sqlrelay\\private\\sqlrshm.h",_
 	"bin\\sqlrclient-config",_
 	"bin\\sqlrclientwrapper-config",_
 	"bin\\sqlrserver-config",_
+	"test\\testall.vbs",_
 	"sqlrelay-c.pc",_
 	"sqlrelay-c++.pc"_
 	)
@@ -1040,6 +1161,13 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@SQLRELAY@",SQLRELAY,1,-1,0)
 	content=replace(content,"@SQL_RELAY@",SQL_RELAY,1,-1,0)
 
+	' max connections
+	content=replace(content,"@ABS_MAXCONNECTIONS@",ABS_MAXCONNECTIONS,1,-1,0)
+
+	' tests
+	content=replace(content,"@TESTDBS@",TESTDBS,1,-1,0)
+	content=replace(content,"@TESTAPIS@",TESTAPIS,1,-1,0)
+
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)
 	call outfile.Write(content)
@@ -1048,59 +1176,6 @@ next
 
 
 ' summary
-CMDLINEBUILD="no "
-CPPBUILD="no "
-PERLBUILD="no "
-PYTHONBUILD="no "
-RUBYBUILD="no "
-PHPBUILD="no "
-PHPPDOBUILD="no "
-ODBCDRIVERBUILD="no "
-JAVABUILD="no "
-TCLBUILD="no "
-CSBUILD="no "
-NODEJSBUILD="no "
-ODBCBUILD="no "
-if disablecmdline=false then
-	CMDLINEBUILD="yes"
-end if
-if disablecpp=false then
-	CPPBUILD="yes"
-end if
-if disableperl=false then
-	PERLBUILD="yes"
-end if
-if disablepython=false then
-	PYTHONBUILD="yes"
-end if
-if disableruby=false then
-	RUBYBUILD="yes"
-end if
-if disablephp=false then
-	PHPBUILD="yes"
-end if
-if disablephp=false then
-	PHPPDOBUILD="yes"
-end if
-if disableodbcdriver=false then
-	ODBCDRIVERBUILD="yes"
-end if
-if disablejava=false then
-	JAVABUILD="yes"
-end if
-if disabletcl=false then
-	TCLBUILD="yes"
-end if
-if disablecs=false then
-	CSBUILD="yes"
-end if
-if disablenodejs=false then
-	NODEJSBUILD="yes"
-end if
-if disableodbc=false then
-	ODBCBUILD="yes"
-end if
-
 WScript.Echo("")
 WScript.Echo("***** Summary ***********************************************")
 WScript.Echo(" Version      : " & SQLR_VERSION)
@@ -1116,51 +1191,11 @@ WSCript.Echo("                PHP PDO     " & PHPPDOBUILD & "           ODBC    
 WSCript.Echo("                TCL         " & TCLBUILD & "           C#         " & CSBUILD)
 WScript.Echo("                node.js     " & NODEJSBUILD)
 WSCript.Echo("")
-
-ORACLE8BUILD="no     "
-MYSQLBUILD="no     "
-POSTGRESQLBUILD="no     "
-FREETDSBUILD="no     "
-SYBASEBUILD="no     "
-ODBCBUILD="no     "
-DB2BUILD="no     "
-FIREBIRDBUILD="no     "
-MDBTOOLSBUILD="no     "
-INFORMIXBUILD="no     "
-ROUTERBUILD="no     "
-if disableoracle=false then
-	ORACLE8BUILD="yes    "
-end if
-if disablemysql=false then
-	MYSQLBUILD="yes    "
-end if
-if disablepostgresql=false then
-	POSTGRESQLBUILD="yes    "
-end if
-if disablesap=false then
-	SYBASEBUILD="yes    "
-end if
-if disableodbc=false then
-	ODBCBUILD="yes    "
-end if
-if disabledb2=false then
-	DB2BUILD="yes    "
-end if
-if disablefirebird=false then
-	FIREBIRDBUILD="yes    "
-end if
-if disableinformix=false then
-	INFORMIXBUILD="yes    "
-end if
-if disablerouter=false then
-	ROUTERBUILD="yes    "
-end if
 WScript.Echo(" Databases    : Oracle8     " & ORACLE8BUILD & "       MySQL      " & MYSQLBUILD)
 WScript.Echo("                PostgreSQL  " & POSTGRESQLBUILD & "       SAP/Sybase " & SYBASEBUILD)
 WScript.Echo("                ODBC        " & ODBCBUILD & "       DB2        " & DB2BUILD)
 WScript.Echo("                Firebird    " & FIREBIRDBUILD & "       Informix   " & INFORMIXBUILD)
 WScript.Echo("                Router      " & ROUTERBUILD)
-
 WScript.Echo("*************************************************************")
 WScript.Echo("")
 WScript.Echo("If you expected a Database or API that doesn't show up in the Summary")

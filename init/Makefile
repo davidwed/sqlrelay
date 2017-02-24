@@ -87,19 +87,15 @@ ifeq ($(initroot),)
 	if ( test -x "/bin/systemctl" ); \
 	then \
 		/bin/systemctl enable sqlrelay.service; \
-		/bin/systemctl enable sqlrcachemanager.service; \
 	elif ( test -x "/usr/bin/systemctl" ); \
 	then \
 		/usr/bin/systemctl enable sqlrelay.service; \
-		/usr/bin/systemctl enable sqlrcachemanager.service; \
 	elif ( test -x "/sbin/systemctl" ); \
 	then \
 		/sbin/systemctl enable sqlrelay.service; \
-		/sbin/systemctl enable sqlrcachemanager.service; \
 	elif ( test -x "/usr/sbin/systemctl" ); \
 	then \
 		/usr/sbin/systemctl enable sqlrelay.service; \
-		/usr/sbin/systemctl enable sqlrcachemanager.service; \
 	elif ( test -x "/sbin/chkconfig" ); \
 	then \
 		/sbin/chkconfig --add sqlrelay; \
@@ -130,25 +126,25 @@ ifeq ($(initroot),)
 		then \
 			cd /etc/rc2.d; \
 			ln -s ../init.d/sqlrelay S85sqlrelay; \
-			ln -s ../init.d/sqlrcachemanager S85sqlrcachemanager; \
+			ln -s ../init.d/sqlrcachemanager K85sqlrcachemanager; \
 		fi; \
 		if ( test -d "/etc/rc3.d" ); \
 		then \
 			cd /etc/rc3.d; \
 			ln -s ../init.d/sqlrelay S85sqlrelay; \
-			ln -s ../init.d/sqlrcachemanager S85sqlrcachemanager; \
+			ln -s ../init.d/sqlrcachemanager K85sqlrcachemanager; \
 		fi; \
 		if ( test -d "/etc/rc4.d" ); \
 		then \
 			cd /etc/rc4.d; \
 			ln -s ../init.d/sqlrelay S85sqlrelay; \
-			ln -s ../init.d/sqlrcachemanager S85sqlrcachemanager; \
+			ln -s ../init.d/sqlrcachemanager K85sqlrcachemanager; \
 		fi; \
 		if ( test -d "/etc/rc5.d" ); \
 		then \
 			cd /etc/rc5.d; \
 			ln -s ../init.d/sqlrelay S85sqlrelay; \
-			ln -s ../init.d/sqlrcachemanager S85sqlrcachemanager; \
+			ln -s ../init.d/sqlrcachemanager K85sqlrcachemanager; \
 		fi; \
 		if ( test -d "/etc/rc6.d" ); \
 		then \

@@ -20,7 +20,7 @@ const char *programs[]={
 	NULL
 };
 
-const char *suffixes[]={"",".","","",NULL};
+const char *suffixes[]={".pid",".",".pid",".pid",NULL};
 
 static void helpmessage(const char *progname) {
 	stdoutput.printf(
@@ -115,11 +115,11 @@ int main(int argc, const char **argv) {
 			// skip the file if it doesn't match what
 			// we're looking for
 			if ((idlen &&
-				(((*suffix)[0]=='.' &&
+				(((*suffix)[1]=='\0' &&
 					charstring::compare(file,
 						match.getString(),
 						match.getStringLength())) ||
-				((*suffix)[0]=='\0' &&
+				((*suffix)[1]=='p' &&
 					charstring::compare(file,
 						match.getString())))) ||
 				charstring::compare(file,

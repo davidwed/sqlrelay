@@ -104,7 +104,7 @@ int main(int argc, const char **argv) {
 			graphname.append(".png");
 		}
 	} else {
-		graphname.append(db)->append(".png");
+		graphname.append(db)->append("-bench.png");
 	}
 	graph=graphname.getString();
 	if (cmdl.found("help","h")) {

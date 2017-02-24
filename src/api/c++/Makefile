@@ -48,7 +48,9 @@ installlib:
 	$(LTFINISH) $(libdir)
 
 uninstall: $(UNINSTALLLIB)
-	$(RMTREE) $(cachedir)
+	$(RMTREE) $(cachedir) \
+		$(localstatedir)/$(SQLRELAY)/cache \
+		$(localstatedir)/sqlrelay/cache
 	$(RM) $(includedir)/sqlrclient.h \
 		$(includedir)/private/sqlrclientincludes.h \
 		$(includedir)/private/sqlrconnection.h \

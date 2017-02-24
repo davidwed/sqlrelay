@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2015  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -13,9 +13,13 @@
 #include <datatypes.h>
 #include <defines.h>
 
-extern "C" {
-	#include <ctpublic.h>
-}
+#ifdef SYBASE_AT_RUNTIME
+	#include "sapatruntime.cpp"
+#else
+	extern "C" {
+		#include <ctpublic.h>
+	}
+#endif
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
@@ -333,6 +337,13 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
+	#ifdef SYBASE_AT_RUNTIME
+	if (!loadLibraries(&loginerror)) {
+		*error=loginerror.getString();
+		return false;
+	}
+	#endif
+
 	// allocate a context
 	context=(CS_CONTEXT *)NULL;
 	if (cs_ctx_alloc(CS_VERSION_100,&context)!=CS_SUCCEED) {
@@ -340,6 +351,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 			"Failed to allocate a context structure",2);
 		return false;
 	}
+
 	// init the context
 	if (ct_init(context,CS_VERSION_100)!=CS_SUCCEED) {
 		*error=logInError(

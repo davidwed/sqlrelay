@@ -498,7 +498,7 @@ print("\n");
 print("RESULT SET BUFFER SIZE: \n");
 checkSuccess($cur->getResultSetBufferSize(),0);
 $cur->setResultSetBufferSize(2);
-checkSuccess($cur->sendQuery("select * from testtable"),1);
+checkSuccess($cur->sendQuery("select * from testtable order by testinteger"),1);
 checkSuccess($cur->getResultSetBufferSize(),2);
 print("\n");
 checkSuccess($cur->firstRowIndex(),0);

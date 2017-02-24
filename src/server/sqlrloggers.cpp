@@ -104,7 +104,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf("failed to load logger module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -119,11 +119,10 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newLogger) {
-		stdoutput.printf("failed to create logger: %s\n",module);
+		stdoutput.printf("failed to load logger: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
-		dl->close();
 		delete dl;
 		return;
 	}

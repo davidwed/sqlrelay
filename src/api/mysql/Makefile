@@ -78,20 +78,25 @@ installdll:
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) $(CP) libmysql3$(SQLRELAY).$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql3$(SQLRELAY).a
-	$(RM) $(libdir)/libmysql3$(SQLRELAY).$(LIBEXT)
+	$(RM) $(libdir)/libmysql3$(SQLRELAY).a \
+		$(libdir)/libmysql3$(SQLRELAY).so \
+		$(libdir)/libmysql3$(SQLRELAY).$(LIBEXT)
 	$(LTINSTALL) $(CP) libmysql40$(SQLRELAY).$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql40$(SQLRELAY).a
-	$(RM) $(libdir)/libmysql40$(SQLRELAY).$(LIBEXT)
+	$(RM) $(libdir)/libmysql40$(SQLRELAY).a \
+		$(libdir)/libmysql40$(SQLRELAY).so \
+		$(libdir)/libmysql40$(SQLRELAY).$(LIBEXT)
 	$(LTINSTALL) $(CP) libmysql41$(SQLRELAY).$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql41$(SQLRELAY).a
-	$(RM) $(libdir)/libmysql41$(SQLRELAY).$(LIBEXT)
+	$(RM) $(libdir)/libmysql41$(SQLRELAY).a \
+		$(libdir)/libmysql41$(SQLRELAY).so \
+		$(libdir)/libmysql41$(SQLRELAY).$(LIBEXT)
 	$(LTINSTALL) $(CP) libmysql50$(SQLRELAY).$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql50$(SQLRELAY).a
-	$(RM) $(libdir)/libmysql50$(SQLRELAY).$(LIBEXT)
+	$(RM) $(libdir)/libmysql50$(SQLRELAY).a \
+		$(libdir)/libmysql50$(SQLRELAY).so \
+		$(libdir)/libmysql50$(SQLRELAY).$(LIBEXT)
 	$(LTINSTALL) $(CP) libmysql51$(SQLRELAY).$(LIBEXT) $(libdir)
-	$(RM) $(libdir)/libmysql51$(SQLRELAY).a
-	$(RM) $(libdir)/libmysql51$(SQLRELAY).$(LIBEXT)
+	$(RM) $(libdir)/libmysql51$(SQLRELAY).a \
+		$(libdir)/libmysql51$(SQLRELAY).so \
+		$(libdir)/libmysql51$(SQLRELAY).$(LIBEXT)
 
 uninstall: $(UNINSTALLLIB)
 	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map \

@@ -141,6 +141,9 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+</blockquote>
 <p>It can be accessed locally using:</p>
 
 <blockquote>
@@ -204,9 +207,19 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The number of connections determines how many client applications can access the database simultaneously.  In this example, up to 10, assuming each client only needs one connection.  Additional clients would be queued and would have to wait for one of the first 10 to disconnect before being able to access the database.</p>
 
+<blockquote>
+  <p>( <b>NOTE:</b> Any number of connections may be configured, up to an "absolute max connections" limit defined at compile-time, which defaults to 4096.  To find the limit on your system, run:</p>
+
+  <blockquote>
+    <pre>sqlr-start -abs-max-connections
+</pre>
+
+  </blockquote>
+The command above also returns the "shmmax requirement" for the configuration.  "shmmax" refers to the maximum size of a single shared memory segment, a tunable kernel parameter on most systems.  The default shmmax requirement is about 5mb.  On modern systems, shmmax defaults to at least 32mb, but on older systems it commonly defaulted to 512k.  In any case, if the shmmax requirement exceeds the value of your system's shmmax parameter, then you will have to reconfigure the parameter before SQL Relay will start successfully.   This may be done at runtime on most modern systems, but on older systems you may have to reconfigure and rebuild the kernel, and reboot.)
+</blockquote>
 <a name="dbconnections-performance"/><h3>For Performance</h3>
 
-<p>Any number of connections can be opened.  In a performance-oriented configuration, a good rule of thumb is to open as many as you can.  That number is usually environment-specific, and dictated by database, system and network resources.</p>
+<p>In a performance-oriented configuration, a good rule of thumb is to open as many connections as you can.  That number is usually environment-specific, and dictated by database, system and network resources.</p>
 
 <a name="dbconnections-throttling"/><h3>Throttling</h3>
 
@@ -241,13 +254,10 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>Any number of cursors can be opened.  A good rule of thumb is to open as few as possible, but as many as you know that your application will need.</p>
 
-<p>NOTE: The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open additional cursors on-demand, up to 5.</p>
-
-<p>This is because it is common for an app to run at least one level of nested queries.  For example, it is common to run a select and then run an insert, update, or delete for each row in the result set.  Unfortunately, it is also common for apps to just manage cursors poorly.  So, by default, SQL Relay offers a bit of flexibility to accommodate these circumstances.</p>
-
-<p>See the next section on Dynamic Scaling for more information about configuring connections and cursors to scale up and down on-demand.</p>
-
-<br/><a name="dynamicscaling"/><h3>Dynamic Scaling</h3>
+<blockquote>
+( <b>NOTE:</b> The documentation above says that by default, each connection opens one cursor, and this is true, but it would be more accurate to say that by default each connection opens one cursor, but will open additional cursors on-demand, up to 5.  This is because it is common for an app to run at least one level of nested queries.  For example, it is common to run a select and then run an insert, update, or delete for each row in the result set.  Unfortunately, it is also not uncommon for apps to just manage cursors poorly.  So, SQL Relay's default configuration offers a bit of flexibility to accommodate these circumstances.  See the next section on Dynamic Scaling for more information about configuring connections and cursors to scale up and down on-demand.)
+</blockquote>
+<br/><br/><a name="dynamicscaling"/><h3>Dynamic Scaling</h3>
 
 <p>Both connections and cursors can be configured to scale dynamically - open on demand and then die off when no longer needed.  This feature is useful if you have spikes in traffic during certain times of day or if your application has a few modules that occasionally need more cursors than usual.</p>
 
@@ -1034,6 +1044,9 @@ sqlr-start -id db2example
 </pre>
 
 </blockquote>
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+</blockquote>
 <p>...and accessed using:</p>
 
 <blockquote>
@@ -1245,6 +1258,9 @@ sqlr-start -id oracleexample -config dir:///home/myuser/sqlrelay.conf.d
 </pre>
 
 </blockquote>
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+</blockquote>
 <p>(the file:// prefix is optional when specifying a file, but the dir:// prefix must be included when specifying a directory)</p>
 
 <p>The -config option may also be used to specify a comma-separated list of files or directories.</p>
@@ -1257,6 +1273,9 @@ sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/s
 sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/sqlrelay-2.conf,dir:///home/myuser/sqlrelay-1.conf.d,dir:///home/myuser/sqlrelay-2.conf.d
 </pre>
 
+</blockquote>
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
 </blockquote>
 <p>Files and directories are processed in the order that they are specified.</p>
 
@@ -1282,8 +1301,11 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 </pre>
 
 </blockquote>
-<p>(Note: the https and scp examples would only work if Rudiments is compiled with support for libcurl.)</p>
-
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+<br/><br/>
+( <b>NOTE:</b> The https and scp examples only work if Rudiments was compiled with support for libcurl.)
+</blockquote>
 <p>In some of the examples above, a user and password are given in the url, separated by a colon, prior to the @ sign.  In other examples, in place of a literal user and password, a user-password file is specified in square brackets.  If a user-password file is used, then the file should contain a single line, consisting of colon-separated user and password.</p>
 
 <p>For example:</p>
@@ -1569,6 +1591,9 @@ sqlr-start -id router
 </pre>
 
 </blockquote>
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+</blockquote>
 <p>Client applications should connect to the router instance rather than the master or slave instances.</p>
 
 <blockquote>
@@ -1657,10 +1682,9 @@ http://www.gnu.org/software/src-highlite -->
 
 </blockquote>
 <blockquote>
-<b>NOTE:</b> Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.
-</blockquote>
-<blockquote>
-<b>NOTE:</b> Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.
+( <b>NOTE:</b> Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.)
+<br/><br/>
+( <b>NOTE:</b> Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
 </blockquote>
 <br/><a name="proxiedauth"/><h3>Proxied Auth</h3>
 
@@ -1689,7 +1713,7 @@ http://www.gnu.org/software/src-highlite -->
 
 </blockquote>
 <blockquote>
-<b>NOTE:</b> Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.
+( <b>NOTE:</b> Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.)
 </blockquote>
 <br/><a name="krb"/><h3>Kerberos and Active Directory Encryption and Authentication</h3>
 
@@ -1753,6 +1777,9 @@ http://www.gnu.org/software/src-highlite -->
   <pre>sqlr-start -id example
 </pre>
 
+</blockquote>
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
 </blockquote>
 <p>To access the instance, you must acquire a Kerberos ticket-granting ticket.  On a Linux or Unix system, this typically involves running <i>kinit</i>, though a fully Kerberized environment may acquire this during login.  On a Windows system, you must log in as an Active Directory domain user.</p>
 
@@ -1842,6 +1869,9 @@ http://www.gnu.org/software/src-highlite -->
   <pre>sqlr-start -id example
 </pre>
 
+</blockquote>
+<blockquote>
+( <b>NOTE:</b> When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
 </blockquote>
 <p>The instance may be accessed as follows:</p>
 
@@ -1968,13 +1998,15 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><a name="se"/><h2>Security Enhancement</h2>
 
-<p>SQL Relay offers several security enhancement features.</p>
+<p>In addition to <a href="#krb">Kerberos and Active Directory Encryption and Authentication</a> and <a href="#tls">TLS/SSL Encryption and Authentication</a>, SQL Relay offers several additional features to enhance security.</p>
 
 <br/><a name="runas"/><h3>Run-As User and Group</h3>
 
-<p>By default, the SQL Relay server runs as whatever user runs sqlr-start.  On unix and linux systems, the root user generally runs all init scripts.  As such, when started at boot, by default, the SQL Relay server also runs as root.</p>
+<p>When a non-root user runs sqlr-start, the SQL Relay server runs as that user and as the primary group of that user.</p>
 
-<p>However, when run as root, the runasuser and runasgroup attributes can be used to control what user and group the SQL Relay server runs as.</p>
+<p>When root runs sqlr-start, the SQL Relay server runs as a more secure user and group, usually nobody/nobody when built from source, or sqlrelay/sqlrelay when installed from packages.</p>
+
+<p>However, the runasuser and runasgroup attributes can be used to control what user and group the SQL Relay server runs as.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -1984,7 +2016,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <font color="#009900">runasuser</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">runasgroup</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> ...<b><font color="#0000FF">&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <font color="#009900">runasuser</font><font color="#990000">=</font><font color="#FF0000">"exampleuser"</font> <font color="#009900">runasgroup</font><font color="#990000">=</font><font color="#FF0000">"examplegroup"</font> ...<b><font color="#0000FF">&gt;</font></b>
 		...
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1992,9 +2024,16 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>Be sure that whatever user/group SQL Relay is configured to run as has permissions to read all configuration files, including any database configuration files such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file.  Otherwise various things will fail, including dynamic scaling.</p>
+<p>There are several important considerations when setting runasuser/runasgroup:</p>
 
-<br/><a name="deniedallowedips"/><h3>Allowed/Denied IP Addresses</h3>
+<ul>
+  <li>runasuser is only effective if sqlr-start is run as root.</li>
+  <li>runasgroup only effective if sqlr-start is run by a member of the group, or by root.</li>
+  <li>All SQL Relay configuration files, and any appropriate database configuration files (such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file) must be readable by the runasuser/runasgroup.  Otherwise various things will fail, most notably, dynamic scaling.</li>
+  <li>SQL Relay must be able to write to "run" and "log" directories.  However, when installed from RPM packages, the /var/run/sqlrelay and /var/log/sqlrelay directories are owned by sqlrelay/sqlrelay and have fairly restrictive 755 permissions.  Thus, the permissions on these directories must be manually changed if runasuser or runasgroup are set to any value other than "sqlrelay".  This is not an issue if SQL Relay is built from source, and is not an issue on Windows.</li>
+</ul>
+
+<br/><br/><a name="deniedallowedips"/><h3>Allowed/Denied IP Addresses</h3>
 
 <p>By default, clients from any IP address are allowed to connect to the SQL Relay srever.  However, the deinedips and allowedips attributes can be used to restrict the set of IP addresses that clients can connect from.</p>
 
@@ -3617,7 +3656,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <h4>debug</h4>
 
-<p>The <b>debug</b> module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.</p>
+<p>The <b>debug</b> module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/log/sqlrelay/debug or /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.</p>
 
 <p>This module takes three parameters: <b>listener</b>, <b>connection</b> and <b>perms</b>.  The <b>listener</b> parameter may be set to "no" to disable logging of the sqlr-listener processes.  The <b>connection</b> parameter may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either parameter is omitted or set to any other value.  The <b>perms</b> parameter may be set to any ls -l style permissions string.  The default is "rw-------" which translates to read/write for owner only.</p>
 
@@ -3634,7 +3673,7 @@ Sample log for connecton process: <a href="sqlr-connection.1871.html">sqlr-conne
 
 <h4>slowqueries</h4>
 
-<p>The <b>slowqueries</b> module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.</p>
+<p>The <b>slowqueries</b> module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay or /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.</p>
 
 <p>This module takes two parameters: <b>sec</b> and <b>usec</b>.  Queries that take longer than <b>sec</b> seconds and <b>usec</b> microseconds will be logged.  Both parameters default to 0 and omitting them causes all queries to be logged.</p>
 

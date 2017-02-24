@@ -37,11 +37,7 @@ clean:
 	cd ruby $(AND) $(MAKE) clean
 	cd stress $(AND) $(MAKE) clean
 	cd tcl $(AND) $(MAKE) clean
-	$(RM) sqlr-connection.*.bt
+	$(RM) sqlr-*.*.bt sybinit.err
 
-tests: all testall$(SCRIPTEXT)
-	$(THISDIR)testall$(SCRIPTEXT)
-
-testall$(SCRIPTEXT): testall$(SCRIPTEXT).in
-	$(REPLACE) @prefix@ "$(prefix)" $@.in > $@
-	$(CHMOD) 755 $@
+tests: all
+	$(SCRIPTINT) $(THISDIR)testall$(SCRIPTEXT)

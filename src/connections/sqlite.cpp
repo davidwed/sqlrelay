@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2015  David Muse
+// Copyright (c) 1999-2016  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -651,7 +651,9 @@ int sqlitecursor::runQuery(const char *query) {
 	// handle special case of selecting the last row id
 	if (selectlastinsertrowid.match(query)) {
 		lastinsertrowid=true;
+		#ifdef HAVE_SQLITE3_STMT
 		justexecuted=true;
+		#endif
 		selectLastInsertRowId();
 		return SQLITE_OK;
 	}

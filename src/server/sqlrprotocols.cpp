@@ -99,7 +99,7 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf("failed to load protocol module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -116,9 +116,9 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
-		stdoutput.printf("failed to create protocol: %s\n",module);
+		stdoutput.printf("failed to load protocol: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;

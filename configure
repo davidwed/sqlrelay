@@ -632,6 +632,8 @@ ac_includes_default="\
 ac_default_prefix=/usr/local/firstworks
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+TESTAPIS
+TESTDBS
 abs_builddir
 abs_srcdir
 STATICLINK
@@ -712,10 +714,12 @@ FIREBIRDSTATIC
 FIREBIRDLIBSPATH
 FIREBIRDLIBS
 FIREBIRDINCLUDES
+ENABLE_INFORMIX
 INFORMIXESQLLIBSPATH
 INFORMIXCLILIBSPATH
 INFORMIXLIBS
 INFORMIXINCLUDES
+ENABLE_DB2
 DB2STATIC
 DB2LIBSPATH
 DB2LIBS
@@ -725,6 +729,7 @@ ODBCSTATIC
 ODBCLIBSPATH
 ODBCLIBS
 ODBCINCLUDES
+ENABLE_SYBASE
 SYBASESTATIC
 SYBASELIBSPATH
 SYBASELIBS
@@ -746,6 +751,7 @@ MYSQLSTATIC
 MYSQLLIBSPATH
 MYSQLLIBS
 MYSQLINCLUDES
+ENABLE_ORACLE
 ORACLESTATIC
 ORACLELIBSPATH
 ORACLELIBS
@@ -831,6 +837,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+ABS_MAXCONNECTIONS
 ENABLE_DOC
 ENABLE_UTIL
 ENABLE_SERVER
@@ -917,6 +924,9 @@ enable_option_checking
 enable_small_code
 enable_debug
 enable_profiling
+enable_fortify
+enable_wall
+enable_werror
 enable_server
 enable_client
 enable_cmdline
@@ -930,6 +940,7 @@ with_oracle_home
 with_oracle_instantclient_prefix
 enable_oracle
 enable_oracle_rpath
+enable_oracle_at_runtime
 with_mysql_prefix
 enable_mysql
 enable_mysql_rpath
@@ -946,6 +957,7 @@ enable_freetds_rpath
 with_sap_prefix
 enable_sap
 enable_sap_rpath
+enable_sap_at_runtime
 with_odbc_prefix
 enable_odbc
 enable_odbc_rpath
@@ -953,12 +965,14 @@ with_db2_prefix
 with_db2_version
 enable_db2
 enable_db2_rpath
+enable_db2_at_runtime
 with_firebird_prefix
 enable_firebird
 enable_firebird_rpath
 with_informix_prefix
 enable_informix
 enable_informix_rpath
+enable_informix_at_runtime
 with_mdbtools_prefix
 enable_mdbtools
 enable_mdbtools_rpath
@@ -1012,6 +1026,9 @@ with_sqlr
 with_sqlrelay
 with_sql_relay
 enable_doc
+with_default_runasuser
+with_default_runasgroup
+with_abs_max_connections
 enable_shared
 enable_static
 with_pic
@@ -1652,6 +1669,9 @@ Optional Features:
   --enable-small-code           optimize for small code size
   --enable-debug                compile with -g option
   --enable-profiling            compile with -pg options
+  --enable-fortify              compile with various gcc fortification options
+  --disable-wall          compile without -Wall, even if supported
+  --disable-werror        compile without -Werror, even if supported
   --disable-server              Don't build any SQL Relay server components
   --disable-client              Don't build any SQL Relay client components
   --disable-cmdline             Don't build any SQL Relay command line client programs
@@ -1659,6 +1679,7 @@ Optional Features:
   --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries
   --disable-oracle              Don't build Oracle connection module
   --disable-oracle-rpath        Don't use -rpath when building Oracle connection module
+  --enable-oracle-at-runtime    Disable static/dynamic linking against Oracle client libraries and force the connection module to load them at runtime
   --disable-mysql               Don't build MySQL connection module
   --enable-mysql-rpath          Use -rpath when building MySQL connection module
   --disable-postgresql          Don't build PostgreSQL connection module
@@ -1670,14 +1691,17 @@ Optional Features:
   --disable-freetds-rpath       Don't use -rpath when building FreeTDS connection module
   --disable-sap                 Don't build SAP/Sybase connection module
   --disable-sap-rpath           Don't use -rpath when building SAP/Sybase connection module
+  --enable-sap-at-runtime       Disable static/dynamic linking against SAP/Sybase client libraries and force the connection module to load them at runtime
   --disable-odbc                Don't build ODBC connection module
   --enable-odbc-rpath           Use -rpath when building ODBC connection module
   --disable-db2                 Don't build DB2 connection module
   --disable-db2-rpath           Use -rpath when building DB2 connection module
+  --enable-db2-at-runtime       Disable static/dynamic linking against DB2 client libraries and force the connection module to load them at runtime
   --disable-firebird            Don't build Firebird connection module
   --enable-firebird-rpath       Use -rpath when building Firebird connection module
   --disable-informix            Don't build Informix connection module
   --disable-informix-rpath      Don't use -rpath when building Informix connection module
+  --enable-informix-at-runtime  Disable static/dynamic linking against Informix client libraries and force the connection module to load them at runtime
   --disable-mdbtools            Don't build MDB Tools connection module
   --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module
   --disable-router              Don't build router connection module
@@ -1756,6 +1780,9 @@ Optional Packages:
   --with-sqlr                   replacement for "sqlr"
   --with-sqlrelay               replacement for "sqlrelay"
   --with-sql-relay              replacement for "SQL Relay"
+  --with-default-runasuser      Default user to run SQL Relay as
+  --with-default-runasgroup     Default group to run SQL Relay as
+  --with-abs-max-connections    Set the absolute maximum number of connections that may be started for an instance.  Defaults to 4096.
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-aix-soname=aix|svr4|both
@@ -2705,6 +2732,27 @@ else
   CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
 fi
 
+# Check whether --enable-fortify was given.
+if test "${enable_fortify+set}" = set; then :
+  enableval=$enable_fortify; CFLAGS="$CFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"; CXXFLAGS="$CXXFLAGS -O -D_FORTIFY_SOURCE=2 -fstack-protector-strong"
+else
+  CFLAGS="$CFLAGS"; CXXFLAGS="$CXXFLAGS"
+fi
+
+# Check whether --enable-wall was given.
+if test "${enable_wall+set}" = set; then :
+  enableval=$enable_wall; ENABLE_WALL=""
+else
+  ENABLE_WALL="yes"
+fi
+
+# Check whether --enable-werror was given.
+if test "${enable_werror+set}" = set; then :
+  enableval=$enable_werror; ENABLE_WERROR=""
+else
+  ENABLE_WERROR="yes"
+fi
+
 
 CFLAGS="$SMALLCODE $CFLAGS"
 CXXFLAGS="$SMALLCODE $CXXFLAGS"
@@ -2800,6 +2848,13 @@ if test "${enable_oracle_rpath+set}" = set; then :
   enableval=$enable_oracle_rpath; ORACLEUSERPATH=""
 else
   ORACLEUSERPATH="yes"
+fi
+
+# Check whether --enable-oracle-at-runtime was given.
+if test "${enable_oracle_at_runtime+set}" = set; then :
+  enableval=$enable_oracle_at_runtime; ORACLEATRUNTIME="yes"
+else
+  ORACLEATRUNTIME=""
 fi
 
 
@@ -2919,6 +2974,13 @@ else
   SYBASEUSERPATH="yes"
 fi
 
+# Check whether --enable-sap-at-runtime was given.
+if test "${enable_sap_at_runtime+set}" = set; then :
+  enableval=$enable_sap_at_runtime; SYBASEATRUNTIME="yes"
+else
+  SYBASEATRUNTIME=""
+fi
+
 
 # Check whether --with-odbc-prefix was given.
 if test "${with_odbc_prefix+set}" = set; then :
@@ -2971,6 +3033,13 @@ else
   DB2USERPATH="yes"
 fi
 
+# Check whether --enable-db2-at-runtime was given.
+if test "${enable_db2_at_runtime+set}" = set; then :
+  enableval=$enable_db2_at_runtime; DB2ATRUNTIME="yes"
+else
+  DB2ATRUNTIME=""
+fi
+
 
 # Check whether --with-firebird-prefix was given.
 if test "${with_firebird_prefix+set}" = set; then :
@@ -3013,6 +3082,13 @@ if test "${enable_informix_rpath+set}" = set; then :
   enableval=$enable_informix_rpath; INFORMIXUSERPATH=""
 else
   INFORMIXUSERPATH="yes"
+fi
+
+# Check whether --enable-informix-at-runtime was given.
+if test "${enable_informix_at_runtime+set}" = set; then :
+  enableval=$enable_informix_at_runtime; INFORMIXATRUNTIME="yes"
+else
+  INFORMIXATRUNTIME=""
 fi
 
 
@@ -3418,6 +3494,30 @@ else
 fi
 
 
+# Check whether --with-default-runasuser was given.
+if test "${with_default_runasuser+set}" = set; then :
+  withval=$with_default_runasuser; DEFAULT_RUNASUSER="$withval"
+else
+  DEFAULT_RUNASUSER="nobody"
+fi
+
+
+# Check whether --with-default-runasgroup was given.
+if test "${with_default_runasgroup+set}" = set; then :
+  withval=$with_default_runasgroup; DEFAULT_RUNASGROUP="$withval"
+else
+  DEFAULT_RUNASGROUP="nobody"
+fi
+
+
+# Check whether --with-abs-max-connections was given.
+if test "${with_abs_max_connections+set}" = set; then :
+  withval=$with_abs_max_connections; ABS_MAXCONNECTIONS="$withval"
+else
+  ABS_MAXCONNECTIONS="4096"
+fi
+
+
 
 if ( test -z "$ENABLE_ODBC" )
 then
@@ -3535,6 +3635,7 @@ fi
 
 
 
+
 cat >>confdefs.h <<_ACEOF
 #define SQLR "$SQLR"
 _ACEOF
@@ -3547,6 +3648,17 @@ _ACEOF
 
 cat >>confdefs.h <<_ACEOF
 #define SQL_RELAY "$SQL_RELAY"
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DEFAULT_RUNASUSER "$DEFAULT_RUNASUSER"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define DEFAULT_RUNASGROUP "$DEFAULT_RUNASGROUP"
 _ACEOF
 
 
@@ -17000,8 +17112,11 @@ fi
 
 
 
+WERROR=""
+if ( test "$ENABLE_WERROR" = "yes" )
+then
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Werror" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Werror" >&5
 $as_echo_n "checking for -Werror... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -17024,8 +17139,6 @@ printf("hello");
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   WERROR="-Werror"
-else
-  WERROR=""
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -17035,33 +17148,37 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-if ( test -n "$WERROR" )
-then
-
-			CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
-
-			if ( test "$CXX_VERSION" != "g+" )
+		if ( test -n "$WERROR" )
 	then
-				if (  test "$CXX_VERSION" -lt "27" )
+
+						CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+
+						if ( test "$CXX_VERSION" != "g+" )
 		then
-			WERROR=""
+						if (  test "$CXX_VERSION" -lt "27" )
+			then
+				WERROR=""
+			fi
 		fi
+
 	fi
 
-fi
-
-if ( test -n "$WERROR" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$WERROR" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+	fi
 fi
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wall" >&5
+WALL=""
+if ( test "$ENABLE_WALL" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wall" >&5
 $as_echo_n "checking for -Wall... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -17084,8 +17201,6 @@ printf("hello");
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   WALL="-Wall"
-else
-  WALL=""
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -17094,22 +17209,22 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-if ( test -n "$WALL" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$WALL" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-fi
+	fi
 
-if ( test -n "$WALL" )
-then
-			OLDCPPFLAGS=$CPPFLAGS
-	CPPFLAGS="$WALL $WERROR $CPPFLAGS"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -Wall includes -Wunused-*" >&5
+	if ( test -n "$WALL" )
+	then
+								OLDCPPFLAGS=$CPPFLAGS
+		CPPFLAGS="$WALL $WERROR $CPPFLAGS"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -Wall includes -Wunused-*" >&5
 $as_echo_n "checking whether -Wall includes -Wunused-*... " >&6; }
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 void f(int a) { return; }
 int
@@ -17128,7 +17243,8 @@ else
 $as_echo "yes" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-	CPPFLAGS=$OLDCPPFLAGS
+		CPPFLAGS=$OLDCPPFLAGS
+	fi
 fi
 
 
@@ -18591,6 +18707,8 @@ echo "******************************"
 echo
 echo "***** Oracle *****************"
 
+if ( test -z "$ORACLEATRUNTIME" )
+then
 if ( test "$ENABLE_ORACLE" = "yes" )
 then
 
@@ -19413,6 +19531,7 @@ fi
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Oracle support will not be built." >&5
 $as_echo "$as_me: WARNING: Oracle support will not be built." >&2;}
+		ENABLE_ORACLE=""
 	fi
 
 
@@ -19421,6 +19540,16 @@ $as_echo "$as_me: WARNING: Oracle support will not be built." >&2;}
 
 
 fi
+fi
+if ( test "$ORACLEATRUNTIME" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: Oracle libraries will be loaded at runtime." >&5
+$as_echo "$as_me: Oracle libraries will be loaded at runtime." >&6;}
+
+$as_echo "#define ORACLE_AT_RUNTIME 1" >>confdefs.h
+
+fi
+
 
 echo "******************************"
 
@@ -24602,6 +24731,8 @@ echo "******************************"
 echo
 echo "***** SAP/Sybase *************"
 
+if ( test -z "$SYBASEATRUNTIME" )
+then
 if ( test "$ENABLE_SYBASE" = "yes" )
 then
 
@@ -25382,12 +25513,13 @@ $as_echo "$as_me: WARNING: No Sybase link configuration could be found." >&2;}
 			SYBASELIBSPATH=""
 			SYBASESTATIC=""
 		fi
+	fi
 
-		if ( test -z "$SYBASELIBS" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Sybase support will not be built." >&5
-$as_echo "$as_me: WARNING: Sybase support will not be built." >&2;}
-		fi
+	if ( test -z "$SYBASELIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SAP/Sybase support will not be built." >&5
+$as_echo "$as_me: WARNING: SAP/Sybase support will not be built." >&2;}
+		ENABLE_SYBASE=""
 	fi
 
 
@@ -25408,6 +25540,16 @@ fi
 
 
 fi
+fi
+if ( test "$SYBASEATRUNTIME" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: SAP/Sybase libraries will be loaded at runtime." >&5
+$as_echo "$as_me: SAP/Sybase libraries will be loaded at runtime." >&6;}
+
+$as_echo "#define SYBASE_AT_RUNTIME 1" >>confdefs.h
+
+fi
+
 
 echo "******************************"
 
@@ -27976,6 +28118,8 @@ echo "******************************"
 echo
 echo "***** DB2 ********************"
 
+if ( test -z "$DB2ATRUNTIME" )
+then
 if ( test "$ENABLE_DB2" = "yes" )
 then
 
@@ -29399,11 +29543,13 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 		fi
-		if ( test -z "$DB2LIBS" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 support will not be built." >&5
+	fi
+
+	if ( test -z "$DB2LIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: DB2 support will not be built." >&5
 $as_echo "$as_me: WARNING: DB2 support will not be built." >&2;}
-		fi
+		ENABLE_DB2=""
 	fi
 
 	if ( test -n "$DB2LIBS" )
@@ -29415,6 +29561,7 @@ then
 fi
 
 	fi
+
 
 if ( test -n "$DB2INCLUDES" )
 then
@@ -29438,6 +29585,16 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 fi
+fi
+if ( test "$DB2ATRUNTIME" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: DB2 libraries will be loaded at runtime." >&5
+$as_echo "$as_me: DB2 libraries will be loaded at runtime." >&6;}
+
+$as_echo "#define DB2_AT_RUNTIME 1" >>confdefs.h
+
+fi
+
 
 echo "******************************"
 
@@ -29446,6 +29603,8 @@ echo "******************************"
 echo
 echo "***** Informix ***************"
 
+if ( test -z "$INFORMIXATRUNTIME" )
+then
 if ( test "$ENABLE_INFORMIX" = "yes" )
 then
 	INFORMIXINCLUDES=""
@@ -29523,6 +29682,13 @@ fi
 		INFORMIXLIBS="$INFORMIXLIBS -L$INFORMIXESQLLIBSPATH -lifgls -lifglx"
 	fi
 
+	if ( test -z "$INFORMIXLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Informix support will not be built." >&5
+$as_echo "$as_me: WARNING: Informix support will not be built." >&2;}
+		ENABLE_INFORMIX=""
+	fi
+
 
 if ( test -n "$INFORMIXINCLUDES" )
 then
@@ -29542,6 +29708,16 @@ fi
 
 
 fi
+fi
+if ( test "$INFORMIXATRUNTIME" = "yes" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: Informix libraries will be loaded at runtime." >&5
+$as_echo "$as_me: Informix libraries will be loaded at runtime." >&6;}
+
+$as_echo "#define INFORMIX_AT_RUNTIME 1" >>confdefs.h
+
+fi
+
 
 echo "******************************"
 
@@ -34448,7 +34624,7 @@ fi
 echo "******************************"
 
 
-SQLR_VERSION="1.0.0"
+SQLR_VERSION="1.0.1"
 
 
 cat >>confdefs.h <<_ACEOF
@@ -34457,7 +34633,7 @@ _ACEOF
 
 
 
-SONAME_VERSION_INFO="4:0:0"
+SONAME_VERSION_INFO="4:1:0"
 
 
 
@@ -34523,7 +34699,195 @@ then
 fi
 
 
-MAKELIST="config.mk bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc"
+
+CMDLINEBUILD="no "
+if ( test -n "$ENABLE_CMDLINE" ); then
+	CMDLINEBUILD="yes"
+fi
+
+CPPBUILD="no "
+PERLBUILD="no "
+PYTHONBUILD="no "
+RUBYBUILD="no "
+PHPBUILD="no "
+PHPPDOBUILD="no "
+JAVABUILD="no "
+TCLBUILD="no "
+ERLANGBUILD="no "
+MONOBUILD="no "
+NODEJSBUILD="no "
+ODBCDRIVERBUILD="no "
+TESTAPIS=""
+if ( test -n "$ENABLE_CPP" ); then
+	CPPBUILD="yes"
+	TESTAPIS="$TESTAPIS c c++"
+fi
+if ( test -n "$HAVE_PERL" ); then
+	PERLBUILD="yes"
+	TESTAPIS="$TESTAPIS perl perldbi"
+fi
+if ( test -n "$HAVE_PYTHON" ); then
+	PYTHONBUILD="yes"
+	TESTAPIS="$TESTAPIS python pythondb"
+fi
+if ( test -n "$HAVE_RUBY" ); then
+	RUBYBUILD="yes"
+	TESTAPIS="$TESTAPIS ruby"
+fi
+if ( test -n "$HAVE_PHP" ); then
+	PHPBUILD="yes"
+	TESTAPIS="$TESTAPIS php"
+fi
+if ( test -n "$HAVE_PHP_PDO" ); then
+	PHPPDOBUILD="yes"
+	TESTAPIS="$TESTAPIS phppdo"
+fi
+if ( test -n "$HAVE_JAVA" ); then
+	JAVABUILD="yes"
+	TESTAPIS="$TESTAPIS java"
+fi
+if ( test -n "$HAVE_TCL" ); then
+	TCLBUILD="yes"
+	TESTAPIS="$TESTAPIS tcl"
+fi
+if ( test -n "$HAVE_ERLANG" ); then
+	ERLANGBUILD="yes"
+fi
+if ( test -n "$HAVE_MONO" ); then
+	MONOBUILD="yes"
+	TESTAPIS="$TESTAPIS cs"
+fi
+if ( test -n "$HAVE_NODEJS" ); then
+	NODEJSBUILD="yes"
+	TESTAPIS="$TESTAPIS nodejs"
+fi
+if ( test -n "$ENABLE_ODBC_DRIVER" ); then
+	ODBCDRIVERBUILD="yes"
+fi
+
+MYSQLDIBUILD="no    "
+POSTGRESQLDIBUILD="no    "
+if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
+	MYSQLDIBUILD="yes   "
+fi
+if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
+	POSTGRESQLDIBUILD="yes   "
+fi
+
+ORACLEBUILD="no        "
+MYSQLBUILD="no        "
+POSTGRESQLBUILD="no        "
+SQLITEBUILD="no        "
+FREETDSBUILD="no        "
+SYBASEBUILD="no        "
+ODBCBUILD="no        "
+DB2BUILD="no        "
+FIREBIRDBUILD="no        "
+MDBTOOLSBUILD="no        "
+INFORMIXBUILD="no        "
+ROUTERBUILD="no        "
+TESTDBS=""
+if ( test -n "$ORACLEVERSION" ); then
+	ORACLEBUILD="dynamic   "
+	if ( test -n "$ORACLESTATIC" ); then
+		ORACLEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS oracle tls krb extensions"
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		ORACLEBUILD="at-runtime"
+	fi
+fi
+if ( test -n "$MYSQLLIBS" ); then
+	MYSQLBUILD="dynamic   "
+	if ( test -n "$MYSQLSTATIC" ); then
+		MYSQLBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS mysql"
+fi
+if ( test -n "$POSTGRESQLLIBS" ); then
+	POSTGRESQLBUILD="dynamic   "
+	if ( test -n "$POSTGRESQLSTATIC" ); then
+		POSTGRESQLBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS postgresql"
+fi
+if ( test -n "$SQLITELIBS" ); then
+	SQLITEBUILD="dynamic   "
+	if ( test -n "$SQLITESTATIC" ); then
+		SQLITEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS sqlite"
+fi
+if ( test -n "$FREETDSLIBS" ); then
+	FREETDSBUILD="dynamic   "
+	if ( test -n "$FREETDSSTATIC" ); then
+		FREETDSBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS freetds"
+fi
+if ( test -n "$SYBASELIBS" ); then
+	SYBASEBUILD="dynamic   "
+	if ( test -n "$SYBASESTATIC" ); then
+		SYBASEBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS sap"
+else
+	if ( test -n "$ENABLE_SYBASE" ); then
+		SYBASEBUILD="at-runtime"
+	fi
+fi
+if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
+	ODBCBUILD="dynamic   "
+	if ( test -n "$ODBCSTATIC" ); then
+		ODBCBUILD="static    "
+	fi
+fi
+if ( test -n "$DB2LIBS" ); then
+	DB2BUILD="dynamic   "
+	if ( test -n "$DB2STATIC" ); then
+		DB2BUILD="static    "
+	fi
+	TESTDBS="$TESTDBS db2"
+else
+	if ( test -n "$ENABLE_DB2" ); then
+		DB2BUILD="at-runtime"
+	fi
+fi
+if ( test -n "$FIREBIRDLIBS" ); then
+	FIREBIRDBUILD="dynamic   "
+	if ( test -n "$FIREBIRDSTATIC" ); then
+		FIREBIRDBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS firebird"
+fi
+if ( test -n "$MDBTOOLSLIBS" ); then
+	MDBTOOLSBUILD="dynamic   "
+	if ( test -n "$MDBTOOLSSTATIC" ); then
+		MDBTOOLSBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS mdbtools"
+fi
+if ( test -n "$INFORMIXLIBS" ); then
+	INFORMIXBUILD="dynamic   "
+	if ( test -n "$INFORMIXSTATIC" ); then
+		INFORMIXBUILD="static    "
+	fi
+	TESTDBS="$TESTDBS informix"
+else
+	if ( test -n "$ENABLE_ORACLE" ); then
+		INFORMIXBUILD="at-runtime"
+	fi
+fi
+if ( test -n "$ENABLE_ROUTER" ); then
+	ROUTERBUILD="yes"
+	TESTDBS="$TESTDBS router"
+fi
+
+
+
+
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF
@@ -36922,6 +37286,8 @@ chmod 755 bin/sqlrclientwrapper-config
 chmod 755 bin/sqlrserver-config
 chmod 755 init/rc.sqlrelay
 chmod 755 init/rc.sqlrcachemanager
+chmod 755 test/testall.sh
+chmod 755 test/test.sh
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
 mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
 sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
@@ -36930,71 +37296,15 @@ sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$lib
 sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
 
 
-
 echo
 echo "***** Summary ***********************************************"
 
 echo " Version      : $SQLR_VERSION"
 echo
 echo " Branding     : $SQL_RELAY / $SQLRELAY / $SQLR"
-
-CMDLINEBUILD="no "
-if ( test -n "$ENABLE_CMDLINE" ); then
-	CMDLINEBUILD="yes"
-fi
-
 echo
 echo " Command Line : Clients     $CMDLINEBUILD"
 echo
-
-CPPBUILD="no "
-PERLBUILD="no "
-PYTHONBUILD="no "
-RUBYBUILD="no "
-PHPBUILD="no "
-PHPPDOBUILD="no "
-JAVABUILD="no "
-TCLBUILD="no "
-ERLANGBUILD="no "
-MONOBUILD="no "
-NODEJSBUILD="no "
-ODBCDRIVERBUILD="no "
-if ( test -n "$ENABLE_CPP" ); then
-	CPPBUILD="yes"
-fi
-if ( test -n "$HAVE_PERL" ); then
-	PERLBUILD="yes"
-fi
-if ( test -n "$HAVE_PYTHON" ); then
-	PYTHONBUILD="yes"
-fi
-if ( test -n "$HAVE_RUBY" ); then
-	RUBYBUILD="yes"
-fi
-if ( test -n "$HAVE_PHP" ); then
-	PHPBUILD="yes"
-fi
-if ( test -n "$HAVE_PHP_PDO" ); then
-	PHPPDOBUILD="yes"
-fi
-if ( test -n "$HAVE_JAVA" ); then
-	JAVABUILD="yes"
-fi
-if ( test -n "$HAVE_TCL" ); then
-	TCLBUILD="yes"
-fi
-if ( test -n "$HAVE_ERLANG" ); then
-	ERLANGBUILD="yes"
-fi
-if ( test -n "$HAVE_MONO" ); then
-	MONOBUILD="yes"
-fi
-if ( test -n "$HAVE_NODEJS" ); then
-	NODEJSBUILD="yes"
-fi
-if ( test -n "$ENABLE_ODBC_DRIVER" ); then
-	ODBCDRIVERBUILD="yes"
-fi
 echo " APIs         : C/C++       $CPPBUILD           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
@@ -37002,109 +37312,15 @@ echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERB
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
 echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
 echo
-
-
-MYSQLDIBUILD="no    "
-POSTGRESQLDIBUILD="no    "
-if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
-	MYSQLDIBUILD="yes   "
-fi
-if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
-	POSTGRESQLDIBUILD="yes   "
-fi
 echo " Drop-In Replacement Libraries:"
 echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
 echo
-
-
-ORACLE8BUILD="no     "
-MYSQLBUILD="no     "
-POSTGRESQLBUILD="no     "
-SQLITEBUILD="no     "
-FREETDSBUILD="no     "
-SYBASEBUILD="no     "
-ODBCBUILD="no     "
-DB2BUILD="no     "
-FIREBIRDBUILD="no     "
-MDBTOOLSBUILD="no     "
-INFORMIXBUILD="no     "
-ROUTERBUILD="no     "
-if ( test -n "$ORACLEVERSION" ); then
-	ORACLE8BUILD="dynamic"
-	if ( test -n "$ORACLESTATIC" ); then
-		ORACLE8BUILD="static "
-	fi
-fi
-if ( test -n "$MYSQLLIBS" ); then
-	MYSQLBUILD="dynamic"
-	if ( test -n "$MYSQLSTATIC" ); then
-		MYSQLBUILD="static "
-	fi
-fi
-if ( test -n "$POSTGRESQLLIBS" ); then
-	POSTGRESQLBUILD="dynamic"
-	if ( test -n "$POSTGRESQLSTATIC" ); then
-		POSTGRESQLBUILD="static "
-	fi
-fi
-if ( test -n "$SQLITELIBS" ); then
-	SQLITEBUILD="dynamic"
-	if ( test -n "$SQLITESTATIC" ); then
-		SQLITEBUILD="static "
-	fi
-fi
-if ( test -n "$FREETDSLIBS" ); then
-	FREETDSBUILD="dynamic"
-	if ( test -n "$FREETDSSTATIC" ); then
-		FREETDSBUILD="static "
-	fi
-fi
-if ( test -n "$SYBASELIBS" ); then
-	SYBASEBUILD="dynamic"
-	if ( test -n "$SYBASESTATIC" ); then
-		SYBASEBUILD="static "
-	fi
-fi
-if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
-	ODBCBUILD="dynamic"
-	if ( test -n "$ODBCSTATIC" ); then
-		ODBCBUILD="static "
-	fi
-fi
-if ( test -n "$DB2LIBS" ); then
-	DB2BUILD="dynamic"
-	if ( test -n "$DB2STATIC" ); then
-		DB2BUILD="static "
-	fi
-fi
-if ( test -n "$FIREBIRDLIBS" ); then
-	FIREBIRDBUILD="dynamic"
-	if ( test -n "$FIREBIRDSTATIC" ); then
-		FIREBIRDBUILD="static "
-	fi
-fi
-if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic"
-	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static "
-	fi
-fi
-if ( test -n "$INFORMIXLIBS" ); then
-	INFORMIXBUILD="dynamic"
-	if ( test -n "$INFORMIXSTATIC" ); then
-		INFORMIXBUILD="static "
-	fi
-fi
-if ( test -n "$ENABLE_ROUTER" ); then
-	ROUTERBUILD="yes   "
-fi
-echo " Databases    : Oracle8     $ORACLE8BUILD       MySQL      $MYSQLBUILD       "
-echo "                PostgreSQL  $POSTGRESQLBUILD       SQLite     $SQLITEBUILD"
-echo "                FreeTDS     $FREETDSBUILD       SAP/Sybase $SYBASEBUILD"
-echo "                ODBC        $ODBCBUILD       DB2        $DB2BUILD"
-echo "                Firebird    $FIREBIRDBUILD       MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD       Router     $ROUTERBUILD"
-
+echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
+echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
+echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
+echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
+echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
+echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
 echo "*************************************************************"
 echo
 echo "If you expected a Database or API that doesn't show up in the Summary"
@@ -37121,6 +37337,6 @@ then
 	echo "NOTE: Python 2 and Python 3 were both found.  For now SQL Relay defaults to"
 	echo "Python 2, however Python 3 will become the default soon."
 	echo
-	echo "To force a build for Python 3, use the  --disable-python2  option."
+	echo "To force a build for Python 3, use the  --disable-python  option."
 	echo
 fi

@@ -106,7 +106,7 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 		stdoutput.printf(
 			"failed to load schedule module: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
 		return;
@@ -123,9 +123,9 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 							xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newSchedule) {
-		stdoutput.printf("failed to create schedule: %s\n",module);
+		stdoutput.printf("failed to load schedule: %s\n",module);
 		char	*error=dl->getError();
-		stdoutput.printf("%s\n",error);
+		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		dl->close();
 		delete dl;
