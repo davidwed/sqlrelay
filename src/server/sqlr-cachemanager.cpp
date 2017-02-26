@@ -102,12 +102,8 @@ void sqlrcachemanager::scan() {
 
 	// create pid file
 	pid_t	pid=process::getProcessId();
-	size_t	pidfilelen=charstring::length(sqlrpth->getPidDir())+18+
-				charstring::integerLength((uint64_t)pid)+4+1;
-	pidfile=new char[pidfilelen];
-	charstring::printf(pidfile,pidfilelen,
-				"%ssqlr-cachemanager.%ld.pid",
-				sqlrpth->getPidDir(),(long)pid);
+	charstring::printf(&pidfile,"%ssqlr-cachemanager.%ld.pid",
+					sqlrpth->getPidDir(),(long)pid);
 
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
 
@@ -156,11 +152,8 @@ void sqlrcachemanager::scan() {
 void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 
 	// derive the full pathname
-	size_t	fullpathnamelen=charstring::length(dirname)+1+
-					charstring::length(filename)+1;
-	char	*fullpathname=new char[fullpathnamelen];
-	charstring::printf(fullpathname,fullpathnamelen,
-				"%s/%s",dirname,filename);
+	char	*fullpathname=NULL;
+	charstring::printf(&fullpathname,"%s/%s",dirname,filename);
 
 	// open the file
 	file	fl;

@@ -631,9 +631,8 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		if (!charstring::length(home)) {
 			home=environment::getValue("ORACLE_HOME");
 		}
-		size_t	tnsnamesorasize=charstring::length(home)+28;
-		char	*tnsnamesora=new char[tnsnamesorasize];
-		charstring::printf(tnsnamesora,tnsnamesorasize,
+		char	*tnsnamesora=NULL;
+		charstring::printf(&tnsnamesora,
 				"%s%cnetwork%cadmin%ctnsnames.ora",
 				home,
 				sys::getDirectorySeparator(),

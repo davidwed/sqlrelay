@@ -601,12 +601,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// create connection pid file
 	pid_t	pid=process::getProcessId();
-	size_t	pidfilelen=charstring::length(
-				pvt->_pth->getPidDir())+16+
-				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::integerLength((uint64_t)pid)+4+1;
-	pvt->_pidfile=new char[pidfilelen];
-	charstring::printf(pvt->_pidfile,pidfilelen,
+	charstring::printf(&pvt->_pidfile,
 				"%ssqlr-connection-%s.%ld.pid",
 				pvt->_pth->getPidDir(),
 				pvt->_cmdl->getId(),
@@ -743,14 +738,11 @@ bool sqlrservercontroller::handlePidFile() {
 	// writes it out after forking and it's possible that the connection
 	// might start up after the sqlr-listener has forked, but before it
 	// writes out the pid file)
-	size_t	listenerpidfilelen=
-			charstring::length(pvt->_pth->getPidDir())+14+
-			charstring::length(pvt->_cmdl->getId())+4+1;
-	char	*listenerpidfile=new char[listenerpidfilelen];
-	charstring::printf(listenerpidfile,listenerpidfilelen,
-						"%ssqlr-listener-%s.pid",
-						pvt->_pth->getPidDir(),
-						pvt->_cmdl->getId());
+	char	*listenerpidfile=NULL;
+	charstring::printf(&listenerpidfile,
+				"%ssqlr-listener-%s.pid",
+				pvt->_pth->getPidDir(),
+				pvt->_cmdl->getId());
 
 	// On most platforms, 1 second is plenty of time to wait for the
 	// listener to come up, but on windows, it can take a while longer.
@@ -801,15 +793,11 @@ bool sqlrservercontroller::handlePidFile() {
 void sqlrservercontroller::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
-	size_t	updownlen=charstring::length(
-				pvt->_pth->getIpcDir())+
-				charstring::length(pvt->_cmdl->getId())+1+
-				charstring::length(pvt->_connectionid)+3+1;
-	pvt->_updown=new char[updownlen];
-	charstring::printf(pvt->_updown,updownlen,"%s%s-%s.up",
-						pvt->_pth->getIpcDir(),
-						pvt->_cmdl->getId(),
-						pvt->_connectionid);
+	charstring::printf(&pvt->_updown,
+				"%s%s-%s.up",
+				pvt->_pth->getIpcDir(),
+				pvt->_cmdl->getId(),
+				pvt->_connectionid);
 }
 
 bool sqlrservercontroller::getUnixSocket() {
@@ -1180,9 +1168,9 @@ bool sqlrservercontroller::openSockets() {
 				}
 
 				char	string[33];
-				charstring::printf(string,33,
-					"listening on inet socket: %d",
-					pvt->_inetport);
+				charstring::printf(string,sizeof(string),
+						"listening on inet socket: %d",
+						pvt->_inetport);
 				raiseDebugMessageEvent(string);
 
 				pvt->_lsnr.addReadFileDescriptor(
@@ -1531,14 +1519,11 @@ void sqlrservercontroller::registerForHandoff() {
 	raiseDebugMessageEvent("registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	handoffsocknamelen=
-			charstring::length(pvt->_pth->getSocketsDir())+
-			charstring::length(pvt->_cmdl->getId())+13+1;
-	char	*handoffsockname=new char[handoffsocknamelen];
-	charstring::printf(handoffsockname,handoffsocknamelen,
-						"%s%s-handoff.sock",
-						pvt->_pth->getSocketsDir(),
-						pvt->_cmdl->getId());
+	char	*handoffsockname=NULL;
+	charstring::printf(&handoffsockname,
+				"%s%s-handoff.sock",
+				pvt->_pth->getSocketsDir(),
+				pvt->_cmdl->getId());
 
 	pvt->_debugstr.clear();
 	pvt->_debugstr.append("handoffsockname: ")->append(handoffsockname);
@@ -1577,12 +1562,8 @@ void sqlrservercontroller::deRegisterForHandoff() {
 	raiseDebugMessageEvent("de-registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	removehandoffsocknamelen=
-				charstring::length(pvt->_pth->getSocketsDir())+
-				charstring::length(pvt->_cmdl->getId())+19+1;
-	char	*removehandoffsockname=new char[removehandoffsocknamelen];
-	charstring::printf(removehandoffsockname,
-				removehandoffsocknamelen,
+	char	*removehandoffsockname=NULL;
+	charstring::printf(&removehandoffsockname,
 				"%s%s-removehandoff.sock",
 				pvt->_pth->getSocketsDir(),
 				pvt->_cmdl->getId());
@@ -4497,12 +4478,8 @@ void sqlrservercontroller::deleteCursor(sqlrservercursor *curs) {
 
 bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
-	size_t	idfilenamelen=charstring::length(
-					pvt->_pth->getIpcDir())+
-					charstring::length(id)+4+1;
-	char	*idfilename=new char[idfilenamelen];
-	charstring::printf(idfilename,idfilenamelen,"%s%s.ipc",
-					pvt->_pth->getIpcDir(),id);
+	char	*idfilename=NULL;
+	charstring::printf(&idfilename,"%s%s.ipc",pvt->_pth->getIpcDir(),id);
 
 	pvt->_debugstr.clear();
 	pvt->_debugstr.append("attaching to shared memory and semaphores ");

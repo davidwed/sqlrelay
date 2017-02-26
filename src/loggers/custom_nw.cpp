@@ -61,21 +61,14 @@ bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
 			(sqlrcon)?sqlrcon->cont->getId():sqlrl->getId();
 
 	// create the directory
-	size_t	querylognamelen=charstring::length(logdir)+1+
-					charstring::length(id)+1+1;
 	delete[] querylogname;
-	querylogname=new char[querylognamelen];
-	charstring::printf(querylogname,querylognamelen,"%s/%s",logdir,id);
+	charstring::printf(&querylogname,"%s/%s",logdir,id);
 	directory::create(querylogname,
 			permissions::evalPermString("rwxrwxrwx"));
 
 	// create the log file name
-	querylognamelen=charstring::length(logdir)+1+
-				charstring::length(id)+10+1;
 	delete[] querylogname;
-	querylogname=new char[querylognamelen];
-	charstring::printf(querylogname,querylognamelen,
-				"%s/%s/query.log",logdir,id);
+	charstring::printf(&querylogname,"%s/%s/query.log",logdir,id);
 
 	// create the new log file
 	querylog.close();

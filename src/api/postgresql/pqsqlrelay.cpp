@@ -677,13 +677,8 @@ PGresult *PQprepare(PGconn *conn,
 
 			const char	*dbtype=conn->sqlrcon->identify();
 			if (!dbtype) {
-				size_t	errorlen=
-					charstring::length(conn->sqlrcur->
-							errorMessage())+2;
-				conn->error=new char[errorlen];
-				charstring::printf(
-					conn->error,errorlen,"%s\n",
-					conn->sqlrcur->errorMessage());
+				charstring::printf(&conn->error,"%s\n",
+						conn->sqlrcur->errorMessage());
 				PQclear(result);
 				return NULL;
 			}
@@ -770,11 +765,7 @@ PGresult *PQexecPrepared(PGconn *conn,
 				result->execstatus=PGRES_TUPLES_OK;
 			}
 		} else {
-			size_t	errorlen=
-				charstring::length(result->
-						sqlrcur->errorMessage())+2;
-			conn->error=new char[errorlen];
-			charstring::printf(conn->error,errorlen,"%s\n",
+			charstring::printf(&conn->error,"%s\n",
 					result->sqlrcur->errorMessage());
 			PQclear(result);
 			result=NULL;

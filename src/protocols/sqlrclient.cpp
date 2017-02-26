@@ -2277,7 +2277,7 @@ void sqlrprotocol_sqlrclient::sendRowCounts(bool knowsactual,
 	if (knowsactual) {
 
 		char	string[30];
-		charstring::printf(string,30,
+		charstring::printf(string,sizeof(string),
 				"actual rows: %lld",(long long)actual);
 		cont->raiseDebugMessageEvent(string);
 

@@ -1900,8 +1900,6 @@ void firebirdcursor::getField(uint32_t col,
 	#endif
 
 		// build a string of "yyyy-mm-dd hh:mm:ss" format
-		//char	buffer[20];
-		//charstring::printf(buffer,20,
 		*fldlength=charstring::printf(field[col].textbuffer,
 					firebirdconn->maxitembuffersize,
 					"%d-%02d-%02d %02d:%02d:%02d",
@@ -1922,8 +1920,6 @@ void firebirdcursor::getField(uint32_t col,
 		isc_decode_sql_time(&field[col].timebuffer,
 						&entry_time);
 		// build a string of "hh:mm:ss" format
-		//char	buffer[9];
-		//charstring::printf(buffer,9,
 		*fldlength=charstring::printf(field[col].textbuffer,
 					firebirdconn->maxitembuffersize,
 					"%02d:%02d:%02d",
@@ -1940,8 +1936,6 @@ void firebirdcursor::getField(uint32_t col,
 		isc_decode_sql_date(&field[col].datebuffer,
 						&entry_date);
 		// build a string of "yyyy-mm-dd" format
-		//char	buffer[11];
-		//charstring::printf(buffer,11,
 		*fldlength=charstring::printf(field[col].textbuffer,
 					firebirdconn->maxitembuffersize,
 					"%d:%02d:%02d",

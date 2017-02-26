@@ -66,12 +66,8 @@ bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 	pid_t	pid=process::getProcessId();
 
 	// build up the query log name
-	size_t	querylognamelen=
-			charstring::length(sqlrcon->cont->getLogDir())+17+
-			charstring::length(sqlrcon->cont->getId())+10+20+1;
 	delete[] querylogname;
-	querylogname=new char[querylognamelen];
-	charstring::printf(querylogname,querylognamelen,
+	charstring::printf(&querylogname,
 				"%s/sqlr-connection-%s-querylog.%ld",
 				sqlrcon->cont->getLogDir(),
 				sqlrcon->cont->getId(),(long)pid);

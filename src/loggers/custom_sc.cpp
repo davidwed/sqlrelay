@@ -74,11 +74,8 @@ bool sqlrlogger_custom_sc::init(sqlrlistener *sqlrl,
 	}
 
 	// build up the query log name
-	size_t	querylognamelen;
 	delete[] querylogname;
-	querylognamelen=charstring::length(path)+1+charstring::length(name)+1;
-	querylogname=new char[querylognamelen];
-	charstring::printf(querylogname,querylognamelen,"%s/%s",path,name);
+	charstring::printf(&querylogname,"%s/%s",path,name);
 
 	// create the new log file
 	querylog.close();
@@ -123,7 +120,8 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// append the date
 	char	datebuffer[20];
-	charstring::printf(datebuffer,20,"%04d-%02d-%02d %02d:%02d:%02d",
+	charstring::printf(datebuffer,sizeof(datebuffer),
+				"%04d-%02d-%02d %02d:%02d:%02d",
 				dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
 				dt.getHour(),dt.getMinutes(),dt.getSeconds());
 	logbuffer.append(datebuffer)->append(' ');
