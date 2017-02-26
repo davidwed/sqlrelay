@@ -373,7 +373,7 @@ void sqlrlistener::setUserAndGroup() {
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
 	if (charstring::compare(currentuser,pvt->_cfg->getRunAsUser()) &&
-				!process::setUser(pvt->_cfg->getRunAsUser())) {
+			!process::setUser(pvt->_cfg->getRunAsUser())) {
 		errorstr.append("Warning: could not change user to ")->
 			append(pvt->_cfg->getRunAsUser())->append('\n');
 	}
@@ -534,6 +534,9 @@ void sqlrlistener::setHandoffMethod() {
 		} else {
 			pvt->_handoffmode=HANDOFF_PROXY;
 		}
+
+        	// clean up
+        	delete[] os;
 	}
 
 	// create the list of handoff nodes

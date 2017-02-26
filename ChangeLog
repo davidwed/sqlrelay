@@ -1,3 +1,5 @@
+1.0.2 - updated to use charstring asprintf analogs
+
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
 	updated some module-load error verbage
