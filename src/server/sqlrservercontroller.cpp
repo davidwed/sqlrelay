@@ -255,6 +255,8 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_isolationlevel=NULL;
 
+	pvt->_sendcolumninfo=SEND_COLUMN_INFO;
+
 	pvt->_maxquerysize=0;
 	pvt->_maxbindcount=0;
 	pvt->_maxerrorlength=0;
@@ -2235,6 +2237,8 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	// and rollback queries also need to be intercepted as well, otherwise
 	// the query will be sent directly to the db and endFakeBeginTransaction
 	// won't get called.
+	bool	retval=false;
+	bool	oldsendcolumninfo=pvt->_sendcolumninfo;
 	if (isBeginTransactionQuery(cursor)) {
 		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
@@ -2244,9 +2248,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setError(
 				"begin while in transaction block",
 							999999,true);
-			return false;
+		} else {
+			retval=begin();
 		}
-		return begin();
 		// FIXME: if the begin fails and the db api doesn't support
 		// a begin command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
@@ -2259,9 +2263,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setError(
 				"commit while not in transaction block",
 								999998,true);
-			return false;
+		} else {
+			retval=commit();
 		}
-		return commit();
 		// FIXME: if the commit fails and the db api doesn't support
 		// a commit command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
@@ -2274,14 +2278,15 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setError(
 				"rollback while not in transaction block",
 								999997,true);
-			return false;
+		} else {
+			retval=rollback();
 		}
-		return rollback();
 		// FIXME: if the rollback fails and the db api doesn't support
 		// a rollback command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
 	}
-	return false;
+	pvt->_sendcolumninfo=oldsendcolumninfo;
+	return retval;
 }
 
 bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
