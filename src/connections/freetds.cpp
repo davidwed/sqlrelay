@@ -2130,6 +2130,7 @@ CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 
 	errorcode=msgp->msgnumber;
 
+	errorstring.clear();
 	errorstring.append("Client Library error: ")->append(msgp->msgstring);
 	errorstring.append(" severity(")->
 		append((int32_t)CS_SEVERITY(msgp->msgnumber))->append(")");
@@ -2176,6 +2177,7 @@ CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 
 	errorcode=msgp->msgnumber;
 
+	errorstring.clear();
 	errorstring.append("Client Library error: ")->append(msgp->msgstring);
 	errorstring.append(" severity(")->
 		append((int32_t)CS_SEVERITY(msgp->msgnumber))->append(")");
@@ -2233,6 +2235,7 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	errorcode=msgp->msgnumber;
 
+	errorstring.clear();
 	errorstring.append("Server message: ")->append(msgp->text);
 	errorstring.append(" severity(")->
 		append((int32_t)CS_SEVERITY(msgp->msgnumber))->append(")");
