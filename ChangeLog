@@ -1,5 +1,7 @@
 1.0.2 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
+	fixed a bug in freetds connection that caused error messages to be
+		concatenated over and over
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
