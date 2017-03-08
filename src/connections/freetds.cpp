@@ -238,9 +238,6 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 		bool		prepared;
 		bool		clean;
 
-		regularexpression	cursorquery;
-		regularexpression	rpcquery;
-
 		freetdsconnection	*freetdsconn;
 };
 
@@ -948,12 +945,6 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	// temporary table
 	setCreateTempTablePattern("^(create|CREATE)[ 	\r\n]"
 					"+(table|TABLE)[ 	\r\n]+#");
-
-	cursorquery.compile("^(select|SELECT)[ 	\r\n]+");
-	cursorquery.study();
-
-	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ 	\r\n]+");
-	rpcquery.study();
 
 	allocateResultSetBuffers(freetdsconn->maxselectlistsize);
 
