@@ -24,6 +24,12 @@ postgresql.lo: postgresql.cpp
 postgresql.obj: postgresql.cpp
 	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(POSTGRESQLINCLUDES) $(COMPILE) postgresql.cpp
 
+tds.lo: tds.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(FREETDSINCLUDES) $(COMPILE) $< $(OUT)$@
+
+tds.obj: tds.cpp
+	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(FREETDSINCLUDES) $(COMPILE) tds.cpp
+
 mysql: mysql.cpp mysql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
 
@@ -32,6 +38,9 @@ mysqldatetodatetime: mysqldatetodatetime.cpp mysqldatetodatetime.$(OBJ)
 
 postgresql: postgresql.cpp postgresql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) postgresql.$(OBJ) $(POSTGRESQLLIBS) $(DROPINTESTLIBS)
+
+tds: tds.cpp tds.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tds.$(OBJ) $(FREETDSLIBS) $(DROPINTESTLIBS)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE)
