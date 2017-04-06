@@ -38,7 +38,18 @@
  * [#proxiedauth Proxied Auth]
  * [#krb Kerberos and Active Directory Encryption and Authentication]
  * [#tls TLS/SSL Encryption and Authentication]
-* [#se Security Enhancement]
+* [#security Security Features]
+ * [#krbtls Kerberos/Active Directory and TLS/SSL Encryption and Authentication]
+ * [#securedb Secure Database Connections]
+  * [#securedb-oracle Oracle]
+  * [#securedb-mssql Microsoft SQL Server (using FreeTDS)]
+  * [#securedb-sap SAP/Sybase]
+  * [#securedb-db2 IBM DB2]
+  * [#securedb-informix Informix]
+  * [#securedb-mysql MySQL]
+  * [#securedb-postgresql PostgreSQL]
+  * [#securedb-firebird Firebird]
+  * [#securedb-odbc ODBC]
  * [#runas Run-As User and Group]
  * [#deniedallowedips Denied/Allowed IP Addresses]
  * [#pwdenc Password Encryption]
@@ -1277,7 +1288,7 @@ If the server's certificate is self-signed, then the certificate authority won't
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/sqlrca.pem
+sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1291,7 +1302,7 @@ For a more secure session, the client may validate that the host name provided b
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1305,7 +1316,7 @@ Unless self-signed, certificates can be expensive, so certificates are often sha
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/sqlrca.pem
+sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1347,7 +1358,7 @@ In a more likely use case, cross-validation occurs - the client validates the se
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/sqlrclient.pem -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/sqlrclient.pem -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1365,10 +1376,72 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 
 ----
 
-[[br]][=#se]
-== Security Enhancement ==
+[[br]][=#security]
+== Security Features ==
 
-In addition to [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication], SQL Relay offers several additional features to enhance security.
+SQL Relay offers several features to enhance security.
+
+[[br]][=#krbtls]
+=== Kerberos/Active Directory and TLS/SSL Encryption and Authentication ===
+
+As mentioned in the [#authoptions Authentication/Authorization Options] section above, SQL Relay supports [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication].
+
+[[br]][=#securedb]
+=== Secure Database Connections Over TLS/SSL ===
+
+SQL Relay supports TLS/SSL-secured connections between itself and the database.
+
+When a secure connection to the database is used:
+
+* All communications between the SQL Relay server and database are encrypted.
+* The SQL Relay server and database may optionally validate each other's certificates and identities.
+
+The instructions below assume that you have certificates '''sqlrserver.pem''' (for the SQL Relay server) and '''db.pem''' (for the database server) which are self-signed by your own '''myca.pem''' certificate.
+
+[[br]][=#securedb-oracle]
+==== Oracle ====
+
+...
+
+[[br]][=#securedb-mssql]
+==== Microsoft SQL Server (using !FreeTDS) ====
+
+...
+
+[[br]][=#securedb-sap]
+==== SAP/Sybase ====
+
+...
+
+[[br]][=#securedb-db2]
+==== IBM DB2 ====
+
+...
+
+[[br]][=#securedb-informix]
+==== Informix ====
+
+...
+
+[[br]][=#securedb-mysql]
+==== !MySQL ====
+
+...
+
+[[br]][=#securedb-postgresql]
+==== !PostgreSQL ====
+
+...
+
+[[br]][=#securedb-firebird]
+==== Firebird ====
+
+...
+
+[[br]][=#securedb-odbc]
+==== ODBC ====
+
+...
 
 [[br]][=#runas]
 === Run-As User and Group ===

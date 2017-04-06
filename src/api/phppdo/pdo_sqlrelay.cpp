@@ -979,6 +979,57 @@ sqlrconnectionExecute(pdo_dbh_t *dbh,
 	return -1;
 }
 
+static int sqlrconnectionQuote(pdo_dbh_t *dbh,
+					const char *unquoted,
+#if PHP_MAJOR_VERSION >= 7
+					size_t unquotedlen,
+#else
+					int unquotedlen,
+#endif
+					char **quoted,
+#if PHP_MAJOR_VERSION >= 7
+					size_t *quotedlen,
+#else
+					int *quotedlen,
+#endif
+					enum pdo_param_type paramtype TSRMLS_DC
+					) {
+
+	// fail if quoted/quotedlen weren't provided
+	if (!quoted || !quotedlen) {
+		return 0;
+	}
+
+	// determine size of new string
+	*quotedlen=unquotedlen+2;
+	for (size_t i=0; i<unquotedlen; i++) {
+		if (unquoted[i]=='\'') {
+			(*quotedlen)++;
+		}
+	}
+
+	// allocate new string
+	*quoted=(char *)safe_emalloc((*quotedlen)+1,sizeof(char),0);
+
+	// quote the string
+	char	*ptr=*quoted;
+	*ptr='\'';
+	ptr++;
+	for (size_t i=0; i<unquotedlen; i++) {
+		if (unquoted[i]=='\'') {
+			*ptr='\'';
+			ptr++;
+		}
+		*ptr=unquoted[i];
+		ptr++;
+	}
+	*ptr='\'';
+	ptr++;
+	*ptr='\0';
+
+	return 1;
+}
+
 static int sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	if (((sqlrconnection *)sqlrdbh->sqlrcon)->begin()) {
@@ -1423,7 +1474,7 @@ static struct pdo_dbh_methods sqlrconnectionMethods={
 	sqlrconnectionClose,
 	sqlrconnectionPrepare,
 	sqlrconnectionExecute,
-	NULL, // quote
+	sqlrconnectionQuote,
 	sqlrconnectionBegin,
 	sqlrconnectionCommit,
 	sqlrconnectionRollback,

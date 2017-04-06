@@ -63,8 +63,22 @@
     <li><a href="#tls">TLS/SSL Encryption and Authentication</a></li>
   </ul>
 
-  <li><a href="#se">Security Enhancement</a></li>
+  <li><a href="#security">Security Features</a></li>
   <ul>
+    <li><a href="#krbtls">Kerberos/Active Directory and TLS/SSL Encryption and Authentication</a></li>
+    <li><a href="#securedb">Secure Database Connections</a></li>
+    <ul>
+      <li><a href="#securedb-oracle">Oracle</a></li>
+      <li><a href="#securedb-mssql">Microsoft SQL Server (using FreeTDS)</a></li>
+      <li><a href="#securedb-sap">SAP/Sybase</a></li>
+      <li><a href="#securedb-db2">IBM DB2</a></li>
+      <li><a href="#securedb-informix">Informix</a></li>
+      <li><a href="#securedb-mysql">MySQL</a></li>
+      <li><a href="#securedb-postgresql">PostgreSQL</a></li>
+      <li><a href="#securedb-firebird">Firebird</a></li>
+      <li><a href="#securedb-odbc">ODBC</a></li>
+    </ul>
+
     <li><a href="#runas">Run-As User and Group</a></li>
     <li><a href="#deniedallowedips">Denied/Allowed IP Addresses</a></li>
     <li><a href="#pwdenc">Password Encryption</a></li>
@@ -1892,7 +1906,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>If the server's certificate is self-signed, then the certificate authority won't be known to the system, but it's certificate may be specified by the tlsca parameter as follows:</p>
 
 <blockquote>
-  <pre>sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/sqlrca.pem
+  <pre>sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/myca.pem
 </pre>
 
 </blockquote>
@@ -1903,7 +1917,7 @@ http://www.gnu.org/software/src-highlite -->
 <br/><p>For a more secure session, the client may validate that the host name provided by the server's certificate matches the host name that the client meant to connect to, as follows:</p>
 
 <blockquote>
-  <pre>sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+  <pre>sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
 </pre>
 
 </blockquote>
@@ -1914,7 +1928,7 @@ http://www.gnu.org/software/src-highlite -->
 <br/><p>Unless self-signed, certificates can be expensive, so certificates are often shared by multiple servers across a domain.  To manage environments like this, the host name validation can be relaxed as follows:</p>
 
 <blockquote>
-  <pre>sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/sqlrca.pem
+  <pre>sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/myca.pem
 </pre>
 
 </blockquote>
@@ -1938,7 +1952,7 @@ http://www.gnu.org/software/src-highlite -->
 		<font color="#009900">tls</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
 		<font color="#009900">tlscert</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrserver.pem"</font>
 		<font color="#009900">tlsvalidate</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
-		<font color="#009900">tlsca</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrca.pem"</font><b><font color="#0000FF">&gt;</font></b>
+		<font color="#009900">tlsca</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/myca.pem"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient1.firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient2.firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
@@ -1976,7 +1990,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In a more likely use case, cross-validation occurs - the client validates the server and the server validates the client, as follows:</p>
 
 <blockquote>
-  <pre>sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/sqlrclient.pem -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/sqlrca.pem
+  <pre>sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/sqlrclient.pem -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
 </pre>
 
 </blockquote>
@@ -1996,9 +2010,62 @@ http://www.gnu.org/software/src-highlite -->
 
 <hr/>
 
-<br/><a name="se"/><h2>Security Enhancement</h2>
+<br/><a name="security"/><h2>Security Features</h2>
 
-<p>In addition to <a href="#krb">Kerberos and Active Directory Encryption and Authentication</a> and <a href="#tls">TLS/SSL Encryption and Authentication</a>, SQL Relay offers several additional features to enhance security.</p>
+<p>SQL Relay offers several features to enhance security.</p>
+
+<br/><a name="krbtls"/><h3>Kerberos/Active Directory and TLS/SSL Encryption and Authentication</h3>
+
+<p>As mentioned in the <a href="#authoptions">Authentication/Authorization Options</a> section above, SQL Relay supports <a href="#krb">Kerberos and Active Directory Encryption and Authentication</a> and <a href="#tls">TLS/SSL Encryption and Authentication</a>.</p>
+
+<br/><a name="securedb"/><h3>Secure Database Connections Over TLS/SSL</h3>
+
+<p>SQL Relay supports TLS/SSL-secured connections between itself and the database.</p>
+
+<p>When a secure connection to the database is used:</p>
+
+<ul>
+  <li>All communications between the SQL Relay server and database are encrypted.</li>
+  <li>The SQL Relay server and database may optionally validate each other's certificates and identities.</li>
+</ul>
+
+<p>The instructions below assume that you have certificates <b>sqlrserver.pem</b> (for the SQL Relay server) and <b>db.pem</b> (for the database server) which are self-signed by your own <b>myca.pem</b> certificate.</p>
+
+<br/><a name="securedb-oracle"/><h4>Oracle</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-mssql"/><h4>Microsoft SQL Server (using FreeTDS)</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-sap"/><h4>SAP/Sybase</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-db2"/><h4>IBM DB2</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-informix"/><h4>Informix</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-mysql"/><h4>MySQL</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-postgresql"/><h4>PostgreSQL</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-firebird"/><h4>Firebird</h4>
+
+<p>...</p>
+
+<br/><a name="securedb-odbc"/><h4>ODBC</h4>
+
+<p>...</p>
 
 <br/><a name="runas"/><h3>Run-As User and Group</h3>
 

@@ -25,55 +25,6 @@
 <p>A fairly comprehensive example follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
-<b><font color="#0000FF">&lt;instances&gt;</font></b>
-
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font>
-		<font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/example.socket"</font>
-		<font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">maxconnections</font><font color="#990000">=</font><font color="#FF0000">"15"</font> <font color="#009900">maxqueuelength</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">growby</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="#009900">ttl</font><font color="#990000">=</font><font color="#FF0000">"60"</font> <font color="#009900">softttl</font><font color="#990000">=</font><font color="#FF0000">"0"</font>
-		<font color="#009900">maxsessioncount</font><font color="#990000">=</font><font color="#FF0000">"1000"</font> <font color="#009900">endofsession</font><font color="#990000">=</font><font color="#FF0000">"commit"</font> <font color="#009900">sessiontimeout</font><font color="#990000">=</font><font color="#FF0000">"600"</font>
-		<font color="#009900">runasuser</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">runasgroup</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">cursors</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">maxcursors</font><font color="#990000">=</font><font color="#FF0000">"10"</font> <font color="#009900">cursors_growby</font><font color="#990000">=</font><font color="#FF0000">"1"</font>
-		<font color="#009900">authtier</font><font color="#990000">=</font><font color="#FF0000">"connection"</font> <font color="#009900">sessionhandler</font><font color="#990000">=</font><font color="#FF0000">"process"</font> <font color="#009900">handoff</font><font color="#990000">=</font><font color="#FF0000">"pass"</font> <font color="#009900">deniedips</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">allowedips</font><font color="#990000">=</font><font color="#FF0000">""</font>
-		<font color="#009900">maxquerysize</font><font color="#990000">=</font><font color="#FF0000">"65536"</font> <font color="#009900">maxbindvars</font><font color="#990000">=</font><font color="#FF0000">"256"</font> <font color="#009900">maxstringbindvaluelength</font><font color="#990000">=</font><font color="#FF0000">"4000"</font> <font color="#009900">maxlobbindvaluelength</font><font color="#990000">=</font><font color="#FF0000">"71680"</font>
-		<font color="#009900">idleclienttimeout</font><font color="#990000">=</font><font color="#FF0000">"-1"</font> <font color="#009900">maxlisteners</font><font color="#990000">=</font><font color="#FF0000">"-1"</font> <font color="#009900">listenertimeout</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="#009900">reloginatstart</font><font color="#990000">=</font><font color="#FF0000">"no"</font>
-		<font color="#009900">fakeinputbindvariables</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">translatebindvariables</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">isolationlevel</font><font color="#990000">=</font><font color="#FF0000">"read committed"</font>
-		<font color="#009900">ignoreselectdatabase</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">waitfordowndatabase</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">&gt;</font></b>
-	       <b><font color="#0000FF">&lt;users&gt;</font></b>
-		      <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password1"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password2"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password3"</font><b><font color="#0000FF">/&gt;</font></b>
-	       <b><font color="#0000FF">&lt;/users&gt;</font></b>
-	       <b><font color="#0000FF">&lt;session&gt;</font></b>
-		      <b><font color="#0000FF">&lt;start&gt;</font></b>
-			     <b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='MM-DD-YYYY HH24:MI:SS'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
-		      <b><font color="#0000FF">&lt;/start&gt;</font></b>
-		      <b><font color="#0000FF">&lt;end&gt;</font></b>
-			     <b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='DD-MON-YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
-		      <b><font color="#0000FF">&lt;/end&gt;</font></b>
-	       <b><font color="#0000FF">&lt;/session&gt;</font></b>
-	       <b><font color="#0000FF">&lt;connections&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db1"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser1;password=examplepassword1;oracle_sid=EXAMPLE1;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db2"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser2;password=examplepassword2;oracle_sid=EXAMPLE2;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db3"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser3;password=examplepassword3;oracle_sid=EXAMPLE3;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db4"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser4;password=examplepassword4;oracle_sid=EXAMPLE4;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-	       <b><font color="#0000FF">&lt;/connections&gt;</font></b>
-        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
-
-<b><font color="#0000FF">&lt;/instances&gt;</font></b>
-</tt></pre>
-
 </blockquote>
 <a name="tags"/><h2>Tags</h2>
 

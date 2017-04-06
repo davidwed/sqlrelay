@@ -663,11 +663,16 @@ if (PHP_VERSION_ID < 70000) {
 	checkSuccess($info[2],"ORA-00923: FROM keyword not found where expected");
 	echo("\n");
 
+	echo("QUOTE: \n");
+	checkSuccess($dbh->quote("select * from table"),"'select * from table'");
+	checkSuccess($dbh->quote("Naughty ' string"),"'Naughty '' string'");
+	checkSuccess($dbh->quote("Co'mpl''ex \"st'\"ring"),"'Co''mpl''''ex \"st''\"ring'");
+	echo("\n");
+
 	echo("INVALID OPERATIONS: \n");
 	checkSuccess($stmt->nextRowset(),0);
 	checkSuccess($stmt->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE),0);
 	checkSuccess($stmt->getAttribute(PDO::ATTR_AUTOCOMMIT),0);
-	checkSuccess($dbh->quote("select * from table"),null);
 	checkSuccess($stmt->bindValue(1,1,9999),true);
 	echo("\n");
 
