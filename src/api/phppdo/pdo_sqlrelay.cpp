@@ -995,6 +995,12 @@ static int sqlrconnectionQuote(pdo_dbh_t *dbh,
 					enum pdo_param_type paramtype TSRMLS_DC
 					) {
 
+#if PHP_MAJOR_VERSION >= 7
+	size_t	i;
+#else
+	int	i;
+#endif
+
 	// fail if quoted/quotedlen weren't provided
 	if (!quoted || !quotedlen) {
 		return 0;
@@ -1002,7 +1008,7 @@ static int sqlrconnectionQuote(pdo_dbh_t *dbh,
 
 	// determine size of new string
 	*quotedlen=unquotedlen+2;
-	for (size_t i=0; i<unquotedlen; i++) {
+	for (i=0; i<unquotedlen; i++) {
 		if (unquoted[i]=='\'') {
 			(*quotedlen)++;
 		}
@@ -1015,7 +1021,7 @@ static int sqlrconnectionQuote(pdo_dbh_t *dbh,
 	char	*ptr=*quoted;
 	*ptr='\'';
 	ptr++;
-	for (size_t i=0; i<unquotedlen; i++) {
+	for (i=0; i<unquotedlen; i++) {
 		if (unquoted[i]=='\'') {
 			*ptr='\'';
 			ptr++;
