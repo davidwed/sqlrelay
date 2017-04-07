@@ -1396,7 +1396,7 @@ When a secure connection to the database is used:
 * All communications between the SQL Relay server and database are encrypted.
 * The SQL Relay server and database may optionally validate each other's certificates and identities.
 
-The instructions below assume that you have certificates '''sqlrserver.pem''' (for the SQL Relay server) and '''db.pem''' (for the database server) which are self-signed by your own '''myca.pem''' certificate.
+...
 
 [[br]][=#securedb-oracle]
 ==== Oracle ====
