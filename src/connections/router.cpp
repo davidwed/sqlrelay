@@ -667,9 +667,10 @@ bool routerconnection::ping() {
 	// ping all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("ping(): %s\n",conids[index]);
+		debugPrintf("ping(): %s (%d)\n",conids[index],index);
 		bool	res=cons[index]->ping();
-		if (result) {
+		if (!res) {
+			debugPrintf("error: %s\n",cons[index]->errorMessage());
 			result=res;
 		}
 	}

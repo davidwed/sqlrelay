@@ -3,6 +3,7 @@
 	fixed a bug in freetds connection that caused error messages to be
 		concatenated over and over
 	added missing quote method to pdo driver
+	fixed a subtle login/ping bug in the router
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
