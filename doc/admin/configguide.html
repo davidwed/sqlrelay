@@ -66,19 +66,6 @@
   <li><a href="#security">Security Features</a></li>
   <ul>
     <li><a href="#krbtls">Kerberos/Active Directory and TLS/SSL Encryption and Authentication</a></li>
-    <li><a href="#securedb">Secure Database Connections</a></li>
-    <ul>
-      <li><a href="#securedb-oracle">Oracle</a></li>
-      <li><a href="#securedb-mssql">Microsoft SQL Server (using FreeTDS)</a></li>
-      <li><a href="#securedb-sap">SAP/Sybase</a></li>
-      <li><a href="#securedb-db2">IBM DB2</a></li>
-      <li><a href="#securedb-informix">Informix</a></li>
-      <li><a href="#securedb-mysql">MySQL</a></li>
-      <li><a href="#securedb-postgresql">PostgreSQL</a></li>
-      <li><a href="#securedb-firebird">Firebird</a></li>
-      <li><a href="#securedb-odbc">ODBC</a></li>
-    </ul>
-
     <li><a href="#runas">Run-As User and Group</a></li>
     <li><a href="#deniedallowedips">Denied/Allowed IP Addresses</a></li>
     <li><a href="#pwdenc">Password Encryption</a></li>
@@ -2017,55 +2004,6 @@ http://www.gnu.org/software/src-highlite -->
 <br/><a name="krbtls"/><h3>Kerberos/Active Directory and TLS/SSL Encryption and Authentication</h3>
 
 <p>As mentioned in the <a href="#authoptions">Authentication/Authorization Options</a> section above, SQL Relay supports <a href="#krb">Kerberos and Active Directory Encryption and Authentication</a> and <a href="#tls">TLS/SSL Encryption and Authentication</a>.</p>
-
-<br/><a name="securedb"/><h3>Secure Database Connections Over TLS/SSL</h3>
-
-<p>SQL Relay supports TLS/SSL-secured connections between itself and the database.</p>
-
-<p>When a secure connection to the database is used:</p>
-
-<ul>
-  <li>All communications between the SQL Relay server and database are encrypted.</li>
-  <li>The SQL Relay server and database may optionally validate each other's certificates and identities.</li>
-</ul>
-
-<p>The instructions below assume that you have certificates <b>sqlrserver.pem</b> (for the SQL Relay server) and <b>db.pem</b> (for the database server) which are self-signed by your own <b>myca.pem</b> certificate.</p>
-
-<br/><a name="securedb-oracle"/><h4>Oracle</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-mssql"/><h4>Microsoft SQL Server (using FreeTDS)</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-sap"/><h4>SAP/Sybase</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-db2"/><h4>IBM DB2</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-informix"/><h4>Informix</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-mysql"/><h4>MySQL</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-postgresql"/><h4>PostgreSQL</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-firebird"/><h4>Firebird</h4>
-
-<p>...</p>
-
-<br/><a name="securedb-odbc"/><h4>ODBC</h4>
-
-<p>...</p>
 
 <br/><a name="runas"/><h3>Run-As User and Group</h3>
 

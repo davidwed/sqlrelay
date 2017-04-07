@@ -40,16 +40,6 @@
  * [#tls TLS/SSL Encryption and Authentication]
 * [#security Security Features]
  * [#krbtls Kerberos/Active Directory and TLS/SSL Encryption and Authentication]
- * [#securedb Secure Database Connections]
-  * [#securedb-oracle Oracle]
-  * [#securedb-mssql Microsoft SQL Server (using FreeTDS)]
-  * [#securedb-sap SAP/Sybase]
-  * [#securedb-db2 IBM DB2]
-  * [#securedb-informix Informix]
-  * [#securedb-mysql MySQL]
-  * [#securedb-postgresql PostgreSQL]
-  * [#securedb-firebird Firebird]
-  * [#securedb-odbc ODBC]
  * [#runas Run-As User and Group]
  * [#deniedallowedips Denied/Allowed IP Addresses]
  * [#pwdenc Password Encryption]
@@ -1385,63 +1375,6 @@ SQL Relay offers several features to enhance security.
 === Kerberos/Active Directory and TLS/SSL Encryption and Authentication ===
 
 As mentioned in the [#authoptions Authentication/Authorization Options] section above, SQL Relay supports [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication].
-
-[[br]][=#securedb]
-=== Secure Database Connections Over TLS/SSL ===
-
-SQL Relay supports TLS/SSL-secured connections between itself and the database.
-
-When a secure connection to the database is used:
-
-* All communications between the SQL Relay server and database are encrypted.
-* The SQL Relay server and database may optionally validate each other's certificates and identities.
-
-...
-
-[[br]][=#securedb-oracle]
-==== Oracle ====
-
-...
-
-[[br]][=#securedb-mssql]
-==== Microsoft SQL Server (using !FreeTDS) ====
-
-...
-
-[[br]][=#securedb-sap]
-==== SAP/Sybase ====
-
-...
-
-[[br]][=#securedb-db2]
-==== IBM DB2 ====
-
-...
-
-[[br]][=#securedb-informix]
-==== Informix ====
-
-...
-
-[[br]][=#securedb-mysql]
-==== !MySQL ====
-
-...
-
-[[br]][=#securedb-postgresql]
-==== !PostgreSQL ====
-
-...
-
-[[br]][=#securedb-firebird]
-==== Firebird ====
-
-...
-
-[[br]][=#securedb-odbc]
-==== ODBC ====
-
-...
 
 [[br]][=#runas]
 === Run-As User and Group ===
