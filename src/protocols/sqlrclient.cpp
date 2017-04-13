@@ -2720,7 +2720,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 		cont->raiseDebugMessageEvent(debugstr.getString());
 	}
 
-	// FIXME: preallocated these 
+	// FIXME: preallocate these 
 	uint32_t	colcount=cont->colCount(cursor);
 	fieldnames=new const char *[colcount];
 	fields=new const char *[colcount];
@@ -2755,6 +2755,8 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 	delete[] fieldnames;
 	delete[] fields;
 	delete[] fieldlengths;
+	delete[] blob;
+	delete[] null;
 
 	cont->raiseDebugMessageEvent("done returning result set data");
 	return true;

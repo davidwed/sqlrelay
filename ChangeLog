@@ -4,6 +4,7 @@
 		concatenated over and over
 	added missing quote method to pdo driver
 	fixed a subtle login/ping bug in the router
+	fixed a memory leak in the sqlrclient protocol module
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
