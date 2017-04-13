@@ -149,11 +149,18 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 	}
 #endif
 
-	// get the affected row count
+	// get the result status
+	PQresultStatus(pgresult);
+
+	// get the column, row, and affected row count
+	int32_t	cols=PQnfields(pgresult);
+	int	rows=PQntuples(pgresult);
 	PQcmdTuples(pgresult);
 
-	// get the column count
-	int32_t	cols=PQnfields(pgresult);
+#ifdef HAVE_POSTGRESQL_PQOIDVALUE
+	// get the oid of the inserted row, if this was an insert
+	PQoidValue(pgresult);
+#endif
 
 	// run through the columns
 	if (getcolumns) {
@@ -161,11 +168,16 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 			PQfname(pgresult,i);
 			PQftype(pgresult,i);
 			PQfsize(pgresult,i);
+#ifdef HAVE_POSTGRESQL_PQFMOD
+			PQfmod(pgresult,i);
+#endif
+#ifdef HAVE_POSTGRESQL_PQBINARYTUPLES
+			PQbinaryTuples(pgresult);
+#endif
 		}
 	}
 
 	// run through the rows
-	int	rows=PQntuples(pgresult);
 	for (int i=0; i<rows; i++) {
 		for (int j=0; j<cols; j++) {
 			PQgetisnull(pgresult,i,j);
