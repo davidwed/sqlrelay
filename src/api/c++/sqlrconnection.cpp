@@ -748,9 +748,11 @@ bool sqlrconnection::reConfigureSockets() {
 
 	pvt->_ucs.setReadBufferSize(65536);
 	pvt->_ucs.setWriteBufferSize(65536);
+	//pvt->_ucs.useAsyncWrite();
 
 	pvt->_ics.setReadBufferSize(65536);
 	pvt->_ics.setWriteBufferSize(65536);
+	//pvt->_ics.useAsyncWrite();
 
 
 	if (pvt->_usekrb) {

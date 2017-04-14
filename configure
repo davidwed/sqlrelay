@@ -22654,9 +22654,85 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQserverVersion" >&5
-$as_echo_n "checking if PostgreSQL has PQserverVersion... " >&6; }
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQsendQueryPrepared" >&5
+$as_echo_n "checking if PostgreSQL has PQsendQueryPrepared... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$POSTGRESQLINCLUDES"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <libpq-fe.h>
+#include <stdlib.h>
+int
+main ()
+{
+PQsendQueryPrepared(NULL,NULL,0,NULL,NULL,NULL,0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_POSTGRESQL_PQSENDQUERYPREPARED 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQsetSingleRowMode" >&5
+$as_echo_n "checking if PostgreSQL has PQsetSingleRowMode... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$POSTGRESQLINCLUDES"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <libpq-fe.h>
+#include <stdlib.h>
+int
+main ()
+{
+PQsetSingleRowMode(NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_POSTGRESQL_PQSETSINGLEROWMODE 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 		fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQserverVersion" >&5
+$as_echo_n "checking if PostgreSQL has PQserverVersion... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
@@ -34624,7 +34700,7 @@ fi
 echo "******************************"
 
 
-SQLR_VERSION="1.0.1"
+SQLR_VERSION="1.0.2"
 
 
 cat >>confdefs.h <<_ACEOF

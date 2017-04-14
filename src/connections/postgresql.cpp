@@ -14,6 +14,8 @@
 
 #include <libpq-fe.h>
 
+//#undef HAVE_POSTGRESQL_PQSENDQUERYPREPARED
+
 class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 	friend class postgresqlcursor;
 	public:
@@ -85,8 +87,10 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 				postgresqlcursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~postgresqlcursor();
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 #endif
@@ -95,8 +99,10 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		void		encodeBlob(stringbuffer *buffer,
 							const char *data,
 							uint32_t datasize);
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -123,8 +129,10 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 		void		errorMessage(char *errorbuffer,
 					uint32_t errorbufferlength,
 					uint32_t *errorlength,
@@ -161,8 +169,10 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 
 		postgresqlconnection	*postgresqlconn;
 
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 		int		bindcount;
 		int		bindcounter;
 		char		**bindvalues;
@@ -170,6 +180,11 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		int		*bindformats;
 
 		bool		bindformaterror;
+#endif
+
+#if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
+		bool		justexecuted;
 #endif
 };
 
@@ -313,8 +328,10 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 		PQclear(result);
 	}
 
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	// don't use bind variables against older servers
 	if (PQprotocolVersion(pgconn)<3) {
 		cont->fakeInputBinds();
@@ -572,8 +589,10 @@ const char *postgresqlconnection::getLastInsertIdQuery() {
 }
 
 const char *postgresqlconnection::bindFormat() {
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	return "$1";
 #else
 	return sqlrserverconnection::bindFormat();
@@ -584,8 +603,10 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	pgresult=NULL;
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	bindcounter=0;
 	bindcount=0;
 	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
@@ -595,11 +616,17 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	bindformats=new int[maxbindcount];
 	bindformaterror=false;
 #endif
+#if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
+	justexecuted=false;
+#endif
 }
 
 postgresqlcursor::~postgresqlcursor() {
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	for (uint16_t i=0; i<bindcounter; i++) {
 		delete[] bindvalues[i];
 	}
@@ -609,8 +636,10 @@ postgresqlcursor::~postgresqlcursor() {
 #endif
 }
 
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize the column count
@@ -795,8 +824,10 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 #endif
 
 bool postgresqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	return true;
 #else
 	return false;
@@ -829,14 +860,39 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	nrows=0;
 	currentrow=-1;
 
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+#if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
+	int	result=1;
+	if (bindcounter) {
+		result=PQsendQueryPrepared(postgresqlconn->pgconn,"",
+						bindcounter,bindvalues,
+						bindlengths,bindformats,0);
+		bindcounter=0;
+	} else {
+		result=PQsendQuery(postgresqlconn->pgconn,query);
+	}
+
+	// handle some kind of outright failure
+	if (!result) {
+		return false;
+	}
+
+	// set single-row mode
+	if (!PQsetSingleRowMode(postgresqlconn->pgconn)) {
+		return false;
+	}
+
+	// get the result (and the first row)
+	pgresult=PQgetResult(postgresqlconn->pgconn);
+
+	justexecuted=true;
+	currentrow=0;
+#elif defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	if (bindcounter) {
-		// execute the query
 		pgresult=PQexecPrepared(postgresqlconn->pgconn,"",
 					bindcounter,bindvalues,
 					bindlengths,bindformats,0);
-		// reset bind counter
 		bindcounter=0;
 	} else {
 		pgresult=PQexec(postgresqlconn->pgconn,query);
@@ -863,8 +919,11 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	// get the col count
 	ncols=PQnfields(pgresult);
 
+#if !(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	// get the row count
 	nrows=PQntuples(pgresult);
+#endif
 
 	// get the affected row count
 	const char	*affrows=PQcmdTuples(pgresult);
@@ -884,8 +943,10 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 void postgresqlcursor::errorMessage(char *errorbuffer,
 					uint32_t errorbufferlength,
 					uint32_t *errorlength,
@@ -909,7 +970,12 @@ void postgresqlcursor::errorMessage(char *errorbuffer,
 #endif
 
 bool postgresqlcursor::knowsRowCount() {
+#if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
+	return false;
+#else
 	return true;
+#endif
 }
 
 uint64_t postgresqlcursor::rowCount() {
@@ -1220,15 +1286,39 @@ uint16_t postgresqlcursor::getColumnIsBinary(uint32_t col) {
 }
 
 bool postgresqlcursor::noRowsToReturn() {
+#if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
+	// if there are no columns, then there can't be any rows either
+	return (ncols)?false:true;
+#else
 	return (!nrows);
+#endif
 }
 
 bool postgresqlcursor::fetchRow() {
+#if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
+	if (!justexecuted) {
+		PQclear(pgresult);
+		pgresult=PQgetResult(postgresqlconn->pgconn);
+	} else {
+		justexecuted=false;
+	}
+	// The docs say call PQgetResult until it returns null, but it will
+	// actually return non-null one time when called after the end of the
+	// result set.  Fortunately, we can detect the true end with
+	// PQresultStatus.
+	if (PQresultStatus(pgresult)==PGRES_SINGLE_TUPLE && pgresult) {
+		return true;
+	}
+	return false;
+#else
 	if (currentrow<nrows-1) {
 		currentrow++;
 		return true;
 	}
 	return false;
+#endif
 }
 
 void postgresqlcursor::getField(uint32_t col,
@@ -1248,18 +1338,33 @@ void postgresqlcursor::getField(uint32_t col,
 
 void postgresqlcursor::closeResultSet() {
 
-#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	for (uint16_t i=0; i<bindcounter; i++) {
 		delete[] bindvalues[i];
 		bindvalues[i]=NULL;
 	}
 #endif
 
+#if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
+	for (;;) {
+		if (pgresult) {
+			PQclear(pgresult);
+		} else {
+			break;
+		}
+		pgresult=PQgetResult(postgresqlconn->pgconn);
+	}
+	justexecuted=false;
+#else
 	if (pgresult) {
 		PQclear(pgresult);
 		pgresult=NULL;
 	}
+#endif
 }
 
 extern "C" {

@@ -360,6 +360,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 	clientsock->setSocketWriteBufferSize(65536);
 	clientsock->setReadBufferSize(65536);
 	clientsock->setWriteBufferSize(65536);
+	//clientsock->useAsyncWrite();
 
 	clientsessionexitstatus_t	status=CLIENTSESSIONEXITSTATUS_ERROR;
 
@@ -2730,23 +2731,13 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 	// send the specified number of rows back
 	for (uint64_t i=0; (!fetch || i<fetch); i++) {
-
-		if (!cont->fetchRow(cursor)) {
+		if (cont->fetchRow(cursor)) {
+			returnRow(cursor);
+			// FIXME: kludgy
+			cont->nextRow(cursor);
+		} else {
 			clientsock->write((uint16_t)END_RESULT_SET);
 			break;
-		}
-
-		if (cont->logEnabled() || cont->notificationsEnabled()) {
-			debugstr.clear();
-		}
-
-		returnRow(cursor);
-
-		// FIXME: kludgy
-		cont->nextRow(cursor);
-
-		if (cont->logEnabled() || cont->notificationsEnabled()) {
-			cont->raiseDebugMessageEvent(debugstr.getString());
 		}
 	}
 	clientsock->flushWriteBuffer(-1,-1);
@@ -2764,6 +2755,10 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	debugFunction();
+
+	if (cont->logEnabled() || cont->notificationsEnabled()) {
+		debugstr.clear();
+	}
 
 	// get the column count
 	uint32_t	colcount=cont->colCount(cursor);
@@ -2808,6 +2803,10 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 					&(fields[i]),&(fieldlengths[i]));
 			sendField(fields[i],fieldlengths[i]);
 		}
+	}
+
+	if (cont->logEnabled() || cont->notificationsEnabled()) {
+		cont->raiseDebugMessageEvent(debugstr.getString());
 	}
 }
 

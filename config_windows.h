@@ -145,6 +145,9 @@
 /* Some versions of postgresql have PQprepare */
 #define HAVE_POSTGRESQL_PQPREPARE 1
 
+/* Some versions of postgresql have PQsendQueryPrepared */
+#define HAVE_POSTGRESQL_PQSENDQUERYPREPARED 1
+
 /* Some versions of postgresql have PQserverVersion */
 #define HAVE_POSTGRESQL_PQSERVERVERSION 1
 
@@ -153,6 +156,9 @@
 
 /* Some versions of postgresql have PQsetNoticeProcessor */
 #define HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR 1
+
+/* Some versions of postgresql have PQsetSingleRowMode */
+#define HAVE_POSTGRESQL_PQSETSINGLEROWMODE 1
 
 /* Do we have SIGABRT */
 #define HAVE_SIGABRT 1

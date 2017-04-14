@@ -283,9 +283,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->rowCount(),8);
 	stdoutput.printf("\n");
 
-	stdoutput.printf("TOTAL ROWS: \n");
+	/*stdoutput.printf("TOTAL ROWS: \n");
 	checkSuccess(cur->totalRows(),8);
-	stdoutput.printf("\n");
+	stdoutput.printf("\n");*/
 
 	stdoutput.printf("FIRST ROW INDEX: \n");
 	checkSuccess(cur->firstRowIndex(),0);

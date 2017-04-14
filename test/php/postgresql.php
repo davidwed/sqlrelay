@@ -200,9 +200,9 @@
 	checkSuccess(sqlrcur_rowCount($cur),8);
 	echo("\n");
 
-	echo("TOTAL ROWS: \n");
+	/*echo("TOTAL ROWS: \n");
 	checkSuccess(sqlrcur_totalRows($cur),8);
-	echo("\n");
+	echo("\n");*/
 
 	echo("FIRST ROW INDEX: \n");
 	checkSuccess(sqlrcur_firstRowIndex($cur),0);

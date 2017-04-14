@@ -253,9 +253,9 @@ class postgresql {
 		checkSuccess(cur.rowCount(),8);
 		System.out.println();
 	
-		System.out.println("TOTAL ROWS: ");
+		/*System.out.println("TOTAL ROWS: ");
 		checkSuccess(cur.totalRows(),8);
-		System.out.println();
+		System.out.println();*/
 	
 		System.out.println("FIRST ROW INDEX: ");
 		checkSuccess(cur.firstRowIndex(),0);

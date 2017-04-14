@@ -156,6 +156,9 @@
 /* Some versions of postgresql have PQprepare */
 #undef HAVE_POSTGRESQL_PQPREPARE
 
+/* Some versions of postgresql have PQsendQueryPrepared */
+#undef HAVE_POSTGRESQL_PQSENDQUERYPREPARED
+
 /* Some versions of postgresql have PQserverVersion */
 #undef HAVE_POSTGRESQL_PQSERVERVERSION
 
@@ -164,6 +167,9 @@
 
 /* Some versions of postgresql have PQsetNoticeProcessor */
 #undef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
+
+/* Some versions of postgresql have PQsetSingleRowMode */
+#undef HAVE_POSTGRESQL_PQSETSINGLEROWMODE
 
 /* Some systems have SQLConnectW */
 #undef HAVE_SQLCONNECTW

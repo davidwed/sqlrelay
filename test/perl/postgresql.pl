@@ -229,9 +229,9 @@ print("ROW COUNT: \n");
 checkSuccess($cur->rowCount(),8);
 print("\n");
 
-print("TOTAL ROWS: \n");
-checkSuccess($cur->totalRows(),8);
-print("\n");
+#print("TOTAL ROWS: \n");
+#checkSuccess($cur->totalRows(),8);
+#print("\n");
 
 print("FIRST ROW INDEX: \n");
 checkSuccess($cur->firstRowIndex(),0);

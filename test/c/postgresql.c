@@ -247,9 +247,9 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_rowCount(cur),8);
 	printf("\n");
 
-	printf("TOTAL ROWS: \n");
+	/*printf("TOTAL ROWS: \n");
 	checkSuccessInt(sqlrcur_totalRows(cur),8);
-	printf("\n");
+	printf("\n");*/
 
 	printf("FIRST ROW INDEX: \n");
 	checkSuccessInt(sqlrcur_firstRowIndex(cur),0);

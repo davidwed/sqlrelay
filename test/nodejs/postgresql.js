@@ -213,9 +213,9 @@ console.log("ROW COUNT: ");
 checkSuccess(cur.rowCount(),8);
 console.log("\n");
 	
-console.log("TOTAL ROWS: ");
+/*console.log("TOTAL ROWS: ");
 checkSuccess(cur.totalRows(),8);
-console.log("\n");
+console.log("\n");*/
 	
 console.log("FIRST ROW INDEX: ");
 checkSuccess(cur.firstRowIndex(),0);

@@ -202,9 +202,9 @@ puts "ROW COUNT: "
 checkSuccess [$cur rowCount] 8
 puts ""
 
-puts "TOTAL ROWS: "
-checkSuccess [$cur totalRows] 8
-puts ""
+#puts "TOTAL ROWS: "
+#checkSuccess [$cur totalRows] 8
+#puts ""
 
 puts "FIRST ROW INDEX: "
 checkSuccess [$cur firstRowIndex] 0

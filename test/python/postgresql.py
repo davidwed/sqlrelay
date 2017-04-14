@@ -204,9 +204,9 @@ def main():
 	checkSuccess(cur.rowCount(),8)
 	print()
 
-	print("TOTAL ROWS: ")
-	checkSuccess(cur.totalRows(),8)
-	print()
+	#print("TOTAL ROWS: ")
+	#checkSuccess(cur.totalRows(),8)
+	#print()
 
 	print("FIRST ROW INDEX: ")
 	checkSuccess(cur.firstRowIndex(),0)
