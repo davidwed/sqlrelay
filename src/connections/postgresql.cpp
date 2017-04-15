@@ -1257,10 +1257,8 @@ const char *postgresqlcursor::getColumnTypeName(uint32_t col) {
 		charstring::printf(typenamebuffer,sizeof(typenamebuffer),
 						"%d",(int32_t)pgfieldtype);
 		return typenamebuffer;
-	} else {
-		return postgresqlconn->datatypes.getValue((int32_t)pgfieldtype);
 	}
-	return NULL;
+	return postgresqlconn->datatypes.getValue((int32_t)pgfieldtype);
 }
 
 uint32_t postgresqlcursor::getColumnLength(uint32_t col) {
