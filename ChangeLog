@@ -7,6 +7,7 @@
 	fixed a memory leak in the sqlrclient protocol module
 	postgresql connection uses async functions and fetches one row at a
 		time now, if available
+	mysql connection checks for valid stmt before resetting it now
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

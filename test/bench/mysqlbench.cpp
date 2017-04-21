@@ -223,6 +223,11 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 			return false;
 		}
 
+		// execute the query
+		if (mysql_stmt_execute(stmt)) {
+			return false;
+		}
+
 		// get the column count
 		uint32_t	ncols=mysql_stmt_field_count(stmt);
 
@@ -231,11 +236,6 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 
 		// bind result set buffers
 		if (mysql_stmt_bind_result(stmt,fieldbind)) {
-			return false;
-		}
-
-		// execute the query
-		if (mysql_stmt_execute(stmt)) {
 			return false;
 		}
 	

@@ -793,9 +793,7 @@ bool mysqlcursor::open() {
 	stmt=mysql_stmt_init(mysqlconn->mysqlptr);
 	return true;
 }
-#endif
 
-#ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::close() {
 	mysql_stmt_close(stmt);
 	return true;
