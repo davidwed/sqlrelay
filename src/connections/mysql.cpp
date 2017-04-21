@@ -665,13 +665,13 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 	*errorcode=mysql_errno(mysqlptr);
 	*liveconnection=(!charstring::compare(errorstring,"") ||
 		!charstring::compareIgnoringCase(errorstring,
-				"mysql server has gone away") ||
+				"mysql server has gone away",26) ||
 		!charstring::compareIgnoringCase(errorstring,
 				"Can't connect to local MySQL",28) ||
 		!charstring::compareIgnoringCase(errorstring,
 				"Can't connect to MySQL",22) /*||
 		!charstring::compareIgnoringCase(errorstring,
-			"Lost connection to MySQL server during query")*/);
+			"Lost connection to MySQL server during query",44)*/);
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -1287,7 +1287,7 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 	#endif
 	if (!charstring::compare(err,"") ||
 		!charstring::compareIgnoringCase(err,
-				"mysql server has gone away") ||
+				"mysql server has gone away",26) ||
 		!charstring::compareIgnoringCase(err,
 				"Can't connect to local MySQL",28) ||
 		!charstring::compareIgnoringCase(err,

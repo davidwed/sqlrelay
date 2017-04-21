@@ -591,13 +591,19 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		uint16_t	countBindVariables(const char *query);
 
 		bool	isBitType(const char *type);
+		bool	isBitType(int16_t type);
 		bool	isBoolType(const char *type);
+		bool	isBoolType(int16_t type);
 		bool	isFloatType(const char *type);
+		bool	isFloatType(int16_t type);
 		bool	isNumberType(const char *type);
 		bool	isNumberType(int16_t type);
 		bool	isBlobType(const char *type);
+		bool	isBlobType(int16_t type);
 		bool	isUnsignedType(const char *type);
+		bool	isUnsignedType(int16_t type);
 		bool	isBinaryType(const char *type);
+		bool	isBinaryType(int16_t type);
 		bool	isDateTimeType(const char *type);
 		bool	isDateTimeType(int16_t type);
 

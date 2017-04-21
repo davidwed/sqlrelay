@@ -421,31 +421,61 @@ static const char	*datatypestring[] = {
 
 #ifdef NEED_IS_BIT_TYPE_CHAR
 static bool isBitTypeChar(const char *type) {
-  return (!charstring::compareIgnoringCase(type,"BIT") ||
-	  !charstring::compareIgnoringCase(type,"VARBIT"));
+	return (!charstring::compareIgnoringCase(type,"BIT") ||
+		!charstring::compareIgnoringCase(type,"VARBIT"));
+}
+#endif
+
+#ifdef NEED_IS_BIT_TYPE_INT
+static bool isBitTypeInt(int16_t type) {
+	return (type==BIT_DATATYPE ||
+		type==VARBIT_DATATYPE);
 }
 #endif
 
 #ifdef NEED_IS_BOOL_TYPE_CHAR
 static bool isBoolTypeChar(const char *type) {
-  return !charstring::compareIgnoringCase(type,"BOOL");
+	return !charstring::compareIgnoringCase(type,"BOOL");
+}
+#endif
+
+#ifdef NEED_IS_BOOL_TYPE_INT
+static bool isBoolTypeInt(int16_t type) {
+	return (type==BOOL_DATATYPE);
 }
 #endif
 
 #ifdef NEED_IS_FLOAT_TYPE_CHAR
 static bool isFloatTypeChar(const char *type) {
-  return (!charstring::compareIgnoringCase(type,"NUMERIC") ||
-	  !charstring::compareIgnoringCase(type,"REAL") ||
-	  !charstring::compareIgnoringCase(type,"FLOAT") ||
-	  !charstring::compareIgnoringCase(type,"DOUBLE") ||
-	  !charstring::compareIgnoringCase(type,"D_FLOAT") ||
-	  !charstring::compareIgnoringCase(type,"DECIMAL") ||
-	  !charstring::compareIgnoringCase(type,"MONEY") ||
-	  !charstring::compareIgnoringCase(type,"SMALLMONEY") ||
-	  !charstring::compareIgnoringCase(type,"DOUBLE PRECISION") ||
-	  !charstring::compareIgnoringCase(type,"FLOAT4") ||
-	  !charstring::compareIgnoringCase(type,"FLOAT8") ||
-	  !charstring::compareIgnoringCase(type,"_NUMERIC"));
+	return (!charstring::compareIgnoringCase(type,"NUMERIC") ||
+		!charstring::compareIgnoringCase(type,"REAL") ||
+		!charstring::compareIgnoringCase(type,"FLOAT") ||
+		!charstring::compareIgnoringCase(type,"DOUBLE") ||
+		!charstring::compareIgnoringCase(type,"D_FLOAT") ||
+		!charstring::compareIgnoringCase(type,"DECIMAL") ||
+		!charstring::compareIgnoringCase(type,"MONEY") ||
+		!charstring::compareIgnoringCase(type,"SMALLMONEY") ||
+		!charstring::compareIgnoringCase(type,"DOUBLE PRECISION") ||
+		!charstring::compareIgnoringCase(type,"FLOAT4") ||
+		!charstring::compareIgnoringCase(type,"FLOAT8") ||
+		!charstring::compareIgnoringCase(type,"_NUMERIC"));
+}
+#endif
+
+#ifdef NEED_IS_FLOAT_TYPE_INT
+static bool isFloatTypeInt(int16_t type) {
+	return (type==NUMERIC_DATATYPE ||
+		type==REAL_DATATYPE ||
+		type==FLOAT_DATATYPE ||
+		type==DOUBLE_DATATYPE ||
+		type==D_FLOAT_DATATYPE ||
+		type==DECIMAL_DATATYPE ||
+		type==MONEY_DATATYPE ||
+		type==SMALLMONEY_DATATYPE ||
+		type==DOUBLE_PRECISION_DATATYPE ||
+		type==FLOAT4_DATATYPE ||
+		type==FLOAT8_DATATYPE ||
+		type==_NUMERIC_DATATYPE);
 }
 #endif
 
@@ -511,6 +541,56 @@ static bool isNumberTypeChar(const char *type) {
 }
 #endif
 
+#ifdef NEED_IS_NUMBER_TYPE_INT
+static bool isNumberTypeInt(int16_t type) {
+	return (type==NUMBER_DATATYPE ||
+		type==INT_DATATYPE ||
+		type==SMALLINT_DATATYPE ||
+		type==TINYINT_DATATYPE ||
+		type==BIT_DATATYPE ||
+		type==REAL_DATATYPE ||
+		type==FLOAT_DATATYPE ||
+		type==USHORT_DATATYPE ||
+		type==DOUBLE_DATATYPE ||
+		type==UINT_DATATYPE ||
+		type==LASTREAL_DATATYPE ||
+		type==TINY_DATATYPE ||
+		type==SHORT_DATATYPE ||
+		type==LONGLONG_DATATYPE ||
+		type==MEDIUMINT_DATATYPE ||
+		type==YEAR_DATATYPE ||
+		type==BIGINT_DATATYPE ||
+		type==INTEGER_DATATYPE ||
+		type==D_FLOAT_DATATYPE || 
+		type==DECIMAL_DATATYPE ||
+		type==INT64_DATATYPE ||
+		type==MONEY_DATATYPE ||
+		type==SMALLMONEY_DATATYPE ||
+		type==DOUBLE_PRECISION_DATATYPE ||
+		type==INT8_DATATYPE ||
+		type==INT2_DATATYPE ||
+		type==INT4_DATATYPE ||
+		type==TID_DATATYPE ||
+		type==XID_DATATYPE ||
+		type==CID_DATATYPE ||
+		type==FLOAT4_DATATYPE ||
+		type==FLOAT8_DATATYPE ||
+		type==TINTERVAL_DATATYPE ||
+		type==_MONEY_DATATYPE ||
+		type==_INT2_DATATYPE ||
+		type==_INT4_DATATYPE ||
+		type==_TID_DATATYPE ||
+		type==_XID_DATATYPE ||
+		type==_CID_DATATYPE ||
+		type==_INT8_DATATYPE ||
+		type==_FLOAT4_DATATYPE ||
+		type==_FLOAT8_DATATYPE ||
+		type==_TINTERVAL_DATATYPE ||
+		type==INTERVAL_DATATYPE ||
+		type==_INTERVAL_DATATYPE);
+}
+#endif
+
 #ifdef NEED_IS_BLOB_TYPE_CHAR
 static bool isBlobTypeChar(const char *type) { 
 	return (!charstring::compareIgnoringCase(type,"IMAGE") ||
@@ -537,12 +617,47 @@ static bool isBlobTypeChar(const char *type) {
 }
 #endif
 
+#ifdef NEED_IS_BLOB_TYPE_INT
+static bool isBlobTypeInt(int16_t type) { 
+	return (type==IMAGE_DATATYPE ||
+		type==BINARY_DATATYPE ||
+		type==VARBINARY_DATATYPE ||
+		type==LONGCHAR_DATATYPE ||
+		type==LONGBINARY_DATATYPE ||
+		type==LONG_DATATYPE ||
+		type==TINY_BLOB_DATATYPE ||
+		type==MEDIUM_BLOB_DATATYPE ||
+		type==LONG_BLOB_DATATYPE ||
+		type==BLOB_DATATYPE ||
+		type==RAW_DATATYPE ||
+		type==LONG_RAW_DATATYPE ||
+		type==CLOB_DATATYPE ||
+		type==BFILE_DATATYPE ||
+		type==DBCLOB_DATATYPE ||
+		type==TINYTEXT_DATATYPE ||
+		type==MEDIUMTEXT_DATATYPE ||
+		type==LONGTEXT_DATATYPE ||
+		type==JSON_DATATYPE ||
+		type==GEOMETRY_DATATYPE ||
+		type==SDO_GEOMETRY_DATATYPE);
+}
+#endif
+
 #ifdef NEED_IS_UNSIGNED_TYPE_CHAR
 static bool isUnsignedTypeChar(const char *type) { 
 	return (!charstring::compareIgnoringCase(type,"USHORT") ||
 		!charstring::compareIgnoringCase(type,"UINT")||
 		!charstring::compareIgnoringCase(type,"YEAR") ||
 		!charstring::compareIgnoringCase(type,"TIMESTAMP"));
+}
+#endif
+
+#ifdef NEED_IS_UNSIGNED_TYPE_INT
+static bool isUnsignedTypeInt(int16_t type) { 
+	return (type==USHORT_DATATYPE ||
+		type==UINT_DATATYPE ||
+		type==YEAR_DATATYPE ||
+		type==TIMESTAMP_DATATYPE);
 }
 #endif
 
@@ -573,6 +688,33 @@ static bool isBinaryTypeChar(const char *type) {
 }
 #endif
 
+#ifdef NEED_IS_BINARY_TYPE_INT
+static bool isBinaryTypeInt(int16_t type) { 
+	return (type==IMAGE_DATATYPE ||
+		type==BINARY_DATATYPE ||
+		type==VARBINARY_DATATYPE ||
+		type==LONGBINARY_DATATYPE ||
+		type==TINY_BLOB_DATATYPE ||
+		type==MEDIUM_BLOB_DATATYPE ||
+		type==LONG_BLOB_DATATYPE ||
+		type==BLOB_DATATYPE ||
+		type==BFILE_DATATYPE ||
+		type==LONGVARBINARY_DATATYPE ||
+		type==GRAPHIC_DATATYPE ||
+		type==VARGRAPHIC_DATATYPE ||
+		type==LONGVARGRAPHIC_DATATYPE ||
+		type==OID_DATATYPE ||
+		type==_OID_DATATYPE ||
+		type==OIDVECTOR_DATATYPE ||
+		type==_BYTEA_DATATYPE ||
+		type==TIMESTAMP_DATATYPE ||
+		type==DATE_DATATYPE ||
+		type==TIME_DATATYPE ||
+		type==DATETIME_DATATYPE ||
+		type==NEWDATE_DATATYPE);
+}
+#endif
+
 #ifdef NEED_IS_DATETIME_TYPE_CHAR
 static bool isDateTimeTypeChar(const char *type) {
 	return (!charstring::compareIgnoringCase(type,"DATETIME") ||
@@ -581,35 +723,6 @@ static bool isDateTimeTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"TIME") ||
 		!charstring::compareIgnoringCase(type,"TIMESTAMP") ||
 		!charstring::compareIgnoringCase(type,"NEWDATE"));
-}
-#endif
-
-#ifdef NEED_IS_NUMBER_TYPE_INT
-static bool isNumberTypeInt(int16_t type) {
-	return (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
-		type==SMALLINT_DATATYPE || type==TINYINT_DATATYPE ||
-		type==BIT_DATATYPE ||
-		type==REAL_DATATYPE || type==FLOAT_DATATYPE ||
-		type==USHORT_DATATYPE || type==DOUBLE_DATATYPE ||
-		type==UINT_DATATYPE || type==LASTREAL_DATATYPE ||
-		type==TINY_DATATYPE || type==SHORT_DATATYPE ||
-		type==LONGLONG_DATATYPE || type==MEDIUMINT_DATATYPE ||
-		type==YEAR_DATATYPE || type==BIGINT_DATATYPE ||
-		type==INTEGER_DATATYPE || type==D_FLOAT_DATATYPE || 
-		type==DECIMAL_DATATYPE || type==INT64_DATATYPE ||
-		type==MONEY_DATATYPE || type==SMALLMONEY_DATATYPE ||
-		type==DOUBLE_PRECISION_DATATYPE || type==INT8_DATATYPE ||
-		type==INT2_DATATYPE || type==INT4_DATATYPE ||
-		type==TID_DATATYPE ||
-		type==XID_DATATYPE || type==CID_DATATYPE ||
-		type==FLOAT4_DATATYPE || type==FLOAT8_DATATYPE ||
-		type==TINTERVAL_DATATYPE || type==_MONEY_DATATYPE ||
-		type==_INT2_DATATYPE || type==_INT4_DATATYPE ||
-		type==_TID_DATATYPE ||
-		type==_XID_DATATYPE || type==_CID_DATATYPE ||
-		type==_INT8_DATATYPE || type==_FLOAT4_DATATYPE ||
-		type==_FLOAT8_DATATYPE || type==_TINTERVAL_DATATYPE ||
-		type==INTERVAL_DATATYPE || type==_INTERVAL_DATATYPE);
 }
 #endif
 

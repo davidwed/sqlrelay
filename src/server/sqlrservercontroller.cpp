@@ -30,14 +30,20 @@
 #include <defaults.h>
 #define NEED_DATATYPESTRING
 #define NEED_IS_BIT_TYPE_CHAR
+#define NEED_IS_BIT_TYPE_INT
 #define NEED_IS_BOOL_TYPE_CHAR
+#define NEED_IS_BOOL_TYPE_INT
 #define NEED_IS_FLOAT_TYPE_CHAR
+#define NEED_IS_FLOAT_TYPE_INT
 #define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_BLOB_TYPE_CHAR
-#define NEED_IS_UNSIGNED_TYPE_CHAR
-#define NEED_IS_BINARY_TYPE_CHAR
-#define NEED_IS_DATETIME_TYPE_CHAR
 #define NEED_IS_NUMBER_TYPE_INT
+#define NEED_IS_BLOB_TYPE_CHAR
+#define NEED_IS_BLOB_TYPE_INT
+#define NEED_IS_UNSIGNED_TYPE_CHAR
+#define NEED_IS_UNSIGNED_TYPE_INT
+#define NEED_IS_BINARY_TYPE_CHAR
+#define NEED_IS_BINARY_TYPE_INT
+#define NEED_IS_DATETIME_TYPE_CHAR
 #define NEED_IS_DATETIME_TYPE_INT
 #include <datatypes.h>
 #define NEED_CONVERT_DATE_TIME
@@ -2471,12 +2477,24 @@ bool sqlrservercontroller::isBitType(const char *type) {
 	return ::isBitTypeChar(type);
 }
 
+bool sqlrservercontroller::isBitType(int16_t type) {
+	return ::isBitTypeInt(type);
+}
+
 bool sqlrservercontroller::isBoolType(const char *type) {
 	return ::isBoolTypeChar(type);
 }
 
+bool sqlrservercontroller::isBoolType(int16_t type) {
+	return ::isBoolTypeInt(type);
+}
+
 bool sqlrservercontroller::isFloatType(const char *type) {
 	return ::isFloatTypeChar(type);
+}
+
+bool sqlrservercontroller::isFloatType(int16_t type) {
+	return ::isFloatTypeInt(type);
 }
 
 bool sqlrservercontroller::isNumberType(const char *type) {
@@ -2491,12 +2509,24 @@ bool sqlrservercontroller::isBlobType(const char *type) {
 	return ::isBlobTypeChar(type);
 }
 
+bool sqlrservercontroller::isBlobType(int16_t type) {
+	return ::isBlobTypeInt(type);
+}
+
 bool sqlrservercontroller::isUnsignedType(const char *type) {
 	return ::isUnsignedTypeChar(type);
 }
 
+bool sqlrservercontroller::isUnsignedType(int16_t type) {
+	return ::isUnsignedTypeInt(type);
+}
+
 bool sqlrservercontroller::isBinaryType(const char *type) {
 	return ::isBinaryTypeChar(type);
+}
+
+bool sqlrservercontroller::isBinaryType(int16_t type) {
+	return ::isBinaryTypeInt(type);
 }
 
 bool sqlrservercontroller::isDateTimeType(const char *type) {
