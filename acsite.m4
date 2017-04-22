@@ -944,6 +944,12 @@ else
 	done
 fi
 
+if ( test -z "$RUDIMENTSLIBS" )
+then
+	AC_MSG_ERROR(Rudiments not found.  SQL-Relay requires this package.)
+	exit
+fi
+
 if ( test -n "$RUDIMENTSVERSION" )
 then
 	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
@@ -954,12 +960,6 @@ then
 		AC_MSG_ERROR([Rudiments version must be >= 1.0.5, found version $RUDIMENTSVERSION])
 		exit
 	fi
-fi
-
-if ( test -z "$RUDIMENTSLIBS" )
-then
-	AC_MSG_ERROR(Rudiments not found.  SQL-Relay requires this package.)
-	exit
 fi
 
 FW_INCLUDES(rudiments,[$RUDIMENTSINCLUDES])
