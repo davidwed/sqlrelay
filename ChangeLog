@@ -1,4 +1,4 @@
-1.0.2 - updated to use charstring asprintf analogs
+1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
 	fixed a bug in freetds connection that caused error messages to be
 		concatenated over and over
@@ -8,6 +8,9 @@
 	postgresql connection uses async functions and fetches one row at a
 		time now, if available
 	mysql connection checks for valid stmt before resetting it now
+	removed various unused methods associated with getting a unique
+		unix socket
+	added server api methods to get column flags by numeric type
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

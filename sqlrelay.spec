@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.0.1
+Version: 1.1.0
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: rudiments-devel >= 1.0.3, systemd
+BuildRequires: rudiments-devel >= 1.0.4, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,

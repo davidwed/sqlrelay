@@ -734,11 +734,6 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	return conn;
 }
 
-void sqlrservercontroller::setUnixSocketDirectory() {
-	// FIXME: this method is unused and should
-	// be removed in the next minor release
-}
-
 bool sqlrservercontroller::handlePidFile() {
 
 	// check for listener's pid file
@@ -806,36 +801,6 @@ void sqlrservercontroller::initDatabaseAvailableFileName() {
 				pvt->_pth->getIpcDir(),
 				pvt->_cmdl->getId(),
 				pvt->_connectionid);
-}
-
-bool sqlrservercontroller::getUnixSocket() {
-	// FIXME: this method is unused and should
-	// be removed in the next minor release
-	return true;
-}
-
-bool sqlrservercontroller::openSequenceFile(file *sockseq) {
-	// FIXME: this method is unused and should
-	// be removed in the next minor release
-	return true;
-}
-
-bool sqlrservercontroller::lockSequenceFile(file *sockseq) {
-	// FIXME: this method is unused and should
-	// be removed in the next minor release
-	return true;
-}
-
-bool sqlrservercontroller::unLockSequenceFile(file *sockseq) {
-	// FIXME: this method is unused and should
-	// be removed in the next minor release
-	return true;
-}
-
-bool sqlrservercontroller::getAndIncrementSequenceNumber(file *sockseq) {
-	// FIXME: this method is unused and should
-	// be removed in the next minor release
-	return true;
 }
 
 bool sqlrservercontroller::attemptLogIn(bool printerrors) {

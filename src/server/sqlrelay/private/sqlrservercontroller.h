@@ -6,18 +6,9 @@
 
 		sqlrserverconnection	*initConnection(const char *dbase);
 
-		void	setUnixSocketDirectory();
-
 		bool	handlePidFile();
 
 		void	initDatabaseAvailableFileName();
-
-		bool	getUnixSocket();
-
-		bool	openSequenceFile(file *sockseq);
-		bool	lockSequenceFile(file *sockseq);
-		bool	getAndIncrementSequenceNumber(file *sockseq);
-		bool	unLockSequenceFile(file *sockseq);
 
 		bool	attemptLogIn(bool printerrors);
 		bool	logIn(bool printerrors);
