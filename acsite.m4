@@ -900,6 +900,7 @@ dnl RUDIMENTSLIBSINCLUDES
 AC_DEFUN([FW_CHECK_RUDIMENTS],
 [
 
+RUDIMENTSVERSION=""
 RUDIMENTSLIBS=""
 RUDIMENTSLIBSPATH=""
 RUDIMENTSINCLUDES=""
@@ -931,6 +932,7 @@ else
 			RUDIMENTSCONFIG="$i/bin/rudiments-config"
 			if ( test -r "$RUDIMENTSCONFIG" )
 			then
+				RUDIMENTSVERSION="`$RUDIMENTSCONFIG --version`"
 				RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
 				RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
 			fi
@@ -940,6 +942,18 @@ else
 			break
 		fi
 	done
+fi
+
+if ( test -n "$RUDIMENTSVERSION" )
+then
+	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
+	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
+	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
+	if ( test "$V1" -lt "1" -o "$V2" -lt "0" -o "$V3" -lt "5" )
+	then
+		AC_MSG_ERROR([Rudiments version must be >= 1.0.5, found version $RUDIMENTSVERSION])
+		exit
+	fi
 fi
 
 if ( test -z "$RUDIMENTSLIBS" )

@@ -11,6 +11,7 @@
 	removed various unused methods associated with getting a unique
 		unix socket
 	added server api methods to get column flags by numeric type
+	added rudiments version requirement to configure script
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
