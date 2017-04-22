@@ -447,10 +447,12 @@ void graphStats(const char *graph, const char *db,
 	f.open("temp.csv",O_WRONLY|O_TRUNC|O_CREAT,
 			permissions::evalPermString("rw-r--r--"));
 
+	uint32_t	count=0;
 	for (linkedlistnode< float > *node=stats->getKeys()->getFirst();
 						node; node=node->getNext()) {
 		f.printf("%f",node->getValue());
 		linkedlist< float >	*l=stats->getValue(node->getValue());
+		count=l->getLength();
 		for (linkedlistnode< float > *lnode=l->getFirst();
 						lnode; lnode=lnode->getNext()) {
 			f.printf(",%f",lnode->getValue());
@@ -458,16 +460,13 @@ void graphStats(const char *graph, const char *db,
 		f.printf("\n");
 	}
 
-stdoutput.printf("count: %d\n",stats->getKeys()->getLength());
 	// use gnuplot to create temp.png
-	const char	*gnuplot="plot2.gnu";
-	if (stats->getKeys()->getLength()==3) {
-		gnuplot="plot3.gnu";
-	}
+	stringbuffer	gnuplot;
+	gnuplot.append("plot")->append(count)->append(".gnu");
 	stringbuffer	dbvar;
 	dbvar.append("db='")->append(db)->append("'");
 	const char	*args[]={
-		"gnuplot","-e",dbvar.getString(),gnuplot,NULL
+		"gnuplot","-e",dbvar.getString(),gnuplot.getString(),NULL
 	};
 	pid_t	pid=process::spawn("gnuplot",args,false);
 	process::wait(pid);
