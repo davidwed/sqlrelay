@@ -33,6 +33,7 @@ int main(int argc, const char **argv) {
 	// default parameters
 	const char	*db="oracle";
 	const char	*dbconnectstring=NULL;
+	const char	*proxyconnectstring=NULL;
 	const char	*sqlrconnectstring=NULL;
 	const char	*sqlr="local";
 	uint64_t	queries=30;
@@ -42,6 +43,7 @@ int main(int argc, const char **argv) {
 	uint16_t	samples=10;
 	uint64_t	rsbs=0;
 	bool		dbonly=false;
+	bool		proxyonly=false;
 	bool		sqlrelayonly=false;
 	bool		debug=false;
 	const char	*graph=NULL;
@@ -53,6 +55,9 @@ int main(int argc, const char **argv) {
 	}
 	if (cmdl.found("dbconnectstring")) {
 		dbconnectstring=cmdl.getValue("dbconnectstring");
+	}
+	if (cmdl.found("proxyconnectstring")) {
+		proxyconnectstring=cmdl.getValue("proxyconnectstring");
 	}
 	if (cmdl.found("sqlrconnectstring")) {
 		sqlrconnectstring=cmdl.getValue("sqlrconnectstring");
@@ -86,6 +91,9 @@ int main(int argc, const char **argv) {
 	if (cmdl.found("dbonly")) {
 		dbonly=true;
 	}
+	if (cmdl.found("proxyonly")) {
+		proxyonly=true;
+	}
 	if (cmdl.found("sqlrelayonly")) {
 		sqlrelayonly=true;
 	}
@@ -118,6 +126,7 @@ int main(int argc, const char **argv) {
 			"	[-db db2|informix|firebird|freetds|mysql|"
 			"oracle|postgresql|sap|sqlite] \\\n"
 			"	[-dbconnectstring dbconnectstring] \\\n"
+			"	[-proxyconnectstring proxyconnectstring] \\\n"
 			"	[-sqlrconnectstring sqlrconnectstring] \\\n"
 			"	[-sqlr [local|remote|db]] \\\n"
 			"	[-queries total-query-count] \\\n"
@@ -126,7 +135,7 @@ int main(int argc, const char **argv) {
 			"	[-colsize characters-per-column] \\\n"
 			"	[-samples samples-per-test] \\\n"
 			"	[-rsbs result-set-buffer-size] \\\n"
-			"	[-dbonly|-sqlrelayonly] \\\n"
+			"	[-dbonly|-proxyonly|-sqlrelayonly] \\\n"
 			"	[-debug] \\\n"
 			"	[-graph graph-file-name] \\\n"
 			"	[-nosettle]\n");
@@ -144,6 +153,7 @@ int main(int argc, const char **argv) {
 
 	// for each database...
 	dynamiclib	sqlrdl;
+	dynamiclib	proxydl;
 	dynamiclib	dbdl;
 	dynamiclib	*dl;
 
@@ -158,15 +168,33 @@ int main(int argc, const char **argv) {
 	}
 	sqlrc.append("user=test;password=test;debug=no");
 
-	// first time for the real db, second time for sqlrelay...
-	uint16_t	start=(dbonly)?1:0;
-	uint16_t	end=(sqlrelayonly)?1:2;
-	for (uint16_t direct=start; direct<end && !stop; direct++) {
+	// first sqlrelay, then proxy, the direct
+	for (uint16_t i=0; i<3; i++) {
 
-		if (!direct) {
+		bool	sqlrelay=(i==0);
+		bool	proxy=(i==1);
+		bool	direct=(i==2);
+
+		// skip tests we don't want to run
+		if ((sqlrelayonly && i!=0) ||
+			(proxyonly && i!=1) ||
+			(dbonly && i!=2)) {
+			continue;
+		}
+
+		// skip proxy tests except for mysql
+		if (proxy &&  charstring::compare(db,"mysql")) {
+			continue;
+		}
+
+		if (sqlrelay) {
 			stdoutput.printf("\nbenchmarking "
 						"%s via sqlrelay:\n\n",db);
 			dl=&sqlrdl;
+		} else if (proxy) {
+			stdoutput.printf("\nbenchmarking "
+						"%s via proxy:\n\n",db);
+			dl=&proxydl;
 		} else {
 			stdoutput.printf("\nbenchmarking "
 						"%s directly:\n\n",db);
@@ -184,9 +212,19 @@ int main(int argc, const char **argv) {
 		}
 
 		// default connect strings
-		if (!direct) {
+		if (sqlrelay) {
 			if (!sqlrconnectstring) {
 				sqlrconnectstring=sqlrc.getString();
+			}
+		} else if (proxy) {
+			if (!charstring::compare(db,"mysql")) {
+				if (!proxyconnectstring) {
+					proxyconnectstring=
+					"socket=/tmp/mysql.socket;"
+					"db=testdb;"
+					"user=testuser;"
+					"password=testpassword;";
+				}
 			}
 		} else if (!charstring::compare(db,"db2")) {
 			if (!dbconnectstring) {
@@ -207,7 +245,8 @@ int main(int argc, const char **argv) {
 		} else if (!charstring::compare(db,"firebird")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-					"user=testuser;password=testpassword;"
+					"user=testuser;"
+					"password=testpassword;"
 					"db=firebird:"
 					"/opt/firebird/testdb.gdb;"
 					"dialect=3";
@@ -216,21 +255,26 @@ int main(int argc, const char **argv) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"sybase=/etc;"
-					"server=mssql;db=testdb;"
-					"user=testuser;password=testpassword;";
+					"server=mssql;"
+					"db=testdb;"
+					"user=testuser;"
+					"password=testpassword;";
 			}
 		} else if (!charstring::compare(db,"mysql")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-				"host=mysql;db=testdb;"
-				"user=testuser;password=testpassword;"
-				;
+					"host=mysql;"
+					"db=testdb;"
+					"user=testuser;"
+					"password=testpassword;";
 			}
 		} else if (!charstring::compare(db,"mysqlssl")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-				"host=mysql;db=testdb;"
-				"user=testuser;password=testpassword;"
+				"host=mysql;"
+				"db=testdb;"
+				"user=testuser;"
+				"password=testpassword;"
 				"sslca=/etc/mysql-ssl/ca-cert.pem;"
 				"sslcert=/etc/mysql-ssl/client-cert.pem;"
 				"sslkey=/etc/mysql-ssl/client-key.pem";
@@ -240,19 +284,24 @@ int main(int argc, const char **argv) {
 			if (!dbconnectstring) {
 				dbconnectstring=
 					"sid=" ORACLE_SID ";"
-					"user=testuser;password=testpassword;";
+					"user=testuser;"
+					"password=testpassword;";
 			}
 		} else if (!charstring::compare(db,"postgresql")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-					"user=testuser;password=testpassword;"
-					"db=testdb;host=postgresql;";
+					"user=testuser;"
+					"password=testpassword;"
+					"db=testdb;"
+					"host=postgresql;";
 			}
 		} else if (!charstring::compare(db,"postgresqlssl")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-					"user=testuser;password=testpassword;"
-					"db=testdb;host=postgresql;"
+					"user=testuser;"
+					"password=testpassword;"
+					"db=testdb;"
+					"host=postgresql;"
 					"sslmode=verify-ca;";
 			}
 		} else if (!charstring::compare(db,"sqlite")) {
@@ -264,16 +313,19 @@ int main(int argc, const char **argv) {
 				!charstring::compare(db,"sybase")) {
 			if (!dbconnectstring) {
 				dbconnectstring=
-					"sybase=/opt/sap;lang=en_US;"
-					"server=SAP;db=testdb;"
-					"user=testuser;password=testpassword;";
+					"sybase=/opt/sap;"
+					"lang=en_US;"
+					"server=SAP;"
+					"db=testdb;"
+					"user=testuser;"
+					"password=testpassword;";
 			}
 		}
 
 		// init bench
 		stringbuffer	modulename;
 		modulename.append(".libs/sqlrbench_");
-		modulename.append((!direct)?"sqlrelay":db)->append(".so");
+		modulename.append((sqlrelay)?"sqlrelay":db)->append(".so");
 		if (!dl->open(modulename.getString(),true,true)) {
 			stdoutput.printf("failed to load "
 					"bench module: %s\n",
@@ -284,7 +336,7 @@ int main(int argc, const char **argv) {
 			continue;
 		}
 		stringbuffer	functionname;
-		functionname.append("new_")->append((!direct)?"sqlrelay":db);
+		functionname.append("new_")->append((sqlrelay)?"sqlrelay":db);
 		functionname.append("bench");
 		sqlrbench	*(*newBm)(const char *,
 						const char *,
@@ -313,9 +365,15 @@ int main(int argc, const char **argv) {
 			continue;
 		}
 
-		bm=newBm((!direct)?sqlrconnectstring:dbconnectstring,
-					db,queries,rows,cols,colsize,
-					samples,rsbs,debug);
+		const char	*cstring=sqlrconnectstring;
+		if (proxy) {
+			cstring=proxyconnectstring;
+		} else if (direct) {
+			cstring=dbconnectstring;
+		}
+		bm=newBm(cstring,db,
+				queries,rows,cols,colsize,
+				samples,rsbs,debug);
 		if (!bm) {
 			stdoutput.printf("error creating bench\n");
 			continue;
@@ -400,11 +458,16 @@ void graphStats(const char *graph, const char *db,
 		f.printf("\n");
 	}
 
+stdoutput.printf("count: %d\n",stats->getKeys()->getLength());
 	// use gnuplot to create temp.png
+	const char	*gnuplot="plot2.gnu";
+	if (stats->getKeys()->getLength()==3) {
+		gnuplot="plot3.gnu";
+	}
 	stringbuffer	dbvar;
 	dbvar.append("db='")->append(db)->append("'");
 	const char	*args[]={
-		"gnuplot","-e",dbvar.getString(),"plot.gnu",NULL
+		"gnuplot","-e",dbvar.getString(),gnuplot,NULL
 	};
 	pid_t	pid=process::spawn("gnuplot",args,false);
 	process::wait(pid);
