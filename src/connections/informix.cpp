@@ -14,12 +14,6 @@
 	#include <infxcli.h>
 #endif
 
-// multi-row fetch doesn't work with clobs/blobs because you're already on a
-// different row when SQLGetData is called to get the data for the clob/blob
-// on the first row
-#define FETCH_AT_ONCE		1
-#define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768	
 #define MAX_OUT_BIND_LOB_SIZE	2097152
 
 #define MAX_LOB_CHUNK_SIZE	2147483647
@@ -60,8 +54,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 			informixcursor(sqlrserverconnection *conn, uint16_t id);
 			~informixcursor();
 	private:
-		void		allocateResultSetBuffers(
-						int32_t selectlistsize);
+		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
@@ -190,7 +183,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		SQLSMALLINT	ncols;
 		SQLLEN 		affectedrows;
 
-		int32_t		selectlistsize;
+		int32_t		columncount;
 		char		**field;
 		SQLLEN		**loblength;
 		SQLLEN		**indicator;
@@ -267,9 +260,6 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 
 		stringbuffer	errormessage;
 
-		uint32_t	fetchatonce;
-		int32_t		maxselectlistsize;
-		int32_t		maxitembuffersize;
 		int32_t		maxoutbindlobsize;
 
 		const char	*identity;
@@ -282,9 +272,6 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 informixconnection::informixconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 
-	fetchatonce=FETCH_AT_ONCE;
-	maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	identity=NULL;
 }
@@ -781,7 +768,7 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 		outlobbindlen[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
-	allocateResultSetBuffers(informixconn->maxselectlistsize);
+	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	truevalue=SQL_TRUE;
 }
 
@@ -793,33 +780,34 @@ informixcursor::~informixcursor() {
 	deallocateResultSetBuffers();
 }
 
-void informixcursor::allocateResultSetBuffers(int32_t selectlistsize) {
+void informixcursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (selectlistsize==-1) {
-		this->selectlistsize=0;
+	if (columncount==-1) {
+		this->columncount=0;
 		field=NULL;
 		loblength=NULL;
 		indicator=NULL;
 		column=NULL;
 	} else {
-		this->selectlistsize=selectlistsize;
-		field=new char *[selectlistsize];
-		loblength=new SQLLEN *[selectlistsize];
-		indicator=new SQLLEN *[selectlistsize];
-		column=new informixcolumn[selectlistsize];
-		for (int32_t i=0; i<selectlistsize; i++) {
+		this->columncount=columncount;
+		field=new char *[columncount];
+		loblength=new SQLLEN *[columncount];
+		indicator=new SQLLEN *[columncount];
+		column=new informixcolumn[columncount];
+		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
+		for (int32_t i=0; i<columncount; i++) {
 			column[i].name=new char[4096];
-			field[i]=new char[informixconn->fetchatonce*
-					informixconn->maxitembuffersize];
-			loblength[i]=new SQLLEN[informixconn->fetchatonce];
-			indicator[i]=new SQLLEN[informixconn->fetchatonce];
+			field[i]=new char[fetchatonce*maxfieldlength];
+			loblength[i]=new SQLLEN[fetchatonce];
+			indicator[i]=new SQLLEN[fetchatonce];
 		}
 	}
 }
 
 void informixcursor::deallocateResultSetBuffers() {
-	if (selectlistsize) {
-		for (int32_t i=0; i<selectlistsize; i++) {
+	if (columncount) {
+		for (int32_t i=0; i<columncount; i++) {
 			delete[] column[i].name;
 			delete[] field[i];
 			delete[] loblength[i];
@@ -829,7 +817,7 @@ void informixcursor::deallocateResultSetBuffers() {
 		delete[] field;
 		delete[] loblength;
 		delete[] indicator;
-		selectlistsize=0;
+		columncount=0;
 	}
 }
 
@@ -845,7 +833,7 @@ bool informixcursor::open() {
 
 		// set the row array size
 		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)informixconn->fetchatonce,0);
+				(SQLPOINTER)conn->cont->getFetchAtOnce(),0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
@@ -1300,10 +1288,11 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// allocate buffers and limit column count if necessary
-	if (informixconn->maxselectlistsize==-1) {
+	int32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+	if (maxcolumncount==-1) {
 		allocateResultSetBuffers(ncols);
-	} else if (ncols>informixconn->maxselectlistsize) {
-		ncols=informixconn->maxselectlistsize;
+	} else if (ncols>maxcolumncount) {
+		ncols=maxcolumncount;
 	}
 
 	// run through the columns
@@ -1388,12 +1377,12 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			column[i].type==SQL_INFX_UDT_BLOB) {
 			erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 					field[i],
-					informixconn->maxitembuffersize,
+					conn->cont->getMaxFieldLength(),
 					indicator[i]);
 		} else {
 			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 					field[i],
-					informixconn->maxitembuffersize,
+					conn->cont->getMaxFieldLength(),
 					indicator[i]);
 		}
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1618,7 +1607,7 @@ bool informixcursor::skipRow() {
 
 bool informixcursor::fetchRow() {
 
-	if (rowgroupindex==informixconn->fetchatonce) {
+	if (rowgroupindex==conn->cont->getFetchAtOnce()) {
 		rowgroupindex=0;
 	}
 	if (rowgroupindex>0 && rowgroupindex==totalinrowgroup) {
@@ -1672,7 +1661,7 @@ void informixcursor::getField(uint32_t col,
 	}
 
 	// handle normal datatypes
-	*fld=&field[col][rowgroupindex*informixconn->maxitembuffersize];
+	*fld=&field[col][rowgroupindex*conn->cont->getMaxFieldLength()];
 	*fldlength=indicator[col][rowgroupindex];
 }
 
@@ -1773,7 +1762,7 @@ void informixcursor::closeResultSet() {
 		outlobbindlen[i]=0;
 	}
 
-	if (informixconn->maxselectlistsize==-1) {
+	if (conn->cont->getMaxColumnCount()==-1) {
 		deallocateResultSetBuffers();
 	}
 }

@@ -58,12 +58,6 @@ extern	CS_INT	ct_dynamic(CS_COMMAND *,CS_INT,CS_CHAR *,CS_INT,CS_CHAR *,CS_INT);
 }
 #endif
 
-// this is here in case freetds ever supports array fetches
-//#define FETCH_AT_ONCE		10
-#define FETCH_AT_ONCE		1
-#define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768
-
 // this is here in case freetds ever supports cursors
 //#define FREETDS_SUPPORTS_CURSORS
 
@@ -92,8 +86,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 				freetdscursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~freetdscursor();
-		void		allocateResultSetBuffers(
-					int32_t selectlistsize);
+		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
@@ -226,7 +219,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 		datebind	*outbinddates;
 		uint16_t	outbindindex;
 
-		int32_t		selectlistsize;
+		int32_t		columncount;
 		CS_DATAFMT	templatecolumn;
 		CS_DATAFMT	*column;
 		char		**data;
@@ -289,10 +282,6 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		const char	*hostname;
 		const char	*packetsize;
 
-		int32_t		fetchatonce;
-		int32_t		maxselectlistsize;
-		int32_t		maxitembuffersize;
-
 		const char	*identity;
 
 		bool		dbused;
@@ -327,10 +316,6 @@ freetdsconnection::freetdsconnection(sqlrservercontroller *cont) :
 	dbversion=NULL;
 	sybasedb=true;
 
-	fetchatonce=FETCH_AT_ONCE;
-	maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-
 	identity=NULL;
 }
 
@@ -339,39 +324,25 @@ freetdsconnection::~freetdsconnection() {
 }
 
 void freetdsconnection::handleConnectString() {
+
+	sqlrserverconnection::handleConnectString();
+
 	sybase=cont->getConnectStringValue("sybase");
 	lang=cont->getConnectStringValue("lang");
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
 	server=cont->getConnectStringValue("server");
 	db=cont->getConnectStringValue("db");
 	charset=cont->getConnectStringValue("charset");
 	language=cont->getConnectStringValue("language");
 	hostname=cont->getConnectStringValue("hostname");
 	packetsize=cont->getConnectStringValue("packetsize");
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
-	}
-	// this is here in case freetds ever supports array fetches
-	/*fetchatonce=charstring::toInteger(
-				cont->getConnectStringValue("fetchatonce"));
-	if (fetchatonce<1) {
-		fetchatonce=FETCH_AT_ONCE;
-	}*/
-	maxselectlistsize=charstring::toInteger(
-			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize || maxselectlistsize<-1) {
-		maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	} else if (maxselectlistsize==1) {
-		// if maxselectlistsize is set to 1 then force it
+
+	// freetds doesn't currently support array fetches
+	cont->setFetchAtOnce(1);
+
+	if (cont->getMaxColumnCount()==1) {
+		// if max column count is set to 1 then force it
 		// to 2 so the db version detection doesn't crash
-		maxselectlistsize=2;
-	}
-	maxitembuffersize=charstring::toInteger(
-			cont->getConnectStringValue("maxitembuffersize"));
-	if (maxitembuffersize<1) {
-		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+		cont->setMaxColumnCount(2);
 	}
 
 	identity=cont->getConnectStringValue("identity");
@@ -946,18 +917,18 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	setCreateTempTablePattern("^(create|CREATE)[ 	\r\n]"
 					"+(table|TABLE)[ 	\r\n]+#");
 
-	allocateResultSetBuffers(freetdsconn->maxselectlistsize);
+	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 
 	// define a template column-bind definition...
 	// get the field as a null terminated character string
 	// no longer than MAX_ITEM_BUFFER_SIZE, override some
 	templatecolumn.datatype=CS_CHAR_TYPE;
 	templatecolumn.format=CS_FMT_NULLTERM;
-	templatecolumn.maxlength=freetdsconn->maxitembuffersize;
+	templatecolumn.maxlength=conn->cont->getMaxFieldLength();
 	templatecolumn.scale=CS_UNUSED;
 	templatecolumn.precision=CS_UNUSED;
 	templatecolumn.status=CS_UNUSED;
-	templatecolumn.count=freetdsconn->fetchatonce;
+	templatecolumn.count=conn->cont->getFetchAtOnce();
 	templatecolumn.usertype=CS_UNUSED;
 	templatecolumn.locale=NULL;
 }
@@ -976,35 +947,34 @@ freetdscursor::~freetdscursor() {
 	deallocateResultSetBuffers();
 }
 
-void freetdscursor::allocateResultSetBuffers(int32_t selectlistsize) {
+void freetdscursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (selectlistsize==-1) {
-		this->selectlistsize=0;
+	if (columncount==-1) {
+		this->columncount=0;
 		column=NULL;
 		data=NULL;
 		datalength=NULL;
 		nullindicator=NULL;
 	} else {
-		this->selectlistsize=selectlistsize;
-		column=new CS_DATAFMT[selectlistsize];
-		data=new char *[selectlistsize];
-		datalength=new CS_INT *[selectlistsize];
-		nullindicator=new CS_SMALLINT *[selectlistsize];
-		for (int32_t i=0; i<selectlistsize; i++) {
-			data[i]=new char[freetdsconn->fetchatonce*
-					freetdsconn->maxitembuffersize];
-			datalength[i]=
-				new CS_INT[freetdsconn->fetchatonce];
-			nullindicator[i]=
-				new CS_SMALLINT[freetdsconn->fetchatonce];
+		this->columncount=columncount;
+		column=new CS_DATAFMT[columncount];
+		data=new char *[columncount];
+		datalength=new CS_INT *[columncount];
+		nullindicator=new CS_SMALLINT *[columncount];
+		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
+		for (int32_t i=0; i<columncount; i++) {
+			data[i]=new char[fetchatonce*maxfieldlength];
+			datalength[i]=new CS_INT[fetchatonce];
+			nullindicator[i]=new CS_SMALLINT[fetchatonce];
 		}
 	}
 }
 
 void freetdscursor::deallocateResultSetBuffers() {
-	if (selectlistsize) {
+	if (columncount) {
 		delete[] column;
-		for (int32_t i=0; i<selectlistsize; i++) {
+		for (int32_t i=0; i<columncount; i++) {
 			delete[] data[i];
 			delete[] datalength[i];
 			delete[] nullindicator[i];
@@ -1012,7 +982,7 @@ void freetdscursor::deallocateResultSetBuffers() {
 		delete[] data;
 		delete[] datalength;
 		delete[] nullindicator;
-		selectlistsize=0;
+		columncount=0;
 	}
 }
 
@@ -1556,7 +1526,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
 					NULL,CS_UNUSED,
-					(CS_INT)freetdsconn->fetchatonce)!=
+					(CS_INT)conn->cont->getFetchAtOnce())!=
 					CS_SUCCEED) {
 			return false;
 		}
@@ -1664,10 +1634,11 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// allocate buffers and limit column count if necessary
-		if (freetdsconn->maxselectlistsize==-1) {
+		int32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+		if (maxcolumncount==-1) {
 			allocateResultSetBuffers(ncols);
-		} else if (ncols>freetdsconn->maxselectlistsize) {
-			ncols=freetdsconn->maxselectlistsize;
+		} else if (ncols>maxcolumncount) {
+			ncols=maxcolumncount;
 		}
 
 		// bind columns
@@ -1890,8 +1861,9 @@ uint16_t freetdscursor::getColumnType(uint32_t col) {
 
 uint32_t freetdscursor::getColumnLength(uint32_t col) {
 	// limit the column size
-	if (column[col].maxlength>freetdsconn->maxitembuffersize) {
-		column[col].maxlength=freetdsconn->maxitembuffersize;
+	int32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+	if (column[col].maxlength>maxfieldlength) {
+		column[col].maxlength=maxfieldlength;
 	}
 	return column[col].maxlength;
 }
@@ -1989,7 +1961,7 @@ bool freetdscursor::skipRow() {
 }
 
 bool freetdscursor::fetchRow() {
-	if (row==freetdsconn->fetchatonce) {
+	if (row==(CS_INT)conn->cont->getFetchAtOnce()) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
@@ -2042,15 +2014,17 @@ void freetdscursor::getField(uint32_t col,
 		return;
 	}
 
+	int32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+
 	// Empty TEXT fields don't get properly converted
 	// to null-terminated strings.  Handle them.
 	if (column[col].datatype==CS_TEXT_TYPE && !datalength[col][row]) {
-		data[col][row*freetdsconn->maxitembuffersize]='\0';
+		data[col][row*maxfieldlength]='\0';
 		datalength[col][row]=1;
 	}
 
 	// handle normal datatypes
-	*field=&data[col][row*freetdsconn->maxitembuffersize];
+	*field=&data[col][row*maxfieldlength];
 	*fieldlength=datalength[col][row]-1;
 }
 
@@ -2090,7 +2064,7 @@ void freetdscursor::discardResults() {
 		}
 	}
 
-	if (freetdsconn->maxselectlistsize==-1) {
+	if (conn->cont->getMaxColumnCount()==-1) {
 		deallocateResultSetBuffers();
 	}
 }

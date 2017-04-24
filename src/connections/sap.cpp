@@ -21,10 +21,6 @@
 	}
 #endif
 
-#define FETCH_AT_ONCE		10
-#define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768
-
 class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 	friend class sapcursor;
 	public:
@@ -72,10 +68,6 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 		const char	*hostname;
 		const char	*packetsize;
 
-		int32_t		fetchatonce;
-		int32_t		maxselectlistsize;
-		int32_t		maxitembuffersize;
-
 		const char	*identity;
 
 		bool		dbused;
@@ -116,8 +108,7 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 				sapcursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~sapcursor();
-		void		allocateResultSetBuffers(
-					int32_t selectlistsize);
+		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
@@ -237,7 +228,7 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 		datebind	*outbinddates;
 		uint16_t	outbindindex;
 
-		int32_t		selectlistsize;
+		int32_t		columncount;
 		CS_DATAFMT	templatecolumn;
 		CS_DATAFMT	*column;
 		char		**data;
@@ -263,10 +254,6 @@ sapconnection::sapconnection(sqlrservercontroller *cont) :
 	dbused=false;
 	dbversion=NULL;
 
-	fetchatonce=FETCH_AT_ONCE;
-	maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-
 	identity=NULL;
 }
 
@@ -275,39 +262,24 @@ sapconnection::~sapconnection() {
 }
 
 void sapconnection::handleConnectString() {
+
+	sqlrserverconnection::handleConnectString();
+
 	sybase=cont->getConnectStringValue("sybase");
 	lang=cont->getConnectStringValue("lang");
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
 	server=cont->getConnectStringValue("server");
 	db=cont->getConnectStringValue("db");
 	charset=cont->getConnectStringValue("charset");
 	language=cont->getConnectStringValue("language");
 	hostname=cont->getConnectStringValue("hostname");
 	packetsize=cont->getConnectStringValue("packetsize");
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
-	}
-	fetchatonce=charstring::toInteger(
-				cont->getConnectStringValue("fetchatonce"));
-	if (fetchatonce<1) {
-		fetchatonce=FETCH_AT_ONCE;
-	}
-	maxselectlistsize=charstring::toInteger(
-			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize || maxselectlistsize<-1) {
-		maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	} else if (maxselectlistsize==1) {
-		// if maxselectlistsize is set to 1 then force it
+
+	if (cont->getMaxColumnCount()==1) {
+		// if max column count is set to 1 then force it
 		// to 2 so the db version detection doesn't crash
-		maxselectlistsize=2;
+		cont->setMaxColumnCount(2);
 	}
-	maxitembuffersize=charstring::toInteger(
-			cont->getConnectStringValue("maxitembuffersize"));
-	if (maxitembuffersize<1) {
-		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-	}
+
 	identity=cont->getConnectStringValue("identity");
 }
 
@@ -723,19 +695,19 @@ sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
 	setCreateTempTablePattern("^(create|CREATE)[ 	\r\n]+"
 					"(table|TABLE)[ 	\r\n]+#");
 
-	selectlistsize=0;
-	allocateResultSetBuffers(sapconn->maxselectlistsize);
+	columncount=0;
+	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 
 	// define a template column-bind definition...
 	// get the field as a null terminated character string
 	// no longer than MAX_ITEM_BUFFER_SIZE, override some
 	templatecolumn.datatype=CS_CHAR_TYPE;
 	templatecolumn.format=CS_FMT_NULLTERM;
-	templatecolumn.maxlength=sapconn->maxitembuffersize;
+	templatecolumn.maxlength=conn->cont->getMaxFieldLength();
 	templatecolumn.scale=CS_UNUSED;
 	templatecolumn.precision=CS_UNUSED;
 	templatecolumn.status=CS_UNUSED;
-	templatecolumn.count=sapconn->fetchatonce;
+	templatecolumn.count=conn->cont->getFetchAtOnce();
 	templatecolumn.usertype=CS_UNUSED;
 	templatecolumn.locale=NULL;
 }
@@ -754,35 +726,36 @@ sapcursor::~sapcursor() {
 	deallocateResultSetBuffers();
 }
 
-void sapcursor::allocateResultSetBuffers(int32_t selectlistsize) {
+void sapcursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (selectlistsize==-1) {
-		this->selectlistsize=0;
+	if (columncount==-1) {
+		this->columncount=0;
 		column=NULL;
 		data=NULL;
 		datalength=NULL;
 		nullindicator=NULL;
 	} else {
-		this->selectlistsize=selectlistsize;
-		column=new CS_DATAFMT[selectlistsize];
-		data=new char *[selectlistsize];
-		datalength=new CS_INT *[selectlistsize];
-		nullindicator=new CS_SMALLINT *[selectlistsize];
-		for (int32_t i=0; i<selectlistsize; i++) {
-			data[i]=new char[sapconn->fetchatonce*
-						sapconn->maxitembuffersize];
+		this->columncount=columncount;
+		column=new CS_DATAFMT[columncount];
+		data=new char *[columncount];
+		datalength=new CS_INT *[columncount];
+		nullindicator=new CS_SMALLINT *[columncount];
+		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
+		for (int32_t i=0; i<columncount; i++) {
+			data[i]=new char[fetchatonce*maxfieldlength];
 			datalength[i]=
-				new CS_INT[sapconn->fetchatonce];
+				new CS_INT[fetchatonce*maxfieldlength];
 			nullindicator[i]=
-				new CS_SMALLINT[sapconn->fetchatonce];
+				new CS_SMALLINT[fetchatonce*maxfieldlength];
 		}
 	}
 }
 
 void sapcursor::deallocateResultSetBuffers() {
-	if (selectlistsize) {
+	if (columncount) {
 		delete[] column;
-		for (int32_t i=0; i<selectlistsize; i++) {
+		for (int32_t i=0; i<columncount; i++) {
 			delete[] data[i];
 			delete[] datalength[i];
 			delete[] nullindicator[i];
@@ -790,7 +763,7 @@ void sapcursor::deallocateResultSetBuffers() {
 		delete[] data;
 		delete[] datalength;
 		delete[] nullindicator;
-		selectlistsize=0;
+		columncount=0;
 	}
 }
 
@@ -1286,7 +1259,7 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
 					NULL,CS_UNUSED,
-					(CS_INT)sapconn->fetchatonce)!=
+					(CS_INT)conn->cont->getFetchAtOnce())!=
 					CS_SUCCEED) {
 			return false;
 		}
@@ -1390,10 +1363,11 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// allocate buffers and limit column count if necessary
-		if (sapconn->maxselectlistsize==-1) {
+		int32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+		if (maxcolumncount==-1) {
 			allocateResultSetBuffers(ncols);
-		} else if (ncols>sapconn->maxselectlistsize) {
-			ncols=sapconn->maxselectlistsize;
+		} else if (ncols>maxcolumncount) {
+			ncols=maxcolumncount;
 		}
 
 		// bind columns
@@ -1574,8 +1548,9 @@ uint16_t sapcursor::getColumnType(uint32_t col) {
 
 uint32_t sapcursor::getColumnLength(uint32_t col) {
 	// limit the column size
-	if (column[col].maxlength>sapconn->maxitembuffersize) {
-		column[col].maxlength=sapconn->maxitembuffersize;
+	int32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+	if (column[col].maxlength>maxfieldlength) {
+		column[col].maxlength=maxfieldlength;
 	}
 	return column[col].maxlength;
 }
@@ -1624,7 +1599,7 @@ bool sapcursor::skipRow() {
 }
 
 bool sapcursor::fetchRow() {
-	if (row==sapconn->fetchatonce) {
+	if (row==(CS_INT)conn->cont->getFetchAtOnce()) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
@@ -1654,7 +1629,7 @@ void sapcursor::getField(uint32_t col,
 	}
 
 	// handle normal datatypes
-	*field=&data[col][row*sapconn->maxitembuffersize];
+	*field=&data[col][row*conn->cont->getMaxFieldLength()];
 	*fieldlength=datalength[col][row]-1;
 }
 
@@ -1694,7 +1669,7 @@ void sapcursor::discardResults() {
 		}
 	}
 
-	if (sapconn->maxselectlistsize==-1) {
+	if (conn->cont->getMaxColumnCount()==-1) {
 		deallocateResultSetBuffers();
 	}
 }

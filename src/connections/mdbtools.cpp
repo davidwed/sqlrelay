@@ -130,8 +130,14 @@ mdbtoolsconnection::~mdbtoolsconnection() {
 }
 
 void mdbtoolsconnection::handleConnectString() {
+
+	sqlrserverconnection::handleConnectString();
+
 	db=cont->getConnectStringValue("db");
 	identity=cont->getConnectStringValue("identity");
+
+	cont->setFetchAtOnce(1);
+	cont->setMaxColumnCount(-1);
 }
 
 bool mdbtoolsconnection::logIn(const char **error, const char **warning) {
@@ -598,7 +604,7 @@ void mdbtoolscursor::getField(uint32_t col,
 				} else {
 					*null=true;
 				}
-				return;
+				break;
 			}
 		}
 
@@ -688,6 +694,12 @@ void mdbtoolscursor::getField(uint32_t col,
 			*field=currentcolumnscale;
 		}
 		*fieldlength=charstring::length(*field);
+	}
+
+	// restrict field length
+	int32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+	if (*fieldlength>(uint64_t)maxfieldlength) {
+		*fieldlength=maxfieldlength;
 	}
 }
 
