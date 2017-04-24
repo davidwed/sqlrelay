@@ -117,7 +117,7 @@ class sqlrservercontrollerprivate {
 	bool		_intercepttxqueries;
 	bool		_faketransactionblocks;
 	bool		_faketransactionblocksautocommiton;
-	bool		_intransactionblock;
+	bool		_infaketransactionblock;
 	bool		_intransaction;
 
 	bool		_needcommitorrollback;
@@ -255,7 +255,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_intercepttxqueries=false;
 	pvt->_faketransactionblocks=false;
 	pvt->_faketransactionblocksautocommiton=false;
-	pvt->_intransactionblock=false;
+	pvt->_infaketransactionblock=false;
 	pvt->_intransaction=false;
 
 	pvt->_fakeinputbinds=false;
@@ -2012,14 +2012,23 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 
 bool sqlrservercontroller::autoCommitOn() {
 	pvt->_autocommitforthissession=true;
-	pvt->_intransaction=true;
-	return pvt->_conn->autoCommitOn();
+	if (pvt->_conn->autoCommitOn()) {
+		pvt->_intransaction=false;
+		return true;
+	}
+	return false;
 }
 
 bool sqlrservercontroller::autoCommitOff() {
 	pvt->_autocommitforthissession=false;
-	pvt->_intransaction=false;
-	return pvt->_conn->autoCommitOff();
+	if (pvt->_conn->autoCommitOff()) {
+		// if the db doesn't support transaction blocks (oracle,
+		// firebird, informix) then we are in a transaction here,
+		// otherwise we aren't
+		pvt->_intransaction=!pvt->_conn->supportsTransactionBlocks();
+		return true;
+	}
+	return false;
 }
 
 bool sqlrservercontroller::begin() {
@@ -2045,7 +2054,7 @@ bool sqlrservercontroller::beginFakeTransactionBlock() {
 			return false;
 		}
 	}
-	pvt->_intransactionblock=true;
+	pvt->_infaketransactionblock=true;
 	return true;
 }
 
@@ -2070,7 +2079,7 @@ bool sqlrservercontroller::endFakeTransactionBlock() {
 			return false;
 		}
 	}
-	pvt->_intransactionblock=false;
+	pvt->_infaketransactionblock=false;
 	return true;
 }
 
@@ -2229,7 +2238,8 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks && pvt->_intransactionblock) {
+		if (pvt->_faketransactionblocks &&
+				pvt->_infaketransactionblock) {
 			cursor->setError(
 				"begin while in transaction block",
 							999999,true);
@@ -2244,7 +2254,8 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks && !pvt->_intransactionblock) {
+		if (pvt->_faketransactionblocks &&
+				!pvt->_infaketransactionblock) {
 			cursor->setError(
 				"commit while not in transaction block",
 								999998,true);
@@ -2259,7 +2270,8 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks && !pvt->_intransactionblock) {
+		if (pvt->_faketransactionblocks &&
+				!pvt->_infaketransactionblock) {
 			cursor->setError(
 				"rollback while not in transaction block",
 								999997,true);
@@ -4058,13 +4070,13 @@ void sqlrservercontroller::endSession() {
 	// running session-end-queries.  Some queries, including drop table,
 	// cause an implicit commit.  If we need to rollback, then make sure
 	// that's done first.
-	if (pvt->_intransactionblock) {
+	if (pvt->_infaketransactionblock) {
 
 		// if we're faking transaction blocks and the session was ended
 		// but we haven't ended the transaction block, then we need to
 		// rollback and end the block
 		rollback();
-		pvt->_intransactionblock=false;
+		pvt->_infaketransactionblock=false;
 
 	} else if (pvt->_conn->isTransactional() &&
 				pvt->_needcommitorrollback) {
