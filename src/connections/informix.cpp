@@ -291,6 +291,8 @@ informixconnection::informixconnection(sqlrservercontroller *cont) :
 
 void informixconnection::handleConnectString() {
 
+	sqlrserverconnection::handleConnectString();
+
 	// get informix dir
 	informixdir=cont->getConnectStringValue("informixdir");
 
@@ -300,8 +302,6 @@ void informixconnection::handleConnectString() {
 		servername=environment::getValue("INFORMIXSERVER");
 	}
 	db=cont->getConnectStringValue("db");
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
 
 	// build dsn
 	dsn.clear();
@@ -330,40 +330,15 @@ void informixconnection::handleConnectString() {
 	}
 
 	// get other parameters
-	const char	*autocom=cont->getConnectStringValue("autocommit");
-	cont->setAutoCommitBehavior((autocom &&
-		!charstring::compareIgnoringCase(autocom,"yes")));
 	lang=cont->getConnectStringValue("lang");
-	cont->setFakeTransactionBlocksBehavior(
-		!charstring::compare(
-			cont->getConnectStringValue("faketransactionblocks"),
-			"yes"));
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
-	}
 
 	timeout=charstring::toInteger(cont->getConnectStringValue("timeout"));
 
 	// multi-row fetch doesn't work with clobs/blobs because you're already
 	// on a different row when SQLGetData is called to get the data for the
-	// clob/blob on the first row
-	/*fetchatonce=charstring::toUnsignedInteger(
-				cont->getConnectStringValue("fetchatonce"));
-	if (fetchatonce<1) {
-		fetchatonce=FETCH_AT_ONCE;
-	}*/
+	// clob/blob on the first row, so override it to 1
+	cont->setFetchAtOnce(1);
 
-	maxselectlistsize=charstring::toInteger(
-			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize || maxselectlistsize<-1) {
-		maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	}
-	maxitembuffersize=charstring::toInteger(
-			cont->getConnectStringValue("maxitembuffersize"));
-	if (maxitembuffersize<1) {
-		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-	}
 	maxoutbindlobsize=charstring::toInteger(
 			cont->getConnectStringValue("maxoutbindlobsize"));
 	if (maxoutbindlobsize<1) {

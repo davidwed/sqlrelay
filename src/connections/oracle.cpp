@@ -32,10 +32,7 @@
 	#endif
 #endif
 
-#define FETCH_AT_ONCE		10
 #define STMT_CACHE_SIZE		0
-#define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768
 
 extern "C" {
 	#ifdef __CYGWIN__
@@ -165,9 +162,6 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 
 		stringbuffer	errormessage;
 
-		uint32_t	fetchatonce;
-		int32_t		maxselectlistsize;
-		int32_t		maxitembuffersize;
 		#ifdef OCI_STMT_CACHE
 		uint32_t	stmtcachesize;
 		#endif
@@ -187,9 +181,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 				oraclecursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~oraclecursor();
-		void		allocateResultSetBuffers(uint32_t fetchatonce,
-							int32_t selectlistsize,
-							int32_t itembuffersize);
+		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
@@ -447,9 +439,6 @@ oracleconnection::oracleconnection(sqlrservercontroller *cont) :
 
 	lastinsertidquery=NULL;
 
-	fetchatonce=FETCH_AT_ONCE;
-	maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	#ifdef OCI_STMT_CACHE
 	stmtcachesize=STMT_CACHE_SIZE;
 	#endif
@@ -467,34 +456,17 @@ oracleconnection::~oracleconnection() {
 }
 
 void oracleconnection::handleConnectString() {
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
+
+	sqlrserverconnection::handleConnectString();
+
 	sid=cont->getConnectStringValue("oracle_sid");
 	home=cont->getConnectStringValue("oracle_home");
+
 	nlslang=cont->getConnectStringValue("nls_lang");
-	const char	*autocom=cont->getConnectStringValue("autocommit");
-	cont->setAutoCommitBehavior((autocom &&
-		!charstring::compareIgnoringCase(autocom,"yes")));
 
-	fetchatonce=charstring::toUnsignedInteger(
-				cont->getConnectStringValue("fetchatonce"));
-	if (fetchatonce<1) {
-		fetchatonce=FETCH_AT_ONCE;
-	}
-
-	maxselectlistsize=charstring::toInteger(
-			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize || maxselectlistsize<-1) {
-		maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	}
-
-	maxitembuffersize=charstring::toInteger(
-			cont->getConnectStringValue("maxitembuffersize"));
-	if (maxitembuffersize<1) {
-		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-	}
-	if (maxitembuffersize<MAX_BYTES_PER_CHAR) {
-		maxitembuffersize=MAX_BYTES_PER_CHAR;
+	// override max field length if it was set too small
+	if (cont->getMaxFieldLength()<MAX_BYTES_PER_CHAR) {
+		cont->setMaxFieldLength(MAX_BYTES_PER_CHAR);
 	}
 
 	// When using OCI from 8.0, if the fetch buffer is bigger than 32767,
@@ -502,11 +474,10 @@ void oracleconnection::handleConnectString() {
 	// ORA-01801: date format is too long for internal buffer
 	// at least with 8.0.5 on Redhat 5.2.
 	#ifndef HAVE_ORACLE_8i
-		if (maxitembuffersize>32767) {
-			maxitembuffersize=32767;
+		if (cont->getMaxFieldLength()>32767) {
+			cont->setMaxFieldLength(32767);
 		}
 	#endif
-
 
 	#ifdef OCI_STMT_CACHE
 	stmtcachesize=charstring::toUnsignedInteger(
@@ -515,11 +486,6 @@ void oracleconnection::handleConnectString() {
 		stmtcachesize=STMT_CACHE_SIZE;
 	}
 	#endif
-
-	cont->setFakeTransactionBlocksBehavior(
-		!charstring::compare(
-			cont->getConnectStringValue("faketransactionblocks"),
-			"yes"));
 
 	#ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
@@ -2004,9 +1970,7 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 	ncols=0;
 
 	oracleconn=(oracleconnection *)conn;
-	allocateResultSetBuffers(oracleconn->fetchatonce,
-					oracleconn->maxselectlistsize,
-					oracleconn->maxitembuffersize);
+	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	inbindpp=new OCIBind *[maxbindcount];
@@ -2111,11 +2075,9 @@ oraclecursor::~oraclecursor() {
 	deallocateResultSetBuffers();
 }
 
-void oraclecursor::allocateResultSetBuffers(uint32_t fetchatonce,
-						int32_t selectlistsize,
-						int32_t itembuffersize) {
+void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (selectlistsize==-1) {
+	if (columncount==-1) {
 		resultsetbuffercount=0;
 		desc=NULL;
 		def=NULL;
@@ -2125,7 +2087,7 @@ void oraclecursor::allocateResultSetBuffers(uint32_t fetchatonce,
 		def_col_retlen=NULL;
 		def_col_retcode=NULL;
 	} else {
-		resultsetbuffercount=selectlistsize;
+		resultsetbuffercount=columncount;
 		desc=new describe[resultsetbuffercount];
 		def=new OCIDefine *[resultsetbuffercount];
 		def_lob=new OCILobLocator **[resultsetbuffercount];
@@ -2133,12 +2095,14 @@ void oraclecursor::allocateResultSetBuffers(uint32_t fetchatonce,
 		def_indp=new sb2 *[resultsetbuffercount];
 		def_col_retlen=new ub2 *[resultsetbuffercount];
 		def_col_retcode=new ub2 *[resultsetbuffercount];
+		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int32_t i=0; i<resultsetbuffercount; i++) {
 			def_lob[i]=new OCILobLocator *[fetchatonce];
 			for (uint32_t j=0; j<fetchatonce; j++) {
 				def_lob[i][j]=NULL;
 			}
-			def_buf[i]=new ub1[fetchatonce*itembuffersize];
+			def_buf[i]=new ub1[fetchatonce*maxfieldlength];
 			def_indp[i]=new sb2[fetchatonce];
 			def_col_retlen[i]=new ub2[fetchatonce];
 			def_col_retcode[i]=new ub2[fetchatonce];
@@ -2194,8 +2158,9 @@ bool oraclecursor::open() {
 	}
 
 	// set the number of rows to prefetch
+	uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
 	return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&(oracleconn->fetchatonce),
+				(dvoid *)&fetchatonce,
 				(ub4)0,OCI_ATTR_PREFETCH_ROWS,
 				(OCIError *)oracleconn->err)==OCI_SUCCESS);
 }
@@ -2297,9 +2262,11 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 		}
 
 		// set the number of rows to prefetch
+		// FIXME: we set this in open(), does it need to be reset?
+		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
 		return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&(oracleconn->fetchatonce),(ub4)0,
-				OCI_ATTR_PREFETCH_ROWS,
+				(dvoid *)&fetchatonce,
+				(ub4)0,OCI_ATTR_PREFETCH_ROWS,
 				(OCIError *)oracleconn->err)==OCI_SUCCESS);
 
 	}
@@ -3168,21 +3135,21 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 		}
 
 		// validate column count
-		if (oracleconn->maxselectlistsize!=-1 &&
-			ncols>oracleconn->maxselectlistsize) {
+		if (conn->cont->getMaxColumnCount()!=-1 &&
+			ncols>conn->cont->getMaxColumnCount()) {
 			stringbuffer	err;
 			err.append(SQLR_ERROR_MAXSELECTLIST_STRING);
 			err.append(" (")->append(ncols)->append('>');
-			err.append(oracleconn->maxselectlistsize)->append(')');
+			err.append(conn->cont->getMaxColumnCount());
+			err.append(')');
 			setError(err.getString(),
 					SQLR_ERROR_MAXSELECTLIST,true);
 			return false;
 		}
 
 		// allocate buffers, if necessary
-		if (oracleconn->maxselectlistsize==-1) {
-			allocateResultSetBuffers(oracleconn->fetchatonce,
-					ncols,oracleconn->maxitembuffersize);
+		if (conn->cont->getMaxColumnCount()==-1) {
+			allocateResultSetBuffers(ncols);
 		}
 
 		// indicate that the result needs to be freed
@@ -3256,11 +3223,11 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 				// set the NULL indicators to false
 				bytestring::zero(def_indp[i],
 						sizeof(sb2)*
-						oracleconn->fetchatonce);
+						conn->cont->getFetchAtOnce());
 
 				// allocate a lob descriptor
 				for (uint32_t j=0;
-					j<oracleconn->fetchatonce;
+					j<conn->cont->getFetchAtOnce();
 					j++) {
 					if (OCIDescriptorAlloc(
 						(void *)oracleconn->env,
@@ -3302,7 +3269,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 					oracleconn->err,
 					i+1,
 					(dvoid *)def_buf[i],
-					(sb4)oracleconn->maxitembuffersize,
+					(sb4)conn->cont->getMaxFieldLength(),
 					SQLT_STR,
 					(dvoid *)def_indp[i],
 					(ub2 *)def_col_retlen[i],
@@ -3313,7 +3280,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 
 				// set the lob member to NULL
 				for (uint32_t j=0;
-					j<oracleconn->fetchatonce;
+					j<conn->cont->getFetchAtOnce();
 					j++) {
 					def_lob[i][j]=NULL;
 				}
@@ -3564,7 +3531,7 @@ bool oraclecursor::skipRow() {
 }
 
 bool oraclecursor::fetchRow() {
-	if (row==oracleconn->fetchatonce) {
+	if (row==conn->cont->getFetchAtOnce()) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
@@ -3572,7 +3539,7 @@ bool oraclecursor::fetchRow() {
 	}
 	if (!row) {
 		OCIStmtFetch(stmt,oracleconn->err,
-				(ub4)oracleconn->fetchatonce,
+				(ub4)conn->cont->getFetchAtOnce(),
 				OCI_FETCH_NEXT,OCI_DEFAULT);
 		ub4	currentrow;
 		OCIAttrGet(stmt,OCI_HTYPE_STMT,
@@ -3606,7 +3573,7 @@ void oraclecursor::getField(uint32_t col,
 	}
 
 	// handle normal datatypes
-	*field=(const char *)&def_buf[col][row*oracleconn->maxitembuffersize];
+	*field=(const char *)&def_buf[col][row*conn->cont->getMaxFieldLength()];
 	*fieldlength=def_col_retlen[col][row];
 }
 
@@ -3685,13 +3652,14 @@ void oraclecursor::closeResultSet() {
 	// free row/column resources
 	if (!resultfreed) {
 
-		int32_t	selectlistsize=(oracleconn->maxselectlistsize==-1)?
-					ncols:oracleconn->maxselectlistsize;
+		int32_t	columncount=(conn->cont->getMaxColumnCount()==-1)?
+					ncols:conn->cont->getMaxColumnCount();
 
-		for (int32_t i=0; i<selectlistsize; i++) {
+		for (int32_t i=0; i<columncount; i++) {
 
 			// free lob resources
-			for (uint32_t j=0; j<oracleconn->fetchatonce; j++) {
+			for (uint32_t j=0;
+				j<conn->cont->getFetchAtOnce(); j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(
 						def_lob[i][j],OCI_DTYPE_LOB);
@@ -3728,7 +3696,7 @@ void oraclecursor::closeResultSet() {
 
 		// deallocate buffers, if necessary
 		if (stmttype==OCI_STMT_SELECT &&
-			oracleconn->maxselectlistsize==-1) {
+			conn->cont->getMaxColumnCount()==-1) {
 			deallocateResultSetBuffers();
 		}
 

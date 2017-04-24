@@ -161,6 +161,14 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		getFakeInputBinds();
 		memorypool	*getBindMappingsPool();
 
+		// fetch info
+		void		setFetchAtOnce(uint32_t fao);
+		void		setMaxColumnCount(int32_t mcc);
+		void		setMaxFieldLength(int32_t mfl);
+		uint32_t	getFetchAtOnce();
+		int32_t		getMaxColumnCount();
+		int32_t		getMaxFieldLength();
+
 		// db selection
 		bool	selectDatabase(const char *db);
 		void	dbHasChanged();
@@ -621,7 +629,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool	mustDetachBeforeLogIn();
 
 		virtual bool	supportsAuthOnDatabase();
-		virtual	void	handleConnectString()=0;
+		virtual	void	handleConnectString();
 
 		virtual	bool	logIn(const char **error,
 					const char **warning)=0;

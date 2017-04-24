@@ -14,9 +14,6 @@
 	#include <sqlcli1.h>
 #endif
 
-#define FETCH_AT_ONCE		10
-#define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768	
 #define MAX_OUT_BIND_LOB_SIZE	2097152
 
 #define MAX_LOB_CHUNK_SIZE	2147483647
@@ -59,8 +56,7 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 			db2cursor(sqlrserverconnection *conn, uint16_t id);
 			~db2cursor();
 	private:
-		void		allocateResultSetBuffers(
-						int32_t selectlistsize);
+		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
@@ -195,7 +191,7 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		SQLSMALLINT	ncols;
 		SQLINTEGER 	affectedrows;
 
-		int32_t		selectlistsize;
+		int32_t		columncount;
 		char		**field;
 		SQLINTEGER	**loblocator;
 		SQLINTEGER	**loblength;
@@ -275,9 +271,6 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 
 		stringbuffer	errormessage;
 
-		uint32_t	fetchatonce;
-		int32_t		maxselectlistsize;
-		int32_t		maxitembuffersize;
 		int32_t		maxoutbindlobsize;
 
 		const char	*identity;
@@ -295,14 +288,13 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 db2connection::db2connection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 
-	fetchatonce=FETCH_AT_ONCE;
-	maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	identity=NULL;
 }
 
 void db2connection::handleConnectString() {
+
+	sqlrserverconnection::handleConnectString();
 
 	db2path=cont->getConnectStringValue("db2path");
 
@@ -313,20 +305,9 @@ void db2connection::handleConnectString() {
 		server=tmp;
 	}
 
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
-	const char	*autocom=cont->getConnectStringValue("autocommit");
-	cont->setAutoCommitBehavior((autocom &&
-		!charstring::compareIgnoringCase(autocom,"yes")));
+	identity=cont->getConnectStringValue("identity");
+
 	lang=cont->getConnectStringValue("lang");
-	cont->setFakeTransactionBlocksBehavior(
-		!charstring::compare(
-			cont->getConnectStringValue("faketransactionblocks"),
-			"yes"));
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
-	}
 
 	const char	*to=cont->getConnectStringValue("timeout");
 	if (!charstring::length(to)) {
@@ -336,27 +317,11 @@ void db2connection::handleConnectString() {
 		timeout=charstring::toInteger(to);
 	}
 
-	fetchatonce=charstring::toUnsignedInteger(
-				cont->getConnectStringValue("fetchatonce"));
-	if (fetchatonce<1) {
-		fetchatonce=FETCH_AT_ONCE;
-	}
-	maxselectlistsize=charstring::toInteger(
-			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize || maxselectlistsize<-1) {
-		maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	}
-	maxitembuffersize=charstring::toInteger(
-			cont->getConnectStringValue("maxitembuffersize"));
-	if (maxitembuffersize<1) {
-		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-	}
 	maxoutbindlobsize=charstring::toInteger(
 			cont->getConnectStringValue("maxoutbindlobsize"));
 	if (maxoutbindlobsize<1) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	}
-	identity=cont->getConnectStringValue("identity");
 }
 
 bool db2connection::mustDetachBeforeLogIn() {
@@ -768,7 +733,7 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 		outlobbindlen[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
-	allocateResultSetBuffers(db2conn->maxselectlistsize);
+	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 }
 
 db2cursor::~db2cursor() {
@@ -779,10 +744,10 @@ db2cursor::~db2cursor() {
 	deallocateResultSetBuffers();
 }
 
-void db2cursor::allocateResultSetBuffers(int32_t selectlistsize) {
+void db2cursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (selectlistsize==-1) {
-		this->selectlistsize=0;
+	if (columncount==-1) {
+		this->columncount=0;
 		field=NULL;
 		loblocator=NULL;
 		loblength=NULL;
@@ -792,29 +757,30 @@ void db2cursor::allocateResultSetBuffers(int32_t selectlistsize) {
 		#endif
 		column=NULL;
 	} else {
-		this->selectlistsize=selectlistsize;
-		field=new char *[selectlistsize];
-		loblocator=new SQLINTEGER *[selectlistsize];
-		loblength=new SQLINTEGER *[selectlistsize];
-		indicator=new SQLINTEGER *[selectlistsize];
+		this->columncount=columncount;
+		field=new char *[columncount];
+		loblocator=new SQLINTEGER *[columncount];
+		loblength=new SQLINTEGER *[columncount];
+		indicator=new SQLINTEGER *[columncount];
+		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
 		#if (DB2VERSION>7)
-		rowstat=new SQLUSMALLINT[db2conn->fetchatonce];
+		rowstat=new SQLUSMALLINT[fetchatonce];
 		#endif
-		column=new db2column[selectlistsize];
-		for (int32_t i=0; i<selectlistsize; i++) {
+		column=new db2column[columncount];
+		for (int32_t i=0; i<columncount; i++) {
 			column[i].name=new char[4096];
-			field[i]=new char[db2conn->fetchatonce*
-						db2conn->maxitembuffersize];
-			loblocator[i]=new SQLINTEGER[db2conn->fetchatonce];
-			loblength[i]=new SQLINTEGER[db2conn->fetchatonce];
-			indicator[i]=new SQLINTEGER[db2conn->fetchatonce];
+			field[i]=new char[fetchatonce*maxfieldlength];
+			loblocator[i]=new SQLINTEGER[fetchatonce];
+			loblength[i]=new SQLINTEGER[fetchatonce];
+			indicator[i]=new SQLINTEGER[fetchatonce];
 		}
 	}
 }
 
 void db2cursor::deallocateResultSetBuffers() {
-	if (selectlistsize) {
-		for (int32_t i=0; i<selectlistsize; i++) {
+	if (columncount) {
+		for (int32_t i=0; i<columncount; i++) {
 			delete[] column[i].name;
 			delete[] field[i];
 			delete[] loblocator[i];
@@ -829,7 +795,7 @@ void db2cursor::deallocateResultSetBuffers() {
 		#if (DB2VERSION>7)
 		delete[] rowstat;
 		#endif
-		selectlistsize=0;
+		columncount=0;
 	}
 }
 
@@ -845,13 +811,13 @@ bool db2cursor::open() {
 
 		// set the row array size
 		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-					(SQLPOINTER)db2conn->fetchatonce,0);
+				(SQLPOINTER)conn->cont->getFetchAtOnce(),0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
 
 		#if (DB2VERSION>7)
-		if (db2conn->maxselectlistsize!=-1) {
+		if (conn->cont->getMaxColumnCount()!=-1) {
 
 			// set the row status ptr
 			// (only do this here if we're not
@@ -1344,7 +1310,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// allocate buffers and limit column count if necessary
-	if (db2conn->maxselectlistsize==-1) {
+	if (conn->cont->getMaxColumnCount()==-1) {
 
 		allocateResultSetBuffers(ncols);
 
@@ -1359,8 +1325,8 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 		}
 		#endif
 
-	} else if (ncols>db2conn->maxselectlistsize) {
-		ncols=db2conn->maxselectlistsize;
+	} else if (ncols>conn->cont->getMaxColumnCount()) {
+		ncols=conn->cont->getMaxColumnCount();
 	}
 
 	// run through the columns
@@ -1452,9 +1418,9 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 				break;
 			default:
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-						field[i],
-						db2conn->maxitembuffersize,
-						(SQLINTEGER *)indicator[i]);
+					field[i],
+					conn->cont->getMaxFieldLength(),
+					(SQLINTEGER *)indicator[i]);
 				break;
 		}
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1636,7 +1602,7 @@ bool db2cursor::skipRow() {
 
 bool db2cursor::fetchRow() {
 
-	if (rowgroupindex==db2conn->fetchatonce) {
+	if (rowgroupindex==conn->cont->getFetchAtOnce()) {
 		rowgroupindex=0;
 	}
 	if (rowgroupindex>0 && rowgroupindex==totalinrowgroup) {
@@ -1660,7 +1626,7 @@ bool db2cursor::fetchRow() {
 		// SQL_ATTR_ROW_NUMBER to always be 1, running through
 		// the row status buffer appears to work though.
 		uint32_t	index=0;
-		while (index<db2conn->fetchatonce &&
+		while (index<conn->cont->getFetchAtOnce() &&
 			(rowstat[index]==SQL_ROW_SUCCESS ||
 			rowstat[index]==SQL_ROW_SUCCESS_WITH_INFO)) {
 			index++;
@@ -1702,7 +1668,7 @@ void db2cursor::getField(uint32_t col,
 	}
 
 	// handle normal datatypes
-	*fld=&field[col][rowgroupindex*db2conn->maxitembuffersize];
+	*fld=&field[col][rowgroupindex*conn->cont->getMaxFieldLength()];
 	*fldlength=indicator[col][rowgroupindex];
 }
 
@@ -1814,7 +1780,7 @@ void db2cursor::closeResultSet() {
 		outlobbindlen[i]=0;
 	}
 
-	if (db2conn->maxselectlistsize==-1) {
+	if (conn->cont->getMaxColumnCount()==-1) {
 		deallocateResultSetBuffers();
 	}
 }

@@ -7,6 +7,11 @@
 
 #include <defines.h>
 
+#define FETCH_AT_ONCE		10
+#define MAX_COLUMN_COUNT	256
+#define MAX_FIELD_LENGTH	32768	
+#define MAX_OUT_BIND_LOB_SIZE	2097152
+
 class sqlrserverconnectionprivate {
 	friend class sqlrserverconnection;
 
@@ -63,6 +68,62 @@ bool sqlrserverconnection::mustDetachBeforeLogIn() {
 
 bool sqlrserverconnection::supportsAuthOnDatabase() {
 	return true;
+}
+
+void sqlrserverconnection::handleConnectString() {
+
+	// get some parameters that are common to most db's
+
+	// user and password
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+
+	// autocommit
+	const char	*autocom=cont->getConnectStringValue("autocommit");
+	cont->setAutoCommitBehavior((autocom &&
+		!charstring::compareIgnoringCase(autocom,"yes")));
+
+	// fake transaction blocks
+	cont->setFakeTransactionBlocksBehavior(
+		!charstring::compare(
+			cont->getConnectStringValue("faketransactionblocks"),
+			"yes"));
+
+	// fake binds
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
+
+	// rows to fetch-at-once
+	uint32_t	fetchatonce=charstring::toUnsignedInteger(
+				cont->getConnectStringValue("fetchatonce"));
+	if (fetchatonce<1) {
+		fetchatonce=FETCH_AT_ONCE;
+	}
+	cont->setFetchAtOnce(fetchatonce);
+
+	// max column count
+	const char	*mcc=cont->getConnectStringValue("maxcolumncount");
+	if (!mcc) {
+		mcc=cont->getConnectStringValue("maxselectlistsize");
+	}
+	int32_t	maxcolumncount=charstring::toInteger(mcc);
+	if (!maxcolumncount || maxcolumncount<-1) {
+		maxcolumncount=MAX_COLUMN_COUNT;
+	}
+	cont->setMaxColumnCount(maxcolumncount);
+
+	// max field length
+	const char	*mfl=cont->getConnectStringValue("maxfieldlength");
+	if (!mfl) {
+		mfl=cont->getConnectStringValue("maxitembuffersize");
+	}
+	int32_t	maxfieldlength=charstring::toInteger(mfl);
+	if (maxfieldlength<1) {
+		maxfieldlength=MAX_FIELD_LENGTH;
+	}
+	cont->setMaxFieldLength(maxfieldlength);
 }
 
 bool sqlrserverconnection::changeUser(const char *newuser,
