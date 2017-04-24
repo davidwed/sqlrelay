@@ -184,6 +184,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	setInterceptTransactionQueriesBehavior(bool itxqb);
 		void	setFakeTransactionBlocksBehavior(bool ftb);
 		void	setAutoCommitBehavior(bool ac);
+		bool	inTransaction();
 
 		// errors
 		void		errorMessage(char *errorbuffer,

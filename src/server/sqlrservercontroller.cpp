@@ -118,6 +118,7 @@ class sqlrservercontrollerprivate {
 	bool		_faketransactionblocks;
 	bool		_faketransactionblocksautocommiton;
 	bool		_intransactionblock;
+	bool		_intransaction;
 
 	bool		_needcommitorrollback;
 
@@ -255,6 +256,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_faketransactionblocks=false;
 	pvt->_faketransactionblocksautocommiton=false;
 	pvt->_intransactionblock=false;
+	pvt->_intransaction=false;
 
 	pvt->_fakeinputbinds=false;
 	pvt->_translatebinds=false;
@@ -2010,20 +2012,26 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 
 bool sqlrservercontroller::autoCommitOn() {
 	pvt->_autocommitforthissession=true;
+	pvt->_intransaction=true;
 	return pvt->_conn->autoCommitOn();
 }
 
 bool sqlrservercontroller::autoCommitOff() {
 	pvt->_autocommitforthissession=false;
+	pvt->_intransaction=false;
 	return pvt->_conn->autoCommitOff();
 }
 
 bool sqlrservercontroller::begin() {
 	// if we're faking transaction blocks, do that,
 	// otherwise run an actual begin query
-	return (pvt->_faketransactionblocks)?
+	if ((pvt->_faketransactionblocks)?
 			beginFakeTransactionBlock():
-			pvt->_conn->begin();
+			pvt->_conn->begin()) {
+		pvt->_intransaction=true;
+		return true;
+	}
+	return false;
 }
 
 bool sqlrservercontroller::beginFakeTransactionBlock() {
@@ -2044,6 +2052,9 @@ bool sqlrservercontroller::beginFakeTransactionBlock() {
 bool sqlrservercontroller::commit() {
 	if (pvt->_conn->commit()) {
 		endFakeTransactionBlock();
+		if (!pvt->_autocommitforthissession) {
+			pvt->_intransaction=false;
+		}
 		return true;
 	}
 	return false;
@@ -2066,6 +2077,9 @@ bool sqlrservercontroller::endFakeTransactionBlock() {
 bool sqlrservercontroller::rollback() {
 	if (pvt->_conn->rollback()) {
 		endFakeTransactionBlock();
+		if (!pvt->_autocommitforthissession) {
+			pvt->_intransaction=false;
+		}
 		return true;
 	}
 	return false;
@@ -3647,6 +3661,10 @@ void sqlrservercontroller::commitOrRollback(sqlrservercursor *cursor) {
 	}
 
 	raiseDebugMessageEvent("done with commit or rollback check");
+}
+
+bool sqlrservercontroller::inTransaction() {
+	return pvt->_intransaction;
 }
 
 uint16_t sqlrservercontroller::getSendColumnInfo() {
