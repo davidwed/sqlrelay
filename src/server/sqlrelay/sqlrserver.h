@@ -1007,6 +1007,15 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		stringbuffer	*getQueryWithFakeInputBindsBuffer();
 
+		void	allocateFieldPointers(uint32_t colcount);
+		void	deallocateFieldPointers();
+		void	getFieldPointers(sqlrservercursor *cursor,
+						const char ***fieldnames,
+						const char ***fields,
+						uint64_t **fieldlengths,
+						bool **blob,
+						bool **null);
+
 		sqlrserverconnection	*conn;
 
 	#include <sqlrelay/private/sqlrservercursor.h>

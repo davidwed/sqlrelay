@@ -214,6 +214,12 @@ class sqlrservercontrollerprivate {
 	dictionary< uint32_t, uint32_t >	_odbcdatabasescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbctablescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbccolumnscolumnmap;
+
+	const char	**_fieldnames;
+	const char	**_fields;
+	uint64_t	*_fieldlengths;
+	bool		*_blobs;
+	bool		*_nulls;
 };
 
 static signalhandler		alarmhandler;
@@ -6036,12 +6042,49 @@ bool sqlrservercontroller::skipRow(sqlrservercursor *cursor) {
 }
 
 bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
-	cursor->setCurrentRowReformatted(false);
-	if (cursor->fetchRow()) {
-		cursor->incrementTotalRowsFetched();
-		return true;
+
+	// fetch the row
+	if (!cursor->fetchRow()) {
+		return false;
 	}
-	return false;
+
+	// get arrays of field pointers,
+	// helpfully provided for us by the cursor
+	cursor->getFieldPointers(cursor,&(pvt->_fieldnames),
+					&(pvt->_fields),
+					&(pvt->_fieldlengths),
+					&(pvt->_blobs),
+					&(pvt->_nulls));
+
+	// get the column count
+	uint32_t	colcount=colCount(cursor);
+
+	// use the provided field pointer arrays to get the
+	// pointers to the column names and actual field data
+	for (uint32_t i=0; i<colcount; i++) {
+		pvt->_fieldnames[i]=getColumnName(cursor,i);
+		pvt->_fieldlengths[i]=0;
+		pvt->_blobs[i]=false;
+		pvt->_nulls[i]=false;
+		cursor->getField(i,&(pvt->_fields[i]),
+					&(pvt->_fieldlengths[i]),
+					&(pvt->_blobs[i]),
+					&(pvt->_nulls[i]));
+	}
+
+	// reformat the row
+	reformatRow(cursor,colcount,pvt->_fieldnames,
+				&(pvt->_fields),&(pvt->_fieldlengths));
+
+	// reformat each field
+	for (uint32_t i=0; i<colcount; i++) {
+		reformatField(cursor,pvt->_fieldnames[i],i,
+				&(pvt->_fields[i]),&(pvt->_fieldlengths[i]));
+	}
+
+	// bump total rows fetched
+	cursor->incrementTotalRowsFetched();
+	return true;
 }
 
 void sqlrservercontroller::nextRow(sqlrservercursor *cursor) {
@@ -6054,12 +6097,14 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 						uint64_t *fieldlength,
 						bool *blob,
 						bool *null) {
-	if (cursor->getCurrentRowReformatted()) {
-		// FIXME: reformat row
-		cursor->setCurrentRowReformatted(true);
-	}
-	// FIXME: reformat field
-	cursor->getField(mapColumn(col),field,fieldlength,blob,null);
+	//cursor->getField(mapColumn(col),field,fieldlength,blob,null);
+
+	// return the requested field (which these pointers
+	// were set to during the previous call to fetchRow)
+	*field=pvt->_fields[col];
+	*fieldlength=pvt->_fieldlengths[col];
+	*blob=pvt->_blobs[col];
+	*null=pvt->_nulls[col];
 }
 
 bool sqlrservercontroller::getLobFieldLength(sqlrservercursor *cursor,

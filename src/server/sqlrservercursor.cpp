@@ -59,6 +59,12 @@ class sqlrservercursorprivate {
 		bool	_querywasintercepted;
 		bool	_bindswerefaked;
 		bool	_fakeinputbindsforthisquery;
+
+		const char	**_fieldnames;
+		const char	**_fields;
+		uint64_t	*_fieldlengths;
+		bool		*_blobs;
+		bool		*_nulls;
 };
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
@@ -113,6 +119,16 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_querywasintercepted=false;
 	pvt->_bindswerefaked=false;
 	pvt->_fakeinputbindsforthisquery=false;
+
+	pvt->_fieldnames=NULL;
+	pvt->_fields=NULL;
+	pvt->_fieldlengths=NULL;
+	pvt->_blobs=NULL;
+	pvt->_nulls=NULL;
+	uint32_t	colcount=conn->cont->getMaxColumnCount();
+	if (colcount) {
+		allocateFieldPointers(colcount);
+	}
 }
 
 sqlrservercursor::~sqlrservercursor() {
@@ -122,6 +138,7 @@ sqlrservercursor::~sqlrservercursor() {
 	delete[] pvt->_outbindvars;
 	delete pvt->_customquerycursor;
 	delete[] pvt->_error;
+	deallocateFieldPointers();
 	delete pvt;
 }
 
@@ -1056,4 +1073,52 @@ bool sqlrservercursor::getFakeInputBindsForThisQuery() {
 
 stringbuffer *sqlrservercursor::getQueryWithFakeInputBindsBuffer() {
 	return &(pvt->_querywithfakeinputbinds);
+}
+
+void sqlrservercursor::allocateFieldPointers(uint32_t colcount) {
+	pvt->_fieldnames=new const char *[colcount];
+	pvt->_fields=new const char *[colcount];
+	pvt->_fieldlengths=new uint64_t[colcount];
+	pvt->_blobs=new bool[colcount];
+	pvt->_nulls=new bool[colcount];
+}
+
+void sqlrservercursor::deallocateFieldPointers() {
+	delete[] pvt->_fieldnames;
+	delete[] pvt->_fields;
+	delete[] pvt->_fieldlengths;
+	delete[] pvt->_blobs;
+	delete[] pvt->_nulls;
+}
+
+void sqlrservercursor::getFieldPointers(sqlrservercursor *cursor,
+						const char ***fieldnames,
+						const char ***fields,
+						uint64_t **fieldlengths,
+						bool **blobs,
+						bool **nulls) {
+
+	// get the max column count
+	uint32_t	colcount=conn->cont->getMaxColumnCount();
+
+	// decide if we need to allocate field pointers here,
+	// and if so, how many columns
+	bool	allocate=false;
+	if (!colcount) {
+		colcount=conn->cont->colCount(cursor);
+		allocate=true;
+	}
+
+	// allocate the field pointers, if necessary
+	if (allocate) {
+		deallocateFieldPointers();
+		allocateFieldPointers(colcount);
+	}
+
+	// return the field pointers
+	*fieldnames=pvt->_fieldnames;
+	*fields=pvt->_fields;
+	*fieldlengths=pvt->_fieldlengths;
+	*blobs=pvt->_blobs;
+	*nulls=pvt->_nulls;
 }

@@ -2762,7 +2762,7 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 
 	// get the column count
 	uint32_t	colcount=cont->colCount(cursor);
-
+/*
 	// get the fields
 	for (uint32_t i=0; i<colcount; i++) {
 
@@ -2782,24 +2782,34 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	// reformat row
 	// FIXME: push this up
 	cont->reformatRow(cursor,colcount,fieldnames,&fields,&fieldlengths);
+*/
 
 	// send fields
 	for (uint32_t i=0; i<colcount; i++) {
 
+		const char	*field;
+		uint64_t	fieldlength;
+		bool		blob;
+		bool		null;
+		cont->getField(cursor,i,&field,&fieldlength,&blob,&null);
+
 		// send data to the client
-		if (null[i]) {
+		//if (null[i]) {
+		if (null) {
 			sendNullField();
-		} else if (blob[i]) {
+		//} else if (blob[i]) {
+		} else if (blob) {
 			sendLobField(cursor,i);
 			// FIXME: move closeLob() into sendLobField()?
 			cont->closeLobField(cursor,i);
 		} else {
 			// reformat fields individually
 			// FIXME: push this up
-			cont->reformatField(cursor,
+			/*cont->reformatField(cursor,
 					fieldnames[i],i,
 					&(fields[i]),&(fieldlengths[i]));
-			sendField(fields[i],fieldlengths[i]);
+			sendField(fields[i],fieldlengths[i]);*/
+			sendField(field,fieldlength);
 		}
 	}
 
