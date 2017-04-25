@@ -25,16 +25,19 @@ endif
 all:
 
 install:
-	if ( test -d "/lib/systemd/system" ); \
+	if ( test -x "/bin/systemctl" -o -x "/usr/bin/systemctl" -o -x "/sbin/systemctl" -o -x "/usr/sbin/systemctl" ); \
 	then \
-		$(MKINSTALLDIRS) $(initroot)/lib/systemd/system; \
-		$(CP) sqlrelay.service $(initroot)/lib/systemd/system; \
-		$(CP) sqlrcachemanager.service $(initroot)/lib/systemd/system; \
-	elif ( test -d "/usr/lib/systemd/system" ); \
-	then \
-		$(MKINSTALLDIRS) $(initroot)/usr/lib/systemd/system; \
-		$(CP) sqlrelay.service $(initroot)/usr/lib/systemd/system; \
-		$(CP) sqlrcachemanager.service $(initroot)/usr/lib/systemd/system; \
+		if ( test -d "/lib/systemd/system" ); \
+		then \
+			$(MKINSTALLDIRS) $(initroot)/lib/systemd/system; \
+			$(CP) sqlrelay.service $(initroot)/lib/systemd/system; \
+			$(CP) sqlrcachemanager.service $(initroot)/lib/systemd/system; \
+		elif ( test -d "/usr/lib/systemd/system" ); \
+		then \
+			$(MKINSTALLDIRS) $(initroot)/usr/lib/systemd/system; \
+			$(CP) sqlrelay.service $(initroot)/usr/lib/systemd/system; \
+			$(CP) sqlrcachemanager.service $(initroot)/usr/lib/systemd/system; \
+		fi; \
 	elif ( test -d "/etc/init.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/init.d; \
