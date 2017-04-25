@@ -6062,7 +6062,10 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	// use the provided field pointer arrays to get the
 	// pointers to the column names and actual field data
 	for (uint32_t i=0; i<colcount; i++) {
+
 		pvt->_fieldnames[i]=getColumnName(cursor,i);
+
+		pvt->_fields[i]=NULL;
 		pvt->_fieldlengths[i]=0;
 		pvt->_blobs[i]=false;
 		pvt->_nulls[i]=false;
@@ -6097,7 +6100,6 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 						uint64_t *fieldlength,
 						bool *blob,
 						bool *null) {
-	//cursor->getField(mapColumn(col),field,fieldlength,blob,null);
 
 	// return the requested field (which these pointers
 	// were set to during the previous call to fetchRow)

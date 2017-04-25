@@ -20,6 +20,10 @@
 		maxfieldlength (old parameter names still work though)
 	fetch-at-once, max column count, and max field length are now available
 		via server API
+	updated sqlrservercursor to provide preallocated and reused field
+		pointer buffers to protocol modules
+	refactored fetchRow/getField and pushed reformatRow/Field up into
+		sqlrservercontroller
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

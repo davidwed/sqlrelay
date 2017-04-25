@@ -208,12 +208,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		char		lobbuffer[32768];
 
-		const char	**fieldnames;
-		const char	**fields;
-		uint64_t	*fieldlengths;
-		bool		*blob;
-		bool		*null;
-
 		bool		debug;
 };
 
@@ -2721,14 +2715,6 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 		cont->raiseDebugMessageEvent(debugstr.getString());
 	}
 
-	// FIXME: preallocate these 
-	uint32_t	colcount=cont->colCount(cursor);
-	fieldnames=new const char *[colcount];
-	fields=new const char *[colcount];
-	fieldlengths=new uint64_t[colcount];
-	blob=new bool[colcount];
-	null=new bool[colcount];
-
 	// send the specified number of rows back
 	for (uint64_t i=0; (!fetch || i<fetch); i++) {
 		if (cont->fetchRow(cursor)) {
@@ -2742,13 +2728,6 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 	}
 	clientsock->flushWriteBuffer(-1,-1);
 
-	// clean up
-	delete[] fieldnames;
-	delete[] fields;
-	delete[] fieldlengths;
-	delete[] blob;
-	delete[] null;
-
 	cont->raiseDebugMessageEvent("done returning result set data");
 	return true;
 }
@@ -2760,31 +2739,8 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 		debugstr.clear();
 	}
 
-	// get the column count
-	uint32_t	colcount=cont->colCount(cursor);
-/*
-	// get the fields
-	for (uint32_t i=0; i<colcount; i++) {
-
-		// get the field name
-		fieldnames[i]=cont->getColumnName(cursor,i),
-
-		// get the field
-		fields[i]=NULL;
-		fieldlengths[i]=0;
-		blob[i]=false;
-		null[i]=false;
-		cont->getField(cursor,i,
-				&(fields[i]),&(fieldlengths[i]),
-				&(blob[i]),&(null[i]));
-	}
-
-	// reformat row
-	// FIXME: push this up
-	cont->reformatRow(cursor,colcount,fieldnames,&fields,&fieldlengths);
-*/
-
 	// send fields
+	uint32_t	colcount=cont->colCount(cursor);
 	for (uint32_t i=0; i<colcount; i++) {
 
 		const char	*field;
@@ -2794,21 +2750,11 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 		cont->getField(cursor,i,&field,&fieldlength,&blob,&null);
 
 		// send data to the client
-		//if (null[i]) {
 		if (null) {
 			sendNullField();
-		//} else if (blob[i]) {
 		} else if (blob) {
 			sendLobField(cursor,i);
-			// FIXME: move closeLob() into sendLobField()?
-			cont->closeLobField(cursor,i);
 		} else {
-			// reformat fields individually
-			// FIXME: push this up
-			/*cont->reformatField(cursor,
-					fieldnames[i],i,
-					&(fields[i]),&(fieldlengths[i]));
-			sendField(fields[i],fieldlengths[i]);*/
 			sendField(field,fieldlength);
 		}
 	}
@@ -2851,6 +2797,7 @@ void sqlrprotocol_sqlrclient::sendLobField(sqlrservercursor *cursor,
 	uint64_t	loblength;
 	if (!cont->getLobFieldLength(cursor,col,&loblength)) {
 		sendNullField();
+		cont->closeLobField(cursor,col);
 		return;
 	}
 
@@ -2859,6 +2806,7 @@ void sqlrprotocol_sqlrclient::sendLobField(sqlrservercursor *cursor,
 		startSendingLong(0);
 		sendLongSegment("",0);
 		endSendingLong();
+		cont->closeLobField(cursor,col);
 		return;
 	}
 
@@ -2884,6 +2832,7 @@ void sqlrprotocol_sqlrclient::sendLobField(sqlrservercursor *cursor,
 			} else {
 				endSendingLong();
 			}
+			cont->closeLobField(cursor,col);
 			return;
 
 		} else {
