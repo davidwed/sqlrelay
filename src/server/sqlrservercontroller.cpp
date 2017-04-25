@@ -188,8 +188,8 @@ class sqlrservercontrollerprivate {
 	uint32_t	_maxerrorlength;
 
 	uint32_t	_fetchatonce;
-	int32_t		_maxcolumncount;
-	int32_t		_maxfieldlength;
+	uint32_t	_maxcolumncount;
+	uint32_t	_maxfieldlength;
 
 	int64_t		_loggedinsec;
 	int64_t		_loggedinusec;
@@ -275,8 +275,8 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_idleclienttimeout=-1;
 
 	pvt->_fetchatonce=1;
-	pvt->_maxcolumncount=-1;
-	pvt->_maxfieldlength=-1;
+	pvt->_maxcolumncount=0;
+	pvt->_maxfieldlength=0;
 
 	pvt->_connected=false;
 	pvt->_inclientsession=false;
@@ -5401,11 +5401,11 @@ void sqlrservercontroller::setFetchAtOnce(uint32_t fao) {
 	pvt->_fetchatonce=fao;
 }
 
-void sqlrservercontroller::setMaxColumnCount(int32_t mcc) {
+void sqlrservercontroller::setMaxColumnCount(uint32_t mcc) {
 	pvt->_maxcolumncount=mcc;
 }
 
-void sqlrservercontroller::setMaxFieldLength(int32_t mfl) {
+void sqlrservercontroller::setMaxFieldLength(uint32_t mfl) {
 	pvt->_maxfieldlength=mfl;
 }
 
@@ -5413,11 +5413,11 @@ uint32_t sqlrservercontroller::getFetchAtOnce() {
 	return pvt->_fetchatonce;
 }
 
-int32_t sqlrservercontroller::getMaxColumnCount() {
+uint32_t sqlrservercontroller::getMaxColumnCount() {
 	return pvt->_maxcolumncount;
 }
 
-int32_t sqlrservercontroller::getMaxFieldLength() {
+uint32_t sqlrservercontroller::getMaxFieldLength() {
 	return pvt->_maxfieldlength;
 }
 

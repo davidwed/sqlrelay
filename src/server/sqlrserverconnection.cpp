@@ -96,32 +96,41 @@ void sqlrserverconnection::handleConnectString() {
 	}
 
 	// rows to fetch-at-once
-	uint32_t	fetchatonce=charstring::toUnsignedInteger(
-				cont->getConnectStringValue("fetchatonce"));
-	if (fetchatonce<1) {
-		fetchatonce=FETCH_AT_ONCE;
+	uint32_t	fetchatonce=FETCH_AT_ONCE;
+	const char	*fao=cont->getConnectStringValue("fetchatonce");
+	if (fao) {
+		fetchatonce=charstring::toUnsignedInteger(fao);
+		if (fetchatonce<1) {
+			fetchatonce=1;
+		}
 	}
 	cont->setFetchAtOnce(fetchatonce);
 
 	// max column count
+	int32_t		maxcolumncount=MAX_COLUMN_COUNT;
 	const char	*mcc=cont->getConnectStringValue("maxcolumncount");
 	if (!mcc) {
 		mcc=cont->getConnectStringValue("maxselectlistsize");
 	}
-	int32_t	maxcolumncount=charstring::toInteger(mcc);
-	if (!maxcolumncount || maxcolumncount<-1) {
-		maxcolumncount=MAX_COLUMN_COUNT;
+	if (mcc) {
+		maxcolumncount=charstring::toInteger(mcc);
+		if (maxcolumncount<0) {
+			maxcolumncount=0;
+		}
 	}
 	cont->setMaxColumnCount(maxcolumncount);
 
 	// max field length
+	int32_t		maxfieldlength=MAX_FIELD_LENGTH;
 	const char	*mfl=cont->getConnectStringValue("maxfieldlength");
 	if (!mfl) {
 		mfl=cont->getConnectStringValue("maxitembuffersize");
 	}
-	int32_t	maxfieldlength=charstring::toInteger(mfl);
-	if (maxfieldlength<1) {
-		maxfieldlength=MAX_FIELD_LENGTH;
+	if (mfl) {
+		maxfieldlength=charstring::toInteger(mfl);
+		if (maxfieldlength<0) {
+			maxfieldlength=0;
+		}
 	}
 	cont->setMaxFieldLength(maxfieldlength);
 }

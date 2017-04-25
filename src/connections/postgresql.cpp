@@ -216,12 +216,13 @@ postgresqlconnection::~postgresqlconnection() {
 }
 
 void postgresqlconnection::handleConnectString() {
+
+	sqlrserverconnection::handleConnectString();
+
 	host=cont->getConnectStringValue("host");
 	port=cont->getConnectStringValue("port");
 	options=cont->getConnectStringValue("options");
 	db=cont->getConnectStringValue("db");
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
 	sslmode=cont->getConnectStringValue("sslmode");
 	const char	*typemang=cont->getConnectStringValue("typemangling");
 	if (!typemang ||!charstring::compareIgnoringCase(typemang,"no")) {
@@ -240,11 +241,10 @@ void postgresqlconnection::handleConnectString() {
 		liiquery.append(lastinsertidfunc);
 		lastinsertidquery=liiquery.detachString();
 	}
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
-	}
 	identity=cont->getConnectStringValue("identity");
+
+	// postgresql doesn't support multi-row fetches
+	cont->setFetchAtOnce(1);
 }
 
 bool postgresqlconnection::logIn(const char **error, const char **warning) {
@@ -914,10 +914,22 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-	checkForTempTable(query,length);
-
 	// get the col count
 	ncols=PQnfields(pgresult);
+
+	// validate column count
+	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+	if (maxcolumncount && (uint32_t)ncols>maxcolumncount) {
+		stringbuffer	err;
+		err.append(SQLR_ERROR_MAXSELECTLIST_STRING);
+		err.append(" (")->append(ncols)->append('>');
+		err.append(maxcolumncount);
+		err.append(')');
+		setError(err.getString(),SQLR_ERROR_MAXSELECTLIST,true);
+		return false;
+	}
+
+	checkForTempTable(query,length);
 
 #if !(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))

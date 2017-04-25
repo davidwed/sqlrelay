@@ -746,7 +746,7 @@ db2cursor::~db2cursor() {
 
 void db2cursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (columncount==-1) {
+	if (!columncount) {
 		this->columncount=0;
 		field=NULL;
 		loblocator=NULL;
@@ -763,7 +763,7 @@ void db2cursor::allocateResultSetBuffers(int32_t columncount) {
 		loblength=new SQLINTEGER *[columncount];
 		indicator=new SQLINTEGER *[columncount];
 		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
-		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		#if (DB2VERSION>7)
 		rowstat=new SQLUSMALLINT[fetchatonce];
 		#endif
@@ -817,7 +817,7 @@ bool db2cursor::open() {
 		}
 
 		#if (DB2VERSION>7)
-		if (conn->cont->getMaxColumnCount()!=-1) {
+		if (conn->cont->getMaxColumnCount()) {
 
 			// set the row status ptr
 			// (only do this here if we're not
@@ -1310,7 +1310,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// allocate buffers and limit column count if necessary
-	if (conn->cont->getMaxColumnCount()==-1) {
+	if (!conn->cont->getMaxColumnCount()) {
 
 		allocateResultSetBuffers(ncols);
 
@@ -1325,7 +1325,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 		}
 		#endif
 
-	} else if (ncols>conn->cont->getMaxColumnCount()) {
+	} else if ((uint32_t)ncols>conn->cont->getMaxColumnCount()) {
 		ncols=conn->cont->getMaxColumnCount();
 	}
 
@@ -1780,7 +1780,7 @@ void db2cursor::closeResultSet() {
 		outlobbindlen[i]=0;
 	}
 
-	if (conn->cont->getMaxColumnCount()==-1) {
+	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
 }

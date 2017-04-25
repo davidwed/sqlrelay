@@ -28,11 +28,6 @@
 // it until I can figure out a workaround.
 #undef HAVE_MYSQL_CHANGE_USER
 
-#define MAX_SELECT_LIST_SIZE	256
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	#define MAX_ITEM_BUFFER_SIZE	32768
-#endif
-
 class mysqlconnection;
 
 class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
@@ -41,11 +36,10 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 				mysqlcursor(sqlrserverconnection *conn,
 							uint16_t id);
 				~mysqlcursor();
-#ifdef HAVE_MYSQL_STMT_PREPARE
-		void		allocateResultSetBuffers(
-						int32_t selectlistsize,
-						int32_t itembuffersize);
+
+		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
+#ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		open();
 		bool		close();
 #endif
@@ -237,10 +231,6 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*sslcipher;
 		bool		foundrows;
 		bool		ignorespace;
-		int32_t		maxselectlistsize;
-#ifdef HAVE_MYSQL_STMT_PREPARE
-		int32_t		maxitembuffersize;
-#endif
 
 		const char	*identity;
 
@@ -267,6 +257,8 @@ const my_bool	mysqlconnection::myfalse=FALSE;
 
 mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
+//char a;
+//stdinput.read(&a);
 	connected=false;
 	dbversion=NULL;
 	dbhostname=NULL;
@@ -274,11 +266,6 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 	// start this at false because we don't need to do a commit before
 	// the first query when we very first start up
 	firstquery=false;
-
-	maxselectlistsize=MAX_SELECT_LIST_SIZE;
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-#endif
 
 	identity=NULL;
 
@@ -291,8 +278,9 @@ mysqlconnection::~mysqlconnection() {
 }
 
 void mysqlconnection::handleConnectString() {
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
+
+	sqlrserverconnection::handleConnectString();
+
 	db=cont->getConnectStringValue("db");
 	host=cont->getConnectStringValue("host");
 	port=cont->getConnectStringValue("port");
@@ -303,30 +291,14 @@ void mysqlconnection::handleConnectString() {
 	sslca=cont->getConnectStringValue("sslca");
 	sslcapath=cont->getConnectStringValue("sslcapath");
 	sslcipher=cont->getConnectStringValue("sslcipher");
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
-	}
 	foundrows=!charstring::compare(
 			cont->getConnectStringValue("foundrows"),"yes");
 	ignorespace=!charstring::compare(
 			cont->getConnectStringValue("ignorespace"),"yes");
-
-	maxselectlistsize=charstring::toInteger(
-			cont->getConnectStringValue("maxselectlistsize"));
-	if (!maxselectlistsize) {
-		maxselectlistsize=MAX_SELECT_LIST_SIZE;
-	}
-
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	maxitembuffersize=charstring::toInteger(
-			cont->getConnectStringValue("maxitembuffersize"));
-	if (!maxitembuffersize) {
-		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
-	}
-#endif
-
 	identity=cont->getConnectStringValue("identity");
+
+	// mysql doesn't support multi-row fetches
+	cont->setFetchAtOnce(1);
 }
 
 bool mysqlconnection::logIn(const char **error, const char **warning) {
@@ -693,8 +665,6 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
 
-	mysqlfields=new MYSQL_FIELD *[mysqlconn->maxselectlistsize];
-
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
 	stmtfreeresult=false;
@@ -732,10 +702,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 				"rollback|ROLLBACK"
 			")[ 	\r\n]*)");
 	unsupportedbystmt.study();
-
-	allocateResultSetBuffers(mysqlconn->maxselectlistsize,
-					mysqlconn->maxitembuffersize);
 #endif
+
+	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 }
 
 mysqlcursor::~mysqlcursor() {
@@ -748,47 +717,61 @@ mysqlcursor::~mysqlcursor() {
 	}
 	delete[] bind;
 	delete[] bindvaluesize;
-
-	deallocateResultSetBuffers();
 #endif
-
-	delete[] mysqlfields;
+	deallocateResultSetBuffers();
 }
 
+void mysqlcursor::allocateResultSetBuffers(int32_t columncount) {
+
+	if (!columncount) {
+		mysqlfields=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
-void mysqlcursor::allocateResultSetBuffers(int32_t selectlistsize,
-						int32_t itembuffersize) {
-	if (selectlistsize<1) {
 		fieldbind=NULL;
 		field=NULL;
 		isnull=NULL;
 		fieldlength=NULL;
+#endif
 	} else {
-		fieldbind=new MYSQL_BIND[selectlistsize];
-		field=new char[selectlistsize*itembuffersize];
-		isnull=new my_bool[selectlistsize];
-		fieldlength=new unsigned long[selectlistsize];
-		bytestring::zero(fieldbind,selectlistsize*sizeof(MYSQL_BIND));
-		for (unsigned short index=0; index<selectlistsize; index++) {
+		mysqlfields=new MYSQL_FIELD *[columncount];
+#ifdef HAVE_MYSQL_STMT_PREPARE
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		fieldbind=new MYSQL_BIND[columncount];
+		field=new char[columncount*maxfieldlength];
+		isnull=new my_bool[columncount];
+		fieldlength=new unsigned long[columncount];
+		bytestring::zero(fieldbind,columncount*sizeof(MYSQL_BIND));
+		for (unsigned short index=0; index<columncount; index++) {
 			fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
-			fieldbind[index].buffer=&field[index*itembuffersize];
-			fieldbind[index].buffer_length=itembuffersize;
+			fieldbind[index].buffer=&field[index*maxfieldlength];
+			fieldbind[index].buffer_length=maxfieldlength;
 			fieldbind[index].is_null=&isnull[index];
 			fieldbind[index].length=&fieldlength[index];
 		}
+#endif
 	}
 
+#ifdef HAVE_MYSQL_STMT_PREPARE
 	bytestring::zero(&lobfield,sizeof(MYSQL_BIND));
 	lobfield.buffer_type=MYSQL_TYPE_STRING;
+#endif
 }
 
 void mysqlcursor::deallocateResultSetBuffers() {
+#ifdef HAVE_MYSQL_STMT_PREPARE
 	delete[] fieldbind;
 	delete[] field;
 	delete[] isnull;
 	delete[] fieldlength;
+	fieldbind=NULL;
+	field=NULL;
+	isnull=NULL;
+	fieldlength=NULL;
+#endif
+	delete[] mysqlfields;
+	mysqlfields=NULL;
 }
 
+#ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::open() {
 	stmt=mysql_stmt_init(mysqlconn->mysqlptr);
 	return true;
@@ -845,10 +828,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	stmtfreeresult=true;
 
+	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+
 	// get the column count
 	ncols=mysql_stmt_field_count(stmt);
-	if (ncols>mysqlconn->maxselectlistsize &&
-		mysqlconn->maxselectlistsize!=-1) {
+	if (!maxcolumncount && ncols>maxcolumncount) {
 		// mysql_stmt_bind_result expects:
 		// "the array (fieldbind) to contain one element for
 		// each colun of the result set."
@@ -858,11 +842,16 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		// columns.
 		stringbuffer	err;
 		err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
-		err.append(" (")->append(mysqlconn->maxselectlistsize);
+		err.append(" (")->append(maxcolumncount);
 		err.append('<')->append(ncols)->append(')');
 		setError(err.getString(),
 			SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
 		return false;
+	}
+
+	// allocate buffers, if necessary
+	if (!maxcolumncount) {
+		allocateResultSetBuffers(ncols);
 	}
 
 	// get the metadata
@@ -1151,16 +1140,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		checkForTempTable(query,length);
 
-		// allocate buffers, if necessary
-		if (mysqlconn->maxselectlistsize==-1) {
-			allocateResultSetBuffers(ncols,
-					mysqlconn->maxitembuffersize);
-		}
-
 		// get the affected row count
-		// (call after mysql_stmt_store_result or this will return
-		// -1 when the query is a select, which we don't want if
-		// foundrows is enabled)
 		affectedrows=mysql_stmt_affected_rows(stmt);
 
 	} else {
@@ -1199,13 +1179,15 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		// get the column count
 		ncols=mysql_num_fields(mysqlresult);
 
+		// allocate buffers, if necessary
+		if (!conn->cont->getMaxColumnCount()) {
+			allocateResultSetBuffers(ncols);
+		}
+
 		// get the row count
 		nrows=mysql_num_rows(mysqlresult);
 
 		// get the affected row count
-		// (call after mysql_stmt_store_result or this will return
-		// -1 when the query is a select, which we don't want if
-		// foundrows is enabled)
 		affectedrows=mysql_affected_rows(mysqlconn->mysqlptr);
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -1571,7 +1553,8 @@ void mysqlcursor::getField(uint32_t col,
 				*blob=true;
 				return;
 			} else {
-				*fld=&field[col*mysqlconn->maxitembuffersize];
+				*fld=&field[col*
+					conn->cont->getMaxFieldLength()];
 				*fldlength=fieldlength[col];
 			}
 		} else {
@@ -1668,9 +1651,7 @@ void mysqlcursor::closeResultSet() {
 		}
 #endif
 	}
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	if (usestmtprepare && mysqlconn->maxselectlistsize==-1) {
+	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
-#endif
 }

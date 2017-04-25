@@ -27,8 +27,8 @@
 #endif
 
 #define FETCH_AT_ONCE		10
-#define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768
+#define MAX_COLUMN_COUNT	256
+#define MAX_FIELD_LENGTH	32768
 
 struct odbccolumn {
 	char		name[4096];
@@ -172,17 +172,17 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 // successfully supports array fetches
 
 /*#ifdef HAVE_UNIXODBC
-		char		field[MAX_SELECT_LIST_SIZE]
+		char		field[MAX_COLUMN_COUNT]
 					[FETCH_AT_ONCE]
-					[MAX_ITEM_BUFFER_SIZE];
-		SQLINTEGER	indicator[MAX_SELECT_LIST_SIZE]
+					[MAX_FIELD_LENGTH];
+		SQLINTEGER	indicator[MAX_COLUMN_COUNT]
 						[FETCH_AT_ONCE];
 #else*/
-		char		field[MAX_SELECT_LIST_SIZE]
-					[MAX_ITEM_BUFFER_SIZE];
-		SQLINTEGER	indicator[MAX_SELECT_LIST_SIZE];
+		char		field[MAX_COLUMN_COUNT]
+					[MAX_FIELD_LENGTH];
+		SQLINTEGER	indicator[MAX_COLUMN_COUNT];
 //#endif
-		odbccolumn 	col[MAX_SELECT_LIST_SIZE];
+		odbccolumn 	col[MAX_COLUMN_COUNT];
 
 		datebind	**outdatebind;
 
@@ -371,16 +371,10 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 
 
 void odbcconnection::handleConnectString() {
+
+	sqlrserverconnection::handleConnectString();
+
 	dsn=cont->getConnectStringValue("dsn");
-	cont->setUser(cont->getConnectStringValue("user"));
-	cont->setPassword(cont->getConnectStringValue("password"));
-	const char	*autocom=cont->getConnectStringValue("autocommit");
-	cont->setAutoCommitBehavior((autocom &&
-		!charstring::compareIgnoringCase(autocom,"yes")));
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
-	}
 
 	const char	*to=cont->getConnectStringValue("timeout");
 	if (!charstring::length(to)) {
@@ -393,6 +387,13 @@ void odbcconnection::handleConnectString() {
 	identity=cont->getConnectStringValue("identity");
 
 	odbcversion=cont->getConnectStringValue("odbcversion");
+
+	// unixodbc doesn't support array fetches
+	cont->setFetchAtOnce(1);
+
+	// this module doesn't support dynamic max-column-count/max-field-length
+	cont->setMaxColumnCount(MAX_COLUMN_COUNT);
+	cont->setMaxFieldLength(MAX_FIELD_LENGTH);
 }
 
 bool odbcconnection::logIn(const char **error, const char **warning) {
@@ -1230,8 +1231,8 @@ bool odbccursor::handleColumns() {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
-	if (ncols>MAX_SELECT_LIST_SIZE) {
-		ncols=MAX_SELECT_LIST_SIZE;
+	if (ncols>MAX_COLUMN_COUNT) {
+		ncols=MAX_COLUMN_COUNT;
 	}
 
 	// run through the columns
@@ -1448,7 +1449,7 @@ bool odbccursor::handleColumns() {
 			// bind varchar and char fields as wchar
 			// bind the column to a buffer
 			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-					field[i],MAX_ITEM_BUFFER_SIZE,
+					field[i],MAX_FIELD_LENGTH,
 					#ifdef SQLBINDCOL_SQLLEN
 					(SQLLEN *)&indicator[i]
 					#else
@@ -1460,7 +1461,7 @@ bool odbccursor::handleColumns() {
 			// bind the column to a buffer
 			if (col[i].type==93 || col[i].type==91) {
 				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-						field[i],MAX_ITEM_BUFFER_SIZE,
+						field[i],MAX_FIELD_LENGTH,
 						#ifdef SQLBINDCOL_SQLLEN
 						(SQLLEN *)&indicator[i]
 						#else
@@ -1469,7 +1470,7 @@ bool odbccursor::handleColumns() {
 						);
 			} else {
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-						field[i],MAX_ITEM_BUFFER_SIZE,
+						field[i],MAX_FIELD_LENGTH,
 						#ifdef SQLBINDCOL_SQLLEN
 						(SQLLEN *)&indicator[i]
 						#else
@@ -1482,7 +1483,7 @@ bool odbccursor::handleColumns() {
 		}
 #else
 		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-				field[i],MAX_ITEM_BUFFER_SIZE,
+				field[i],MAX_FIELD_LENGTH,
 				#ifdef SQLBINDCOL_SQLLEN
 				(SQLLEN *)&indicator[i]
 				#else

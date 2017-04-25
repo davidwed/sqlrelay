@@ -163,11 +163,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// fetch info
 		void		setFetchAtOnce(uint32_t fao);
-		void		setMaxColumnCount(int32_t mcc);
-		void		setMaxFieldLength(int32_t mfl);
+		void		setMaxColumnCount(uint32_t mcc);
+		void		setMaxFieldLength(uint32_t mfl);
 		uint32_t	getFetchAtOnce();
-		int32_t		getMaxColumnCount();
-		int32_t		getMaxFieldLength();
+		uint32_t	getMaxColumnCount();
+		uint32_t	getMaxFieldLength();
 
 		// db selection
 		bool	selectDatabase(const char *db);

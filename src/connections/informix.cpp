@@ -782,7 +782,7 @@ informixcursor::~informixcursor() {
 
 void informixcursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (columncount==-1) {
+	if (!columncount) {
 		this->columncount=0;
 		field=NULL;
 		loblength=NULL;
@@ -1289,7 +1289,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 
 	// allocate buffers and limit column count if necessary
 	int32_t	maxcolumncount=conn->cont->getMaxColumnCount();
-	if (maxcolumncount==-1) {
+	if (!maxcolumncount) {
 		allocateResultSetBuffers(ncols);
 	} else if (ncols>maxcolumncount) {
 		ncols=maxcolumncount;
@@ -1762,7 +1762,7 @@ void informixcursor::closeResultSet() {
 		outlobbindlen[i]=0;
 	}
 
-	if (conn->cont->getMaxColumnCount()==-1) {
+	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
 }

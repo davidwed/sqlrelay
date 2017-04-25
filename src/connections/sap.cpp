@@ -728,7 +728,7 @@ sapcursor::~sapcursor() {
 
 void sapcursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (columncount==-1) {
+	if (!columncount) {
 		this->columncount=0;
 		column=NULL;
 		data=NULL;
@@ -741,7 +741,7 @@ void sapcursor::allocateResultSetBuffers(int32_t columncount) {
 		datalength=new CS_INT *[columncount];
 		nullindicator=new CS_SMALLINT *[columncount];
 		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
-		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int32_t i=0; i<columncount; i++) {
 			data[i]=new char[fetchatonce*maxfieldlength];
 			datalength[i]=
@@ -1363,10 +1363,10 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// allocate buffers and limit column count if necessary
-		int32_t	maxcolumncount=conn->cont->getMaxColumnCount();
-		if (maxcolumncount==-1) {
+		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+		if (!maxcolumncount) {
 			allocateResultSetBuffers(ncols);
-		} else if (ncols>maxcolumncount) {
+		} else if ((uint32_t)ncols>maxcolumncount) {
 			ncols=maxcolumncount;
 		}
 
@@ -1548,8 +1548,8 @@ uint16_t sapcursor::getColumnType(uint32_t col) {
 
 uint32_t sapcursor::getColumnLength(uint32_t col) {
 	// limit the column size
-	int32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-	if (column[col].maxlength>maxfieldlength) {
+	uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+	if ((uint32_t)column[col].maxlength>maxfieldlength) {
 		column[col].maxlength=maxfieldlength;
 	}
 	return column[col].maxlength;
@@ -1669,7 +1669,7 @@ void sapcursor::discardResults() {
 		}
 	}
 
-	if (conn->cont->getMaxColumnCount()==-1) {
+	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
 }

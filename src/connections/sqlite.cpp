@@ -180,6 +180,10 @@ sqliteconnection::~sqliteconnection() {
 void sqliteconnection::handleConnectString() {
 	db=cont->getConnectStringValue("db");
 	identity=cont->getConnectStringValue("identity");
+
+	cont->setFetchAtOnce(1);
+	cont->setMaxColumnCount(0);
+	cont->setMaxFieldLength(0);
 }
 
 bool sqliteconnection::logIn(const char **error, const char **warning) {

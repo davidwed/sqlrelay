@@ -2077,7 +2077,7 @@ oraclecursor::~oraclecursor() {
 
 void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 
-	if (columncount==-1) {
+	if (!columncount) {
 		resultsetbuffercount=0;
 		desc=NULL;
 		def=NULL;
@@ -2096,7 +2096,7 @@ void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 		def_col_retlen=new ub2 *[resultsetbuffercount];
 		def_col_retcode=new ub2 *[resultsetbuffercount];
 		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
-		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int32_t i=0; i<resultsetbuffercount; i++) {
 			def_lob[i]=new OCILobLocator *[fetchatonce];
 			for (uint32_t j=0; j<fetchatonce; j++) {
@@ -3135,20 +3135,19 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 		}
 
 		// validate column count
-		if (conn->cont->getMaxColumnCount()!=-1 &&
-			ncols>conn->cont->getMaxColumnCount()) {
+		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+		if (maxcolumncount && (uint32_t)ncols>maxcolumncount) {
 			stringbuffer	err;
 			err.append(SQLR_ERROR_MAXSELECTLIST_STRING);
 			err.append(" (")->append(ncols)->append('>');
-			err.append(conn->cont->getMaxColumnCount());
+			err.append(maxcolumncount);
 			err.append(')');
-			setError(err.getString(),
-					SQLR_ERROR_MAXSELECTLIST,true);
+			setError(err.getString(),SQLR_ERROR_MAXSELECTLIST,true);
 			return false;
 		}
 
 		// allocate buffers, if necessary
-		if (conn->cont->getMaxColumnCount()==-1) {
+		if (!maxcolumncount) {
 			allocateResultSetBuffers(ncols);
 		}
 
@@ -3652,7 +3651,7 @@ void oraclecursor::closeResultSet() {
 	// free row/column resources
 	if (!resultfreed) {
 
-		int32_t	columncount=(conn->cont->getMaxColumnCount()==-1)?
+		int32_t	columncount=(!conn->cont->getMaxColumnCount())?
 					ncols:conn->cont->getMaxColumnCount();
 
 		for (int32_t i=0; i<columncount; i++) {
@@ -3696,7 +3695,7 @@ void oraclecursor::closeResultSet() {
 
 		// deallocate buffers, if necessary
 		if (stmttype==OCI_STMT_SELECT &&
-			conn->cont->getMaxColumnCount()==-1) {
+				!conn->cont->getMaxColumnCount()) {
 			deallocateResultSetBuffers();
 		}
 

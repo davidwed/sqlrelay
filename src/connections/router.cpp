@@ -16,8 +16,6 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-#define FETCH_AT_ONCE	10
-
 struct outputbindvar {
 	const char	*variable;
 	union {
@@ -358,6 +356,10 @@ void routerconnection::handleConnectString() {
 		index++;
 		csln=csln->getNext();
 	}
+
+	cont->setFetchAtOnce(10);
+	cont->setMaxColumnCount(0);
+	cont->setMaxFieldLength(0);
 }
 
 bool routerconnection::logIn(const char **error, const char **warning) {
@@ -812,7 +814,8 @@ routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
 			continue;
 		}
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
-		curs[index]->setResultSetBufferSize(FETCH_AT_ONCE);
+		curs[index]->setResultSetBufferSize(
+					conn->cont->getFetchAtOnce());
 	}
 
 	obv=new outputbindvar[conn->cont->getConfig()->getMaxBindCount()];
@@ -1205,7 +1208,8 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 		if (!rcur->currentcur) {
 			return false;
 		}
-		rcur->currentcur->setResultSetBufferSize(FETCH_AT_ONCE);
+		rcur->currentcur->setResultSetBufferSize(
+					conn->cont->getFetchAtOnce());
 		rcur->isbindcur=true;
 		rcur->nextrow=0;
 		if (!rcur->currentcur->fetchFromBindCursor()) {
