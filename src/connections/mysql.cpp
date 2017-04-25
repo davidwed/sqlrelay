@@ -832,7 +832,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// get the column count
 	ncols=mysql_stmt_field_count(stmt);
-	if (!maxcolumncount && ncols>maxcolumncount) {
+	if (maxcolumncount && ncols>maxcolumncount) {
 		// mysql_stmt_bind_result expects:
 		// "the array (fieldbind) to contain one element for
 		// each colun of the result set."

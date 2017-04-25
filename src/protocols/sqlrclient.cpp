@@ -2781,9 +2781,7 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 
 	// reformat row
 	// FIXME: push this up
-	cont->reformatRow(cursor,
-			colcount,fieldnames,
-			&fields,&fieldlengths);
+	cont->reformatRow(cursor,colcount,fieldnames,&fields,&fieldlengths);
 
 	// send fields
 	for (uint32_t i=0; i<colcount; i++) {

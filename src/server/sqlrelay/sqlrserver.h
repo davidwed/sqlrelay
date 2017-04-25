@@ -556,7 +556,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// cursor state
 		void			setState(sqlrservercursor *cursor,
-							sqlrcursorstate_t state);
+						sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState(sqlrservercursor *cursor);
 
 		// query parser
@@ -915,7 +915,6 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 					const char *data, uint32_t datasize);
 
 
-		// 
 		uint16_t	getId();
 
 		bool		fakeInputBinds();
@@ -971,6 +970,9 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		void		clearTotalRowsFetched();
 		uint64_t	getTotalRowsFetched();
 		void		incrementTotalRowsFetched();
+
+		void		setCurrentRowReformatted(bool crr);
+		bool		getCurrentRowReformatted();
 
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);

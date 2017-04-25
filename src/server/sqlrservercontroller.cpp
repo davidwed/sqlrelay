@@ -6036,6 +6036,7 @@ bool sqlrservercontroller::skipRow(sqlrservercursor *cursor) {
 }
 
 bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
+	cursor->setCurrentRowReformatted(false);
 	if (cursor->fetchRow()) {
 		cursor->incrementTotalRowsFetched();
 		return true;
@@ -6053,6 +6054,11 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 						uint64_t *fieldlength,
 						bool *blob,
 						bool *null) {
+	if (cursor->getCurrentRowReformatted()) {
+		// FIXME: reformat row
+		cursor->setCurrentRowReformatted(true);
+	}
+	// FIXME: reformat field
 	cursor->getField(mapColumn(col),field,fieldlength,blob,null);
 }
 

@@ -32,6 +32,8 @@ class sqlrservercursorprivate {
 
 		uint64_t	_totalrowsfetched;
 
+		bool		_currentrowreformatted;
+
 		uint64_t	_commandstartsec;
 		uint64_t	_commandstartusec;
 		uint64_t	_commandendsec;
@@ -73,6 +75,10 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	setOutputBindCount(0);
 	pvt->_outbindvars=new sqlrserverbindvar[
 				conn->cont->getConfig()->getMaxBindCount()];
+
+	pvt->_totalrowsfetched=0;
+
+	pvt->_currentrowreformatted=false;
 	
 	setState(SQLRCURSORSTATE_AVAILABLE);
 
@@ -939,6 +945,14 @@ uint64_t sqlrservercursor::getTotalRowsFetched() {
 
 void sqlrservercursor::incrementTotalRowsFetched() {
 	pvt->_totalrowsfetched++;
+}
+
+void sqlrservercursor::setCurrentRowReformatted(bool crr) {
+	pvt->_currentrowreformatted=crr;
+}
+
+bool sqlrservercursor::getCurrentRowReformatted() {
+	return pvt->_currentrowreformatted;
 }
 
 void sqlrservercursor::clearError() {
