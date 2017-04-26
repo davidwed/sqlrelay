@@ -6079,12 +6079,6 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	reformatRow(cursor,colcount,pvt->_fieldnames,
 				&(pvt->_fields),&(pvt->_fieldlengths));
 
-	// reformat each field
-	for (uint32_t i=0; i<colcount; i++) {
-		reformatField(cursor,pvt->_fieldnames[i],i,
-				&(pvt->_fields[i]),&(pvt->_fieldlengths[i]));
-	}
-
 	// bump total rows fetched
 	cursor->incrementTotalRowsFetched();
 	return true;
@@ -6107,6 +6101,9 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 	*fieldlength=pvt->_fieldlengths[col];
 	*blob=pvt->_blobs[col];
 	*null=pvt->_nulls[col];
+
+	// reformat the field
+	reformatField(cursor,pvt->_fieldnames[col],col,field,fieldlength);
 }
 
 bool sqlrservercontroller::getLobFieldLength(sqlrservercursor *cursor,
