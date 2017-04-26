@@ -190,12 +190,18 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 							"but no parser "
 							"available...\n\n");
 				}
-				return false;
+				return true;
 			}
 
 			if (!tree) {
 				if (!sqlrp->parse(query)) {
-					return false;
+					if (pvt->_debug) {
+						stdoutput.printf("\nfilter "
+							"requires query tree "
+							"but query failed to "
+							"parse ...\n\n");
+					}
+					return true;
 				}
 				tree=sqlrp->getTree();
 				if (pvt->_debug) {
