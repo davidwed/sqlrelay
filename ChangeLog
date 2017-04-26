@@ -25,6 +25,7 @@
 	refactored fetchRow/getField and pushed reformatRow/Field up into
 		sqlrservercontroller
 	fixed systemd/sysvinit detection on ubuntu
+	added clientinfolist router module
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
