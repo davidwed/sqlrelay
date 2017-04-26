@@ -1559,16 +1559,6 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/master.socket;user=masteruser;password=masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/slave.socket;user=slaveuser;password=slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
-			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;events&gt;</font></b>
-					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/events&gt;</font></b>
-				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
-					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
-			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
-		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
         <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
 <b><font color="#0000FF">&lt;/instances&gt;</font></b>
@@ -3127,6 +3117,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>regex</b></li>
   <li><b>userlist</b></li>
   <li><b>clientiplist</b></li>
+  <li><b>clientinfolist</b></li>
 </ul>
 
 <p>Custom modules may also be developed.  For more information, please contact David Muse at <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
@@ -3204,16 +3195,6 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/master.socket;user=masteruser;password=masterpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/slave.socket;user=slaveuser;password=slavepassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
-			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;events&gt;</font></b>
-					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/events&gt;</font></b>
-				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
-					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
-			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
-		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
         <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
 <b><font color="#0000FF">&lt;/instances&gt;</font></b>
@@ -3382,16 +3363,6 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/oracle.socket;user=oracleuser;password=oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/sap.socket;user=sapuser;password=sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
-			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;events&gt;</font></b>
-					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/events&gt;</font></b>
-				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
-					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
-			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
-		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
         <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
 <b><font color="#0000FF">&lt;/instances&gt;</font></b>
@@ -3418,9 +3389,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
 </ul>
 
-<p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="#notifications">Notifications</a> for information about notification modules.</p>
-
-<h4>clientiplist</h4>
+<br/><h4>clientiplist</h4>
 
 <p>The <b>clientiplist</b> module routes queries by matching the client that ran the query against a list of IP addresses.</p>
 
@@ -3474,16 +3443,6 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/oracle.socket;user=oracleuser;password=oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/sap.socket;user=sapuser;password=sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-		<b><font color="#0000FF">&lt;notifications&gt;</font></b>
-			<b><font color="#0000FF">&lt;notification</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"events"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;events&gt;</font></b>
-					<b><font color="#0000FF">&lt;event</font></b> <font color="#009900">event</font><font color="#990000">=</font><font color="#FF0000">"integrity_violation"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/events&gt;</font></b>
-				<b><font color="#0000FF">&lt;recipients&gt;</font></b>
-					<b><font color="#0000FF">&lt;recipient</font></b> <font color="#009900">address</font><font color="#990000">=</font><font color="#FF0000">"dba@firstworks.com"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;/recipients&gt;</font></b>
-			<b><font color="#0000FF">&lt;/notification&gt;</font></b>
-		<b><font color="#0000FF">&lt;/notifications&gt;</font></b>
         <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
 <b><font color="#0000FF">&lt;/instances&gt;</font></b>
@@ -3512,7 +3471,86 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
 </ul>
 
-<p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="#notifications">Notifications</a> for information about notification modules.</p>
+<br/><h4>clientinfolist</h4>
+
+<p>The <b>clientinfolist</b> module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  The client info cannot currently be set when using a connector for a database abstraction later such as PHP PDO or ODBC.</p>
+
+<p>An example configuration follows.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to an Oracle database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/oracle.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oracleuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance maintains connections to an SAP database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/sap.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"sap"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+                <b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb;"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+        <i><font color="#9A1900">&lt;!-- This instance sends one set of users to the Oracle database and</font></i>
+<i><font color="#9A1900">                all other users to the sap database. --&gt;</font></i>
+        <b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;users&gt;</font></b>
+                        <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientinfolist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">".*oracle.*"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">".*orcl.*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientinfolist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">"*"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/oracle.socket;user=oracleuser;password=oraclepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"sap"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/sap.socket;user=sapuser;password=sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example, 3 SQL Relay instances are defined:</p>
+
+<ul>
+  <li>one to maintain connections to an Oracle database</li>
+  <li>one to maintain connections to a SAP database</li>
+  <li>one to route queries to the other two instances</li>
+</ul>
+
+<p>In this configuration, queries made by users who send client info which contains the string "oracle" or "orcl" to the connectionid "oracle", and queries made by users sending any other client info the connectionid "sap".</p>
+
+<p>The <b>string</b> parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:</p>
+
+<ul>
+  <li><b>host</b> - the host name or IP address of the SQL Relay instance</li>
+  <li><b>port</b> - the port of the SQL Relay instance</li>
+  <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
+  <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
+  <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+</ul>
 
 <h3>Quirks and Limitations</h3>
 
@@ -3560,13 +3598,28 @@ pushed out to the slaves until the changes have been committed.  Since your
 selects are being run against the slaves, you must first commit before your
 changes will be visible.</p>
 
-<h4>Integrity Violations</h4>
+<h4>Stored Procedures</h4>
 
-<p>Behind the scenes, the router maintains parallel transactions on each of the
-databases that it is routing queries to.  When the client issues a begin, commit
-or rollback, the router issues a begin, commit or rollback to each of the
-databases.  Similarly, if the client turns auto-commit on or off, the router
-turns auto-commit on or off on each of the databases.</p>
+<p>It's possible to use stored procedures with SQL Relay's query routing
+feature.  However, since stored procedures are run on the database, SQL Relay
+can't route the individual queries run inside the stored procedure.  So, the
+stored procedure and all queries run inside of it will be run against whichever
+database it was routed to.</p>
+
+<h4>Parallel Transactions</h4>
+
+<p>Router modules like <b>userlist</b>, <b>clientiplist</b>, and <b>clientinfolist</b>
+route entire sessions to one database or another.  Router modules like
+<b>regex</b> route individual queries.  Behind the scenes, modules which route
+individual queries maintain parallel transactions on each of the databases that
+it is routing queries to, which present the following issues.</p>
+
+<p><b>Integrity Violations</b></p>
+
+<p>When the client issues a begin, commit or rollback, the router issues a begin,
+commit or rollback to each of the databases.  Similarly, if the client turns
+auto-commit on or off, the router turns auto-commit on or off on each of the
+databases.</p>
 
 <p>There are scenarios where a commit, rollback or auto-commit on/off command
 could succeed on some of the databases and fail on others.  Some databases
@@ -3581,34 +3634,27 @@ email about the problem.  Unfortunately, there is no standard way to solve
 the problem.  The DBA must determine the cause, resolve it manually, and restart
 SQL Relay.</p>
 
-<h4>Commits and Rollbacks</h4>
+<p><b>Commits and Rollbacks</b></p>
 
 <p>Since queries may be routed to different kinds of databases, the router has
-to employ some tricks to maintain parallel transactions.  Some databases run
-in auto-commit mode by default and must be issued a "begin" query to start a
-transaction.  Other databases implicitly start a new transaction when a client
-logs in and after each commit or rollback.  If any of the databases being
-routed to require a "begin" query to start a transaction, then the ones that
-don't are put in auto-commit mode when the client logs in and after each commit
-or rollback and are taken out of auto-commit mode when the client sends a begin
-query.  If none of the databases being routed to require a "begin" query to
-start a transaction, then the databases are not put in auto-commit mode when
-the client logs in or after each commit or rollback.  Rather, transactions are
-implicitly started by the database.  For example, if your client application
-is using a router which routes queries over both PostgreSQL and Oracle databases,
-then since PostgreSQL requires "begin" queries, you must use a "begin" query to
-start a transaction, even if your app only intends to send queries which would
-be run against Oracle.  Conversely, if your client application is using a router
-which only routes queries over a set of Oracle databases, then you do not have
-to use "begin" queries.</p>
-
-<h4>Stored Procedures</h4>
-
-<p>It's possible to use stored procedures with SQL Relay's query routing
-feature.  However, since stored procedures are run on the database, SQL Relay
-can't route the individual queries run inside the stored procedure.  So, the
-stored procedure and all queries run inside of it will be run against whichever
-database it was routed to.</p>
+to employ some tricks to maintain parallel transactions on dissimilar
+databases.  Some databases run in auto-commit mode by default and must be
+issued a "begin" query to start a transaction.  Other databases implicitly
+start a new transaction when a client logs in and after each commit or rollback.
+If any of the databases being routed to require a "begin" query to start a
+transaction, then the ones that don't are put in auto-commit mode when the
+client logs in and after each commit or rollback and are taken out of
+auto-commit mode when the client sends a begin query.  If none of the databases
+being routed to require a "begin" query to start a transaction, then the
+databases are not put in auto-commit mode when the client logs in or after each
+commit or rollback.  Rather, transactions are implicitly started by the
+database.  For example, if your client application is using a router which
+routes queries over both PostgreSQL and Oracle databases, then since
+PostgreSQL requires "begin" queries, you must use a "begin" query to start a
+transaction, even if your app only intends to send queries which would be run
+against Oracle.  Conversely, if your client application is using a router which
+only routes queries over a set of Oracle databases, then you do not have to use
+"begin" queries.</p>
 
 <hr/>
 

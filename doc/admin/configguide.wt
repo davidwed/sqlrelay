@@ -2057,6 +2057,7 @@ Currently, the following router modules are available:
 * '''regex'''
 * '''userlist'''
 * '''clientiplist'''
+* '''clientinfolist'''
 
 Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
@@ -2136,8 +2137,6 @@ The '''string''' parameter in each connection tag provides the parameters necess
 * '''user''' - the user to use when connecting to the SQL Relay instance as
 * '''password''' - the password to use when connecting to the SQL Relay instance
 
-Note the use of a notification module to notify //dba@firstworks.com// if an //integrity_violation// event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See [#notifications Notifications] for information about notification modules.
-
 
 ==== clientiplist ====
 
@@ -2169,7 +2168,34 @@ The '''string''' parameter in each connection tag provides the parameters necess
 * '''user''' - the user to use when connecting to the SQL Relay instance as
 * '''password''' - the password to use when connecting to the SQL Relay instance
 
-Note the use of a notification module to notify //dba@firstworks.com// if an //integrity_violation// event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See [#notifications Notifications] for information about notification modules.
+
+==== clientinfolist ====
+
+The '''clientinfolist''' module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  The client info cannot currently be set when using a connector for a database abstraction later such as PHP PDO or ODBC.
+
+An example configuration follows.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-routers-clientinfolist.conf@
+}}}
+}}}
+
+In this example, 3 SQL Relay instances are defined:
+
+* one to maintain connections to an Oracle database
+* one to maintain connections to a SAP database
+* one to route queries to the other two instances
+
+In this configuration, queries made by users who send client info which contains the string "oracle" or "orcl" to the connectionid "oracle", and queries made by users sending any other client info the connectionid "sap".
+
+The '''string''' parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
+
+* '''host''' - the host name or IP address of the SQL Relay instance
+* '''port''' - the port of the SQL Relay instance
+* '''socket''' - the socket of the SQL Relay instance, if it is running locally
+* '''user''' - the user to use when connecting to the SQL Relay instance as
+* '''password''' - the password to use when connecting to the SQL Relay instance
 
 === Quirks and Limitations ===
 
@@ -2217,13 +2243,28 @@ pushed out to the slaves until the changes have been committed.  Since your
 selects are being run against the slaves, you must first commit before your
 changes will be visible.
 
-==== Integrity Violations ====
+==== Stored Procedures ====
 
-Behind the scenes, the router maintains parallel transactions on each of the
-databases that it is routing queries to.  When the client issues a begin, commit
-or rollback, the router issues a begin, commit or rollback to each of the
-databases.  Similarly, if the client turns auto-commit on or off, the router
-turns auto-commit on or off on each of the databases.
+It's possible to use stored procedures with SQL Relay's query routing
+feature.  However, since stored procedures are run on the database, SQL Relay
+can't route the individual queries run inside the stored procedure.  So, the
+stored procedure and all queries run inside of it will be run against whichever
+database it was routed to.
+
+==== Parallel Transactions ====
+
+Router modules like '''userlist''', '''clientiplist''', and '''clientinfolist'''
+route entire sessions to one database or another.  Router modules like
+'''regex''' route individual queries.  Behind the scenes, modules which route
+individual queries maintain parallel transactions on each of the databases that
+it is routing queries to, which present the following issues.
+
+'''Integrity Violations'''
+
+When the client issues a begin, commit or rollback, the router issues a begin,
+commit or rollback to each of the databases.  Similarly, if the client turns
+auto-commit on or off, the router turns auto-commit on or off on each of the
+databases.
 
 There are scenarios where a commit, rollback or auto-commit on/off command
 could succeed on some of the databases and fail on others.  Some databases
@@ -2238,34 +2279,27 @@ email about the problem.  Unfortunately, there is no standard way to solve
 the problem.  The DBA must determine the cause, resolve it manually, and restart
 SQL Relay.
 
-==== Commits and Rollbacks ====
+'''Commits and Rollbacks'''
 
 Since queries may be routed to different kinds of databases, the router has
-to employ some tricks to maintain parallel transactions.  Some databases run
-in auto-commit mode by default and must be issued a "begin" query to start a
-transaction.  Other databases implicitly start a new transaction when a client
-logs in and after each commit or rollback.  If any of the databases being
-routed to require a "begin" query to start a transaction, then the ones that
-don't are put in auto-commit mode when the client logs in and after each commit
-or rollback and are taken out of auto-commit mode when the client sends a begin
-query.  If none of the databases being routed to require a "begin" query to
-start a transaction, then the databases are not put in auto-commit mode when
-the client logs in or after each commit or rollback.  Rather, transactions are
-implicitly started by the database.  For example, if your client application
-is using a router which routes queries over both !PostgreSQL and Oracle databases,
-then since !PostgreSQL requires "begin" queries, you must use a "begin" query to
-start a transaction, even if your app only intends to send queries which would
-be run against Oracle.  Conversely, if your client application is using a router
-which only routes queries over a set of Oracle databases, then you do not have
-to use "begin" queries.
-
-==== Stored Procedures ====
-
-It's possible to use stored procedures with SQL Relay's query routing
-feature.  However, since stored procedures are run on the database, SQL Relay
-can't route the individual queries run inside the stored procedure.  So, the
-stored procedure and all queries run inside of it will be run against whichever
-database it was routed to.
+to employ some tricks to maintain parallel transactions on dissimilar
+databases.  Some databases run in auto-commit mode by default and must be
+issued a "begin" query to start a transaction.  Other databases implicitly
+start a new transaction when a client logs in and after each commit or rollback.
+If any of the databases being routed to require a "begin" query to start a
+transaction, then the ones that don't are put in auto-commit mode when the
+client logs in and after each commit or rollback and are taken out of
+auto-commit mode when the client sends a begin query.  If none of the databases
+being routed to require a "begin" query to start a transaction, then the
+databases are not put in auto-commit mode when the client logs in or after each
+commit or rollback.  Rather, transactions are implicitly started by the
+database.  For example, if your client application is using a router which
+routes queries over both !PostgreSQL and Oracle databases, then since
+!PostgreSQL requires "begin" queries, you must use a "begin" query to start a
+transaction, even if your app only intends to send queries which would be run
+against Oracle.  Conversely, if your client application is using a router which
+only routes queries over a set of Oracle databases, then you do not have to use
+"begin" queries.
 
 ----
 
