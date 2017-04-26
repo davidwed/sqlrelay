@@ -1850,7 +1850,12 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <ul>
   <li>The <b>tls</b> parameter enables (or disables) TLS/SSL encryption.</li>
-  <li>The <b>tlscert</b> parameter specifies a TLS/SSL certificate to use.  A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.</li>
+  <li>The <b>tlscert</b> parameter specifies a TLS/SSL certificate chain file to use.</li>
+  <ul>
+    <li>This file should contain the server's certificate, private key, and signing certificates, as appropriate.</li>
+    <li>A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.</li>
+  </ul>
+
   <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
 </ul>
 
@@ -1953,7 +1958,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.</p>
 
-<p>To access the instance, the client must provide, at minimum, a certificate, as follows:</p>
+<p>To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:</p>
 
 <blockquote>
   <pre>sqlrsh -host sqlrserver -tls -tlsvalidate no -tlscert /usr/local/firstworks/etc/sqlrclient.pem
@@ -1964,7 +1969,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.</p>
 
-<p>In a more likely use case, cross-validation occurs - the client validates the server and the server validates the client, as follows:</p>
+<p>In a more likely use case though, mutual authentication occurs - the client validates the server's certificate and the server validates the client's certificate, as follows:</p>
 
 <blockquote>
   <pre>sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/sqlrclient.pem -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem

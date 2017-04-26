@@ -1239,7 +1239,9 @@ The following configuration enables TLS/SSL security for an instance of SQL rela
 }}}
 
 * The '''tls''' parameter enables (or disables) TLS/SSL encryption.
-* The '''tlscert''' parameter specifies a TLS/SSL certificate to use.  A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.
+* The '''tlscert''' parameter specifies a TLS/SSL certificate chain file to use.
+ * This file should contain the server's certificate, private key, and signing certificates, as appropriate.
+ * A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.
 * User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
 
 To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:
@@ -1332,7 +1334,7 @@ The following configuration enables these checks for an instance of SQL relay:
 
 Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.
 
-To access the instance, the client must provide, at minimum, a certificate, as follows:
+To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:
 
 {{{#!blockquote
 {{{
@@ -1344,7 +1346,7 @@ sqlrsh -host sqlrserver -tls -tlsvalidate no -tlscert /usr/local/firstworks/etc/
 
 Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.
 
-In a more likely use case, cross-validation occurs - the client validates the server and the server validates the client, as follows:
+In a more likely use case though, mutual authentication occurs - the client validates the server's certificate and the server validates the client's certificate, as follows:
 
 {{{#!blockquote
 {{{
