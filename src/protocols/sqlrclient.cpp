@@ -294,9 +294,26 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 				parameters->getAttributeValue("tlsversion"));
 
 			// get the certificate chain file to use
-			// FIXME: not-found warning
-			tctx.setCertificateChainFile(
-				parameters->getAttributeValue("tlscert"));
+			const char	*tlscert=
+				parameters->getAttributeValue("tlscert");
+			if (file::readable(tlscert)) {
+				tctx.setCertificateChainFile(tlscert);
+			} else if (!charstring::isNullOrEmpty(tlscert)) {
+				stderror.printf("Warning: TLS certificate "
+						"file %s is not readable.\n",
+						tlscert);
+			}
+
+			// get the private key file to use
+			const char	*tlskey=
+				parameters->getAttributeValue("tlskey");
+			if (file::readable(tlskey)) {
+				tctx.setPrivateKeyFile(tlskey);
+			} else if (!charstring::isNullOrEmpty(tlskey)) {
+				stderror.printf("Warning: TLS private key "
+						"file %s is not readable.\n",
+						tlskey);
+			}
 
 			// get the private key password to use
 			tctx.setPrivateKeyPassword(

@@ -1110,6 +1110,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	xmldomnode	*tls=instance->getAttribute("tls");
 	xmldomnode	*tlsversion=instance->getAttribute("tlsversion");
 	xmldomnode	*tlscert=instance->getAttribute("tlscert");
+	xmldomnode	*tlskey=instance->getAttribute("tlskey");
 	xmldomnode	*tlspassword=instance->getAttribute("tlspassword");
 	xmldomnode	*tlsvalidate=instance->getAttribute("tlsvalidate");
 	xmldomnode	*tlsca=instance->getAttribute("tlsca");
@@ -1126,6 +1127,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!tls->isNullNode() ||
 			!tlsversion->isNullNode() ||
 			!tlscert->isNullNode() ||
+			!tlskey->isNullNode() ||
 			!tlspassword->isNullNode() ||
 			!tlsvalidate->isNullNode() ||
 			!tlsca->isNullNode() ||
@@ -1189,6 +1191,11 @@ void sqlrconfig_xmldom::normalizeTree() {
 			listener->setAttributeValue("tlscert",
 							tlscert->getValue());
 			instance->deleteAttribute(tlscert);
+		}
+		if (!tlskey->isNullNode()) {
+			listener->setAttributeValue("tlskey",
+							tlskey->getValue());
+			instance->deleteAttribute(tlskey);
 		}
 		if (!tlspassword->isNullNode()) {
 			listener->setAttributeValue("tlspassword",
