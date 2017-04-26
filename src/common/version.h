@@ -91,6 +91,12 @@ static void help(int argc, const char **argv) {
 "	-tlsversion version	Use the specified TLS/SSL version.\n" \
 "\n" \
 "	-tlscert file		Use the specified certificate chain file.\n" \
+"				This file should contain the client's\n" \
+"				certificate, private key, and signing\n" \
+"				certificates, as appropriate.\n" \
+"				On Windows systems, this must be a .pfx file.\n" \
+"				On non-Windows systems, a variety of file\n" \
+"				formats are supported.\n" \
 "\n" \
 "	-tlspassword pwd	Use the specified password to acess the private\n" \
 "				key in the file specified by -tlscert.\n" \

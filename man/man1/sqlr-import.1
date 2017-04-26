@@ -62,6 +62,12 @@ Use the specified TLS/SSL version.
 .TP
 \fB\-tlscert\fR file
 Use the specified certificate chain file.
+This file should contain the client's
+certificate, private key, and signing
+certificates, as appropriate.
+On Windows systems, this must be a .pfx file.
+On non\-Windows systems, a variety of file
+formats are supported.
 .TP
 \fB\-tlspassword\fR pwd
 Use the specified password to acess the private
