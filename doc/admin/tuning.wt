@@ -244,13 +244,13 @@ db=testdb
 
 As far as I can tell, SAP/Sybase only supports client connections over inet
 sockets.  If anyone knows differently, send mail to
-[mailto:david.muse@firstworks.com david.muse@firstworks.com].
+[mailto:dev@firstworks.com dev@firstworks.com].
 
 === Firebird ===
 
 As far as I can tell, Firebird only supports client connections
 over inet sockets.  If anyone knows differently, send mail to
-[mailto:david.muse@firstworks.com david.muse@firstworks.com].
+[mailto:dev@firstworks.com dev@firstworks.com].
 
 [=#unixsocket"]
 == Connect To SQL Relay Using a Unix Socket ==

@@ -17,6 +17,12 @@ extern "C" {
 
 #include "sqlrbench.h"
 
+#ifndef TRUE
+#define TRUE (1)
+#endif
+
+//#undef HAVE_MYSQL_STMT_PREPARE
+
 class mysqlbench : public sqlrbench {
 	public:
 		mysqlbench(const char *connectstring,
@@ -56,7 +62,11 @@ class mysqlbenchconnection : public sqlrbenchconnection {
 		MYSQL		mysql;
 
 		bool		firstquery;
+
+		static const my_bool	mytrue;
 };
+
+const my_bool	mysqlbenchconnection::mytrue=TRUE;
 
 class mysqlbenchcursor : public sqlrbenchcursor {
 	public:
@@ -142,6 +152,9 @@ bool mysqlbenchconnection::connect() {
 		stdoutput.printf("mysql_(real)_connect failed\n");
 		return false;
 	}
+	#ifdef HAVE_MYSQL_OPT_RECONNECT
+	mysql_options(&mysql,MYSQL_OPT_RECONNECT,&mytrue);
+	#endif
 	#ifdef MYSQL_SELECT_DB
 	if (mysql_select_db(&mysql,dbname)) {
 		stdoutput.printf("mysql_select_db failed\n");
@@ -197,8 +210,10 @@ bool mysqlbenchcursor::open() {
 	if (!stmt) {
 		stmt=mysql_stmt_init(&mbcon->mysql);
 	}
-	#endif
 	return (stmt!=NULL);
+	#else
+	return true;
+	#endif
 }
 
 bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
@@ -220,11 +235,13 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 
 		// prepare the query
 		if (mysql_stmt_prepare(stmt,query,charstring::length(query))) {
+stdoutput.printf("prepare: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 
 		// execute the query
 		if (mysql_stmt_execute(stmt)) {
+stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 
@@ -236,6 +253,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 
 		// bind result set buffers
 		if (mysql_stmt_bind_result(stmt,fieldbind)) {
+stdoutput.printf("bind: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 	
@@ -292,6 +310,10 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 		unsigned long	*mysqlrowlengths;
 		while ((mysqlrow=mysql_fetch_row(mysqlresult)) &&
 			(mysqlrowlengths=mysql_fetch_lengths(mysqlresult))) {
+for (uint32_t i=0; i<ncols; i++) {
+	stdoutput.printf("%s,",mysqlrow[i]);
+}
+stdoutput.printf("\n");
 		}
 
 		// free the result set

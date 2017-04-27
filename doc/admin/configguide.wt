@@ -1510,7 +1510,7 @@ The '''md5''' module is a one-way encryption module that encrypts the password u
 
 The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
 
-Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 
 [[br]][=#schedules]
@@ -1542,7 +1542,7 @@ Connection schedule modules can be "stacked".  Multiple different modules may be
 
 At startup, the SQL Relay server creates instances of the specified schedule modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  Each module applies its rules to the specified user.  If a module denies access to a user then the remaining modules are ignored.  If the user makes it through all modules without being denies access, then the user is allowed access.
 
-Currently, only the ''cron_userlist'' connection schedule module is available in the standard SQL Relay distribution.  Custom modules may be developed though.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Currently, only the ''cron_userlist'' connection schedule module is available in the standard SQL Relay distribution.  Custom modules may be developed though.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 The '''cron_userlist''' module allows you to define a connection schedule for a list of users, using a cron-like syntax.
 
@@ -1733,7 +1733,7 @@ Currently, the following filter modules are available:
 * '''regex'''
 * '''string'''
 
-Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 ==== patterns ====
 
@@ -1873,7 +1873,7 @@ Currently, the following translation module is available:
 
 * '''normalize'''
 
-Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 The '''normalize''' module performs the following operations on a query:
 
@@ -1965,7 +1965,7 @@ Currently, the following result set translation module is available:
 
 * '''reformatdatetime'''
 
-Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 The '''reformatdatetime''' module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.
 
@@ -2061,7 +2061,7 @@ Currently, the following router modules are available:
 * '''clientiplist'''
 * '''clientinfolist'''
 
-Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 ==== regex ====
 
@@ -2335,7 +2335,7 @@ Currently, the following standard logger modules are available:
 * '''debug'''
 * '''slowqueries'''
 
-Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 ==== debug ====
 
@@ -2408,7 +2408,7 @@ Currently, the following standard notification module is available:
 
 * '''events'''
 
-Custom modules may also be developed.  For more information, please contact David Muse at [mailto:david.muse@firstworks.com david.muse@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 The '''events''' module listens for a specified set of events and notifies recipients when a one occurs.
 
