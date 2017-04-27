@@ -26,6 +26,14 @@
 		sqlrservercontroller
 	fixed systemd/sysvinit detection on ubuntu
 	added clientinfolist router module
+	switched from Semantic Versioning to "intuitive versioning":
+		Given a version number MAJOR.MINOR.PATCH, increment the:
+		1. MAJOR when you make very significant changes
+		   and set MINOR and PATCH to 0
+		2. MINOR when you make backwards-incompatible changes
+		   and set PATCH to 0
+		3. PATCH when you make backwards-compatible changes
+	client and server libraries have distinct SONAME_VERSION_INFO now
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

@@ -6050,7 +6050,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 
 	// get arrays of field pointers,
 	// helpfully provided for us by the cursor
-	cursor->getFieldPointers(cursor,&(pvt->_fieldnames),
+	cursor->getFieldPointers(&(pvt->_fieldnames),
 					&(pvt->_fields),
 					&(pvt->_fieldlengths),
 					&(pvt->_blobs),

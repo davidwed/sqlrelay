@@ -1009,8 +1009,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		void	allocateFieldPointers(uint32_t colcount);
 		void	deallocateFieldPointers();
-		void	getFieldPointers(sqlrservercursor *cursor,
-						const char ***fieldnames,
+		void	getFieldPointers(const char ***fieldnames,
 						const char ***fields,
 						uint64_t **fieldlengths,
 						bool **blob,

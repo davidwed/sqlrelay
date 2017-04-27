@@ -1091,8 +1091,7 @@ void sqlrservercursor::deallocateFieldPointers() {
 	delete[] pvt->_nulls;
 }
 
-void sqlrservercursor::getFieldPointers(sqlrservercursor *cursor,
-						const char ***fieldnames,
+void sqlrservercursor::getFieldPointers(const char ***fieldnames,
 						const char ***fields,
 						uint64_t **fieldlengths,
 						bool **blobs,
@@ -1105,7 +1104,7 @@ void sqlrservercursor::getFieldPointers(sqlrservercursor *cursor,
 	// and if so, how many columns
 	bool	allocate=false;
 	if (!colcount) {
-		colcount=conn->cont->colCount(cursor);
+		colcount=colCount();
 		allocate=true;
 	}
 

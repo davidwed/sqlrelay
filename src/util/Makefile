@@ -28,7 +28,7 @@ clean:
 	$(RMTREE) .libs
 
 lib$(SQLR)util.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(STATICUTILPLUGINLOBJS) $(LDFLAGS) $(LINKFLAGS) $(UTILLIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(STATICUTILPLUGINLOBJS) $(LDFLAGS) $(SRVLINKFLAGS) $(UTILLIBS)
 
 sqlrconfigdeclarations.cpp: sqlrconfigdeclarations.cpp.in
 	$(RM) $@

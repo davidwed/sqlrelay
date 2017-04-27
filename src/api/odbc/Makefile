@@ -17,7 +17,7 @@ clean:
 	$(RMTREE) .libs
 
 lib$(SQLR)odbc.$(LIBEXT): sqlrodbc.cpp sqlrodbc.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ sqlrodbc.$(OBJ) $(LDFLAGS) $(ODBCDRIVERLIBS) $(ODBCDRIVERRPATH) $(LINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrodbc.$(OBJ) $(LDFLAGS) $(ODBCDRIVERLIBS) $(ODBCDRIVERRPATH) $(CLTLINKFLAGS)
 
 install: $(INSTALLLIB)
 

@@ -1,5 +1,6 @@
 SQLR_VERSION = @SQLR_VERSION@
-SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
+SRV_SONAME_VERSION_INFO = @SRV_SONAME_VERSION_INFO@
+CLT_SONAME_VERSION_INFO = @CLT_SONAME_VERSION_INFO@
 
 SQLRELAY_ENABLE_SHARED = @enable_shared@
 
@@ -78,7 +79,8 @@ LINK = @CXX@
 CCLINK = @CC@
 AR = @AR@
 LDFLAGS = @LDFLAGS@
-LINKFLAGS = -rpath $(libdir) -version-info $(SONAME_VERSION_INFO) -no-undefined
+SRVLINKFLAGS = -rpath $(libdir) -version-info $(SRV_SONAME_VERSION_INFO) -no-undefined
+CLTLINKFLAGS = -rpath $(libdir) -version-info $(CLT_SONAME_VERSION_INFO) -no-undefined
 MODLINKFLAGS = -rpath $(libexecdir) -avoid-version -module -no-undefined
 INSTALLLIB = installlib
 UNINSTALLLIB = uninstalllib

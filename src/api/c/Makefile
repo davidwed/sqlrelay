@@ -20,7 +20,7 @@ clean:
 	$(RMTREE) .libs
 
 lib$(SQLR)clientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
-	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(CLIBS) $(LINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(CLIBS) $(CLTLINKFLAGS)
 
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay

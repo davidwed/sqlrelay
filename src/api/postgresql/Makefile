@@ -17,7 +17,7 @@ clean:
 	$(RMTREE) .libs
 
 libpq$(SQLRELAY).$(LIBEXT): pqsqlrelay.cpp pqsqlrelay.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ pqsqlrelay.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(POSTGRESQLDRLIBLIBS)
+	$(LTLINK) $(LINK) $(OUT)$@ pqsqlrelay.$(OBJ) $(LDFLAGS) $(CLTLINKFLAGS) $(POSTGRESQLDRLIBLIBS)
 
 install: $(INSTALLLIB)
 
