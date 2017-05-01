@@ -8,6 +8,7 @@
 #include <rudiments/character.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/stdio.h>
+#include <rudiments/process.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -744,10 +745,8 @@ void sapcursor::allocateResultSetBuffers(int32_t columncount) {
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int32_t i=0; i<columncount; i++) {
 			data[i]=new char[fetchatonce*maxfieldlength];
-			datalength[i]=
-				new CS_INT[fetchatonce*maxfieldlength];
-			nullindicator[i]=
-				new CS_SMALLINT[fetchatonce*maxfieldlength];
+			datalength[i]=new CS_INT[fetchatonce];
+			nullindicator[i]=new CS_SMALLINT[fetchatonce];
 		}
 	}
 }
