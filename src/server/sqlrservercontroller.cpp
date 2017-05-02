@@ -3044,7 +3044,7 @@ void sqlrservercontroller::translateBeginTransaction(sqlrservercursor *cursor) {
 	raiseDebugMessageEvent(querybuffer);
 }
 
-bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
+bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor, bool before) {
 
 	const char	*query=cursor->getQueryBuffer();
 
@@ -3057,7 +3057,18 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor) {
 	// apply filters
 	const char	*err=NULL;
 	int64_t		errn=0;
-	if (!pvt->_sqlrf->run(pvt->_conn,cursor,pvt->_sqlrp,query,&err,&errn)) {
+	bool		success=(before)?
+				pvt->_sqlrf->runBeforeFilters(pvt->_conn,
+								cursor,
+								pvt->_sqlrp,
+								query,
+								&err,&errn):
+				pvt->_sqlrf->runAfterFilters(pvt->_conn,
+								cursor,
+								pvt->_sqlrp,
+								query,
+								&err,&errn);
+	if (!success) {
 		setError(cursor,err,errn,true);
 		raiseFilterViolationEvent(cursor);
 		if (pvt->_debugsqlrfilters) {
@@ -3379,6 +3390,19 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// because translateQuery might use it
 		pvt->_bindmappingspool->deallocate();
 
+		// before-filter query
+		if (enablefilters && pvt->_sqlrf) {
+			if (!filterQuery(cursor,true)) {
+
+				// log the query
+				raiseQueryEvent(cursor);
+
+				cursor->setQueryStatus(
+					SQLRQUERYSTATUS_FILTER_VIOLATION);
+				return false;
+			}
+		}
+
 		// translate query
 		if (enabletranslations && pvt->_sqlrt) {
 			translateQuery(cursor);
@@ -3395,9 +3419,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			translateBeginTransaction(cursor);
 		}
 
-		// filter query
+		// after-filter query
 		if (enablefilters && pvt->_sqlrf) {
-			if (!filterQuery(cursor)) {
+			if (!filterQuery(cursor,false)) {
 
 				// log the query
 				raiseQueryEvent(cursor);

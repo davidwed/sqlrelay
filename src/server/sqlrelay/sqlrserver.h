@@ -1531,7 +1531,13 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 		~sqlrfilters();
 
 		bool	load(xmldomnode *parameters);
-		bool	run(sqlrserverconnection *sqlrcon,
+		bool	runBeforeFilters(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						sqlrparser *sqlrp,
+						const char *query,
+						const char **err,
+						int64_t *errn);
+		bool	runAfterFilters(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						sqlrparser *sqlrp,
 						const char *query,

@@ -49,21 +49,20 @@ bool sqlrtriggers::load(xmldomnode *parameters) {
 	for (xmldomnode *trigger=parameters->getFirstTagChild();
 		!trigger->isNullNode(); trigger=trigger->getNextTagSibling()) {
 
-		// add trigger to before list
 		if (charstring::contains(
 				trigger->getAttributeValue("when"),
 				"before")) {
+
+			// add trigger to before list
 			if (pvt->_debug) {
 				stdoutput.printf("loading trigger "
 							"before ...\n");
 			}
 			loadTrigger(trigger,&pvt->_beforetriggers);
-		}
 
-		// add trigger to after list
-		if (charstring::contains(
-				trigger->getAttributeValue("when"),
-				"after")) {
+		} else {
+
+			// add trigger to after list
 			if (pvt->_debug) {
 				stdoutput.printf("loading trigger "
 							"after ...\n");

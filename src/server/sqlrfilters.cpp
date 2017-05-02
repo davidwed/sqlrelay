@@ -30,7 +30,8 @@ class sqlrfiltersprivate {
 
 		bool	_debug;
 
-		singlylinkedlist< sqlrfilterplugin * >	_tlist;
+		singlylinkedlist< sqlrfilterplugin * >	_beforefilters;
+		singlylinkedlist< sqlrfilterplugin * >	_afterfilters;
 };
 
 sqlrfilters::sqlrfilters(sqlrservercontroller *cont) {
@@ -56,27 +57,52 @@ bool sqlrfilters::load(xmldomnode *parameters) {
 				!filter->isNullNode();
 				filter=filter->getNextTagSibling()) {
 
-		// load filter
-		loadFilter(filter);
-	}
+		if (charstring::contains(
+				filter->getAttributeValue("when"),
+				"before")) {
 
+			// add filter to before list
+			if (pvt->_debug) {
+				stdoutput.printf("loading filter before ...\n");
+			}
+			loadFilter(filter,&pvt->_beforefilters);
+
+		} else {
+
+			// add filter to after list
+			if (pvt->_debug) {
+				stdoutput.printf("loading filter after ...\n");
+			}
+			loadFilter(filter,&pvt->_afterfilters);
+		}
+	}
 	return true;
 }
 
 void sqlrfilters::unload() {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
-						pvt->_tlist.getFirst();
+						pvt->_beforefilters.getFirst();
 						node; node=node->getNext()) {
 		sqlrfilterplugin	*sqlrfp=node->getValue();
 		delete sqlrfp->f;
 		delete sqlrfp->dl;
 		delete sqlrfp;
 	}
-	pvt->_tlist.clear();
+	pvt->_beforefilters.clear();
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_afterfilters.getFirst();
+						node; node=node->getNext()) {
+		sqlrfilterplugin	*sqlrfp=node->getValue();
+		delete sqlrfp->f;
+		delete sqlrfp->dl;
+		delete sqlrfp;
+	}
+	pvt->_afterfilters.clear();
 }
 
-void sqlrfilters::loadFilter(xmldomnode *filter) {
+void sqlrfilters::loadFilter(xmldomnode *filter, 
+				singlylinkedlist< sqlrfilterplugin * > *list) {
 	debugFunction();
 
 	// ignore non-filters
@@ -154,15 +180,36 @@ void sqlrfilters::loadFilter(xmldomnode *filter) {
 	sqlrfilterplugin	*sqlrfp=new sqlrfilterplugin;
 	sqlrfp->f=f;
 	sqlrfp->dl=dl;
-	pvt->_tlist.append(sqlrfp);
+	list->append(sqlrfp);
 }
 
-bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
+bool sqlrfilters::runBeforeFilters(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrparser *sqlrp,
 					const char *query,
 					const char **err,
 					int64_t *errn) {
+	debugFunction();
+	return run(sqlrcon,sqlrcur,sqlrp,query,err,errn,&pvt->_beforefilters);
+}
+
+bool sqlrfilters::runAfterFilters(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					sqlrparser *sqlrp,
+					const char *query,
+					const char **err,
+					int64_t *errn) {
+	debugFunction();
+	return run(sqlrcon,sqlrcur,sqlrp,query,err,errn,&pvt->_afterfilters);
+}
+
+bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
+				sqlrparser *sqlrp,
+				const char *query,
+				const char **err,
+				int64_t *errn,
+				singlylinkedlist< sqlrfilterplugin * > *list) {
 	debugFunction();
 
 	if (!query) {
@@ -171,8 +218,7 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 
 	xmldom	*tree=NULL;
 
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
-						pvt->_tlist.getFirst();
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
 
 		if (pvt->_debug) {

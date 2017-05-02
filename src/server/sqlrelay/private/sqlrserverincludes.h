@@ -79,6 +79,7 @@ class sqlrtranslations;
 class sqlrtranslationsprivate;
 class sqlrfilter;
 class sqlrfilterprivate;
+class sqlrfilterplugin;
 class sqlrfilters;
 class sqlrfiltersprivate;
 class sqlrresultsettranslation;

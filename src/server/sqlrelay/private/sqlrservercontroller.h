@@ -69,7 +69,7 @@
 
 		void	translateBeginTransaction(sqlrservercursor *cursor);
 
-		bool	filterQuery(sqlrservercursor *cursor);
+		bool	filterQuery(sqlrservercursor *cursor, bool before);
 
 		bool	handleBinds(sqlrservercursor *cursor);
 
