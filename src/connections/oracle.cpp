@@ -3651,8 +3651,9 @@ void oraclecursor::closeResultSet() {
 	// free row/column resources
 	if (!resultfreed) {
 
-		int32_t	columncount=(!conn->cont->getMaxColumnCount())?
-					ncols:conn->cont->getMaxColumnCount();
+		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+
+		int32_t	columncount=(!maxcolumncount)?ncols:maxcolumncount;
 
 		for (int32_t i=0; i<columncount; i++) {
 
@@ -3694,8 +3695,7 @@ void oraclecursor::closeResultSet() {
 		}
 
 		// deallocate buffers, if necessary
-		if (stmttype==OCI_STMT_SELECT &&
-				!conn->cont->getMaxColumnCount()) {
+		if (stmttype==OCI_STMT_SELECT && !maxcolumncount) {
 			deallocateResultSetBuffers();
 		}
 
