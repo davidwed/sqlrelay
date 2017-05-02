@@ -2193,6 +2193,7 @@ void sqlrprotocol_sqlrclient::returnResultSetHeader(sqlrservercursor *cursor) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("returning result set header...");
+stdoutput.printf("returning result set header...");
 
 	// return the row counts
 	cont->raiseDebugMessageEvent("returning row counts...");
@@ -2205,6 +2206,7 @@ void sqlrprotocol_sqlrclient::returnResultSetHeader(sqlrservercursor *cursor) {
 	// tell the client whether or not the column information will be sent
 	uint16_t	sendcolumninfo=cont->getSendColumnInfo();
 	clientsock->write(sendcolumninfo);
+stdoutput.printf("sendcolumninfo=%d\n",sendcolumninfo);
 	cont->raiseDebugMessageEvent((sendcolumninfo==SEND_COLUMN_INFO)?
 					"column info will be sent":
 					"column info will not be sent");
@@ -2219,7 +2221,8 @@ void sqlrprotocol_sqlrclient::returnResultSetHeader(sqlrservercursor *cursor) {
 		// return the column type format
 		cont->raiseDebugMessageEvent("sending column type format...");
 		uint16_t	format=cont->columnTypeFormat(cursor);
-		cont->raiseDebugMessageEvent((format==COLUMN_TYPE_IDS)?"id's":"names");
+		cont->raiseDebugMessageEvent((format==COLUMN_TYPE_IDS)?
+							"id's":"names");
 		clientsock->write(format);
 		cont->raiseDebugMessageEvent("done sending column type format");
 

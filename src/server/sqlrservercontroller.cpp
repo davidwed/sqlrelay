@@ -2246,7 +2246,6 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	// the query will be sent directly to the db and endFakeBeginTransaction
 	// won't get called.
 	bool	retval=false;
-	bool	oldsendcolumninfo=pvt->_sendcolumninfo;
 	if (isBeginTransactionQuery(cursor)) {
 		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
@@ -2296,7 +2295,6 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		// a rollback command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
 	}
-	pvt->_sendcolumninfo=oldsendcolumninfo;
 	return retval;
 }
 
