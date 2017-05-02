@@ -356,7 +356,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		#endif
 		sword		ncols;
 
-		int32_t		resultsetbuffercount;
+		int32_t		columncount;
 		describe	*desc;
 		OCIDefine	**def;
 		OCILobLocator	***def_lob;
@@ -2078,7 +2078,7 @@ oraclecursor::~oraclecursor() {
 void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 
 	if (!columncount) {
-		resultsetbuffercount=0;
+		this->columncount=0;
 		desc=NULL;
 		def=NULL;
 		def_lob=NULL;
@@ -2087,17 +2087,17 @@ void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 		def_col_retlen=NULL;
 		def_col_retcode=NULL;
 	} else {
-		resultsetbuffercount=columncount;
-		desc=new describe[resultsetbuffercount];
-		def=new OCIDefine *[resultsetbuffercount];
-		def_lob=new OCILobLocator **[resultsetbuffercount];
-		def_buf=new ub1 *[resultsetbuffercount];
-		def_indp=new sb2 *[resultsetbuffercount];
-		def_col_retlen=new ub2 *[resultsetbuffercount];
-		def_col_retcode=new ub2 *[resultsetbuffercount];
+		this->columncount=columncount;
+		desc=new describe[columncount];
+		def=new OCIDefine *[columncount];
+		def_lob=new OCILobLocator **[columncount];
+		def_buf=new ub1 *[columncount];
+		def_indp=new sb2 *[columncount];
+		def_col_retlen=new ub2 *[columncount];
+		def_col_retcode=new ub2 *[columncount];
 		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-		for (int32_t i=0; i<resultsetbuffercount; i++) {
+		for (int32_t i=0; i<columncount; i++) {
 			def_lob[i]=new OCILobLocator *[fetchatonce];
 			for (uint32_t j=0; j<fetchatonce; j++) {
 				def_lob[i][j]=NULL;
@@ -2113,8 +2113,8 @@ void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 }
 
 void oraclecursor::deallocateResultSetBuffers() {
-	if (resultsetbuffercount) {
-		for (int32_t i=0; i<resultsetbuffercount; i++) {
+	if (columncount) {
+		for (int32_t i=0; i<columncount; i++) {
 			delete[] def_col_retcode[i];
 			delete[] def_col_retlen[i];
 			delete[] def_indp[i];
@@ -2128,7 +2128,7 @@ void oraclecursor::deallocateResultSetBuffers() {
 		delete[] def_buf;
 		delete[] def;
 		delete[] desc;
-		resultsetbuffercount=0;
+		columncount=0;
 	}
 }
 

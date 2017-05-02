@@ -34,6 +34,8 @@
 		   and set PATCH to 0
 		3. PATCH when you make backwards-compatible changes
 	client and server libraries have distinct SONAME_VERSION_INFO now
+	filters can be run before or after translations now
+	triggers default to "after" if not specified now
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

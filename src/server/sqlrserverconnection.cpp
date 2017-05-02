@@ -79,9 +79,10 @@ void sqlrserverconnection::handleConnectString() {
 	cont->setPassword(cont->getConnectStringValue("password"));
 
 	// autocommit
-	const char	*autocom=cont->getConnectStringValue("autocommit");
-	cont->setAutoCommitBehavior((autocom &&
-		!charstring::compareIgnoringCase(autocom,"yes")));
+	cont->setAutoCommitBehavior(
+		!charstring::compare(
+			cont->getConnectStringValue("autocommit"),
+			"yes"));
 
 	// fake transaction blocks
 	cont->setFakeTransactionBlocksBehavior(
