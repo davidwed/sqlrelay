@@ -15,9 +15,6 @@
 class sqlrserverconnectionprivate {
 	friend class sqlrserverconnection;
 
-		bool		_autocommit;
-		bool		_fakeautocommit;
-
 		uint32_t	_maxquerysize;
 		uint32_t	_maxerrorlength;
 
@@ -46,9 +43,6 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 	pvt->_errnum=0;
 	pvt->_liveconnection=false;
 	pvt->_errorsetmanually=false;
-
-	pvt->_autocommit=false;
-	pvt->_fakeautocommit=false;
 
 	pvt->_dbhostname=NULL;
 	pvt->_dbipaddress=NULL;
@@ -79,13 +73,13 @@ void sqlrserverconnection::handleConnectString() {
 	cont->setPassword(cont->getConnectStringValue("password"));
 
 	// autocommit
-	cont->setAutoCommitBehavior(
+	cont->setInitialAutoCommit(
 		!charstring::compare(
 			cont->getConnectStringValue("autocommit"),
 			"yes"));
 
 	// fake transaction blocks
-	cont->setFakeTransactionBlocksBehavior(
+	cont->setFakeTransactionBlocks(
 		!charstring::compare(
 			cont->getConnectStringValue("faketransactionblocks"),
 			"yes"));
@@ -93,7 +87,7 @@ void sqlrserverconnection::handleConnectString() {
 	// fake binds
 	if (!charstring::compare(
 			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
+		cont->setFakeInputBinds(true);
 	}
 
 	// rows to fetch-at-once
@@ -147,14 +141,12 @@ bool sqlrserverconnection::changeProxiedUser(const char *newuser,
 }
 
 bool sqlrserverconnection::autoCommitOn() {
-	pvt->_fakeautocommit=true;
-	pvt->_autocommit=true;
+	cont->setFakeAutoCommit(true);
 	return true;
 }
 
 bool sqlrserverconnection::autoCommitOff() {
-	pvt->_fakeautocommit=true;
-	pvt->_autocommit=false;
+	cont->setFakeAutoCommit(false);
 	return true;
 }
 
@@ -164,6 +156,10 @@ bool sqlrserverconnection::isTransactional() {
 
 bool sqlrserverconnection::supportsTransactionBlocks() {
 	return true;
+}
+
+bool sqlrserverconnection::supportsAutoCommit() {
+	return false;
 }
 
 bool sqlrserverconnection::begin() {
@@ -208,7 +204,7 @@ bool sqlrserverconnection::begin() {
 
 	// we will need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->commitOrRollbackIsNeeded();
+		cont->setNeedsCommitOrRollback(true);
 	}
 
 	return retval;
@@ -252,7 +248,7 @@ bool sqlrserverconnection::commit() {
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->commitOrRollbackIsNotNeeded();
+		cont->setNeedsCommitOrRollback(false);
 	}
 
 	return retval;
@@ -292,7 +288,7 @@ bool sqlrserverconnection::rollback() {
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->commitOrRollbackIsNotNeeded();
+		cont->setNeedsCommitOrRollback(false);
 	}
 
 	return retval;
@@ -754,18 +750,6 @@ bool sqlrserverconnection::tempTableTruncateBeforeDrop() {
 
 void sqlrserverconnection::endSession() {
 	// by default, do nothing
-}
-
-bool sqlrserverconnection::getAutoCommit() {
-	return pvt->_autocommit;
-}
-
-void sqlrserverconnection::setAutoCommit(bool autocommit) {
-	pvt->_autocommit=autocommit;
-}
-
-bool sqlrserverconnection::getFakeAutoCommit() {
-	return pvt->_fakeautocommit;
 }
 
 void sqlrserverconnection::clearError() {

@@ -60,6 +60,7 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		void		logOut();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
+		bool		supportsAutoCommit();
 		bool		begin();
 		bool		commit();
 		bool		rollback();
@@ -281,7 +282,7 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 
 	// tell the controller to intercept begins, commits, and rollbacks sent
 	// as queries and call begin(), commit(), and rollback() methods instead
-	cont->setInterceptTransactionQueriesBehavior(true);
+	cont->setInterceptTransactionQueries(true);
 }
 
 routerconnection::~routerconnection() {
@@ -481,6 +482,10 @@ bool routerconnection::autoCommitOff() {
 		}
 	}
 	return result;
+}
+
+bool routerconnection::supportsAutoCommit() {
+	return true;
 }
 
 bool routerconnection::begin() {

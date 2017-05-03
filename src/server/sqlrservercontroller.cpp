@@ -120,7 +120,10 @@ class sqlrservercontrollerprivate {
 	bool		_infaketransactionblock;
 	bool		_intransaction;
 
-	bool		_needcommitorrollback;
+	bool		_needscommitorrollback;
+
+	bool		_fakeautocommit;
+	bool		_initialautocommit;
 
 	bool		_fakeinputbinds;
 	bool		_translatebinds;
@@ -258,7 +261,10 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_inetport=0;
 
-	pvt->_needcommitorrollback=false;
+	pvt->_needscommitorrollback=false;
+
+	pvt->_fakeautocommit=false;
+	pvt->_initialautocommit=false;
 
 	pvt->_autocommitforthissession=false;
 
@@ -603,7 +609,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// set autocommit behavior
-	setAutoCommit(pvt->_conn->getAutoCommit());
+	setAutoCommit(pvt->_initialautocommit);
 
 	// get fake input bind variable behavior
 	// (this may have already been set true by the connect string)
@@ -1378,8 +1384,8 @@ void sqlrservercontroller::reLogIn() {
 	pvt->_conn->selectDatabase(currentdb);
 	delete[] currentdb;
 
-	// restore autocommit
-	if (pvt->_conn->getAutoCommit()) {
+	// restore initial autocommit behavior
+	if (pvt->_initialautocommit) {
 		pvt->_conn->autoCommitOn();
 	} else {
 		pvt->_conn->autoCommitOff();
@@ -1394,7 +1400,7 @@ void sqlrservercontroller::initSession() {
 
 	raiseDebugMessageEvent("initializing session...");
 
-	pvt->_needcommitorrollback=false;
+	pvt->_needscommitorrollback=false;
 	pvt->_suspendedsession=false;
 	for (int32_t i=0; i<pvt->_cursorcount; i++) {
 		pvt->_cur[i]->setState(SQLRCURSORSTATE_AVAILABLE);
@@ -3657,16 +3663,12 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// was the query a commit or rollback?
 	commitOrRollback(cursor);
 
-	// On success, commit if necessary.
-	// Connection classes could override autoCommitOn() and autoCommitOff()
-	// to do database API-specific things, but will not set 
-	// fakeautocommit, so this code won't get called at all for those 
-	// connections.
+	// commit if necessary
 	if (success && pvt->_conn->isTransactional() &&
 			!pvt->_conn->supportsTransactionBlocks() &&
-			pvt->_needcommitorrollback &&
-			pvt->_conn->getFakeAutoCommit() &&
-			pvt->_conn->getAutoCommit()) {
+			pvt->_needscommitorrollback &&
+			!pvt->_conn->supportsAutoCommit() &&
+			pvt->_fakeautocommit) {
 		raiseDebugMessageEvent("commit necessary...");
 		success=commit();
 	}
@@ -3685,12 +3687,12 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	return success;
 }
 
-void sqlrservercontroller::commitOrRollbackIsNeeded() {
-	pvt->_needcommitorrollback=true;
+void sqlrservercontroller::setNeedsCommitOrRollback(bool needed) {
+	pvt->_needscommitorrollback=needed;
 }
 
-void sqlrservercontroller::commitOrRollbackIsNotNeeded() {
-	pvt->_needcommitorrollback=false;
+bool sqlrservercontroller::getNeedsCommitOrRollback() {
+	return pvt->_needscommitorrollback;
 }
 
 void sqlrservercontroller::commitOrRollback(sqlrservercursor *cursor) {
@@ -3701,10 +3703,10 @@ void sqlrservercontroller::commitOrRollback(sqlrservercursor *cursor) {
 	if (pvt->_conn->isTransactional()) {
 		if (cursor->queryIsCommitOrRollback()) {
 			raiseDebugMessageEvent("commit or rollback not needed");
-			pvt->_needcommitorrollback=false;
+			pvt->_needscommitorrollback=false;
 		} else if (cursor->queryIsNotSelect()) {
 			raiseDebugMessageEvent("commit or rollback needed");
-			pvt->_needcommitorrollback=true;
+			pvt->_needscommitorrollback=true;
 		}
 	}
 
@@ -4115,7 +4117,7 @@ void sqlrservercontroller::endSession() {
 		pvt->_infaketransactionblock=false;
 
 	} else if (pvt->_conn->isTransactional() &&
-				pvt->_needcommitorrollback) {
+				pvt->_needscommitorrollback) {
 
 		// otherwise, commit or rollback as necessary
 		if (pvt->_cfg->getEndOfSessionCommit()) {
@@ -4148,8 +4150,8 @@ void sqlrservercontroller::endSession() {
 		pvt->_dbchanged=false;
 	}
 
-	// reset autocommit behavior
-	setAutoCommit(pvt->_conn->getAutoCommit());
+	// reset initial autocommit behavior
+	setAutoCommit(pvt->_initialautocommit);
 
 	// set isolation level
 	pvt->_conn->setIsolationLevel(pvt->_isolationlevel);
@@ -4953,15 +4955,11 @@ const char *sqlrservercontroller::getClientAddr() {
 	return (pvt->_connstats)?pvt->_connstats->clientaddr:NULL;
 }
 
-void sqlrservercontroller::disableInstance() {
-	pvt->_shm->disabled=true;
+void sqlrservercontroller::setInstanceDisabled(bool disabled) {
+	pvt->_shm->disabled=disabled;
 }
 
-void sqlrservercontroller::enableInstance() {
-	pvt->_shm->disabled=false;
-}
-
-bool sqlrservercontroller::disabledInstance() {
+bool sqlrservercontroller::getInstanceDisabled() {
 	return pvt->_shm->disabled;
 }
 
@@ -5381,16 +5379,37 @@ const char *sqlrservercontroller::getUser() {
 const char *sqlrservercontroller::getPassword() {
 	return pvt->_password;
 }
-void sqlrservercontroller::setAutoCommitBehavior(bool ac) {
-	pvt->_conn->setAutoCommit(ac);
+
+void sqlrservercontroller::setInterceptTransactionQueries(bool itxq) {
+	pvt->_intercepttxqueries=itxq;
 }
 
-void sqlrservercontroller::setInterceptTransactionQueriesBehavior(bool itxqb) {
-	pvt->_intercepttxqueries=itxqb;
+bool sqlrservercontroller::getInterceptTransactionQueries() {
+	return pvt->_intercepttxqueries;
 }
 
-void sqlrservercontroller::setFakeTransactionBlocksBehavior(bool ftb) {
+void sqlrservercontroller::setFakeTransactionBlocks(bool ftb) {
 	pvt->_faketransactionblocks=ftb;
+}
+
+bool sqlrservercontroller::getFakeTransactionBlocks() {
+	return pvt->_faketransactionblocks;
+}
+
+void sqlrservercontroller::setFakeAutoCommit(bool fac) {
+	pvt->_fakeautocommit=fac;
+}
+
+bool sqlrservercontroller::getFakeAutoCommit() {
+	return pvt->_fakeautocommit;
+}
+
+void sqlrservercontroller::setInitialAutoCommit(bool iac) {
+	pvt->_initialautocommit=iac;
+}
+
+bool sqlrservercontroller::getInitialAutoCommit() {
+	return pvt->_initialautocommit;
 }
 
 const char *sqlrservercontroller::bindFormat() {
@@ -5413,12 +5432,8 @@ bool sqlrservercontroller::bindValueIsNull(int16_t isnull) {
 	return pvt->_conn->bindValueIsNull(isnull);
 }
 
-void sqlrservercontroller::fakeInputBinds() {
-	pvt->_fakeinputbinds=true;
-}
-
-void sqlrservercontroller::dontFakeInputBinds() {
-	pvt->_fakeinputbinds=false;
+void sqlrservercontroller::setFakeInputBinds(bool fake) {
+	pvt->_fakeinputbinds=fake;
 }
 
 bool sqlrservercontroller::getFakeInputBinds() {

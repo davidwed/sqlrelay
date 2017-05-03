@@ -390,7 +390,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 		// handle disabled instance
 		// FIXME: push up?
-		if (cont->disabledInstance()) {
+		if (cont->getInstanceDisabled()) {
 			endsession=true;
 			break;
 		}

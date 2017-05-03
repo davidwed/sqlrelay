@@ -51,6 +51,7 @@ class SQLRSERVER_DLLSPEC mdbtoolsconnection : public sqlrserverconnection {
 		bool	setIsolationLevel(const char *isolevel);
 		bool	autoCommitOn();
 		bool	autoCommitOff();
+		bool	supportsAutoCommit();
 		bool	commit();
 		bool	rollback();
 		void	errorMessage(char *errorbuffer,
@@ -220,6 +221,11 @@ bool mdbtoolsconnection::autoCommitOn() {
 
 bool mdbtoolsconnection::autoCommitOff() {
 	// do nothing
+	return true;
+}
+
+bool mdbtoolsconnection::supportsAutoCommit() {
+	// fake this
 	return true;
 }
 

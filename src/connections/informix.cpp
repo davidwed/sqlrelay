@@ -223,6 +223,7 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		bool	autoCommitOn();
 		bool	autoCommitOff();
 		bool	supportsTransactionBlocks();
+		bool	supportsAutoCommit();
 		bool	commit();
 		bool	rollback();
 		void	errorMessage(char *errorbuffer,
@@ -474,6 +475,10 @@ bool informixconnection::autoCommitOff() {
 
 bool informixconnection::supportsTransactionBlocks() {
 	return false;
+}
+
+bool informixconnection::supportsAutoCommit() {
+	return true;
 }
 
 bool informixconnection::commit() {

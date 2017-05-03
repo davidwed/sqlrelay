@@ -106,6 +106,7 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 						const char *newpassword);
 		#endif
 		bool		supportsTransactionBlocks();
+		bool		supportsAutoCommit();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();
@@ -511,11 +512,6 @@ void oracleconnection::handleConnectString() {
 		liiquery.append(lastinsertidfunc);
 		liiquery.append(" from dual");
 		lastinsertidquery=liiquery.detachString();
-	}
-
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
-		cont->fakeInputBinds();
 	}
 
 	identity=cont->getConnectStringValue("identity");
@@ -1080,6 +1076,10 @@ bool oracleconnection::autoCommitOff() {
 
 bool oracleconnection::supportsTransactionBlocks() {
 	return false;
+}
+
+bool oracleconnection::supportsAutoCommit() {
+	return true;
 }
 
 bool oracleconnection::commit() {

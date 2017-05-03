@@ -236,6 +236,7 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		bool	autoCommitOn();
 		bool	autoCommitOff();
 		bool	supportsTransactionBlocks();
+		bool	supportsAutoCommit();
 		bool	commit();
 		bool	rollback();
 		void	errorMessage(char *errorbuffer,
@@ -554,6 +555,10 @@ bool db2connection::autoCommitOff() {
 
 bool db2connection::supportsTransactionBlocks() {
 	return false;
+}
+
+bool db2connection::supportsAutoCommit() {
+	return true;
 }
 
 bool db2connection::commit() {

@@ -199,6 +199,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		bool		getLastInsertId(uint64_t *id);
 		bool		autoCommitOn();
 		bool		autoCommitOff();
+		bool		supportsAutoCommit();
 		bool		commit();
 		bool		rollback();
 		void		errorMessage(char *errorbuffer,
@@ -408,7 +409,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	// fake binds when connected to older servers
 #ifdef HAVE_MYSQL_GET_SERVER_VERSION
 	if (mysql_get_server_version(mysqlptr)<40102) {
-		cont->fakeInputBinds();
+		cont->setFakeInputBinds(true);
 	}
 #else
 	char		**list;
@@ -422,7 +423,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 		uint64_t	patch=charstring::toUnsignedInteger(list[2]);
 		if (major>4 || (major==4 && minor>1) ||
 				(major==4 && minor==1 && patch>=2)) {
-			cont->fakeInputBinds();
+			cont->setFakeInputBinds(true);
 		} 
 		for (uint64_t index=0; index<listlen; index++) {
 			delete[] list[index];
@@ -605,6 +606,10 @@ bool mysqlconnection::autoCommitOff() {
 	// do nothing
 	return true;
 #endif
+}
+
+bool mysqlconnection::supportsAutoCommit() {
+	return true;
 }
 
 bool mysqlconnection::commit() {

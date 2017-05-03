@@ -334,7 +334,7 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	// don't use bind variables against older servers
 	if (PQprotocolVersion(pgconn)<3) {
-		cont->fakeInputBinds();
+		cont->setFakeInputBinds(true);
 	}
 #endif
 

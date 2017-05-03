@@ -38,6 +38,12 @@
 	triggers default to "after" if not specified now
 	fixed bug that could cause begin/commit/rollback to try to send
 		nonexistent column info sometimes when faketransactionblocks=yes
+	getters/setters renamed in the server api re.:
+		fake input binds
+		commit/rollback needed
+		intercept tx queries
+		fake transaction blocks
+	general refactoring of the fake-autocommit framework
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

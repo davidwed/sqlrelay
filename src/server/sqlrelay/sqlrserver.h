@@ -156,8 +156,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		int16_t		nonNullBindValue();
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(int16_t isnull);
-		void		fakeInputBinds();
-		void		dontFakeInputBinds();
+		void		setFakeInputBinds(bool fake);
 		bool		getFakeInputBinds();
 		memorypool	*getBindMappingsPool();
 
@@ -186,12 +185,17 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	rollback();
 		bool	autoCommitOn();
 		bool	autoCommitOff();
-		void	commitOrRollbackIsNeeded();
-		void	commitOrRollbackIsNotNeeded();
+		void	setNeedsCommitOrRollback(bool needed);
+		bool	getNeedsCommitOrRollback();
 		bool	setIsolationLevel(const char *isolevel);
-		void	setInterceptTransactionQueriesBehavior(bool itxqb);
-		void	setFakeTransactionBlocksBehavior(bool ftb);
-		void	setAutoCommitBehavior(bool ac);
+		void	setInterceptTransactionQueries(bool itxqb);
+		bool	getInterceptTransactionQueries();
+		void	setFakeTransactionBlocks(bool ftb);
+		bool	getFakeTransactionBlocks();
+		void	setFakeAutoCommit(bool fac);
+		bool	getFakeAutoCommit();
+		void	setInitialAutoCommit(bool iac);
+		bool	getInitialAutoCommit();
 		bool	inTransaction();
 
 		// errors
@@ -225,9 +229,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getClientAddr();
 
 		// instance state
-		void	disableInstance();
-		void	enableInstance();
-		bool	disabledInstance();
+		void	setInstanceDisabled(bool disabled);
+		bool	getInstanceDisabled();
 
 
 		// statistics api...
@@ -645,6 +648,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 
 		virtual bool	isTransactional();
 		virtual bool	supportsTransactionBlocks();
+		virtual bool	supportsAutoCommit();
 
 		virtual bool		begin();
 		virtual const char	*beginTransactionQuery();
@@ -716,10 +720,6 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool		tempTableTruncateBeforeDrop();
 
 		virtual void		endSession();
-
-		bool	getAutoCommit();
-		void	setAutoCommit(bool autocommit);
-		bool	getFakeAutoCommit();
 
 		void		clearError();
 		void		setError(const char *err,
