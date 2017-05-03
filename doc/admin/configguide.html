@@ -2525,6 +2525,8 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>All filter modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
 
+<p>All filter modules have an <i>when</i> parameter as well, which determines when the filter is applied.  If set to "before" then the module is executed before any query translations are executed.  If set to "after", or omitted, then the module is executed  after all query translations have been executed.  See <a href="#querytranslations">Query Translations</a> below for more information.</p>
+
 <p>Filter modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
