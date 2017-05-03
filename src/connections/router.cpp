@@ -801,7 +801,7 @@ void routerconnection::raiseIntegrityViolationEvent(const char *command,
 	info.append(conids[index]);
 	cont->raiseIntegrityViolationEvent(info.getString());
 
-	cont->disableInstance();
+	cont->setInstanceDisabled(true);
 }
 
 
