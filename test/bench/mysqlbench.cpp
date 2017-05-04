@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 //#undef HAVE_MYSQL_STMT_PREPARE
+//#define EXEC_BEFORE_METADATA 1
 
 class mysqlbench : public sqlrbench {
 	public:
@@ -239,11 +240,13 @@ stdoutput.printf("prepare: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 
+#ifdef EXEC_BEFORE_METADATA
 		// execute the query
 		if (mysql_stmt_execute(stmt)) {
 stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
+#endif
 
 		// get the column count
 		uint32_t	ncols=mysql_stmt_field_count(stmt);
@@ -265,13 +268,14 @@ stdoutput.printf("bind: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 
-/*
+#ifndef EXEC_BEFORE_METADATA
 		// execute the query
 		if (mysql_stmt_execute(stmt)) {
 stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
-*/
+#endif
+
 		// get the affected row count
 		mysql_stmt_affected_rows(stmt);
 
