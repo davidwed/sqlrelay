@@ -239,6 +239,12 @@ stdoutput.printf("prepare: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 
+		// execute the query
+		if (mysql_stmt_execute(stmt)) {
+stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
+			return false;
+		}
+
 		// get the column count
 		uint32_t	ncols=mysql_stmt_field_count(stmt);
 
@@ -259,12 +265,13 @@ stdoutput.printf("bind: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 
+/*
 		// execute the query
 		if (mysql_stmt_execute(stmt)) {
 stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
-	
+*/
 		// get the affected row count
 		mysql_stmt_affected_rows(stmt);
 
