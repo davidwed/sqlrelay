@@ -55,10 +55,14 @@ class sqlrservercursorprivate {
 
 		sqlrquerycursor		*_customquerycursor;
 
+		bool	_queryhasbeenpreprocessed;
 		bool	_queryhasbeenprepared;
+		bool	_queryhasbeenexecuted;
+		bool	_queryneedsintercept;
 		bool	_querywasintercepted;
 		bool	_bindswerefaked;
 		bool	_fakeinputbindsforthisquery;
+		sqlrquerytype_t	_querytype;
 
 		const char	**_fieldnames;
 		const char	**_fields;
@@ -115,10 +119,14 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_id=id;
 
+	pvt->_queryhasbeenpreprocessed=false;
 	pvt->_queryhasbeenprepared=false;
+	pvt->_queryhasbeenexecuted=false;
+	pvt->_queryneedsintercept=false;
 	pvt->_querywasintercepted=false;
 	pvt->_bindswerefaked=false;
 	pvt->_fakeinputbindsforthisquery=false;
+	pvt->_querytype=SQLRQUERYTYPE_ETC;
 
 	pvt->_fieldnames=NULL;
 	pvt->_fields=NULL;
@@ -182,9 +190,19 @@ sqlrquerytype_t sqlrservercursor::queryType(const char *query,
 	} else if (!charstring::compare(ptr,"alter",5)) {
 		retval=SQLRQUERYTYPE_ALTER;
 		ptr=ptr+5;
+	} else if (!charstring::compare(ptr,"begin") ||
+			!charstring::compare(ptr,"begin work")) {
+		return SQLRQUERYTYPE_BEGIN;
+	} else if (!charstring::compare(ptr,"start",5)) {
+		retval=SQLRQUERYTYPE_BEGIN;
+		ptr=ptr+5;
+	} else if (!charstring::compare(ptr,"commit",6)) {
+		return SQLRQUERYTYPE_COMMIT;
+	} else if (!charstring::compare(ptr,"rollback",8)) {
+		return SQLRQUERYTYPE_ROLLBACK;
 	}
 
-	// verify that there's whitespace after the query type
+	// for some query types, verify that whitespace follows
 	if (retval!=SQLRQUERYTYPE_ETC) {
 		if (!character::isWhitespace(*ptr)) {
 			retval=SQLRQUERYTYPE_ETC;
@@ -1038,37 +1056,68 @@ const char *sqlrservercursor::skipCreateTempTableClause(const char *query) {
 	return NULL;
 }
 
-void sqlrservercursor::setQueryHasBeenPrepared(bool queryhasbeenprepared) {
-	pvt->_queryhasbeenprepared=queryhasbeenprepared;
+void sqlrservercursor::setQueryHasBeenPreProcessed(bool preprocessed) {
+	pvt->_queryhasbeenpreprocessed=preprocessed;
+}
+
+bool sqlrservercursor::getQueryHasBeenPreProcessed() {
+	return pvt->_queryhasbeenpreprocessed;
+}
+
+void sqlrservercursor::setQueryHasBeenPrepared(bool prepared) {
+	pvt->_queryhasbeenprepared=prepared;
 }
 
 bool sqlrservercursor::getQueryHasBeenPrepared() {
 	return pvt->_queryhasbeenprepared;
 }
 
-void sqlrservercursor::setQueryWasIntercepted(bool querywasintercepted) {
-	pvt->_querywasintercepted=querywasintercepted;
+void sqlrservercursor::setQueryHasBeenExecuted(bool executed) {
+	pvt->_queryhasbeenexecuted=executed;
+}
+
+bool sqlrservercursor::getQueryHasBeenExecuted() {
+	return pvt->_queryhasbeenexecuted;
+}
+
+void sqlrservercursor::setQueryNeedsIntercept(bool intercept) {
+	pvt->_queryneedsintercept=intercept;
+}
+
+bool sqlrservercursor::getQueryNeedsIntercept() {
+	return pvt->_queryneedsintercept;
+}
+
+void sqlrservercursor::setQueryWasIntercepted(bool intercepted) {
+	pvt->_querywasintercepted=intercepted;
 }
 
 bool sqlrservercursor::getQueryWasIntercepted() {
 	return pvt->_querywasintercepted;
 }
 
-void sqlrservercursor::setBindsWereFaked(bool bindswerefaked) {
-	pvt->_bindswerefaked=bindswerefaked;
+void sqlrservercursor::setBindsWereFaked(bool faked) {
+	pvt->_bindswerefaked=faked;
 }
 
 bool sqlrservercursor::getBindsWereFaked() {
 	return pvt->_bindswerefaked;
 }
 
-void sqlrservercursor::setFakeInputBindsForThisQuery(
-					bool fakeinputbindsforthisquery) {
-	pvt->_fakeinputbindsforthisquery=fakeinputbindsforthisquery;
+void sqlrservercursor::setFakeInputBindsForThisQuery(bool fake) {
+	pvt->_fakeinputbindsforthisquery=fake;
 }
 
 bool sqlrservercursor::getFakeInputBindsForThisQuery() {
 	return pvt->_fakeinputbindsforthisquery;
+}
+
+void sqlrservercursor::setQueryType(sqlrquerytype_t querytype) {
+	pvt->_querytype=querytype;
+}
+
+sqlrquerytype_t sqlrservercursor::getQueryType() {
+	return pvt->_querytype;
 }
 
 stringbuffer *sqlrservercursor::getQueryWithFakeInputBindsBuffer() {

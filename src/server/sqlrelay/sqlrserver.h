@@ -36,7 +36,10 @@ enum sqlrquerytype_t {
 	SQLRQUERYTYPE_DROP,
 	SQLRQUERYTYPE_ALTER,
 	SQLRQUERYTYPE_CUSTOM,
-	SQLRQUERYTYPE_ETC
+	SQLRQUERYTYPE_ETC,
+	SQLRQUERYTYPE_BEGIN,
+	SQLRQUERYTYPE_COMMIT,
+	SQLRQUERYTYPE_ROLLBACK
 };
 
 enum sqlrquerystatus_t {
@@ -355,6 +358,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t length);
+		bool	prepareQuery(sqlrservercursor *cursor,
+						const char *query,
+						uint32_t length,
+						bool enabletranslations,
+						bool enablefilters);
 		bool	executeQuery(sqlrservercursor *cursor);
 		bool	executeQuery(sqlrservercursor *cursor,
 						bool enabletranslations,
@@ -992,18 +1000,29 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		const char	*skipCreateTempTableClause(
 						const char *query);
 
-		void	setQueryHasBeenPrepared(bool queryhasbeenprepared);
+		void	setQueryHasBeenPreProcessed(bool preprocessed);
+		bool	getQueryHasBeenPreProcessed();
+
+		void	setQueryHasBeenPrepared(bool prepared);
 		bool	getQueryHasBeenPrepared();
 
-		void	setQueryWasIntercepted(bool querywasintercepted);
+		void	setQueryHasBeenExecuted(bool executed);
+		bool	getQueryHasBeenExecuted();
+
+		void	setQueryNeedsIntercept(bool intercept);
+		bool	getQueryNeedsIntercept();
+
+		void	setQueryWasIntercepted(bool intercepted);
 		bool	getQueryWasIntercepted();
 
-		void	setBindsWereFaked(bool bindswerefaked);
+		void	setBindsWereFaked(bool faked);
 		bool	getBindsWereFaked();
 
-		void	setFakeInputBindsForThisQuery(
-					bool fakeinputbindsforthisquery);
+		void	setFakeInputBindsForThisQuery(bool fake);
 		bool	getFakeInputBindsForThisQuery();
+
+		void		setQueryType(sqlrquerytype_t querytype);
+		sqlrquerytype_t	getQueryType();
 
 		stringbuffer	*getQueryWithFakeInputBindsBuffer();
 

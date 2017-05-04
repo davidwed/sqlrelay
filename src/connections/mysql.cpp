@@ -152,8 +152,8 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		my_bool		*isnull;
 		unsigned long	*fieldlength;
 
-		uint16_t	bindcount;
 		bool		boundvariables;
+		uint16_t	maxbindcount;
 		MYSQL_BIND	*bind;
 		unsigned long	*bindvaluesize;
 
@@ -674,10 +674,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=NULL;
 	stmtfreeresult=false;
 
-	bindcount=0;
 	boundvariables=false;
 
-	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
+	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	bind=new MYSQL_BIND[maxbindcount];
 	bindvaluesize=new unsigned long[maxbindcount];
 	bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
@@ -804,7 +803,8 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 
-	// reset the bind format error flag
+	// reset the bind counter and flags
+	boundvariables=false;
 	bindformaterror=false;
 
 	// can't use stmt API to run a couple of types of queries as of 5.0
@@ -817,15 +817,6 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		return true;
 	}
 
-	// store inbindcount here, otherwise if rebinding/reexecution occurs and
-	// the client tries to bind more variables than were defined when the
-	// query was prepared, it would cause the inputBind methods to attempt
-	// to address beyond the end of the various arrays
-	bindcount=getInputBindCount();
-
-	// reset bound variables flag
-	boundvariables=false;
-
 	// prepare the statement
 	if (mysql_stmt_prepare(stmt,query,length)) {
 		return false;
@@ -837,6 +828,8 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// get the column count
 	ncols=mysql_stmt_field_count(stmt);
+
+	// validate the column count
 	if (maxcolumncount && ncols>maxcolumncount) {
 		// mysql_stmt_bind_result expects:
 		// "the array (fieldbind) to contain one element for
@@ -863,6 +856,14 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	mysqlresult=NULL;
 	if (ncols) {
 		mysqlresult=mysql_stmt_result_metadata(stmt);
+	}
+
+	// grab the field info
+	if (mysqlresult) {
+		mysql_field_seek(mysqlresult,0);
+		for (unsigned int i=0; i<ncols; i++) {
+			mysqlfields[i]=mysql_fetch_field(mysqlresult);
+		}
 	}
 
 	// bind the fields
@@ -900,9 +901,8 @@ bool mysqlcursor::inputBind(const char *variable,
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// don't attempt to bind beyond the number of
-	// variables defined when the query was prepared
-	if (pos>bindcount) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return false;
 	}
@@ -940,9 +940,8 @@ bool mysqlcursor::inputBind(const char *variable,
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// don't attempt to bind beyond the number of
-	// variables defined when the query was prepared
-	if (pos>bindcount) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return false;
 	}
@@ -975,9 +974,8 @@ bool mysqlcursor::inputBind(const char *variable,
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// don't attempt to bind beyond the number of
-	// variables defined when the query was prepared
-	if (pos>bindcount) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return false;
 	}
@@ -1019,9 +1017,8 @@ bool mysqlcursor::inputBind(const char *variable,
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// don't attempt to bind beyond the number of
-	// variables defined when the query was prepared
-	if (pos>bindcount) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return false;
 	}
@@ -1090,9 +1087,8 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// don't attempt to bind beyond the number of
-	// variables defined when the query was prepared
-	if (pos>bindcount) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return false;
 	}
@@ -1163,8 +1159,8 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		checkForTempTable(query,length);
 
 		// store the result set
-		if ((mysqlresult=mysql_store_result(mysqlconn->mysqlptr))==
-							(MYSQL_RES *)NULL) {
+		mysqlresult=mysql_store_result(mysqlconn->mysqlptr);
+		if (mysqlresult==(MYSQL_RES *)NULL) {
 
 			// if there was an error then return failure, otherwise
 			// the query must have been some DML or DDL
@@ -1184,8 +1180,20 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		// get the column count
 		ncols=mysql_num_fields(mysqlresult);
 
+		// validate the column count
+		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+		if (maxcolumncount && ncols>maxcolumncount) {
+			stringbuffer	err;
+			err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
+			err.append(" (")->append(maxcolumncount);
+			err.append('<')->append(ncols)->append(')');
+			setError(err.getString(),
+				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
+			return false;
+		}
+
 		// allocate buffers, if necessary
-		if (!conn->cont->getMaxColumnCount()) {
+		if (!maxcolumncount) {
 			allocateResultSetBuffers(ncols);
 		}
 
@@ -1195,17 +1203,17 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		// get the affected row count
 		affectedrows=mysql_affected_rows(mysqlconn->mysqlptr);
 
+		// grab the field info
+		if (mysqlresult) {
+			mysql_field_seek(mysqlresult,0);
+			for (unsigned int i=0; i<ncols; i++) {
+				mysqlfields[i]=mysql_fetch_field(mysqlresult);
+			}
+		}
+
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	}
 #endif
-
-	// grab the field info
-	if (mysqlresult) {
-		mysql_field_seek(mysqlresult,0);
-		for (unsigned int i=0; i<ncols; i++) {
-			mysqlfields[i]=mysql_fetch_field(mysqlresult);
-		}
-	}
 
 	return true;
 }
@@ -1635,7 +1643,7 @@ void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		boundvariables=false;
-		bytestring::zero(bind,bindcount*sizeof(MYSQL_BIND));
+		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
 		mysql_stmt_reset(stmt);
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);

@@ -173,11 +173,11 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-		int		bindcount;
-		int		bindcounter;
+		uint16_t	maxbindcount;
 		char		**bindvalues;
 		int		*bindlengths;
 		int		*bindformats;
+		int		bindcounter;
 
 		bool		bindformaterror;
 #endif
@@ -607,13 +607,12 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-	bindcounter=0;
-	bindcount=0;
-	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
+	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	bindvalues=new char *[maxbindcount];
 	bytestring::zero(bindvalues,maxbindcount*sizeof(char *));
 	bindlengths=new int[maxbindcount];
 	bindformats=new int[maxbindcount];
+	bindcounter=0;
 	bindformaterror=false;
 #endif
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
@@ -644,12 +643,6 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize the column count
 	ncols=0;
-
-	// store inbindcount here, otherwise if rebinding/reexecution occurs and
-	// the client tries to bind more variables than were defined when the
-	// query was prepared, it would cause the inputBind methods to attempt
-	// to address beyond the end of the various arrays
-	bindcount=getInputBindCount();
 
 	// reset bind counter
 	bindcounter=0;
@@ -687,12 +680,14 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	int32_t	pos=charstring::toInteger(variable+1)-1;
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// ignore attempts to bind beyond the number of
-	// variables defined when the query was prepared
-	// or below 0
-	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return true;
 	}
@@ -713,12 +708,14 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
-	int32_t	pos=charstring::toInteger(variable+1)-1;
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// ignore attempts to bind beyond the number of
-	// variables defined when the query was prepared
-	// or below 0
-	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return true;
 	}
@@ -736,12 +733,14 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
-	int32_t	pos=charstring::toInteger(variable+1)-1;
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// ignore attempts to bind beyond the number of
-	// variables defined when the query was prepared
-	// or below 0
-	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
 		return true;
 	}
@@ -759,19 +758,15 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	int32_t	pos=charstring::toInteger(variable+1)-1;
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// ignore attempts to bind beyond the number of
-	// variables defined when the query was prepared
-	// or below 0
-	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
-		return true;
-	}
-
-	// ignore attempts to bind beyond the number of
-	// variables defined when the query was prepared
-	if (pos>=bindcount || bindcounter>=bindcount) {
 		return true;
 	}
 
@@ -794,19 +789,15 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	int32_t	pos=charstring::toInteger(variable+1)-1;
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
-	// ignore attempts to bind beyond the number of
-	// variables defined when the query was prepared
-	// or below 0
-	if (pos>=bindcount || bindcounter>=bindcount || pos<0) {
+	// validate bind index
+	if (pos>=maxbindcount) {
 		bindformaterror=true;
-		return true;
-	}
-
-	// ignore attempts to bind beyond the number of
-	// variables defined when the query was prepared
-	if (pos>=bindcount || bindcounter>=bindcount) {
 		return true;
 	}
 

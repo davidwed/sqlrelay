@@ -887,11 +887,16 @@ bool informixcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	if (*isnull==SQL_NULL_DATA) {
 		// the 4th parameter (ValueType) must by
 		// SQL_C_BINARY for this to work with blobs
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
 				SQL_CHAR,
@@ -902,7 +907,7 @@ bool informixcursor::inputBind(const char *variable,
 				&sqlnulldata);
 	} else {
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -924,8 +929,13 @@ bool informixcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -946,8 +956,13 @@ bool informixcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_DOUBLE,
 				SQL_DOUBLE,
@@ -977,6 +992,11 @@ bool informixcursor::inputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	bool	validdate=(year>=0 && month>=0 && day>=0);
 	bool	validtime=(hour>=0 && minute>=0 && second>=0 && microsecond>=0);
 
@@ -988,7 +1008,7 @@ bool informixcursor::inputBind(const char *variable,
 		ts->day=day;
 
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_DATE,
 				SQL_DATE,
@@ -1010,7 +1030,7 @@ bool informixcursor::inputBind(const char *variable,
 		ts->fraction=microsecond*1000;
 
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
@@ -1033,9 +1053,14 @@ bool informixcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	lobbindsize[getInputBindCount()]=valuesize;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	lobbindsize[pos-1]=valuesize;
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
 				SQL_LONGVARBINARY,
@@ -1043,7 +1068,7 @@ bool informixcursor::inputBindBlob(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(lobbindsize[getInputBindCount()]));
+				&(lobbindsize[pos-1]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1056,9 +1081,14 @@ bool informixcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	lobbindsize[getInputBindCount()]=valuesize;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	lobbindsize[pos-1]=valuesize;
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				// SQL_C_CHAR works as expected with TEXT
 				// columns, but when used with clobs it ends up
@@ -1070,7 +1100,7 @@ bool informixcursor::inputBindClob(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(lobbindsize[getInputBindCount()]));
+				&(lobbindsize[pos-1]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1083,10 +1113,15 @@ bool informixcursor::outputBind(const char *variable,
 					uint16_t valuesize, 
 					int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -1106,12 +1141,17 @@ bool informixcursor::outputBind(const char *variable,
 					int64_t *value,
 					int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	*value=0;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -1133,12 +1173,17 @@ bool informixcursor::outputBind(const char *variable,
 					uint32_t *scale,
 					int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	*value=0.0;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_DOUBLE,
 				SQL_DOUBLE,
@@ -1168,6 +1213,11 @@ bool informixcursor::outputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	datebind	*db=new datebind;
 	db->year=year;
 	db->month=month;
@@ -1179,10 +1229,10 @@ bool informixcursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
-	outdatebind[getOutputBindCount()]=db;
+	outdatebind[pos-1]=db;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
@@ -1202,11 +1252,16 @@ bool informixcursor::outputBindBlob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	outlobbind[index]=new char[informixconn->maxoutbindlobsize];
 	outlobbindlen[index]=SQL_NULL_DATA;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_BINARY,
 				SQL_LONGVARBINARY,
@@ -1226,11 +1281,16 @@ bool informixcursor::outputBindClob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	outlobbind[index]=new char[informixconn->maxoutbindlobsize];
 	outlobbindlen[index]=SQL_NULL_DATA;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_LONGVARCHAR,

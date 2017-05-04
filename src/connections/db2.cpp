@@ -900,11 +900,16 @@ bool db2cursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	if (*isnull==SQL_NULL_DATA) {
 		// the 4th parameter (ValueType) must by
 		// SQL_C_BINARY for this to work with blobs
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
 				SQL_CHAR,
@@ -915,7 +920,7 @@ bool db2cursor::inputBind(const char *variable,
 				(SQLINTEGER *)&sqlnulldata);
 	} else {
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -935,8 +940,13 @@ bool db2cursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -957,8 +967,13 @@ bool db2cursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_DOUBLE,
 				SQL_DOUBLE,
@@ -988,6 +1003,11 @@ bool db2cursor::inputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	bool	validdate=(year>=0 && month>=0 && day>=0);
 	bool	validtime=(hour>=0 && minute>=0 && second>=0 && microsecond>=0);
 
@@ -999,7 +1019,7 @@ bool db2cursor::inputBind(const char *variable,
 		ts->day=day;
 
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_DATE,
 				SQL_DATE,
@@ -1021,7 +1041,7 @@ bool db2cursor::inputBind(const char *variable,
 		ts->fraction=microsecond*1000;
 
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
@@ -1044,9 +1064,14 @@ bool db2cursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	blobbindsize[getInputBindCount()]=valuesize;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	blobbindsize[pos-1]=valuesize;
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
 				SQL_BLOB,
@@ -1054,7 +1079,7 @@ bool db2cursor::inputBindBlob(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(blobbindsize[getInputBindCount()]));
+				&(blobbindsize[pos-1]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1072,8 +1097,13 @@ bool db2cursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_CHAR,
 				SQL_CLOB,
@@ -1095,10 +1125,15 @@ bool db2cursor::outputBind(const char *variable,
 					uint16_t valuesize, 
 					int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -1118,12 +1153,17 @@ bool db2cursor::outputBind(const char *variable,
 					int64_t *value,
 					int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	*value=0;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -1145,12 +1185,17 @@ bool db2cursor::outputBind(const char *variable,
 					uint32_t *scale,
 					int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	*value=0.0;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_DOUBLE,
 				SQL_DOUBLE,
@@ -1180,6 +1225,11 @@ bool db2cursor::outputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	datebind	*db=new datebind;
 	db->year=year;
 	db->month=month;
@@ -1191,10 +1241,10 @@ bool db2cursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
-	outdatebind[getOutputBindCount()]=db;
+	outdatebind[pos-1]=db;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
@@ -1214,12 +1264,17 @@ bool db2cursor::outputBindBlob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	outlobbind[index]=new char[db2conn->maxoutbindlobsize];
 
 	// FIXME: Ideally we'd bind a lob locator like we are for columns,
 	// but I can't seem to get that working.
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_BINARY,
 				SQL_BLOB,
@@ -1239,6 +1294,11 @@ bool db2cursor::outputBindClob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	outlobbind[index]=new char[db2conn->maxoutbindlobsize];
 
 	// FIXME: Ideally we'd bind a lob locator like we are for columns,
@@ -1248,7 +1308,7 @@ bool db2cursor::outputBindClob(const char *variable,
 	// Some versions of DB2 don't have SQL_CLOB, but all have SQL_CHAR.
 	// SQL_CHAR works on versions > 7 but does not work on versions <= 7
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				#if (DB2VERSION>7)

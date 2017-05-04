@@ -147,7 +147,6 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindString(cur,"6","testvarchar8");
 	sqlrcur_inputBindString(cur,"7","01/01/2008");
 	sqlrcur_inputBindString(cur,"8","08:00:00");
-	sqlrcur_inputBindString(cur,"9","junkvalue");
 	sqlrcur_validateBinds(cur);
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	printf("\n");

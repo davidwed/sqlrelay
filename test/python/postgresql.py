@@ -104,7 +104,6 @@ def main():
 	cur.inputBind("6","testvarchar8")
 	cur.inputBind("7","01/01/2008")
 	cur.inputBind("8","08:00:00")
-	cur.inputBind("9","junkvalue")
 	cur.validateBinds()
 	checkSuccess(cur.executeQuery(),1)
 	print()

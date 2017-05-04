@@ -184,6 +184,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 //#endif
 		odbccolumn 	col[MAX_COLUMN_COUNT];
 
+		uint16_t	maxbindcount;
 		datebind	**outdatebind;
 
 		uint32_t	row;
@@ -726,8 +727,9 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
-	outdatebind=new datebind *[conn->cont->getConfig()->getMaxBindCount()];
-	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
+	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
+	outdatebind=new datebind *[maxbindcount];
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 	}
 }
@@ -806,6 +808,11 @@ bool odbccursor::inputBind(const char *variable,
 				uint32_t valuesize,
 				short *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	#ifdef HAVE_SQLCONNECTW
 	char *value_ucs=conv_to_ucs((char*)value);
 	valuesize=ucslen(value_ucs)*2;
@@ -817,7 +824,7 @@ bool odbccursor::inputBind(const char *variable,
 		// the 4th parameter (ValueType) must by
 		// SQL_C_BINARY for this to work with blobs
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				/*#ifdef HAVE_SQLCONNECTW
 				SQL_C_WCHAR,
@@ -842,7 +849,7 @@ bool odbccursor::inputBind(const char *variable,
 				);
 	} else {
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				#ifdef HAVE_SQLCONNECTW
 				SQL_C_WCHAR,
@@ -875,8 +882,13 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t *value) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -904,8 +916,13 @@ bool odbccursor::inputBind(const char *variable,
 				uint32_t precision,
 				uint32_t scale) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_DOUBLE,
 				SQL_DECIMAL,
@@ -942,6 +959,11 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	bool	validdate=(year>=0 && month>=0 && day>=0);
 	bool	validtime=(hour>=0 && minute>=0 && second>=0 && microsecond>=0);
 
@@ -953,7 +975,7 @@ bool odbccursor::inputBind(const char *variable,
 		ts->day=day;
 
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_DATE,
 				SQL_DATE,
@@ -981,7 +1003,7 @@ bool odbccursor::inputBind(const char *variable,
 		ts->fraction=microsecond*1000;
 
 		erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
@@ -1011,10 +1033,15 @@ bool odbccursor::outputBind(const char *variable,
 				uint16_t valuesize, 
 				short *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_CHAR,
@@ -1041,12 +1068,17 @@ bool odbccursor::outputBind(const char *variable,
 				int64_t *value,
 				int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	*value=0;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_LONG,
 				SQL_INTEGER,
@@ -1075,12 +1107,17 @@ bool odbccursor::outputBind(const char *variable,
 				uint32_t *scale,
 				int16_t *isnull) {
 
-	outdatebind[getOutputBindCount()]=NULL;
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
 
 	*value=0.0;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_DOUBLE,
 				SQL_DOUBLE,
@@ -1117,6 +1154,11 @@ bool odbccursor::outputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
 	datebind	*db=new datebind;
 	db->year=year;
 	db->month=month;
@@ -1128,10 +1170,10 @@ bool odbccursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
-	outdatebind[getOutputBindCount()]=db;
+	outdatebind[pos-1]=db;
 
 	erg=SQLBindParameter(stmt,
-				charstring::toInteger(variable+1),
+				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
@@ -1200,7 +1242,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -1717,7 +1759,7 @@ void odbccursor::nextRow() {
 void odbccursor::closeResultSet() {
 	SQLCloseCursor(stmt);
 
-	for (uint16_t i=0; i<conn->cont->getConfig()->getMaxBindCount(); i++) {
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
 	}

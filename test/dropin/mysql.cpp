@@ -892,10 +892,9 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 
-	stdoutput.printf("mysql_stmt_prepare/execute: select\n");
+	stdoutput.printf("mysql_stmt_prepare: select\n");
 	query="select * from testdb.testtable";
 	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
-	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 
 
@@ -982,6 +981,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("mysql_stmt_execute: select\n");
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_stmt_fetch:\n");
 	checkSuccess(mysql_stmt_fetch(stmt),0);

@@ -44,6 +44,12 @@
 		intercept tx queries
 		fake transaction blocks
 	general refactoring of the fake-autocommit framework
+	prepare/execute only does lazy prepares if fake-binds are required
+		now. thus, for databases that support it, column info is
+		now exposed to protocol modules post-prepare and pre-execute
+	db connection modules have been updated not to require that the bind
+		counts are known at prepare-time now
+	
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

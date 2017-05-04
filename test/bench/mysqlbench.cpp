@@ -239,26 +239,11 @@ stdoutput.printf("prepare: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
 
-		// execute the query
-		if (mysql_stmt_execute(stmt)) {
-stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
-			return false;
-		}
-
 		// get the column count
 		uint32_t	ncols=mysql_stmt_field_count(stmt);
 
 		// get statement metadata
 		MYSQL_RES	*mysqlresult=mysql_stmt_result_metadata(stmt);
-
-		// bind result set buffers
-		if (mysql_stmt_bind_result(stmt,fieldbind)) {
-stdoutput.printf("bind: %s\n",mysql_stmt_error(stmt));
-			return false;
-		}
-	
-		// get the affected row count
-		mysql_stmt_affected_rows(stmt);
 
 		// run through the columns
 		if (getcolumns) {
@@ -267,6 +252,21 @@ stdoutput.printf("bind: %s\n",mysql_stmt_error(stmt));
 				mysql_fetch_field(mysqlresult);
 			}
 		}
+
+		// bind result set buffers
+		if (mysql_stmt_bind_result(stmt,fieldbind)) {
+stdoutput.printf("bind: %s\n",mysql_stmt_error(stmt));
+			return false;
+		}
+
+		// execute the query
+		if (mysql_stmt_execute(stmt)) {
+stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
+			return false;
+		}
+	
+		// get the affected row count
+		mysql_stmt_affected_rows(stmt);
 
 		// run through the rows
 		while (!mysql_stmt_fetch(stmt)) {

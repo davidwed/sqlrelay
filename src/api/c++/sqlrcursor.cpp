@@ -2026,7 +2026,7 @@ void sqlrcursor::validateBindsInternal() {
 	const char	*start;
 	const char	*after;
 	bool		found;
-	int		len;
+	size_t		len;
 
 	// check each input bind
 	for (uint64_t in=0; in<pvt->_inbindvars->getLength(); in++) {

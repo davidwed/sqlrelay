@@ -100,7 +100,6 @@
 	sqlrcur_inputBind($cur,"6","testvarchar8");
 	sqlrcur_inputBind($cur,"7","01/01/2008");
 	sqlrcur_inputBind($cur,"8","08:00:00");
-	sqlrcur_inputBind($cur,"9","junkvalue");
 	sqlrcur_validateBinds($cur);
 	checkSuccess(sqlrcur_executeQuery($cur),1);
 	echo("\n");

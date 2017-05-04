@@ -2237,22 +2237,47 @@ void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 	pvt->_conn->setLiveConnection(liveconnection);
 }
 
+bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
+
+	// we have to do this if we're faking transaction blocks,
+	// otherwise we'll only do it if it was manually enabled
+	if (!pvt->_faketransactionblocks && !pvt->_intercepttxqueries) {
+		return false;
+	}
+
+	// for now, we only intercept transaction queries
+	if (isBeginTransactionQuery(cursor)) {
+		cursor->setQueryType(SQLRQUERYTYPE_BEGIN);
+		return true;
+	} else if (isCommitQuery(cursor)) {
+		cursor->setQueryType(SQLRQUERYTYPE_COMMIT);
+		return true;
+	} else if (isRollbackQuery(cursor)) {
+		cursor->setQueryType(SQLRQUERYTYPE_ROLLBACK);
+		return true;
+	}
+	return false;
+}
+
 bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 
 	cursor->setQueryWasIntercepted(false);
 
 	// we have to do this if we're faking transaction blocks,
 	// otherwise we'll only do it if it was manually enabled
-	if (!pvt->_intercepttxqueries && !pvt->_faketransactionblocks) {
+	if (!pvt->_faketransactionblocks && !pvt->_intercepttxqueries) {
 		return false;
 	}
+
+	// Get the query type.  It will have been set by checkInterceptQuery().
+	sqlrquerytype_t	querytype=cursor->getQueryType();
 
 	// Intercept begins and handle them.  If we're faking begins, commit
 	// and rollback queries also need to be intercepted as well, otherwise
 	// the query will be sent directly to the db and endFakeBeginTransaction
 	// won't get called.
 	bool	retval=false;
-	if (isBeginTransactionQuery(cursor)) {
+	if (querytype==SQLRQUERYTYPE_BEGIN) {
 		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
@@ -2268,7 +2293,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		// FIXME: if the begin fails and the db api doesn't support
 		// a begin command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
-	} else if (isCommitQuery(cursor)) {
+	} else if (querytype==SQLRQUERYTYPE_COMMIT) {
 		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
@@ -2284,7 +2309,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		// FIXME: if the commit fails and the db api doesn't support
 		// a commit command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
-	} else if (isRollbackQuery(cursor)) {
+	} else if (querytype==SQLRQUERYTYPE_ROLLBACK) {
 		cursor->setQueryWasIntercepted(true);
 		cursor->setInputBindCount(0);
 		cursor->setOutputBindCount(0);
@@ -3306,6 +3331,14 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t querylen) {
+	return prepareQuery(cursor,query,querylen,false,false);
+}
+
+bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
+						const char *query,
+						uint32_t querylen,
+						bool enabletranslations,
+						bool enablefilters) {
 
 	// The standard paradigm is:
 	//
@@ -3313,13 +3346,28 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// * bind(variable,value)
 	// * execute()
 	//
-	// We need to do lazy preparing though.
-	//
-	// Under various circumstances, we may need to fake binds.  This
+	// Under various circumstances, we may need to fake binds though.  This
 	// requires the query to be rewritten to include the bind values before
-	// being prepared.  So, we'll defer preparing the query until the
-	// execution phase so that we'll be sure to have all of the bind values
-	// on hand.
+	// being prepared.  In that case, we must defer preparing the query
+	// until the execution phase so that we'll be sure to have all of the
+	// bind values on hand ("lazy prepares").
+	//
+	// The sqlrclient protocol is fine with that, but other protocols like
+	// mysql and tds want to be able to return column info after prepare
+	// but before execution.
+	//
+	// So, we can't just generally do lazy-prepares.  Instead, we'll follow
+	// the standard paradigm when we can, and lazy-prepare when we must.
+	//
+	// That way, non-sqlrclient protocols will work as expected, unless
+	// fakeinputbinds="yes" is explicitly set.
+	//
+	// There are some queries that must be fake-bind'ed, and thus
+	// lazy-prepared (eg. Oracle's "create as select", and some MySQL
+	// queries...) but they don't return a result set.  So, they'll end up
+	// working fine, even with protocols that want to return column info
+	// after prepare, because it turns out that there's no column info to
+	// return anyway.
 
 	// clean up the previous result set
 	closeResultSet(cursor);
@@ -3328,11 +3376,15 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	clearError(cursor);
 
 	// reset flags
+	cursor->setQueryHasBeenPreProcessed(false);
 	cursor->setQueryHasBeenPrepared(false);
+	cursor->setQueryHasBeenExecuted(false);
+	cursor->setQueryNeedsIntercept(false);
 	cursor->setQueryWasIntercepted(false);
 	cursor->setBindsWereFaked(false);
-	cursor->setFakeInputBindsForThisQuery(false);
+	cursor->setFakeInputBindsForThisQuery(pvt->_fakeinputbinds);
 	cursor->setQueryStatus(SQLRQUERYSTATUS_ERROR);
+	cursor->setQueryType(SQLRQUERYTYPE_ETC);
 
 	// reset column mapping
 	pvt->_columnmap=NULL;
@@ -3341,6 +3393,10 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	if (querylen>pvt->_maxquerysize) {
 		querylen=pvt->_maxquerysize;
 		cursor->setQueryLength(pvt->_maxquerysize);
+		// FIXME: Should we throw an error here?  If not, we'll end up
+		// trying to execute a partial query, which could fail, or
+		// could just truncate part of the where clause, yielding a
+		// valid, but incorrect result.
 	}
 
 	// copy query to cursor's query buffer if necessary
@@ -3349,6 +3405,143 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		cursor->getQueryBuffer()[querylen]='\0';
 		cursor->setQueryLength(querylen);
 	}
+
+
+
+	// NEW CODE.......
+
+	// bail if we are just generally configured to fake input binds
+	if (cursor->getFakeInputBindsForThisQuery()) {
+		return true;
+	}
+
+	// do this here instead of inside translateBindVariables
+	// because translateQuery might use it
+	pvt->_bindmappingspool->deallocate();
+
+	// before-filter query
+	if (enablefilters && pvt->_sqlrf) {
+		if (!filterQuery(cursor,true)) {
+
+			// log the query
+			raiseQueryEvent(cursor);
+
+			cursor->setQueryStatus(
+				SQLRQUERYSTATUS_FILTER_VIOLATION);
+			return false;
+		}
+	}
+
+	// translate query
+	if (enabletranslations && pvt->_sqlrt) {
+		translateQuery(cursor);
+	}
+
+	// translate bind variables
+	if (pvt->_translatebinds) {
+		translateBindVariables(cursor);
+	}
+
+	// translate "begin" queries
+	if (pvt->_conn->supportsTransactionBlocks() &&
+			isBeginTransactionQuery(cursor)) {
+		translateBeginTransaction(cursor);
+	}
+
+	// after-filter query
+	if (enablefilters && pvt->_sqlrf) {
+		if (!filterQuery(cursor,false)) {
+
+			// log the query
+			raiseQueryEvent(cursor);
+
+			cursor->setQueryStatus(
+				SQLRQUERYSTATUS_FILTER_VIOLATION);
+			return false;
+		}
+	}
+
+	// (re)get the query now that it's been translated
+	query=cursor->getQueryBuffer();
+	querylen=cursor->getQueryLength();
+
+	// fake input binds if this specific query doesn't support them
+	if (!cursor->supportsNativeBinds(query,querylen)) {
+		cursor->setFakeInputBindsForThisQuery(true);
+	}
+
+	// check to see if the query needs to be intercepted,
+	// but don't actually intercept it yet
+	cursor->setQueryNeedsIntercept(checkInterceptQuery(cursor));
+
+	// set flag indicating that the query has been preprocessed
+	cursor->setQueryHasBeenPreProcessed(true);
+
+	// Bail if we this query should fake input binds.  This an happen if:
+	// * the instance is generally configured to fake input binds
+	// * one of the translations has set the
+	// 	fakeinputbindsforthisquery flag true
+	// * the specific query doesn't support native binds
+	// In any of these cases, the cursor's fakeinputbindsforthisquery
+	// flag will have been set true.
+	if (cursor->getFakeInputBindsForThisQuery()) {
+		return true;
+	}
+
+	raiseDebugMessageEvent("preparing query...");
+
+	// set the query start time (in case the prepare fails)
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+
+	// prepare the query
+	bool	success=cursor->prepareQuery(query,querylen);
+
+	// log result
+	raiseDebugMessageEvent((success)?"prepare query succeeded":
+						"prepare query failed");
+	raiseDebugMessageEvent("done with prepare query");
+
+	if (!success) {
+
+		// set the query end time
+		dt.getSystemDateAndTime();
+		cursor->setQueryEnd(dt.getSeconds(),
+					dt.getMicroseconds());
+
+		// update query and error counts
+		incrementQueryCounts(cursor->queryType(query,querylen));
+		incrementTotalErrors();
+
+		// get the error
+		uint32_t	errorlength;
+		int64_t		errnum;
+		bool		liveconnection;
+		errorMessage(cursor,
+				cursor->getErrorBuffer(),
+				pvt->_maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
+		cursor->setErrorLength(errorlength);
+		cursor->setErrorNumber(errnum);
+		cursor->setLiveConnection(liveconnection);
+
+		pvt->_debugstr.clear();
+		pvt->_debugstr.append("prepare failed: ");
+		pvt->_debugstr.append("\"");
+		pvt->_debugstr.append(
+			cursor->getErrorBuffer(),errorlength);
+		pvt->_debugstr.append("\"");
+		raiseDebugMessageEvent(pvt->_debugstr.getString());
+
+		// log the query (attempt)
+		raiseQueryEvent(cursor);
+
+		return false;
+	}
+
+	// set flag indicating that the query has been prepared
+	cursor->setQueryHasBeenPrepared(true);
 
 	return true;
 }
@@ -3362,14 +3555,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enablefilters,
 						bool enabletriggers) {
 
-	// we'll need this later
-	datetime	dt;
-
 	// set state
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
 
 	// if we're re-executing
-	if (cursor->getQueryHasBeenPrepared()) {
+	if (cursor->getQueryHasBeenExecuted()) {
 
 		// clean up the previous result set
 		closeResultSet(cursor);
@@ -3384,11 +3574,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 	}
 
-	// init result
-	bool	success=false;
-
-	// if the query hasn't been prepared then do various translations
-	if (!cursor->getQueryHasBeenPrepared()) {
+	// if the query hasn't been preprocessed then execute various
+	// filters, translations, and checks
+	if (!cursor->getQueryHasBeenPreProcessed()) {
 
 		// do this here instead of inside translateBindVariables
 		// because translateQuery might use it
@@ -3436,38 +3624,58 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			}
 		}
 
-		// fake input binds if necessary
-		// * the instance could be configured to fake all input binds
-		// * the specific query might not support native binds
-		// * one of the translations might have set the
-		// 	fakeinputbindsforthisquery flag true
-		if (pvt->_fakeinputbinds ||
-			!cursor->supportsNativeBinds(
+		// fake input binds if this specific query doesn't support them
+		if (!cursor->supportsNativeBinds(
 					cursor->getQueryBuffer(),
-					cursor->getQueryLength()) ||
-			cursor->getFakeInputBindsForThisQuery()) {
-
-			raiseDebugMessageEvent("faking binds...");
-
+					cursor->getQueryLength())) {
 			cursor->setFakeInputBindsForThisQuery(true);
-
-			if (cursor->fakeInputBinds()) {
-				if (pvt->_debugsqlrtranslation) {
-					stdoutput.printf(
-					"after faking input binds:\n%s\n\n",
-					cursor->
-					getQueryWithFakeInputBindsBuffer()->
-								getString());
-				}
-				cursor->setBindsWereFaked(true);
-			}
 		}
 
-		// set the query start time (in case the query is intercepted)
-		dt.getSystemDateAndTime();
-		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+		// check to see if the query needs to be intercepted,
+		// but don't actually intercept it yet
+		cursor->setQueryNeedsIntercept(checkInterceptQuery(cursor));
 
-		// intercept some queries for special handling
+		// set flag indicating that the query has been preprocessed
+		cursor->setQueryHasBeenPreProcessed(true);
+	}
+
+	// Do we need to fake input binds?
+	// We do if:
+	// * the instance is generally configured to fake input binds
+	// * one of the translations has set the
+	// 	fakeinputbindsforthisquery flag true
+	// * the specific query doesn't support native binds
+	// In any of these cases, the cursor's fakeinputbindsforthisquery flag
+	// will have been set true.
+	if (cursor->getFakeInputBindsForThisQuery()) {
+
+		raiseDebugMessageEvent("faking binds...");
+
+		if (cursor->fakeInputBinds()) {
+			if (pvt->_debugsqlrtranslation) {
+				stdoutput.printf(
+				"after faking input binds:\n%s\n\n",
+				cursor->
+				getQueryWithFakeInputBindsBuffer()->
+							getString());
+			}
+			cursor->setBindsWereFaked(true);
+		}
+	}
+
+	// (re)set the query start time
+	// (which may have been set earlier during prepare,
+	// in case the prepare failed)
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+
+	// init result
+	bool	success=false;
+
+	// if the query needs to be intercepted, then intercept it
+	if (cursor->getQueryNeedsIntercept()) {
+
 		success=interceptQuery(cursor);
 		if (cursor->getQueryWasIntercepted()) {
 
@@ -3497,7 +3705,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 							getStringLength();
 	}
 
-	// now actually prepare the query, if necessary
+	// if the query still hasn't been prepared (probably
+	// because we're faking binds), then prepare it now
 	if (!cursor->getQueryHasBeenPrepared()) {
 
 		raiseDebugMessageEvent("preparing query...");
@@ -3617,6 +3826,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// execute the query
 	success=cursor->executeQuery(query,querylen);
+
+	// set flag indicating that the query has been executed
+	if (success) {
+		cursor->setQueryHasBeenExecuted(true);
+	}
 
 	// set the query end time
 	dt.getSystemDateAndTime();
