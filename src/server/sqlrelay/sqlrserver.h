@@ -740,8 +740,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		void		setErrorNumber(uint32_t errnum);
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
-		bool		getErrorSetManually();
-		void		setErrorSetManually(bool errorsetmanually);
+		bool		getErrorWasSetManually();
+		void		setErrorWasSetManually(bool manually);
 
 		sqlrservercontroller	*cont;
 
@@ -992,8 +992,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		void		setErrorNumber(uint32_t errnum);
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
-		bool		getErrorSetManually();
-		void		setErrorSetManually(bool errorsetmanually);
+		bool		getErrorWasSetManually();
+		void		setErrorWasSetManually(bool manually);
 
 		void		setCreateTempTablePattern(
 						const char *createtemp);

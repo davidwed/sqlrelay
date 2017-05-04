@@ -1669,8 +1669,8 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 				// FIXME: set error here
 				return false;
 			}
-			curs->setState(SQLRCURSORSTATE_BUSY);
-			bv->value.cursorid=curs->getId();
+			cont->setState(curs,SQLRCURSORSTATE_BUSY);
+			bv->value.cursorid=cont->getId(curs);
 		}
 
 		// init the null indicator

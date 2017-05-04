@@ -2181,7 +2181,7 @@ void sqlrservercontroller::errorMessage(char *errorbuffer,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection) {
-	if (pvt->_conn->getErrorSetManually()) {
+	if (pvt->_conn->getErrorWasSetManually()) {
 		*errorlength=pvt->_conn->getErrorLength();
 		charstring::safeCopy(errorbuffer,
 					errorbuffersize,
@@ -2189,7 +2189,7 @@ void sqlrservercontroller::errorMessage(char *errorbuffer,
 					pvt->_cfg->getMaxErrorLength());
 		*errorcode=pvt->_conn->getErrorNumber();
 		*liveconnection=pvt->_conn->getLiveConnection();
-		pvt->_conn->setErrorSetManually(false);
+		pvt->_conn->setErrorWasSetManually(false);
 	} else {
 		pvt->_conn->errorMessage(errorbuffer,
 					errorbuffersize,
@@ -2337,22 +2337,22 @@ bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
 
 	// See if it was any of the different queries used to start a
 	// transaction.  IMPORTANT: don't just look for the first 5 characters
-	// to be "BEGIN", make sure it's the entire query.  Many db's use
-	// "BEGIN" to start a stored procedure block, but in those cases,
+	// to be "begin", make sure it's the entire query.  Many db's use
+	// "begin" to start a stored procedure block, but in those cases,
 	// something will follow it.
-	if (!charstring::compareIgnoringCase(ptr,"BEGIN",5)) {
+	if (!charstring::compareIgnoringCase(ptr,"begin",5)) {
 
 		// make sure there are only spaces, comments or the word "work"
 		// after the begin
 		const char	*spaceptr=skipWhitespaceAndComments(ptr+5);
 		
-		if (!charstring::compareIgnoringCase(spaceptr,"WORK",4) ||
+		if (!charstring::compareIgnoringCase(spaceptr,"work",4) ||
 			*spaceptr=='\0') {
 			return true;
 		}
 		return false;
 
-	} else if (!charstring::compareIgnoringCase(ptr,"START ",6)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"start ",6)) {
 		return true;
 	}
 	return false;
@@ -6161,7 +6161,7 @@ void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection) {
-	if (cursor->getErrorSetManually()) {
+	if (cursor->getErrorWasSetManually()) {
 		*errorlength=cursor->getErrorLength();
 		charstring::safeCopy(errorbuffer,
 					errorbuffersize,
@@ -6169,7 +6169,7 @@ void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 					pvt->_cfg->getMaxErrorLength());
 		*errorcode=cursor->getErrorNumber();
 		*liveconnection=cursor->getLiveConnection();
-		cursor->setErrorSetManually(false);
+		cursor->setErrorWasSetManually(false);
 	} else {
 		cursor->errorMessage(errorbuffer,
 					errorbuffersize,

@@ -22,7 +22,7 @@ class sqlrserverconnectionprivate {
 		uint32_t	_errorlength;
 		int64_t		_errnum;
 		bool		_liveconnection;
-		bool		_errorsetmanually;
+		bool		_errorwassetmanually;
 
 		char		*_dbhostname;
 		char		*_dbipaddress;
@@ -42,7 +42,7 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 	pvt->_errorlength=0;
 	pvt->_errnum=0;
 	pvt->_liveconnection=false;
-	pvt->_errorsetmanually=false;
+	pvt->_errorwassetmanually=false;
 
 	pvt->_dbhostname=NULL;
 	pvt->_dbipaddress=NULL;
@@ -754,7 +754,7 @@ void sqlrserverconnection::endSession() {
 
 void sqlrserverconnection::clearError() {
 	setError(NULL,0,true);
-	pvt->_errorsetmanually=false;
+	pvt->_errorwassetmanually=false;
 }
 
 void sqlrserverconnection::setError(const char *err,
@@ -768,7 +768,7 @@ void sqlrserverconnection::setError(const char *err,
 	pvt->_error[pvt->_errorlength]='\0';
 	pvt->_errnum=errn;
 	pvt->_liveconnection=liveconn;
-	pvt->_errorsetmanually=true;
+	pvt->_errorwassetmanually=true;
 }
 
 char *sqlrserverconnection::getErrorBuffer() {
@@ -799,10 +799,10 @@ void sqlrserverconnection::setLiveConnection(bool liveconnection) {
 	pvt->_liveconnection=liveconnection;
 }
 
-bool sqlrserverconnection::getErrorSetManually() {
-	return pvt->_errorsetmanually;
+bool sqlrserverconnection::getErrorWasSetManually() {
+	return pvt->_errorwassetmanually;
 }
 
-void sqlrserverconnection::setErrorSetManually(bool errorsetmanually) {
-	pvt->_errorsetmanually=errorsetmanually;
+void sqlrserverconnection::setErrorWasSetManually(bool manually) {
+	pvt->_errorwassetmanually=manually;
 }

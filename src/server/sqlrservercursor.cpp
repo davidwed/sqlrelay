@@ -49,7 +49,7 @@ class sqlrservercursorprivate {
 		uint32_t	_errorlength;
 		int64_t		_errnum;
 		bool		_liveconnection;
-		bool		_errorsetmanually;
+		bool		_errorwassetmanually;
 
 		sqlrcursorstate_t	_state;
 
@@ -106,7 +106,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_errorlength=0;
 	pvt->_errnum=0;
 	pvt->_liveconnection=true;
-	pvt->_errorsetmanually=false;
+	pvt->_errorwassetmanually=false;
 
 	setCommandStart(0,0);
 	setCommandEnd(0,0);
@@ -992,7 +992,7 @@ bool sqlrservercursor::getCurrentRowReformatted() {
 
 void sqlrservercursor::clearError() {
 	setError(NULL,0,true);
-	pvt->_errorsetmanually=false;
+	pvt->_errorwassetmanually=false;
 }
 
 void sqlrservercursor::setError(const char *err, int64_t errn, bool liveconn) {
@@ -1004,7 +1004,7 @@ void sqlrservercursor::setError(const char *err, int64_t errn, bool liveconn) {
 	pvt->_error[pvt->_errorlength]='\0';
 	pvt->_errnum=errn;
 	pvt->_liveconnection=liveconn;
-	pvt->_errorsetmanually=true;
+	pvt->_errorwassetmanually=true;
 }
 
 char *sqlrservercursor::getErrorBuffer() {
@@ -1035,12 +1035,12 @@ void sqlrservercursor::setLiveConnection(bool liveconnection) {
 	pvt->_liveconnection=liveconnection;
 }
 
-bool sqlrservercursor::getErrorSetManually() {
-	return pvt->_errorsetmanually;
+bool sqlrservercursor::getErrorWasSetManually() {
+	return pvt->_errorwassetmanually;
 }
 
-void sqlrservercursor::setErrorSetManually(bool errorsetmanually) {
-	pvt->_errorsetmanually=errorsetmanually;
+void sqlrservercursor::setErrorWasSetManually(bool manually) {
+	pvt->_errorwassetmanually=manually;
 }
 
 void sqlrservercursor::setCreateTempTablePattern(const char *createtemp) {
