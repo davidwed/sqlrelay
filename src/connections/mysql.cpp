@@ -796,6 +796,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// doing this will refresh this connection with any data committed
 	// by other connections, which is what would happen if a new client
 	// connected directly to mysql
+	// FIXME: is this necessary since queryIsNotSelect() returns true?
 	if (mysqlconn->firstquery) {
 		mysqlconn->commit();
 		mysqlconn->firstquery=false;
