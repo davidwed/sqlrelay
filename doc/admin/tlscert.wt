@@ -1,0 +1,38 @@
+= The tlscert Parameter =
+
+SQL Relay supports a '''tlscert''' parameter in the SQL Relay server's configuration file, and as an argument to the various command line client programs.  In either case, it specifies the TLS certificate chain to use.
+
+On non-Windows platforms, it must specify a certificate chain file.
+
+On Windows platforms it may specify a certificate chain file or it may specify a certificate in a Windows Certificate Store.
+
+For actual files:
+
+* The file should contain the server's certificate, private key, and signing certificates, as appropriate.
+* On non-Windows systems, a variety of file formats are supported.
+* On Windows systems it must be a .pfx file.
+
+For certificates in a Windows Certificate store:
+
+* The certificate should have an associated private key, and associated signing certificates, as appropriate.
+* The parameter must be formatted in one of the following ways:
+ * location:store:subject
+ * store:subject
+ * subject
+* The location part must be one of the following:
+ * CURRENT_USER
+ * LOCAL_MACHINE
+ * CURRENT_SERVICE
+ * SERVICES
+ * USERS
+ * CURRENT_USER_GROUP_POLICY
+ * LOCAL_MACHINE_GROUP_POLICY
+ * LOCAL_MACHINE_ENTERPRISE
+ * (if omitted, it defaults to CURRENT_USER)
+* The store part must be one of the following:
+ * MY
+ * Root
+ * Trust
+ * CA
+ * (if omitted, it defaults to MY)
+* The "subject" parameter identifies the certificate.  The first certificate in the specified location/store who's Subject contains "subject" (case-insensitive) will be used.  Note that the order of the certificates in the store is not guaranteed, so "subject" should contain enough information to uniquely identify a certificate.

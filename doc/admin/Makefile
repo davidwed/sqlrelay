@@ -10,7 +10,8 @@ SRCS = configguide.wt \
 	oraclentier.wt \
 	prerequisites.wt \
 	running.wt \
-	tuning.wt
+	tuning.wt \
+	tlscert.wt
 
 OBJS = configguide.html \
 	configreference.html \
@@ -18,7 +19,8 @@ OBJS = configguide.html \
 	oraclentier.html \
 	prerequisites.html \
 	running.html \
-	tuning.html
+	tuning.html \
+	tlscert.html
 
 .wt.html:
 	wt -i $< -o $@ -xhtml xhtml.conf

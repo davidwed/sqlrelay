@@ -1823,7 +1823,7 @@ http://www.gnu.org/software/src-highlite -->
   <li>SQL Relay clients and servers may optionally validate each other's certificates and identities.</li>
 </ul>
 
-<p>When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.  Linux and Unix systems support a variety of certificate formats, including the popular .pem format.  On Windows systems, only the .pfx certificate format is currently supported.</p>
+<p>When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.</p>
 
 <p>The following configuration enables TLS/SSL security for an instance of SQL relay:</p>
 
@@ -1850,12 +1850,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <ul>
   <li>The <b>tls</b> parameter enables (or disables) TLS/SSL encryption.</li>
-  <li>The <b>tlscert</b> parameter specifies a TLS/SSL certificate chain file to use.</li>
-  <ul>
-    <li>This file should contain the server's certificate, private key, and signing certificates, as appropriate.</li>
-    <li>A .pem file is specified in this example, but on Windows systems, a .pfx file must be used.</li>
-  </ul>
-
+  <li>The <b>tlscert</b> parameter specifies the TLS/SSL certificate chain to use. (See <a href="tlscert.html">The tlscert Parameter</a> for details)</li>
   <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
 </ul>
 
@@ -1892,7 +1887,7 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)</p>
+<p>(a .pem file is specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See <a href="tlscert.html">The tlscert Parameter</a> for details.)</p>
 
 <p>This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, <b>but the client is still vulnerable to various attacks</b>.</p>
 
@@ -1903,7 +1898,7 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>(.pem files are specified in this example, but on Windows systems, .pfx files must be used)</p>
+<p>(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See <a href="tlscert.html">The tlscert Parameter</a> for details.)</p>
 
 <p>Note that the fully qualified host name was provided.  Note also the use of the ca+host value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the host name will also be validated.  If the certificate contains Subject Alternative Names, then the host name will be compared to each of them.  If no Subject Alternative Names are provided then the host name will be compared to the certificate's Common Name.  The session will only continue if the sever's certificate and identity are both valid.</p>
 
@@ -1914,7 +1909,7 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)</p>
+<p>(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See <a href="tlscert.html">The tlscert Parameter</a> for details.)</p>
 
 <p>Note that the fully qualified host name was provided.  Note also the use of the ca+domain value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the domain name portion of the host name will also be validated.  If the certificate contains Subject Alternative Names, then the domain name portion of the host name will be compared to the domain name portion of each of them.  If no Subject Alternative Names are provided then the domain name portion of the host name will be compared to the domain name portion of the certificate's Common Name.  The session will only continue if the sever's certificate and domain identity are both valid.</p>
 
@@ -1965,7 +1960,7 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>(a .pem file is specified in this example, but on Windows systems, a .pfx file must be used)</p>
+<p>(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See <a href="tlscert.html">The tlscert Parameter</a> for details.)</p>
 
 <p>Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.</p>
 
@@ -1976,7 +1971,7 @@ http://www.gnu.org/software/src-highlite -->
 </pre>
 
 </blockquote>
-<p>(.pem files are specified in this example, but on Windows systems, .pfx files must be used)</p>
+<p>(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See <a href="tlscert.html">The tlscert Parameter</a> for details.)</p>
 
 <p>In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.</p>
 

@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title>The tlscert Parameter</title>
+	<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<h1>The tlscert Parameter</h1>
+
+<p>SQL Relay supports a <b>tlscert</b> parameter in the SQL Relay server's configuration file, and as an argument to the various command line client programs.  In either case, it specifies the TLS certificate chain to use.</p>
+
+<p>On non-Windows platforms, it must specify a certificate chain file.</p>
+
+<p>On Windows platforms it may specify a certificate chain file or it may specify a certificate in a Windows Certificate Store.</p>
+
+<p>For actual files:</p>
+
+<ul>
+  <li>The file should contain the server's certificate, private key, and signing certificates, as appropriate.</li>
+  <li>On non-Windows systems, a variety of file formats are supported.</li>
+  <li>On Windows systems it must be a .pfx file.</li>
+</ul>
+
+<p>For certificates in a Windows Certificate store:</p>
+
+<ul>
+  <li>The certificate should have an associated private key, and associated signing certificates, as appropriate.</li>
+  <li>The parameter must be formatted in one of the following ways:</li>
+  <ul>
+    <li>location:store:subject</li>
+    <li>store:subject</li>
+    <li>subject</li>
+  </ul>
+
+  <li>The location part must be one of the following:</li>
+  <ul>
+    <li>CURRENT_USER</li>
+    <li>LOCAL_MACHINE</li>
+    <li>CURRENT_SERVICE</li>
+    <li>SERVICES</li>
+    <li>USERS</li>
+    <li>CURRENT_USER_GROUP_POLICY</li>
+    <li>LOCAL_MACHINE_GROUP_POLICY</li>
+    <li>LOCAL_MACHINE_ENTERPRISE</li>
+    <li>(if omitted, it defaults to CURRENT_USER)</li>
+  </ul>
+
+  <li>The store part must be one of the following:</li>
+  <ul>
+    <li>MY</li>
+    <li>Root</li>
+    <li>Trust</li>
+    <li>CA</li>
+    <li>(if omitted, it defaults to MY)</li>
+  </ul>
+
+  <li>The "subject" parameter identifies the certificate.  The first certificate in the specified location/store who's Subject contains "subject" (case-insensitive) will be used.  Note that the order of the certificates in the store is not guaranteed, so "subject" should contain enough information to uniquely identify a certificate.
+</li>
+</ul>
+
+</body>
+</html>
