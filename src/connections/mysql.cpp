@@ -137,7 +137,6 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	**mysqlfields;
-		uint32_t	mysqlfieldindex;
 		unsigned int	ncols;
 		my_ulonglong	nrows;
 		my_ulonglong	affectedrows;
