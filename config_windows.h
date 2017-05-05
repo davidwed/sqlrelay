@@ -136,6 +136,9 @@
 /* MySQL supports mysql_set_character_set */
 #define HAVE_MYSQL_SET_CHARACTER_SET 1
 
+/* MySQL supports mysql_ssl_set */
+#define HAVE_MYSQL_SSL_SET 1
+
 /* MySQL supports mysql_stmt_prepare */
 #define HAVE_MYSQL_STMT_PREPARE 1
 
