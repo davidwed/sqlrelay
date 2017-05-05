@@ -42,9 +42,9 @@ int main(int argc, const char **argv) {
 	uint32_t	colsize=32;
 	uint16_t	samples=10;
 	uint64_t	rsbs=0;
-	bool		dbonly=false;
-	bool		proxyonly=false;
-	bool		sqlrelayonly=false;
+	bool		benchdb=true;
+	bool		benchproxy=false;
+	bool		benchsqlrelay=true;
 	bool		debug=false;
 	const char	*graph=NULL;
 	bool		nosettle=false;
@@ -88,14 +88,11 @@ int main(int argc, const char **argv) {
 	if (cmdl.found("rsbs")) {
 		rsbs=charstring::toInteger(cmdl.getValue("rsbs"));
 	}
-	if (cmdl.found("dbonly")) {
-		dbonly=true;
-	}
-	if (cmdl.found("proxyonly")) {
-		proxyonly=true;
-	}
-	if (cmdl.found("sqlrelayonly")) {
-		sqlrelayonly=true;
+	if (cmdl.found("bench")) {
+		const char	*bench=cmdl.getValue("bench");
+		benchsqlrelay=charstring::contains(bench,"sqlrelay");
+		benchproxy=charstring::contains(bench,"proxy");
+		benchdb=charstring::contains(bench,"db");
 	}
 	if (cmdl.found("debug")) {
 		debug=true;
@@ -135,7 +132,7 @@ int main(int argc, const char **argv) {
 			"	[-colsize characters-per-column] \\\n"
 			"	[-samples samples-per-test] \\\n"
 			"	[-rsbs result-set-buffer-size] \\\n"
-			"	[-dbonly|-proxyonly|-sqlrelayonly] \\\n"
+			"	[-bench [sqlrelay],[proxy],[db]] \\\n"
 			"	[-debug] \\\n"
 			"	[-graph graph-file-name] \\\n"
 			"	[-nosettle]\n");
@@ -176,9 +173,9 @@ int main(int argc, const char **argv) {
 		bool	direct=(i==2);
 
 		// skip tests we don't want to run
-		if ((sqlrelayonly && i!=0) ||
-			(proxyonly && i!=1) ||
-			(dbonly && i!=2)) {
+		if ((!benchsqlrelay && i==0) ||
+			(!benchproxy && i==1) ||
+			(!benchdb && i==2)) {
 			continue;
 		}
 
