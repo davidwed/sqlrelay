@@ -49,6 +49,8 @@
 		now exposed to protocol modules post-prepare and pre-execute
 	db connection modules have been updated not to require that the bind
 		counts are known at prepare-time now
+	added sslmode, tlsversion, sslcrl, and sslcrlpath options to mysql
+		connection module connect-string options
 	
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png

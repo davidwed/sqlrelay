@@ -225,11 +225,21 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*port;
 		const char	*socket;
 		const char	*charset;
+		const char	*sslmode;
+#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
+		const my_bool	*sslenforce;
+#endif
+#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
+		const my_bool	*sslverifyservercert;
+#endif
+		const char	*tlsversion;
 		const char	*sslkey;
 		const char	*sslcert;
+		const char	*sslcipher;
 		const char	*sslca;
 		const char	*sslcapath;
-		const char	*sslcipher;
+		const char	*sslcrl;
+		const char	*sslcrlpath;
 		bool		foundrows;
 		bool		ignorespace;
 
@@ -258,8 +268,6 @@ const my_bool	mysqlconnection::myfalse=FALSE;
 
 mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
-//char a;
-//stdinput.read(&a);
 	connected=false;
 	dbversion=NULL;
 	dbhostname=NULL;
@@ -287,11 +295,29 @@ void mysqlconnection::handleConnectString() {
 	port=cont->getConnectStringValue("port");
 	socket=cont->getConnectStringValue("socket");
 	charset=cont->getConnectStringValue("charset");
+	sslmode=cont->getConnectStringValue("sslmode");
+#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
+	sslenforce=&myfalse;
+	if (!charstring::compare(sslmode,"require") ||
+		!charstring::compare(sslmode,"verify-ca") ||
+		!charstring::compare(sslmode,"verify-identity")) {
+		sslenforce=&mytrue;
+	}
+#endif
+#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
+	sslverifyservercert=&myfalse;
+	if (!charstring::compare(sslmode,"verify-identity")) {
+		sslverifyservercert=&mytrue;
+	}
+#endif
+	tlsversion=cont->getConnectStringValue("tlsversion");
 	sslkey=cont->getConnectStringValue("sslkey");
 	sslcert=cont->getConnectStringValue("sslcert");
+	sslcipher=cont->getConnectStringValue("sslcipher");
 	sslca=cont->getConnectStringValue("sslca");
 	sslcapath=cont->getConnectStringValue("sslcapath");
-	sslcipher=cont->getConnectStringValue("sslcipher");
+	sslcrl=cont->getConnectStringValue("sslcrl");
+	sslcrlpath=cont->getConnectStringValue("sslcrlpath");
 	foundrows=!charstring::compare(
 			cont->getConnectStringValue("foundrows"),"yes");
 	ignorespace=!charstring::compare(
@@ -351,9 +377,30 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 		*error="mysql_init failed";
 		return false;
 	}
+	#ifdef HAVE_MYSQL_OPT_SSL_MODE
+	mysql_options(mysqlptr,MYSQL_OPT_SSL_MODE,sslmode);
+	#else
+		#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
+		mysql_options(mysqlptr,MYSQL_OPT_SSL_ENFORCE,&sslenforce);
+		#endif
+		#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
+		mysql_options(mysqlptr,MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
+							&sslverifyservercert);
+		#endif
+	#endif
+	#ifdef HAVE_MYSQL_OPT_TLS_VERSION
+	mysql_options(mysqlptr,MYSQL_OPT_TLS_VERSION,tlsversion);
+	#endif
 	#ifdef HAVE_MYSQL_SSL_SET
 	mysql_ssl_set(mysqlptr,sslkey,sslcert,sslca,sslcapath,sslcipher);
 	#endif
+	#ifdef HAVE_MYSQL_OPT_SSLCRL
+	mysql_options(mysqlptr,MYSQL_OPT_SSLCRL,sslcrl);
+	#endif
+	#ifdef HAVE_MYSQL_OPT_SSLCRLPATH
+	mysql_options(mysqlptr,MYSQL_OPT_SSLCRLPATH,sslcrlpath);
+	#endif
+
 	if (!mysql_real_connect(mysqlptr,hostval,user,password,dbval,
 					portval,socketval,clientflag)) {
 	#else

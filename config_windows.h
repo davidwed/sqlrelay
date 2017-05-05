@@ -100,6 +100,24 @@
 /* MySQL supports MYSQL_OPT_RECONNECT */
 #define HAVE_MYSQL_OPT_RECONNECT 1
 
+/* MySQL supports MYSQL_OPT_SSL_CRL */
+#define HAVE_MYSQL_OPT_SSL_CRL 1
+
+/* MySQL supports MYSQL_OPT_SSL_CRLPATH */
+#define HAVE_MYSQL_OPT_SSL_CRLPATH 1
+
+/* MySQL supports MYSQL_OPT_SSL_ENFORCE */
+/* #undef HAVE_MYSQL_OPT_SSL_ENFORCE */
+
+/* MySQL supports MYSQL_OPT_SSL_MODE */
+/* #undef HAVE_MYSQL_OPT_SSL_MODE */
+
+/* MySQL supports MYSQL_OPT_SSL_VERIFY_SERVER_CERT */
+#define HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT 1
+
+/* MySQL supports MYSQL_OPT_TLS_VERSION */
+/* #undef HAVE_MYSQL_OPT_TLS_VERSION */
+
 /* MySQL supports mysql_ping */
 #define HAVE_MYSQL_PING 1
 
