@@ -3408,8 +3408,6 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 
 
-	// NEW CODE.......
-
 	// bail if we are just generally configured to fake input binds
 	if (cursor->getFakeInputBindsForThisQuery()) {
 		return true;
