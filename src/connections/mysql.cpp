@@ -225,7 +225,9 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*port;
 		const char	*socket;
 		const char	*charset;
-		const char	*sslmode;
+#ifdef HAVE_MYSQL_OPT_SSL_MODE
+		unsigned int	sslmode;
+#endif
 #ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
 		const my_bool	*sslenforce;
 #endif
@@ -295,18 +297,32 @@ void mysqlconnection::handleConnectString() {
 	port=cont->getConnectStringValue("port");
 	socket=cont->getConnectStringValue("socket");
 	charset=cont->getConnectStringValue("charset");
-	sslmode=cont->getConnectStringValue("sslmode");
+	const char	*sslmodestr=cont->getConnectStringValue("sslmode");
+#ifdef HAVE_MYSQL_OPT_SSL_MODE
+	if (charstring::isNullOrEmpty(sslmode) ||
+		!charstring::compare(sslmodestr,"disable")) {
+		sslmode=SSL_MODE_DISABLED;
+	} else if (!charstring::compare(sslmodestr,"prefer")) {
+		sslmode=SSL_MODE_PREFERRED;
+	} else if (!charstring::compare(sslmodestr,"require")) {
+		sslmode=SSL_MODE_REQUIRED;
+	} else if (!charstring::compare(sslmodestr,"verify-ca")) {
+		sslmode=SSL_MODE_VERIFY_CA;
+	} else if (!charstring::compare(sslmodestr,"verify-identity")) {
+		sslmode=SSL_MODE_VERIFY_IDENTITY;
+	}
+#endif
 #ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
 	sslenforce=&myfalse;
-	if (!charstring::compare(sslmode,"require") ||
-		!charstring::compare(sslmode,"verify-ca") ||
-		!charstring::compare(sslmode,"verify-identity")) {
+	if (!charstring::compare(sslmodestr,"require") ||
+		!charstring::compare(sslmodestr,"verify-ca") ||
+		!charstring::compare(sslmodestr,"verify-identity")) {
 		sslenforce=&mytrue;
 	}
 #endif
 #ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
 	sslverifyservercert=&myfalse;
-	if (!charstring::compare(sslmode,"verify-identity")) {
+	if (!charstring::compare(sslmodestr,"verify-identity")) {
 		sslverifyservercert=&mytrue;
 	}
 #endif
@@ -380,12 +396,21 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	#ifdef HAVE_MYSQL_OPT_SSL_MODE
 	mysql_options(mysqlptr,MYSQL_OPT_SSL_MODE,sslmode);
 	#else
+		// apparently calling these at all enable,
+		// even passing them false
 		#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
-		mysql_options(mysqlptr,MYSQL_OPT_SSL_ENFORCE,&sslenforce);
+		if (sslenforce==&mytrue) {
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSL_ENFORCE,
+					&sslenforce);
+		}
 		#endif
 		#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
-		mysql_options(mysqlptr,MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
-							&sslverifyservercert);
+		if (sslverifyservercert==&mytrue) {
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
+					&sslverifyservercert);
+		}
 		#endif
 	#endif
 	#ifdef HAVE_MYSQL_OPT_TLS_VERSION
