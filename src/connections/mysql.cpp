@@ -395,21 +395,12 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	#ifdef HAVE_MYSQL_OPT_SSL_MODE
 	mysql_options(mysqlptr,MYSQL_OPT_SSL_MODE,&sslmode);
 	#else
-		// apparently calling these at all enable,
-		// even passing them false
 		#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
-		if (sslenforce==&mytrue) {
-			mysql_options(mysqlptr,
-					MYSQL_OPT_SSL_ENFORCE,
-					&sslenforce);
-		}
+		mysql_options(mysqlptr,MYSQL_OPT_SSL_ENFORCE,sslenforce);
 		#endif
 		#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
-		if (sslverifyservercert==&mytrue) {
-			mysql_options(mysqlptr,
-					MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
-					&sslverifyservercert);
-		}
+		mysql_options(mysqlptr,MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
+							sslverifyservercert);
 		#endif
 	#endif
 	#ifdef HAVE_MYSQL_OPT_TLS_VERSION
