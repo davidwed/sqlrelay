@@ -299,7 +299,7 @@ void mysqlconnection::handleConnectString() {
 	charset=cont->getConnectStringValue("charset");
 	const char	*sslmodestr=cont->getConnectStringValue("sslmode");
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
-	if (charstring::isNullOrEmpty(sslmode) ||
+	if (charstring::isNullOrEmpty(sslmodestr) ||
 		!charstring::compare(sslmodestr,"disable")) {
 		sslmode=SSL_MODE_DISABLED;
 	} else if (!charstring::compare(sslmodestr,"prefer")) {
@@ -394,7 +394,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 	#ifdef HAVE_MYSQL_OPT_SSL_MODE
-	mysql_options(mysqlptr,MYSQL_OPT_SSL_MODE,sslmode);
+	mysql_options(mysqlptr,MYSQL_OPT_SSL_MODE,&sslmode);
 	#else
 		// apparently calling these at all enable,
 		// even passing them false
