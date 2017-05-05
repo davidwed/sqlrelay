@@ -1282,7 +1282,7 @@ sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate 
 }}}
 }}}
 
-(a .pem file is specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] for details.)
+(a .pem file is specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlsca Parameter] for details.)
 
 This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, '''but the client is still vulnerable to various attacks'''.
 
@@ -1296,7 +1296,7 @@ sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tl
 }}}
 }}}
 
-(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] for details.)
+(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] and [tlsca.html The tlsca Parameter] for details.)
 
 Note that the fully qualified host name was provided.  Note also the use of the ca+host value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the host name will also be validated.  If the certificate contains Subject Alternative Names, then the host name will be compared to each of them.  If no Subject Alternative Names are provided then the host name will be compared to the certificate's Common Name.  The session will only continue if the sever's certificate and identity are both valid.
 
@@ -1310,7 +1310,7 @@ sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tl
 }}}
 }}}
 
-(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] for details.)
+(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] and [tlsca.html The tlsca Parameter] for details.)
 
 Note that the fully qualified host name was provided.  Note also the use of the ca+domain value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the domain name portion of the host name will also be validated.  If the certificate contains Subject Alternative Names, then the domain name portion of the host name will be compared to the domain name portion of each of them.  If no Subject Alternative Names are provided then the domain name portion of the host name will be compared to the domain name portion of the certificate's Common Name.  The session will only continue if the sever's certificate and domain identity are both valid.
 
@@ -1327,7 +1327,7 @@ The following configuration enables these checks for an instance of SQL relay:
 }}}
 
 * The '''tlsvalidate''' parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.
-* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.  (See [tlsca.html The tlsca Parameter] for details)
 * User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
 
 Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.
@@ -1340,7 +1340,7 @@ sqlrsh -host sqlrserver -tls -tlsvalidate no -tlscert /usr/local/firstworks/etc/
 }}}
 }}}
 
-(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] for details.)
+(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] and [tlsca.html The tlsca Parameter] for details.)
 
 Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.
 
@@ -1352,7 +1352,7 @@ sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/s
 }}}
 }}}
 
-(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] for details.)
+(.pem files are specified in this example, but on Windows systems, .pfx file or reference to a certificate in a Windows Certificate Store must be used.  See [tlscert.html The tlscert Parameter] and [tlsca.html The tlsca Parameter] for details.)
 
 In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
 

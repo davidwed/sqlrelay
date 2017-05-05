@@ -2,9 +2,38 @@
 
 SQL Relay supports a '''tlscert''' parameter in the SQL Relay server's configuration file, and as an argument to the various command line client programs.  In either case, it specifies the TLS certificate chain to use.
 
-On non-Windows platforms, it must specify a certificate chain file.
+On non-Windows platforms, it must specify a certificate chain file.  For example:
 
-On Windows platforms it may specify a certificate chain file or it may specify a certificate in a Windows Certificate Store.
+{{{#!blockquote
+{{{
+/usr/local/firstworks/etc/sqlrserver.pem
+/usr/local/firstworks/etc/sqlrclient.pem
+}}}
+}}}
+
+On Windows platforms it may specify a certificate chain file.  For example:
+
+{{{#!blockquote
+{{{
+C:\\Program Files\\Firstworks\\etc\\sqlrserver.pfx
+C:\\Program Files\\Firstworks\\etc\\sqlrclient.pfx
+}}}
+}}}
+
+(note the double-backslashes)
+
+Or, it may specify a certificate in a Windows Certificate Store.  For example:
+
+{{{#!blockquote
+{{{
+CURRENT_USER:MY:sqlrserver
+MY:sqlrserver
+sqlrserver
+CURRENT_USER:MY:sqlrclient
+MY:sqlrclient
+sqlrclient
+}}}
+}}}
 
 For actual files:
 
@@ -35,4 +64,4 @@ For certificates in a Windows Certificate store:
  * Trust
  * CA
  * (if omitted, it defaults to MY)
-* The "subject" parameter identifies the certificate.  The first certificate in the specified location/store who's Subject contains "subject" (case-insensitive) will be used.  Note that the order of the certificates in the store is not guaranteed, so "subject" should contain enough information to uniquely identify a certificate.
+* The subject part identifies the certificate.  The first certificate in the specified location/store who's Subject contains the specified subject (in a case-insensitive comparison) will be used.  Note that the order of the certificates in the store is not guaranteed, so the specified subject should contain enough information to uniquely identify a certificate.
