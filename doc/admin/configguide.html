@@ -3221,6 +3221,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
   <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
   <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+  <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
 </ul>
 
 <p>Note the use of a notification module to notify <i>dba@firstworks.com</i> if an <i>integrity_violation</i> event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See <a href="#notifications">Notifications</a> for information about notification modules.</p>
@@ -3389,6 +3390,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
   <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
   <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+  <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
 </ul>
 
 <br/><h4>clientiplist</h4>
@@ -3471,6 +3473,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
   <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
   <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+  <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
 </ul>
 
 <br/><h4>clientinfolist</h4>
@@ -3552,6 +3555,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
   <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
   <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+  <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
 </ul>
 
 <h3>Quirks and Limitations</h3>

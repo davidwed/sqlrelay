@@ -2090,6 +2090,7 @@ The '''string''' parameter in each connection tag provides the parameters necess
 * '''socket''' - the socket of the SQL Relay instance, if it is running locally
 * '''user''' - the user to use when connecting to the SQL Relay instance as
 * '''password''' - the password to use when connecting to the SQL Relay instance
+* '''fetchatonce''' - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)
 
 Note the use of a notification module to notify //dba@firstworks.com// if an //integrity_violation// event occurs.  SQL Relay must maintain parallel transactions on all databases that a query may be routed to.  An integrity violation occurs when a transaction control query (begin, commit, rollback, autocommit on, or autocommit off) succeeds on some of the backends but fails on others.  See [#notifications Notifications] for information about notification modules.
 
@@ -2138,6 +2139,7 @@ The '''string''' parameter in each connection tag provides the parameters necess
 * '''socket''' - the socket of the SQL Relay instance, if it is running locally
 * '''user''' - the user to use when connecting to the SQL Relay instance as
 * '''password''' - the password to use when connecting to the SQL Relay instance
+* '''fetchatonce''' - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)
 
 
 ==== clientiplist ====
@@ -2169,6 +2171,7 @@ The '''string''' parameter in each connection tag provides the parameters necess
 * '''socket''' - the socket of the SQL Relay instance, if it is running locally
 * '''user''' - the user to use when connecting to the SQL Relay instance as
 * '''password''' - the password to use when connecting to the SQL Relay instance
+* '''fetchatonce''' - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)
 
 
 ==== clientinfolist ====
@@ -2198,6 +2201,7 @@ The '''string''' parameter in each connection tag provides the parameters necess
 * '''socket''' - the socket of the SQL Relay instance, if it is running locally
 * '''user''' - the user to use when connecting to the SQL Relay instance as
 * '''password''' - the password to use when connecting to the SQL Relay instance
+* '''fetchatonce''' - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)
 
 === Quirks and Limitations ===
 

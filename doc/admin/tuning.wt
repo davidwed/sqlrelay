@@ -491,7 +491,9 @@ The "maximum size of an individual non-LOB field" parameter should be set to the
 
 There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.
 
-For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For Informix, !MySQL, Firebird, and !FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the [configreference.html SQL Relay Configuration Reference] for details.
+For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For Informix, !MySQL, Firebird, and !FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  When routing queries or sessions, the fetchatonce parameter is available.
+
+See the [configreference.html SQL Relay Configuration Reference] for details.
 
 Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.
 
