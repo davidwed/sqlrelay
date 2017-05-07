@@ -9,7 +9,10 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 	public:
 			sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount);
 			~sqlrrouter_regex();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -25,9 +28,15 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 };
 
 sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
-					sqlrrouters *rs,
-					xmldomnode *parameters) :
-					sqlrrouter(cont,rs,parameters) {
+						sqlrrouters *rs,
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount) :
+					sqlrrouter(cont,rs,parameters,
+							connectionids,
+							connections,
+							connectioncount) {
 	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -89,7 +98,13 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_regex(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
-		return new sqlrrouter_regex(cont,rs,parameters);
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount) {
+		return new sqlrrouter_regex(cont,rs,parameters,
+							connectionids,
+							connections,
+							connectioncount);
 	}
 }

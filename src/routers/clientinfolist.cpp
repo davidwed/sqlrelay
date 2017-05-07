@@ -8,8 +8,11 @@
 class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 	public:
 			sqlrrouter_clientinfolist(sqlrservercontroller *cont,
-							sqlrrouters *rs,
-							xmldomnode *parameters);
+						sqlrrouters *rs,
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount);
 			~sqlrrouter_clientinfolist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -28,8 +31,14 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 
 sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
-						sqlrrouter(cont,rs,parameters) {
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount) :
+					sqlrrouter(cont,rs,parameters,
+							connectionids,
+							connections,
+							connectioncount) {
 	clientinfos=NULL;
 
 	debug=cont->getConfig()->getDebugRouters();
@@ -101,7 +110,13 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_clientinfolist(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
-		return new sqlrrouter_clientinfolist(cont,rs,parameters);
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount) {
+		return new sqlrrouter_clientinfolist(cont,rs,parameters,
+							connectionids,
+							connections,
+							connectioncount);
 	}
 }

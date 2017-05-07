@@ -13,7 +13,8 @@ include ../../config.mk
 all: $(SQLR)router_regex.$(LIBEXT) \
 	$(SQLR)router_userlist.$(LIBEXT) \
 	$(SQLR)router_clientiplist.$(LIBEXT) \
-	$(SQLR)router_clientinfolist.$(LIBEXT)
+	$(SQLR)router_clientinfolist.$(LIBEXT) \
+	$(SQLR)router_usedatabase.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
@@ -31,6 +32,9 @@ $(SQLR)router_clientiplist.$(LIBEXT): clientiplist.cpp clientiplist.$(OBJ)
 $(SQLR)router_clientinfolist.$(LIBEXT): clientinfolist.cpp clientinfolist.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ clientinfolist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+$(SQLR)router_usedatabase.$(LIBEXT): usedatabase.cpp usedatabase.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ usedatabase.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 install: $(INSTALLLIB)
 
 installdll:
@@ -39,6 +43,7 @@ installdll:
 	$(LTINSTALL) $(CP) $(SQLR)router_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)router_clientiplist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)router_clientinfolist.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)router_usedatabase.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
@@ -60,9 +65,14 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)router_clientinfolist.a
 	$(RM) $(libexecdir)/$(SQLR)router_clientinfolist.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)router_clientinfolist.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)router_usedatabase.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)router_usedatabase.a
+	$(RM) $(libexecdir)/$(SQLR)router_usedatabase.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)router_usedatabase.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/$(SQLR)router_regex.*
 	$(RM) $(libexecdir)/$(SQLR)router_userlist.*
 	$(RM) $(libexecdir)/$(SQLR)router_clientiplist.*
 	$(RM) $(libexecdir)/$(SQLR)router_clientinfolist.*
+	$(RM) $(libexecdir)/$(SQLR)router_usedatabase.*

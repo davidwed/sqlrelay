@@ -7,8 +7,11 @@
 class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 	public:
 			sqlrrouter_clientiplist(sqlrservercontroller *cont,
-							sqlrrouters *rs,
-							xmldomnode *parameters);
+						sqlrrouters *rs,
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount);
 			~sqlrrouter_clientiplist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -29,8 +32,14 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 
 sqlrrouter_clientiplist::sqlrrouter_clientiplist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
-						sqlrrouter(cont,rs,parameters) {
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount) :
+					sqlrrouter(cont,rs,parameters,
+							connectionids,
+							connections,
+							connectioncount) {
 	clientips=NULL;
 
 	debug=cont->getConfig()->getDebugRouters();
@@ -204,7 +213,13 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_clientiplist(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
-		return new sqlrrouter_clientiplist(cont,rs,parameters);
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount) {
+		return new sqlrrouter_clientiplist(cont,rs,parameters,
+							connectionids,
+							connections,
+							connectioncount);
 	}
 }
