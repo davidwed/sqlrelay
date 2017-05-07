@@ -338,7 +338,8 @@ void routerconnection::handleConnectString() {
 				0,1);
 
 		const char	*id=cons[index]->identify();
-		if (!charstring::compare(id,"sybase") ||
+		if (!charstring::compare(id,"sap") ||
+				!charstring::compare(id,"sybase") ||
 				!charstring::compare(id,"freetds")) {
 			beginquery[index]="begin tran";
 		} else if (!charstring::compare(id,"sqlite")) {
@@ -358,7 +359,14 @@ void routerconnection::handleConnectString() {
 		csln=csln->getNext();
 	}
 
-	cont->setFetchAtOnce(10);
+	// re-get fetchatonce, defaulting to 10, and allowing it to be set to 0
+	uint32_t	fetchatonce=10;
+	const char	*fao=cont->getConnectStringValue("fetchatonce");
+	if (fao) {
+		fetchatonce=charstring::toUnsignedInteger(fao);
+	}
+	cont->setFetchAtOnce(fetchatonce);
+
 	cont->setMaxColumnCount(0);
 	cont->setMaxFieldLength(0);
 }
