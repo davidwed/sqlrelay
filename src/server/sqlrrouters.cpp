@@ -25,6 +25,7 @@ class sqlrrouterplugin {
 class sqlrroutersprivate {
 	friend class sqlrrouters;
 	private:
+		const char		*_conid;
 		sqlrservercontroller	*_cont;
 
 		singlylinkedlist< sqlrrouterplugin * >	_llist;
@@ -33,6 +34,7 @@ class sqlrroutersprivate {
 sqlrrouters::sqlrrouters(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrroutersprivate;
+	pvt->_conid=NULL;
 	pvt->_cont=cont;
 }
 
@@ -42,7 +44,10 @@ sqlrrouters::~sqlrrouters() {
 	delete pvt;
 }
 
-bool sqlrrouters::load(xmldomnode *parameters) {
+bool sqlrrouters::load(xmldomnode *parameters,
+				const char **connectionids,
+				sqlrconnection **connections,
+				uint16_t connectioncount) {
 	debugFunction();
 
 	unload();
@@ -53,7 +58,7 @@ bool sqlrrouters::load(xmldomnode *parameters) {
 			router=router->getNextTagSibling()) {
 
 		// load router
-		loadRouter(router);
+		loadRouter(router,connectionids,connections,connectioncount);
 	}
 	return true;
 }
@@ -71,7 +76,10 @@ void sqlrrouters::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrrouters::loadRouter(xmldomnode *router) {
+void sqlrrouters::loadRouter(xmldomnode *router,
+				const char **connectionids,
+				sqlrconnection **connections,
+				uint16_t connectioncount) {
 
 	debugFunction();
 
@@ -117,10 +125,16 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	functionname.append("new_sqlrrouter_")->append(module);
 	sqlrrouter *(*newRouter)(sqlrservercontroller *,
 					sqlrrouters *,
-					xmldomnode *)=
+					xmldomnode *,
+					const char **,
+					sqlrconnection **,
+					uint16_t)=
 			(sqlrrouter *(*)(sqlrservercontroller *,
 						sqlrrouters *,
-						xmldomnode *))
+						xmldomnode *,
+						const char **,
+						sqlrconnection **,
+						uint16_t))
 				dl->getSymbol(functionname.getString());
 	if (!newRouter) {
 		stdoutput.printf("failed to load router: %s\n",module);
@@ -131,7 +145,10 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 		delete dl;
 		return;
 	}
-	sqlrrouter	*r=(*newRouter)(pvt->_cont,this,router);
+	sqlrrouter	*r=(*newRouter)(pvt->_cont,this,router,
+							connectionids,
+							connections,
+							connectioncount);
 
 #else
 
@@ -179,4 +196,12 @@ bool sqlrrouters::routeEntireSession() {
 
 void sqlrrouters::endSession() {
 	// nothing for now, maybe in the future
+}
+
+void sqlrrouters::setCurrentConnectionId(const char *conid) {
+	pvt->_conid=conid;
+}
+
+const char *sqlrrouters::getCurrentConnectionId() {
+	return pvt->_conid;
 }

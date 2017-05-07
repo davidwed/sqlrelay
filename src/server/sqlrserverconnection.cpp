@@ -328,10 +328,10 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	// run the query...
 	bool	retval=false;
 	sqlrservercursor	*sdcur=cont->newCursor();
-	if (sdcur->open() &&
-		sdcur->prepareQuery(sdquery,sdquerylen) &&
-		sdcur->executeQuery(sdquery,sdquerylen)) {
-		sdcur->closeResultSet();
+	if (cont->open(sdcur) &&
+		cont->prepareQuery(sdcur,sdquery,sdquerylen) &&
+		cont->executeQuery(sdcur)) {
+		cont->closeResultSet(sdcur);
 		retval=true;
 
 		// set a flag indicating that the db has been changed
@@ -340,14 +340,15 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		sdcur->errorMessage(pvt->_error,
-					pvt->_maxerrorlength,
-					&(pvt->_errorlength),
-					&(pvt->_errnum),
-					&(pvt->_liveconnection));
+		cont->errorMessage(sdcur,
+				pvt->_error,
+				pvt->_maxerrorlength,
+				&(pvt->_errorlength),
+				&(pvt->_errnum),
+				&(pvt->_liveconnection));
 	}
 	delete[] sdquery;
-	sdcur->close();
+	cont->close(sdcur);
 	cont->deleteCursor(sdcur);
 	return retval;
 }

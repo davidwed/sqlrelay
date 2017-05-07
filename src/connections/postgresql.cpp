@@ -42,7 +42,6 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
-		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		bool		getLastInsertId(uint64_t *id);
 		const char	*getLastInsertIdQuery();
@@ -562,10 +561,6 @@ const char *postgresqlconnection::getColumnListQuery(
 		"	table_name='%s' "
 		"order by "
 		"	ordinal_position";
-}
-
-const char *postgresqlconnection::selectDatabaseQuery() {
-	return "use %s";
 }
 
 const char *postgresqlconnection::getCurrentDatabaseQuery() {

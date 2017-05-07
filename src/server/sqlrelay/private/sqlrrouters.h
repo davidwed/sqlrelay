@@ -3,6 +3,13 @@
 
 	private:
 		void		unload();
-		void		loadRouter(xmldomnode *route);
+		void		loadRouter(xmldomnode *route,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount);
+
+		friend class routerconnection;
+		friend class routercursor;
+		void		setCurrentConnectionId(const char *conid);
 
 		sqlrroutersprivate	*pvt;

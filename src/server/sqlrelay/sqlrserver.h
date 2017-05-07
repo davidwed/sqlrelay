@@ -1390,7 +1390,10 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 	public:
 		sqlrrouter(sqlrservercontroller *cont,
 				sqlrrouters *rs,
-				xmldomnode *parameters);
+				xmldomnode *parameters,
+				const char **connectionids,
+				sqlrconnection **connections,
+				uint16_t connectioncount);
 		virtual	~sqlrrouter();
 
 		virtual const char	*route(sqlrserverconnection *sqlrcon,
@@ -1401,6 +1404,9 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 	protected:
 		sqlrrouters	*getRouters();
 		xmldomnode	*getParameters();
+		const char 	**getConnectionIds();
+		sqlrconnection 	**getConnections();
+		uint16_t	getConnectionCount();
 
 	#include <sqlrelay/private/sqlrrouter.h>
 };
@@ -1410,12 +1416,17 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 		sqlrrouters(sqlrservercontroller *cont);
 		~sqlrrouters();
 
-		bool		load(xmldomnode *parameters);
+		bool		load(xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection **connections,
+						uint16_t connectioncount);
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur);
 		bool	routeEntireSession();
 
 		void	endSession();
+
+		const char	*getCurrentConnectionId();
 
 	#include <sqlrelay/private/sqlrrouters.h>
 };

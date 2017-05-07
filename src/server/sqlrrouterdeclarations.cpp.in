@@ -1,2 +1,6 @@
 sqlrrouter	*new_sqlrrouter_@module@(sqlrservercontroller *cont,
-						xmldomnode *parameters);
+						sqlrrouters *rs,
+						xmldomnode *parameters,
+						const char **connectionids,
+						sqlrconnection *connections,
+						uint16_t connectioncount);

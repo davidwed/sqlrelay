@@ -7,7 +7,7 @@
 #include <rudiments/snooze.h>
 #include <rudiments/regularexpression.h>
 
-//#define DEBUG_MESSAGES 1
+#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
 #include <datatypes.h>
@@ -73,7 +73,16 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostName();
 		const char	*dbIpAddress();
+		bool		getListsByApiCalls();
+		bool		getDatabaseList(sqlrservercursor *cursor,
+						const char *wild);
+		bool		getTableList(sqlrservercursor *cursor,
+						const char *wild);
+		bool		getColumnList(sqlrservercursor *cursor,
+						const char *table,
+						const char *wild);
 		bool		ping();
+		const char	*selectDatabaseQuery();
 		bool		getLastInsertId(uint64_t *id);
 		void		endSession();
 
@@ -91,9 +100,9 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 
 		const char	**conids;
 		sqlrconnection	**cons;
+		uint16_t	concount;
 		const char	**beginquery;
 		bool		anymustbegin;
-		uint16_t	concount;
 
 		sqlrconnection	*currentcon;
 		uint16_t	currentconindex;
@@ -259,6 +268,8 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 
 		cursorbindvar	*cbv;
 		uint16_t	cbcount;
+
+		bool		emptyquery;
 };
 
 routerconnection::routerconnection(sqlrservercontroller *cont) :
@@ -267,11 +278,11 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 
 	conids=NULL;
 	cons=NULL;
+	concount=0;
 	currentcon=NULL;
 	currentconindex=0;
 	beginquery=NULL;
 	anymustbegin=false;
-	concount=0;
 	justloggedin=false;
 	nullbindvalue=nullBindValue();
 	nonnullbindvalue=nonNullBindValue();
@@ -304,13 +315,20 @@ void routerconnection::handleConnectString() {
 
 	identity=cont->getConnectStringValue("identity");
 
-	xmldomnode	*routers=cont->getConfig()->getRouters();
-	if (!routers->isNullNode()) {
-		sqlrr=new sqlrrouters(cont);
-		sqlrr->load(routers);
-		routeentiresession=sqlrr->routeEntireSession();
+	// re-get fetchatonce, defaulting to 10, and allowing it to be set to 0
+	uint32_t	fetchatonce=10;
+	const char	*fao=cont->getConnectStringValue("fetchatonce");
+	if (fao) {
+		fetchatonce=charstring::toUnsignedInteger(fao);
 	}
+	cont->setFetchAtOnce(fetchatonce);
 
+	cont->setMaxColumnCount(0);
+	cont->setMaxFieldLength(0);
+
+
+	// build the connections that we'll route to
+	// (this is just a convenient place to do it)
 	linkedlist< connectstringcontainer * >	*cslist=
 				cont->getConfig()->getConnectStringList();
 	concount=cslist->getLength();
@@ -359,16 +377,14 @@ void routerconnection::handleConnectString() {
 		csln=csln->getNext();
 	}
 
-	// re-get fetchatonce, defaulting to 10, and allowing it to be set to 0
-	uint32_t	fetchatonce=10;
-	const char	*fao=cont->getConnectStringValue("fetchatonce");
-	if (fao) {
-		fetchatonce=charstring::toUnsignedInteger(fao);
+	// load the router modules
+	// (this is just a convenient place to do it)
+	xmldomnode	*routers=cont->getConfig()->getRouters();
+	if (!routers->isNullNode()) {
+		sqlrr=new sqlrrouters(cont);
+		sqlrr->load(routers,conids,cons,concount);
+		routeentiresession=sqlrr->routeEntireSession();
 	}
-	cont->setFetchAtOnce(fetchatonce);
-
-	cont->setMaxColumnCount(0);
-	cont->setMaxFieldLength(0);
 }
 
 bool routerconnection::logIn(const char **error, const char **warning) {
@@ -669,6 +685,29 @@ const char *routerconnection::dbIpAddress() {
 	return (currentcon)?currentcon->dbIpAddress():NULL;
 }
 
+bool routerconnection::getListsByApiCalls() {
+	return true;
+}
+
+bool routerconnection::getDatabaseList(sqlrservercursor *cursor,
+						const char *wild) {
+	// FIXME: implement this...
+	return false;
+}
+
+bool routerconnection::getTableList(sqlrservercursor *cursor,
+						const char *wild) {
+	// FIXME: implement this...
+	return false;
+}
+
+bool routerconnection::getColumnList(sqlrservercursor *cursor,
+						const char *table,
+						const char *wild) {
+	// FIXME: implement this...
+	return false;
+}
+
 bool routerconnection::ping() {
 
 	route();
@@ -690,6 +729,10 @@ bool routerconnection::ping() {
 		}
 	}
 	return result;
+}
+
+const char *routerconnection::selectDatabaseQuery() {
+	return "use %s";
 }
 
 bool routerconnection::getLastInsertId(uint64_t *id) {
@@ -736,7 +779,7 @@ void routerconnection::endSession() {
 
 void routerconnection::route() {
 
-	debugPrintf("route()...\n");
+	debugPrintf("route() (connection)...\n");
 
 	// bail if we're routing the entire session
 	// and we already have a currentcon
@@ -753,11 +796,12 @@ void routerconnection::route() {
 
 	// determine which connectionid to route to
 	const char	*connectionid=sqlrr->route(this,NULL);
+	debugPrintf("	routing to %s\n",connectionid);
 
 	// handle ignore flag
 	ignorerouteentiresession=!charstring::compare(connectionid,"-1");
 	if (ignorerouteentiresession) {
-		debugPrintf("ignoring route-entire-session flag\n");
+		debugPrintf("	ignoring route-entire-session flag\n");
 		return;
 	}
 
@@ -770,11 +814,15 @@ void routerconnection::route() {
 					csn->getValue()->getConnectionId())) {
 			currentcon=cons[ind];
 			currentconindex=ind;
+			sqlrr->setCurrentConnectionId(connectionid);
+			debugPrintf("	setting currentcon to %s\n",
+							connectionid);
 			return;
 		}
 		csn=csn->getNext();
 		ind++;
 	}
+	debugPrintf("	connection %s not found\n",connectionid);
 }
 
 void routerconnection::autoCommitOnFailed(uint16_t index) {
@@ -837,6 +885,8 @@ routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
 	cbv=new cursorbindvar[conn->cont->getConfig()->getMaxBindCount()];
 	cbcount=0;
 
+	emptyquery=false;
+
 	routerconn->routercursors.append(this);
 }
 
@@ -881,6 +931,9 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// initialize the cursor bind count
 	cbcount=0;
 
+	// initialize the empty query flag
+	emptyquery=false;
+
 	// determine which connectionid to route to
 	route();
 	debugPrintf("prepareQuery(): %s%s\n",
@@ -894,16 +947,27 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// currentcur could be NULL here if no
 	// connection could be found to run the query.
 	if (!currentcur) {
+		debugPrintf("	bailing... no connection found\n");
 		return false;
 	}
 
+	// Did a module make the query empty?  If so, then we won't actually
+	// prepare/execute it, just return true.  The usedatabase module does
+	// this.
+	emptyquery=!getQueryLength();
+
 	// prepare the query using the cursor from whichever
 	// connection turned out to be the right one
-	currentcur->prepareQuery(query);
+	if (!emptyquery) {
+		debugPrintf("	query: %.*s\n",length,query);
+		currentcur->prepareQuery(query,length);
+	}
 	return true;
 }
 
 void routercursor::route() {
+
+	debugPrintf("route() (cursor)...\n");
 
 	// if we're routing the entire session and this particular routercursor
 	// hasn't sorted itself out, but the routerconnection has, then get
@@ -921,7 +985,7 @@ void routercursor::route() {
 			currentcur=curs[routerconn->currentconindex];
 			return;
 		}
-		debugPrintf("but need to get currentcon\n");
+		debugPrintf("	but need to get currentcon\n");
 	}
 
 	// otherwise, sort this routercursor out...
@@ -934,12 +998,13 @@ void routercursor::route() {
 
 	// determine which connectionid to route to
 	const char	*connectionid=routerconn->sqlrr->route(conn,this);
+	debugPrintf("	routing to %s\n",connectionid);
 
 	// handle ignore flag
 	routerconn->ignorerouteentiresession=
 			!charstring::compare(connectionid,"-1");
 	if (routerconn->ignorerouteentiresession) {
-		debugPrintf("ignoring route-entire-session flag\n");
+		debugPrintf("	ignoring route-entire-session flag\n");
 		return;
 	}
 
@@ -954,11 +1019,15 @@ void routercursor::route() {
 			currentcur=curs[ind];
 			routerconn->currentcon=currentcon;
 			routerconn->currentconindex=ind;
+			routerconn->sqlrr->setCurrentConnectionId(connectionid);
+			debugPrintf("	setting currentcon to %s\n",
+							connectionid);
 			return;
 		}
 		csn=csn->getNext();
 		ind++;
 	}
+	debugPrintf("	connection %s not found\n",connectionid);
 }
 
 bool routercursor::supportsNativeBinds(const char *query, uint32_t length) {
@@ -1170,8 +1239,14 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 		}
 	}
 
-	if (!currentcur || !currentcur->executeQuery()) {
+	if (!currentcur) {
 		return false;
+	}
+
+	if (!emptyquery) {
+		if (!currentcur->executeQuery()) {
+			return false;
+		}
 	}
 
 	nextrow=0;
