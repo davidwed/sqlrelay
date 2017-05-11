@@ -5124,7 +5124,9 @@ void sqlrservercontroller::setCurrentQuery(const char *query,
 
 void sqlrservercontroller::setClientInfo(const char *info,
 						uint32_t infolen) {
+//stdoutput.printf("setting client info to %.*s\n",infolen,info);
 	if (!pvt->_connstats) {
+//stdoutput.printf("no connstats\n");
 		return;
 	}
 	uint64_t	len=infolen;
@@ -5133,6 +5135,7 @@ void sqlrservercontroller::setClientInfo(const char *info,
 	}
 	charstring::copy(pvt->_connstats->clientinfo,info,len);
 	pvt->_connstats->clientinfo[len]='\0';
+//stdoutput.printf("set client info to %s\n",pvt->_connstats->clientinfo);
 }
 
 void sqlrservercontroller::setClientAddr() {
