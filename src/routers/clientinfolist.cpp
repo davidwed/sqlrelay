@@ -9,17 +9,16 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 	public:
 			sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount);
+						xmldomnode *parameters);
 			~sqlrrouter_clientinfolist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur);
-		bool		routeEntireSession();
+						sqlrservercursor *sqlrcur,
+						const char **err,
+						int64_t *errn);
+		bool	routeEntireSession();
 	private:
-		const char	*connectionid;
+		const char	*connid;
 
 		regularexpression	**clientinfos;
 		uint64_t		clientinfocount;
@@ -31,14 +30,8 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 
 sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) :
-					sqlrrouter(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount) {
+						xmldomnode *parameters) :
+					sqlrrouter(cont,rs,parameters) {
 	clientinfos=NULL;
 
 	debug=cont->getConfig()->getDebugRouters();
@@ -49,7 +42,7 @@ sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 		return;
 	}
 
-	connectionid=parameters->getAttributeValue("connectionid");
+	connid=parameters->getAttributeValue("connectionid");
 
 	// this is faster than running through the xml over and over
 	clientinfocount=parameters->getChildCount();
@@ -71,7 +64,9 @@ sqlrrouter_clientinfolist::~sqlrrouter_clientinfolist() {
 }
 
 const char *sqlrrouter_clientinfolist::route(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur) {
+						sqlrservercursor *sqlrcur,
+						const char **err,
+						int64_t *errn) {
 	if (!enabled) {
 		return NULL;
 	}
@@ -80,10 +75,9 @@ const char *sqlrrouter_clientinfolist::route(sqlrserverconnection *sqlrcon,
 	const char	*clientinfo=sqlrcon->cont->getClientInfo();
 	if (charstring::isNullOrEmpty(clientinfo)) {
 		if (debug) {
-			stdoutput.printf("routing client info "
-					"(null/empty) to -1\n");
+			stdoutput.printf("routing null/empty client info\n");
 		}
-		return "-1";
+		return NULL;
 	}
 
 	// run through the clientinfo array...
@@ -94,9 +88,9 @@ const char *sqlrrouter_clientinfolist::route(sqlrserverconnection *sqlrcon,
 			if (debug) {
 				stdoutput.printf("routing client info "
 						"\"%s\" to %s\n",
-						clientinfo,connectionid);
+						clientinfo,connid);
 			}
-			return connectionid;
+			return connid;
 		}
 	}
 	return NULL;
@@ -110,13 +104,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_clientinfolist(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) {
-		return new sqlrrouter_clientinfolist(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount);
+						xmldomnode *parameters) {
+		return new sqlrrouter_clientinfolist(cont,rs,parameters);
 	}
 }

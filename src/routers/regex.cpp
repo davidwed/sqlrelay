@@ -9,18 +9,17 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 	public:
 			sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount);
+						xmldomnode *parameters);
 			~sqlrrouter_regex();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur);
+						sqlrservercursor *sqlrcur,
+						const char **err,
+						int64_t *errn);
 	private:
 		linkedlist< regularexpression * >	relist;
 
-		const char	*connectionid;
+		const char	*connid;
 
 		bool	enabled;
 
@@ -29,14 +28,8 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 
 sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) :
-					sqlrrouter(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount) {
+						xmldomnode *parameters) :
+					sqlrrouter(cont,rs,parameters) {
 	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -45,7 +38,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 		return;
 	}
 
-	connectionid=parameters->getAttributeValue("connectionid");
+	connid=parameters->getAttributeValue("connectionid");
 
 	for (xmldomnode *pn=parameters->getFirstTagChild("pattern");
 				!pn->isNullNode();
@@ -74,7 +67,9 @@ sqlrrouter_regex::~sqlrrouter_regex() {
 }
 
 const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur) {
+					sqlrservercursor *sqlrcur,
+					const char **err,
+					int64_t *errn) {
 	if (!enabled || !sqlrcon || !sqlrcur) {
 		return NULL;
 	}
@@ -86,9 +81,9 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 			if (debug) {
 				stdoutput.printf("\nrouting query:\n"
 							"	%s\nto: %s\n",
-							query,connectionid);
+							query,connid);
 			}
-			return connectionid;
+			return connid;
 		}
 	}
 	return NULL;
@@ -98,13 +93,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_regex(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) {
-		return new sqlrrouter_regex(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount);
+						xmldomnode *parameters) {
+		return new sqlrrouter_regex(cont,rs,parameters);
 	}
 }

@@ -1,6 +1,3 @@
 	if (!charstring::compare(module,"@module@")) {
-		r=new_sqlrrouter_@module@(pvt->_cont,this,router,
-						connectionids,
-						connections,
-						connectioncount);
+		r=new_sqlrrouter_@module@(pvt->_cont,this,router);
 	} else

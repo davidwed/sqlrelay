@@ -3468,12 +3468,15 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		cursor->setFakeInputBindsForThisQuery(true);
 	}
 
-	// check to see if the query needs to be intercepted,
-	// but don't actually intercept it yet
-	cursor->setQueryNeedsIntercept(checkInterceptQuery(cursor));
-
 	// set flag indicating that the query has been preprocessed
 	cursor->setQueryHasBeenPreProcessed(true);
+
+	// Check to see if the query needs to be intercepted.  Don't
+	// actually intercept it yet, but bail if it needs to be.
+	cursor->setQueryNeedsIntercept(checkInterceptQuery(cursor));
+	if (cursor->getQueryNeedsIntercept()) {
+		return true;
+	}
 
 	// Bail if we this query should fake input binds.  This an happen if:
 	// * the instance is generally configured to fake input binds

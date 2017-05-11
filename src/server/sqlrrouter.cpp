@@ -8,23 +8,14 @@ class sqlrrouterprivate {
 	private:
 		sqlrrouters	*_rs;
 		xmldomnode	*_parameters;
-		const char	**_connectionids;
-		sqlrconnection	**_connections;
-		uint16_t	_connectioncount;
 };
 
 sqlrrouter::sqlrrouter(sqlrservercontroller *cont,
 				sqlrrouters *rs,
-				xmldomnode *parameters,
-				const char **connectionids,
-				sqlrconnection **connections,
-				uint16_t connectioncount) {
+				xmldomnode *parameters) {
 	pvt=new sqlrrouterprivate;
 	pvt->_rs=rs;
 	pvt->_parameters=parameters;
-	pvt->_connectionids=connectionids;
-	pvt->_connections=connections;
-	pvt->_connectioncount=connectioncount;
 }
 
 sqlrrouter::~sqlrrouter() {
@@ -32,7 +23,9 @@ sqlrrouter::~sqlrrouter() {
 }
 
 const char *sqlrrouter::route(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur) {
+					sqlrservercursor *sqlrcur,
+					const char **err,
+					int64_t *errn) {
 	return NULL;
 }
 
@@ -46,16 +39,4 @@ sqlrrouters *sqlrrouter::getRouters() {
 
 xmldomnode *sqlrrouter::getParameters() {
 	return pvt->_parameters;
-}
-
-const char  **sqlrrouter::getConnectionIds() {
-	return pvt->_connectionids;
-}
-
-sqlrconnection  **sqlrrouter::getConnections() {
-	return pvt->_connections;
-}
-
-uint16_t sqlrrouter::getConnectionCount() {
-	return pvt->_connectioncount;
 }

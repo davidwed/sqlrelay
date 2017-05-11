@@ -25,17 +25,26 @@ class sqlrrouterplugin {
 class sqlrroutersprivate {
 	friend class sqlrrouters;
 	private:
-		const char		*_conid;
+		const char		*_connid;
 		sqlrservercontroller	*_cont;
+		const char		**_connids;
+		sqlrconnection		**_conns;
+		uint16_t		_conncount;
 
 		singlylinkedlist< sqlrrouterplugin * >	_llist;
 };
 
-sqlrrouters::sqlrrouters(sqlrservercontroller *cont) {
+sqlrrouters::sqlrrouters(sqlrservercontroller *cont,
+				const char **connectionids,
+				sqlrconnection **connections,
+				uint16_t connectioncount) {
 	debugFunction();
 	pvt=new sqlrroutersprivate;
-	pvt->_conid=NULL;
+	pvt->_connid=NULL;
 	pvt->_cont=cont;
+	pvt->_connids=connectionids;
+	pvt->_conns=connections;
+	pvt->_conncount=connectioncount;
 }
 
 sqlrrouters::~sqlrrouters() {
@@ -44,10 +53,7 @@ sqlrrouters::~sqlrrouters() {
 	delete pvt;
 }
 
-bool sqlrrouters::load(xmldomnode *parameters,
-				const char **connectionids,
-				sqlrconnection **connections,
-				uint16_t connectioncount) {
+bool sqlrrouters::load(xmldomnode *parameters) {
 	debugFunction();
 
 	unload();
@@ -58,7 +64,7 @@ bool sqlrrouters::load(xmldomnode *parameters,
 			router=router->getNextTagSibling()) {
 
 		// load router
-		loadRouter(router,connectionids,connections,connectioncount);
+		loadRouter(router);
 	}
 	return true;
 }
@@ -76,10 +82,7 @@ void sqlrrouters::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrrouters::loadRouter(xmldomnode *router,
-				const char **connectionids,
-				sqlrconnection **connections,
-				uint16_t connectioncount) {
+void sqlrrouters::loadRouter(xmldomnode *router) {
 
 	debugFunction();
 
@@ -125,16 +128,10 @@ void sqlrrouters::loadRouter(xmldomnode *router,
 	functionname.append("new_sqlrrouter_")->append(module);
 	sqlrrouter *(*newRouter)(sqlrservercontroller *,
 					sqlrrouters *,
-					xmldomnode *,
-					const char **,
-					sqlrconnection **,
-					uint16_t)=
+					xmldomnode *)=
 			(sqlrrouter *(*)(sqlrservercontroller *,
 						sqlrrouters *,
-						xmldomnode *,
-						const char **,
-						sqlrconnection **,
-						uint16_t))
+						xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newRouter) {
 		stdoutput.printf("failed to load router: %s\n",module);
@@ -145,10 +142,7 @@ void sqlrrouters::loadRouter(xmldomnode *router,
 		delete dl;
 		return;
 	}
-	sqlrrouter	*r=(*newRouter)(pvt->_cont,this,router,
-							connectionids,
-							connections,
-							connectioncount);
+	sqlrrouter	*r=(*newRouter)(pvt->_cont,this,router);
 
 #else
 
@@ -168,15 +162,17 @@ void sqlrrouters::loadRouter(xmldomnode *router,
 }
 
 const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur) {
+					sqlrservercursor *sqlrcur,
+					const char **err,
+					int64_t *errn) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
-		const char	*connectionid=
-				node->getValue()->r->route(sqlrcon,sqlrcur);
-		if (connectionid) {
-			return connectionid;
+		const char	*connid=node->getValue()->r->route(
+						sqlrcon,sqlrcur,err,errn);
+		if (connid) {
+			return connid;
 		}
 	}
 	return NULL;
@@ -198,10 +194,22 @@ void sqlrrouters::endSession() {
 	// nothing for now, maybe in the future
 }
 
-void sqlrrouters::setCurrentConnectionId(const char *conid) {
-	pvt->_conid=conid;
+void sqlrrouters::setCurrentConnectionId(const char *connid) {
+	pvt->_connid=connid;
 }
 
 const char *sqlrrouters::getCurrentConnectionId() {
-	return pvt->_conid;
+	return pvt->_connid;
+}
+
+const char **sqlrrouters::getConnectionIds() {
+	return pvt->_connids;
+}
+
+sqlrconnection **sqlrrouters::getConnections() {
+	return pvt->_conns;
+}
+
+uint16_t sqlrrouters::getConnectionCount() {
+	return pvt->_conncount;
 }

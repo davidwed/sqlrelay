@@ -86,7 +86,7 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		bool		getLastInsertId(uint64_t *id);
 		void		endSession();
 
-		void		route();
+		bool	route();
 
 		void	autoCommitOnFailed(uint16_t index);
 		void	autoCommitOffFailed(uint16_t index);
@@ -117,7 +117,6 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		sqlrrouters	*sqlrr;
 
 		bool		routeentiresession;
-		bool		ignorerouteentiresession;
 
 		linkedlist< routercursor * >	routercursors;
 };
@@ -289,7 +288,6 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 
 	sqlrr=NULL;
 	routeentiresession=false;
-	ignorerouteentiresession=false;
 
 	// tell the controller to intercept begins, commits, and rollbacks sent
 	// as queries and call begin(), commit(), and rollback() methods instead
@@ -381,8 +379,8 @@ void routerconnection::handleConnectString() {
 	// (this is just a convenient place to do it)
 	xmldomnode	*routers=cont->getConfig()->getRouters();
 	if (!routers->isNullNode()) {
-		sqlrr=new sqlrrouters(cont);
-		sqlrr->load(routers,conids,cons,concount);
+		sqlrr=new sqlrrouters(cont,conids,cons,concount);
+		sqlrr->load(routers);
 		routeentiresession=sqlrr->routeEntireSession();
 	}
 }
@@ -415,11 +413,11 @@ bool routerconnection::autoCommitOn() {
 		justloggedin=false;
 	}
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then just enable for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("autoCommitOn(): %s (session)\n",
 						conids[currentconindex]);
 		return (currentcon)?currentcon->autoCommitOn():true;
@@ -464,11 +462,11 @@ bool routerconnection::autoCommitOff() {
 		justloggedin=false;
 	}
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then just disable for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("autoCommitOff(): %s (session)\n",
 						conids[currentconindex]);
 		return (currentcon)?currentcon->autoCommitOff():true;
@@ -514,11 +512,11 @@ bool routerconnection::supportsAutoCommit() {
 
 bool routerconnection::begin() {
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then just begin for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("begin(): %s (session)\n",
 					conids[currentconindex]);
 		return (currentcon)?currentcon->begin():true;
@@ -541,11 +539,11 @@ bool routerconnection::begin() {
 
 bool routerconnection::commit() {
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then just commit for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("commit(): %s (session)\n",
 					conids[currentconindex]);
 		return (currentcon)?currentcon->commit():true;
@@ -568,11 +566,11 @@ bool routerconnection::commit() {
 
 bool routerconnection::rollback() {
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then just rollback for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("rollback(): %s (session)\n",
 					conids[currentconindex]);
 		return (currentcon)?currentcon->rollback():true;
@@ -618,11 +616,11 @@ const char *routerconnection::identify() {
 
 const char *routerconnection::dbVersion() {
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then get this for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("dbVersion(): %s (session)\n",
 					conids[currentconindex]);
 		return (currentcon)?currentcon->dbVersion():NULL;
@@ -641,11 +639,11 @@ const char *routerconnection::dbVersion() {
 
 const char *routerconnection::dbHostName() {
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then get this for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("dbHostName(): %s (session)\n",
 					conids[currentconindex]);
 		return (currentcon)?currentcon->dbHostName():NULL;
@@ -664,11 +662,11 @@ const char *routerconnection::dbHostName() {
 
 const char *routerconnection::dbIpAddress() {
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then get this for
 	// the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("dbIpAddress(): %s (session)\n",
 					conids[currentconindex]);
 		return (currentcon)?currentcon->dbIpAddress():NULL;
@@ -710,10 +708,10 @@ bool routerconnection::getColumnList(sqlrservercursor *cursor,
 
 bool routerconnection::ping() {
 
-	route();
+	bool	routed=route();
 
 	// if routing entire sessions, then ping the appropriate connection
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 		debugPrintf("ping(): %s (session)\n",conids[currentconindex]);
 		return (currentcon)?currentcon->ping():true;
 	}
@@ -747,9 +745,9 @@ bool routerconnection::getLastInsertId(uint64_t *id) {
 
 void routerconnection::endSession() {
 
-	route();
+	bool	routed=route();
 
-	if (routeentiresession && !ignorerouteentiresession) {
+	if (routed && routeentiresession) {
 
 		// if routing entire sessions, then end-session
 		// on the appropriate connection
@@ -777,15 +775,15 @@ void routerconnection::endSession() {
 	}
 }
 
-void routerconnection::route() {
+bool routerconnection::route() {
 
 	debugPrintf("route() (connection)...\n");
 
 	// bail if we're routing the entire session
 	// and we already have a currentcon
-	if (!ignorerouteentiresession && routeentiresession && currentcon) {
+	if (routeentiresession && currentcon) {
 		debugPrintf("	routing entire session and have currentcon\n");
-		return;
+		return true;
 	}
 
 	// otherwise, sort ourselves out...
@@ -794,35 +792,30 @@ void routerconnection::route() {
 	currentcon=NULL;
 	currentconindex=0;
 
-	// determine which connectionid to route to
-	const char	*connectionid=sqlrr->route(this,NULL);
+	// route...
+	const char	*err=NULL;
+	int64_t		errn=0;
+	const char	*connectionid=sqlrr->route(this,NULL,&err,&errn);
+	if (!connectionid) {
+		debugPrintf("	no connection id returned\n");
+		// FIXME: handle error
+		return false;
+	}
 	debugPrintf("	routing to %s\n",connectionid);
 
-	// handle ignore flag
-	ignorerouteentiresession=!charstring::compare(connectionid,"-1");
-	if (ignorerouteentiresession) {
-		debugPrintf("	ignoring route-entire-session flag\n");
-		return;
-	}
-
-	// get the corresponding connection and cursor
-	uint16_t		ind=0;
-	connectstringnode	*csn=cont->getConfig()->
-					getConnectStringList()->getFirst();
-	while (csn) {
-		if (!charstring::compare(connectionid,
-					csn->getValue()->getConnectionId())) {
-			currentcon=cons[ind];
-			currentconindex=ind;
+	// get the corresponding connection
+	for (uint16_t i=0; i<concount; i++) {
+		if (!charstring::compare(connectionid,conids[i])) {
+			currentcon=cons[i];
+			currentconindex=i;
 			sqlrr->setCurrentConnectionId(connectionid);
 			debugPrintf("	setting currentcon to %s\n",
 							connectionid);
-			return;
+			return true;
 		}
-		csn=csn->getNext();
-		ind++;
 	}
 	debugPrintf("	connection %s not found\n",connectionid);
+	return false;
 }
 
 void routerconnection::autoCommitOnFailed(uint16_t index) {
@@ -972,8 +965,7 @@ void routercursor::route() {
 	// if we're routing the entire session and this particular routercursor
 	// hasn't sorted itself out, but the routerconnection has, then get
 	// which connection and cursor to use from the routerconnection
-	if (!routerconn->ignorerouteentiresession &&
-			routerconn->routeentiresession) {
+	if (routerconn->routeentiresession) {
 
 		debugPrintf("	routing entire session ");
 		if (currentcon) {
@@ -996,36 +988,30 @@ void routercursor::route() {
 	routerconn->currentcon=NULL;
 	routerconn->currentconindex=0;
 
-	// determine which connectionid to route to
-	const char	*connectionid=routerconn->sqlrr->route(conn,this);
-	debugPrintf("	routing to %s\n",connectionid);
-
-	// handle ignore flag
-	routerconn->ignorerouteentiresession=
-			!charstring::compare(connectionid,"-1");
-	if (routerconn->ignorerouteentiresession) {
-		debugPrintf("	ignoring route-entire-session flag\n");
+	// route...
+	const char	*err=NULL;
+	int64_t		errn=0;
+	const char	*connectionid=routerconn->sqlrr->route(
+						routerconn,this,&err,&errn);
+	if (!connectionid) {
+		debugPrintf("	no connection id returned\n");
+		// FIXME: handle error
 		return;
 	}
+	debugPrintf("	routing to %s\n",connectionid);
 
 	// get the corresponding connection and cursor
-	uint16_t		ind=0;
-	connectstringnode	*csn=conn->cont->getConfig()->
-					getConnectStringList()->getFirst();
-	while (csn) {
-		if (!charstring::compare(connectionid,
-					csn->getValue()->getConnectionId())) {
-			currentcon=routerconn->cons[ind];
-			currentcur=curs[ind];
+	for (uint16_t i=0; i<routerconn->concount; i++) {
+		if (!charstring::compare(connectionid,routerconn->conids[i])) {
+			currentcon=routerconn->cons[i];
+			currentcur=curs[i];
 			routerconn->currentcon=currentcon;
-			routerconn->currentconindex=ind;
+			routerconn->currentconindex=i;
 			routerconn->sqlrr->setCurrentConnectionId(connectionid);
 			debugPrintf("	setting currentcon to %s\n",
 							connectionid);
 			return;
 		}
-		csn=csn->getNext();
-		ind++;
 	}
 	debugPrintf("	connection %s not found\n",connectionid);
 }

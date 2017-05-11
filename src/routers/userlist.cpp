@@ -8,17 +8,16 @@ class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 	public:
 			sqlrrouter_userlist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount);
+						xmldomnode *parameters);
 			~sqlrrouter_userlist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur);
-		bool		routeEntireSession();
+						sqlrservercursor *sqlrcur,
+						const char **err,
+						int64_t *errn);
+		bool	routeEntireSession();
 	private:
-		const char	*connectionid;
+		const char	*connid;
 
 		const char	**users;
 		uint64_t	usercount;
@@ -30,14 +29,8 @@ class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 
 sqlrrouter_userlist::sqlrrouter_userlist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) :
-					sqlrrouter(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount) {
+						xmldomnode *parameters) :
+					sqlrrouter(cont,rs,parameters) {
 	users=NULL;
 
 	debug=cont->getConfig()->getDebugRouters();
@@ -48,7 +41,7 @@ sqlrrouter_userlist::sqlrrouter_userlist(sqlrservercontroller *cont,
 		return;
 	}
 
-	connectionid=parameters->getAttributeValue("connectionid");
+	connid=parameters->getAttributeValue("connectionid");
 
 	// this is faster than running through the xml over and over
 	usercount=parameters->getChildCount();
@@ -65,7 +58,9 @@ sqlrrouter_userlist::~sqlrrouter_userlist() {
 }
 
 const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur) {
+						sqlrservercursor *sqlrcur,
+						const char **err,
+						int64_t *errn) {
 	if (!enabled) {
 		return NULL;
 	}
@@ -74,10 +69,9 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 	const char	*user=sqlrcon->cont->getCurrentUser();
 	if (charstring::isNullOrEmpty(user)) {
 		if (debug) {
-				stdoutput.printf("\nrouting user "
-						"(null/empty) to -1\n");
+			stdoutput.printf("\nrouting null/empty user\n");
 		}
-		return "-1";
+		return NULL;
 	}
 
 	// run through the user array...
@@ -88,9 +82,9 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 			!charstring::compare(users[i],"*")) {
 			if (debug) {
 				stdoutput.printf("\nrouting user %s to %s\n",
-							user,connectionid);
+								user,connid);
 			}
-			return connectionid;
+			return connid;
 		}
 	}
 	return NULL;
@@ -104,13 +98,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_userlist(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) {
-		return new sqlrrouter_userlist(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount);
+						xmldomnode *parameters) {
+		return new sqlrrouter_userlist(cont,rs,parameters);
 	}
 }

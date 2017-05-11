@@ -34,14 +34,13 @@ class SQLRSERVER_DLLSPEC sqlrrouter_usedatabase : public sqlrrouter {
 	public:
 			sqlrrouter_usedatabase(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount);
+						xmldomnode *parameters);
 			~sqlrrouter_usedatabase();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur);
+						sqlrservercursor *sqlrcur,
+						const char **err,
+						int64_t *errn);
 	private:
 		void		buildDictionary();
 		const char	*mapDbName(const char *sqlrconid,
@@ -57,14 +56,8 @@ class SQLRSERVER_DLLSPEC sqlrrouter_usedatabase : public sqlrrouter {
 
 sqlrrouter_usedatabase::sqlrrouter_usedatabase(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) :
-					sqlrrouter(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount) {
+						xmldomnode *parameters) :
+					sqlrrouter(cont,rs,parameters) {
 	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -81,19 +74,21 @@ sqlrrouter_usedatabase::~sqlrrouter_usedatabase() {
 }
 
 const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur) {
+						sqlrservercursor *sqlrcur,
+						const char **err,
+						int64_t *errn) {
 
 	// initialze the return value to the current connection
 	const char	*retval=getRouters()->getCurrentConnectionId();
 
 	if (!enabled || !sqlrcon || !sqlrcur) {
-		return retval;
+		return NULL;
 	}
 
 	// is the query a "use database" query?
 	char	*query=sqlrcur->getQueryBuffer();
 	if (charstring::compare(query,"use ",4)) {
-		return retval;
+		return NULL;
 	}
 
 	// get the db name (alias)
@@ -121,20 +116,23 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 
 		// select the specified db
 		if (cdb->sqlrcon->selectDatabase(cdb->dbname)) {
-			retval=cdb->connid;
 			if (debug) {
 				stdoutput.printf("(success)\n");
 			}
+			retval=cdb->connid;
 		} else {
+			// FIXME: set err/errn
 			if (debug) {
 				stdoutput.printf("(failed)\n");
 			}
+			retval=NULL;
 		}
 	} else {
-		// FIXME: somehow throw an error
+		// FIXME: set err/errn
 		if (debug) {
 			stdoutput.printf("	%s not found\n",dbalias);
 		}
+		retval=NULL;
 	}
 
 	if (debug) {
@@ -214,13 +212,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_usedatabase(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters,
-						const char **connectionids,
-						sqlrconnection **connections,
-						uint16_t connectioncount) {
-		return new sqlrrouter_usedatabase(cont,rs,parameters,
-							connectionids,
-							connections,
-							connectioncount);
+						xmldomnode *parameters) {
+		return new sqlrrouter_usedatabase(cont,rs,parameters);
 	}
 }
