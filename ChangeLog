@@ -52,7 +52,8 @@
 	added sslmode, tlsversion, sslcrl, and sslcrlpath options to mysql
 		connection module connect-string options
 	router db connection module supports fetchatonce option now
-	
+	client info is reset at end-of-session now
+	router framework has been refactored to allow route() to return errors
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
