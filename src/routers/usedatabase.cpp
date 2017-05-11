@@ -88,7 +88,7 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 	// is the query a "use database" query?
 	char	*query=sqlrcur->getQueryBuffer();
 	if (charstring::compare(query,"use ",4)) {
-		return NULL;
+		return retval;
 	}
 
 	// get the db name (alias)
@@ -153,10 +153,10 @@ void sqlrrouter_usedatabase::buildDictionary() {
 	}
 
 	// run through the connections...
-	for (uint16_t i=0; i<getConnectionCount(); i++) {
+	for (uint16_t i=0; i<getRouters()->getConnectionCount(); i++) {
 
-		const char	*sqlrconid=getConnectionIds()[i];
-		sqlrconnection	*sqlrcon=getConnections()[i];
+		const char	*sqlrconid=getRouters()->getConnectionIds()[i];
+		sqlrconnection	*sqlrcon=getRouters()->getConnections()[i];
 		sqlrcursor	sqlrcur(sqlrcon);
 
 		// get the db list
