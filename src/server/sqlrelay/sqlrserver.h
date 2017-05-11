@@ -202,11 +202,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	inTransaction();
 
 		// errors
-		void		errorMessage(char *errorbuffer,
-					uint32_t errorbuffersize,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection);
+		void		errorMessage(const char **errorbuffer,
+						uint32_t *errorlength,
+						int64_t *errorcode,
+						bool *liveconnection);
 		void		clearError();
 		void		setError(const char *err,
 					int64_t errn, bool liveconn);
@@ -544,8 +543,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// errors
 		void		errorMessage(sqlrservercursor *cursor,
-						char *errorbuffer,
-						uint32_t errorbuffersize,
+						const char **errorbuffer,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection);
@@ -693,6 +691,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual const char	*dbIpAddressQuery();
 		virtual const char	*dbHostName();
 		virtual const char	*dbIpAddress();
+		virtual bool		cacheDbHostInfo();
 
 		virtual bool		getListsByApiCalls();
 		virtual bool		getDatabaseList(
@@ -740,8 +739,6 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		void		setErrorNumber(uint32_t errnum);
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
-		bool		getErrorWasSetManually();
-		void		setErrorWasSetManually(bool manually);
 
 		sqlrservercontroller	*cont;
 
@@ -992,8 +989,6 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		void		setErrorNumber(uint32_t errnum);
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
-		bool		getErrorWasSetManually();
-		void		setErrorWasSetManually(bool manually);
 
 		void		setCreateTempTablePattern(
 						const char *createtemp);

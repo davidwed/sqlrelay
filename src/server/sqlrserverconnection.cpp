@@ -22,7 +22,6 @@ class sqlrserverconnectionprivate {
 		uint32_t	_errorlength;
 		int64_t		_errnum;
 		bool		_liveconnection;
-		bool		_errorwassetmanually;
 
 		char		*_dbhostname;
 		char		*_dbipaddress;
@@ -42,7 +41,6 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 	pvt->_errorlength=0;
 	pvt->_errnum=0;
 	pvt->_liveconnection=false;
-	pvt->_errorwassetmanually=false;
 
 	pvt->_dbhostname=NULL;
 	pvt->_dbipaddress=NULL;
@@ -338,14 +336,13 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 		// so it can be reset at the end of the session
 		cont->dbHasChanged();
 	} else {
-		// If there was an error, copy it out.  We'l be destroying the
+		// If there was an error, copy it out.  We'll be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		cont->errorMessage(sdcur,
-				pvt->_error,
-				pvt->_maxerrorlength,
-				&(pvt->_errorlength),
-				&(pvt->_errnum),
-				&(pvt->_liveconnection));
+		sdcur->errorMessage(pvt->_error,
+					pvt->_maxerrorlength,
+					&(pvt->_errorlength),
+					&(pvt->_errnum),
+					&(pvt->_liveconnection));
 	}
 	delete[] sdquery;
 	cont->close(sdcur);
@@ -442,7 +439,7 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 		}
 
 	} else {
-		// If there was an error, copy it out.  We'l be destroying the
+		// If there was an error, copy it out.  We'll be destroying the
 		// cursor in a moment and the error will be lost otherwise.
 		liicur->errorMessage(pvt->_error,
 					pvt->_maxerrorlength,
@@ -652,6 +649,10 @@ const char *sqlrserverconnection::dbIpAddress() {
 	return pvt->_dbipaddress;
 }
 
+bool sqlrserverconnection::cacheDbHostInfo() {
+	return true;
+}
+
 bool sqlrserverconnection::getListsByApiCalls() {
 	return false;
 }
@@ -755,7 +756,6 @@ void sqlrserverconnection::endSession() {
 
 void sqlrserverconnection::clearError() {
 	setError(NULL,0,true);
-	pvt->_errorwassetmanually=false;
 }
 
 void sqlrserverconnection::setError(const char *err,
@@ -769,7 +769,6 @@ void sqlrserverconnection::setError(const char *err,
 	pvt->_error[pvt->_errorlength]='\0';
 	pvt->_errnum=errn;
 	pvt->_liveconnection=liveconn;
-	pvt->_errorwassetmanually=true;
 }
 
 char *sqlrserverconnection::getErrorBuffer() {
@@ -798,12 +797,4 @@ bool sqlrserverconnection::getLiveConnection() {
 
 void sqlrserverconnection::setLiveConnection(bool liveconnection) {
 	pvt->_liveconnection=liveconnection;
-}
-
-bool sqlrserverconnection::getErrorWasSetManually() {
-	return pvt->_errorwassetmanually;
-}
-
-void sqlrserverconnection::setErrorWasSetManually(bool manually) {
-	pvt->_errorwassetmanually=manually;
 }

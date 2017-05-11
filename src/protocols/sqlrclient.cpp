@@ -140,8 +140,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	startSendingLong(uint64_t longlength);
 		void	sendLongSegment(const char *data, uint32_t size);
 		void	endSendingLong();
-		void	returnError(bool disconnect);
-		void	returnError(sqlrservercursor *cursor, bool disconnect);
+		void	returnError(bool forcedisconnect);
+		void	returnError(sqlrservercursor *cursor,
+						bool forcedisconnect);
 		bool	fetchResultSetCommand(sqlrservercursor *cursor);
 		void	abortResultSetCommand(sqlrservercursor *cursor);
 		void	suspendResultSetCommand(sqlrservercursor *cursor);
@@ -912,7 +913,7 @@ void sqlrprotocol_sqlrclient::pingCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->raiseDebugMessageEvent("ping failed");
-		returnError(!cont->getLiveConnection());
+		returnError(false);
 	}
 	if (!pingresult) {
 		cont->reLogIn();
@@ -960,7 +961,7 @@ void sqlrprotocol_sqlrclient::autoCommitCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->raiseDebugMessageEvent("failed");
-		returnError(!cont->getLiveConnection());
+		returnError(false);
 	}
 }
 
@@ -973,7 +974,7 @@ void sqlrprotocol_sqlrclient::beginCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->raiseDebugMessageEvent("failed");
-		returnError(!cont->getLiveConnection());
+		returnError(false);
 	}
 }
 
@@ -986,7 +987,7 @@ void sqlrprotocol_sqlrclient::commitCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->raiseDebugMessageEvent("failed");
-		returnError(!cont->getLiveConnection());
+		returnError(false);
 	}
 }
 
@@ -999,7 +1000,7 @@ void sqlrprotocol_sqlrclient::rollbackCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->raiseDebugMessageEvent("failed");
-		returnError(!cont->getLiveConnection());
+		returnError(false);
 	}
 }
 
@@ -1099,7 +1100,7 @@ void sqlrprotocol_sqlrclient::selectDatabaseCommand() {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
-		returnError(!cont->getLiveConnection());
+		returnError(false);
 	}
 
 	delete[] db;
@@ -1137,7 +1138,7 @@ void sqlrprotocol_sqlrclient::getLastInsertIdCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->raiseDebugMessageEvent("get last insert id failed");
-		returnError(!cont->getLiveConnection());
+		returnError(false);
 	}
 }
 
@@ -1365,7 +1366,7 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 			if (dbup || !waitfordowndb) {
 
 				// return the error
-				returnError(cursor,!dbup);
+				returnError(cursor,false);
 			}
 
 			// if the error was a dead connection
@@ -2899,67 +2900,63 @@ void sqlrprotocol_sqlrclient::endSendingLong() {
 	clientsock->write((uint16_t)END_LONG_DATA);
 }
 
-void sqlrprotocol_sqlrclient::returnError(bool disconnect) {
+void sqlrprotocol_sqlrclient::returnError(bool forcedisconnect) {
 	debugFunction();
 
-	// Get the error data if none is set already
-	// FIXME: this will always evaluate false,
-	// shouldn't it be !cont->getErrorLength()?
-	if (!cont->getErrorBuffer()) {
-		uint32_t	errorlength;
-		int64_t		errnum;
-		bool		liveconnection;
-		cont->errorMessage(
-				cont->getErrorBuffer(),
-				maxerrorlength,
-				&errorlength,&errnum,&liveconnection);
-		cont->setErrorLength(errorlength);
-		cont->setErrorNumber(errnum);
-		cont->setLiveConnection(liveconnection);
-		if (!liveconnection) {
-			disconnect=true;
-		}
-	}
+	cont->raiseDebugMessageEvent("returning error...");
+
+	const char	*errorstring;
+	uint32_t	errorlength;
+	int64_t		errnum;
+	bool		liveconnection;
+	cont->errorMessage(&errorstring,&errorlength,&errnum,&liveconnection);
 
 	// send the appropriate error status
-	if (disconnect) {
+	if (forcedisconnect || !liveconnection) {
 		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
 	} else {
 		clientsock->write((uint16_t)ERROR_OCCURRED);
 	}
 
 	// send the error code and error string
-	clientsock->write((uint64_t)cont->getErrorNumber());
+	clientsock->write((uint64_t)errnum);
 
 	// send the error string
-	clientsock->write((uint16_t)cont->getErrorLength());
-	clientsock->write(cont->getErrorBuffer(),
-				cont->getErrorLength());
+	clientsock->write((uint16_t)errorlength);
+	clientsock->write(errorstring,errorlength);
 	clientsock->flushWriteBuffer(-1,-1);
 
-	cont->raiseDbErrorEvent(NULL,cont->getErrorBuffer());
+	cont->raiseDebugMessageEvent("done returning error");
+
+	cont->raiseDbErrorEvent(NULL,errorstring);
 }
 
 void sqlrprotocol_sqlrclient::returnError(sqlrservercursor *cursor,
-							bool disconnect) {
+						bool forcedisconnect) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("returning error...");
 
+	const char	*errorstring;
+	uint32_t	errorlength;
+	int64_t		errnum;
+	bool		liveconnection;
+	cont->errorMessage(cursor,&errorstring,&errorlength,
+					&errnum,&liveconnection);
+
 	// send the appropriate error status
-	if (disconnect) {
+	if (forcedisconnect || !liveconnection) {
 		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
 	} else {
 		clientsock->write((uint16_t)ERROR_OCCURRED);
 	}
 
 	// send the error code
-	clientsock->write((uint64_t)cont->getErrorNumber(cursor));
+	clientsock->write((uint64_t)errnum);
 
 	// send the error string
-	clientsock->write((uint16_t)cont->getErrorLength(cursor));
-	clientsock->write(cont->getErrorBuffer(cursor),
-				cont->getErrorLength(cursor));
+	clientsock->write((uint16_t)errorlength);
+	clientsock->write(errorstring,errorlength);
 
 	// client will be sending skip/fetch, better get
 	// it even though we're not going to use it
@@ -2975,7 +2972,7 @@ void sqlrprotocol_sqlrclient::returnError(sqlrservercursor *cursor,
 
 	cont->raiseDebugMessageEvent("done returning error");
 
-	cont->raiseDbErrorEvent(cursor,cont->getErrorBuffer(cursor));
+	cont->raiseDbErrorEvent(cursor,errorstring);
 }
 
 bool sqlrprotocol_sqlrclient::fetchResultSetCommand(
@@ -3248,16 +3245,7 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 
 	// if an error occurred...
 	if (!success) {
-		uint32_t	errorlength;
-		int64_t		errnum;
-		bool		liveconnection;
-		cont->errorMessage(cursor,cont->getErrorBuffer(cursor),
-					maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
-		cont->setErrorLength(cursor,errorlength);
-		cont->setErrorNumber(cursor,errnum);
-		cont->setLiveConnection(cursor,liveconnection);
-		returnError(cursor,!liveconnection);
+		returnError(cursor,false);
 
 		// this is actually OK, only return false on a network error
 		return true;

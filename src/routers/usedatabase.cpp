@@ -6,6 +6,8 @@
 #include <rudiments/linkedlist.h>
 #include <rudiments/regularexpression.h>
 
+#include <defines.h>
+
 class conndb {
 	public:
 		conndb(const char *dbname,
@@ -121,14 +123,16 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 			}
 			retval=cdb->connid;
 		} else {
-			// FIXME: set err/errn
+			*err=cdb->sqlrcon->errorMessage();
+			*errn=cdb->sqlrcon->errorNumber();
 			if (debug) {
 				stdoutput.printf("(failed)\n");
 			}
 			retval=NULL;
 		}
 	} else {
-		// FIXME: set err/errn
+		*err=SQLR_ERROR_DBNOTFOUND_STRING;
+		*errn=SQLR_ERROR_DBNOTFOUND;
 		if (debug) {
 			stdoutput.printf("	%s not found\n",dbalias);
 		}
