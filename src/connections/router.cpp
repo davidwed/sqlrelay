@@ -81,6 +81,7 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 						const char *wild);
 		bool		ping();
 		const char	*selectDatabaseQuery();
+		char		*getCurrentDatabase();
 		bool		getLastInsertId(uint64_t *id);
 		void		endSession();
 
@@ -904,20 +905,26 @@ bool routerconnection::getListsByApiCalls() {
 
 bool routerconnection::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
-	// FIXME: implement this...
+	// FIXME: implement this
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool routerconnection::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
-	// FIXME: implement this...
+	// FIXME: implement this
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool routerconnection::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	// FIXME: implement this...
+	// FIXME: implement this
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
@@ -973,6 +980,11 @@ bool routerconnection::ping() {
 
 const char *routerconnection::selectDatabaseQuery() {
 	return "use %s";
+}
+
+char *routerconnection::getCurrentDatabase() {
+	return (currentcon)?
+		charstring::duplicate(currentcon->getCurrentDatabase()):NULL;
 }
 
 bool routerconnection::getLastInsertId(uint64_t *id) {
