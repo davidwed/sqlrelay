@@ -1082,7 +1082,7 @@ void routerconnection::route(bool *routed, bool *err) {
 						"an error occurred: "
 						"%d - %s\n",errn,errm);
 			}
-			setError(errm,errn,true);
+			cont->setError(errm,errn,true);
 			*err=true;
 		}
 		if (debug) {
@@ -1090,7 +1090,6 @@ void routerconnection::route(bool *routed, bool *err) {
 		}
 		return;
 	}
-
 	if (debug) {
 		stdoutput.printf("		routing to: %s\n",connectionid);
 	}
@@ -1334,10 +1333,10 @@ void routercursor::route(bool *routed, bool *err) {
 		if (errm) {
 			if (routerconn->debug) {
 				stdoutput.printf("		"
-					"an error occurred: "
-					"%d - %s\n",errn,errm);
+						"an error occurred: "
+						"%d - %s\n",errn,errm);
 			}
-			setError(errm,errn,true);
+			conn->cont->setError(this,errm,errn,true);
 			*err=true;
 		}
 		if (routerconn->debug) {
@@ -1346,7 +1345,7 @@ void routercursor::route(bool *routed, bool *err) {
 		return;
 	}
 	if (routerconn->debug) {
-		stdoutput.printf("		routing to %s\n",connectionid);
+		stdoutput.printf("		routing to: %s\n",connectionid);
 	}
 
 	// get the corresponding connection and cursor

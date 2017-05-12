@@ -163,7 +163,7 @@ bool sqlrserverconnection::supportsAutoCommit() {
 bool sqlrserverconnection::begin() {
 
 	// re-init error data
-	clearError();
+	cont->clearError();
 
 	// for db's that don't support begin queries,
 	// don't do anything, just return true
@@ -188,11 +188,7 @@ bool sqlrserverconnection::begin() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		begincur->errorMessage(pvt->_error,
-					pvt->_maxerrorlength,
-					&(pvt->_errorlength),
-					&(pvt->_errnum),
-					&(pvt->_liveconnection));
+		cont->saveErrorFromCursor(begincur);
 	}
 
 	// clean up
@@ -215,7 +211,7 @@ const char *sqlrserverconnection::beginTransactionQuery() {
 bool sqlrserverconnection::commit() {
 
 	// re-init error data
-	clearError();
+	cont->clearError();
 
 	// init some variables
 	const char	*commitquery="commit";
@@ -232,11 +228,7 @@ bool sqlrserverconnection::commit() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		commitcur->errorMessage(pvt->_error,
-					pvt->_maxerrorlength,
-					&(pvt->_errorlength),
-					&(pvt->_errnum),
-					&(pvt->_liveconnection));
+		cont->saveErrorFromCursor(commitcur);
 	}
 
 	// clean up
@@ -255,7 +247,7 @@ bool sqlrserverconnection::commit() {
 bool sqlrserverconnection::rollback() {
 
 	// re-init error data
-	clearError();
+	cont->clearError();
 
 	// init some variables
 	const char	*rollbackquery="rollback";
@@ -272,11 +264,7 @@ bool sqlrserverconnection::rollback() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		rbcur->errorMessage(pvt->_error,
-					pvt->_maxerrorlength,
-					&(pvt->_errorlength),
-					&(pvt->_errnum),
-					&(pvt->_liveconnection));
+		cont->saveErrorFromCursor(rbcur);
 	}
 
 	// clean up
@@ -295,7 +283,7 @@ bool sqlrserverconnection::rollback() {
 bool sqlrserverconnection::selectDatabase(const char *database) {
 
 	// re-init error data
-	clearError();
+	cont->clearError();
 
 	// handle the degenerate case
 	if (!database) {
@@ -338,11 +326,7 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	} else {
 		// If there was an error, copy it out.  We'll be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		sdcur->errorMessage(pvt->_error,
-					pvt->_maxerrorlength,
-					&(pvt->_errorlength),
-					&(pvt->_errnum),
-					&(pvt->_liveconnection));
+		cont->saveErrorFromCursor(sdcur);
 	}
 	delete[] sdquery;
 	cont->close(sdcur);
@@ -398,7 +382,7 @@ const char *sqlrserverconnection::getCurrentDatabaseQuery() {
 bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 
 	// re-init error data
-	clearError();
+	cont->clearError();
 
 	// get the get current database query base
 	const char	*liiquery=getLastInsertIdQuery();
@@ -406,8 +390,9 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 	// If there is no query for this then the db we're using doesn't
 	// support switching.
 	if (!liiquery) {
-		setError(SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING,
-				SQLR_ERROR_LASTINSERTIDNOTSUPPORTED,true);
+		cont->setError(
+			SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING,
+			SQLR_ERROR_LASTINSERTIDNOTSUPPORTED,true);
 		return false;
 	}
 
@@ -433,7 +418,8 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 
 		}  else {
 
-			setError(SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING,
+			cont->setError(
+				SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING,
 				SQLR_ERROR_LASTINSERTIDNOTSUPPORTED,true);
 			retval=false;
 		}
@@ -441,11 +427,7 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 	} else {
 		// If there was an error, copy it out.  We'll be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		liicur->errorMessage(pvt->_error,
-					pvt->_maxerrorlength,
-					&(pvt->_errorlength),
-					&(pvt->_errnum),
-					&(pvt->_liveconnection));
+		cont->saveErrorFromCursor(liicur);
 	}
 
 	liicur->closeResultSet();
@@ -498,11 +480,7 @@ bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 	// FIXME: we don't really need to do this now but we will
 	// later if we ever add an API call to set the isolation level
 	/* else {
-		silcur->errorMessage(pvt->_error,
-					pvt->_maxerrorlength,
-					&(pvt->_errorlength),
-					&(pvt->_errnum),
-					&(pvt->_liveconnection));
+		cont->saveErrorFromCursor(silcur);
 	} */
 
 	delete[] silquery;
@@ -752,23 +730,6 @@ bool sqlrserverconnection::tempTableTruncateBeforeDrop() {
 
 void sqlrserverconnection::endSession() {
 	// by default, do nothing
-}
-
-void sqlrserverconnection::clearError() {
-	setError(NULL,0,true);
-}
-
-void sqlrserverconnection::setError(const char *err,
-					int64_t errn,
-					bool liveconn) {
-	pvt->_errorlength=charstring::length(err);
-	if (pvt->_errorlength>pvt->_maxerrorlength-1) {
-		pvt->_errorlength=pvt->_maxerrorlength-1;
-	}
-	charstring::copy(pvt->_error,err,pvt->_errorlength);
-	pvt->_error[pvt->_errorlength]='\0';
-	pvt->_errnum=errn;
-	pvt->_liveconnection=liveconn;
 }
 
 char *sqlrserverconnection::getErrorBuffer() {

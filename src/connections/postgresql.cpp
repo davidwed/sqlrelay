@@ -24,6 +24,9 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
+		bool		logIn(const char **error,
+					const char **warning,
+					const char *database);
 		const char	*logInError(const char *errmsg);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
@@ -42,6 +45,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
+		bool		selectDatabase(const char *database);
 		const char	*getCurrentDatabaseQuery();
 		bool		getLastInsertId(uint64_t *id);
 		const char	*getLastInsertIdQuery();
@@ -247,6 +251,12 @@ void postgresqlconnection::handleConnectString() {
 }
 
 bool postgresqlconnection::logIn(const char **error, const char **warning) {
+	return logIn(error,warning,db);
+}
+
+bool postgresqlconnection::logIn(const char **error,
+					const char **warning,
+					const char *database) {
 
 	// clear the datatype dictionary
 	if (typemangling==2) {
@@ -272,8 +282,8 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 	if (!charstring::isNullOrEmpty(options)) {
 		conninfo.append(" options=")->append(options);
 	}
-	if (!charstring::isNullOrEmpty(db)) {
-		conninfo.append(" dbname=")->append(db);
+	if (!charstring::isNullOrEmpty(database)) {
+		conninfo.append(" dbname=")->append(database);
 	}
 	// sslmode isn't supported by older versions of postgresql, and
 	// including it at all will cause PQconnectdb to fail.  Remove it
@@ -284,7 +294,7 @@ bool postgresqlconnection::logIn(const char **error, const char **warning) {
 	}
 	pgconn=PQconnectdb(conninfo.getString());
 #else
-	pgconn=PQsetdbLogin(host,port,options,NULL,db,
+	pgconn=PQsetdbLogin(host,port,options,NULL,database,
 				cont->getUser(),cont->getPassword());
 #endif
 
@@ -561,6 +571,35 @@ const char *postgresqlconnection::getColumnListQuery(
 		"	table_name='%s' "
 		"order by "
 		"	ordinal_position";
+}
+
+bool postgresqlconnection::selectDatabase(const char *database) {
+
+	cont->clearError();
+
+	const char	*error=NULL;
+	const char	*warning=NULL;
+
+	// log out and log back in to the specified database
+	logOut();
+	if (!logIn(&error,&warning,database)) {
+
+		// Set the error, but don't use the error that was returned
+		// from logIn() because it will have a message prepended to it.
+		// Also, we can't get the message from PQerrorMessage, because
+		// if PQconnect fails then pgconn will be NULL and
+		// PQerrorMessage will just return a message saying that it's
+		// NULL.  So, we'll just return the generic SQL Relay error
+		// for these kinds of things.
+		cont->setError(SQLR_ERROR_DBNOTFOUND_STRING,
+				SQLR_ERROR_DBNOTFOUND,true);
+
+		// log back in to the original database, we'll assume that works
+		logOut();
+		logIn(&error,&warning);
+		return false;
+	}
+	return true;
 }
 
 const char *postgresqlconnection::getCurrentDatabaseQuery() {
@@ -911,7 +950,8 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		err.append(" (")->append(ncols)->append('>');
 		err.append(maxcolumncount);
 		err.append(')');
-		setError(err.getString(),SQLR_ERROR_MAXSELECTLIST,true);
+		conn->cont->setError(this,err.getString(),
+					SQLR_ERROR_MAXSELECTLIST,true);
 		return false;
 	}
 

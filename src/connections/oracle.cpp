@@ -3142,7 +3142,8 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 			err.append(" (")->append(ncols)->append('>');
 			err.append(maxcolumncount);
 			err.append(')');
-			setError(err.getString(),SQLR_ERROR_MAXSELECTLIST,true);
+			conn->cont->setError(this,err.getString(),
+						SQLR_ERROR_MAXSELECTLIST,true);
 			return false;
 		}
 
@@ -3369,7 +3370,7 @@ bool oraclecursor::validBinds() {
 			stringbuffer	err;
 			err.append(SQLR_ERROR_DUPLICATEBINDNAME_STRING);
 			err.append(" (")->append(bvnp[i])->append(')');
-			setError(err.getString(),
+			conn->cont->setError(this,err.getString(),
 					SQLR_ERROR_DUPLICATEBINDNAME,true);
 			return false;
 		}
@@ -3384,7 +3385,8 @@ bool oraclecursor::validBinds() {
 							(char *)bvnp[i]);
 			}
 			if (!foundvar) {
-				setError("ORA-01008: not all variables bound",
+				conn->cont->setError(this,
+					"ORA-01008: not all variables bound",
 								1008,true);
 				return false;
 			}

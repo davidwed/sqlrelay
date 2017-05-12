@@ -5,6 +5,7 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
+#include <rudiments/process.h>
 
 #define NEED_DATATYPESTRING 1
 #include <datatypes.h>
@@ -462,6 +463,20 @@ void sqlrservercursor::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+
+	// if the cursor happens to have an error, then return that
+	if (pvt->_errorlength) {
+		charstring::safeCopy(errorbuffer,errorbuffersize,
+					pvt->_error,pvt->_errorlength);
+		*errorlength=pvt->_errorlength;
+		if (*errorlength>errorbuffersize) {
+			*errorlength=errorbuffersize;
+		}
+		*errorcode=pvt->_errnum;
+		*liveconnection=pvt->_liveconnection;
+	}
+
+	// otherwise return the connection's error
 	conn->errorMessage(errorbuffer,errorbuffersize,
 				errorlength,errorcode,liveconnection);
 }
@@ -986,21 +1001,6 @@ void sqlrservercursor::setCurrentRowReformatted(bool crr) {
 
 bool sqlrservercursor::getCurrentRowReformatted() {
 	return pvt->_currentrowreformatted;
-}
-
-void sqlrservercursor::clearError() {
-	setError(NULL,0,true);
-}
-
-void sqlrservercursor::setError(const char *err, int64_t errn, bool liveconn) {
-	pvt->_errorlength=charstring::length(err);
-	if (pvt->_errorlength>pvt->_maxerrorlength) {
-		pvt->_errorlength=pvt->_maxerrorlength;
-	}
-	charstring::copy(pvt->_error,err,pvt->_errorlength);
-	pvt->_error[pvt->_errorlength]='\0';
-	pvt->_errnum=errn;
-	pvt->_liveconnection=liveconn;
 }
 
 char *sqlrservercursor::getErrorBuffer() {

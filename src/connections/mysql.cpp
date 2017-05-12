@@ -905,8 +905,8 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
 		err.append(" (")->append(maxcolumncount);
 		err.append('<')->append(ncols)->append(')');
-		setError(err.getString(),
-			SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
+		conn->cont->setError(this,err.getString(),
+				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
 		return false;
 	}
 
@@ -1250,7 +1250,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 			err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
 			err.append(" (")->append(maxcolumncount);
 			err.append('<')->append(ncols)->append(')');
-			setError(err.getString(),
+			conn->cont->setError(this,err.getString(),
 				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
 			return false;
 		}
