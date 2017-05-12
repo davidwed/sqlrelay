@@ -53,6 +53,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_usedatabase : public sqlrrouter {
 		bool	debug;
 
 		dictionary<char *,conndb *>	dbs;
+		avltree<const char *>		denieddbs;
 		bool	initialized;
 };
 
@@ -60,12 +61,24 @@ sqlrrouter_usedatabase::sqlrrouter_usedatabase(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						xmldomnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
+
 	debug=cont->getConfig()->getDebugRouters();
+
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
 	if (!enabled && debug) {
 		stdoutput.printf("	disabled\n");
 		return;
+	}
+
+	// build the deny-list
+	for (xmldomnode *deny=parameters->getFirstTagChild("deny");
+				!deny->isNullNode();
+				deny=deny->getNextTagSibling("deny")) {
+		const char	*db=deny->getAttributeValue("db");
+		if (!charstring::isNullOrEmpty(db)) {
+			denieddbs.insert(db);
+		}
 	}
 
 	initialized=false;
@@ -109,7 +122,18 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 
 	// get the id of the connection that hosts the db
 	conndb		*cdb=NULL;
-	if (dbs.getValue((char *)dbalias,&cdb)) {
+	if (denieddbs.find(dbalias)) {
+
+		*err=SQLR_ERROR_ACCESSDENIED_STRING;
+		*errn=SQLR_ERROR_ACCESSDENIED;
+		if (debug) {
+			stdoutput.printf("			"
+						"%s denied\n",
+						dbalias);
+		}
+		retval=NULL;
+
+	} else if (dbs.getValue((char *)dbalias,&cdb)) {
 
 		if (debug) {
 			stdoutput.printf("			"
