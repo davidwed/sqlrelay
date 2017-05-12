@@ -7,6 +7,7 @@
 #include <rudiments/sys.h>
 
 #include <datatypes.h>
+#include <defines.h>
 #include <config.h>
 
 extern "C" {
@@ -37,6 +38,8 @@ class SQLRSERVER_DLLSPEC mdbtoolsconnection : public sqlrserverconnection {
 		void	logOut();
 		bool	isTransactional();
 		bool	ping();
+		bool	selectDatabase(const char *database);
+		char	*getCurrentDatabase();
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*dbHostName();
@@ -60,9 +63,8 @@ class SQLRSERVER_DLLSPEC mdbtoolsconnection : public sqlrserverconnection {
 					int64_t	*errorcode,
 					bool *liveconnection);
 
-		const char	*db;
+		char		*db;
 		const char	*identity;
-
 		char		*hostname;
 };
 
@@ -122,11 +124,13 @@ class SQLRSERVER_DLLSPEC mdbtoolscursor : public sqlrservercursor {
 
 mdbtoolsconnection::mdbtoolsconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
-	hostname=NULL;
+	db=NULL;
 	identity=NULL;
+	hostname=NULL;
 }
 
 mdbtoolsconnection::~mdbtoolsconnection() {
+	delete[] db;
 	delete[] hostname;
 }
 
@@ -134,7 +138,7 @@ void mdbtoolsconnection::handleConnectString() {
 
 	sqlrserverconnection::handleConnectString();
 
-	db=cont->getConnectStringValue("db");
+	db=charstring::duplicate(cont->getConnectStringValue("db"));
 	identity=cont->getConnectStringValue("identity");
 
 	cont->setFetchAtOnce(1);
@@ -144,7 +148,7 @@ void mdbtoolsconnection::handleConnectString() {
 
 bool mdbtoolsconnection::logIn(const char **error, const char **warning) {
 	mdb_init_backends();
-	return true;
+	return file::exists(db);
 }
 
 sqlrservercursor *mdbtoolsconnection::newCursor(uint16_t id) {
@@ -164,6 +168,41 @@ void mdbtoolsconnection::logOut() {
 
 bool mdbtoolsconnection::ping() {
 	return true;
+}
+
+bool mdbtoolsconnection::selectDatabase(const char *database) {
+
+	// keep track of the original db and host
+	char	*originaldb=db;
+
+	// reset the db/host
+	db=charstring::duplicate(database);
+
+	cont->clearError();
+
+	// log out and log back in to the specified database
+	logOut();
+	if (!logIn(NULL,NULL)) {
+
+		// Set the error.
+		cont->setError(SQLR_ERROR_DBNOTFOUND_STRING,
+				SQLR_ERROR_DBNOTFOUND,true);
+
+		// log back in to the original database, we'll assume that works
+		delete[] db;
+		db=originaldb;
+		logOut();
+		logIn(NULL,NULL);
+		return false;
+	}
+
+	// clean up
+	delete[] originaldb;
+	return true;
+}
+
+char *mdbtoolsconnection::getCurrentDatabase() {
+	return charstring::duplicate(db);
 }
 
 const char *mdbtoolsconnection::identify() {

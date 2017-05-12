@@ -236,6 +236,8 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 					uint32_t *errorlength,
 					int64_t	*errorcode,
 					bool *liveconnection);
+		bool		selectDatabase(const char *database);
+		char		*getCurrentDatabase();
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*dbHostName();
@@ -252,7 +254,7 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		isc_db_handle	db;
 		isc_tr_handle	tr;
 
-		const char	*database;
+		char		*database;
 		char		*host;
 		unsigned short	dialect;
 
@@ -284,6 +286,7 @@ firebirdconnection::firebirdconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
 	dbversion=NULL;
 	lastinsertidquery=NULL;
+	database=NULL;
 	host=NULL;
 	identity=NULL;
 }
@@ -291,6 +294,7 @@ firebirdconnection::firebirdconnection(sqlrservercontroller *cont) :
 firebirdconnection::~firebirdconnection() {
 	delete dbversion;
 	delete[] lastinsertidquery;
+	delete[] database;
 	delete[] host;
 }
 
@@ -299,19 +303,11 @@ void firebirdconnection::handleConnectString() {
 	sqlrserverconnection::handleConnectString();
 
 	// override legacy "database" parameter with modern "db" parameter
-	database=cont->getConnectStringValue("database");
-	const char	*tmp=cont->getConnectStringValue("db");
-	if (!charstring::isNullOrEmpty(tmp)) {
-		database=tmp;
+	const char	*dbtmp=cont->getConnectStringValue("db");
+	if (charstring::isNullOrEmpty(dbtmp)) {
+		dbtmp=cont->getConnectStringValue("database");
 	}
-
-	// parse the host name from the database
-	const char	*colon=charstring::findFirst(database,':');
-	if (colon) {
-		host=charstring::duplicate(database,colon-database);
-	} else {
-		host=sys::getHostName();
-	}
+	database=charstring::duplicate(dbtmp);
 
 	const char	*dialectstr=cont->getConnectStringValue("dialect");
 	if (dialectstr) {
@@ -350,6 +346,15 @@ void firebirdconnection::handleConnectString() {
 }
 
 bool firebirdconnection::logIn(const char **err, const char **warning) {
+
+	// parse the host name from the database
+	const char	*colon=charstring::findFirst(database,':');
+	delete[] host;
+	if (colon) {
+		host=charstring::duplicate(database,colon-database);
+	} else {
+		host=sys::getHostName();
+	}
 
 	// initialize a parameter buffer
 	char	*dpbptr=dpb;
@@ -494,6 +499,50 @@ bool firebirdconnection::ping() {
 				sizeof(resbuffer),resbuffer);
 
 	return !(status[0]==1 && status[1]);
+}
+
+bool firebirdconnection::selectDatabase(const char *database) {
+
+	// keep track of the original db and host
+	char	*originaldb=this->database;
+	char	*originalhost=this->host;
+
+	// reset the db/host
+	this->database=charstring::duplicate(database);
+	this->host=NULL;
+
+	cont->clearError();
+
+	// log out and log back in to the specified database
+	logOut();
+	const char	*error=NULL;
+	const char	*warning=NULL;
+	if (!logIn(&error,&warning)) {
+
+		// Set the error, but don't use the error that was returned
+		// from logIn() because it will be confusing.  So, we'll
+		// just return the generic SQL Relay error for these kinds of
+		// things.
+		cont->setError(SQLR_ERROR_DBNOTFOUND_STRING,
+				SQLR_ERROR_DBNOTFOUND,true);
+
+		// log back in to the original database, we'll assume that works
+		delete[] this->database;
+		this->database=originaldb;
+		this->host=originalhost;
+		logOut();
+		logIn(&error,&warning);
+		return false;
+	}
+
+	// clean up
+	delete[] originaldb;
+	delete[] originalhost;
+	return true;
+}
+
+char *firebirdconnection::getCurrentDatabase() {
+	return charstring::duplicate(database);
 }
 
 const char *firebirdconnection::identify() {

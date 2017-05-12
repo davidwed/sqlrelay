@@ -577,11 +577,10 @@ bool postgresqlconnection::selectDatabase(const char *database) {
 
 	cont->clearError();
 
-	const char	*error=NULL;
-	const char	*warning=NULL;
-
 	// log out and log back in to the specified database
 	logOut();
+	const char	*error=NULL;
+	const char	*warning=NULL;
 	if (!logIn(&error,&warning,database)) {
 
 		// Set the error, but don't use the error that was returned

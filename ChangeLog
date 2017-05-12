@@ -56,6 +56,8 @@
 	router framework has been refactored to allow route() to return errors
 	server-side error buffering has been refactored
 	added "use database" router module
+	firebird, mdbtools connection modules can report the current database now
+	"use database" works with postgreqsl, firebird, mdbtools, ...
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

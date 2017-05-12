@@ -6,6 +6,7 @@
 #include <rudiments/sys.h>
 
 #include <datatypes.h>
+#include <defines.h>
 #include <config.h>
 
 extern "C" {
@@ -53,6 +54,8 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 		#ifdef SQLITE_TRANSACTIONAL
 		const char	*setIsolationLevelQuery();
 		#endif
+		bool		selectDatabase(const char *database);
+		char		*getCurrentDatabase();
 		bool		getLastInsertId(uint64_t *id);
 		#ifdef SQLITE3
 		char		*duplicate(const char *str);
@@ -70,7 +73,7 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 
 		void		clearErrors();
 
-		const char	*db;
+		char		*db;
 
 		const char	*identity;
 
@@ -170,15 +173,17 @@ sqliteconnection::sqliteconnection(sqlrservercontroller *cont) :
 	errmesg=NULL;
 	errcode=0;
 	hostname=NULL;
+	db=NULL;
 }
 
 sqliteconnection::~sqliteconnection() {
 	clearErrors();
 	delete[] hostname;
+	delete[] db;
 }
 
 void sqliteconnection::handleConnectString() {
-	db=cont->getConnectStringValue("db");
+	db=charstring::duplicate(cont->getConnectStringValue("db"));
 	identity=cont->getConnectStringValue("identity");
 
 	cont->setFetchAtOnce(1);
@@ -322,6 +327,45 @@ const char *sqliteconnection::setIsolationLevelQuery() {
 	return "pragma %s";
 }
 #endif
+
+bool sqliteconnection::selectDatabase(const char *database) {
+
+	// keep track of the original db and host
+	char	*originaldb=db;
+
+	// reset the db/host
+	db=charstring::duplicate(database);
+
+	cont->clearError();
+
+	// log out and log back in to the specified database
+	logOut();
+	const char	*error;
+	const char	*warning;
+	if (!logIn(&error,&warning)) {
+
+		// Set the error.  We can't get the message from sqlite3_errmsg,
+		// because sqliteptr will be NULL.  So, we'll just return the
+		// generic SQL Relay error for these kinds of things.
+		cont->setError(SQLR_ERROR_DBNOTFOUND_STRING,
+				SQLR_ERROR_DBNOTFOUND,true);
+
+		// log back in to the original database, we'll assume that works
+		delete[] db;
+		db=originaldb;
+		logOut();
+		logIn(&error,&warning);
+		return false;
+	}
+
+	// clean up
+	delete[] originaldb;
+	return true;
+}
+
+char *sqliteconnection::getCurrentDatabase() {
+	return charstring::duplicate(db);
+}
 
 bool sqliteconnection::getLastInsertId(uint64_t *id) {
 	*id=sqlite3_last_insert_rowid(sqliteptr);
