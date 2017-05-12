@@ -67,11 +67,16 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 		return NULL;
 	}
 
+	if (debug) {
+		stdoutput.printf("		route {\n");
+	}
+
 	// get the clientip
 	const char	*clientip=sqlrcon->cont->getClientAddr();
 	if (charstring::isNullOrEmpty(clientip)) {
 		if (debug) {
-			stdoutput.printf("routing null/empty client ip\n");
+			stdoutput.printf("			"
+					"routing null/empty client ip\n");
 		}
 		return NULL;
 	}
@@ -82,13 +87,16 @@ const char *sqlrrouter_clientiplist::route(sqlrserverconnection *sqlrcon,
 		// if the clientip matches...
 		if (match(clientip,clientips[i])) {
 			if (debug) {
-				stdoutput.printf("routing client ip "
-							"\"%s\" to %s\n",
+				stdoutput.printf("			"
+							"routing client ip "
+							"\"%s\" to %s\n	}\n",
 							clientip,connid);
 			}
 			return connid;
 		}
 	}
+
+	stdoutput.printf("		}\n");
 	return NULL;
 }
 
@@ -108,7 +116,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 		// handle wildcards
 		if (!charstring::compare(pattern,"*")) {
 			if (debug) {
-				stdoutput.printf("	"
+				stdoutput.printf("		"
 						"%s matches "
 						"wildcard %s...\n",
 						ip,pattern);
@@ -117,7 +125,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 		}
 		if (!charstring::compare(pattern,"*.",2)) {
 			if (debug) {
-				stdoutput.printf("	"
+				stdoutput.printf("		"
 						"%s matches "
 						"wildcard %s...\n",
 						ip,pattern);
@@ -146,7 +154,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 
 			if (!inrange) {
 				if (debug) {
-					stdoutput.printf("	"
+					stdoutput.printf("		"
 							"%s doesn't "
 							"match %s...\n",
 							ip,pattern);
@@ -155,7 +163,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			}
 
 			if (debug) {
-				stdoutput.printf("	"
+				stdoutput.printf("		"
 						"%s matches "
 						"range %s...\n",
 						ip,pattern);
@@ -174,7 +182,7 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 				charstring::toUnsignedInteger(ip)) {
 
 			if (debug) {
-				stdoutput.printf("	"
+				stdoutput.printf("		"
 						"%s matches "
 						"individual %s...\n",
 						ip,pattern);
@@ -187,8 +195,9 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 		}
 
 		if (debug) {
-			stdoutput.printf("	%s doesn't match %s...\n",
-								ip,pattern);
+			stdoutput.printf("		"
+					"%s doesn't match %s...\n",
+					ip,pattern);
 		}
 		return false;
 	}

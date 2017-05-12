@@ -70,8 +70,13 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char **err,
 					int64_t *errn) {
+
 	if (!enabled || !sqlrcon || !sqlrcur) {
 		return NULL;
+	}
+
+	if (debug) {
+		stdoutput.printf("		route {\n");
 	}
 
 	const char	*query=sqlrcur->getQueryBuffer();
@@ -79,12 +84,19 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 							rn; rn=rn->getNext()) {
 		if (rn->getValue()->match(query)) {
 			if (debug) {
-				stdoutput.printf("\nrouting query:\n"
-							"	%s\nto: %s\n",
+				stdoutput.printf("			"
+							"routing query:\n"
+							"		"
+							"%s\n		"
+							"to: %s\n	}\n",
 							query,connid);
 			}
 			return connid;
 		}
+	}
+
+	if (debug) {
+		stdoutput.printf("		}\n");
 	}
 	return NULL;
 }

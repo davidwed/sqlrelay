@@ -65,11 +65,16 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 		return NULL;
 	}
 
+	if (debug) {
+		stdoutput.printf("		route {\n");
+	}
+
 	// get the user
 	const char	*user=sqlrcon->cont->getCurrentUser();
 	if (charstring::isNullOrEmpty(user)) {
 		if (debug) {
-			stdoutput.printf("\nrouting null/empty user\n");
+			stdoutput.printf("			"
+					"routing null/empty user\n");
 		}
 		return NULL;
 	}
@@ -81,11 +86,16 @@ const char *sqlrrouter_userlist::route(sqlrserverconnection *sqlrcon,
 		if (!charstring::compare(user,users[i]) ||
 			!charstring::compare(users[i],"*")) {
 			if (debug) {
-				stdoutput.printf("\nrouting user %s to %s\n",
-								user,connid);
+				stdoutput.printf("			"
+						"routing user %s to %s\n",
+						user,connid);
 			}
 			return connid;
 		}
+	}
+
+	if (debug) {
+		stdoutput.printf("		}\n");
 	}
 	return NULL;
 }

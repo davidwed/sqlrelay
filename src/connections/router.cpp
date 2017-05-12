@@ -7,9 +7,6 @@
 #include <rudiments/snooze.h>
 #include <rudiments/regularexpression.h>
 
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
-
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
@@ -118,6 +115,8 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		sqlrrouters	*sqlrr;
 
 		bool		routeentiresession;
+
+		bool		debug;
 
 		linkedlist< routercursor * >	routercursors;
 };
@@ -293,6 +292,8 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	// tell the controller to intercept begins, commits, and rollbacks sent
 	// as queries and call begin(), commit(), and rollback() methods instead
 	cont->setInterceptTransactionQueries(true);
+
+	debug=cont->getConfig()->getDebugRouters();
 }
 
 routerconnection::~routerconnection() {
@@ -410,6 +411,10 @@ void routerconnection::logOut() {
 
 bool routerconnection::autoCommitOn() {
 
+	if (debug) {
+		stdoutput.printf("autoCommitOn {\n");
+	}
+
 	if (justloggedin) {
 		justloggedin=false;
 	}
@@ -419,14 +424,19 @@ bool routerconnection::autoCommitOn() {
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return false;
 	}
 
 	// if routing entire sessions, then just enable for
 	// the appropriate connection
 	if (routed && routeentiresession) {
-		debugPrintf("autoCommitOn(): %s (session)\n",
-						conids[currentconindex]);
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
+				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->autoCommitOn():true;
 	}
 
@@ -434,9 +444,17 @@ bool routerconnection::autoCommitOn() {
 	// if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("autoCommitOn(): %s\n",conids[index]);
+
+		if (debug) {
+			stdoutput.printf("	executing on: %s\n",
+							conids[index]);
+		}
+
 		bool	res=cons[index]->autoCommitOn();
 		if (!res) {
+			if (debug) {
+				stdoutput.printf("	failed\n");
+			}
 			autoCommitOnFailed(index);
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
@@ -460,10 +478,18 @@ bool routerconnection::autoCommitOn() {
 			result=res;
 		}
 	}
+
+	if (debug) {
+		stdoutput.printf("}\n");
+	}
 	return result;
 }
 
 bool routerconnection::autoCommitOff() {
+
+	if (debug) {
+		stdoutput.printf("autoCommitOff {\n");
+	}
 
 	if (justloggedin) {
 		justloggedin=false;
@@ -474,14 +500,19 @@ bool routerconnection::autoCommitOff() {
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return false;
 	}
 
 	// if routing entire sessions, then just disable for
 	// the appropriate connection
 	if (routed && routeentiresession) {
-		debugPrintf("autoCommitOff(): %s (session)\n",
-						conids[currentconindex]);
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
+				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->autoCommitOff():true;
 	}
 
@@ -489,9 +520,17 @@ bool routerconnection::autoCommitOff() {
 	// if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("autoCommitOff(): %s\n",conids[index]);
+
+		if (debug) {
+			stdoutput.printf("	executing on: %s\n",
+							conids[index]);
+		}
+
 		bool	res=cons[index]->autoCommitOff();
 		if (!res) {
+			if (debug) {
+				stdoutput.printf("	failed\n");
+			}
 			autoCommitOffFailed(index);
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
@@ -516,6 +555,10 @@ bool routerconnection::autoCommitOff() {
 			result=res;
 		}
 	}
+
+	if (debug) {
+		stdoutput.printf("}\n");
+	}
 	return result;
 }
 
@@ -525,99 +568,162 @@ bool routerconnection::supportsAutoCommit() {
 
 bool routerconnection::begin() {
 
+	if (debug) {
+		stdoutput.printf("begin {\n");
+	}
+
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return false;
 	}
 
 	// if routing entire sessions, then just begin for
 	// the appropriate connection
 	if (routed && routeentiresession) {
-		debugPrintf("begin(): %s (session)\n",
-					conids[currentconindex]);
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
+				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->begin():true;
 	}
 
 	// otherwise, begin all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("begin(): %s\n",conids[index]);
+
+		if (debug) {
+			stdoutput.printf("	executing on: %s\n",
+							conids[index]);
+		}
+
 		bool	res=cons[index]->begin();
 		if (!res) {
+			if (debug) {
+				stdoutput.printf("	failed\n");
+			}
 			beginFailed(index);
 		}
 		if (result) {
 			result=res;
 		}
 	}
+
+	if (debug) {
+		stdoutput.printf("}\n");
+	}
 	return result;
 }
 
 bool routerconnection::commit() {
+
+	if (debug) {
+		stdoutput.printf("commit {\n");
+	}
 
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return false;
 	}
 
 	// if routing entire sessions, then just commit for
 	// the appropriate connection
 	if (routed && routeentiresession) {
-		debugPrintf("commit(): %s (session)\n",
-					conids[currentconindex]);
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
+				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->commit():true;
 	}
 
 	// otherwise, commit all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("commit(): %s\n",conids[index]);
+
+		if (debug) {
+			stdoutput.printf("	executing on: %s\n",
+							conids[index]);
+		}
+
 		bool	res=cons[index]->commit();
 		if (!res) {
+			if (debug) {
+				stdoutput.printf("	failed\n");
+			}
 			commitFailed(index);
 		}
 		if (result) {
 			result=res;
 		}
 	}
+
+	if (debug) {
+		stdoutput.printf("}\n");
+	}
 	return result;
 }
 
 bool routerconnection::rollback() {
+
+	if (debug) {
+		stdoutput.printf("rollback {\n");
+	}
 
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return false;
 	}
 
 	// if routing entire sessions, then just rollback for
 	// the appropriate connection
 	if (routed && routeentiresession) {
-		debugPrintf("rollback(): %s (session)\n",
-					conids[currentconindex]);
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
+				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->rollback():true;
 	}
 
 	// otherwise, rollback all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("rollback(): %s\n",conids[index]);
+
+		if (debug) {
+			stdoutput.printf("	executing on: %s\n",
+							conids[index]);
+		}
+
 		bool	res=cons[index]->rollback();
 		if (!res) {
+			if (debug) {
+				stdoutput.printf("	failed\n");
+			}
 			rollbackFailed(index);
 		}
 		if (result) {
 			result=res;
 		}
+	}
+
+	if (debug) {
+		stdoutput.printf("}\n");
 	}
 	return result;
 }
@@ -648,19 +754,28 @@ const char *routerconnection::identify() {
 
 const char *routerconnection::dbVersion() {
 
+	if (debug) {
+		stdoutput.printf("dbVersion {\n");
+	}
+
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return NULL;
 	}
 
 	// if routing entire sessions, then get this for
 	// the appropriate connection
 	if (routeentiresession) {
-		debugPrintf("dbVersion(): %s (session)\n",
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
 				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->dbVersion():NULL;
 	}
 
@@ -671,26 +786,43 @@ const char *routerconnection::dbVersion() {
 			currentconindex=index;
 		}
 	}
-	debugPrintf("dbVersion(): %s\n",
+
+	if (debug) {
+		stdoutput.printf("	executing on: %s\n",
 			(currentcon)?conids[currentconindex]:NULL);
-	return (currentcon)?currentcon->dbVersion():NULL;
+	}
+
+	const char	*retval=(currentcon)?currentcon->dbVersion():NULL;
+	if (debug) {
+		stdoutput.printf("	db version: %s\n}\n",retval);
+	}
+	return retval;
 }
 
 const char *routerconnection::dbHostName() {
+
+	if (debug) {
+		stdoutput.printf("dbHostName {\n");
+	}
 
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return NULL;
 	}
 
 	// if routing entire sessions, then get this for
 	// the appropriate connection
 	if (routeentiresession) {
-		debugPrintf("dbHostName(): %s (session)\n",
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
 				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->dbHostName():NULL;
 	}
 
@@ -701,26 +833,43 @@ const char *routerconnection::dbHostName() {
 			currentconindex=index;
 		}
 	}
-	debugPrintf("dbHostName(): %s\n",
+
+	if (debug) {
+		stdoutput.printf("	executing on: %s\n",
 			(currentcon)?conids[currentconindex]:NULL);
-	return (currentcon)?currentcon->dbHostName():NULL;
+	}
+
+	const char	*retval=(currentcon)?currentcon->dbHostName():NULL;
+	if (debug) {
+		stdoutput.printf("	db hostname: %s\n}\n",retval);
+	}
+	return retval;
 }
 
 const char *routerconnection::dbIpAddress() {
+
+	if (debug) {
+		stdoutput.printf("dbIpAddress {\n");
+	}
 
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return NULL;
 	}
 
 	// if routing entire sessions, then get this for
 	// the appropriate connection
 	if (routeentiresession) {
-		debugPrintf("dbIpAddress(): %s (session)\n",
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
 				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->dbIpAddress():NULL;
 	}
 
@@ -731,9 +880,17 @@ const char *routerconnection::dbIpAddress() {
 			currentconindex=index;
 		}
 	}
-	debugPrintf("dbIpAddress(): %s\n",
+
+	if (debug) {
+		stdoutput.printf("	executing on: %s\n",
 			(currentcon)?conids[currentconindex]:NULL);
-	return (currentcon)?currentcon->dbIpAddress():NULL;
+	}
+
+	const char	*retval=(currentcon)?currentcon->dbIpAddress():NULL;
+	if (debug) {
+		stdoutput.printf("	db ip address: %s\n}\n",retval);
+	}
+	return retval;
 }
 
 bool  routerconnection::cacheDbHostInfo() {
@@ -765,29 +922,50 @@ bool routerconnection::getColumnList(sqlrservercursor *cursor,
 
 bool routerconnection::ping() {
 
+	if (debug) {
+		stdoutput.printf("ping {\n");
+	}
+
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return NULL;
 	}
 
 	// if routing entire sessions, then ping the appropriate connection
 	if (routed && routeentiresession) {
-		debugPrintf("ping(): %s (session)\n",conids[currentconindex]);
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
+				(currentcon)?conids[currentconindex]:NULL);
+		}
 		return (currentcon)?currentcon->ping():true;
 	}
 
 	// ping all connections, if any fail, return failure
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("ping(): %s (%d)\n",conids[index],index);
+
+		if (debug) {
+			stdoutput.printf("	executing on: %s\n",
+							conids[index]);
+		}
+
 		bool	res=cons[index]->ping();
 		if (!res) {
-			debugPrintf("error: %s\n",cons[index]->errorMessage());
+			if (debug) {
+				stdoutput.printf("	failed\n");
+			}
 			result=res;
 		}
+	}
+
+	if (debug) {
+		stdoutput.printf("}\n");
 	}
 	return result;
 }
@@ -808,11 +986,18 @@ bool routerconnection::getLastInsertId(uint64_t *id) {
 
 void routerconnection::endSession() {
 
+	if (debug) {
+		stdoutput.printf("endSession {\n");
+	}
+
 	// route
 	bool	routed=false;
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return;
 	}
 
@@ -820,33 +1005,45 @@ void routerconnection::endSession() {
 
 		// if routing entire sessions, then end-session
 		// on the appropriate connection
-		debugPrintf("endSession(): %s (session)\n",
-						conids[currentconindex]);
+		if (debug) {
+			stdoutput.printf("	only executing on: %s\n}\n",
+				(currentcon)?conids[currentconindex]:NULL);
+		}
 		currentcon->endSession();
 
-		// reset pointers and index
-		currentcon=NULL;
-		currentconindex=0;
-		for (linkedlistnode< routercursor * > *node=
-					routercursors.getFirst();
-					node; node=node->getNext()) {
-			routercursor	*rcur=node->getValue();
-			rcur->currentcon=NULL;
-			rcur->currentcur=NULL;
-		}
+	} else {
 
+		// otherwise end-session on all connections
+		for (uint16_t index=0; index<concount; index++) {
+			if (debug) {
+				stdoutput.printf("	executing on: %s\n",
+								conids[index]);
+			}
+			cons[index]->endSession();
+		}
 	}
 
-	// otherwise end-session on all connections
-	for (uint16_t index=0; index<concount; index++) {
-		debugPrintf("endSession(): %s\n",conids[index]);
-		cons[index]->endSession();
+	// reset pointers and index
+	currentcon=NULL;
+	currentconindex=0;
+	for (linkedlistnode< routercursor * > *node=routercursors.getFirst();
+						node; node=node->getNext()) {
+		routercursor	*rcur=node->getValue();
+		rcur->currentcon=NULL;
+		rcur->currentcur=NULL;
+	}
+	sqlrr->setCurrentConnectionId(NULL);
+
+	if (debug) {
+		stdoutput.printf("}\n");
 	}
 }
 
 void routerconnection::route(bool *routed, bool *err) {
 
-	debugPrintf("route() (connection)...\n");
+	if (debug) {
+		stdoutput.printf("	route (connection) {\n");
+	}
 
 	// initialize return values
 	*err=false;
@@ -855,7 +1052,11 @@ void routerconnection::route(bool *routed, bool *err) {
 	// bail if we're routing the entire session
 	// and we already have a currentcon
 	if (routeentiresession && currentcon) {
-		debugPrintf("	routing entire session and have currentcon\n");
+		if (debug) {
+			stdoutput.printf("		"
+					"routing entire session and "
+					"have currentcon\n	}\n");
+		}
 		return;
 	}
 
@@ -870,16 +1071,28 @@ void routerconnection::route(bool *routed, bool *err) {
 	int64_t		errn=0;
 	const char	*connectionid=sqlrr->route(this,NULL,&errm,&errn);
 	if (!connectionid) {
-		debugPrintf("	no connection id returned\n");
+		if (debug) {
+			stdoutput.printf("		"
+					"no connection id returned\n");
+		}
 		if (errm) {
-			debugPrintf("	an error occurred: "
-					"%d - %s\n",errn,errm);
+			if (debug) {
+				stdoutput.printf("		"
+						"an error occurred: "
+						"%d - %s\n",errn,errm);
+			}
 			setError(errm,errn,true);
 			*err=true;
 		}
+		if (debug) {
+			stdoutput.printf("	}\n");
+		}
 		return;
 	}
-	debugPrintf("	routing to %s\n",connectionid);
+
+	if (debug) {
+		stdoutput.printf("		routing to: %s\n",connectionid);
+	}
 
 	// get the corresponding connection
 	for (uint16_t i=0; i<concount; i++) {
@@ -887,13 +1100,18 @@ void routerconnection::route(bool *routed, bool *err) {
 			currentcon=cons[i];
 			currentconindex=i;
 			sqlrr->setCurrentConnectionId(connectionid);
-			debugPrintf("	setting currentcon to %s\n",
-							connectionid);
 			*routed=true;
+			if (debug) {
+				stdoutput.printf("	}\n");
+			}
 			return;
 		}
 	}
-	debugPrintf("	connection %s not found\n",connectionid);
+
+	if (debug) {
+		stdoutput.printf("		"
+				"%s not found\n	}\n",connectionid);
+	}
 }
 
 void routerconnection::autoCommitOnFailed(uint16_t index) {
@@ -973,6 +1191,10 @@ routercursor::~routercursor() {
 
 bool routercursor::prepareQuery(const char *query, uint32_t length) {
 
+	if (routerconn->debug) {
+		stdoutput.printf("prepareQuery {\n");
+	}
+
 	// FIXME: remove this and use a translation
 
 	// convert to lowercase and normalize whitespace, for regex matching
@@ -1010,12 +1232,11 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	bool	err=false;
 	route(&routed,&err);
 	if (err) {
+		if (routerconn->debug) {
+			stdoutput.printf("	routing error\n}\n");
+		}
 		return false;
 	}
-	debugPrintf("prepareQuery(): %s%s\n",
-				routerconn->conids[routerconn->currentconindex],
-				(routerconn->routeentiresession)?
-						" (session)":"");
 
 	// free normalized query
 	delete[] nquery;
@@ -1023,7 +1244,10 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// currentcur could be NULL here if no
 	// connection could be found to run the query.
 	if (!currentcur) {
-		debugPrintf("	bailing... no connection found\n");
+		if (routerconn->debug) {
+			stdoutput.printf("	no connection "
+					"found, bailing\n}\n");
+		}
 		return false;
 	}
 
@@ -1031,19 +1255,30 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// prepare/execute it, just return true.  The usedatabase module does
 	// this.
 	emptyquery=!getQueryLength();
+	if (routerconn->debug) {
+		stdoutput.printf("%s",(emptyquery)?"	query set empty\n":"");
+	}
 
 	// prepare the query using the cursor from whichever
 	// connection turned out to be the right one
 	if (!emptyquery) {
-		debugPrintf("	query: %.*s\n",length,query);
+		if (routerconn->debug) {
+			stdoutput.printf("	query: %.*s\n",length,query);
+		}
 		currentcur->prepareQuery(query,length);
+	}
+
+	if (routerconn->debug) {
+		stdoutput.printf("}\n");
 	}
 	return true;
 }
 
 void routercursor::route(bool *routed, bool *err) {
 
-	debugPrintf("route() (cursor)...\n");
+	if (routerconn->debug) {
+		stdoutput.printf("	route (cursor) {\n");
+	}
 
 	// initialize return values
 	*err=false;
@@ -1054,17 +1289,27 @@ void routercursor::route(bool *routed, bool *err) {
 	// which connection and cursor to use from the routerconnection
 	if (routerconn->routeentiresession) {
 
-		debugPrintf("	routing entire session ");
+		if (routerconn->debug) {
+			stdoutput.printf("		"
+					"routing entire session ");
+		}
 		if (currentcon) {
-			debugPrintf("and have currentcon\n");
+			if (routerconn->debug) {
+				stdoutput.printf("and have currentcon\n	}\n");
+			}
 			return;
 		} else if (routerconn->currentcon) {
-			debugPrintf("and conn has currentcon\n");
+			if (routerconn->debug) {
+				stdoutput.printf("and conn has "
+						"currentcon\n	}\n");
+			}
 			currentcon=routerconn->currentcon;
 			currentcur=curs[routerconn->currentconindex];
 			return;
 		}
-		debugPrintf("	but need to get currentcon\n");
+		if (routerconn->debug) {
+			stdoutput.printf("but need to get currentcon\n");
+		}
 	}
 
 	// otherwise, sort this routercursor out...
@@ -1081,16 +1326,27 @@ void routercursor::route(bool *routed, bool *err) {
 	const char	*connectionid=routerconn->sqlrr->route(
 						routerconn,this,&errm,&errn);
 	if (!connectionid) {
-		debugPrintf("	no connection id returned\n");
+		if (routerconn->debug) {
+			stdoutput.printf("		"
+					"no connection id returned\n");
+		}
 		if (errm) {
-			debugPrintf("	an error occurred: "
+			if (routerconn->debug) {
+				stdoutput.printf("		"
+					"an error occurred: "
 					"%d - %s\n",errn,errm);
+			}
 			setError(errm,errn,true);
 			*err=true;
 		}
+		if (routerconn->debug) {
+			stdoutput.printf("	}\n");
+		}
 		return;
 	}
-	debugPrintf("	routing to %s\n",connectionid);
+	if (routerconn->debug) {
+		stdoutput.printf("		routing to %s\n",connectionid);
+	}
 
 	// get the corresponding connection and cursor
 	for (uint16_t i=0; i<routerconn->concount; i++) {
@@ -1100,13 +1356,18 @@ void routercursor::route(bool *routed, bool *err) {
 			routerconn->currentcon=currentcon;
 			routerconn->currentconindex=i;
 			routerconn->sqlrr->setCurrentConnectionId(connectionid);
-			debugPrintf("	setting currentcon to %s\n",
-							connectionid);
 			*routed=true;
+			if (routerconn->debug) {
+				stdoutput.printf("	}\n");
+			}
 			return;
 		}
 	}
-	debugPrintf("	connection %s not found\n",connectionid);
+
+	if (routerconn->debug) {
+		stdoutput.printf("		"
+				"%s not found\n	}\n",connectionid);
+	}
 }
 
 bool routercursor::supportsNativeBinds(const char *query, uint32_t length) {

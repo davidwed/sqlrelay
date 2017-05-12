@@ -71,11 +71,16 @@ const char *sqlrrouter_clientinfolist::route(sqlrserverconnection *sqlrcon,
 		return NULL;
 	}
 
+	if (debug) {
+		stdoutput.printf("		route {\n");
+	}
+
 	// get the clientinfo
 	const char	*clientinfo=sqlrcon->cont->getClientInfo();
 	if (charstring::isNullOrEmpty(clientinfo)) {
 		if (debug) {
-			stdoutput.printf("routing null/empty client info\n");
+			stdoutput.printf("			"
+					"routing null/empty client info\n");
 		}
 		return NULL;
 	}
@@ -86,12 +91,17 @@ const char *sqlrrouter_clientinfolist::route(sqlrserverconnection *sqlrcon,
 		// if the clientinfo matches...
 		if (clientinfos[i]->match(clientinfo)) {
 			if (debug) {
-				stdoutput.printf("routing client info "
-						"\"%s\" to %s\n",
+				stdoutput.printf("			"
+						"routing client info "
+						"\"%s\" to %s\n	}\n",
 						clientinfo,connid);
 			}
 			return connid;
 		}
+	}
+
+	if (debug) {
+		stdoutput.printf("		}\n");
 	}
 	return NULL;
 }

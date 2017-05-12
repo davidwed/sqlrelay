@@ -103,8 +103,8 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("route {\n");
-		stdoutput.printf("	%s\n",query);
+		stdoutput.printf("		route {\n"
+				"			%s\n",query);
 	}
 
 	// get the id of the connection that hosts the db
@@ -112,7 +112,8 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 	if (dbs.getValue((char *)dbalias,&cdb)) {
 
 		if (debug) {
-			stdoutput.printf("	%s to %s at %s",
+			stdoutput.printf("			"
+					"%s to %s at %s ",
 					dbalias,cdb->dbname,cdb->connid);
 		}
 
@@ -134,13 +135,15 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 		*err=SQLR_ERROR_DBNOTFOUND_STRING;
 		*errn=SQLR_ERROR_DBNOTFOUND;
 		if (debug) {
-			stdoutput.printf("	%s not found\n",dbalias);
+			stdoutput.printf("			"
+						"%s not found\n",
+						dbalias);
 		}
 		retval=NULL;
 	}
 
 	if (debug) {
-		stdoutput.printf("}\n");
+		stdoutput.printf("		}\n");
 	}
 
 	// the original "use database" query shouldn't actually be run now,
@@ -153,7 +156,7 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 void sqlrrouter_usedatabase::buildDictionary() {
 
 	if (debug) {
-		stdoutput.printf("build dictionary {\n");
+		stdoutput.printf("		build dictionary {\n");
 	}
 
 	// run through the connections...
@@ -178,14 +181,15 @@ void sqlrrouter_usedatabase::buildDictionary() {
 			dbs.setValue(charstring::duplicate(dbalias),cdb);
 
 			if (debug) {
-				stdoutput.printf("	%s -> %s@%s\n",
+				stdoutput.printf("			"
+						"%s -> %s@%s\n",
 						dbalias,dbname,sqlrconid);
 			}
 		}
 	}
 
 	if (debug) {
-		stdoutput.printf("}\n");
+		stdoutput.printf("		}\n");
 	}
 }
 
