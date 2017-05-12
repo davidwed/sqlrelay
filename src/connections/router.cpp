@@ -394,6 +394,7 @@ bool routerconnection::logIn(const char **error, const char **warning) {
 	while (!ping()) {
 		snooze::macrosnooze(1);
 	}
+	endSession();
 	return true;
 }
 
