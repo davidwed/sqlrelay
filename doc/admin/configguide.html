@@ -80,6 +80,15 @@
   </ul>
 
   <li><a href="#queryrouting">Query Routing</a></li>
+  <ul>
+    <li><a href="#regex">regex</a></li>
+    <li><a href="#userlist">userlist</a></li>
+    <li><a href="#clientiplist">clientiplist</a></li>
+    <li><a href="#clientinfolist">clientinfolist</a></li>
+    <li><a href="#usedatabase">usedatabase</a></li>
+    <li><a href="#routingquirks">Quirks and Limitations</a></li>
+  </ul>
+
   <li><a href="#logging">Logging</a></li>
   <li><a href="#notifications">Notifications</a></li>
   <li><a href="#sessionqueries">Session-Queries</a></li>
@@ -3116,15 +3125,16 @@ http://www.gnu.org/software/src-highlite -->
 <p>Currently, the following router modules are available:</p>
 
 <ul>
-  <li><b>regex</b></li>
-  <li><b>userlist</b></li>
-  <li><b>clientiplist</b></li>
-  <li><b>clientinfolist</b></li>
+  <li><a href="#regex">regex</a></li>
+  <li><a href="#userlist">userlist</a></li>
+  <li><a href="#clientiplist">clientiplist</a></li>
+  <li><a href="#clientinfolist">lientinfolist</a></li>
+  <li><a href="#usedatabase">usedatabase</a></li>
 </ul>
 
 <p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
 
-<h4>regex</h4>
+<br/><a name="regex"/><h4>regex</h4>
 
 <p>The <b>regex</b> module routes queries by matching them against regular expressions.</p>
 
@@ -3302,7 +3312,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Note the use of a notification module, as above.</p>
 
-<h4>userlist</h4>
+<br/><a name="userlist"/><h4>userlist</h4>
 
 <p>The <b>userlist</b> module routes queries by matching the user that ran the query against a list of users.</p>
 
@@ -3393,7 +3403,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
 </ul>
 
-<br/><h4>clientiplist</h4>
+<br/><br/><a name="clientiplist"/><h4>clientiplist</h4>
 
 <p>The <b>clientiplist</b> module routes queries by matching the client that ran the query against a list of IP addresses.</p>
 
@@ -3476,7 +3486,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
 </ul>
 
-<br/><h4>clientinfolist</h4>
+<br/><br/><a name="clientinfolist"/><h4>clientinfolist</h4>
 
 <p>The <b>clientinfolist</b> module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  The client info cannot currently be set when using a connector for a database abstraction later such as PHP PDO or ODBC.</p>
 
@@ -3558,7 +3568,205 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
 </ul>
 
-<h3>Quirks and Limitations</h3>
+<br/><br/><a name="usedatabase"/><h4>usedatabase</h4>
+
+<p>The <b>usedatabase</b> allows you to access databases across multiple database instances via the same SQL Relay front-end with "use database" queries.</p>
+
+<p>For example, lets say you have two database instances:</p>
+
+<p>A MySQL instance that hosts 3 databases:</p>
+
+<ul>
+  <li>mydb1</li>
+  <li>mydb2</li>
+  <li>mydb3</li>
+</ul>
+
+<p>...and a PostgreSQL instance that hosts 2 databases:</p>
+
+<ul>
+  <li>pg1</li>
+  <li>pg2</li>
+</ul>
+
+<p>If you configure an instance of SQL Relay to access the MySQL instance, then a SQL Relay client can run queries like "use mydb1" or "use mydb2" to select the database.</p>
+
+<p>Similarly, if you configure an instance of SQL Relay to access the PostgreSQL instance, then a SQL Relay client can run queries like "use pbdb1" or "use pbdb2" to select the database.</p>
+
+<p>The <b>usedatabase</b> module allows a client connected to a single instance of SQL Relay to select the database across both instances.  For example, "use mydb1" would set the current database to the mydb1 database hosted by the MySQL instance, and "use pgdb2" would set the current database to the pgdb2 database hosted by the PostgreSQL instance.</p>
+
+<p>An example configuration follows.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a MySQL database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/mysqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"mysqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqldbuser;password=mysqldbpassword;host=mysqldb;db=mysqldb;"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+	<i><font color="#9A1900">&lt;!-- This instance maintains connections to a PostgreSQL database --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/postgresqldb.socket"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqldbuser;password=postgresqldbpassword;host=postgresqldb;db=postgresqldb;"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+
+	<i><font color="#9A1900">&lt;!-- This instance sends queries to databases hosted by the mysql</font></i>
+<i><font color="#9A1900">		instance and postgresql instance based on "use ..." queries. --&gt;</font></i>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"usedatabase"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/mysqldb.socket;user=mysqldbuser;password=mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/postgresqldb.socket;user=postgresqldbuser;password=postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example, 3 SQL Relay instances are defined:</p>
+
+<ul>
+  <li>one to maintain connections to an MySQL instance</li>
+  <li>one to maintain connections to a PostgreSQL database</li>
+  <li>one to route queries to the other two instances</li>
+</ul>
+
+<p>The <b>string</b> parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:</p>
+
+<ul>
+  <li><b>host</b> - the host name or IP address of the SQL Relay instance</li>
+  <li><b>port</b> - the port of the SQL Relay instance</li>
+  <li><b>socket</b> - the socket of the SQL Relay instance, if it is running locally</li>
+  <li><b>user</b> - the user to use when connecting to the SQL Relay instance as</li>
+  <li><b>password</b> - the password to use when connecting to the SQL Relay instance</li>
+  <li><b>fetchatonce</b> - the number of rows to fetch at a time (defaults to 10, 0 means fetch the entire result set)</li>
+</ul>
+
+<p>When the router instance starts, it gets the list of databases available from each of the other two instances, and routes to them accordingly.</p>
+
+<p>A sample sqlrsh session follows:</p>
+
+<blockquote>
+  <pre>sqlrsh -host localhost -user routeruser -password routerpassword
+sqlrsh - Version 1.1.0
+        Connected to: localhost:9000 as routeruser
+
+        type help; for help.
+
+0> use mydb1;
+0> currentdb;
+mydb1
+0> select * from testtable;
+col1
+==========================
+this table is in db mydb1
+
+        Rows Returned   : 1
+        Fields Returned : 1
+        Elapsed Time    : 0.001512 sec
+
+0> use mydb2;
+0> currentdb;
+mydb2
+0> select * from testtable;
+col1
+==========================
+this table is in db mydb2
+
+        Rows Returned   : 1
+        Fields Returned : 1
+        Elapsed Time    : 0.001512 sec
+
+0> use pgdb1;
+0> currentdb;
+pgdb1
+0> select * from testtable;
+col1
+==========================
+this table is in db pgdb1
+
+        Rows Returned   : 1
+        Fields Returned : 1
+        Elapsed Time    : 0.001344 sec
+
+0>
+</pre>
+
+</blockquote>
+<p>But...  What if two different instances host databases with the same name?  For example, what if your MySQL instance hosts a database named db2, and your PostgreSQL instance also hosts a database named db2?</p>
+
+<p>To resolve situations like this, the <b>usedatabase</b> module allows you to map a database to an alias.  In this example, the db2 database hosted by MySQL is mapped to mydb2, and the db2 database hosted by PostgreSQL is mapped to pgdb2.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	... MySQL/PostgreSQL instance details omitted ...
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"router"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"router"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"routeruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"routerpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;routers&gt;</font></b>
+			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"usedatabase"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;map</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">db</font><font color="#990000">=</font><font color="#FF0000">"db2"</font> <font color="#009900">alias</font><font color="#990000">=</font><font color="#FF0000">"mydb2"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;map</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">db</font><font color="#990000">=</font><font color="#FF0000">"db3"</font> <font color="#009900">alias</font><font color="#990000">=</font><font color="#FF0000">"pgdb3"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/router&gt;</font></b>
+		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"mysqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/mysqldb.socket;user=mysqldbuser;password=mysqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"postgresqldb"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"socket=/tmp/postgresqldb.socket;user=postgresqldbuser;password=postgresqldbpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>To access the db2 database hosted by MySQL, the user would run:</p>
+
+<blockquote>
+  <pre>use mydb2
+</pre>
+
+</blockquote>
+<p>To access the db2 database hosted by PostgreSQL, the user would run:</p>
+
+<blockquote>
+  <pre>use pgdb2
+</pre>
+
+</blockquote>
+<p>Attempts to "use db2" would fail.</p>
+
+<br/><a name="routingquirks"/><h3>Quirks and Limitations</h3>
 
 <h4>Query Normalization</h4>
 
