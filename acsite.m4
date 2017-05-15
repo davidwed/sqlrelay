@@ -2992,7 +2992,7 @@ then
 				do
 
 					PYTHONDIR=""
-					for k in "config" "config-$MULTIARCHDIR" "config-$j" "config-${j}mu" "config-${j}m" "config-${j}u"
+					for k in "config" "config-$MULTIARCHDIR" "config-$j-$MULTIARCHDIR" "config-$j" "config-${j}mu-$MULTIARCHDIR" "config-${j}mu" "config-${j}m-$MULTIARCHDIR" "config-${j}m" "config-${j}u-$MULTIARCHDIR" "config-${j}u"
 					do
 
 						if ( test -d "$i/$k" )
@@ -3140,7 +3140,7 @@ then
 				do
 
 					PYTHON3DIR=""
-					for k in "config" "config-$MULTIARCHDIR" "config-$j" "config-${j}mu" "config-${j}m" "config-${j}u"
+					for k in "config" "config-$MULTIARCHDIR" "config-$j-$MULTIARCHDIR" "config-$j" "config-${j}mu-$MULTIARCHDIR" "config-${j}mu" "config-${j}m-$MULTIARCHDIR" "config-${j}m" "config-${j}u-$MULTIARCHDIR" "config-${j}u"
 					do
 
 						if ( test -d "$i/$k" )
