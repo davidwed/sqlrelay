@@ -61,6 +61,7 @@
 	"use database" works with postgreqsl, firebird, mdbtools, and sqlite
 	configure script can find python3 on ubuntu 16.04 now
 	configure script can find mariadb on ubuntu 16.04 now
+	configure script can find openjdk-1.9.0 correctly now
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
