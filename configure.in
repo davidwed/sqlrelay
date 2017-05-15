@@ -1150,7 +1150,7 @@ if ( test -n "$INFORMIXLIBS" ); then
 	fi
 	TESTDBS="$TESTDBS informix"
 else
-	if ( test -n "$ENABLE_ORACLE" ); then
+	if ( test -n "$ENABLE_INFORMIX" ); then
 		INFORMIXBUILD="at-runtime"
 	fi
 fi
