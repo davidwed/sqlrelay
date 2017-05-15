@@ -1337,14 +1337,26 @@ then
 		dnl try mysql_config first...
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for dir in "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r`
+			for dir in "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
 			do
 
+				dnl try mysql_config, and if that fails,
+				dnl try mariadb_config
 				if ( test -n "$dir" )
 				then
 					MYSQLCONFIG="$dir/mysql_config"
 				else
 					MYSQLCONFIG="mysql_config"
+				fi
+				$MYSQLCONFIG 2> /dev/null
+				if ( test "$?" -ne "0" )
+				then
+					if ( test -n "$dir" )
+					then
+						MYSQLCONFIG="$dir/mariadb_config"
+					else
+						MYSQLCONFIG="mariadb_config"
+					fi
 				fi
 
 				MYSQLINCLUDES=`$MYSQLCONFIG --cflags 2> /dev/null | sed -e "s|'||g"`
@@ -1365,11 +1377,15 @@ then
 			done
 		fi
 
-		dnl if mysql_config didn't work then fall back to just looking
-		dnl directly for headers and libs
+		dnl if mysql_config/mariadb_config didn't work then fall back
+		dnl to just looking directly for headers and libs
 		if ( test -z "$MYSQLLIBS" )
 		then
 			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mysql],[mysql.h],[mysqlclient],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[yes])
+		fi
+		if ( test -z "$MYSQLLIBS" )
+		then
+			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mariadb],[mysql.h],[mariadb],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[yes])
 		fi
 
 		dnl on some platforms, mysql_config returns options

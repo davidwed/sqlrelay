@@ -19602,14 +19602,24 @@ then
 
 				if ( test -z "$MYSQLLIBS" )
 		then
-			for dir in "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r`
+			for dir in "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
 			do
 
-				if ( test -n "$dir" )
+												if ( test -n "$dir" )
 				then
 					MYSQLCONFIG="$dir/mysql_config"
 				else
 					MYSQLCONFIG="mysql_config"
+				fi
+				$MYSQLCONFIG 2> /dev/null
+				if ( test "$?" -ne "0" )
+				then
+					if ( test -n "$dir" )
+					then
+						MYSQLCONFIG="$dir/mariadb_config"
+					else
+						MYSQLCONFIG="mariadb_config"
+					fi
 				fi
 
 				MYSQLINCLUDES=`$MYSQLCONFIG --cflags 2> /dev/null | sed -e "s|'||g"`
@@ -19636,6 +19646,334 @@ SEARCHPATH=$MYSQLPATH
 NAME=mysql
 HEADER=mysql.h
 LIBNAME=mysqlclient
+LINKSTATIC=$STATICFLAG
+LINKRPATH=$RPATHFLAG
+USEFULLLIBPATH=yes
+INCLUDESTRING=""
+LIBSTRING=""
+LIBPATH=""
+STATIC=""
+HEADERSANDLIBSPATH=""
+
+eval "MYSQLINCLUDES=\"\""
+eval "MYSQLLIBS=\"\""
+eval "MYSQLLIBSPATH=\"\""
+eval "MYSQLSTATIC=\"\""
+if ( test -n "dummy" )
+then
+	eval "dummy=\"\""
+fi
+
+
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
+do
+	if ( test -n "$path" -a -d "$path" )
+	then
+
+		if ( test "$path" = "/" )
+		then
+						if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-Wl,/lib/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+
+			if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-Wl,/lib64/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib64/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\""
+	fi
+else
+	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "/lib64/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+			fi
+
+
+						path=""
+		fi
+
+
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
+		do
+
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+
+			for includepath in "$path/include" "$path/include/$NAME"
+			do
+
+				if ( test -n "$LIBSTRING" )
+				then
+					break
+				fi
+
+				if ( test "$USEFULLLIBPATH" = "yes" )
+				then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				else
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "$includepath/$HEADER" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "INCLUDESTRING=\"-I$includepath\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
+	fi
+else
+	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
+	then
+
+if ( test -r "$libpath/lib$LIBNAME.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "INCLUDESTRING=\"-I$includepath\""
+			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
+		fi
+	fi
+fi
+
+				fi
+			done
+		done
+
+		if ( test -n "$LIBSTRING" )
+		then
+			HEADERSANDLIBSPATH="$path"
+			break
+		fi
+	fi
+done
+
+INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
+LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
+
+eval "MYSQLINCLUDES=\"$INCLUDESTRING\""
+eval "MYSQLLIBS=\"$LIBSTRING\""
+eval "MYSQLLIBSPATH=\"$LIBPATH\""
+eval "MYSQLSTATIC=\"$STATIC\""
+if ( test -n "dummy" )
+then
+	eval "dummy=\"$HEADERSANDLIBSPATH\""
+fi
+
+		fi
+		if ( test -z "$MYSQLLIBS" )
+		then
+
+
+SEARCHPATH=$MYSQLPATH
+NAME=mariadb
+HEADER=mysql.h
+LIBNAME=mariadb
 LINKSTATIC=$STATICFLAG
 LINKRPATH=$RPATHFLAG
 USEFULLLIBPATH=yes
