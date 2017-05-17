@@ -35484,7 +35484,8 @@ if ( test -n "$ORACLEVERSION" ); then
 	if ( test -n "$ORACLESTATIC" ); then
 		ORACLEBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS oracle tls krb extensions"
+	#TESTDBS="$TESTDBS oracle tls krb extensions"
+	TESTDBS="$TESTDBS oracle tls extensions"
 else
 	if ( test -n "$ENABLE_ORACLE" ); then
 		ORACLEBUILD="at-runtime"
