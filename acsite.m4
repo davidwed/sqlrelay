@@ -1348,7 +1348,7 @@ then
 				else
 					MYSQLCONFIG="mysql_config"
 				fi
-				$MYSQLCONFIG 2> /dev/null
+				$MYSQLCONFIG --cflags 2> /dev/null
 				if ( test "$?" -ne "0" )
 				then
 					if ( test -n "$dir" )
