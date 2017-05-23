@@ -117,7 +117,7 @@ do
 	if ( test -r "$TESTFILE" )
 	then
 		$TEST
-		if ( test "$?" = "1" )
+		if ( test "$?" = "1" -o "$?" = "255" )
 		then
 			echo
 			echo
