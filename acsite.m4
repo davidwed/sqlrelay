@@ -3499,6 +3499,16 @@ then
 			PHPCONFSTYLE="ubuntu"
 		fi
 	fi
+	if ( test -d "`ls -d /etc/php/*/mods-available 2> /dev/null | sort | head -1`" )
+	then
+		PHPCONFDIR="`ls -d /etc/php/*/mods-available 2> /dev/null | sort | head -1`"
+		if ( test -d "`ls -d /etc/php/*/conf.d 2> /dev/null | sort | head -1`" )
+		then
+			PHPCONFSTYLE="debian"
+		else
+			PHPCONFSTYLE="ubuntu"
+		fi
+	fi
 	if ( test "$PHPCONFSTYLE" = "unknown" )
 	then
 		for dir in `ls -d /etc/php/* 2> /dev/null`
