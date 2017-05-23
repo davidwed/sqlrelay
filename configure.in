@@ -804,7 +804,7 @@ echo "******************************"
 dnl Checks for python
 echo
 echo "***** Python *****************"
-FW_CHECK_PYTHON2
+FW_CHECK_PYTHON
 echo "******************************"
 
 

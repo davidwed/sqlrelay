@@ -80,18 +80,18 @@ do
 			fi
 			;;
 		python)
-			python --version > /dev/null 2>&1
+			@PYTHON@ --version > /dev/null 2>&1
 			if ( test "$?" = "0" )
 			then
-				TEST="python $1.py"
+				TEST="@PYTHON@ $1.py"
 				TESTFILE="$1.py"
 			fi
 			;;
 		pythondb)
-			python --version > /dev/null 2>&1
+			@PYTHON@ --version > /dev/null 2>&1
 			if ( test "$?" = "0" )
 			then
-				TEST="python $1.py"
+				TEST="@PYTHON@ $1.py"
 				TESTFILE="$1.py"
 			fi
 			;;

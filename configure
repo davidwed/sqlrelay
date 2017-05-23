@@ -685,6 +685,7 @@ HAVE_RUBY
 RUBY
 EXCEPTIONSSTANDARDERROR
 IMPORTEXCEPTIONS
+PYTHON
 PYTHONLIB
 PYTHONSITEDIR
 PYTHONDIR
@@ -33207,6 +33208,7 @@ then
 	PYTHONSITEDIR=""
 	PYTHONLIB=""
 	PYTHONVERSION=""
+	PYTHON=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -33215,98 +33217,85 @@ then
 
 	else
 
-		if ( test -n "$PYTHONPATH" )
-		then
+		for pyversion in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+		do
 
-			for i in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+			for pyprefix in "$PYTHONPATH" "/usr" "/usr/local" "/usr/pkg" "/usr/local/python$pyversion" "/opt/sfw" "/usr/sfw" "/opt/csw" "/sw" "/System/Library/Frameworks/Python.framework/Versions/Current" "/boot/common"
 			do
-				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib64/python$i/config" )
+
+				if ( test -n "$pyprefix" )
 				then
-					PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
-					PYTHONDIR="$PYTHONPATH/lib64/python$i"
-				else
-					if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib/python$i/config" )
-					then
-						PYTHONINCLUDES="-I$PYTHONPATH/include/python$i"
-						PYTHONDIR="$PYTHONPATH/lib/python$i"
-					fi
-				fi
 
-				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-				then
-					PYTHONVERSION=`echo $i | sed -e "s|\.||"`
-					break
-				fi
-			done
-
-		else
-
-			for j in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
-			do
-				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j" "/boot/common/include/python$j"
-				do
 					PYTHONINCLUDES=""
-					for k in "mu" "m" "u" ""
+					for ext in "mu" "m" "u" ""
 					do
-						if ( test -d "$i$k" )
+						if ( test -d "$pyprefix/include/python$pyversion$ext" )
 						then
-							PYTHONINCLUDES="-I$i$k"
-							if ( test -n "$PYTHONINCLUDES" )
-							then
-								PYTHONVERSION=`echo $j | sed -e "s|\.||"`
-								break
-							fi
+							PYTHONINCLUDES="-I$pyprefix/include/python$pyversion$ext"
+							PYTHONVERSION=`echo $pyversion | sed -e "s|\.||"`
+							break;
 						fi
 					done
-					if ( test -n "$PYTHONINCLUDES" )
-					then
-						break
-					fi
-				done
 
-				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j" "/boot/common/lib/python$j"
-				do
-
-					PYTHONDIR=""
-					for k in "config" "config-$MULTIARCHDIR" "config-$j-$MULTIARCHDIR" "config-$j" "config-${j}mu-$MULTIARCHDIR" "config-${j}mu" "config-${j}m-$MULTIARCHDIR" "config-${j}m" "config-${j}u-$MULTIARCHDIR" "config-${j}u"
+					for libdir in "$pyprefix/lib64/python$pyversion" "$prefix/lib/python$pyversion"
 					do
 
-						if ( test -d "$i/$k" )
+						PYTHONDIR=""
+						for k in "config" "config-$MULTIARCHDIR" "config-$pyversion-$MULTIARCHDIR" "config-$pyversion" "config-${pyversion}mu-$MULTIARCHDIR" "config-${pyversion}mu" "config-${pyversion}m-$MULTIARCHDIR" "config-${pyversion}m" "config-${pyversion}u-$MULTIARCHDIR" "config-${pyversion}u"
+						do
+
+							if ( test -d "$libdir/$k" )
+							then
+																								if ( test -n "$CYGWIN" -a -r "$libdir/$k/libpython$pyversion.dll.a" )
+								then
+									PYTHONDIR="$libdir"
+									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
+								elif ( test -n "$DARWIN" )
+								then
+									PYTHONDIR="$libdir"
+									PYTHONLIB="-lpython$pyversion"
+								else
+									PYTHONDIR="$libdir"
+								fi
+								if ( test -n "$PYTHONDIR" )
+								then
+									break
+								fi
+							fi
+						done
+						if ( test -n "$PYTHONDIR" )
 						then
-																					if ( test -n "$CYGWIN" -a -r "$i/$k/libpython$j.dll.a" )
-							then
-								PYTHONDIR="$i"
-								PYTHONLIB="-L$PYTHONDIR/$k -lpython$j"
-							elif ( test -n "$DARWIN" )
-							then
-								PYTHONDIR="$i"
-								PYTHONLIB="-lpython$j"
-							else
-								PYTHONDIR="$i"
-							fi
-							if ( test -n "$PYTHONDIR" )
-							then
-								break
-							fi
+							break
 						fi
 					done
-					if ( test -n "$PYTHONDIR" )
+
+					for pyexe in "python" "python$pyversion" "python$PYTHONVERSION"
+					do
+						if ( test -x "$pyprefix/bin/$pyexe" )
+						then
+							PYTHON="$pyprefix/bin/$pyexe"
+							break
+						fi
+					done
+
+					if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 					then
+												if ( test -d "/Library/Python/$pyversion/site-packages" )
+						then
+							PYTHONDIR="/Library/Python/$pyversion"
+						fi
 						break
 					fi
-				done
-
-				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
-				then
-										if ( test -d "/Library/Python/$j/site-packages" )
-					then
-						PYTHONDIR="/Library/Python/$j"
-					fi
-					break
 				fi
+
 			done
 
-		fi
+			if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
+			then
+				break
+			fi
+
+		done
 
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
@@ -33370,6 +33359,7 @@ fi
 		IMPORTEXCEPTIONS="import exceptions"
 		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 	fi
+
 
 
 
