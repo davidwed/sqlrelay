@@ -62,6 +62,7 @@
 	configure script can find python3 on ubuntu 16.04 now
 	configure script can find mariadb on ubuntu 16.04 now
 	configure script can find openjdk-1.9.0 correctly now
+	python 3 is preferred to python 2 now
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

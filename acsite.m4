@@ -2958,7 +2958,7 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 		
-			for i in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+			for i in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib64/python$i/config" )
 				then
@@ -2981,7 +2981,7 @@ then
 
 		else
 		
-			for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+			for j in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j" "/boot/common/include/python$j"
 				do
@@ -3053,7 +3053,7 @@ then
 
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
-			AC_MSG_CHECKING(for Python.h (for python 2))
+			AC_MSG_CHECKING(for Python.h)
 			FW_TRY_COMPILE([#include <Python.h>],[PyArg_ParseTuple(NULL,NULL,NULL,NULL,NULL);],[$PYTHONINCLUDES],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); PYTHONINCLUDES=""; PYTHONDIR=""])
 		fi
 		
@@ -3076,179 +3076,13 @@ then
 	then
 		PYTHONDIR="$OVERRIDEPYTHONDIR"
 	fi
-fi
-])
 
-
-
-AC_DEFUN([FW_CHECK_PYTHON3],
-[
-if ( test "$ENABLE_PYTHON3" = "yes" )
-then
-
-	OVERRIDEPYTHON3DIR="$PYTHON3DIR"
-
-	HAVE_PYTHON3=""
-	PYTHON3INCLUDES=""
-	PYTHON3DIR=""
-	PYTHON3SITEDIR=""
-	PYTHON3LIB=""
-	PYTHON3VERSION=""
-
-	if ( test "$cross_compiling" = "yes" )
+	IMPORTEXCEPTIONS=""
+	EXCEPTIONSSTANDARDERROR="Exception"
+	if ( test "$PYTHONVERSION" = "2" )
 	then
-
-		dnl cross compiling ...
-		echo "cross compiling..."
-
-	else
-
-		if ( test -n "$PYTHON3PATH" )
-		then
-		
-			for i in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0"
-			do
-				if ( test -d "$PYTHON3PATH/include/python$i" -a -d "$PYTHON3PATH/lib64/python$i/config" )
-				then
-					PYTHON3INCLUDES="-I$PYTHON3PATH/include/python$i"
-					PYTHON3DIR="$PYTHON3PATH/lib64/python$i"
-				else
-					if ( test -d "$PYTHON3PATH/include/python$i" -a -d "$PYTHON3PATH/lib/python$i/config" )
-					then
-						PYTHON3INCLUDES="-I$PYTHON3PATH/include/python$i"
-						PYTHON3DIR="$PYTHON3PATH/lib/python$i"
-					fi
-				fi
-			
-				if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
-				then
-					PYTHON3VERSION=`echo $i | sed -e "s|\.||"`
-					break
-				fi
-			done
-
-		else
-		
-			for j in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0"
-			do
-				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j" "/boot/common/include/python$j"
-				do
-					PYTHON3INCLUDES=""
-					for k in "mu" "m" "u" ""
-					do
-						if ( test -d "$i$k" )
-						then
-							PYTHON3INCLUDES="-I$i$k"
-							if ( test -n "$PYTHON3INCLUDES" )
-							then
-								PYTHON3VERSION=`echo $j | sed -e "s|\.||"`
-								break
-							fi
-						fi
-					done
-					if ( test -n "$PYTHON3INCLUDES" )
-					then
-						break
-					fi
-				done
-
-				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j" "/boot/common/lib/python$j"
-				do
-
-					PYTHON3DIR=""
-					for k in "config" "config-$MULTIARCHDIR" "config-$j-$MULTIARCHDIR" "config-$j" "config-${j}mu-$MULTIARCHDIR" "config-${j}mu" "config-${j}m-$MULTIARCHDIR" "config-${j}m" "config-${j}u-$MULTIARCHDIR" "config-${j}u"
-					do
-
-						if ( test -d "$i/$k" )
-						then
-							dnl for cygwin and mac os x
-							dnl add -lpython
-							if ( test -n "$CYGWIN" -a -r "$i/$k/libpython$j.dll.a" )
-							then
-								PYTHON3DIR="$i"
-								PYTHON3LIB="-L$PYTHON3DIR/$k -lpython$j"
-							elif ( test -n "$DARWIN" )
-							then
-								PYTHON3DIR="$i"
-								PYTHON3LIB="-lpython$j"
-							else
-								PYTHON3DIR="$i"
-							fi
-							if ( test -n "$PYTHON3DIR" )
-							then
-								break
-							fi
-						fi
-					done
-					if ( test -n "$PYTHON3DIR" )
-					then
-						break
-					fi
-				done
-
-				if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
-				then
-					dnl override PYTHON3DIR on osx in some cases
-					if ( test -d "/Library/Python/$j/site-packages" )
-					then
-						PYTHON3DIR="/Library/Python/$j"
-					fi
-					break
-				fi
-			done
-
-		fi
-
-		if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
-		then
-			AC_MSG_CHECKING(for Python.h (for python 3))
-			FW_TRY_COMPILE([#include <Python.h>],[PyArg_ParseTuple(NULL,NULL,NULL,NULL,NULL);],[$PYTHON3INCLUDES],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); PYTHON3INCLUDES=""; PYTHON3DIR=""])
-		fi
-		
-		if ( test -n "$PYTHON3INCLUDES" -a -n "$PYTHON3DIR" )
-		then
-			HAVE_PYTHON3="yes"
-
-			if ( test -d "$PYTHON3DIR/dist-packages" )
-			then
-				PYTHON3SITEDIR="dist-packages"
-			else
-				PYTHON3SITEDIR="site-packages"
-			fi
-		fi
-	fi
-
-	FW_INCLUDES(python,[$PYTHON3INCLUDES])
-
-	if ( test -n "$OVERRIDEPYTHON3DIR" )
-	then
-		PYTHON3DIR="$OVERRIDEPYTHON3DIR"
-	fi
-fi
-])
-
-
-
-AC_DEFUN([FW_PYTHON_DECIDE],
-[
-	IMPORTEXCEPTIONS="import exceptions"
-	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
-	PYTHONWARN=""
-
-	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "yes" )
-	then
-		PYTHONWARN="yes"
-	fi
-
-	if ( test "$HAVE_PYTHON3" = "yes" -a "$HAVE_PYTHON" = "" )
-	then
-		HAVE_PYTHON="$HAVE_PYTHON3"
-		PYTHONINCLUDES="$PYTHON3INCLUDES"
-		PYTHONDIR="$PYTHON3DIR"
-		PYTHONSITEDIR="$PYTHON3SITEDIR"
-		PYTHONLIB="$PYTHON3LIB"
-		IMPORTEXCEPTIONS=""
-		EXCEPTIONSSTANDARDERROR="Exception"
+		IMPORTEXCEPTIONS="import exceptions"
+		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 	fi
 
 	AC_SUBST(HAVE_PYTHON)
@@ -3263,6 +3097,7 @@ AC_DEFUN([FW_PYTHON_DECIDE],
 	then
 		AC_MSG_WARN(The Python API will not be built.)
 	fi
+fi
 ])
 
 
