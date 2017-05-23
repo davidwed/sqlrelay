@@ -2976,27 +2976,27 @@ then
 						fi
 					done
 
-					for libdir in "$pyprefix/lib64/python$pyversion" "$prefix/lib/python$pyversion"
+					for pylibdir in "$pyprefix/lib64/python$pyversion" "$prefix/lib/python$pyversion"
 					do
 
 						PYTHONDIR=""
 						for k in "config" "config-$MULTIARCHDIR" "config-$pyversion-$MULTIARCHDIR" "config-$pyversion" "config-${pyversion}mu-$MULTIARCHDIR" "config-${pyversion}mu" "config-${pyversion}m-$MULTIARCHDIR" "config-${pyversion}m" "config-${pyversion}u-$MULTIARCHDIR" "config-${pyversion}u"
 						do
 
-							if ( test -d "$libdir/$k" )
+							if ( test -d "$pylibdir/$k" )
 							then
 								dnl for cygwin and mac os x
 								dnl add -lpython
-								if ( test -n "$CYGWIN" -a -r "$libdir/$k/libpython$pyversion.dll.a" )
+								if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
 								then
-									PYTHONDIR="$libdir"
+									PYTHONDIR="$pylibdir"
 									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
 								elif ( test -n "$DARWIN" )
 								then
-									PYTHONDIR="$libdir"
+									PYTHONDIR="$pylibdir"
 									PYTHONLIB="-lpython$pyversion"
 								else
-									PYTHONDIR="$libdir"
+									PYTHONDIR="$pylibdir"
 								fi
 								if ( test -n "$PYTHONDIR" )
 								then
