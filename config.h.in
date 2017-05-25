@@ -135,6 +135,21 @@
 /* MySQL supports mysql_set_character_set */
 #undef HAVE_MYSQL_SET_CHARACTER_SET
 
+/* MySQL supports SSL_MODE_DISABLED */
+#undef HAVE_MYSQL_SSL_MODE_DISABLED
+
+/* MySQL supports SSL_MODE_PREFERRED */
+#undef HAVE_MYSQL_SSL_MODE_PREFERRED
+
+/* MySQL supports SSL_MODE_REQUIRED */
+#undef HAVE_MYSQL_SSL_MODE_REQUIRED
+
+/* MySQL supports SSL_MODE_VERIFY_CA */
+#undef HAVE_MYSQL_SSL_MODE_VERIFY_CA
+
+/* MySQL supports SSL_MODE_VERIFY_IDENTITY */
+#undef HAVE_MYSQL_SSL_MODE_VERIFY_IDENTITY
+
 /* MySQL supports mysql_ssl_set */
 #undef HAVE_MYSQL_SSL_SET
 

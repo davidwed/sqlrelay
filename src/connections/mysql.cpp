@@ -280,6 +280,8 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 	identity=NULL;
 
 	mysqlptr=NULL;
+
+	sslmode=0;
 }
 
 mysqlconnection::~mysqlconnection() {
@@ -300,15 +302,25 @@ void mysqlconnection::handleConnectString() {
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
 	if (charstring::isNullOrEmpty(sslmodestr) ||
 		!charstring::compare(sslmodestr,"disable")) {
+		#ifdef HAVE_MYSQL_SSL_MODE_DISABLED
 		sslmode=SSL_MODE_DISABLED;
+		#endif
 	} else if (!charstring::compare(sslmodestr,"prefer")) {
+		#ifdef HAVE_MYSQL_SSL_MODE_PREFERRED
 		sslmode=SSL_MODE_PREFERRED;
+		#endif
 	} else if (!charstring::compare(sslmodestr,"require")) {
+		#ifdef HAVE_MYSQL_SSL_MODE_REQUIRED
 		sslmode=SSL_MODE_REQUIRED;
+		#endif
 	} else if (!charstring::compare(sslmodestr,"verify-ca")) {
+		#ifdef HAVE_MYSQL_SSL_MODE_VERIFY_CA
 		sslmode=SSL_MODE_VERIFY_CA;
+		#endif
 	} else if (!charstring::compare(sslmodestr,"verify-identity")) {
+		#ifdef HAVE_MYSQL_SSL_MODE_VERIFY_IDENTITY
 		sslmode=SSL_MODE_VERIFY_IDENTITY;
+		#endif
 	}
 #endif
 #ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
