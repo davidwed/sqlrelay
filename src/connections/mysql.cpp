@@ -281,7 +281,9 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 
 	mysqlptr=NULL;
 
+#ifdef HAVE_MYSQL_OPT_SSL_MODE
 	sslmode=0;
+#endif
 }
 
 mysqlconnection::~mysqlconnection() {
