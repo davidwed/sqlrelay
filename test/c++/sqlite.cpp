@@ -678,4 +678,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	stdoutput.printf("\n");
+
+	return 0;
 }

@@ -773,4 +773,6 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable"),0);
 	printf("\n");
+
+	return 0;
 }

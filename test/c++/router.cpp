@@ -702,4 +702,6 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable2");
 
 	stdoutput.printf("\n");
+
+	return 0;
 }

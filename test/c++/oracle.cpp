@@ -1122,4 +1122,6 @@ int	main(int argc, char **argv) {
 
 	delete cur;
 	delete con;
+
+	return 0;
 }
