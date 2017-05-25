@@ -63,8 +63,9 @@
 	configure script can find mariadb on ubuntu 16.04 now
 	configure script can find openjdk-1.9.0 correctly now
 	python 3 is preferred to python 2 now
-	-Wl,--disable-new-dtags is used (if supported) when linking Oracle
-		stuff now, so RPATH will be used instead of RUNPATH
+	-Wl,--disable-new-dtags is used (if supported) when linking Oracle,
+		SAP, DB2, and Informix stuff now, so RPATH will be used instead
+		of RUNPATH
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API
