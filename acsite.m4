@@ -3556,6 +3556,14 @@ then
 			fi
 		done
 	fi
+	if ( test "$PHPCONFSTYLE" = "unknown" )
+	then
+		if ( test -d "/usr/local/etc/php" )
+		then
+			PHPCONFDIR="/usr/local/etc/php"
+			PHPCONFSTYLE="freebsd"
+		fi
+	fi
 	AC_MSG_RESULT($PHPCONFDIR - $PHPCONFSTYLE style)
 
 	dnl strip trailing / from PHPEXTDIR or libtool might complain

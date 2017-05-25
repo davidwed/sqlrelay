@@ -34457,6 +34457,14 @@ $as_echo_n "checking for PHP config directory... " >&6; }
 			fi
 		done
 	fi
+	if ( test "$PHPCONFSTYLE" = "unknown" )
+	then
+		if ( test -d "/usr/local/etc/php" )
+		then
+			PHPCONFDIR="/usr/local/etc/php"
+			PHPCONFSTYLE="freebsd"
+		fi
+	fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFDIR - $PHPCONFSTYLE style" >&5
 $as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 

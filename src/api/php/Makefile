@@ -30,7 +30,7 @@ installlib:
 	$(LTINSTALL) $(CP) sql_relay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.$(LIBEXT)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.a
-	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
+	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" -o "$(PHPCONFSTYLE)" = "freebsd" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
 		$(LTINSTALL) $(CP) sql_relay.ini $(DESTDIR)$(PHPCONFDIR); \

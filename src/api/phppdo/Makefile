@@ -30,7 +30,7 @@ installlib:
 	$(LTINSTALL) $(CP) pdo_sqlrelay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.$(LIBEXT)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.a
-	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
+	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" -o "$(PHPCONFSTYLE)" = "freebsd" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
 		$(LTINSTALL) $(CP) pdo_sqlrelay.ini $(DESTDIR)$(PHPCONFDIR); \
