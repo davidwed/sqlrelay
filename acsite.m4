@@ -432,6 +432,22 @@ fi
 ])
 
 
+
+dnl checks to see if ld --disable-new-dtags option works or not
+AC_DEFUN([FW_CHECK_NEW_DTAGS],
+[
+	AC_MSG_CHECKING(for -disable-new-dtags)
+	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wl,--disable-new-dtags],[],[],[DISABLE_NEW_DTAGS="-Wl,--disable-new-dtags"],[DISABLE_NEW_DTAGS=""])
+	if ( test "$DISABLE_NEW_DTAGS" = "-Wl,--disable-new-dtags" )
+	then
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
+	AC_SUBST(DISABLE_NEW_DTAGS)
+])
+
+
 dnl Checks for multiarch platform
 AC_DEFUN([FW_CHECK_MULTIARCH],
 [
