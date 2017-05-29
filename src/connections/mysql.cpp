@@ -157,6 +157,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		unsigned long	*bindvaluesize;
 
 		MYSQL_BIND	lobfield;
+		unsigned long	lobfieldlength;
 
 		bool		usestmtprepare;
 		bool		bindformaterror;
@@ -1665,6 +1666,7 @@ void mysqlcursor::getField(uint32_t col,
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 bool mysqlcursor::getLobFieldLength(uint32_t col, uint64_t *length)  {
+
 	// lobfield needs to be zero'ed prior to each call to
 	// mysql_stmt_fetch_column() because mysql_stmt_fetch_column()
 	// fiddles with its member variables, and we don't want stale
@@ -1673,6 +1675,10 @@ bool mysqlcursor::getLobFieldLength(uint32_t col, uint64_t *length)  {
 	lobfield.buffer_type=MYSQL_TYPE_STRING;
 	lobfield.buffer_length=fieldlength[col];
 	*length=lobfield.buffer_length;
+
+	// mariadb-client-lgpl_2.0.0 crashes if the length pointer isn't set
+	lobfield.length=&lobfieldlength;
+
 	return true;
 }
 
