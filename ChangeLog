@@ -68,6 +68,7 @@
 		of RUNPATH
 	php ini files are automatically installed on freebsd now
 	--with-mysql-prefix was being ignored, fixed that
+	the MYSQLLIBSPATH wasn't being extracted from mysql_config, fixed that
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

@@ -1392,6 +1392,19 @@ then
 					MYSQLLIBS=$MYSQLLIBSR
 				fi
 
+				dnl extract the libs path
+				if ( test -n "$MYSQLLIBS" )
+				then
+					for part in `echo "$MYSQLLIBS"`
+					do
+						if ( test "`echo $part | cut -c1-2`" = "-L" )
+						then
+							MYSQLLIBSPATH="`echo $part | cut -c3-1000`"
+						fi
+					done
+					break;
+				fi
+
 				if ( test -n "$MYSQLLIBS" )
 				then
 					break;
