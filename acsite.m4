@@ -3011,6 +3011,8 @@ then
 
 	else
 
+		pyext=""
+
 		for pyversion in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 		do
 
@@ -3027,6 +3029,7 @@ then
 						then
 							PYTHONINCLUDES="-I$pyprefix/include/python$pyversion$ext"
 							PYTHONVERSION=`echo $pyversion | sed -e "s|\.||"`
+							pyext="$ext"
 							break;
 						fi
 					done
@@ -3065,7 +3068,7 @@ then
 						fi
 					done
 
-					for pyexe in "python" "python$pyversion" "python$PYTHONVERSION"
+					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
 					do
 						if ( test -x "$pyprefix/bin/$pyexe" )
 						then
