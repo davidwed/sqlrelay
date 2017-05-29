@@ -3031,7 +3031,7 @@ then
 						fi
 					done
 
-					for pylibdir in "$pyprefix/lib64/python$pyversion" "$prefix/lib/python$pyversion"
+					for pylibdir in "$pyprefix/lib64/python$pyversion" "$pyprefix/lib/python$pyversion"
 					do
 
 						PYTHONDIR=""
