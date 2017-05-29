@@ -67,6 +67,7 @@
 		SAP, DB2, and Informix stuff now, so RPATH will be used instead
 		of RUNPATH
 	php ini files are automatically installed on freebsd now
+	--with-mysql-prefix was being ignored, fixed that
 
 1.0.1 - updated sqlr-bench to create "db"-bench.png
 	added edoc-generated API docs for the Erlang API

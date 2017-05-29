@@ -1350,10 +1350,16 @@ then
 			STATICFLAG="-static"
 		fi
 
+		MYSQLPATHBIN=""
+		if ( test -n "$MYSQLPATH" )
+		then
+			MYSQLPATHBIN="$MYSQLPATH/bin"
+		fi
+
 		dnl try mysql_config first...
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for dir in "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
+			for dir in "$MYSQLPATHBIN" "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
 			do
 
 				dnl try mysql_config, and if that fails,
