@@ -21,19 +21,19 @@ clean:
 	$(RMTREE) .libs
 
 $(SQLR)router_regex.$(LIBEXT): regex.cpp regex.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ regex.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ regex.$(OBJ) $(LDFLAGS) $(ROUTERPLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)router_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ userlist.$(OBJ) $(LDFLAGS) $(ROUTERPLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)router_clientiplist.$(LIBEXT): clientiplist.cpp clientiplist.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ clientiplist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ clientiplist.$(OBJ) $(LDFLAGS) $(ROUTERPLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)router_clientinfolist.$(LIBEXT): clientinfolist.cpp clientinfolist.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ clientinfolist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ clientinfolist.$(OBJ) $(LDFLAGS) $(ROUTERPLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)router_usedatabase.$(LIBEXT): usedatabase.cpp usedatabase.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ usedatabase.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ usedatabase.$(OBJ) $(LDFLAGS) $(ROUTERPLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

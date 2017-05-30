@@ -3107,11 +3107,23 @@ then
 		then
 			HAVE_PYTHON="yes"
 
+			dnl dist-packages or site-packages?  Ubuntu/Debian
+			dnl use dist-packages.  Others use site-packages.
 			if ( test -d "$PYTHONDIR/dist-packages" )
 			then
 				PYTHONSITEDIR="dist-packages"
-			else
+			elif ( test -d "$PYTHONDIR/site-packages" )
+			then
 				PYTHONSITEDIR="site-packages"
+			fi
+			if ( test -z "$PYTHONSITEDIR" )
+			then
+				if ( test -r "/etc/debian_version" )
+				then
+					PYTHONSITEDIR="dist-packages"
+				else
+					PYTHONSITEDIR="site-packages"
+				fi
 			fi
 		fi
 	fi

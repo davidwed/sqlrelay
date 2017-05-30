@@ -676,6 +676,7 @@ endif
 # plugins
 PLUGINCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 PLUGINLIBS = -L$(top_builddir)/src/server -l$(SQLR)server -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(EXTRALIBS)
+ROUTERPLUGINLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client -L$(top_builddir)/src/server -l$(SQLR)server -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(EXTRALIBS)
 CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++

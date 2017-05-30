@@ -33592,11 +33592,21 @@ CPPFLAGS="$SAVECPPFLAGS"
 		then
 			HAVE_PYTHON="yes"
 
-			if ( test -d "$PYTHONDIR/dist-packages" )
+									if ( test -d "$PYTHONDIR/dist-packages" )
 			then
 				PYTHONSITEDIR="dist-packages"
-			else
+			elif ( test -d "$PYTHONDIR/site-packages" )
+			then
 				PYTHONSITEDIR="site-packages"
+			fi
+			if ( test -z "$PYTHONSITEDIR" )
+			then
+				if ( test -r "/etc/debian_version" )
+				then
+					PYTHONSITEDIR="dist-packages"
+				else
+					PYTHONSITEDIR="site-packages"
+				fi
 			fi
 		fi
 	fi
