@@ -357,7 +357,7 @@ CACHEMANAGERLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIME
 
 
 # plugins
-PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D SQLRSERVER_EXPORTS /D SQLRUTIL_EXPORTS
+PLUGINCPPFLAGS = $(BASECPPFLAGS) /I$(top_builddir) /I$(top_builddir)\src\util /I$(top_builddir)\src\server /I$(top_builddir)\src\api\c++ /I$(top_builddir)\src\common $(RUDIMENTSINCLUDES) /D SQLRSERVER_EXPORTS /D SQLRUTIL_EXPORTS
 PLUGINLIBS = /LIBPATH:$(top_builddir)\src\server lib$(SQLR)server.lib /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
 ROUTERPLUGINLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib /LIBPATH:$(top_builddir)\src\server lib$(SQLR)server.lib /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
 CONFIGPLUGINLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIMENTSLIBS) $(EXTRALIBS)
