@@ -145,6 +145,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		MYSQL_STMT	*stmt;
 		bool		stmtfreeresult;
+		bool		stmtpreparefailed;
 
 		MYSQL_BIND	*fieldbind;
 		char		*field;
@@ -759,6 +760,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
 
 	usestmtprepare=true;
+	stmtpreparefailed=false;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
 			"^[ 	\r\n]*(("
@@ -897,6 +899,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// prepare the statement
 	if (mysql_stmt_prepare(stmt,query,length)) {
+		stmtpreparefailed=true;
 		return false;
 	}
 
@@ -1731,6 +1734,17 @@ void mysqlcursor::closeResultSet() {
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
 			stmtfreeresult=false;
+		}
+
+		// In mariadb-client-lgpl_2.x, if a mysql_stmt_prepare fails,
+		// then subsequent attempts to prepare the same stmt again with:
+		// "Unknown prepared statement handler (27) given to
+		// mysqld_stmt_reset" unless the statement is close and
+		// reopened.
+		if (stmtpreparefailed) {
+			mysql_stmt_close(stmt);
+			stmt=mysql_stmt_init(mysqlconn->mysqlptr);
+			stmtpreparefailed=false;
 		}
 	}
 #endif
