@@ -1,0 +1,67 @@
+= The tlsca Parameter =
+
+SQL Relay supports a '''tlsca''' parameter in the SQL Relay server's configuration file, and as an argument to the various command line client programs.  In either case, it specifies the location of the certificate store that contains the TLS certificate of the certificate authority (CA cert) to use when validating the peer's certificate.
+
+On non-Windows platforms, it may specify a certificate store file.  For example:
+
+{{{#!blockquote
+{{{
+/usr/local/firstworks/etc/myca.pem
+}}}
+}}}
+
+Or, it may specify a directory containing a set of certificate store files.  For example:
+
+{{{#!blockquote
+{{{
+/usr/local/firstworks/etc
+}}}
+}}}
+
+On Windows platforms it may specify a certificate store file.  For example:
+
+{{{#!blockquote
+{{{
+C:\\Program Files\\Firstworks\\etc\\myca.pfx
+}}}
+}}}
+
+(note the double-backslashes)
+
+Or, it may specify a Windows Certificate Store.  For example:
+
+{{{#!blockquote
+{{{
+CURRENT_USER:MY
+MY
+}}}
+}}}
+
+For actual files, only that file will be used, though the file may contain multiple CA certs.  And...
+
+* On non-Windows systems, a variety of file formats are supported.
+* On Windows systems it must be a .pfx file.
+
+For directories, all certificate store files found in the directory will be used.
+
+For Windows Certificate store, all certificates in the store will be used. And...
+
+* The parameter must be formatted in one of the following ways:
+ * location:store
+ * store
+* The location part must be one of the following:
+ * CURRENT_USER
+ * LOCAL_MACHINE
+ * CURRENT_SERVICE
+ * SERVICES
+ * USERS
+ * CURRENT_USER_GROUP_POLICY
+ * LOCAL_MACHINE_GROUP_POLICY
+ * LOCAL_MACHINE_ENTERPRISE
+ * (if omitted, it defaults to CURRENT_USER)
+* The store part must be one of the following:
+ * MY
+ * Root
+ * Trust
+ * CA
+ * (if omitted, it defaults to MY)

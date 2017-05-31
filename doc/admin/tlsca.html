@@ -1,0 +1,86 @@
+<html>
+<head>
+	<title>The tlsca Parameter</title>
+	<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<h1>The tlsca Parameter</h1>
+
+<p>SQL Relay supports a <b>tlsca</b> parameter in the SQL Relay server's configuration file, and as an argument to the various command line client programs.  In either case, it specifies the location of the certificate store that contains the TLS certificate of the certificate authority (CA cert) to use when validating the peer's certificate.</p>
+
+<p>On non-Windows platforms, it may specify a certificate store file.  For example:</p>
+
+<blockquote>
+  <pre>/usr/local/firstworks/etc/myca.pem
+</pre>
+
+</blockquote>
+<p>Or, it may specify a directory containing a set of certificate store files.  For example:</p>
+
+<blockquote>
+  <pre>/usr/local/firstworks/etc
+</pre>
+
+</blockquote>
+<p>On Windows platforms it may specify a certificate store file.  For example:</p>
+
+<blockquote>
+  <pre>C:\\Program Files\\Firstworks\\etc\\myca.pfx
+</pre>
+
+</blockquote>
+<p>(note the double-backslashes)</p>
+
+<p>Or, it may specify a Windows Certificate Store.  For example:</p>
+
+<blockquote>
+  <pre>CURRENT_USER:MY
+MY
+</pre>
+
+</blockquote>
+<p>For actual files, only that file will be used, though the file may contain multiple CA certs.  And...</p>
+
+<ul>
+  <li>On non-Windows systems, a variety of file formats are supported.</li>
+  <li>On Windows systems it must be a .pfx file.</li>
+</ul>
+
+<p>For directories, all certificate store files found in the directory will be used.</p>
+
+<p>For Windows Certificate store, all certificates in the store will be used. And...</p>
+
+<ul>
+  <li>The parameter must be formatted in one of the following ways:</li>
+  <ul>
+    <li>location:store</li>
+    <li>store</li>
+  </ul>
+
+  <li>The location part must be one of the following:</li>
+  <ul>
+    <li>CURRENT_USER</li>
+    <li>LOCAL_MACHINE</li>
+    <li>CURRENT_SERVICE</li>
+    <li>SERVICES</li>
+    <li>USERS</li>
+    <li>CURRENT_USER_GROUP_POLICY</li>
+    <li>LOCAL_MACHINE_GROUP_POLICY</li>
+    <li>LOCAL_MACHINE_ENTERPRISE</li>
+    <li>(if omitted, it defaults to CURRENT_USER)</li>
+  </ul>
+
+  <li>The store part must be one of the following:</li>
+  <ul>
+    <li>MY</li>
+    <li>Root</li>
+    <li>Trust</li>
+    <li>CA</li>
+    <li>(if omitted, it defaults to MY)
+</li>
+  </ul>
+
+</ul>
+
+</body>
+</html>
