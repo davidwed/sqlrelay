@@ -61,6 +61,7 @@ class sqlrimport : public xmlsax {
 		bool		*numbercolumn;
 		uint32_t	currentcol;
 		bool		infield;
+		bool		foundfieldtext;
 		uint32_t	fieldcount;
 		uint64_t	rowcount;
 		uint64_t	commitcount;
@@ -133,6 +134,7 @@ sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
 	currentcol=0;
 	numbercolumn=NULL;
 	infield=false;
+	foundfieldtext=false;
 	fieldcount=0;
 	rowcount=0;
 	this->verbose=verbose;
@@ -289,6 +291,7 @@ bool sqlrimport::rowTagStart() {
 bool sqlrimport::fieldTagStart() {
 	currenttag=FIELDTAG;
 	infield=true;
+	foundfieldtext=false;
 	return true;
 }
 
@@ -425,6 +428,12 @@ bool sqlrimport::rowTagEnd() {
 }
 
 bool sqlrimport::fieldTagEnd() {
+	if (!foundfieldtext) {
+		query.append("NULL");
+		if (currentcol<colcount-1) {
+			query.append(",");
+		}
+	}
 	infield=false;
 	currentcol++;
 	fieldcount++;
@@ -433,6 +442,7 @@ bool sqlrimport::fieldTagEnd() {
 
 bool sqlrimport::text(const char *string) {
 	if (infield) {
+		foundfieldtext=true;
 		if (!charstring::isNullOrEmpty(string)) {
 			if (!numbercolumn[currentcol]) {
 				query.append('\'');
