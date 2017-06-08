@@ -1,3 +1,6 @@
+1.1.1 - fixed subtle error in sqlr-import that could cause it to skip empty
+		(NULL) fields
+
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
 	fixed a bug in freetds connection that caused error messages to be
