@@ -857,6 +857,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[4],"Jan  1 2001 01:01:00:000PM");
 	checkSuccess(*(datalength[4]),27);
 	checkSuccess(*(nullindicator[4]),0);
+	// reals aren't converted to strings reliably enough to compare
 	//checkSuccess(data[5],"1.23");
 	checkSuccess(*(nullindicator[5]),0);
 	checkSuccess(data[6],"1.23");
@@ -865,6 +866,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[7],"Jan  1 2001 01:01:01:000PM");
 	checkSuccess(*(datalength[7]),27);
 	checkSuccess(*(nullindicator[7]),0);
+	// floats aren't converted to strings reliably enough to compare
 	//checkSuccess(data[8],"1.23");
 	checkSuccess(*(nullindicator[8]),0);
 	checkSuccess(data[9],"1.23");
@@ -882,10 +884,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[13],"1.23");
 	checkSuccess(*(datalength[13]),5);
 	checkSuccess(*(nullindicator[13]),0);
-	//checkSuccess(data[14],"2001-01-01");		#4780
-	//checkSuccess(data[15],"13:01:01.0000000");	#4780
-	//checkSuccess(data[16],"2001-01-01 13:01:01.0000000");		#4780
-	//checkSuccess(data[17],"2001-01-01 13:01:01.0000000 +00:00");	#4780
+	// FIXME: #4780 date, time, datetime2, datetimeoffset types
+	//checkSuccess(data[14],"2001-01-01");
+	//checkSuccess(data[15],"13:01:01.0000000");
+	//checkSuccess(data[16],"2001-01-01 13:01:01.0000000");
+	//checkSuccess(data[17],"2001-01-01 13:01:01.0000000 +00:00");
 	checkSuccess(data[18],"char1                                   ");
 	checkSuccess(*(datalength[18]),41);
 	checkSuccess(*(nullindicator[18]),0);
