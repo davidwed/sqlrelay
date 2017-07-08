@@ -270,8 +270,8 @@ int	main(int argc, char **argv) {
 				"testsmallmoney smallmoney, "
 				"testbigint bigint, "
 				"testguid uniqueidentifier, "
-				"testdecimal decimal(2,1), "
-				"testnumeric numeric(2,1), "
+				"testdecimal decimal(3,2), "
+				"testnumeric numeric(3,2), "
 				"testdate date, "
 				"testtime time, "
 				"testdatetime2 datetime2, "
@@ -409,7 +409,6 @@ int	main(int argc, char **argv) {
 					query,charstring::length(query),
 					CS_UNUSED),CS_SUCCEED);
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
-// hangs here against SQL Relay
 	results=ct_results(cmd,&resultstype);
 	checkSuccess(results,CS_SUCCEED);
 	checkSuccess(resultstype,CS_ROW_RESULT);
@@ -515,18 +514,18 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[3],"1");
 	checkSuccess(data[4],"Jan  1 2001 01:01:00:000PM");
 	//checkSuccess(data[5],"1.23");
-	//checkSuccess(data[6],"1.23");
+	checkSuccess(data[6],"1.23");
 	checkSuccess(data[7],"Jan  1 2001 01:01:01:000PM");
 	//checkSuccess(data[8],"1.23");
-	//checkSuccess(data[9],"1.23");
+	checkSuccess(data[9],"1.23");
 	checkSuccess(data[10],"1");
 	checkSuccess(data[11],"01020304-0102-0304-0102-030401020304");
-	//checkSuccess(data[12],"1.23");
-	//checkSuccess(data[13],"1.23");
-	checkSuccess(data[14],"2001-01-01");
-	checkSuccess(data[15],"13:01:01.0000000");
-	checkSuccess(data[16],"2001-01-01 13:01:01.0000000");
-	checkSuccess(data[17],"2001-01-01 13:01:01.0000000 +00:00");
+	checkSuccess(data[12],"1.23");
+	checkSuccess(data[13],"1.23");
+	//checkSuccess(data[14],"2001-01-01");		#4780
+	//checkSuccess(data[15],"13:01:01.0000000");	#4780
+	//checkSuccess(data[16],"2001-01-01 13:01:01.0000000");		#4780
+	//checkSuccess(data[17],"2001-01-01 13:01:01.0000000 +00:00");	#4780
 	checkSuccess(data[18],"char1                                   ");
 	checkSuccess(data[19],"varchar1");
 	//checkSuccess(data[20],"binary1");
@@ -552,18 +551,18 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[3],"2");
 	checkSuccess(data[4],"Feb  2 2002 02:02:00:000PM");
 	//checkSuccess(data[5],"2.34");
-	//checkSuccess(data[6],"2.34");
+	checkSuccess(data[6],"2.34");
 	checkSuccess(data[7],"Feb  2 2002 02:02:02:000PM");
 	//checkSuccess(data[8],"2.34");
-	//checkSuccess(data[9],"2.34");
+	checkSuccess(data[9],"2.34");
 	checkSuccess(data[10],"2");
 	checkSuccess(data[11],"01020304-0102-0304-0102-030401020304");
-	//checkSuccess(data[12],"2.34");
-	//checkSuccess(data[13],"2.34");
-	checkSuccess(data[14],"2002-02-02");
-	checkSuccess(data[15],"14:02:02.0000000");
-	checkSuccess(data[16],"2002-02-02 14:02:02.0000000");
-	checkSuccess(data[17],"2002-02-02 14:02:02.0000000 +00:00");
+	checkSuccess(data[12],"2.34");
+	checkSuccess(data[13],"2.34");
+	//checkSuccess(data[14],"2002-02-02");		#4780
+	//checkSuccess(data[15],"14:02:02.0000000");	#4780
+	//checkSuccess(data[16],"2002-02-02 14:02:02.0000000");		#4780
+	//checkSuccess(data[17],"2002-02-02 14:02:02.0000000 +00:00");	#4780
 	checkSuccess(data[18],"char2                                   ");
 	checkSuccess(data[19],"varchar2");
 	//checkSuccess(data[20],"binary2");
