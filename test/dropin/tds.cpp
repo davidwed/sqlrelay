@@ -895,9 +895,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[20],"62696e61727931000000000000000000000000000000000000000000000000000000000000000000");
 	checkSuccess(*(datalength[20]),81);
 	checkSuccess(*(nullindicator[20]),0);
-	// FIXME: these work against the db directly
-	//checkSuccess(data[21],"76617262696e61727931");	#4781
-	//checkSuccess(*(datalength[21]),21);			#4781
+	checkSuccess(data[21],"76617262696e61727931");
+	checkSuccess(*(datalength[21]),21);
 	checkSuccess(*(nullindicator[21]),0);
 	checkSuccess(data[22],"nvarchar1");
 	checkSuccess(*(datalength[22]),10);
@@ -911,9 +910,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[25],"text1");
 	checkSuccess(*(datalength[25]),6);
 	checkSuccess(*(nullindicator[25]),0);
-	// FIXME: these work against the db directly
-	//checkSuccess(data[26],"696d61676531");	#4781
-	//checkSuccess(*(datalength[26]),13);		#4781
+	checkSuccess(data[26],"696d61676531");
+	checkSuccess(*(datalength[26]),13);
 	checkSuccess(*(nullindicator[26]),0);
 	checkSuccess(data[27],"ntext1");
 	checkSuccess(*(datalength[27]),7);
@@ -949,12 +947,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[18],"char2                                   ");
 	checkSuccess(data[19],"varchar2");
 	checkSuccess(data[20],"62696e61727932000000000000000000000000000000000000000000000000000000000000000000");
-	//checkSuccess(data[21],"76617262696e61727932");	#4781
+	checkSuccess(data[21],"76617262696e61727932");
 	checkSuccess(data[22],"nvarchar2");
 	checkSuccess(data[23],"nchar2                                  ");
 	checkSuccess(data[24],"xml2");
 	checkSuccess(data[25],"text2");
-	//checkSuccess(data[26],"696d61676532");	#4781
+	checkSuccess(data[26],"696d61676532");
 	checkSuccess(data[27],"ntext2");
 	stdoutput.printf("\n");
 
