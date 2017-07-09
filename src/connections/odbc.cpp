@@ -235,6 +235,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
+		const char	*selectDatabaseQuery();
+		char		*getCurrentDatabase();
 		bool		setIsolationLevel(const char *isolevel);
 
 		SQLRETURN	erg;
@@ -671,6 +673,21 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;
+}
+
+const char *odbcconnection::selectDatabaseQuery() {
+	// FIXME: this won't work with every database
+	return "use %s";
+}
+
+char *odbcconnection::getCurrentDatabase() {
+	char	*currentdb=new char[256];
+	SQLSMALLINT	currentdblen;
+	SQLGetInfo(dbc,SQL_DATABASE_NAME,
+			(SQLPOINTER)currentdb,
+			(SQLSMALLINT)256,
+			&currentdblen);
+	return currentdb;
 }
 
 #if (ODBCVER >= 0x0300)

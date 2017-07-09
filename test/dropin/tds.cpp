@@ -318,20 +318,20 @@ int	main(int argc, char **argv) {
 				"1,"
 				"1,"
 				"1,"
-				"'Jan 01 2001 01:01:01:000PM', "
+				"'2001-01-01 13:01:01.000', "
 				"1.23, "
 				"1.23, "
-				"'Jan 01 2001 01:01:01:000PM', "
+				"'2001-01-01 13:01:01:000', "
 				"1.23, "
 				"1.23, "
 				"1, "
 				"'01020304-0102-0304-0102-030401020304', "
 				"1.23, "
 				"1.23, "
-				"'Jan 01 2001', "
-				"'01:01:01:000PM', "
-				"'Jan 01 2001 01:01:01:000PM', "
-				"'Jan 01 2001 01:01:01:000PM', "
+				"'2001-01-01', "
+				"'13:01:01.000', "
+				"'2001-01-01T13:01:01.000', "
+				"'2001-01-01 13:01:01.000', "
 				"'char1', "
 				"'varchar1', "
 				"CONVERT(binary, 'binary1'), "
@@ -370,20 +370,20 @@ int	main(int argc, char **argv) {
 				"1,"
 				"2,"
 				"2,"
-				"'Feb 02 2002 02:02:02:000PM', "
+				"'2002-02-02 14:02:02.000', "
 				"2.34, "
 				"2.34, "
-				"'Feb 02 2002 02:02:02:000PM', "
+				"'2002-02-02 14:02:02.000', "
 				"2.34, "
 				"2.34, "
 				"2, "
 				"'01020304-0102-0304-0102-030401020304', "
 				"2.34, "
 				"2.34, "
-				"'Feb 02 2002', "
-				"'02:02:02:000PM', "
-				"'Feb 02 2002 02:02:02:000PM', "
-				"'Feb 02 2002 02:02:02:000PM', "
+				"'2002-02-02', "
+				"'14:02:02.000', "
+				"'2002-02-02T14:02:02.000', "
+				"'2002-02-02 14:02:02.000', "
 				"'char2', "
 				"'varchar2', "
 				"CONVERT(binary, 'binary2'), "
@@ -702,7 +702,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[18].name,"testchar");
 	checkSuccess(column[18].datatype,CS_CHAR_TYPE);
 	checkSuccess(column[18].format,CS_FMT_NULLTERM);
-	// FIXME: 40 direct, 160 via relay (charset issue)
+	// FIXME: 40 direct, 160 via relay	#4783
 	//checkSuccess(column[18].maxlength,40);
 	checkSuccess(column[18].precision,0);
 	checkSuccess(column[18].scale,0);
@@ -716,7 +716,7 @@ int	main(int argc, char **argv) {
 	//checkSuccess(column[19].datatype,CS_VARCHAR_TYPE);
 	checkSuccess(column[19].datatype,CS_CHAR_TYPE);		// #4652
 	checkSuccess(column[19].format,CS_FMT_NULLTERM);
-	// FIXME: 40 direct, 160 via relay (charset issue)
+	// FIXME: 40 direct, 160 via relay	#4783
 	//checkSuccess(column[19].maxlength,40);
 	checkSuccess(column[19].precision,0);
 	checkSuccess(column[19].scale,0);
@@ -755,7 +755,7 @@ int	main(int argc, char **argv) {
 	//checkSuccess(column[22].datatype,CS_NVARCHAR_TYPE);
 	checkSuccess(column[22].datatype,CS_CHAR_TYPE);		// #4652
 	checkSuccess(column[22].format,CS_FMT_NULLTERM);
-	// FIXME: 40 direct, 160 via relay (charset issue)
+	// FIXME: 40 direct, 160 via relay	#4783
 	//checkSuccess(column[22].maxlength,40);
 	checkSuccess(column[22].precision,0);
 	checkSuccess(column[22].scale,0);
@@ -769,7 +769,7 @@ int	main(int argc, char **argv) {
 	//checkSuccess(column[23].datatype,CS_NCHAR_TYPE);
 	checkSuccess(column[23].datatype,CS_CHAR_TYPE);		// #4652
 	checkSuccess(column[23].format,CS_FMT_NULLTERM);
-	// FIXME: 40 direct, 160 via relay (charset issue)
+	// FIXME: 40 direct, 160 via relay	#4783
 	//checkSuccess(column[23].maxlength,40);
 	checkSuccess(column[23].precision,0);
 	checkSuccess(column[23].scale,0);
