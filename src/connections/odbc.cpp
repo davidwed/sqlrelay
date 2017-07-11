@@ -1510,8 +1510,7 @@ bool odbccursor::handleColumns() {
 		// bind the column to a buffer
 #ifdef HAVE_SQLCONNECTW
 		if (col[i].type==-9 || col[i].type==-8) {
-			// bind varchar and char fields as wchar
-			// bind the column to a buffer
+			// bind nvarchar and nchar fields as wchar
 			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
 					field[i],MAX_FIELD_LENGTH,
 					#ifdef SQLBINDCOL_SQLLEN
@@ -1609,6 +1608,8 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 			return BIT_DATATYPE;
 		case SQL_CHAR:
 			return CHAR_DATATYPE;
+		case SQL_DATE:
+			return DATETIME_DATATYPE;
 		case SQL_TYPE_DATE:
 			return DATE_DATATYPE;
 		case SQL_DECIMAL:
@@ -1639,6 +1640,23 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 			return VARBINARY_DATATYPE;
 		case SQL_VARCHAR:
 			return VARCHAR_DATATYPE;
+		case SQL_GUID:
+			return UNIQUEIDENTIFIER_DATATYPE;
+
+		// MS SQL Server types
+		case -8:
+			return NCHAR_DATATYPE;
+		case -9:
+			return NVARCHAR_DATATYPE;
+		case -10:
+			return NTEXT_DATATYPE;
+		case -152:
+			return XML_DATATYPE;
+		case -154:
+			return TIME_DATATYPE;
+		case -155:
+			return DATETIMEOFFSET_DATATYPE;
+
 		default:
 			return UNKNOWN_DATATYPE;
 	}

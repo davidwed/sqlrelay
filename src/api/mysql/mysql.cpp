@@ -1825,7 +1825,17 @@ static enum enum_field_types	mysqltypemap[]={
 	// "GEOMETRY"
 	MYSQL_TYPE_BLOB,
 	// "SDO_GEOMETRY"
-	MYSQL_TYPE_BLOB
+	MYSQL_TYPE_BLOB,
+	// "NCHAR"
+	MYSQL_TYPE_STRING,
+	// "NVARCHAR"
+	MYSQL_TYPE_VAR_STRING,
+	// "NTEXT"
+	MYSQL_TYPE_BLOB,
+	// "XML"
+	MYSQL_TYPE_BLOB,
+	// "DATETIMEOFFSET"
+	MYSQL_TYPE_DATETIME
 };
 
 enum enum_field_types map_col_type(const char *columntype, int64_t scale) {

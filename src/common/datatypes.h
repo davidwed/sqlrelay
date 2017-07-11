@@ -210,7 +210,13 @@ typedef	enum {
 	JSON_DATATYPE,
 	GEOMETRY_DATATYPE,
 	// also added by oracle
-	SDO_GEOMETRY_DATATYPE
+	SDO_GEOMETRY_DATATYPE,
+	// added by mssql
+	NCHAR_DATATYPE,
+	NVARCHAR_DATATYPE,
+	NTEXT_DATATYPE,
+	XML_DATATYPE,
+	DATETIMEOFFSET_DATATYPE
 } datatype;
 
 #ifdef NEED_DATATYPESTRING
@@ -415,6 +421,12 @@ static const char	*datatypestring[] = {
 	"GEOMETRY",
 	// also added by oracle
 	"SDO_GEOMETRY",
+	// added by mssql
+	"NCHAR",
+	"NVARCHAR",
+	"NTEXT",
+	"XML",
+	"DATETIMEOFFSET",
 	NULL
 };
 #endif
@@ -613,7 +625,9 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"LONGTEXT") ||
 		!charstring::compareIgnoringCase(type,"JSON") ||
 		!charstring::compareIgnoringCase(type,"GEOMETRY") ||
-		!charstring::compareIgnoringCase(type,"SDO_GEOMETRY"));
+		!charstring::compareIgnoringCase(type,"SDO_GEOMETRY") ||
+		!charstring::compareIgnoringCase(type,"NTEXT") ||
+		!charstring::compareIgnoringCase(type,"XML"));
 }
 #endif
 
@@ -722,7 +736,8 @@ static bool isDateTimeTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"DATE") ||
 		!charstring::compareIgnoringCase(type,"TIME") ||
 		!charstring::compareIgnoringCase(type,"TIMESTAMP") ||
-		!charstring::compareIgnoringCase(type,"NEWDATE"));
+		!charstring::compareIgnoringCase(type,"NEWDATE") ||
+		!charstring::compareIgnoringCase(type,"DATETIMEOFFSET"));
 }
 #endif
 
