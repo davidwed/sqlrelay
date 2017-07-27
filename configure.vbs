@@ -10,6 +10,7 @@ End If
 OPTCPPFLAGS="/O2"
 DEBUGCPPFLAGS="/MD"
 DEBUGLDFLAGS=""
+hexversion=""
 
 disableutil=false
 disableserver=false
@@ -221,6 +222,8 @@ for i=0 to WScript.Arguments.Count-1
 		disablecmdline=true
 	elseif mid(arg,1,13)="--disable-doc" then
 		disabledoc=true
+	elseif mid(arg,1,23)="--with-windows-version=" then
+		hexversion=mid(arg,24)
 	end if
 next
 
@@ -300,21 +303,22 @@ end if
 
 
 ' determine OS Version number
-set cmd=WshShell.exec("%comspec% /c ver")
-stdout=cmd.StdOut.ReadAll()
-stderr=cmd.StdErr.ReadLine()
-hexversion=""
-if instr(stdout,"Windows NT Version 4.0")>0 then
-	hexversion="0x0400"
-else
-	parts0=split(stdout,"[")
-	parts1=split(parts0(1)," ")
-	parts2=split(parts1(1),"]")
-	parts3=split(parts2(0),".")
-	if parts3(1)="00" then
-		parts3(1)="0"
+if len(hexversion)=0 then
+	set cmd=WshShell.exec("%comspec% /c ver")
+	stdout=cmd.StdOut.ReadAll()
+	stderr=cmd.StdErr.ReadLine()
+	if instr(stdout,"Windows NT Version 4.0")>0 then
+		hexversion="0x0400"
+	else
+		parts0=split(stdout,"[")
+		parts1=split(parts0(1)," ")
+		parts2=split(parts1(1),"]")
+		parts3=split(parts2(0),".")
+		if parts3(1)="00" then
+			parts3(1)="0"
+		end if
+		hexversion="0x0"&parts3(0)&"0"&parts3(1)
 	end if
-	hexversion="0x0"&parts3(0)&"0"&parts3(1)
 end if
 
 WScript.Echo("Windows Version: " & hexversion)
