@@ -259,6 +259,7 @@ initscript_prefix=""
 ' extension
 EXE=".exe"
 
+
 ' create file system object
 set fso=CreateObject("Scripting.FileSystemObject")
 
@@ -1287,15 +1288,18 @@ Function findHeadersAndLibs(basefolder, subfolderpattern,_
 
 	' get and sort its subfolders (descending)
 	' (this makes more newly versioned folders be found first)
-	Set subfolders=CreateObject("System.Collections.ArrayList")
+	Dim subfolders()
+	i=0
 	for each sf in bf.SubFolders
-		subfolders.Add(sf.Name)
+		subfolders(i) = sf.Name
 	next
-	subfolders.Sort()
-	subfolders.Reverse()
+	Sort(subfolders)
+	Reverse(subfolders)
 
 	' run through the subfolders...
-	for each sfname in subfolders
+	for i=0 to UBound(subfolders)
+
+		sfname=subfolders(i)
 
 		' reset output variables
 		includesfolder=""
@@ -1369,17 +1373,16 @@ Sub findPrefix(basefolder, subfolderpattern, apiprefix, disableapi)
 
 		' get and sort its subfolders (descending)
 		' (this makes more newly versioned folders be found first)
-		Set subfolders=CreateObject("System.Collections.ArrayList")
+		Dim subfolders()
+		i=0
 		for each sf in bf.SubFolders
-			if InStr(sf.Name,subfolderpattern)>0 then
-				subfolders.Add(sf.Name)
-			end if
+			subfolders(i) = sf.Name
 		next
-		subfolders.Sort()
-		subfolders.Reverse()
+		Sort(subfolders)
+		Reverse(subfolders)
 
 		' return the first matching subfolder (after the sort)
-		if subfolders.Count>0 then
+		if UBound(subfolders)>-1 then
 			apiprefix=basefolder & subfolders(0)
 			disableapi=false
 		end if
@@ -1449,3 +1452,26 @@ Sub findVersion(basefolder, fileprefix, filesuffix, apiversion)
 	end if
 
 End Sub
+
+Function Sort(arr)
+	for i=UBound(arr)-1 to 0 step -1
+		for j=0 to i
+			if arr(j)>arr(j+1) then
+				temp=arr(j+1)
+				arr(j+1)=arr(j)
+				arr(j)=temp
+			end if
+		next
+	next
+	Sort=arr
+End Function
+
+Function Reverse(arr)
+	Wscript.Echo(UBound(arr))
+	for i=0 to UBound(arr)/2
+		temp=arr(i)
+		arr(i)=arr(UBound(arr)-i)
+		arr(UBound(arr)-i)=temp
+	next
+	Reverse=arr
+End Function
