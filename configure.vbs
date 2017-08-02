@@ -1288,10 +1288,13 @@ Function findHeadersAndLibs(basefolder, subfolderpattern,_
 
 	' get and sort its subfolders (descending)
 	' (this makes more newly versioned folders be found first)
-	Dim subfolders()
+	Dim subfolders(100)
 	i=0
 	for each sf in bf.SubFolders
-		subfolders(i) = sf.Name
+		if i < UBound(subfolders) then
+			subfolders(i) = sf.Name
+			i=i+1
+		end if
 	next
 	Sort(subfolders)
 	Reverse(subfolders)
@@ -1373,10 +1376,15 @@ Sub findPrefix(basefolder, subfolderpattern, apiprefix, disableapi)
 
 		' get and sort its subfolders (descending)
 		' (this makes more newly versioned folders be found first)
-		Dim subfolders()
+		Dim subfolders(100)
 		i=0
 		for each sf in bf.SubFolders
-			subfolders(i) = sf.Name
+			if i < UBound(subfolders) then
+				if InStr(sf.Name,subfolderpattern)>0 then
+					subfolders(i) = sf.Name
+					i=i+1
+				end if
+			end if
 		next
 		Sort(subfolders)
 		Reverse(subfolders)
@@ -1467,7 +1475,6 @@ Function Sort(arr)
 End Function
 
 Function Reverse(arr)
-	Wscript.Echo(UBound(arr))
 	for i=0 to UBound(arr)/2
 		temp=arr(i)
 		arr(i)=arr(UBound(arr)-i)
