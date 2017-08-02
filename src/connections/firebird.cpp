@@ -108,7 +108,7 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
-						uint16_t valuesize,
+						uint32_t valuesize,
 						short *isnull);
 		bool		outputBind(const char *variable,
 						uint16_t variablesize,
@@ -1082,7 +1082,7 @@ bool firebirdcursor::inputBindClob(const char *variable,
 bool firebirdcursor::outputBind(const char *variable, 
 				uint16_t variablesize,
 				char *value, 
-				uint16_t valuesize, 
+				uint32_t valuesize, 
 				int16_t *isnull) {
 
 	outbindcount++;

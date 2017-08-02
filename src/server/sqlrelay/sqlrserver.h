@@ -821,7 +821,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual	bool	outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value,
-						uint16_t valuesize,
+						uint32_t valuesize,
 						int16_t *isnull);
 		virtual	bool	outputBind(const char *variable, 
 						uint16_t variablesize,

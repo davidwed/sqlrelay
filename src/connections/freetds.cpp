@@ -128,7 +128,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
-						uint16_t valuesize, 
+						uint32_t valuesize, 
 						int16_t *isnull);
 		bool		outputBind(const char *variable,
 						uint16_t variablesize,
@@ -213,7 +213,7 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 		uint16_t	paramindex;
 		CS_INT		*outbindtype;
 		char		**outbindstrings;
-		uint16_t	*outbindstringlengths;
+		uint32_t	*outbindstringlengths;
 		int64_t		**outbindints;
 		double		**outbinddoubles;
 		datebind	*outbinddates;
@@ -907,7 +907,7 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	parameter=new CS_DATAFMT[maxbindcount];
 	outbindtype=new CS_INT[maxbindcount];
 	outbindstrings=new char *[maxbindcount];
-	outbindstringlengths=new uint16_t[maxbindcount];
+	outbindstringlengths=new uint32_t[maxbindcount];
 	outbindints=new int64_t *[maxbindcount];
 	outbinddoubles=new double *[maxbindcount];
 	outbinddates=new datebind[maxbindcount];
@@ -1346,7 +1346,7 @@ bool freetdscursor::inputBind(const char *variable,
 bool freetdscursor::outputBind(const char *variable, 
 				uint16_t variablesize,
 				char *value, 
-				uint16_t valuesize, 
+				uint32_t valuesize, 
 				int16_t *isnull) {
 
 	checkRePrepare();

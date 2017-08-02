@@ -103,7 +103,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
-						uint16_t valuesize,
+						uint32_t valuesize,
 						short *isnull);
 		bool		outputBind(const char *variable,
 						uint16_t variablesize,
@@ -1047,7 +1047,7 @@ bool odbccursor::inputBind(const char *variable,
 bool odbccursor::outputBind(const char *variable, 
 				uint16_t variablesize,
 				const char *value, 
-				uint16_t valuesize, 
+				uint32_t valuesize, 
 				short *isnull) {
 
 	uint16_t	pos=charstring::toInteger(variable+1);

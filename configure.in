@@ -883,7 +883,7 @@ dnl if library source changed at all,         c:r:a -> c:r+1:a
 dnl if interfaces added, removed, or changed, c:r:a -> c+1:0:a
 dnl if interfaces added,                      c:r:a -> c:r:a+1
 dnl if interfaces removed,                    c:r:a -> c:r:0
-SRV_SONAME_VERSION_INFO="5:0:0"
+SRV_SONAME_VERSION_INFO="6:0:0"
 CLT_SONAME_VERSION_INFO="4:0:0"
 AC_SUBST(SRV_SONAME_VERSION_INFO)
 AC_SUBST(CLT_SONAME_VERSION_INFO)

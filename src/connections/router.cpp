@@ -31,7 +31,7 @@ struct outputbindvar {
 			bool		*isnegative;
 		} datevalue;
 	} value;
-	uint16_t		valuesize;
+	uint32_t		valuesize;
 	sqlrserverbindvartype_t	type;
 	int16_t			*isnull;
 };
@@ -173,7 +173,7 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value,
-						uint16_t valuesize,
+						uint32_t valuesize,
 						int16_t *isnull);
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
@@ -1451,7 +1451,7 @@ bool routercursor::inputBindClob(const char *variable,
 bool routercursor::outputBind(const char *variable, 
 				uint16_t variablesize,
 				char *value,
-				uint16_t valuesize,
+				uint32_t valuesize,
 				int16_t *isnull) {
 	currentcur->defineOutputBindString(variable+1,valuesize);
 	obv[obcount].variable=variable+1;

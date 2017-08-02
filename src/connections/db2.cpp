@@ -107,7 +107,7 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
-						uint16_t valuesize,
+						uint32_t valuesize,
 						int16_t *isnull);
 		bool		outputBind(const char *variable,
 						uint16_t variablesize,
@@ -1122,7 +1122,7 @@ bool db2cursor::inputBindClob(const char *variable,
 bool db2cursor::outputBind(const char *variable, 
 					uint16_t variablesize,
 					char *value, 
-					uint16_t valuesize, 
+					uint32_t valuesize, 
 					int16_t *isnull) {
 
 	uint16_t	pos=charstring::toInteger(variable+1);

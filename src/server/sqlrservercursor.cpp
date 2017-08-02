@@ -314,7 +314,7 @@ bool sqlrservercursor::inputBindClob(const char *variable,
 bool sqlrservercursor::outputBind(const char *variable,
 					uint16_t variablesize,
 					char *value, 
-					uint16_t valuesize, 
+					uint32_t valuesize, 
 					int16_t *isnull) {
 	// by default, do nothing...
 	return true;

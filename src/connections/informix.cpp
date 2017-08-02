@@ -100,7 +100,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
-						uint16_t valuesize,
+						uint32_t valuesize,
 						int16_t *isnull);
 		bool		outputBind(const char *variable,
 						uint16_t variablesize,
@@ -1110,7 +1110,7 @@ bool informixcursor::inputBindClob(const char *variable,
 bool informixcursor::outputBind(const char *variable, 
 					uint16_t variablesize,
 					char *value, 
-					uint16_t valuesize, 
+					uint32_t valuesize, 
 					int16_t *isnull) {
 
 	uint16_t	pos=charstring::toInteger(variable+1);
