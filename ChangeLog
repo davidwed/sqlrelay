@@ -5,6 +5,8 @@
 	added NCHAR, NVARCHAR, NTEXT, XML, and DATETIMEOFFSET types, updated
 		odbc connection to recognize them
 	added --with-windows-version to configure.vbs
+	enabled "liveconnection" test for "Lost connection to MySQL server
+		during query" error
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
