@@ -13,10 +13,10 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-//#define DEBUG_MESSAGES 1
-//#define DEBUG_TO_FILE 1
+#define DEBUG_MESSAGES 1
+#define DEBUG_TO_FILE 1
 //static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
-//static const char debugfile[]="C:\\Users\\dmuse\\sqlrodbcdebug.txt";
+static const char debugfile[]="C:\\Users\\dmuse\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -2971,6 +2971,11 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	return SQLR_SQLExecute(statementhandle);
 }
 
+static SQLRETURN SQLR_SQLSetPos(SQLHSTMT statementhandle,
+					SQLSETPOSIROW irow,
+					SQLUSMALLINT foption,
+					SQLUSMALLINT flock);
+
 static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLSMALLINT targettype,
@@ -3039,15 +3044,20 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		}
 	}
 
+	// Update the "start row" (the index of the first row of the block of
+	// rows that was just fetched).  If we end up calling SQLR_SQLSetPos()
+	// below will, then it will need this to be set correctly here.
+	stmt->currentstartrow=stmt->currentfetchrow;
+
 	// update column binds (if we have any)
 	if (stmt->fieldlist.getList()->getLength()) {
 
-		// we'll use SQLR_SQLGetData below to copy out data, so set the
-		// row that will be copied out during the next call to that
-		stmt->currentgetdatarow=stmt->currentstartrow;
-
 		uint32_t	colcount=stmt->cur->colCount();
 		for (uint64_t row=0; row<rowstofetch; row++) {
+
+			// set the position within the block
+			// of rows that we just fetched
+			SQLR_SQLSetPos(statementhandle,row+1,SQL_POSITION,0);
 
 			for (uint32_t index=0; index<colcount; index++) {
 
@@ -3079,15 +3089,19 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 					return getdataresult;
 				}
 			}
-
-			// bump currentgetdatarow
-			stmt->currentgetdatarow++;
 		}
 	}
 
-	// update the various row indices
-	stmt->currentstartrow=stmt->currentfetchrow;
+	// update the "fetch row"
+	// (the index of the row that the next call to this function
+	// will call getRow() on to fetch the next block of rows)
 	stmt->currentfetchrow=stmt->currentfetchrow+rowsfetched;
+
+	// Update the "get data row" (the index of the row that the next call
+	// to SQLGetData() will operate on).  If we ended up calling
+	// SQLR_SQLSetPos() above, then it will have modified this value, and
+	// we need to reset it here so future calls to SQLSetPos()/SQLGetData()
+	// will work as expected.
 	stmt->currentgetdatarow=stmt->currentstartrow;
 
 	debugPrintf("  currentstartrow  : %lld\n",stmt->currentstartrow);
@@ -7025,11 +7039,9 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		// clear the error
 		SQLR_STMTClearError(stmt);
 
-debugPrintf("here!\n");
 		retval=
 		(stmt->cur->getDatabaseList(NULL,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
-debugPrintf("now here!\n");
 
 	} else if (!charstring::compare(schname,SQL_ALL_SCHEMAS) &&
 				charstring::isNullOrEmpty(catname) &&
@@ -7071,12 +7083,10 @@ debugPrintf("now here!\n");
 							SQL_SUCCESS:SQL_ERROR;
 	}
 
-debugPrintf("now here!\n");
 	delete[] catname;
 	delete[] schname;
 	delete[] tblname;
 	delete[] tbltype;
-debugPrintf("now here!\n");
 
 	delete[] wild;
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
@@ -7447,7 +7457,7 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
+static SQLRETURN SQLR_SQLSetPos(SQLHSTMT statementhandle,
 					SQLSETPOSIROW irow,
 					SQLUSMALLINT foption,
 					SQLUSMALLINT flock) {
@@ -7472,6 +7482,13 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 	SQLR_STMTSetError(stmt,
 			"Driver does not support this function",0,"IM001");
 	return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
+					SQLSETPOSIROW irow,
+					SQLUSMALLINT foption,
+					SQLUSMALLINT flock) {
+	return SQLR_SQLSetPos(statementhandle,irow,foption,flock);
 }
 
 SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
