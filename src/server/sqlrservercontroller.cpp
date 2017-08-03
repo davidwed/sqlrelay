@@ -4204,7 +4204,6 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 
 	// run translations
 	if (pvt->_sqlrrst) {
-		// FIXME: use mapColumn() here?
 		pvt->_sqlrrst->run(pvt->_conn,cursor,
 					name,index,field,fieldlength);
 	}
