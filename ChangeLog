@@ -8,6 +8,7 @@
 	enabled "liveconnection" test for "Lost connection to MySQL server
 		during query" error
 	made server-side string outputBind() method's valuesize 32-bits
+	added missing mapColumn() call to sqlrservercontroller::getField()
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

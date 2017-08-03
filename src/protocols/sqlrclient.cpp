@@ -2802,7 +2802,7 @@ void sqlrprotocol_sqlrclient::sendNullField() {
 	debugFunction();
 
 	if (cont->logEnabled() || cont->notificationsEnabled()) {
-		debugstr.append("NULL");
+		debugstr.append("NULL,");
 	}
 	clientsock->write((uint16_t)NULL_DATA);
 }

@@ -4232,7 +4232,6 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 
 	// run translations
 	if (pvt->_sqlrrrst) {
-		// FIXME: use mapColumn() here?
 		pvt->_sqlrrrst->run(pvt->_conn,cursor,colcount,
 					names,fields,fieldlengths);
 	}
@@ -6395,10 +6394,11 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 
 	// return the requested field (which these pointers
 	// were set to during the previous call to fetchRow)
-	*field=pvt->_fields[col];
-	*fieldlength=pvt->_fieldlengths[col];
-	*blob=pvt->_blobs[col];
-	*null=pvt->_nulls[col];
+	uint32_t	actualcol=mapColumn(col);
+	*field=pvt->_fields[actualcol];
+	*fieldlength=pvt->_fieldlengths[actualcol];
+	*blob=pvt->_blobs[actualcol];
+	*null=pvt->_nulls[actualcol];
 
 	// reformat the field
 	reformatField(cursor,pvt->_fieldnames[col],col,field,fieldlength);

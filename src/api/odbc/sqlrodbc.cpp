@@ -7025,9 +7025,11 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		// clear the error
 		SQLR_STMTClearError(stmt);
 
+debugPrintf("here!\n");
 		retval=
 		(stmt->cur->getDatabaseList(NULL,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
+debugPrintf("now here!\n");
 
 	} else if (!charstring::compare(schname,SQL_ALL_SCHEMAS) &&
 				charstring::isNullOrEmpty(catname) &&
@@ -7069,10 +7071,12 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 							SQL_SUCCESS:SQL_ERROR;
 	}
 
+debugPrintf("now here!\n");
 	delete[] catname;
 	delete[] schname;
 	delete[] tblname;
 	delete[] tbltype;
+debugPrintf("now here!\n");
 
 	delete[] wild;
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
@@ -8411,7 +8415,7 @@ static void createControls(HWND hwnd) {
 	debugedit=createEdit(box3,
 			dsndict.getValue("Debug"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
-			1024,true,false);
+			1024,false,false);
 	columnnamecaseedit=createEdit(box3,
 			dsndict.getValue("ColumnNameCase"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
