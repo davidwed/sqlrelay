@@ -13,10 +13,10 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-#define DEBUG_MESSAGES 1
-#define DEBUG_TO_FILE 1
+//#define DEBUG_MESSAGES 1
+//#define DEBUG_TO_FILE 1
 //static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
-static const char debugfile[]="C:\\Users\\dmuse\\sqlrodbcdebug.txt";
+//static const char debugfile[]="C:\\Tmp\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -8166,6 +8166,8 @@ static WORD				dsnrequest;
 static dictionary< char *, char * >	dsndict;
 
 BOOL DllMain(HANDLE hinstdll, DWORD fdwreason, LPVOID lpvreserved) {
+	debugFunction();
+
 	if (fdwreason==DLL_PROCESS_ATTACH) {
 		hinst=(HINSTANCE)hinstdll;
 	}
@@ -8174,6 +8176,9 @@ BOOL DllMain(HANDLE hinstdll, DWORD fdwreason, LPVOID lpvreserved) {
 
 static void createLabel(HWND parent, const char *label,
 			int x, int y, int width, int height) {
+	debugFunction();
+	debugPrintf("  label: %s\n",label);
+
 	HWND	labelwin=CreateWindow("STATIC",label,
 					WS_CHILD|WS_VISIBLE|SS_RIGHT,
 					x,y,width,height,
@@ -8182,11 +8187,16 @@ static void createLabel(HWND parent, const char *label,
 			WM_SETFONT,
 			(WPARAM)GetStockObject(DEFAULT_GUI_FONT),
 			MAKELPARAM(FALSE,0));
+
+	debugPrintf("  success\n");
 }
 
 static HWND createEdit(HWND parent, const char *defaultvalue,
 			int x, int y, int width, int height,
 			int charlimit, bool numeric, bool first) {
+	debugFunction();
+	debugPrintf("  default value: %s\n",defaultvalue);
+
 	DWORD	style=WS_CHILD|WS_VISIBLE|WS_BORDER|WS_TABSTOP|ES_LEFT;
 	if (numeric) {
 		style|=ES_NUMBER;
@@ -8205,12 +8215,17 @@ static HWND createEdit(HWND parent, const char *defaultvalue,
 			EM_SETLIMITTEXT,
 			MAKEWPARAM(charlimit,0),
 			MAKELPARAM(FALSE,0));
+
+	debugPrintf("  success\n");
 	return editwin;
 }
 
 static void createButton(HWND parent, const char *label,
 					int x, int y, HMENU id,
 					bool first) {
+	debugFunction();
+	debugPrintf("  label: %s\n",label);
+
 	DWORD	style=WS_CHILD|WS_VISIBLE|WS_TABSTOP;
 	if (first) {
 		style|=WS_GROUP;
@@ -8222,11 +8237,15 @@ static void createButton(HWND parent, const char *label,
 			WM_SETFONT,
 			(WPARAM)GetStockObject(DEFAULT_GUI_FONT),
 			MAKELPARAM(FALSE,0));
+
+	debugPrintf("  success\n");
 }
 
 static void createControls(HWND hwnd) {
+	debugFunction();
 
-	// create a box to surround the labels and edits
+	// create boxes to surround the labels and edits
+	debugPrintf("  box1\n");
 	HWND	box1=CreateWindowEx(WS_EX_CONTROLPARENT,
 				"STATIC","",
 				WS_CHILD|WS_VISIBLE|SS_GRAYFRAME,
@@ -8236,6 +8255,7 @@ static void createControls(HWND hwnd) {
 				boxheight,
 				hwnd,(HMENU)SQLR_BOX,hinst,NULL);
 
+	debugPrintf("  box2\n");
 	HWND	box2=CreateWindowEx(WS_EX_CONTROLPARENT,
 				"STATIC","",
 				WS_CHILD|WS_VISIBLE|SS_GRAYFRAME,
@@ -8245,6 +8265,7 @@ static void createControls(HWND hwnd) {
 				boxheight,
 				hwnd,(HMENU)SQLR_BOX,hinst,NULL);
 
+	debugPrintf("  box3\n");
 	HWND	box3=CreateWindowEx(WS_EX_CONTROLPARENT,
 				"STATIC","",
 				WS_CHILD|WS_VISIBLE|SS_GRAYFRAME,
@@ -8253,6 +8274,8 @@ static void createControls(HWND hwnd) {
 				boxwidth,
 				boxheight,
 				hwnd,(HMENU)SQLR_BOX,hinst,NULL);
+
+	debugPrintf("  labels...\n");
 
 	// create labels...
 	int	x=xoffset;
@@ -8339,6 +8362,8 @@ static void createControls(HWND hwnd) {
 	createLabel(box3,"Lazy Connect",
 			x,y+=(labelheight+labeloffset),
 			labelwidth,labelheight);
+
+	debugPrintf("  edits...\n");
 
 	// create edits...
 	x=xoffset+labelwidth+xoffset;
@@ -8454,6 +8479,8 @@ static void createControls(HWND hwnd) {
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1,true,false);
 
+	debugPrintf("  buttons...\n");
+
 	// create buttons...
 	x=mainwindowwidth-xoffset-buttonwidth-xoffset-buttonwidth;
 	y=yoffset+boxheight+yoffset;
@@ -8461,27 +8488,21 @@ static void createControls(HWND hwnd) {
 	createButton(hwnd,"Cancel",x+=buttonwidth+xoffset,y,
 					(HMENU)SQLR_CANCEL,false);
 
+	debugPrintf("  focus...\n");
+
 	// set focus
 	SetFocus(dsnedit);
+
+	debugPrintf("  success\n");
 }
 
 static void parseDsn(const char *dsn) {
+	debugFunction();
 
-	// dsn is formatted like:
-	// DSN=xxx\0Server=xxx\0Port=xxx\0\0
-	for (const char *c=dsn; *c; c=c+charstring::length(c)+1) {
-		char		**parts;
-		uint64_t	partcount;
-		charstring::split(c,"=",true,&parts,&partcount);
-		dsndict.setValue(parts[0],parts[1]);
-	}
-
-	// But, actually, it usually just contains the DSN name itself and
-	// the rest of the bits of data have to be fetched...
-
-	// get the name of the dsn that we were given, bail if it's empty
-	const char	*dsnval=dsndict.getValue("DSN");
+	// if the dsn is empty then set some defaults and return...
 	if (charstring::isNullOrEmpty(dsn)) {
+
+		debugPrintf("  empty dsn, returning defaults\n");
 
 		// provide some defaults...
 		dsndict.setValue("Port",charstring::duplicate("9000"));
@@ -8511,8 +8532,32 @@ static void parseDsn(const char *dsn) {
 					charstring::duplicate("0"));
 		dsndict.setValue("LazyConnect",
 					charstring::duplicate("1"));
+
+		debugPrintf("  success...\n");
 		return;
 	}
+
+	debugPrintf("  non-empty dsn, parsing\n");
+
+	// dsn is formatted like:
+	// DSN=xxx\0Server=xxx\0Port=xxx\0\0
+	for (const char *c=dsn; c && *c; c=c+charstring::length(c)+1) {
+		char		**parts;
+		uint64_t	partcount;
+		charstring::split(c,"=",true,&parts,&partcount);
+		dsndict.setValue(parts[0],parts[1]);
+	}
+
+	debugPrintf("  parsed successfully\n");
+
+	// But, it usually just contains the DSN name itself and
+	// the rest of the bits of data have to be fetched...
+
+	// get the name of the dsn that we were given
+	const char	*dsnval=dsndict.getValue("DSN");
+
+	debugPrintf("  DSN=%s\n",dsnval);
+	debugPrintf("  getting other values...\n");
 
 	// get the rest of the data...
 	if (!dsndict.getValue("Server")) {
@@ -8671,10 +8716,12 @@ static void parseDsn(const char *dsn) {
 						lazyconnect,2,ODBC_INI);
 		dsndict.setValue("LazyConnect",lazyconnect);
 	}
-	dsndict.print();
+
+	debugPrintf("  success...\n");
 }
 
 static void dsnError() {
+	debugFunction();
 
 	DWORD	pferrorcode;
 	char	errormsg[SQL_MAX_MESSAGE_LENGTH+1];
@@ -8691,6 +8738,7 @@ static void dsnError() {
 }
 
 static bool validDsn() {
+	debugFunction();
 
 	// FIXME: SQLValidDSN always seems to return false
 	return true;
@@ -8703,6 +8751,8 @@ static bool validDsn() {
 }
 
 static bool removeDsn() {
+	debugFunction();
+	
 	if (SQLRemoveDSNFromIni(dsndict.getValue("DSN"))==FALSE) {
 		dsnError();
 		return false;
@@ -8711,6 +8761,7 @@ static bool removeDsn() {
 }
 
 static void getDsnFromUi() {
+	debugFunction();
 
 	// populate dsndict from values in edit windows...
 
@@ -8905,6 +8956,8 @@ static void getDsnFromUi() {
 }
 
 static bool writeDsn() {
+	debugFunction();
+
 	const char	*dsnname=dsndict.getValue("DSN");
 	if (SQLWriteDSNToIni(dsnname,SQL_RELAY)==FALSE) {
 		dsnError();
@@ -8928,6 +8981,7 @@ static bool writeDsn() {
 
 
 static bool saveDsn() {
+	debugFunction();
 
 	// validate dsn
 	if (!validDsn()) {
@@ -8954,28 +9008,37 @@ static bool saveDsn() {
 
 static LRESULT CALLBACK windowProc(HWND hwnd, UINT umsg,
 				WPARAM wparam, LPARAM lparam) {
+	debugFunction();
+
 	switch (umsg) {
 		case WM_CREATE:
+			debugPrintf("  WM_CREATE\n");
 			createControls(hwnd);
 			break;
 		case WM_CLOSE:
+			debugPrintf("  WM_CLOSE\n");
 			DestroyWindow(hwnd);
 			break;
 		case WM_DESTROY:
+			debugPrintf("  WM_DESTROY\n");
 			PostQuitMessage(0);
 			break;
 		case WM_COMMAND:
+			debugPrintf("  WM_COMMAND\n");
 			switch (GetDlgCtrlID((HWND)lparam)) {
 				case SQLR_OK:
+					debugPrintf("  SQLR_OK\n");
 					if (saveDsn()) {
 						DestroyWindow(mainwindow);
 					}
 					break;
 				case SQLR_CANCEL:
+					debugPrintf("  SQLR_CANCEL\n");
 					DestroyWindow(mainwindow);
 					break;
 			}
 		default:
+			debugPrintf("  default\n");
 			return DefWindowProc(hwnd,umsg,wparam,lparam);
 	}
 	return 0;
@@ -9007,6 +9070,8 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 	// display a dialog box displaying values supplied in lpszattributes
 	// and prompting the user for data not supplied
 
+	debugPrintf("  ConfigDSN create window class...\n");
+
 	// create a window class...
 	WNDCLASS	wcx;
 	wcx.style=0;
@@ -9022,6 +9087,8 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 	if (RegisterClass(&wcx)==FALSE) {
 		return FALSE;
 	}
+
+	debugPrintf("  ConfigDSN adjust window rect...\n");
 
 	// figure out how big the outside of the window needs to be,
 	// based on the desired size of the inside...
@@ -9043,6 +9110,8 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 		reqtitle.append(" Data Source Configuration");
 	}
 
+	debugPrintf("  ConfigDSN create dialog...\n");
+
 	// create the dialog window...
 	mainwindow=CreateWindowEx(WS_EX_CONTROLPARENT,
 				sqlrwindowclass,
@@ -9061,6 +9130,8 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 		return FALSE;
 	}
 
+	debugPrintf("  ConfigDSN show window...\n");
+
 	// show the window and take input...
 	ShowWindow(mainwindow,SW_SHOWDEFAULT);
 	UpdateWindow(mainwindow);
@@ -9072,10 +9143,14 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 		}
 	}
 
+	debugPrintf("  ConfigDSN clean up...\n");
+
 	// clean up
 	UnregisterClass(sqlrwindowclass,hinst);
 
 	// FIXME: clean up dsndict
+
+	debugPrintf("  ConfigDSN success\n");
 
 	return TRUE;
 }
