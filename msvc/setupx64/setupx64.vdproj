@@ -4218,6 +4218,13 @@
         }
         "LaunchCondition"
         {
+            "{836E08B8-0285-4809-BA42-01DB6754A45D}:_57AD2E1237E340ABAFFA15DAA3B1709A"
+            {
+            "Name" = "8:Privileged"
+            "Condition" = "8:Privileged"
+            "Message" = "8:This package must be installed by an Administrator."
+            "InstallUrl" = "8:"
+            }
         }
         "Locator"
         {
@@ -4232,7 +4239,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Firstworks SQL Relay (64-bit)"
         "ProductCode" = "8:{C0EC8D59-D301-4F83-83D9-1CCD6E8001A5}"
-        "PackageCode" = "8:{C32A94F7-93C6-45C1-B50E-92225E371E7A}"
+        "PackageCode" = "8:{3A9A4CB6-9123-499C-BB45-5992B867E840}"
         "UpgradeCode" = "8:{97679A6A-B07C-4278-9494-57F8C96615C6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
