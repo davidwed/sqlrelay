@@ -9,6 +9,8 @@
 		during query" error
 	made server-side string outputBind() method's valuesize 32-bits
 	added missing mapColumn() call to sqlrservercontroller::getField()
+	fixed var directories in Windows deployment projects
+	added run-as-Admin requirement to Windows installer
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
