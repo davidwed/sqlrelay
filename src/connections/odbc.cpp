@@ -235,6 +235,10 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
+		bool		getProcedureBindAndColumnList(
+						sqlrservercursor *cursor,
+						const char *procedure,
+						const char *wild);
 		const char	*selectDatabaseQuery();
 		char		*getCurrentDatabase();
 		bool		setIsolationLevel(const char *isolevel);
@@ -670,6 +674,44 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	delete[] empty;
 	delete[] wildcopy;
 	delete[] tablecopy;
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
+}
+
+bool odbcconnection::getProcedureBindAndColumnList(
+					sqlrservercursor *cursor,
+					const char *procedure,
+					const char *wild) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
+
+	// SQLColumns takes non-const arguments, so we have to make
+	// copies of the various arguments that we want to pass in.
+	char	*wildcopy=charstring::duplicate(wild);
+	char	*procedurecopy=charstring::duplicate(procedure);
+	char	*empty=new char[1];
+	empty[0]='\0';
+
+	// get the column list
+	erg=SQLProcedureColumns(odbccur->stmt,
+			(SQLCHAR *)empty,SQL_NTS,
+			(SQLCHAR *)empty,SQL_NTS,
+			(SQLCHAR *)procedure,charstring::length(procedurecopy),
+			(SQLCHAR *)wildcopy,charstring::length(wildcopy));
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+	delete[] empty;
+	delete[] wildcopy;
+	delete[] procedurecopy;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;

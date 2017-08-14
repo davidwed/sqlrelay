@@ -21,7 +21,8 @@ enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_QUERY=0,
 	SQLRCLIENTQUERYTYPE_DATABASE_LIST,
 	SQLRCLIENTQUERYTYPE_TABLE_LIST,
-	SQLRCLIENTQUERYTYPE_COLUMN_LIST
+	SQLRCLIENTQUERYTYPE_COLUMN_LIST,
+	SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST
 };
 
 class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
@@ -150,6 +151,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getDatabaseListCommand(sqlrservercursor *cursor);
 		bool	getTableListCommand(sqlrservercursor *cursor);
 		bool	getColumnListCommand(sqlrservercursor *cursor);
+		bool	getProcedureBindAndColumnListCommand(
+						sqlrservercursor *cursor);
 		bool	getListCommand(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
 					bool gettable);
@@ -546,6 +549,9 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		} else if (command==GETCOLUMNLIST) {
 			cont->incrementGetColumnListCount();
 			loop=getColumnListCommand(cursor);
+		} else if (command==GETPROCEDUREBINDANDCOLUMNLIST) {
+			//cont->incrementGetColumnListCount();
+			loop=getProcedureBindAndColumnListCommand(cursor);
 		} else if (command==GET_QUERY_TREE) {
 			cont->incrementGetQueryTreeCount();
 			loop=getQueryTreeCommand(cursor);
@@ -3082,6 +3088,17 @@ bool sqlrprotocol_sqlrclient::getColumnListCommand(sqlrservercursor *cursor) {
 	return retval;
 }
 
+bool sqlrprotocol_sqlrclient::getProcedureBindAndColumnListCommand(
+						sqlrservercursor *cursor) {
+	debugFunction();
+	cont->raiseDebugMessageEvent("get procedure bind and column list...");
+	bool	retval=getListCommand(cursor,
+		SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST,true);
+	cont->raiseDebugMessageEvent("done getting procedure "
+					"bind and column list");
+	return retval;
+}
+
 
 bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
@@ -3234,6 +3251,12 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
 			cont->setColumnListColumnMap(listformat);
 			success=cont->getColumnList(cursor,table,wild);
+			break;
+		case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
+			cont->setProcedureBindAndColumnListColumnMap(
+								listformat);
+			success=cont->getProcedureBindAndColumnList(
+							cursor,table,wild);
 			break;
 		default:
 			break;

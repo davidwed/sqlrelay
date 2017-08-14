@@ -430,7 +430,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							const char *schema,
 							const char *table);
 
-		// db, table, column lists
+		// db, table, column, procedure bind/column lists
 		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
@@ -439,11 +439,18 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
+		bool		getProcedureBindAndColumnList(
+						sqlrservercursor *cursor,
+						const char *procedure,
+						const char *wild);
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(const char *table,
-								bool wild);
+							bool wild);
+		const char	*getProcedureBindAndColumnListQuery(
+							const char *procedure,
+							bool wild);
 
 		// column info
 		uint16_t	getSendColumnInfo();
@@ -455,6 +462,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setTableListColumnMap(
 					sqlrserverlistformat_t listformat);
 		void		setColumnListColumnMap(
+					sqlrserverlistformat_t listformat);
+		void		setProcedureBindAndColumnListColumnMap(
 					sqlrserverlistformat_t listformat);
 		const char	*getColumnName(sqlrservercursor *cursor,
 							uint32_t col);
@@ -718,11 +727,18 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
+		virtual bool		getProcedureBindAndColumnList(
+						sqlrservercursor *cursor,
+						const char *procedure,
+						const char *wild);
 		virtual const char	*getDatabaseListQuery(bool wild);
 		virtual const char	*getTableListQuery(bool wild);
 		virtual const char	*getGlobalTempTableListQuery();
 		virtual const char	*getColumnListQuery(
 						const char *table,
+						bool wild);
+		virtual const char	*getProcedureBindAndColumnListQuery(
+						const char *procedure,
 						bool wild);
 		virtual bool		isSynonym(const char *table);
 		virtual const char	*isSynonymQuery();

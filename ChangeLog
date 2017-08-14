@@ -120,6 +120,7 @@
 	fixed another subtle bug in the ODBC driver that caused the first row
 		to be duplicated if columns were not bound
 	added --disable-wall and --disable-werror configure options
+	added minimal passthrough implementation of ODBC SQLProcedureColumns
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

@@ -147,5 +147,12 @@
 		bool		getColumnList(const char *table,
 					const char *wild,
 					sqlrclientlistformat_t listformat);
+		bool		getProcedureBindAndColumnList(
+					const char *procedure,
+					const char *wild);
+		bool		getProcedureBindAndColumnList(
+					const char *procedure,
+					const char *wild,
+					sqlrclientlistformat_t listformat);
 
 	friend class sqlrconnection;

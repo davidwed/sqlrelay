@@ -165,6 +165,7 @@ class	sqlrsh {
 		char	*getWild(const char *command);
 		char	*getTable(enum querytype_t querytype,
 					const char *command);
+		char	*getProcedure(const char *command);
 		void	initStats(sqlrshenv *env);
 		void	displayError(sqlrshenv *env,
 					const char *message,
@@ -871,6 +872,13 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+				"show procedure binds and columns",32)) {
+			char	*procedure=getProcedure(command);
+			char	*wild=getWild(command);
+			sqlrcur->getProcedureBindAndColumnList(procedure,wild);
+			delete[] procedure;
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 							"reexecute")) {	
 			executeQuery(sqlrcur,env);
 		} else {
@@ -1049,6 +1057,19 @@ char *sqlrsh::getTable(querytype_t querytype, const char *command) {
 		return charstring::duplicate(tableptr+1);
 	}
 	return NULL;
+}
+
+char *sqlrsh::getProcedure(const char *command) {
+	const char	*procptr=charstring::findFirst(command," in ");
+	if (!procptr) {
+		return NULL;
+	}
+	procptr=procptr+4;
+	const char	*endptr=charstring::findFirst(procptr," ");
+	if (!endptr) {
+		return charstring::duplicate(procptr);
+	}
+	return charstring::duplicate(procptr,endptr-procptr);
 }
 
 void sqlrsh::initStats(sqlrshenv *env) {
@@ -1877,6 +1898,8 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("		returns a list of column metadata for the table \"table\"\n");
 	stdoutput.printf("	fields table				-\n");
 	stdoutput.printf("		returns a list of column names for the table \"table\"\n\n");
+	stdoutput.printf("	show procedure binds and columns in procedure [like pattern]	-\n");
+	stdoutput.printf("		returns a list of bind/column metadata for \"procedure\"\n");
 	stdoutput.printf("	setclientinfo info	- sets the client info\n");
 	stdoutput.printf("	getclientinfo		- displays the client info\n\n");
 	stdoutput.printf("	setresultsetbuffersize size	- fetch size rows at a time\n");
