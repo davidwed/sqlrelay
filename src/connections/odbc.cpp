@@ -695,10 +695,35 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
+	// Unlike SQLColumns/SQLTables, SQLProcedureColumns wants NULL instead
+	// of "" for catalog/schema, to indicate the current catalog/schema.
+	// It interprets "" as meaning outside of any catalog/schema.
+	char	*catalog=NULL;
+	char	*schema=NULL;
+	char	*proc=NULL;
+
+	// split the procedure name and extract the parts
+	// FIXME: arguably getColumnList and getDatabaseOrTableList
+	// ought to do this same thing
+	char		**parts;
+	uint64_t	partslength;
+	charstring::split(procedure,".",true,&parts,&partslength);
+	if (partslength==1) {
+		proc=parts[0];
+	} else if (partslength==2) {
+		// FIXME: note here about why we're doing catalog.proc
+		// instead of schema.proc
+		catalog=parts[0];
+		proc=parts[1];
+	} else if (partslength>=3) {
+		catalog=parts[0];
+		schema=parts[1];
+		proc=parts[2];
+	}
+
 	// SQLProcedureColumns takes non-const arguments, so we have to make
-	// copies of the various arguments that we want to pass in.
+	// a copy of the wild parameter.
 	char	*wildcopy=charstring::duplicate(wild);
-	char	*procedurecopy=charstring::duplicate(procedure);
 
 	// SQLColumns interprets an empty or NULL column name as meaning
 	// "all columns".  SQLProcedureColumns interprtes an empty column name
@@ -712,20 +737,23 @@ bool odbcconnection::getProcedureBindAndColumnList(
 
 	// get the column list
 	erg=SQLProcedureColumns(odbccur->stmt,
-			// SQLProcedureColumns wants NULL instead of empty
-			// for these parameters, to indicate the current
-			// catalog and schema.  It interprets empty as meaning
-			// outside of any catalog or schema.
-			(SQLCHAR *)NULL,0,
-			(SQLCHAR *)NULL,0,
-			(SQLCHAR *)procedurecopy,
-			charstring::length(procedurecopy),
+			(SQLCHAR *)catalog,
+			charstring::length(catalog),
+			(SQLCHAR *)schema,
+			charstring::length(schema),
+			(SQLCHAR *)proc,
+			charstring::length(proc),
 			(SQLCHAR *)wildcopy,
 			charstring::length(wildcopy)
 			);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+
+	// clean up
 	delete[] wildcopy;
-	delete[] procedurecopy;
+	for (uint64_t i=0; i<partslength; i++) {
+		delete[] parts[i];
+	}
+	delete[] parts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;
