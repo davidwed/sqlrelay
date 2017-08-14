@@ -1932,6 +1932,11 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 						SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
 	delete[] wild;
+
+	// the statement has been executed
+	stmt->executed=true;
+
+	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 	return retval;
 }
 
@@ -7096,6 +7101,10 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	delete[] tbltype;
 
 	delete[] wild;
+
+	// the statement has been executed
+	stmt->executed=true;
+
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 	return retval;
 }
@@ -7508,6 +7517,11 @@ debugPrintf("proc:    %s (%d)\n",procedurename,namelength3);
 						SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
 	delete[] wild;
+
+	// the statement has been executed
+	stmt->executed=true;
+
+	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 	return retval;
 }
 
@@ -8130,7 +8144,8 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 
 	switch (inputoutputtype) {
 		case SQL_PARAM_INPUT:
-			debugPrintf("  parametertype: SQL_PARAM_INPUT\n");
+			debugPrintf("  parametertype: "
+						"SQL_PARAM_INPUT\n");
 			return SQLR_InputBindParameter(statementhandle,
 							parameternumber,
 							valuetype,
@@ -8139,11 +8154,22 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							parametervalue,
 							strlen_or_ind);
 		case SQL_PARAM_INPUT_OUTPUT:
-			debugPrintf("  parametertype: SQL_PARAM_INPUT_OUTPUT\n");
-			// SQL Relay doesn't currently support in/out params
-			return SQL_ERROR;
+			debugPrintf("  parametertype: "
+						"SQL_PARAM_INPUT_OUTPUT\n");
+			// FIXME: SQL Relay doesn't currently support in/out
+			// params, and some apps pass input params as in/out.
+			// So, for now we'll just pass an in/out param as an
+			// in param.
+			return SQLR_InputBindParameter(statementhandle,
+							parameternumber,
+							valuetype,
+							lengthprecision,
+							parameterscale,
+							parametervalue,
+							strlen_or_ind);
 		case SQL_PARAM_OUTPUT:
-			debugPrintf("  parametertype: SQL_PARAM_OUTPUT\n");
+			debugPrintf("  parametertype: "
+						"SQL_PARAM_OUTPUT\n");
 			return SQLR_OutputBindParameter(statementhandle,
 							parameternumber,
 							valuetype,
