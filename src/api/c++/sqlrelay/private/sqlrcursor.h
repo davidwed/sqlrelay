@@ -154,5 +154,12 @@
 					const char *procedure,
 					const char *wild,
 					sqlrclientlistformat_t listformat);
+		bool		getTypeInfoList(
+					const char *type,
+					const char *wild);
+		bool		getTypeInfoList(
+					const char *type,
+					const char *wild,
+					sqlrclientlistformat_t listformat);
 
 	friend class sqlrconnection;

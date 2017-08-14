@@ -239,6 +239,9 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 						sqlrservercursor *cursor,
 						const char *procedure,
 						const char *wild);
+		bool		getTypeInfoList(sqlrservercursor *cursor,
+						const char *type,
+						const char *wild);
 		const char	*selectDatabaseQuery();
 		char		*getCurrentDatabase();
 		bool		setIsolationLevel(const char *isolevel);
@@ -754,6 +757,116 @@ bool odbcconnection::getProcedureBindAndColumnList(
 		delete[] parts[i];
 	}
 	delete[] parts;
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
+}
+
+bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
+					const char *type,
+					const char *wild) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
+
+	// map the string type to a number
+	// FIXME: this will be slooowwww... improve it
+	SQLSMALLINT	typenumber=-1;
+	if (!charstring::compare(type,"SQL_CHAR")) {
+		typenumber=SQL_CHAR;
+	} else if (!charstring::compare(type,"SQL_VARCHAR")) {
+		typenumber=SQL_VARCHAR;
+	} else if (!charstring::compare(type,"SQL_LONGVARCHAR")) {
+		typenumber=SQL_LONGVARCHAR;
+	} else if (!charstring::compare(type,"SQL_WCHAR")) {
+		typenumber=SQL_WCHAR;
+	} else if (!charstring::compare(type,"SQL_WVARCHAR")) {
+		typenumber=SQL_WVARCHAR;
+	} else if (!charstring::compare(type,"SQL_WLONGVARCHAR")) {
+		typenumber=SQL_WLONGVARCHAR;
+	} else if (!charstring::compare(type,"SQL_DECIMAL")) {
+		typenumber=SQL_DECIMAL;
+	} else if (!charstring::compare(type,"SQL_NUMERIC")) {
+		typenumber=SQL_NUMERIC;
+	} else if (!charstring::compare(type,"SQL_SMALLINT")) {
+		typenumber=SQL_SMALLINT;
+	} else if (!charstring::compare(type,"SQL_INTEGER")) {
+		typenumber=SQL_INTEGER;
+	} else if (!charstring::compare(type,"SQL_REAL")) {
+		typenumber=SQL_REAL;
+	} else if (!charstring::compare(type,"SQL_FLOAT")) {
+		typenumber=SQL_FLOAT;
+	} else if (!charstring::compare(type,"SQL_DOUBLE")) {
+		typenumber=SQL_DOUBLE;
+	} else if (!charstring::compare(type,"SQL_BIT")) {
+		typenumber=SQL_BIT;
+	} else if (!charstring::compare(type,"SQL_TINYINT")) {
+		typenumber=SQL_TINYINT;
+	} else if (!charstring::compare(type,"SQL_BIGINT")) {
+		typenumber=SQL_BIGINT;
+	} else if (!charstring::compare(type,"SQL_BINARY")) {
+		typenumber=SQL_BINARY;
+	} else if (!charstring::compare(type,"SQL_VARBINARY")) {
+		typenumber=SQL_VARBINARY;
+	} else if (!charstring::compare(type,"SQL_LONGVARBINARY")) {
+		typenumber=SQL_LONGVARBINARY;
+	} else if (!charstring::compare(type,"SQL_TYPE_DATE")) {
+		typenumber=SQL_TYPE_DATE;
+	} else if (!charstring::compare(type,"SQL_TYPE_TIME")) {
+		typenumber=SQL_TYPE_TIME;
+	} else if (!charstring::compare(type,"SQL_TYPE_TIMESTAMP")) {
+		typenumber=SQL_TYPE_TIMESTAMP;
+	#ifdef SQL_TYPE_UTCDATETIME
+	} else if (!charstring::compare(type,"SQL_TYPE_UTCDATETIME")) {
+		typenumber=SQL_TYPE_UTCDATETIME;
+	#endif
+	#ifdef SQL_TYPE_UTCTIME
+	} else if (!charstring::compare(type,"SQL_TYPE_UCTTIME")) {
+		typenumber=SQL_TYPE_UTCTIME;
+	#endif
+	} else if (!charstring::compare(type,"SQL_INTERVAL_MONTH")) {
+		typenumber=SQL_INTERVAL_MONTH;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_YEAR")) {
+		typenumber=SQL_INTERVAL_YEAR;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_YEAR_TO_MONTH")) {
+		typenumber=SQL_INTERVAL_YEAR_TO_MONTH;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY")) {
+		typenumber=SQL_INTERVAL_DAY;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_HOUR")) {
+		typenumber=SQL_INTERVAL_HOUR;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_MINUTE")) {
+		typenumber=SQL_INTERVAL_MINUTE;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_SECOND")) {
+		typenumber=SQL_INTERVAL_SECOND;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY_TO_HOUR")) {
+		typenumber=SQL_INTERVAL_DAY_TO_HOUR;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY_TO_MINUTE")) {
+		typenumber=SQL_INTERVAL_DAY_TO_MINUTE;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY_TO_SECOND")) {
+		typenumber=SQL_INTERVAL_DAY_TO_SECOND;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_HOUR_TO_MINUTE")) {
+		typenumber=SQL_INTERVAL_HOUR_TO_MINUTE;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_HOUR_TO_SECOND")) {
+		typenumber=SQL_INTERVAL_HOUR_TO_SECOND;
+	} else if (!charstring::compare(type,"SQL_INTERVAL_MINUTE_TO_SECOND")) {
+		typenumber=SQL_INTERVAL_MINUTE_TO_SECOND;
+	} else if (!charstring::compare(type,"SQL_GUID")) {
+		typenumber=SQL_GUID;
+	} else if (!charstring::compare(type,"*")) {
+		typenumber=SQL_ALL_TYPES;
+	}
+
+	// get the type list
+	erg=SQLGetTypeInfo(odbccur->stmt,typenumber);
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;

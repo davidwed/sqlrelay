@@ -6363,7 +6363,7 @@ SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT statementhandle,
 }
 
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
-					SQLSMALLINT DataType) {
+					SQLSMALLINT type) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -6372,16 +6372,155 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// This function isn't currently supported  We need to return success
-	// though as the JDBC-ODBC bridge really wants this function to work.
-	// It's ok if the the result set contains no data, but there has to at
-	// least be an empty result set.  So, we'll just run an erroneous
-	// query (which will return no result set) and pretend that it
-	// succeeded.
+	debugPrintf("  type: %d\n",type);
 
-	SQLR_SQLExecDirect(statementhandle,(SQLCHAR *)"",0);
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
 	SQLR_STMTClearError(stmt);
-	return SQL_SUCCESS;
+
+	// map the numeric type to a string
+	const char	*typestring="";
+	switch (type) {
+		case SQL_CHAR:
+			typestring="CHAR";
+			break;
+		case SQL_VARCHAR:
+			typestring="VARCHAR";
+			break;
+		case SQL_LONGVARCHAR:
+			typestring="LONGVARCHAR";
+			break;
+		case SQL_WCHAR:
+			typestring="WCHAR";
+			break;
+		case SQL_WVARCHAR:
+			typestring="WVARCHAR";
+			break;
+		case SQL_WLONGVARCHAR:
+			typestring="WLONGVARCHAR";
+			break;
+		case SQL_DECIMAL:
+			typestring="DECIMAL";
+			break;
+		case SQL_NUMERIC:
+			typestring="NUMERIC";
+			break;
+		case SQL_SMALLINT:
+			typestring="SMALLINT";
+			break;
+		case SQL_INTEGER:
+			typestring="INTEGER";
+			break;
+		case SQL_REAL:
+			typestring="REAL";
+			break;
+		case SQL_FLOAT:
+			typestring="FLOAT";
+			break;
+		case SQL_DOUBLE:
+			typestring="DOUBLE";
+			break;
+		case SQL_BIT:
+			typestring="BIT";
+			break;
+		case SQL_TINYINT:
+			typestring="TINYINT";
+			break;
+		case SQL_BIGINT:
+			typestring="BIGINT";
+			break;
+		case SQL_BINARY:
+			typestring="BINARY";
+			break;
+		case SQL_VARBINARY:
+			typestring="VARBINARY";
+			break;
+		case SQL_LONGVARBINARY:
+			typestring="LONGVARBINARY";
+			break;
+		case SQL_TYPE_DATE:
+			typestring="TYPE_DATE";
+			break;
+		case SQL_TYPE_TIME:
+			typestring="TYPE_TIME";
+			break;
+		case SQL_TYPE_TIMESTAMP:
+			typestring="TYPE_TIMESTAMP";
+			break;
+		#ifdef SQL_TYPE_UTCDATETIME
+		case SQL_TYPE_UTCDATETIME:
+			typestring="TYPE_UTCDATETIME";
+			break;
+		#endif
+		#ifdef SQL_TYPE_UTCTIME
+		case SQL_TYPE_UCTTIME:
+			typestring="TYPE_UTCTIME";
+			break;
+		#endif
+		case SQL_INTERVAL_MONTH:
+			typestring="INTERVAL_MONTH";
+			break;
+		case SQL_INTERVAL_YEAR:
+			typestring="INTERVAL_YEAR";
+			break;
+		case SQL_INTERVAL_YEAR_TO_MONTH:
+			typestring="INTERVAL_YEAR_TO_MONTH";
+			break;
+		case SQL_INTERVAL_DAY:
+			typestring="INTERVAL_DAY";
+			break;
+		case SQL_INTERVAL_HOUR:
+			typestring="INTERVAL_HOUR";
+			break;
+		case SQL_INTERVAL_MINUTE:
+			typestring="INTERVAL_MINUTE";
+			break;
+		case SQL_INTERVAL_SECOND:
+			typestring="INTERVAL_SECOND";
+			break;
+		case SQL_INTERVAL_DAY_TO_HOUR:
+			typestring="INTERVAL_DAY_TO_HOUR";
+			break;
+		case SQL_INTERVAL_DAY_TO_MINUTE:
+			typestring="INTERVAL_DAY_TO_MINUTE";
+			break;
+		case SQL_INTERVAL_DAY_TO_SECOND:
+			typestring="INTERVAL_DAY_TO_SECOND";
+			break;
+		case SQL_INTERVAL_HOUR_TO_MINUTE:
+			typestring="INTERVAL_HOUR_TO_MINUTE";
+			break;
+		case SQL_INTERVAL_HOUR_TO_SECOND:
+			typestring="INTERVAL_HOUR_TO_SECOND";
+			break;
+		case SQL_INTERVAL_MINUTE_TO_SECOND:
+			typestring="INTERVAL_MINUTE_TO_SECOND";
+			break;
+		case SQL_GUID:
+			typestring="GUID";
+			break;
+		case SQL_ALL_TYPES:
+			typestring="*";
+			break;
+		default:
+			typestring="";
+			break;
+	}
+
+	// get the type info
+	SQLRETURN	retval=(stmt->cur->getTypeInfoList(typestring,NULL,
+						SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
+
+	// the statement has been executed
+	stmt->executed=true;
+
+	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+	return retval;
 }
 
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
@@ -7475,9 +7614,6 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	//
 	// Also, we can use BuildTableName here, to build the procedure name.
 	stringbuffer	procedure;
-debugPrintf("catalog: %s (%d)\n",catalogname,namelength1);
-debugPrintf("schema:  %s (%d)\n",schemaname,namelength2);
-debugPrintf("proc:    %s (%d)\n",procedurename,namelength3);
 	if (!charstring::isNullOrEmpty(catalogname)) {
 		SQLR_BuildTableName(&procedure,catalogname,namelength1,
 					NULL,0,procedurename,namelength3);

@@ -22,7 +22,8 @@ enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_DATABASE_LIST,
 	SQLRCLIENTQUERYTYPE_TABLE_LIST,
 	SQLRCLIENTQUERYTYPE_COLUMN_LIST,
-	SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST
+	SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST,
+	SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST
 };
 
 class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
@@ -153,23 +154,24 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getColumnListCommand(sqlrservercursor *cursor);
 		bool	getProcedureBindAndColumnListCommand(
 						sqlrservercursor *cursor);
+		bool	getTypeInfoListCommand(sqlrservercursor *cursor);
 		bool	getListCommand(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
-					bool gettable);
+					bool getobject);
 		bool	getListByApiCall(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
-					const char *table,
+					const char *object,
 					const char *wild,
 					sqlrserverlistformat_t listformat);
 		bool	getListByQuery(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
-					const char *table,
+					const char *object,
 					const char *wild,
 					sqlrserverlistformat_t listformat);
 		bool	buildListQuery(sqlrservercursor *cursor,
 						const char *query,
 						const char *wild,
-						const char *table);
+						const char *object);
 		void	escapeParameter(stringbuffer *buffer,
 						const char *parameter);
 		bool	getQueryTreeCommand(sqlrservercursor *cursor);
@@ -550,8 +552,11 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 			cont->incrementGetColumnListCount();
 			loop=getColumnListCommand(cursor);
 		} else if (command==GETPROCEDUREBINDANDCOLUMNLIST) {
-			//cont->incrementGetColumnListCount();
+			//cont->incrementGetProcedureBindAndColumnListCount();
 			loop=getProcedureBindAndColumnListCommand(cursor);
+		} else if (command==GETTYPEINFOLIST) {
+			//cont->incrementGetTypeInfoListCount();
+			loop=getTypeInfoListCommand(cursor);
 		} else if (command==GET_QUERY_TREE) {
 			cont->incrementGetQueryTreeCount();
 			loop=getQueryTreeCommand(cursor);
@@ -702,6 +707,7 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 		command==GETTABLELIST ||
 		command==GETCOLUMNLIST ||
 		command==GETPROCEDUREBINDANDCOLUMNLIST ||
+		command==GETTYPEINFOLIST ||
 		command==ABORT_RESULT_SET ||
 		command==GET_QUERY_TREE ||
 		command==GET_TRANSLATED_QUERY) {
@@ -3100,10 +3106,19 @@ bool sqlrprotocol_sqlrclient::getProcedureBindAndColumnListCommand(
 	return retval;
 }
 
+bool sqlrprotocol_sqlrclient::getTypeInfoListCommand(sqlrservercursor *cursor) {
+	debugFunction();
+	cont->raiseDebugMessageEvent("get type info list...");
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST,true);
+	cont->raiseDebugMessageEvent("done getting type info list");
+	return retval;
+}
+
 
 bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
-					bool gettable) {
+					bool getobject) {
 	debugFunction();
 
 	// if we're using a custom cursor then close it
@@ -3140,7 +3155,8 @@ bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 		debugstr.clear();
 		debugstr.append("get list failed: wild length too large: ");
 		debugstr.append(wildlen);
-		cont->raiseClientProtocolErrorEvent(cursor,debugstr.getString(),1);
+		cont->raiseClientProtocolErrorEvent(
+					cursor,debugstr.getString(),1);
 		return false;
 	}
 
@@ -3157,53 +3173,54 @@ bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 	}
 	wild[wildlen]='\0';
 
-	// read the table parameter into the buffer
-	char	*table=NULL;
-	if (gettable) {
+	// read the object parameter into the buffer
+	char	*object=NULL;
+	if (getobject) {
 
-		// get length of table parameter
-		uint32_t	tablelen;
-		result=clientsock->read(&tablelen,idleclienttimeout,0);
+		// get length of object parameter
+		uint32_t	objectlen;
+		result=clientsock->read(&objectlen,idleclienttimeout,0);
 		if (result!=sizeof(uint32_t)) {
 			cont->raiseClientProtocolErrorEvent(cursor,
 					"get list failed: "
-					"failed to get table length",result);
+					"failed to get object length",result);
 			return false;
 		}
 
 		// bounds checking
-		if (tablelen>maxquerysize) {
+		if (objectlen>maxquerysize) {
 			debugstr.clear();
 			debugstr.append("get list failed: "
-					"table length too large: ");
-			debugstr.append(tablelen);
+					"object length too large: ");
+			debugstr.append(objectlen);
 			cont->raiseClientProtocolErrorEvent(
 					cursor,debugstr.getString(),1);
 			return false;
 		}
 
-		// read the table parameter into the buffer
-		table=new char[tablelen+1];
-		if (tablelen) {
-			result=clientsock->read(table,tablelen,
+		// read the object parameter into the buffer
+		object=new char[objectlen+1];
+		if (objectlen) {
+			result=clientsock->read(object,objectlen,
 						idleclienttimeout,0);
-			if ((uint32_t)result!=tablelen) {
+			if ((uint32_t)result!=objectlen) {
 				cont->raiseClientProtocolErrorEvent(cursor,
 					"get list failed: "
-					"failed to get table parameter",result);
+					"failed to get object parameter",
+					result);
 				return false;
 			}
 		}
-		table[tablelen]='\0';
+		object[objectlen]='\0';
 
 		// some apps aren't well behaved, trim spaces off of both sides
-		charstring::bothTrim(table);
+		charstring::bothTrim(object);
 
-		// translate table name, if necessary
-		const char	*newtable=cont->translateTableName(table);
-		if (newtable) {
-			delete[] table;
-			table=charstring::duplicate(newtable);
+		// translate object name, if necessary
+		const char	*newobject=cont->translateTableName(object);
+		if (newobject) {
+			delete[] object;
+			object=charstring::duplicate(newobject);
 		}
 	}
 
@@ -3215,23 +3232,23 @@ bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 	// get the list and return it
 	bool	retval=true;
 	if (cont->getListsByApiCalls()) {
-		retval=getListByApiCall(cursor,querytype,table,wild,
+		retval=getListByApiCall(cursor,querytype,object,wild,
 					(sqlrserverlistformat_t)listformat);
 	} else {
-		retval=getListByQuery(cursor,querytype,table,wild,
+		retval=getListByQuery(cursor,querytype,object,wild,
 					(sqlrserverlistformat_t)listformat);
 	}
 
 	// clean up
 	delete[] wild;
-	delete[] table;
+	delete[] object;
 
 	return retval;
 }
 
 bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
-					const char *table,
+					const char *object,
 					const char *wild,
 					sqlrserverlistformat_t listformat) {
 	debugFunction();
@@ -3251,14 +3268,17 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 			break;
 		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
 			cont->setColumnListColumnMap(listformat);
-			success=cont->getColumnList(cursor,table,wild);
+			success=cont->getColumnList(cursor,object,wild);
 			break;
 		case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
 			cont->setProcedureBindAndColumnListColumnMap(
 								listformat);
 			success=cont->getProcedureBindAndColumnList(
-							cursor,table,wild);
+							cursor,object,wild);
 			break;
+		case SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST:
+			cont->setTypeInfoListColumnMap(listformat);
+			success=cont->getTypeInfoList(cursor,object,wild);
 		default:
 			break;
 	}
@@ -3296,7 +3316,7 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 
 bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
-					const char *table,
+					const char *object,
 					const char *wild,
 					sqlrserverlistformat_t listformat) {
 	debugFunction();
@@ -3312,18 +3332,21 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 			query=cont->getTableListQuery(havewild);
 			break;
 		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
-			query=cont->getColumnListQuery(table,havewild);
+			query=cont->getColumnListQuery(object,havewild);
 			break;
 		case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
 			query=cont->getProcedureBindAndColumnListQuery(
-							table,havewild);
+							object,havewild);
+			break;
+		case SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST:
+			query=cont->getTypeInfoListQuery(object,havewild);
 			break;
 		default:
 			break;
 	}
 
 	// FIXME: this can fail
-	buildListQuery(cursor,query,wild,table);
+	buildListQuery(cursor,query,wild,object);
 
 	return processQueryOrBindCursor(cursor,querytype,
 					listformat,false,false);
@@ -3332,28 +3355,28 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 bool sqlrprotocol_sqlrclient::buildListQuery(sqlrservercursor *cursor,
 						const char *query,
 						const char *wild,
-						const char *table) {
+						const char *object) {
 	debugFunction();
 
 	// clean up buffers to avoid SQL injection
 	stringbuffer	wildbuf;
 	escapeParameter(&wildbuf,wild);
-	stringbuffer	tablebuf;
-	escapeParameter(&tablebuf,table);
+	stringbuffer	objectbuf;
+	escapeParameter(&objectbuf,object);
 
 	// bounds checking
 	cont->setQueryLength(cursor,charstring::length(query)+
 					wildbuf.getStringLength()+
-					tablebuf.getStringLength());
+					objectbuf.getStringLength());
 	if (cont->getQueryLength(cursor)>maxquerysize) {
 		return false;
 	}
 
 	// fill the query buffer and update the length
 	char	*querybuffer=cont->getQueryBuffer(cursor);
-	if (tablebuf.getStringLength()) {
+	if (objectbuf.getStringLength()) {
 		charstring::printf(querybuffer,maxquerysize+1,
-						query,tablebuf.getString(),
+						query,objectbuf.getString(),
 						wildbuf.getString());
 	} else {
 		charstring::printf(querybuffer,maxquerysize+1,

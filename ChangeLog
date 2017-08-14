@@ -121,6 +121,7 @@
 		to be duplicated if columns were not bound
 	added --disable-wall and --disable-werror configure options
 	added minimal passthrough implementation of ODBC SQLProcedureColumns
+	added minimal passthrough implementation of ODBC SQLGetTypeInfo
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

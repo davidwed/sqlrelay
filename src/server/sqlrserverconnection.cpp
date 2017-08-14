@@ -658,6 +658,12 @@ bool sqlrserverconnection::getProcedureBindAndColumnList(
 	return false;
 }
 
+bool sqlrserverconnection::getTypeInfoList(sqlrservercursor *cursor,
+						const char *type,
+						const char *wild) {
+	return false;
+}
+
 const char *sqlrserverconnection::getDatabaseListQuery(bool wild) {
 	return "select 1";
 }
@@ -677,6 +683,11 @@ const char *sqlrserverconnection::getColumnListQuery(const char *table,
 
 const char *sqlrserverconnection::getProcedureBindAndColumnListQuery(
 							const char *procedure,
+							bool wild) {
+	return "select 1";
+}
+
+const char *sqlrserverconnection::getTypeInfoListQuery(const char *type,
 							bool wild) {
 	return "select 1";
 }
