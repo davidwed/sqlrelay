@@ -3288,13 +3288,8 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		{
 			debugPrintf("  attribute: SQL_CURRENT_QUALIFIER/"
 						"SQL_ATTR_CURRENT_CATALOG\n");
-			debugPrintf("  buffer length: %d\n",bufferlength);
 			const char	*db=conn->con->getCurrentDatabase();
-			debugPrintf("  conn=%08x\n",conn);
-			debugPrintf("  con=%08x\n",conn->con);
-			debugPrintf("  db=%s\n",db);
 			SQLINTEGER	stringlen=charstring::length(db);
-			debugPrintf("  stringlen: %d\n",stringlen);
 			charstring::safeCopy((char *)value,bufferlength,
 								db,stringlen);
 			if (stringlength) {
@@ -7467,6 +7462,9 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	//
 	// Also, we can use BuildTableName here, to build the procedure name.
 	stringbuffer	procedure;
+debugPrintf("catalog: %s (%d)\n",catalogname,namelength1);
+debugPrintf("schema:  %s (%d)\n",schemaname,namelength2);
+debugPrintf("proc:    %s (%d)\n",procedurename,namelength3);
 	if (!charstring::isNullOrEmpty(catalogname)) {
 		SQLR_BuildTableName(&procedure,catalogname,namelength1,
 					NULL,0,procedurename,namelength3);
