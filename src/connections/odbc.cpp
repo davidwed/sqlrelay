@@ -695,24 +695,35 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
-	// SQLColumns takes non-const arguments, so we have to make
+	// SQLProcedureColumns takes non-const arguments, so we have to make
 	// copies of the various arguments that we want to pass in.
 	char	*wildcopy=charstring::duplicate(wild);
 	char	*procedurecopy=charstring::duplicate(procedure);
-	char	*empty=new char[1];
-	empty[0]='\0';
+
+	// SQLColumns interprets an empty or NULL column name as meaning
+	// "all columns".  SQLProcedureColumns interprtes an empty column name
+	// as meaning "no columns" and a NULL as meaning "all columns".  At
+	// least with the MS SQL Server driver.  For consistency, we'll make
+	// empty work the same as NULL by mapping empty to NULL here.
+	if (wildcopy[0]=='\0') {
+		delete[] wildcopy;
+		wildcopy=NULL;
+	}
 
 	// get the column list
-stdoutput.printf("%s,%s\n",procedurecopy,wildcopy);
 	erg=SQLProcedureColumns(odbccur->stmt,
-			(SQLCHAR *)empty,SQL_NTS,
-			(SQLCHAR *)empty,SQL_NTS,
+			// SQLProcedureColumns wants NULL instead of empty
+			// for these parameters, to indicate the current
+			// catalog and schema.  It interprets empty as meaning
+			// outside of any catalog or schema.
+			(SQLCHAR *)NULL,0,
+			(SQLCHAR *)NULL,0,
 			(SQLCHAR *)procedurecopy,
 			charstring::length(procedurecopy),
 			(SQLCHAR *)wildcopy,
-			charstring::length(wildcopy));
+			charstring::length(wildcopy)
+			);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-	delete[] empty;
 	delete[] wildcopy;
 	delete[] procedurecopy;
 

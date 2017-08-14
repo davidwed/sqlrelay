@@ -3314,6 +3314,10 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
 			query=cont->getColumnListQuery(table,havewild);
 			break;
+		case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
+			query=cont->getProcedureBindAndColumnListQuery(
+							table,havewild);
+			break;
 		default:
 			break;
 	}
