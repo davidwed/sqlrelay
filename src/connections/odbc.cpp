@@ -780,87 +780,94 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 	// map the string type to a number
 	// FIXME: this will be slooowwww... improve it
 	SQLSMALLINT	typenumber=-1;
-	if (!charstring::compare(type,"SQL_CHAR")) {
+	if (!charstring::compareIgnoringCase(type,"CHAR")) {
 		typenumber=SQL_CHAR;
-	} else if (!charstring::compare(type,"SQL_VARCHAR")) {
+	} else if (!charstring::compareIgnoringCase(type,"VARCHAR")) {
 		typenumber=SQL_VARCHAR;
-	} else if (!charstring::compare(type,"SQL_LONGVARCHAR")) {
+	} else if (!charstring::compareIgnoringCase(type,"LONGVARCHAR")) {
 		typenumber=SQL_LONGVARCHAR;
-	} else if (!charstring::compare(type,"SQL_WCHAR")) {
+	} else if (!charstring::compareIgnoringCase(type,"WCHAR")) {
 		typenumber=SQL_WCHAR;
-	} else if (!charstring::compare(type,"SQL_WVARCHAR")) {
+	} else if (!charstring::compareIgnoringCase(type,"WVARCHAR")) {
 		typenumber=SQL_WVARCHAR;
-	} else if (!charstring::compare(type,"SQL_WLONGVARCHAR")) {
+	} else if (!charstring::compareIgnoringCase(type,"WLONGVARCHAR")) {
 		typenumber=SQL_WLONGVARCHAR;
-	} else if (!charstring::compare(type,"SQL_DECIMAL")) {
+	} else if (!charstring::compareIgnoringCase(type,"DECIMAL")) {
 		typenumber=SQL_DECIMAL;
-	} else if (!charstring::compare(type,"SQL_NUMERIC")) {
+	} else if (!charstring::compareIgnoringCase(type,"NUMERIC")) {
 		typenumber=SQL_NUMERIC;
-	} else if (!charstring::compare(type,"SQL_SMALLINT")) {
+	} else if (!charstring::compareIgnoringCase(type,"SMALLINT")) {
 		typenumber=SQL_SMALLINT;
-	} else if (!charstring::compare(type,"SQL_INTEGER")) {
+	} else if (!charstring::compareIgnoringCase(type,"INTEGER")) {
 		typenumber=SQL_INTEGER;
-	} else if (!charstring::compare(type,"SQL_REAL")) {
+	} else if (!charstring::compareIgnoringCase(type,"REAL")) {
 		typenumber=SQL_REAL;
-	} else if (!charstring::compare(type,"SQL_FLOAT")) {
+	} else if (!charstring::compareIgnoringCase(type,"FLOAT")) {
 		typenumber=SQL_FLOAT;
-	} else if (!charstring::compare(type,"SQL_DOUBLE")) {
+	} else if (!charstring::compareIgnoringCase(type,"DOUBLE")) {
 		typenumber=SQL_DOUBLE;
-	} else if (!charstring::compare(type,"SQL_BIT")) {
+	} else if (!charstring::compareIgnoringCase(type,"BIT")) {
 		typenumber=SQL_BIT;
-	} else if (!charstring::compare(type,"SQL_TINYINT")) {
+	} else if (!charstring::compareIgnoringCase(type,"TINYINT")) {
 		typenumber=SQL_TINYINT;
-	} else if (!charstring::compare(type,"SQL_BIGINT")) {
+	} else if (!charstring::compareIgnoringCase(type,"BIGINT")) {
 		typenumber=SQL_BIGINT;
-	} else if (!charstring::compare(type,"SQL_BINARY")) {
+	} else if (!charstring::compareIgnoringCase(type,"BINARY")) {
 		typenumber=SQL_BINARY;
-	} else if (!charstring::compare(type,"SQL_VARBINARY")) {
+	} else if (!charstring::compareIgnoringCase(type,"VARBINARY")) {
 		typenumber=SQL_VARBINARY;
-	} else if (!charstring::compare(type,"SQL_LONGVARBINARY")) {
+	} else if (!charstring::compareIgnoringCase(type,"LONGVARBINARY")) {
 		typenumber=SQL_LONGVARBINARY;
-	} else if (!charstring::compare(type,"SQL_TYPE_DATE")) {
+	} else if (!charstring::compareIgnoringCase(type,"TYPE_DATE")) {
 		typenumber=SQL_TYPE_DATE;
-	} else if (!charstring::compare(type,"SQL_TYPE_TIME")) {
+	} else if (!charstring::compareIgnoringCase(type,"TYPE_TIME")) {
 		typenumber=SQL_TYPE_TIME;
-	} else if (!charstring::compare(type,"SQL_TYPE_TIMESTAMP")) {
+	} else if (!charstring::compareIgnoringCase(type,"TYPE_TIMESTAMP")) {
 		typenumber=SQL_TYPE_TIMESTAMP;
 	#ifdef SQL_TYPE_UTCDATETIME
-	} else if (!charstring::compare(type,"SQL_TYPE_UTCDATETIME")) {
+	} else if (!charstring::compareIgnoringCase(type,"TYPE_UTCDATETIME")) {
 		typenumber=SQL_TYPE_UTCDATETIME;
 	#endif
 	#ifdef SQL_TYPE_UTCTIME
-	} else if (!charstring::compare(type,"SQL_TYPE_UCTTIME")) {
+	} else if (!charstring::compareIgnoringCase(type,"TYPE_UCTTIME")) {
 		typenumber=SQL_TYPE_UTCTIME;
 	#endif
-	} else if (!charstring::compare(type,"SQL_INTERVAL_MONTH")) {
+	} else if (!charstring::compareIgnoringCase(type,"INTERVAL_MONTH")) {
 		typenumber=SQL_INTERVAL_MONTH;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_YEAR")) {
+	} else if (!charstring::compareIgnoringCase(type,"INTERVAL_YEAR")) {
 		typenumber=SQL_INTERVAL_YEAR;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_YEAR_TO_MONTH")) {
+	} else if (!charstring::compareIgnoringCase(
+					type,"INTERVAL_YEAR_TO_MONTH")) {
 		typenumber=SQL_INTERVAL_YEAR_TO_MONTH;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY")) {
+	} else if (!charstring::compareIgnoringCase(type,"INTERVAL_DAY")) {
 		typenumber=SQL_INTERVAL_DAY;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_HOUR")) {
+	} else if (!charstring::compareIgnoringCase(type,"INTERVAL_HOUR")) {
 		typenumber=SQL_INTERVAL_HOUR;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_MINUTE")) {
+	} else if (!charstring::compareIgnoringCase(type,"INTERVAL_MINUTE")) {
 		typenumber=SQL_INTERVAL_MINUTE;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_SECOND")) {
+	} else if (!charstring::compareIgnoringCase(type,"INTERVAL_SECOND")) {
 		typenumber=SQL_INTERVAL_SECOND;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY_TO_HOUR")) {
+	} else if (!charstring::compareIgnoringCase(
+					type,"INTERVAL_DAY_TO_HOUR")) {
 		typenumber=SQL_INTERVAL_DAY_TO_HOUR;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY_TO_MINUTE")) {
+	} else if (!charstring::compareIgnoringCase(
+					type,"INTERVAL_DAY_TO_MINUTE")) {
 		typenumber=SQL_INTERVAL_DAY_TO_MINUTE;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_DAY_TO_SECOND")) {
+	} else if (!charstring::compareIgnoringCase(
+					type,"INTERVAL_DAY_TO_SECOND")) {
 		typenumber=SQL_INTERVAL_DAY_TO_SECOND;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_HOUR_TO_MINUTE")) {
+	} else if (!charstring::compareIgnoringCase(
+					type,"INTERVAL_HOUR_TO_MINUTE")) {
 		typenumber=SQL_INTERVAL_HOUR_TO_MINUTE;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_HOUR_TO_SECOND")) {
+	} else if (!charstring::compareIgnoringCase(
+					type,"INTERVAL_HOUR_TO_SECOND")) {
 		typenumber=SQL_INTERVAL_HOUR_TO_SECOND;
-	} else if (!charstring::compare(type,"SQL_INTERVAL_MINUTE_TO_SECOND")) {
+	} else if (!charstring::compareIgnoringCase(
+					type,"INTERVAL_MINUTE_TO_SECOND")) {
 		typenumber=SQL_INTERVAL_MINUTE_TO_SECOND;
-	} else if (!charstring::compare(type,"SQL_GUID")) {
+	} else if (!charstring::compareIgnoringCase(type,"GUID")) {
 		typenumber=SQL_GUID;
-	} else if (!charstring::compare(type,"*")) {
+	} else if (!charstring::compareIgnoringCase(type,"*")) {
 		typenumber=SQL_ALL_TYPES;
 	}
 
