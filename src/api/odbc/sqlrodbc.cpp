@@ -3288,8 +3288,10 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		{
 			debugPrintf("  attribute: SQL_CURRENT_QUALIFIER/"
 						"SQL_ATTR_CURRENT_CATALOG\n");
+			debugPrintf("  buffer length: %d\n",bufferlength);
 			const char	*db=conn->con->getCurrentDatabase();
 			*stringlength=charstring::length(db);
+			debugPrintf("  string length: %d\n",*stringlength);
 			charstring::safeCopy((char *)value,bufferlength,
 							db,*stringlength);
 			debugPrintf("    current catalog: %s\n",db);
