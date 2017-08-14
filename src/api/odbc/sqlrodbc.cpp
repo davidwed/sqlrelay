@@ -3290,10 +3290,16 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 						"SQL_ATTR_CURRENT_CATALOG\n");
 			debugPrintf("  buffer length: %d\n",bufferlength);
 			const char	*db=conn->con->getCurrentDatabase();
-			*stringlength=charstring::length(db);
-			debugPrintf("  string length: %d\n",*stringlength);
+			debugPrintf("  conn=%08x\n",conn);
+			debugPrintf("  con=%08x\n",conn->con);
+			debugPrintf("  db=%s\n",db);
+			SQLINTEGER	stringlen=charstring::length(db);
+			debugPrintf("  stringlen: %d\n",stringlen);
 			charstring::safeCopy((char *)value,bufferlength,
-							db,*stringlength);
+								db,stringlen);
+			if (stringlength) {
+				*stringlength=stringlen;
+			}
 			debugPrintf("    current catalog: %s\n",db);
 			return SQL_SUCCESS;
 		}
