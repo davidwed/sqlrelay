@@ -4542,8 +4542,8 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLPROCEDURECOLUMNS:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLPROCEDURECOLUMNS "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLPROCEDURES:
 			debugPrintf("  functionid: "
@@ -7412,14 +7412,14 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 }
 
 SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
-					SQLCHAR *szCatalogName,
-					SQLSMALLINT cbCatalogName,
-					SQLCHAR *szSchemaName,
-					SQLSMALLINT cbSchemaName,
-					SQLCHAR *szProcName,
-					SQLSMALLINT cbProcName,
-					SQLCHAR *szColumnName,
-					SQLSMALLINT cbColumnName) {
+					SQLCHAR *catalogname,
+					SQLSMALLINT namelength1,
+					SQLCHAR *schemaname,
+					SQLSMALLINT namelength2,
+					SQLCHAR *procedurename,
+					SQLSMALLINT namelength3,
+					SQLCHAR *columnname,
+					SQLSMALLINT namelength4) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -7428,11 +7428,77 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported
-	SQLR_STMTSetError(stmt,
-			"Driver does not support this function",0,"IM001");
+	// FIXME: this code treats xxxname as a search pattern in all cases
+	// xxxname is a case-insensitive search pattern if:
+	// * SQL_ODBC_VERSION is SQL_OV_ODBC3
+	// * SQL_ATTR_METADATA_ID is SQL_FALSE
+	// otherwise it's a case-insensitive literal
 
-	return SQL_ERROR;
+	// FIXME: I suspect I'll be revisiting this in the future...
+	//
+	// SQLGetConnectAttr(SQL_ATTR_CURRENT_CATALOG) returns the
+	// "current db name".  In most db's, this is the instance but in others
+	// (Oracle) it's the schema.  Most db's don't have a concept of
+	// instance.schema.procedure though, just instance.procedure or
+	// schema.procedure so the two are usually interchangeable.
+	//
+	// Since this function supports all three (but calls the instance the
+	// catalog), an app might pass in "the current catalog" as either the
+	// catalog name or the schema name.
+	//
+	// If it's passed in as the catalog, what would the app pass in as the
+	// schema?  Maybe nothing.  But maybe, erroneously, the user it used
+	// to log into SQL Relay.  The Oracle Heterogenous Agent does this.
+	//
+	// A workaround it to use either the catalog, or the schema, but not
+	// both, and prefer the catalog.
+	//
+	// Unfortunately, I'll bet that there are apps out there that need to
+	// use both, and I'll bet that I'll be revisiting this code someday.
+	//
+	//
+	// Also, we can use BuildTableName here, to build the procedure name.
+	stringbuffer	procedure;
+	if (!charstring::isNullOrEmpty(catalogname)) {
+		SQLR_BuildTableName(&procedure,catalogname,namelength1,
+					NULL,0,procedurename,namelength3);
+	} else if (!charstring::isNullOrEmpty(schemaname)) {
+		SQLR_BuildTableName(&procedure,NULL,0,
+					schemaname,namelength2,
+					procedurename,namelength3);
+	} else {
+		SQLR_BuildTableName(&procedure,NULL,0,NULL,0,
+					procedurename,namelength3);
+	}
+
+	if (namelength4==SQL_NTS) {
+		namelength4=charstring::length(columnname);
+	}
+	char	*wild=charstring::duplicate(
+				(const char *)columnname,namelength4);
+	if (!charstring::compare(wild,"%")) {
+		delete[] wild;
+		wild=NULL;
+	}
+
+	debugPrintf("  procedure: %s\n",procedure.getString());
+	debugPrintf("  wild: %s\n",(wild)?wild:"");
+
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
+	SQLR_STMTClearError(stmt);
+
+	SQLRETURN	retval=
+		(stmt->cur->getProcedureBindAndColumnList(
+						procedure.getString(),wild,
+						SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
+	delete[] wild;
+	return retval;
 }
 
 SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,

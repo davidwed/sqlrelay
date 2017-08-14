@@ -668,7 +668,7 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	erg=SQLColumns(odbccur->stmt,
 			(SQLCHAR *)empty,SQL_NTS,
 			(SQLCHAR *)empty,SQL_NTS,
-			(SQLCHAR *)table,charstring::length(tablecopy),
+			(SQLCHAR *)tablecopy,charstring::length(tablecopy),
 			(SQLCHAR *)wildcopy,charstring::length(wildcopy));
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 	delete[] empty;
@@ -703,11 +703,14 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	empty[0]='\0';
 
 	// get the column list
+stdoutput.printf("%s,%s\n",procedurecopy,wildcopy);
 	erg=SQLProcedureColumns(odbccur->stmt,
 			(SQLCHAR *)empty,SQL_NTS,
 			(SQLCHAR *)empty,SQL_NTS,
-			(SQLCHAR *)procedure,charstring::length(procedurecopy),
-			(SQLCHAR *)wildcopy,charstring::length(wildcopy));
+			(SQLCHAR *)procedurecopy,
+			charstring::length(procedurecopy),
+			(SQLCHAR *)wildcopy,
+			charstring::length(wildcopy));
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 	delete[] empty;
 	delete[] wildcopy;

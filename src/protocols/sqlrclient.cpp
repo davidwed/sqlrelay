@@ -701,6 +701,7 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 		command==GETDBLIST ||
 		command==GETTABLELIST ||
 		command==GETCOLUMNLIST ||
+		command==GETPROCEDUREBINDANDCOLUMNLIST ||
 		command==ABORT_RESULT_SET ||
 		command==GET_QUERY_TREE ||
 		command==GET_TRANSLATED_QUERY) {
