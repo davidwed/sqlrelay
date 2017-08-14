@@ -3009,6 +3009,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	uint64_t	rowstofetch=stmt->cur->getResultSetBufferSize();
 	uint64_t	rowsfetched=0;
 	if (fetchresult==SQL_NO_DATA_FOUND) {
+		debugPrintf("  NO DATA FOUND\n");
 		rowsfetched=0;
 	} else if (rowstofetch) {
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
