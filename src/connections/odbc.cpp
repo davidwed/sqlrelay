@@ -77,7 +77,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						uint16_t variablesize,
 						const char *value, 
 						uint32_t valuesize,
-						uint16_t *isnull);
+						int16_t *isnull);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
@@ -1027,7 +1027,8 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				const char *value,
 				uint32_t valuesize,
-				uint16_t *isnull) {
+				int16_t *isnull) {
+stdoutput.printf("inputBind(%s,%s)\n",variable,value);
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
