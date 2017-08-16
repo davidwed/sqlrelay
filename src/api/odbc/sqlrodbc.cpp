@@ -5233,6 +5233,32 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_STRING_FUNCTIONS:
 			debugPrintf("  unsupported infotype: "
 					"SQL_STRING_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=SQL_FN_STR_CONCAT|
+						SQL_FN_STR_INSERT|
+						SQL_FN_STR_LEFT|
+						SQL_FN_STR_LTRIM|
+						SQL_FN_STR_LENGTH|
+						SQL_FN_STR_LOCATE|
+						SQL_FN_STR_LCASE|
+						SQL_FN_STR_REPEAT|
+						SQL_FN_STR_REPLACE|
+						SQL_FN_STR_RIGHT|
+						SQL_FN_STR_RTRIM|
+						SQL_FN_STR_SUBSTRING|
+						SQL_FN_STR_UCASE|
+						SQL_FN_STR_ASCII|
+						SQL_FN_STR_CHAR|
+						SQL_FN_STR_DIFFERENCE|
+						SQL_FN_STR_LOCATE_2|
+						SQL_FN_STR_SOUNDEX|
+						SQL_FN_STR_SPACE|
+						SQL_FN_STR_BIT_LENGTH|
+						SQL_FN_STR_CHAR_LENGTH|
+						SQL_FN_STR_CHARACTER_LENGTH|
+						SQL_FN_STR_OCTET_LENGTH|
+						SQL_FN_STR_POSITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_SYSTEM_FUNCTIONS:
 			debugPrintf("  unsupported infotype: "
@@ -8294,15 +8320,16 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 			debugPrintf("  parametertype: "
 						"SQL_PARAM_INPUT_OUTPUT\n");
 			// FIXME: SQL Relay doesn't currently support in/out
-			// params, and some apps pass input params as in/out.
+			// params, and some apps pass output params as in/out.
 			// So, for now we'll just pass an in/out param as an
-			// in param.
-			return SQLR_InputBindParameter(statementhandle,
+			// out param.
+			return SQLR_OutputBindParameter(statementhandle,
 							parameternumber,
 							valuetype,
 							lengthprecision,
 							parameterscale,
 							parametervalue,
+							bufferlength,
 							strlen_or_ind);
 		case SQL_PARAM_OUTPUT:
 			debugPrintf("  parametertype: "
