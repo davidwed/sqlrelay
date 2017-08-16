@@ -1917,10 +1917,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("		returns a list of column metadata for the table \"table\"\n");
 	stdoutput.printf("	fields table				-\n");
 	stdoutput.printf("		returns a list of column names for the table \"table\"\n\n");
-	stdoutput.printf("	show procedure binds and columns in procedure [like pattern]	-\n");
-	stdoutput.printf("		returns a list of bind/column metadata for \"procedure\"\n");
-	stdoutput.printf("	show type info for type	-\n");
-	stdoutput.printf("		returns type info for \"type\"\n");
+	// FIXME: document show type info/show procedure binds and columns
 	stdoutput.printf("	setclientinfo info	- sets the client info\n");
 	stdoutput.printf("	getclientinfo		- displays the client info\n\n");
 	stdoutput.printf("	setresultsetbuffersize size	- fetch size rows at a time\n");

@@ -3,7 +3,7 @@
 	implemented getCurrentDatabase for odbc connections
 	implemented selectDatabaseQuery for odbc connections
 	added NCHAR, NVARCHAR, NTEXT, XML, and DATETIMEOFFSET types, updated
-		odbc connection to recognize them
+		odbc connection module to recognize them
 	added --with-windows-version to configure.vbs
 	enabled "liveconnection" test for "Lost connection to MySQL server
 		during query" error
@@ -11,8 +11,20 @@
 	added missing mapColumn() call to sqlrservercontroller::getField()
 	fixed var directories in Windows deployment projects
 	added run-as-Admin requirement to Windows installer
-	various obscure ODBC fixes
-	fixed odbccursor::outputBind() signature
+	implemented ODBC SQLProcedureColumns and SQLGetTypeInfo (currently
+		only works when using the ODBC driver and an odbc connection
+		module)
+	ODBC SQLProcedureColumns/SQLColumns/SQLTables/SQLGetTypeInfo properly
+		set the error now if there was one.
+	ODBC SQLError properly cycles through the error records now
+	updated ODBC SQLGetInfo(SQL_DRIVER_ODBC_VER) to return a value
+		corresponding to the value set by
+		SQLSetAttrInfo(SQL_ATTR_ODBC_VERSION)
+	fixed string outputBind() signature in odbc connection module
+	fixed a couple of short -> int16_t/uint16_t errors in odbc and mysql
+		connection modules
+	ODBC SQLBindParameter(in/out) calls outputBind() now, to work with
+		apps like Delphi which broadly use in/out for out parameters
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
@@ -122,8 +134,6 @@
 	fixed another subtle bug in the ODBC driver that caused the first row
 		to be duplicated if columns were not bound
 	added --disable-wall and --disable-werror configure options
-	added minimal passthrough implementation of ODBC SQLProcedureColumns
-	added minimal passthrough implementation of ODBC SQLGetTypeInfo
 
 1.0.0 - updated md5 pwdenc to use rudiments md5 class
 	solved a long-standing hang that could occur if the database password

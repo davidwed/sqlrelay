@@ -11,6 +11,7 @@
 		void	clearColumns();
 		void	clearRows();
 		void	clearVariables();
+		void	clearVariables(bool clearbinds);
 		void	deleteSubstitutionVariables();
 		void	deleteInputBindVariables();
 		void	deleteOutputBindVariables();
@@ -161,5 +162,7 @@
 					const char *type,
 					const char *wild,
 					sqlrclientlistformat_t listformat);
+		void		clearBindsDuringPrepare();
+		void		dontClearBindsDuringPrepare();
 
 	friend class sqlrconnection;

@@ -220,6 +220,7 @@ class sqlrcursorprivate {
 		dynamicarray<sqlrclientbindvar>	*_outbindvars;
 		bool				_validatebinds;
 		bool				_dirtybinds;
+		bool				_clearbindsduringprepare;
 
 		// result set
 		uint64_t	_rsbuffersize;
@@ -411,6 +412,7 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 					OPTIMISTIC_BIND_COUNT,16);
 	pvt->_outbindvars=new dynamicarray<sqlrclientbindvar>(
 					OPTIMISTIC_BIND_COUNT,16);
+	pvt->_clearbindsduringprepare=true;
 	clearVariables();
 }
 
@@ -1067,7 +1069,7 @@ void sqlrcursor::prepareQuery(const char *query, uint32_t length) {
 	pvt->_reexecute=false;
 	pvt->_validatebinds=false;
 	pvt->_resumed=false;
-	clearVariables();
+	clearVariables(pvt->_clearbindsduringprepare);
 	pvt->_querylen=length;
 	if (pvt->_copyrefs) {
 		initQueryBuffer(pvt->_querylen);
@@ -1205,11 +1207,17 @@ uint16_t sqlrcursor::countBindVariables() const {
 }
 
 void sqlrcursor::clearVariables() {
+	return clearVariables(true);
+}
+
+void sqlrcursor::clearVariables(bool clearbinds) {
 	deleteSubstitutionVariables();
 	pvt->_subvars->clear();
 	pvt->_dirtysubs=false;
-	pvt->_dirtybinds=false;
-	clearBinds();
+	if (clearbinds) {
+		pvt->_dirtybinds=false;
+		clearBinds();
+	}
 }
 
 void sqlrcursor::deleteVariables() {
@@ -5311,4 +5319,12 @@ sqlrcursor *sqlrcursor::next() {
 
 void sqlrcursor::havecursorid(bool havecursorid) {
 	pvt->_havecursorid=havecursorid;
+}
+
+void sqlrcursor::clearBindsDuringPrepare() {
+	pvt->_clearbindsduringprepare=true;
+}
+
+void sqlrcursor::dontClearBindsDuringPrepare() {
+	pvt->_clearbindsduringprepare=false;
 }

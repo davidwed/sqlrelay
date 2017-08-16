@@ -118,6 +118,7 @@ struct CONN {
 	bool				dontgetcolumninfo;
 	bool				nullsasnulls;
 	bool				lazyconnect;
+	bool				clearbindsduringprepare;
 
 	bool				attrmetadataid;
 	SQLSMALLINT			sqlerrorindex;
@@ -343,6 +344,13 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				}
 				stmt->cur->setResultSetBufferSize(
 						conn->resultsetbuffersize);
+				if (conn->clearbindsduringprepare) {
+					stmt->cur->
+						clearBindsDuringPrepare();
+				} else {
+					stmt->cur->
+						dontClearBindsDuringPrepare();
+				}
 				if (conn->dontgetcolumninfo) {
 					stmt->cur->dontGetColumnInfo();
 				} else {
@@ -1945,7 +1953,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (retval=!SQL_SUCCESS) {
+	if (retval!=SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
@@ -2133,6 +2141,14 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					sizeof(lazyconnectbuf),
 					ODBC_INI);
 	conn->lazyconnect=!charstring::isNo(lazyconnectbuf);
+	char	clearbindsduringpreparebuf[6];
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"ClearBindsDuringPrepare","yes",
+					clearbindsduringpreparebuf,
+					sizeof(clearbindsduringpreparebuf),
+					ODBC_INI);
+	conn->clearbindsduringprepare=
+		!charstring::isNo(clearbindsduringpreparebuf);
 
 	debugPrintf("  DSN: %s\n",conn->dsn);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
@@ -2162,6 +2178,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  DontGetColumnInfo: %d\n",conn->dontgetcolumninfo);
 	debugPrintf("  NullsAsNulls: %d\n",conn->nullsasnulls);
 	debugPrintf("  LazyConnect: %d\n",conn->lazyconnect);
+	debugPrintf("  ClearBindsDuringPrepare: %d\n",
+					conn->clearbindsduringprepare);
 
 	// create connection
 	conn->con=new sqlrconnection(conn->server,
@@ -6607,7 +6625,7 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (retval=!SQL_SUCCESS) {
+	if (retval!=SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
@@ -7338,7 +7356,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (retval=!SQL_SUCCESS) {
+	if (retval!=SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
@@ -7757,7 +7775,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (retval=!SQL_SUCCESS) {
+	if (retval!=SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
@@ -8484,6 +8502,7 @@ static HWND		resultsetbuffersizeedit;
 static HWND		dontgetcolumninfoedit;
 static HWND		nullsasnullsedit;
 static HWND		lazyconnectedit;
+static HWND		clearbindsduringprepareedit;
 
 static const char	sqlrwindowclass[]="SQLRWindowClass";
 static const int	labelwidth=120;
@@ -8704,6 +8723,9 @@ static void createControls(HWND hwnd) {
 	createLabel(box3,"Lazy Connect",
 			x,y+=(labelheight+labeloffset),
 			labelwidth,labelheight);
+	createLabel(box3,"Clear Binds During Prepare",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
 
 	debugPrintf("  edits...\n");
 
@@ -8820,6 +8842,10 @@ static void createControls(HWND hwnd) {
 			dsndict.getValue("LazyConnect"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1,true,false);
+	clearbindsduringprepareedit=createEdit(box3,
+			dsndict.getValue("ClearBindsDuringPrepare"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1,true,false);
 
 	debugPrintf("  buttons...\n");
 
@@ -8873,6 +8899,8 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("NullsAsNulls",
 					charstring::duplicate("0"));
 		dsndict.setValue("LazyConnect",
+					charstring::duplicate("1"));
+		dsndict.setValue("ClearBindsDuringPrepare",
 					charstring::duplicate("1"));
 
 		debugPrintf("  success...\n");
@@ -9057,6 +9085,13 @@ static void parseDsn(const char *dsn) {
 		SQLGetPrivateProfileString(dsnval,"LazyConnect","1",
 						lazyconnect,2,ODBC_INI);
 		dsndict.setValue("LazyConnect",lazyconnect);
+	}
+	if (!dsndict.getValue("ClearBindsDuringPrepare")) {
+		char	*clearbindsduringprepare=new char[2];
+		SQLGetPrivateProfileString(dsnval,"ClearBindsDuringPrepare","1",
+					clearbindsduringprepare,2,ODBC_INI);
+		dsndict.setValue("ClearBindsDuringPrepare",
+					clearbindsduringprepare);
 	}
 
 	debugPrintf("  success...\n");
@@ -9295,6 +9330,13 @@ static void getDsnFromUi() {
 	GetWindowText(lazyconnectedit,data,len+1);
 	delete[] dsndict.getValue("LazyConnect");
 	dsndict.setValue("LazyConnect",data);
+
+	// ClearBindsDuringPrepare
+	len=GetWindowTextLength(clearbindsduringprepareedit);
+	data=new char[len+1];
+	GetWindowText(clearbindsduringprepareedit,data,len+1);
+	delete[] dsndict.getValue("ClearBindsDuringPrepare");
+	dsndict.setValue("ClearBindsDuringPrepare",data);
 }
 
 static bool writeDsn() {

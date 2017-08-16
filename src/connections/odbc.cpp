@@ -1028,7 +1028,6 @@ bool odbccursor::inputBind(const char *variable,
 				const char *value,
 				uint32_t valuesize,
 				int16_t *isnull) {
-stdoutput.printf("inputBind(%s,%s)\n",variable,value);
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
