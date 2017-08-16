@@ -1937,6 +1937,12 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	stmt->executed=true;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+
+	// handle errors
+	if (!retval) {
+		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+					stmt->cur->errorNumber(),NULL);
+	}
 	return retval;
 }
 
@@ -6547,6 +6553,12 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 	stmt->executed=true;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+
+	// handle errors
+	if (!retval) {
+		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+					stmt->cur->errorNumber(),NULL);
+	}
 	return retval;
 }
 
@@ -7272,6 +7284,12 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	stmt->executed=true;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+
+	// handle errors
+	if (!retval) {
+		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+					stmt->cur->errorNumber(),NULL);
+	}
 	return retval;
 }
 
@@ -7685,6 +7703,12 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	stmt->executed=true;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+
+	// handle errors
+	if (!retval) {
+		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+					stmt->cur->errorNumber(),NULL);
+	}
 	return retval;
 }
 
