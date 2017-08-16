@@ -8505,7 +8505,7 @@ static HWND		lazyconnectedit;
 static HWND		clearbindsduringprepareedit;
 
 static const char	sqlrwindowclass[]="SQLRWindowClass";
-static const int	labelwidth=120;
+static const int	labelwidth=135;
 static const int	labelheight=18;
 static const int	labeloffset=2;
 static const int	labelcount=12;
