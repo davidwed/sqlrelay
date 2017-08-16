@@ -5231,7 +5231,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_NUMERIC_FUNCTIONS\n");
 			break;
 		case SQL_STRING_FUNCTIONS:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_STRING_FUNCTIONS\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=SQL_FN_STR_CONCAT|
