@@ -77,7 +77,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						uint16_t variablesize,
 						const char *value, 
 						uint32_t valuesize,
-						short *isnull);
+						uint16_t *isnull);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
@@ -102,9 +102,9 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						int16_t *isnull);
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
-						const char *value, 
+						char *value, 
 						uint32_t valuesize,
-						short *isnull);
+						int16_t *isnull);
 		bool		outputBind(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
@@ -129,9 +129,9 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
-		short		nonNullBindValue();
-		short		nullBindValue();
-		bool		bindValueIsNull(short isnull);
+		int16_t		nonNullBindValue();
+		int16_t		nullBindValue();
+		bool		bindValueIsNull(uint16_t isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		bool		handleColumns();
@@ -1027,7 +1027,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				const char *value,
 				uint32_t valuesize,
-				short *isnull) {
+				uint16_t *isnull) {
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
@@ -1250,9 +1250,9 @@ bool odbccursor::inputBind(const char *variable,
 
 bool odbccursor::outputBind(const char *variable, 
 				uint16_t variablesize,
-				const char *value, 
+				char *value, 
 				uint32_t valuesize, 
-				short *isnull) {
+				int16_t *isnull) {
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
@@ -1416,15 +1416,15 @@ bool odbccursor::outputBind(const char *variable,
 	return true;
 }
 
-short odbccursor::nonNullBindValue() {
+int16_t odbccursor::nonNullBindValue() {
 	return 0;
 }
 
-short odbccursor::nullBindValue() {
+int16_t odbccursor::nullBindValue() {
 	return SQL_NULL_DATA;
 }
 
-bool odbccursor::bindValueIsNull(short isnull) {
+bool odbccursor::bindValueIsNull(uint16_t isnull) {
 	return (isnull==SQL_NULL_DATA);
 }
 

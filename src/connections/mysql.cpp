@@ -209,8 +209,8 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 						int64_t	*errorcode,
 						bool *liveconnection);
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		short		nonNullBindValue();
-		short		nullBindValue();
+		int16_t		nonNullBindValue();
+		int16_t		nullBindValue();
 #endif
 		void		endSession();
 
@@ -730,11 +730,11 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-short mysqlconnection::nonNullBindValue() {
+int16_t mysqlconnection::nonNullBindValue() {
 	return 0;
 }
 
-short mysqlconnection::nullBindValue() {
+int16_t mysqlconnection::nullBindValue() {
 	return 1;
 }
 #endif
