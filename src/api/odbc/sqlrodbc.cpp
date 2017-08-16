@@ -2426,7 +2426,7 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 	} else if (connectionhandle && connectionhandle!=SQL_NULL_HANDLE) {
 
 		recnumber=&(((CONN *)connectionhandle)->sqlerrorindex);
-		if (recnumber) {
+		if (*recnumber) {
 			retval=SQLR_SQLGetDiagRec(SQL_HANDLE_DBC,
 						(SQLHANDLE)connectionhandle,
 						*recnumber,sqlstate,
@@ -2441,7 +2441,7 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 	} else if (statementhandle && statementhandle!=SQL_NULL_HSTMT) {
 
 		recnumber=&(((STMT *)statementhandle)->sqlerrorindex);
-		if (recnumber) {
+		if (*recnumber) {
 			retval=SQLR_SQLGetDiagRec(SQL_HANDLE_STMT,
 						(SQLHANDLE)statementhandle,
 						*recnumber,sqlstate,
