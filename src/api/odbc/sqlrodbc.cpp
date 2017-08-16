@@ -71,6 +71,7 @@ struct ENV {
 	char				*error;
 	int64_t				errn;
 	const char			*sqlstate;
+	SQLSMALLINT			sqlerrorindex;
 };
 
 struct STMT;
@@ -119,6 +120,7 @@ struct CONN {
 	bool				lazyconnect;
 
 	bool				attrmetadataid;
+	SQLSMALLINT			sqlerrorindex;
 };
 
 struct rowdesc {
@@ -171,6 +173,7 @@ struct STMT {
 	bool					executedbynumresultcols;
 	SQLRETURN				executedbynumresultcolsresult;
 	SQLULEN					rowbindtype;
+	SQLSMALLINT				sqlerrorindex;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -201,6 +204,7 @@ static void SQLR_ENVSetError(ENV *env, const char *error,
 	env->error=charstring::duplicate((error)?error:"");
 	env->errn=errn;
 	env->sqlstate=(sqlstate)?sqlstate:"";
+	env->sqlerrorindex=1;
 	debugPrintf("  error: %s\n",env->error);
 	debugPrintf("  errn: %lld\n",env->errn);
 	debugPrintf("  sqlstate: %s\n",env->sqlstate);
@@ -221,6 +225,7 @@ static void SQLR_CONNSetError(CONN *conn, const char *error,
 	conn->error=charstring::duplicate((error)?error:"");
 	conn->errn=errn;
 	conn->sqlstate=(sqlstate)?sqlstate:"";
+	conn->sqlerrorindex=1;
 	debugPrintf("  error: %s\n",conn->error);
 	debugPrintf("  errn: %lld\n",conn->errn);
 	debugPrintf("  sqlstate: %s\n",conn->sqlstate);
@@ -241,6 +246,7 @@ static void SQLR_STMTSetError(STMT *stmt, const char *error,
 	stmt->error=charstring::duplicate((error)?error:"");
 	stmt->errn=errn;
 	stmt->sqlstate=(sqlstate)?sqlstate:"";
+	stmt->sqlerrorindex=1;
 	debugPrintf("  error: %s\n",stmt->error);
 	debugPrintf("  errn: %lld\n",stmt->errn);
 	debugPrintf("  sqlstate: %s\n",stmt->sqlstate);
@@ -1939,7 +1945,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (!retval) {
+	if (retval=!SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
@@ -2399,24 +2405,53 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 					SQLSMALLINT *textlength) {
 	debugFunction();
 
+	SQLRETURN	retval=SQL_NO_DATA;
+	SQLSMALLINT	*recnumber=NULL;
+
 	if (environmenthandle && environmenthandle!=SQL_NULL_HENV) {
-		return SQLR_SQLGetDiagRec(SQL_HANDLE_ENV,
-					(SQLHANDLE)environmenthandle,
-					1,sqlstate,
-					nativeerror,messagetext,
-					bufferlength,textlength);
+
+		recnumber=&(((ENV *)environmenthandle)->sqlerrorindex);
+		if (*recnumber) {
+			retval=SQLR_SQLGetDiagRec(SQL_HANDLE_ENV,
+						(SQLHANDLE)environmenthandle,
+						*recnumber,sqlstate,
+						nativeerror,messagetext,
+						bufferlength,textlength);
+			(*recnumber)--;
+		} else {
+			debugPrintf("  no more records\n");
+		}
+		return retval;
+
 	} else if (connectionhandle && connectionhandle!=SQL_NULL_HANDLE) {
-		return SQLR_SQLGetDiagRec(SQL_HANDLE_DBC,
-					(SQLHANDLE)connectionhandle,
-					1,sqlstate,
-					nativeerror,messagetext,
-					bufferlength,textlength);
+
+		recnumber=&(((CONN *)environmenthandle)->sqlerrorindex);
+		if (recnumber) {
+			retval=SQLR_SQLGetDiagRec(SQL_HANDLE_DBC,
+						(SQLHANDLE)connectionhandle,
+						*recnumber,sqlstate,
+						nativeerror,messagetext,
+						bufferlength,textlength);
+			(*recnumber)--;
+		} else {
+			debugPrintf("  no more records\n");
+		}
+		return retval;
+
 	} else if (statementhandle && statementhandle!=SQL_NULL_HSTMT) {
-		return SQLR_SQLGetDiagRec(SQL_HANDLE_STMT,
-					(SQLHANDLE)statementhandle,
-					1,sqlstate,
-					nativeerror,messagetext,
-					bufferlength,textlength);
+
+		recnumber=&(((STMT *)environmenthandle)->sqlerrorindex);
+		if (recnumber) {
+			retval=SQLR_SQLGetDiagRec(SQL_HANDLE_STMT,
+						(SQLHANDLE)statementhandle,
+						*recnumber,sqlstate,
+						nativeerror,messagetext,
+						bufferlength,textlength);
+			(*recnumber)--;
+		} else {
+			debugPrintf("  no more records\n");
+		}
+		return retval;
 	}
 	debugPrintf("  no valid handle\n");
 	return SQL_INVALID_HANDLE;
@@ -3828,6 +3863,8 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 				case SQL_DIAG_CLASS_ORIGIN:
 					debugPrintf("  diagidentifier: "
 						"SQL_DIAG_CLASS_ORIGIN\n");
+					debugPrintf("  sqlstate: %s\n",
+							conn->sqlstate);
 					if (!charstring::compare(
 						conn->sqlstate,"IM",2)) {
 						di="ODBC 3.0";
@@ -3838,6 +3875,8 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 				case SQL_DIAG_SUBCLASS_ORIGIN:
 					debugPrintf("  diagidentifier: "
 						"SQL_DIAG_SUBCLASS_ORIGIN\n");
+					debugPrintf("  sqlstate: %s\n",
+							conn->sqlstate);
 					if (charstring::inSet(
 							conn->sqlstate,
 							odbc3states)) {
@@ -5368,9 +5407,22 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case SQL_DRIVER_ODBC_VER:
 			debugPrintf("  infotype: "
-					"SQL_DRIVER_ODBC_VER (%d.%d)\n",
-					SQL_SPEC_MAJOR,SQL_SPEC_MINOR);
-			strval="03.00";
+					"SQL_DRIVER_ODBC_VER\n");
+			// Apparently some apps (Delphi) expect this to return
+			// a value in keeping with what was set by a call to
+			// SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION).  I can't find
+			// any docs that say that is should though.
+			if (conn->env->odbcversion==SQL_OV_ODBC2) {
+				strval="02.00";
+			#if (ODBCVER >= 0x0300)
+			} else if (conn->env->odbcversion==SQL_OV_ODBC3) {
+				strval="03.00";
+			} else {
+				// FIXME: not sure why we're doing this
+				//strval="03.80";
+				strval="03.00";
+			}
+			#endif
 			break;
 		case SQL_LOCK_TYPES:
 			debugPrintf("  infotype: "
@@ -6555,7 +6607,7 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (!retval) {
+	if (retval=!SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
@@ -7286,7 +7338,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (!retval) {
+	if (retval=!SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
@@ -7705,7 +7757,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
 	// handle errors
-	if (!retval) {
+	if (retval=!SQL_SUCCESS) {
 		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 					stmt->cur->errorNumber(),NULL);
 	}
