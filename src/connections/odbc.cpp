@@ -608,7 +608,12 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*tablename="";
+	const char	*tabletype=NULL;
+	char		**tableparts=NULL;
+	uint64_t	tablepartcount=0;
+
 	if (table) {
+
 		// get the current catalog (instance)
 		SQLINTEGER	cataloglen=0;
 		if (SQLGetConnectAttr(dbc,
@@ -619,6 +624,7 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 			catalogbuffer[cataloglen]='\0';
 			catalog=catalogbuffer;
 		}
+
 		// get the current user (schema)
 		SQLSMALLINT	schemalen=0;
 		if (SQLGetInfo(dbc,
@@ -629,17 +635,60 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 			schemabuffer[schemalen]='\0';
 			schema=schemabuffer;
 		}
-		tablename=(!charstring::isNullOrEmpty(wild))?wild:"%";
+
+		// get the table name (or % for all tables)
+		if (charstring::isNullOrEmpty(wild)) {
+
+			tablename="%";
+
+		} else {
+
+			// the table name might be in one
+			// of the following formats:
+			// * table
+			// * schema.table
+			// * catalog.schema.table
+			charstring::split(wild,".",true,
+					&tableparts,&tablepartcount);
+
+			// reset schema and catalog if necessary
+			switch (tablepartcount) {
+				case 3:
+					catalog=tableparts[0];
+					schema=tableparts[1];
+					tablename=tableparts[2];
+					break;
+				case 2:
+					schema=tableparts[0];
+					tablename=tableparts[1];
+					break;
+				case 1:
+					tablename=tableparts[0];
+					break;
+			}
+		}
+		
+		// get tables and views
+		tabletype="TABLE,VIEW";
+
 	} else {
 		catalog=((!charstring::isNullOrEmpty(wild))?
 						wild:SQL_ALL_CATALOGS);
 	}
+
+	// get the tables/databases
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)tablename,SQL_NTS,
-			NULL,SQL_NTS);
+			(SQLCHAR *)tabletype,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+
+	// clean up
+	for (uint64_t i=0; i<tablepartcount; i++) {
+		delete[] tableparts[i];
+	}
+	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;
@@ -660,23 +709,76 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
-	// SQLColumns takes non-const arguments, so we have to make
-	// copies of the various arguments that we want to pass in.
-	char	*wildcopy=charstring::duplicate(wild);
-	char	*tablecopy=charstring::duplicate(table);
-	char	*empty=new char[1];
-	empty[0]='\0';
+	// get the table/database list
+	char		catalogbuffer[1024];
+	const char	*catalog=NULL;
+	char		schemabuffer[1024];
+	const char	*schema="";
+	const char	*tablename="";
+	char		**tableparts=NULL;
+	uint64_t	tablepartcount=0;
 
+	// get the current catalog (instance)
+	SQLINTEGER	cataloglen=0;
+	if (SQLGetConnectAttr(dbc,
+				SQL_CURRENT_QUALIFIER,
+				catalogbuffer,
+				sizeof(catalogbuffer),
+				&cataloglen)==SQL_SUCCESS) {
+		catalogbuffer[cataloglen]='\0';
+		catalog=catalogbuffer;
+	}
+
+	// get the current user (schema)
+	SQLSMALLINT	schemalen=0;
+	if (SQLGetInfo(dbc,
+			SQL_USER_NAME,
+			schemabuffer,
+			sizeof(schemabuffer),
+			&schemalen)==SQL_SUCCESS) {
+		schemabuffer[schemalen]='\0';
+		schema=schemabuffer;
+	}
+
+	// the table name might be in one
+	// of the following formats:
+	// * table
+	// * schema.table
+	// * catalog.schema.table
+	charstring::split(table,".",true,&tableparts,&tablepartcount);
+
+	// reset schema and catalog if necessary
+	switch (tablepartcount) {
+		case 3:
+			catalog=tableparts[0];
+			schema=tableparts[1];
+			tablename=tableparts[2];
+			break;
+		case 2:
+			schema=tableparts[0];
+			tablename=tableparts[1];
+			break;
+		case 1:
+			tablename=tableparts[0];
+			break;
+	}
+
+	// use % if wild was empty
+	wild=(!charstring::isNullOrEmpty(wild))?wild:"%";
+		
 	// get the column list
 	erg=SQLColumns(odbccur->stmt,
-			(SQLCHAR *)empty,SQL_NTS,
-			(SQLCHAR *)empty,SQL_NTS,
-			(SQLCHAR *)tablecopy,charstring::length(tablecopy),
-			(SQLCHAR *)wildcopy,charstring::length(wildcopy));
+			(SQLCHAR *)catalog,SQL_NTS,
+			(SQLCHAR *)schema,SQL_NTS,
+			(SQLCHAR *)tablename,SQL_NTS,
+			(SQLCHAR *)wild,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-	delete[] empty;
-	delete[] wildcopy;
-	delete[] tablecopy;
+
+	// clean up
+	for (uint64_t i=0; i<tablepartcount; i++) {
+		delete[] tableparts[i];
+	}
+	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;

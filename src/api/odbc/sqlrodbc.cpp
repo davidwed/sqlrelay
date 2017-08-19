@@ -7232,10 +7232,15 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 					SQLSMALLINT namelength4) {
 	debugFunction();
 
-	debugPrintf("  for catalog=%s schema=%s table=%s tabletype=%s\n",
+	debugPrintf("  for catalog=%.*s schema=%.*s "
+			"table=%.*s tabletype=%.*s\n",
+			(namelength1 && catalogname)?namelength1:0,
 			(namelength1 && catalogname)?catalogname:(SQLCHAR *)"",
+			(namelength2 && catalogname)?namelength2:0,
 			(namelength2 && schemaname)?schemaname:(SQLCHAR *)"",
+			(namelength3 && tablename)?namelength3:0,
 			(namelength3 && tablename)?tablename:(SQLCHAR *)"",
+			(namelength4 && tablename)?namelength4:0,
 			(namelength4 && tabletype)?tabletype:(SQLCHAR *)"");
 
 

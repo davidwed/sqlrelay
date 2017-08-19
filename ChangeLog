@@ -25,6 +25,8 @@
 		connection modules
 	ODBC SQLBindParameter(in/out) calls outputBind() now, to work with
 		apps like Delphi which broadly use in/out for out parameters
+	refactored odbc connection module's methods to get table/column lists
+		to support dot-separated table identifiers
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

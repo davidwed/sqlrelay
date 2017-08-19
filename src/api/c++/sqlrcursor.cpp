@@ -891,7 +891,7 @@ bool sqlrcursor::getTableList(const char *wild,
 					sqlrclientlistformat_t listformat) {
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("getting table list");
+		pvt->_sqlrc->debugPrint("getting table list ");
 		if (wild) {
 			pvt->_sqlrc->debugPrint("\"");
 			pvt->_sqlrc->debugPrint(wild);
