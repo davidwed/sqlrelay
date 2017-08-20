@@ -3579,7 +3579,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					stmt->currentgetdatarow,col);
 	uint32_t	fieldlength=stmt->cur->getFieldLength(
 					stmt->currentgetdatarow,col);
-	debugPrintf("  field      : %s\n",field);
+	debugPrintf("  field      : %.*s\n",fieldlength,field);
 	debugPrintf("  fieldlength: %d\n",fieldlength);
 
 	// handle NULL fields
