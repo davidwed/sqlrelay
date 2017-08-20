@@ -23,7 +23,8 @@ enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_TABLE_LIST,
 	SQLRCLIENTQUERYTYPE_COLUMN_LIST,
 	SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST,
-	SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST
+	SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST,
+	SQLRCLIENTQUERYTYPE_PROCEDURE_LIST
 };
 
 class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
@@ -155,6 +156,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getProcedureBindAndColumnListCommand(
 						sqlrservercursor *cursor);
 		bool	getTypeInfoListCommand(sqlrservercursor *cursor);
+		bool	getProcedureListCommand(sqlrservercursor *cursor);
 		bool	getListCommand(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
 					bool getobject);
@@ -557,6 +559,9 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		} else if (command==GETTYPEINFOLIST) {
 			//cont->incrementGetTypeInfoListCount();
 			loop=getTypeInfoListCommand(cursor);
+		} else if (command==GETPROCEDURELIST) {
+			//cont->incrementGetProcedureListCount();
+			loop=getProcedureListCommand(cursor);
 		} else if (command==GET_QUERY_TREE) {
 			cont->incrementGetQueryTreeCount();
 			loop=getQueryTreeCommand(cursor);
@@ -708,6 +713,7 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 		command==GETCOLUMNLIST ||
 		command==GETPROCEDUREBINDANDCOLUMNLIST ||
 		command==GETTYPEINFOLIST ||
+		command==GETPROCEDURELIST ||
 		command==ABORT_RESULT_SET ||
 		command==GET_QUERY_TREE ||
 		command==GET_TRANSLATED_QUERY) {
@@ -3115,6 +3121,16 @@ bool sqlrprotocol_sqlrclient::getTypeInfoListCommand(sqlrservercursor *cursor) {
 	return retval;
 }
 
+bool sqlrprotocol_sqlrclient::getProcedureListCommand(
+					sqlrservercursor *cursor) {
+	debugFunction();
+	cont->raiseDebugMessageEvent("get procedure list...");
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_PROCEDURE_LIST,false);
+	cont->raiseDebugMessageEvent("done getting procedure list");
+	return retval;
+}
+
 
 bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
@@ -3279,6 +3295,10 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 		case SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST:
 			cont->setTypeInfoListColumnMap(listformat);
 			success=cont->getTypeInfoList(cursor,object,wild);
+			break;
+		case SQLRCLIENTQUERYTYPE_PROCEDURE_LIST:
+			cont->setProcedureListColumnMap(listformat);
+			success=cont->getProcedureList(cursor,wild);
 		default:
 			break;
 	}
@@ -3340,6 +3360,9 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 			break;
 		case SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST:
 			query=cont->getTypeInfoListQuery(object,havewild);
+			break;
+		case SQLRCLIENTQUERYTYPE_PROCEDURE_LIST:
+			query=cont->getProcedureListQuery(havewild);
 			break;
 		default:
 			break;

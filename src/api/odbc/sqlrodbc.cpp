@@ -4624,8 +4624,8 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLPROCEDURES:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLPROCEDURES "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLTABLEPRIVILEGES:
 			debugPrintf("  functionid: "
@@ -7240,7 +7240,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 			(namelength2 && schemaname)?schemaname:(SQLCHAR *)"",
 			(namelength3 && tablename)?namelength3:0,
 			(namelength3 && tablename)?tablename:(SQLCHAR *)"",
-			(namelength4 && tablename)?namelength4:0,
+			(namelength4 && tabletype)?namelength4:0,
 			(namelength4 && tabletype)?tabletype:(SQLCHAR *)"");
 
 
@@ -7287,7 +7287,6 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	// return the list of databases in catalog format, when the list of
 	// catalogs are requested.
 
-	char		*wild=NULL;
 	SQLRETURN	retval=SQL_ERROR;
 	if (!charstring::compare(catname,SQL_ALL_CATALOGS) &&
 				charstring::isNullOrEmpty(schname) &&
@@ -7352,8 +7351,6 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	delete[] schname;
 	delete[] tblname;
 	delete[] tbltype;
-
-	delete[] wild;
 
 	// the statement has been executed
 	stmt->executed=true;
@@ -7788,25 +7785,88 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 }
 
 SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
-					SQLCHAR *szCatalogName,
-					SQLSMALLINT cbCatalogName,
-					SQLCHAR *szSchemaName,
-					SQLSMALLINT cbSchemaName,
-					SQLCHAR *szProcName,
-					SQLSMALLINT cbProcName) {
+					SQLCHAR *catalogname,
+					SQLSMALLINT namelength1,
+					SQLCHAR *schemaname,
+					SQLSMALLINT namelength2,
+					SQLCHAR *procname,
+					SQLSMALLINT namelength3) {
 	debugFunction();
 
+	debugPrintf("  for catalog=%.*s schema=%.*s procedure=%.*s\n",
+			(namelength1 && catalogname)?namelength1:0,
+			(namelength1 && catalogname)?catalogname:(SQLCHAR *)"",
+			(namelength2 && catalogname)?namelength2:0,
+			(namelength2 && schemaname)?schemaname:(SQLCHAR *)"",
+			(namelength3 && procname)?namelength3:0,
+			(namelength3 && procname)?procname:(SQLCHAR *)"");
+
+
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+	if (statementhandle==SQL_NULL_HSTMT || !stmt) {
 		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported
-	SQLR_STMTSetError(stmt,
-			"Driver does not support this function",0,"IM001");
+	// normalize the names
+	if (namelength1==SQL_NTS) {
+		namelength1=charstring::length(catalogname);
+	}
+	if (namelength2==SQL_NTS) {
+		namelength2=charstring::length(schemaname);
+	}
+	if (namelength3==SQL_NTS) {
+		namelength3=charstring::length(procname);
+	}
+	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
+	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
+	char	*prcname=charstring::duplicate((char *)procname,namelength3);
 
-	return SQL_ERROR;
+	// FIXME: this code treats xxxname as a search pattern in all cases
+	// xxxname should be a case-insensitive search pattern if:
+	// * SQL_ODBC_VERSION is SQL_OV_ODBC3
+	// * SQL_ATTR_METADATA_ID is SQL_FALSE
+	// otherwise it should be a case-insensitive literal
+
+	SQLRETURN	retval=SQL_ERROR;
+
+	const char	*wild=prcname;
+	if (!charstring::compare(wild,"%")) {
+		wild=NULL;
+	}
+
+	debugPrintf("  getting procedure list...\n");
+	debugPrintf("  wild: %s\n",(wild)?wild:"");
+
+	// FIXME: this list should also be restricted to the
+	// specified catalog, schema, and procedure type
+
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
+	SQLR_STMTClearError(stmt);
+
+	retval=(stmt->cur->getProcedureList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
+
+	delete[] catname;
+	delete[] schname;
+	delete[] prcname;
+
+	// the statement has been executed
+	stmt->executed=true;
+
+	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+
+	// handle errors
+	if (retval!=SQL_SUCCESS) {
+		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+					stmt->cur->errorNumber(),NULL);
+	}
+	return retval;
 }
 
 static SQLRETURN SQLR_SQLSetPos(SQLHSTMT statementhandle,

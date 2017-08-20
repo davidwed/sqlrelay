@@ -162,6 +162,11 @@
 					const char *type,
 					const char *wild,
 					sqlrclientlistformat_t listformat);
+		bool		getProcedureList(
+					const char *wild);
+		bool		getProcedureList(
+					const char *wild,
+					sqlrclientlistformat_t listformat);
 		void		clearBindsDuringPrepare();
 		void		dontClearBindsDuringPrepare();
 

@@ -11,11 +11,12 @@
 	added missing mapColumn() call to sqlrservercontroller::getField()
 	fixed var directories in Windows deployment projects
 	added run-as-Admin requirement to Windows installer
-	implemented ODBC SQLProcedureColumns and SQLGetTypeInfo (currently
-		only works when using the ODBC driver and an odbc connection
-		module)
-	ODBC SQLProcedureColumns/SQLColumns/SQLTables/SQLGetTypeInfo properly
-		set the error now if there was one.
+	implemented ODBC SQLProcedures, SQLProcedureColumns and
+		SQLGetTypeInfo, though currently only works when using the
+		ODBC driver and an odbc connection module
+	ODBC SQLProcedures, SQLProcedureColumns, SQLColumns, 
+		SQLTables, SQLGetTypeInfo properly set the error now if there
+		was one
 	ODBC SQLError properly cycles through the error records now
 	updated ODBC SQLGetInfo(SQL_DRIVER_ODBC_VER) to return a value
 		corresponding to the value set by
@@ -25,8 +26,8 @@
 		connection modules
 	ODBC SQLBindParameter(in/out) calls outputBind() now, to work with
 		apps like Delphi which broadly use in/out for out parameters
-	refactored odbc connection module's methods to get table/column lists
-		to support dot-separated table identifiers
+	refactored odbc connection module's methods to get object lists to
+		support dot-separated object identifiers
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

@@ -242,6 +242,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild);
+		bool		getProcedureList(sqlrservercursor *cursor,
+						const char *wild);
 		const char	*selectDatabaseQuery();
 		char		*getCurrentDatabase();
 		bool		setIsolationLevel(const char *isolevel);
@@ -975,6 +977,95 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 
 	// get the type list
 	erg=SQLGetTypeInfo(odbccur->stmt,typenumber);
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
+}
+
+bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
+						const char *wild) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
+
+	// get the procedure list
+	char		catalogbuffer[1024];
+	const char	*catalog=NULL;
+	char		schemabuffer[1024];
+	const char	*schema="";
+	const char	*procname="";
+	char		**procparts=NULL;
+	uint64_t	procpartcount=0;
+
+	// get the current catalog (instance)
+	SQLINTEGER	cataloglen=0;
+	if (SQLGetConnectAttr(dbc,
+			SQL_CURRENT_QUALIFIER,
+			catalogbuffer,
+			sizeof(catalogbuffer),
+			&cataloglen)==SQL_SUCCESS) {
+		catalogbuffer[cataloglen]='\0';
+		catalog=catalogbuffer;
+	}
+
+	// get the current user (schema)
+	SQLSMALLINT	schemalen=0;
+	if (SQLGetInfo(dbc,
+			SQL_USER_NAME,
+			schemabuffer,
+			sizeof(schemabuffer),
+			&schemalen)==SQL_SUCCESS) {
+		schemabuffer[schemalen]='\0';
+		schema=schemabuffer;
+	}
+
+	// get the procedure name (or % for all procedures)
+	if (charstring::isNullOrEmpty(wild)) {
+
+		procname="%";
+
+	} else {
+
+		// the procedure name might be in one
+		// of the following formats:
+		// * procedure
+		// * schema.procedure
+		// * catalog.schema.procedure
+		charstring::split(wild,".",true,
+				&procparts,&procpartcount);
+
+		// reset schema and catalog if necessary
+		switch (procpartcount) {
+			case 3:
+				catalog=procparts[0];
+				schema=procparts[1];
+				procname=procparts[2];
+				break;
+			case 2:
+				schema=procparts[0];
+				procname=procparts[1];
+				break;
+			case 1:
+				procname=procparts[0];
+				break;
+		}
+	}
+
+	// get the procedure list
+stdoutput.printf("%s.%s.%s\n",catalog,schema,procname);
+	erg=SQLProcedures(odbccur->stmt,
+			(SQLCHAR *)catalog,SQL_NTS,
+			(SQLCHAR *)schema,SQL_NTS,
+			(SQLCHAR *)procname,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information

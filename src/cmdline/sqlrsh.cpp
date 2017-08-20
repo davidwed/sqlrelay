@@ -885,6 +885,11 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			sqlrcur->getTypeInfoList(type,NULL);
 			delete[] type;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show procedures",15)) {
+			char	*wild=getWild(command);
+			sqlrcur->getProcedureList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 							"reexecute")) {	
 			executeQuery(sqlrcur,env);
 		} else {
@@ -1917,7 +1922,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("		returns a list of column metadata for the table \"table\"\n");
 	stdoutput.printf("	fields table				-\n");
 	stdoutput.printf("		returns a list of column names for the table \"table\"\n\n");
-	// FIXME: document show type info/show procedure binds and columns
+	// FIXME: document show type info/show procedure binds and columns/procedures
 	stdoutput.printf("	setclientinfo info	- sets the client info\n");
 	stdoutput.printf("	getclientinfo		- displays the client info\n\n");
 	stdoutput.printf("	setresultsetbuffersize size	- fetch size rows at a time\n");

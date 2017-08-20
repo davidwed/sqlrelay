@@ -978,6 +978,26 @@ bool sqlrcursor::getTypeInfoList(const char *type,
 	return getList(GETTYPEINFOLIST,listformat,(type)?type:"",wild);
 }
 
+bool sqlrcursor::getProcedureList(const char *wild) {
+	return getProcedureList(wild,SQLRCLIENTLISTFORMAT_MYSQL);
+}
+
+bool sqlrcursor::getProcedureList(const char *wild,
+					sqlrclientlistformat_t listformat) {
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("getting procedure list ");
+		if (wild) {
+			pvt->_sqlrc->debugPrint("\"");
+			pvt->_sqlrc->debugPrint(wild);
+			pvt->_sqlrc->debugPrint("\"");
+		}
+		pvt->_sqlrc->debugPrint("\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+	return getList(GETPROCEDURELIST,listformat,NULL,wild);
+}
+
 bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 					const char *table, const char *wild) {
 

@@ -2172,6 +2172,11 @@ bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 	return pvt->_conn->getTypeInfoList(cursor,type,wild);
 }
 
+bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
+						const char *wild) {
+	return pvt->_conn->getProcedureList(cursor,wild);
+}
+
 const char *sqlrservercontroller::getDatabaseListQuery(bool wild) {
 	return pvt->_conn->getDatabaseListQuery(wild);
 }
@@ -2198,6 +2203,10 @@ const char *sqlrservercontroller::getProcedureBindAndColumnListQuery(
 const char *sqlrservercontroller::getTypeInfoListQuery(const char *type,
 							bool wild) {
 	return pvt->_conn->getTypeInfoListQuery(type,wild);
+}
+
+const char *sqlrservercontroller::getProcedureListQuery(bool wild) {
+	return pvt->_conn->getProcedureListQuery(wild);
 }
 
 void sqlrservercontroller::saveError() {
@@ -4137,6 +4146,40 @@ void sqlrservercontroller::setProcedureBindAndColumnListColumnMap(
 }
 
 void sqlrservercontroller::setTypeInfoListColumnMap(
+					sqlrserverlistformat_t listformat) {
+
+	// for now, don't remap columns if api calls are used to get lists,
+	// the columns don't come back in the "native" format
+	// FIXME: this "happens to work" for odbc passthrough:
+	// ODBC -> sqlrelay client -> sqlrelay server -> ODBC -> some db
+	// but wouldn't if either ODBC were replaced with something else
+	if (pvt->_conn->getListsByApiCalls()) {
+		pvt->_columnmap=NULL;
+		return;
+	}
+
+	// FIXME: currently, the only connection that implements this is the
+	// odbc connection, which gets lists by api calls, but eventually we
+	// should implement it for other connections too...
+	switch (listformat) {
+		case SQLRSERVERLISTFORMAT_NULL:
+			pvt->_columnmap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_MYSQL:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_ODBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			break;
+		default:
+			pvt->_columnmap=NULL;
+			break;
+	}
+}
+
+void sqlrservercontroller::setProcedureListColumnMap(
 					sqlrserverlistformat_t listformat) {
 
 	// for now, don't remap columns if api calls are used to get lists,
