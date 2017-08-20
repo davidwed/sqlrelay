@@ -1061,7 +1061,6 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	}
 
 	// get the procedure list
-stdoutput.printf("%s.%s.%s\n",catalog,schema,procname);
 	erg=SQLProcedures(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
