@@ -911,11 +911,9 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 	} else if (!charstring::compareIgnoringCase(type,"DOUBLE")) {
 		typenumber=SQL_DOUBLE;
 	} else if (!charstring::compareIgnoringCase(type,"DATE")) {
-		//typenumber=SQL_DATE;
-		typenumber=SQL_TIMESTAMP;
+		typenumber=SQL_DATE;
 	} else if (!charstring::compareIgnoringCase(type,"TIME")) {
-		//typenumber=SQL_TIME;
-		typenumber=SQL_TIMESTAMP;
+		typenumber=SQL_TIME;
 	} else if (!charstring::compareIgnoringCase(type,"TIMESTAMP")) {
 		typenumber=SQL_TIMESTAMP;
 	} else if (!charstring::compareIgnoringCase(type,"BIT")) {
@@ -2003,47 +2001,80 @@ uint16_t odbccursor::getColumnNameLength(uint32_t i) {
 }
 
 uint16_t odbccursor::getColumnType(uint32_t i) {
+
 	switch (col[i].type) {
+
+		// generic types...
+		case SQL_CHAR:
+			return CHAR_DATATYPE;
+		case SQL_VARCHAR:
+			return VARCHAR_DATATYPE;
+		case SQL_LONGVARCHAR:
+			return LONGVARCHAR_DATATYPE;
+		// FIXME:
+		// case SQL_WCHAR:
+		// FIXME:
+		// case SQL_WVARCHAR:
+		// FIXME:
+		// case SQL_WLONGVARCHAR:
+		case SQL_DECIMAL:
+			return DECIMAL_DATATYPE;
+		case SQL_NUMERIC:
+			return NUMERIC_DATATYPE;
+		case SQL_SMALLINT:
+			return SMALLINT_DATATYPE;
+		case SQL_INTEGER:
+			return INTEGER_DATATYPE;
+		case SQL_REAL:
+			return REAL_DATATYPE;
+		case SQL_FLOAT:
+			return FLOAT_DATATYPE;
+		case SQL_DOUBLE:
+			return DOUBLE_DATATYPE;
+		case SQL_DATE:
+		//case SQL_DATETIME:
+		//	(dup of SQL_DATE)
+			// FIXME: need parameter indicating whether
+			// to map this to date or datetime.  MySQL, for example,
+			// may use SQL_DATE for dates and SQL_TIMESTAMP for
+			// datetimes.
+			return DATETIME_DATATYPE;
+		case SQL_TIME:
+		//case SQL_INTERVAL:
+		//	(dup of SQL_TIME)
+			return TIME_DATATYPE;
+		case SQL_TIMESTAMP:
+			return TIMESTAMP_DATATYPE;
+		case SQL_BIT:
+			return BIT_DATATYPE;
+		case SQL_TINYINT:
+			return TINYINT_DATATYPE;
 		case SQL_BIGINT:
 			return BIGINT_DATATYPE;
 		case SQL_BINARY:
 			return BINARY_DATATYPE;
-		case SQL_BIT:
-			return BIT_DATATYPE;
-		case SQL_CHAR:
-			return CHAR_DATATYPE;
-		case SQL_DATE:
-			return DATETIME_DATATYPE;
-		case SQL_TYPE_DATE:
-			return DATE_DATATYPE;
-		case SQL_DECIMAL:
-			return DECIMAL_DATATYPE;
-		case SQL_DOUBLE:
-			return DOUBLE_DATATYPE;
-		case SQL_FLOAT:
-			return FLOAT_DATATYPE;
-		case SQL_INTEGER:
-			return INTEGER_DATATYPE;
+		case SQL_VARBINARY:
+			return VARBINARY_DATATYPE;
 		case SQL_LONGVARBINARY:
 			return LONGVARBINARY_DATATYPE;
-		case SQL_LONGVARCHAR:
-			return LONGVARCHAR_DATATYPE;
-		case SQL_NUMERIC:
-			return NUMERIC_DATATYPE;
-		case SQL_REAL:
-			return REAL_DATATYPE;
-		case SQL_SMALLINT:
-			return SMALLINT_DATATYPE;
+		case SQL_TYPE_DATE:
+			// FIXME: need parameter indicating whether
+			// to map this to date or datetime.  MySQL, for example,
+			// may use SQL_TYPE_DATE for dates and
+			// SQL_TYPE_TIMESTAMP for datetimes.
+			return DATETIME_DATATYPE;
 		case SQL_TYPE_TIME:
 			return TIME_DATATYPE;
 		case SQL_TYPE_TIMESTAMP:
 			return TIMESTAMP_DATATYPE;
-		case SQL_TINYINT:
-			return TINYINT_DATATYPE;
-		case SQL_VARBINARY:
-			return VARBINARY_DATATYPE;
-		case SQL_VARCHAR:
-			return VARCHAR_DATATYPE;
+		// FIXME:
+		// #ifdef SQL_TYPE_UTCDATETIME
+		//case SQL_TYPE_UTCDATETIME:
+		// FIXME:
+		// #ifdef SQL_TYPE_UTCTIME
+		//case SQL_TYPE_UTCTIME:
+		// FIXME:
+		// interval types...
 		case SQL_GUID:
 			return UNIQUEIDENTIFIER_DATATYPE;
 
