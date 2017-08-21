@@ -800,6 +800,10 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 		return SQL_DOUBLE;
 	}
 	if (!charstring::compare(ctype,"DATE")) {
+		// FIXME: need parameter indicating whether
+		// to map this to date or datetime.  MySQL, for example,
+		// may use DATE for dates and TIMESTAMP for
+		// datetimes.
 		return SQL_DATETIME;
 	}
 	if (!charstring::compare(ctype,"TIME")) {
@@ -1292,7 +1296,13 @@ static SQLSMALLINT SQLR_MapCColumnType(sqlrcursor *cur, uint32_t col) {
 			return SQL_C_FLOAT;
 		case SQL_DOUBLE:
 			return SQL_C_DOUBLE;
-		case SQL_DATETIME:
+		case SQL_DATE:
+		// case SQL_DATETIME:
+		// 	(dup of SQL_DATE)
+			// FIXME: need parameter indicating whether
+			// to map this to SQL_C_DATE or SQL_C_TIMESTAMP.
+			// MySQL, for example, may use DATE for dates and
+			// TIMESTAMP for datetimes.
 			return SQL_C_TIMESTAMP;
 		case SQL_VARCHAR:
 			return SQL_C_CHAR;
@@ -1302,9 +1312,9 @@ static SQLSMALLINT SQLR_MapCColumnType(sqlrcursor *cur, uint32_t col) {
 			return SQL_C_TIME;
 		case SQL_TYPE_TIMESTAMP:
 			return SQL_C_TIMESTAMP;
+		case SQL_TIME:
 		// case SQL_INTERVAL:
 		// 	(dup of SQL_TIME)
-		case SQL_TIME:
 			return SQL_C_TIME;
 		case SQL_TIMESTAMP:
 			return SQL_C_TIMESTAMP;
@@ -1359,7 +1369,13 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 			return 7;
 		case SQL_DOUBLE:
 			return 15;
-		case SQL_DATETIME:
+		case SQL_DATE:
+		// case SQL_DATETIME:
+		// 	(dup of SQL_DATE)
+			// FIXME: need parameter indicating whether
+			// to map this to the length of SQL_C_DATE or
+			// SQL_C_TIMESTAMP.  MySQL, for example, may use DATE
+			// for dates and TIMESTAMP for datetimes.
 			return 25;
 		case SQL_TYPE_DATE:
 			return 10;
@@ -1367,9 +1383,9 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 			return 8;
 		case SQL_TYPE_TIMESTAMP:
 			return 25;
+		case SQL_TIME:
 		// case SQL_INTERVAL:
 		// 	(dup of SQL_TIME)
-		case SQL_TIME:
 			return 25;
 		case SQL_TIMESTAMP:
 			return 25;
@@ -2755,6 +2771,10 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				ds->year=year;
 				ds->month=month;
 				ds->day=day;
+
+				debugPrintf("    year: %d\n",ds->year);
+				debugPrintf("    month: %d\n",ds->month);
+				debugPrintf("    day: %d\n",ds->day);
 				}
 				break;
 			case SQL_C_TIME:
@@ -2781,6 +2801,10 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				ts->hour=hour;
 				ts->minute=minute;
 				ts->second=second;
+
+				debugPrintf("    hour: %d\n",ts->hour);
+				debugPrintf("    minute: %d\n",ts->minute);
+				debugPrintf("    second: %d\n",ts->second);
 				}
 				break;
 			case SQL_C_TIMESTAMP:
@@ -2812,6 +2836,14 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				ts->minute=minute;
 				ts->second=second;
 				ts->fraction=microsecond*10;
+
+				debugPrintf("    year: %d\n",ts->year);
+				debugPrintf("    month: %d\n",ts->month);
+				debugPrintf("    day: %d\n",ts->day);
+				debugPrintf("    hour: %d\n",ts->hour);
+				debugPrintf("    minute: %d\n",ts->minute);
+				debugPrintf("    second: %d\n",ts->second);
+				debugPrintf("    fraction: %d\n",ts->fraction);
 				}
 				break;
 			case SQL_C_INTERVAL_YEAR:
@@ -6556,12 +6588,12 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 			typestring="DOUBLE";
 			break;
 		case SQL_DATE:
-		//case SQL_DATETIME:
+		// case SQL_DATETIME:
 		// 	(dup of SQL_DATE)
 			typestring="DATE";
 			break;
 		case SQL_TIME:
-		//case SQL_INTERVAL:
+		// case SQL_INTERVAL:
 		// 	(dup of SQL_TIME)
 			typestring="TIME";
 			break;
