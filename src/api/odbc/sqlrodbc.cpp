@@ -6555,6 +6555,19 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 		case SQL_DOUBLE:
 			typestring="DOUBLE";
 			break;
+		case SQL_DATE:
+		//case SQL_DATETIME:
+		// 	(dup of SQL_DATE)
+			typestring="DATE";
+			break;
+		case SQL_TIME:
+		//case SQL_INTERVAL:
+		// 	(dup of SQL_TIME)
+			typestring="TIME";
+			break;
+		case SQL_TIMESTAMP:
+			typestring="TIMESTAMP";
+			break;
 		case SQL_BIT:
 			typestring="BIT";
 			break;
