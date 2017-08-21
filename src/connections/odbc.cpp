@@ -2033,7 +2033,7 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 			return DOUBLE_DATATYPE;
 		case SQL_DATE:
 		//case SQL_DATETIME:
-		//	(dup of SQL_DATE)
+		//	(odbc 3 dup of SQL_DATE)
 			// FIXME: need parameter indicating whether
 			// to map this to date or datetime.  MySQL, for example,
 			// may use SQL_DATE for dates and SQL_TIMESTAMP for
@@ -2041,7 +2041,7 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 			return DATETIME_DATATYPE;
 		case SQL_TIME:
 		//case SQL_INTERVAL:
-		//	(dup of SQL_TIME)
+		//	(odbc 3 dup of SQL_TIME)
 			return TIME_DATATYPE;
 		case SQL_TIMESTAMP:
 			return TIMESTAMP_DATATYPE;

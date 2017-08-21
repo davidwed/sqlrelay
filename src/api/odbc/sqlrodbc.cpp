@@ -729,7 +729,7 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 		return SQL_CHAR;
 	}
 	if (!charstring::compare(ctype,"DATETIME")) {
-		return SQL_DATETIME;
+		return SQL_DATE;
 	}
 	if (!charstring::compare(ctype,"NUMERIC")) {
 		return SQL_NUMERIC;
@@ -800,11 +800,7 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 		return SQL_DOUBLE;
 	}
 	if (!charstring::compare(ctype,"DATE")) {
-		// FIXME: need parameter indicating whether
-		// to map this to date or datetime.  MySQL, for example,
-		// may use DATE for dates and TIMESTAMP for
-		// datetimes.
-		return SQL_DATETIME;
+		return SQL_DATE;
 	}
 	if (!charstring::compare(ctype,"TIME")) {
 		return SQL_TIME;
@@ -838,7 +834,7 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 		return SQL_SMALLINT;
 	}
 	if (!charstring::compare(ctype,"NEWDATE")) {
-		return SQL_DATETIME;
+		return SQL_DATE;
 	}
 	if (!charstring::compare(ctype,"NULL")) {
 		return SQL_CHAR;
@@ -1298,7 +1294,7 @@ static SQLSMALLINT SQLR_MapCColumnType(sqlrcursor *cur, uint32_t col) {
 			return SQL_C_DOUBLE;
 		case SQL_DATE:
 		// case SQL_DATETIME:
-		// 	(dup of SQL_DATE)
+		// 	(ODBC 3 dup of SQL_DATE)
 			// FIXME: need parameter indicating whether
 			// to map this to SQL_C_DATE or SQL_C_TIMESTAMP.
 			// MySQL, for example, may use DATE for dates and
@@ -1314,7 +1310,7 @@ static SQLSMALLINT SQLR_MapCColumnType(sqlrcursor *cur, uint32_t col) {
 			return SQL_C_TIMESTAMP;
 		case SQL_TIME:
 		// case SQL_INTERVAL:
-		// 	(dup of SQL_TIME)
+		// 	(ODBC 3 dup of SQL_TIME)
 			return SQL_C_TIME;
 		case SQL_TIMESTAMP:
 			return SQL_C_TIMESTAMP;
@@ -1371,7 +1367,7 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 			return 15;
 		case SQL_DATE:
 		// case SQL_DATETIME:
-		// 	(dup of SQL_DATE)
+		// 	(ODBC 3 dup of SQL_DATE)
 			// FIXME: need parameter indicating whether
 			// to map this to the length of SQL_C_DATE or
 			// SQL_C_TIMESTAMP.  MySQL, for example, may use DATE
@@ -1385,7 +1381,7 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 			return 25;
 		case SQL_TIME:
 		// case SQL_INTERVAL:
-		// 	(dup of SQL_TIME)
+		// 	(ODBC 3 dup of SQL_TIME)
 			return 25;
 		case SQL_TIMESTAMP:
 			return 25;
@@ -3641,6 +3637,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					stmt->currentgetdatarow,col);
 	debugPrintf("  field      : %.*s\n",fieldlength,field);
 	debugPrintf("  fieldlength: %d\n",fieldlength);
+
+bytestring::zero(targetvalue,bufferlength);
 
 	// handle NULL fields
 	if (!field) {
@@ -6589,12 +6587,12 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 			break;
 		case SQL_DATE:
 		// case SQL_DATETIME:
-		// 	(dup of SQL_DATE)
+		// 	(ODBC 3 dup of SQL_DATE)
 			typestring="DATE";
 			break;
 		case SQL_TIME:
 		// case SQL_INTERVAL:
-		// 	(dup of SQL_TIME)
+		// 	(ODBC 3 dup of SQL_TIME)
 			typestring="TIME";
 			break;
 		case SQL_TIMESTAMP:
