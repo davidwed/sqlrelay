@@ -3053,15 +3053,12 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					SQLLEN *strlen_or_ind);
 
 static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
-						SQLUSMALLINT *rgfrowstatus,
-						bool extendedfetch) {
+						SQLUSMALLINT *rgfrowstatus) {
 	debugFunction();
 
+	// no need to validate stmt, the various functions that call
+	// SQLR_Fetch have already validated it
 	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("  NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
-	}
 
 	// fetch the row
 	SQLRETURN	fetchresult=
@@ -3093,27 +3090,16 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	debugPrintf("  rowstofetch: %lld\n",rowstofetch);
 	debugPrintf("  rowsfetched: %lld\n",rowsfetched);
 
-	if (extendedfetch) {
-		if (pcrow) {
-			*pcrow=rowsfetched;
-		}
-	} else {
-		if (stmt->rowsfetchedptr) {
-			*(stmt->rowsfetchedptr)=rowsfetched;
-		}
+	if (pcrow) {
+		*pcrow=rowsfetched;
 	}
 
 	// update row statuses
 	for (SQLULEN i=0; i<rowstofetch; i++) {
 		SQLUSMALLINT	status=(i<rowsfetched)?
 					SQL_ROW_SUCCESS:SQL_ROW_NOROW;
-		if (extendedfetch) {
-			if (rgfrowstatus) {
-				rgfrowstatus[i]=status;
-			}
-			if (stmt->rowstatusptr && stmt->rowstatusptr[i]) {
-				stmt->rowstatusptr[i]=status;
-			}
+		if (rgfrowstatus && rgfrowstatus[i]) {
+			rgfrowstatus[i]=status;
 		}
 	}
 
@@ -3195,27 +3181,21 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	// one in the row.  SQLSetPos can be used to get fields from the other
 	// rows.
 
-/*if (stmt->cur->colCount()>11) {
-	FIELD	*field=NULL;
-	stmt->fieldlist.getValue(9,&field);
-	if (field->targettype==SQL_C_DATE) {
-		unsigned char	*targetvalue=
-				((unsigned char *)field->targetvalue)+
-						(field->bufferlength*0);
-		DATE_STRUCT	*val=(DATE_STRUCT *)targetvalue;
-		debugPrintf("  ROW 0, FIELD 10:\n");
-		debugPrintf("    year: %d\n",val->year);
-		debugPrintf("    month: %d\n",val->month);
-		debugPrintf("    day: %d\n",val->day);
-	}
-}*/
-
 	return fetchresult;
 }
 
 SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
 	debugFunction();
-	return SQLR_Fetch(statementhandle,NULL,NULL,false);
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("  NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	return SQLR_Fetch(statementhandle,
+				stmt->rowsfetchedptr,
+				stmt->rowstatusptr);
 }
 
 SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
@@ -3236,7 +3216,9 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 		return SQL_ERROR;
 	}
 
-	return SQLR_Fetch(statementhandle,NULL,NULL,false);
+	return SQLR_Fetch(statementhandle,
+				stmt->rowsfetchedptr,
+				stmt->rowstatusptr);
 }
 
 static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle);
@@ -7618,7 +7600,14 @@ SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 					SQLULEN *pcrow,
 					SQLUSMALLINT *rgfrowstatus) {
 	debugFunction();
-	return SQLR_Fetch(statementhandle,pcrow,rgfrowstatus,true);
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("  NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	return SQLR_Fetch(statementhandle,pcrow,rgfrowstatus);
 }
 #else
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
@@ -7627,7 +7616,14 @@ SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 					SQLROWSETSIZE *pcrow,
 					SQLUSMALLINT *rgfrowstatus) {
 	debugFunction();
-	return SQLR_Fetch(statementhandle,(SQLULEN *)pcrow,rgfrowstatus,true);
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("  NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	return SQLR_Fetch(statementhandle,(SQLULEN *)pcrow,rgfrowstatus);
 }
 #endif
 
