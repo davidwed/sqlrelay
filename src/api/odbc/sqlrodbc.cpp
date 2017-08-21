@@ -175,6 +175,7 @@ struct STMT {
 	SQLRETURN				executedbynumresultcolsresult;
 	SQLULEN					rowbindtype;
 	SQLSMALLINT				sqlerrorindex;
+	bool					nodata;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -333,6 +334,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->executedbynumresultcols=false;
 				stmt->executedbynumresultcolsresult=SQL_SUCCESS;
 				stmt->rowbindtype=SQL_BIND_BY_COLUMN;
+				stmt->nodata=false;
 
 				// set flags
 				if (!charstring::compare(
@@ -1949,6 +1951,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 
 	// the statement has been executed
 	stmt->executed=true;
+	stmt->nodata=false;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
@@ -2965,6 +2968,7 @@ static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 
 	// the statement has been executed
 	stmt->executed=true;
+	stmt->nodata=false;
 
 	// handle success
 	if (result) {
@@ -3017,6 +3021,7 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 
 	// the statement has been executed
 	stmt->executed=true;
+	stmt->nodata=false;
 
 	// handle success
 	if (result) {
@@ -3070,6 +3075,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	if (fetchresult==SQL_NO_DATA_FOUND) {
 		debugPrintf("  NO DATA FOUND\n");
 		// Bail here if no data was found.
+		stmt->nodata=true;
 		return fetchresult;
 	} else if (rowstofetch) {
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
@@ -3574,6 +3580,13 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
 		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
+	}
+
+	// bail if we've already fetched beyond the end
+	if (stmt->nodata) {
+		debugPrintf("  after the end of the result set\n");
+		SQLR_STMTSetError(stmt,NULL,0,"24000");
+		return SQL_ERROR;
 	}
 
 	debugPrintf("  row   : %d\n",(int)stmt->currentgetdatarow);
@@ -6638,6 +6651,7 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 
 	// the statement has been executed
 	stmt->executed=true;
+	stmt->nodata=false;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
@@ -7371,6 +7385,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	// the statement has been executed
 	stmt->executed=true;
+	stmt->nodata=false;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
@@ -7790,6 +7805,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 
 	// the statement has been executed
 	stmt->executed=true;
+	stmt->nodata=false;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
@@ -7875,6 +7891,7 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 
 	// the statement has been executed
 	stmt->executed=true;
+	stmt->nodata=false;
 
 	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
 
