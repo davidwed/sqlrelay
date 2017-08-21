@@ -3471,6 +3471,10 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	ds->year=(year!=-1)?year:0;
 	ds->month=(month!=-1)?month:0;
 	ds->day=(day!=-1)?day:0;
+
+	debugPrintf("    year: %d\n",ds->year);
+	debugPrintf("    month: %d\n",ds->month);
+	debugPrintf("    day: %d\n",ds->day);
 }
 
 static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
@@ -3505,6 +3509,10 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	ts->hour=(hour!=-1)?hour:0;
 	ts->minute=(minute!=-1)?minute:0;
 	ts->second=(second!=-1)?second:0;
+
+	debugPrintf("    hour: %d\n",ts->hour);
+	debugPrintf("    minute: %d\n",ts->minute);
+	debugPrintf("    second: %d\n",ts->second);
 }
 
 static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
@@ -3543,6 +3551,14 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	tss->minute=(minute!=-1)?minute:0;
 	tss->second=(second!=-1)?second:0;
 	tss->fraction=(fraction!=-1)?fraction:0;
+
+	debugPrintf("    year: %d\n",tss->year);
+	debugPrintf("    month: %d\n",tss->month);
+	debugPrintf("    day: %d\n",tss->day);
+	debugPrintf("    hour: %d\n",tss->hour);
+	debugPrintf("    minute: %d\n",tss->minute);
+	debugPrintf("    second: %d\n",tss->second);
+	debugPrintf("    fraction: %d\n",tss->fraction);
 }
 
 static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
