@@ -3194,6 +3194,21 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	// one in the row.  SQLSetPos can be used to get fields from the other
 	// rows.
 
+if (stmt->cur->colCount()>11) {
+	FIELD	*field=NULL;
+	stmt->fieldlist.getValue(10,&field);
+	if (field->targettype==SQL_C_DATE) {
+		unsigned char	*targetvalue=
+				((unsigned char *)field->targetvalue)+
+						(field->bufferlength*0);
+		DATE_STRUCT	*val=(DATE_STRUCT *)targetvalue;
+		debugPrintf("  ROW 0, FIELD 10:\n");
+		debugPrintf("    year: %d\n",val->year);
+		debugPrintf("    month: %d\n",val->month);
+		debugPrintf("    day: %d\n",val->day);
+	}
+}
+
 	return fetchresult;
 }
 
