@@ -883,7 +883,7 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 
 	// map the string type to a number
 	// FIXME: this will be slooowwww... improve it
-	SQLSMALLINT	typenumber=-1;
+	SQLSMALLINT	typenumber=-200;
 	if (!charstring::compareIgnoringCase(type,"CHAR")) {
 		typenumber=SQL_CHAR;
 	} else if (!charstring::compareIgnoringCase(type,"VARCHAR")) {
