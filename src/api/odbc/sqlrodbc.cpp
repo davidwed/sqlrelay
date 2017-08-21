@@ -3196,7 +3196,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 
 if (stmt->cur->colCount()>11) {
 	FIELD	*field=NULL;
-	stmt->fieldlist.getValue(10,&field);
+	stmt->fieldlist.getValue(9,&field);
 	if (field->targettype==SQL_C_DATE) {
 		unsigned char	*targetvalue=
 				((unsigned char *)field->targetvalue)+
