@@ -911,9 +911,11 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 	} else if (!charstring::compareIgnoringCase(type,"DOUBLE")) {
 		typenumber=SQL_DOUBLE;
 	} else if (!charstring::compareIgnoringCase(type,"DATE")) {
-		typenumber=SQL_DATE;
+		//typenumber=SQL_DATE;
+		typenumber=SQL_TIMESTAMP;
 	} else if (!charstring::compareIgnoringCase(type,"TIME")) {
-		typenumber=SQL_TIME;
+		//typenumber=SQL_TIME;
+		typenumber=SQL_TIMESTAMP;
 	} else if (!charstring::compareIgnoringCase(type,"TIMESTAMP")) {
 		typenumber=SQL_TIMESTAMP;
 	} else if (!charstring::compareIgnoringCase(type,"BIT")) {
