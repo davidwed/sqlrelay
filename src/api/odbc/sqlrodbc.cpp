@@ -3623,6 +3623,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	if (targettype==SQL_C_DEFAULT) {
 		targettype=SQLR_MapCColumnType(stmt->cur,col);
 	}
+if (targettype==SQL_C_DATE) {
+	targettype=SQL_C_TIMESTAMP;
+}
 
 	// initialize strlen indicator
 	if (strlen_or_ind) {
