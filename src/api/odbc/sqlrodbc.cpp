@@ -729,7 +729,8 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 		return SQL_CHAR;
 	}
 	if (!charstring::compare(ctype,"DATETIME")) {
-		return SQL_DATE;
+		//return SQL_DATE;
+return SQL_TIMESTAMP;
 	}
 	if (!charstring::compare(ctype,"NUMERIC")) {
 		return SQL_NUMERIC;
