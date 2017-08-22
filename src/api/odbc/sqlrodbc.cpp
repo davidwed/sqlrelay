@@ -3644,8 +3644,6 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	debugPrintf("  field      : %.*s\n",fieldlength,field);
 	debugPrintf("  fieldlength: %d\n",fieldlength);
 
-bytestring::zero(targetvalue,bufferlength);
-
 	// handle NULL fields
 	if (!field) {
 		if (strlen_or_ind) {
@@ -6280,18 +6278,28 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		#endif
 		default:
 			debugPrintf("  unsupported infotype: %d\n",infotype);
-			break;
+			SQLR_CONNSetError(conn,
+				"Optional field not implemented",0,"HYC00");
+			return SQL_ERROR;
 	}
 
 	// copy out the string value
 	if (strval) {
-		charstring::safeCopy((char *)infovalue,bufferlength,strval);
-		debugPrintf("  infovalue: %s\n",(const char *)infovalue);
+		debugPrintf("  strval: %s\n",strval);
 		valuelength=charstring::length(strval);
+		if (infovalue) {
+			charstring::safeCopy((char *)infovalue,
+						bufferlength,strval);
+		} else {
+			debugPrintf("  NULL infovalue "
+					"(not copying out strval)\n");
+		}
 	}
 	if (stringlength) {
 		*stringlength=valuelength;
 		debugPrintf("  stringlength: %d\n",(int)*stringlength);
+	} else {
+		debugPrintf("  NULL stringlength\n");
 	}
 
 	return SQL_SUCCESS;
@@ -6507,6 +6515,8 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		#endif
 		default:
 			debugPrintf("  invalid attribute\n");
+			SQLR_STMTSetError(stmt,
+				"Optional field not implemented",0,"HYC00");
 			return SQL_ERROR;
 	}
 	return SQL_SUCCESS;
@@ -6827,8 +6837,18 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 	debugFunction();
 
 	CONN	*conn=(CONN *)connectionhandle;
-	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
+	if ((connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) &&
+			(attribute==SQL_AUTOCOMMIT ||
+			attribute==SQL_ATTR_METADATA_ID)) {
+
+		if (attribute==SQL_AUTOCOMMIT) {
+			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
+		} else if (attribute==SQL_ATTR_METADATA_ID) {
+			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
+		}
+
 		debugPrintf("  NULL conn handle\n");
+
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -6851,21 +6871,64 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		#endif
 
 		// FIXME: implement
- 		/*case SQL_ACCESS_MODE:
+ 		case SQL_ACCESS_MODE:
+ 			debugPrintf("	attribute: SQL_ACCESS_MODE "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_LOGIN_TIMEOUT:
+			debugPrintf("	attribute: SQL_LOGIN_TIMEOUT "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_OPT_TRACE:
+			debugPrintf("	attribute: SQL_OPT_TRACE "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_OPT_TRACEFILE:
+			debugPrintf("	attribute: SQL_OPT_TRACEFILE "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_TRANSLATE_DLL:
+			debugPrintf("	attribute: SQL_TRANSLATE_DLL "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_TRANSLATE_OPTION:
+			debugPrintf("	attribute: SQL_TRANSLATE_OPTION "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_ODBC_CURSORS:
+			debugPrintf("	attribute: SQL_ODBC_CURSORS "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_QUIET_MODE:
-		case SQL_PACKET_SIZE:*/
+			debugPrintf("	attribute: SQL_QUIET_MODE "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
+		case SQL_PACKET_SIZE:
+			debugPrintf("	attribute: SQL_PACKET_SIZE "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 	#if (ODBCVER >= 0x0300)
-		/*case SQL_ATTR_CONNECTION_TIMEOUT:
+		case SQL_ATTR_CONNECTION_TIMEOUT:
+			debugPrintf("	attribute: SQL_ATTR_CONNECTION_TIMEOUT "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_ATTR_DISCONNECT_BEHAVIOR:
+			debugPrintf("	attribute: "
+						"SQL_ATTR_DISCONNECT_BEHAVIOR "
+						"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_ATTR_ENLIST_IN_DTC:
+			debugPrintf("	attribute: SQL_ATTR_ENLIST_IN_DTC "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_ATTR_ENLIST_IN_XA:
-		case SQL_ATTR_AUTO_IPD:*/
+			debugPrintf("	attribute: SQL_ATTR_ENLIST_IN_XA "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
+		case SQL_ATTR_AUTO_IPD:
+			debugPrintf("	attribute: SQL_ATTR_AUTO_IPD "
+							"(unsupported)\n");
+			return SQL_SUCCESS;
 		case SQL_ATTR_METADATA_ID:
 		{
 			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
@@ -7334,16 +7397,8 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	char	*tblname=charstring::duplicate((char *)tablename,namelength3);
 	char	*tbltype=charstring::duplicate((char *)tabletype,namelength4);
 
-	debugPrintf("  for catalog=%.*s schema=%.*s "
-			"table=%.*s tabletype=%.*s\n",
-			(namelength1 && catname)?namelength1:0,
-			(namelength1 && catname)?catname:"",
-			(namelength2 && schname)?namelength2:0,
-			(namelength2 && schname)?schname:"",
-			(namelength3 && tblname)?namelength3:0,
-			(namelength3 && tblname)?tblname:"",
-			(namelength4 && tbltype)?namelength4:0,
-			(namelength4 && tbltype)?tbltype:"");
+	debugPrintf("  for catalog=%s schema=%s table=%s tabletype=%s\n",
+					catname,schname,tblname,tbltype);
 
 
 	// FIXME: this code treats xxxname as a search pattern in all cases
@@ -7907,13 +7962,8 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
 	char	*prcname=charstring::duplicate((char *)procname,namelength3);
 
-	debugPrintf("  for catalog=%.*s schema=%.*s procedure=%.*s\n",
-			(namelength1 && catname)?namelength1:0,
-			(namelength1 && catname)?catname:"",
-			(namelength2 && schname)?namelength2:0,
-			(namelength2 && schname)?schname:"",
-			(namelength3 && prcname)?namelength3:0,
-			(namelength3 && prcname)?prcname:"");
+	debugPrintf("  for catalog=%s schema=%s procedure=%s\n",
+						catname,schname,prcname);
 
 
 	// FIXME: this code treats xxxname as a search pattern in all cases
