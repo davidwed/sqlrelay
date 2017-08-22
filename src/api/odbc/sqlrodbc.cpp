@@ -733,7 +733,6 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 		// to map this to SQL_DATE or SQL_TIMESTAMP.
 		// MySQL, for example, may use DATE for dates and
 		// TIMESTAMP for datetimes.
-		//return SQL_DATE;
 		return SQL_TIMESTAMP;
 	}
 	if (!charstring::compare(ctype,"NUMERIC")) {
