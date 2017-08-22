@@ -729,8 +729,12 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 		return SQL_CHAR;
 	}
 	if (!charstring::compare(ctype,"DATETIME")) {
+		// FIXME: need parameter indicating whether
+		// to map this to SQL_DATE or SQL_TIMESTAMP.
+		// MySQL, for example, may use DATE for dates and
+		// TIMESTAMP for datetimes.
 		//return SQL_DATE;
-return SQL_TIMESTAMP;
+		return SQL_TIMESTAMP;
 	}
 	if (!charstring::compare(ctype,"NUMERIC")) {
 		return SQL_NUMERIC;
@@ -801,6 +805,7 @@ return SQL_TIMESTAMP;
 		return SQL_DOUBLE;
 	}
 	if (!charstring::compare(ctype,"DATE")) {
+		// FIXME: optionally map to SQL_TIMESTAMP?
 		return SQL_DATE;
 	}
 	if (!charstring::compare(ctype,"TIME")) {
@@ -835,6 +840,7 @@ return SQL_TIMESTAMP;
 		return SQL_SMALLINT;
 	}
 	if (!charstring::compare(ctype,"NEWDATE")) {
+		// FIXME: optionally map to SQL_TIMESTAMP?
 		return SQL_DATE;
 	}
 	if (!charstring::compare(ctype,"NULL")) {
