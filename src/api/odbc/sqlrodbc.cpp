@@ -6866,6 +6866,9 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 				if (conn->con->autoCommitOff()) {
 					return SQL_SUCCESS;
 				}
+			} else {
+				debugPrintf("  unsupported val: %d\n",val);
+				return SQL_SUCCESS;
 			}
 		}
 		#endif
