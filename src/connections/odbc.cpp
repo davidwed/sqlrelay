@@ -805,27 +805,31 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	// Unlike SQLColumns/SQLTables, SQLProcedureColumns wants NULL instead
 	// of "" for catalog/schema, to indicate the current catalog/schema.
 	// It interprets "" as meaning outside of any catalog/schema.
-	char	*catalog=NULL;
-	char	*schema=NULL;
-	char	*proc=NULL;
+	const char	*catalog=NULL;
+	const char	*schema=NULL;
+	const char	*proc=NULL;
 
 	// split the procedure name and extract the parts
 	// FIXME: arguably getColumnList and getDatabaseOrTableList
 	// ought to do this same thing
-	char		**parts;
-	uint64_t	partslength;
-	charstring::split(procedure,".",true,&parts,&partslength);
-	if (partslength==1) {
-		proc=parts[0];
-	} else if (partslength==2) {
-		// FIXME: note here about why we're doing catalog.proc
-		// instead of schema.proc
-		catalog=parts[0];
-		proc=parts[1];
-	} else if (partslength>=3) {
-		catalog=parts[0];
-		schema=parts[1];
-		proc=parts[2];
+	char		**procparts=NULL;
+	uint64_t	procpartcount=0;
+	charstring::split(procedure,".",true,&procparts,&procpartcount);
+	switch (procpartcount) {
+		case 3:
+			catalog=procparts[0];
+			schema=procparts[1];
+			proc=procparts[2];
+			break;
+		case 2:
+			// FIXME: note here about why we're doing catalog.proc
+			// instead of schema.proc
+			catalog=procparts[0];
+			proc=procparts[1];
+			break;
+		case 1:
+			proc=procparts[0];
+			break;
 	}
 
 	// SQLProcedureColumns takes non-const arguments, so we have to make
@@ -857,10 +861,10 @@ bool odbcconnection::getProcedureBindAndColumnList(
 
 	// clean up
 	delete[] wildcopy;
-	for (uint64_t i=0; i<partslength; i++) {
-		delete[] parts[i];
+	for (uint64_t i=0; i<procpartcount; i++) {
+		delete[] procparts[i];
 	}
-	delete[] parts;
+	delete[] procparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;
@@ -1072,6 +1076,12 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)procname,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+
+	// clean up
+	for (uint64_t i=0; i<procpartcount; i++) {
+		delete[] procparts[i];
+	}
+	delete[] procparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;

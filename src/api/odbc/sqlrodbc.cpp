@@ -7304,18 +7304,6 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 					SQLSMALLINT namelength4) {
 	debugFunction();
 
-	debugPrintf("  for catalog=%.*s schema=%.*s "
-			"table=%.*s tabletype=%.*s\n",
-			(namelength1 && catalogname)?namelength1:0,
-			(namelength1 && catalogname)?catalogname:(SQLCHAR *)"",
-			(namelength2 && catalogname)?namelength2:0,
-			(namelength2 && schemaname)?schemaname:(SQLCHAR *)"",
-			(namelength3 && tablename)?namelength3:0,
-			(namelength3 && tablename)?tablename:(SQLCHAR *)"",
-			(namelength4 && tabletype)?namelength4:0,
-			(namelength4 && tabletype)?tabletype:(SQLCHAR *)"");
-
-
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt) {
 		debugPrintf("  NULL stmt handle\n");
@@ -7339,6 +7327,18 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
 	char	*tblname=charstring::duplicate((char *)tablename,namelength3);
 	char	*tbltype=charstring::duplicate((char *)tabletype,namelength4);
+
+	debugPrintf("  for catalog=%.*s schema=%.*s "
+			"table=%.*s tabletype=%.*s\n",
+			(namelength1 && catname)?namelength1:0,
+			(namelength1 && catname)?catname:"",
+			(namelength2 && schname)?namelength2:0,
+			(namelength2 && schname)?schname:"",
+			(namelength3 && tblname)?namelength3:0,
+			(namelength3 && tblname)?tblname:"",
+			(namelength4 && tbltype)?namelength4:0,
+			(namelength4 && tbltype)?tbltype:"");
+
 
 	// FIXME: this code treats xxxname as a search pattern in all cases
 	// xxxname should be a case-insensitive search pattern if:
@@ -7881,15 +7881,6 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 					SQLSMALLINT namelength3) {
 	debugFunction();
 
-	debugPrintf("  for catalog=%.*s schema=%.*s procedure=%.*s\n",
-			(namelength1 && catalogname)?namelength1:0,
-			(namelength1 && catalogname)?catalogname:(SQLCHAR *)"",
-			(namelength2 && catalogname)?namelength2:0,
-			(namelength2 && schemaname)?schemaname:(SQLCHAR *)"",
-			(namelength3 && procname)?namelength3:0,
-			(namelength3 && procname)?procname:(SQLCHAR *)"");
-
-
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt) {
 		debugPrintf("  NULL stmt handle\n");
@@ -7909,6 +7900,15 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
 	char	*prcname=charstring::duplicate((char *)procname,namelength3);
+
+	debugPrintf("  for catalog=%.*s schema=%.*s procedure=%.*s\n",
+			(namelength1 && catname)?namelength1:0,
+			(namelength1 && catname)?catname:"",
+			(namelength2 && schname)?namelength2:0,
+			(namelength2 && schname)?schname:"",
+			(namelength3 && prcname)?namelength3:0,
+			(namelength3 && prcname)?prcname:"");
+
 
 	// FIXME: this code treats xxxname as a search pattern in all cases
 	// xxxname should be a case-insensitive search pattern if:
