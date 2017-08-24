@@ -6908,20 +6908,16 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 					debugPrintf("  success\n");
 					return SQL_SUCCESS;
 				}
-				debugPrintf("  failed "
-					"(but returning success)\n");
-				//return SQL_ERROR;
-				return SQL_SUCCESS;
+				debugPrintf("  failed\n");
+				return SQL_ERROR;
 			} else if (val==SQL_AUTOCOMMIT_OFF) {
 				debugPrintf("  OFF\n");
 				if (conn->con->autoCommitOff()) {
 					debugPrintf("  success\n");
 					return SQL_SUCCESS;
 				}
-				debugPrintf("  failed "
-					"(but returning success)\n");
-				//return SQL_ERROR;
-				return SQL_SUCCESS;
+				debugPrintf("  failed\n");
+				return SQL_ERROR;
 			}
 			debugPrintf("  unsupported val: %d "
 					"(but returning success)\n",val);
