@@ -4935,8 +4935,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_IDENTIFIER_CASE\n");
 			// FIXME: this isn't true for all db's
-			*(SQLUINTEGER *)infovalue=SQL_IC_MIXED;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=SQL_IC_MIXED;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_IDENTIFIER_QUOTE_CHAR:
 			debugPrintf("  infotype: "
@@ -4950,8 +4950,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_COLUMN_NAME_LEN/"
 					"SQL_MAXIMUM_COLUMN_NAME_LEN\n");
 			// 0 means no max or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_CURSOR_NAME_LEN:
 			// aka SQL_MAXIMUM_CURSOR_NAME_LENGTH
@@ -4959,8 +4959,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_CURSOR_NAME_LEN/"
 					"SQL_MAXIMUM_CURSOR_NAME_LEN\n");
 			// 0 means no max or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_OWNER_NAME_LEN:
 			// aka SQL_MAX_SCHEMA_NAME_LEN
@@ -4970,23 +4970,23 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_SCHEMA_NAME_LEN/"
 					"SQL_MAXIMUM_SCHEMA_NAME_LEN\n");
 			// 0 means no max or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_CATALOG_NAME_LEN:
 			// aka SQL_MAXIMUM_CATALOG_NAME_LENGTH
 			debugPrintf("  infotype: "
 					"SQL_MAX_CATALOG_NAME_LEN\n");
 			// 0 means no max or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MAX_TABLE_NAME_LEN:
 			debugPrintf("  infotype: "
 					"SQL_MAX_TABLE_NAME_LEN\n");
 			// 0 means no max or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_SCROLL_CONCURRENCY:
 			debugPrintf("  infotype: "
@@ -5304,8 +5304,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_MAX_PROCEDURE_NAME_LEN\n");
 			// 0 means no max or unknown
-			*(SQLUINTEGER *)infovalue=0;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=0;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_MULT_RESULT_SETS:
 			debugPrintf("  infotype: "
@@ -5625,8 +5625,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_QUOTED_IDENTIFIER_CASE\n");
 			// FIXME: is this true for all db's?
-			*(SQLUINTEGER *)infovalue=SQL_IC_SENSITIVE;
-			valuelength=sizeof(SQLUINTEGER);
+			*(SQLUSMALLINT *)infovalue=SQL_IC_SENSITIVE;
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		case SQL_SUBQUERIES:
 			debugPrintf("  infotype: "
