@@ -6840,15 +6840,8 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 	if ((connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) &&
 			(attribute==SQL_AUTOCOMMIT ||
 			attribute==SQL_ATTR_METADATA_ID)) {
-
-		if (attribute==SQL_AUTOCOMMIT) {
-			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
-		} else if (attribute==SQL_ATTR_METADATA_ID) {
-			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
-		}
-
+		debugPrintf("  attribute: %d\n",attribute);
 		debugPrintf("  NULL conn handle\n");
-
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -6858,14 +6851,21 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		{
 			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
 			uint64_t	val=(uint64_t)value;
+			debugPrintf("  val: %lld\n",val);
 			if (val==SQL_AUTOCOMMIT_ON) {
 				if (conn->con->autoCommitOn()) {
+					debugPrintf("  success\n");
 					return SQL_SUCCESS;
 				}
+				debugPrintf("  failed\n");
+				return SQL_ERROR;
 			} else if (val==SQL_AUTOCOMMIT_OFF) {
 				if (conn->con->autoCommitOff()) {
+					debugPrintf("  success\n");
 					return SQL_SUCCESS;
 				}
+				debugPrintf("  failed\n");
+				return SQL_ERROR;
 			} else {
 				debugPrintf("  unsupported val: %d\n",val);
 				return SQL_SUCCESS;
@@ -6873,69 +6873,70 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		}
 		#endif
 
-		// FIXME: implement
+		// FIXME: implement...
  		case SQL_ACCESS_MODE:
- 			debugPrintf("	attribute: SQL_ACCESS_MODE "
-							"(unsupported)\n");
+ 			debugPrintf("  attribute: SQL_ACCESS_MODE "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_LOGIN_TIMEOUT:
-			debugPrintf("	attribute: SQL_LOGIN_TIMEOUT "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_LOGIN_TIMEOUT "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_OPT_TRACE:
-			debugPrintf("	attribute: SQL_OPT_TRACE "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_OPT_TRACE "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_OPT_TRACEFILE:
-			debugPrintf("	attribute: SQL_OPT_TRACEFILE "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_OPT_TRACEFILE "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_TRANSLATE_DLL:
-			debugPrintf("	attribute: SQL_TRANSLATE_DLL "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_TRANSLATE_DLL "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_TRANSLATE_OPTION:
-			debugPrintf("	attribute: SQL_TRANSLATE_OPTION "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_TRANSLATE_OPTION "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_ODBC_CURSORS:
-			debugPrintf("	attribute: SQL_ODBC_CURSORS "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_ODBC_CURSORS "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_QUIET_MODE:
-			debugPrintf("	attribute: SQL_QUIET_MODE "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_QUIET_MODE "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_PACKET_SIZE:
-			debugPrintf("	attribute: SQL_PACKET_SIZE "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_PACKET_SIZE "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 	#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_CONNECTION_TIMEOUT:
-			debugPrintf("	attribute: SQL_ATTR_CONNECTION_TIMEOUT "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_ATTR_CONNECTION_TIMEOUT "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_ATTR_DISCONNECT_BEHAVIOR:
-			debugPrintf("	attribute: "
-						"SQL_ATTR_DISCONNECT_BEHAVIOR "
-						"(unsupported)\n");
+			debugPrintf("  attribute: "
+				"SQL_ATTR_DISCONNECT_BEHAVIOR "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_ATTR_ENLIST_IN_DTC:
-			debugPrintf("	attribute: SQL_ATTR_ENLIST_IN_DTC "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_ATTR_ENLIST_IN_DTC "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_ATTR_ENLIST_IN_XA:
-			debugPrintf("	attribute: SQL_ATTR_ENLIST_IN_XA "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_ATTR_ENLIST_IN_XA "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_ATTR_AUTO_IPD:
-			debugPrintf("	attribute: SQL_ATTR_AUTO_IPD "
-							"(unsupported)\n");
+			debugPrintf("  attribute: SQL_ATTR_AUTO_IPD "
+				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
 		case SQL_ATTR_METADATA_ID:
 		{
 			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
 			uint64_t	val=(uint64_t)value;
+			debugPrintf("  val: %lld\n",val);
 			conn->attrmetadataid=(val==SQL_TRUE);
 			return SQL_SUCCESS;
 		}
@@ -7030,11 +7031,15 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 
 	switch (attribute) {
 		case SQL_ATTR_OUTPUT_NTS:
-			debugPrintf("  attribute: SQL_ATTR_OUTPUT_NTS\n");
+			debugPrintf("  attribute: "
+				"SQL_ATTR_OUTPUT_NTS: %lld\n",
+				(uint64_t)val);
 			// this can't be set to false
 			return (val==SQL_TRUE)?SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_ODBC_VERSION:
-			debugPrintf("  attribute: SQL_ATTR_ODBC_VERSION\n");
+			debugPrintf("  attribute: "
+				"SQL_ATTR_ODBC_VERSION: %lld\n",
+				(uint64_t)val);
 			switch (val) {
 				case SQL_OV_ODBC2:
 					env->odbcversion=SQL_OV_ODBC2;
@@ -7045,14 +7050,19 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 					break;
 				#endif
 			}
-			debugPrintf("  odbcversion: %d\n",(int)env->odbcversion);
+			debugPrintf("  odbcversion: %lld\n",
+					(int64_t)env->odbcversion);
 			return SQL_SUCCESS;
 		case SQL_ATTR_CONNECTION_POOLING:
-			debugPrintf("  attribute: SQL_ATTR_CONNECTION_POOLING\n");
+			debugPrintf("  attribute: "
+				"SQL_ATTR_CONNECTION_POOLING: %lld\n",
+				(uint64_t)val);
 			// this can't be set on
 			return (val==SQL_CP_OFF)?SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_CP_MATCH:
-			debugPrintf("  attribute: SQL_ATTR_CP_MATCH\n");
+			debugPrintf("  attribute: "
+				"SQL_ATTR_CP_MATCH: %lld\n",
+				(uint64_t)val);
 			// this can't be set to anything but default
 			return (val==SQL_CP_MATCH_DEFAULT)?
 						SQL_SUCCESS:SQL_ERROR;
@@ -7091,6 +7101,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("  attribute: %d\n",attribute);
 		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -7120,11 +7131,13 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			// read-only
 			return SQL_ERROR;
 		case SQL_ATTR_CURSOR_SCROLLABLE:
-			debugPrintf("  attribute: SQL_ATTR_CURSOR_SCROLLABLE\n");
+			debugPrintf("  attribute: SQL_ATTR_CURSOR_SCROLLABLE "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_CURSOR_SENSITIVITY:
-			debugPrintf("  attribute: SQL_ATTR_CURSOR_SENSITIVITY\n");
+			debugPrintf("  attribute: SQL_ATTR_CURSOR_SENSITIVITY "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		#endif
@@ -7132,32 +7145,37 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 		case SQL_QUERY_TIMEOUT:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_QUERY_TIMEOUT/"
-					"SQL_QUERY_TIMEOUT\n");
+					"SQL_QUERY_TIMEOUT "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_MAX_ROWS:
 		case SQL_MAX_ROWS:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_MAX_ROWS/"
-					"SQL_MAX_ROWS\n");
+					"SQL_MAX_ROWS "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_NOSCAN:
 		case SQL_NOSCAN:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_NOSCAN/"
-					"SQL_NOSCAN\n");
+					"SQL_NOSCAN "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_MAX_LENGTH:
 		case SQL_MAX_LENGTH:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_MAX_LENGTH/"
-					"SQL_MAX_LENGTH\n");
+					"SQL_MAX_LENGTH "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ASYNC_ENABLE:
-			debugPrintf("  attribute: SQL_ASYNC_ENABLE\n");
+			debugPrintf("  attribute: SQL_ASYNC_ENABLE "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_ROW_BIND_TYPE:
@@ -7165,7 +7183,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			debugPrintf("  attribute: "
 					"SQL_ATTR_ROW_BIND_TYPE/"
 					"SQL_BIND_TYPE: "
-					"%lld\n",(uint64_t)(value));
+					"%lld\n",(uint64_t)value);
 			stmt->rowbindtype=(SQLULEN)value;
 			return SQL_SUCCESS;
 		//case SQL_ATTR_CONCURRENCY:
@@ -7174,48 +7192,55 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			debugPrintf("  attribute: "
 					"SQL_ATTR_CONCURRENCY/"
 					"SQL_ATTR_CURSOR_TYPE/"
-					"SQL_CURSOR_TYPE\n");
+					"SQL_CURSOR_TYPE "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_CONCURRENCY:
-			debugPrintf("  attribute: SQL_CONCURRENCY\n");
+			debugPrintf("  attribute: SQL_CONCURRENCY "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_KEYSET_SIZE:
 		case SQL_KEYSET_SIZE:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_KEYSET_SIZE/"
-					"SQL_KEYSET_SIZE\n");
+					"SQL_KEYSET_SIZE "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ROWSET_SIZE:
 			debugPrintf("  attribute: SQL_ROWSET_SIZE: "
-						"%lld\n",(uint64_t)(value));
+						"%lld\n",(uint64_t)value);
 			stmt->cur->setResultSetBufferSize((uint64_t)value);
 			return SQL_SUCCESS;
 		//case SQL_ATTR_SIMULATE_CURSOR:
 		case SQL_SIMULATE_CURSOR:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_SIMULATE_CURSOR/"
-					"SQL_SIMULATE_CURSOR\n");
+					"SQL_SIMULATE_CURSOR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_RETRIEVE_DATA:
 		case SQL_RETRIEVE_DATA:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_RETRIEVE_DATA/"
-					"SQL_RETRIEVE_DATA\n");
+					"SQL_RETRIEVE_DATA "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_USE_BOOKMARKS:
 		case SQL_USE_BOOKMARKS:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_USE_BOOKMARKS/"
-					"SQL_USE_BOOKMARKS\n");
+					"SQL_USE_BOOKMARKS "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_GET_BOOKMARK:
-			debugPrintf("  attribute: SQL_GET_BOOKMARK\n");
+			debugPrintf("  attribute: SQL_GET_BOOKMARK "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_ROW_NUMBER:
@@ -7227,47 +7252,57 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			return SQL_ERROR;
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_ENABLE_AUTO_IPD:
-			debugPrintf("  attribute: SQL_ATTR_ENABLE_AUTO_IPD\n");
+			debugPrintf("  attribute: SQL_ATTR_ENABLE_AUTO_IPD "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_FETCH_BOOKMARK_PTR:
-			debugPrintf("  attribute: SQL_ATTR_FETCH_BOOKMARK_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_FETCH_BOOKMARK_PTR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
 			debugPrintf("  attribute: "
-					"SQL_ATTR_PARAM_BIND_OFFSET_PTR\n");
+					"SQL_ATTR_PARAM_BIND_OFFSET_PTR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_BIND_TYPE:
-			debugPrintf("  attribute: SQL_ATTR_PARAM_BIND_TYPE\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAM_BIND_TYPE "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_OPERATION_PTR:
 			debugPrintf("  attribute: "
-					"SQL_ATTR_PARAM_OPERATION_PTR\n");
+					"SQL_ATTR_PARAM_OPERATION_PTR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_STATUS_PTR:
-			debugPrintf("  attribute: SQL_ATTR_PARAM_STATUS_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAM_STATUS_PTR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAMS_PROCESSED_PTR:
 			debugPrintf("  attribute: "
-					"SQL_ATTR_PARAMS_PROCESSED_PTR\n");
+					"SQL_ATTR_PARAMS_PROCESSED_PTR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAMSET_SIZE:
-			debugPrintf("  attribute: SQL_ATTR_PARAMSET_SIZE\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAMSET_SIZE "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_BIND_OFFSET_PTR:
 			debugPrintf("  attribute: "	
-					"SQL_ATTR_ROW_BIND_OFFSET_PTR\n");
+					"SQL_ATTR_ROW_BIND_OFFSET_PTR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_OPERATION_PTR:
-			debugPrintf("  attribute: SQL_ATTR_ROW_OPERATION_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_ROW_OPERATION_PTR "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_STATUS_PTR:
@@ -7280,17 +7315,19 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_ARRAY_SIZE:
 			debugPrintf("  attribute: SQL_ATTR_ROW_ARRAY_SIZE: "
-						"%lld\n",(uint64_t)(value));
+						"%lld\n",(uint64_t)value);
 			stmt->cur->setResultSetBufferSize((uint64_t)value);
 			return SQL_SUCCESS;
 		#endif
 		#if (ODBCVER < 0x0300)
 		case SQL_STMT_OPT_MAX:
-			debugPrintf("  attribute: SQL_STMT_OPT_MAX\n");
+			debugPrintf("  attribute: SQL_STMT_OPT_MAX "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_STMT_OPT_MIN:
-			debugPrintf("  attribute: SQL_STMT_OPT_MIN\n");
+			debugPrintf("  attribute: SQL_STMT_OPT_MIN "
+				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		#endif
