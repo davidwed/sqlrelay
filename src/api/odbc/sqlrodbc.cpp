@@ -1518,7 +1518,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			}
 			break;
@@ -1556,7 +1560,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			break;
 		case SQL_DESC_BASE_TABLE_NAME:
@@ -1569,7 +1577,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			break;
 		//case SQL_DESC_CASE_SENSITIVE:
@@ -1595,7 +1607,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			break;
 		//case SQL_DESC_DISPLAY_SIZE:
@@ -1641,7 +1657,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			}
 			break;
@@ -1658,6 +1678,9 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 							bufferlength,"'");
 				if (stringlength) {
 					*stringlength=1;
+				} else {
+					debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 				}
 			} else if (type==SQL_BINARY ||
 					type==SQL_VARBINARY ||
@@ -1666,18 +1689,28 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 							bufferlength,"0x");
 				if (stringlength) {
 					*stringlength=2;
+				} else {
+					debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 				}
 			} else {
 				charstring::safeCopy((char *)characterattribute,
 							bufferlength,"");
 				if (stringlength) {
 					*stringlength=0;
+				} else {
+					debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 				}
 			}
 			debugPrintf("  literal prefix: %s\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			}
 			break;
@@ -1694,18 +1727,28 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 							bufferlength,"'");
 				if (stringlength) {
 					*stringlength=1;
+				} else {
+					debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 				}
 			} else {
 				charstring::safeCopy((char *)characterattribute,
 							bufferlength,"");
 				if (stringlength) {
 					*stringlength=0;
+				} else {
+					debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 				}
 			}
 			debugPrintf("  literal prefix: %s\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			}
 			break;
@@ -1720,7 +1763,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			}
 			break;
@@ -1746,7 +1793,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			break;
 		//case SQL_DESC_SEARCHABLE
@@ -1773,7 +1824,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			}
 			break;
@@ -1789,7 +1844,11 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("  length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			break;
 		//case SQL_DESC_UNSIGNED
@@ -3414,12 +3473,21 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			debugPrintf("  attribute: SQL_CURRENT_QUALIFIER/"
 						"SQL_ATTR_CURRENT_CATALOG\n");
 			const char	*db=conn->con->getCurrentDatabase();
-			charstring::safeCopy((char *)value,bufferlength,db);
 			debugPrintf("  current catalog: %s\n",db);
+			if (value) {
+				charstring::safeCopy((char *)value,
+							bufferlength,db);
+			} else {
+				debugPrintf("  NULL value "
+						"(not copying out catalog)\n");
+			}
 			if (stringlength) {
 				*stringlength=charstring::length(db);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
 			}
 			return SQL_SUCCESS;
 		}
@@ -3436,11 +3504,24 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_ATTR_METADATA_ID:
 		{
 			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
-			*(SQLUINTEGER *)value=
-				(conn->attrmetadataid)?SQL_TRUE:SQL_FALSE;
-			*stringlength=sizeof(SQLUINTEGER);
-			debugPrintf("  value: %lld\n",
+			if (value) {
+				*(SQLUINTEGER *)value=
+					(conn->attrmetadataid)?
+						SQL_TRUE:SQL_FALSE;
+				debugPrintf("  value: %lld\n",
 					(uint64_t)(*(SQLUINTEGER *)value));
+			} else {
+				debugPrintf("  NULL value "
+						"(not copying out data)\n");
+			}
+			if (stringlength) {
+				*stringlength=sizeof(SQLUINTEGER);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			} else {
+				debugPrintf("  NULL stringlength "
+						"(not copying out length)\n");
+			}
 			return SQL_SUCCESS;
 		}
 	#endif
