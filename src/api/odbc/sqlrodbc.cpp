@@ -6903,6 +6903,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 			uint64_t	val=(uint64_t)value;
 			debugPrintf("  val: %lld\n",val);
 			if (val==SQL_AUTOCOMMIT_ON) {
+				debugPrintf("  ON\n");
 				if (conn->con->autoCommitOn()) {
 					debugPrintf("  success\n");
 					return SQL_SUCCESS;
@@ -6912,6 +6913,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 				//return SQL_ERROR;
 				return SQL_SUCCESS;
 			} else if (val==SQL_AUTOCOMMIT_OFF) {
+				debugPrintf("  OFF\n");
 				if (conn->con->autoCommitOff()) {
 					debugPrintf("  success\n");
 					return SQL_SUCCESS;
