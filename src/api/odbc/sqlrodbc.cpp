@@ -6349,7 +6349,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		*stringlength=valuelength;
 	} else {
 		debugPrintf("  NULL stringlength "
-					"(not copying out stringlength)\n");
+					"(not copying out valuelength)\n");
 	}
 
 	return SQL_SUCCESS;
