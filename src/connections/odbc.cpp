@@ -232,6 +232,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 						sqlrservercursor *cursor,
 						const char *wild,
 						bool table);
+		bool		isCurrentCatalog(const char *name);
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
@@ -666,9 +667,17 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 					// * catalog(.defaultschama).proc
 					//   or
 					// * (currentcatalog.)schema.proc...
-					// We'll guess schema.proc, but we
-					// don't know for sure.
-					schema=tableparts[0];
+					// If the first part is not the same as
+					// the current catalog, then we'll
+					// guess (currentcatalog.)schema.proc,
+					// but we don't really know for sure.
+					// The app may really mean to target
+					// another catalog.
+					if (charstring::compare(
+							tableparts[0],
+							catalogbuffer)) {
+						schema=tableparts[0];
+					}
 					tablename=tableparts[1];
 					break;
 				case 1:
@@ -768,8 +777,14 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 			// * catalog(.defaultschama).proc
 			//   or
 			// * (currentcatalog.)schema.proc...
-			// We'll guess schema.proc, but we don't know for sure.
-			schema=tableparts[0];
+			// If the first part is not the same as the current
+			// catalog, then we'll guess
+			// (currentcatalog.)schema.proc, but we don't really
+			// know for sure. The app may really mean to target
+			// another catalog.
+			if (charstring::compare(tableparts[0],catalogbuffer)) {
+				schema=tableparts[0];
+			}
 			tablename=tableparts[1];
 			break;
 		case 1:
@@ -821,6 +836,17 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	const char	*schema=NULL;
 	const char	*proc=NULL;
 
+	// get the current catalog (instance)
+	char		catalogbuffer[1024];
+	SQLINTEGER	cataloglen=0;
+	if (SQLGetConnectAttr(dbc,
+				SQL_CURRENT_QUALIFIER,
+				catalogbuffer,
+				sizeof(catalogbuffer),
+				&cataloglen)==SQL_SUCCESS) {
+		catalogbuffer[cataloglen]='\0';
+	}
+
 	// split the procedure name and extract the parts
 	char		**procparts=NULL;
 	uint64_t	procpartcount=0;
@@ -836,8 +862,15 @@ bool odbcconnection::getProcedureBindAndColumnList(
 			// * catalog(.defaultschama).proc
 			//   or
 			// * (currentcatalog.)schema.proc...
-			// We'll guess schema.proc, but we don't know for sure.
-			schema=procparts[0];
+			// If the first part is not the same as the
+			// current catalog, then we'll guess
+			// (currentcatalog.)schema.proc, but we don't really
+			// know for sure.  The app may really mean to target
+			// another catalog.
+			if (charstring::compare(procparts[0],
+						catalogbuffer)) {
+				schema=procparts[0];
+			}
 			proc=procparts[1];
 
 			// NOTE: Delphi was passing catalog.proc at one point,
@@ -1082,9 +1115,15 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 				// * catalog(.defaultschama).proc
 				//   or
 				// * (currentcatalog.)schema.proc...
-				// We'll guess schema.proc, but we don't know
-				// for sure.
-				schema=procparts[0];
+				// If the first part is not the same as the
+				// current catalog, then we'll guess
+				// (currentcatalog.)schema.proc, but we don't
+				// really know for sure.  The app may really
+				// mean to target another catalog.
+				if (charstring::compare(procparts[0],
+							catalogbuffer)) {
+					schema=procparts[0];
+				}
 				procname=procparts[1];
 				break;
 			case 1:
