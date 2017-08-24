@@ -6335,21 +6335,25 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 
 	// copy out the string value
 	if (strval) {
+		debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 		debugPrintf("  strval: %s\n",strval);
 		valuelength=charstring::length(strval);
 		if (infovalue) {
 			charstring::safeCopy((char *)infovalue,
 						bufferlength,strval);
+			// make sure infovalue is null-terminated
+			((char *)infovalue)[bufferlength]='\0';
 		} else {
 			debugPrintf("  NULL infovalue "
 					"(not copying out strval)\n");
 		}
 	}
 	if (stringlength) {
+		debugPrintf("  valuelength: %d\n",(int)valuelength);
 		*stringlength=valuelength;
-		debugPrintf("  stringlength: %d\n",(int)*stringlength);
 	} else {
-		debugPrintf("  NULL stringlength\n");
+		debugPrintf("  NULL stringlength "
+					"(not copying out stringlength)\n");
 	}
 
 	return SQL_SUCCESS;
