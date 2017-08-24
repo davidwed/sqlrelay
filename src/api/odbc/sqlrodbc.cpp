@@ -3474,6 +3474,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 						"SQL_ATTR_CURRENT_CATALOG\n");
 			const char	*db=conn->con->getCurrentDatabase();
 			debugPrintf("  current catalog: %s\n",db);
+			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (value) {
 				charstring::safeCopy((char *)value,
 							bufferlength,db);
@@ -3504,6 +3505,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_ATTR_METADATA_ID:
 		{
 			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
+			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (value) {
 				*(SQLUINTEGER *)value=
 					(conn->attrmetadataid)?
