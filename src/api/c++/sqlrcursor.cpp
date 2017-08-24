@@ -939,7 +939,7 @@ bool sqlrcursor::getProcedureBindAndColumnList(
 				sqlrclientlistformat_t listformat) {
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("getting proceure bind "
+		pvt->_sqlrc->debugPrint("getting procedure bind "
 					"and column list for: \"");
 		pvt->_sqlrc->debugPrint(procedure);
 		pvt->_sqlrc->debugPrint("\"");
