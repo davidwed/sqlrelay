@@ -3414,17 +3414,13 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			debugPrintf("  attribute: SQL_CURRENT_QUALIFIER/"
 						"SQL_ATTR_CURRENT_CATALOG\n");
 			const char	*db=conn->con->getCurrentDatabase();
-			SQLINTEGER	stringlen=charstring::length(db);
-			// Make sure to use stringlen+1 to include the null
-			// terminator.  Some apps (Delphi) don't pass in a
-			// pointer to stringlength, don't get the length, and
-			// just expect the string to be null-terminated.
-			charstring::safeCopy((char *)value,bufferlength,
-								db,stringlen+1);
-			if (stringlength) {
-				*stringlength=stringlen;
-			}
+			charstring::safeCopy((char *)value,bufferlength,db);
 			debugPrintf("  current catalog: %s\n",db);
+			if (stringlength) {
+				*stringlength=charstring::length(db);
+				debugPrintf("  length: %d\n",
+						(int)*stringlength);
+			}
 			return SQL_SUCCESS;
 		}
 
