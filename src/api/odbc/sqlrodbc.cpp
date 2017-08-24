@@ -6337,8 +6337,9 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		if (infovalue) {
 			charstring::safeCopy((char *)infovalue,
 						bufferlength,strval);
-			// make sure infovalue is null-terminated
-			((char *)infovalue)[bufferlength]='\0';
+			// make sure to null-terminate
+			// (even if data has to be truncated)
+			((char *)infovalue)[bufferlength-1]='\0';
 		} else {
 			debugPrintf("  NULL infovalue "
 					"(not copying out strval)\n");
