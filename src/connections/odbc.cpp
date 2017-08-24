@@ -1166,15 +1166,17 @@ char *odbcconnection::getCurrentDatabase() {
 
 #if (ODBCVER >= 0x0300)
 bool odbcconnection::autoCommitOn() {
-	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
+	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_ON,
-				sizeof(SQLINTEGER))==SQL_SUCCESS);
+				sizeof(SQLINTEGER));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbcconnection::autoCommitOff() {
-	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
+	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
-				sizeof(SQLINTEGER))==SQL_SUCCESS);
+				sizeof(SQLINTEGER));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbcconnection::supportsAutoCommit() {
