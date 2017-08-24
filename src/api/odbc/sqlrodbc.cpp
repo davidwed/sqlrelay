@@ -1847,39 +1847,89 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
 					numericattribute);
 }
 
-static void SQLR_BuildTableName(stringbuffer *table,
+static void SQLR_BuildObjectName(stringbuffer *object,
 				SQLCHAR *catalogname,
 				SQLSMALLINT namelength1,
 				SQLCHAR *schemaname,
 				SQLSMALLINT namelength2,
-				SQLCHAR *tablename,
+				SQLCHAR *objectname,
 				SQLSMALLINT namelength3) {
 	debugFunction();
+
+	// FIXME: I suspect I'll be revisiting this in the future...
+	//
+	// Databases disagree about the definition of catalog and schema.
+	// Some db's don't have the concept of a schema.
+	// In some databases, the terms are interchangeable.
+	//
+	// It's possible for an app to accidentally pass in the same name for
+	// catalog and schema, intending to only have specified one or the
+	// other.
+	//
+	// The workaround here is: if the catalog and schema are the same,
+	// don't include the schema in the name.
+	//
+	// Unfortunately, there are probably cases where the catalog and
+	// schema are legitimately the same and the app means to pass them
+	// both.  I'll bet that I'll be revisiting this code someday.
+
+	// FIXME: some apps pass schema.object as the object name.  Arguably,
+	// this should be caught.
+
+	// FIXME: oracle needs schema.object@catalog instead of
+	// catalog.schema.object
+
 	if (namelength1) {
 		if (namelength1==SQL_NTS) {
-			table->append(catalogname);
+			debugPrintf("  catalog: %s\n",catalogname);
+			object->append(catalogname);
 		} else {
-			table->append(catalogname,namelength1);
+			debugPrintf("  catalog: %.*s\n",
+					namelength1,catalogname);
+			object->append(catalogname,namelength1);
 		}
 	}
+
 	if (namelength2) {
-		if (table->getStringLength()) {
-			table->append('.');
-		}
-		if (namelength2==SQL_NTS) {
-			table->append(schemaname);
+
+		if (namelength2!=namelength1 ||
+			charstring::compare((char *)schemaname,
+						(char *)catalogname,
+						namelength1)) {
+
+			if (object->getStringLength()) {
+				object->append('.');
+			}
+			if (namelength2==SQL_NTS) {
+				debugPrintf("  schema: %s\n",schemaname);
+				object->append(schemaname);
+			} else {
+				debugPrintf("  schema: %.*s\n",
+						namelength2,schemaname);
+				object->append(schemaname,namelength2);
+			}
 		} else {
-			table->append(schemaname,namelength2);
+			if (namelength2==SQL_NTS) {
+				debugPrintf("  schema: %s (ignored)\n",
+						schemaname);
+			} else {
+				debugPrintf("  schema: %.*s (ignored)\n",
+						namelength2,schemaname);
+			}
 		}
 	}
+
 	if (namelength3) {
-		if (table->getStringLength()) {
-			table->append('.');
+		if (object->getStringLength()) {
+			object->append('.');
 		}
 		if (namelength3==SQL_NTS) {
-			table->append(tablename);
+			debugPrintf("  object: %s\n",objectname);
+			object->append(objectname);
 		} else {
-			table->append(tablename,namelength3);
+			debugPrintf("  object: %.*s\n",
+					namelength3,objectname);
+			object->append(objectname,namelength3);
 		}
 	}
 }
@@ -1907,38 +1957,10 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	// * SQL_ATTR_METADATA_ID is SQL_FALSE
 	// otherwise it's a case-insensitive literal
 
-	// FIXME: I suspect I'll be revisiting this in the future...
-	//
-	// SQLGetConnectAttr(SQL_ATTR_CURRENT_CATALOG) returns the
-	// "current db name".  In most db's, this is the instance but in others
-	// (Oracle) it's the schema.  Most db's don't have a concept of
-	// instance.schema.table though, just instance.table or schema.table
-	// so the two are usually interchangeable.
-	//
-	// Since this function supports all three (but calls the instance the
-	// catalog), an app might pass in "the current catalog" as either the
-	// catalog name or the schema name.
-	//
-	// If it's passed in as the catalog, what would the app pass in as the
-	// schema?  Maybe nothing.  But maybe, erroneously, the user it used
-	// to log into SQL Relay.  The Oracle Heterogenous Agent does this.
-	//
-	// A workaround it to use either the catalog, or the schema, but not
-	// both, and prefer the catalog.
-	//
-	// Unfortunately, I'll bet that there are apps out there that need to
-	// use both, and I'll bet that I'll be revisiting this code someday.
 	stringbuffer	table;
-	if (!charstring::isNullOrEmpty(catalogname)) {
-		SQLR_BuildTableName(&table,catalogname,namelength1,
-					NULL,0,tablename,namelength3);
-	} else if (!charstring::isNullOrEmpty(schemaname)) {
-		SQLR_BuildTableName(&table,NULL,0,
+	SQLR_BuildObjectName(&table,catalogname,namelength1,
 					schemaname,namelength2,
 					tablename,namelength3);
-	} else {
-		SQLR_BuildTableName(&table,NULL,0,NULL,0,tablename,namelength3);
-	}
 
 	if (namelength4==SQL_NTS) {
 		namelength4=charstring::length(columnname);
@@ -3129,11 +3151,10 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	}
 
 	// update row statuses
-	for (SQLULEN i=0; i<rowstofetch; i++) {
-		SQLUSMALLINT	status=(i<rowsfetched)?
-					SQL_ROW_SUCCESS:SQL_ROW_NOROW;
-		if (rgfrowstatus && rgfrowstatus[i]) {
-			rgfrowstatus[i]=status;
+	if (rgfrowstatus) {
+		for (SQLULEN i=0; i<rowstofetch; i++) {
+			rgfrowstatus[i]=(i<rowsfetched)?
+						SQL_ROW_SUCCESS:SQL_ROW_NOROW;
 		}
 	}
 
@@ -3403,7 +3424,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			if (stringlength) {
 				*stringlength=stringlen;
 			}
-			debugPrintf("    current catalog: %s\n",db);
+			debugPrintf("  current catalog: %s\n",db);
 			return SQL_SUCCESS;
 		}
 
@@ -3422,7 +3443,8 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			*(SQLUINTEGER *)value=
 				(conn->attrmetadataid)?SQL_TRUE:SQL_FALSE;
 			*stringlength=sizeof(SQLUINTEGER);
-			debugPrintf("    value: %d\n",*(SQLUINTEGER *)value);
+			debugPrintf("  value: %lld\n",
+					(uint64_t)(*(SQLUINTEGER *)value));
 			return SQL_SUCCESS;
 		}
 	#endif
@@ -5322,8 +5344,14 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_QUALIFIER_NAME_SEPARATOR/"
 					"SQL_CATALOG_NAME_SEPARATOR\n");
-			// FIXME: is this true for all db's?
-			strval=".";
+			// FIXME: are there db's other than oracle where the
+			// catalog separator is an @?
+			if (!charstring::compare(conn->con->identify(),
+								"oracle")) {
+				strval="@";
+			} else {
+				strval=".";
+			}
 			break;
 		case SQL_QUALIFIER_TERM:
 			// aka SQL_CATALOG_TERM
@@ -5572,7 +5600,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_OWNER_USAGE:
 			// aka SQL_SCHEMA_USAGE
 			debugPrintf("  infotype: "
-					"SQL_OWNSER_USAGE/"
+					"SQL_OWNER_USAGE/"
 					"SQL_SCHEMA_USAGE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=
@@ -5585,7 +5613,17 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case SQL_QUALIFIER_USAGE:
 			// aka SQL_CATALOG_USAGE
-			debugPrintf("  unsupported infotype: %d\n",infotype);
+			debugPrintf("  infotype: "
+					"SQL_QUALIFIER_USAGE/"
+					"SQL_CATALOG_USAGE\n");
+			// FIXME: this isn't true for all db's
+			*(SQLUINTEGER *)infovalue=
+					SQL_SU_DML_STATEMENTS|
+					SQL_SU_PROCEDURE_INVOCATION|
+					SQL_SU_TABLE_DEFINITION|
+					SQL_SU_INDEX_DEFINITION|
+					SQL_SU_PRIVILEGE_DEFINITION;
+			valuelength=sizeof(SQLUINTEGER);
 			break;
 		case SQL_QUOTED_IDENTIFIER_CASE:
 			debugPrintf("  infotype: "
@@ -5681,6 +5719,18 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_QUALIFIER_LOCATION:
 			// aka SQL_CATALOG_LOCATION
 			debugPrintf("  unsupported infotype: %d\n",infotype);
+			debugPrintf("  infotype: "
+					"SQL_QUALIFIER_LOCATION/"
+					"SQL_CATALOG_LOCATION\n");
+			// FIXME: are there db's other than oracle where the
+			// catalog is at the end?
+			if (!charstring::compare(conn->con->identify(),
+								"oracle")) {
+				*(SQLUSMALLINT *)infovalue=SQL_CL_END;
+			} else {
+				*(SQLUSMALLINT *)infovalue=SQL_CL_START;
+			}
+			valuelength=sizeof(SQLUSMALLINT);
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_ACTIVE_ENVIRONMENTS:
@@ -6866,10 +6916,10 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 				}
 				debugPrintf("  failed\n");
 				return SQL_ERROR;
-			} else {
-				debugPrintf("  unsupported val: %d\n",val);
-				return SQL_SUCCESS;
 			}
+			debugPrintf("  unsupported val: %d "
+					"(but returning success)\n",val);
+			return SQL_SUCCESS;
 		}
 		#endif
 
@@ -7447,18 +7497,17 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	// * SQL_ATTR_METADATA_ID is SQL_FALSE
 	// otherwise it should be a case-insensitive literal
 
-	// FIXME: I suspect I'll be revisiting this in the future...
-	//
-	// SQL Relay doesn't really differentiate between catalog and schema.
-	// It calls both "database" because most db's don't have a concept of
-	// catalog.schema.table, just catalog.table or schema.table
-	// so the two are usually interchangeable.
-	//
 	// The SQL Relay server is currently only capable of returning
 	// the column format that ODBC likes for a catalog list, not a schema
 	// list, so for now, we'll ignore requests for schema lists and
-	// return the list of databases in catalog format, when the list of
+	// return the list of "databases" in catalog format, when the list of
 	// catalogs are requested.
+	//
+	// Unfortunately, to most databases, "database" = "catalog", but for
+	// some (oracle), if you ask for the list of "databases" then it really
+	// means you want the list of schemas.  So, that's what's returned if
+	// you're using an oracle backend.  There are probably other db's that
+	// do similar things...
 
 	SQLRETURN	retval=SQL_ERROR;
 	if (!charstring::compare(catname,SQL_ALL_CATALOGS) &&
@@ -7894,42 +7943,10 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	// * SQL_ATTR_METADATA_ID is SQL_FALSE
 	// otherwise it's a case-insensitive literal
 
-	// FIXME: I suspect I'll be revisiting this in the future...
-	//
-	// SQLGetConnectAttr(SQL_ATTR_CURRENT_CATALOG) returns the
-	// "current db name".  In most db's, this is the instance but in others
-	// (Oracle) it's the schema.  Most db's don't have a concept of
-	// instance.schema.procedure though, just instance.procedure or
-	// schema.procedure so the two are usually interchangeable.
-	//
-	// Since this function supports all three (but calls the instance the
-	// catalog), an app might pass in "the current catalog" as either the
-	// catalog name or the schema name.
-	//
-	// If it's passed in as the catalog, what would the app pass in as the
-	// schema?  Maybe nothing.  But maybe, erroneously, the user it used
-	// to log into SQL Relay.  The Oracle Heterogenous Agent does this.
-	//
-	// A workaround it to use either the catalog, or the schema, but not
-	// both, and prefer the catalog.
-	//
-	// Unfortunately, I'll bet that there are apps out there that need to
-	// use both, and I'll bet that I'll be revisiting this code someday.
-	//
-	//
-	// Also, we can use BuildTableName here, to build the procedure name.
 	stringbuffer	procedure;
-	if (!charstring::isNullOrEmpty(catalogname)) {
-		SQLR_BuildTableName(&procedure,catalogname,namelength1,
-					NULL,0,procedurename,namelength3);
-	} else if (!charstring::isNullOrEmpty(schemaname)) {
-		SQLR_BuildTableName(&procedure,NULL,0,
+	SQLR_BuildObjectName(&procedure,catalogname,namelength1,
 					schemaname,namelength2,
 					procedurename,namelength3);
-	} else {
-		SQLR_BuildTableName(&procedure,NULL,0,NULL,0,
-					procedurename,namelength3);
-	}
 
 	if (namelength4==SQL_NTS) {
 		namelength4=charstring::length(columnname);

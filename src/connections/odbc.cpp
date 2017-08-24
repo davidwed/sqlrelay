@@ -661,6 +661,13 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 					tablename=tableparts[2];
 					break;
 				case 2:
+					// If there are 2 parts the it could
+					// mean:
+					// * catalog(.defaultschama).proc
+					//   or
+					// * (currentcatalog.)schema.proc...
+					// We'll guess schema.proc, but we
+					// don't know for sure.
 					schema=tableparts[0];
 					tablename=tableparts[1];
 					break;
@@ -757,6 +764,11 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 			tablename=tableparts[2];
 			break;
 		case 2:
+			// If there are 2 parts the it could mean:
+			// * catalog(.defaultschama).proc
+			//   or
+			// * (currentcatalog.)schema.proc...
+			// We'll guess schema.proc, but we don't know for sure.
 			schema=tableparts[0];
 			tablename=tableparts[1];
 			break;
@@ -810,8 +822,6 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	const char	*proc=NULL;
 
 	// split the procedure name and extract the parts
-	// FIXME: arguably getColumnList and getDatabaseOrTableList
-	// ought to do this same thing
 	char		**procparts=NULL;
 	uint64_t	procpartcount=0;
 	charstring::split(procedure,".",true,&procparts,&procpartcount);
@@ -822,10 +832,17 @@ bool odbcconnection::getProcedureBindAndColumnList(
 			proc=procparts[2];
 			break;
 		case 2:
-			// FIXME: note here about why we're doing catalog.proc
-			// instead of schema.proc
-			catalog=procparts[0];
+			// If there are 2 parts the it could mean:
+			// * catalog(.defaultschama).proc
+			//   or
+			// * (currentcatalog.)schema.proc...
+			// We'll guess schema.proc, but we don't know for sure.
+			schema=procparts[0];
 			proc=procparts[1];
+
+			// NOTE: Delphi was passing catalog.proc at one point,
+			// and we were assuming that instead.
+			//catalog=procparts[0];
 			break;
 		case 1:
 			proc=procparts[0];
@@ -1061,6 +1078,12 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 				procname=procparts[2];
 				break;
 			case 2:
+				// If there are 2 parts the it could mean:
+				// * catalog(.defaultschama).proc
+				//   or
+				// * (currentcatalog.)schema.proc...
+				// We'll guess schema.proc, but we don't know
+				// for sure.
 				schema=procparts[0];
 				procname=procparts[1];
 				break;
