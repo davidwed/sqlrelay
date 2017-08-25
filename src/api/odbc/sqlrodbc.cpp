@@ -3511,9 +3511,8 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			// FIXME: implement
 			break;
 		case SQL_QUIET_MODE:
-			debugPrintf("  unsupported attribute: "
-						"SQL_QUIET_MODE\n");
-			// FIXME: implement
+			debugPrintf("  attribute: SQL_QUIET_MODE\n");
+			// SQL Relay doesn't need to do anything with this
 			break;
 		case SQL_PACKET_SIZE:
 			debugPrintf("  unsupported attribute: "
@@ -7488,68 +7487,82 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		}
 		#endif
 
-		// FIXME: implement...
  		case SQL_ACCESS_MODE:
  			debugPrintf("  attribute: SQL_ACCESS_MODE "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_LOGIN_TIMEOUT:
 			debugPrintf("  attribute: SQL_LOGIN_TIMEOUT "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_OPT_TRACE:
 			debugPrintf("  attribute: SQL_OPT_TRACE "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_OPT_TRACEFILE:
 			debugPrintf("  attribute: SQL_OPT_TRACEFILE "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_TRANSLATE_DLL:
 			debugPrintf("  attribute: SQL_TRANSLATE_DLL "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_TRANSLATE_OPTION:
 			debugPrintf("  attribute: SQL_TRANSLATE_OPTION "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_TXN_ISOLATION:
 			debugPrintf("  attribute: SQL_TXN_ISOLATION "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_ODBC_CURSORS:
 			debugPrintf("  attribute: SQL_ODBC_CURSORS "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_QUIET_MODE:
 			debugPrintf("  attribute: SQL_QUIET_MODE "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_PACKET_SIZE:
 			debugPrintf("  attribute: SQL_PACKET_SIZE "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 	#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_CONNECTION_TIMEOUT:
 			debugPrintf("  attribute: SQL_ATTR_CONNECTION_TIMEOUT "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_ATTR_DISCONNECT_BEHAVIOR:
 			debugPrintf("  attribute: "
 				"SQL_ATTR_DISCONNECT_BEHAVIOR "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_ATTR_ENLIST_IN_DTC:
 			debugPrintf("  attribute: SQL_ATTR_ENLIST_IN_DTC "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_ATTR_ENLIST_IN_XA:
 			debugPrintf("  attribute: SQL_ATTR_ENLIST_IN_XA "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_ATTR_AUTO_IPD:
 			debugPrintf("  attribute: SQL_ATTR_AUTO_IPD "
 				"(unsupported but returning success)\n");
+			// FIXME: implement...
 			return SQL_SUCCESS;
 		case SQL_ATTR_METADATA_ID:
 		{
@@ -7560,17 +7573,19 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 			return SQL_SUCCESS;
 		}
 		case 1041:
-			debugPrintf("  attribute: 1041 (license file) "
-				"(unsupported but returning success)\n");
+			debugPrintf("  attribute: 1041 (license file)\n");
+			// SQL Relay doesn't need to do anything with this
 			return SQL_SUCCESS;
 		case 1042:
-			debugPrintf("  attribute: 1042 (password) "
-				"(unsupported but returning success)\n");
+			debugPrintf("  attribute: 1042 (password)\n");
+			// SQL Relay doesn't need to do anything with this
 			return SQL_SUCCESS;
 	#endif
 		default:
-			debugPrintf("  unsupported attribute: %d\n",attribute);
-			return SQL_SUCCESS;
+			debugPrintf("  invalid attribute: %d\n",attribute);
+			SQLR_CONNSetError(conn,
+				"Optional field not implemented",0,"HYC00");
+			return SQL_ERROR;
 	}
 
 	return SQL_ERROR;
