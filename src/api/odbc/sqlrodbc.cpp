@@ -3572,12 +3572,17 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			debugPrintf("  strval: %s\n",val.strval);
 			valuelength=charstring::length(val.strval);
 			if (value && bufferlength) {
+
 				charstring::safeCopy((char *)value,
 							bufferlength,
 							val.strval);
+
 				// make sure to null-terminate
 				// (even if data has to be truncated)
 				((char *)value)[bufferlength-1]='\0';
+
+				// reset valuelength
+				valuelength=charstring::length((char *)value);
 			} else {
 				debugPrintf("  NULL value or "
 						"0 bufferlength "
@@ -4084,6 +4089,12 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 		return SQL_NO_DATA;
 	}
 
+	union {
+		const char	*strval;
+		SQLLEN		lenval;
+	} val;
+	int16_t	type=-1;
+
 	switch (handletype) {
 		case SQL_HANDLE_ENV:
 			{
@@ -4110,7 +4121,6 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 			}
 
 			// get the requested data
-			const char	*di=NULL;
 			switch (diagidentifier) {
 				case SQL_DIAG_CLASS_ORIGIN:
 					debugPrintf("  diagidentifier: "
@@ -4119,10 +4129,11 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 							conn->sqlstate);
 					if (!charstring::compare(
 						conn->sqlstate,"IM",2)) {
-						di="ODBC 3.0";
+						val.strval="ODBC 3.0";
 					} else {
-						di="ISO 9075";
+						val.strval="ISO 9075";
 					}
+					type=0;
 					break;
 				case SQL_DIAG_SUBCLASS_ORIGIN:
 					debugPrintf("  diagidentifier: "
@@ -4132,21 +4143,24 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 					if (charstring::inSet(
 							conn->sqlstate,
 							odbc3states)) {
-						di="ODBC 3.0";
+						val.strval="ODBC 3.0";
 					} else {
-						di="ISO 9075";
+						val.strval="ISO 9075";
 					}
+					type=0;
 					break;
 				case SQL_DIAG_CONNECTION_NAME:
 					debugPrintf("  diagidentifier: "
 						"SQL_DIAG_CONNECTION_NAME\n");
 					// return the server name for this too
-					di=conn->server;
+					val.strval=conn->server;
+					type=0;
 					break;
 				case SQL_DIAG_SERVER_NAME:
 					debugPrintf("  diagidentifier: "
 						"SQL_DIAG_SERVER_NAME\n");
-					di=conn->server;
+					val.strval=conn->server;
+					type=0;
 					break;
 				default:
 					// anything else is not supported
@@ -4155,14 +4169,8 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 							diagidentifier);
 					return SQL_NO_DATA;
 			}
-
-			// copy out the data
-			charstring::copy((char *)diaginfo,di);
-
-			debugPrintf("  diaginfo: %s\n",(char *)diaginfo);
-
-			return SQL_SUCCESS;
 			}
+			break;
 		case SQL_HANDLE_STMT:
 			{
 			debugPrintf("  handletype: SQL_HANDLE_STMT\n");
@@ -4176,15 +4184,15 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 					debugPrintf("  diagidentifier: "
 						"SQL_DIAG_ROW_COUNT: %lld\n",
 						stmt->cur->affectedRows());
-					*(SQLLEN *)diaginfo=
-						stmt->cur->affectedRows();
+					val.lenval=stmt->cur->affectedRows();
+					type=1;
 					break;
 				case SQL_DIAG_SQLSTATE:
 					debugPrintf("  diagidentifier: "
 						"SQL_DIAG_SQLSTATE: %s\n",
 						stmt->sqlstate);
-					charstring::copy((char *)diaginfo,
-								stmt->sqlstate);
+					val.strval=stmt->sqlstate;
+					type=1;
 					break;
 				default:
 					// anything else is not supported
@@ -4193,18 +4201,70 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 							diagidentifier);
 					return SQL_NO_DATA;
 			}
-
-			return SQL_SUCCESS;
 			}
+			break;
 		case SQL_HANDLE_DESC:
 			debugPrintf("  handletype: SQL_HANDLE_DESC\n");
 			debugPrintf("  diagidentifier: %d (unsupported)\n",
 								diagidentifier);
 			// not supported
 			return SQL_NO_DATA;
+		default:
+			debugPrintf("  invalid handletype\n");
+			return SQL_ERROR;
 	}
-	debugPrintf("  invalid handletype\n");
-	return SQL_ERROR;
+
+
+	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
+
+	// copy out the value and length
+	SQLSMALLINT	valuelength=0;
+	switch (type) {
+		case -1:
+			debugPrintf("  (not copying out any value)\n");
+			break;
+		case 0:
+			debugPrintf("  strval: %s\n",val.strval);
+			valuelength=charstring::length(val.strval);
+			if (diaginfo && bufferlength) {
+
+				charstring::safeCopy((char *)diaginfo,
+							bufferlength,
+							val.strval);
+
+				// make sure to null-terminate
+				// (even if data has to be truncated)
+				((char *)diaginfo)[bufferlength-1]='\0';
+
+				// reset valuelength
+				valuelength=charstring::length(
+							(char *)diaginfo);
+			} else {
+				debugPrintf("  NULL diaginfo or "
+						"0 bufferlength "
+						"(not copying out strval)\n");
+			}
+			break;
+		case 1:
+			debugPrintf("  lenval: %d\n",val.lenval);
+			valuelength=sizeof(SQLLEN);
+			if (diaginfo) {
+				*((SQLLEN *)diaginfo)=val.lenval;
+			} else {
+				debugPrintf("  NULL diaginfo "
+						"(not copying out lenval)\n");
+			}
+			break;
+	}
+	debugPrintf("  valuelength: %d\n",(int)valuelength);
+	if (stringlength) {
+		*stringlength=valuelength;
+	} else {
+		debugPrintf("  NULL stringlength "
+					"(not copying out valuelength)\n");
+	}
+
+	return SQL_SUCCESS;
 }
 
 static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
@@ -4290,21 +4350,49 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	}
 
 	// copy out the data
-	charstring::safeCopy((char *)messagetext,(size_t)bufferlength,error);
-	*textlength=charstring::length(error);
-	if (*textlength>bufferlength) {
-		*textlength=bufferlength;
-	}
 	if (nativeerror) {
 		*nativeerror=errn;
+		debugPrintf("  nativeerror: %lld\n",(int64_t)*nativeerror);
+	} else {
+		debugPrintf("  NULL nativerror "
+				"(not copying out: %lld)\n",(int64_t)errn);
 	}
-	charstring::copy((char *)sqlstate,sqlst);
+	if (sqlstate) {
+		charstring::copy((char *)sqlstate,sqlst);
+		debugPrintf("  sqlstate: %s\n",
+				((char *)sqlstate)?(char *)sqlstate:"");
+	} else {
+		debugPrintf("  NULL sqlstate "
+				"(not copying out: %s)\n",(sqlst)?sqlst:"");
+	}
 
-	debugPrintf("  sqlstate: %s\n",(sqlst)?sqlst:"");
-	debugPrintf("  nativeerror: %lld\n",(int64_t)errn);
-	debugPrintf("  messagetext: %s\n",(error)?error:"");
-	debugPrintf("  bufferlength: %d\n",bufferlength);
-	debugPrintf("  textlength: %d\n",*textlength);
+	SQLSMALLINT	valuelength=charstring::length(error);
+	if (messagetext && bufferlength) {
+
+		charstring::safeCopy((char *)messagetext,
+					(size_t)bufferlength,
+					error);
+		valuelength=charstring::length(messagetext);
+
+		// make sure to null-terminate
+		// (even if data has to be truncated)
+		((char *)messagetext)[bufferlength-1]='\0';
+
+		// reset valuelength
+		valuelength=charstring::length((char *)messagetext);
+
+		debugPrintf("  messagetext: %s\n",messagetext);
+	} else {
+		debugPrintf("  NULL value or 0 bufferlength "
+					"(not copying out: %s)\n",error);
+	}
+	if (textlength) {
+		*textlength=valuelength;
+		debugPrintf("  textlength: %d\n",(int)*textlength);
+	} else {
+		debugPrintf("  NULL textlength (not copying out: %d\n",
+								valuelength);
+	}
 
 	return SQL_SUCCESS;
 }
@@ -6540,12 +6628,18 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  strval: %s\n",val.strval);
 			valuelength=charstring::length(val.strval);
 			if (infovalue && bufferlength) {
+
 				charstring::safeCopy((char *)infovalue,
 							bufferlength,
 							val.strval);
+
 				// make sure to null-terminate
 				// (even if data has to be truncated)
 				((char *)infovalue)[bufferlength-1]='\0';
+
+				// reset valuelength
+				valuelength=charstring::length(
+							(char *)infovalue);
 			} else {
 				debugPrintf("  NULL infovalue or "
 						"0 bufferlength "
