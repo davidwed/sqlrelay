@@ -2779,8 +2779,9 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			case SQL_C_LONG:
 				debugPrintf("  valuetype: "
 					"SQL_C_SLONG/SQL_C_LONG\n");
-				*((long *)ob->parametervalue)=
-					(long)stmt->cur->getOutputBindInteger(
+				*((int32_t *)ob->parametervalue)=
+					(int32_t)
+					stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			//case SQL_C_BOOKMARK:
@@ -2788,8 +2789,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			case SQL_C_ULONG:
 				debugPrintf("  valuetype: "
 					"SQL_C_ULONG/SQL_C_BOOKMARK\n");
-				*((unsigned long *)ob->parametervalue)=
-					(unsigned long)
+				*((uint32_t *)ob->parametervalue)=
+					(uint32_t)
 					stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
@@ -2797,14 +2798,15 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			case SQL_C_SHORT:
 				debugPrintf("  valuetype: "
 					"SQL_C_SSHORT/SQL_C_SHORT\n");
-				*((short *)ob->parametervalue)=
-					(short)stmt->cur->getOutputBindInteger(
+				*((int16_t *)ob->parametervalue)=
+					(int16_t)
+					stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_USHORT:
 				debugPrintf("  valuetype: SQL_C_USHORT\n");
-				*((unsigned short *)ob->parametervalue)=
-					(unsigned short)
+				*((uint16_t *)ob->parametervalue)=
+					(uint16_t)
 					stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
@@ -3796,15 +3798,24 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		return SQL_ERROR;
 	}
 
-	debugPrintf("  row   : %d\n",(int)stmt->currentgetdatarow);
+	// bail if bufferlength < 0
+	if (bufferlength<0) {
+		debugPrintf("  bufferlength < 0 (%lld)\n",
+						(int64_t)bufferlength);
+		SQLR_STMTSetError(stmt,
+			"Invalid string or buffer length",0,"HY090");
+		return SQL_ERROR;
+	}
+
+	debugPrintf("  row   : %lld\n",stmt->currentgetdatarow);
 	debugPrintf("  column: %d\n",(int)columnnumber);
-	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
+	debugPrintf("  bufferlength: %lld\n",(int64_t)bufferlength);
 
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
 	if (columnnumber<1 || columnnumber>colcount) {
 		debugPrintf("  invalid column: %d\n",columnnumber);
-		SQLR_STMTSetError(stmt,NULL,0,"07009");
+		SQLR_STMTSetError(stmt,"Invalid descriptor index",0,"07009");
 		return SQL_ERROR;
 	}
 
@@ -3858,26 +3869,42 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_SSHORT:
 		case SQL_C_SHORT:
-		case SQL_C_USHORT:
-			debugPrintf("  targettype: SQL_C_(X)SHORT\n");
+			debugPrintf("  targettype: SQL_C_(S)SHORT\n");
 			if (targetvalue) {
-				*((short *)targetvalue)=
-					(short)charstring::toInteger(field);
+				*((int16_t *)targetvalue)=
+					(int16_t)charstring::toInteger(field);
 				debugPrintf("  value: %d\n",
-						*((short *)targetvalue));
+						*((int16_t *)targetvalue));
+			}
+			break;
+		case SQL_C_USHORT:
+			debugPrintf("  targettype: SQL_C_USHORT\n");
+			if (targetvalue) {
+				*((uint16_t *)targetvalue)=
+					(uint16_t)charstring::toInteger(field);
+				debugPrintf("  value: %d\n",
+						*((uint16_t *)targetvalue));
 			}
 			break;
 		case SQL_C_SLONG:
 		case SQL_C_LONG:
+			debugPrintf("  targettype: SQL_C_(S)LONG\n");
+			if (targetvalue) {
+				*((int32_t *)targetvalue)=
+					(int32_t)charstring::toInteger(field);
+				debugPrintf("  value: %ld\n",
+						*((int32_t *)targetvalue));
+			}
+			break;
 		//case SQL_C_BOOKMARK:
 		//	(dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
-			debugPrintf("  targettype: SQL_C_(X)LONG\n");
+			debugPrintf("  targettype: SQL_C_ULONG\n");
 			if (targetvalue) {
-				*((long *)targetvalue)=
-					(long)charstring::toInteger(field);
+				*((uint32_t *)targetvalue)=
+					(uint32_t)charstring::toInteger(field);
 				debugPrintf("  value: %ld\n",
-						*((long *)targetvalue));
+						*((uint32_t *)targetvalue));
 			}
 			break;
 		case SQL_C_FLOAT:
@@ -3910,8 +3937,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_STINYINT:
 		case SQL_C_TINYINT:
-		case SQL_C_UTINYINT:
-			debugPrintf("  targettype: SQL_C_(X)TINYINT\n");
+			debugPrintf("  targettype: SQL_C_(S)TINYINT\n");
 			if (targetvalue) {
 				*((char *)targetvalue)=
 					charstring::toInteger(field);
@@ -3919,14 +3945,31 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 						*((char *)targetvalue));
 			}
 			break;
+		case SQL_C_UTINYINT:
+			debugPrintf("  targettype: SQL_C_UTINYINT\n");
+			if (targetvalue) {
+				*((unsigned char *)targetvalue)=
+					charstring::toInteger(field);
+				debugPrintf("  value: %c\n",
+					*((unsigned char *)targetvalue));
+			}
+			break;
 		case SQL_C_SBIGINT:
-		case SQL_C_UBIGINT:
-			debugPrintf("  targettype: SQL_C_(X)BIGINT\n");
+			debugPrintf("  targettype: SQL_C_SBIGINT\n");
 			if (targetvalue) {
 				*((int64_t *)targetvalue)=
 					charstring::toInteger(field);
 				debugPrintf("  value: %lld\n",
 						*((int64_t *)targetvalue));
+			}
+			break;
+		case SQL_C_UBIGINT:
+			debugPrintf("  targettype: SQL_C_UBIGINT\n");
+			if (targetvalue) {
+				*((uint64_t *)targetvalue)=
+					charstring::toInteger(field);
+				debugPrintf("  value: %lld\n",
+						*((uint64_t *)targetvalue));
 			}
 			break;
 		//case SQL_C_VARBOOKMARK:
@@ -4017,7 +4060,11 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			return SQL_ERROR;
 	}
 
-	debugPrintf("  strlen_or_ind: %d\n",(strlen_or_ind)?*strlen_or_ind:0);
+	if (strlen_or_ind) {
+		debugPrintf("  strlen_or_ind: %d\n",*strlen_or_ind);
+	} else {
+		debugPrintf("  NULL strlen_or_ind (not copying out length)\n");
+	}
 
 	return SQL_SUCCESS;
 }
@@ -8943,31 +8990,31 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_CHAR:
 			debugPrintf("  valuetype: SQL_C_CHAR\n");
 			stmt->cur->inputBind(parametername,
-					(const char *)parametervalue);
+				(const char *)parametervalue);
 			break;
 		case SQL_C_LONG:
 			debugPrintf("  valuetype: SQL_C_LONG\n");
 			stmt->cur->inputBind(parametername,
-					(int64_t)(*((long *)parametervalue)));
+				(int64_t)(*((int32_t *)parametervalue)));
 			break;
 		case SQL_C_SHORT:
 			debugPrintf("  valuetype: SQL_C_SHORT\n");
 			stmt->cur->inputBind(parametername,
-					(int64_t)(*((short *)parametervalue)));
+				(int64_t)(*((int16_t *)parametervalue)));
 			break;
 		case SQL_C_FLOAT:
 			debugPrintf("  valuetype: SQL_C_FLOAT\n");
 			stmt->cur->inputBind(parametername,
-					(float)(*((double *)parametervalue)),
-					lengthprecision,
-					parameterscale);
+				(float)(*((double *)parametervalue)),
+				lengthprecision,
+				parameterscale);
 			break;
 		case SQL_C_DOUBLE:
 			debugPrintf("  valuetype: SQL_C_DOUBLE\n");
 			stmt->cur->inputBind(parametername,
-					*((double *)parametervalue),
-					lengthprecision,
-					parameterscale);
+				*((double *)parametervalue),
+				lengthprecision,
+				parameterscale);
 			break;
 		case SQL_C_NUMERIC:
 			debugPrintf("  valuetype: SQL_C_NUMERIC\n");
@@ -9057,12 +9104,12 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_SLONG:
 			debugPrintf("  valuetype: SQL_C_SLONG\n");
 			stmt->cur->inputBind(parametername,
-					(int64_t)(*((long *)parametervalue)));
+				(int64_t)(*((int32_t *)parametervalue)));
 			break;
 		case SQL_C_SSHORT:
 			debugPrintf("  valuetype: SQL_C_SSHORT\n");
 			stmt->cur->inputBind(parametername,
-					(int64_t)(*((short *)parametervalue)));
+				(int64_t)(*((int16_t *)parametervalue)));
 			break;
 		case SQL_C_TINYINT:
 		case SQL_C_STINYINT:
@@ -9076,12 +9123,12 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_ULONG:
 			debugPrintf("  valuetype: SQL_C_ULONG/SQL_C_BOOKMARK\n");
 			stmt->cur->inputBind(parametername,
-				(int64_t)(*((unsigned long *)parametervalue)));
+				(int64_t)(*((uint32_t *)parametervalue)));
 			break;
 		case SQL_C_USHORT:
 			debugPrintf("  valuetype: SQL_C_USHORT\n");
 			stmt->cur->inputBind(parametername,
-				(int64_t)(*((unsigned short *)parametervalue)));
+				(int64_t)(*((uint16_t *)parametervalue)));
 			break;
 		case SQL_C_UTINYINT:
 			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
