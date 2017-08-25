@@ -7917,6 +7917,14 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
+	SQLR_STMTClearError(stmt);
+
 	// normalize the names
 	if (namelength1==SQL_NTS) {
 		namelength1=charstring::length(catalogname);
@@ -7945,18 +7953,6 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	// * SQL_ATTR_METADATA_ID is SQL_FALSE
 	// otherwise it should be a case-insensitive literal
 
-	// The SQL Relay server is currently only capable of returning
-	// the column format that ODBC likes for a catalog list, not a schema
-	// list, so for now, we'll ignore requests for schema lists and
-	// return the list of "databases" in catalog format, when the list of
-	// catalogs are requested.
-	//
-	// Unfortunately, to most databases, "database" = "catalog", but for
-	// some (oracle), if you ask for the list of "databases" then it really
-	// means you want the list of schemas.  So, that's what's returned if
-	// you're using an oracle backend.  There are probably other db's that
-	// do similar things...
-
 	SQLRETURN	retval=SQL_ERROR;
 	if (!charstring::compare(catname,SQL_ALL_CATALOGS) &&
 				charstring::isNullOrEmpty(schname) &&
@@ -7964,14 +7960,6 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 				charstring::isNullOrEmpty(tbltype)) {
 
 		debugPrintf("  getting database list...\n");
-
-		// reinit row indices
-		stmt->currentfetchrow=0;
-		stmt->currentstartrow=0;
-		stmt->currentgetdatarow=0;
-
-		// clear the error
-		SQLR_STMTClearError(stmt);
 
 		retval=
 		(stmt->cur->getDatabaseList(NULL,SQLRCLIENTLISTFORMAT_ODBC))?
@@ -7982,18 +7970,22 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 				charstring::isNullOrEmpty(tblname) &&
 				charstring::isNullOrEmpty(tbltype)) {
 
-		debugPrintf("  schema list not supported\n");
+		debugPrintf("  getting schema list...\n");
 
-		SQLR_STMTClearError(stmt);
+		retval=
+		(stmt->cur->getSchemaList(NULL,SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
 
 	} else if (!charstring::compare(tbltype,SQL_ALL_TABLE_TYPES) &&
 				charstring::isNullOrEmpty(catname) &&
 				charstring::isNullOrEmpty(schname) &&
 				charstring::isNullOrEmpty(tblname)) {
 
-		debugPrintf("  table type list not supported\n");
+		debugPrintf("  getting table type list...\n");
 
-		SQLR_STMTClearError(stmt);
+		retval=
+		(stmt->cur->getTableTypeList(NULL,SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
 
 	} else {
 
@@ -8007,14 +7999,6 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 		// FIXME: this list should also be restricted to the
 		// specified catalog, schema, and table type
-
-		// reinit row indices
-		stmt->currentfetchrow=0;
-		stmt->currentstartrow=0;
-		stmt->currentgetdatarow=0;
-
-		// clear the error
-		SQLR_STMTClearError(stmt);
 
 		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
