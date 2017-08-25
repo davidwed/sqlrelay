@@ -7984,12 +7984,16 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 		debugPrintf("  schema list not supported\n");
 
+		SQLR_STMTClearError(stmt);
+
 	} else if (!charstring::compare(tbltype,SQL_ALL_TABLE_TYPES) &&
 				charstring::isNullOrEmpty(catname) &&
 				charstring::isNullOrEmpty(schname) &&
 				charstring::isNullOrEmpty(tblname)) {
 
 		debugPrintf("  table type list not supported\n");
+
+		SQLR_STMTClearError(stmt);
 
 	} else {
 
