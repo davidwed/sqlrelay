@@ -34,6 +34,8 @@
 	various odbc driver improvements
 	updated odbc driver to interpret SQL_C_(X)LONG types as (u)int32_t's
 		rather than long's
+	updated odbc connection module to use SQL_C_SBIGINT/SQL_BIGINT for
+		integer binds, rather than SQL_C_LONG/SQL_INTEGER
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

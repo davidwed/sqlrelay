@@ -1441,16 +1441,14 @@ bool odbccursor::inputBind(const char *variable,
 	erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
-				SQL_C_LONG,
-				SQL_INTEGER,
+				SQL_C_SBIGINT,
+				SQL_BIGINT,
 				0,
 				0,
 				value,
 				sizeof(int64_t),
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)NULL
 				#else
 				(SQLINTEGER *)NULL
 				#endif
@@ -1483,8 +1481,6 @@ bool odbccursor::inputBind(const char *variable,
 				sizeof(double),
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)NULL
 				#else
 				(SQLINTEGER *)NULL
 				#endif
@@ -1536,8 +1532,6 @@ bool odbccursor::inputBind(const char *variable,
 				0,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)NULL
 				#else
 				(SQLINTEGER *)NULL
 				#endif
@@ -1564,8 +1558,6 @@ bool odbccursor::inputBind(const char *variable,
 				0,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)NULL
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)NULL
 				#else
 				(SQLINTEGER *)NULL
 				#endif
@@ -1602,8 +1594,6 @@ bool odbccursor::outputBind(const char *variable,
 				valuesize,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)isnull
 				#else
 				(SQLINTEGER *)isnull
 				#endif
@@ -1631,16 +1621,14 @@ bool odbccursor::outputBind(const char *variable,
 	erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_OUTPUT,
-				SQL_C_LONG,
-				SQL_INTEGER,
+				SQL_C_SBIGINT,
+				SQL_BIGINT,
 				0,
 				0,
 				value,
 				sizeof(int64_t),
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)isnull
 				#else
 				(SQLINTEGER *)isnull
 				#endif
@@ -1678,8 +1666,6 @@ bool odbccursor::outputBind(const char *variable,
 				sizeof(double),
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)isnull
 				#else
 				(SQLINTEGER *)isnull
 				#endif
@@ -1734,8 +1720,6 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
-				#elif defined(SQLBINDPARAMETER_SQLLEN)
-				(unsigned long *)isnull
 				#else
 				(SQLINTEGER *)isnull
 				#endif
