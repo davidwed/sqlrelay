@@ -5746,7 +5746,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			type=1;
 			break;
 		case SQL_TIMEDATE_FUNCTIONS:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_TIMEDATE_FUNCTIONS\n");
 			// FIXME: this isn't true for all db's
 			val.uintval=SQL_FN_TD_CURRENT_DATE|
@@ -5773,80 +5773,137 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			type=1;
 			break;
 		case SQL_CONVERT_BIGINT:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_BIGINT\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_BINARY:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_BINARY\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_BIT:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_BIT\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_CHAR:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_CHAR\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_DATE:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_DATE\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_DECIMAL:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_DECIMAL\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_DOUBLE:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_DOUBLE\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_FLOAT:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_FLOAT\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_INTEGER:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_INTEGER\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_LONGVARCHAR:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_LONGVARCHAR\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_NUMERIC:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_NUMERIC\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_REAL:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_REAL\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_SMALLINT:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_SMALLINT\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_TIME:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_TIME\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_TIMESTAMP:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_TIMESTAMP\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_TINYINT:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_TINYINT\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_VARBINARY:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_VARBINARY\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_VARCHAR:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_VARCHAR\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_LONGVARBINARY:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_LONGVARBINARY\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CORRELATION_NAME:
 			debugPrintf("  infotype: "
@@ -5947,8 +6004,11 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			type=2;
 			break;
 		case SQL_KEYWORDS:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_KEYWORDS\n");
+			// FIXME: this isn't true for all db's
+			val.strval=SQL_ODBC_KEYWORDS;
+			type=0;
 			break;
 		case SQL_OWNER_USAGE:
 			// aka SQL_SCHEMA_USAGE
@@ -6158,24 +6218,39 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			type=1;
 			break;
 		case SQL_CONVERT_WCHAR:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_WCHAR\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_INTERVAL_DAY_TIME:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_INTERVAL_DAY_TIME\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_INTERVAL_YEAR_MONTH:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_INTERVAL_YEAR_MONTH\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_WLONGVARCHAR:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_WLONGVARCHAR\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CONVERT_WVARCHAR:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_CONVERT_WVARCHAR\n");
+			// FIXME: 0 means no no conversions are supported
+			val.uintval=0;
+			type=1;
 			break;
 		case SQL_CREATE_ASSERTION:
 			debugPrintf("  infotype: "
@@ -6413,7 +6488,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			type=1;
 			break;
 		case SQL_MAX_ASYNC_CONCURRENT_STATEMENTS:
-			debugPrintf("  unsupported infotype: %d\n",infotype);
+			debugPrintf("  infotype: "
+				"SQL_MAX_ASYNC_CONCURRENT_STATEMENTS\n");
 			// 0 means no max or unknown
 			val.uintval=0;
 			type=1;
