@@ -4062,6 +4062,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 
 	if (strlen_or_ind) {
 		debugPrintf("  strlen_or_ind: %d\n",*strlen_or_ind);
+		if (*strlen_or_ind>bufferlength) {
+			debugPrintf("  WARNING! strlen_or_ind>bufferlength\n");
+		}
 	} else {
 		debugPrintf("  NULL strlen_or_ind (not copying out length)\n");
 	}
