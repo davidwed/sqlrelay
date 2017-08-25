@@ -3560,8 +3560,6 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 	}
 
 
-	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
-
 	// copy out the value and length
 	SQLSMALLINT	valuelength=0;
 	switch (type) {
@@ -3571,6 +3569,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
 			valuelength=charstring::length(val.strval);
+			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (value && bufferlength) {
 
 				charstring::safeCopy((char *)value,
@@ -4463,8 +4462,6 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 			break;
 	}
 
-
-	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 
 	// copy out the value and length
 	SQLSMALLINT	valuelength=sizeof(SQLUINTEGER);
@@ -6616,8 +6613,6 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 	}
 
 
-	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
-
 	// copy out the value and length
 	SQLSMALLINT	valuelength=0;
 	switch (type) {
@@ -6627,6 +6622,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
 			valuelength=charstring::length(val.strval);
+			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (infovalue && bufferlength) {
 
 				charstring::safeCopy((char *)infovalue,
@@ -6946,8 +6942,6 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 			return SQL_ERROR;
 	}
 
-
-	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 
 	// copy out the value and length
 	SQLSMALLINT	valuelength=0;
