@@ -7390,6 +7390,10 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 			debugPrintf("  attribute: SQL_TRANSLATE_OPTION "
 				"(unsupported but returning success)\n");
 			return SQL_SUCCESS;
+		case SQL_TXN_ISOLATION:
+			debugPrintf("  attribute: SQL_TXN_ISOLATION "
+				"(unsupported but returning success)\n");
+			return SQL_SUCCESS;
 		case SQL_ODBC_CURSORS:
 			debugPrintf("  attribute: SQL_ODBC_CURSORS "
 				"(unsupported but returning success)\n");
@@ -7432,6 +7436,14 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 			conn->attrmetadataid=(val==SQL_TRUE);
 			return SQL_SUCCESS;
 		}
+		case 1041:
+			debugPrintf("  attribute: 1041 (license file) "
+				"(unsupported but returning success)\n");
+			return SQL_SUCCESS;
+		case 1042:
+			debugPrintf("  attribute: 1042 (password) "
+				"(unsupported but returning success)\n");
+			return SQL_SUCCESS;
 	#endif
 		default:
 			debugPrintf("  unsupported attribute: %d\n",attribute);
