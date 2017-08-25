@@ -5677,8 +5677,34 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			type=1;
 			break;
 		case SQL_NUMERIC_FUNCTIONS:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_NUMERIC_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			val.uintval=SQL_FN_NUM_ABS|
+					SQL_FN_NUM_ACOS|
+					SQL_FN_NUM_ASIN|
+					SQL_FN_NUM_ATAN|
+					SQL_FN_NUM_ATAN2|
+					SQL_FN_NUM_CEILING|
+					SQL_FN_NUM_COS|
+					SQL_FN_NUM_COT|
+					SQL_FN_NUM_DEGREES|
+					SQL_FN_NUM_EXP|
+					SQL_FN_NUM_FLOOR|
+					SQL_FN_NUM_LOG|
+					SQL_FN_NUM_LOG10|
+					SQL_FN_NUM_MOD|
+					SQL_FN_NUM_PI|
+					SQL_FN_NUM_POWER|
+					SQL_FN_NUM_RADIANS|
+					SQL_FN_NUM_RAND|
+					SQL_FN_NUM_ROUND|
+					SQL_FN_NUM_SIGN|
+					SQL_FN_NUM_SIN|
+					SQL_FN_NUM_SQRT|
+					SQL_FN_NUM_TAN|
+					SQL_FN_NUM_TRUNCATE;
+			type=1;
 			break;
 		case SQL_STRING_FUNCTIONS:
 			debugPrintf("  infotype: "
@@ -5711,12 +5737,40 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			type=1;
 			break;
 		case SQL_SYSTEM_FUNCTIONS:
-			debugPrintf("  unsupported infotype: "
+			debugPrintf("  infotype: "
 					"SQL_SYSTEM_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			val.uintval=SQL_FN_SYS_DBNAME|
+					SQL_FN_SYS_IFNULL|
+					SQL_FN_SYS_USERNAME;
+			type=1;
 			break;
 		case SQL_TIMEDATE_FUNCTIONS:
 			debugPrintf("  unsupported infotype: "
 					"SQL_TIMEDATE_FUNCTIONS\n");
+			// FIXME: this isn't true for all db's
+			val.uintval=SQL_FN_TD_CURRENT_DATE|
+					SQL_FN_TD_CURRENT_TIME|
+					SQL_FN_TD_CURRENT_TIMESTAMP|
+					SQL_FN_TD_CURDATE|
+					SQL_FN_TD_CURTIME|
+					SQL_FN_TD_DAYNAME|
+					SQL_FN_TD_DAYOFMONTH|
+					SQL_FN_TD_DAYOFWEEK|
+					SQL_FN_TD_DAYOFYEAR|
+					SQL_FN_TD_EXTRACT|
+					SQL_FN_TD_HOUR|
+					SQL_FN_TD_MINUTE|
+					SQL_FN_TD_MONTH|
+					SQL_FN_TD_MONTHNAME|
+					SQL_FN_TD_NOW|
+					SQL_FN_TD_QUARTER|
+					SQL_FN_TD_SECOND|
+					SQL_FN_TD_TIMESTAMPADD|
+					SQL_FN_TD_TIMESTAMPDIFF|
+					SQL_FN_TD_WEEK|
+					SQL_FN_TD_YEAR;
+			type=1;
 			break;
 		case SQL_CONVERT_BIGINT:
 			debugPrintf("  unsupported infotype: "
@@ -6017,7 +6071,6 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case SQL_QUALIFIER_LOCATION:
 			// aka SQL_CATALOG_LOCATION
-			debugPrintf("  unsupported infotype: %d\n",infotype);
 			debugPrintf("  infotype: "
 					"SQL_QUALIFIER_LOCATION/"
 					"SQL_CATALOG_LOCATION\n");
