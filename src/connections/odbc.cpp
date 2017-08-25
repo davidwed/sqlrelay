@@ -581,7 +581,7 @@ bool odbcconnection::getListsByApiCalls() {
 }
 
 bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
-					const char *wild) {
+						const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
@@ -594,13 +594,9 @@ bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
-	// massage the catalog name
-	const char	*catalog=
-		((!charstring::isNullOrEmpty(wild))?wild:SQL_ALL_CATALOGS);
-
 	// get the catalogs
 	erg=SQLTables(odbccur->stmt,
-			(SQLCHAR *)catalog,SQL_NTS,
+			(SQLCHAR *)SQL_ALL_CATALOGS,SQL_NTS,
 			(SQLCHAR *)"",SQL_NTS,
 			(SQLCHAR *)"",SQL_NTS,
 			(SQLCHAR *)"",SQL_NTS);
@@ -611,7 +607,7 @@ bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
 }
 
 bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
-					const char *wild) {
+						const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
@@ -624,64 +620,13 @@ bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
-	// various buffers/pointers
-	char		catalogbuffer[1024];
-	const char	*catalog=NULL;
-	const char	*schema="";
-	char		**schemaparts=NULL;
-	uint64_t	schemapartcount=0;
-
-	// get the current catalog (instance)
-	SQLINTEGER	cataloglen=0;
-	if (SQLGetConnectAttr(dbc,
-				SQL_CURRENT_QUALIFIER,
-				catalogbuffer,
-				sizeof(catalogbuffer),
-				&cataloglen)==SQL_SUCCESS) {
-		catalogbuffer[cataloglen]='\0';
-		catalog=catalogbuffer;
-	}
-
-	// get the schema name (or % for all schemas)
-	if (charstring::isNullOrEmpty(wild)) {
-
-		// FIXME: should this be SQL_ALL_SCHEMAS
-		schema="%";
-
-	} else {
-
-		// the schema name might be in one
-		// of the following formats:
-		// * schema
-		// * catalog.schema
-		charstring::split(wild,".",true,
-				&schemaparts,&schemapartcount);
-
-		// reset schema and catalog if necessary
-		switch (schemapartcount) {
-			case 2:
-				catalog=schemaparts[0];
-				schema=schemaparts[1];
-				break;
-			case 1:
-				schema=schemaparts[0];
-				break;
-		}
-	}
-
 	// get the schemas
 	erg=SQLTables(odbccur->stmt,
-			(SQLCHAR *)catalog,SQL_NTS,
-			(SQLCHAR *)schema,SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS,
+			(SQLCHAR *)SQL_ALL_SCHEMAS,SQL_NTS,
 			(SQLCHAR *)"",SQL_NTS,
 			(SQLCHAR *)"",SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<schemapartcount; i++) {
-		delete[] schemaparts[i];
-	}
-	delete[] schemaparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;
@@ -736,7 +681,7 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	// get the table name (or % for all tables)
 	if (charstring::isNullOrEmpty(wild)) {
 
-		// FIXME: should this be SQL_ALL_TABLES
+		// FIXME: should this be SQL_ALL_TABLES?
 		table="%";
 
 	} else {
@@ -813,16 +758,12 @@ bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
-	// massage the table type name
-	const char	*tabletypes=
-		((!charstring::isNullOrEmpty(wild))?wild:SQL_ALL_TABLE_TYPES);
-
 	// get the table types
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)"",SQL_NTS,
 			(SQLCHAR *)"",SQL_NTS,
 			(SQLCHAR *)"",SQL_NTS,
-			(SQLCHAR *)tabletypes,SQL_NTS);
+			(SQLCHAR *)SQL_ALL_TABLE_TYPES,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information
@@ -891,12 +832,12 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 			break;
 		case 2:
 			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).proc
+			// * catalog(.defaultschama).table
 			//   or
-			// * (currentcatalog.)schema.proc...
+			// * (currentcatalog.)schema.table...
 			// If the first part is not the same as the current
 			// catalog, then we'll guess
-			// (currentcatalog.)schema.proc, but we don't really
+			// (currentcatalog.)schema.table, but we don't really
 			// know for sure. The app may really mean to target
 			// another catalog.
 			if (charstring::compare(tableparts[0],catalogbuffer)) {
