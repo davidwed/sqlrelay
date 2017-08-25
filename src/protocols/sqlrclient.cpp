@@ -20,7 +20,9 @@
 enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_QUERY=0,
 	SQLRCLIENTQUERYTYPE_DATABASE_LIST,
+	SQLRCLIENTQUERYTYPE_SCHEMA_LIST,
 	SQLRCLIENTQUERYTYPE_TABLE_LIST,
+	SQLRCLIENTQUERYTYPE_TABLETYPE_LIST,
 	SQLRCLIENTQUERYTYPE_COLUMN_LIST,
 	SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST,
 	SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST,
@@ -151,7 +153,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	suspendResultSetCommand(sqlrservercursor *cursor);
 		bool	resumeResultSetCommand(sqlrservercursor *cursor);
 		bool	getDatabaseListCommand(sqlrservercursor *cursor);
+		bool	getSchemaListCommand(sqlrservercursor *cursor);
 		bool	getTableListCommand(sqlrservercursor *cursor);
+		bool	getTableTypeListCommand(sqlrservercursor *cursor);
 		bool	getColumnListCommand(sqlrservercursor *cursor);
 		bool	getProcedureBindAndColumnListCommand(
 						sqlrservercursor *cursor);
@@ -547,9 +551,15 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		} else if (command==GETDBLIST) {
 			cont->incrementGetDbListCount();
 			loop=getDatabaseListCommand(cursor);
+		} else if (command==GETSCHEMALIST) {
+			//cont->incrementGetSchemaListCount();
+			loop=getSchemaListCommand(cursor);
 		} else if (command==GETTABLELIST) {
 			cont->incrementGetTableListCount();
 			loop=getTableListCommand(cursor);
+		} else if (command==GETTABLETYPELIST) {
+			//cont->incrementGetTableTypeListCount();
+			loop=getTableTypeListCommand(cursor);
 		} else if (command==GETCOLUMNLIST) {
 			cont->incrementGetColumnListCount();
 			loop=getColumnListCommand(cursor);
@@ -709,7 +719,9 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 	uint16_t	neednewcursor=DONT_NEED_NEW_CURSOR;
 	if (command==NEW_QUERY ||
 		command==GETDBLIST ||
+		command==GETSCHEMALIST ||
 		command==GETTABLELIST ||
+		command==GETTABLETYPELIST ||
 		command==GETCOLUMNLIST ||
 		command==GETPROCEDUREBINDANDCOLUMNLIST ||
 		command==GETTYPEINFOLIST ||
@@ -1354,12 +1366,32 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 					cont->setDatabaseListColumnMap(
 								listformat);
 					break;
+				case SQLRCLIENTQUERYTYPE_SCHEMA_LIST:
+					cont->setSchemaListColumnMap(
+								listformat);
+					break;
 				case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+					cont->setTableListColumnMap(
+								listformat);
+					break;
+				case SQLRCLIENTQUERYTYPE_TABLETYPE_LIST:
 					cont->setTableListColumnMap(
 								listformat);
 					break;
 				case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
 					cont->setColumnListColumnMap(
+								listformat);
+					break;
+				case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
+					cont->setProcedureBindAndColumnListColumnMap(
+								listformat);
+					break;
+				case SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST:
+					cont->setTypeInfoListColumnMap(
+								listformat);
+					break;
+				case SQLRCLIENTQUERYTYPE_PROCEDURE_LIST:
+					cont->setProcedureListColumnMap(
 								listformat);
 					break;
 				default:
@@ -3074,7 +3106,8 @@ bool sqlrprotocol_sqlrclient::resumeResultSetCommand(
 	return retval;
 }
 
-bool sqlrprotocol_sqlrclient::getDatabaseListCommand(sqlrservercursor *cursor) {
+bool sqlrprotocol_sqlrclient::getDatabaseListCommand(
+					sqlrservercursor *cursor) {
 	debugFunction();
 	cont->raiseDebugMessageEvent("get db list...");
 	bool	retval=getListCommand(cursor,
@@ -3083,7 +3116,18 @@ bool sqlrprotocol_sqlrclient::getDatabaseListCommand(sqlrservercursor *cursor) {
 	return retval;
 }
 
-bool sqlrprotocol_sqlrclient::getTableListCommand(sqlrservercursor *cursor) {
+bool sqlrprotocol_sqlrclient::getSchemaListCommand(
+					sqlrservercursor *cursor) {
+	debugFunction();
+	cont->raiseDebugMessageEvent("get schema list...");
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_SCHEMA_LIST,false);
+	cont->raiseDebugMessageEvent("done getting schema list");
+	return retval;
+}
+
+bool sqlrprotocol_sqlrclient::getTableListCommand(
+					sqlrservercursor *cursor) {
 	debugFunction();
 	cont->raiseDebugMessageEvent("get table list...");
 	bool	retval=getListCommand(cursor,
@@ -3092,7 +3136,18 @@ bool sqlrprotocol_sqlrclient::getTableListCommand(sqlrservercursor *cursor) {
 	return retval;
 }
 
-bool sqlrprotocol_sqlrclient::getColumnListCommand(sqlrservercursor *cursor) {
+bool sqlrprotocol_sqlrclient::getTableTypeListCommand(
+					sqlrservercursor *cursor) {
+	debugFunction();
+	cont->raiseDebugMessageEvent("get table type list...");
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_TABLETYPE_LIST,false);
+	cont->raiseDebugMessageEvent("done getting table type list");
+	return retval;
+}
+
+bool sqlrprotocol_sqlrclient::getColumnListCommand(
+					sqlrservercursor *cursor) {
 	debugFunction();
 	cont->raiseDebugMessageEvent("get column list...");
 	bool	retval=getListCommand(cursor,
@@ -3112,7 +3167,8 @@ bool sqlrprotocol_sqlrclient::getProcedureBindAndColumnListCommand(
 	return retval;
 }
 
-bool sqlrprotocol_sqlrclient::getTypeInfoListCommand(sqlrservercursor *cursor) {
+bool sqlrprotocol_sqlrclient::getTypeInfoListCommand(
+					sqlrservercursor *cursor) {
 	debugFunction();
 	cont->raiseDebugMessageEvent("get type info list...");
 	bool	retval=getListCommand(cursor,
@@ -3278,9 +3334,17 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 			cont->setDatabaseListColumnMap(listformat);
 			success=cont->getDatabaseList(cursor,wild);
 			break;
+		case SQLRCLIENTQUERYTYPE_SCHEMA_LIST:
+			cont->setSchemaListColumnMap(listformat);
+			success=cont->getSchemaList(cursor,wild);
+			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
 			cont->setTableListColumnMap(listformat);
 			success=cont->getTableList(cursor,wild);
+			break;
+		case SQLRCLIENTQUERYTYPE_TABLETYPE_LIST:
+			cont->setTableTypeListColumnMap(listformat);
+			success=cont->getTableTypeList(cursor,wild);
 			break;
 		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
 			cont->setColumnListColumnMap(listformat);
@@ -3348,8 +3412,14 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 		case SQLRCLIENTQUERYTYPE_DATABASE_LIST:
 			query=cont->getDatabaseListQuery(havewild);
 			break;
+		case SQLRCLIENTQUERYTYPE_SCHEMA_LIST:
+			query=cont->getSchemaListQuery(havewild);
+			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
 			query=cont->getTableListQuery(havewild);
+			break;
+		case SQLRCLIENTQUERYTYPE_TABLETYPE_LIST:
+			query=cont->getTableTypeListQuery(havewild);
 			break;
 		case SQLRCLIENTQUERYTYPE_COLUMN_LIST:
 			query=cont->getColumnListQuery(object,havewild);

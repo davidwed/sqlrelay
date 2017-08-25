@@ -143,7 +143,13 @@
 		const char	*getTranslatedQuery();
 		bool		getDatabaseList(const char *wild,
 					sqlrclientlistformat_t listformat);
+		bool		getSchemaList(const char *wild);
+		bool		getSchemaList(const char *wild,
+					sqlrclientlistformat_t listformat);
 		bool		getTableList(const char *wild,
+					sqlrclientlistformat_t listformat);
+		bool		getTableTypeList(const char *wild);
+		bool		getTableTypeList(const char *wild,
 					sqlrclientlistformat_t listformat);
 		bool		getColumnList(const char *table,
 					const char *wild,

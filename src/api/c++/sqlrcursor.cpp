@@ -883,6 +883,26 @@ bool sqlrcursor::getDatabaseList(const char *wild,
 	return getList(GETDBLIST,listformat,NULL,wild);
 }
 
+bool sqlrcursor::getSchemaList(const char *wild) {
+	return getSchemaList(wild,SQLRCLIENTLISTFORMAT_MYSQL);
+}
+
+bool sqlrcursor::getSchemaList(const char *wild,
+					sqlrclientlistformat_t listformat) {
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("getting schema list");
+		if (wild) {
+			pvt->_sqlrc->debugPrint("\"");
+			pvt->_sqlrc->debugPrint(wild);
+			pvt->_sqlrc->debugPrint("\"");
+		}
+		pvt->_sqlrc->debugPrint("\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+	return getList(GETSCHEMALIST,listformat,NULL,wild);
+}
+
 bool sqlrcursor::getTableList(const char *wild) {
 	return getTableList(wild,SQLRCLIENTLISTFORMAT_MYSQL);
 }
@@ -901,6 +921,26 @@ bool sqlrcursor::getTableList(const char *wild,
 		pvt->_sqlrc->debugPreEnd();
 	}
 	return getList(GETTABLELIST,listformat,NULL,wild);
+}
+
+bool sqlrcursor::getTableTypeList(const char *wild) {
+	return getTableTypeList(wild,SQLRCLIENTLISTFORMAT_MYSQL);
+}
+
+bool sqlrcursor::getTableTypeList(const char *wild,
+					sqlrclientlistformat_t listformat) {
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("getting table type list ");
+		if (wild) {
+			pvt->_sqlrc->debugPrint("\"");
+			pvt->_sqlrc->debugPrint(wild);
+			pvt->_sqlrc->debugPrint("\"");
+		}
+		pvt->_sqlrc->debugPrint("\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+	return getList(GETTABLETYPELIST,listformat,NULL,wild);
 }
 
 bool sqlrcursor::getColumnList(const char *table, const char *wild) {
@@ -1021,7 +1061,7 @@ bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 	// refresh socket client
 	pvt->_cs=pvt->_sqlrc->cs();
 
-	// tell the server we want to get a db list
+	// tell the server we want to get a list
 	pvt->_cs->write(command);
 
 	// tell the server whether we'll need a cursor or not

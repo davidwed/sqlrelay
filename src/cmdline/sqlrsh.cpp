@@ -840,6 +840,11 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			sqlrcur->getDatabaseList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show schemas",12)) {
+			char	*wild=getWild(command);
+			sqlrcur->getSchemaList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 						"show tables odbc",16)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild,
@@ -849,6 +854,11 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 							"show tables",11)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+							"show table types",16)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableTypeList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"show columns odbc",17)) {
@@ -1922,7 +1932,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("		returns a list of column metadata for the table \"table\"\n");
 	stdoutput.printf("	fields table				-\n");
 	stdoutput.printf("		returns a list of column names for the table \"table\"\n\n");
-	// FIXME: document show type info/show procedure binds and columns/procedures
+	// FIXME: document show type info/show procedure binds and columns/procedures/schemas/table types
 	stdoutput.printf("	setclientinfo info	- sets the client info\n");
 	stdoutput.printf("	getclientinfo		- displays the client info\n\n");
 	stdoutput.printf("	setresultsetbuffersize size	- fetch size rows at a time\n");

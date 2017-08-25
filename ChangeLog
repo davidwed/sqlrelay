@@ -12,8 +12,11 @@
 	fixed var directories in Windows deployment projects
 	added run-as-Admin requirement to Windows installer
 	implemented ODBC SQLProcedures, SQLProcedureColumns and
-		SQLGetTypeInfo, though currently only works when using the
-		ODBC driver and an odbc connection module
+		SQLGetTypeInfo, though currently only works when using
+		the odbc connection module
+	implemented ODBC SQLTables to get schema and table type lists,
+		though currently only works when using the odbc connection
+		module
 	ODBC SQLProcedures, SQLProcedureColumns, SQLColumns, 
 		SQLTables, SQLGetTypeInfo properly set the error now if there
 		was one

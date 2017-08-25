@@ -434,7 +434,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
+		bool		getSchemaList(sqlrservercursor *cursor,
+						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
+						const char *wild);
+		bool		getTableTypeList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
@@ -449,7 +453,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		getProcedureList(sqlrservercursor *cursor,
 						const char *wild);
 		const char	*getDatabaseListQuery(bool wild);
+		const char	*getSchemaListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
+		const char	*getTableTypeListQuery(bool wild);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(const char *table,
 							bool wild);
@@ -467,7 +473,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		uint16_t	columnTypeFormat(sqlrservercursor *cursor);
 		void		setDatabaseListColumnMap(
 					sqlrserverlistformat_t listformat);
+		void		setSchemaListColumnMap(
+					sqlrserverlistformat_t listformat);
 		void		setTableListColumnMap(
+					sqlrserverlistformat_t listformat);
+		void		setTableTypeListColumnMap(
 					sqlrserverlistformat_t listformat);
 		void		setColumnListColumnMap(
 					sqlrserverlistformat_t listformat);
@@ -732,7 +742,13 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool		getDatabaseList(
 						sqlrservercursor *cursor,
 						const char *wild);
+		virtual bool		getSchemaList(
+						sqlrservercursor *cursor,
+						const char *wild);
 		virtual bool		getTableList(
+						sqlrservercursor *cursor,
+						const char *wild);
+		virtual bool		getTableTypeList(
 						sqlrservercursor *cursor,
 						const char *wild);
 		virtual bool		getColumnList(
@@ -751,7 +767,9 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						sqlrservercursor *cursor,
 						const char *wild);
 		virtual const char	*getDatabaseListQuery(bool wild);
+		virtual const char	*getSchemaListQuery(bool wild);
 		virtual const char	*getTableListQuery(bool wild);
+		virtual const char	*getTableTypeListQuery(bool wild);
 		virtual const char	*getGlobalTempTableListQuery();
 		virtual const char	*getColumnListQuery(
 						const char *table,

@@ -226,12 +226,12 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
+		bool		getSchemaList(sqlrservercursor *cursor,
+						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
 						const char *wild);
-		bool		getDatabaseOrTableList(
-						sqlrservercursor *cursor,
-						const char *wild,
-						bool table);
+		bool		getTableTypeList(sqlrservercursor *cursor,
+						const char *wild);
 		bool		isCurrentCatalog(const char *name);
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
@@ -582,17 +582,6 @@ bool odbcconnection::getListsByApiCalls() {
 
 bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
 					const char *wild) {
-	return getDatabaseOrTableList(cursor,wild,false);
-}
-
-bool odbcconnection::getTableList(sqlrservercursor *cursor,
-					const char *wild) {
-	return getDatabaseOrTableList(cursor,wild,true);
-}
-
-bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
-					const char *wild,
-					bool table) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
@@ -605,100 +594,198 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
-	// get the table/database list
+	// massage the catalog name
+	const char	*catalog=
+		((!charstring::isNullOrEmpty(wild))?wild:SQL_ALL_CATALOGS);
+
+	// get the catalogs
+	erg=SQLTables(odbccur->stmt,
+			(SQLCHAR *)catalog,SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS);
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
+}
+
+bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
+					const char *wild) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
+
+	// various buffers/pointers
+	char		catalogbuffer[1024];
+	const char	*catalog=NULL;
+	const char	*schema="";
+	char		**schemaparts=NULL;
+	uint64_t	schemapartcount=0;
+
+	// get the current catalog (instance)
+	SQLINTEGER	cataloglen=0;
+	if (SQLGetConnectAttr(dbc,
+				SQL_CURRENT_QUALIFIER,
+				catalogbuffer,
+				sizeof(catalogbuffer),
+				&cataloglen)==SQL_SUCCESS) {
+		catalogbuffer[cataloglen]='\0';
+		catalog=catalogbuffer;
+	}
+
+	// get the schema name (or % for all schemas)
+	if (charstring::isNullOrEmpty(wild)) {
+
+		// FIXME: should this be SQL_ALL_SCHEMAS
+		schema="%";
+
+	} else {
+
+		// the schema name might be in one
+		// of the following formats:
+		// * schema
+		// * catalog.schema
+		charstring::split(wild,".",true,
+				&schemaparts,&schemapartcount);
+
+		// reset schema and catalog if necessary
+		switch (schemapartcount) {
+			case 2:
+				catalog=schemaparts[0];
+				schema=schemaparts[1];
+				break;
+			case 1:
+				schema=schemaparts[0];
+				break;
+		}
+	}
+
+	// get the schemas
+	erg=SQLTables(odbccur->stmt,
+			(SQLCHAR *)catalog,SQL_NTS,
+			(SQLCHAR *)schema,SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS);
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+
+	// clean up
+	for (uint64_t i=0; i<schemapartcount; i++) {
+		delete[] schemaparts[i];
+	}
+	delete[] schemaparts;
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
+}
+
+bool odbcconnection::getTableList(sqlrservercursor *cursor,
+					const char *wild) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
+
+	// various buffers/pointers
 	char		catalogbuffer[1024];
 	const char	*catalog=NULL;
 	char		schemabuffer[1024];
 	const char	*schema="";
-	const char	*tablename="";
-	const char	*tabletype=NULL;
+	const char	*table="";
+	const char	*tabletype="TABLE,VIEW,SYNONYM,ALIAS";
 	char		**tableparts=NULL;
 	uint64_t	tablepartcount=0;
 
-	if (table) {
-
-		// get the current catalog (instance)
-		SQLINTEGER	cataloglen=0;
-		if (SQLGetConnectAttr(dbc,
-					SQL_CURRENT_QUALIFIER,
-					catalogbuffer,
-					sizeof(catalogbuffer),
-					&cataloglen)==SQL_SUCCESS) {
-			catalogbuffer[cataloglen]='\0';
-			catalog=catalogbuffer;
-		}
-
-		// get the current user (schema)
-		SQLSMALLINT	schemalen=0;
-		if (SQLGetInfo(dbc,
-				SQL_USER_NAME,
-				schemabuffer,
-				sizeof(schemabuffer),
-				&schemalen)==SQL_SUCCESS) {
-			schemabuffer[schemalen]='\0';
-			schema=schemabuffer;
-		}
-
-		// get the table name (or % for all tables)
-		if (charstring::isNullOrEmpty(wild)) {
-
-			tablename="%";
-
-		} else {
-
-			// the table name might be in one
-			// of the following formats:
-			// * table
-			// * schema.table
-			// * catalog.schema.table
-			charstring::split(wild,".",true,
-					&tableparts,&tablepartcount);
-
-			// reset schema and catalog if necessary
-			switch (tablepartcount) {
-				case 3:
-					catalog=tableparts[0];
-					schema=tableparts[1];
-					tablename=tableparts[2];
-					break;
-				case 2:
-					// If there are 2 parts the it could
-					// mean:
-					// * catalog(.defaultschama).proc
-					//   or
-					// * (currentcatalog.)schema.proc...
-					// If the first part is not the same as
-					// the current catalog, then we'll
-					// guess (currentcatalog.)schema.proc,
-					// but we don't really know for sure.
-					// The app may really mean to target
-					// another catalog.
-					if (charstring::compare(
-							tableparts[0],
-							catalogbuffer)) {
-						schema=tableparts[0];
-					}
-					tablename=tableparts[1];
-					break;
-				case 1:
-					tablename=tableparts[0];
-					break;
-			}
-		}
-		
-		// get tables and views
-		tabletype="TABLE,VIEW";
-
-	} else {
-		catalog=((!charstring::isNullOrEmpty(wild))?
-						wild:SQL_ALL_CATALOGS);
+	// get the current catalog (instance)
+	SQLINTEGER	cataloglen=0;
+	if (SQLGetConnectAttr(dbc,
+				SQL_CURRENT_QUALIFIER,
+				catalogbuffer,
+				sizeof(catalogbuffer),
+				&cataloglen)==SQL_SUCCESS) {
+		catalogbuffer[cataloglen]='\0';
+		catalog=catalogbuffer;
 	}
 
-	// get the tables/databases
+	// get the current user (schema)
+	SQLSMALLINT	schemalen=0;
+	if (SQLGetInfo(dbc,
+			SQL_USER_NAME,
+			schemabuffer,
+			sizeof(schemabuffer),
+			&schemalen)==SQL_SUCCESS) {
+		schemabuffer[schemalen]='\0';
+		schema=schemabuffer;
+	}
+
+	// get the table name (or % for all tables)
+	if (charstring::isNullOrEmpty(wild)) {
+
+		// FIXME: should this be SQL_ALL_TABLES
+		table="%";
+
+	} else {
+
+		// the table name might be in one
+		// of the following formats:
+		// * table
+		// * schema.table
+		// * catalog.schema.table
+		charstring::split(wild,".",true,
+				&tableparts,&tablepartcount);
+
+		// reset schema and catalog if necessary
+		switch (tablepartcount) {
+			case 3:
+				catalog=tableparts[0];
+				schema=tableparts[1];
+				table=tableparts[2];
+				break;
+			case 2:
+				// If there are 2 parts the it could
+				// mean:
+				// * catalog(.defaultschama).table
+				//   or
+				// * (currentcatalog.)schema.table...
+				// If the first part is not the same as
+				// the current catalog, then we'll
+				// guess (currentcatalog.)schema.table,
+				// but we don't really know for sure.
+				// The app may really mean to target
+				// another catalog.
+				if (charstring::compare(
+						tableparts[0],
+						catalogbuffer)) {
+					schema=tableparts[0];
+				}
+				table=tableparts[1];
+				break;
+			case 1:
+				table=tableparts[0];
+				break;
+		}
+	}
+
+	// get the table list
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
-			(SQLCHAR *)tablename,SQL_NTS,
+			(SQLCHAR *)table,SQL_NTS,
 			(SQLCHAR *)tabletype,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
@@ -707,6 +794,36 @@ bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 		delete[] tableparts[i];
 	}
 	delete[] tableparts;
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
+}
+
+bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
+					const char *wild) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize column and row counts
+	odbccur->initializeColCounts();
+	odbccur->initializeRowCounts();
+
+	// massage the table type name
+	const char	*tabletypes=
+		((!charstring::isNullOrEmpty(wild))?wild:SQL_ALL_TABLE_TYPES);
+
+	// get the table types
+	erg=SQLTables(odbccur->stmt,
+			(SQLCHAR *)"",SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS,
+			(SQLCHAR *)"",SQL_NTS,
+			(SQLCHAR *)tabletypes,SQL_NTS);
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;
@@ -727,7 +844,7 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
 
-	// get the table/database list
+	// various buffers/pointers
 	char		catalogbuffer[1024];
 	const char	*catalog=NULL;
 	char		schemabuffer[1024];

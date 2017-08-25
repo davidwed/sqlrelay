@@ -640,7 +640,17 @@ bool sqlrserverconnection::getDatabaseList(sqlrservercursor *cursor,
 	return false;
 }
 
+bool sqlrserverconnection::getSchemaList(sqlrservercursor *cursor,
+						const char *wild) {
+	return false;
+}
+
 bool sqlrserverconnection::getTableList(sqlrservercursor *cursor,
+						const char *wild) {
+	return false;
+}
+
+bool sqlrserverconnection::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
 	return false;
 }
@@ -673,7 +683,15 @@ const char *sqlrserverconnection::getDatabaseListQuery(bool wild) {
 	return "select 1";
 }
 
+const char *sqlrserverconnection::getSchemaListQuery(bool wild) {
+	return "select 1";
+}
+
 const char *sqlrserverconnection::getTableListQuery(bool wild) {
+	return "select 1";
+}
+
+const char *sqlrserverconnection::getTableTypeListQuery(bool wild) {
 	return "select 1";
 }
 
