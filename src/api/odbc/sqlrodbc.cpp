@@ -3185,9 +3185,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	// Determine the number of rows that were actually fetched.
 	uint64_t	rowstofetch=stmt->cur->getResultSetBufferSize();
 	uint64_t	rowsfetched=0;
-	if (fetchresult==SQL_NO_DATA_FOUND) {
-		stmt->nodata=true;
-	} else if (rowstofetch) {
+	if (rowstofetch) {
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
 		uint64_t	rowcount=stmt->cur->rowCount();
 		uint64_t	lastrowindex=(rowcount)?rowcount-1:0;
