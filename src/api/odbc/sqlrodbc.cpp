@@ -3177,21 +3177,16 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	// SQLR_Fetch have already validated it
 	STMT	*stmt=(STMT *)statementhandle;
 
-	// fetch the row
+	// fetch the row(s)
 	SQLRETURN	fetchresult=
 			(stmt->cur->getRow(stmt->currentfetchrow))?
 					SQL_SUCCESS:SQL_NO_DATA_FOUND;
 
-	// Update the number of rows that were fetched in this operation.
-	// (hide the fact that SQL Relay caches the entire result set unless
-	// we're explicitly fetching more than 1 row at a time)
+	// Determine the number of rows that were actually fetched.
 	uint64_t	rowstofetch=stmt->cur->getResultSetBufferSize();
 	uint64_t	rowsfetched=0;
 	if (fetchresult==SQL_NO_DATA_FOUND) {
-		debugPrintf("  NO DATA FOUND\n");
-		// Bail here if no data was found.
 		stmt->nodata=true;
-		return fetchresult;
 	} else if (rowstofetch) {
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
 		uint64_t	rowcount=stmt->cur->rowCount();
@@ -3200,13 +3195,16 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		rowsfetched=(firstrowindex==stmt->currentfetchrow)?
 							bufferedrowcount:0;
 	} else {
-		rowstofetch=1;
+		// in this case, internally, sqlrclient has actually fetched
+		// the entire result set, but from ODBC's perspective, we're
+		// stepping through it row-at-a-time
 		rowsfetched=1;
 	}
 
 	debugPrintf("  rowstofetch: %lld\n",rowstofetch);
 	debugPrintf("  rowsfetched: %lld\n",rowsfetched);
 
+	// update fetched row counter
 	if (pcrow) {
 		*pcrow=rowsfetched;
 	}
@@ -3217,6 +3215,12 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 			rgfrowstatus[i]=(i<rowsfetched)?
 						SQL_ROW_SUCCESS:SQL_ROW_NOROW;
 		}
+	}
+
+	// bail here if no data was found
+	if (fetchresult==SQL_NO_DATA_FOUND) {
+		debugPrintf("  NO DATA FOUND\n");
+		return fetchresult;
 	}
 
 	// Update the "start row" (the index of the first row of the block of
