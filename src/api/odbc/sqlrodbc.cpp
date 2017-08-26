@@ -3185,7 +3185,12 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	// Determine the number of rows that were actually fetched.
 	uint64_t	rowstofetch=stmt->cur->getResultSetBufferSize();
 	uint64_t	rowsfetched=0;
-	if (rowstofetch) {
+	if (fetchresult==SQL_NO_DATA_FOUND) {
+		if (!rowstofetch) {
+			rowstofetch=1;
+		}
+		stmt->nodata=true;
+	} else if (rowstofetch) {
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
 		uint64_t	rowcount=stmt->cur->rowCount();
 		uint64_t	lastrowindex=(rowcount)?rowcount-1:0;
@@ -3193,9 +3198,6 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		rowsfetched=(firstrowindex==stmt->currentfetchrow)?
 							bufferedrowcount:0;
 	} else {
-		// in this case, internally, sqlrclient has actually fetched
-		// the entire result set, but from ODBC's perspective, we're
-		// stepping through it row-at-a-time
 		rowstofetch=1;
 		rowsfetched=1;
 	}
