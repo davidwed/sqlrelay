@@ -3198,6 +3198,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		// in this case, internally, sqlrclient has actually fetched
 		// the entire result set, but from ODBC's perspective, we're
 		// stepping through it row-at-a-time
+		rowstofetch=1;
 		rowsfetched=1;
 	}
 
