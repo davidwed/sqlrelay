@@ -1067,7 +1067,6 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	}
 
 	// get the primary key list
-stdoutput.printf("uniqueness: %d  accuracy: %d\n",uniqueness,accuracy);
 	erg=SQLStatistics(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,

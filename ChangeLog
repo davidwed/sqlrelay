@@ -11,15 +11,15 @@
 	added missing mapColumn() call to sqlrservercontroller::getField()
 	fixed var directories in Windows deployment projects
 	added run-as-Admin requirement to Windows installer
-	implemented ODBC SQLProcedures, SQLProcedureColumns,
-		SQLGetTypeInfo, though currently they only work when using
-		the odbc connection module
+	implemented ODBC SQLProcedures, SQLProcedureColumns, SQLGetTypeInfo,
+		SQLPrimaryKeys, and SQLStatistics, though currently they only
+		work when using the odbc connection module
 	implemented ODBC SQLTables to get schema and table type lists,
 		though currently only works when using the odbc connection
 		module
-	ODBC SQLProcedures, SQLProcedureColumns, SQLColumns, 
-		SQLTables, SQLGetTypeInfo properly set the error now if there
-		was one
+	ODBC SQLProcedures, SQLProcedureColumns, SQLColumns, SQLTables,
+		SQLGetTypeInfo, SQLPrimaryKeys, and SQLStatistics properly set
+		the error now if there was one
 	ODBC SQLError properly cycles through the error records now
 	updated ODBC SQLGetInfo(SQL_DRIVER_ODBC_VER) to return a value
 		corresponding to the value set by
