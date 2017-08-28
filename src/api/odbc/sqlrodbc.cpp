@@ -5030,8 +5030,8 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLPRIMARYKEYS:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLPRIMARYKEYS "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLPROCEDURECOLUMNS:
 			debugPrintf("  functionid: "
