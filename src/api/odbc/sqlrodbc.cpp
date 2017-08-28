@@ -8554,12 +8554,12 @@ SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle,
 }
 
 SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
-					SQLCHAR *szCatalogName,
-					SQLSMALLINT cbCatalogName,
-					SQLCHAR *szSchemaName,
-					SQLSMALLINT cbSchemaName,
-					SQLCHAR *szTableName,
-					SQLSMALLINT cbTableName) {
+					SQLCHAR *catalogname,
+					SQLSMALLINT namelength1,
+					SQLCHAR *schemaname,
+					SQLSMALLINT namelength2,
+					SQLCHAR *tablename,
+					SQLSMALLINT namelength3) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -8568,11 +8568,44 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported
-	SQLR_STMTSetError(stmt,
-			"Driver does not support this function",0,"IM001");
+	// FIXME: this code treats xxxname as a search pattern in all cases
+	// xxxname is a case-insensitive search pattern if:
+	// * SQL_ODBC_VERSION is SQL_OV_ODBC3
+	// * SQL_ATTR_METADATA_ID is SQL_FALSE
+	// otherwise it's a case-insensitive literal
 
-	return SQL_ERROR;
+	stringbuffer	table;
+	SQLR_BuildObjectName(&table,catalogname,namelength1,
+					schemaname,namelength2,
+					tablename,namelength3);
+
+	debugPrintf("  table: %s\n",table.getString());
+
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
+	SQLR_STMTClearError(stmt);
+
+	SQLRETURN	retval=
+		(stmt->cur->getPrimaryKeysList(table.getString(),NULL,
+						SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
+
+	// the statement has been executed
+	stmt->executed=true;
+	stmt->nodata=false;
+
+	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+
+	// handle errors
+	if (retval!=SQL_SUCCESS) {
+		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+					stmt->cur->errorNumber(),NULL);
+	}
+	return retval;
 }
 
 SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
