@@ -3587,7 +3587,11 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 				((char *)value)[bufferlength-1]='\0';
 
 				// reset valuelength
-				valuelength=charstring::length((char *)value);
+				//valuelength=charstring::length((char *)value);
+				if (valuelength>bufferlength) {
+					debugPrintf("  WARNING! valuelength>"
+							"bufferlength\n");
+				}
 			} else {
 				debugPrintf("  NULL value or "
 						"0 bufferlength "
@@ -4290,8 +4294,12 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 				((char *)diaginfo)[bufferlength-1]='\0';
 
 				// reset valuelength
-				valuelength=charstring::length(
-							(char *)diaginfo);
+				//valuelength=charstring::length(
+							//(char *)diaginfo);
+				if (valuelength>bufferlength) {
+					debugPrintf("  WARNING! valuelength>"
+							"bufferlength\n");
+				}
 			} else {
 				debugPrintf("  NULL diaginfo or "
 						"0 bufferlength "
@@ -4432,7 +4440,10 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 		((char *)messagetext)[bufferlength-1]='\0';
 
 		// reset valuelength
-		valuelength=charstring::length((char *)messagetext);
+		//valuelength=charstring::length((char *)messagetext);
+		if (valuelength>bufferlength) {
+			debugPrintf("  WARNING! valuelength>textlength\n");
+		}
 
 		debugPrintf("  messagetext: %s\n",messagetext);
 	} else {
@@ -6817,8 +6828,12 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 				((char *)infovalue)[bufferlength-1]='\0';
 
 				// reset valuelength
-				valuelength=charstring::length(
-							(char *)infovalue);
+				//valuelength=charstring::length(
+							//(char *)infovalue);
+				if (valuelength>bufferlength) {
+					debugPrintf("  WARNING! valuelength>"
+							"bufferlength\n");
+				}
 			} else {
 				debugPrintf("  NULL infovalue or "
 						"0 bufferlength "
