@@ -36,6 +36,7 @@
 		rather than long's
 	updated odbc connection module to use SQL_C_SBIGINT/SQL_BIGINT for
 		integer binds, rather than SQL_C_LONG/SQL_INTEGER
+	fixed uninitialized null/blob flags in sqlrclientprotocol::returnRow()
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

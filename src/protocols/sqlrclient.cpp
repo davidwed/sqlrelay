@@ -2834,10 +2834,10 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 	uint32_t	colcount=cont->colCount(cursor);
 	for (uint32_t i=0; i<colcount; i++) {
 
-		const char	*field;
-		uint64_t	fieldlength;
-		bool		blob;
-		bool		null;
+		const char	*field=NULL;
+		uint64_t	fieldlength=0;
+		bool		blob=false;
+		bool		null=false;
 		cont->getField(cursor,i,&field,&fieldlength,&blob,&null);
 
 		// send data to the client

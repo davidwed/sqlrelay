@@ -3994,7 +3994,6 @@ bool sqlrcursor::parseData() {
 
 		// check for the end of the result set
 		if (type==END_RESULT_SET) {
-pvt->_sqlrc->debugPrint("(END)");
 
 			if (pvt->_sqlrc->debug()) {
 				pvt->_sqlrc->debugPreStart();
@@ -4046,7 +4045,6 @@ pvt->_sqlrc->debugPrint("(END)");
 		}
 
 		if (type==NULL_DATA) {
-pvt->_sqlrc->debugPrint("(NULL)");
 
 			// handle null data
 			if (pvt->_returnnulls) {
@@ -4065,9 +4063,6 @@ pvt->_sqlrc->debugPrint("(NULL)");
 					"A network error may have occurred");
 				return false;
 			}
-pvt->_sqlrc->debugPrint("(STRING");
-pvt->_sqlrc->debugPrint((int64_t)length);
-pvt->_sqlrc->debugPrint(")");
 
 			// for non-long, non-NULL datatypes...
 			// get the field into a buffer
@@ -4080,7 +4075,6 @@ pvt->_sqlrc->debugPrint(")");
 			buffer[length]='\0';
 
 		} else if (type==START_LONG_DATA) {
-pvt->_sqlrc->debugPrint("(LONG)");
 
 			uint64_t	totallength;
 			if (getLongLong(&totallength)!=sizeof(uint64_t)) {
