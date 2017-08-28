@@ -115,6 +115,7 @@ enum querytype_t {
 	SHOW_DATABASES_QUERY=0,
 	SHOW_TABLES_QUERY,
 	SHOW_COLUMNS_QUERY,
+	SHOW_PRIMARY_KEYS_QUERY,
 	DESCRIBE_QUERY
 };
 
@@ -163,8 +164,7 @@ class	sqlrsh {
 		void	executeQuery(sqlrcursor *sqlrcur,
 					sqlrshenv *env);
 		char	*getWild(const char *command);
-		char	*getTable(enum querytype_t querytype,
-					const char *command);
+		char	*getTable(const char *command, bool in);
 		char	*getProcedure(const char *command);
 		char	*getType(const char *command);
 		void	initStats(sqlrshenv *env);
@@ -807,7 +807,7 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 	} else if (!charstring::compareIgnoringCase(command,"fields ",7)) {
 
-		char	*table=getTable(DESCRIBE_QUERY,command);
+		char	*table=getTable(command,false);
 		sqlrcur->getColumnList(table,NULL);
 		delete[] table;
 
@@ -856,13 +856,13 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			sqlrcur->getTableList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
-							"show table types",16)) {
+						"show table types",16)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableTypeList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"show columns odbc",17)) {
-			char	*table=getTable(SHOW_COLUMNS_QUERY,command);
+			char	*table=getTable(command,true);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild,
 					SQLRCLIENTLISTFORMAT_ODBC);
@@ -870,14 +870,21 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 							"show columns",12)) {
-			char	*table=getTable(SHOW_COLUMNS_QUERY,command);
+			char	*table=getTable(command,true);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild);
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show primary keys",17)) {
+			char	*table=getTable(command,true);
+			char	*wild=getWild(command);
+			sqlrcur->getPrimaryKeysList(table,wild);
+			delete[] table;
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 							"describe ",9)) {
-			char	*table=getTable(DESCRIBE_QUERY,command);
+			char	*table=getTable(command,false);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild);
 			delete[] table;
@@ -1057,9 +1064,9 @@ char *sqlrsh::getWild(const char *command) {
 	return output.detachString();
 }
 
-char *sqlrsh::getTable(querytype_t querytype, const char *command) {
+char *sqlrsh::getTable(const char *command, bool in) {
 	const char	*tableptr=NULL;
-	if (querytype==SHOW_COLUMNS_QUERY) {
+	if (in) {
 		tableptr=charstring::findFirst(command," in ");
 		if (!tableptr) {
 			return NULL;
@@ -1070,7 +1077,7 @@ char *sqlrsh::getTable(querytype_t querytype, const char *command) {
 			return charstring::duplicate(tableptr);
 		}
 		return charstring::duplicate(tableptr,endptr-tableptr);
-	} else if (querytype==DESCRIBE_QUERY) {
+	} else {
 		tableptr=charstring::findFirst(command," ");
 		if (!tableptr) {
 			return NULL;

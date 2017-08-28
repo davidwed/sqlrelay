@@ -661,6 +661,12 @@ bool sqlrserverconnection::getColumnList(sqlrservercursor *cursor,
 	return false;
 }
 
+bool sqlrserverconnection::getPrimaryKeyList(sqlrservercursor *cursor,
+						const char *table,
+						const char *wild) {
+	return false;
+}
+
 bool sqlrserverconnection::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
@@ -700,6 +706,11 @@ const char *sqlrserverconnection::getGlobalTempTableListQuery() {
 }
 
 const char *sqlrserverconnection::getColumnListQuery(const char *table,
+							bool wild) {
+	return "select 1";
+}
+
+const char *sqlrserverconnection::getPrimaryKeyListQuery(const char *table,
 							bool wild) {
 	return "select 1";
 }

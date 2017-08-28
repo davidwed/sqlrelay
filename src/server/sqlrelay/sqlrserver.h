@@ -443,6 +443,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
+		bool		getPrimaryKeyList(sqlrservercursor *cursor,
+						const char *table,
+						const char *wild);
 		bool		getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
@@ -458,6 +461,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getTableTypeListQuery(bool wild);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(const char *table,
+							bool wild);
+		const char	*getPrimaryKeyListQuery(const char *table,
 							bool wild);
 		const char	*getProcedureBindAndColumnListQuery(
 							const char *procedure,
@@ -480,6 +485,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setTableTypeListColumnMap(
 					sqlrserverlistformat_t listformat);
 		void		setColumnListColumnMap(
+					sqlrserverlistformat_t listformat);
+		void		setPrimaryKeyListColumnMap(
 					sqlrserverlistformat_t listformat);
 		void		setProcedureBindAndColumnListColumnMap(
 					sqlrserverlistformat_t listformat);
@@ -755,6 +762,10 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
+		virtual bool		getPrimaryKeyList(
+						sqlrservercursor *cursor,
+						const char *table,
+						const char *wild);
 		virtual bool		getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
@@ -772,6 +783,9 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual const char	*getTableTypeListQuery(bool wild);
 		virtual const char	*getGlobalTempTableListQuery();
 		virtual const char	*getColumnListQuery(
+						const char *table,
+						bool wild);
+		virtual const char	*getPrimaryKeyListQuery(
 						const char *table,
 						bool wild);
 		virtual const char	*getProcedureBindAndColumnListQuery(

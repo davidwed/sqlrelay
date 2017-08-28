@@ -154,6 +154,11 @@
 		bool		getColumnList(const char *table,
 					const char *wild,
 					sqlrclientlistformat_t listformat);
+		bool		getPrimaryKeysList(const char *table,
+					const char *wild);
+		bool		getPrimaryKeysList(const char *table,
+					const char *wild,
+					sqlrclientlistformat_t listformat);
 		bool		getProcedureBindAndColumnList(
 					const char *procedure,
 					const char *wild);
