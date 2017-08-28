@@ -3593,9 +3593,14 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 							"bufferlength\n");
 				}
 			} else {
-				debugPrintf("  NULL value or "
-						"0 bufferlength "
+				if (!value) {
+					debugPrintf("  NULL value "
 						"(not copying out strval)\n");
+				}
+				if (!bufferlength) {
+					debugPrintf("  0 bufferlength "
+						"(not copying out strval)\n");
+				}
 			}
 			break;
 		case 1:
