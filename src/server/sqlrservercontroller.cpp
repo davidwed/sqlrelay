@@ -2175,6 +2175,12 @@ bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 	return pvt->_conn->getPrimaryKeyList(cursor,table,wild);
 }
 
+bool sqlrservercontroller::getKeyAndIndexList(sqlrservercursor *cursor,
+						const char *table,
+						const char *wild) {
+	return pvt->_conn->getKeyAndIndexList(cursor,table,wild);
+}
+
 bool sqlrservercontroller::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
@@ -2221,6 +2227,11 @@ const char *sqlrservercontroller::getColumnListQuery(const char *table,
 const char *sqlrservercontroller::getPrimaryKeyListQuery(const char *table,
 								bool wild) {
 	return pvt->_conn->getPrimaryKeyListQuery(table,wild);
+}
+
+const char *sqlrservercontroller::getKeyAndIndexListQuery(const char *table,
+								bool wild) {
+	return pvt->_conn->getKeyAndIndexListQuery(table,wild);
 }
 
 const char *sqlrservercontroller::getProcedureBindAndColumnListQuery(
@@ -4209,6 +4220,40 @@ void sqlrservercontroller::setColumnListColumnMap(
 }
 
 void sqlrservercontroller::setPrimaryKeyListColumnMap(
+					sqlrserverlistformat_t listformat) {
+
+	// for now, don't remap columns if api calls are used to get lists,
+	// the columns don't come back in the "native" format
+	// FIXME: this "happens to work" for odbc passthrough:
+	// ODBC -> sqlrelay client -> sqlrelay server -> ODBC -> some db
+	// but wouldn't if either ODBC were replaced with something else
+	if (pvt->_conn->getListsByApiCalls()) {
+		pvt->_columnmap=NULL;
+		return;
+	}
+
+	// FIXME: currently, the only connection that implements this is the
+	// odbc connection, which gets lists by api calls, but eventually we
+	// should implement it for other connections too...
+	switch (listformat) {
+		case SQLRSERVERLISTFORMAT_NULL:
+			pvt->_columnmap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_MYSQL:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_ODBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			break;
+		default:
+			pvt->_columnmap=NULL;
+			break;
+	}
+}
+
+void sqlrservercontroller::setKeyAndIndexListColumnMap(
 					sqlrserverlistformat_t listformat) {
 
 	// for now, don't remap columns if api calls are used to get lists,

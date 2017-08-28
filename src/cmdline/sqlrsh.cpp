@@ -883,6 +883,13 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show keys and indexes",21)) {
+			char	*table=getTable(command,true);
+			char	*wild=getWild(command);
+			sqlrcur->getKeyAndIndexList(table,wild);
+			delete[] table;
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 							"describe ",9)) {
 			char	*table=getTable(command,false);
 			char	*wild=getWild(command);

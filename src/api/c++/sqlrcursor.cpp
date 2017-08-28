@@ -989,6 +989,30 @@ bool sqlrcursor::getPrimaryKeysList(const char *table,
 	return getList(GETPRIMARYKEYLIST,listformat,(table)?table:"",wild);
 }
 
+bool sqlrcursor::getKeyAndIndexList(const char *table, const char *qualifier) {
+	return getKeyAndIndexList(table,qualifier,SQLRCLIENTLISTFORMAT_MYSQL);
+}
+
+bool sqlrcursor::getKeyAndIndexList(const char *table,
+					const char *qualifier,
+					sqlrclientlistformat_t listformat) {
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("getting keys and indexes for: \"");
+		pvt->_sqlrc->debugPrint(table);
+		pvt->_sqlrc->debugPrint("\"");
+		if (qualifier) {
+			pvt->_sqlrc->debugPrint(" - \"");
+			pvt->_sqlrc->debugPrint(qualifier);
+			pvt->_sqlrc->debugPrint("\"");
+		}
+		pvt->_sqlrc->debugPrint("\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+	return getList(GETKEYANDINDEXLIST,listformat,
+					(table)?table:"",qualifier);
+}
+
 bool sqlrcursor::getProcedureBindAndColumnList(
 				const char *procedure,
 				const char *wild) {

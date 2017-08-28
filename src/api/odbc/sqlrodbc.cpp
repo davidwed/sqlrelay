@@ -4986,8 +4986,8 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLSTATISTICS:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLSTATISTICS "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLTABLES:
 			debugPrintf("  functionid: "
@@ -8096,14 +8096,14 @@ SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 }
 
 SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
-					SQLCHAR *CatalogName,
-					SQLSMALLINT NameLength1,
-					SQLCHAR *SchemaName,
-					SQLSMALLINT NameLength2,
-					SQLCHAR *TableName,
-					SQLSMALLINT NameLength3,
-					SQLUSMALLINT Unique,
-					SQLUSMALLINT Reserved) {
+					SQLCHAR *catalogname,
+					SQLSMALLINT namelength1,
+					SQLCHAR *schemaname,
+					SQLSMALLINT namelength2,
+					SQLCHAR *tablename,
+					SQLSMALLINT namelength3,
+					SQLUSMALLINT unique,
+					SQLUSMALLINT reserved) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -8112,11 +8112,75 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported
-	SQLR_STMTSetError(stmt,
-			"Driver does not support this function",0,"IM001");
+	// FIXME: this code treats xxxname as a search pattern in all cases
+	// xxxname is a case-insensitive search pattern if:
+	// * SQL_ODBC_VERSION is SQL_OV_ODBC3
+	// * SQL_ATTR_METADATA_ID is SQL_FALSE
+	// otherwise it's a case-insensitive literal
 
-	return SQL_ERROR;
+	stringbuffer	table;
+	SQLR_BuildObjectName(&table,catalogname,namelength1,
+					schemaname,namelength2,
+					tablename,namelength3);
+
+	const char	*uniqueness=NULL;
+	switch (unique) {
+		case SQL_INDEX_UNIQUE:
+			uniqueness="unique";
+			break;
+		case SQL_INDEX_ALL:
+			uniqueness="all";
+			break;
+		default:
+			SQLR_STMTSetError(stmt,
+			"Uniqueness option type out of range",0,"HY100");
+	}
+
+	const char	*accuracy=NULL;
+	switch (reserved) {
+		case SQL_ENSURE:
+			accuracy="ensure";
+			break;
+		case SQL_QUICK:
+			accuracy="quick";
+			break;
+		default:
+			SQLR_STMTSetError(stmt,
+			"Accuracy option type out of range",0,"HY101");
+	}
+
+	char	*wild;
+	charstring::printf(&wild,"%s:%s",uniqueness,accuracy);
+
+	debugPrintf("  table: %s\n",table.getString());
+	debugPrintf("  wild: %s\n",(wild)?wild:"");
+
+	// reinit row indices
+	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
+	stmt->currentgetdatarow=0;
+
+	// clear the error
+	SQLR_STMTClearError(stmt);
+
+	SQLRETURN	retval=
+		(stmt->cur->getKeyAndIndexList(table.getString(),wild,
+						SQLRCLIENTLISTFORMAT_ODBC))?
+							SQL_SUCCESS:SQL_ERROR;
+	delete[] wild;
+
+	// the statement has been executed
+	stmt->executed=true;
+	stmt->nodata=false;
+
+	debugPrintf("  %s\n",(retval==SQL_SUCCESS)?"success":"error");
+
+	// handle errors
+	if (retval!=SQL_SUCCESS) {
+		SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+					stmt->cur->errorNumber(),NULL);
+	}
+	return retval;
 }
 
 SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,

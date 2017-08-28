@@ -25,6 +25,7 @@ enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_TABLE_TYPE_LIST,
 	SQLRCLIENTQUERYTYPE_COLUMN_LIST,
 	SQLRCLIENTQUERYTYPE_PRIMARY_KEY_LIST,
+	SQLRCLIENTQUERYTYPE_KEY_AND_INDEX_LIST,
 	SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST,
 	SQLRCLIENTQUERYTYPE_TYPE_INFO_LIST,
 	SQLRCLIENTQUERYTYPE_PROCEDURE_LIST
@@ -159,6 +160,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getTableTypeListCommand(sqlrservercursor *cursor);
 		bool	getColumnListCommand(sqlrservercursor *cursor);
 		bool	getPrimaryKeyListCommand(sqlrservercursor *cursor);
+		bool	getKeyAndIndexListCommand(sqlrservercursor *cursor);
 		bool	getProcedureBindAndColumnListCommand(
 						sqlrservercursor *cursor);
 		bool	getTypeInfoListCommand(sqlrservercursor *cursor);
@@ -568,6 +570,9 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		} else if (command==GETPRIMARYKEYLIST) {
 			//cont->incrementGetPrimaryKeyListCount();
 			loop=getPrimaryKeyListCommand(cursor);
+		} else if (command==GETKEYANDINDEXLIST) {
+			//cont->incrementGetKeyAndIndexListCount();
+			loop=getKeyAndIndexListCommand(cursor);
 		} else if (command==GETPROCEDUREBINDANDCOLUMNLIST) {
 			//cont->incrementGetProcedureBindAndColumnListCount();
 			loop=getProcedureBindAndColumnListCommand(cursor);
@@ -729,6 +734,7 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 		command==GETTABLETYPELIST ||
 		command==GETCOLUMNLIST ||
 		command==GETPRIMARYKEYLIST ||
+		command==GETKEYANDINDEXLIST ||
 		command==GETPROCEDUREBINDANDCOLUMNLIST ||
 		command==GETTYPEINFOLIST ||
 		command==GETPROCEDURELIST ||
@@ -1390,6 +1396,10 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 					break;
 				case SQLRCLIENTQUERYTYPE_PRIMARY_KEY_LIST:
 					cont->setPrimaryKeyListColumnMap(
+								listformat);
+					break;
+				case SQLRCLIENTQUERYTYPE_KEY_AND_INDEX_LIST:
+					cont->setKeyAndIndexListColumnMap(
 								listformat);
 					break;
 				case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
@@ -3176,6 +3186,16 @@ bool sqlrprotocol_sqlrclient::getPrimaryKeyListCommand(
 	return retval;
 }
 
+bool sqlrprotocol_sqlrclient::getKeyAndIndexListCommand(
+					sqlrservercursor *cursor) {
+	debugFunction();
+	cont->raiseDebugMessageEvent("get key and index list...");
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_KEY_AND_INDEX_LIST,true);
+	cont->raiseDebugMessageEvent("done getting key and index list");
+	return retval;
+}
+
 bool sqlrprotocol_sqlrclient::getProcedureBindAndColumnListCommand(
 						sqlrservercursor *cursor) {
 	debugFunction();
@@ -3374,6 +3394,10 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 			cont->setPrimaryKeyListColumnMap(listformat);
 			success=cont->getPrimaryKeyList(cursor,object,wild);
 			break;
+		case SQLRCLIENTQUERYTYPE_KEY_AND_INDEX_LIST:
+			cont->setKeyAndIndexListColumnMap(listformat);
+			success=cont->getKeyAndIndexList(cursor,object,wild);
+			break;
 		case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
 			cont->setProcedureBindAndColumnListColumnMap(
 								listformat);
@@ -3450,6 +3474,9 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 			break;
 		case SQLRCLIENTQUERYTYPE_PRIMARY_KEY_LIST:
 			query=cont->getPrimaryKeyListQuery(object,havewild);
+			break;
+		case SQLRCLIENTQUERYTYPE_KEY_AND_INDEX_LIST:
+			query=cont->getKeyAndIndexListQuery(object,havewild);
 			break;
 		case SQLRCLIENTQUERYTYPE_PROCEDURE_BIND_AND_COLUMN_LIST:
 			query=cont->getProcedureBindAndColumnListQuery(
