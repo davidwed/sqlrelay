@@ -215,10 +215,10 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		datebind	**outdatebind;
 		int16_t		**outisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
-		SQLLEN		**outisnull;
+		SQLLEN		*outisnull;
 		SQLLEN		inisnull;
 		#else
-		SQLINTEGER	**outisnull;
+		SQLINTEGER	*outisnull;
 		SQLINTEGER	inisnull;
 		#endif
 
@@ -1531,15 +1531,13 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	outdatebind=new datebind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
 	#ifdef SQLBINDPARAMETER_SQLLEN
-	outisnull=new SQLLEN *[maxbindcount];
+	outisnull=new SQLLEN[maxbindcount];
 	#else
-	outisnull=new SQLINTEGER *[maxbindcount];
+	outisnull=new SQLINTEGER[maxbindcount];
 	#endif
 	inisnull=SQL_NULL_DATA;
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
-		outisnullptr[i]=NULL;
-		outisnull[i]=NULL;
 	}
 }
 
@@ -1819,7 +1817,6 @@ bool odbccursor::outputBind(const char *variable,
 
 	outdatebind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
-	outisnull[pos-1]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -1830,7 +1827,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				outisnull[pos-1]
+				&(outisnull[pos-1])
 				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -1850,7 +1847,6 @@ bool odbccursor::outputBind(const char *variable,
 
 	outdatebind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
-	outisnull[pos-1]=NULL;
 
 	*value=0;
 
@@ -1863,7 +1859,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(int64_t),
-				outisnull[pos-1]
+				&(outisnull[pos-1])
 				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -1885,7 +1881,6 @@ bool odbccursor::outputBind(const char *variable,
 
 	outdatebind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
-	outisnull[pos-1]=NULL;
 
 	*value=0.0;
 
@@ -1898,7 +1893,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(double),
-				outisnull[pos-1]
+				&(outisnull[pos-1])
 				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -1939,7 +1934,6 @@ bool odbccursor::outputBind(const char *variable,
 	db->buffer=buffer;
 	outdatebind[pos-1]=db;
 	outisnullptr[pos-1]=isnull;
-	outisnull[pos-1]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -1950,7 +1944,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				outisnull[pos-1]
+				&(outisnull[pos-1])
 				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -2015,7 +2009,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
 		}
-		*(outisnullptr[i])=*(outisnull[i]);
+		*(outisnullptr[i])=outisnull[i];
 	}
 
 	return true;
