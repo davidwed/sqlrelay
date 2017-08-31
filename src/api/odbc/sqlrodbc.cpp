@@ -4306,9 +4306,14 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 							"bufferlength\n");
 				}
 			} else {
-				debugPrintf("  NULL diaginfo or "
-						"0 bufferlength "
+				if (!diaginfo) {
+					debugPrintf("  NULL diaginfo or "
 						"(not copying out strval)\n");
+				}
+				if (!bufferlength) {
+					debugPrintf("  0 bufferlength "
+						"(not copying out strval)\n");
+				}
 			}
 			break;
 		case 1:
@@ -6840,9 +6845,14 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 							"bufferlength\n");
 				}
 			} else {
-				debugPrintf("  NULL infovalue or "
-						"0 bufferlength "
+				if (!infovalue) {
+					debugPrintf("  NULL infovalue "
 						"(not copying out strval)\n");
+				}
+				if (!bufferlength) {
+					debugPrintf("  0 bufferlength "
+						"(not copying out strval)\n");
+				}
 			}
 			break;
 		case 1:
