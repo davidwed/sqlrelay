@@ -175,12 +175,21 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		char		field[MAX_COLUMN_COUNT]
 					[FETCH_AT_ONCE]
 					[MAX_FIELD_LENGTH];
+		#ifdef SQLBINDCOL_SQLLEN
+		SQLLEN		indicator[MAX_COLUMN_COUNT]
+						[FETCH_AT_ONCE];
+		#else
 		SQLINTEGER	indicator[MAX_COLUMN_COUNT]
 						[FETCH_AT_ONCE];
+		#endif
 #else*/
 		char		field[MAX_COLUMN_COUNT]
 					[MAX_FIELD_LENGTH];
+		#ifdef SQLBINDCOL_SQLLEN
+		SQLLEN		indicator[MAX_COLUMN_COUNT];
+		#else
 		SQLINTEGER	indicator[MAX_COLUMN_COUNT];
+		#endif
 //#endif
 		odbccolumn 	col[MAX_COLUMN_COUNT];
 
