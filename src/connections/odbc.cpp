@@ -39,12 +39,7 @@ struct odbccolumn {
 	SQLLEN		precision;
 	SQLLEN		scale;
 	SQLLEN		nullable;
-	SQLLEN		primarykey;
-	SQLLEN		unique;
-	SQLLEN		partofkey;
 	SQLLEN		unsignednumber;
-	SQLLEN		zerofill;
-	SQLLEN		binary;
 	SQLLEN		autoincrement;
 #else
 	SQLINTEGER	type;
@@ -52,12 +47,7 @@ struct odbccolumn {
 	SQLINTEGER	precision;
 	SQLINTEGER	scale;
 	SQLINTEGER	nullable;
-	SQLINTEGER	primarykey;
-	SQLINTEGER	unique;
-	SQLINTEGER	partofkey;
 	SQLINTEGER	unsignednumber;
-	SQLINTEGER	zerofill;
-	SQLINTEGER	binary;
 	SQLINTEGER	autoincrement;
 #endif
 };
