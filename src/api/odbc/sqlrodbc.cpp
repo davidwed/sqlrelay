@@ -9121,24 +9121,42 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 	// convert parameternumber to a string
 	char	*parametername=charstring::parseNumber(parameternumber);
 
+	// handle NULLs by binding a NULL string
+	if (strlen_or_ind) {
+		debugPrintf("  strlen_or_ind: %d\n",*strlen_or_ind);
+		if (*strlen_or_ind==SQL_NULL_DATA) {
+			valuetype=SQL_C_CHAR;
+			parametervalue=NULL;
+		}
+	} else {
+		debugPrintf("  strlen_or_ind is NULL\n");
+	}
+
 	switch (valuetype) {
 		case SQL_C_CHAR:
 			debugPrintf("  valuetype: SQL_C_CHAR\n");
+			debugPrintf("  value: \"%s\"\n",parametervalue);
 			stmt->cur->inputBind(parametername,
 				(const char *)parametervalue);
 			break;
 		case SQL_C_LONG:
 			debugPrintf("  valuetype: SQL_C_LONG\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int32_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((int32_t *)parametervalue)));
 			break;
 		case SQL_C_SHORT:
 			debugPrintf("  valuetype: SQL_C_SHORT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int16_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((int16_t *)parametervalue)));
 			break;
 		case SQL_C_FLOAT:
 			debugPrintf("  valuetype: SQL_C_FLOAT\n");
+			debugPrintf("  value: \"%f\"\n",
+				(float)(*((double *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(float)(*((double *)parametervalue)),
 				lengthprecision,
@@ -9146,6 +9164,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_DOUBLE:
 			debugPrintf("  valuetype: SQL_C_DOUBLE\n");
+			debugPrintf("  value: \"%f\"\n",
+				*((double *)parametervalue));
 			stmt->cur->inputBind(parametername,
 				*((double *)parametervalue),
 				lengthprecision,
@@ -9153,6 +9173,9 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_NUMERIC:
 			debugPrintf("  valuetype: SQL_C_NUMERIC\n");
+			debugPrintf("  value: \"%s\"\n",
+				SQLR_BuildNumeric(stmt,parameternumber,
+					(SQL_NUMERIC_STRUCT *)parametervalue));
 			stmt->cur->inputBind(parametername,
 				SQLR_BuildNumeric(stmt,parameternumber,
 					(SQL_NUMERIC_STRUCT *)parametervalue));
@@ -9162,6 +9185,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			{
 			debugPrintf("  valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
 			DATE_STRUCT	*ds=(DATE_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d-%d-%d\"\n",
+						ds->year,ds->month,ds->day);
 			stmt->cur->inputBind(parametername,
 						ds->year,ds->month,ds->day,
 						0,0,0,0,NULL,false);
@@ -9172,6 +9197,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			{
 			debugPrintf("  valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
 			TIME_STRUCT	*ts=(TIME_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d:%d:%d\"\n",
+						ts->hour,ts->minute,ts->second);
 			stmt->cur->inputBind(parametername,
 						0,0,0,
 						ts->hour,ts->minute,ts->second,
@@ -9185,6 +9212,10 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
 			TIMESTAMP_STRUCT	*tss=
 					(TIMESTAMP_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d-%d-%d %d:%d:%d:%d\"\n",
+					tss->year,tss->month,tss->day,
+					tss->hour,tss->minute,tss->second,
+					tss->fraction/10);
 			stmt->cur->inputBind(parametername,
 					tss->year,tss->month,tss->day,
 					tss->hour,tss->minute,tss->second,
@@ -9220,6 +9251,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_BIT:
 			debugPrintf("  valuetype: SQL_C_BIT\n");
+			debugPrintf("  value: \"%s\"\n",parametervalue);
 			stmt->cur->inputBind(parametername,
 				(charstring::contains("YyTt",
 					(const char *)parametervalue) ||
@@ -9228,21 +9260,29 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_SBIGINT:
 			debugPrintf("  valuetype: SQL_C_BIGINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int64_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((int64_t *)parametervalue)));
 			break;
 		case SQL_C_UBIGINT:
 			debugPrintf("  valuetype: SQL_C_UBIGINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int64_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((uint64_t *)parametervalue)));
 			break;
 		case SQL_C_SLONG:
 			debugPrintf("  valuetype: SQL_C_SLONG\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int32_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((int32_t *)parametervalue)));
 			break;
 		case SQL_C_SSHORT:
 			debugPrintf("  valuetype: SQL_C_SSHORT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int16_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((int16_t *)parametervalue)));
 			break;
@@ -9250,6 +9290,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_STINYINT:
 			debugPrintf("  valuetype: "
 				"SQL_C_TINYINT/SQL_C_STINYINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+					(int64_t)(*((char *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 					(int64_t)(*((char *)parametervalue)));
 			break;
@@ -9257,16 +9299,22 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		//	(dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
 			debugPrintf("  valuetype: SQL_C_ULONG/SQL_C_BOOKMARK\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((uint32_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((uint32_t *)parametervalue)));
 			break;
 		case SQL_C_USHORT:
 			debugPrintf("  valuetype: SQL_C_USHORT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((uint16_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((uint16_t *)parametervalue)));
 			break;
 		case SQL_C_UTINYINT:
 			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((unsigned char *)parametervalue)));
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((unsigned char *)parametervalue)));
 			break;
