@@ -7522,7 +7522,13 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	*rowcount=stmt->cur->affectedRows();
+	if (rowcount) {
+		*rowcount=stmt->cur->affectedRows();
+		debugPrintf("  rowcount: %lld\n",(int64_t)*rowcount);
+	} else {
+		debugPrintf("  rowcount is null (not copying out %lld)\n",
+						stmt->cur->affectedRows());
+	}
 
 	return SQL_SUCCESS;
 }
