@@ -2763,6 +2763,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 		char	*parametername=charstring::parseNumber(
 						ob->parameternumber);
 
+		// FIXME: handle NULL values
+
 		switch (ob->valuetype) {
 			case SQL_C_CHAR:
 				debugPrintf("  valuetype: SQL_C_CHAR\n");

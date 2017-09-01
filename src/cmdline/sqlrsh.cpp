@@ -63,6 +63,7 @@ class sqlrshenv {
 			dictionary<char *, sqlrshbindvalue *> *binds);
 
 		bool		headers;
+		bool		divider;
 		bool		stats;
 		uint64_t	rsbs;
 		bool		final;
@@ -77,6 +78,7 @@ class sqlrshenv {
 
 sqlrshenv::sqlrshenv() {
 	headers=true;
+	divider=true;
 	stats=true;
 	rsbs=100;
 	final=false;
@@ -477,6 +479,7 @@ int sqlrsh::commandType(const char *command) {
 
 	// compare to known internal commands
 	if (!charstring::compareIgnoringCase(ptr,"headers",7) ||
+		!charstring::compareIgnoringCase(ptr,"divider",7) ||
 		!charstring::compareIgnoringCase(ptr,"stats",5) ||
 		!charstring::compareIgnoringCase(ptr,"format",6) ||
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
@@ -548,6 +551,9 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	if (!charstring::compareIgnoringCase(ptr,"headers",7)) {
 		ptr=ptr+7;
 		cmdtype=2;
+	} else if (!charstring::compareIgnoringCase(ptr,"divider",7)) {
+		ptr=ptr+7;
+		cmdtype=11;
 	} else if (!charstring::compareIgnoringCase(ptr,"stats",5)) {	
 		ptr=ptr+5;
 		cmdtype=3;
@@ -738,35 +744,47 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	// set parameter
-	if (cmdtype==2) {
-		env->headers=toggle;
-	} else if (cmdtype==3) {
-		env->stats=toggle;
-	} else if (cmdtype==5) {
-		env->final=toggle;
-	} else if (cmdtype==7) {
-		env->delimiter=ptr[0];
-		stdoutput.printf("Delimiter set to %c\n",env->delimiter);
-	} else if (cmdtype==8) {
-		if (toggle) {
-			if (sqlrcon->autoCommitOn()) {
-				stdoutput.printf("Autocommit set on\n");
+	switch (cmdtype) {
+		case 2:
+			env->headers=toggle;
+			break;
+		case 11:
+			env->divider=toggle;
+			break;
+		case 3:
+			env->stats=toggle;
+			break;
+		case 5:
+			env->final=toggle;
+			break;
+		case 7:
+			env->delimiter=ptr[0];
+			stdoutput.printf("Delimiter set to %c\n",
+							env->delimiter);
+			break;
+		case 8:
+			if (toggle) {
+				if (sqlrcon->autoCommitOn()) {
+					stdoutput.printf(
+						"Autocommit set on\n");
+				} else {
+					displayError(env,NULL,
+						sqlrcon->errorMessage(),
+						sqlrcon->errorNumber());
+					return false;
+				}
 			} else {
-				displayError(env,NULL,
-					sqlrcon->errorMessage(),
-					sqlrcon->errorNumber());
-				return false;
+				if (sqlrcon->autoCommitOff()) {
+					stdoutput.printf(
+						"Autocommit set off\n");
+				} else {
+					displayError(env,NULL,
+						sqlrcon->errorMessage(),
+						sqlrcon->errorNumber());
+					return false;
+				}
 			}
-		} else {
-			if (sqlrcon->autoCommitOff()) {
-				stdoutput.printf("Autocommit set off\n");
-			} else {
-				displayError(env,NULL,
-					sqlrcon->errorMessage(),
-					sqlrcon->errorNumber());
-				return false;
-			}
-		}
+			break;
 	}
 	return true;
 }
@@ -1201,11 +1219,13 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	}
 	stdoutput.printf("\n");
 
-	// display delimiter
-	for (uint32_t i=0; i<charcount; i++) {
-		stdoutput.printf("=");
+	// display divider
+	if (env->divider) {
+		for (uint32_t i=0; i<charcount; i++) {
+			stdoutput.printf("=");
+		}
+		stdoutput.printf("\n");
 	}
-	stdoutput.printf("\n");
 }
 
 void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
@@ -1890,6 +1910,9 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("runs commands contained in file \"script\"\n");
 	stdoutput.printf("	headers on|off		- ");
 	stdoutput.printf("toggles column descriptions before result set\n");
+	stdoutput.printf("	divider on|off		- ");
+	stdoutput.printf("toggles the divider between the column descriptions "
+			"and the result set\n");
 	stdoutput.printf("	stats on|off		- ");
 	stdoutput.printf("toggles statistics after result set\n");
 	stdoutput.printf("	format plain|csv	- ");
