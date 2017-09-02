@@ -2544,7 +2544,7 @@ bool sqlrservercontroller::parseDateTime(
 				const char *datedelimiters,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int16_t *fraction, bool *isnegative) {
+				int32_t *fraction, bool *isnegative) {
 	return ::parseDateTime(datetime,ddmm,yyyyddmm,datedelimiters,
 				year,month,day,hour,minute,second,fraction,
 				isnegative);
@@ -2553,7 +2553,7 @@ bool sqlrservercontroller::parseDateTime(
 char *sqlrservercontroller::convertDateTime(const char *format,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t fraction, bool isnegative) {
+				int32_t fraction, bool isnegative) {
 	return ::convertDateTime(format,year,month,day,
 				hour,minute,second,fraction,
 				isnegative);
@@ -4586,7 +4586,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
-	int16_t	fraction=-1;
+	int32_t	fraction=-1;
 	bool	isnegative=false;
 	if (!parseDateTime(field,ddmm,yyyyddmm,
 				datedelimiters,

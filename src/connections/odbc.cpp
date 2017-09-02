@@ -1781,7 +1781,12 @@ bool odbccursor::inputBind(const char *variable,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
 				0,
-				0,
+				// Here, decimal digits here refers to the max
+				// digits in ts->fraction.  Since ts->fraction
+				// represents billionths of a second
+				// (0-999999999) in ODBC, decimal digits must
+				// be 9 to accomodate the full range.
+				9,
 				buffer,
 				0,
 				NULL

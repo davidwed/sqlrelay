@@ -655,12 +655,12 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 				const char *datedelimiters,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int16_t *fraction, bool *isnegative);
+				int32_t *fraction, bool *isnegative);
 
 		char	*convertDateTime(const char *format,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t fraction, bool isnegative);
+				int32_t fraction, bool isnegative);
 
 		const char	*asciiToHex(unsigned char ch);
 		const char	*asciiToOctal(unsigned char ch);

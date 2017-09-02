@@ -40,6 +40,8 @@
 	various variables are now properly typed (SQLLEN vs. SQLINTEGER) in the
 		odbc connection module
 	added "divider on/off" command to sqlrsh
+	fixed several cases where microseconds were represented by an int16_t
+		made them all int32_t's
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

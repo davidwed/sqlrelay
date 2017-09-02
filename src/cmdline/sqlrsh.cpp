@@ -1505,7 +1505,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		int16_t	hour;
 		int16_t	minute;
 		int16_t	second;
-		int16_t	fraction;
+		int32_t	fraction;
 		bool	isnegative;
 		parseDateTime(value,false,false,"/",
 					&year,&month,&day,
