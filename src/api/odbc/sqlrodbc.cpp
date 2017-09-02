@@ -2467,8 +2467,10 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 						node; node=node->getNext()) {
 
 				if (completiontype==SQL_COMMIT) {
+					debugPrintf("  commit\n");
 					node->getValue()->con->commit();
 				} else if (completiontype==SQL_ROLLBACK) {
+					debugPrintf("  rollback\n");
 					node->getValue()->con->rollback();
 				}
 			}
@@ -2486,8 +2488,10 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 			}
 
 			if (completiontype==SQL_COMMIT) {
+				debugPrintf("  commit\n");
 				conn->con->commit();
 			} else if (completiontype==SQL_ROLLBACK) {
+				debugPrintf("  rollback\n");
 				conn->con->rollback();
 			}
 
