@@ -1505,12 +1505,12 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		int16_t	hour;
 		int16_t	minute;
 		int16_t	second;
-		int32_t	fraction;
+		int32_t	microsecond;
 		bool	isnegative;
 		parseDateTime(value,false,false,"/",
 					&year,&month,&day,
 					&hour,&minute,&second,
-					&fraction,&isnegative);
+					&microsecond,&isnegative);
 		bv->type=SQLRCLIENTBINDVARTYPE_DATE;
 		bv->dateval.year=year;
 		bv->dateval.month=month;
@@ -1518,7 +1518,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		bv->dateval.hour=hour;
 		bv->dateval.minute=minute;
 		bv->dateval.second=second;
-		bv->dateval.microsecond=fraction;
+		bv->dateval.microsecond=microsecond;
 		bv->dateval.tz="";
 		bv->dateval.isnegative=isnegative;
 		delete[] value;

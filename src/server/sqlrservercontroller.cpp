@@ -2544,18 +2544,18 @@ bool sqlrservercontroller::parseDateTime(
 				const char *datedelimiters,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int32_t *fraction, bool *isnegative) {
+				int32_t *microsecond, bool *isnegative) {
 	return ::parseDateTime(datetime,ddmm,yyyyddmm,datedelimiters,
-				year,month,day,hour,minute,second,fraction,
+				year,month,day,hour,minute,second,microsecond,
 				isnegative);
 }
 
 char *sqlrservercontroller::convertDateTime(const char *format,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int32_t fraction, bool isnegative) {
+				int32_t microsecond, bool isnegative) {
 	return ::convertDateTime(format,year,month,day,
-				hour,minute,second,fraction,
+				hour,minute,second,microsecond,
 				isnegative);
 }
 
@@ -4586,13 +4586,13 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
-	int32_t	fraction=-1;
+	int32_t	microsecond=-1;
 	bool	isnegative=false;
 	if (!parseDateTime(field,ddmm,yyyyddmm,
 				datedelimiters,
 				&year,&month,&day,
 				&hour,&minute,&second,
-				&fraction,&isnegative)) {
+				&microsecond,&isnegative)) {
 		return;
 	}
 
@@ -4610,7 +4610,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	pvt->_reformattedfield=convertDateTime(format,
 					year,month,day,
 					hour,minute,second,
-					fraction,isnegative);
+					microsecond,isnegative);
 	pvt->_reformattedfieldlength=charstring::length(pvt->_reformattedfield);
 
 	if (pvt->_debugsqlrresultsettranslation) {

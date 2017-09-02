@@ -1908,7 +1908,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
-	int32_t	fraction=-1;
+	int32_t	usec=-1;
 	bool	isnegative=false;
 
 	// copy into a buffer (to make sure it's null-terminated)
@@ -1930,7 +1930,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	parseDateTime(buffer,ddmm,yyyyddmm,
 				"/-:",&year,&month,&day,
 				&hour,&minute,&second,
-				&fraction,&isnegative);
+				&usec,&isnegative);
 
 	// copy back data
 	tm->year=(year!=-1)?year:0;

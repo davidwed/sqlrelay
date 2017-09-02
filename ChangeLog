@@ -42,6 +42,8 @@
 	added "divider on/off" command to sqlrsh
 	fixed several cases where microseconds were represented by an int16_t
 		made them all int32_t's
+	parsing/generation of fractional seconds pays attention to length of
+		value/format-string now
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

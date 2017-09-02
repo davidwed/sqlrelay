@@ -2926,7 +2926,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				ts->hour=hour;
 				ts->minute=minute;
 				ts->second=second;
-				ts->fraction=microsecond*10;
+				ts->fraction=microsecond*1000;
 
 				debugPrintf("    year: %d\n",ts->year);
 				debugPrintf("    month: %d\n",ts->month);
@@ -3760,7 +3760,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
-	int32_t	fraction=-1;
+	int32_t	usec=-1;
 	bool	isnegative=false;
 
 	// get day/month format
@@ -3777,7 +3777,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
-				&hour,&minute,&second,&fraction,&isnegative);
+				&hour,&minute,&second,&usec,&isnegative);
 
 	// copy data out
 	tss->year=(year!=-1)?year:0;
@@ -3786,7 +3786,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	tss->hour=(hour!=-1)?hour:0;
 	tss->minute=(minute!=-1)?minute:0;
 	tss->second=(second!=-1)?second:0;
-	tss->fraction=(fraction!=-1)?fraction:0;
+	tss->fraction=(usec!=-1)?usec*1000:0;
 
 	debugPrintf("    year: %d\n",tss->year);
 	debugPrintf("    month: %d\n",tss->month);
@@ -9227,11 +9227,11 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			debugPrintf("  value: \"%d-%d-%d %d:%d:%d:%d\"\n",
 					tss->year,tss->month,tss->day,
 					tss->hour,tss->minute,tss->second,
-					tss->fraction/10);
+					tss->fraction/1000);
 			stmt->cur->inputBind(parametername,
 					tss->year,tss->month,tss->day,
 					tss->hour,tss->minute,tss->second,
-					tss->fraction/10,NULL,false);
+					tss->fraction/1000,NULL,false);
 			break;
 			}
 		case SQL_C_INTERVAL_YEAR:

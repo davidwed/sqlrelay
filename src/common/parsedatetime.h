@@ -46,11 +46,30 @@ static int16_t adjustHour(int16_t hour, const char *timestring) {
 	return hour;
 }
 
+static int32_t fractionToMicroseconds(const char *fraction) {
+
+	int32_t	val=charstring::toInteger(fraction);
+	if (!val) {
+		return 0;
+	}
+
+	size_t	len=charstring::length(fraction);
+	while (len<6) {
+		val=val*10;
+		len++;
+	}
+	while (len>6) {
+		val=val/10;
+		len--;
+	}
+	return val;
+}
+
 static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 			const char *datedelimiters,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second,
-			int32_t *fraction, bool *isnegative) {
+			int32_t *microsecond, bool *isnegative) {
 
 	bool	supportslashdelimiteddate=
 			charstring::contains(datedelimiters,'/');
@@ -68,7 +87,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 	*hour=-1;
 	*minute=-1;
 	*second=-1;
-	*fraction=-1;
+	*microsecond=-1;
 	*isnegative=false;
 
 	// different db's format dates very differently
@@ -159,7 +178,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				*hour=charstring::toInteger(timeparts[0]);
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=0;
-				*fraction=0;
+				*microsecond=0;
 
 			} else if (timepartcount==2 &&
 				charstring::isNumber(timeparts[0]) &&
@@ -180,7 +199,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=0;
-				*fraction=0;
+				*microsecond=0;
 				*hour=adjustHour(*hour,timeparts[1]);
 
 			} else if (timepartcount==3 &&
@@ -234,7 +253,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 								timeparts[1]);
 					*second=charstring::toInteger(
 								timeparts[2]);
-					*fraction=0;
+					*microsecond=0;
 				}
 
 			} else if (timepartcount==3 &&
@@ -260,7 +279,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				*second=charstring::toInteger(timeparts[2]);
 				const char	*dot=
 					charstring::findFirst(timeparts[2],'.');
-				*fraction=charstring::toInteger(dot+1);
+				*microsecond=fractionToMicroseconds(dot+1);
 				*hour=adjustHour(*hour,timeparts[2]);
 
 			} else if (timepartcount==3 &&
@@ -283,7 +302,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
-				*fraction=0;
+				*microsecond=0;
 				*hour=adjustHour(*hour,timeparts[2]);
 
 			} else if (timepartcount==3 &&
@@ -303,7 +322,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				*second=charstring::toInteger(timeparts[2]);
 				const char	*dot=
 					charstring::findFirst(timeparts[2],'.');
-				*fraction=charstring::toInteger(dot+1);
+				*microsecond=fractionToMicroseconds(dot+1);
 
 			} else if (timepartcount==4 &&
 				charstring::isNumber(timeparts[0]) &&
@@ -326,7 +345,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
-				*fraction=charstring::toInteger(timeparts[3]);
+				*microsecond=
+					fractionToMicroseconds(timeparts[3]);
 				*hour=adjustHour(*hour,timeparts[3]);
 
 			} else if (timepartcount==4 &&
@@ -345,7 +365,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 				}
 				*minute=charstring::toInteger(timeparts[1]);
 				*second=charstring::toInteger(timeparts[2]);
-				*fraction=charstring::toInteger(timeparts[3]);
+				*microsecond=
+					fractionToMicroseconds(timeparts[3]);
 
 			} else {
 				retval=false;
@@ -640,7 +661,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 static char *convertDateTime(const char *format,
 			int16_t year, int16_t month, int16_t day,
 			int16_t hour, int16_t minute, int16_t second,
-			int32_t fraction, bool isnegative) {
+			int32_t microsecond, bool isnegative) {
 
 	// if no format was passed in
 	if (!format) {
@@ -654,7 +675,7 @@ static char *convertDateTime(const char *format,
 	hour=(hour>0)?hour:0;
 	minute=(minute>0)?minute:0;
 	second=(second>0)?second:0;
-	fraction=(fraction>0)?fraction:0;
+	microsecond=(microsecond>0)?microsecond:0;
 
 	// output buffer
 	stringbuffer	output;
@@ -706,10 +727,30 @@ static char *convertDateTime(const char *format,
 			charstring::printf(buf,5,"%02d",second);
 			output.append(buf);
 			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"FFFFFF",6)) {
+			charstring::printf(buf,5,"%06d",microsecond);
+			output.append(buf);
+			ptr=ptr+6;
+		} else if (!charstring::compare(ptr,"FFFFF",5)) {
+			charstring::printf(buf,5,"%05d",microsecond/10);
+			output.append(buf);
+			ptr=ptr+5;
+		} else if (!charstring::compare(ptr,"FFFF",4)) {
+			charstring::printf(buf,5,"%04d",microsecond/100);
+			output.append(buf);
+			ptr=ptr+4;
 		} else if (!charstring::compare(ptr,"FFF",3)) {
-			charstring::printf(buf,5,"%03d",fraction);
+			charstring::printf(buf,5,"%03d",microsecond/1000);
 			output.append(buf);
 			ptr=ptr+3;
+		} else if (!charstring::compare(ptr,"FF",2)) {
+			charstring::printf(buf,5,"%02d",microsecond/10000);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"F",1)) {
+			charstring::printf(buf,5,"%01d",microsecond/100000);
+			output.append(buf);
+			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"AM",2)) {
 			output.append((hour<12)?"AM":"PM");
 			ptr=ptr+2;
