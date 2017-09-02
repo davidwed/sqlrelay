@@ -3684,7 +3684,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
-	int32_t	fraction=-1;
+	int32_t	usec=-1;
 	bool	isnegative=false;
 
 	// get day/month format
@@ -3701,7 +3701,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
-				&hour,&minute,&second,&fraction,&isnegative);
+				&hour,&minute,&second,&usec,&isnegative);
 
 	// copy data out
 	ds->year=(year!=-1)?year:0;
@@ -3722,7 +3722,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
-	int32_t	fraction=-1;
+	int32_t	usec=-1;
 	bool	isnegative=false;
 
 	// get day/month format
@@ -3739,7 +3739,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
-				&hour,&minute,&second,&fraction,&isnegative);
+				&hour,&minute,&second,&usec,&isnegative);
 
 	// copy data out
 	ts->hour=(hour!=-1)?hour:0;
