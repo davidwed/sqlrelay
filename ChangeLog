@@ -44,6 +44,7 @@
 		made them all int32_t's
 	parsing/generation of fractional seconds pays attention to length of
 		value/format-string now
+	fixed a bug that caused fractional seconds to be dropped sometimes
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

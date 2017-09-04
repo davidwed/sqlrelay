@@ -4,6 +4,7 @@
 #define PARSE_DATE_H
 
 #include <rudiments/charstring.h>
+#include <rudiments/stdio.h>
 
 static const char *shortmonths[]={
 	"JAN",
@@ -205,7 +206,8 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 			} else if (timepartcount==3 &&
 				charstring::isNumber(timeparts[0]) &&
 				charstring::isNumber(timeparts[1]) &&
-				charstring::isNumber(timeparts[2])) {
+				charstring::isNumber(timeparts[2]) &&
+				!charstring::contains(timeparts[2],'.')) {
 
 				// well, if the first or last part is 4 digit
 				// then it's a date (firebird uses
