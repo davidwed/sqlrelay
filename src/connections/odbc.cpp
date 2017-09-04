@@ -1774,6 +1774,14 @@ bool odbccursor::inputBind(const char *variable,
 		ts->minute=minute;
 		ts->second=second;
 		ts->fraction=microsecond*1000;
+stdoutput.printf("timestamp: %d-%d-%d %d:%d:%d.%d\n",
+		ts->year,
+		ts->month,
+		ts->day,
+		ts->hour,
+		ts->minute,
+		ts->second,
+		ts->fraction);
 
 		erg=SQLBindParameter(stmt,
 				pos,
