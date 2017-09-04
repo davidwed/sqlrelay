@@ -3708,6 +3708,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	ds->month=(month!=-1)?month:0;
 	ds->day=(day!=-1)?day:0;
 
+	debugPrintf("    value: %s\n",value);
 	debugPrintf("    year: %d\n",ds->year);
 	debugPrintf("    month: %d\n",ds->month);
 	debugPrintf("    day: %d\n",ds->day);
@@ -3746,6 +3747,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	ts->minute=(minute!=-1)?minute:0;
 	ts->second=(second!=-1)?second:0;
 
+	debugPrintf("    value: %s\n",value);
 	debugPrintf("    hour: %d\n",ts->hour);
 	debugPrintf("    minute: %d\n",ts->minute);
 	debugPrintf("    second: %d\n",ts->second);
@@ -3788,6 +3790,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	tss->second=(second!=-1)?second:0;
 	tss->fraction=(usec!=-1)?usec*1000:0;
 
+	debugPrintf("    value: %s\n",value);
 	debugPrintf("    year: %d\n",tss->year);
 	debugPrintf("    month: %d\n",tss->month);
 	debugPrintf("    day: %d\n",tss->day);
