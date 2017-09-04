@@ -1775,6 +1775,13 @@ bool odbccursor::inputBind(const char *variable,
 		ts->second=second;
 		ts->fraction=microsecond*1000;
 
+		// FIXME: this works with the SQL Server Native Client ODBC
+		// drivers, but not the old "standard" SQL Server driver
+		// (seconds and fractional seconds are truncated).  The web is
+		// riddled with people trying to get it to work with the old
+		// driver.  None of their solutions worked for me.  There is
+		// probably some magic that will work.  I'll have to find it
+		// some day.
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
