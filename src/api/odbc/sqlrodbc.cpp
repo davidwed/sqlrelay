@@ -10216,8 +10216,8 @@ static void parseDsn(const char *dsn) {
 	if (!dsndict.getValue("DisableQuoteCharacter")) {
 		char	*disablequotecharacter=new char[2];
 		SQLGetPrivateProfileString(dsnval,"DisableQuoteCharacter","0",
-					quotecharacter,2,ODBC_INI);
-		dsndict.setValue("DisableQuoteCharacter",quotecharacter);
+					disablequotecharacter,2,ODBC_INI);
+		dsndict.setValue("DisableQuoteCharacter",disablequotecharacter);
 	}
 
 	debugPrintf("  success...\n");
@@ -10465,9 +10465,9 @@ static void getDsnFromUi() {
 	dsndict.setValue("ClearBindsDuringPrepare",data);
 
 	// DisableQuoteCharacter
-	len=GetWindowTextLength(quotecharacter);
+	len=GetWindowTextLength(disablequotecharacter);
 	data=new char[len+1];
-	GetWindowText(quotecharacteredit,data,len+1);
+	GetWindowText(disablequotecharacteredit,data,len+1);
 	delete[] dsndict.getValue("DisableQuoteCharacter");
 	dsndict.setValue("DisableQuoteCharacter",data);
 }
