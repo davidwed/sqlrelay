@@ -2252,9 +2252,9 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 	conn->clearbindsduringprepare=
 		!charstring::isNo(clearbindsduringpreparebuf);
-	char	disablequotecharacterbuf[2];
+	char	disablequotecharacterbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,
-					"DisableQuoteCharacter","",
+					"DisableQuoteCharacter","no",
 					disablequotecharacterbuf,
 					sizeof(disablequotecharacterbuf),
 					ODBC_INI);
@@ -10215,8 +10215,8 @@ static void parseDsn(const char *dsn) {
 	}
 	if (!dsndict.getValue("DisableQuoteCharacter")) {
 		char	*disablequotecharacter=new char[2];
-		SQLGetPrivateProfileString(dsnval,"DisableQuoteCharacter","",
-					quotecharacter,6,ODBC_INI);
+		SQLGetPrivateProfileString(dsnval,"DisableQuoteCharacter","0",
+					quotecharacter,2,ODBC_INI);
 		dsndict.setValue("DisableQuoteCharacter",quotecharacter);
 	}
 
