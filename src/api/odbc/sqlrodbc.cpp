@@ -10465,7 +10465,7 @@ static void getDsnFromUi() {
 	dsndict.setValue("ClearBindsDuringPrepare",data);
 
 	// DisableQuoteCharacter
-	len=GetWindowTextLength(disablequotecharacter);
+	len=GetWindowTextLength(disablequotecharacteredit);
 	data=new char[len+1];
 	GetWindowText(disablequotecharacteredit,data,len+1);
 	delete[] dsndict.getValue("DisableQuoteCharacter");
