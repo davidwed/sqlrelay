@@ -13,10 +13,10 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-//#define DEBUG_MESSAGES 1
-//#define DEBUG_TO_FILE 1
+#define DEBUG_MESSAGES 1
+#define DEBUG_TO_FILE 1
 //static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
-//static const char debugfile[]="C:\\Tmp\\sqlrodbcdebug.txt";
+static const char debugfile[]="C:\\Tmp\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -3195,6 +3195,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	STMT	*stmt=(STMT *)statementhandle;
 
 	// fetch the row(s)
+	debugPrintf("  currentfetchrow: %lld\n",stmt->currentfetchrow);
 	SQLRETURN	fetchresult=
 			(stmt->cur->getRow(stmt->currentfetchrow))?
 					SQL_SUCCESS:SQL_NO_DATA_FOUND;
@@ -3208,12 +3209,26 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		}
 		stmt->nodata=true;
 	} else if (rowstofetch) {
+		// FIXME: terrible problem here...
+		// SQLR_SQLSetStmtAttr(SQL_ROWSET_SIZE) (which sets the result
+		// set buffer size) may be called after execute, but before
+		// fetch.
+		// So, SQL Relay may already have fetched more rows than the
+		// rsbs is set to at this point.
+		// Also, ODBC's concept of the row window differs from
+		// SQL Relay's, and if the two aren't aligned then it can cause
+		// SetPos to try to access rows that aren't currently buffered.
+		// Yikes!
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
 		uint64_t	rowcount=stmt->cur->rowCount();
 		uint64_t	lastrowindex=(rowcount)?rowcount-1:0;
 		uint64_t	bufferedrowcount=lastrowindex-firstrowindex+1;
 		rowsfetched=(firstrowindex==stmt->currentfetchrow)?
 							bufferedrowcount:0;
+		debugPrintf("  firstrowindex   : %lld\n",firstrowindex);
+		debugPrintf("  rowcount        : %lld\n",rowcount);
+		debugPrintf("  lastrowindex    : %lld\n",lastrowindex);
+		debugPrintf("  bufferedrowcount: %lld\n",bufferedrowcount);
 	} else {
 		rowstofetch=1;
 		rowsfetched=1;
@@ -3603,8 +3618,6 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 				// (even if data has to be truncated)
 				((char *)value)[bufferlength-1]='\0';
 
-				// reset valuelength
-				//valuelength=charstring::length((char *)value);
 				if (valuelength>bufferlength) {
 					debugPrintf("  WARNING! valuelength>"
 							"bufferlength\n");
@@ -3886,19 +3899,17 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	// get the field data
 	switch (targettype) {
 		case SQL_C_CHAR:
-			{
 			debugPrintf("  targettype: SQL_C_CHAR\n");
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
 			}
-			// make sure to null-terminate
 			if (targetvalue) {
+				// make sure to null-terminate
 				charstring::safeCopy((char *)targetvalue,
 							bufferlength,
 							field,fieldlength+1);
 				debugPrintf("  value: %s\n",
 						(char *)targetvalue);
-			}
 			}
 			break;
 		case SQL_C_SSHORT:
@@ -4092,6 +4103,10 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		default:
 			debugPrintf("  invalid targettype\n");
 			return SQL_ERROR;
+	}
+
+	if (!targetvalue) {
+		debugPrintf("  NULL targetvalue (not copying out value)\n");
 	}
 
 	if (strlen_or_ind) {
@@ -4318,9 +4333,6 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 				// (even if data has to be truncated)
 				((char *)diaginfo)[bufferlength-1]='\0';
 
-				// reset valuelength
-				//valuelength=charstring::length(
-							//(char *)diaginfo);
 				if (valuelength>bufferlength) {
 					debugPrintf("  WARNING! valuelength>"
 							"bufferlength\n");
@@ -4469,8 +4481,6 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 		// (even if data has to be truncated)
 		((char *)messagetext)[bufferlength-1]='\0';
 
-		// reset valuelength
-		//valuelength=charstring::length((char *)messagetext);
 		if (valuelength>bufferlength) {
 			debugPrintf("  WARNING! valuelength>textlength\n");
 		}
@@ -5337,6 +5347,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_COLUMN_NAME_LEN/"
 					"SQL_MAXIMUM_COLUMN_NAME_LEN\n");
 			// 0 means no max or unknown
+			// FIXME: FIPS intermediate level returns >= 128
 			val.usmallintval=0;
 			type=2;
 			break;
@@ -5346,6 +5357,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_CURSOR_NAME_LEN/"
 					"SQL_MAXIMUM_CURSOR_NAME_LEN\n");
 			// 0 means no max or unknown
+			// FIXME: FIPS intermediate level returns >= 128
 			val.usmallintval=0;
 			type=2;
 			break;
@@ -5356,8 +5368,17 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_MAX_OWNER_NAME_LEN/"
 					"SQL_MAX_SCHEMA_NAME_LEN/"
 					"SQL_MAXIMUM_SCHEMA_NAME_LEN\n");
-			// 0 means no max or unknown
-			val.usmallintval=0;
+			// 0 means no max or unknown, which is the case.
+			// But, returning 0 causes some apps (Delphi):
+			// * not to call SQLGetInfo(SQL_USER_NAME)
+			// * thus not to recognize the schema name returned by
+			// 	SQLTables as the schema
+			// * thus to build and quote table names like "dbo.tbl"
+			// 	rather than "dbo"."tbl", which fails.
+			// Hilariously, Delphi doesn't actually use this value
+			// to size the schema-name buffer.  It just doesn't
+			// call SQLGetInfo(SQL_USER_NAME) if it returns 0.
+			val.usmallintval=128;
 			type=2;
 			break;
 		case SQL_MAX_CATALOG_NAME_LEN:
@@ -5365,6 +5386,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_MAX_CATALOG_NAME_LEN\n");
 			// 0 means no max or unknown
+			// FIXME: FIPS intermediate level returns >= 128
 			val.usmallintval=0;
 			type=2;
 			break;
@@ -5372,6 +5394,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("  infotype: "
 					"SQL_MAX_TABLE_NAME_LEN\n");
 			// 0 means no max or unknown
+			// FIXME: FIPS entry level returns >= 18
+			// FIXME: FIPS intermediate level returns >= 128
 			val.usmallintval=0;
 			type=2;
 			break;
@@ -5392,7 +5416,18 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_USER_NAME:
 			debugPrintf("  infotype: "
 					"SQL_USER_NAME\n");
-			val.strval=conn->user;
+			// FIXME: This should be passed through to the backend.
+			// Eg. SQL Server generally returns "dbo" for this,
+			// rather than the login name.  Not returning "dbo"
+			// causes some apps (Delphi):
+			// * not to call SQLGetInfo(SQL_USER_NAME)
+			// * thus not to recognize the schema name returned by
+			// 	SQLTables as the schema
+			// * thus to build and quote table names like "dbo.tbl"
+			// 	rather than "dbo"."tbl", which fails.
+			//val.strval=conn->user;
+			// FIXME: hack
+			val.strval="dbo";
 			type=0;
 			break;
 		case SQL_TXN_ISOLATION_OPTION:
@@ -6866,9 +6901,6 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 				// (even if data has to be truncated)
 				((char *)infovalue)[bufferlength-1]='\0';
 
-				// reset valuelength
-				//valuelength=charstring::length(
-							//(char *)infovalue);
 				if (valuelength>bufferlength) {
 					debugPrintf("  WARNING! valuelength>"
 							"bufferlength\n");
