@@ -6834,10 +6834,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_DM_VER:
 			debugPrintf("  infotype: "
 					"SQL_DM_VER\n");
-			// FIXME: Should this be implemented or should only
-			// the Driver Manager implement it?
-			// This is the version number for the windows 7
-			// Driver Manager...
+			// Really, only the driver manager should
+			// implement this.  But, for consistency...
 			val.strval="03.80";
 			type=0;
 			break;

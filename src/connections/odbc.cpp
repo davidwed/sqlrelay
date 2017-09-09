@@ -559,7 +559,7 @@ const char *odbcconnection::logInError(const char *errmsg) {
 		errormessage.append(errmsg)->append(": ");
 	}
 
-	// get the error message from db2
+	// get the error message
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
 	SQLCHAR		errorbuffer[1024];

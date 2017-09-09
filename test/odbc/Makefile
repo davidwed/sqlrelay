@@ -10,11 +10,11 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(ODBCTESTCPPFLAGS) $(COMPILE) $<
 
-all: oracle
+all: mssql
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj oracle$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj mssql$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
-oracle: oracle.cpp oracle.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ oracle.$(OBJ) $(ODBCTESTLIBS)
+mssql: mssql.cpp mssql.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ mssql.$(OBJ) $(ODBCTESTLIBS)
