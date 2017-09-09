@@ -347,6 +347,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				}
 				stmt->cur->setResultSetBufferSize(
 						conn->resultsetbuffersize);
+				stmt->cur->lazyFetch();
 				if (conn->clearbindsduringprepare) {
 					stmt->cur->
 						clearBindsDuringPrepare();
@@ -2344,6 +2345,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		conn->con->selectDatabase(conn->db);
 	}
 
+	// don't allow the result set buffer size to be set to "fetch all rows"
+	if (!conn->resultsetbuffersize) {
+		conn->resultsetbuffersize=1;
+	}
+
 	return SQL_SUCCESS;
 }
 
@@ -3208,17 +3214,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 			rowstofetch=1;
 		}
 		stmt->nodata=true;
-	} else if (rowstofetch) {
-		// FIXME: terrible problem here...
-		// SQLR_SQLSetStmtAttr(SQL_ROWSET_SIZE) (which sets the result
-		// set buffer size) may be called after execute, but before
-		// fetch.
-		// So, SQL Relay may already have fetched more rows than the
-		// rsbs is set to at this point.
-		// Also, ODBC's concept of the row window differs from
-		// SQL Relay's, and if the two aren't aligned then it can cause
-		// SetPos to try to access rows that aren't currently buffered.
-		// Yikes!
+	} else {
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
 		uint64_t	rowcount=stmt->cur->rowCount();
 		uint64_t	lastrowindex=(rowcount)?rowcount-1:0;
@@ -3229,9 +3225,6 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		debugPrintf("  rowcount        : %lld\n",rowcount);
 		debugPrintf("  lastrowindex    : %lld\n",lastrowindex);
 		debugPrintf("  bufferedrowcount: %lld\n",bufferedrowcount);
-	} else {
-		rowstofetch=1;
-		rowsfetched=1;
 	}
 
 	debugPrintf("  rowstofetch: %lld\n",rowstofetch);
@@ -8006,8 +7999,15 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 		case SQL_ROWSET_SIZE:
 			debugPrintf("  attribute: SQL_ROWSET_SIZE: "
 						"%lld\n",(uint64_t)value);
-			stmt->cur->setResultSetBufferSize((uint64_t)value);
+			{
+			uint64_t	val=(uint64_t)value;
+			// don't allow this to be set to "fetch all rows"
+			if (!val) {
+				val=1;
+			}
+			stmt->cur->setResultSetBufferSize(val);
 			return SQL_SUCCESS;
+			}
 		//case SQL_ATTR_SIMULATE_CURSOR:
 		case SQL_SIMULATE_CURSOR:
 			debugPrintf("  attribute: "
@@ -8110,8 +8110,15 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 		case SQL_ATTR_ROW_ARRAY_SIZE:
 			debugPrintf("  attribute: SQL_ATTR_ROW_ARRAY_SIZE: "
 						"%lld\n",(uint64_t)value);
-			stmt->cur->setResultSetBufferSize((uint64_t)value);
+			{
+			uint64_t	val=(uint64_t)value;
+			// don't allow this to be set to "fetch all rows"
+			if (!val) {
+				val=1;
+			}
+			stmt->cur->setResultSetBufferSize(val);
 			return SQL_SUCCESS;
+			}
 		#endif
 		#if (ODBCVER < 0x0300)
 		case SQL_STMT_OPT_MAX:

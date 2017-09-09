@@ -364,6 +364,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("LONGEST COLUMN: \n");
+// lazyfetch
+//sqlrcur_getFieldByIndex(cur,0,0);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,0),1);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"TESTNUMBER"),1);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,1),40);
@@ -569,6 +571,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 	checkSuccessInt(sqlrcur_firstRowIndex(cur),0);
 	checkSuccessInt(sqlrcur_endOfResultSet(cur),0);
+// lazyfetch
+//sqlrcur_getFieldByIndex(cur,0,0);
 	checkSuccessInt(sqlrcur_rowCount(cur),2);
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,1,0),"2");
@@ -665,6 +669,8 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
 	checkSuccessInt(sqlrcur_resumeResultSet(cur,id),1);
 	printf("\n");
+// lazyfetch
+//sqlrcur_getFieldByIndex(cur,4,0);
 	checkSuccessInt(sqlrcur_firstRowIndex(cur),4);
 	checkSuccessInt(sqlrcur_endOfResultSet(cur),0);
 	checkSuccessInt(sqlrcur_rowCount(cur),6);
@@ -767,6 +773,8 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcon_resumeSession(con,port,socket),1);
 	checkSuccessInt(sqlrcur_resumeCachedResultSet(cur,id,filename),1);
 	printf("\n");
+// lazyfetch
+//sqlrcur_getFieldByIndex(cur,4,0);
 	checkSuccessInt(sqlrcur_firstRowIndex(cur),4);
 	checkSuccessInt(sqlrcur_endOfResultSet(cur),0);
 	checkSuccessInt(sqlrcur_rowCount(cur),6);

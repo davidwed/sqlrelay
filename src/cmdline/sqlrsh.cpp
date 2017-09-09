@@ -68,6 +68,7 @@ class sqlrshenv {
 		uint64_t	rsbs;
 		bool		final;
 		bool		autocommit;
+		bool		lazyfetch;
 		char		delimiter;
 		dictionary<char *, sqlrshbindvalue *>	inputbinds;
 		memorypool	*inbindpool;
@@ -83,6 +84,7 @@ sqlrshenv::sqlrshenv() {
 	rsbs=100;
 	final=false;
 	autocommit=false;
+	lazyfetch=false;
 	delimiter=';';
 	inbindpool=new memorypool(512,128,100);
 	cacheto=NULL;
@@ -516,6 +518,7 @@ int sqlrsh::commandType(const char *command) {
 					"setresultsetbuffersize ",23) ||
 		!charstring::compareIgnoringCase(ptr,
 					"getresultsetbuffersize") ||
+		!charstring::compareIgnoringCase(ptr,"lazyfetch ",10) ||
 		!charstring::compareIgnoringCase(ptr,"endsession") ||
 		!charstring::compareIgnoringCase(ptr,"querytree") ||
 		!charstring::compareIgnoringCase(ptr,"translatedquery") ||
@@ -660,10 +663,10 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					ptr,"setresultsetbuffersize ",23)) {	
 		ptr=ptr+23;
 		env->rsbs=charstring::toInteger(ptr);
-		if (!env->rsbs) {
-			env->rsbs=100;
-		}
 		return true;
+	} else if (!charstring::compareIgnoringCase(ptr,"lazyfetch ",10)) {
+		ptr=ptr+10;
+		cmdtype=12;
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"getresultsetbuffersize")) {	
 		stdoutput.printf("%lld\n",(long long)env->rsbs);
@@ -785,6 +788,9 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				}
 			}
 			break;
+		case 12:
+			env->lazyfetch=toggle;
+			break;
 	}
 	return true;
 }
@@ -844,6 +850,12 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	} else {
 
 		sqlrcur->setResultSetBufferSize(env->rsbs);
+
+		if (env->lazyfetch) {
+			sqlrcur->lazyFetch();
+		} else {
+			sqlrcur->dontLazyFetch();
+		}
 
 		// send the query
 		if (!charstring::compareIgnoringCase(command,
@@ -1969,7 +1981,6 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("		returns a list of column metadata for the table \"table\"\n");
 	stdoutput.printf("	fields table				-\n");
 	stdoutput.printf("		returns a list of column names for the table \"table\"\n\n");
-	// FIXME: document show type info/show procedure binds and columns/procedures/schemas/table types
 	stdoutput.printf("	setclientinfo info	- sets the client info\n");
 	stdoutput.printf("	getclientinfo		- displays the client info\n\n");
 	stdoutput.printf("	setresultsetbuffersize size	- fetch size rows at a time\n");

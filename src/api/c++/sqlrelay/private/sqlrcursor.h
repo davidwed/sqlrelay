@@ -68,7 +68,7 @@
 		void	performSubstitution(stringbuffer *buffer,
 							uint16_t which);
 		bool	runQuery(const char *query);
-		bool	processResultSet(bool getallrows, uint64_t rowtoget);
+		bool	processInitialResultSet();
 
 		int32_t	getString(char *string, int32_t size);
 		int32_t	getBool(bool *boolean);
@@ -85,13 +85,13 @@
 		bool	getSuspended();
 		bool	parseColumnInfo();
 		bool	parseOutputBinds();
-		bool	parseData();
+		bool	parseResults();
 		void	setError(const char *err);
 		void	getErrorFromServer();
 		void	handleError();
 
-		bool	skipAndFetch(bool getallrows, uint64_t rowtoget);
-		bool	skipRows(bool getallrows, uint64_t rowtoget);
+		bool	skipAndFetch(bool initial, uint64_t rowstoskip);
+		bool	skipRows(bool initial, uint64_t rowstoskip);
 		void	fetchRows();
 
 		void	startCaching();
@@ -102,8 +102,8 @@
 		void	cacheData();
 		void	finishCaching();
  
-		bool	fetchRowIntoBuffer(bool getallrows,
-					uint64_t row, uint64_t *rowbufferindex);
+		bool	fetchRowIntoBuffer(uint64_t row,
+						uint64_t *rowbufferindex);
 
 		void	createColumnArrays();
 		void	createExtraRowArray();
@@ -185,5 +185,7 @@
 					sqlrclientlistformat_t listformat);
 		void		clearBindsDuringPrepare();
 		void		dontClearBindsDuringPrepare();
+		void		lazyFetch();
+		void		dontLazyFetch();
 
 	friend class sqlrconnection;

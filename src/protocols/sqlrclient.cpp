@@ -96,7 +96,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getLobBind(sqlrservercursor *cursor,
 						sqlrserverbindvar *bv);
 		bool	getSendColumnInfo();
-		bool	getSkipAndFetch(sqlrservercursor *cursor);
+		bool	getSkipAndFetch(bool initial, sqlrservercursor *cursor);
 		void	returnResultSetHeader(sqlrservercursor *cursor);
 		void	returnColumnInfo(sqlrservercursor *cursor,
 							uint16_t format);
@@ -139,7 +139,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 						uint16_t binary,
 						uint16_t autoincrement);
 		bool	returnResultSetData(sqlrservercursor *cursor,
-						bool getskipandfetch);
+						bool getskipandfetch,
+						bool overridelazyfetch);
 		void	returnRow(sqlrservercursor *cursor);
 		void	sendField(const char *data, uint32_t size);
 		void	sendNullField();
@@ -221,6 +222,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		uint64_t	skip;
 		uint64_t	fetch;
+		bool		lazyfetch;
 
 		char		lobbuffer[32768];
 
@@ -243,6 +245,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 			cont->getConfig()->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cont->getConfig()->getMaxLobBindValueLength();
 	bindpool=new memorypool(512,128,100);
+	lazyfetch=false;
 	maxerrorlength=cont->getConfig()->getMaxErrorLength();
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
@@ -1351,7 +1354,7 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 		// get the skip and fetch parameters here so everything can be
 		// done in one round trip without relying on buffering
 		if (success) {
-			success=getSkipAndFetch(cursor);
+			success=getSkipAndFetch(true,cursor);
 		}
 
 		if (success) {
@@ -1422,7 +1425,7 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 			returnResultSetHeader(cursor);
 
 			// return the result set
-			return returnResultSetData(cursor,false);
+			return returnResultSetData(cursor,false,false);
 
 		} else {
 
@@ -2239,16 +2242,39 @@ bool sqlrprotocol_sqlrclient::getSendColumnInfo() {
 	return true;
 }
 
-bool sqlrprotocol_sqlrclient::getSkipAndFetch(sqlrservercursor *cursor) {
+bool sqlrprotocol_sqlrclient::getSkipAndFetch(bool initial,
+						sqlrservercursor *cursor) {
 	debugFunction();
 
-	// get the number of rows to skip
-	ssize_t		result=clientsock->read(&skip,idleclienttimeout,0);
-	if (result!=sizeof(uint64_t)) {
-		cont->raiseClientProtocolErrorEvent(cursor,
-				"return result set data failed: "
-				"failed to get rows to skip",result);
-		return false;
+	ssize_t	result=0;
+	if (initial) {
+
+		// get some flags
+		uint64_t	flags=0;
+		result=clientsock->read(&flags,idleclienttimeout,0);
+		if (result!=sizeof(uint64_t)) {
+			cont->raiseClientProtocolErrorEvent(cursor,
+					"return result set data failed: "
+					"failed to get flags",result);
+			return false;
+		}
+
+		// for now the only flag is whether or not to do lazy fetches
+		lazyfetch=flags;
+
+		// in this situation, skip should always be 0
+		skip=0;
+
+	} else {
+
+		// get the number of rows to skip
+		result=clientsock->read(&skip,idleclienttimeout,0);
+		if (result!=sizeof(uint64_t)) {
+			cont->raiseClientProtocolErrorEvent(cursor,
+					"return result set data failed: "
+					"failed to get rows to skip",result);
+			return false;
+		}
 	}
 
 	// get the number of rows to fetch
@@ -2755,7 +2781,8 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 }
 
 bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
-							bool getskipandfetch) {
+						bool getskipandfetch,
+						bool overridelazyfetch) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("returning result set data...");
@@ -2773,7 +2800,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 	// get the number of rows to skip and fetch
 	if (getskipandfetch) {
-		if (!getSkipAndFetch(cursor)) {
+		if (!getSkipAndFetch(false,cursor)) {
 			return false;
 		}
 	}
@@ -2782,39 +2809,44 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 	// FIXME: push up?
 	cont->setState(cursor,SQLRCURSORSTATE_BUSY);
 
-	// for some queries, there are no rows to return, 
-	if (cont->noRowsToReturn(cursor)) {
-		clientsock->write((uint16_t)END_RESULT_SET);
-		clientsock->flushWriteBuffer(-1,-1);
-		cont->raiseDebugMessageEvent("done returning result set data");
-		return true;
-	}
+	if (!lazyfetch || overridelazyfetch) {
 
-	// skip the specified number of rows
-	if (!cont->skipRows(cursor,skip)) {
-		clientsock->write((uint16_t)END_RESULT_SET);
-		clientsock->flushWriteBuffer(-1,-1);
-		cont->raiseDebugMessageEvent("done returning result set data");
-		return true;
-	}
-
-	if (cont->logEnabled() || cont->notificationsEnabled()) {
-		debugstr.clear();
-		debugstr.append("fetching ");
-		debugstr.append(fetch);
-		debugstr.append(" rows...");
-		cont->raiseDebugMessageEvent(debugstr.getString());
-	}
-
-	// send the specified number of rows back
-	for (uint64_t i=0; (!fetch || i<fetch); i++) {
-		if (cont->fetchRow(cursor)) {
-			returnRow(cursor);
-			// FIXME: kludgy
-			cont->nextRow(cursor);
-		} else {
+		// for some queries, there are no rows to return, 
+		if (cont->noRowsToReturn(cursor)) {
 			clientsock->write((uint16_t)END_RESULT_SET);
-			break;
+			clientsock->flushWriteBuffer(-1,-1);
+			cont->raiseDebugMessageEvent(
+				"done returning result set data");
+			return true;
+		}
+
+		// skip the specified number of rows
+		if (!cont->skipRows(cursor,skip)) {
+			clientsock->write((uint16_t)END_RESULT_SET);
+			clientsock->flushWriteBuffer(-1,-1);
+			cont->raiseDebugMessageEvent(
+				"done returning result set data");
+			return true;
+		}
+
+		if (cont->logEnabled() || cont->notificationsEnabled()) {
+			debugstr.clear();
+			debugstr.append("fetching ");
+			debugstr.append(fetch);
+			debugstr.append(" rows...");
+			cont->raiseDebugMessageEvent(debugstr.getString());
+		}
+
+		// send the specified number of rows back
+		for (uint64_t i=0; (!fetch || i<fetch); i++) {
+			if (cont->fetchRow(cursor)) {
+				returnRow(cursor);
+				// FIXME: kludgy
+				cont->nextRow(cursor);
+			} else {
+				clientsock->write((uint16_t)END_RESULT_SET);
+				break;
+			}
 		}
 	}
 	clientsock->flushWriteBuffer(-1,-1);
@@ -3050,7 +3082,7 @@ bool sqlrprotocol_sqlrclient::fetchResultSetCommand(
 					sqlrservercursor *cursor) {
 	debugFunction();
 	cont->raiseDebugMessageEvent("fetching result set...");
-	bool	retval=returnResultSetData(cursor,true);
+	bool	retval=returnResultSetData(cursor,true,true);
 	cont->raiseDebugMessageEvent("done fetching result set");
 	return retval;
 }
@@ -3080,7 +3112,8 @@ bool sqlrprotocol_sqlrclient::resumeResultSetCommand(
 
 	if (cont->getState(cursor)==SQLRCURSORSTATE_SUSPENDED) {
 
-		cont->raiseDebugMessageEvent("previous result set was suspended");
+		cont->raiseDebugMessageEvent(
+				"previous result set was suspended");
 
 		// indicate that no error has occurred
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -3101,11 +3134,12 @@ bool sqlrprotocol_sqlrclient::resumeResultSetCommand(
 		clientsock->write((totalrowsfetched)?totalrowsfetched-1:0);
 
 		returnResultSetHeader(cursor);
-		retval=returnResultSetData(cursor,true);
+		retval=returnResultSetData(cursor,true,false);
 
 	} else {
 
-		cont->raiseDebugMessageEvent("previous result set was not suspended");
+		cont->raiseDebugMessageEvent(
+				"previous result set was not suspended");
 
 		// indicate that an error has occurred
 		clientsock->write((uint16_t)ERROR_OCCURRED);
@@ -3416,7 +3450,7 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 	}
 
 	if (success) {
-		success=getSkipAndFetch(cursor);
+		success=getSkipAndFetch(true,cursor);
 	}
 
 	// if an error occurred...
@@ -3440,7 +3474,7 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 
 	// if the query processed ok then send a result set header and return...
 	returnResultSetHeader(cursor);
-	if (!returnResultSetData(cursor,false)) {
+	if (!returnResultSetData(cursor,false,false)) {
 		return false;
 	}
 	return true;

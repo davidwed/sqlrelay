@@ -223,6 +223,7 @@ class sqlrcursorprivate {
 		bool				_clearbindsduringprepare;
 
 		// result set
+		bool		_lazyfetch;
 		uint64_t	_rsbuffersize;
 		uint16_t	_sendcolumninfo;
 		uint16_t	_sentcolumninfo;
@@ -242,8 +243,8 @@ class sqlrcursorprivate {
 		char			**_columnnamearray;
 
 		uint64_t	_firstrowindex;
+		uint64_t	_resumedlastrowindex;
 		uint64_t	_rowcount;
-		uint64_t	_previousrowcount;
 		uint16_t	_knowsactualrows;
 		uint64_t	_actualrows;
 		uint16_t	_knowsaffectedrows;
@@ -347,11 +348,12 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	pvt->_fullpath=NULL;
 
 	// result set
+	pvt->_lazyfetch=false;
 	pvt->_rsbuffersize=0;
 
 	pvt->_firstrowindex=0;
+	pvt->_resumedlastrowindex=0;
 	pvt->_rowcount=0;
-	pvt->_previousrowcount=0;
 	pvt->_actualrows=0;
 	pvt->_affectedrows=0;
 	pvt->_endofresultset=true;
@@ -502,6 +504,14 @@ void sqlrcursor::setResultSetBufferSize(uint64_t rows) {
 
 uint64_t sqlrcursor::getResultSetBufferSize() {
 	return pvt->_rsbuffersize;
+}
+
+void sqlrcursor::lazyFetch() {
+	pvt->_lazyfetch=true;
+}
+
+void sqlrcursor::dontLazyFetch() {
+	pvt->_lazyfetch=false;
 }
 
 void sqlrcursor::dontGetColumnInfo() {
@@ -1135,17 +1145,8 @@ bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 
 	pvt->_sqlrc->flushWriteBuffer();
 
-	// process the result set
-	bool	retval=true;
-	if (pvt->_rsbuffersize) {
-		if (!processResultSet(false,pvt->_rsbuffersize-1)) {
-			retval=false;
-		}
-	} else {
-		if (!processResultSet(true,0)) {
-			retval=false;
-		}
-	}
+	// process the initial result set
+	bool	retval=processInitialResultSet();
 
 	// set up not to re-execute the same query if executeQuery is called
 	// again before calling prepareQuery on a new query
@@ -2305,14 +2306,8 @@ bool sqlrcursor::runQuery(const char *query) {
 
 		pvt->_sqlrc->flushWriteBuffer();
 
-		if (pvt->_rsbuffersize) {
-			if (processResultSet(false,pvt->_rsbuffersize-1)) {
-				return true;
-			}
-		} else {
-			if (processResultSet(true,0)) {
-				return true;
-			}
+		if (processInitialResultSet()) {
+			return true;
 		}
 	}
 	return false;
@@ -2791,7 +2786,13 @@ void sqlrcursor::sendGetColumnInfo() {
 	}
 }
 
-bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
+bool sqlrcursor::processInitialResultSet() {
+
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("Fetching initial rows...\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
 
 	// start caching the result set
 	if (pvt->_cacheon) {
@@ -2801,10 +2802,10 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 	// parse the columninfo and data
 	bool	success=true;
 
-	// skip and fetch here if we're not reading from a cached result set
-	// this way, everything gets done in 1 round trip
+	// Skip and fetch here if we're not reading from a cached result set.
+	// This way, everything gets done in 1 round trip.
 	if (!pvt->_cachesource) {
-		success=skipAndFetch(getallrows,pvt->_firstrowindex+rowtoget);
+		success=skipAndFetch(true,0);
 	}
 
 	// check for an error
@@ -2837,7 +2838,7 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 		}
 	}
 
-	// get data back from the server
+	// get data from the server/cache
 	if (success && ((pvt->_cachesource && pvt->_cachesourceind) ||
 			((!pvt->_cachesource && !pvt->_cachesourceind)  && 
 				(success=getCursorId()) && 
@@ -2847,80 +2848,72 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 
 		// skip and fetch here if we're reading from a cached result set
 		if (pvt->_cachesource) {
-			success=skipAndFetch(getallrows,
-					pvt->_firstrowindex+rowtoget);
+			success=skipAndFetch(true,0);
 		}
 
 		// parse the data
 		if (success) {
-			success=parseData();
+
+			if (!pvt->_lazyfetch) {
+
+				success=parseResults();
+
+			} else {
+
+				// If we just resumed a result set, (or more
+				// precisely, if we did, and any rows had been
+				// fetched from it prior to suspension) then
+				// rowcount and firstrowindex need to be set
+				// here.  If we were't lazy-fetching then they
+				// would have been set inside of parseResults().
+				if (pvt->_resumedlastrowindex) {
+					pvt->_rowcount=
+						pvt->_resumedlastrowindex+1;
+					pvt->_firstrowindex=pvt->_rowcount;
+				}
+			}
 		}
 	}
 
-	// if success is false, then some kind of network error occurred,
-	// end the session
 	if (!success) {
+		// some kind of network error occurred, end the session
 		clearResultSet();
 		pvt->_sqlrc->endSession();
 	}
 	return success;
 }
 
-bool sqlrcursor::skipAndFetch(bool getallrows, uint64_t rowtoget) {
+bool sqlrcursor::skipAndFetch(bool initial, uint64_t rowstoskip) {
 
-	if (pvt->_sqlrc->debug()) {
-		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("Skipping and Fetching\n");
-		if (!getallrows) {
-			pvt->_sqlrc->debugPrint("	row to get: ");
-			pvt->_sqlrc->debugPrint((int64_t)rowtoget);
-			pvt->_sqlrc->debugPrint("\n");
-		}
-		pvt->_sqlrc->debugPreEnd();
-	}
-
-	// if we're stepping through the result set, we can possibly 
-	// skip a big chunk of it...
-	if (!skipRows(getallrows,rowtoget)) {
+	if (!skipRows(initial,rowstoskip)) {
 		return false;
 	}
 
-	// tell the connection how many rows to send
 	fetchRows();
 
 	pvt->_sqlrc->flushWriteBuffer();
 	return true;
 }
 
-void sqlrcursor::fetchRows() {
+bool sqlrcursor::skipRows(bool initial, uint64_t rowstoskip) {
 
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("Fetching ");
-		pvt->_sqlrc->debugPrint((int64_t)pvt->_rsbuffersize);
+		pvt->_sqlrc->debugPrint("Skipping ");
+		pvt->_sqlrc->debugPrint((int64_t)rowstoskip);
 		pvt->_sqlrc->debugPrint(" rows\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
 
-	// if we're reading from a cached result set, do nothing
-	if (pvt->_cachesource && pvt->_cachesourceind) {
-		return;
-	}
+	// bump the rowcount
+	pvt->_rowcount+=rowstoskip;
 
-	// otherwise, send to the connection the number of rows to send back
-	pvt->_cs->write(pvt->_rsbuffersize);
-}
-
-bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
-
-	// if we're reading from a cached result set we have to manually skip
+	// skip manually if we're reading from a cached result set
 	if (pvt->_cachesource && pvt->_cachesourceind) {
 
-		// skip to the next block of rows
-		if (getallrows) {
+		// bail if we don't need to skip
+		if (!rowstoskip) {
 			return true;
-		} else {
-			pvt->_rowcount=rowtoget-(rowtoget%pvt->_rsbuffersize);
 		}
 
 		// get the row offset from the index
@@ -2938,25 +2931,57 @@ bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
 		return true;
 	}
 
-	// calculate how many rows to skip unless we're buffering the entire
-	// result set or caching the result set
-	uint64_t	skip=0;
-	if (pvt->_rsbuffersize && !pvt->_cachedest && !getallrows) {
-		skip=(rowtoget-(rowtoget%pvt->_rsbuffersize))-pvt->_rowcount; 
-		pvt->_rowcount=pvt->_rowcount+skip;
+	if (initial) {
+
+		// If this is the initial fetch, then rowstoskip will always
+		// be 0, and prior to 1.2, we would always send a 0 here.
+		//
+		// In 1.2+ we need a way to send some flags to the server, so
+		// we'll repurpose these 8 bytes as flags.
+		//
+		// For now, the only flag is whether or not to do lazy fetches.
+
+		uint64_t	flags=0;
+		if (pvt->_lazyfetch) {
+			flags=1;
+		}
+
+		if (pvt->_sqlrc->debug()) {
+			pvt->_sqlrc->debugPreStart();
+			if (pvt->_lazyfetch) {
+				pvt->_sqlrc->debugPrint("Lazy fetching\n");
+			} else {
+				pvt->_sqlrc->debugPrint("Eager fetching\n");
+			}
+			pvt->_sqlrc->debugPreEnd();
+		}
+
+		pvt->_cs->write(flags);
+
+	} else {
+		// otherwise send the server the number of rows to skip
+		pvt->_cs->write(rowstoskip);
 	}
+	return true;
+}
+
+void sqlrcursor::fetchRows() {
+
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("Skipping ");
-		pvt->_sqlrc->debugPrint((int64_t)skip);
+		pvt->_sqlrc->debugPrint("Fetching ");
+		pvt->_sqlrc->debugPrint((int64_t)pvt->_rsbuffersize);
 		pvt->_sqlrc->debugPrint(" rows\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
 
-	// if we're reading from a connection, send the connection the 
-	// number of rows to skip
-	pvt->_cs->write(skip);
-	return true;
+	// bail if we're reading from a cached result set
+	if (pvt->_cachesource && pvt->_cachesourceind) {
+		return;
+	}
+
+	// otherwise send the server the number of rows to fetch
+	pvt->_cs->write(pvt->_rsbuffersize);
 }
 
 uint16_t sqlrcursor::getErrorStatus() {
@@ -2985,7 +3010,7 @@ uint16_t sqlrcursor::getErrorStatus() {
 	if (err==NO_ERROR_OCCURRED) {
 		if (pvt->_sqlrc->debug()) {
 			pvt->_sqlrc->debugPreStart();
-			pvt->_sqlrc->debugPrint("none.\n");
+			pvt->_sqlrc->debugPrint("	none.\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
 		cacheNoError();
@@ -2994,7 +3019,7 @@ uint16_t sqlrcursor::getErrorStatus() {
 
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("error!!!\n");
+		pvt->_sqlrc->debugPrint("	error!!!\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
 	return err;
@@ -3045,20 +3070,20 @@ bool sqlrcursor::getSuspended() {
 
 		// If it was suspended the server will send the index of the 
 		// last row from the previous result set.
-		// Initialize firstrowindex and rowcount from this index.
-		if (pvt->_cs->read(&pvt->_firstrowindex)!=sizeof(uint64_t)) {
+		if (pvt->_cs->read(&pvt->_resumedlastrowindex)!=
+						sizeof(uint64_t)) {
 			setError("Failed to get the index of the "
 				"last row of a previously suspended result "
 				"set.\n A network error may have ocurred.");
 			return false;
 		}
-		pvt->_rowcount=pvt->_firstrowindex+1;
 	
 		if (pvt->_sqlrc->debug()) {
 			pvt->_sqlrc->debugPreStart();
-			pvt->_sqlrc->debugPrint("Previous result set was ");
+			pvt->_sqlrc->debugPrint("Result set was ");
 	       		pvt->_sqlrc->debugPrint("suspended at row index: ");
-			pvt->_sqlrc->debugPrint((int64_t)pvt->_firstrowindex);
+			pvt->_sqlrc->debugPrint(
+					(int64_t)pvt->_resumedlastrowindex);
 			pvt->_sqlrc->debugPrint("\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
@@ -3080,7 +3105,7 @@ bool sqlrcursor::parseColumnInfo() {
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
 		pvt->_sqlrc->debugPrint("Parsing Column Info\n");
-		pvt->_sqlrc->debugPrint("Actual row count: ");
+		pvt->_sqlrc->debugPrint("	Actual row count: ");
 		pvt->_sqlrc->debugPreEnd();
 	}
 
@@ -3115,7 +3140,7 @@ bool sqlrcursor::parseColumnInfo() {
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
 		pvt->_sqlrc->debugPrint("\n");
-		pvt->_sqlrc->debugPrint("Affected row count: ");
+		pvt->_sqlrc->debugPrint("	Affected row count: ");
 		pvt->_sqlrc->debugPreEnd();
 	}
 
@@ -3169,7 +3194,7 @@ bool sqlrcursor::parseColumnInfo() {
 	}
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("Column count: ");
+		pvt->_sqlrc->debugPrint("	Column count: ");
 		pvt->_sqlrc->debugPrint((int64_t)pvt->_colcount);
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
@@ -3309,6 +3334,7 @@ bool sqlrcursor::parseColumnInfo() {
 	
 			if (pvt->_sqlrc->debug()) {
 				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint("	");
 				pvt->_sqlrc->debugPrint("\"");
 				pvt->_sqlrc->debugPrint(currentcol->name);
 				pvt->_sqlrc->debugPrint("\",");
@@ -3948,11 +3974,11 @@ bool sqlrcursor::parseOutputBinds() {
 	return true;
 }
 
-bool sqlrcursor::parseData() {
+bool sqlrcursor::parseResults() {
 
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
-		pvt->_sqlrc->debugPrint("Parsing Data\n");
+		pvt->_sqlrc->debugPrint("Parsing Results\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
 
@@ -3967,6 +3993,14 @@ bool sqlrcursor::parseData() {
 		return true;
 	}
 
+	// if we just resumed a result set, then reset the rowcount
+	if (!pvt->_rowcount && pvt->_resumedlastrowindex) {
+		pvt->_rowcount=pvt->_resumedlastrowindex+1;
+	}
+
+	// set firstrowindex to the index of the first row in the block of rows
+	pvt->_firstrowindex=pvt->_rowcount;
+
 	// useful variables
 	uint16_t		type;
 	uint32_t		length;
@@ -3976,11 +4010,9 @@ bool sqlrcursor::parseData() {
 	sqlrclientrow		*currentrow=NULL;
 	bool			firstrow=true;
 
-	// set firstrowindex to the index of the first row in the buffer
-	pvt->_firstrowindex=pvt->_rowcount;
-
-	// keep track of how large the buffer is
-	uint64_t	rowbuffercount=0;
+	// in the block of rows, keep track of
+	// how many rows are actually populated
+	uint64_t	rowblockcount=0;
 
 	// get rows
 	for (;;) {
@@ -4014,11 +4046,11 @@ bool sqlrcursor::parseData() {
 		// buffer counter and total row counter
 		if (colindex==0) {
 
-			if (rowbuffercount<OPTIMISTIC_ROW_COUNT) {
+			if (rowblockcount<OPTIMISTIC_ROW_COUNT) {
 				if (!pvt->_rows) {
 					createRowBuffers();
 				}
-				currentrow=pvt->_rows[rowbuffercount];
+				currentrow=pvt->_rows[rowblockcount];
 			} else {
 				if (pvt->_sqlrc->debug()) {
 					pvt->_sqlrc->debugPreStart();
@@ -4040,7 +4072,7 @@ bool sqlrcursor::parseData() {
 				currentrow->resize(pvt->_colcount);
 			}
 
-			rowbuffercount++;
+			rowblockcount++;
 			pvt->_rowcount++;
 		}
 
@@ -4213,7 +4245,7 @@ bool sqlrcursor::parseData() {
 
 			// check to see if we've gotten enough rows
 			if (pvt->_rsbuffersize &&
-				rowbuffercount==pvt->_rsbuffersize) {
+				rowblockcount==pvt->_rsbuffersize) {
 				break;
 			}
 
@@ -4222,7 +4254,7 @@ bool sqlrcursor::parseData() {
 	}
 
 	// terminate the row list
-	if (rowbuffercount>=OPTIMISTIC_ROW_COUNT && currentrow) {
+	if (rowblockcount>=OPTIMISTIC_ROW_COUNT && currentrow) {
 		currentrow->next=NULL;
 		createExtraRowArray();
 	}
@@ -4321,53 +4353,79 @@ void sqlrcursor::handleError() {
 	finishCaching();
 }
 
-bool sqlrcursor::fetchRowIntoBuffer(bool getallrows, uint64_t row,
-						uint64_t *rowbufferindex) {
+bool sqlrcursor::fetchRowIntoBuffer(uint64_t row, uint64_t *rowbufferindex) {
 
-	// if we getting the entire result set at once, then the result set 
-	// buffer index is the requested row-pvt->_firstrowindex
-	if (!pvt->_rsbuffersize) {
-		if (row<pvt->_rowcount && row>=pvt->_firstrowindex) {
-			*rowbufferindex=row-pvt->_firstrowindex;
-			return true;
-		}
+	// bail if the requested row is before the current block of rows
+	if (row<pvt->_firstrowindex) {
 		return false;
 	}
 
-	// but, if we're not getting the entire result set at once
-	// and if the requested row is not in the current range, 
-	// fetch more data from the connection
-	while (row>=(pvt->_firstrowindex+pvt->_rsbuffersize) &&
-					!pvt->_endofresultset) {
-
-		if (pvt->_sqlrc->connected() ||
-			(pvt->_cachesource && pvt->_cachesourceind)) {
-
-			clearRows();
-
-			// if we're not fetching from a cached result set,
-			// tell the server to send one 
-			if (!pvt->_cachesource && !pvt->_cachesourceind) {
-				pvt->_cs->write((uint16_t)FETCH_RESULT_SET);
-				pvt->_cs->write(pvt->_cursorid);
-			}
-
-			if (!skipAndFetch(getallrows,row) || !parseData()) {
-				return false;
-			}
-
-		} else {
-			return false;
-		}
-	}
-
-	// return the buffer index corresponding to the requested row
-	// or -1 if the requested row is past the end of the result set
-	if (row<pvt->_rowcount) {
-		*rowbufferindex=row%pvt->_rsbuffersize;
+	// if the requested row is in the current block of rows
+	// then return the row buffer index
+	if (row>=pvt->_firstrowindex && row<pvt->_rowcount) {
+		*rowbufferindex=row-pvt->_firstrowindex;
 		return true;
 	}
-	return false;
+
+	// bail if the requested row is past the end of the result set
+	if (pvt->_endofresultset) {
+		return false;
+	}
+
+	// bail if we lost our data source
+	if (!pvt->_sqlrc->connected() &&
+		!(pvt->_cachesource && pvt->_cachesourceind)) {
+		return false;
+	}
+
+	// otherwise, fetch additional rows...
+
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("Fetching additional rows...\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+
+	// skip to the block of rows containing the requested row,
+	// fetch that block of rows, and process what we get back...
+	do {
+
+		// clear the row buffers
+		clearRows();
+
+		// if we're not fetching from a cached result set,
+		// then tell the server to send some rows
+		if (!pvt->_cachesource && !pvt->_cachesourceind) {
+			pvt->_cs->write((uint16_t)FETCH_RESULT_SET);
+			pvt->_cs->write(pvt->_cursorid);
+		}
+
+		// calculate how many rows to actually skip
+		// if we're caching the result set, then we shouldn't skip any
+		// (thus the outer loop)
+		// also, if we're fetching all rows then we shouldn't skip any
+		uint64_t	rowstoskip=0;
+		if (!pvt->_cachedest && pvt->_rsbuffersize) {
+			rowstoskip=
+			row-((pvt->_rsbuffersize)?(row%pvt->_rsbuffersize):0)-
+			pvt->_rowcount;
+		}
+
+		if (!skipAndFetch(false,rowstoskip) || !parseResults()) {
+			return false;
+		}
+
+	} while (!pvt->_endofresultset && pvt->_rowcount<=row);
+
+	// bail if the requested row is still past the end of the result set
+	if (row>=pvt->_rowcount) {
+		return false;
+	}
+
+	// the requested row must be in the current block of rows,
+	// return the row buffer index
+	*rowbufferindex=(pvt->_rsbuffersize)?(row%pvt->_rsbuffersize):row;
+	return true;
 }
 
 int32_t sqlrcursor::getBool(bool *boolean) {
@@ -4474,11 +4532,7 @@ bool sqlrcursor::fetchFromBindCursor() {
 
 	pvt->_sqlrc->flushWriteBuffer();
 
-	if (pvt->_rsbuffersize) {
-		return processResultSet(false,pvt->_rsbuffersize-1);
-	} else {
-		return processResultSet(true,0);
-	}
+	return processInitialResultSet();
 }
 
 bool sqlrcursor::openCachedResultSet(const char *filename) {
@@ -4513,10 +4567,6 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 
 		delete[] indexfilename;
 
-		// initialize firstrowindex and rowcount
-		pvt->_firstrowindex=0;
-		pvt->_rowcount=pvt->_firstrowindex;
-
 		// make sure it's a cache file and skip the ttl
 		char		magicid[13];
 		uint64_t	ttl;
@@ -4525,13 +4575,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 			getLongLong(&ttl)==sizeof(uint64_t)) {
 
 			// process the result set
-			if (pvt->_rsbuffersize) {
-				return processResultSet(false,
-						pvt->_firstrowindex+
-							pvt->_rsbuffersize-1);
-			} else {
-				return processResultSet(true,0);
-			}
+			return processInitialResultSet();
 		} else {
 
 			// if the test above failed, the file is either not
@@ -4854,15 +4898,15 @@ uint32_t sqlrcursor::getFieldLengthInternal(uint64_t row, uint32_t col) {
 
 const char *sqlrcursor::getField(uint64_t row, uint32_t col) {
 
-	if (pvt->_rowcount && row>=pvt->_firstrowindex && col<pvt->_colcount) {
+	// bail if the requested column is invalid
+	if (col>=pvt->_colcount) {
+		return NULL;
+	}
 
-		// in the event that we're stepping through the result set 
-		// instead of buffering the entire thing, the requested row
-		// may have to be fetched into the buffer...
-		uint64_t	rowbufferindex;
-		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
-			return getFieldInternal(rowbufferindex,col);
-		}
+	// fetch and return the field
+	uint64_t	rowbufferindex;
+	if (fetchRowIntoBuffer(row,&rowbufferindex)) {
+		return getFieldInternal(rowbufferindex,col);
 	}
 	return NULL;
 }
@@ -4879,25 +4923,22 @@ double sqlrcursor::getFieldAsDouble(uint64_t row, uint32_t col) {
 
 const char *sqlrcursor::getField(uint64_t row, const char *col) {
 
-	if (pvt->_sendcolumninfo==SEND_COLUMN_INFO && 
-			pvt->_sentcolumninfo==SEND_COLUMN_INFO &&
-			pvt->_rowcount && row>=pvt->_firstrowindex) {
-		for (uint32_t i=0; i<pvt->_colcount; i++) {
-			if (!charstring::compare(
-					getColumnInternal(i)->name,col)) {
+	// bail if no column info was sent
+	if (pvt->_sendcolumninfo!=SEND_COLUMN_INFO || 
+			pvt->_sentcolumninfo!=SEND_COLUMN_INFO) {
+		return NULL;
+	}
 
-				// in the event that we're stepping through the
-				// result set instead of buffering the entire 
-				// thing, the requested row may have to be 
-				// fetched into the buffer...
-				uint64_t	rowbufferindex;
-				if (fetchRowIntoBuffer(false,row,
-							&rowbufferindex)) {
-					return getFieldInternal(
-							rowbufferindex,i);
-				}
-				return NULL;
+	// get the column index, by name
+	for (uint32_t i=0; i<pvt->_colcount; i++) {
+		if (!charstring::compare(getColumnInternal(i)->name,col)) {
+
+			// fetch and return the field
+			uint64_t	rowbufferindex;
+			if (fetchRowIntoBuffer(row,&rowbufferindex)) {
+				return getFieldInternal(rowbufferindex,i);
 			}
+			return NULL;
 		}
 	}
 	return NULL;
@@ -4915,41 +4956,37 @@ double sqlrcursor::getFieldAsDouble(uint64_t row, const char *col) {
 
 uint32_t sqlrcursor::getFieldLength(uint64_t row, uint32_t col) {
 
-	if (pvt->_rowcount && row>=pvt->_firstrowindex && col<pvt->_colcount) {
+	// bail if the requested column is invalid
+	if (col>=pvt->_colcount) {
+		return 0;
+	}
 
-		// in the event that we're stepping through the result set 
-		// instead of buffering the entire thing, the requested row
-		// may have to be fetched into the buffer...
-		uint64_t	rowbufferindex;
-		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
-			return getFieldLengthInternal(rowbufferindex,col);
-		}
+	// fetch and return the field length
+	uint64_t	rowbufferindex;
+	if (fetchRowIntoBuffer(row,&rowbufferindex)) {
+		return getFieldLengthInternal(rowbufferindex,col);
 	}
 	return 0;
 }
 
 uint32_t sqlrcursor::getFieldLength(uint64_t row, const char *col) {
 
-	if (pvt->_sendcolumninfo==SEND_COLUMN_INFO && 
-			pvt->_sentcolumninfo==SEND_COLUMN_INFO &&
-			pvt->_rowcount && row>=pvt->_firstrowindex) {
+	// bail if no column info was sent
+	if (pvt->_sendcolumninfo!=SEND_COLUMN_INFO ||
+		pvt->_sentcolumninfo!=SEND_COLUMN_INFO) {
+		return 0;
+	}
 
-		for (uint32_t i=0; i<pvt->_colcount; i++) {
-			if (!charstring::compare(
-					getColumnInternal(i)->name,col)) {
+	// get the column index, by name
+	for (uint32_t i=0; i<pvt->_colcount; i++) {
+		if (!charstring::compare(getColumnInternal(i)->name,col)) {
 
-				// in the event that we're stepping through the
-				// result set instead of buffering the entire 
-				// thing, the requested row may have to be 
-				// fetched into the buffer...
-				uint64_t	rowbufferindex;
-				if (fetchRowIntoBuffer(false,row,
-							&rowbufferindex)) {
-					return getFieldLengthInternal(
-							rowbufferindex,i);
-				}
-				return 0;
+			// fetch and return the field length
+			uint64_t	rowbufferindex;
+			if (fetchRowIntoBuffer(row,&rowbufferindex)) {
+				return getFieldLengthInternal(rowbufferindex,i);
 			}
+			return 0;
 		}
 	}
 	return 0;
@@ -4957,18 +4994,13 @@ uint32_t sqlrcursor::getFieldLength(uint64_t row, const char *col) {
 
 const char * const *sqlrcursor::getRow(uint64_t row) {
 
-	if (pvt->_rowcount && row>=pvt->_firstrowindex) {
-
-		// in the event that we're stepping through the result set 
-		// instead of buffering the entire thing, the requested row
-		// may have to be fetched into the buffer...
-		uint64_t	rowbufferindex;
-		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
-			if (!pvt->_fields) {
-				createFields();
-			}
-			return pvt->_fields[rowbufferindex];
+	// fetch and return the row
+	uint64_t	rowbufferindex;
+	if (fetchRowIntoBuffer(row,&rowbufferindex)) {
+		if (!pvt->_fields) {
+			createFields();
 		}
+		return pvt->_fields[rowbufferindex];
 	}
 	return NULL;
 }
@@ -4992,18 +5024,13 @@ void sqlrcursor::createFields() {
 
 uint32_t *sqlrcursor::getRowLengths(uint64_t row) {
 
-	if (pvt->_rowcount && row>=pvt->_firstrowindex) {
-
-		// in the event that we're stepping through the result set 
-		// instead of buffering the entire thing, the requested row
-		// may have to be fetched into the buffer...
-		uint64_t	rowbufferindex;
-		if (fetchRowIntoBuffer(false,row,&rowbufferindex)) {
-			if (!pvt->_fieldlengths) {
-				createFieldLengths();
-			}
-			return pvt->_fieldlengths[rowbufferindex];
+	// fetch and return the row lengths
+	uint64_t	rowbufferindex;
+	if (fetchRowIntoBuffer(row,&rowbufferindex)) {
+		if (!pvt->_fieldlengths) {
+			createFieldLengths();
 		}
+		return pvt->_fieldlengths[rowbufferindex];
 	}
 	return NULL;
 }
@@ -5093,18 +5120,7 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 	if (!charstring::isNullOrEmpty(filename)) {
 		cacheToFile(filename);
 	}
-	if (pvt->_rsbuffersize) {
-		if (processResultSet(true,
-				pvt->_firstrowindex+
-					pvt->_rsbuffersize-1)) {
-			return true;
-		}
-	} else {
-		if (processResultSet(false,0)) {
-			return true;
-		}
-	}
-	return false;
+	return processInitialResultSet();
 }
 
 void sqlrcursor::closeResultSet() {
@@ -5134,18 +5150,19 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 				clearRows();
 
 				// if we're not fetching from a cached result 
-				// set tell the server to send one 
+				// set, then tell the server to send one 
 				if (!pvt->_cachesource &&
 						!pvt->_cachesourceind) {
-					pvt->_cs->write((uint16_t)FETCH_RESULT_SET);
+					pvt->_cs->write(
+						(uint16_t)FETCH_RESULT_SET);
 					pvt->_cs->write(pvt->_cursorid);
 				}
 
-				// parseData should call finishCaching when
+				// parseResults should call finishCaching when
 				// it hits the end of the result set, but
 				// if it or skipAndFetch return a -1 (network
 				// error) we'll have to call it ourselves.
-				if (!skipAndFetch(true,0) || !parseData()) {
+				if (!skipAndFetch(false,0) || !parseResults()) {
 					finishCaching();
 					return;
 				}
@@ -5185,7 +5202,7 @@ void sqlrcursor::clearResultSet() {
 	// are the only methods that call clearRows() and fetchRowIntoBuffer()
 	// needs these values not to be cleared, we'll clear them here...
 	pvt->_firstrowindex=0;
-	pvt->_previousrowcount=pvt->_rowcount;
+	pvt->_resumedlastrowindex=0;
 	pvt->_rowcount=0;
 	pvt->_actualrows=0;
 	pvt->_affectedrows=0;
