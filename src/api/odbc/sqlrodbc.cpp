@@ -7613,6 +7613,9 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 					debugPrintf("  success\n");
 					return SQL_SUCCESS;
 				}
+				SQLR_CONNSetError(conn,
+					conn->con->errorMessage(),
+					conn->con->errorNumber(),NULL);
 				debugPrintf("  failed\n");
 				return SQL_ERROR;
 			} else if (val==SQL_AUTOCOMMIT_OFF) {
@@ -7621,6 +7624,9 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 					debugPrintf("  success\n");
 					return SQL_SUCCESS;
 				}
+				SQLR_CONNSetError(conn,
+					conn->con->errorMessage(),
+					conn->con->errorNumber(),NULL);
 				debugPrintf("  failed\n");
 				return SQL_ERROR;
 			}
@@ -9548,9 +9554,11 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	debugPrintf("  parametertype: %d\n",parametertype);
+
 	switch (inputoutputtype) {
 		case SQL_PARAM_INPUT:
-			debugPrintf("  parametertype: "
+			debugPrintf("  inputoutputtype: "
 						"SQL_PARAM_INPUT\n");
 			return SQLR_InputBindParameter(statementhandle,
 							parameternumber,
@@ -9560,7 +9568,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							parametervalue,
 							strlen_or_ind);
 		case SQL_PARAM_INPUT_OUTPUT:
-			debugPrintf("  parametertype: "
+			debugPrintf("  inputoutputtype: "
 						"SQL_PARAM_INPUT_OUTPUT\n");
 			// FIXME: SQL Relay doesn't currently support in/out
 			// params, and some apps pass output params as in/out.
@@ -9575,7 +9583,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							bufferlength,
 							strlen_or_ind);
 		case SQL_PARAM_OUTPUT:
-			debugPrintf("  parametertype: "
+			debugPrintf("  inputoutputtype: "
 						"SQL_PARAM_OUTPUT\n");
 			return SQLR_OutputBindParameter(statementhandle,
 							parameternumber,
@@ -9586,7 +9594,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							bufferlength,
 							strlen_or_ind);
 		default:
-			debugPrintf("  invalid parametertype\n");
+			debugPrintf("  invalid inputoutputtype\n");
 			return SQL_ERROR;
 	}
 }

@@ -509,6 +509,9 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	}
 #endif
 
+	// enable MARS with SQL Server
+	SQLSetConnectAttr(dbc,1224,(SQLPOINTER *)1,SQL_IS_UINTEGER);
+
 	// connect to the database
 	char *user_asc=(char*)cont->getUser();
 	char *password_asc=(char*)cont->getPassword();
