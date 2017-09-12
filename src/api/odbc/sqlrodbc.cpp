@@ -15,8 +15,8 @@
 #include <rudiments/error.h>
 #define DEBUG_MESSAGES 1
 #define DEBUG_TO_FILE 1
-//static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
-static const char debugfile[]="C:\\Tmp\\sqlrodbcdebug.txt";
+static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
+//static const char debugfile[]="C:\\Tmp\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -182,9 +182,8 @@ struct STMT {
 	linkedlist<SQLUSMALLINT>		*dataatexeckeys;
 	SQLCHAR					*dataatexecstatement;
 	SQLINTEGER				dataatexecstatementlength;
-	SQLUSMALLINT				currentputdatabindnumber;
-	SQLPOINTER				currentputdatabuffer;
-	SQLULEN					currentputdataoffset;
+	SQLUSMALLINT				putdatabind;
+	bytebuffer				putdatabuffer;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -350,9 +349,8 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->dataatexeckeys=NULL;
 				stmt->dataatexecstatement=NULL;
 				stmt->dataatexecstatementlength=0;
-				stmt->currentputdatabindnumber=0;
-				stmt->currentputdatabuffer=NULL;
-				stmt->currentputdataoffset=0;
+				stmt->putdatabind=0;
+				stmt->putdatabuffer.clear();
 
 				// set flags
 				if (!charstring::compare(
@@ -3106,7 +3104,7 @@ static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 		debugPrintf("  data-at-exec detected, deferring execution\n");
 		stmt->dataatexecstatement=statementtext;
 		stmt->dataatexecstatementlength=textlength;
-		return SQL_SUCCESS;
+		return SQL_NEED_DATA;
 	}
 
 	// reinit row indices
@@ -3170,7 +3168,7 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 		debugPrintf("  data-at-exec detected, deferring execution\n");
 		stmt->dataatexecstatement=NULL;
 		stmt->dataatexecstatementlength=0;
-		return SQL_SUCCESS;
+		return SQL_NEED_DATA;
 	}
 
 	// don't actually do anything if the statement
@@ -7540,27 +7538,34 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// We're faking SQLBindParameter data-at-exec by:
+	// * tracking the data-at-exec binds in SQLBindParameter
+	// * deferring SQLExecDirect/Execute
+	// * buffering the data locally in SQLParamData/SQLPutData
+	// * binding the buffered data data
+	// * then finally actually running SQLExecDirect/Execute
+
 	// bail if there is no data-at-exec
 	if (!stmt->dataatexec) {
 		debugPrintf("  no data-at-exec detected\n");
 		return SQL_SUCCESS;
 	}
 
-	// if there's an existing currentputdata then bind it
-	if (stmt->currentputdatabuffer) {
+	// if there's an existing putdata then bind it
+	if (stmt->putdatabind) {
 		// FIXME: for now we only support SQL_C_DATA, but eventually
 		// we'll need to do some type-checking here and handle different
 		// data types in different ways
 		char	*parametername=charstring::parseNumber(
-						stmt->currentputdatabindnumber);
+						stmt->putdatabind);
 		debugPrintf("  parametername: %s\n",
 					parametername);
 		debugPrintf("  value: \"%.*s\"\n",
-					stmt->currentputdataoffset,
-					stmt->currentputdatabuffer);
+					stmt->putdatabuffer.getSize(),
+					stmt->putdatabuffer.getBuffer());
 		stmt->cur->inputBind(parametername,
-				(const char *)stmt->currentputdatabuffer,
-				stmt->currentputdataoffset);
+				(const char *)stmt->putdatabuffer.getBuffer(),
+				stmt->putdatabuffer.getSize());
 		delete[] parametername;
 	}
 
@@ -7584,15 +7589,11 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 							keynode->getValue());
 
 		// keep track of the bind number
-		stmt->currentputdatabindnumber=keynode->getValue();
-		debugPrintf("  current put-data bind number: %d\n",
-					stmt->currentputdatabindnumber);
+		stmt->putdatabind=keynode->getValue();
+		debugPrintf("  put-data bind: %d\n",stmt->putdatabind);
 
 		// get the bind buffer
 		SQLPOINTER	val=valuenode->getValue();
-		stmt->currentputdatabuffer=val;
-		debugPrintf("  current put-data buffer: 0x%08x\n",
-					stmt->currentputdatabuffer);
 
 		// pass the buffer out
 		if (value) {
@@ -7603,10 +7604,22 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		stmt->dataatexecdict.remove(valuenode);
 		stmt->dataatexeckeys->remove(keynode);
 
+		// reset the put data buffer
+		stmt->putdatabuffer.clear();
+
 		// return "need data"
 		debugPrintf("  SQL NEED DATA\n");
 		return SQL_NEED_DATA;
 	}
+
+	// reset the various data-at-exec related things
+	// (do this prior to execute to prevent looping forever)
+	// FIXME: also reset in SQLFreeStmt?
+	stmt->dataatexec=false;
+	delete stmt->dataatexeckeys;
+	stmt->dataatexeckeys=NULL;
+	stmt->putdatabind=0;
+	stmt->putdatabuffer.clear();
 
 	// exec/exec-direct will have been deferred until now...
 	SQLRETURN	retval=SQL_ERROR;
@@ -7617,19 +7630,15 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 					statementhandle,
 					stmt->dataatexecstatement,
 					stmt->dataatexecstatementlength);
+
+		// reset statement/length
+		stmt->dataatexecstatement=NULL;
+		stmt->dataatexecstatementlength=0;
 	} else {
 		// otherwise just execute
 		debugPrintf("  exececuting...\n");
 		retval=SQLR_SQLExecute(statementhandle);
 	}
-
-	// FIXME: also reset in SQLFreeStmt?
-	// reset the various data-at-exec related things
-	stmt->dataatexec=false;
-	delete stmt->dataatexeckeys;
-	stmt->dataatexeckeys=NULL;
-	stmt->dataatexecstatement=NULL;
-	stmt->dataatexecstatementlength=0;
 
 	return retval;
 }
@@ -7677,6 +7686,9 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// We're faking SQLBindParameter data-at-exec below.
+	// See SQLParamData for more details.
+
 	// deal with invalid buffers/lengths
 	if (strlen_or_ind<0 && strlen_or_ind!=SQL_NTS) {
 		SQLR_STMTSetError(stmt,
@@ -7702,15 +7714,11 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 	// FIXME: for now we only support SQL_C_DATA, but eventually we'll
 	// need to do some type-checking here and print out debug for
 	// different data types in different ways
-	debugPrintf("  copying out data: \"%s\"\n",strlen_or_ind,data);
+	debugPrintf("  strlen_or_ind   : %lld\n",strlen_or_ind);
+	debugPrintf("  copying out data: \"%.*s\"\n",strlen_or_ind,data);
 
-	// copy data to currentputdata
-	bytestring::copy((unsigned char *)stmt->currentputdatabuffer+
-						stmt->currentputdataoffset,
-						data,strlen_or_ind);
-
-	// bump currentputdata
-	stmt->currentputdataoffset+=strlen_or_ind;
+	// copy data to putdata
+	stmt->putdatabuffer.append((unsigned char *)data,strlen_or_ind);
 
 	return SQL_SUCCESS;
 }
@@ -9356,13 +9364,17 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 
 		debugPrintf("  strlen_or_ind: %d\n",*strlen_or_ind);
 
-		// handle NULLs by binding a NULL string and catch data-at-exec
+		// handle NULLs by binding a NULL string
 		if (*strlen_or_ind==SQL_NULL_DATA) {
 			valuetype=SQL_C_CHAR;
 			parametervalue=NULL;
-		} else if (*strlen_or_ind==SQL_DATA_AT_EXEC ||
+		} else
+
+		// catch data-at-exec
+		// We're actually faking SQLBindParameter data-at-exec below.
+		// See SQLParamData for more details.
+		if (*strlen_or_ind==SQL_DATA_AT_EXEC ||
 				*strlen_or_ind<=SQL_LEN_DATA_AT_EXEC_OFFSET) {
-			debugPrintf("  data at exec\n");
 			dataatexec=true;
 		}
 
@@ -9375,6 +9387,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			debugPrintf("  valuetype: SQL_C_CHAR\n");
 			// FIXME: support data-at-exec with other types
 			if (dataatexec) {
+				debugPrintf("  data at exec\n");
 				stmt->dataatexec=true;
 				stmt->dataatexecdict.setValue(parameternumber,
 								parametervalue);

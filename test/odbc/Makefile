@@ -18,3 +18,6 @@ clean:
 
 mssql: mssql.cpp mssql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ mssql.$(OBJ) $(ODBCTESTLIBS)
+
+putdata: putdata.cpp putdata.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ putdata.$(OBJ) $(ODBCTESTLIBS)
