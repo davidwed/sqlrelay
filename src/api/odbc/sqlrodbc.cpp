@@ -15,8 +15,8 @@
 #include <rudiments/error.h>
 #define DEBUG_MESSAGES 1
 #define DEBUG_TO_FILE 1
-static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
-//static const char debugfile[]="C:\\Tmp\\sqlrodbcdebug.txt";
+//static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
+static const char debugfile[]="C:\\Tmp\\sqlrodbcdebug.txt";
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)

@@ -510,6 +510,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 #endif
 
 	// enable MARS with SQL Server
+	// FIXME: make this configurable
 	SQLSetConnectAttr(dbc,1224,(SQLPOINTER *)1,SQL_IS_UINTEGER);
 
 	// connect to the database
