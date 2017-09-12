@@ -177,6 +177,14 @@ struct STMT {
 	SQLULEN					rowbindtype;
 	SQLSMALLINT				sqlerrorindex;
 	bool					nodata;
+	bool					dataatexec;
+	dictionary<SQLUSMALLINT,SQLPOINTER>	dataatexecdict;
+	linkedlist<SQLUSMALLINT>		*dataatexeckeys;
+	SQLCHAR					*dataatexecstatement;
+	SQLINTEGER				dataatexecstatementlength;
+	SQLUSMALLINT				currentputdatabindnumber;
+	SQLPOINTER				currentputdatabuffer;
+	SQLULEN					currentputdataoffset;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -336,6 +344,16 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->executedbynumresultcolsresult=SQL_SUCCESS;
 				stmt->rowbindtype=SQL_BIND_BY_COLUMN;
 				stmt->nodata=false;
+				// FIXME: reset these somewhere (and list)
+				stmt->dataatexec=false;
+				stmt->dataatexecdict.
+					setTrackInsertionOrder(true);
+				stmt->dataatexeckeys=NULL;
+				stmt->dataatexecstatement=NULL;
+				stmt->dataatexecstatementlength=0;
+				stmt->currentputdatabindnumber=0;
+				stmt->currentputdatabuffer=NULL;
+				stmt->currentputdataoffset=0;
 
 				// set flags
 				if (!charstring::compare(
@@ -3084,6 +3102,13 @@ static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// defer execution if there are any data-at-exec binds
+	if (stmt->dataatexec) {
+		stmt->dataatexecstatement=statementtext;
+		stmt->dataatexecstatementlength=textlength;
+		return SQL_SUCCESS;
+	}
+
 	// reinit row indices
 	stmt->currentfetchrow=0;
 	stmt->currentstartrow=0;
@@ -3138,6 +3163,13 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
 		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
+	}
+
+	// defer execution if there are any data-at-exec binds
+	if (stmt->dataatexec) {
+		stmt->dataatexecstatement=NULL;
+		stmt->dataatexecstatementlength=0;
+		return SQL_SUCCESS;
 	}
 
 	// don't actually do anything if the statement
@@ -4988,14 +5020,14 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLPUTDATA:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLPUTDATA "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLPARAMDATA:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLPARAMDATA "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLGETCONNECTATTR:
@@ -7498,7 +7530,7 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 }
 
 SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
-					SQLPOINTER *Value) {
+					SQLPOINTER *value) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -7507,11 +7539,87 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported
-	SQLR_STMTSetError(stmt,
-			"Driver does not support this function",0,"IM001");
+	// bail if there is no data-at-exec
+	if (!stmt->dataatexec) {
+		return SQL_SUCCESS;
+	}
 
-	return SQL_ERROR;
+	// if there's an existing currentputdata then bind it
+	if (stmt->currentputdatabuffer) {
+		// FIXME: for now we only support SQL_C_DATA, but eventually
+		// we'll need to do some type-checking here and handle different
+		// data types in different ways
+		debugPrintf("  binding value: \"%.*s\"\n",
+						stmt->currentputdataoffset,
+						stmt->currentputdatabuffer);
+		char	*parametername=charstring::parseNumber(
+						stmt->currentputdatabindnumber);
+		stmt->cur->inputBind(parametername,
+				(const char *)stmt->currentputdatabuffer,
+				stmt->currentputdataoffset);
+		delete[] parametername;
+	}
+
+	// get the data-at-exec keys (parameter numbers)
+	if (!stmt->dataatexeckeys) {
+		stmt->dataatexeckeys=stmt->dataatexecdict.getKeys();
+	}
+
+	// if there's a data-at-exec buffer then return it,
+	// and remove it from the dictionary
+	if (stmt->dataatexeckeys->getLength()) {
+
+		// get the first bind number
+		linkedlistnode<SQLUSMALLINT>	*keynode=
+					stmt->dataatexeckeys->getFirst();
+
+		// get the corresponding bind buffer node
+		dictionarynode<SQLUSMALLINT,SQLPOINTER>	*valuenode=
+					stmt->dataatexecdict.getNode(
+							keynode->getValue());
+
+		// keep track of the bind number
+		stmt->currentputdatabindnumber=keynode->getValue();
+
+		// get the bind buffer
+		SQLPOINTER	val=valuenode->getValue();
+		stmt->currentputdatabuffer=val;
+
+		// pass the buffer out
+		if (value) {
+			*value=val;
+		}
+
+		// remove the buffer and key
+		stmt->dataatexecdict.remove(valuenode);
+		stmt->dataatexeckeys->remove(keynode);
+
+		// return "need data"
+		return SQL_NEED_DATA;
+	}
+
+	// exec/exec-direct will have been deferred until now...
+	SQLRETURN	retval=SQL_ERROR;
+	if (stmt->dataatexecstatement) {
+		// if we have a query then exec-direct it
+		retval=SQLR_SQLExecDirect(
+					statementhandle,
+					stmt->dataatexecstatement,
+					stmt->dataatexecstatementlength);
+	} else {
+		// otherwise just execute
+		retval=SQLR_SQLExecute(statementhandle);
+	}
+
+	// FIXME: also reset in SQLFreeStmt?
+	// reset the various data-at-exec related things
+	stmt->dataatexec=false;
+	delete stmt->dataatexeckeys;
+	stmt->dataatexeckeys=NULL;
+	stmt->dataatexecstatement=NULL;
+	stmt->dataatexecstatementlength=0;
+
+	return retval;
 }
 
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
@@ -7547,8 +7655,8 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
 }
 
 SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
-					SQLPOINTER Data,
-					SQLLEN StrLen_or_Ind) {
+					SQLPOINTER data,
+					SQLLEN strlen_or_ind) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -7557,9 +7665,29 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// not supported
-	SQLR_STMTSetError(stmt,
-			"Driver does not support this function",0,"IM001");
+	if (!strlen_or_ind) {
+		// FIXME: error...
+	}
+
+	if (!data && strlen_or_ind) {
+		// FIXME: error...
+	}
+
+	if (strlen_or_ind<0 && strlen_or_ind!=SQL_NTS) {
+		// FIXME: error...
+	}
+
+	if (strlen_or_ind==SQL_NTS) {
+		strlen_or_ind=charstring::length((const char *)data);
+	}
+
+	// copy data to currentputdata
+	bytestring::copy((unsigned char *)stmt->currentputdatabuffer+
+						stmt->currentputdataoffset,
+						data,strlen_or_ind);
+
+	// bump currentputdata
+	stmt->currentputdataoffset+=strlen_or_ind;
 
 	return SQL_ERROR;
 }
@@ -9199,13 +9327,21 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 	// convert parameternumber to a string
 	char	*parametername=charstring::parseNumber(parameternumber);
 
-	// handle NULLs by binding a NULL string
+	bool	dataatexec=false;
 	if (strlen_or_ind) {
+
 		debugPrintf("  strlen_or_ind: %d\n",*strlen_or_ind);
+
+		// handle NULLs by binding a NULL string and catch data-at-exec
 		if (*strlen_or_ind==SQL_NULL_DATA) {
 			valuetype=SQL_C_CHAR;
 			parametervalue=NULL;
+		} else if (*strlen_or_ind==SQL_DATA_AT_EXEC ||
+				*strlen_or_ind<=SQL_LEN_DATA_AT_EXEC_OFFSET) {
+			debugPrintf("  data at exec\n");
+			dataatexec=true;
 		}
+
 	} else {
 		debugPrintf("  strlen_or_ind is NULL\n");
 	}
@@ -9213,9 +9349,17 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 	switch (valuetype) {
 		case SQL_C_CHAR:
 			debugPrintf("  valuetype: SQL_C_CHAR\n");
-			debugPrintf("  value: \"%s\"\n",parametervalue);
-			stmt->cur->inputBind(parametername,
-				(const char *)parametervalue);
+			// FIXME: support data-at-exec with other types
+			if (dataatexec) {
+				stmt->dataatexec=true;
+				stmt->dataatexecdict.setValue(parameternumber,
+								parametervalue);
+			} else {
+				debugPrintf("  value: \"%s\"\n",
+							parametervalue);
+				stmt->cur->inputBind(parametername,
+					(const char *)parametervalue);
+			}
 			break;
 		case SQL_C_LONG:
 			debugPrintf("  valuetype: SQL_C_LONG\n");
