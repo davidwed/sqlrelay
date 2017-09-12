@@ -344,7 +344,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->executedbynumresultcolsresult=SQL_SUCCESS;
 				stmt->rowbindtype=SQL_BIND_BY_COLUMN;
 				stmt->nodata=false;
-				// FIXME: reset these somewhere (and list)
 				stmt->dataatexec=false;
 				stmt->dataatexecdict.
 					setTrackInsertionOrder(true);
@@ -3104,6 +3103,7 @@ static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 
 	// defer execution if there are any data-at-exec binds
 	if (stmt->dataatexec) {
+		debugPrintf("  data-at-exec detected, deferring execution\n");
 		stmt->dataatexecstatement=statementtext;
 		stmt->dataatexecstatementlength=textlength;
 		return SQL_SUCCESS;
@@ -3167,6 +3167,7 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 
 	// defer execution if there are any data-at-exec binds
 	if (stmt->dataatexec) {
+		debugPrintf("  data-at-exec detected, deferring execution\n");
 		stmt->dataatexecstatement=NULL;
 		stmt->dataatexecstatementlength=0;
 		return SQL_SUCCESS;
@@ -7541,6 +7542,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 
 	// bail if there is no data-at-exec
 	if (!stmt->dataatexec) {
+		debugPrintf("  no data-at-exec detected\n");
 		return SQL_SUCCESS;
 	}
 
@@ -7549,11 +7551,13 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		// FIXME: for now we only support SQL_C_DATA, but eventually
 		// we'll need to do some type-checking here and handle different
 		// data types in different ways
-		debugPrintf("  binding value: \"%.*s\"\n",
-						stmt->currentputdataoffset,
-						stmt->currentputdatabuffer);
 		char	*parametername=charstring::parseNumber(
 						stmt->currentputdatabindnumber);
+		debugPrintf("  parametername: %s\n",
+					parametername);
+		debugPrintf("  value: \"%.*s\"\n",
+					stmt->currentputdataoffset,
+					stmt->currentputdatabuffer);
 		stmt->cur->inputBind(parametername,
 				(const char *)stmt->currentputdatabuffer,
 				stmt->currentputdataoffset);
@@ -7562,6 +7566,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 
 	// get the data-at-exec keys (parameter numbers)
 	if (!stmt->dataatexeckeys) {
+		debugPrintf("  getting keys\n");
 		stmt->dataatexeckeys=stmt->dataatexecdict.getKeys();
 	}
 
@@ -7580,10 +7585,14 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 
 		// keep track of the bind number
 		stmt->currentputdatabindnumber=keynode->getValue();
+		debugPrintf("  current put-data bind number: %d\n",
+					stmt->currentputdatabindnumber);
 
 		// get the bind buffer
 		SQLPOINTER	val=valuenode->getValue();
 		stmt->currentputdatabuffer=val;
+		debugPrintf("  current put-data buffer: 0x%08x\n",
+					stmt->currentputdatabuffer);
 
 		// pass the buffer out
 		if (value) {
@@ -7595,6 +7604,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		stmt->dataatexeckeys->remove(keynode);
 
 		// return "need data"
+		debugPrintf("  SQL NEED DATA\n");
 		return SQL_NEED_DATA;
 	}
 
@@ -7602,12 +7612,14 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 	SQLRETURN	retval=SQL_ERROR;
 	if (stmt->dataatexecstatement) {
 		// if we have a query then exec-direct it
+		debugPrintf("  exec-direc'ing...\n");
 		retval=SQLR_SQLExecDirect(
 					statementhandle,
 					stmt->dataatexecstatement,
 					stmt->dataatexecstatementlength);
 	} else {
 		// otherwise just execute
+		debugPrintf("  exececuting...\n");
 		retval=SQLR_SQLExecute(statementhandle);
 	}
 
@@ -7665,21 +7677,32 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	if (!strlen_or_ind) {
-		// FIXME: error...
-	}
-
-	if (!data && strlen_or_ind) {
-		// FIXME: error...
-	}
-
+	// deal with invalid buffers/lengths
 	if (strlen_or_ind<0 && strlen_or_ind!=SQL_NTS) {
-		// FIXME: error...
+		SQLR_STMTSetError(stmt,
+			"Invalid string or buffer length",0,"HY090");
+	}
+	if (strlen_or_ind && !data) {
+		SQLR_STMTSetError(stmt,
+			"Invalid use of null pointer",0,"HY009");
 	}
 
+	// handle null-terminated strings
 	if (strlen_or_ind==SQL_NTS) {
 		strlen_or_ind=charstring::length((const char *)data);
 	}
+
+	// handle null/empty data
+	if (!strlen_or_ind || strlen_or_ind==SQL_NULL_DATA) {
+		debugPrintf("  strlen_or_ind 0 or NULL\n");
+		debugPrintf("  not copying out any data\n");
+		return SQL_SUCCESS;
+	}
+
+	// FIXME: for now we only support SQL_C_DATA, but eventually we'll
+	// need to do some type-checking here and print out debug for
+	// different data types in different ways
+	debugPrintf("  copying out data: \"%s\"\n",strlen_or_ind,data);
 
 	// copy data to currentputdata
 	bytestring::copy((unsigned char *)stmt->currentputdatabuffer+
@@ -7689,7 +7712,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 	// bump currentputdata
 	stmt->currentputdataoffset+=strlen_or_ind;
 
-	return SQL_ERROR;
+	return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
@@ -9326,6 +9349,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 
 	// convert parameternumber to a string
 	char	*parametername=charstring::parseNumber(parameternumber);
+	debugPrintf("  parametername: %s\n",parametername);
 
 	bool	dataatexec=false;
 	if (strlen_or_ind) {
