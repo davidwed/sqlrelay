@@ -48,6 +48,7 @@
 	odbc lazy-fetches now
 	odbc driver fakes SQLBindParameter with data-at-exec by deferring the
 		execute and buffering the data locally now
+	bumped odbc MAX_COLUMN_COUNT to 384
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

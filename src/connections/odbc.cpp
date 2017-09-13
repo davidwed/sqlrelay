@@ -27,7 +27,7 @@
 #endif
 
 #define FETCH_AT_ONCE		10
-#define MAX_COLUMN_COUNT	256
+#define MAX_COLUMN_COUNT	384
 #define MAX_FIELD_LENGTH	32768
 
 struct odbccolumn {
