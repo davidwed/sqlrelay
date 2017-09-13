@@ -278,6 +278,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 						const char *wild);
 		const char	*selectDatabaseQuery();
 		char		*getCurrentDatabase();
+		char		*getCurrentSchema();
 		bool		setIsolationLevel(const char *isolevel);
 
 		SQLRETURN	erg;
@@ -1468,6 +1469,16 @@ char *odbcconnection::getCurrentDatabase() {
 			(SQLSMALLINT)256,
 			&currentdblen);
 	return currentdb;
+}
+
+char *odbcconnection::getCurrentSchema() {
+	char	*currentschema=new char[256];
+	SQLSMALLINT	currentschemalen;
+	SQLGetInfo(dbc,SQL_USER_NAME,
+			(SQLPOINTER)currentschema,
+			(SQLSMALLINT)256,
+			&currentschemalen);
+	return currentschema;
 }
 
 #if (ODBCVER >= 0x0300)

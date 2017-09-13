@@ -5427,18 +5427,19 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_USER_NAME:
 			debugPrintf("  infotype: "
 					"SQL_USER_NAME\n");
-			// FIXME: This should be passed through to the backend.
-			// Eg. SQL Server generally returns "dbo" for this,
-			// rather than the login name.  Not returning "dbo"
-			// causes some apps (Delphi):
-			// * not to call SQLGetInfo(SQL_USER_NAME)
-			// * thus not to recognize the schema name returned by
-			// 	SQLTables as the schema
-			// * thus to build and quote table names like "dbo.tbl"
-			// 	rather than "dbo"."tbl", which fails.
-			//val.strval=conn->user;
-			// FIXME: hack
-			val.strval="dbo";
+			// Really, when an app calls this, they usually
+			// want the schema, not user.  In most databases,
+			// there is 1 schema per user, so they are synonymous,
+			// but not in all (MS SQL Server).
+			val.strval=conn->con->getCurrentSchema();
+			// This isn't currently (as of 1.2.0) implemented
+			// for all connection modules, so we'll fall back to
+			// conn->user if we don't get anything for the schema,
+			// which was how this was implemented prior to 1.2.0
+			// anyway.
+			if (charstring::isNullOrEmpty(val.strval)) {
+				val.strval=conn->user;
+			}
 			type=0;
 			break;
 		case SQL_TXN_ISOLATION_OPTION:

@@ -175,6 +175,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	selectDatabase(const char *db);
 		void	dbHasChanged();
 		char	*getCurrentDatabase();
+		char	*getCurrentSchema();
 
 		// column names
 		bool	getColumnNames(const char *query, stringbuffer *output);
@@ -732,6 +733,9 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 
 		virtual char		*getCurrentDatabase();
 		virtual const char	*getCurrentDatabaseQuery();
+
+		virtual char		*getCurrentSchema();
+		virtual const char	*getCurrentSchemaQuery();
 
 		virtual bool		getLastInsertId(uint64_t *id);
 		virtual const char	*getLastInsertIdQuery();

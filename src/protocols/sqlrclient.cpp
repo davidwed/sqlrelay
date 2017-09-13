@@ -64,6 +64,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	serverVersionCommand();
 		void	selectDatabaseCommand();
 		void	getCurrentDatabaseCommand();
+		void	getCurrentSchemaCommand();
 		void	getLastInsertIdCommand();
 		void	dbHostNameCommand();
 		void	dbIpAddressCommand();
@@ -499,6 +500,10 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		} else if (command==GET_CURRENT_DATABASE) {
 			cont->incrementGetCurrentDatabaseCount();
 			getCurrentDatabaseCommand();
+			continue;
+		} else if (command==GET_CURRENT_SCHEMA) {
+			//cont->incrementGetCurrentSchemaCount();
+			getCurrentSchemaCommand();
 			continue;
 		} else if (command==GET_LAST_INSERT_ID) {
 			cont->incrementGetLastInsertIdCount();
@@ -1171,6 +1176,25 @@ void sqlrprotocol_sqlrclient::getCurrentDatabaseCommand() {
 
 	// clean up
 	delete[] currentdb;
+}
+
+void sqlrprotocol_sqlrclient::getCurrentSchemaCommand() {
+	debugFunction();
+
+	cont->raiseDebugMessageEvent("get current schema");
+
+	// get the current schema
+	char	*currentschema=cont->getCurrentSchema();
+
+	// send it to the client
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	uint16_t	currentschemasize=charstring::length(currentschema);
+	clientsock->write(currentschemasize);
+	clientsock->write(currentschema,currentschemasize);
+	clientsock->flushWriteBuffer(-1,-1);
+
+	// clean up
+	delete[] currentschema;
 }
 
 void sqlrprotocol_sqlrclient::getLastInsertIdCommand() {

@@ -101,6 +101,9 @@ class sqlrconnectionprivate {
 		// current database name
 		char		*_currentdbname;
 
+		// current schema name
+		char		*_currentschemaname;
+
 		// bind format
 		char		*_bindformat;
 
@@ -217,6 +220,9 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	// current database name
 	pvt->_currentdbname=NULL;
 
+	// current schema name
+	pvt->_currentschemaname=NULL;
+
 	// bind format
 	pvt->_bindformat=NULL;
 
@@ -287,6 +293,15 @@ sqlrconnection::~sqlrconnection() {
 
 	// deallocate db ip address
 	delete[] pvt->_dbipaddress;
+
+	// deallocate server version
+	delete[] pvt->_serverversion;
+
+	// deallocate current database name
+	delete[] pvt->_currentdbname;
+
+	// deallocate current schema name
+	delete[] pvt->_currentschemaname;
 
 	// deallocate bindformat
 	delete[] pvt->_bindformat;
@@ -1503,7 +1518,7 @@ const char *sqlrconnection::getCurrentDatabase() {
 
 	clearError();
 
-	// tell the server we want to select a db
+	// tell the server we want to get the current db
 	pvt->_cs->write((uint16_t)GET_CURRENT_DATABASE);
 	flushWriteBuffer();
 
@@ -1539,6 +1554,60 @@ const char *sqlrconnection::getCurrentDatabase() {
 		debugPreEnd();
 	}
 	return pvt->_currentdbname;
+}
+
+const char *sqlrconnection::getCurrentSchema() {
+
+	if (!openSession()) {
+		return NULL;
+	}
+
+	clearError();
+
+	if (pvt->_debug) {
+		debugPreStart();
+		debugPrint("Getting the current schema...\n");
+		debugPreEnd();
+	}
+
+	clearError();
+
+	// tell the server we want to get the current schema
+	pvt->_cs->write((uint16_t)GET_CURRENT_SCHEMA);
+	flushWriteBuffer();
+
+	if (gotError()) {
+		return NULL;
+	}
+
+	// get the current schema name size
+	uint16_t	size;
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to get the current database.\n"
+				"A network error may have ocurred.");
+		return NULL;
+	}
+
+	// get the current schema name
+	delete[] pvt->_currentschemaname;
+	pvt->_currentschemaname=new char[size+1];
+	if (pvt->_cs->read(pvt->_currentschemaname,size)!=size) {
+		setError("Failed to get the current database.\n"
+				"A network error may have ocurred.");
+		delete[] pvt->_currentschemaname;
+		pvt->_currentschemaname=NULL;
+		return NULL;
+	}
+	pvt->_currentschemaname[size]='\0';
+
+	if (pvt->_debug) {
+		debugPreStart();
+		debugPrint(pvt->_currentschemaname);
+		debugPrint("\n");
+		debugPreEnd();
+	}
+	return pvt->_currentschemaname;
 }
 
 uint64_t sqlrconnection::getLastInsertId() {

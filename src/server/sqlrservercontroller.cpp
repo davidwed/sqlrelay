@@ -2127,6 +2127,10 @@ char *sqlrservercontroller::getCurrentDatabase() {
 	return pvt->_conn->getCurrentDatabase();
 }
 
+char *sqlrservercontroller::getCurrentSchema() {
+	return pvt->_conn->getCurrentSchema();
+}
+
 bool sqlrservercontroller::getLastInsertId(uint64_t *id) {
 	return pvt->_conn->getLastInsertId(id);
 }

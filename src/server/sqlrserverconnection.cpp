@@ -343,8 +343,7 @@ char *sqlrserverconnection::getCurrentDatabase() {
 	// get the get current database query base
 	const char	*gcdquery=getCurrentDatabaseQuery();
 
-	// If there is no query for this then the db we're using doesn't
-	// support switching.
+	// bail if there is no query for this
 	if (!gcdquery) {
 		return NULL;
 	}
@@ -376,6 +375,46 @@ char *sqlrserverconnection::getCurrentDatabase() {
 }
 
 const char *sqlrserverconnection::getCurrentDatabaseQuery() {
+	return NULL;
+}
+
+char *sqlrserverconnection::getCurrentSchema() {
+
+	// get the get current database query base
+	const char	*gcsquery=getCurrentSchemaQuery();
+
+	// bail if there is no query for this
+	if (!gcsquery) {
+		return NULL;
+	}
+
+	size_t		gcsquerylen=charstring::length(gcsquery);
+
+	// run the query...
+	char	*retval=NULL;
+	sqlrservercursor	*gcscur=cont->newCursor();
+	if (gcscur->open() &&
+		gcscur->prepareQuery(gcsquery,gcsquerylen) &&
+		gcscur->executeQuery(gcsquery,gcsquerylen)) {
+
+		if (!gcscur->noRowsToReturn() && gcscur->fetchRow()) {
+
+			// get the first field of the row and return it
+			const char	*field=NULL;
+			uint64_t	fieldlength=0;
+			bool		blob=false;
+			bool		null=false;
+			gcscur->getField(0,&field,&fieldlength,&blob,&null);
+			retval=charstring::duplicate(field);
+		} 
+	}
+	gcscur->closeResultSet();
+	gcscur->close();
+	cont->deleteCursor(gcscur);
+	return retval;
+}
+
+const char *sqlrserverconnection::getCurrentSchemaQuery() {
 	return NULL;
 }
 

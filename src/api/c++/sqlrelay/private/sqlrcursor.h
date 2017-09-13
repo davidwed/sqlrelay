@@ -141,6 +141,7 @@
 		void		attachToBindCursor(uint16_t bindcursorid);
 		const char	*getQueryTree();
 		const char	*getTranslatedQuery();
+
 		bool		getDatabaseList(const char *wild,
 					sqlrclientlistformat_t listformat);
 		bool		getSchemaList(const char *wild);
