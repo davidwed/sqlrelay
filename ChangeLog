@@ -49,6 +49,8 @@
 	odbc driver fakes SQLBindParameter with data-at-exec by deferring the
 		execute and buffering the data locally now
 	bumped odbc MAX_COLUMN_COUNT to 384
+	added a mars=yes/no flag to enable MS SQL Server MARS when using the
+		odbc driver for MS SQL Server with the odbc connection module
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

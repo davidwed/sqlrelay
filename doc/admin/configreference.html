@@ -390,7 +390,7 @@ or a tnsnames-style expression such as:
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 
-<br/><a name="odbc"/><p>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;identity=ID"</p>
+<br/><a name="odbc"/><p>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;identity=ID;mars=yes/no"</p>
 
 <ul>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -400,6 +400,7 @@ or a tnsnames-style expression such as:
   <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
   <li><b>odbcversion</b>: Tells the driver to exhibit behavior from the specified version of ODBC.  Valid values include: 2, 3, and 3.8.  Defaults to 3.  It may be necessary to set this to 2 for some drivers that only support ODBC 2.</li>
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
+  <li><b>mars</b>: Whether to enable MS SQL Server MARS (Multiple Active Result Sets).  Set to yes to enable MARS with MS SQL Server.  Omit or set to no to disable MARS.  Omit when using an ODBC driver for a database other than MS SQL Server.  Optional, defaults to no.</li>
 </ul>
 
 <br/><a name="mdbtools"/><p>For <b>mdbtools</b> databases, the connect string syntax is "db=DATABASE;identity=ID"</p>

@@ -290,6 +290,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*identity;
 
 		const char	*odbcversion;
+		bool		mars;
 
 		stringbuffer	errormessage;
 
@@ -412,6 +413,7 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 	identity=NULL;
 	odbcversion=NULL;
+	mars=false;
 }
 
 
@@ -432,6 +434,8 @@ void odbcconnection::handleConnectString() {
 	identity=cont->getConnectStringValue("identity");
 
 	odbcversion=cont->getConnectStringValue("odbcversion");
+
+	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
@@ -509,9 +513,10 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	}
 #endif
 
-	// enable MARS with SQL Server
-	// FIXME: make this configurable
-	SQLSetConnectAttr(dbc,1224,(SQLPOINTER *)1,SQL_IS_UINTEGER);
+	// enable SQL Server MARS, if configured to do so
+	if (mars) {
+		SQLSetConnectAttr(dbc,1224,(SQLPOINTER *)1,SQL_IS_UINTEGER);
+	}
 
 	// connect to the database
 	char *user_asc=(char*)cont->getUser();

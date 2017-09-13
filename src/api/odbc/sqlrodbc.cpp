@@ -5113,8 +5113,8 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLDRIVERS:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLDRIVERS "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true (provided by driver manager)\n");
+			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLGETDESCFIELD:
@@ -9125,33 +9125,6 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
 
 	return SQL_ERROR;
 }
-
-#if (ODBCVER < 0x0300)
-SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
-					SQLUSMALLINT fDirection,
-					SQLCHAR *szDriverDesc,
-					SQLSMALLINT cbDriverDescMax,
-					SQLSMALLINT *pcbDriverDesc,
-					SQLCHAR *szDriverAttributes,
-					SQLSMALLINT cbDrvrAttrMax,
-					SQLSMALLINT *pcbDrvrAttr) {
-	debugFunction();
-
-	// FIXME: this is allegedly mapped in ODBC3 but I can't tell what to
-
-	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("  NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
-	}
-
-	// not supported
-	SQLR_STMTSetError(stmt,
-			"Driver does not support this function",0,"IM001");
-
-	return SQL_ERROR;
-}
-#endif
 
 static const char *SQLR_BuildNumeric(STMT *stmt,
 					int32_t parameternumber,
