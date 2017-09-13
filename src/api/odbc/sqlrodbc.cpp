@@ -119,7 +119,6 @@ struct CONN {
 	bool				nullsasnulls;
 	bool				lazyconnect;
 	bool				clearbindsduringprepare;
-	bool				disablequotecharacter;
 
 	bool				attrmetadataid;
 	SQLSMALLINT			sqlerrorindex;
@@ -2268,14 +2267,6 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 	conn->clearbindsduringprepare=
 		!charstring::isNo(clearbindsduringpreparebuf);
-	char	disablequotecharacterbuf[6];
-	SQLGetPrivateProfileString((const char *)conn->dsn,
-					"DisableQuoteCharacter","no",
-					disablequotecharacterbuf,
-					sizeof(disablequotecharacterbuf),
-					ODBC_INI);
-	conn->disablequotecharacter=
-		!charstring::isNo(disablequotecharacterbuf);
 
 	debugPrintf("  DSN: %s\n",conn->dsn);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
@@ -2307,8 +2298,6 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  LazyConnect: %d\n",conn->lazyconnect);
 	debugPrintf("  ClearBindsDuringPrepare: %d\n",
 					conn->clearbindsduringprepare);
-	debugPrintf("  DisableQuoteCharacter: %d\n",
-					conn->disablequotecharacter);
 
 	// create connection
 	conn->con=new sqlrconnection(conn->server,
@@ -5351,9 +5340,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_IDENTIFIER_QUOTE_CHAR:
 			debugPrintf("  infotype: "
 					"SQL_IDENTIFIER_QUOTE_CHAR\n");
-			if (conn->disablequotecharacter) {
-				val.strval="";
-			} else if (!charstring::compare(conn->con->identify(),
+			if (!charstring::compare(conn->con->identify(),
 								"mysql")) {
 				// mysql uses a back-tick
 				val.strval="`";
@@ -9814,7 +9801,6 @@ static HWND		dontgetcolumninfoedit;
 static HWND		nullsasnullsedit;
 static HWND		lazyconnectedit;
 static HWND		clearbindsduringprepareedit;
-static HWND		disablequotecharacteredit;
 
 static const char	sqlrwindowclass[]="SQLRWindowClass";
 static const int	labelwidth=135;
@@ -10038,9 +10024,6 @@ static void createControls(HWND hwnd) {
 	createLabel(box3,"Clear Binds During Prepare",
 			x,y+=(labelheight+labeloffset),
 			labelwidth,labelheight);
-	createLabel(box3,"Disable Quote Character",
-			x,y+=(labelheight+labeloffset),
-			labelwidth,labelheight);
 
 	debugPrintf("  edits...\n");
 
@@ -10159,10 +10142,6 @@ static void createControls(HWND hwnd) {
 			1,true,false);
 	clearbindsduringprepareedit=createEdit(box3,
 			dsndict.getValue("ClearBindsDuringPrepare"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight,
-			1,true,false);
-	disablequotecharacteredit=createEdit(box3,
-			dsndict.getValue("DisableQuoteCharacter"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1,true,false);
 
@@ -10412,12 +10391,6 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("ClearBindsDuringPrepare",
 					clearbindsduringprepare);
 	}
-	if (!dsndict.getValue("DisableQuoteCharacter")) {
-		char	*disablequotecharacter=new char[2];
-		SQLGetPrivateProfileString(dsnval,"DisableQuoteCharacter","0",
-					disablequotecharacter,2,ODBC_INI);
-		dsndict.setValue("DisableQuoteCharacter",disablequotecharacter);
-	}
 
 	debugPrintf("  success...\n");
 }
@@ -10662,13 +10635,6 @@ static void getDsnFromUi() {
 	GetWindowText(clearbindsduringprepareedit,data,len+1);
 	delete[] dsndict.getValue("ClearBindsDuringPrepare");
 	dsndict.setValue("ClearBindsDuringPrepare",data);
-
-	// DisableQuoteCharacter
-	len=GetWindowTextLength(disablequotecharacteredit);
-	data=new char[len+1];
-	GetWindowText(disablequotecharacteredit,data,len+1);
-	delete[] dsndict.getValue("DisableQuoteCharacter");
-	dsndict.setValue("DisableQuoteCharacter",data);
 }
 
 static bool writeDsn() {
