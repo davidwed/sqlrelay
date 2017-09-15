@@ -2787,20 +2787,48 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 		// convert parameternumber to a string
 		char	*parametername=charstring::parseNumber(
 						ob->parameternumber);
+		debugPrintf("  parametername: %s\n",parametername);
 
 		// FIXME: handle NULL values
 
+		if (!ob->parametervalue) {
+			debugPrintf("  parametervalue is NULL, "
+					"(not copying out any value)\n");
+			delete[] parametername;
+			continue;
+		}
+
 		switch (ob->valuetype) {
 			case SQL_C_CHAR:
+				{
 				debugPrintf("  valuetype: SQL_C_CHAR\n");
-				// make sure to null-terminate
-				charstring::safeCopy(
-					(char *)ob->parametervalue,
-					ob->bufferlength,
+				const char	*str=
 					stmt->cur->getOutputBindString(
-							parametername),
+								parametername);
+				uint32_t	len=
 					stmt->cur->getOutputBindLength(
-							parametername)+1);
+								parametername);
+				if (!str) {
+					debugPrintf("  value is NULL\n");
+					if (ob->strlen_or_ind) {
+						*(ob->strlen_or_ind)=
+							SQL_NULL_DATA;
+					} else {
+						debugPrintf("  strlen_or_ind "
+								"is NULL\n");
+					}
+				} else {
+					// make sure to null-terminate
+					charstring::safeCopy(
+						(char *)ob->parametervalue,
+						ob->bufferlength,
+						str,len+1);
+					debugPrintf("  value: %.*s\n",
+								len,str);
+					debugPrintf("  bufferlength: %lld\n",
+							ob->bufferlength);
+				}
+				}
 				break;
 			case SQL_C_SLONG:
 			case SQL_C_LONG:
@@ -2810,6 +2838,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					(int32_t)
 					stmt->cur->getOutputBindInteger(
 								parametername);
+				debugPrintf("  value: %d\n",
+					*((int32_t *)ob->parametervalue));
 				break;
 			//case SQL_C_BOOKMARK:
 			//	(dup of SQL_C_ULONG)
@@ -2820,6 +2850,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					(uint32_t)
 					stmt->cur->getOutputBindInteger(
 								parametername);
+				debugPrintf("  value: %d\n",
+					*((int32_t *)ob->parametervalue));
 				break;
 			case SQL_C_SSHORT:
 			case SQL_C_SHORT:
@@ -2829,6 +2861,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					(int16_t)
 					stmt->cur->getOutputBindInteger(
 								parametername);
+				debugPrintf("  value: %d\n",
+					*((int16_t *)ob->parametervalue));
 				break;
 			case SQL_C_USHORT:
 				debugPrintf("  valuetype: SQL_C_USHORT\n");
@@ -2836,6 +2870,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					(uint16_t)
 					stmt->cur->getOutputBindInteger(
 								parametername);
+				debugPrintf("  value: %d\n",
+					*((int16_t *)ob->parametervalue));
 				break;
 			case SQL_C_FLOAT:
 				debugPrintf("  valuetype: SQL_C_FLOAT\n");
@@ -3011,12 +3047,16 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				*((int64_t *)ob->parametervalue)=
 				(int64_t)stmt->cur->getOutputBindInteger(
 								parametername);
+				debugPrintf("  value: %lld\n",
+					*((int64_t *)ob->parametervalue));
 				break;
 			case SQL_C_UBIGINT:
 				debugPrintf("  valuetype: SQL_C_UBIGINT\n");
 				*((uint64_t *)ob->parametervalue)=
 				(uint64_t)stmt->cur->getOutputBindInteger(
 								parametername);
+				debugPrintf("  value: %lld\n",
+					*((int64_t *)ob->parametervalue));
 				break;
 			case SQL_C_TINYINT:
 			case SQL_C_STINYINT:
@@ -3045,6 +3085,9 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				debugPrintf("  invalue valuetype\n");
 				break;
 		}
+
+		// clean up
+		delete[] parametername;
 	}
 }
 
@@ -9577,6 +9620,7 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 
 	// convert parameternumber to a string
 	char	*parametername=charstring::parseNumber(parameternumber);
+	debugPrintf("  parametername: %s\n",parametername);
 
 	// store the output bind for later
 	outputbind	*ob=new outputbind;
