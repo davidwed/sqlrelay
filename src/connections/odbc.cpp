@@ -1548,6 +1548,8 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	inisnull=SQL_NULL_DATA;
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
+		outisnullptr[i]=NULL;
+		outisnull[i]=0;
 	}
 }
 
@@ -2031,7 +2033,9 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
 		}
-		*(outisnullptr[i])=outisnull[i];
+		if (outisnullptr[i]) {
+			*(outisnullptr[i])=outisnull[i];
+		}
 	}
 
 	return true;
@@ -2525,6 +2529,8 @@ void odbccursor::closeResultSet() {
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
+		outisnullptr[i]=NULL;
+		outisnull[i]=0;
 	}
 }
 
