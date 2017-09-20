@@ -2791,7 +2791,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 		debugPrintf("  parameternumber: %d\n",ob->parameternumber);
 		debugPrintf("  valuetype: %d\n",ob->valuetype);
 		debugPrintf("  lengthprecision: %lld\n",ob->lengthprecision);
-		debugPrintf("  parameterscale: %lld\n",ob->parameterscale);
+		debugPrintf("  parameterscale: %ld\n",ob->parameterscale);
 		debugPrintf("  bufferlength: %lld\n",ob->bufferlength);
 		debugPrintf("  strlen_or_ind: %lld\n",
 					(uint64_t)ob->strlen_or_ind);
@@ -9638,7 +9638,7 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 	debugPrintf("  parameternumber: %d\n",parameternumber);
 	debugPrintf("  valuetype: %d\n",valuetype);
 	debugPrintf("  lengthprecision: %lld\n",lengthprecision);
-	debugPrintf("  parameterscale: %lld\n",parameterscale);
+	debugPrintf("  parameterscale: %d\n",parameterscale);
 	debugPrintf("  bufferlength: %lld\n",bufferlength);
 	debugPrintf("  strlen_or_ind: %lld\n",(uint64_t)strlen_or_ind);
 
