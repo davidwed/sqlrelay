@@ -2787,12 +2787,15 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 		// convert parameternumber to a string
 		char	*parametername=charstring::parseNumber(
 						ob->parameternumber);
+		debugPrintf("\n");
 		debugPrintf("  parametername: %s\n",parametername);
 		debugPrintf("  parameternumber: %d\n",ob->parameternumber);
 		debugPrintf("  valuetype: %d\n",ob->valuetype);
-		debugPrintf("  lengthprecision: %lld\n",ob->lengthprecision);
+		debugPrintf("  lengthprecision: %lld\n",
+					(uint64_t)ob->lengthprecision);
 		debugPrintf("  parameterscale: %ld\n",ob->parameterscale);
-		debugPrintf("  bufferlength: %lld\n",ob->bufferlength);
+		debugPrintf("  bufferlength: %lld\n",
+					(uint64_t)ob->bufferlength);
 		debugPrintf("  strlen_or_ind: %lld\n",
 					(uint64_t)ob->strlen_or_ind);
 
@@ -9637,9 +9640,9 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 	debugPrintf("  parametername: %s\n",parametername);
 	debugPrintf("  parameternumber: %d\n",parameternumber);
 	debugPrintf("  valuetype: %d\n",valuetype);
-	debugPrintf("  lengthprecision: %lld\n",lengthprecision);
+	debugPrintf("  lengthprecision: %lld\n",(uint64_t)lengthprecision);
 	debugPrintf("  parameterscale: %d\n",parameterscale);
-	debugPrintf("  bufferlength: %lld\n",bufferlength);
+	debugPrintf("  bufferlength: %lld\n",(uint64_t)bufferlength);
 	debugPrintf("  strlen_or_ind: %lld\n",(uint64_t)strlen_or_ind);
 
 	// store the output bind for later
