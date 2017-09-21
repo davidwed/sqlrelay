@@ -7959,6 +7959,13 @@ SQLRETURN SQL_API SQLSetConnectOption(SQLHDBC connectionhandle,
 					SQLUSMALLINT option,
 					SQLULEN value) {
 	debugFunction();
+
+	// FIXME:
+	// In ODBC2, this method can set some statement-level attributes,
+	// which become the defaults for future statements:
+	// http://os2ports.os2site.com/pub/DB2/db2l0/db2l0225.htm#HDRWQ3521
+	// https://docs.microsoft.com/en-us/sql/odbc/reference/appendixes/sqlsetconnectoption-mapping
+
 	return SQLR_SQLSetConnectAttr(connectionhandle,option,
 						(SQLPOINTER)value,0);
 }
