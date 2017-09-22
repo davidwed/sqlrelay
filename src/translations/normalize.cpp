@@ -315,7 +315,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// Remove spaces around most symbols.
 		// Parentheses, asterisks and right brackets require special
 		// handling.
-		static const char symbols[]="!%^-_+=[{}\\|;,<.>/";
+		static const char symbols[]="!%^-+=[{}\\|;,<.>/";
 		if (
 			(*ptr==' ' &&
 			(character::inSet(*(ptr+1),symbols) ||
