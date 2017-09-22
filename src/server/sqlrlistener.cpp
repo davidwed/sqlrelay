@@ -834,7 +834,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 			pvt->_clientsockinprotoindex[ind]=protocolindex;
 
 			if (pvt->_clientsockin[ind]->
-					listen(addr[index],port,15)) {
+					listen(addr[index],port,128)) {
 				pvt->_lsnr.addReadFileDescriptor(
 						pvt->_clientsockin[ind]);
 				listening=true;
@@ -874,7 +874,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 							protocolindex;
 
 		if (pvt->_clientsockun[pvt->_clientsockunindex]->
-						listen(sock,0000,15)) {
+						listen(sock,0000,128)) {
 			pvt->_lsnr.addReadFileDescriptor(
 				pvt->_clientsockun[pvt->_clientsockunindex]);
 			listening=true;
@@ -922,7 +922,7 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 
 	pvt->_handoffsockun=new unixsocketserver();
 	bool	success=pvt->_handoffsockun->listen(
-				pvt->_handoffsockname,0077,15);
+				pvt->_handoffsockname,0077,128);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_handoffsockun);
@@ -956,7 +956,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 
 	pvt->_removehandoffsockun=new unixsocketserver();
 	bool	success=pvt->_removehandoffsockun->listen(
-				pvt->_removehandoffsockname,0077,15);
+				pvt->_removehandoffsockname,0077,128);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_removehandoffsockun);
@@ -990,7 +990,7 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 				pvt->_sqlrpth->getSocketsDir(),id);
 
 	pvt->_fixupsockun=new unixsocketserver();
-	bool	success=pvt->_fixupsockun->listen(pvt->_fixupsockname,0077,15);
+	bool	success=pvt->_fixupsockun->listen(pvt->_fixupsockname,0077,128);
 
 	if (success) {
 		pvt->_lsnr.addReadFileDescriptor(pvt->_fixupsockun);

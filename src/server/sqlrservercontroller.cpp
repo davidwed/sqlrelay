@@ -1100,7 +1100,7 @@ bool sqlrservercontroller::openSockets() {
 
 		pvt->_serversockun=new unixsocketserver();
 		if (pvt->_serversockun->listen(
-				pvt->_unixsocket.getString(),0000,5)) {
+				pvt->_unixsocket.getString(),0000,128)) {
 			pvt->_debugstr.clear();
 			pvt->_debugstr.append("listening on unix socket: ");
 			pvt->_debugstr.append(pvt->_unixsocket.getString());
@@ -1155,7 +1155,7 @@ bool sqlrservercontroller::openSockets() {
 			}
 			pvt->_serversockin[index]=new inetsocketserver();
 			if (pvt->_serversockin[index]->
-				listen(addr[index],pvt->_inetport,5)) {
+				listen(addr[index],pvt->_inetport,128)) {
 
 				if (!pvt->_inetport) {
 					pvt->_inetport=

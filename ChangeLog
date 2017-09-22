@@ -53,6 +53,8 @@
 		odbc driver for MS SQL Server with the odbc connection module
 	ODBC SQLGetInfo(SQL_USER_NAME) gets the schema from the backend when
 		used with the odbc connection module now
+	Increased listen backlogs to 128 from 15/5 per recommendation from
+		funnyjackgao at zenzet.
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
