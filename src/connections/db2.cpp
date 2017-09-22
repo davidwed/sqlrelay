@@ -206,6 +206,8 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		datebind	**outdatebind;
 		char		**outlobbind;
 		SQLINTEGER 	*outlobbindlen;
+		int16_t		**outisnullptr;
+		SQLINTEGER	*outisnull;
 		SQLINTEGER	sqlnulldata;
 
 		uint64_t	rowgroupindex;
@@ -732,10 +734,14 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];
 	outlobbindlen=new SQLINTEGER[maxbindcount];
+	outisnullptr=new int16_t *[maxbindcount];
+	outisnull=new SQLINTEGER[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outlobbind[i]=NULL;
 		outlobbindlen[i]=0;
+		outisnullptr[i]=NULL;
+		outisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
@@ -746,6 +752,8 @@ db2cursor::~db2cursor() {
 	delete[] outdatebind;
 	delete[] outlobbind;
 	delete[] outlobbindlen;
+	delete[] outisnullptr;
+	delete[] outisnull;
 	deallocateResultSetBuffers();
 }
 
@@ -917,7 +925,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)&sqlnulldata);
+				&sqlnulldata);
 	} else {
 		erg=SQLBindParameter(stmt,
 				pos,
@@ -928,7 +936,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)NULL);
+				NULL);
 	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -954,7 +962,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				value,
 				sizeof(int64_t),
-				(SQLINTEGER *)NULL);
+				NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -981,7 +989,7 @@ bool db2cursor::inputBind(const char *variable,
 				scale,
 				value,
 				sizeof(double),
-				(SQLINTEGER *)NULL);
+				NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1027,7 +1035,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				(SQLINTEGER *)NULL);
+				NULL);
 
 	} else {
 
@@ -1049,7 +1057,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				(SQLINTEGER *)NULL);
+				NULL);
 	}
 
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1111,7 +1119,7 @@ bool db2cursor::inputBindClob(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)NULL);
+				NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1131,6 +1139,7 @@ bool db2cursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -1141,7 +1150,8 @@ bool db2cursor::outputBind(const char *variable,
 				0,
 				value,
 				valuesize,
-				(SQLINTEGER *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1159,6 +1169,7 @@ bool db2cursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outisnullptr[pos-1]=isnull;
 
 	*value=0;
 
@@ -1171,7 +1182,8 @@ bool db2cursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(int64_t),
-				(SQLINTEGER *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1191,6 +1203,7 @@ bool db2cursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outisnullptr[pos-1]=isnull;
 
 	*value=0.0;
 
@@ -1203,7 +1216,8 @@ bool db2cursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(double),
-				(SQLINTEGER *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1242,6 +1256,7 @@ bool db2cursor::outputBind(const char *variable,
 	*isnegative=false;
 	db->buffer=buffer;
 	outdatebind[pos-1]=db;
+	outisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -1252,7 +1267,8 @@ bool db2cursor::outputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				(SQLINTEGER *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1474,18 +1490,18 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 			case SQL_CLOB:
 				erg=SQLBindCol(stmt,i+1,SQL_C_CLOB_LOCATOR,
 						loblocator[i],0,
-						(SQLINTEGER *)indicator[i]);
+						indicator[i]);
 				break;
 			case SQL_BLOB:
 				erg=SQLBindCol(stmt,i+1,SQL_C_BLOB_LOCATOR,
 						loblocator[i],0,
-						(SQLINTEGER *)indicator[i]);
+						indicator[i]);
 				break;
 			default:
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 					field[i],
 					conn->cont->getMaxFieldLength(),
-					(SQLINTEGER *)indicator[i]);
+					indicator[i]);
 				break;
 		}
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1499,7 +1515,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-	// convert date output binds
+	// convert date output binds and copy out isnulls
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
@@ -1513,6 +1529,9 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 			*(db->second)=ts->second;
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
+		}
+		if (outisnullptr[i]) {
+			*(outisnullptr[i])=outisnull[i];
 		}
 	}
 	
@@ -1843,6 +1862,8 @@ void db2cursor::closeResultSet() {
 		delete outlobbind[i];
 		outlobbind[i]=NULL;
 		outlobbindlen[i]=0;
+		outisnullptr[i]=NULL;
+		outisnull[i]=0;
 	}
 
 	if (!conn->cont->getMaxColumnCount()) {

@@ -55,6 +55,7 @@
 		used with the odbc connection module now
 	increased listen backlogs to 128 from 15/5
 	normalize translation doesn't remove spaces around _'s any more
+	implemented output bind null indicators properly for db2/informix
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

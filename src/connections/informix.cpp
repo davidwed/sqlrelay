@@ -194,6 +194,8 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		datebind	**outdatebind;
 		char		**outlobbind;
 		SQLLEN 		*outlobbindlen;
+		int16_t		**outisnullptr;
+		SQLLEN		*outisnull;
 		SQLLEN		sqlnulldata;
 		BOOL		truevalue;
 
@@ -767,10 +769,14 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];
 	outlobbindlen=new SQLLEN[maxbindcount];
+	outisnullptr=new int16_t *[maxbindcount];
+	outisnull=new SQLLEN[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outlobbind[i]=NULL;
 		outlobbindlen[i]=0;
+		outisnullptr[i]=NULL;
+		outisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
@@ -782,6 +788,8 @@ informixcursor::~informixcursor() {
 	delete[] outdatebind;
 	delete[] outlobbind;
 	delete[] outlobbindlen;
+	delete[] outisnullptr;
+	delete[] outisnull;
 	deallocateResultSetBuffers();
 }
 
@@ -917,7 +925,7 @@ bool informixcursor::inputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLLEN *)NULL);
+				NULL);
 	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -943,7 +951,7 @@ bool informixcursor::inputBind(const char *variable,
 				0,
 				value,
 				sizeof(int64_t),
-				(SQLLEN *)NULL);
+				NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -970,7 +978,7 @@ bool informixcursor::inputBind(const char *variable,
 				scale,
 				value,
 				sizeof(double),
-				(SQLLEN *)NULL);
+				NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1016,7 +1024,7 @@ bool informixcursor::inputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				(SQLLEN *)NULL);
+				NULL);
 
 	} else {
 
@@ -1038,7 +1046,7 @@ bool informixcursor::inputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				(SQLLEN *)NULL);
+				NULL);
 	}
 
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1119,6 +1127,7 @@ bool informixcursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -1129,7 +1138,8 @@ bool informixcursor::outputBind(const char *variable,
 				0,
 				value,
 				valuesize,
-				(SQLLEN *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1147,6 +1157,7 @@ bool informixcursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outisnullptr[pos-1]=isnull;
 
 	*value=0;
 
@@ -1159,7 +1170,8 @@ bool informixcursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(int64_t),
-				(SQLLEN *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1179,6 +1191,7 @@ bool informixcursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outisnullptr[pos-1]=isnull;
 
 	*value=0.0;
 
@@ -1191,7 +1204,8 @@ bool informixcursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(double),
-				(SQLLEN *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1230,6 +1244,7 @@ bool informixcursor::outputBind(const char *variable,
 	*isnegative=false;
 	db->buffer=buffer;
 	outdatebind[pos-1]=db;
+	outisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -1240,7 +1255,8 @@ bool informixcursor::outputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				(SQLLEN *)isnull);
+				&(outisnull[pos-1])
+				);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1464,7 +1480,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 		affectedrows=0;
 	}
 
-	// convert date output binds
+	// convert date output binds and copy out isnulls
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
@@ -1478,6 +1494,9 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			*(db->second)=ts->second;
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
+		}
+		if (outisnullptr[i]) {
+			*(outisnullptr[i])=outisnull[i];
 		}
 	}
 	
@@ -1825,6 +1844,8 @@ void informixcursor::closeResultSet() {
 		delete outlobbind[i];
 		outlobbind[i]=NULL;
 		outlobbindlen[i]=0;
+		outisnullptr[i]=NULL;
+		outisnull[i]=0;
 	}
 
 	if (!conn->cont->getMaxColumnCount()) {
