@@ -70,10 +70,9 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 				~odbccursor();
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
-		bool		open();
-		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		bool		allocateStatementHandle();
 		void		initializeColCounts();
 		void		initializeRowCounts();
 		bool		inputBind(const char *variable, 
@@ -604,6 +603,11 @@ bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -625,6 +629,11 @@ bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -645,6 +654,11 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 					const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -753,6 +767,11 @@ bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -774,6 +793,11 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 					const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -871,6 +895,11 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -962,6 +991,11 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -1070,6 +1104,11 @@ bool odbcconnection::getProcedureBindAndColumnList(
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -1170,6 +1209,11 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 					const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -1287,6 +1331,11 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -1524,42 +1573,15 @@ void odbccursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool odbccursor::open() {
-
-	if (!stmt) {
-
-		// allocate the cursor-
-		#if (ODBCVER >= 0x0300)
-		erg=SQLAllocHandle(SQL_HANDLE_STMT,odbcconn->dbc,&stmt);
-		#else
-		erg=SQLAllocStmt(odbcconn->dbc,&stmt);
-		#endif
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool odbccursor::close() {
-
-	if (stmt) {
-		#if (ODBCVER >= 0x0300)
-		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
-		#else
-		SQLFreeStmt(stmt,SQL_DROP);
-		#endif
-		stmt=NULL;
-	}
-
-	return true;
-}
-
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize column count
 	initializeColCounts();
+
+	// allocate the statement handle
+	if (!allocateStatementHandle()) {
+		return false;
+	}
 
 	// prepare the query...
 
@@ -1584,6 +1606,25 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	return true;
+}
+
+bool odbccursor::allocateStatementHandle() {
+
+	if (stmt) {
+		#if (ODBCVER >= 0x0300)
+		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
+		#else
+		SQLFreeStmt(stmt,SQL_DROP);
+		#endif
+	}
+
+	#if (ODBCVER >= 0x0300)
+	erg=SQLAllocHandle(SQL_HANDLE_STMT,odbcconn->dbc,&stmt);
+	#else
+	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
+	#endif
+
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::inputBind(const char *variable,
