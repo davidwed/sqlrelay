@@ -188,10 +188,10 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		int16_t		**outisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
 		SQLLEN		*outisnull;
-		SQLLEN		inisnull;
+		SQLLEN		sqlnulldata;
 		#else
 		SQLINTEGER	*outisnull;
-		SQLINTEGER	inisnull;
+		SQLINTEGER	sqlnulldata;
 		#endif
 
 		uint32_t	row;
@@ -1473,12 +1473,12 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	#else
 	outisnull=new SQLINTEGER[maxbindcount];
 	#endif
-	inisnull=SQL_NULL_DATA;
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
 	}
+	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 }
 
@@ -1625,8 +1625,7 @@ bool odbccursor::inputBind(const char *variable,
 				(SQLPOINTER)value,
 				#endif
 				valuesize,
-				&inisnull
-				);
+				&sqlnulldata);
 	} else {
 		erg=SQLBindParameter(stmt,
 				pos,
@@ -1645,8 +1644,7 @@ bool odbccursor::inputBind(const char *variable,
 				(SQLPOINTER)value,
 				#endif
 				valuesize,
-				NULL
-				);
+				NULL);
 	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -1672,8 +1670,7 @@ bool odbccursor::inputBind(const char *variable,
 				0,
 				value,
 				sizeof(int64_t),
-				NULL
-				);
+				NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1700,8 +1697,7 @@ bool odbccursor::inputBind(const char *variable,
 				scale,
 				value,
 				sizeof(double),
-				NULL
-				);
+				NULL);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1747,8 +1743,7 @@ bool odbccursor::inputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				NULL
-				);
+				NULL);
 	} else {
 
 		SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
@@ -1781,8 +1776,7 @@ bool odbccursor::inputBind(const char *variable,
 				9,
 				buffer,
 				0,
-				NULL
-				);
+				NULL);
 	}
 
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1814,8 +1808,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(outisnull[pos-1])
-				);
+				&(outisnull[pos-1]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1846,8 +1839,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(int64_t),
-				&(outisnull[pos-1])
-				);
+				&(outisnull[pos-1]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1880,8 +1872,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				value,
 				sizeof(double),
-				&(outisnull[pos-1])
-				);
+				&(outisnull[pos-1]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -1931,8 +1922,7 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				buffer,
 				0,
-				&(outisnull[pos-1])
-				);
+				&(outisnull[pos-1]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
