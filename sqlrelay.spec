@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: rudiments-devel >= 1.0.4, systemd
+BuildRequires: rudiments-devel >= 1.0.5, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -88,7 +88,7 @@ The SQL Relay C client library.
 %package c++-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C++ client library
-Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.3
+Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.5
 
 %description c++-devel
 Development files for the SQL Relay C++ client library.
@@ -846,7 +846,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Feb 17 2017 David Muse <david.muse@firstworks.com> - 1.0.1-1
+* Fri Sep 22 2017 David Muse <david.muse@firstworks.com> - 1.2.0-1
+- Updated required version of rudiments-devel to 1.0.5.
+
+* Fri Feb 17 2017 David Muse <david.muse@firstworks.com> - 1.1.0-1
 - Added fedora dist-tag conditionals.
 - Created sqlrelay-cachemanager subpackage.
 - Created sqlrelay-common and sqlrelay-common-devel subpackages.
