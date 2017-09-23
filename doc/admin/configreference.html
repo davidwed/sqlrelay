@@ -390,7 +390,7 @@ or a tnsnames-style expression such as:
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 
-<br/><a name="odbc"/><p>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;identity=ID;mars=yes/no"</p>
+<br/><a name="odbc"/><p>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no"</p>
 
 <ul>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -399,6 +399,8 @@ or a tnsnames-style expression such as:
   <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
   <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
   <li><b>odbcversion</b>: Tells the driver to exhibit behavior from the specified version of ODBC.  Valid values include: 2, 3, and 3.8.  Defaults to 3.  It may be necessary to set this to 2 for some drivers that only support ODBC 2.</li>
+  <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+  <li><b>maxitembuffersize</b>: The maximum size of a field.  Fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
   <li><b>mars</b>: Whether to enable MS SQL Server MARS (Multiple Active Result Sets).  Set to yes to enable MARS with MS SQL Server.  Omit or set to no to disable MARS.  Omit when using an ODBC driver for a database other than MS SQL Server.  Optional, defaults to no.</li>
 </ul>
