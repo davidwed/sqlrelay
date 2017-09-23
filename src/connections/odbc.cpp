@@ -26,10 +26,6 @@
 	#include <iodbcinst.h>
 #endif
 
-#define FETCH_AT_ONCE		10
-#define MAX_COLUMN_COUNT	384
-#define MAX_FIELD_LENGTH	32768
-
 struct odbccolumn {
 	char		name[4096];
 	uint16_t	namelength;
@@ -72,9 +68,12 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 				odbccursor(sqlrserverconnection *conn,
 							uint16_t id);
 				~odbccursor();
+		void		allocateResultSetBuffers(int32_t columncount);
+		void		deallocateResultSetBuffers();
+		bool		open();
+		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-		bool		allocateStatementHandle();
 		void		initializeColCounts();
 		void		initializeRowCounts();
 		bool		inputBind(const char *variable, 
@@ -163,7 +162,6 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		nextRow();
 		void		closeResultSet();
 
 
@@ -176,30 +174,14 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		SQLINTEGER 	affectedrows;
 		#endif
 
-// this code is here in case unixodbc ever 
-// successfully supports array fetches
-
-/*#ifdef HAVE_UNIXODBC
-		char		field[MAX_COLUMN_COUNT]
-					[FETCH_AT_ONCE]
-					[MAX_FIELD_LENGTH];
+		int32_t		columncount;
+		char		**field;
 		#ifdef SQLBINDCOL_SQLLEN
-		SQLLEN		indicator[MAX_COLUMN_COUNT]
-						[FETCH_AT_ONCE];
+		SQLLEN		*indicator;
 		#else
-		SQLINTEGER	indicator[MAX_COLUMN_COUNT]
-						[FETCH_AT_ONCE];
+		SQLINTEGER	*indicator;
 		#endif
-#else*/
-		char		field[MAX_COLUMN_COUNT]
-					[MAX_FIELD_LENGTH];
-		#ifdef SQLBINDCOL_SQLLEN
-		SQLLEN		indicator[MAX_COLUMN_COUNT];
-		#else
-		SQLINTEGER	indicator[MAX_COLUMN_COUNT];
-		#endif
-//#endif
-		odbccolumn 	col[MAX_COLUMN_COUNT];
+		odbccolumn 	*col;
 
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
@@ -233,7 +215,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
-#if (ODBCVER>=0x0300)
+		#if (ODBCVER>=0x0300)
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		supportsAutoCommit();
@@ -244,7 +226,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
-#endif
+		#endif
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
@@ -297,9 +279,9 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 
 		char		dbversion[512];
 
-#if (ODBCVER>=0x0300)
+		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
-#endif
+		#endif
 };
 
 #ifdef HAVE_SQLCONNECTW
@@ -346,11 +328,11 @@ char *conv_to_user_coding(char *inbuf) {
 
 	char	*inptr=inbuf;
 		
-#ifdef ICONV_CONST_CHAR
+	#ifdef ICONV_CONST_CHAR
 	size_t	nconv=iconv(cd,(const char **)&inptr,&insize,&wrptr,&avail);
-#else
+	#else
 	size_t	nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
-#endif
+	#endif
 	if (nconv==(size_t)-1) {
 		stdoutput.printf("conv_to_user_coding: error in iconv\n");
 	}		
@@ -387,11 +369,11 @@ char *conv_to_ucs(char *inbuf) {
 
 	char *inptr = inbuf;
 		
-#ifdef ICONV_CONST_CHAR
+	#ifdef ICONV_CONST_CHAR
 	size_t nconv=iconv(cd,(const char **)&inptr,&insize,&wrptr,&avail);
-#else
+	#else
 	size_t nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
-#endif
+	#endif
 	if (nconv == (size_t) -1) {
 		stdoutput.printf("conv_to_ucs: error in iconv\n");
 	}
@@ -440,10 +422,6 @@ void odbcconnection::handleConnectString() {
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
-
-	// this module doesn't support dynamic max-column-count/max-field-length
-	cont->setMaxColumnCount(MAX_COLUMN_COUNT);
-	cont->setMaxFieldLength(MAX_FIELD_LENGTH);
 }
 
 bool odbcconnection::logIn(const char **error, const char **warning) {
@@ -460,11 +438,11 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	if (!charstring::compare(odbcversion,"2")) {
 		erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
 					(void *)SQL_OV_ODBC2,0);
-#ifdef SQL_OV_ODBC3_80
+	#ifdef SQL_OV_ODBC3_80
 	} else if (!charstring::compare(odbcversion,"3.8")) {
 		erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
 					(void *)SQL_OV_ODBC3_80,0);
-#endif
+	#endif
 	} else {
 		erg=SQLSetEnvAttr(env,SQL_ATTR_ODBC_VERSION,
 					(void *)SQL_OV_ODBC3,0);
@@ -474,29 +452,29 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 #endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		*error="Failed to allocate environment handle";
-#if (ODBCVER >= 0x0300)
+		#if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
-#else
+		#else
 		SQLFreeEnv(env);
-#endif
+		#endif
 		return false;
 	}
 
 	// allocate connection handle
-#if (ODBCVER >= 0x0300)
+	#if (ODBCVER >= 0x0300)
 	erg=SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc);
-#else
+	#else
 	erg=SQLAllocConnect(env,&dbc);
-#endif
+	#endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		*error="Failed to allocate connection handle";
-#if (ODBCVER >= 0x0300)
+		#if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
-#else
+		#else
 		SQLFreeConnect(dbc);
 		SQLFreeEnv(env);
-#endif
+		#endif
 		return false;
 	}
 
@@ -550,13 +528,13 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		*warning=logInError(NULL);
 	} else if (erg!=SQL_SUCCESS) {
 		*error=logInError("SQLConnect failed");
-#if (ODBCVER >= 0x0300)
+		#if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
-#else
+		#else
 		SQLFreeConnect(dbc);
 		SQLFreeEnv(env);
-#endif
+		#endif
 		return false;
 	}
 	return true;
@@ -591,13 +569,13 @@ void odbcconnection::deleteCursor(sqlrservercursor *curs) {
 
 void odbcconnection::logOut() {
 	SQLDisconnect(dbc);
-#if (ODBCVER >= 0x0300)
+	#if (ODBCVER >= 0x0300)
 	SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 	SQLFreeHandle(SQL_HANDLE_ENV,env);
-#else
+	#else
 	SQLFreeConnect(dbc);
 	SQLFreeEnv(env);
-#endif
+	#endif
 }
 
 bool odbcconnection::ping() {
@@ -626,11 +604,6 @@ bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
-
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -652,11 +625,6 @@ bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
-
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -677,11 +645,6 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 					const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
-
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -790,11 +753,6 @@ bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
-
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -816,11 +774,6 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 					const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
-
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -918,11 +871,6 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
-
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -1014,11 +962,6 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
-
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -1127,11 +1070,6 @@ bool odbcconnection::getProcedureBindAndColumnList(
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
-
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -1232,11 +1170,6 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 					const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
-
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -1354,11 +1287,6 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
-
-	// allocate the statement handle
-	if (!odbccur->allocateStatementHandle()) {
-		return false;
-	}
 
 	// initialize column and row counts
 	odbccur->initializeColCounts();
@@ -1551,12 +1479,81 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
 	}
+	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 }
 
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
 	delete[] outisnullptr;
 	delete[] outisnull;
+	deallocateResultSetBuffers();
+}
+
+void odbccursor::allocateResultSetBuffers(int32_t columncount) {
+
+	if (!columncount) {
+		this->columncount=0;
+		field=NULL;
+		indicator=NULL;
+		col=NULL;
+	} else {
+		this->columncount=columncount;
+		field=new char *[columncount];
+		#ifdef SQLBINDCOL_SQLLEN
+		indicator=new SQLLEN[columncount];
+		#else
+		indicator=new SQLINTEGER[columncount];
+		#endif
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		col=new odbccolumn[columncount];
+		for (int32_t i=0; i<columncount; i++) {
+			field[i]=new char[maxfieldlength];
+		}
+	}
+}
+
+void odbccursor::deallocateResultSetBuffers() {
+	if (columncount) {
+		for (int32_t i=0; i<columncount; i++) {
+			delete[] field[i];
+		}
+		delete[] col;
+		delete[] field;
+		delete[] indicator;
+		columncount=0;
+	}
+}
+
+bool odbccursor::open() {
+
+	if (!stmt) {
+
+		// allocate the cursor-
+		#if (ODBCVER >= 0x0300)
+		erg=SQLAllocHandle(SQL_HANDLE_STMT,odbcconn->dbc,&stmt);
+		#else
+		erg=SQLAllocStmt(odbcconn->dbc,&stmt);
+		#endif
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool odbccursor::close() {
+
+	if (stmt) {
+		#if (ODBCVER >= 0x0300)
+		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
+		#else
+		SQLFreeStmt(stmt,SQL_DROP);
+		#endif
+		stmt=NULL;
+	}
+
+	return true;
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
@@ -1564,26 +1561,9 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	// initialize column count
 	initializeColCounts();
 
-	// allocate the statement handle
-	if (!allocateStatementHandle()) {
-		return false;
-	}
-
-// this code is here in case unixodbc or iodbc ever 
-// successfully support array fetches
-
-/*#if (ODBCVER >= 0x0300)
-	// set the row array size
-	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)FETCH_AT_ONCE,0);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-#endif*/
-
 	// prepare the query...
 
-#ifdef HAVE_SQLCONNECTW
+	#ifdef HAVE_SQLCONNECTW
 	//free allocated buffers
 	while (nextbuf>0) {
 		nextbuf--;
@@ -1596,31 +1576,14 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	if (query_ucs) {
 		delete[] query_ucs;
 	}
-#else
+	#else
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
-#endif
+	#endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
 
 	return true;
-}
-
-bool odbccursor::allocateStatementHandle() {
-
-	if (stmt) {
-#if (ODBCVER >= 0x0300)
-		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
-#else
-		SQLFreeStmt(stmt,SQL_DROP);
-#endif
-	}
-#if (ODBCVER >= 0x0300)
-	erg=SQLAllocHandle(SQL_HANDLE_STMT,odbcconn->dbc,&stmt);
-#else
-	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
-#endif
-	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::inputBind(const char *variable,
@@ -1997,11 +1960,11 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	erg=SQLExecute(stmt);
 	if (erg!=SQL_SUCCESS &&
 			erg!=SQL_SUCCESS_WITH_INFO
-#if defined(SQL_NO_DATA)
+			#if defined(SQL_NO_DATA)
 			&& erg!=SQL_NO_DATA
-#elif defined(SQL_NO_DATA_FOUND)
+			#elif defined(SQL_NO_DATA_FOUND)
 			&& erg!=SQL_NO_DATA_FOUND
-#endif
+			#endif
 		) {
 		return false;
 	}
@@ -2058,8 +2021,12 @@ bool odbccursor::handleColumns() {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
-	if (ncols>MAX_COLUMN_COUNT) {
-		ncols=MAX_COLUMN_COUNT;
+
+	// allocate buffers and limit column count if necessary
+	if (!conn->cont->getMaxColumnCount()) {
+		allocateResultSetBuffers(ncols);
+	} else if ((uint32_t)ncols>conn->cont->getMaxColumnCount()) {
+		ncols=conn->cont->getMaxColumnCount();
 	}
 
 	// run through the columns
@@ -2212,7 +2179,7 @@ bool odbccursor::handleColumns() {
 			// binary
 
 			// autoincrement
-#ifdef SQL_DESC_AUTO_UNIQUE_VALUE
+			#ifdef SQL_DESC_AUTO_UNIQUE_VALUE
 			erg=SQLColAttributes(stmt,i+1,
 					SQL_COLUMN_AUTO_UNIQUE_VALUE,
 					NULL,0,NULL,
@@ -2220,39 +2187,40 @@ bool odbccursor::handleColumns() {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
-#else
+			#else
 			col[i].autoincrement=0;
-#endif
+			#endif
 #endif
 		}
 
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 
 		// bind the column to a buffer
-#ifdef HAVE_SQLCONNECTW
+		#ifdef HAVE_SQLCONNECTW
 		if (col[i].type==-9 || col[i].type==-8) {
 			// bind nvarchar and nchar fields as wchar
 			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-					field[i],MAX_FIELD_LENGTH,
+					field[i],maxfieldlength,
 					&indicator[i]);
 
 		} else {
 			// bind the column to a buffer
 			if (col[i].type==93 || col[i].type==91) {
 				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-						field[i],MAX_FIELD_LENGTH,
+						field[i],maxfieldlength,
 						&indicator[i]);
 			} else {
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-						field[i],MAX_FIELD_LENGTH,
+						field[i],maxfieldlength,
 						&indicator[i]);
 			}
 
 		}
-#else
+		#else
 		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-				field[i],MAX_FIELD_LENGTH,
+				field[i],maxfieldlength,
 				&indicator[i]);
-#endif
+		#endif
 		
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
@@ -2432,37 +2400,12 @@ bool odbccursor::noRowsToReturn() {
 
 bool odbccursor::fetchRow() {
 
-// this code is here in case unixodbc ever 
-// successfully supports array fetches
-
-/*#if (ODBCVER >= 0x0300)
-	if (row==FETCH_AT_ONCE) {
-		row=0;
-	}
-	if (row>0 && row==maxrow) {
-		return false;
-	}
-	if (!row) {
-		erg=SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
-		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
-				(SQLPOINTER)&rownumber,0,NULL);
-		if (rownumber==totalrows) {
-			return false;
-		}
-		maxrow=rownumber-totalrows;
-		totalrows=rownumber;
-	}
-	return true;
-#else*/
 	erg=SQLFetch(stmt);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
 	
-#ifdef HAVE_SQLCONNECTW
+	#ifdef HAVE_SQLCONNECTW
 	//convert char and varchar data to user coding from ucs-2
 	for (int i=0; i<ncols; i++) {
 		if (col[i].type==-9 || col[i].type==-8) {
@@ -2477,31 +2420,14 @@ bool odbccursor::fetchRow() {
 			}
 		}
 	}
-#endif
+	#endif
 
 	return true;
-//#endif
 }
 
 void odbccursor::getField(uint32_t col,
 				const char **fld, uint64_t *fldlength,
 				bool *blob, bool *null) {
-
-// this code is here in case unixodbc ever 
-// successfully supports array fetches
-
-/*#if (ODBCVER >= 0x0300)
-
-	// handle a null field
-	if (indicator[col][row]==SQL_NULL_DATA) {
-		*null=true;
-		return;
-	}
-
-	// handle a non-null field
-	*fld=field[col][row];
-	*fldlength=indicator[col][row];
-#else*/
 
 	// handle a null field
 	if (indicator[col]==SQL_NULL_DATA) {
@@ -2512,15 +2438,6 @@ void odbccursor::getField(uint32_t col,
 	// handle a non-null field
 	*fld=field[col];
 	*fldlength=indicator[col];
-//#endif
-}
-
-void odbccursor::nextRow() {
-
-	// this code is here in case unixodbc ever 
-	// successfully supports array fetches
-
-	//row++;
 }
 
 void odbccursor::closeResultSet() {
@@ -2531,6 +2448,10 @@ void odbccursor::closeResultSet() {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
+	}
+
+	if (!conn->cont->getMaxColumnCount()) {
+		deallocateResultSetBuffers();
 	}
 }
 
