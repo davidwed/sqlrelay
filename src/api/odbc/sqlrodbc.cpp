@@ -5339,8 +5339,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_SEARCH_PATTERN_ESCAPE:
 			debugPrintf("  infotype: "
 					"SQL_SEARCH_PATTERN_ESCAPE\n");
-			// FIXME: what about _ and ?
-			val.strval="%";
+			val.strval="\\";
 			type=0;
 			break;
 		case SQL_DATABASE_NAME:
