@@ -3985,7 +3985,10 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	if (strlen_or_ind) {
 		*strlen_or_ind=SQLR_GetCColumnTypeSize(targettype);
 		debugPrintf("  setting strlen_or_ind to %lld (type %d)\n",
-						*strlen_or_ind,targettype);
+						(int64_t)*strlen_or_ind,
+						(int32_t)targettype);
+	} else {
+		debugPrintf("  not setting strlen_or_ind (null)\n");
 	}
 
 	// get the field data
@@ -4000,6 +4003,11 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 				charstring::safeCopy((char *)targetvalue,
 							bufferlength,
 							field,fieldlength+1);
+
+				// make sure to null-terminate
+				// (even if data has to be truncated)
+				((char *)targetvalue)[bufferlength-1]='\0';
+
 				debugPrintf("  value: %s\n",
 						(char *)targetvalue);
 			}
@@ -4008,29 +4016,32 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		case SQL_C_SHORT:
 			debugPrintf("  targettype: SQL_C_(S)SHORT\n");
 			if (targetvalue) {
-				*((int16_t *)targetvalue)=
-					(int16_t)charstring::toInteger(field);
+				*((SQLSMALLINT *)targetvalue)=
+					(SQLSMALLINT)
+						charstring::toInteger(field);
 				debugPrintf("  value: %d\n",
-						*((int16_t *)targetvalue));
+						*((SQLSMALLINT *)targetvalue));
 			}
 			break;
 		case SQL_C_USHORT:
 			debugPrintf("  targettype: SQL_C_USHORT\n");
 			if (targetvalue) {
-				*((uint16_t *)targetvalue)=
-					(uint16_t)charstring::toInteger(field);
+				*((SQLUSMALLINT *)targetvalue)=
+					(SQLUSMALLINT)
+						charstring::toInteger(field);
 				debugPrintf("  value: %d\n",
-						*((uint16_t *)targetvalue));
+						*((SQLUSMALLINT *)targetvalue));
 			}
 			break;
 		case SQL_C_SLONG:
 		case SQL_C_LONG:
 			debugPrintf("  targettype: SQL_C_(S)LONG\n");
 			if (targetvalue) {
-				*((int32_t *)targetvalue)=
-					(int32_t)charstring::toInteger(field);
+				*((SQLINTEGER *)targetvalue)=
+					(SQLINTEGER)
+						charstring::toInteger(field);
 				debugPrintf("  value: %ld\n",
-						*((int32_t *)targetvalue));
+						*((SQLINTEGER *)targetvalue));
 			}
 			break;
 		//case SQL_C_BOOKMARK:
@@ -4038,28 +4049,29 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		case SQL_C_ULONG:
 			debugPrintf("  targettype: SQL_C_ULONG\n");
 			if (targetvalue) {
-				*((uint32_t *)targetvalue)=
-					(uint32_t)charstring::toInteger(field);
+				*((SQLUINTEGER *)targetvalue)=
+					(SQLUINTEGER)
+						charstring::toInteger(field);
 				debugPrintf("  value: %ld\n",
-						*((uint32_t *)targetvalue));
+						*((SQLUINTEGER *)targetvalue));
 			}
 			break;
 		case SQL_C_FLOAT:
 			debugPrintf("  targettype: SQL_C_FLOAT\n");
 			if (targetvalue) {
-				*((float *)targetvalue)=
-					(float)charstring::toFloat(field);
+				*((SQLREAL *)targetvalue)=
+					(SQLREAL)charstring::toFloat(field);
 				debugPrintf("  value: %f\n",
-						*((float *)targetvalue));
+						*((SQLREAL *)targetvalue));
 			}
 			break;
 		case SQL_C_DOUBLE:
 			debugPrintf("  targettype: SQL_C_DOUBLE\n");
 			if (targetvalue) {
-				*((double *)targetvalue)=
-					(double)charstring::toFloat(field);
+				*((SQLDOUBLE *)targetvalue)=
+					(SQLDOUBLE)charstring::toFloat(field);
 				debugPrintf("  value: %f\n",
-						*((double *)targetvalue));
+						*((SQLDOUBLE *)targetvalue));
 			}
 			break;
 		case SQL_C_BIT:
@@ -4076,37 +4088,37 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		case SQL_C_TINYINT:
 			debugPrintf("  targettype: SQL_C_(S)TINYINT\n");
 			if (targetvalue) {
-				*((char *)targetvalue)=
+				*((SQLSCHAR *)targetvalue)=
 					charstring::toInteger(field);
 				debugPrintf("  value: %c\n",
-						*((char *)targetvalue));
+						*((SQLSCHAR *)targetvalue));
 			}
 			break;
 		case SQL_C_UTINYINT:
 			debugPrintf("  targettype: SQL_C_UTINYINT\n");
 			if (targetvalue) {
-				*((unsigned char *)targetvalue)=
+				*((SQLCHAR *)targetvalue)=
 					charstring::toInteger(field);
 				debugPrintf("  value: %c\n",
-					*((unsigned char *)targetvalue));
+					*((SQLCHAR *)targetvalue));
 			}
 			break;
 		case SQL_C_SBIGINT:
 			debugPrintf("  targettype: SQL_C_SBIGINT\n");
 			if (targetvalue) {
-				*((int64_t *)targetvalue)=
+				*((SQLBIGINT *)targetvalue)=
 					charstring::toInteger(field);
 				debugPrintf("  value: %lld\n",
-						*((int64_t *)targetvalue));
+						*((SQLBIGINT *)targetvalue));
 			}
 			break;
 		case SQL_C_UBIGINT:
 			debugPrintf("  targettype: SQL_C_UBIGINT\n");
 			if (targetvalue) {
-				*((uint64_t *)targetvalue)=
+				*((SQLUBIGINT *)targetvalue)=
 					charstring::toInteger(field);
 				debugPrintf("  value: %lld\n",
-						*((uint64_t *)targetvalue));
+						*((SQLUBIGINT *)targetvalue));
 			}
 			break;
 		//case SQL_C_VARBOOKMARK:
@@ -4202,7 +4214,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	}
 
 	if (strlen_or_ind) {
-		debugPrintf("  strlen_or_ind: %d\n",*strlen_or_ind);
+		debugPrintf("  strlen_or_ind: %lld\n",(int64_t)*strlen_or_ind);
 		if (*strlen_or_ind>bufferlength) {
 			debugPrintf("  WARNING! strlen_or_ind>bufferlength\n");
 		}
@@ -9414,7 +9426,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 	bool	dataatexec=false;
 	if (strlen_or_ind) {
 
-		debugPrintf("  strlen_or_ind: %d\n",*strlen_or_ind);
+		debugPrintf("  strlen_or_ind: %lld\n",(int64_t)*strlen_or_ind);
 
 		// handle NULLs by binding a NULL string
 		if (*strlen_or_ind==SQL_NULL_DATA) {
