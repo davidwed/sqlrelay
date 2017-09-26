@@ -3971,6 +3971,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	// initialize strlen indicator
 	if (strlen_or_ind) {
 		*strlen_or_ind=SQLR_GetCColumnTypeSize(targettype);
+		debugPrintf("  setting strlen_or_ind to %lld (type %d)\n",
+						*strlen_or_ind,targettype);
 	}
 
 	// get the field data
