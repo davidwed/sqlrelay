@@ -5766,6 +5766,8 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					"SQL_ODBC_VER\n");
 			// FIXME: this should be of format ##.##.####
 			// (major.minor.release)
+			// Though, I think the driver manager always
+			// intercepts this and returns its version.
 			val.strval=conn->con->clientVersion();
 			type=0;
 			break;
