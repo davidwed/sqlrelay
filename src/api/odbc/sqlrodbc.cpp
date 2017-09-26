@@ -282,7 +282,11 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
 			if (outputhandle) {
 				ENV	*env=new ENV;
-				env->odbcversion=0;
+				#if (ODBCVER >= 0x0300)
+					env->odbcversion=SQL_OV_ODBC3;
+				#else
+					env->odbcversion=SQL_OV_ODBC2;
+				#endif
 				*outputhandle=(SQLHANDLE)env;
 				env->error=NULL;
 				SQLR_ENVClearError(env);
@@ -402,12 +406,15 @@ SQLRETURN SQL_API SQLAllocHandleStd(SQLSMALLINT handletype,
 					SQLHANDLE inputhandle,
 					SQLHANDLE *outputhandle) {
 	debugFunction();
-	if (handletype==SQL_HANDLE_ENV) {
+	SQLRETURN	retval=SQLR_SQLAllocHandle(handletype,
+							inputhandle,
+							outputhandle);
+	if (retval==SQL_SUCCESS && handletype==SQL_HANDLE_ENV) {
 		#if (ODBCVER >= 0x0300)
 		((ENV *)inputhandle)->odbcversion=SQL_OV_ODBC3;
 		#endif
 	}
-	return SQLR_SQLAllocHandle(handletype,inputhandle,outputhandle);
+	return retval;
 }
 
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
@@ -2833,21 +2840,27 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 								"is NULL\n");
 					}
 				} else {
-					// make sure to null-terminate
+
+					// make sure to incldue the
+					// null-terminator
 					charstring::safeCopy(
 						(char *)ob->parametervalue,
 						ob->bufferlength,
 						str,len+1);
+
+					// make sure to null-terminate
+					// (even if data has to be truncated)
+					((char *)ob->parametervalue)[
+						ob->bufferlength-1]='\0';
+
 					if (ob->strlen_or_ind) {
 						*(ob->strlen_or_ind)=len;
 					} else {
 						debugPrintf("  strlen_or_ind "
 								"is NULL\n");
 					}
-					debugPrintf("  value: %.*s\n",
-								len,str);
-					debugPrintf("  bufferlength: %lld\n",
-							ob->bufferlength);
+					debugPrintf("  value: \"%.*s\" (%d)\n",
+								len,str,len);
 				}
 				}
 				break;
@@ -3983,7 +3996,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 				*strlen_or_ind=fieldlength;
 			}
 			if (targetvalue) {
-				// make sure to null-terminate
+				// make sure to include the null-terminator
 				charstring::safeCopy((char *)targetvalue,
 							bufferlength,
 							field,fieldlength+1);
