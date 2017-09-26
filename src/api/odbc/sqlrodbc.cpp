@@ -5743,7 +5743,11 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_DRIVER_NAME:
 			debugPrintf("  infotype: "
 					"SQL_DRIVER_NAME\n");
-			val.strval=SQL_RELAY;
+			#ifdef _WIN32
+			val.strval="libsqlrodbc.dll";
+			#else
+			val.strval="libsqlrodbc.so";
+			#endif
 			type=0;
 			break;
 		case SQL_DRIVER_VER:
@@ -6421,14 +6425,14 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_BATCH_ROW_COUNT:
 			debugPrintf("  infotype: "
 					"SQL_BATCH_ROW_COUNT\n");
-			// batch sql is not supported
+			// FIXME: this might not be correct
 			val.uintval=0;
 			type=1;
 			break;
 		case SQL_BATCH_SUPPORT:
 			debugPrintf("  infotype: "
 					"SQL_BATCH_SUPPORT\n");
-			// batch sql is not supported
+			// FIXME: this might not be correct
 			val.uintval=0;
 			type=1;
 			break;
