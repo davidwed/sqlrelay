@@ -3990,9 +3990,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	// initialize strlen indicator
 	if (strlen_or_ind) {
 		*strlen_or_ind=SQLR_GetCColumnTypeSize(targettype);
-		debugPrintf("  strlen_or_ind address: 0x%08x\n",strlen_or_ind);
 		debugPrintf("  strlen_or_ind (from type): %lld\n",
 						(int64_t)*strlen_or_ind);
+		debugPrintf("  strlen_or_ind address: 0x%08x\n",strlen_or_ind);
 	} else {
 		debugPrintf("  NULL strlen_or_ind (not setting from type)\n");
 	}
