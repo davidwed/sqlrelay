@@ -434,24 +434,27 @@ SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 
 static SQLLEN SQLR_GetCColumnTypeSize(SQLSMALLINT targettype) {
 	switch (targettype) {
-		case SQL_C_CHAR:
 		case SQL_C_BIT:
-			return sizeof(SQLCHAR);
+			return sizeof(unsigned char);
 		case SQL_C_SHORT:
-		case SQL_C_USHORT:
 		case SQL_C_SSHORT:
 			return sizeof(SQLSMALLINT);
+		case SQL_C_USHORT:
+			return sizeof(SQLUSMALLINT);
 		case SQL_C_TINYINT:
-		case SQL_C_UTINYINT:
 		case SQL_C_STINYINT:
 			return sizeof(SQLCHAR);
+		case SQL_C_UTINYINT:
+			return sizeof(unsigned char);
 		case SQL_C_LONG:
-		case SQL_C_ULONG:
 		case SQL_C_SLONG:
 			return sizeof(SQLINTEGER);
+		case SQL_C_ULONG:
+			return sizeof(SQLUINTEGER);
 		case SQL_C_SBIGINT:
-		case SQL_C_UBIGINT:
 			return sizeof(SQLBIGINT);
+		case SQL_C_UBIGINT:
+			return sizeof(SQLUBIGINT);
 		case SQL_C_FLOAT:
 			return sizeof(SQLREAL);
 		case SQL_C_DOUBLE:
@@ -580,8 +583,6 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 				(int)columnnumber);
 	debugPrintf("  targettype  : %s\n",
 				SQLR_GetCColumnTypeName(targettype));
-	debugPrintf("  bufferlength (supplied) : %lld\n",
-				(uint64_t)bufferlength);
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
@@ -602,15 +603,16 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 	field->targetvalue=targetvalue;
 	if (bufferlength) {
 		field->bufferlength=bufferlength;
+		debugPrintf("  bufferlength (supplied) : %lld\n",
+					(uint64_t)bufferlength);
 	} else {
 		field->bufferlength=SQLR_GetCColumnTypeSize(targettype);
+		debugPrintf("  bufferlength (from type): %lld\n",
+					(uint64_t)field->bufferlength);
 	}
 	field->strlen_or_ind=strlen_or_ind;
 
 	stmt->fieldlist.setValue(columnnumber-1,field);
-	
-	debugPrintf("  bufferlength (from type): %lld\n",
-					(uint64_t)field->bufferlength);
 
 	return SQL_SUCCESS;
 }
@@ -3979,17 +3981,23 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	// reset targettype based on column type
 	if (targettype==SQL_C_DEFAULT) {
 		targettype=SQLR_MapCColumnType(stmt->cur,col);
+		debugPrintf("  targettype SQL_C_DEFAULT, "
+						"mapped to: %d (from %s)\n",
+						(int)targettype,
+						stmt->cur->getColumnType(col));
 	}
 
 	// initialize strlen indicator
 	if (strlen_or_ind) {
 		*strlen_or_ind=SQLR_GetCColumnTypeSize(targettype);
-		debugPrintf("  setting strlen_or_ind to %lld (type %d)\n",
-						(int64_t)*strlen_or_ind,
-						(int32_t)targettype);
+		debugPrintf("  strlen_or_ind address: 0x%08x\n",strlen_or_ind);
+		debugPrintf("  strlen_or_ind (from type): %lld\n",
+						(int64_t)*strlen_or_ind);
 	} else {
-		debugPrintf("  not setting strlen_or_ind (null)\n");
+		debugPrintf("  NULL strlen_or_ind (not setting from type)\n");
 	}
+
+	debugPrintf("  targetvalue address: 0x%08x\n",targetvalue);
 
 	// get the field data
 	switch (targettype) {
@@ -4214,6 +4222,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	}
 
 	if (strlen_or_ind) {
+		debugPrintf("  strlen_or_ind address: 0x%08x\n",strlen_or_ind);
 		debugPrintf("  strlen_or_ind: %lld\n",(int64_t)*strlen_or_ind);
 		if (*strlen_or_ind>bufferlength) {
 			debugPrintf("  WARNING! strlen_or_ind>bufferlength\n");
