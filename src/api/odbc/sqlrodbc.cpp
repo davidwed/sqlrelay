@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-#ifdef _WIN32
+/*#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif
+#endif*/
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -188,6 +188,8 @@ struct STMT {
 	SQLINTEGER				dataatexecstatementlength;
 	SQLUSMALLINT				putdatabind;
 	bytebuffer				putdatabuffer;
+	uint64_t				rowsetsize;
+	uint64_t				rowarraysize;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -227,6 +229,7 @@ static void SQLR_ENVSetError(ENV *env, const char *error,
 static void SQLR_ENVClearError(ENV *env) {
 	debugFunction();
 	SQLR_ENVSetError(env,NULL,0,"00000");
+	env->sqlerrorindex=0;
 }
 
 static void SQLR_CONNSetError(CONN *conn, const char *error,
@@ -248,6 +251,8 @@ static void SQLR_CONNSetError(CONN *conn, const char *error,
 static void SQLR_CONNClearError(CONN *conn) {
 	debugFunction();
 	SQLR_CONNSetError(conn,NULL,0,"00000");
+	conn->sqlerrorindex=0;
+	SQLR_ENVClearError(conn->env);
 }
 
 static void SQLR_STMTSetError(STMT *stmt, const char *error,
@@ -269,6 +274,8 @@ static void SQLR_STMTSetError(STMT *stmt, const char *error,
 static void SQLR_STMTClearError(STMT *stmt) {
 	debugFunction();
 	SQLR_STMTSetError(stmt,NULL,0,"00000");
+	stmt->sqlerrorindex=0;
+	SQLR_CONNClearError(stmt->conn);
 }
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -308,10 +315,10 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				CONN	*conn=new CONN;
 				conn->con=NULL;
 				*outputhandle=(SQLHANDLE)conn;
+				conn->env=env;
 				conn->error=NULL;
 				SQLR_CONNClearError(conn);
 				env->connlist.append(conn);
-				conn->env=env;
 				conn->attrmetadataid=false;
 			}
 			return SQL_SUCCESS;
@@ -359,6 +366,8 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->dataatexecstatementlength=0;
 				stmt->putdatabind=0;
 				stmt->putdatabuffer.clear();
+				stmt->rowsetsize=conn->resultsetbuffersize;
+				stmt->rowarraysize=conn->resultsetbuffersize;
 
 				// set flags
 				if (!charstring::compare(
@@ -368,8 +377,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 					conn->columnnamecase,"lower")) {
 					stmt->cur->lowerCaseColumnNames();
 				}
-				stmt->cur->setResultSetBufferSize(
-						conn->resultsetbuffersize);
 				stmt->cur->lazyFetch();
 				if (conn->clearbindsduringprepare) {
 					stmt->cur->
@@ -2569,6 +2576,8 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 
 	if (environmenthandle && environmenthandle!=SQL_NULL_HENV) {
 
+		debugPrintf("  handletype: SQL_HANDLE_ENV\n");
+
 		recnumber=&(((ENV *)environmenthandle)->sqlerrorindex);
 		if (*recnumber) {
 			retval=SQLR_SQLGetDiagRec(SQL_HANDLE_ENV,
@@ -2584,6 +2593,8 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 
 	} else if (connectionhandle && connectionhandle!=SQL_NULL_HANDLE) {
 
+		debugPrintf("  handletype: SQL_HANDLE_DBC\n");
+
 		recnumber=&(((CONN *)connectionhandle)->sqlerrorindex);
 		if (*recnumber) {
 			retval=SQLR_SQLGetDiagRec(SQL_HANDLE_DBC,
@@ -2598,6 +2609,8 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 		return retval;
 
 	} else if (statementhandle && statementhandle!=SQL_NULL_HSTMT) {
+
+		debugPrintf("  handletype: SQL_HANDLE_STMT\n");
 
 		recnumber=&(((STMT *)statementhandle)->sqlerrorindex);
 		if (*recnumber) {
@@ -3291,13 +3304,19 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind);
 
-static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
-						SQLUSMALLINT *rgfrowstatus) {
+static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
+					SQLULEN *pcrow,
+					SQLUSMALLINT *rgfrowstatus,
+					uint64_t rowstofetch) {
 	debugFunction();
 
 	// no need to validate stmt, the various functions that call
 	// SQLR_Fetch have already validated it
 	STMT	*stmt=(STMT *)statementhandle;
+
+	// set the result set buffer size
+	// (it's safe to set this here because we always lazy-fetch)
+	stmt->cur->setResultSetBufferSize(rowstofetch);
 
 	// fetch the row(s)
 	debugPrintf("  currentfetchrow: %lld\n",stmt->currentfetchrow);
@@ -3306,12 +3325,8 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 					SQL_SUCCESS:SQL_NO_DATA_FOUND;
 
 	// Determine the number of rows that were actually fetched.
-	uint64_t	rowstofetch=stmt->cur->getResultSetBufferSize();
 	uint64_t	rowsfetched=0;
 	if (fetchresult==SQL_NO_DATA_FOUND) {
-		if (!rowstofetch) {
-			rowstofetch=1;
-		}
 		stmt->nodata=true;
 	} else {
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
@@ -3440,7 +3455,8 @@ SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
 
 	return SQLR_Fetch(statementhandle,
 				stmt->rowsfetchedptr,
-				stmt->rowstatusptr);
+				stmt->rowstatusptr,
+				stmt->rowarraysize);
 }
 
 SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
@@ -3463,7 +3479,8 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 
 	return SQLR_Fetch(statementhandle,
 				stmt->rowsfetchedptr,
-				stmt->rowstatusptr);
+				stmt->rowstatusptr,
+				stmt->rowarraysize);
 }
 
 static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle);
@@ -3969,6 +3986,19 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	debugPrintf("  field      : %.*s\n",fieldlength,field);
 	debugPrintf("  fieldlength: %d\n",fieldlength);
 
+	// ADO often passes in a targetvalue which overlaps the strlen_or_ind.
+	// (usually by 2 bytes, as if strlen_or_ind should only be 2 bytes long)
+	// Also, notably, in these cases, targetvalue isn't aligned to a
+	// 4-byte boundary.
+	// Not sure what to do, other than ignore one or the other.
+	if (targetvalue>=strlen_or_ind &&
+		targetvalue<(((unsigned char *)strlen_or_ind)+
+					sizeof(strlen_or_ind))) {
+		debugPrintf("  WARNING! targetvalue overlaps strlen_or_ind\n");
+		targetvalue=NULL;
+		//strlen_or_ind=NULL;
+	}
+
 	// handle NULL fields
 	if (!field) {
 		if (strlen_or_ind) {
@@ -3992,12 +4022,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		*strlen_or_ind=SQLR_GetCColumnTypeSize(targettype);
 		debugPrintf("  strlen_or_ind (from type): %lld\n",
 						(int64_t)*strlen_or_ind);
-		debugPrintf("  strlen_or_ind address: 0x%08x\n",strlen_or_ind);
 	} else {
 		debugPrintf("  NULL strlen_or_ind (not setting from type)\n");
 	}
-
-	debugPrintf("  targetvalue address: 0x%08x\n",targetvalue);
 
 	// get the field data
 	switch (targettype) {
@@ -4098,7 +4125,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLSCHAR *)targetvalue)=
 					charstring::toInteger(field);
-				debugPrintf("  value: %c\n",
+				debugPrintf("  value: %d\n",
 						*((SQLSCHAR *)targetvalue));
 			}
 			break;
@@ -4107,7 +4134,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLCHAR *)targetvalue)=
 					charstring::toInteger(field);
-				debugPrintf("  value: %c\n",
+				debugPrintf("  value: %d\n",
 					*((SQLCHAR *)targetvalue));
 			}
 			break;
@@ -4222,7 +4249,6 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	}
 
 	if (strlen_or_ind) {
-		debugPrintf("  strlen_or_ind address: 0x%08x\n",strlen_or_ind);
 		debugPrintf("  strlen_or_ind: %lld\n",(int64_t)*strlen_or_ind);
 		if (*strlen_or_ind>bufferlength) {
 			debugPrintf("  WARNING! strlen_or_ind>bufferlength\n");
@@ -7201,7 +7227,7 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		case SQL_ROWSET_SIZE:
 			debugPrintf("  attribute: "
 					"SQL_ROWSET_SIZE\n");
-			val.ulenval=stmt->cur->getResultSetBufferSize();
+			val.ulenval=stmt->rowsetsize;
 			type=2;
 			break;
 		//case SQL_ATTR_SIMULATE_CURSOR:
@@ -7308,7 +7334,7 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		case SQL_ATTR_ROW_ARRAY_SIZE:
 			debugPrintf("  attribute: "
 					"SQL_ATTR_ROW_ARRAY_SIZE\n");
-			val.ulenval=stmt->cur->getResultSetBufferSize();
+			val.ulenval=stmt->rowarraysize;
 			type=2;
 			break;
 		#endif
@@ -8268,7 +8294,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			if (!val) {
 				val=1;
 			}
-			stmt->cur->setResultSetBufferSize(val);
+			stmt->rowsetsize=val;
 			return SQL_SUCCESS;
 			}
 		//case SQL_ATTR_SIMULATE_CURSOR:
@@ -8379,7 +8405,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			if (!val) {
 				val=1;
 			}
-			stmt->cur->setResultSetBufferSize(val);
+			stmt->rowarraysize=val;
 			return SQL_SUCCESS;
 			}
 		#endif
@@ -8866,7 +8892,10 @@ SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQLR_Fetch(statementhandle,pcrow,rgfrowstatus);
+	return SQLR_Fetch(statementhandle,
+				pcrow,
+				rgfrowstatus,
+				stmt->rowsetsize);
 }
 #else
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
@@ -8882,7 +8911,15 @@ SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQLR_Fetch(statementhandle,(SQLULEN *)pcrow,rgfrowstatus);
+	SQLULEN	localpcrow=0;
+	SQLRETURN	retval=SQLR_Fetch(statementhandle,
+						&localpcrow,
+						rgfrowstatus,
+						stmt->rowsetsize);
+	if (pcrow) {
+		*pcrow=localpcrow;
+	}
+	return retval;
 }
 #endif
 
