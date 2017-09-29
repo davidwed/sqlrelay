@@ -13,7 +13,7 @@ include ../../config.mk
 all: mssql
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj mssql$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj mssql$(EXE) putdata$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
 mssql: mssql.cpp mssql.$(OBJ)
