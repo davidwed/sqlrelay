@@ -3740,20 +3740,6 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			type=1;
 			break;
 	#endif
-		// MS SQL Server-specific calls...
-		case 1202:
-			debugPrintf("  attribute: 1202 "
-					"(SQL_USE_PROCEDURE_FOR_PREPARE/"
-					"SQL_COPT_SS_USE_PROC_FOR_PREP)\n");
-			val.uintval=conn->useprocforprepare;
-			type=1;
-			break;
-		case 1217:
-			debugPrintf("  attribute: 1217 "
-					"(SQL_COPT_SS_USE_QUOTED_IDENT)\n");
-			val.uintval=1;
-			type=1;
-			break;
 		default:
 			debugPrintf("  invalid attribute: %d\n",attribute);
 			SQLR_CONNSetError(conn,
@@ -8072,15 +8058,6 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case 1042:
 			debugPrintf("  attribute: 1042 (password)\n");
 			// SQL Relay doesn't need to do anything with this
-			return SQL_SUCCESS;
-		case 1202:
-			debugPrintf("  attribute: 1202 "
-					"(SQL_USE_PROCEDURE_FOR_PREPARE/"
-					"SQL_COPT_SS_USE_PROC_FOR_PREP)\n")
-			debugPrintf("  value: %lld\n",(uint64_t)value);
-			// FIXME: We currently don't do anything with this
-			// but store it here and report what we stored.
-			conn->useprocforprepare=(SQLINTEGER)value;
 			return SQL_SUCCESS;
 		default:
 			debugPrintf("  invalid attribute: %d\n",attribute);
