@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-/*#ifdef _WIN32
+#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif*/
+#endif
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -126,6 +126,7 @@ struct CONN {
 	bool				clearbindsduringprepare;
 
 	bool				attrmetadataid;
+	SQLINTEGER			useprocforprepare;
 	SQLSMALLINT			sqlerrorindex;
 };
 
@@ -320,6 +321,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				SQLR_CONNClearError(conn);
 				env->connlist.append(conn);
 				conn->attrmetadataid=false;
+				conn->useprocforprepare=1;
 			}
 			return SQL_SUCCESS;
 			}
@@ -1312,6 +1314,42 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 	if (!charstring::compare(ctype,"BOOLEAN")) {
 		return SQL_CHAR;
 	}
+	// also added by mysql
+	if (!charstring::compare(ctype,"TINYTEXT")) {
+		return SQL_LONGVARCHAR;
+	}
+	if (!charstring::compare(ctype,"MEDIUMTEXT")) {
+		return SQL_LONGVARCHAR;
+	}
+	if (!charstring::compare(ctype,"LONGTEXT")) {
+		return SQL_LONGVARCHAR;
+	}
+	if (!charstring::compare(ctype,"JSON")) {
+		return SQL_LONGVARCHAR;
+	}
+	if (!charstring::compare(ctype,"GEOMETRY")) {
+		return SQL_BINARY;
+	}
+	// also added by oracle
+	if (!charstring::compare(ctype,"SDO_GEOMETRY")) {
+		return SQL_BINARY;
+	}
+	// added by mssql
+	if (!charstring::compare(ctype,"NCHAR")) {
+		return SQL_WCHAR;
+	}
+	if (!charstring::compare(ctype,"NVARCHAR")) {
+		return SQL_WVARCHAR;
+	}
+	if (!charstring::compare(ctype,"NTEXT")) {
+		return SQL_WLONGVARCHAR;
+	}
+	if (!charstring::compare(ctype,"XML")) {
+		return SQL_LONGVARCHAR;
+	}
+	if (!charstring::compare(ctype,"DATETIMEOFFSET")) {
+		return SQL_TIMESTAMP;
+	}
 	return SQL_CHAR;
 }
 
@@ -1388,6 +1426,9 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 		case SQL_BINARY:
 		case SQL_VARBINARY:
 		case SQL_LONGVARBINARY:
+		case SQL_WCHAR:
+		case SQL_WVARCHAR:
+		case SQL_WLONGVARCHAR:
 			{
 			// FIXME: this really ought to be sorted out in the
 			// connection code, rather than here.
@@ -1437,7 +1478,7 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 		case SQL_GUID:
 			return 36;
 	}
-	return SQL_C_CHAR;
+	return 0;
 }
 
 static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
@@ -3699,6 +3740,20 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			type=1;
 			break;
 	#endif
+		// MS SQL Server-specific calls...
+		case 1202:
+			debugPrintf("  attribute: 1202 "
+					"(SQL_USE_PROCEDURE_FOR_PREPARE/"
+					"SQL_COPT_SS_USE_PROC_FOR_PREP)\n");
+			val.uintval=conn->useprocforprepare;
+			type=1;
+			break;
+		case 1217:
+			debugPrintf("  attribute: 1217 "
+					"(SQL_COPT_SS_USE_QUOTED_IDENT)\n");
+			val.uintval=1;
+			type=1;
+			break;
 		default:
 			debugPrintf("  invalid attribute: %d\n",attribute);
 			SQLR_CONNSetError(conn,
@@ -4029,7 +4084,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	// get the field data
 	switch (targettype) {
 		case SQL_C_CHAR:
-			debugPrintf("  targettype: SQL_C_CHAR\n");
+		case SQL_C_WCHAR:
+			debugPrintf("  targettype: SQL_C_(W)CHAR\n");
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
 			}
@@ -6211,7 +6267,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// a value in keeping with what was set by a call to
 			// SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION).  I can't find
 			// any docs that say that is should though.
-			if (conn->env->odbcversion==SQL_OV_ODBC2) {
+			/*if (conn->env->odbcversion==SQL_OV_ODBC2) {
 				val.strval="02.00";
 			#if (ODBCVER >= 0x0300)
 			} else if (conn->env->odbcversion==SQL_OV_ODBC3) {
@@ -6221,7 +6277,15 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 				//val.strval="03.80";
 				val.strval="03.00";
 			}
-			#endif
+			#endif*/
+// TESTING
+#if (ODBCVER == 0x0380)
+	val.strval="03.80";
+#elif (ODBCVER >= 0x0300)
+	val.strval="03.00";
+#else
+	val.strval="02.00";
+#endif
 			type=0;
 			break;
 		case SQL_LOCK_TYPES:
@@ -7195,7 +7259,7 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		//case SQL_ATTR_ROW_BIND_TYPE:
 		case SQL_BIND_TYPE:
 			debugPrintf("  attribute: "
-					"SQL_ATTR_BIND_TYPE/"
+					"SQL_ATTR_ROW_BIND_TYPE/"
 					"SQL_BIND_TYPE\n");
 			val.ulenval=stmt->rowbindtype;
 			type=2;
@@ -7999,6 +8063,8 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 			conn->attrmetadataid=(val==SQL_TRUE);
 			return SQL_SUCCESS;
 		}
+	#endif
+		// MS SQL Server-specific calls...
 		case 1041:
 			debugPrintf("  attribute: 1041 (license file)\n");
 			// SQL Relay doesn't need to do anything with this
@@ -8007,7 +8073,15 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 			debugPrintf("  attribute: 1042 (password)\n");
 			// SQL Relay doesn't need to do anything with this
 			return SQL_SUCCESS;
-	#endif
+		case 1202:
+			debugPrintf("  attribute: 1202 "
+					"(SQL_USE_PROCEDURE_FOR_PREPARE/"
+					"SQL_COPT_SS_USE_PROC_FOR_PREP)\n")
+			debugPrintf("  value: %lld\n",(uint64_t)value);
+			// FIXME: We currently don't do anything with this
+			// but store it here and report what we stored.
+			conn->useprocforprepare=(SQLINTEGER)value;
+			return SQL_SUCCESS;
 		default:
 			debugPrintf("  invalid attribute: %d\n",attribute);
 			SQLR_CONNSetError(conn,

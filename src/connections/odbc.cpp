@@ -1668,6 +1668,16 @@ bool odbccursor::inputBind(const char *variable,
 				valuesize,
 				&sqlnulldata);
 	} else {
+
+		// In ODBC-2 mode, SQL Server Native Client 11.0 (at least)
+		// allows a valuesize of 0, when the value is "".
+		// In non-ODBC-2 mode, it throws: "Invalid precision value"
+		// Using a valuesize of 1 works with all ODBC-modes.
+		// Hopefully it works with all drivers.
+		if (!valuesize) {
+			valuesize=1;
+		}
+
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
