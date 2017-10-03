@@ -1937,8 +1937,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("	headers on|off		- ");
 	stdoutput.printf("toggles column descriptions before result set\n");
 	stdoutput.printf("	divider on|off		- ");
-	stdoutput.printf("toggles the divider between the column descriptions "
-			"and the result set\n");
+	stdoutput.printf("toggles the divider before the result set\n");
 	stdoutput.printf("	stats on|off		- ");
 	stdoutput.printf("toggles statistics after result set\n");
 	stdoutput.printf("	format plain|csv	- ");
