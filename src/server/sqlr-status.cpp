@@ -50,7 +50,6 @@ static void helpmessage(const char *progname) {
 }
 
 int main(int argc, const char **argv) {
-stdoutput.printf("sizeof(sqlrshm)=%d\n",sizeof(struct sqlrshm));
 
 	version(argc,argv);
 	help(argc,argv);
