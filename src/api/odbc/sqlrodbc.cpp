@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-#ifdef _WIN32
+/*#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif
+#endif*/
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -126,7 +126,6 @@ struct CONN {
 	bool				clearbindsduringprepare;
 
 	bool				attrmetadataid;
-	SQLINTEGER			useprocforprepare;
 	SQLSMALLINT			sqlerrorindex;
 };
 
@@ -321,7 +320,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				SQLR_CONNClearError(conn);
 				env->connlist.append(conn);
 				conn->attrmetadataid=false;
-				conn->useprocforprepare=1;
 			}
 			return SQL_SUCCESS;
 			}
@@ -6249,29 +6247,35 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_DRIVER_ODBC_VER:
 			debugPrintf("  infotype: "
 					"SQL_DRIVER_ODBC_VER\n");
-			// Apparently some apps (Delphi) expect this to return
-			// a value in keeping with what was set by a call to
-			// SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION).  I can't find
-			// any docs that say that is should though.
-			/*if (conn->env->odbcversion==SQL_OV_ODBC2) {
-				val.strval="02.00";
-			#if (ODBCVER >= 0x0300)
-			} else if (conn->env->odbcversion==SQL_OV_ODBC3) {
-				val.strval="03.00";
+			if (true) {
+				// Apparently some apps (Delphi) expect this to
+				// return a value in keeping with what was set
+				// by a call to
+				// SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION).  I
+				// can't find any docs that say that is should
+				// though.
+				if (conn->env->odbcversion==
+							SQL_OV_ODBC2) {
+					val.strval="02.00";
+				#if (ODBCVER >= 0x0300)
+				} else if (conn->env->odbcversion==
+							SQL_OV_ODBC3) {
+					val.strval="03.00";
+				} else {
+					// FIXME: not sure why we're doing this
+					//val.strval="03.80";
+					val.strval="03.00";
+				}
+				#endif
 			} else {
-				// FIXME: not sure why we're doing this
-				//val.strval="03.80";
-				val.strval="03.00";
+				#if (ODBCVER == 0x0380)
+					val.strval="03.80";
+				#elif (ODBCVER >= 0x0300)
+					val.strval="03.00";
+				#else
+					val.strval="02.00";
+				#endif
 			}
-			#endif*/
-// TESTING
-#if (ODBCVER == 0x0380)
-	val.strval="03.80";
-#elif (ODBCVER >= 0x0300)
-	val.strval="03.00";
-#else
-	val.strval="02.00";
-#endif
 			type=0;
 			break;
 		case SQL_LOCK_TYPES:
