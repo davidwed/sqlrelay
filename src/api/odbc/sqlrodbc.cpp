@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-/*#ifdef _WIN32
+#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif*/
+#endif
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -6247,7 +6247,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_DRIVER_ODBC_VER:
 			debugPrintf("  infotype: "
 					"SQL_DRIVER_ODBC_VER\n");
-			if (true) {
+			if (false) {
 				// Apparently some apps (Delphi) expect this to
 				// return a value in keeping with what was set
 				// by a call to
