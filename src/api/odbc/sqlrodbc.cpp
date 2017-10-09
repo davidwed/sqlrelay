@@ -6247,35 +6247,13 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 		case SQL_DRIVER_ODBC_VER:
 			debugPrintf("  infotype: "
 					"SQL_DRIVER_ODBC_VER\n");
-			if (false) {
-				// Apparently some apps (Delphi) expect this to
-				// return a value in keeping with what was set
-				// by a call to
-				// SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION).  I
-				// can't find any docs that say that is should
-				// though.
-				if (conn->env->odbcversion==
-							SQL_OV_ODBC2) {
-					val.strval="02.00";
-				#if (ODBCVER >= 0x0300)
-				} else if (conn->env->odbcversion==
-							SQL_OV_ODBC3) {
-					val.strval="03.00";
-				} else {
-					// FIXME: not sure why we're doing this
-					//val.strval="03.80";
-					val.strval="03.00";
-				}
-				#endif
-			} else {
-				#if (ODBCVER == 0x0380)
-					val.strval="03.80";
-				#elif (ODBCVER >= 0x0300)
-					val.strval="03.00";
-				#else
-					val.strval="02.00";
-				#endif
-			}
+			#if (ODBCVER == 0x0380)
+				val.strval="03.80";
+			#elif (ODBCVER >= 0x0300)
+				val.strval="03.00";
+			#else
+				val.strval="02.00";
+			#endif
 			type=0;
 			break;
 		case SQL_LOCK_TYPES:
@@ -7503,6 +7481,34 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 	}
 
 	debugPrintf("  type: %d\n",type);
+
+	// remap date/time types to the appropriate odbc2/3 type
+	if (stmt->conn->env->odbcversion==SQL_OV_ODBC2) {
+		switch (type) {
+			case SQL_TYPE_DATE:
+				type=SQL_DATE;
+				break;
+			case SQL_TYPE_TIME:
+				type=SQL_TIME;
+				break;
+			case SQL_TYPE_TIMESTAMP:
+				type=SQL_TIMESTAMP;
+				break;
+		}
+	} else {
+		switch (type) {
+			case SQL_DATE:
+				type=SQL_TYPE_DATE;
+				break;
+			case SQL_TIME:
+				type=SQL_TYPE_TIME;
+				break;
+			case SQL_TIMESTAMP:
+				type=SQL_TYPE_TIMESTAMP;
+				break;
+		}
+	}
+	debugPrintf("  remapped type: %d\n",type);
 
 	// reinit row indices
 	stmt->currentfetchrow=0;

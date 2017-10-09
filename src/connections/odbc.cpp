@@ -1319,6 +1319,34 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 		typenumber=SQL_ALL_TYPES;
 	}
 
+	// remap date/time types to the appropriate odbc2/3 type,
+	// just in case the client isn't well-behaved
+	if (!charstring::compare(odbcversion,"2")) {
+		switch (typenumber) {
+			case SQL_TYPE_DATE:
+				typenumber=SQL_DATE;
+				break;
+			case SQL_TYPE_TIME:
+				typenumber=SQL_TIME;
+				break;
+			case SQL_TYPE_TIMESTAMP:
+				typenumber=SQL_TIMESTAMP;
+				break;
+		}
+	} else {
+		switch (typenumber) {
+			case SQL_DATE:
+				typenumber=SQL_TYPE_DATE;
+				break;
+			case SQL_TIME:
+				typenumber=SQL_TYPE_TIME;
+				break;
+			case SQL_TIMESTAMP:
+				typenumber=SQL_TYPE_TIMESTAMP;
+				break;
+		}
+	}
+
 	// get the type list
 	erg=SQLGetTypeInfo(odbccur->stmt,typenumber);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
