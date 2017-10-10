@@ -30,6 +30,12 @@ tds.lo: tds.cpp
 tds.obj: tds.cpp
 	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(FREETDSINCLUDES) $(COMPILE) tds.cpp
 
+oracle.lo: oracle.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(ORACLEINCLUDES) $(COMPILE) $< $(OUT)$@
+
+oracle.obj: oracle.cpp
+	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(ORACLENCLUDES) $(COMPILE) tds.cpp
+
 mysql: mysql.cpp mysql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
 
@@ -42,5 +48,8 @@ postgresql: postgresql.cpp postgresql.$(OBJ)
 tds: tds.cpp tds.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tds.$(OBJ) $(FREETDSLIBS) $(DROPINTESTLIBS)
 
+oracle: oracle.cpp oracle.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(ORACLELIBS) $(DROPINTESTLIBS)
+
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE) oracle$(EXE)
