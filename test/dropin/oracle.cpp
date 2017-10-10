@@ -85,13 +85,11 @@ int	main(int argc, char **argv) {
 	// eg: ./oracle ora1
 	if (argc==2) {
 		sid=argv[1];
-		user="scott";
-		password="tiger";
 	} else {
 		sid="sqlrelay";
-		user="testuser";
-		password="testpassword";
 	}
+	user="scott";
+	password="tiger";
 
 	environment::setValue("ORACLE_SID",sid);
 	environment::setValue("TWO_TASK",sid);
@@ -173,13 +171,16 @@ int	main(int argc, char **argv) {
 
 
 	stdoutput.printf("\n================ Prepare ==============\n");
-	query="select 1 from dual";
+	query="select 'hello' as hello from dual";
 	checkSuccess(
 		OCIStmtPrepare(stmt,err,
 				(text *)query,charstring::length(query),
 				OCI_NTV_SYNTAX,
 				//OCI_V7_SYNTAX,
 				OCI_DEFAULT),
+		OCI_SUCCESS);
+	checkSuccess(
+		OCIStmtExecute(svc,stmt,err,0,0,NULL,NULL,OCI_PARSE_ONLY),
 		OCI_SUCCESS);
 	checkSuccess(
 		OCIAttrGet(stmt,OCI_HTYPE_STMT,
@@ -207,8 +208,8 @@ int	main(int argc, char **argv) {
 				&colname,&colnamelen,
 				OCI_ATTR_NAME,err),
 		OCI_SUCCESS);
-	checkSuccess((const char *)colname,"1");
-	checkSuccess(colnamelen,1);
+	checkSuccess((const char *)colname,"HELLO");
+	checkSuccess(colnamelen,5);
 	stdoutput.printf("\n\n");
 
 
@@ -240,6 +241,6 @@ int	main(int argc, char **argv) {
 				OCI_ATTR_ROW_COUNT,err),
 		OCI_SUCCESS);
 	checkSuccess(currentrow,1);
-	checkSuccess((const char *)field,"1");
+	checkSuccess((const char *)field,"hello");
 	stdoutput.printf("\n\n");
 }
