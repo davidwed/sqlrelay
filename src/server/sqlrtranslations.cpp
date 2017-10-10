@@ -187,7 +187,9 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 	pvt->_tree=NULL;
 
-	stringbuffer	tempquerystr;
+	stringbuffer	tempquerystr1;
+	stringbuffer	tempquerystr2;
+	stringbuffer	*tempquerystr=&tempquerystr1;
 	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
@@ -231,28 +233,29 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 			}
 
 		} else {
+			tempquerystr->clear();
 
-			bool	freequery=false;
 			if (pvt->_tree) {
-				if (!sqlrp->write(&tempquerystr)) {
+				if (!sqlrp->write(tempquerystr)) {
 					return false;
 				}
 				pvt->_tree=NULL;
-				query=tempquerystr.detachString();
-				freequery=true;
+				query=tempquerystr->getString();
+
+				tempquerystr=(tempquerystr==&tempquerystr1)?
+						&tempquerystr2:&tempquerystr1;
 			}
 
 			bool	success=tr->run(sqlrcon,sqlrcur,
-						query,&tempquerystr);
-			if (freequery) {
-				delete[] query;
-			}
-
+						query,tempquerystr);
 			if (!success) {
 				return false;
 			}
 
-			query=tempquerystr.getString();
+			query=tempquerystr->getString();
+
+			tempquerystr=(tempquerystr==&tempquerystr1)?
+						&tempquerystr2:&tempquerystr1;
 		}
 	}
 
