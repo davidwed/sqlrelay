@@ -190,6 +190,7 @@ struct STMT {
 	bytebuffer				putdatabuffer;
 	uint64_t				rowsetsize;
 	uint64_t				rowarraysize;
+	uint64_t				*coloffsets;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -368,6 +369,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->putdatabuffer.clear();
 				stmt->rowsetsize=conn->resultsetbuffersize;
 				stmt->rowarraysize=conn->resultsetbuffersize;
+				stmt->coloffsets=NULL;
 
 				// set flags
 				if (!charstring::compare(
@@ -3396,6 +3398,14 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 		}
 	}
 
+	// reinit column positions
+	uint32_t	colcount=stmt->cur->colCount();
+	delete[] stmt->coloffsets;
+	stmt->coloffsets=new uint64_t[rowsfetched*colcount];
+	for (uint64_t i=0; i<rowsfetched*colcount; i++) {
+		stmt->coloffsets[i]=0;
+	}
+
 	// bail here if no data was found
 	if (fetchresult==SQL_NO_DATA_FOUND) {
 		debugPrintf("  NO DATA FOUND\n");
@@ -3410,7 +3420,6 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 	// update column binds (if we have any)
 	if (stmt->fieldlist.getList()->getLength()) {
 
-		uint32_t	colcount=stmt->cur->colCount();
 		for (uint64_t row=0; row<rowsfetched; row++) {
 
 			// set the position within the block
@@ -3577,6 +3586,7 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 			stmt->conn->stmtlist.removeAll(stmt);
 			delete stmt->improwdesc;
 			delete stmt->impparamdesc;
+			delete[] stmt->coloffsets;
 			delete stmt->cur;
 			delete stmt;
 			return SQL_SUCCESS;
@@ -4022,21 +4032,32 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					stmt->currentgetdatarow,col);
 	uint32_t	fieldlength=stmt->cur->getFieldLength(
 					stmt->currentgetdatarow,col);
-	debugPrintf("  field      : %.*s\n",fieldlength,field);
+	debugPrintf("  field: %.*s%s",
+			(fieldlength<=80)?fieldlength:80,
+			field,(fieldlength>80)?"...\n":"\n");
 	debugPrintf("  fieldlength: %d\n",fieldlength);
 
+	// get the offset
+	uint64_t	*offset=&(stmt->coloffsets[
+					(stmt->currentgetdatarow-
+					stmt->cur->firstRowIndex())*
+					stmt->cur->colCount()+col]);
+	debugPrintf("  offset: %lld\n",*offset);
+
+	// FIXME: remove this, this wasn't the problem, and the problem is
+	// solved...
 	// ADO often passes in a targetvalue which overlaps the strlen_or_ind.
 	// (usually by 2 bytes, as if strlen_or_ind should only be 2 bytes long)
 	// Also, notably, in these cases, targetvalue isn't aligned to a
 	// 4-byte boundary.
 	// Not sure what to do, other than ignore one or the other.
-	if (targetvalue>=strlen_or_ind &&
+	/*if (targetvalue>=strlen_or_ind &&
 		targetvalue<(((unsigned char *)strlen_or_ind)+
 					sizeof(strlen_or_ind))) {
 		debugPrintf("  WARNING! targetvalue overlaps strlen_or_ind\n");
 		targetvalue=NULL;
 		//strlen_or_ind=NULL;
-	}
+	}*/
 
 	// handle NULL fields
 	if (!field) {
@@ -4066,25 +4087,48 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	}
 
 	// get the field data
+	bool	trunc=false;
 	switch (targettype) {
 		case SQL_C_CHAR:
 		case SQL_C_WCHAR:
+			{
 			debugPrintf("  targettype: SQL_C_(W)CHAR\n");
+
+			// reset field and fieldlength re. offset
+			field+=*offset;
+			fieldlength-=*offset;
+
+			// calculate size to copy
+			// make sure to include the null-terminator
+			uint32_t	bytestocopy=
+					((uint32_t)bufferlength<fieldlength+1)?
+						bufferlength:fieldlength+1;
+			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
+
+			// update offset
+			*offset+=bytestocopy;
+
+			// decide if truncation occurred
+			trunc=(bytestocopy<fieldlength+1);
+
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
 			}
+
 			if (targetvalue) {
-				// make sure to include the null-terminator
-				charstring::safeCopy((char *)targetvalue,
-							bufferlength,
-							field,fieldlength+1);
+				charstring::copy((char *)targetvalue,
+							(const char *)field,
+							bytestocopy);
 
 				// make sure to null-terminate
 				// (even if data has to be truncated)
 				((char *)targetvalue)[bufferlength-1]='\0';
 
-				debugPrintf("  value: %s\n",
-						(char *)targetvalue);
+				debugPrintf("  value: %.*s%s",
+					(bytestocopy<=80)?bytestocopy:80,
+					(char *)targetvalue,
+					(bytestocopy>80)?"...\n":"\n");
+			}
 			}
 			break;
 		case SQL_C_SSHORT:
@@ -4202,17 +4246,37 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			{
 			debugPrintf("  targettype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
-			uint32_t	sizetocopy=
+
+			// reset field and fieldlength re. offset
+			field+=*offset;
+			fieldlength-=*offset;
+
+			// calculate size to copy
+			uint32_t	bytestocopy=
 					((uint32_t)bufferlength<fieldlength)?
 						bufferlength:fieldlength;
+			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
+
+			// update offset
+			*offset+=bytestocopy;
+
+			// decide if truncation occurred
+			trunc=(bytestocopy<fieldlength);
+
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
 			}
+
 			if (targetvalue) {
 				bytestring::copy((void *)targetvalue,
-					(const void *)field,sizetocopy);
+							(const void *)field,
+							bytestocopy);
 				debugPrintf("  value: ");
-				debugSafePrint((char *)targetvalue,sizetocopy);
+				debugSafePrint((char *)targetvalue,
+					(bytestocopy<=80)?bytestocopy:80);
+				if (bytestocopy>80) {
+					debugPrintf("...");
+				}
 				debugPrintf("\n");
 			}
 			}
@@ -4284,6 +4348,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			return SQL_ERROR;
 	}
 
+	debugPrintf("  offset: %lld\n",*offset);
+	debugPrintf("  trunc: %d\n",trunc);
+
 	if (!targetvalue) {
 		debugPrintf("  NULL targetvalue (not copying out value)\n");
 	}
@@ -4297,6 +4364,11 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		debugPrintf("  NULL strlen_or_ind (not copying out length)\n");
 	}
 
+	if (trunc) {
+		SQLR_STMTSetError(stmt,
+			"String data, right truncation",0,"01004");
+		return SQL_SUCCESS_WITH_INFO;
+	}
 	return SQL_SUCCESS;
 }
 
