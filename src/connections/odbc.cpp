@@ -26,6 +26,8 @@
 	#include <iodbcinst.h>
 #endif
 
+#define MAX_LOB_CHUNK_SIZE	2147483647
+
 struct odbccolumn {
 	char		name[4096];
 	uint16_t	namelength;
@@ -161,6 +163,12 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
+		bool		getLobFieldLength(uint32_t col,
+							uint64_t *length);
+		bool		getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread);
 		void		closeResultSet();
 
 
@@ -176,11 +184,14 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		int32_t		columncount;
 		char		**field;
 		#ifdef SQLBINDCOL_SQLLEN
+		SQLLEN		*loblength;
 		SQLLEN		*indicator;
 		#else
+		SQLINTEGER	*loblength;
 		SQLINTEGER	*indicator;
 		#endif
-		odbccolumn 	*col;
+		odbccolumn 	*column;
+		uint32_t	maxfieldlength;
 
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
@@ -1571,18 +1582,21 @@ void odbccursor::allocateResultSetBuffers(int32_t columncount) {
 	if (!columncount) {
 		this->columncount=0;
 		field=NULL;
+		loblength=NULL;
 		indicator=NULL;
-		col=NULL;
+		column=NULL;
 	} else {
 		this->columncount=columncount;
 		field=new char *[columncount];
 		#ifdef SQLBINDCOL_SQLLEN
+		loblength=new SQLLEN[columncount];
 		indicator=new SQLLEN[columncount];
 		#else
+		loblength=new SQLINTEGER[columncount];
 		indicator=new SQLINTEGER[columncount];
 		#endif
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-		col=new odbccolumn[columncount];
+		column=new odbccolumn[columncount];
 		for (int32_t i=0; i<columncount; i++) {
 			field[i]=new char[maxfieldlength];
 		}
@@ -1594,8 +1608,9 @@ void odbccursor::deallocateResultSetBuffers() {
 		for (int32_t i=0; i<columncount; i++) {
 			delete[] field[i];
 		}
-		delete[] col;
+		delete[] column;
 		delete[] field;
+		delete[] loblength;
 		delete[] indicator;
 		columncount=0;
 	}
@@ -2105,18 +2120,18 @@ bool odbccursor::handleColumns() {
 #if (ODBCVER >= 0x0300)
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
-					col[i].name,4096,
-					(SQLSMALLINT *)&(col[i].namelength),
+					column[i].name,4096,
+					(SQLSMALLINT *)&(column[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
-			col[i].namelength=charstring::length(col[i].name);
+			column[i].namelength=charstring::length(column[i].name);
 
 			// column length
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
 					NULL,0,NULL,
-					&(col[i].length));
+					&(column[i].length));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2124,7 +2139,7 @@ bool odbccursor::handleColumns() {
 			// column type
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TYPE,
 					NULL,0,NULL,
-					&(col[i].type));
+					&(column[i].type));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2132,7 +2147,7 @@ bool odbccursor::handleColumns() {
 			// column precision
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
 					NULL,0,NULL,
-					&(col[i].precision));
+					&(column[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2140,7 +2155,7 @@ bool odbccursor::handleColumns() {
 			// column scale
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_SCALE,
 					NULL,0,NULL,
-					&(col[i].scale));
+					&(column[i].scale));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2148,7 +2163,7 @@ bool odbccursor::handleColumns() {
 			// column nullable
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_NULLABLE,
 					NULL,0,NULL,
-					&(col[i].nullable));
+					&(column[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2162,7 +2177,7 @@ bool odbccursor::handleColumns() {
 			// unsigned number
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_UNSIGNED,
 					NULL,0,NULL,
-					&(col[i].unsignednumber));
+					&(column[i].unsignednumber));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2174,15 +2189,15 @@ bool odbccursor::handleColumns() {
 			// autoincrement
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_AUTO_UNIQUE_VALUE,
 					NULL,0,NULL,
-					&(col[i].autoincrement));
+					&(column[i].autoincrement));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 #else
 			// column name
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LABEL,
-					col[i].name,4096,
-					(SQLSMALLINT *)&(col[i].namelength),
+					column[i].name,4096,
+					(SQLSMALLINT *)&(column[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
@@ -2192,7 +2207,7 @@ bool odbccursor::handleColumns() {
 			// column length
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LENGTH,
 					NULL,0,NULL,
-					&(col[i].length));
+					&(column[i].length));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2200,7 +2215,7 @@ bool odbccursor::handleColumns() {
 			// column type
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_TYPE,
 					NULL,0,NULL,
-					&(col[i].type));
+					&(column[i].type));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2208,7 +2223,7 @@ bool odbccursor::handleColumns() {
 			// column precision
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_PRECISION,
 					NULL,0,NULL,
-					&(col[i].precision));
+					&(column[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2216,7 +2231,7 @@ bool odbccursor::handleColumns() {
 			// column scale
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_SCALE,
 					NULL,0,NULL,
-					&(col[i].scale));
+					&(column[i].scale));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2224,7 +2239,7 @@ bool odbccursor::handleColumns() {
 			// column nullable
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_NULLABLE,
 					NULL,0,NULL,
-					&(col[i].nullable));
+					&(column[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2238,7 +2253,7 @@ bool odbccursor::handleColumns() {
 			// unsigned number
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_UNSIGNED,
 					NULL,0,NULL,
-					&(col[i].unsignednumber));
+					&(column[i].unsignednumber));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -2252,12 +2267,12 @@ bool odbccursor::handleColumns() {
 			erg=SQLColAttributes(stmt,i+1,
 					SQL_COLUMN_AUTO_UNIQUE_VALUE,
 					NULL,0,NULL,
-					&(col[i].autoincrement));
+					&(column[i].autoincrement));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 			#else
-			col[i].autoincrement=0;
+			column[i].autoincrement=0;
 			#endif
 #endif
 		}
@@ -2266,7 +2281,7 @@ bool odbccursor::handleColumns() {
 
 		// bind the column to a buffer
 		#ifdef HAVE_SQLCONNECTW
-		if (col[i].type==-9 || col[i].type==-8) {
+		if (column[i].type==-9 || column[i].type==-8) {
 			// bind nvarchar and nchar fields as wchar
 			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
 					field[i],maxfieldlength,
@@ -2274,7 +2289,7 @@ bool odbccursor::handleColumns() {
 
 		} else {
 			// bind the column to a buffer
-			if (col[i].type==93 || col[i].type==91) {
+			if (column[i].type==93 || column[i].type==91) {
 				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 						field[i],maxfieldlength,
 						&indicator[i]);
@@ -2286,9 +2301,12 @@ bool odbccursor::handleColumns() {
 
 		}
 		#else
-		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-				field[i],maxfieldlength,
-				&indicator[i]);
+		if (column[i].type!=SQL_LONGVARCHAR &&
+			column[i].type!=SQL_LONGVARBINARY) {
+			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+					field[i],maxfieldlength,
+					&indicator[i]);
+		}
 		#endif
 		
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -2327,16 +2345,16 @@ uint32_t odbccursor::colCount() {
 }
 
 const char *odbccursor::getColumnName(uint32_t i) {
-	return col[i].name;
+	return column[i].name;
 }
 
 uint16_t odbccursor::getColumnNameLength(uint32_t i) {
-	return col[i].namelength;
+	return column[i].namelength;
 }
 
 uint16_t odbccursor::getColumnType(uint32_t i) {
 
-	switch (col[i].type) {
+	switch (column[i].type) {
 
 		// generic types...
 		case SQL_CHAR:
@@ -2432,23 +2450,23 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 }
 
 uint32_t odbccursor::getColumnLength(uint32_t i) {
-	return col[i].length;
+	return column[i].length;
 }
 
 uint32_t odbccursor::getColumnPrecision(uint32_t i) {
-	return col[i].precision;
+	return column[i].precision;
 }
 
 uint32_t odbccursor::getColumnScale(uint32_t i) {
-	return col[i].scale;
+	return column[i].scale;
 }
 
 uint16_t odbccursor::getColumnIsNullable(uint32_t i) {
-	return col[i].nullable;
+	return column[i].nullable;
 }
 
 uint16_t odbccursor::getColumnIsUnsigned(uint32_t i) {
-	return col[i].unsignednumber;
+	return column[i].unsignednumber;
 }
 
 uint16_t odbccursor::getColumnIsBinary(uint32_t i) {
@@ -2459,7 +2477,7 @@ uint16_t odbccursor::getColumnIsBinary(uint32_t i) {
 }
 
 uint16_t odbccursor::getColumnIsAutoIncrement(uint32_t i) {
-	return col[i].autoincrement;
+	return column[i].autoincrement;
 }
 
 bool odbccursor::noRowsToReturn() {
@@ -2477,7 +2495,7 @@ bool odbccursor::fetchRow() {
 	#ifdef HAVE_SQLCONNECTW
 	//convert char and varchar data to user coding from ucs-2
 	for (int i=0; i<ncols; i++) {
-		if (col[i].type==-9 || col[i].type==-8) {
+		if (column[i].type==-9 || column[i].type==-8) {
 			if (indicator[i]!=-1 && field[i]) {
 				char *u=conv_to_user_coding(field[i]);
 				int len=charstring::length(u);
@@ -2498,15 +2516,101 @@ void odbccursor::getField(uint32_t col,
 				const char **fld, uint64_t *fldlength,
 				bool *blob, bool *null) {
 
-	// handle a null field
+	// handle NULLs
 	if (indicator[col]==SQL_NULL_DATA) {
 		*null=true;
 		return;
 	}
 
-	// handle a non-null field
+	// handle lobs
+	if (column[col].type==SQL_LONGVARCHAR ||
+		column[col].type==SQL_LONGVARBINARY) {
+		*blob=true;
+		return;
+	}
+
+	// handle normal datatypes
 	*fld=field[col];
-	*fldlength=indicator[col];
+	uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+	*fldlength=(indicator[col]<=maxfieldlength)?
+				indicator[col]:maxfieldlength;
+}
+
+bool odbccursor::getLobFieldLength(uint32_t col, uint64_t *length) {
+
+	// get the length of the lob
+
+	// a valid buffer must be provided, but it's ok to fetch 0 bytes into it
+	SQLCHAR	buffer[1];
+	erg=SQLGetData(stmt,col+1,SQL_C_BINARY,buffer,0,&(loblength[col]));
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+
+	// copy out the length
+	*length=loblength[col];
+
+	return true;
+}
+
+bool odbccursor::getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+
+	// bail if we're attempting to start reading past the end
+	if (offset>(uint64_t)loblength[col]) {
+		return false;
+	}
+
+	// prevent attempts to read past the end
+	if (offset+charstoread>(uint64_t)loblength[col]) {
+		charstoread=charstoread-((offset+charstoread)-loblength[col]);
+	}
+
+	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
+	uint64_t	totalbytesread=0;
+	SQLLEN		bytestoread=0;
+	uint64_t	remainingbytestoread=charstoread;
+	for (;;) {
+
+		// figure out how many bytes to read this time
+		if (remainingbytestoread<MAX_LOB_CHUNK_SIZE) {
+			bytestoread=remainingbytestoread;
+		} else {
+			bytestoread=MAX_LOB_CHUNK_SIZE;
+			remainingbytestoread=remainingbytestoread-
+						MAX_LOB_CHUNK_SIZE;
+		}
+
+		// read the bytes
+		SQLLEN	ind=0;
+		erg=SQLGetData(stmt,col+1,
+				SQL_C_BINARY,
+				buffer+totalbytesread,
+				bytestoread,&ind);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+
+		// determine how many bytes were read
+		uint64_t	bytesread=
+			(ind>=bytestoread || ind==SQL_NO_TOTAL)?bytestoread:ind;
+
+		// update total bytes read
+		totalbytesread=totalbytesread+bytesread;
+
+		// bail if we're done reading
+		if ((SQLUINTEGER)bytesread<bytestoread ||
+				totalbytesread==charstoread) {
+			break;
+		}
+	}
+
+	// return number of bytes/chars read
+	*charsread=totalbytesread;
+
+	return true;
 }
 
 void odbccursor::closeResultSet() {

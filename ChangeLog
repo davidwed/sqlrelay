@@ -59,6 +59,8 @@
 	odbc connection supports dynamic maxcolumncount/maxfieldlength now
 	fixed but that caused the results of non-tree-based query translations
 		to be concatenated
+	updated odbc connection to fetch blob columns in chunks and not be
+		bound by maxitembuffersize
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
