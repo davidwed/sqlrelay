@@ -191,6 +191,7 @@ struct STMT {
 	uint64_t				rowsetsize;
 	uint64_t				rowarraysize;
 	uint64_t				*coloffsets;
+	SQLULEN					*paramsprocessed;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -370,6 +371,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->rowsetsize=conn->resultsetbuffersize;
 				stmt->rowarraysize=conn->resultsetbuffersize;
 				stmt->coloffsets=NULL;
+				stmt->paramsprocessed=NULL;
 
 				// set flags
 				if (!charstring::compare(
@@ -3318,6 +3320,13 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 
 	// handle success
 	if (result) {
+
+		// set the number of sets of input binds that were processed
+		// (always 1 because we don't support array binds)
+		if (stmt->paramsprocessed) {
+			*(stmt->paramsprocessed)=1;
+		}
+
 		SQLR_FetchOutputBinds(stmt);
 		return SQL_SUCCESS;
 	}
@@ -7411,7 +7420,8 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		case SQL_ATTR_PARAMSET_SIZE:
 			debugPrintf("  unsupported attribute: "
 					"SQL_ATTR_PARAMSET_SIZE\n");
-			// FIXME: implement
+			val.ulenval=1;
+			type=2;
 			break;
 		case SQL_ATTR_ROW_BIND_OFFSET_PTR:
 			debugPrintf("  unsupported attribute: "
@@ -8500,16 +8510,25 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAMS_PROCESSED_PTR:
+			{
+			stmt->paramsprocessed=(SQLULEN *)value;
 			debugPrintf("  attribute: "
-					"SQL_ATTR_PARAMS_PROCESSED_PTR "
-				"(unsupported but returning success)\n");
-			// FIXME: implement
+					"SQL_ATTR_PARAMS_PROCESSED_PTR: "
+					"0x%08x\n",stmt->paramsprocessed);
 			return SQL_SUCCESS;
+			}
 		case SQL_ATTR_PARAMSET_SIZE:
-			debugPrintf("  attribute: SQL_ATTR_PARAMSET_SIZE "
-				"(unsupported but returning success)\n");
-			// FIXME: implement
+			{
+			SQLULEN	val=(SQLULEN)value;
+			debugPrintf("  attribute: SQL_ATTR_PARAMSET_SIZE: "
+					"%lld\n",(uint64_t)val);
+			if (val!=1) {
+				SQLR_STMTSetError(stmt,
+					"Invalid attribute value",0,"HY024");
+				return SQL_ERROR;
+			}
 			return SQL_SUCCESS;
+			}
 		case SQL_ATTR_ROW_BIND_OFFSET_PTR:
 			debugPrintf("  attribute: "	
 					"SQL_ATTR_ROW_BIND_OFFSET_PTR "
@@ -9601,7 +9620,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 	// convert parameternumber to a string
 	char	*parametername=charstring::parseNumber(parameternumber);
 	debugPrintf("  parametername: %s\n",parametername);
-	debugPrintf("  lengthprecisione: %lld\n",(uint64_t)lengthprecision);
+	debugPrintf("  lengthprecision: %lld\n",(uint64_t)lengthprecision);
 	debugPrintf("  parameterscale: %lld\n",(uint64_t)parameterscale);
 
 	bool	dataatexec=false;
@@ -9751,7 +9770,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
 			stmt->cur->inputBindBlob(parametername,
 					(const char *)parametervalue,
-					lengthprecision);
+					(strlen_or_ind)?*strlen_or_ind:0);
 			break;
 		case SQL_C_BIT:
 			debugPrintf("  valuetype: SQL_C_BIT\n");
