@@ -9601,6 +9601,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 	// convert parameternumber to a string
 	char	*parametername=charstring::parseNumber(parameternumber);
 	debugPrintf("  parametername: %s\n",parametername);
+	debugPrintf("  lengthprecisione: %lld\n",(uint64_t)lengthprecision);
+	debugPrintf("  parameterscale: %lld\n",(uint64_t)parameterscale);
 
 	bool	dataatexec=false;
 	if (strlen_or_ind) {
