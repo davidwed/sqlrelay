@@ -1723,12 +1723,11 @@ bool odbccursor::inputBind(const char *variable,
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
-				/*#ifdef HAVE_SQLCONNECTW
+				#ifdef HAVE_SQLCONNECTW
 				SQL_C_WCHAR,
 				#else
 				SQL_C_CHAR,
-				#endif*/
-				SQL_C_BINARY,
+				#endif
 				SQL_CHAR,
 				valuesize,
 				0,
