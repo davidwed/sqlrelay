@@ -880,10 +880,7 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 void db2cursor::encodeBlob(stringbuffer *buffer,
@@ -938,10 +935,7 @@ bool db2cursor::inputBind(const char *variable,
 				valuesize,
 				NULL);
 	}
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::inputBind(const char *variable,
@@ -963,10 +957,7 @@ bool db2cursor::inputBind(const char *variable,
 				value,
 				sizeof(int64_t),
 				NULL);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::inputBind(const char *variable,
@@ -990,10 +981,7 @@ bool db2cursor::inputBind(const char *variable,
 				value,
 				sizeof(double),
 				NULL);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::inputBind(const char *variable,
@@ -1059,11 +1047,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				NULL);
 	}
-
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::inputBindBlob(const char *variable,
@@ -1088,10 +1072,7 @@ bool db2cursor::inputBindBlob(const char *variable,
 				(SQLPOINTER)value,
 				valuesize,
 				&(blobbindsize[pos-1]));
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 #if (DB2VERSION<=7)
@@ -1120,10 +1101,7 @@ bool db2cursor::inputBindClob(const char *variable,
 				(SQLPOINTER)value,
 				valuesize,
 				NULL);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 #endif
 
@@ -1152,10 +1130,7 @@ bool db2cursor::outputBind(const char *variable,
 				valuesize,
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::outputBind(const char *variable,
@@ -1184,10 +1159,7 @@ bool db2cursor::outputBind(const char *variable,
 				sizeof(int64_t),
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::outputBind(const char *variable,
@@ -1218,10 +1190,7 @@ bool db2cursor::outputBind(const char *variable,
 				sizeof(double),
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::outputBind(const char *variable,
@@ -1269,10 +1238,7 @@ bool db2cursor::outputBind(const char *variable,
 				0,
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::outputBindBlob(const char *variable, 
@@ -1299,10 +1265,7 @@ bool db2cursor::outputBindBlob(const char *variable,
 				outlobbind[index],
 				db2conn->maxoutbindlobsize,
 				&outlobbindlen[index]);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::outputBindClob(const char *variable, 
@@ -1337,10 +1300,7 @@ bool db2cursor::outputBindClob(const char *variable,
 				outlobbind[index],
 				db2conn->maxoutbindlobsize,
 				&outlobbindlen[index]);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool db2cursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {

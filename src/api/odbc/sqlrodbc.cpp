@@ -3674,34 +3674,35 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			break;
 		//case SQL_AUTOCOMMIT: (settable but not gettable)
 		case SQL_LOGIN_TIMEOUT:
-			debugPrintf("	unsupported attribute: "
+			debugPrintf("  unsupported attribute: "
 						"SQL_LOGIN_TIMEOUT\n");
 			// FIXME: implement
 			break;
 		case SQL_OPT_TRACE:
-			debugPrintf("	unsupported attribute: "
+			debugPrintf("  unsupported attribute: "
 						"SQL_OPT_TRACE\n");
 			// FIXME: implement
 			break;
 		case SQL_OPT_TRACEFILE:
-			debugPrintf("	unsupported attribute: "
+			debugPrintf("  unsupported attribute: "
 						"SQL_OPT_TRACEFILE\n");
 			// FIXME: implement
 			break;
 		case SQL_TRANSLATE_DLL:
-			debugPrintf("	unsupported attribute: "
+			debugPrintf("  unsupported attribute: "
 						"SQL_TRANSLATE_DLL\n");
 			// FIXME: implement
 			break;
 		case SQL_TRANSLATE_OPTION:
-			debugPrintf("	unsupported attribute: "
+			debugPrintf("  unsupported attribute: "
 						"SQL_TRANSLATE_OPTION\n");
 			// FIXME: implement
 			break;
 		case SQL_TXN_ISOLATION:
-			debugPrintf("	unsupported attribute: "
-						"SQL_TXN_ISOLATION\n");
-			// FIXME: implement
+			debugPrintf("  attribute: SQL_TXN_ISOLATION\n");
+			// FIXME: this isn't always true
+			val.uintval=SQL_TXN_READ_COMMITTED;
+			type=1;
 			break;
 		//case SQL_ATTR_CURRENT_CATALOG:
 		//	(dup of SQL_CURRENT_QUALIFIER)

@@ -883,10 +883,7 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::inputBind(const char *variable,
@@ -927,10 +924,7 @@ bool informixcursor::inputBind(const char *variable,
 				valuesize,
 				NULL);
 	}
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::inputBind(const char *variable,
@@ -952,10 +946,7 @@ bool informixcursor::inputBind(const char *variable,
 				value,
 				sizeof(int64_t),
 				NULL);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::inputBind(const char *variable,
@@ -979,10 +970,7 @@ bool informixcursor::inputBind(const char *variable,
 				value,
 				sizeof(double),
 				NULL);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::inputBind(const char *variable,
@@ -1048,11 +1036,7 @@ bool informixcursor::inputBind(const char *variable,
 				0,
 				NULL);
 	}
-
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::inputBindBlob(const char *variable,
@@ -1077,10 +1061,7 @@ bool informixcursor::inputBindBlob(const char *variable,
 				(SQLPOINTER)value,
 				valuesize,
 				&(lobbindsize[pos-1]));
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::inputBindClob(const char *variable,
@@ -1109,10 +1090,7 @@ bool informixcursor::inputBindClob(const char *variable,
 				(SQLPOINTER)value,
 				valuesize,
 				&(lobbindsize[pos-1]));
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::outputBind(const char *variable, 
@@ -1140,10 +1118,7 @@ bool informixcursor::outputBind(const char *variable,
 				valuesize,
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::outputBind(const char *variable,
@@ -1172,10 +1147,7 @@ bool informixcursor::outputBind(const char *variable,
 				sizeof(int64_t),
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::outputBind(const char *variable,
@@ -1206,10 +1178,7 @@ bool informixcursor::outputBind(const char *variable,
 				sizeof(double),
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::outputBind(const char *variable,
@@ -1257,10 +1226,7 @@ bool informixcursor::outputBind(const char *variable,
 				0,
 				&(outisnull[pos-1])
 				);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::outputBindBlob(const char *variable, 
@@ -1286,10 +1252,7 @@ bool informixcursor::outputBindBlob(const char *variable,
 				outlobbind[index],
 				informixconn->maxoutbindlobsize,
 				&outlobbindlen[index]);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::outputBindClob(const char *variable, 
@@ -1315,10 +1278,7 @@ bool informixcursor::outputBindClob(const char *variable,
 				outlobbind[index],
 				informixconn->maxoutbindlobsize,
 				&outlobbindlen[index]);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool informixcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {

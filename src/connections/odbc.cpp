@@ -18,6 +18,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
+#include <rudiments/process.h>
 
 #include <datatypes.h>
 #include <defines.h>
@@ -1568,6 +1569,8 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
+	initializeColCounts();
+	initializeRowCounts();
 }
 
 odbccursor::~odbccursor() {
@@ -1644,11 +1647,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	#else
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	#endif
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::allocateStatementHandle() {
@@ -1724,11 +1723,12 @@ bool odbccursor::inputBind(const char *variable,
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
-				#ifdef HAVE_SQLCONNECTW
+				/*#ifdef HAVE_SQLCONNECTW
 				SQL_C_WCHAR,
 				#else
 				SQL_C_CHAR,
-				#endif
+				#endif*/
+				SQL_C_BINARY,
 				SQL_CHAR,
 				valuesize,
 				0,
@@ -1741,9 +1741,9 @@ bool odbccursor::inputBind(const char *variable,
 				NULL);
 	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
+		stdoutput.printf("bind failed\n");
 	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::inputBind(const char *variable,
@@ -1765,10 +1765,7 @@ bool odbccursor::inputBind(const char *variable,
 				value,
 				sizeof(int64_t),
 				NULL);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::inputBind(const char *variable,
@@ -1792,10 +1789,7 @@ bool odbccursor::inputBind(const char *variable,
 				value,
 				sizeof(double),
 				NULL);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::inputBind(const char *variable,
@@ -1872,11 +1866,7 @@ bool odbccursor::inputBind(const char *variable,
 				0,
 				NULL);
 	}
-
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::outputBind(const char *variable, 
@@ -1903,10 +1893,7 @@ bool odbccursor::outputBind(const char *variable,
 				(SQLPOINTER)value,
 				valuesize,
 				&(outisnull[pos-1]));
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::outputBind(const char *variable,
@@ -1934,10 +1921,7 @@ bool odbccursor::outputBind(const char *variable,
 				value,
 				sizeof(int64_t),
 				&(outisnull[pos-1]));
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::outputBind(const char *variable,
@@ -1967,10 +1951,7 @@ bool odbccursor::outputBind(const char *variable,
 				value,
 				sizeof(double),
 				&(outisnull[pos-1]));
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::outputBind(const char *variable,
@@ -2017,10 +1998,7 @@ bool odbccursor::outputBind(const char *variable,
 				buffer,
 				0,
 				&(outisnull[pos-1]));
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-	return true;
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 int16_t odbccursor::nonNullBindValue() {
@@ -2096,6 +2074,7 @@ void odbccursor::initializeRowCounts() {
 	row=0;
 	maxrow=0;
 	totalrows=0;
+	affectedrows=-1;
 }
 
 bool odbccursor::handleColumns() {
@@ -2614,7 +2593,7 @@ bool odbccursor::getLobFieldSegment(uint32_t col,
 }
 
 void odbccursor::closeResultSet() {
-	SQLCloseCursor(stmt);
+	//SQLCloseCursor(stmt);
 
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
