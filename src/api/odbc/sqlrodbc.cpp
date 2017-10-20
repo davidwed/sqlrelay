@@ -192,6 +192,7 @@ struct STMT {
 	uint64_t				rowarraysize;
 	uint64_t				*coloffsets;
 	SQLULEN					*paramsprocessed;
+	SQLULEN					*parambindoffsetptr;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -372,6 +373,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->rowarraysize=conn->resultsetbuffersize;
 				stmt->coloffsets=NULL;
 				stmt->paramsprocessed=NULL;
+				stmt->parambindoffsetptr=NULL;
 
 				// set flags
 				if (!charstring::compare(
@@ -4552,6 +4554,15 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 					val.strval=stmt->sqlstate;
 					type=1;
 					break;
+				case SQL_DIAG_CURSOR_ROW_COUNT:
+					val.lenval=
+						stmt->cur->rowCount()-
+						stmt->cur->firstRowIndex();
+					debugPrintf("  diagidentifier: "
+						"SQL_CURSOR_DIAG_ROW_COUNT: "
+							"%lld\n",val.lenval);
+					type=1;
+					break;
 				default:
 					// anything else is not supported
 					debugPrintf("  diagidentifier: %d "
@@ -8451,12 +8462,20 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			return SQL_SUCCESS;
 		//case SQL_ATTR_RETRIEVE_DATA:
 		case SQL_RETRIEVE_DATA:
+			{
+			SQLULEN	val=(SQLULEN)value;
 			debugPrintf("  attribute: "
 					"SQL_ATTR_RETRIEVE_DATA/"
-					"SQL_RETRIEVE_DATA "
-				"(unsupported but returning success)\n");
-			// FIXME: implement
-			return SQL_SUCCESS;
+					"SQL_RETRIEVE_DATA: %lld\n",
+					(uint64_t)val);
+			if (val==SQL_RD_ON) {
+				return SQL_SUCCESS;
+			} else {
+				SQLR_STMTSetError(stmt,
+					"Invalid attribute value",0,"HY024");
+				return SQL_ERROR;
+			}
+			}
 		//case SQL_ATTR_USE_BOOKMARKS:
 		case SQL_USE_BOOKMARKS:
 			debugPrintf("  attribute: "
@@ -8489,19 +8508,29 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
+			{
+			stmt->parambindoffsetptr=(SQLULEN *)value;
 			debugPrintf("  attribute: "
-					"SQL_ATTR_PARAM_BIND_OFFSET_PTR "
-				"(unsupported but returning success)\n");
-			// FIXME: implement
+					"SQL_ATTR_PARAM_BIND_OFFSET_PTR: "
+					"0x%08x\n",
+					stmt->parambindoffsetptr);
 			return SQL_SUCCESS;
+			}
 		case SQL_ATTR_PARAM_BIND_TYPE:
-			debugPrintf("  attribute: SQL_ATTR_PARAM_BIND_TYPE "
-				"(unsupported but returning success)\n");
-			// FIXME: implement
-			return SQL_SUCCESS;
+			{
+			SQLULEN	val=(SQLULEN)value;
+			debugPrintf("  attribute: SQL_ATTR_PARAM_BIND_TYPE: "
+							"%lld\n",(uint64_t)val);
+			if (val==SQL_PARAM_BIND_BY_COLUMN) {
+				return SQL_SUCCESS;
+			} else {
+				SQLR_STMTSetError(stmt,
+					"Invalid attribute value",0,"HY024");
+				return SQL_ERROR;
+			}
+			}
 		case SQL_ATTR_PARAM_OPERATION_PTR:
-			debugPrintf("  attribute: "
-					"SQL_ATTR_PARAM_OPERATION_PTR "
+			debugPrintf("  attribute: SQL_ATTR_PARAM_OPERATION_PTR "
 				"(unsupported but returning success)\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
@@ -9623,6 +9652,11 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 	debugPrintf("  parametername: %s\n",parametername);
 	debugPrintf("  lengthprecision: %lld\n",(uint64_t)lengthprecision);
 	debugPrintf("  parameterscale: %lld\n",(uint64_t)parameterscale);
+	if (stmt->parambindoffsetptr && *(stmt->parambindoffsetptr)) {
+		debugPrintf("  WARNING: stmt->parambindoffsetptr=%lld "
+				"(but is unused)\n",
+				(uint64_t)*(stmt->parambindoffsetptr));
+	}
 
 	bool	dataatexec=false;
 	if (strlen_or_ind) {
