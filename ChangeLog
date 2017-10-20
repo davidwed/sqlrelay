@@ -61,6 +61,8 @@
 		to be concatenated
 	updated odbc connection to fetch blob columns in chunks and not be
 		bound by maxitembuffersize
+	fixed a bug that could cause a buffer overrun when using
+		maxitembuffersize with odbc, db2, and informix
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

@@ -6684,6 +6684,15 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 					&(pvt->_fieldlengths[i]),
 					&(pvt->_blobs[i]),
 					&(pvt->_nulls[i]));
+
+		// A connection module might return the actual field length,
+		// even if its larger than the buffer that the data was
+		// copied into.  Override fieldlength, if necessary, just
+		// to be safe.
+		if (pvt->_maxfieldlength &&
+			pvt->_fieldlengths[i]>pvt->_maxfieldlength) {
+			pvt->_fieldlengths[i]=pvt->_maxfieldlength;
+		}
 	}
 
 	// reformat the row

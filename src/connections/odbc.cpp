@@ -192,7 +192,6 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		SQLINTEGER	*indicator;
 		#endif
 		odbccolumn 	*column;
-		uint32_t	maxfieldlength;
 
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
@@ -2509,9 +2508,7 @@ void odbccursor::getField(uint32_t col,
 
 	// handle normal datatypes
 	*fld=field[col];
-	uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-	*fldlength=(indicator[col]<=maxfieldlength)?
-				indicator[col]:maxfieldlength;
+	*fldlength=indicator[col];
 }
 
 bool odbccursor::getLobFieldLength(uint32_t col, uint64_t *length) {

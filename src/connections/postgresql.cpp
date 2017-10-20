@@ -248,6 +248,7 @@ void postgresqlconnection::handleConnectString() {
 
 	// postgresql doesn't support multi-row fetches
 	cont->setFetchAtOnce(1);
+	cont->setMaxFieldLength(0);
 }
 
 bool postgresqlconnection::logIn(const char **error, const char **warning) {
