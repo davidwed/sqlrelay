@@ -1315,7 +1315,7 @@ uint16_t sqlrcursor::countBindVariables() const {
 }
 
 void sqlrcursor::clearVariables() {
-	return clearVariables(true);
+	clearVariables(true);
 }
 
 void sqlrcursor::clearVariables(bool clearbinds) {
