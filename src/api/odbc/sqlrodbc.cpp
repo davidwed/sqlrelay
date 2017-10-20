@@ -29,6 +29,13 @@
 	#include <windows.h>
 #endif
 
+// older unixodbc needs this
+#if !defined(_WIN32) && \
+	defined(RUDIMENTS_HAVE_LONG_LONG) && \
+	!defined(HAVE_LONG_LONG)
+	#define HAVE_LONG_LONG 1
+#endif
+
 #include <sql.h>
 #include <sqlext.h>
 #include <odbcinst.h>
@@ -1340,13 +1347,25 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 	}
 	// added by mssql
 	if (!charstring::compare(ctype,"NCHAR")) {
-		return SQL_WCHAR;
+		#ifdef SQL_WCHAR
+			return SQL_WCHAR;
+		#else
+			return SQL_CHAR;
+		#endif
 	}
 	if (!charstring::compare(ctype,"NVARCHAR")) {
-		return SQL_WVARCHAR;
+		#ifdef SQL_WVARCHAR
+			return SQL_WVARCHAR;
+		#else
+			return SQL_VARCHAR;
+		#endif
 	}
 	if (!charstring::compare(ctype,"NTEXT")) {
-		return SQL_WLONGVARCHAR;
+		#ifdef SQL_WLONGVARCHAR
+			return SQL_WLONGVARCHAR;
+		#else
+			return SQL_LONGVARCHAR;
+		#endif
 	}
 	if (!charstring::compare(ctype,"XML")) {
 		return SQL_LONGVARCHAR;
@@ -1430,9 +1449,15 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 		case SQL_BINARY:
 		case SQL_VARBINARY:
 		case SQL_LONGVARBINARY:
+		#ifdef SQL_WCHAR
 		case SQL_WCHAR:
+		#endif
+		#ifdef SQL_WVARCHAR
 		case SQL_WVARCHAR:
+		#endif
+		#ifdef SQL_WLONGVARCHAR
 		case SQL_WLONGVARCHAR:
+		#endif
 			{
 			// FIXME: this really ought to be sorted out in the
 			// connection code, rather than here.
@@ -4102,7 +4127,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	bool	trunc=false;
 	switch (targettype) {
 		case SQL_C_CHAR:
+		#ifdef SQL_C_WCHAR
 		case SQL_C_WCHAR:
+		#endif
 			{
 			debugPrintf("  targettype: SQL_C_(W)CHAR\n");
 
@@ -7624,15 +7651,21 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 		case SQL_LONGVARCHAR:
 			typestring="LONGVARCHAR";
 			break;
+		#ifdef SQL_WCHAR
 		case SQL_WCHAR:
 			typestring="WCHAR";
 			break;
+		#endif
+		#ifdef SQL_WVARCHAR
 		case SQL_WVARCHAR:
 			typestring="WVARCHAR";
 			break;
+		#endif
+		#ifdef SQL_WLONGVARCHAR
 		case SQL_WLONGVARCHAR:
 			typestring="WLONGVARCHAR";
 			break;
+		#endif
 		case SQL_DECIMAL:
 			typestring="DECIMAL";
 			break;
@@ -8037,7 +8070,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_AUTOCOMMIT:
 		{
 			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
-			uint64_t	val=(uint64_t)value;
+			SQLUINTEGER	val=(SQLUINTEGER)value;
 			debugPrintf("  val: %lld\n",val);
 			if (val==SQL_AUTOCOMMIT_ON) {
 				debugPrintf("  ON\n");
@@ -8148,8 +8181,8 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_ATTR_METADATA_ID:
 		{
 			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
-			uint64_t	val=(uint64_t)value;
-			debugPrintf("  val: %lld\n",val);
+			SQLUINTEGER	val=(SQLUINTEGER)value;
+			debugPrintf("  val: %lld\n",(uint16_t)val);
 			conn->attrmetadataid=(val==SQL_TRUE);
 			return SQL_SUCCESS;
 		}
@@ -8441,10 +8474,10 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ROWSET_SIZE:
-			debugPrintf("  attribute: SQL_ROWSET_SIZE: "
-						"%lld\n",(uint64_t)value);
 			{
-			uint64_t	val=(uint64_t)value;
+			SQLULEN	val=(SQLULEN)value;
+			debugPrintf("  attribute: SQL_ROWSET_SIZE: "
+						"%lld\n",(uint64_t)val);
 			// don't allow this to be set to "fetch all rows"
 			if (!val) {
 				val=1;
@@ -8579,10 +8612,10 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			stmt->rowsfetchedptr=(SQLROWSETSIZE *)value;
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_ARRAY_SIZE:
-			debugPrintf("  attribute: SQL_ATTR_ROW_ARRAY_SIZE: "
-						"%lld\n",(uint64_t)value);
 			{
-			uint64_t	val=(uint64_t)value;
+			SQLULEN val=(SQLULEN)value;
+			debugPrintf("  attribute: SQL_ATTR_ROW_ARRAY_SIZE: "
+						"%lld\n",(uint64_t)val);
 			// don't allow this to be set to "fetch all rows"
 			if (!val) {
 				val=1;
