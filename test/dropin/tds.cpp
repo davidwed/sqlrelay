@@ -118,7 +118,7 @@ int	main(int argc, char **argv) {
 	const char	*language="us_english";
 	const char	*charset="utf-8";
 	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		server="sqlrelay";
+		server="localhost";
 		user="test";
 		password="test";
 		db="testdb";
@@ -128,7 +128,7 @@ int	main(int argc, char **argv) {
 		if (argc==2) {
 			server=argv[1];
 		} else {
-			server="sqlrelay";
+			server="localhost";
 		}
 		user="testuser";
 		password="testpassword";
