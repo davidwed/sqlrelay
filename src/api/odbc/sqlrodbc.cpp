@@ -8050,28 +8050,6 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-static SQLUINTEGER getSqlUInteger(SQLPOINTER value) {
-
-	// SQLUINTEGER is always 32-bit
-	//
-	// SQLPOINTER is 32-bit on some platforms and 64-bit on others.
-	//
-	// these gyrations are necessary to avoid errors like:
-	//
-	// error: cast from ‘SQLPOINTER {aka void*}’ to
-	// ‘SQLUINTEGER {aka unsigned int}’ loses precision [-fpermissive]
-
-	if (sizeof(SQLPOINTER)==8) {
-		uint64_t	val;
-		bytestring::copy(&val,value,sizeof(value));
-		return (SQLUINTEGER)val;
-	} else {
-		uint32_t	val;
-		bytestring::copy(&val,value,sizeof(value));
-		return (SQLUINTEGER)val;
-	}
-}
-
 static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -8087,12 +8065,15 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// use reinterpret_cast and assignment to smaller
+	// sized value to avoid compiler warnings
+	SQLUINTEGER	val=reinterpret_cast<uint64_t>(value);
+
 	switch (attribute) {
 		#ifdef SQL_AUTOCOMMIT
 		case SQL_AUTOCOMMIT:
 		{
 			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
-			SQLUINTEGER	val=getSqlUInteger(value);
 			debugPrintf("  val: %lld\n",(uint64_t)val);
 			if (val==SQL_AUTOCOMMIT_ON) {
 				debugPrintf("  ON\n");
@@ -8203,8 +8184,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_ATTR_METADATA_ID:
 		{
 			debugPrintf("  attribute: SQL_ATTR_METADATA_ID\n");
-			SQLUINTEGER	val=getSqlUInteger(value);
-			debugPrintf("  val: %lld\n",(uint16_t)val);
+			debugPrintf("  val: %lld\n",(uint64_t)val);
 			conn->attrmetadataid=(val==SQL_TRUE);
 			return SQL_SUCCESS;
 		}
