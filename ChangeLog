@@ -63,6 +63,9 @@
 		bound by maxitembuffersize
 	fixed a bug that could cause a buffer overrun when using
 		maxitembuffersize with odbc, db2, and informix
+	configure script finagles the multiarch dir for platforms where
+		gcc -print-multiarch doesn't return anything, but the
+		multiarch dir is necessary to find python3
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side

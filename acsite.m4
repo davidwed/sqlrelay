@@ -453,6 +453,21 @@ AC_DEFUN([FW_CHECK_MULTIARCH],
 [
 AC_MSG_CHECKING(for multiarch platform)
 MULTIARCHDIR="`$CC $CPPFLAGS -print-multiarch 2> /dev/null`"
+
+dnl $CC -print-multiarch doesn't return anything on most platforms,
+dnl but we need the multiarch dir to find python on some platforms,
+dnl (eg. python3.6 on fedora 26) so, we'll attempt to finagle it...
+if ( test -z "$MULTIARCHDIR" )
+then
+	MAARCH=`uname -m 2> /dev/null`
+	MAOS=`uname -o 2> /dev/null`
+	if ( test "$MAOS" = "GNU/Linux" )
+	then
+		MAOS="linux-gnu"
+	fi
+	MULTIARCHDIR="$MAARCH-$MAOS"
+fi
+
 if ( test -n "$MULTIARCHDIR" )
 then
 	AC_MSG_RESULT($MULTIARCHDIR)

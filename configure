@@ -16709,6 +16709,18 @@ UNAME=`uname -s`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for multiarch platform" >&5
 $as_echo_n "checking for multiarch platform... " >&6; }
 MULTIARCHDIR="`$CC $CPPFLAGS -print-multiarch 2> /dev/null`"
+
+if ( test -z "$MULTIARCHDIR" )
+then
+	MAARCH=`uname -m 2> /dev/null`
+	MAOS=`uname -o 2> /dev/null`
+	if ( test "$MAOS" = "GNU/Linux" )
+	then
+		MAOS="linux-gnu"
+	fi
+	MULTIARCHDIR="$MAARCH-$MAOS"
+fi
+
 if ( test -n "$MULTIARCHDIR" )
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $MULTIARCHDIR" >&5
