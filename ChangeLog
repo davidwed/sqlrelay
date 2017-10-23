@@ -66,6 +66,7 @@
 	configure script finagles the multiarch dir for platforms where
 		gcc -print-multiarch doesn't return anything, but the
 		multiarch dir is necessary to find python3
+	configure script can find php-7 on openbsd now
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
