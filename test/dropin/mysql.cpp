@@ -746,6 +746,9 @@ int	main(int argc, char **argv) {
 	}
 
 
+	// some versions of mariadb crash when you call this
+	// (arguably, I should figure out which versions and look for that too)
+	#ifndef LIBMARIADB
 	stdoutput.printf("mysql_list_processes\n");
 	result=mysql_list_processes(&mysql);
 	checkSuccess(mysql_num_fields(result),9);
@@ -771,6 +774,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 	mysql_free_result(result);
 	stdoutput.printf("\n");
+	#endif
 
 	// FIXME: mysql_info for:
 	// insert into ... select ...
@@ -1064,7 +1068,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldisnull[3],0);
 	checkSuccess(fieldisnull[4],1);
 	checkSuccess(fieldisnull[5],0);
-	stdoutput.printf("\n");
+	stdoutput.printf("\n");	
 
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with binds\n");
