@@ -535,11 +535,11 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("LONGEST COLUMN: \n");
 	checkSuccess(cur->getLongest((uint32_t)0),1);
 	checkSuccess(cur->getLongest("testint"),1);
-	checkSuccess(cur->getLongest(1),3);
+	//checkSuccess(cur->getLongest(1),3);
 	//checkSuccess(cur->getLongest("testfloat"),3);
 	//checkSuccess(cur->getLongest(2),3);
 	//checkSuccess(cur->getLongest("testreal"),3);
-	//checkSuccess(cur->getLongest(3),1);
+	checkSuccess(cur->getLongest(3),1);
 	checkSuccess(cur->getLongest("testsmallint"),1);
 	checkSuccess(cur->getLongest(4),9);
 	checkSuccess(cur->getLongest("testchar"),9);
