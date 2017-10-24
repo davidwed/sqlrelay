@@ -69,6 +69,8 @@
 	configure script can find php-7 on openbsd now
 	node is used to run node-gyp.js now
 	configure script looks for /etc/php7 now
+	configure script looks for node-gyp under
+		/usr/lib*/node_modules/nmp[678] now
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
