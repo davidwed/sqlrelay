@@ -3574,10 +3574,25 @@ then
 		PHPCONFDIR="/etc/php5/conf.d"
 		PHPCONFSTYLE="suse"
 	fi
+	if ( test -d "/etc/php7/conf.d" )
+	then
+		PHPCONFDIR="/etc/php7/conf.d"
+		PHPCONFSTYLE="suse"
+	fi
 	if ( test -d "/etc/php5/mods-available" )
 	then
 		PHPCONFDIR="/etc/php5/mods-available"
 		if ( test -d "/etc/php5/conf.d" )
+		then
+			PHPCONFSTYLE="debian"
+		else
+			PHPCONFSTYLE="ubuntu"
+		fi
+	fi
+	if ( test -d "/etc/php7/mods-available" )
+	then
+		PHPCONFDIR="/etc/php7/mods-available"
+		if ( test -d "/etc/php7/conf.d" )
 		then
 			PHPCONFSTYLE="debian"
 		else
