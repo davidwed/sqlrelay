@@ -105,6 +105,7 @@ int	main(int argc, char **argv) {
 	#endif
 	stdoutput.printf("\n");
 
+#if 0
 	#ifdef HAVE_MYSQL_PING
 	stdoutput.printf("mysql_ping\n");
 	checkSuccess(mysql_ping(&mysql),0);
@@ -137,7 +138,9 @@ int	main(int argc, char **argv) {
 	mysql_free_result(result);
 	stdoutput.printf("\n");
 
+#endif
 	const char	*query="drop table testdb.testtable";
+#if 0
 	mysql_real_query(&mysql,query,charstring::length(query));
 
 	stdoutput.printf("mysql_real_query: create\n");
@@ -866,9 +869,11 @@ int	main(int argc, char **argv) {
 						(long)mysql);
 	#endif
 	stdoutput.printf("\n");
+#endif
 
 	stdoutput.printf("mysql_stmt_init:\n");
 	MYSQL_STMT	*stmt=mysql_stmt_init(&mysql);
+#if 0
 	checkSuccess((int)(stmt!=NULL),1);
 	stdoutput.printf("\n");
 	stdoutput.printf("mysql_stmt_prepare: create\n");
@@ -971,6 +976,7 @@ int	main(int argc, char **argv) {
 
 
 	stdoutput.printf("mysql_stmt_bind_result:\n");
+#endif
 	MYSQL_BIND	fieldbind[19];
 	char		fieldbuffer[19*1024];
 	my_bool		fieldisnull[19];
@@ -983,6 +989,7 @@ int	main(int argc, char **argv) {
 		fieldbind[i].is_null=&fieldisnull[i];
 		fieldbind[i].length=&fieldlength[i];
 	}
+#if 0
 	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
 	stdoutput.printf("\n");
 
@@ -1042,6 +1049,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 
+#endif
 	stdoutput.printf("mysql_stmt_prepare/execute: select with even NULLS\n");
 	query="select 1,NULL,1,NULL,1,NULL";
 	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
@@ -1072,6 +1080,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");	
 
 
+#if 0
 	stdoutput.printf("mysql_stmt_prepare/execute: select with binds\n");
 	query="select ?,?,?,?,?,?,?,?,?,?,?,?,?,?";
 	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
@@ -1357,6 +1366,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("mysql_get_proto_info: %d\n",
 				mysql_get_proto_info(&mysql));
 	stdoutput.printf("\n");
+#endif
 
 
 	mysql_close(&mysql);

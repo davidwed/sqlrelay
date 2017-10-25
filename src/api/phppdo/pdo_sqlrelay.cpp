@@ -259,7 +259,7 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 static int sqlrcursorFetch(pdo_stmt_t *stmt,
 				enum pdo_fetch_orientation ori,
 #if PHP_MAJOR_VERSION >= 7
-				ssize_t offset TSRMLS_DC
+				zend_long offset TSRMLS_DC
 #else
 				long offset TSRMLS_DC
 #endif
@@ -693,7 +693,7 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 
 static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 #if PHP_MAJOR_VERSION >= 7
-					ssize_t attr,
+					zend_long attr,
 #else
 					long attr,
 #endif
@@ -730,7 +730,7 @@ static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 
 static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
 #if PHP_MAJOR_VERSION >= 7
-					ssize_t attr,
+					zend_long attr,
 #else
 					long attr,
 #endif
@@ -750,7 +750,7 @@ static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
 
 static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 #if PHP_MAJOR_VERSION >= 7
-					ssize_t colno,
+					zend_long colno,
 #else
 					long colno,
 #endif
@@ -1065,7 +1065,7 @@ static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) {
 
 static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 #if PHP_MAJOR_VERSION >= 7
-					ssize_t attr,
+					zend_long attr,
 #else
 					long attr,
 #endif
@@ -1204,7 +1204,7 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 
 static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 #if PHP_MAJOR_VERSION >= 7
-					ssize_t attr,
+					zend_long attr,
 #else
 					long attr,
 #endif
