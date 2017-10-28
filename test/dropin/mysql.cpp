@@ -1029,11 +1029,15 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[10].buffer,"2002-01-01 02:00:00");
 	checkSuccess((const char *)fieldbind[11].buffer,"2002");
 	checkSuccess((const char *)fieldbind[12].buffer,"char2");
-	checkSuccess((const char *)fieldbind[13].buffer,"text2");
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[13].buffer,"text2",5),1);
 	checkSuccess((const char *)fieldbind[14].buffer,"varchar2");
-	checkSuccess((const char *)fieldbind[15].buffer,"tinytext2");
-	checkSuccess((const char *)fieldbind[16].buffer,"mediumtext2");
-	checkSuccess((const char *)fieldbind[17].buffer,"longtext2");
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[15].buffer,"tinytext2",9),1);
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[16].buffer,"mediumtext2",11),1);
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[17].buffer,"longtext2",9),1);
 	stdoutput.printf("\n");
 	checkSuccess(mysql_stmt_fetch(stmt),MYSQL_NO_DATA);
 	stdoutput.printf("\n");
