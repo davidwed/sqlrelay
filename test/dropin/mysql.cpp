@@ -547,11 +547,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[10],"2001-01-01 01:00:00");
 	checkSuccess(row[11],"2001");
 	checkSuccess(row[12],"char1");
-	checkSuccess(row[13],"text1");
+	checkSuccess(!charstring::compare(row[13],"text1",5),1);
 	checkSuccess(row[14],"varchar1");
-	checkSuccess(row[15],"tinytext1");
-	checkSuccess(row[16],"mediumtext1");
-	checkSuccess(row[17],"longtext1");
+	checkSuccess(!charstring::compare(row[15],"tinytext1",9),1);
+	checkSuccess(!charstring::compare(row[16],"mediumtext1",11),1);
+	checkSuccess(!charstring::compare(row[17],"longtext1",9),1);
 	stdoutput.printf("\n");
 
 
@@ -594,11 +594,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[10],"2002-01-01 02:00:00");
 	checkSuccess(row[11],"2002");
 	checkSuccess(row[12],"char2");
-	checkSuccess(row[13],"text2");
+	checkSuccess(!charstring::compare(row[13],"text2",5),1);
 	checkSuccess(row[14],"varchar2");
-	checkSuccess(row[15],"tinytext2");
-	checkSuccess(row[16],"mediumtext2");
-	checkSuccess(row[17],"longtext2");
+	checkSuccess(!charstring::compare(row[15],"tinytext2",9),1);
+	checkSuccess(!charstring::compare(row[16],"mediumtext2",11),1);
+	checkSuccess(!charstring::compare(row[17],"longtext2",9),1);
 	stdoutput.printf("\n");
 
 
@@ -660,11 +660,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[10],"2001-01-01 01:00:00");
 	checkSuccess(row[11],"2001");
 	checkSuccess(row[12],"char1");
-	checkSuccess(row[13],"text1");
+	checkSuccess(!charstring::compare(row[13],"text1",5),1);
 	checkSuccess(row[14],"varchar1");
-	checkSuccess(row[15],"tinytext1");
-	checkSuccess(row[16],"mediumtext1");
-	checkSuccess(row[17],"longtext1");
+	checkSuccess(!charstring::compare(row[15],"tinytext1",9),1);
+	checkSuccess(!charstring::compare(row[16],"mediumtext1",11),1);
+	checkSuccess(!charstring::compare(row[17],"longtext1",9),1);
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"2");
 	checkSuccess(row[1],"2");
@@ -679,11 +679,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[10],"2002-01-01 02:00:00");
 	checkSuccess(row[11],"2002");
 	checkSuccess(row[12],"char2");
-	checkSuccess(row[13],"text2");
+	checkSuccess(!charstring::compare(row[13],"text2",5),1);
 	checkSuccess(row[14],"varchar2");
-	checkSuccess(row[15],"tinytext2");
-	checkSuccess(row[16],"mediumtext2");
-	checkSuccess(row[17],"longtext2");
+	checkSuccess(!charstring::compare(row[15],"tinytext2",9),1);
+	checkSuccess(!charstring::compare(row[16],"mediumtext2",11),1);
+	checkSuccess(!charstring::compare(row[17],"longtext2",9),1);
 	checkSuccess((long)mysql_fetch_row(result),0);
 	stdoutput.printf("\n");
 
@@ -1005,11 +1005,15 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[10].buffer,"2001-01-01 01:00:00");
 	checkSuccess((const char *)fieldbind[11].buffer,"2001");
 	checkSuccess((const char *)fieldbind[12].buffer,"char1");
-	checkSuccess((const char *)fieldbind[13].buffer,"text1");
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[13].buffer,"text1",5),1);
 	checkSuccess((const char *)fieldbind[14].buffer,"varchar1");
-	checkSuccess((const char *)fieldbind[15].buffer,"tinytext1");
-	checkSuccess((const char *)fieldbind[16].buffer,"mediumtext1");
-	checkSuccess((const char *)fieldbind[17].buffer,"longtext1");
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[15].buffer,"tinytext1",9),1);
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[16].buffer,"mediumtext1",11),1);
+	checkSuccess(!charstring::compare(
+			(const char *)fieldbind[17].buffer,"longtext1",9),1);
 	stdoutput.printf("\n");
 	checkSuccess(mysql_stmt_fetch(stmt),0);
 	checkSuccess((const char *)fieldbind[0].buffer,"2");
