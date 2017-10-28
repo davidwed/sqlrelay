@@ -747,6 +747,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
+	ncols=0;
+	nrows=0;
+	affectedrows=0;
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;

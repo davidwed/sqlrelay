@@ -72,6 +72,7 @@
 	configure script looks for node-gyp under
 		/usr/lib*/node_modules/nmp[6789] now
 	php pdo api uses zend_long in place of ssize_t now
+	fixed uninitialized ncols in mysql connection module
 
 1.1.0 - updated to use charstring asprintf analogs
 	fixed uninitialized sendcolumninfo on server-side
