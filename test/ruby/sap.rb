@@ -5,6 +5,7 @@
 
 
 
+require 'rbconfig'
 require 'sqlrelay'
 
 
