@@ -1499,6 +1499,8 @@ char *odbcconnection::getCurrentSchema() {
 
 #if (ODBCVER >= 0x0300)
 bool odbcconnection::autoCommitOn() {
+	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
+	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_ON,
 				sizeof(SQLINTEGER));
@@ -1506,6 +1508,8 @@ bool odbcconnection::autoCommitOn() {
 }
 
 bool odbcconnection::autoCommitOff() {
+	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
+	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
 				sizeof(SQLINTEGER));
@@ -1517,10 +1521,14 @@ bool odbcconnection::supportsAutoCommit() {
 }
 
 bool odbcconnection::commit() {
+	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
+	cont->closeAllResultSets();
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_COMMIT)==SQL_SUCCESS);
 }
 
 bool odbcconnection::rollback() {
+	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
+	cont->closeAllResultSets();
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
