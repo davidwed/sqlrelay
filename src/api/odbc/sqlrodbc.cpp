@@ -5275,9 +5275,8 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLCANCEL:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLCANCEL "
-				"- false\n");
-			// FIXME: this is implemented, sort-of...
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLCOLUMNS:
 			debugPrintf("  functionid: "

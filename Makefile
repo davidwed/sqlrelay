@@ -8,6 +8,7 @@ all:
 clean:
 	cd src $(AND) $(MAKE) clean
 	cd test $(AND) $(MAKE) clean
+	$(RMTREE) msvc/setupx86/Debug msvc/setupx86/Release msvc/setupx64/Debug msvc/setupx64/Release
 
 install: $(INSTALLSUBDIRS)
 
