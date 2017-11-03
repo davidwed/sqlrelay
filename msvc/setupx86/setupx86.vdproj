@@ -4239,7 +4239,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Firstworks SQL Relay (32-bit)"
         "ProductCode" = "8:{C0EC8D59-D301-4F83-83D9-1CCD6E8001A5}"
-        "PackageCode" = "8:{4CD5372F-757C-4370-84E9-615755A93488}"
+        "PackageCode" = "8:{F9A1BBE6-3349-45C9-8455-3DB47A56227E}"
         "UpgradeCode" = "8:{97679A6A-B07C-4278-9494-57F8C96615C6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

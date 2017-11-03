@@ -608,9 +608,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		pvt->_sqlrtr->load(triggers);
 	}
 
-	// set autocommit behavior
-	setAutoCommit(pvt->_initialautocommit);
-
 	// get fake input bind variable behavior
 	// (this may have already been set true by the connect string)
 	pvt->_fakeinputbinds=(pvt->_fakeinputbinds ||
@@ -628,6 +625,9 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		logOut();
 		return false;
 	}
+
+	// set autocommit behavior
+	setAutoCommit(pvt->_initialautocommit);
 
 	// create connection pid file
 	pid_t	pid=process::getProcessId();
