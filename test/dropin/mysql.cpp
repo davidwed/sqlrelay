@@ -122,7 +122,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_num_fields(result),1);
 	field=mysql_fetch_field_direct(result,0);
 	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		checkSuccess(field->name,"Database");
+		checkSuccess(
+			!charstring::compare(field->name,"Database") || 
+			!charstring::compare(field->name,"Database (%)"),1);
 	} else {
 		// sqlrelay calls this column schema_name rather
 		// than Database so the drop-in lib does too
@@ -153,7 +155,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_num_fields(result),1);
 	field=mysql_fetch_field_direct(result,0);
 	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		checkSuccess(field->name,"Tables_in_testdb");
+		checkSuccess(
+		!charstring::compare(field->name,"Tables_in_testdb") || 
+		!charstring::compare(field->name,"Tables_in_testdb (%)"),1);
 	} else {
 		// sqlrelay calls this column schema_name rather
 		// than Database so the drop-in lib does too
