@@ -475,7 +475,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %pre
 # Add the "sqlrelay" user
 /usr/sbin/useradd -c "SQL Relay" -s /bin/false \
-	-r -d %{_localstatedir}/%{name} %{name} 2> /dev/null || :
+	-r -m -d %{_localstatedir}/%{name} %{name} 2> /dev/null || :
 
 
 %post
