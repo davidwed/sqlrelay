@@ -297,7 +297,7 @@ Oracle back-end module for SQL Relay.
 %package mysql
 License: GPLv2 with exceptions
 Summary: MySQL back-end module for SQL Relay
-BuildRequires: mysql-devel
+BuildRequires: mariadb-connector-c-devel
 
 %description mysql
 MySQL back-end module for SQL Relay.
