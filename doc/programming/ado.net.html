@@ -36,13 +36,6 @@
 use the SQLRClient namespace.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>You'll also need to include the SQLRelay.dll assembly.  This is usually found in C:\Program Files\Firstworks\bin on Windows or /usr/local/firstworks/lib on Unix/Linux.</p>
 
@@ -96,28 +89,6 @@ mcs -pkg:dotnet /out:sqlrexample.exe sqlrexample.cs /reference:SQLRClient.dll
 <p>To use SQL Relay, you have to first open a connection.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <p>The following connect string variables control attributes of the connection:</p>
 
@@ -174,107 +145,12 @@ session.</p>
 <p>In any case, you must create an instance of SQLRelayCommand and set its CommandText.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-
-			<i><font color="#9A1900">// DML queries...</font></i>
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"insert into testtable values (1,'hello')"</font><font color="#990000">;</font>
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				<font color="#990000">...</font> <font color="#008080">handle</font> exceptions <font color="#990000">...</font>
-			<font color="#FF0000">}</font>
-
-
-			<i><font color="#9A1900">// Single values</font></i>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select 1 from dual"</font><font color="#990000">;</font>
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				<font color="#008080">Int64</font> value <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
-
-				<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with <font color="#008080">the</font> value <font color="#990000">...</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				<font color="#990000">...</font> <font color="#008080">handle</font> exceptions <font color="#990000">...</font>
-			<font color="#FF0000">}</font>
-
-
-			<i><font color="#9A1900">// Multiple rows</font></i>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from testtable"</font><font color="#990000">;</font>
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-
-				<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with the <font color="#008080">result</font> set <font color="#990000">...</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				<font color="#990000">...</font> <font color="#008080">handle</font> exceptions <font color="#990000">...</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <a name="commit"/><h2>Commits and Rollbacks</h2>
 
 <p>If you need to execute a commit or rollback, you should create an instance of the SQLRelayTransaction class and use its commit() and rollback() methods rather than sending "commit" or "rollback" queries.  There are two reasons for this.  First, it's much more efficient to call the methods.  Second, if you're writing code that can run on transactional or non-transactional databases, some non-transactional databases will throw errors if they receive a "commit" or "rollback" query, but by calling the commit() and rollback() methods you instruct the database connection daemon to call the commit and rollback API methods for that database rather than issuing them as queries.  If the API's have no commit or rollback methods, the calls do nothing and the database throws no error.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayTransaction</font> sqlrtran <font color="#990000">=</font> sqlrcon<font color="#990000">.</font><b><font color="#000000">BeginTransaction</font></b><font color="#990000">();</font>
-
-			<font color="#990000">...</font> run some queries that we want to keep the <font color="#008080">results</font> of <font color="#990000">...</font>
-
-			sqlrtran<font color="#990000">.</font><b><font color="#000000">Commit</font></b><font color="#990000">();</font>
-
-			<font color="#990000">...</font> run some queries that <font color="#008080">we</font> don<font color="#FF0000">'t want to keep the results of ...</font>
-
-<font color="#FF0000">			sqlrtran.Rollback();</font>
-<font color="#FF0000">		}</font>
-<font color="#FF0000">	}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <a name="temptables"/><h2>Temporary Tables</h2>
 
@@ -305,39 +181,6 @@ directly to the database.</p>
 <p>If your calls to ExecuteNonQuery, ExecuteScalar or ExecuteReader fail, you can catch the error an exception.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"insert into testtable values (1,'hello')"</font><font color="#990000">;</font>
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <a name="bindvars"/><h2>Bind Variables</h2>
 
@@ -351,162 +194,16 @@ for using bind variables (also known as parameters) in those queries.</p>
 <p>To use bind variables (parameters) with the ADO.NET API, you must add variable/value pairs to the parameter collection associated with each instance of SQLRelayCommand.  For numeric, string or date variables, this is straightforward, you can just use the Parameters.Add() method.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"insert into testtable values (:var1,:var2,:var3)"</font><font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var2"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var2"</font><font color="#990000">,</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">DateTime</font></b><font color="#990000">(</font><font color="#993399">2001</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">));</font>
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <p>You can also bind CLOB's and BLOB's.  It is a little more complex but not terribly.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"insert into testtable values (:clobvar,:blobvar)"</font><font color="#990000">;</font>
-
-			<font color="#008080">SQLRelayParameter</font> clobvar <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-			clobvar<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"clobvar"</font><font color="#990000">;</font>
-			clobvar<font color="#990000">.</font>Value <font color="#990000">=</font> <font color="#FF0000">"testclob"</font><font color="#990000">;</font>
-			clobvar<font color="#990000">.</font>SQLRelayType <font color="#990000">=</font> SQLRelayType<font color="#990000">.</font>Clob<font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>clobvar<font color="#990000">);</font>
-
-			<font color="#008080">SQLRelayParameter</font> blobvar <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-			blobvar<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"blobvar"</font><font color="#990000">;</font>
-			blobvar<font color="#990000">.</font>Value <font color="#990000">=</font> System<font color="#990000">.</font>Text<font color="#990000">.</font>Encoding<font color="#990000">.</font>Default<font color="#990000">.</font><b><font color="#000000">GetBytes</font></b><font color="#990000">(</font><font color="#FF0000">"testblob"</font><font color="#990000">);</font>
-			blobvar<font color="#990000">.</font>SQLRelayType <font color="#990000">=</font> SQLRelayType<font color="#990000">.</font>Blob<font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>blobvar<font color="#990000">);</font>
-
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Clob or Blob types.</p>
 
 <p>Output bind variables can be used too.  The Direction and DbType attributes of the parameter must be specified though and for strings, the Size of the buffer to allocate for the return value must be specified as well.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  :datevar:='03-FEB-2001'; end;"</font><font color="#990000">;</font>
-
-			<font color="#008080">SQLRelayParameter</font> numvar <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-			numvar<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"numvar"</font><font color="#990000">;</font>
-			numvar<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-			numvar<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>numvar<font color="#990000">);</font>
-
-			<font color="#008080">SQLRelayParameter</font> stringvar <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-			stringvar<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"stringvar"</font><font color="#990000">;</font>
-			stringvar<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-			stringvar<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>String<font color="#990000">;</font>
-			stringvar<font color="#990000">.</font>Size <font color="#990000">=</font> <font color="#993399">20</font><font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>stringvar<font color="#990000">);</font>
-
-			<font color="#008080">SQLRelayParameter</font> floatvar <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-			floatvar<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"floatvar"</font><font color="#990000">;</font>
-			floatvar<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-			floatvar<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Double<font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>floatvar<font color="#990000">);</font>
-
-			<font color="#008080">SQLRelayParameter</font> datevar <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-			datevar<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"datevar"</font><font color="#990000">;</font>
-			datevar<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-			datevar<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>DateTime<font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>datevar<font color="#990000">);</font>
-
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-
-			<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something <font color="#008080">with</font> numvar<font color="#990000">.</font>Value <font color="#990000">...</font>
-			<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something <font color="#008080">with</font> stringvar<font color="#990000">.</font>Value <font color="#990000">...</font>
-			<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something <font color="#008080">with</font> floatvar<font color="#990000">.</font>Value <font color="#990000">...</font>
-			<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something <font color="#008080">with</font> datevar<font color="#990000">.</font>Value <font color="#990000">...</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <p>FIXME: ... clob, blob and cursor output bind ...</p>
 
@@ -518,65 +215,6 @@ over and over without re-preparing it.  If your backend database natively
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<i><font color="#9A1900">// Prepare the query...</font></i>
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"insert into testtable values (:var1,:var2,:var3)"</font><font color="#990000">;</font>
-			sqlrcom<font color="#990000">.</font><b><font color="#000000">Prepare</font></b><font color="#990000">();</font>
-
-
-			<i><font color="#9A1900">// Execute once...</font></i>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var2"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var2"</font><font color="#990000">,</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">DateTime</font></b><font color="#990000">(</font><font color="#993399">2001</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">));</font>
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Clear</font></b><font color="#990000">();</font>
-
-
-			<i><font color="#9A1900">// Execute again with new values...</font></i>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var1"</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var2"</font><font color="#990000">,</font> <font color="#FF0000">"bye"</font><font color="#990000">);</font>
-			sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"var2"</font><font color="#990000">,</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">DateTime</font></b><font color="#990000">(</font><font color="#993399">2002</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">));</font>
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-
-
-			<font color="#990000">...</font> re<font color="#990000">-</font>bind <font color="#008080">and</font> re<font color="#990000">-</font>execute again <font color="#008080">and</font> again <font color="#990000">...</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <a name="fields"/><h2>Accessing Fields in the Result Set</h2>
 
@@ -589,73 +227,6 @@ http://www.gnu.org/software/src-highlite -->
 <p>Further, the raw data for each field can be coaxed into a native type using the GetBoolean(), GetByte(), GetBytes(), GetChar(), GetChars(), GetGuid(), GetInt16(), GetInt32(), GetInt64(), GetFloat(), GetDouble(), GetString(), GetDecimal() and GetDateTime() methods.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select col1,col2 from testtable"</font><font color="#990000">;</font>
-
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-				
-				<i><font color="#9A1900">// read row...</font></i>
-				datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-
-				<i><font color="#9A1900">// get the raw data of the first field in a variety of ways</font></i>
-				<font color="#008080">Object</font> o1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetValue</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-				o1 <font color="#990000">=</font> datareader<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">];</font>
-				o1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetValue</font></b><font color="#990000">(</font>datareader<font color="#990000">.</font><b><font color="#000000">GetOrdinal</font></b><font color="#990000">(</font><font color="#FF0000">"col1"</font><font color="#990000">));</font>
-				o1 <font color="#990000">=</font> datareader<font color="#990000">[</font><font color="#FF0000">"col1"</font><font color="#990000">];</font>
-				Object<font color="#990000">[]</font> os1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetValues</font></b><font color="#990000">();</font>
-				o1 <font color="#990000">=</font> os1<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">];</font>
-
-				<i><font color="#9A1900">// get the first field as a string</font></i>
-				<font color="#008080">String</font> s1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-
-
-				<i><font color="#9A1900">// get the raw data of the second field in a variety of ways</font></i>
-				<font color="#008080">Object</font> o2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetValue</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-				o2 <font color="#990000">=</font> datareader<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">];</font>
-				o2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetValue</font></b><font color="#990000">(</font>datareader<font color="#990000">.</font><b><font color="#000000">GetOrdinal</font></b><font color="#990000">(</font><font color="#FF0000">"col2"</font><font color="#990000">));</font>
-				o2 <font color="#990000">=</font> datareader<font color="#990000">[</font><font color="#FF0000">"col2"</font><font color="#990000">];</font>
-				Object<font color="#990000">[]</font> os2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetValues</font></b><font color="#990000">();</font>
-				o2 <font color="#990000">=</font> os2<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">];</font>
-
-				<i><font color="#9A1900">// get the second field as a string</font></i>
-				<font color="#008080">String</font> s2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-				
-				<i><font color="#9A1900">// read another row...</font></i>
-				datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-
-				<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with <font color="#008080">this</font> row <font color="#990000">...</font>
-
-				<font color="#990000">...</font> fetch <font color="#008080">more</font> rows <font color="#990000">...</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <br/><a name="largeresultsets"/><h2>Dealing With Large Result Sets</h2>
 
@@ -676,181 +247,16 @@ iterate through its result set, inserting rows into another table, using only
 <p>For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom1 <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom1<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from my_first_table"</font><font color="#990000">;</font>
-
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom2 <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom2<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"insert into my_second_table values (:col1, :col2, :col3)"</font><font color="#990000">;</font>
-
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom1<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-				<b><font color="#0000FF">while</font></b> <font color="#990000">(</font>datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">())</font>
-				<font color="#FF0000">{</font>
-					sqlrcom2<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Clear</font></b><font color="#990000">();</font>
-					sqlrcom2<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"col1"</font><font color="#990000">,</font>datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">));</font>
-					sqlrcom2<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"col2"</font><font color="#990000">,</font>datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">));</font>
-					sqlrcom2<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"col3"</font><font color="#990000">,</font>datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">));</font>
-					<b><font color="#0000FF">try</font></b>
-					<font color="#FF0000">{</font>
-						sqlrcom2<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-					<font color="#FF0000">}</font>
-					<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-					<font color="#FF0000">{</font>
-						Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-					<font color="#FF0000">}</font>
-				<font color="#FF0000">}</font>
-				
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <a name="columns"/><h2>Getting Column Information</h2>
 
 <p>After executing a query, the column count is stored in the FieldCount property of the SQLRelayDataReader class.  Column names are accessible via the GetName() method.  Column types are available from the GetDataTypeName().  The native .NET data type for the field is avialable from the GetFieldType() method.  They may be used as follows:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from my_first_table"</font><font color="#990000">;</font>
-
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-				<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">UInt32</font> index <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font> <font color="#008080">index</font> <font color="#990000">&amp;</font>lt<font color="#990000">;</font> sqlrcom<font color="#990000">.</font>FieldCount<font color="#990000">;</font> index<font color="#990000">++)</font>
-				<font color="#FF0000">{</font>
-					<font color="#008080">String</font> name <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetName</font></b><font color="#990000">(</font>index<font color="#990000">);</font>
-					<font color="#008080">String</font> datatype <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDataTypename</font></b><font color="#990000">(</font>index<font color="#990000">);</font>
-					<font color="#008080">String</font> nativedatatype <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetFieldType</font></b><font color="#990000">(</font>index<font color="#990000">).</font><b><font color="#000000">ToString</font></b><font color="#990000">();</font>
-
-					<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> someting with the <font color="#008080">column</font> data <font color="#990000">...</font>
-				<font color="#FF0000">}</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <p>Extended column information is available from the GetSchemaTable method.  Usage is best illustrated by example.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> System<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>Data<font color="#990000">;</font>
-<b><font color="#0000FF">using</font></b> System<font color="#990000">.</font>IO<font color="#990000">;</font>
-
-<b><font color="#0000FF">namespace</font></b> SQLRExamples
-<font color="#FF0000">{</font>
-	<b><font color="#0000FF">class</font></b> <font color="#008080">SQLRExample</font>
-	<font color="#FF0000">{</font>
-		<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">Main</font></b><font color="#990000">()</font>
-		<font color="#FF0000">{</font>
-			<font color="#008080">SQLRelayConnection</font> sqlrcon <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayConnection</font></b><font color="#990000">(</font><font color="#FF0000">"Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false"</font><font color="#990000">);</font>
-			sqlrcon<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">();</font>
-
-			<font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-			sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from my_first_table"</font><font color="#990000">;</font>
-
-			<b><font color="#0000FF">try</font></b>
-			<font color="#FF0000">{</font>
-				System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-
-				<font color="#008080">DataTable</font> schematable <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetSchemaTable</font></b><font color="#990000">();</font>
-				<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">UInt32</font> index <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font> <font color="#008080">index</font> <font color="#990000">&amp;</font>lt<font color="#990000">;</font> sqlrcom<font color="#990000">.</font>FieldCount<font color="#990000">;</font> index<font color="#990000">++)</font>
-				<font color="#FF0000">{</font>
-					<font color="#008080">String</font> columnname <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"ColumnName"</font><font color="#990000">]);</font>
-					<font color="#008080">Int64</font> columnordinal <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"ColumnOrdinal"</font><font color="#990000">]);</font>
-            				<font color="#008080">Int64</font> columnsize <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"ColumnSize"</font><font color="#990000">]);</font>
-            				<font color="#008080">Int64</font> numericprecision <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"NumericPrecision"</font><font color="#990000">]);</font>
-            				<font color="#008080">Int64</font> numericscale <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"NumericScale"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> isunique <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsUnique"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> iskey <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsKey"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> baseservername <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"BaseServerName"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> basecatalogname <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"BaseCatalogName"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> basecolumnname <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"BaseColumnName"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> baseschemaname <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"BaseSchemaName"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> basetablename <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"BaseTableName"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> datatype <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"DataType"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> allowdbnull <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"AllowDBNull"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> providertype <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"ProviderType"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> isaliased <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsAliased"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> isexpression <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsExpression"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> isidentity <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsIdentity"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> isautoincrement <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsAutoIncrement"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> isrowversion <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsRowVersion"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> ishidden <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsHidden"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> islong <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsLong"</font><font color="#990000">]);</font>
-            				<font color="#008080">Boolean</font> isreadonly <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToBoolean</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"IsReadOnly"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> providerspecificdatatype <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"ProviderSpecificDataType"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> datatypename <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"DataTypeName"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> xmlschemacollectiondatabase <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"XmlSchemaCollectionDatabase"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> xmlschemacollectionowningschema <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"XmlSchemaCollectionOwningSchema"</font><font color="#990000">]);</font>
-            				<font color="#008080">String</font> xmlschemacollectionname <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>schematable<font color="#990000">.</font>Rows<font color="#990000">[</font>index<font color="#990000">][</font><font color="#FF0000">"XmlSchemaCollectionName"</font><font color="#990000">]);</font>
-
-					<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with all these bits <font color="#008080">of</font> information <font color="#990000">...</font>
-				<font color="#FF0000">}</font>
-			<font color="#FF0000">}</font>
-			<b><font color="#0000FF">catch</font></b> <font color="#990000">(</font><font color="#008080">Exception</font> ex<font color="#990000">)</font>
-			<font color="#FF0000">{</font>
-				Console<font color="#990000">.</font><b><font color="#000000">WriteLine</font></b><font color="#990000">(</font>ex<font color="#990000">.</font>Message<font color="#990000">);</font>
-			<font color="#FF0000">}</font>
-		<font color="#FF0000">}</font>
-	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font>
-</tt></pre>
-
 </blockquote>
 <p>SQL Relay support most of the fields that might be returned in the schema table but not all.  Most databases don't support all of these fields either.  In the future, support may improve.</p>
 
@@ -887,266 +293,92 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
-begin
-        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"begin testproc(:in1,:in2,:in3); end;"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
-        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"exec testproc"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
-begin
-        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
-        suspend<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
-begin
-        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">void</font> as <font color="#FF0000">'</font>
-<font color="#FF0000">begin</font>
-<font color="#FF0000">        insert into mytable values ($1,$2,$3);</font>
-<font color="#FF0000">        return;</font>
-<font color="#FF0000">end;'</font> language plpgsql
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testfunc($1,$2,$3)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-</tt></pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-begin
-        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h3>Single Values</h3>
 
@@ -1165,44 +397,15 @@ Oracle calls these functions.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
-begin
-        <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select testproc(:in1,:in2,:in3) from dual"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">Int64</font> result<font color="#990000">=</font>sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <p>Here is an example where the value is returned through an output
 parameter.</p>
@@ -1210,50 +413,15 @@ parameter.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
-begin
-        out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"begin testproc(:in1,:in2,:in3,:out1); end"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out1 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out1<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out1"</font><font color="#990000">;</font>
-out1<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out1<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out1<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
@@ -1264,82 +432,26 @@ itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
-        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"exec testproc"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out1 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out1<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out1"</font><font color="#990000">;</font>
-out1<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out1<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out1<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">)</font> as
-begin
-        out1<font color="#990000">=</font>in1<font color="#990000">;</font>
-        suspend<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using an output bind variable.  Note that in Firebird, input and
@@ -1348,35 +460,10 @@ output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out1 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out1<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"1"</font><font color="#990000">;</font>
-out1<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out1<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out1<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>DB2</h4>
 
@@ -1386,100 +473,30 @@ than as return values of the procedure itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
-begin
-        <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
-end
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc(?,?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out4 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out4<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"4"</font><font color="#990000">;</font>
-out4<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out4<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out4<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out4<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">int</font> as <font color="#FF0000">'</font>
-<font color="#FF0000">declare</font>
-<font color="#FF0000">        in1 int;</font>
-<font color="#FF0000">        in2 float;</font>
-<font color="#FF0000">        in3 char(20);</font>
-<font color="#FF0000">begin</font>
-<font color="#FF0000">        in1:=$1;</font>
-<font color="#FF0000">        return;</font>
-<font color="#FF0000">end;</font>
-<font color="#FF0000">'</font> language plpgsql
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from testfunc($1,$2,$3)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-</tt></pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
@@ -1488,81 +505,32 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the function, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the function from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from testfunc(?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <p>A single value can be returned in the result set of a MySQL procedure.</p>
 
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select testproc()"</font><font color="#990000">;</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <p>A single value can be returned using the output variable of a MySQL
 procedure.</p>
@@ -1570,45 +538,15 @@ procedure.</p>
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"set @out1=0"</font><font color="#990000">;</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc(@out1)"</font><font color="#990000">;</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select @out1"</font><font color="#990000">;</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteScalar</font></b><font color="#990000">();</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><br/><h3>Multiple Values</h3>
 
@@ -1626,169 +564,41 @@ itself, but the rest must be returned through output parameters.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">,</font> out2 <font color="#008080">out</font> number<font color="#990000">,</font> out3 <font color="#008080">out</font> varchar2<font color="#990000">)</font> is
-begin
-        out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
-        out2<font color="#990000">:=</font>in2<font color="#990000">;</font>
-        out3<font color="#990000">:=</font>in3<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out1 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out1<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out1"</font><font color="#990000">;</font>
-out1<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out1<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out1<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out2<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out2"</font><font color="#990000">;</font>
-out2<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out2<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Double<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out2<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out3<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out3"</font><font color="#990000">;</font>
-out3<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out3<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>String<font color="#990000">;</font>
-out3<font color="#990000">.</font>Size <font color="#990000">=</font> <font color="#993399">20</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out3<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result1 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">Double</font> result2 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToDouble</font></b><font color="#990000">(</font>out2<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
-        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">),</font>
-                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">),</font>
-                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"exec testproc"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out1 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out1<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out1"</font><font color="#990000">;</font>
-out1<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out1<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out1<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out2<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out2"</font><font color="#990000">;</font>
-out2<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out2<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Double<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out2<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out3<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"out3"</font><font color="#990000">;</font>
-out3<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out3<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>String<font color="#990000">;</font>
-out3<font color="#990000">.</font>Size <font color="#990000">=</font> <font color="#993399">20</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out3<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result1 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">Double</font> result2 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToDouble</font></b><font color="#990000">(</font>out2<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">,</font> <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
-begin
-        out1<font color="#990000">=</font>in1<font color="#990000">;</font>
-        out2<font color="#990000">=</font>in2<font color="#990000">;</font>
-        out3<font color="#990000">=</font>in3<font color="#990000">;</font>
-        suspend<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using a output bind variables.  Note that in Firebird, input and
@@ -1797,166 +607,40 @@ first output bind variable is 1 rather than 4, even though there were 3 input
 bind variables.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"exec procedure testproc ?, ?, ?"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out1 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out1<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"1"</font><font color="#990000">;</font>
-out1<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out1<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out1<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out2<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"2"</font><font color="#990000">;</font>
-out2<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out2<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Double<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out2<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out3<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"3"</font><font color="#990000">;</font>
-out3<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out3<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>String<font color="#990000">;</font>
-out3<font color="#990000">.</font>Size <font color="#990000">=</font> <font color="#993399">20</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out3<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result1 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">Double</font> result2 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToDouble</font></b><font color="#990000">(</font>out2<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">double</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
-begin
-        <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
-        <font color="#008080">set</font> out2 <font color="#990000">=</font> in2<font color="#990000">;</font>
-        <font color="#008080">set</font> out3 <font color="#990000">=</font> in3<font color="#990000">;</font>
-end
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc(?,?,?,?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out1 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out1<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"4"</font><font color="#990000">;</font>
-out1<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out1<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Int64<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out1<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out2<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"5"</font><font color="#990000">;</font>
-out2<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out2<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>Double<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out2<font color="#990000">);</font>
-<font color="#008080">SQLRelayParameter</font> out2 <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-out3<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"6"</font><font color="#990000">;</font>
-out3<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-out3<font color="#990000">.</font>DbType <font color="#990000">=</font> DbType<font color="#990000">.</font>String<font color="#990000">;</font>
-out3<font color="#990000">.</font>Size <font color="#990000">=</font> <font color="#993399">20</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>out3<font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result1 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToInt64</font></b><font color="#990000">(</font>out1<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">Double</font> result2 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToDouble</font></b><font color="#990000">(</font>out2<font color="#990000">.</font>Value<font color="#990000">);</font>
-<font color="#008080">String</font> result3 <font color="#990000">=</font> Convert<font color="#990000">.</font><b><font color="#000000">ToString</font></b><font color="#990000">(</font>out3<font color="#990000">.</font>Value<font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">record</font> as <font color="#FF0000">'</font>
-<font color="#FF0000">declare</font>
-<font color="#FF0000">        output record;</font>
-<font color="#FF0000">begin</font>
-<font color="#FF0000">        select $1,$2,$3 into output;</font>
-<font color="#FF0000">        return output;</font>
-<font color="#FF0000">end;</font>
-<font color="#FF0000">'</font> language plpgsql
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from testfunc(?,?,?) as (col1 int, col2 float, col3 char(20))"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-</tt></pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
@@ -1966,48 +650,17 @@ set of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <p>Here's how you can get multiple values from the output variables
 of a MySQL procedure.</p>
@@ -2015,49 +668,15 @@ of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"set @out1=0, @out2=0.0, @out3=''"</font><font color="#990000">;</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc(@out1,@out2,@out3)"</font><font color="#990000">;</font>
-<font color="#008080">Int64</font> result <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select @out1,@out2,@out3"</font><font color="#990000">;</font>
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h3>Result Sets</h3>
 
@@ -2070,22 +689,6 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create or replace package types as
-        type cursorType is <font color="#008080">ref</font> cursor<font color="#990000">;</font>
-end<font color="#990000">;</font>
-
-create function testproc <font color="#008080">return</font> types<font color="#990000">.</font>cursortype is
-        <font color="#008080">l_cursor</font>    types<font color="#990000">.</font>cursorType<font color="#990000">;</font>
-begin
-        <font color="#008080">open</font> l_cursor <font color="#008080">for</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font>
-        <b><font color="#0000FF">return</font></b> l_cursor<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor.  That cursor may then be opened and fetched from.  In fact, a stored procedure may return multiple result sets and each may be bound to a cursor.</p>
 
@@ -2094,30 +697,6 @@ end<font color="#990000">;</font>
 <p>For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"begin :curs=testproc; end;"</font><font color="#990000">;</font>
-
-<font color="#008080">SQLRelayParameter</font> curs <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-curs<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"curs"</font><font color="#990000">;</font>
-curs<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-curs<font color="#990000">.</font>SQLRelayType <font color="#990000">=</font> SQLRelayType<font color="#990000">.</font>Cursor<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>curs<font color="#990000">);</font>
-
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-
-<i><font color="#9A1900">// the main result set will be empty, skip to the result set of the cursor</font></i>
-datareader<font color="#990000">.</font><b><font color="#000000">NextResult</font></b><font color="#990000">();</font>
-
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Cursor types.</p>
 
@@ -2126,86 +705,25 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <p>For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#008080">SQLRelayCommand</font> sqlrcom <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayComand<font color="#990000">)</font>sqlrcon<font color="#990000">.</font><b><font color="#000000">CreateCommand</font></b><font color="#990000">();</font>
-sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"begin :curs=testproc; end;"</font><font color="#990000">;</font>
-
-<font color="#008080">SQLRelayParameter</font> curs <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">SQLRelayParameter</font></b><font color="#990000">();</font>
-curs<font color="#990000">.</font>ParameterName <font color="#990000">=</font> <font color="#FF0000">"curs"</font><font color="#990000">;</font>
-curs<font color="#990000">.</font>Direction <font color="#990000">=</font> ParameterDirection<font color="#990000">.</font>Output<font color="#990000">;</font>
-curs<font color="#990000">.</font>SQLRelayType <font color="#990000">=</font> SQLRelayType<font color="#990000">.</font>Cursor<font color="#990000">;</font>
-sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font>curs<font color="#990000">);</font>
-
-sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</font></b><font color="#990000">();</font>
-
-<font color="#008080">SQLRelayDataReader</font> datareader <font color="#990000">=</font> <font color="#990000">(</font>SQLRelayDataReader<font color="#990000">)</font>curs<font color="#990000">.</font>Value<font color="#990000">;</font>
-
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function testproc
-drop package types
-</tt></pre>
-
 </blockquote>
 <h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create procedure testproc <font color="#008080">as</font> select <font color="#990000">*</font> from testtable
-</tt></pre>
-
 </blockquote>
 <p>To exceute the stored procedure from an SQL Relay program, ue code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"exec testproc"</font><font color="#990000">;</font>
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <br/><h4>Firebird</h4>
 
@@ -2225,53 +743,15 @@ that return result sets.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">()</font> returns setof <font color="#008080">record</font> as <font color="#FF0000">'</font>
-<font color="#FF0000">        declare output record;</font>
-<font color="#FF0000">begin</font>
-<font color="#FF0000">        for output in select * from mytable loop</font>
-<font color="#FF0000">                return next output;</font>
-<font color="#FF0000">        end loop;</font>
-<font color="#FF0000">        return;</font>
-<font color="#FF0000">end;</font>
-<font color="#FF0000">'</font> language plpgsql
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"select * from testfunc() as (testint int, testfloat float, testchar char(40))"</font><font color="#990000">;</font>
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function testfunc
-</tt></pre>
-
 </blockquote>
 <h4>MySQL</h4>
 
@@ -2284,45 +764,15 @@ currently SQL Relay can only fetch the first result set.</p>
 the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
-</tt></pre>
-
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> <font color="#FF0000">"call testproc()"</font><font color="#990000">;</font>
-System<font color="#990000">.</font>Data<font color="#990000">.</font><font color="#008080">IDataReader</font> datareader <font color="#990000">=</font> sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteReader</font></b><font color="#990000">();</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-<font color="#008080">Double</font> out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b><font color="#990000">();</font>
-out1 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetInt64</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
-out2 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetDouble</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
-out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><font color="#000000">GetString</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">);</font>
-</tt></pre>
-
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
-</tt></pre>
-
 </blockquote>
 <a name="lastinsertid"/><h2>Getting the Last Insert ID</h2>
 

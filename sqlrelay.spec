@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.2.0
+Version: 1.2.1
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -846,6 +846,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Nov 08 2017 David Muse <david.muse@firstworks.com> - 1.2.1-1
+- Updated to version 1.2.1.
+
 * Fri Sep 22 2017 David Muse <david.muse@firstworks.com> - 1.2.0-1
 - Updated required version of rudiments-devel to 1.0.5.
 
