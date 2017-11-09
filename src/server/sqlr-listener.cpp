@@ -68,6 +68,9 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
+		"	-nodetach	Suppresses detachment from the controlling terminal.\n"
+		"			Useful for debugging.\n"
+		"\n"
 		DISABLECRASHHANDLER
 		BACKTRACE,
 		progname,SQL_RELAY,progname,SQL_RELAY,
@@ -84,7 +87,7 @@ int main(int argc, const char **argv) {
 	if (!cmdl.found("-id")) {
 		stdoutput.printf("usage:\n"
 			" %s-listener [-config config] -id id "
-			"[-localstatedir dir]\n",
+			"[-localstatedir dir] [-nodetach]\n",
 			SQLR);
 		process::exit(0);
 	}

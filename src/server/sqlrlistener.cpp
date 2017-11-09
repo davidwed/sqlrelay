@@ -335,7 +335,9 @@ bool sqlrlistener::init(int argc, const char **argv) {
 		return false;
 	}
 
-	process::detach();
+	if (!pvt->_cmdl->found("-nodetach")) {
+		process::detach();
+	}
 
 	process::createPidFile(pvt->_pidfile,permissions::ownerReadWrite());
 

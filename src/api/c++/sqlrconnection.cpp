@@ -936,7 +936,10 @@ void sqlrconnection::auth() {
 		debugPrint("Auth : ");
 		debugPrint(pvt->_user);
 		debugPrint(":");
-		debugPrint(pvt->_password);
+		// hide the password
+		for (uint8_t i=0; i<pvt->_passwordlen; i++) {
+			debugPrint("*");
+		}
 		debugPrint("\n");
 		debugPreEnd();
 	}

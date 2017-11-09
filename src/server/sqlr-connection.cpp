@@ -123,8 +123,8 @@ static void helpmessage(const char *progname) {
 		"	-scaler		Indicates to the %s that it was spawned\n"
 		"			by the %s-scaler.\n"
 		"\n"
-		"	-ttl sec	Time-to-live, in seconds.  If the %s is idle\n"
-		"			for this number of seconds, then it will exit.\n"
+		"	-ttl sec	Time-to-live, in seconds.  If the %s is\n"
+		"			idle for this number of seconds, then it will exit.\n"
 		"\n"
 		"	-silent		Suppresses log-in errors.\n"
 		"\n"
@@ -134,7 +134,7 @@ static void helpmessage(const char *progname) {
 		DISABLECRASHHANDLER
 		BACKTRACE,
 		progname,SQL_RELAY,progname,progname,SQL_RELAY,
-		progname,SQLR,SQLR,progname,progname,progname,SQLR);
+		progname,SQLR,SQLR,progname,progname,progname,SQLR,progname);
 }
 
 int main(int argc, const char **argv) {

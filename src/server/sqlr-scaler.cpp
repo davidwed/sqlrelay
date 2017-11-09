@@ -86,6 +86,7 @@ class SQLRSERVER_DLLSPEC scaler {
 		bool		iswindows;
 
 		const char	*backtrace;
+		bool		disablecrashhandler;
 
 		static	bool	shutdown;
 };
@@ -129,7 +130,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	cmdl=new sqlrcmdline(argc,argv);
 
 	process::handleShutDown(shutDown);
-	if (!cmdl->found("-disable-crash-handler")) {
+	disablecrashhandler=cmdl->found("-disable-crash-handler");
+	if (!disablecrashhandler) {
 		process::handleCrash(shutDown);
 	}
 
@@ -373,8 +375,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	dt.getSystemDateAndTime();
 	currentseed=dt.getEpoch();
 
-	// detach from the controlling tty
-	process::detach();
+	if (!cmdl->found("-nodetach")) {
+		// detach from the controlling tty
+		process::detach();
+	}
 
 	// create the pid file
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
@@ -490,7 +494,7 @@ pid_t scaler::openOneConnection() {
 
 	// build args
 	uint16_t	p=0;
-	const char	*args[17];
+	const char	*args[18];
 	args[p++]=cmdname.getString();
 	args[p++]="-silent";
 	args[p++]="-nodetach";
@@ -511,6 +515,9 @@ pid_t scaler::openOneConnection() {
 		args[p++]=backtrace;
 	}
 	args[p++]="-scaler";
+	if (disablecrashhandler) {
+		args[p++]="-disable-crash-handler";
+	}
 	args[p++]=NULL; // the last
 
 	pid_t	pid=process::spawn(cmd.getString(),args,(iswindows)?true:false);
@@ -790,6 +797,9 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
+		"	-nodetach	Suppresses detachment from the controlling terminal.\n"
+		"			Useful for debugging.\n"
+		"\n"
 		DISABLECRASHHANDLER
 		BACKTRACECHILDREN,
 		progname,SQL_RELAY,progname,SQL_RELAY,progname,SQLR,progname);
@@ -805,7 +815,7 @@ int main(int argc, const char **argv) {
 	if (!cmdl.found("-id")) {
 		stdoutput.printf("usage: \n"
 			" %s-scaler [-config config] -id id "
-			"[-localstatedir dir]\n",
+			"[-localstatedir dir] [-nodetach]\n",
 			SQLR);
 		process::exit(0);
 	}

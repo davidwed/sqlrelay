@@ -1,4 +1,9 @@
 1.2.1 - updated systemd init file to use SIGINT to kill sqlrelay
+	fixed several "ocurred" -> "occurred" typo's
+	client debug hides password now
+	passing -disable-crash-handler to the scaler passes it to connections
+		spawned by it now
+	passing -nodetach to the sqlr-scaler or sqlr-listener works now
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
