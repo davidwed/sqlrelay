@@ -14,7 +14,7 @@ all: $(SQLR)query_sqlrcmdgstat.$(LIBEXT) \
 	$(SQLR)query_sqlrcmdcstat.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)query_sqlrcmdgstat.$(LIBEXT): sqlrcmdgstat.cpp sqlrcmdgstat.$(OBJ)

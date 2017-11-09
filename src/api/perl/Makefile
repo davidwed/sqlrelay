@@ -17,7 +17,7 @@ include ../../../config.mk
 all: Connection.$(LIBEXT) Cursor.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.cpp *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.so *.$(PERLMAN3EXT_LOCAL)
+	$(LTCLEAN) $(RM) *.cpp *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii *.so *.$(PERLMAN3EXT_LOCAL)
 	$(RMTREE) .libs
 
 Connection.$(LIBEXT): Connection.xs Connection.cpp Connection.$(OBJ)

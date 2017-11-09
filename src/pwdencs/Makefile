@@ -15,7 +15,7 @@ all: $(SQLR)pwdenc_rot.$(LIBEXT) \
 	$(SQLR)pwdenc_crypt.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)pwdenc_rot.$(LIBEXT): rot.cpp rot.$(OBJ)

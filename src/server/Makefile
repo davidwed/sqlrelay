@@ -91,7 +91,7 @@ all: $(STATICPLUGINSRCS) \
 	$(SQLR)-status$(EXE)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(SQLR)-pwdenc$(EXE) $(SQLR)-status$(EXE) $(STATICPLUGINSRCS)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(SQLR)-pwdenc$(EXE) $(SQLR)-status$(EXE) $(STATICPLUGINSRCS)
 	$(RMTREE) .libs
 
 lib$(SQLR)server.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)

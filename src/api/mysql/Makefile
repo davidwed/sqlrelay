@@ -42,7 +42,7 @@ mysql51.obj: mysql.cpp
 	$(MV) mysql.obj mysql51.obj
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 libmysql3$(SQLRELAY).$(LIBEXT): mysql.cpp mysql3.$(OBJ)

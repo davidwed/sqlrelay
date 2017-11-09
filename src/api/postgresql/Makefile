@@ -13,7 +13,7 @@ include ../../../config.mk
 all: libpq$(SQLRELAY).$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 libpq$(SQLRELAY).$(LIBEXT): pqsqlrelay.cpp pqsqlrelay.$(OBJ)

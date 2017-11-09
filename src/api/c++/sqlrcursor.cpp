@@ -3003,7 +3003,7 @@ uint16_t sqlrcursor::getErrorStatus() {
 	} else if (result!=sizeof(uint16_t)) {
 		setError("Failed to determine whether an "
 				"error occurred or not.\n "
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return ERROR_OCCURRED;
 	}
 
@@ -3037,7 +3037,7 @@ bool sqlrcursor::getCursorId() {
 			char	*err=error::getErrorString();
 			stringbuffer	errstr;
 			errstr.append("Failed to get a cursor id.\n "
-					"A network error may have ocurred. ");
+					"A network error may have occurred. ");
 			errstr.append(err);
 			setError(errstr.getString());
 			delete[] err;
@@ -3062,7 +3062,7 @@ bool sqlrcursor::getSuspended() {
 	if (pvt->_cs->read(&suspendedresultset)!=sizeof(uint16_t)) {
 		setError("Failed to determine whether "
 			"the session was suspended or not.\n "
-			"A network error may have ocurred.");
+			"A network error may have occurred.");
 		return false;
 	}
 
@@ -3074,7 +3074,7 @@ bool sqlrcursor::getSuspended() {
 						sizeof(uint64_t)) {
 			setError("Failed to get the index of the "
 				"last row of a previously suspended result "
-				"set.\n A network error may have ocurred.");
+				"set.\n A network error may have occurred.");
 			return false;
 		}
 	
@@ -4601,7 +4601,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 		delete[] indexfilename;
 	}
 
-	// if we fell through to here, then an error has ocurred
+	// if we fell through to here, then an error has occurred
 	clearCacheSource();
 	return false;
 }

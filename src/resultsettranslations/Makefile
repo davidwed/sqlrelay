@@ -13,7 +13,7 @@ include ../../config.mk
 all: $(SQLR)resultsettranslation_reformatdatetime.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)resultsettranslation_reformatdatetime.$(LIBEXT): reformatdatetime.cpp reformatdatetime.$(OBJ)

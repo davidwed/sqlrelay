@@ -42,7 +42,7 @@ include ../../../config.mk
 all: sqlrelay.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.so
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.so *.ii
 	$(RMTREE) .libs
 
 sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)

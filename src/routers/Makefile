@@ -17,7 +17,7 @@ all: $(SQLR)router_regex.$(LIBEXT) \
 	$(SQLR)router_usedatabase.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)router_regex.$(LIBEXT): regex.cpp regex.$(OBJ)

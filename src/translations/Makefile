@@ -13,7 +13,7 @@ include ../../config.mk
 all: $(SQLR)translation_normalize.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)translation_normalize.$(LIBEXT): normalize.cpp normalize.$(OBJ)

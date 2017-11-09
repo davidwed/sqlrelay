@@ -13,7 +13,7 @@ include ../../config.mk
 all: $(SQLR)sh$(EXE) $(SQLR)-export$(EXE) $(SQLR)-import$(EXE)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj $(SQLR)-export$(EXE) $(SQLR)-import$(EXE) $(SQLR)sh$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.ii $(SQLR)-export$(EXE) $(SQLR)-import$(EXE) $(SQLR)sh$(EXE)
 
 $(SQLR)-export$(EXE): sqlr-export.cpp sqlr-export.$(OBJ)
 	$(LTLINK) $(LINK) $(CXXFLAGS) $(LDFLAGS) $(OUT)$@ sqlr-export.$(OBJ) $(CMDLINELIBS)

@@ -19,7 +19,7 @@ all-base: $(SQLR)auth_userlist.$(LIBEXT) \
 all-sqlrelay: $(SQLR)auth_sqlrelay.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)auth_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)

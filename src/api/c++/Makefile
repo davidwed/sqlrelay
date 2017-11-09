@@ -16,7 +16,7 @@ LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ)
 all: lib$(SQLR)client.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 lib$(SQLR)client.$(LIBEXT): $(SRCS) $(LOBJS)

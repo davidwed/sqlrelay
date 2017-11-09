@@ -16,7 +16,7 @@ LOBJS = sqlrclientwrapper.$(OBJ)
 all: lib$(SQLR)clientwrapper.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 lib$(SQLR)clientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
