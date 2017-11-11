@@ -490,6 +490,24 @@ void sqlrconnection::setTimeoutFromEnv(const char *var,
 	}
 }
 
+void sqlrconnection::getConnectTimeout(int32_t *timeoutsec,
+					int32_t *timeoutusec) {
+	*timeoutsec=pvt->_connecttimeoutsec;
+	*timeoutusec=pvt->_connecttimeoutusec;
+}
+
+void sqlrconnection::getAuthenticationTimeout(int32_t *timeoutsec,
+						int32_t *timeoutusec) {
+	*timeoutsec=pvt->_authtimeoutsec;
+	*timeoutusec=pvt->_authtimeoutusec;
+}
+
+void sqlrconnection::getResponseTimeout(int32_t *timeoutsec,
+						int32_t *timeoutusec) {
+	*timeoutsec=pvt->_responsetimeoutsec;
+	*timeoutusec=pvt->_responsetimeoutusec;
+}
+
 void sqlrconnection::endSession() {
 
 	if (pvt->_debug) {
