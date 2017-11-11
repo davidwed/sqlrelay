@@ -24,7 +24,7 @@
 		$tlscert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
 		$tlsca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
 	}
-	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;tls=yes;tlscert=$tlscert;tlsvalidate=ca;tlsca=$tlsca;debug=0";
+	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;tls=yes;tlscert=$tlscert;tlsvalidate=ca;tlsca=$tlsca;autocommit=0;debug=0";
 
 
 	# instantiation
