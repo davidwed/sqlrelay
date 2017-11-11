@@ -503,7 +503,7 @@ static int32_t bitStringToLong(const char *str) {
 #endif
 
 #ifdef NEED_IS_NUMBER_TYPE_CHAR
-static bool isNumberTypeChar(const char *type) { 
+static bool isNumberTypeChar(const char *type) {
 	return (!charstring::compareIgnoringCase(type,"NUMBER") ||
 		!charstring::compareIgnoringCase(type,"INT") ||
 		!charstring::compareIgnoringCase(type,"SMALLINT") ||
@@ -549,7 +549,8 @@ static bool isNumberTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"_FLOAT8") ||
 		!charstring::compareIgnoringCase(type,"_TINTERVAL") ||
 		!charstring::compareIgnoringCase(type,"INTERVAL") ||
-		!charstring::compareIgnoringCase(type,"_INTERVAL"));
+		!charstring::compareIgnoringCase(type,"_INTERVAL") ||
+		!charstring::compareIgnoringCase(type,"NUMERIC"));
 }
 #endif
 
@@ -599,7 +600,8 @@ static bool isNumberTypeInt(int16_t type) {
 		type==_FLOAT8_DATATYPE ||
 		type==_TINTERVAL_DATATYPE ||
 		type==INTERVAL_DATATYPE ||
-		type==_INTERVAL_DATATYPE);
+		type==_INTERVAL_DATATYPE ||
+		type==NUMERIC_DATATYPE);
 }
 #endif
 

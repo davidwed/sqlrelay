@@ -18,7 +18,7 @@
 	$socket="/tmp/test.socket";
 	$user="test";
 	$password="test";
-	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
+	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;autocommit=0;debug=0";
 
 
 	# instantiation

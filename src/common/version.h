@@ -5,6 +5,7 @@
 #include <rudiments/stdio.h>
 #include <rudiments/file.h>
 #include <rudiments/process.h>
+#include <rudiments/sys.h>
 
 static void version(int argc, const char **argv) {
 
@@ -13,7 +14,11 @@ static void version(int argc, const char **argv) {
 		return;
 	}
 
-	stdoutput.printf("%s %s\n",argv[0],SQLR_VERSION);
+	stdoutput.printf("%s %s\n\n",argv[0],SQLR_VERSION);
+	stdoutput.printf("Rudiments version: %s\n",sys::getRudimentsVersion());
+#if defined(__DATE__) && defined(__TIME__)
+	stdoutput.printf("Compiled: %s %s\n",__DATE__,__TIME__);
+#endif
 	stdoutput.write("\n"
 		"Copyright (C) 1999-2016 David Muse\n"
 		"This is free software; see the source for copying "
