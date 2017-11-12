@@ -942,6 +942,13 @@ class SQLRCLIENT_DLLSPEC sqlrcursor {
 		bool	resumeCachedResultSet(uint16_t id,
 						const char *filename);
 
+
+		/** Returns true and acts like executeQuery()
+		 *  when there is another result set available
+		 *  from the server. */
+		bool	nextResultSet();
+
+
 		/** Closes the current result set, if one is open.  Data
 		 *  that has been fetched already is still available but
 		 *  no more data may be fetched.  Server side resources

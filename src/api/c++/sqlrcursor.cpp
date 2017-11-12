@@ -5123,6 +5123,63 @@ bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 	return processInitialResultSet();
 }
 
+bool sqlrcursor::nextResultSet() {
+
+	// One could imagine an optimization where the availability of a next
+	// result set could be returned along with every result set..
+
+	if (!pvt->_queryptr) {
+		setError("No query being executed: _queryptr");
+		return false;
+	}
+	if (!pvt->_reexecute) {
+		setError("No query being executed: _rexecute");
+		return false;
+	}
+
+	if (!pvt->_sqlrc->openSession()) {
+		return false;
+	}
+
+	// refresh socket client
+	pvt->_cs=pvt->_sqlrc->cs();
+
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("Requesting nextResultSet");
+		pvt->_sqlrc->debugPrint("\n");
+		pvt->_sqlrc->debugPrint("Requesting Cursor: ");
+		pvt->_sqlrc->debugPrint((int64_t)pvt->_cursorid);
+		pvt->_sqlrc->debugPrint("\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+	pvt->_cs->write((uint16_t)NEXT_RESULT_SET);
+	pvt->_cs->write(pvt->_cursorid);
+	pvt->_sqlrc->flushWriteBuffer();
+
+	uint16_t err=getErrorStatus();
+	if (err != NO_ERROR_OCCURRED) {
+		if (err==TIMEOUT_GETTING_ERROR_STATUS) {
+			// the pattern here is that we bail immediately.
+			// error status has already been set.
+			pvt->_sqlrc->endSession();
+			return false;
+		}
+		getErrorFromServer();
+		if (err==ERROR_OCCURRED_DISCONNECT) {
+			pvt->_sqlrc->endSession();
+		}
+		return false;
+	}
+	bool resultbool;
+	if (getBool(&resultbool)!=sizeof(bool)) {
+		setError("Failed to get bool value.\n "
+			 "A network error may have occurred.");
+		return false;
+	}
+	return resultbool;
+}
+
 void sqlrcursor::closeResultSet() {
 	closeResultSet(true);
 }
@@ -5224,7 +5281,7 @@ void sqlrcursor::clearRows() {
 	// delete data in rows for long datatypes
 	uint32_t	rowbuffercount=pvt->_rowcount-pvt->_firstrowindex;
 	for (uint32_t i=0; i<rowbuffercount; i++) {
-	        for (uint32_t j=0; j<pvt->_colcount; j++) {
+		for (uint32_t j=0; j<pvt->_colcount; j++) {
 			if (getColumnInternal(j)->longdatatype) {
 				char		*field=getFieldInternal(i,j);
 				uint32_t	len=getFieldLengthInternal(i,j);

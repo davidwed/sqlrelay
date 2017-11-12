@@ -474,6 +474,18 @@ static bool isFloatTypeChar(const char *type) {
 }
 #endif
 
+#ifdef NEED_IS_NONSCALE_FLOAT_TYPE_CHAR
+static bool isNonScaleFloatTypeChar(const char *type) {
+	return (!charstring::compareIgnoringCase(type,"REAL") ||
+		!charstring::compareIgnoringCase(type,"FLOAT") ||
+		!charstring::compareIgnoringCase(type,"DOUBLE") ||
+		!charstring::compareIgnoringCase(type,"D_FLOAT") ||
+		!charstring::compareIgnoringCase(type,"DOUBLE PRECISION") ||
+		!charstring::compareIgnoringCase(type,"FLOAT4") ||
+		!charstring::compareIgnoringCase(type,"FLOAT8"));
+}
+#endif
+
 #ifdef NEED_IS_FLOAT_TYPE_INT
 static bool isFloatTypeInt(int16_t type) {
 	return (type==NUMERIC_DATATYPE ||
