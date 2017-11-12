@@ -431,6 +431,12 @@ bool sqlrservercursor::fetchFromBindCursor() {
 	return true;
 }
 
+bool sqlrservercursor::nextResultSet(bool *nextresultsetavailable) {
+	// by default, a next result set is not available
+	*nextresultsetavailable = false;
+	return true;
+}
+
 bool sqlrservercursor::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.

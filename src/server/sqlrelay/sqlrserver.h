@@ -376,6 +376,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						bool enablefilters,
 						bool enabletriggers);
 		bool	fetchFromBindCursor(sqlrservercursor *cursor);
+		bool	nextResultSet(sqlrservercursor *cursor,
+						bool *nextresultsetavailable);
 
 		// input bind variables
 		void		setFakeInputBindsForThisQuery(
@@ -963,6 +965,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual	bool		executeQuery(const char *query,
 							uint32_t length);
 		virtual bool	fetchFromBindCursor();
+		virtual	bool	nextResultSet(bool *nextresultsetavailable);
 		virtual	bool	queryIsNotSelect();
 		virtual	bool	queryIsCommitOrRollback();
 		virtual	void	errorMessage(char *errorbuffer,

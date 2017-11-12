@@ -6488,6 +6488,32 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 	return success;
 }
 
+bool sqlrservercontroller::nextResultSet(sqlrservercursor *cursor,
+						bool *nextresultsetavailable) {
+
+	bool	success=cursor->nextResultSet(nextresultsetavailable);
+
+	// on failure get the error (unless it's already been set)
+	if (!success && !cursor->getErrorNumber()) {
+		uint32_t	errorlength;
+		int64_t		errnum;
+		bool		liveconnection;
+		errorMessage(cursor,
+				cursor->getErrorBuffer(),
+				pvt->_maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
+		cursor->setErrorLength(errorlength);
+		cursor->setErrorNumber(errnum);
+		cursor->setLiveConnection(liveconnection);
+	}
+
+	raiseDebugMessageEvent((success)?"nextResultSet cursor succeeded":
+						"nextResultSet cursor failed");
+	raiseDebugMessageEvent("done nextResultSet");
+
+	return success;
+}
+
 void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 
 	// don't overwrite any message that's already been saved

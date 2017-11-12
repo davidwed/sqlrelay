@@ -188,6 +188,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 						const char *parameter);
 		bool	getQueryTreeCommand(sqlrservercursor *cursor);
 		bool	getTranslatedQueryCommand(sqlrservercursor *cursor);
+		bool	nextResultSetCommand(sqlrservercursor *cursor);
 
 		stringbuffer	debugstr;
 
@@ -596,6 +597,8 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		} else if (command==GET_TRANSLATED_QUERY) {
 			//cont->incrementGetTranslatedQueryCount();
 			loop=getTranslatedQueryCommand(cursor);
+		} else if (command==NEXT_RESULT_SET) {
+			loop=nextResultSetCommand(cursor);
 		} else {
 			loop=false;
 		}
@@ -1314,6 +1317,36 @@ bool sqlrprotocol_sqlrclient::reExecuteQueryCommand(sqlrservercursor *cursor) {
 		returnError(cursor,true);
 	}
 	cont->raiseDebugMessageEvent("reexecute query failed");
+	return false;
+}
+
+bool sqlrprotocol_sqlrclient::nextResultSetCommand(sqlrservercursor *cursor) {
+	debugFunction();
+
+	cont->raiseDebugMessageEvent("nextResultSet");
+
+	// if we're using a custom cursor then operate on it
+	// FIXME: push up?
+	sqlrservercursor	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		cursor=customcursor;
+	}
+
+	bool nextresultsetavailable;
+	if (cont->nextResultSet(cursor,&nextresultsetavailable)) {
+		cont->raiseDebugMessageEvent("nextResultSet succeeded");
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+		clientsock->write(nextresultsetavailable);
+		clientsock->flushWriteBuffer(-1,-1);
+		// FIXME: re-enable this
+		//cont->incrementNextResultSetCount(nextresultsetavailable);
+		return true;
+	}
+
+	cont->raiseDebugMessageEvent("nextResultSet failed");
+	returnError(!cont->getLiveConnection());
+	// FIXME: re-enable this
+	//cont->incrementNextResultSetCount(false);
 	return false;
 }
 
