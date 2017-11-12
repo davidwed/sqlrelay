@@ -669,9 +669,10 @@ bool sqlrservercursor::fakeInputBinds() {
 				// and skip past the variable...
 				//
 				// for bind-by-name cases, we need to check
-				// after the variable for whitespace, a comma
-				// or a right parenthesis to make sure that we 
-				// don't make the following mistake:
+				// after the variable for whitespace, a comma,
+				// a semicolon, or a right parenthesis to make
+				// sure that we don't make the following
+				// mistake:
 				//
 				// select :var1,:var15 from mytable
 				//
@@ -704,9 +705,13 @@ bool sqlrservercursor::fakeInputBinds() {
 					*(ptr+pvt->_inbindvars[i].
 						variablesize)=='\n' ||
 					*(ptr+pvt->_inbindvars[i].
+						variablesize)=='\r' ||
+					*(ptr+pvt->_inbindvars[i].
 						variablesize)==')' ||
 					*(ptr+pvt->_inbindvars[i].
 						variablesize)==',' ||
+					*(ptr+pvt->_inbindvars[i].
+						variablesize)==';' ||
 					*(ptr+pvt->_inbindvars[i].
 						variablesize)=='\0')
 					)) {

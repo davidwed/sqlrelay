@@ -4,6 +4,14 @@
 	passing -disable-crash-handler to the scaler passes it to connections
 		spawned by it now
 	passing -nodetach to the sqlr-scaler or sqlr-listener works now
+	added get*Timeout methods to the C++ API
+	various pdo tweaks to make it more consistent with other pdo drivers
+	added rudiments version an compile date/time to output of --version
+	exposed timeouts, client info via custom pdo options
+	timeouts configurable in pdo connect string now
+	dsn parameters can be overriden (or supplied outright) in the
+		connect string now
+	added \r and ; as possible after-variable characters for fake-binds
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

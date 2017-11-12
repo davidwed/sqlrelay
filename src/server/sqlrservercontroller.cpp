@@ -2873,7 +2873,8 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// then we're done with the bind variable.  Process it.
 			// Otherwise get the variable itself in another buffer.
 			bool	endofbind=(character::isWhitespace(*c) ||
-						*c==',' || *c==')' || *c==';' ||
+						*c==',' || *c==')' ||
+						*c==';' || *c=='=' ||
 						(*c==':' && *(c+1)=='='));
 			if (endofbind || c==endptr) {
 
