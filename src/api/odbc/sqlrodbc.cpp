@@ -2171,6 +2171,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 
 
 static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
+					parameterstring *connparams,
 					SQLCHAR *dsn,
 					SQLSMALLINT dsnlength,
 					SQLCHAR *user,
@@ -2196,7 +2197,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					(const char *)dsn,dsnlength);
 	conn->dsn[dsnlength]='\0';
 
-	// get data from dsn
+	// get data from dsn...
+	// FIXME: If the dsn is an empty string then SQLGetPrivateProfileString
+	// will fetch the first matching fields it can find from any DSN
+	// FIXME: parameter names should be case insensitive
+	// FIXME: parameter names should support brackets
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Server","",
 					conn->server,sizeof(conn->server),
 					ODBC_INI);
@@ -2251,10 +2256,9 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Tries","1",
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
-
+	conn->tries=(int32_t)charstring::toInteger(triesbuf);
 
 	// krb options
-	conn->tries=(int32_t)charstring::toInteger(triesbuf);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","0",
 					conn->krb,sizeof(conn->krb),
 					ODBC_INI);
@@ -2359,6 +2363,57 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	conn->clearbindsduringprepare=
 		!charstring::isNo(clearbindsduringpreparebuf);
 
+	// override dsn values with values passed in via the connectstring
+	if (connparams!=NULL) {
+		const char	*connserver=connparams->getValue("Server");
+		if (connserver!=NULL) {
+			charstring::safeCopy(conn->server,
+						sizeof(conn->server),
+						connserver);
+		}
+		const char	*connport=connparams->getValue("Port");
+		if (connport!=NULL) {
+			conn->port=(uint16_t)
+				charstring::toUnsignedInteger(connport);
+		}
+		const char	*connsocket=connparams->getValue("Socket");
+		if (connsocket!=NULL) {
+			charstring::safeCopy(conn->socket,
+						sizeof(conn->socket),
+						connsocket);
+		}
+		const char	*connretrytime=
+				connparams->getValue("RetryTime");
+		if (connretrytime!=NULL) {
+			conn->retrytime=(int32_t)
+				charstring::toInteger(connretrytime);
+		}
+		const char	*conntries=connparams->getValue("Tries");
+		if (conntries!=NULL) {
+			conn->tries=(int32_t)charstring::toInteger(conntries);
+		}
+		// FIXME: krb options
+		// FIXME: tls options
+		const char	*conn_db=connparams->getValue("Db");
+		if (conn_db!=NULL) {
+			charstring::safeCopy(conn->db,sizeof(conn->db),conn_db);
+		}
+		const char	*conndebug=connparams->getValue("Debug");
+		if (conndebug!=NULL) {
+			charstring::safeCopy(conn->debug,
+						sizeof(conn->debug),
+						conndebug);
+		}
+		// FIXME: other flags
+		const char	*connlazyconnect=
+				connparams->getValue("LazyConnect");
+		if (connlazyconnect!=NULL) {
+			conn->lazyconnect=!charstring::isNo(connlazyconnect);
+		}
+		// FIXME: other flags
+	}
+
+
 	debugPrintf("  DSN: %s\n",conn->dsn);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
 	debugPrintf("  Server: %s\n",conn->server);
@@ -2456,7 +2511,7 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 					SQLCHAR *password,
 					SQLSMALLINT passwordlength) {
 	debugFunction();
-	return SQLR_SQLConnect(connectionhandle,dsn,dsnlength,
+	return SQLR_SQLConnect(connectionhandle,NULL,dsn,dsnlength,
 				user,userlength,password,passwordlength);
 }
 
@@ -9000,13 +9055,18 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	// clean up
 	delete[] nulltermconnstr;
 
-	// the dsn must be valid
+	// the connect string must include a valid dsn or server parameter
 	if (charstring::isNullOrEmpty(dsn)) {
-		return SQL_ERROR;
+		if (charstring::isNullOrEmpty(pstr.getValue("Server"))) {
+			return SQL_ERROR;
+		} else {
+			dsn="SQLRELAY_DEFAULT";
+		}
 	}
 
 	// connect
 	return SQLR_SQLConnect(hdbc,
+				&pstr,
 				(SQLCHAR *)dsn,
 				charstring::length(dsn),
 				(SQLCHAR *)uid,
