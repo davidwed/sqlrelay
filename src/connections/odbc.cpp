@@ -19,6 +19,7 @@
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
+#include <rudiments/sys.h>
 
 #include <datatypes.h>
 #include <defines.h>
@@ -170,6 +171,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
+		bool		nextResultSet(bool *nextresultsetavailable);
 		void		closeResultSet();
 
 
@@ -220,7 +222,9 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 			odbcconnection(sqlrservercontroller *cont);
 	private:
 		void		handleConnectString();
+		bool		mustDetachBeforeLogIn();
 		bool		logIn(const char **error, const char **warning);
+		char		*traceFileName(const char *tracefilenameformat);
 		const char	*logInError(const char *errmsg);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
@@ -277,12 +281,20 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		SQLHENV		env;
 		SQLHDBC		dbc;
 
+		const char	*driver;
 		const char	*dsn;
+		const char	*server;
+		const char	*db;
+		bool		trace;
+		const char	*tracefile;
 		uint64_t	timeout;
-
+		uint64_t	querytimeout;
 		const char	*identity;
-
 		const char	*odbcversion;
+		bool		detachbeforelogin;
+		const char	*lastinsertidquery;
+		bool		executedirect;
+		bool		executerpc;
 		bool		mars;
 
 		stringbuffer	errormessage;
@@ -299,8 +311,10 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 #include <wchar.h>
 
 #define USER_CODING "UTF8"
+#define FIXED_BUFFER_COUNT 512
 
-char *buffers[200];
+// FIXME: this fixed size should be dynamic or at least checked.
+char *buffers[FIXED_BUFFER_COUNT];
 int nextbuf=0;
 
 void printerror(const char *error) {
@@ -320,11 +334,20 @@ int ucslen(char* str) {
 }
 
 char *conv_to_user_coding(char *inbuf) {
+
+	// Insize is the number of unicode codepoints times 2.
+	// A full 16 bit codepoint might generate 3 bytes in the output utf, so
+	// this conversion could make things bigger.
+	// It's possible to get errno=E2BIG if we do not have enough space, and
+	// that is eventually fatal.
+	// One more byte for zero termination.
 	
 	size_t	insize=ucslen(inbuf)*2;
-	size_t	avail=insize+4;
+	size_t	avail=(insize/2)*3+1;
 	char	*outbuf=new char[avail];
 	char	*wrptr=outbuf;
+	size_t	insizebefore=insize;
+	size_t	availbefore=avail;
 
 	iconv_t	cd=iconv_open(USER_CODING,"UCS-2");
 	if (cd==(iconv_t)-1) {
@@ -344,16 +367,14 @@ char *conv_to_user_coding(char *inbuf) {
 	size_t	nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
 	#endif
 	if (nconv==(size_t)-1) {
-		stdoutput.printf("conv_to_user_coding: error in iconv\n");
+		stdoutput.printf("conv_to_user_coding: error in iconv = %d "
+				"insize=%ld/%ld avail=%ld/%ld before/after.\n",
+				errno,insizebefore,insize,availbefore,avail);
 	}		
 	
 	/* Terminate the output string. */
 	*(wrptr)='\0';
 				
-	if (nconv==(size_t)-1) {
-		stdoutput.printf("wrptr='%s'\n",wrptr);
-	}
-
 	if (iconv_close(cd)!=0) {
 		printerror("iconv_close");
 	}
@@ -404,8 +425,20 @@ char *conv_to_ucs(char *inbuf) {
 
 odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
+	driver=NULL;
+	dsn=NULL;
+	server=NULL;
+	db=NULL;
+	trace=false;
+	tracefile=NULL;
+	timeout=0;
+	querytimeout=0;
 	identity=NULL;
 	odbcversion=NULL;
+	detachbeforelogin=false;
+	lastinsertidquery=NULL;
+	executedirect=false;
+	executerpc=false;
 	mars=false;
 }
 
@@ -414,7 +447,14 @@ void odbcconnection::handleConnectString() {
 
 	sqlrserverconnection::handleConnectString();
 
+	driver=cont->getConnectStringValue("driver");
 	dsn=cont->getConnectStringValue("dsn");
+	server=cont->getConnectStringValue("server");
+	db=cont->getConnectStringValue("db");
+
+	trace=!charstring::compare(
+			cont->getConnectStringValue("trace"),"yes");
+	tracefile=cont->getConnectStringValue("tracefile");
 
 	const char	*to=cont->getConnectStringValue("timeout");
 	if (!charstring::length(to)) {
@@ -424,14 +464,31 @@ void odbcconnection::handleConnectString() {
 		timeout=charstring::toInteger(to);
 	}
 
+	const char	*qto=cont->getConnectStringValue("querytimeout");
+	if (charstring::length(qto)) {
+		querytimeout=charstring::toInteger(qto);
+	}
+
 	identity=cont->getConnectStringValue("identity");
 
 	odbcversion=cont->getConnectStringValue("odbcversion");
+
+	detachbeforelogin=!charstring::compare(
+			cont->getConnectStringValue("detachbeforelogin"),"yes");
+
+	lastinsertidquery=cont->getConnectStringValue("lastinsertidquery");
+
+	executedirect=!charstring::compare(
+			cont->getConnectStringValue("executedirect"),"yes");
 
 	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
+}
+
+bool odbcconnection::mustDetachBeforeLogIn() {
+	return detachbeforelogin;
 }
 
 bool odbcconnection::logIn(const char **error, const char **warning) {
@@ -462,11 +519,6 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 #endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		*error="Failed to allocate environment handle";
-		#if (ODBCVER >= 0x0300)
-		SQLFreeHandle(SQL_HANDLE_ENV,env);
-		#else
-		SQLFreeEnv(env);
-		#endif
 		return false;
 	}
 
@@ -480,18 +532,32 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		*error="Failed to allocate connection handle";
 		#if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
-		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 		#else
-		SQLFreeConnect(dbc);
 		SQLFreeEnv(env);
 		#endif
 		return false;
 	}
 
+#if (ODBCVER >= 0x0300)
+	if (trace && !charstring::isNullOrEmpty(tracefile)) {
+		// FIXME: does this need to persist?
+		char	*tracefilename=traceFileName(tracefile);
+		erg=SQLSetConnectAttr(dbc,
+				SQL_ATTR_TRACEFILE,
+				(SQLPOINTER *)tracefilename,
+				SQL_NTS);
+		erg=SQLSetConnectAttr(dbc,
+				SQL_ATTR_TRACE,
+				(SQLPOINTER *)SQL_OPT_TRACE_ON,
+				0);
+		delete[] tracefilename;
+	}
+#endif
+
 	// set the connect timeout
 #if (ODBCVER >= 0x0300)
 	if (timeout) {
-		SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
+		erg=SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
 					(SQLPOINTER *)timeout,0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			*error="Failed to set timeout";
@@ -548,6 +614,68 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 	return true;
+}
+
+char *odbcconnection::traceFileName(const char *tracefilenameformat) {
+
+	/* This would be a good candidate for promotion to rudiments,
+	   These format operators are enough to provide a unique log file
+	   name, per-process:
+	   %p means PID
+	   %t means a timestamp.
+	   %h means the hostname.
+	   If any of these appears more than once then the output filename
+	   may be truncated.
+	*/
+
+	pid_t	pid=process::getProcessId();
+
+	datetime dt;
+	dt.getSystemDateAndTime();
+	time_t	now=dt.getEpoch();
+
+	char	*hostname=sys::getHostName();
+
+	size_t	tracefilenamebuffersize=charstring::length(tracefilenameformat);
+	tracefilenamebuffersize+=charstring::integerLength((int64_t)pid);
+	tracefilenamebuffersize+=charstring::integerLength((int64_t)now);
+	tracefilenamebuffersize+=charstring::length(hostname);
+	tracefilenamebuffersize+=1;
+
+	char		*tracefilename=new char[tracefilenamebuffersize];
+	char		*outptr=tracefilename;
+	size_t		outptrsize=tracefilenamebuffersize-1;
+	const char	*ptr=tracefilenameformat;
+	*outptr=0;
+	while (*ptr && (outptrsize>0)) {
+		if (*ptr=='%') {
+			char	*insertstring=NULL;
+			int64_t	insertnumber=0;
+			ptr++;
+			if (*ptr=='p') {
+				insertnumber=pid;
+			} else if (*ptr=='t') {
+				insertnumber=now;
+			} else if (*ptr=='h') {
+				insertstring=hostname;
+			}
+			if (insertstring!=NULL) {
+				charstring::printf(outptr,outptrsize,"%s",insertstring);
+			} else {
+				charstring::printf(outptr,outptrsize,"%ld",insertnumber);
+			}
+			ptr++;
+			size_t	outptrinc=charstring::length(outptr);
+			outptrsize-=outptrinc;
+			outptr+=outptrinc;
+		} else {
+			*outptr++=*ptr++;
+			outptrsize--;
+			*outptr=0;
+		}
+	}
+	delete[] hostname;
+	return tracefilename;
 }
 
 const char *odbcconnection::logInError(const char *errmsg) {
@@ -2593,6 +2721,11 @@ bool odbccursor::getLobFieldSegment(uint32_t col,
 	// return number of bytes/chars read
 	*charsread=totalbytesread;
 
+	return true;
+}
+
+bool odbccursor::nextResultSet(bool *nextresultsetavailable) {
+	*nextresultsetavailable=false;
 	return true;
 }
 
