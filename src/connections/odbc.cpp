@@ -244,6 +244,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*bindFormat();
+		const char	*getLastInsertIdQuery();
 		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
@@ -660,9 +662,11 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 				insertstring=hostname;
 			}
 			if (insertstring!=NULL) {
-				charstring::printf(outptr,outptrsize,"%s",insertstring);
+				charstring::printf(
+					outptr,outptrsize,"%s",insertstring);
 			} else {
-				charstring::printf(outptr,outptrsize,"%ld",insertnumber);
+				charstring::printf(
+					outptr,outptrsize,"%ld",insertnumber);
 			}
 			ptr++;
 			size_t	outptrinc=charstring::length(outptr);
@@ -731,6 +735,15 @@ const char *odbcconnection::dbVersion() {
 			(SQLSMALLINT)sizeof(dbversion),
 			&dbversionlen);
 	return dbversion;
+}
+
+const char *odbcconnection::bindFormat() {
+	// FIXME: not true for all db's
+	return "?";
+}
+
+const char *odbcconnection::getLastInsertIdQuery() {
+	return lastinsertidquery;
 }
 
 bool odbcconnection::getListsByApiCalls() {
