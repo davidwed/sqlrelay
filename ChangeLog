@@ -12,6 +12,8 @@
 	dsn parameters can be overriden (or supplied outright) in the
 		connect string now
 	added \r and ; as possible after-variable characters for fake-binds
+	added -short, -connection-detail, and -query options to sqlr-status
+	added initial support for queries that return multiple result sets
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
