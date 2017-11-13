@@ -3,9 +3,11 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
+#include <rudiments/sys.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 #include <datatypes.h>
+#include <config.h>
 
 // for time_t, time(), localtime()
 #include <time.h>
@@ -204,6 +206,11 @@ bool sqlrquery_sqlrcmdgstatcursor::executeQuery(const char *query,
 	strftime(tmpbuf,GSTAT_VALUE_LEN,"%Y/%m/%d %H:%M:%S",
 			localtime(&(gs->peak_connectedclients_1min_time)));
 	setGSResult("peak_session_1min_time",tmpbuf,rowcount++);
+	setGSResult("sqlr_version",SQLR_VERSION,rowcount++);
+	setGSResult("rudiments_version",sys::getRudimentsVersion(),rowcount++);
+#if defined(__DATE__) && defined(__TIME__)
+	setGSResult("module_compiled", __DATE__ " " __TIME__, rowcount++);
+#endif
 
 	currentrow=0;
 	return true;
