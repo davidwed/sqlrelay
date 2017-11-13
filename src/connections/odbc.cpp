@@ -12,6 +12,9 @@
 #include <sqlucode.h>
 #include <sqltypes.h>
 
+// for memchr
+#include <string.h>
+
 // note that sqlrserver.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
@@ -76,6 +79,12 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		void		deallocateResultSetBuffers();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		void		initializeDirectives();
+		void		parseDirective(const char *directivestart,
+							uint32_t length);
+		void		parseDirectives(const char *query,
+							uint32_t length);
+		void		crashmeTest(int32_t iargument);
 		bool		allocateStatementHandle();
 		void		initializeColCounts();
 		void		initializeRowCounts();
@@ -206,6 +215,10 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		SQLINTEGER	sqlnulldata;
 		#endif
 
+		uint64_t	querytimeout;
+		bool		executedirect;
+		bool		executerpc;
+
 		uint32_t	row;
 		uint32_t	maxrow;
 		uint32_t	totalrows;
@@ -308,7 +321,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		detachbeforelogin;
 		const char	*lastinsertidquery;
 		bool		executedirect;
-		bool		executerpc;
 		bool		mars;
 
 		stringbuffer	errormessage;
@@ -453,7 +465,6 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	detachbeforelogin=false;
 	lastinsertidquery=NULL;
 	executedirect=false;
-	executerpc=false;
 	mars=false;
 }
 
@@ -1872,6 +1883,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	initializeColCounts();
 	initializeRowCounts();
+	initializeDirectives();
 }
 
 odbccursor::~odbccursor() {
@@ -1925,6 +1937,10 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	// initialize column count
 	initializeColCounts();
 
+	// parse query directives
+	initializeDirectives();
+	parseDirectives(query,length);
+
 	// allocate the statement handle
 	if (!allocateStatementHandle()) {
 		return false;
@@ -1940,16 +1956,166 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			delete[] buffers[nextbuf];
 		}
 	}
+	if (executedirect) {
+		return true;
+	}
 	char *query_ucs=conv_to_ucs((char*)query);
 	erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
 	if (query_ucs) {
 		delete[] query_ucs;
 	}
 	#else
+	if (executedirect) {
+		return true;
+	}
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	#endif
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
+
+void odbccursor::initializeDirectives() {
+	querytimeout=0;
+	executedirect=odbcconn->executedirect;
+	executerpc=false;
+}
+
+// FIXME: arguably this should all be pushed up to the controller
+
+#define KEYWORD_SQLEXECDIRECT "sqlexecdirect"
+#define KEYWORD_QUERYTIMEOUT "querytimeout:"
+#define KEYWORD_SQLPREPARE "sqlprepare"
+#define KEYWORD_SQLRELAY_CRASH "sqlrelay-crash"
+#define KEYWORD_SQLRELAY_CRASH_ARG "sqlrelay-crash:"
+#define MARKER_ODBC_RPC '{'
+
+void odbccursor::parseDirectives(const char *query, uint32_t length) {
+
+	const char	*linestart=NULL;
+	const char	*lineend=NULL;
+
+	if (query[0]==MARKER_ODBC_RPC) {
+		executedirect=true;
+		executerpc=true;
+	}
+	linestart=query;
+
+	for (uint32_t i=0; i < length; ++i) {
+		if ((query[i]=='\n') || !((i+1)<length)) {
+			if (query[i]=='\n') {
+				lineend=&query[i];
+			} else {
+				lineend=&query[i+1];
+			}
+			if (((lineend-linestart)>2) &&
+				(linestart[0]=='-') &&
+				(linestart[1]=='-')) {
+				parseDirective(&linestart[2],
+						lineend-linestart-2);
+			}
+			linestart=&query[i+1];
+		}
+	}
+}
+
+void odbccursor::parseDirective(const char *directivestart, uint32_t length) {
+
+	uint32_t	cleanlength=length;
+	int32_t		argumentsize;
+	const char	*argument;
+	int32_t		iargument=0;
+
+	if (cleanlength && directivestart[cleanlength-1]=='\r') {
+		cleanlength--;
+	}
+	if (!cleanlength) {
+		return;
+	}
+
+	// Note: These are not intended to be human friendly declarations,
+	// just very strict and simple formats for a code generator to emit.
+	if (!charstring::compare(directivestart,
+				KEYWORD_SQLEXECDIRECT,
+				cleanlength)) {
+		executedirect=true;
+		return;
+	}
+
+	if (!charstring::compare(directivestart,
+				KEYWORD_SQLPREPARE,
+				cleanlength)) {
+		executedirect=false;
+	}
+
+	if (!charstring::compare(directivestart,
+				KEYWORD_SQLRELAY_CRASH,
+				cleanlength)) {
+		crashmeTest(0);
+		return;
+	}
+
+	if ((cleanlength>charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)) &&
+		(!charstring::compare(directivestart,
+			KEYWORD_SQLRELAY_CRASH_ARG,
+			charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)))) {
+
+		argumentsize=cleanlength-
+				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG);
+		argument=&directivestart[
+				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)];
+
+		if (charstring::isInteger(argument,argumentsize)) {
+			iargument=charstring::toInteger(argument);
+		}
+
+		crashmeTest(iargument);
+		return;
+	}
+
+	if ((cleanlength>charstring::length(KEYWORD_QUERYTIMEOUT)) &&
+		(!charstring::compare(directivestart,
+				KEYWORD_QUERYTIMEOUT,
+				charstring::length(KEYWORD_QUERYTIMEOUT)))) {
+
+		argumentsize=cleanlength-
+				charstring::length(KEYWORD_QUERYTIMEOUT);
+		argument=&directivestart[
+				charstring::length(KEYWORD_QUERYTIMEOUT)];
+
+		if (charstring::isInteger(argument,argumentsize)) {
+			// well, I know that the directive is always zero
+			// terminated someplace, and I already know this it
+			// appears to be an integer, so let it rip even though
+			// we would like to use the argumentsize.
+			querytimeout=charstring::toInteger(argument);
+		}
+		return;
+	}
+}
+
+void odbccursor::crashmeTest(int32_t iargument) {
+
+	char	*some_ptr=(char *)NULL;
+
+	if (iargument==0) {
+		// assignment to NULL pointer
+		some_ptr[0]=1;
+	} else if (iargument==1) {
+		// delete NULL pointer
+		delete[] some_ptr;
+	} else if (iargument==2) {
+		// double free
+		some_ptr=new char[100];
+		delete[] some_ptr;
+		delete[] some_ptr;
+	} else if (iargument==3) {
+		// accessing NULL pointer
+		some_ptr[0]=(memchr(some_ptr,25,30))?1:2;
+	} else if (iargument==4) {
+		// accessing NULL pointer 
+		some_ptr[0]=some_ptr[10];
+	}
+}
+
 
 bool odbccursor::allocateStatementHandle() {
 
@@ -1959,6 +2125,7 @@ bool odbccursor::allocateStatementHandle() {
 		#else
 		SQLFreeStmt(stmt,SQL_DROP);
 		#endif
+		stmt=NULL;
 	}
 
 	#if (ODBCVER >= 0x0300)
@@ -2325,11 +2492,11 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	// * init from query timeout specified in the connect string
 	// * override with query timeout set via a directive
 	// * if it's still > 0 then actually set the timeout
+	// FIXME: doesn't initializeDirectives basically do this?
 	uint64_t	statementquerytimeout=odbcconn->querytimeout;
-	// FIXME: re-enable this when directives are merged in...
-	/*if (querytimeout>0) {
+	if (querytimeout>0) {
 		statementquerytimeout=querytimeout;
-	}*/
+	}
 	if (statementquerytimeout>0) {
 		erg=SQLSetStmtAttr(stmt,SQL_ATTR_QUERY_TIMEOUT,
 					(SQLPOINTER)statementquerytimeout,
@@ -2338,8 +2505,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// execute the query
-	// FIXME: re-enable this when directives are merged in...
-	/*if (executedirect) {
+	if (executedirect) {
 		#ifdef HAVE_SQLCONNECTW
 		char	*queryucs=conv_to_ucs((char*)query);
 		erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
@@ -2347,9 +2513,9 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		#else
 		erg=SQLExecDirect(stmt,(SQLCHAR *)query,length);
 		#endif
-	} else {*/
+	} else {
 		erg=SQLExecute(stmt);
-	//}
+	}
 	if (erg!=SQL_SUCCESS &&
 			erg!=SQL_SUCCESS_WITH_INFO
 			#if defined(SQL_NO_DATA)
