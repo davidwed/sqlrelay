@@ -5860,6 +5860,20 @@ void sqlrservercontroller::incrementReLogInCount() {
 	pvt->_connstats->nrelogin++;
 }
 
+void sqlrservercontroller::incrementNextResultSetCount() {
+	if (!pvt->_connstats) {
+		return;
+	}
+	pvt->_connstats->nnextresultset++;
+}
+
+void sqlrservercontroller::incrementNextResultSetAvailableCount() {
+	if (!pvt->_connstats) {
+		return;
+	}
+	pvt->_connstats->nnextresultsetavailable++;
+}
+
 uint32_t sqlrservercontroller::getStatisticsIndex() {
 	if (!pvt->_connstats) {
 		return 0;

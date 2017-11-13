@@ -1338,15 +1338,16 @@ bool sqlrprotocol_sqlrclient::nextResultSetCommand(sqlrservercursor *cursor) {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->write(nextresultsetavailable);
 		clientsock->flushWriteBuffer(-1,-1);
-		// FIXME: re-enable this
-		//cont->incrementNextResultSetCount(nextresultsetavailable);
+		if (nextresultsetavailable) {
+			cont->incrementNextResultSetAvailableCount();
+		}
+		cont->incrementNextResultSetCount();
 		return true;
 	}
 
 	cont->raiseDebugMessageEvent("nextResultSet failed");
 	returnError(!cont->getLiveConnection());
-	// FIXME: re-enable this
-	//cont->incrementNextResultSetCount(false);
+	cont->incrementNextResultSetCount();
 	return false;
 }
 

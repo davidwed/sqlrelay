@@ -283,6 +283,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	incrementGetColumnListCount();
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
+		void	incrementNextResultSetCount();
+		void	incrementNextResultSetAvailableCount();
 		uint32_t	getStatisticsIndex();
 
 

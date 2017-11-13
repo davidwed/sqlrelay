@@ -67,6 +67,8 @@ struct sqlrconnstatistics {
 	uint64_t			nsql;
 	uint32_t			ncustomsql;
 	uint32_t			nrelogin;
+	uint32_t			nnextresultset;
+	uint32_t			nnextresultsetavailable;
 	uint64_t			loggedinsec;
 	uint64_t			loggedinusec;
 	uint64_t			statestartsec;
