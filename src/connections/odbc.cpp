@@ -224,6 +224,13 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		void		handleConnectString();
 		bool		mustDetachBeforeLogIn();
 		bool		logIn(const char **error, const char **warning);
+		char		*odbcDriverConnectionString(
+						const char *userasc,
+						const char *passwordasc);
+		void		pushConnstrValue(char **pptr,
+						size_t *pbuffavail,
+						const char *keyword,
+						const char *value);
 		char		*traceFileName(const char *tracefilenameformat);
 		const char	*logInError(const char *errmsg);
 		sqlrservercursor	*newCursor(uint16_t id);
@@ -241,6 +248,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 						int64_t	*errorcode,
 						bool *liveconnection);
 		#endif
+		bool		isLiveConnection(SQLCHAR *state);
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
@@ -278,12 +286,16 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		char		*getCurrentDatabase();
 		char		*getCurrentSchema();
 		bool		setIsolationLevel(const char *isolevel);
+		const char	*dbHostNameQuery();
+		const char	*dbIpAddressQuery();
+
 
 		SQLRETURN	erg;
 		SQLHENV		env;
 		SQLHDBC		dbc;
 
 		const char	*driver;
+		const char	*driverconnect;
 		const char	*dsn;
 		const char	*server;
 		const char	*db;
@@ -325,9 +337,9 @@ void printerror(const char *error) {
 	delete[] err;
 }
 
-int ucslen(char* str) {
-	char *ptr=str;
-	int res=0;
+int ucslen(const char *str) {
+	const char	*ptr=str;
+	int		res=0;
 	while (!(*ptr==0 && *(ptr+1)==0)) {
 		res++;
 		ptr+=2;
@@ -335,7 +347,7 @@ int ucslen(char* str) {
 	return res;
 }
 
-char *conv_to_user_coding(char *inbuf) {
+char *conv_to_user_coding(const char *inbuf) {
 
 	// Insize is the number of unicode codepoints times 2.
 	// A full 16 bit codepoint might generate 3 bytes in the output utf, so
@@ -361,12 +373,12 @@ char *conv_to_user_coding(char *inbuf) {
 		return outbuf;
 	}
 
-	char	*inptr=inbuf;
+	const char	*inptr=inbuf;
 		
 	#ifdef ICONV_CONST_CHAR
-	size_t	nconv=iconv(cd,(const char **)&inptr,&insize,&wrptr,&avail);
-	#else
 	size_t	nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
+	#else
+	size_t	nconv=iconv(cd,(char **)&inptr,&insize,&wrptr,&avail);
 	#endif
 	if (nconv==(size_t)-1) {
 		stdoutput.printf("conv_to_user_coding: error in iconv = %d "
@@ -383,7 +395,7 @@ char *conv_to_user_coding(char *inbuf) {
 	return outbuf;
 }
 
-char *conv_to_ucs(char *inbuf) {
+char *conv_to_ucs(const char *inbuf) {
 	
 	size_t	insize=charstring::length(inbuf);
 	size_t	avail=insize*2+4;
@@ -396,18 +408,18 @@ char *conv_to_ucs(char *inbuf) {
 		printerror("error in iconv_open");
 
 		/* Terminate the output string.  */
-		*outbuf = L'\0';
+		*outbuf=L'\0';
 		return outbuf;
 	}
 
-	char *inptr = inbuf;
+	const char	*inptr=inbuf;
 		
 	#ifdef ICONV_CONST_CHAR
-	size_t nconv=iconv(cd,(const char **)&inptr,&insize,&wrptr,&avail);
-	#else
 	size_t nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
+	#else
+	size_t nconv=iconv(cd,(char **)&inptr,&insize,&wrptr,&avail);
 	#endif
-	if (nconv == (size_t) -1) {
+	if (nconv==(size_t)-1) {
 		stdoutput.printf("conv_to_ucs: error in iconv\n");
 	}
 	
@@ -418,7 +430,7 @@ char *conv_to_ucs(char *inbuf) {
 		stdoutput.printf("inbuf='%s'\n",inbuf);
 	}
 
-	if (iconv_close (cd) != 0) {
+	if (iconv_close(cd)!=0) {
 		printerror("error in iconv_close");
 	}
 	return outbuf;
@@ -428,6 +440,7 @@ char *conv_to_ucs(char *inbuf) {
 odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 	driver=NULL;
+	driverconnect=NULL;
 	dsn=NULL;
 	server=NULL;
 	db=NULL;
@@ -450,6 +463,7 @@ void odbcconnection::handleConnectString() {
 	sqlrserverconnection::handleConnectString();
 
 	driver=cont->getConnectStringValue("driver");
+	driverconnect=cont->getConnectStringValue("driverconnect");
 	dsn=cont->getConnectStringValue("dsn");
 	server=cont->getConnectStringValue("server");
 	db=cont->getConnectStringValue("db");
@@ -541,6 +555,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	}
 
 #if (ODBCVER >= 0x0300)
+	// enable tracing, if configured to do so
 	if (trace && !charstring::isNullOrEmpty(tracefile)) {
 		// FIXME: does this need to persist?
 		char	*tracefilename=traceFileName(tracefile);
@@ -554,10 +569,20 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 				0);
 		delete[] tracefilename;
 	}
-#endif
+
+	// set the initial db
+	if (!charstring::isNullOrEmpty(db)) {
+		erg = SQLSetConnectAttr(dbc,SQL_ATTR_CURRENT_CATALOG,
+					(SQLPOINTER *)db,SQL_NTS);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			*error="Failed to set database";
+			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
+			SQLFreeHandle(SQL_HANDLE_ENV,env);
+			return false;
+		}
+	}
 
 	// set the connect timeout
-#if (ODBCVER >= 0x0300)
 	if (timeout) {
 		erg=SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
 					(SQLPOINTER *)timeout,0);
@@ -576,39 +601,59 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// connect to the database
-	char *user_asc=(char*)cont->getUser();
-	char *password_asc=(char*)cont->getPassword();
-	char *dsn_asc=(char*)dsn;
-#ifdef HAVE_SQLCONNECTW
-	char *user_ucs=(char*)conv_to_ucs(user_asc);
-	char *password_ucs=(char*)conv_to_ucs(password_asc);
-	char *dsn_ucs=(char*)conv_to_ucs(dsn_asc);
-	erg=SQLConnectW(dbc,(SQLWCHAR *)dsn_ucs,SQL_NTS,
-				(SQLWCHAR *)user_ucs,SQL_NTS,
-				(SQLWCHAR *)password_ucs,SQL_NTS);
-				
-	if (user_ucs) {
-		delete[] user_ucs;
+	const char	*userasc=cont->getUser();
+	const char	*passwordasc=cont->getPassword();
+
+	if (!charstring::isNullOrEmpty(driver)) {
+
+		char	*sqlconnectdriverstring=
+			odbcDriverConnectionString(userasc,passwordasc);
+
+		// These values are useful to look at from the debugger,
+		// it is not a good security practice to directly log
+		// the string, because it might contain a plaintext password.
+		SQLCHAR		outconnectionstring[2048];
+		SQLSMALLINT	outconnectionstringlen;
+		erg=SQLDriverConnect(dbc,
+				(SQLHWND)NULL,
+				(SQLCHAR *)sqlconnectdriverstring,
+				(SQLSMALLINT)charstring::length(
+						sqlconnectdriverstring),
+				outconnectionstring,
+				(SQLSMALLINT)sizeof(outconnectionstring),
+				&outconnectionstringlen,
+				(SQLSMALLINT)SQL_DRIVER_NOPROMPT);
+
+		delete[] sqlconnectdriverstring;
+
+	} else {
+
+		const char	*dsnasc=dsn;
+
+		#ifdef HAVE_SQLCONNECTW
+		char	*dsnucs=conv_to_ucs(dsnasc);
+		char	*userucs=conv_to_ucs(userasc);
+		char	*passworducs=conv_to_ucs(passwordasc);
+		erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
+					(SQLWCHAR *)userucs,SQL_NTS,
+					(SQLWCHAR *)passworducs,SQL_NTS);
+		delete[] dsnucs;
+		delete[] userucs;
+		delete[] passworducs;
+		#else
+		erg=SQLConnect(dbc,(SQLCHAR *)dsnasc,SQL_NTS,
+					(SQLCHAR *)userasc,SQL_NTS,
+					(SQLCHAR *)passwordasc,SQL_NTS);
+		#endif
 	}
-	if (password_ucs) {
-		delete[] password_ucs;
-	}
-	if (dsn_ucs) {
-		delete[] dsn_ucs;
-	}
-#else
-	erg=SQLConnect(dbc,(SQLCHAR *)dsn_asc,SQL_NTS,
-				(SQLCHAR *)user_asc,SQL_NTS,
-				(SQLCHAR *)password_asc,SQL_NTS);
-#endif
 	
 	if (erg==SQL_SUCCESS_WITH_INFO) {
 		*warning=logInError(NULL);
 	} else if (erg!=SQL_SUCCESS) {
 		*error=logInError("SQLConnect failed");
 		#if (ODBCVER >= 0x0300)
-		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
+		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		#else
 		SQLFreeConnect(dbc);
 		SQLFreeEnv(env);
@@ -682,6 +727,91 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 	return tracefilename;
 }
 
+char *odbcconnection::odbcDriverConnectionString(const char *userasc,
+						const char *passwordasc) {
+
+	// FIXME: use a stringbuffer
+	size_t	buffsize=1024;
+	size_t	buffavail=buffsize;
+	char	*buff=new char[buffsize];
+	char	*ptr=buff;
+
+	/* At least with unixODBC, we find that if the DSN is not the first
+	 * field, there will be an SQLDriverConnect error of:
+	 *
+	 *	state 08001
+	 *	errnum 0
+	 *	message [unixODBC][Microsoft][ODBC Driver 11 for SQL Server]Neither DSN nor SERVER keyword supplied
+	 *
+	 * If DSN is specified then the DRIVER seems to be ignored. This makes
+	 * sense actually.
+	 */
+
+	if (!charstring::isNullOrEmpty(dsn)) {
+		pushConnstrValue(&ptr,&buffavail,"DSN",dsn);
+	}
+	if (!charstring::isNullOrEmpty(driver)) {
+		pushConnstrValue(&ptr,&buffavail,"DRIVER",driver);
+	}
+	if (!charstring::isNullOrEmpty(driverconnect)) {
+		// we push this extra info right after the DSN or DRIVER
+		// so that we can clearly see it in the unixODBC trace which
+		// tends to truncate at about 130 characters.
+		unsigned char	*rawdriverconnect=
+				charstring::base64Decode(driverconnect);
+		pushConnstrValue(&ptr,&buffavail,NULL,
+				(const char *)rawdriverconnect);
+		delete[] rawdriverconnect;
+	}
+	if (!(charstring::isNullOrEmpty(server) ||
+			charstring::contains(buff,";SERVER="))) {
+		pushConnstrValue(&ptr,&buffavail,"SERVER",server);
+	}
+	if (!(charstring::isNullOrEmpty(userasc) ||
+			charstring::contains(buff,";UID="))) {
+		pushConnstrValue(&ptr,&buffavail,"UID",userasc);
+	}
+	if (!(charstring::isNullOrEmpty(passwordasc) ||
+			charstring::contains(buff,";PWD="))) {
+		pushConnstrValue(&ptr,&buffavail,"PWD",passwordasc);
+	}
+	if (!charstring::contains(buff, ";WSID=")) {
+		pushConnstrValue(&ptr,&buffavail,"WSID",sys::getHostName());
+	}
+	if (!charstring::contains(buff, ";APP=")) {
+		// FIXME: use one of the SQLR macros here...
+		pushConnstrValue(&ptr,&buffavail,
+					"APP","SQLRelay-" SQLR_VERSION);
+	}
+	return buff;
+}
+
+void pushConnstrValue(char **pptr, size_t *pbuffavail,
+			const char *keyword, const char *value) {
+
+	const char	*openbracket="";
+	const char	*closebracket="";
+	char		*ptr=*pptr;
+	size_t		buffavail=*pbuffavail;
+	if (charstring::contains(value,';')) {
+		openbracket="{";
+		closebracket="}";
+	}
+	if (keyword == NULL) {
+		// here we are just going to push a raw value.
+		// With an extra semicolon just in case.
+		charstring::printf(ptr,buffavail,"%s;",value);
+	} else {
+		charstring::printf(ptr,buffavail,"%s=%s%s%s;",
+				keyword,openbracket,value,closebracket);
+	}
+	size_t	ptrinc=charstring::length(ptr);
+	ptr+=ptrinc;
+	buffavail-=ptrinc;
+	*pptr=ptr;
+	*pbuffavail=buffavail;
+}
+
 const char *odbcconnection::logInError(const char *errmsg) {
 
 	errormessage.clear();
@@ -690,10 +820,12 @@ const char *odbcconnection::logInError(const char *errmsg) {
 	}
 
 	// get the error message
-	SQLCHAR		state[10];
+	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
 	SQLCHAR		errorbuffer[1024];
 	SQLSMALLINT	errlength;
+
+	bytestring::zero(state,sizeof(state));
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
 					errorbuffer,1024,&errlength);
@@ -718,6 +850,8 @@ void odbcconnection::logOut() {
 	SQLFreeConnect(dbc);
 	SQLFreeEnv(env);
 	#endif
+	dbc=NULL;
+	env=NULL;
 }
 
 bool odbcconnection::ping() {
@@ -1678,9 +1812,11 @@ void odbcconnection::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-	SQLCHAR		state[10];
+	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errlength;
+
+	bytestring::zero(state,sizeof(state));
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
 				(SQLCHAR *)errorbuffer,errorbufferlength,
@@ -1689,13 +1825,30 @@ void odbcconnection::errorMessage(char *errorbuffer,
 	// set return values
 	*errorlength=errlength;
 	*errorcode=nativeerrnum;
-	*liveconnection=true;
+	*liveconnection=isLiveConnection(state);
 }
 #endif
+
+bool odbcconnection::isLiveConnection(SQLCHAR *state) {
+	// TODO: Gain access to the dbc, and if ODBC 3.5 see if
+	// SQL_ATTR_CONNECTION_DEAD is SQL_CD_TRUE.
+	return bytestring::compare("08S01",state,5) &&
+		bytestring::compare("08003",state,5);
+}
 
 bool odbcconnection::setIsolationLevel(const char *isolevel) {
 	// FIXME: do nothing for now.  see task #422
 	return true;
+}
+
+const char *odbcconnection::dbHostNameQuery() {
+	// FIXME: only works with MS SQL Server
+	return "SELECT cast(@@SERVERNAME as varchar(64))";
+}
+
+const char *odbcconnection::dbIpAddressQuery() {
+	// FIXME: only works with MS SQL Server
+	return "SELECT CAST(SERVERPROPERTY('ComputerNamePhysicalNetBIOS') as varchar(64))";
 }
 
 odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
@@ -2165,8 +2318,38 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	// initialize counts
 	initializeRowCounts();
 
+
+	// query timeout is an odbc-driver level read timeout but with
+	// special cleanup handling in better drivers to tell the server
+	// to stop executing the query after the client read timeout...
+	// * init from query timeout specified in the connect string
+	// * override with query timeout set via a directive
+	// * if it's still > 0 then actually set the timeout
+	uint64_t	statementquerytimeout=odbcconn->querytimeout;
+	// FIXME: re-enable this when directives are merged in...
+	/*if (querytimeout>0) {
+		statementquerytimeout=querytimeout;
+	}*/
+	if (statementquerytimeout>0) {
+		erg=SQLSetStmtAttr(stmt,SQL_ATTR_QUERY_TIMEOUT,
+					(SQLPOINTER)statementquerytimeout,
+					SQL_IS_UINTEGER);
+		// FIXME: do we care if this fails?
+	}
+
 	// execute the query
-	erg=SQLExecute(stmt);
+	// FIXME: re-enable this when directives are merged in...
+	/*if (executedirect) {
+		#ifdef HAVE_SQLCONNECTW
+		char	*queryucs=conv_to_ucs((char*)query);
+		erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
+		delete[] queryucs;
+		#else
+		erg=SQLExecDirect(stmt,(SQLCHAR *)query,length);
+		#endif
+	} else {*/
+		erg=SQLExecute(stmt);
+	//}
 	if (erg!=SQL_SUCCESS &&
 			erg!=SQL_SUCCESS_WITH_INFO
 			#if defined(SQL_NO_DATA)
@@ -2407,7 +2590,7 @@ bool odbccursor::handleColumns() {
 
 		// bind the column to a buffer
 		#ifdef HAVE_SQLCONNECTW
-		if (column[i].type==-9 || column[i].type==-8) {
+		if (column[i].type==SQL_WVARCHAR || column[i].type==SQL_WCHAR) {
 			// bind nvarchar and nchar fields as wchar
 			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
 					field[i],maxfieldlength,
@@ -2415,7 +2598,8 @@ bool odbccursor::handleColumns() {
 
 		} else {
 			// bind the column to a buffer
-			if (column[i].type==93 || column[i].type==91) {
+			if (column[i].type==SQL_TYPE_TIMESTAMP ||
+					column[i].type==SQL_TYPE_DATE) {
 				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 						field[i],maxfieldlength,
 						&indicator[i]);
@@ -2448,9 +2632,11 @@ void odbccursor::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-	SQLCHAR		state[10];
+	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errlength;
+
+	bytestring::zero(state,sizeof(state));
 
 	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,state,&nativeerrnum,
 				(SQLCHAR *)errorbuffer,errorbufferlength,
@@ -2459,7 +2645,7 @@ void odbccursor::errorMessage(char *errorbuffer,
 	// set return values
 	*errorlength=errlength;
 	*errorcode=nativeerrnum;
-	*liveconnection=true;
+	*liveconnection=odbcconn->isLiveConnection(state);
 }
 
 uint64_t odbccursor::affectedRows() {
@@ -2489,12 +2675,12 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 			return VARCHAR_DATATYPE;
 		case SQL_LONGVARCHAR:
 			return LONGVARCHAR_DATATYPE;
-		// FIXME:
-		// case SQL_WCHAR:
-		// FIXME:
-		// case SQL_WVARCHAR:
-		// FIXME:
-		// case SQL_WLONGVARCHAR:
+		case SQL_WCHAR:
+			return NCHAR_DATATYPE;
+		case SQL_WVARCHAR:
+			return NVARCHAR_DATATYPE;
+		case SQL_WLONGVARCHAR:
+			return NTEXT_DATATYPE;
 		case SQL_DECIMAL:
 			return DECIMAL_DATATYPE;
 		case SQL_NUMERIC:
@@ -2557,12 +2743,11 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 			return UNIQUEIDENTIFIER_DATATYPE;
 
 		// MS SQL Server types
-		case -8:
-			return NCHAR_DATATYPE;
-		case -9:
-			return NVARCHAR_DATATYPE;
-		case -10:
-			return NTEXT_DATATYPE;
+		case -150:
+			// FIXME:
+			// this is "sql_variant"
+			// is there a better type to map it to?
+			return VARCHAR_DATATYPE;
 		case -152:
 			return XML_DATATYPE;
 		case -154:
@@ -2621,15 +2806,16 @@ bool odbccursor::fetchRow() {
 	#ifdef HAVE_SQLCONNECTW
 	//convert char and varchar data to user coding from ucs-2
 	for (int i=0; i<ncols; i++) {
-		if (column[i].type==-9 || column[i].type==-8) {
+		if (column[i].type==SQL_WVARCHAR || column[i].type==SQL_WCHAR) {
 			if (indicator[i]!=-1 && field[i]) {
-				char *u=conv_to_user_coding(field[i]);
-				int len=charstring::length(u);
-				charstring::copy(field[i],u);
-				indicator[i]=len;
-				if (u) {
-					delete[] u;
+				char	*u=conv_to_user_coding(field[i]);
+				size_t	len=charstring::length(u);
+				if (len>=sizeof(field[i])) {
+					len=sizeof(field[i])-1;
 				}
+				charstring::copy(field[i],u,len);
+				indicator[i]=len;
+				delete[] u;
 			}
 		}
 	}
