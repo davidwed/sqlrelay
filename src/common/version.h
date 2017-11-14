@@ -14,6 +14,13 @@ static void version(int argc, const char **argv) {
 	}
 
 	stdoutput.printf("%s %s\n",argv[0],SQLR_VERSION);
+	stdoutput.printf("Rudiments version: %s\n",charstring::rudiments_version());
+#ifdef __DATE__
+#ifdef __TIME__
+        // this info will tend to be ambiguous because it lacks a time zone but it is still useful.
+	stdoutput.printf("Compiled: %s %s\n", __DATE__, __TIME__);
+#endif
+#endif
 	stdoutput.write("\n"
 		"Copyright (C) 1999-2016 David Muse\n"
 		"This is free software; see the source for copying "

@@ -1860,6 +1860,74 @@ bool sqlrcursor::executeQuery() {
 	return retval;
 }
 
+
+bool sqlrcursor::nextResultSet() {
+  // In the Wayfair use case, with local unix sockets we do not care
+  // that this is another round trip to the server. One could imagine
+  // an optimization where the availability of a next result set could
+  // be returned along with every result set. But for now nobody else
+  // is going to be using this api.
+
+  // code from sqlrcursor::executeQuery
+  if (!pvt->_queryptr) {
+    setError("No query being executed: _queryptr");
+    return false;
+  }
+  if (!pvt->_reexecute) {
+    setError("No query being executed: _rexecute");
+    return false;
+  }
+
+  if (!pvt->_sqlrc->openSession()) {
+    return false;
+  }
+
+  // refresh socket client
+  pvt->_cs=pvt->_sqlrc->cs();
+
+  if (pvt->_sqlrc->debug()) {
+    pvt->_sqlrc->debugPreStart();
+    pvt->_sqlrc->debugPrint("Requesting nextResultSet");
+    pvt->_sqlrc->debugPrint("\n");
+    pvt->_sqlrc->debugPrint("Requesting Cursor: ");
+    pvt->_sqlrc->debugPrint((int64_t)pvt->_cursorid);
+    pvt->_sqlrc->debugPrint("\n");
+    pvt->_sqlrc->debugPreEnd();
+  }
+  pvt->_cs->write((uint16_t)NEXT_RESULT_SET);
+  pvt->_cs->write(pvt->_cursorid);
+  pvt->_sqlrc->flushWriteBuffer();
+
+  uint16_t err=getErrorStatus();
+  if (err != NO_ERROR_OCCURRED) {
+    if (err==TIMEOUT_GETTING_ERROR_STATUS) {
+      // the pattern here is that we bail immediately.
+      // error status has already been set.
+      pvt->_sqlrc->endSession();
+      return false;
+    }
+    // otherwise, get the error from the server
+    // this method has a side effect.
+    getErrorFromServer();
+    // also part of patttern.
+    if (err==ERROR_OCCURRED_DISCONNECT) {
+      pvt->_sqlrc->endSession();
+    }
+    return false;
+  }
+  bool resultbool;
+  // a funny thing about the pattern in this client
+  // is that not all reads from the network have a timeout,
+  // so in theory things could get stuck if tcp buffering effects
+  // work out "not necessarily in our favor."
+  if (getBool(&resultbool)!=sizeof(bool)) {
+    setError("Failed to get bool value.\n "
+	     "A network error may have occurred.");
+    return false;
+  }
+  return resultbool;
+}
+
 void sqlrcursor::performSubstitutions() {
 
 	if (!pvt->_subvars->getLength() || !pvt->_dirtysubs) {
@@ -2811,7 +2879,7 @@ uint16_t sqlrcursor::getErrorStatus() {
 	} else if (result!=sizeof(uint16_t)) {
 		setError("Failed to determine whether an "
 				"error occurred or not.\n "
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return ERROR_OCCURRED;
 	}
 
@@ -2845,7 +2913,7 @@ bool sqlrcursor::getCursorId() {
 			char	*err=error::getErrorString();
 			stringbuffer	errstr;
 			errstr.append("Failed to get a cursor id.\n "
-					"A network error may have ocurred. ");
+					"A network error may have occurred. ");
 			errstr.append(err);
 			setError(errstr.getString());
 			delete[] err;
@@ -2870,7 +2938,7 @@ bool sqlrcursor::getSuspended() {
 	if (pvt->_cs->read(&suspendedresultset)!=sizeof(uint16_t)) {
 		setError("Failed to determine whether "
 			"the session was suspended or not.\n "
-			"A network error may have ocurred.");
+			"A network error may have occurred.");
 		return false;
 	}
 
@@ -2882,7 +2950,7 @@ bool sqlrcursor::getSuspended() {
 		if (pvt->_cs->read(&pvt->_firstrowindex)!=sizeof(uint64_t)) {
 			setError("Failed to get the index of the "
 				"last row of a previously suspended result "
-				"set.\n A network error may have ocurred.");
+				"set.\n A network error may have occurred.");
 			return false;
 		}
 		pvt->_rowcount=pvt->_firstrowindex+1;
@@ -4390,7 +4458,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 		delete[] indexfilename;
 	}
 
-	// if we fell through to here, then an error has ocurred
+	// if we fell through to here, then an error has occurred
 	clearCacheSource();
 	return false;
 }
@@ -4707,7 +4775,7 @@ int64_t sqlrcursor::getFieldAsInteger(uint64_t row, uint32_t col) {
 
 double sqlrcursor::getFieldAsDouble(uint64_t row, uint32_t col) {
 	const char	*field=getField(row,col);
-	return (field)?charstring::toFloat(field):0.0;
+	return (field)?charstring::toFloatC(field):0.0;
 }
 
 const char *sqlrcursor::getField(uint64_t row, const char *col) {
@@ -4743,7 +4811,7 @@ int64_t sqlrcursor::getFieldAsInteger(uint64_t row, const char *col) {
 
 double sqlrcursor::getFieldAsDouble(uint64_t row, const char *col) {
 	const char	*field=getField(row,col);
-	return (field)?charstring::toFloat(field):0.0;
+	return (field)?charstring::toFloatC(field):0.0;
 }
 
 uint32_t sqlrcursor::getFieldLength(uint64_t row, uint32_t col) {

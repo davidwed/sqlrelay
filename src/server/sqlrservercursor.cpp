@@ -274,6 +274,15 @@ bool sqlrservercursor::inputBindClob(const char *variable,
 bool sqlrservercursor::outputBind(const char *variable,
 					uint16_t variablesize,
 					char *value, 
+					uint32_t valuesize, 
+					int16_t *isnull) {
+	// by default call the older api
+        return outputBind(variable, variablesize, value, (uint16_t) valuesize, isnull);
+}
+
+bool sqlrservercursor::outputBind(const char *variable,
+					uint16_t variablesize,
+					char *value, 
 					uint16_t valuesize, 
 					int16_t *isnull) {
 	// by default, do nothing...
@@ -388,6 +397,12 @@ bool sqlrservercursor::executeQuery(const char *query, uint32_t length) {
 
 bool sqlrservercursor::fetchFromBindCursor() {
 	// by default, do nothing...
+	return true;
+}
+
+bool sqlrservercursor::nextResultSet(bool *next_result_set_available) {
+        // by default, a next result set is not available
+        *next_result_set_available = false;
 	return true;
 }
 
@@ -654,6 +669,10 @@ bool sqlrservercursor::fakeInputBinds() {
 					*(ptr+pvt->_inbindvars[i].
 						variablesize)==',' ||
 					*(ptr+pvt->_inbindvars[i].
+						variablesize)=='\r' ||
+					*(ptr+pvt->_inbindvars[i].
+						variablesize)==';' ||
+					*(ptr+pvt->_inbindvars[i].
 						variablesize)=='\0')
 					)) {
 
@@ -686,7 +705,14 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 	if (pvt->_inbindvars[index].type==SQLRSERVERBINDVARTYPE_STRING ||
 		pvt->_inbindvars[index].type==SQLRSERVERBINDVARTYPE_CLOB) {
 
-		buffer->append("'");
+                if (pvt->_inbindvars[index].type==SQLRSERVERBINDVARTYPE_STRING) {
+                  /* Note from George Carrette to David Muse: Obviously this should be configurable
+                     as an attribute of the instance element, along with the translatebindvariables
+                     and fakeinputbindvariables attributes. */
+                  buffer->append(" N'");
+                } else {
+                  buffer->append("'");
+                }
 
 		size_t	length=pvt->_inbindvars[index].valuesize;
 

@@ -460,13 +460,32 @@ void sqlrconnection::setResponseTimeout(int32_t timeoutsec,
 	pvt->_responsetimeoutusec=timeoutusec;
 }
 
+
+void sqlrconnection::getConnectTimeout(int32_t *timeoutsec,
+					int32_t *timeoutusec) {
+  *timeoutsec = pvt->_connecttimeoutsec;
+  *timeoutusec = pvt->_connecttimeoutusec;
+}
+
+void sqlrconnection::getAuthenticationTimeout(int32_t *timeoutsec,
+						int32_t *timeoutusec) {
+  *timeoutsec =  pvt->_authtimeoutsec;
+  *timeoutusec = pvt->_authtimeoutusec;
+}
+
+void sqlrconnection::getResponseTimeout(int32_t *timeoutsec,
+						int32_t *timeoutusec) {
+  *timeoutsec =  pvt->_responsetimeoutsec;
+  *timeoutusec = pvt->_responsetimeoutusec;
+}
+
 void sqlrconnection::setTimeoutFromEnv(const char *var,
 					int32_t *timeoutsec,
 					int32_t *timeoutusec) {
 	const char	*timeout=environment::getValue(var);
 	if (charstring::isNumber(timeout)) {
 		*timeoutsec=charstring::toInteger(timeout);
-		long double	dbl=charstring::toFloat(timeout);
+		long double	dbl=charstring::toFloatC(timeout);
 		dbl=dbl-(long double)(*timeoutsec);
 		*timeoutusec=(int32_t)(dbl*1000000.0);
 	} else {
@@ -919,7 +938,12 @@ void sqlrconnection::auth() {
 		debugPrint("Auth : ");
 		debugPrint(pvt->_user);
 		debugPrint(":");
-		debugPrint(pvt->_password);
+		// we should never want to see plaintext passwords printed as debug output here,
+		// but seeing the length of the password is a reasonable debugging tool.
+		// if you object, replace the length with 10.
+		for (unsigned int i=0; i < pvt->_passwordlen; ++i) {
+		  debugPrint("*");
+		}
 		debugPrint("\n");
 		debugPreEnd();
 	}
@@ -944,7 +968,7 @@ bool sqlrconnection::getNewPort() {
 	if (pvt->_cs->read(&size)!=sizeof(uint16_t)) {
 		setError("Failed to get the size of "
 				"the unix connection port.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return false;
 	}
 	
@@ -964,7 +988,7 @@ bool sqlrconnection::getNewPort() {
 	// get the unix port string
 	if (size && pvt->_cs->read(pvt->_connectionunixportbuffer,size)!=size) {
 		setError("Failed to get the unix connection port.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return false;
 	}
 	pvt->_connectionunixportbuffer[size]='\0';
@@ -973,7 +997,7 @@ bool sqlrconnection::getNewPort() {
 	// get the inet port
 	if (pvt->_cs->read(&pvt->_connectioninetport)!=sizeof(uint16_t)) {
 		setError("Failed to get the inet connection port.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return false;
 	}
 
@@ -1156,7 +1180,7 @@ const char *sqlrconnection::identify() {
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to identify.\n"
-			"A network error may have ocurred.");
+			"A network error may have occurred.");
 		return NULL;
 	}
 
@@ -1165,7 +1189,7 @@ const char *sqlrconnection::identify() {
 	pvt->_id=new char[size+1];
 	if (pvt->_cs->read(pvt->_id,size)!=size) {
 		setError("Failed to identify.\n"
-			"A network error may have ocurred.");
+			"A network error may have occurred.");
 		delete[] pvt->_id;
 		pvt->_id=NULL;
 		return NULL;
@@ -1209,7 +1233,7 @@ const char *sqlrconnection::dbVersion() {
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get DB version.\n"
-			"A network error may have ocurred.");
+			"A network error may have occurred.");
 		return NULL;
 	} 
 
@@ -1218,7 +1242,7 @@ const char *sqlrconnection::dbVersion() {
 	pvt->_dbversion=new char[size+1];
 	if (pvt->_cs->read(pvt->_dbversion,size)!=size) {
 		setError("Failed to get DB version.\n"
-			"A network error may have ocurred.");
+			"A network error may have occurred.");
 		delete[] pvt->_dbversion;
 		pvt->_dbversion=NULL;
 		return NULL;
@@ -1262,7 +1286,7 @@ const char *sqlrconnection::dbHostName() {
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get DB host name.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return NULL;
 	}
 
@@ -1271,7 +1295,7 @@ const char *sqlrconnection::dbHostName() {
 	pvt->_dbhostname=new char[size+1];
 	if (pvt->_cs->read(pvt->_dbhostname,size)!=size) {
 		setError("Failed to get DB host name.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		delete[] pvt->_dbhostname;
 		pvt->_dbhostname=NULL;
 		return NULL;
@@ -1315,7 +1339,7 @@ const char *sqlrconnection::dbIpAddress() {
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get DB ip address.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return NULL;
 	}
 
@@ -1324,7 +1348,7 @@ const char *sqlrconnection::dbIpAddress() {
 	pvt->_dbipaddress=new char[size+1];
 	if (pvt->_cs->read(pvt->_dbipaddress,size)!=size) {
 		setError("Failed to get DB ip address.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		delete[] pvt->_dbipaddress;
 		pvt->_dbipaddress=NULL;
 		return NULL;
@@ -1368,7 +1392,7 @@ const char *sqlrconnection::serverVersion() {
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get Server version.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return NULL;
 	}
 
@@ -1377,7 +1401,7 @@ const char *sqlrconnection::serverVersion() {
 	pvt->_serverversion=new char[size+1];
 	if (pvt->_cs->read(pvt->_serverversion,size)!=size) {
 		setError("Failed to get Server version.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		delete[] pvt->_serverversion;
 		pvt->_serverversion=NULL;
 		return NULL;
@@ -1426,7 +1450,7 @@ const char *sqlrconnection::bindFormat() {
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get bind format.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return NULL;
 	}
 
@@ -1435,7 +1459,7 @@ const char *sqlrconnection::bindFormat() {
 	pvt->_bindformat=new char[size+1];
 	if (pvt->_cs->read(pvt->_bindformat,size)!=size) {
 		setError("Failed to get bind format.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		delete[] pvt->_bindformat;
 		pvt->_bindformat=NULL;
 		return NULL;
@@ -1514,7 +1538,7 @@ const char *sqlrconnection::getCurrentDatabase() {
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get the current database.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return NULL;
 	}
 
@@ -1523,7 +1547,7 @@ const char *sqlrconnection::getCurrentDatabase() {
 	pvt->_currentdbname=new char[size+1];
 	if (pvt->_cs->read(pvt->_currentdbname,size)!=size) {
 		setError("Failed to get the current database.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		delete[] pvt->_currentdbname;
 		pvt->_currentdbname=NULL;
 		return NULL;
@@ -1565,7 +1589,7 @@ uint64_t sqlrconnection::getLastInsertId() {
 	uint64_t	id=0;
 	if (pvt->_cs->read(&id)!=sizeof(uint64_t)) {
 		setError("Failed to get the last insert id.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return 0;
 	}
 
@@ -1717,7 +1741,7 @@ uint16_t sqlrconnection::getError() {
 	if (pvt->_cs->read(&status,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get the error status.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return ERROR_OCCURRED;
 	}
 
@@ -1740,7 +1764,7 @@ uint16_t sqlrconnection::getError() {
 	// get the error code
 	if (pvt->_cs->read((uint64_t *)&pvt->_errorno)!=sizeof(uint64_t)) {
 		setError("Failed to get the error code.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return status;
 	}
 
@@ -1748,7 +1772,7 @@ uint16_t sqlrconnection::getError() {
 	uint16_t	size;
 	if (pvt->_cs->read(&size)!=sizeof(uint16_t)) {
 		setError("Failed to get the error size.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return status;
 	}
 
@@ -1756,7 +1780,7 @@ uint16_t sqlrconnection::getError() {
 	pvt->_error=new char[size+1];
 	if (pvt->_cs->read(pvt->_error,size)!=size) {
 		setError("Failed to get the error string.\n"
-				"A network error may have ocurred.");
+				"A network error may have occurred.");
 		return status;
 	}
 	pvt->_error[size]='\0';

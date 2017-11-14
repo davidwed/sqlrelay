@@ -55,9 +55,14 @@ extern "C" {
 
 	#define PHP_STREAM_COPY_TO_MEM(a,b) php_stream_copy_to_mem(a,PHP_STREAM_COPY_ALL,0)
 	#define PHP_STREAM_TO_ZVAL(a,b) php_stream_to_zval(a,&b)
+	#define PHP_STREAM_TO_ZVAL_P(a,b) php_stream_to_zval(a,b)
 
 	#define MY_ZVAL_NULL(a) ZVAL_NULL(&(a))
+	#define MY_ZVAL_NULL_P(a) ZVAL_NULL((a))
 	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(&(a),b)
+	#define MY_ZVAL_LONG_P(a,b) ZVAL_LONG((a),b)
+	#define MY_ZVAL_DOUBLE(a,b) ZVAL_DOUBLE(&(a),b)
+	#define MY_ZVAL_DOUBLE_P(a,b) ZVAL_DOUBLE(a,b)
 	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(&(a),b)
 	#define MY_ZVAL_BOOL_P(a,b) ZVAL_BOOL(a,b)
 	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(&(a),b)
@@ -79,6 +84,7 @@ extern "C" {
 	#define SLEN(a) Z_STRLEN(a)
 	#define LVAL(a) Z_LVAL(a)
 	#define TYPE(a) Z_TYPE(a)
+	#define TYPE_P(a) Z_TYPE_P(a)
 
 	#define ISTRUE(a) (Z_TYPE_P(a)==IS_TRUE)
 
@@ -103,6 +109,8 @@ extern "C" {
 
 	#define MY_ZVAL_NULL(a) ZVAL_NULL(a)
 	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(a,b)
+        #define MY_ZVAL_DOUBLE(a,b) ZVAL_DOUBLE(a,b)
+        #define MY_ZVAL_DOUBLE_P(a,b) ZVAL_DOUBLE(a,b)
 	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(a,b)
 	#define MY_ZVAL_BOOL_P(a,b) ZVAL_BOOL(a,b)
 	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b,c)
@@ -141,6 +149,7 @@ struct sqlrstatement {
 	sqlrcursor			*sqlrcur;
 	int64_t				currentrow;
 	long				longfield;
+	zval				zvalfield;
 	stringbuffer			subvarquery;
 	singlylinkedlist< char * >	subvarstrings;
 	bool				fwdonly;
@@ -164,7 +173,12 @@ enum {
 	PDO_SQLRELAY_ATTR_DB_HOST_NAME,
 	PDO_SQLRELAY_ATTR_DB_IP_ADDRESS,
 	PDO_SQLRELAY_ATTR_BIND_FORMAT,
-	PDO_SQLRELAY_ATTR_CURRENT_DB
+	PDO_SQLRELAY_ATTR_CURRENT_DB,
+	PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT,
+	PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT,
+	PDO_SQLRELAY_ATTR_SQLRELAY_VERSION,
+	PDO_SQLRELAY_ATTR_RUDIMENTS_VERSION,
+	PDO_SQLRELAY_ATTR_CLIENT_INFO,
 };
 
 int _sqlrelayError(pdo_dbh_t *dbh,
@@ -347,7 +361,7 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
 		if (isFloatTypeChar(type)) {
-			stmt->columns[colno].param_type=PDO_PARAM_STR;
+			stmt->columns[colno].param_type=PDO_PARAM_ZVAL;
 		} else {
 			stmt->columns[colno].param_type=PDO_PARAM_INT;
 		}
@@ -378,6 +392,23 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 	*caller_frees=0;
 
 	switch (stmt->columns[colno].param_type) {
+		case PDO_PARAM_ZVAL:
+			// A couple of things to note here:
+			// 1. At this point in describe the only columns that will have
+			//    this PDO param type are double values, but we could do an
+			//    additional float check here.
+			if (!sqlrcur->getFieldLength(
+                                        sqlrstmt->currentrow,colno)) {
+                                *ptr=(char *)sqlrcur->getField(
+                                        sqlrstmt->currentrow,colno);
+                                *len=0;
+                                return 1;
+                        }
+			ZVAL_DOUBLE(&sqlrstmt->zvalfield,(double)sqlrcur->
+				getFieldAsDouble(sqlrstmt->currentrow,colno));
+			*ptr=(char *)&sqlrstmt->zvalfield;
+			*len=sizeof(sqlrstmt->zvalfield);
+			return 1;
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
 			// handle NULLs/empty-strings
@@ -484,17 +515,21 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 					const char *name,
 					struct pdo_bound_param_data *param) {
 
+
+	// Bind null values as NULL, without requiring developer to specify
+	// PARAM_NULL in PDOStatement::bindValue - this is the expected behavior
+	// with other PDO drivers
+	if (TYPE(param->parameter)==IS_NULL) {
+		sqlrcur->inputBind(name,(const char *)NULL);
+		return 1;
+	}
+
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
 			sqlrcur->inputBind(name,(const char *)NULL);
 			return 1;
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
-			// handle NULLs/empty-strings
-			if (TYPE(param->parameter)==IS_NULL) {
-				sqlrcur->inputBind(name,(const char *)NULL);
-				return 1;
-			}
 			CONVERT_TO_LONG(param->parameter);
 			sqlrcur->inputBind(name,LVAL(param->parameter));
 			return 1;
@@ -580,34 +615,46 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 	if (!(param->param_type&PDO_PARAM_INPUT_OUTPUT)) {
 		return 1;
 	}
+	long int_value;
+	char *str_value;
+	zval *parameter;
+
+	if (Z_ISREF(param->parameter))
+	  parameter = Z_REFVAL(param->parameter);
+	else
+	  parameter = &param->parameter;
 
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
-			MY_ZVAL_NULL(param->parameter);
+			MY_ZVAL_NULL_P(parameter);
 			return 1;
 		case PDO_PARAM_INT:
-			MY_ZVAL_LONG(param->parameter,
-					sqlrcur->getOutputBindInteger(name));
+		        int_value = sqlrcur->getOutputBindInteger(name);
+			MY_ZVAL_LONG_P(parameter, int_value);
 			return 1;
 		case PDO_PARAM_BOOL:
-			MY_ZVAL_BOOL(param->parameter,
+			MY_ZVAL_BOOL_P(parameter,
 					sqlrcur->getOutputBindInteger(name));
 			return 1;
 		case PDO_PARAM_STR:
-			MY_ZVAL_STRING(param->parameter,
-				(char *)sqlrcur->getOutputBindString(name),1);
+		        str_value = (char *)sqlrcur->getOutputBindString(name);
+			if (str_value == NULL) {
+			  MY_ZVAL_NULL_P(parameter);
+			} else {
+			  MY_ZVAL_STRING_P(parameter, str_value, 1);
+			}
 			return 1;
 		case PDO_PARAM_LOB:
 			{
 			php_stream	*strm=NULL;
-			if (TYPE(param->parameter)==IS_STRING) {
+			if (TYPE_P(parameter)==IS_STRING) {
 				TSRMLS_FETCH();
 				strm=php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
-			} else if (TYPE(param->parameter)==IS_RESOURCE) {
+			} else if (TYPE_P(parameter)==IS_RESOURCE) {
 				TSRMLS_FETCH();
 				php_stream_from_zval_no_verify(
-						strm,&param->parameter);
+						strm,parameter);
 			}
 			if (!strm) {
 				return 0;
@@ -617,8 +664,8 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 				sqlrcur->getOutputBindBlob(name),
 				sqlrcur->getOutputBindLength(name));
 			php_stream_seek(strm,0,SEEK_SET);
-			if (TYPE(param->parameter)==IS_STRING) {
-				PHP_STREAM_TO_ZVAL(strm,param->parameter);
+			if (TYPE_P(parameter)==IS_STRING) {
+				PHP_STREAM_TO_ZVAL_P(strm,parameter);
 			}
 			}
 			return 1;
@@ -949,7 +996,7 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 					PDO_ATTR_CURSOR,
 					PDO_CURSOR_SCROLL TSRMLS_CC)==
 					PDO_CURSOR_FWDONLY;
-	
+
 	if (!charstring::isNullOrEmpty(sql)) {
 		sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
 	}
@@ -997,7 +1044,7 @@ static int sqlrconnectionCommit(pdo_dbh_t *dbh TSRMLS_DC) {
 	return 0;
 }
 
-static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) { 
+static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	if (((sqlrconnection *)sqlrdbh->sqlrcon)->rollback()) {
 		return 1;
@@ -1043,6 +1090,14 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			sqlrcon->setAuthenticationTimeout(Z_LVAL_P(val),0);
 			sqlrcon->setResponseTimeout(Z_LVAL_P(val),0);
 			return 1;
+	        case PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT:
+			convert_to_long(val);
+			sqlrcon->setConnectTimeout(Z_LVAL_P(val),0);
+			return 1;
+	        case PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT:
+			convert_to_long(val);
+			sqlrcon->setResponseTimeout(Z_LVAL_P(val),0);
+			return 1;
 		case PDO_ATTR_SERVER_VERSION:
 			// database server version
 			return 1;
@@ -1051,6 +1106,10 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			return 1;
 		case PDO_ATTR_SERVER_INFO:
 			// server information
+			return 1;
+		case PDO_SQLRELAY_ATTR_CLIENT_INFO:
+			convert_to_string(val);
+                        sqlrcon->setClientInfo(Z_STRVAL_P(val));
 			return 1;
 		case PDO_ATTR_CONNECTION_STATUS:
 			// connection status
@@ -1168,9 +1227,43 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			// configure the prefetch size for drivers
 			// that support it. Size is in KB
 			return 1;
+		case PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT:
+		       int32_t connect_timeoutsec;
+		       int32_t connect_timeoutusec;
+		       long double connect_timeout;
+		       sqlrcon->getConnectTimeout(&connect_timeoutsec, &connect_timeoutusec);
+		       connect_timeout = connect_timeoutsec + connect_timeoutusec * 1.0E-6;
+		       MY_ZVAL_DOUBLE_P(retval, connect_timeout);
+		       return 1;
 		case PDO_ATTR_TIMEOUT:
-			// connection timeout in seconds
-			return 1;
+		       // generic timeout. Does not make sense to read this value.
+		       // but the closest concept would be the response timeout.
+		case PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT:
+		       int32_t response_timeoutsec;
+		       int32_t response_timeoutusec;
+		       long double response_timeout;
+		       sqlrcon->getResponseTimeout(&response_timeoutsec, &response_timeoutusec);
+		       response_timeout = response_timeoutsec + response_timeoutusec * 1.0E-6;
+		       MY_ZVAL_DOUBLE_P(retval, response_timeout);
+		       return 1;
+	        case PDO_SQLRELAY_ATTR_SQLRELAY_VERSION:
+		  temp=(char *) SQLR_VERSION;
+		  if (temp) {
+		    MY_ZVAL_STRING_P(retval,temp,1);
+		  }
+		  return 1;
+	        case PDO_SQLRELAY_ATTR_RUDIMENTS_VERSION:
+		  temp=(char *) charstring::rudiments_version();
+		  if (temp) {
+		    MY_ZVAL_STRING_P(retval,temp,1);
+		  }
+		  return 1;
+	        case PDO_SQLRELAY_ATTR_CLIENT_INFO:
+		  temp = (char *) ((sqlrcon != NULL) ? sqlrcon->getClientInfo() : NULL);
+		  if (temp) {
+		    MY_ZVAL_STRING_P(retval,temp,1);
+		  }
+		  return 1;
 		case PDO_ATTR_SERVER_VERSION:
 			// database server version
 			temp=(char *)sqlrcon->serverVersion();
@@ -1463,6 +1556,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		{"tlsca",(char *)"",0},
 		{"tlsdepth",(char *)"0",0},
 		{"db",(char *)"",0},
+		{"connecttime", (char *)"", 0},
+		{"autocommit", (char *)"1", 0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1488,6 +1583,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*tlsca=options[20].optval;
 	uint16_t	tlsdepth=charstring::toInteger(options[21].optval);
 	const char	*db=options[22].optval;
+	const char      *connecttime=options[23].optval;
+	bool		autocommit=!charstring::isNo(options[24].optval);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1518,12 +1615,54 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		sqlrdbh->sqlrcon->debugOn();
 	}
 
-	// if we're not doing lazy connects, then do something lightweight
-	// that will verify whether SQL Relay is available or not
-	if (!lazyconnect && !sqlrdbh->sqlrcon->identify()) {
-		delete sqlrdbh->sqlrcon;
-		sqlrdbh->sqlrcon=NULL;
-		return 0;
+	if (charstring::isNumber(connecttime)) {
+          int32_t timeoutsec = charstring::toInteger(connecttime);
+          long double dbl=charstring::toFloatC(connecttime);
+          dbl=dbl-(long double)(timeoutsec);
+          int32_t timeoutusec=(int32_t)(dbl*1000000.0);
+          if (timeoutsec >= 0) {
+            sqlrdbh->sqlrcon->setConnectTimeout(timeoutsec,timeoutusec);
+          }
+        }
+
+	if (!lazyconnect) {
+	  // If we're not doing lazy connects, then do something lightweight
+	  // that will verify whether SQL Relay is available or not.
+	  // Since the identify() operation is implicitly using the
+	  // the ResponseTimeout make sure we adjust it down to the
+	  // connect timeout.
+	  int32_t connect_timeoutsec;
+	  int32_t connect_timeoutusec;
+	  long double connect_timeout;
+	  int32_t response_timeoutsec;
+	  int32_t response_timeoutusec;
+	  long double response_timeout;
+	  sqlrdbh->sqlrcon->getConnectTimeout(&connect_timeoutsec, &connect_timeoutusec);
+	  sqlrdbh->sqlrcon->getResponseTimeout(&response_timeoutsec, &response_timeoutusec);
+	  connect_timeout = connect_timeoutsec + connect_timeoutusec * 1.0E-6;
+	  response_timeout = response_timeoutsec + response_timeoutusec * 1.0E-6;
+	  bool set_responsetimeout = (connect_timeout >= 0.0) && ((response_timeout < 0.0) || (connect_timeout < response_timeout));
+	  if (set_responsetimeout) {
+	    sqlrdbh->sqlrcon->setResponseTimeout(connect_timeoutsec, connect_timeoutusec);
+	  }
+	  bool identify_ok = sqlrdbh->sqlrcon->identify();
+	  if (!identify_ok) {
+	    const char *error_message = sqlrdbh->sqlrcon->errorMessage();
+	    int64_t error_number = sqlrdbh->sqlrcon->errorNumber();
+
+	    TSRMLS_FETCH();
+	    zend_throw_exception_ex(php_pdo_get_exception(),
+				    0 TSRMLS_CC,
+				    "SQLRelay Connection Failed, errorNumber %ld: %s",
+				    error_number, error_message);
+
+	    delete sqlrdbh->sqlrcon;
+	    sqlrdbh->sqlrcon=NULL;
+	    return 0;
+	  }
+	  if (set_responsetimeout) {
+	    sqlrdbh->sqlrcon->setResponseTimeout(response_timeoutsec, response_timeoutusec);
+	  }
 	}
 
 	if (!charstring::isNullOrEmpty(db)) {
@@ -1541,7 +1680,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	dbh->methods=&sqlrconnectionMethods;
 
 	dbh->is_persistent=0;
-	dbh->auto_commit=0;
+	dbh->auto_commit=autocommit;
 	dbh->is_closed=0;
 	dbh->alloc_own_columns=1;
 	dbh->max_escaped_char_length=2;
@@ -1576,7 +1715,16 @@ static PHP_MINIT_FUNCTION(pdo_sqlrelay) {
 				(long)PDO_SQLRELAY_ATTR_BIND_FORMAT);
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_CURRENT_DB",
 				(long)PDO_SQLRELAY_ATTR_CURRENT_DB);
-
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_CONNECTION_TIMEOUT",
+				(long)PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_RESPONSE_TIMEOUT",
+				(long)PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT);
+        REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_SQLRELAY_VERSION",
+				      (long)PDO_SQLRELAY_ATTR_SQLRELAY_VERSION);
+        REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_RUDIMENTS_VERSION",
+				      (long)PDO_SQLRELAY_ATTR_RUDIMENTS_VERSION);
+        REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_CLIENT_INFO",
+				      (long)PDO_SQLRELAY_ATTR_CLIENT_INFO);
 	return php_pdo_register_driver(&sqlrelayDriver);
 }
 
@@ -1594,6 +1742,12 @@ static PHP_MINFO_FUNCTION(pdo_sqlrelay) {
 	php_info_print_table_start();
 	php_info_print_table_header(2,title.getString(),"enabled");
 	php_info_print_table_row(2,"Client API version",SQLR_VERSION);
+	php_info_print_table_row(2, "Rudiments API version", charstring::rudiments_version());
+#ifdef __DATE__
+#ifdef __TIME__
+	php_info_print_table_row(2, "Compiled", __DATE__ " " __TIME__);
+#endif
+#endif
 	php_info_print_table_end();
 }
 
@@ -1633,7 +1787,7 @@ zend_module_entry pdo_sqlrelay_module_entry = {
 	NULL,
 	NULL,
 	PHP_MINFO(pdo_sqlrelay),
-	"1.0",
+	SQLR_VERSION,
 	STANDARD_MODULE_PROPERTIES
 };
 

@@ -3,6 +3,11 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <sqlrelay/sqlrutil.h>
+#define NEED_IS_BIT_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_CHAR
+#define NEED_IS_FLOAT_TYPE_CHAR
+#define NEED_IS_NONSCALE_FLOAT_TYPE_CHAR
+#include <datatypes.h>
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/filesystem.h>
@@ -21,6 +26,8 @@
 #include <defines.h>
 #include <parsedatetime.h>
 #include <version.h>
+#include <locale.h>
+#include <math.h>
 
 class sqlrshbindvalue {
 	public:
@@ -73,6 +80,9 @@ class sqlrshenv {
 		dictionary<char *, sqlrshbindvalue *>	outputbinds;
 		char		*cacheto;
 		sqlrshformat	format;
+                bool            getasnumber;
+                bool            noelapsed;
+                bool            nextresultset;
 };
 
 sqlrshenv::sqlrshenv() {
@@ -85,6 +95,9 @@ sqlrshenv::sqlrshenv() {
 	inbindpool=new memorypool(512,128,100);
 	cacheto=NULL;
 	format=SQLRSH_FORMAT_PLAIN;
+	getasnumber=false;
+	noelapsed=false;
+        nextresultset=false;
 }
 
 sqlrshenv::~sqlrshenv() {
@@ -887,8 +900,20 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 					sqlrcur->errorNumber());
 			retval=false;
 
+		} else if (env->nextresultset) {
+		  bool process_resultset = true;
+		  while (process_resultset) {
+		    displayHeader(sqlrcur,env);
+		    displayResultSet(sqlrcur,env);
+		    process_resultset = sqlrcur->nextResultSet();
+		    if (sqlrcur->errorMessage()) {
+		      displayError(env,NULL,
+				   sqlrcur->errorMessage(),
+				   sqlrcur->errorNumber());
+		      retval = false;
+		    }
+		  }
 		} else {
-
 			// display the header
 			displayHeader(sqlrcur,env);
 
@@ -1150,6 +1175,8 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	uint32_t	longest;
 	const char	*field;
 	uint32_t	fieldlength;
+	const char	*field_type;
+	char            number_field_buffer[256];
 
 	bool		done=false;
 	for (uint64_t row=0; !done; row++) {
@@ -1164,10 +1191,32 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 					stdoutput.write(' ');
 				}
 			}
-
 			// get the field
 			field=sqlrcur->getField(row,col);
-
+			field_type=sqlrcur->getColumnType(col);
+			// get the field length
+			fieldlength=sqlrcur->getFieldLength(row,col);
+			if ((field != NULL) && env->getasnumber && (isBitTypeChar(field_type) || isNumberTypeChar(field_type))) {
+			  // The purpose of this is to check the functionality of these getFieldAs functions.
+			  if (isFloatTypeChar(field_type)) {
+			    double fd = sqlrcur->getFieldAsDouble(row,col);
+			    if (isNonScaleFloatTypeChar(field_type)) {
+			      int precision = sqlrcur->getColumnPrecision(col);
+			      // here precision is a number of bits, but printf %g wants digits.
+			      int digits = ceil(precision / 3.33);
+			      charstring::printf(&number_field_buffer[0], sizeof(number_field_buffer), "%.*g",digits, fd);
+			    } else {
+			      int scale = sqlrcur->getColumnScale(col);
+			      // NOTE: we are not using the precision to format the number to a string.
+			      charstring::printf(&number_field_buffer[0], sizeof(number_field_buffer), "%.*f",scale,fd);
+			    }
+			  } else {
+			    int64_t fi = sqlrcur->getFieldAsInteger(row,col);
+			    charstring::printf(&number_field_buffer[0], sizeof(number_field_buffer), "%ld", fi);
+			  }
+			  field=&number_field_buffer[0];
+			  fieldlength=charstring::length(field);
+			}
 			// check for end-of-result-set condition
 			// (since nullsasnulls might be set, we have to do 
 			// a bit more than just check for a NULL)
@@ -1177,9 +1226,6 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 				done=true;
 				break;
 			}
-
-			// get the field length
-			fieldlength=sqlrcur->getFieldLength(row,col);
 
 			// handle nulls
 			if (!field) {
@@ -1235,9 +1281,11 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	stdoutput.printf("%lld\n",(long long)sqlrcur->rowCount());
 	stdoutput.printf("	Fields Returned : ");
 	stdoutput.printf("%lld\n",
-			(long long)sqlrcur->rowCount()*sqlrcur->colCount());
-	stdoutput.printf("	Elapsed Time    : ");
-	stdoutput.printf("%.6f sec\n",time);
+			 (long long)sqlrcur->rowCount()*sqlrcur->colCount());
+	if (!env->noelapsed) {
+	  stdoutput.printf("	Elapsed Time    : ");
+	  stdoutput.printf("%.6f sec\n",time);
+	}
 	stdoutput.printf("\n");
 }
 
@@ -1439,7 +1487,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		delete[] value;
 	} else if (charstring::isNumber(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-		bv->doubleval.value=charstring::toFloat(value);
+		bv->doubleval.value=charstring::toFloatC(value);
 		bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
 		bv->doubleval.scale=
 			charstring::findFirst(value,'.')-value+
@@ -1985,6 +2033,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	const char	*tlspassword=cmdline->getValue("tlspassword");
 	const char	*tlsciphers=cmdline->getValue("tlsciphers");
 	const char	*tlsvalidate="no";
+	const char      *locale_argument=cmdline->getValue("locale");
 	if (cmdline->found("tlsvalidate")) {
 		tlsvalidate=cmdline->getValue("tlsvalidate");
 	}
@@ -2010,7 +2059,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 			"        [-tlsvalidate (no|ca|ca+domain|ca+host)] "
 			"[-tlsca ca] [-tlsdepth depth]\n"
 			"        [-script script | -command command] [-quiet] "
-			"[-format (plain|csv)]\n"
+			"[-format (plain|csv)] [-locale (env|name)] [-getasnumber] [-noelapsed] [-nextresultset]\n"
 			"        [-resultsetbuffersize rows]\n"
 			"  or\n"
 			" %ssh [-config config] -id id\n"
@@ -2059,6 +2108,16 @@ bool sqlrsh::execute(int argc, const char **argv) {
 		}
 	}
 
+	if (!charstring::isNullOrEmpty(locale_argument)) {
+	  // This is useful for making sure that the C++ client library works
+	  // when the locale is changed to say, de_DE that has different
+	  // number formats.
+	  char *locale_result = setlocale(LC_ALL, (!charstring::compare(locale_argument, "env")) ? "" : locale_argument);
+	  if (locale_result == NULL) {
+	    stderror.printf("ERROR: setlocale failed\n");
+	    return false;
+	  }
+	}
 	// configure sql relay connection
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
@@ -2090,6 +2149,10 @@ bool sqlrsh::execute(int argc, const char **argv) {
 		env.rsbs=charstring::toInteger(
 				cmdline->getValue("resultsetbuffersize"));
 	}
+
+	env.getasnumber=cmdline->found("getasnumber");
+	env.noelapsed=cmdline->found("noelapsed");
+	env.nextresultset=cmdline->found("nextresultset");
 
 	// process RC files
 	userRcFile(&sqlrcon,&sqlrcur,&env);
@@ -2150,6 +2213,15 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"	-format plain|csv	Format the output as specified.\n"
 		"				Defaults to plain.\n"
+		"\n"
+		"	-locale env|locale_name	calls setlocale(LC_ALL, locale_name).\n"
+		"				env means use LC variables.\n"
+                "\n"
+                "	-getasnumber            calls getFieldAs(Integer|Double) as appropriate\n"
+		"\n"
+                "	-noelapsed              do not print elapsed time\n"
+		"\n"
+                "	-nextresultset          attempt to fetch multiple resultsets\n"
 		"\n"
 		"	-resultsetbuffersize rows\n"
 		"				Fetch result sets using the specified number of\n"

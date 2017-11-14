@@ -261,6 +261,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	incrementGetColumnListCount();
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
+		void    incrementNextResultSetCount(bool);
 		uint32_t	getStatisticsIndex();
 
 
@@ -349,6 +350,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						bool enablefilters,
 						bool enabletriggers);
 		bool	fetchFromBindCursor(sqlrservercursor *cursor);
+		bool	nextResultSet(sqlrservercursor *cursor, bool *next_result_set_available);
 
 		// input bind variables
 		void		setFakeInputBindsForThisQuery(
@@ -795,6 +797,11 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						int16_t *isnull);
 		virtual	bool	outputBind(const char *variable, 
 						uint16_t variablesize,
+						char *value,
+						uint32_t valuesize,
+						int16_t *isnull);
+		virtual	bool	outputBind(const char *variable, 
+						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull);
 		virtual	bool	outputBind(const char *variable, 
@@ -843,6 +850,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual	bool		executeQuery(const char *query,
 							uint32_t length);
 		virtual bool	fetchFromBindCursor();
+		virtual bool    nextResultSet(bool *next_result_set_available);
 		virtual	bool	queryIsNotSelect();
 		virtual	bool	queryIsCommitOrRollback();
 		virtual	void	errorMessage(char *errorbuffer,

@@ -2665,7 +2665,9 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// (make sure to catch @'s but not @@'s)
 			if (*c=='?' ||
 				(*c==':' && *(c+1)!='=') ||
-				(*c=='@' && *(c+1)!='@') ||
+                            // TODO: have a config option for this, what to consider as a bind variable
+                            // This is a wayfair-specific patch.
+                            //	(*c=='@' && *(c+1)!='@') ||
 				*c=='$') {
 				parsestate=IN_BIND;
 				currentbind.clear();
@@ -2685,7 +2687,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// then we're done with the bind variable.  Process it.
 			// Otherwise get the variable itself in another buffer.
 			bool	endofbind=(character::isWhitespace(*c) ||
-						*c==',' || *c==')' || *c==';' ||
+						*c==',' || *c==')' || *c==';' || *c=='=' ||
 						(*c==':' && *(c+1)=='='));
 			if (endofbind || c==endptr) {
 
@@ -5186,6 +5188,16 @@ void sqlrservercontroller::incrementNewQueryCount() {
 	pvt->_connstats->nnewquery++;
 }
 
+void sqlrservercontroller::incrementNextResultSetCount(bool next_result_set_available) {
+	if (!pvt->_connstats) {
+		return;
+	}
+	pvt->_connstats->nnextresultset++;
+	if (next_result_set_available) {
+	  pvt->_connstats->nnextresultsettrue++;
+	}
+}
+
 void sqlrservercontroller::incrementReexecuteQueryCount() {
 	if (!pvt->_connstats) {
 		return;
@@ -5855,6 +5867,31 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 	raiseDebugMessageEvent((success)?"fetching from bind cursor succeeded":
 					"fetching from bind cursor failed");
 	raiseDebugMessageEvent("done fetching from bind cursor");
+
+	return success;
+}
+
+bool sqlrservercontroller::nextResultSet(sqlrservercursor *cursor, bool *next_result_set_available) {
+
+        bool	success=cursor->nextResultSet(next_result_set_available);
+
+	// on failure get the error (unless it's already been set)
+	if (!success && !cursor->getErrorNumber()) {
+		uint32_t	errorlength;
+		int64_t		errnum;
+		bool		liveconnection;
+		errorMessage(cursor,
+				cursor->getErrorBuffer(),
+				pvt->_maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
+		cursor->setErrorLength(errorlength);
+		cursor->setErrorNumber(errnum);
+		cursor->setLiveConnection(liveconnection);
+	}
+
+	raiseDebugMessageEvent((success)?"nextResultSet cursor succeeded":
+					"nextResultSet cursor failed");
+	raiseDebugMessageEvent("done nextResultSet");
 
 	return success;
 }

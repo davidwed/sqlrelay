@@ -1937,6 +1937,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 
 
 static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
+	                         parameterstring  *connparams,
 					SQLCHAR *dsn,
 					SQLSMALLINT dsnlength,
 					SQLCHAR *user,
@@ -1963,17 +1964,46 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	conn->dsn[dsnlength]='\0';
 
 	// get data from dsn
+        // Note from: <gcarrette@wayfair.com>
+	// If the dsn is an empty string then SQLGetPrivateProfileString
+        // will fetch the first matching fields it can find from any DSN
+	// This can be very confusing but not worth fixing yet.
+	// If there is a non-null connparams then we also get information from
+	// that. The syntax supported by parameterstring is not exactly
+	// what is expected in an ODBC connection string, which is case
+	// insensitive and also supports brackets, but we could fix that
+	// easily enough in rudiments, and also clean up calling code that works
+	// around the lack of case sensitivity.
+        
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Server","",
-					conn->server,sizeof(conn->server),
+	                                conn->server,sizeof(conn->server),
 					ODBC_INI);
+	if (connparams != NULL) {
+	  const char *conn_server = connparams->getValue("Server");
+	  if (conn_server != NULL) {
+	   charstring::safeCopy(conn->server,sizeof(conn->server),conn_server);
+	}}
+	  
 	char	portbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Port","",
 					portbuf,sizeof(portbuf),
 					ODBC_INI);
 	conn->port=(uint16_t)charstring::toUnsignedInteger(portbuf);
+	if (connparams != NULL) {
+	  const char *conn_port = connparams->getValue("Port");
+	  if (conn_port != NULL) {
+	    conn->port=(uint16_t)charstring::toUnsignedInteger(conn_port);
+	}}
+
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Socket","",
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
+	if (connparams != NULL) {
+	  const char *conn_socket = connparams->getValue("Socket");
+	  if (conn_socket != NULL) {
+	    charstring::safeCopy(conn->socket,sizeof(conn->socket),conn_socket);
+	}}
+	
 	if (!charstring::isNullOrEmpty(user)) {
 		if (userlength==SQL_NTS) {
 			userlength=charstring::length(user);
@@ -2013,14 +2043,26 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					retrytimebuf,sizeof(retrytimebuf),
 					ODBC_INI);
 	conn->retrytime=(int32_t)charstring::toInteger(retrytimebuf);
+	if (connparams != NULL) {
+	  const char *conn_retrytime = connparams->getValue("RetryTime");
+	  if (conn_retrytime != NULL) {
+	    conn->retrytime=(int32_t)charstring::toInteger(conn_retrytime);
+	}}
+
+	
 	char	triesbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Tries","1",
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
-
+	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+	if (connparams != NULL) {
+	  const char *conn_tries = connparams->getValue("Tries");
+	  if (conn_tries != NULL) {
+	    conn->tries=(int32_t)charstring::toInteger(conn_tries);
+	}}
 
 	// krb options
-	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","0",
 					conn->krb,sizeof(conn->krb),
 					ODBC_INI);
@@ -2077,11 +2119,23 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					conn->db,sizeof(conn->db),
 					ODBC_INI);
 
+	if (connparams != NULL) {
+	  const char *conn_db = connparams->getValue("Db");
+	  if (conn_db != NULL) {
+	    charstring::safeCopy(conn->db,sizeof(conn->db),conn_db);
+	}}
+
 	// flags
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Debug","0",
 					conn->debug,
 					sizeof(conn->debug),
 					ODBC_INI);
+	if (connparams != NULL) {
+	  const char *conn_debug = connparams->getValue("Debug");
+	  if (conn_debug != NULL) {
+	    charstring::safeCopy(conn->debug,sizeof(conn->debug),conn_debug);
+	}}
+	
 	SQLGetPrivateProfileString((const char *)conn->dsn,
 					"ColumnNameCase","mixed",
 					conn->columnnamecase,
@@ -2116,6 +2170,12 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					sizeof(lazyconnectbuf),
 					ODBC_INI);
 	conn->lazyconnect=!charstring::isNo(lazyconnectbuf);
+
+	if (connparams != NULL) {
+	  const char *conn_lazyconnect = connparams->getValue("LazyConnect");
+	  if (conn_lazyconnect != NULL) {
+	    conn->lazyconnect=!charstring::isNo(conn_lazyconnect);
+	}}
 
 	debugPrintf("  DSN: %s\n",conn->dsn);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
@@ -2207,7 +2267,7 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 					SQLCHAR *password,
 					SQLSMALLINT passwordlength) {
 	debugFunction();
-	return SQLR_SQLConnect(connectionhandle,dsn,dsnlength,
+	return SQLR_SQLConnect(connectionhandle,NULL,dsn,dsnlength,
 				user,userlength,password,passwordlength);
 }
 
@@ -2378,7 +2438,7 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 					SQLSMALLINT bufferlength,
 					SQLSMALLINT *textlength);
 
-SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
+SQLRETURN SQL_API DISABLE_SQLError(SQLHENV environmenthandle,
 					SQLHDBC connectionhandle,
 					SQLHSTMT statementhandle,
 					SQLCHAR *sqlstate,
@@ -3561,7 +3621,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_FLOAT\n");
 			if (targetvalue) {
 				*((float *)targetvalue)=
-					(float)charstring::toFloat(field);
+					(float)charstring::toFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((float *)targetvalue));
 			}
@@ -3570,7 +3630,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_DOUBLE\n");
 			if (targetvalue) {
 				*((double *)targetvalue)=
-					(double)charstring::toFloat(field);
+					(double)charstring::toFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((double *)targetvalue));
 			}
@@ -4170,8 +4230,8 @@ static SQLRETURN SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLERROR:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLERROR "
-				"- true\n");
-			*supported=SQL_TRUE;
+				"- false\n");
+			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLEXECDIRECT:
 			debugPrintf("  functionid: "
@@ -7183,13 +7243,18 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	// clean up
 	delete[] nulltermconnstr;
 
-	// the dsn must be valid
-	if (charstring::isNullOrEmpty(dsn)) {
-		return SQL_ERROR;
-	}
+	if ((dsn == NULL) && (pstr.getValue("Server") != NULL)) {
+          // provide a way to force SQLGetPrivateProfileString to use the default value,
+          // or for a user to define such defaults in the odbc.ini file.
+          dsn = "SQLRELAY_DEFAULT";
+        } else if (charstring::isNullOrEmpty(dsn)) {
+          // the dsn must be valid
+          return SQL_ERROR;
+        }
 
 	// connect
 	return SQLR_SQLConnect(hdbc,
+	                       &pstr,
 				(SQLCHAR *)dsn,
 				charstring::length(dsn),
 				(SQLCHAR *)uid,

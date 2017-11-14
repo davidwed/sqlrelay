@@ -33,6 +33,11 @@ static void helpmessage(const char *progname) {
 		"\n"
 		"Options:\n"
 		SERVEROPTIONS
+                "	-short                   output just one line with key=value space delimited\n"
+		"\n"
+		"	-connection-detail       show detail for each connection\n"
+		"\n"
+		"	-query                   include last query in connection detail\n"
 		"\n"
 		"Examples:\n"
 		"\n"
@@ -49,8 +54,24 @@ static void helpmessage(const char *progname) {
 		progname,SQL_RELAY,progname,progname,progname,progname);
 }
 
+static const char *sqlrconnectionstate_str (sqlrconnectionstate_t s) {
+  if (s == NOT_AVAILABLE) return("NOT_AVAILABLE");
+  if (s == INIT) return("INIT");
+  if (s == WAIT_FOR_AVAIL_DB) return("WAIT_FOR_AVAIL_DB");
+  if (s == WAIT_CLIENT) return("WAIT_CLIENT");
+  if (s == SESSION_START) return("SESSION_START");
+  if (s == GET_COMMAND) return("GET_COMMAND");
+  if (s == PROCESS_SQL) return("PROCESS_SQL");
+  if (s == PROCESS_CUSTOM) return("PROCESS_CUSTOM");
+  if (s == RETURN_RESULT_SET) return("RETURN_RESULT_SET");
+  if (s == SESSION_END) return("SESSION_END");
+  if (s == ANNOUNCE_AVAILABILITY) return("ANNOUNCE_AVAILABILITY");
+  if (s == WAIT_SEMAPHORE) return("WAIT_SEMAPHORE");
+  return("undefined");
+}
+
+
 int main(int argc, const char **argv) {
-stdoutput.printf("sizeof(sqlrshm)=%d\n",sizeof(struct sqlrshm));
 
 	version(argc,argv);
 	help(argc,argv);
@@ -58,6 +79,12 @@ stdoutput.printf("sizeof(sqlrshm)=%d\n",sizeof(struct sqlrshm));
 	// parse the command line
 	sqlrcmdline	cmdl(argc,argv);
 
+	bool short_output = cmdl.found("-short");
+	bool conn_output = cmdl.found("-connection-detail");
+	bool query_output = cmdl.found("-query");
+	if (!short_output) {
+	  stdoutput.printf("sizeof(sqlrshm)=%d\n",sizeof(struct sqlrshm));
+	}
 	const char	*id=cmdl.getValue("-id");
 	if (charstring::isNullOrEmpty(id)) {
 		stdoutput.printf("usage:\n"
@@ -105,6 +132,28 @@ stdoutput.printf("sizeof(sqlrshm)=%d\n",sizeof(struct sqlrshm));
 	int32_t	sem[SEM_COUNT];
 	for (uint16_t i=0; i<SEM_COUNT; i++) {
 		sem[i]=semset.getValue(i);
+	}
+
+	if (short_output) {
+	  // print out key=value pairs on one line for easier reading by other programs such as zabbix
+	  stdoutput.printf("enabled=%d "
+			   "open_database_connections=%d opened_database_connections=%d "
+			   "open_database_cursors=%d opened_database_cursors=%d "
+			   "open_client_connections=%d opened_client_connections=%d "
+			   "new_cursor_used=%d cursor_reused=%d "
+			   "total_queries=%d total_errors=%d\n",
+			   !statistics.disabled,
+			   statistics.open_db_connections, 
+			   statistics.opened_db_connections,
+			   statistics.open_db_cursors,
+			   statistics.opened_db_cursors,
+			   statistics.open_cli_connections, 
+			   statistics.opened_cli_connections,
+			   statistics.times_new_cursor_used,
+			   statistics.times_cursor_reused,
+			   statistics.total_queries,
+			   statistics.total_errors);
+	  process::exit(0);
 	}
 
 	// print out stats
@@ -192,5 +241,107 @@ stdoutput.printf("sizeof(sqlrshm)=%d\n",sizeof(struct sqlrshm));
 		sem[10],sem[11],sem[12]
 		);
 
+	if (conn_output) {
+	  long j;
+	  long conn_dim = sizeof(statistics.connstats) / sizeof(struct sqlrconnstatistics);
+	  sqlrconnstatistics *conn  = &statistics.connstats[0];
+	  stdoutput.printf("\n");
+	  stdoutput.printf("Info for max=%ld connections id=%s\n\n", conn_dim, &statistics.connectionid[0]);
+	  for(j=0; j < conn_dim; ++j) {
+	    if (conn[j].state != NOT_AVAILABLE) {
+	      // print out multiple lines, a cross between ease of human readability
+	      // and potentially automated parsing.
+	      stdoutput.printf("%ld: pid=%d state=%s (%d) nconnect=%d nauth=%d nsuspend=%d nend=%d nrelogin=%d loggedinsec=%d statestartsec=%d clientsessionsec=%d\n",
+			       j, conn[j].processid,
+			       sqlrconnectionstate_str(conn[j].state), conn[j].state,
+			       conn[j].nconnect,
+			       conn[j].nauth,
+			       conn[j].nsuspend_session,
+			       conn[j].nend_session,
+			       conn[j].nrelogin,
+			       conn[j].loggedinsec,
+			       conn[j].statestartsec,
+			       conn[j].clientsessionsec);
+	      // elsewhere in the code the strings are treated as zero terminated.
+	      stdoutput.printf(" clientinfo=%s clientaddr=%s user=%s\n",
+			       &conn[j].clientinfo[0],
+			       &conn[j].clientaddr[0],
+			       &conn[j].user[0]);
+	      stdoutput.printf(" nautocommit=%d nbegin=%d ncommit=%d nrollback=%d ndbversion=%d nbindformat=%d nserverversion=%d nselectdatabase=%d\n",
+			       conn[j].nautocommit,
+			       conn[j].nbegin,
+			       conn[j].ncommit,
+			       conn[j].nrollback,
+			       conn[j].ndbversion,
+			       conn[j].nbindformat,
+			       conn[j].nserverversion,
+			       conn[j].nselectdatabase);
+	      stdoutput.printf(" ngetcurrentdatabase=%d ngetlastinsertid=%d ngettablelist=%d ngetcolumnlist=%d ngetquerytree=%d\n",
+			       conn[j].ngetcurrentdatabase,
+			       conn[j].ngetlastinsertid,
+			       conn[j].ngettablelist,
+			       conn[j].ngetcolumnlist,
+			       conn[j].ngetquerytree);
+	      stdoutput.printf(" ndbhostname=%d ndbipaddress=%d nfetchfrombindcursor=%d nfetchresultset=%d nabortresultset=%d nsuspendresultset=%d nresumeresultset=%d ngetdblist=%d\n",
+			       conn[j].ndbhostname,
+			       conn[j].ndbipaddress,
+			       conn[j].nfetchfrombindcursor,
+			       conn[j].nfetchresultset,
+			       conn[j].nabortresultset,
+			       conn[j].nsuspendresultset,
+			       conn[j].nresumeresultset,
+			       conn[j].ngetdblist);
+	      stdoutput.printf(" nping=%d nidentify=%d nnewquery=%d nreexecutequery=%d nsql=%d ncustomsql=%d nnextresultset=%d nnextresultsettrue=%d\n",
+			       conn[j].nping,
+			       conn[j].nidentify,
+			       conn[j].nnewquery,
+			       conn[j].nreexecutequery,
+			       conn[j].nsql,
+			       conn[j].ncustomsql,
+			       conn[j].nnextresultset,
+			       conn[j].nnextresultsettrue
+			       );
+	      // we could use the stdoutput.safePrint operation on this string,
+	      // but to take up as little space as possible we want to compress whitespace
+	      // and just ignore non-ascii characters, which is not the right thing, but
+	      // in practice is ok in many environments.
+	      if (query_output) {
+		stdoutput.printf("\n");
+		bool prev_space = true;
+		bool prev_newline = true;
+		size_t k;
+		for (k=0; k < sizeof(conn[j].sqltext); ++k) {
+		  int c = conn[j].sqltext[k];
+		  if (c == 0) {
+		    break;
+		  } else if ((c == '\t') || (c == ' ')) {
+		    if (!prev_space) {
+		      stdoutput.write((char) ' ');
+		      prev_space = true;
+		    }
+		    prev_newline = false;
+		  } else if ((c > ' ') && (c < 128)) {
+		    prev_space = false;
+		    prev_newline = false;
+		    stdoutput.write((char) c);
+		  } else if (c == '\n') {
+		    if (!prev_newline) {
+		      stdoutput.write((char) c);
+		      prev_newline = true;
+		    }
+		    prev_space = true;
+		  }
+		}
+		if (k > 0) {
+		  if (!prev_newline) {
+		    stdoutput.printf("\n");
+		  }
+		  stdoutput.printf("\n");
+		}
+	      }
+	    }
+	  }
+	}
 	process::exit(0);
 }
+

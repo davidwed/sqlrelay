@@ -449,6 +449,18 @@ static bool isFloatTypeChar(const char *type) {
 }
 #endif
 
+#ifdef NEED_IS_NONSCALE_FLOAT_TYPE_CHAR
+static bool isNonScaleFloatTypeChar(const char *type) {
+  return (!charstring::compareIgnoringCase(type,"REAL") ||
+	  !charstring::compareIgnoringCase(type,"FLOAT") ||
+	  !charstring::compareIgnoringCase(type,"DOUBLE") ||
+	  !charstring::compareIgnoringCase(type,"D_FLOAT") ||
+	  !charstring::compareIgnoringCase(type,"DOUBLE PRECISION") ||
+	  !charstring::compareIgnoringCase(type,"FLOAT4") ||
+	  !charstring::compareIgnoringCase(type,"FLOAT8"));
+}
+#endif
+
 #ifdef NEED_BIT_STRING_TO_LONG
 static int32_t bitStringToLong(const char *str) {
 	uint32_t	result=0;
@@ -507,7 +519,8 @@ static bool isNumberTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"_FLOAT8") ||
 		!charstring::compareIgnoringCase(type,"_TINTERVAL") ||
 		!charstring::compareIgnoringCase(type,"INTERVAL") ||
-		!charstring::compareIgnoringCase(type,"_INTERVAL"));
+		!charstring::compareIgnoringCase(type,"_INTERVAL") ||
+		!charstring::compareIgnoringCase(type,"NUMERIC"));
 }
 #endif
 

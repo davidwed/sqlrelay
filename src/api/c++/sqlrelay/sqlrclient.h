@@ -36,27 +36,42 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 
 
 		/** Sets the server connect timeout in seconds and
-		 *  milliseconds.  Setting either parameter to -1 disables the
+		 *  microseconds.  Setting either parameter to -1 disables the
 		 *  timeout.  You can also set this timeout using the
 		 *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
 		void	setConnectTimeout(int32_t timeoutsec,
 						int32_t timeoutusec);
 
 		/** Sets the authentication timeout in seconds and
-		 *  milliseconds.  Setting either parameter to -1 disables the
+		 *  microseconds.  Setting either parameter to -1 disables the
 		 *  timeout.   You can also set this timeout using the
 		 *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
 		void	setAuthenticationTimeout(int32_t timeoutsec,
 							int32_t timeoutusec);
 
 		/** Sets the response timeout (for queries, commits, rollbacks,
-		 *  pings, etc.) in seconds and milliseconds.  Setting either
+		 *  pings, etc.) in seconds and microseconds.  Setting either
 		 *  parameter to -1 disables the timeout.  You can also set
 		 *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
 		 *  environment variable. */
 		void	setResponseTimeout(int32_t timeoutsec,
 						int32_t timeoutusec);
 
+
+		/** Gets the server connect timeout in seconds and
+		 *  microseconds. */
+		void	getConnectTimeout(int32_t *timeoutsec,
+						int32_t *timeoutusec);
+
+		/** Gets the authentication timeout in seconds and
+		 *  microseconds. */
+		void	getAuthenticationTimeout(int32_t *timeoutsec,
+							int32_t *timeoutusec);
+
+		/** Gets the response timeout in seconds and
+		 *  microseconds. */
+		void	getResponseTimeout(int32_t *timeoutsec,
+						int32_t *timeoutusec);
 
 
 		/** Enables Kerberos authentication and encryption.
@@ -708,7 +723,11 @@ class SQLRCLIENT_DLLSPEC sqlrcursor {
 		 *  setResultSetBufferSize() has been called
 		 *  with a parameter other than 0. */
 		bool		endOfResultSet();
-		
+
+		/** Returns true and acts like executeQuery()
+		 *  when there is another result set available
+		 *  from the server. */
+		bool		nextResultSet();
 		
 
 		/** If a query failed and generated an error, 

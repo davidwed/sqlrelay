@@ -1,6 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
+#include <config.h>
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 //#define DEBUG_MESSAGES 1
@@ -22,6 +23,7 @@ class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdgstat : public sqlrquery {
 
 #define GSTAT_KEY_LEN	40
 #define GSTAT_VALUE_LEN	40
+#define GSTAT_ROW_COUNT_MAX 60
 
 struct gs_result_row {
 	char	key[GSTAT_KEY_LEN+1];
@@ -59,7 +61,7 @@ class sqlrquery_sqlrcmdgstatcursor : public sqlrquerycursor {
 		uint64_t	rowcount;
 		uint64_t	currentrow;
 
-		gs_result_row	gs_resultset[60];
+		gs_result_row	gs_resultset[GSTAT_ROW_COUNT_MAX];
 
 };
 
@@ -203,13 +205,20 @@ bool sqlrquery_sqlrcmdgstatcursor::executeQuery(const char *query,
 	strftime(tmpbuf,GSTAT_VALUE_LEN,"%Y/%m/%d %H:%M:%S",
 			localtime(&(gs->peak_connectedclients_1min_time)));
 	setGSResult("peak_session_1min_time",tmpbuf,rowcount++);
-
+#ifdef __DATE__
+#ifdef __TIME__
+	setGSResult("module_compiled", __DATE__ " " __TIME__, rowcount++);
+#endif
+#endif
+	setGSResult("sqlr_version",SQLR_VERSION,rowcount++);
+	setGSResult("rudiments_version",charstring::rudiments_version(),rowcount++);
 	currentrow=0;
 	return true;
 }
 
 void sqlrquery_sqlrcmdgstatcursor::setGSResult(const char *key,
 						int32_t value, uint16_t i) {
+        if (i >= GSTAT_ROW_COUNT_MAX) return;
 	charstring::copy(gs_resultset[i].key,key,GSTAT_KEY_LEN);
 	gs_resultset[i].key[GSTAT_KEY_LEN]='\0';
 	charstring::printf(gs_resultset[i].value,GSTAT_VALUE_LEN,"%d",value);
@@ -218,6 +227,7 @@ void sqlrquery_sqlrcmdgstatcursor::setGSResult(const char *key,
 
 void sqlrquery_sqlrcmdgstatcursor::setGSResult(const char *key,
 						const char *value, uint16_t i) {
+        if (i >= GSTAT_ROW_COUNT_MAX) return;
 	charstring::copy(gs_resultset[i].key,key,GSTAT_KEY_LEN);
 	gs_resultset[i].key[GSTAT_KEY_LEN]='\0';
 	charstring::copy(gs_resultset[i].value,value,GSTAT_VALUE_LEN);
@@ -278,6 +288,13 @@ void sqlrquery_sqlrcmdgstatcursor::getField(uint32_t col,
 						uint64_t *fieldlength,
 						bool *blob,
 						bool *null) {
+        if ((currentrow - 1) >= GSTAT_ROW_COUNT_MAX) {
+	  *field=NULL;
+	  *fieldlength=0;
+	  *blob=false;
+	  *null=true;
+	  return;
+	}
 	if (col==0) {
 		*field=gs_resultset[currentrow-1].key;
 	} else if (col==1) {
