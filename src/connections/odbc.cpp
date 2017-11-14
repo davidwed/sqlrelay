@@ -2539,6 +2539,12 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
+	// FIXME:
+	// Data isn't written to the output bind buffers (at least with the
+	// Microsoft ODBC Driver) until SQLMoreResults() returns SQL_NO_DATA. 
+	// So if there are any output results pending, this work is being done
+	// too soon.
+
 	// convert date output binds and copy out isnulls
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
@@ -2556,6 +2562,25 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		}
 		if (outisnullptr[i]) {
 			*(outisnullptr[i])=outisnull[i];
+			// FIXME: get these to work
+			/*if (outisnull[i]==SQL_NO_TOTAL) {
+				// This is most likely caused by the fact that
+				// we should be using SQL_C_WCHAR and SQL_WCHAR
+				// instead of forcing ODBC to do the conversion
+				// for us.   In a work-around we just kludge
+				// away the space with padding.
+				// Work-around in SQL: return only varchar, not 
+				// varchar.
+				char	*valuep=sb->value;
+				for (int k=(sb->BufferLength-2);
+					k>=0 && valuep[k]==' ';k--) {
+					valuep[k]=0;
+				}
+			} else if (outisnull[i]>=0 &&
+					outisnull[i]<sb->BufferLength) {
+				// forcibly null-terminate the buffer
+				sb->value[outisnull[i]]=0;
+			}*/
 		}
 	}
 
@@ -3095,7 +3120,21 @@ bool odbccursor::nextResultSet(bool *nextresultsetavailable) {
 }
 
 void odbccursor::closeResultSet() {
-	//SQLCloseCursor(stmt);
+
+	/* FIXME:  This code originally just called SQLCloseCursor(stmt) but
+	 * that caused and "Invalid cursor state" error at the next
+	 * SQLExecute().
+	 * George Carrette suggests wrapping it in the "if (stmt)".  I think I
+	 * tried that before too, but I'm not sure.
+	 * For now this is commented out, but it needs to be revisited. */
+	/*if (stmt) {
+		SQLCloseCursor(stmt);
+		// The msdn.microsoft.com documentation says that this call
+		// is equivalent to SQLFreeStmt with SQL_CLOSE.  If so, then
+		// we should be able to set stmt to NULL here.  But, if we do,
+		// then we get SQLExecute.c][170]Error: SQL_INVALID_HANDLE.
+		// So apparently the microsoft documentation is wrong.
+	}*/
 
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
